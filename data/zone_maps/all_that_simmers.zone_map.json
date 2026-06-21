@@ -1,0 +1,95 @@
+{
+  "schemaVersion": "verdance-zone-map/0.1",
+  "mapId": "all_that_simmers",
+  "mapName": "All That Simmers",
+  "coordinateSystem": "normalized_to_elmos",
+  "authoringStatus": "draft_hand_authored_v0_1",
+  "notes": "First playable draft. Bounds are normalized fractions of Game.mapSizeX/mapSizeZ and should be adjusted after visual inspection in BAR.",
+  "zones": [
+    {
+      "zoneId": "ATS_CENTER",
+      "label": "Armada Center Hold",
+      "role": "armada_dominated_center",
+      "shape": "rect",
+      "bounds": {
+        "xMin": 0.32,
+        "xMax": 0.68,
+        "zMin": 0.28,
+        "zMax": 0.72
+      },
+      "tags": [
+        "center",
+        "armada",
+        "primary_objective"
+      ]
+    },
+    {
+      "zoneId": "ATS_WEST_FORWARD",
+      "label": "Ashwalker West Forward Base",
+      "role": "ashwalker_forward_base",
+      "shape": "rect",
+      "bounds": {
+        "xMin": 0.0,
+        "xMax": 0.32,
+        "zMin": 0.16,
+        "zMax": 0.84
+      },
+      "tags": [
+        "side",
+        "ashwalker",
+        "forward_base"
+      ]
+    },
+    {
+      "zoneId": "ATS_EAST_FORWARD",
+      "label": "Ashwalker East Forward Base",
+      "role": "ashwalker_forward_base",
+      "shape": "rect",
+      "bounds": {
+        "xMin": 0.68,
+        "xMax": 1.0,
+        "zMin": 0.16,
+        "zMax": 0.84
+      },
+      "tags": [
+        "side",
+        "ashwalker",
+        "forward_base"
+      ]
+    },
+    {
+      "zoneId": "ATS_NORTH_APPROACH",
+      "label": "Northern Canopy Approach",
+      "role": "approach_lane",
+      "shape": "rect",
+      "bounds": {
+        "xMin": 0.18,
+        "xMax": 0.82,
+        "zMin": 0.0,
+        "zMax": 0.28
+      },
+      "tags": [
+        "approach",
+        "canopy",
+        "flank"
+      ]
+    },
+    {
+      "zoneId": "ATS_SOUTH_APPROACH",
+      "label": "Southern Swamp Approach",
+      "role": "approach_lane",
+      "shape": "rect",
+      "bounds": {
+        "xMin": 0.18,
+        "xMax": 0.82,
+        "zMin": 0.72,
+        "zMax": 1.0
+      },
+      "tags": [
+        "approach",
+        "swamp",
+        "flank"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+﻿{
+    "schemaVersion":  "0.7.1",
+    "barDataRoot":  "C:\\Users\\Luke Spooner\\AppData\\Local\\Programs\\Beyond-All-Reason\\data",
+    "barSdd":  "C:\\Users\\Luke Spooner\\AppData\\Local\\Programs\\Beyond-All-Reason\\data\\games\\BAR.sdd",
+    "workspace":  "C:\\Users\\Luke Spooner\\Documents\\BAR_Verdance_Workspace",
+    "infolog":  "C:\\Users\\Luke Spooner\\AppData\\Local\\Programs\\Beyond-All-Reason\\data\\infolog.txt",
+    "seedDestination":  "C:\\Users\\Luke Spooner\\AppData\\Local\\Programs\\Beyond-All-Reason\\data\\games\\BAR.sdd\\singleplayer\\verdance_ashes\\generated\\va_current.lua",
+    "resultInbox":  "C:\\Users\\Luke Spooner\\Documents\\BAR_Verdance_Workspace\\inbox\\latest_va_result.json",
+    "campaignState":  "C:\\Users\\Luke Spooner\\Documents\\BAR_Verdance_Workspace\\state\\campaign_state.json",
+    "seedOutbox":  "C:\\Users\\Luke Spooner\\Documents\\BAR_Verdance_Workspace\\outbox\\va_current.lua",
+    "processedLedger":  "C:\\Users\\Luke Spooner\\Documents\\BAR_Verdance_Workspace\\ledger\\processed_results.json",
+    "zoneMap":  "C:\\Users\\Luke Spooner\\Documents\\BAR_Verdance_Workspace\\data\\zone_maps\\all_that_simmers.zone_map.json",
+    "exportDir":  "C:\\Users\\Luke Spooner\\Documents\\BAR_Verdance_Workspace\\export"
+}

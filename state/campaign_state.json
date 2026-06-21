@@ -1,0 +1,64 @@
+﻿{
+    "schemaVersion":  "0.5",
+    "campaignId":  "verdance_ashes",
+    "missionNumber":  3,
+    "currentMissionId":  "va_003",
+    "pathSignal":  "B",
+    "graph":  {
+                  "q0_armada_cortex":  0.23,
+                  "q2_void_structure":  0.15,
+                  "q3_biogenesis_memory":  0.28,
+                  "q4_ai_human":  0.72,
+                  "q6_contested":  0.73,
+                  "q6_independent":  0.33999999999999997,
+                  "q7_scarcity":  0.98
+              },
+    "reputation":  {
+                       "armada":  34,
+                       "cortex":  18,
+                       "clans":  66,
+                       "nullmercs":  47,
+                       "sev":  56
+                   },
+    "economy":  {
+                    "metalIncome":  18,
+                    "energyIncome":  42,
+                    "buildPower":  75
+                },
+    "companion":  {
+                      "id":  "ketha_rhekk_line",
+                      "displayName":  "Ketha of Rhekk\u0027s Line",
+                      "unitDefName":  "armwar",
+                      "xp":  0.504,
+                      "morale":  80,
+                      "loyalty":  85,
+                      "stress":  6,
+                      "autonomy":  0.35,
+                      "commandMode":  "hybrid",
+                      "alive":  true
+                  },
+    "history":  [
+                    {
+                        "time":  "2026-06-19T02:23:01",
+                        "missionId":  "va_001",
+                        "status":  "victory",
+                        "pathSignal":  "B",
+                        "holdFrames":  600,
+                        "requiredFrames":  600,
+                        "q6_contested":  0.79,
+                        "q6_independent":  0.29,
+                        "companionXp":  0.424
+                    },
+                    {
+                        "time":  "2026-06-19T02:25:15",
+                        "missionId":  "va_002",
+                        "status":  "victory",
+                        "pathSignal":  "B",
+                        "holdFrames":  100269,
+                        "requiredFrames":  750,
+                        "q6_contested":  0.73,
+                        "q6_independent":  0.33999999999999997,
+                        "companionXp":  0.504
+                    }
+                ]
+}
