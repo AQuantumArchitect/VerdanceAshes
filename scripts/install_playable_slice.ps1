@@ -2,6 +2,8 @@ param(
   [string]$Workspace = "$env:USERPROFILE\Documents\BAR_Verdance_Workspace",
   [switch]$Launch,
   [switch]$Headless,
+  [switch]$SaveGame,
+  [string]$SaveName = "verdance_playable_ats_001",
   [int]$TimeoutSeconds = 90
 )
 
@@ -15,7 +17,11 @@ New-Item -ItemType Directory -Force -Path $runRoot | Out-Null
 $mapName = "All That Simmers v1.1.1"
 $mapSizeX = 7168
 $mapSizeZ = 10240
-$debugCommands = if ($Headless) {
+$runHeadless = $Headless -or $SaveGame
+if ($SaveGame -and $TimeoutSeconds -eq 90) { $TimeoutSeconds = 240 }
+$debugCommands = if ($SaveGame) {
+  "90:luarules vazones|120:luarules vastatus|180:savegame $SaveName|1200:quitforce"
+} elseif ($Headless) {
   "90:luarules vazones|120:luarules vastatus|600:quitforce"
 } else {
   "90:luarules vazones|120:luarules vastatus"
@@ -331,13 +337,13 @@ Write-Host "Installed playable mission seed to BAR: $($config.seedDestination)"
 Write-Host "Installed zone map to BAR: $zoneMapDestination"
 Write-Host "Wrote playable startscript: $startScriptPath"
 
-$engineName = if ($Headless) { "spring-headless.exe" } else { "spring.exe" }
+$engineName = if ($runHeadless) { "spring-headless.exe" } else { "spring.exe" }
 $engine = Join-Path $config.barDataRoot "engine\recoil_2025.06.24\$engineName"
 if (!(Test-Path $engine)) { throw "$engineName not found at $engine" }
 
-if ($Launch -or $Headless) {
+if ($Launch -or $runHeadless) {
   $args = @("--write-dir", $config.barDataRoot, "--only-local", $startScriptPath)
-  if ($Headless) {
+  if ($runHeadless) {
     $psi = [System.Diagnostics.ProcessStartInfo]::new()
     $psi.FileName = $engine
     $psi.WorkingDirectory = $config.barDataRoot
@@ -359,6 +365,23 @@ if ($Launch -or $Headless) {
     }
     Write-Host "spring-headless exit code: $($proc.ExitCode)"
     if ($proc.ExitCode -ne 0) { throw "spring-headless exited with code $($proc.ExitCode). Check $($config.infolog)" }
+    if ($SaveGame) {
+      $saveDir = Join-Path $config.barDataRoot "Saves"
+      $saveGamePath = Join-Path $saveDir "$SaveName.ssf"
+      $saveMetaPath = Join-Path $saveDir "$SaveName.lua"
+      $manifestPath = Join-Path $runRoot "latest_savegame_path.txt"
+      if (!(Test-Path $saveGamePath)) { throw "Expected savegame was not created at $saveGamePath. Check $($config.infolog)" }
+      if (!(Test-Path $saveMetaPath)) { Write-Warning "Save metadata was not created at $saveMetaPath. The .ssf exists, but BAR's load menu may not list it cleanly." }
+      @(
+        "saveName=$SaveName",
+        "saveGamePath=$saveGamePath",
+        "saveMetaPath=$saveMetaPath",
+        "startScriptPath=$startScriptPath",
+        "infolog=$($config.infolog)"
+      ) | Set-Content -Encoding ASCII -Path $manifestPath
+      Write-Host "Created BAR savegame: $saveGamePath"
+      Write-Host "Wrote savegame manifest: $manifestPath"
+    }
   } else {
     Start-Process -FilePath $engine -WorkingDirectory $config.barDataRoot -ArgumentList $args
     Write-Host "Launched visible BAR/Recoil process."
