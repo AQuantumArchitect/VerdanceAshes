@@ -20,7 +20,7 @@ $mapSizeZ = 10240
 $runHeadless = $Headless -or $SaveGame
 if ($SaveGame -and $TimeoutSeconds -eq 90) { $TimeoutSeconds = 240 }
 $debugCommands = if ($SaveGame) {
-  "90:luarules vazones|120:luarules vastatus|180:savegame $SaveName|1200:quitforce"
+  "90:luarules vazones|120:luarules vastatus|180:savegame $SaveName"
 } elseif ($Headless) {
   "90:luarules vazones|120:luarules vastatus|600:quitforce"
 } else {
@@ -90,9 +90,8 @@ return {
         base = { x = 0.16, z = 0.18 },
         groups = {
           { id = "clans_base", units = {
-            { unitDefName = "legcom", count = 1, dx = 0, dz = 0, spacing = 80 },
             { unitDefName = "legck", count = 2, dx = 140, dz = 40, spacing = 90 },
-            { unitDefName = "legmex", count = 3, dx = -160, dz = 120, spacing = 120 },
+            { unitDefName = "legmex", count = 3, atMetalSpots = true, dx = -160, dz = 120, spacing = 120 },
             { unitDefName = "legwin", count = 4, dx = 120, dz = 180, spacing = 90 },
             { unitDefName = "legsolar", count = 2, dx = 260, dz = 120, spacing = 100 },
             { unitDefName = "leglht", count = 3, dx = -120, dz = -140, spacing = 130 },
@@ -109,8 +108,7 @@ return {
         base = { x = 0.80, z = 0.18 },
         groups = {
           { id = "armada_bastion", units = {
-            { unitDefName = "armcom", count = 1, dx = 0, dz = 0, spacing = 80 },
-            { unitDefName = "armmex", count = 3, dx = -160, dz = 120, spacing = 120 },
+            { unitDefName = "armmex", count = 3, atMetalSpots = true, dx = -160, dz = 120, spacing = 120 },
             { unitDefName = "armwin", count = 5, dx = 130, dz = 120, spacing = 85 },
             { unitDefName = "armsolar", count = 3, dx = 240, dz = -20, spacing = 90 },
             { unitDefName = "armllt", count = 5, dx = -180, dz = -180, spacing = 120 },
@@ -142,8 +140,7 @@ return {
         base = { x = 0.82, z = 0.82 },
         groups = {
           { id = "cortex_island", units = {
-            { unitDefName = "corcom", count = 1, dx = 0, dz = 0, spacing = 80 },
-            { unitDefName = "cormex", count = 3, dx = -120, dz = -100, spacing = 120 },
+            { unitDefName = "cormex", count = 3, atMetalSpots = true, dx = -120, dz = -100, spacing = 120 },
             { unitDefName = "corwin", count = 5, dx = 120, dz = -80, spacing = 90 },
             { unitDefName = "corsolar", count = 3, dx = 220, dz = 80, spacing = 90 },
             { unitDefName = "corllt", count = 5, dx = -180, dz = 180, spacing = 120 },
@@ -344,6 +341,15 @@ if (!(Test-Path $engine)) { throw "$engineName not found at $engine" }
 if ($Launch -or $runHeadless) {
   $args = @("--write-dir", $config.barDataRoot, "--only-local", $startScriptPath)
   if ($runHeadless) {
+    $saveDir = Join-Path $config.barDataRoot "Saves"
+    $saveGamePath = Join-Path $saveDir "$SaveName.ssf"
+    $saveMetaPath = Join-Path $saveDir "$SaveName.lua"
+    $manifestPath = Join-Path $runRoot "latest_savegame_path.txt"
+    if ($SaveGame) {
+      New-Item -ItemType Directory -Force -Path $saveDir | Out-Null
+      Remove-Item -Force -ErrorAction SilentlyContinue -LiteralPath $saveGamePath
+      Remove-Item -Force -ErrorAction SilentlyContinue -LiteralPath $saveMetaPath
+    }
     $psi = [System.Diagnostics.ProcessStartInfo]::new()
     $psi.FileName = $engine
     $psi.WorkingDirectory = $config.barDataRoot
@@ -359,17 +365,33 @@ if ($Launch -or $runHeadless) {
     $proc = [System.Diagnostics.Process]::new()
     $proc.StartInfo = $psi
     [void]$proc.Start()
-    if (-not $proc.WaitForExit($TimeoutSeconds * 1000)) {
-      try { $proc.Kill() } catch { }
-      throw "spring-headless timed out after $TimeoutSeconds seconds. Check $($config.infolog)"
-    }
-    Write-Host "spring-headless exit code: $($proc.ExitCode)"
-    if ($proc.ExitCode -ne 0) { throw "spring-headless exited with code $($proc.ExitCode). Check $($config.infolog)" }
     if ($SaveGame) {
-      $saveDir = Join-Path $config.barDataRoot "Saves"
-      $saveGamePath = Join-Path $saveDir "$SaveName.ssf"
-      $saveMetaPath = Join-Path $saveDir "$SaveName.lua"
-      $manifestPath = Join-Path $runRoot "latest_savegame_path.txt"
+      $deadline = [DateTime]::UtcNow.AddSeconds($TimeoutSeconds)
+      $lastLength = -1
+      $stableTicks = 0
+      $saved = $false
+      while ([DateTime]::UtcNow -lt $deadline) {
+        if ($proc.HasExited) { break }
+        if ((Test-Path $saveGamePath) -and (Test-Path $saveMetaPath)) {
+          $item = Get-Item -LiteralPath $saveGamePath
+          if ($item.Length -gt 0 -and $item.Length -eq $lastLength) {
+            $stableTicks += 1
+          } else {
+            $stableTicks = 0
+            $lastLength = $item.Length
+          }
+          if ($stableTicks -ge 3) {
+            $saved = $true
+            break
+          }
+        }
+        Start-Sleep -Seconds 1
+      }
+      if (-not $proc.HasExited) {
+        try { $proc.Kill() } catch { }
+        try { $proc.WaitForExit(10000) | Out-Null } catch { }
+      }
+      if (-not $saved) { throw "Expected savegame was not completed at $saveGamePath within $TimeoutSeconds seconds. Check $($config.infolog)" }
       if (!(Test-Path $saveGamePath)) { throw "Expected savegame was not created at $saveGamePath. Check $($config.infolog)" }
       if (!(Test-Path $saveMetaPath)) { Write-Warning "Save metadata was not created at $saveMetaPath. The .ssf exists, but BAR's load menu may not list it cleanly." }
       @(
@@ -381,6 +403,13 @@ if ($Launch -or $runHeadless) {
       ) | Set-Content -Encoding ASCII -Path $manifestPath
       Write-Host "Created BAR savegame: $saveGamePath"
       Write-Host "Wrote savegame manifest: $manifestPath"
+    } else {
+      if (-not $proc.WaitForExit($TimeoutSeconds * 1000)) {
+        try { $proc.Kill() } catch { }
+        throw "spring-headless timed out after $TimeoutSeconds seconds. Check $($config.infolog)"
+      }
+      Write-Host "spring-headless exit code: $($proc.ExitCode)"
+      if ($proc.ExitCode -ne 0) { throw "spring-headless exited with code $($proc.ExitCode). Check $($config.infolog)" }
     }
   } else {
     Start-Process -FilePath $engine -WorkingDirectory $config.barDataRoot -ArgumentList $args

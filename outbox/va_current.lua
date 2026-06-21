@@ -60,9 +60,8 @@ return {
         base = { x = 0.16, z = 0.18 },
         groups = {
           { id = "clans_base", units = {
-            { unitDefName = "legcom", count = 1, dx = 0, dz = 0, spacing = 80 },
             { unitDefName = "legck", count = 2, dx = 140, dz = 40, spacing = 90 },
-            { unitDefName = "legmex", count = 3, dx = -160, dz = 120, spacing = 120 },
+            { unitDefName = "legmex", count = 3, atMetalSpots = true, dx = -160, dz = 120, spacing = 120 },
             { unitDefName = "legwin", count = 4, dx = 120, dz = 180, spacing = 90 },
             { unitDefName = "legsolar", count = 2, dx = 260, dz = 120, spacing = 100 },
             { unitDefName = "leglht", count = 3, dx = -120, dz = -140, spacing = 130 },
@@ -79,8 +78,7 @@ return {
         base = { x = 0.80, z = 0.18 },
         groups = {
           { id = "armada_bastion", units = {
-            { unitDefName = "armcom", count = 1, dx = 0, dz = 0, spacing = 80 },
-            { unitDefName = "armmex", count = 3, dx = -160, dz = 120, spacing = 120 },
+            { unitDefName = "armmex", count = 3, atMetalSpots = true, dx = -160, dz = 120, spacing = 120 },
             { unitDefName = "armwin", count = 5, dx = 130, dz = 120, spacing = 85 },
             { unitDefName = "armsolar", count = 3, dx = 240, dz = -20, spacing = 90 },
             { unitDefName = "armllt", count = 5, dx = -180, dz = -180, spacing = 120 },
@@ -112,8 +110,7 @@ return {
         base = { x = 0.82, z = 0.82 },
         groups = {
           { id = "cortex_island", units = {
-            { unitDefName = "corcom", count = 1, dx = 0, dz = 0, spacing = 80 },
-            { unitDefName = "cormex", count = 3, dx = -120, dz = -100, spacing = 120 },
+            { unitDefName = "cormex", count = 3, atMetalSpots = true, dx = -120, dz = -100, spacing = 120 },
             { unitDefName = "corwin", count = 5, dx = 120, dz = -80, spacing = 90 },
             { unitDefName = "corsolar", count = 3, dx = 220, dz = 80, spacing = 90 },
             { unitDefName = "corllt", count = 5, dx = -180, dz = 180, spacing = 120 },

@@ -227,6 +227,131 @@ end
 '@
 }
 
+$playableSpawnBlock = @'
+local function metalSpotKey(spot)
+  return tostring(math.floor((spot.x or 0) + 0.5)) .. "|" .. tostring(math.floor((spot.z or 0) + 0.5))
+end
+
+local function metalSpotHasUnit(spot)
+  if not spot or not Spring.GetUnitsInCylinder then return false end
+  local units = Spring.GetUnitsInCylinder(spot.x, spot.z, 96)
+  return units and #units > 0
+end
+
+local function nearestOpenMetalSpot(anchorX, anchorZ, claimedMetalSpots)
+  local spots = GG and GG["resource_spot_finder"] and GG["resource_spot_finder"].metalSpotsList or nil
+  if not spots then return nil end
+  local best, bestDist
+  for i = 1, #spots do
+    local spot = spots[i]
+    local key = metalSpotKey(spot)
+    if not claimedMetalSpots[key] and not metalSpotHasUnit(spot) then
+      local dx, dz = anchorX - spot.x, anchorZ - spot.z
+      local dist = dx * dx + dz * dz
+      if not bestDist or dist < bestDist then
+        best = spot
+        bestDist = dist
+      end
+    end
+  end
+  return best
+end
+
+local function spawnOneUnit(defName, x, z, facing, teamID, spec)
+  local y = Spring.GetGroundHeight(x, z)
+  local unitID = Spring.CreateUnit(defName, x, y, z, facing, teamID)
+  if unitID then
+    Spring.SetUnitRulesParam(unitID, "va_playable_proxy", 1, { public = true })
+    if spec and spec.patrolX and spec.patrolZ and CMD and CMD.FIGHT then
+      local px = normalizedToElmos(spec.patrolX, Game.mapSizeX or 0)
+      local pz = normalizedToElmos(spec.patrolZ, Game.mapSizeZ or 0)
+      Spring.GiveOrderToUnit(unitID, CMD.FIGHT, { px, Spring.GetGroundHeight(px, pz), pz }, {})
+    end
+    return 1
+  end
+  return 0
+end
+
+local function spawnUnitSpec(spec, teamID, baseX, baseZ, groupX, groupZ, claimedMetalSpots)
+  if type(spec) ~= "table" then return 0 end
+  local defName = spec.unitDefName or spec.def or spec[1]
+  if not defName or not UnitDefNames[defName] then
+    Spring.Echo("VA_PLAYABLE_MISSING_UNIT " .. tostring(defName))
+    return 0
+  end
+  local count = tonumber(spec.count or 1) or 1
+  local spacing = tonumber(spec.spacing or 90) or 90
+  local spawned = 0
+  local dx = tonumber(spec.dx or spec.x or 0) or 0
+  local dz = tonumber(spec.dz or spec.z or 0) or 0
+  local facing = tonumber(spec.facing or 0) or 0
+  local anchorX = baseX + groupX + dx
+  local anchorZ = baseZ + groupZ + dz
+
+  if spec.atMetalSpots or spec.nearestMetalSpots then
+    for i = 1, count do
+      local spot = nearestOpenMetalSpot(anchorX, anchorZ, claimedMetalSpots)
+      if not spot then
+        Spring.Echo("VA_PLAYABLE_NO_METAL_SPOT unitDef=" .. tostring(defName) .. " anchorX=" .. tostring(math.floor(anchorX)) .. " anchorZ=" .. tostring(math.floor(anchorZ)))
+        break
+      end
+      claimedMetalSpots[metalSpotKey(spot)] = true
+      spawned = spawned + spawnOneUnit(defName, spot.x, spot.z, facing, teamID, spec)
+    end
+    return spawned
+  end
+
+  for i = 1, count do
+    local row = math.floor((i - 1) / 4)
+    local col = (i - 1) % 4
+    local x = anchorX + ((col - 1.5) * spacing)
+    local z = anchorZ + (row * spacing)
+    spawned = spawned + spawnOneUnit(defName, x, z, facing, teamID, spec)
+  end
+  return spawned
+end
+
+local function spawnPlayableSetup()
+  if playableSetupSpawned then
+    Spring.Echo("VA_PLAYABLE_SETUP already_spawned")
+    return
+  end
+  local setup = mission and mission.playableSetup
+  if not setup or setup.enabled == false then
+    Spring.Echo("VA_PLAYABLE_SETUP none")
+    return
+  end
+  playableSetupSpawned = true
+  local forces = setup.forces or {}
+  local claimedMetalSpots = {}
+  local totalSpawned = 0
+  for _, force in ipairs(forces) do
+    local teamID = tonumber(force.teamID or 0) or 0
+    local base = force.base or {}
+    local baseX = normalizedToElmos(base.x or 0.5, Game.mapSizeX or 0)
+    local baseZ = normalizedToElmos(base.z or 0.5, Game.mapSizeZ or 0)
+    local forceSpawned = 0
+    for _, group in ipairs(force.groups or {}) do
+      local groupX = tonumber(group.dx or group.x or 0) or 0
+      local groupZ = tonumber(group.dz or group.z or 0) or 0
+      for _, spec in ipairs(group.units or {}) do
+        forceSpawned = forceSpawned + spawnUnitSpec(spec, teamID, baseX, baseZ, groupX, groupZ, claimedMetalSpots)
+      end
+    end
+    totalSpawned = totalSpawned + forceSpawned
+    Spring.Echo("VA_PLAYABLE_FORCE id=" .. tostring(force.id or "?") .. " team=" .. tostring(teamID) .. " units=" .. tostring(forceSpawned))
+  end
+  Spring.Echo("VA_PLAYABLE_SETUP spawned forces=" .. tostring(#forces) .. " units=" .. tostring(totalSpawned))
+end
+'@
+
+$playableSpawnPattern = '(?s)local function spawnUnitSpec\(spec, teamID, baseX, baseZ, groupX, groupZ\).*?Spring\.Echo\("VA_PLAYABLE_SETUP spawned forces=" \.\. tostring\(#forces\) \.\. " units=" \.\. tostring\(totalSpawned\)\)\s+end'
+if ($gadget -match $playableSpawnPattern) {
+  $gadget = [regex]::Replace($gadget, $playableSpawnPattern, [System.Text.RegularExpressions.MatchEvaluator]{ param($m) $playableSpawnBlock }, 1)
+} else {
+  throw "Could not find playable spawn block to refresh."
+}
+
 if ($gadget -notmatch 'spawnPlayableSetup\(\)\s+if headlessAutoStart') {
   $gadget = $gadget -replace 'function gadget:GameStart\(\)\s+if headlessAutoStart', @'
 function gadget:GameStart()
