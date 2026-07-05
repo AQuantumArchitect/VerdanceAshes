@@ -1,9 +1,99 @@
+function Get-VerdanceWorkspaceRoot {
+  param([string]$Workspace)
+  if ($Workspace) { return (Resolve-Path $Workspace).Path }
+  if ($env:VERDANCE_WORKSPACE -and (Test-Path $env:VERDANCE_WORKSPACE)) {
+    return (Resolve-Path $env:VERDANCE_WORKSPACE).Path
+  }
+  # scripts\ lives directly under the workspace root
+  return Split-Path -Parent $PSScriptRoot
+}
+
+function Find-BARDataRoot {
+  if ($env:BAR_DATA_ROOT -and (Test-Path $env:BAR_DATA_ROOT)) { return $env:BAR_DATA_ROOT }
+  $candidates = @(
+    (Join-Path $env:LOCALAPPDATA "Programs\Beyond-All-Reason\data"),
+    "C:\Program Files\Beyond-All-Reason\data",
+    (Join-Path ${env:ProgramFiles(x86)} "Steam\steamapps\common\Beyond All Reason\data")
+  )
+  foreach ($candidate in $candidates) {
+    if ($candidate -and (Test-Path (Join-Path $candidate "engine"))) { return $candidate }
+  }
+  return $null
+}
+
 function Get-VerdanceConfig {
   param([string]$Workspace)
-  if (-not $Workspace) { $Workspace = "$env:USERPROFILE\Documents\BAR_Verdance_Workspace" }
+  $Workspace = Get-VerdanceWorkspaceRoot -Workspace $Workspace
   $configPath = Join-Path $Workspace "verdance_config.json"
-  if (!(Test-Path $configPath)) { throw "No verdance_config.json at $configPath. Run install_v06.bat first." }
-  return Get-Content $configPath -Raw | ConvertFrom-Json
+  $config = if (Test-Path $configPath) {
+    Get-Content $configPath -Raw | ConvertFrom-Json
+  } else {
+    [pscustomobject]@{ schemaVersion = "0.8-autodetect" }
+  }
+
+  function Set-DefaultProp($Object, [string]$Name, $Value) {
+    if (-not $Object.PSObject.Properties[$Name] -or -not $Object.$Name) {
+      if ($Object.PSObject.Properties[$Name]) { $Object.$Name = $Value }
+      else { $Object | Add-Member -NotePropertyName $Name -NotePropertyValue $Value }
+    }
+  }
+
+  Set-DefaultProp $config "workspace" $Workspace
+  if (-not ($config.PSObject.Properties["barDataRoot"] -and $config.barDataRoot -and (Test-Path $config.barDataRoot))) {
+    $detected = Find-BARDataRoot
+    if (-not $detected) { throw "Could not locate a Beyond All Reason data directory. Set barDataRoot in verdance_config.json or the BAR_DATA_ROOT environment variable." }
+    Set-DefaultProp $config "barDataRoot" $detected
+    if ($config.PSObject.Properties["barDataRoot"]) { $config.barDataRoot = $detected }
+  }
+
+  # BAR-side derived paths
+  Set-DefaultProp $config "barSdd" (Join-Path $config.barDataRoot "games\BAR.sdd")
+  Set-DefaultProp $config "infolog" (Join-Path $config.barDataRoot "infolog.txt")
+  Set-DefaultProp $config "modSdd" (Join-Path $config.barDataRoot "games\VerdanceAshes.sdd")
+  Set-DefaultProp $config "gameType" 'Verdance Ashes $VERSION'
+  Set-DefaultProp $config "seedDestination" (Join-Path $config.modSdd "singleplayer\verdance_ashes\generated\va_current.lua")
+
+  # Workspace-side derived paths
+  Set-DefaultProp $config "resultInbox" (Join-Path $Workspace "inbox\latest_va_result.json")
+  Set-DefaultProp $config "campaignState" (Join-Path $Workspace "state\campaign_state.json")
+  Set-DefaultProp $config "seedOutbox" (Join-Path $Workspace "outbox\va_current.lua")
+  Set-DefaultProp $config "processedLedger" (Join-Path $Workspace "ledger\processed_results.json")
+  Set-DefaultProp $config "exportDir" (Join-Path $Workspace "export")
+  Set-DefaultProp $config "zoneMap" (Join-Path $Workspace "data\zone_maps\greenest_fields.zone_map.json")
+
+  return $config
+}
+
+function Get-BAREngineDir {
+  param($Config, [string]$EngineName = "spring.exe")
+  if ($Config.PSObject.Properties["engineDir"] -and $Config.engineDir -and (Test-Path (Join-Path $Config.engineDir $EngineName))) {
+    return $Config.engineDir
+  }
+  $engineRoot = Join-Path $Config.barDataRoot "engine"
+  if (!(Test-Path $engineRoot)) { throw "No engine directory under $($Config.barDataRoot)" }
+  $dirs = Get-ChildItem $engineRoot -Directory | Where-Object { Test-Path (Join-Path $_.FullName $EngineName) } | Sort-Object Name -Descending
+  if (-not $dirs) { throw "No engine folder containing $EngineName under $engineRoot" }
+  return $dirs[0].FullName
+}
+
+function Get-VerdancePython {
+  param([string]$Workspace)
+  if ($env:VERDANCE_PYTHON -and (Test-Path $env:VERDANCE_PYTHON)) { return $env:VERDANCE_PYTHON }
+  if ($Workspace) {
+    $embedded = Join-Path $Workspace "runtime\python\python.exe"
+    if (Test-Path $embedded) { return $embedded }
+  }
+  foreach ($candidate in @("python", "py")) {
+    $cmd = Get-Command $candidate -ErrorAction SilentlyContinue
+    if ($cmd) { return $cmd.Source }
+  }
+  throw "No Python interpreter found. Install Python 3 or place an embeddable Python at runtime\python\."
+}
+
+function Get-BARInfolog {
+  param([string]$Workspace)
+  $config = Get-VerdanceConfig -Workspace $Workspace
+  return $config.infolog
 }
 
 function Clamp-Number {

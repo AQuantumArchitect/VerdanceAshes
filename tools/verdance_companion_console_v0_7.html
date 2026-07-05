@@ -17,6 +17,7 @@
       --bad: #ff7878;
       --accent: #80ffbd;
       --blue: #8bd6ff;
+      --violet: #c7a6ff;
     }
     * { box-sizing: border-box; }
     body {
@@ -34,11 +35,11 @@
       backdrop-filter: blur(8px);
       z-index: 3;
     }
-    h1 { margin: 0; font-size: 26px; letter-spacing: .02em; }
+    h1 { margin: 0; font-size: 26px; letter-spacing: 0; }
     .subtitle { color: var(--muted); margin-top: 6px; }
     main { padding: 22px 28px 40px; max-width: 1500px; margin: 0 auto; }
     .grid { display: grid; gap: 16px; }
-    .top { grid-template-columns: 1.2fr .8fr; align-items: stretch; }
+    .top { grid-template-columns: 1.15fr .85fr; align-items: stretch; }
     .cards { grid-template-columns: repeat(4, minmax(170px, 1fr)); }
     .two { grid-template-columns: 1fr 1fr; }
     .panel {
@@ -78,6 +79,7 @@
     button:hover { border-color: var(--accent); filter: brightness(1.08); }
     button.secondary { background: #14221a; border-color: var(--line); color: var(--muted); }
     button.warn { border-color: rgba(255,211,107,.45); color: var(--warn); }
+    button.primary { border-color: rgba(199,166,255,.55); color: var(--violet); }
     button.bad { border-color: rgba(255,120,120,.45); color: var(--bad); }
     button:disabled { opacity: .45; cursor: wait; }
     pre {
@@ -108,13 +110,32 @@
 </head>
 <body>
   <header>
-    <h1>🌿 Verdance Companion Console <span class="muted">v0.7</span></h1>
-    <div class="subtitle">One cockpit for BAR extraction, idempotent campaign advancement, seed install, and ChatGPT handoff export.</div>
+    <h1>Verdance Companion Console <span class="muted">v0.7 + Story Engine v1</span></h1>
+    <div class="subtitle">Campaign state, next mission build, BAR extraction, idempotent advancement, and handoff export.</div>
   </header>
   <main class="grid">
     <section class="grid top">
       <div class="panel">
+        <h2>Play Session</h2>
+        <div class="actions">
+          <button class="primary" onclick="playSession()">&#9654; Play Session (Full Loop)</button>
+          <button class="warn" onclick="action('/api/cancelSession','Cancel Session')">Cancel Session</button>
+        </div>
+        <div id="sessionCard" class="muted" style="margin:10px 0 14px">No active session. Play Session builds the next mission, launches BAR, waits while you play, then extracts, advances, and builds the next mission automatically.</div>
+        <hr style="border:0;border-top:1px solid var(--line);margin:14px 0">
         <h2>Machine Control</h2>
+        <div class="actions">
+          <button class="primary" onclick="action('/api/buildNextMissionV1','Build Next Mission v1')">Build Next Mission</button>
+          <button class="primary" onclick="action('/api/playNextMissionV1','Play Next Mission v1')">Play Next Mission</button>
+          <button class="secondary" onclick="action('/api/createNextMissionSaveV1','Create Next Mission Save v1')">Create Save</button>
+          <button class="secondary" onclick="action('/api/runCycleV1','Extract + Advance v1')">Extract + Advance v1</button>
+          <button class="secondary" onclick="action('/api/advanceV1','Advance v1 Only')">Advance v1 Only</button>
+          <button class="secondary" onclick="action('/api/processHealth','Process Health')">Process Health</button>
+          <button class="warn" onclick="action('/api/stopSpring','Stop Spring/Recoil')">Stop Spring</button>
+          <button class="warn" onclick="action('/api/stopVerdanceSlop','Stop Verdance Slop')">Clean Slop</button>
+        </div>
+        <p class="muted">Manual loop: objectives now auto-detect and auto-report in-game; these buttons run individual steps when you want finer control. <code>/vawin</code> etc. remain as debug overrides.</p>
+        <hr style="border:0;border-top:1px solid var(--line);margin:14px 0">
         <div class="actions">
           <button onclick="action('/api/extract','Extract /varesult')">1. Extract BAR Result</button>
           <button onclick="action('/api/runCycle','Advance + Install Seed')">2. Advance + Install</button>
@@ -125,11 +146,14 @@
           <button class="warn" onclick="action('/api/advanceForce','Force Advance Active Result')">Force Active Result</button>
           <button class="bad" onclick="shutdown()">Stop Console Server</button>
         </div>
-        <p class="muted">Normal loop: in BAR run <code>/vastart</code>, <code>/vaprogressbig</code>, <code>/varesult</code>; then click <b>Run + Export for ChatGPT</b>.</p>
+        <p class="muted">Legacy loop is still here for comparison and fallback.</p>
         <div id="health" class="pillrow"></div>
       </div>
       <div class="panel">
-        <h2>Current Seed</h2>
+        <h2>Next Mission</h2>
+        <div id="intentSummary" class="muted">Loading...</div>
+        <hr style="border:0;border-top:1px solid var(--line);margin:14px 0">
+        <h3>Current Seed</h3>
         <div id="seedSummary" class="muted">Loading...</div>
         <div style="margin-top:10px" class="bar"><span id="progressBar"></span></div>
         <div id="resultProgress" class="muted" style="margin-top:8px"></div>
@@ -167,6 +191,8 @@
           <button class="secondary" onclick="loadFile('result')">Latest Result</button>
           <button class="secondary" onclick="loadFile('ledger')">Ledger</button>
           <button class="secondary" onclick="loadFile('seed')">Seed</button>
+          <button class="secondary" onclick="loadFile('nextIntent')">Next Intent</button>
+          <button class="secondary" onclick="loadFile('nextMissionBuild')">Build Manifest</button>
           <button class="secondary" onclick="loadFile('config')">Config</button>
         </div>
         <pre id="fileText">Choose a file to inspect.</pre>
@@ -209,7 +235,52 @@ async function refresh(){
     $('console').textContent = 'Could not reach companion server. Launch LAUNCH_VERDANCE_CONSOLE.bat again.\n' + e.message;
   }
 }
+const SESSION_PHASES = ['preflight','building','in-game','extracting','build-next','next-ready'];
+function renderSession(sess){
+  const el = $('sessionCard');
+  if(!el) return;
+  if(!sess || !sess.phase || sess.phase === 'idle'){
+    el.innerHTML = 'No active session. Play Session builds the next mission, launches BAR, waits while you play, then extracts, advances, and builds the next mission automatically.';
+    el.className = 'muted';
+    return;
+  }
+  const chips = SESSION_PHASES.map(p=>{
+    const active = sess.phase === p;
+    const done = SESSION_PHASES.indexOf(sess.phase) > SESSION_PHASES.indexOf(p);
+    const color = active ? 'var(--violet)' : (done ? 'var(--good)' : 'var(--muted)');
+    const weight = active ? '700' : '400';
+    return `<span style="color:${color};font-weight:${weight}">${p}</span>`;
+  }).join(' &rarr; ');
+  let banner = '';
+  if(sess.phase === 'next-ready'){
+    banner = `<div style="margin-top:8px;padding:8px 12px;border:1px solid var(--good);border-radius:8px;color:var(--good)"><b>Mission ${esc(sess.nextMissionId || '?')} ready.</b> Press Play Session to continue the campaign.</div>`;
+  } else if(sess.phase === 'error' || sess.phase === 'no-result'){
+    banner = `<div style="margin-top:8px;padding:8px 12px;border:1px solid var(--bad);border-radius:8px;color:var(--bad)">${esc(sess.message || sess.error || sess.phase)}</div>`;
+  } else if(sess.phase === 'cancelled'){
+    banner = `<div style="margin-top:8px" class="warnText">Session cancelled.</div>`;
+  }
+  el.className = '';
+  el.innerHTML = `<div>${chips}</div>
+    <div class="muted" style="margin-top:6px">${esc(sess.message || '')}</div>
+    <div class="muted">mission ${esc(sess.missionId || '?')}${sess.springPid ? ' &middot; pid ' + esc(sess.springPid) : ''} &middot; updated ${esc((sess.updatedAt||'').replace('T',' ').slice(0,19))}</div>
+    ${banner}`;
+}
+async function playSession(){
+  if(busy) return;
+  busy = true;
+  $('console').textContent = 'Starting play session...';
+  try {
+    const data = await getJSON('/api/playSession', {method:'POST'});
+    setConsole('Play Session', data);
+  } catch(e) {
+    setConsole('Play Session', {ok:false, stderr:e.message});
+  } finally {
+    busy = false;
+    await refresh();
+  }
+}
 function render(s){
+  renderSession(s.session);
   const h = s.health || {};
   $('health').innerHTML = [
     pill('workspace', h.workspaceExists),
@@ -218,12 +289,15 @@ function render(s){
     pill('state', h.stateExists),
     pill('result', h.resultExists),
     pill('seed', h.seedDestinationExists),
-    pill('ledger', h.ledgerExists)
+    pill('ledger', h.ledgerExists),
+    pill('intent', h.nextIntentExists),
+    pill('build', h.nextMissionBuildExists)
   ].join('');
   const state = s.state || {};
   const result = s.latestResult || {};
   const comp = state.companion || {};
   const seed = s.installedSeed || s.seed || {};
+  const intent = s.nextIntent || {};
   $('missionValue').textContent = state.currentMissionId || seed.missionId || '?';
   $('missionSmall').textContent = `missionNumber ${state.missionNumber ?? seed.missionNumber ?? '?'} · path ${state.pathSignal ?? '?'}`;
   $('resultValue').textContent = result.status || 'none';
@@ -235,6 +309,11 @@ function render(s){
   $('progressBar').style.width = `${p}%`;
   $('resultProgress').textContent = result.missionId ? `Latest extracted result progress: ${p}% (${result.holdFrames}/${result.requiredFrames})` : 'Run /varesult in BAR, then extract.';
   $('seedSummary').innerHTML = seed.missionId ? `<b>${esc(seed.missionId)}</b><br>${esc(seed.title || '')}<br><span class="muted">requiredFrames ${esc(seed.requiredFrames)}</span>` : 'No installed seed found.';
+  $('intentSummary').innerHTML = intent.missionId ? `<b>${esc(intent.missionId)}</b> on <b>${esc(intent.mapId)}</b><br>
+    Deploy: ${esc(intent.deploymentZoneId || '?')}<br>
+    Extract: ${esc(intent.extractionZoneId || '?')}<br>
+    Objective: ${esc((intent.objectiveTarget && intent.objectiveTarget.label) || intent.objective || '?')}<br>
+    <span class="muted">${esc(intent.storyReason || '')}</span>` : 'No next mission intent found. Run Advance v1 once to materialize one.';
   const graph = state.graph || {};
   const rep = state.reputation || {};
   const rows = [];

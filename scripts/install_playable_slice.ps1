@@ -1,188 +1,341 @@
 param(
-  [string]$Workspace = "$env:USERPROFILE\Documents\BAR_Verdance_Workspace",
+  [string]$Workspace = "",
+  [string]$ScenarioPath = "",
+  [string]$Variant = "",
+  [string]$PlayerController = "human",
+  [switch]$BalanceTest,
+  [int]$SimFrames = 5400,
+  [switch]$ListVariants,
   [switch]$Launch,
   [switch]$Headless,
   [switch]$SaveGame,
   [string]$SaveName = "verdance_playable_ats_001",
+  [string]$ExtraModOptions = "",
   [int]$TimeoutSeconds = 90
 )
 
 $ErrorActionPreference = "Stop"
 . (Join-Path (Split-Path -Parent $MyInvocation.MyCommand.Path) "_common.ps1")
+$Workspace = Get-VerdanceWorkspaceRoot -Workspace $Workspace
+
+function Clone-JsonValue {
+  param($Value)
+  return ($Value | ConvertTo-Json -Depth 100 | ConvertFrom-Json)
+}
+
+function Add-OrSetProperty {
+  param($Object, [string]$Name, $Value)
+  if ($Object.PSObject.Properties[$Name]) {
+    $Object.$Name = $Value
+  } else {
+    $Object | Add-Member -NotePropertyName $Name -NotePropertyValue $Value
+  }
+}
+
+function Get-RequiredProperty {
+  param($Object, [string]$Name, [string]$Context)
+  $prop = $Object.PSObject.Properties[$Name]
+  if (-not $prop) { throw "Missing '$Name' in $Context." }
+  return $prop.Value
+}
+
+function Format-StartScriptNumber {
+  param([double]$Value)
+  return ([string]::Format([System.Globalization.CultureInfo]::InvariantCulture, "{0:0.####}", $Value))
+}
+
+function Format-StartScriptScalar {
+  param($Value)
+  if ($null -eq $Value) { return "" }
+  if ($Value -is [bool]) {
+    if ($Value) { return "1" }
+    return "0"
+  }
+  if ($Value -is [byte] -or $Value -is [int16] -or $Value -is [int32] -or $Value -is [int64] -or $Value -is [single] -or $Value -is [double] -or $Value -is [decimal]) {
+    return Format-StartScriptNumber ([double]$Value)
+  }
+  return [string]$Value
+}
+
+function Join-Rgb {
+  param($Rgb)
+  return (@($Rgb) | ForEach-Object { Format-StartScriptNumber ([double]$_) }) -join " "
+}
+
+function Render-StartScriptBlock {
+  param([string]$Name, [string[]]$Lines)
+  $body = ($Lines | ForEach-Object { "    $_" }) -join "`r`n"
+  return @"
+  [$Name]
+  {
+$body
+  }
+"@
+}
+
+function Render-OptionsBlock {
+  param($Options)
+  if (-not $Options) { return @() }
+  $lines = @("  [OPTIONS]", "  {")
+  foreach ($prop in $Options.PSObject.Properties) {
+    $lines += "    $($prop.Name)=$(Format-StartScriptScalar $prop.Value);"
+  }
+  $lines += "  }"
+  return $lines
+}
+
+function Render-ExtraModOptions {
+  param([string]$Value)
+  if (-not $Value) { return "" }
+  $lines = @()
+  $separator = if ($Value -match ';') { ';' } else { ',' }
+  foreach ($pair in ($Value -split [regex]::Escape($separator))) {
+    $trim = $pair.Trim()
+    if (-not $trim) { continue }
+    if ($trim -notmatch '=') { throw "ExtraModOptions entry must be key=value: $trim" }
+    $lines += "    $trim;"
+  }
+  if ($lines.Count -eq 0) { return "" }
+  return ($lines -join "`r`n") + "`r`n"
+}
+
+function Expand-ScenarioForces {
+  param($Scenario)
+  $forces = @()
+  foreach ($force in @($Scenario.forces)) {
+    $recipeName = [string]$force.recipe
+    $recipe = Get-RequiredProperty $Scenario.baseRecipes $recipeName "baseRecipes"
+    $forces += [ordered]@{
+      id = $force.id
+      label = $force.label
+      teamID = $force.teamID
+      side = $force.side
+      role = $force.role
+      base = $force.base
+      recipe = $recipeName
+      groups = @(
+        [ordered]@{
+          id = $recipeName
+          units = $recipe
+        }
+      )
+    }
+  }
+  return @($forces)
+}
+
+function New-MissionObject {
+  param($Scenario, $VariantObject, [string]$PlayerController, [int]$SimFrames)
+  $variantPlayerTeam = $null
+  if ($VariantObject.PSObject.Properties["playerTeamID"]) { $variantPlayerTeam = [int]$VariantObject.playerTeamID }
+  $balancePlayerTeam = if ($null -ne $variantPlayerTeam) { $variantPlayerTeam } elseif ($PlayerController -eq "clean_baseline") { 0 } else { 3 }
+  $mission = Clone-JsonValue $Scenario.missionBase
+  $existingMissionId = if ($mission.PSObject.Properties["missionId"] -and $mission.missionId) { [string]$mission.missionId } else { "" }
+  if (-not $existingMissionId) {
+    Add-OrSetProperty $mission "missionId" ("va_playable_ats_" + $VariantObject.id)
+  }
+  Add-OrSetProperty $mission "title" ($Scenario.missionBase.title + " - " + $VariantObject.label)
+  Add-OrSetProperty $mission "simulation" ([ordered]@{
+    variantId = $VariantObject.id
+    variantLabel = $VariantObject.label
+    ai = $VariantObject.ai
+  })
+  Add-OrSetProperty $mission "playableSetup" ([ordered]@{
+    enabled = $true
+    mapId = $Scenario.map.id
+    variantId = $VariantObject.id
+    variantLabel = $VariantObject.label
+    notes = $VariantObject.notes
+    forces = Expand-ScenarioForces $Scenario
+  })
+  Add-OrSetProperty $mission "balance" ([ordered]@{
+    playerTeamID = $balancePlayerTeam
+    playerController = $PlayerController
+    simFrames = $SimFrames
+    target = "BARb hard/aggressive should clear or gain advantage; SimpleAI should stall."
+  })
+  return $mission
+}
+
+function Render-AllyTeam {
+  param($AllyTeam)
+  $rect = @($AllyTeam.startRect)
+  $lines = @(
+    "StartRectLeft=$(Format-StartScriptNumber ([double]$rect[0]));",
+    "StartRectTop=$(Format-StartScriptNumber ([double]$rect[1]));",
+    "StartRectRight=$(Format-StartScriptNumber ([double]$rect[2]));",
+    "StartRectBottom=$(Format-StartScriptNumber ([double]$rect[3]));",
+    "NumAllies=0;"
+  )
+  return Render-StartScriptBlock ("ALLYTEAM" + $AllyTeam.id) $lines
+}
+
+function Render-Team {
+  param($Team, [int]$MapSizeX, [int]$MapSizeZ)
+  $base = @($Team.base)
+  $lines = @(
+    "Side=$($Team.side);",
+    "Handicap=0;",
+    "AllyTeam=$($Team.allyTeam);",
+    "TeamLeader=0;",
+    "StartPosX=$([int]($MapSizeX * [double]$base[0]));",
+    "StartPosZ=$([int]($MapSizeZ * [double]$base[1]));",
+    "RgbColor=$(Join-Rgb $Team.rgb);"
+  )
+  return Render-StartScriptBlock ("TEAM" + $Team.id) $lines
+}
+
+function Render-AI {
+  param($Ai, [int]$Index)
+  $version = if ($Ai.PSObject.Properties["version"]) { [string]$Ai.version } else { "<not-versioned>" }
+  $lines = @(
+    "Host=0;",
+    "IsFromDemo=0;",
+    "Name=$($Ai.name);",
+    "ShortName=$($Ai.shortName);",
+    "Team=$($Ai.team);",
+    "Version=$version;"
+  )
+  $lines += Render-OptionsBlock $Ai.options
+  return Render-StartScriptBlock ("AI" + $Index) $lines
+}
+
+function New-PlayerControllerAI {
+  param([string]$Controller)
+  switch ($Controller) {
+    "human" { return $null }
+    "clean_baseline" { return $null }
+    "simple" {
+      return [pscustomobject]@{
+        name = "SimpleAI(Player Legion)"
+        shortName = "SimpleDefenderAI"
+        team = 3
+        version = "<not-versioned>"
+      }
+    }
+    "barbarian_hard" {
+      return [pscustomobject]@{
+        name = "BARbarIAn(Player Hard)"
+        shortName = "BARb"
+        team = 3
+        version = "stable"
+        options = [pscustomobject]@{ profile = "hard" }
+      }
+    }
+    "barbarian_aggressive" {
+      return [pscustomobject]@{
+        name = "BARbarIAn(Player Aggressive)"
+        shortName = "BARb"
+        team = 3
+        version = "stable"
+        options = [pscustomobject]@{ profile = "hard_aggressive" }
+      }
+    }
+    default {
+      throw "Unknown PlayerController '$Controller'. Use human, clean_baseline, simple, barbarian_hard, or barbarian_aggressive."
+    }
+  }
+}
 
 $config = Get-VerdanceConfig -Workspace $Workspace
 $runRoot = Join-Path $Workspace "playable_runs"
 New-Item -ItemType Directory -Force -Path $runRoot | Out-Null
 
-$mapName = "All That Simmers v1.1.1"
-$mapSizeX = 7168
-$mapSizeZ = 10240
-$runHeadless = $Headless -or $SaveGame
+if (-not $ScenarioPath) {
+  $ScenarioPath = Join-Path $Workspace "data\scenarios\all_that_simmers.playable.json"
+}
+if (!(Test-Path $ScenarioPath)) { throw "Scenario file not found: $ScenarioPath" }
+
+$scenario = Get-Content -Raw -LiteralPath $ScenarioPath | ConvertFrom-Json
+if ($scenario.PSObject.Properties["zoneMapPath"] -and $scenario.zoneMapPath) {
+  $scenarioZoneMap = $scenario.zoneMapPath
+  if (-not [System.IO.Path]::IsPathRooted($scenarioZoneMap)) {
+    $scenarioZoneMap = Join-Path $Workspace $scenarioZoneMap
+  }
+  if (!(Test-Path $scenarioZoneMap)) { throw "Scenario zone map not found: $scenarioZoneMap" }
+  $config.zoneMap = $scenarioZoneMap
+}
+if (-not $Variant) { $Variant = [string]$scenario.defaultVariant }
+$variantObject = @($scenario.variants) | Where-Object { $_.id -eq $Variant } | Select-Object -First 1
+if (-not $variantObject) {
+  $known = (@($scenario.variants) | ForEach-Object { $_.id }) -join ", "
+  throw "Unknown scenario variant '$Variant'. Known variants: $known"
+}
+
+if ($ListVariants) {
+  foreach ($item in @($scenario.variants)) {
+    Write-Host "$($item.id) - $($item.label): $($item.notes)"
+  }
+  return
+}
+
+$playerAi = New-PlayerControllerAI $PlayerController
+$mapName = [string]$scenario.map.name
+$mapSizeX = [int]$scenario.map.sizeX
+$mapSizeZ = [int]$scenario.map.sizeZ
+$runHeadless = $Headless -or $SaveGame -or $BalanceTest
 if ($SaveGame -and $TimeoutSeconds -eq 90) { $TimeoutSeconds = 240 }
-$debugCommands = if ($SaveGame) {
+$debugCommands = if ($BalanceTest) {
+  "90:luarules vazones|120:luarules vastatus"
+} elseif ($SaveGame) {
   "90:luarules vazones|120:luarules vastatus|180:savegame $SaveName"
 } elseif ($Headless) {
   "90:luarules vazones|120:luarules vastatus|600:quitforce"
 } else {
   "90:luarules vazones|120:luarules vastatus"
 }
+$balanceModOptions = if ($BalanceTest) {
+@"
+    va_headless_autostart=1;
+    va_headless_fastwin=0;
+    va_balance_export_frame=$SimFrames;
+    va_balance_quit=1;
+"@
+} else { "" }
+$extraModOptionsText = Render-ExtraModOptions $ExtraModOptions
 
-$missionLua = @'
-return {
-  schemaVersion = "0.9-playable",
-  campaignId = "verdance_ashes",
-  missionId = "va_playable_ats_001",
-  missionNumber = 901,
-  pathSignal = "B",
-  title = "Verdance Playable Slice: All That Simmers",
-  zone = "All That Simmers",
-  objective = {
-    id = "ats_playable_proxy_breakout",
-    kind = "playable_proxy",
-    requiredFrames = 1800,
-    description = "Clans start upper-left. Armada holds upper-right and center. Cortex anchors bottom-right. Raptors infest bottom-left."
-  },
-  economy = {
-    metalIncome = 18,
-    energyIncome = 42,
-    buildPower = 75
-  },
-  graph = {
-    q0_armada_cortex = 0.23,
-    q2_void_structure = 0.15,
-    q3_biogenesis_memory = 0.28,
-    q4_ai_human = 0.72,
-    q6_contested = 0.73,
-    q6_independent = 0.34,
-    q7_scarcity = 0.98
-  },
-  reputation = {
-    armada = 34,
-    cortex = 18,
-    clans = 66,
-    nullmercs = 47,
-    sev = 56
-  },
-  companions = {
-    {
-      id = "ketha_rhekk_line",
-      displayName = "Ketha of Rhekk's Line",
-      unitDefName = "legcen",
-      xp = 0.504,
-      morale = 80,
-      loyalty = 85,
-      stress = 6,
-      autonomy = 0.35,
-      commandMode = "hybrid"
-    }
-  },
-  playableSetup = {
-    enabled = true,
-    mapId = "all_that_simmers",
-    notes = "Proxy layout for fast feel-testing. Coordinates are normalized fractions of the observed 7168x10240 map.",
-    forces = {
-      {
-        id = "clans_upper_left",
-        label = "Clans / Player Upper-Left",
-        teamID = 0,
-        side = "Legion",
-        role = "player_anchor",
-        base = { x = 0.16, z = 0.18 },
-        groups = {
-          { id = "clans_base", units = {
-            { unitDefName = "legck", count = 2, dx = 140, dz = 40, spacing = 90 },
-            { unitDefName = "legmex", count = 3, atMetalSpots = true, dx = -160, dz = 120, spacing = 120 },
-            { unitDefName = "legwin", count = 4, dx = 120, dz = 180, spacing = 90 },
-            { unitDefName = "legsolar", count = 2, dx = 260, dz = 120, spacing = 100 },
-            { unitDefName = "leglht", count = 3, dx = -120, dz = -140, spacing = 130 },
-            { unitDefName = "legcen", count = 6, dx = 80, dz = -220, spacing = 95, patrolX = 0.34, patrolZ = 0.34 },
-          } }
-        }
-      },
-      {
-        id = "armada_upper_right",
-        label = "Armada Upper-Right Bastion",
-        teamID = 1,
-        side = "Armada",
-        role = "defender",
-        base = { x = 0.80, z = 0.18 },
-        groups = {
-          { id = "armada_bastion", units = {
-            { unitDefName = "armmex", count = 3, atMetalSpots = true, dx = -160, dz = 120, spacing = 120 },
-            { unitDefName = "armwin", count = 5, dx = 130, dz = 120, spacing = 85 },
-            { unitDefName = "armsolar", count = 3, dx = 240, dz = -20, spacing = 90 },
-            { unitDefName = "armllt", count = 5, dx = -180, dz = -180, spacing = 120 },
-            { unitDefName = "armwar", count = 8, dx = -40, dz = -300, spacing = 90, patrolX = 0.58, patrolZ = 0.44 },
-          } }
-        }
-      },
-      {
-        id = "armada_center_lane",
-        label = "Armada Center-Lane Hold",
-        teamID = 1,
-        side = "Armada",
-        role = "center_hold",
-        base = { x = 0.57, z = 0.48 },
-        groups = {
-          { id = "armada_center", units = {
-            { unitDefName = "armllt", count = 6, dx = 0, dz = 0, spacing = 130 },
-            { unitDefName = "armwar", count = 10, dx = -220, dz = 120, spacing = 85, patrolX = 0.42, patrolZ = 0.58 },
-            { unitDefName = "armpw", count = 14, dx = 120, dz = -140, spacing = 75, patrolX = 0.32, patrolZ = 0.62 },
-          } }
-        }
-      },
-      {
-        id = "cortex_bottom_right",
-        label = "Cortex Bottom-Right Island",
-        teamID = 2,
-        side = "Cortex",
-        role = "defender",
-        base = { x = 0.82, z = 0.82 },
-        groups = {
-          { id = "cortex_island", units = {
-            { unitDefName = "cormex", count = 3, atMetalSpots = true, dx = -120, dz = -100, spacing = 120 },
-            { unitDefName = "corwin", count = 5, dx = 120, dz = -80, spacing = 90 },
-            { unitDefName = "corsolar", count = 3, dx = 220, dz = 80, spacing = 90 },
-            { unitDefName = "corllt", count = 5, dx = -180, dz = 180, spacing = 120 },
-            { unitDefName = "corgator", count = 8, dx = -260, dz = -230, spacing = 90, patrolX = 0.62, patrolZ = 0.66 },
-            { unitDefName = "corthud", count = 4, dx = -40, dz = -320, spacing = 95, patrolX = 0.56, patrolZ = 0.62 },
-          } }
-        }
-      },
-      {
-        id = "raptors_bottom_left",
-        label = "Raptor Bottom-Left Infestation",
-        teamID = 3,
-        side = "Raptors",
-        role = "wild_pressure",
-        base = { x = 0.18, z = 0.78 },
-        groups = {
-          { id = "raptor_nest", units = {
-            { unitDefName = "raptor_hive", count = 1, dx = 0, dz = 0, spacing = 80 },
-            { unitDefName = "raptor_turret_basic_t2_v1", count = 4, dx = -160, dz = 80, spacing = 130 },
-            { unitDefName = "raptor_land_swarmer_basic_t1_v1", count = 16, dx = 120, dz = -80, spacing = 70, patrolX = 0.35, patrolZ = 0.60 },
-            { unitDefName = "raptor_land_swarmer_basic_t2_v1", count = 8, dx = -220, dz = -160, spacing = 80, patrolX = 0.42, patrolZ = 0.58 },
-            { unitDefName = "raptor_land_assault_basic_t2_v1", count = 4, dx = 180, dz = 150, spacing = 90, patrolX = 0.48, patrolZ = 0.52 },
-          } }
-        }
-      },
-    }
-  }
-}
-'@
+$mission = New-MissionObject $scenario $variantObject $PlayerController $SimFrames
+$missionLua = "return " + (ConvertTo-LuaLiteral $mission 0) + "`n"
 
 New-Item -ItemType Directory -Force -Path (Split-Path -Parent $config.seedOutbox) | Out-Null
 Set-Content -Encoding ASCII -Path $config.seedOutbox -Value $missionLua
-New-Item -ItemType Directory -Force -Path (Split-Path -Parent $config.seedDestination) | Out-Null
-Set-Content -Encoding ASCII -Path $config.seedDestination -Value $missionLua
+try {
+  New-Item -ItemType Directory -Force -Path (Split-Path -Parent $config.seedDestination) | Out-Null
+  Set-Content -Encoding ASCII -Path $config.seedDestination -Value $missionLua
+  $installedToBar = $true
+} catch {
+  $installedToBar = $false
+  Write-Warning "Could not install playable seed to BAR destination: $($_.Exception.Message)"
+}
 $zoneMapDestination = Install-VerdanceZoneMap -Config $config
 
-$startScriptPath = Join-Path $runRoot "verdance_playable_all_that_simmers.txt"
+$safeMapId = if ($scenario.map.id) { [string]$scenario.map.id } else { ($mapName -replace '[^A-Za-z0-9_-]', '_') }
+$safeMapId = $safeMapId -replace '[^A-Za-z0-9_-]', '_'
+$startScriptPath = Join-Path $runRoot "verdance_playable_${safeMapId}_$Variant.txt"
+$allyTeamBlocks = @($scenario.layout.allyTeams) | ForEach-Object { Render-AllyTeam $_ }
+$teamBlocks = @($scenario.layout.teams) | ForEach-Object { Render-Team $_ $mapSizeX $mapSizeZ }
+$aiSpecs = @($variantObject.ai)
+if ($playerAi) { $aiSpecs += $playerAi }
+$aiIndex = 0
+$aiBlocks = foreach ($ai in @($aiSpecs)) {
+  Render-AI $ai $aiIndex
+  $aiIndex += 1
+}
+$playerSpectator = if ($playerAi -or $PlayerController -eq "clean_baseline") { 1 } else { 0 }
+$variantPlayerTeam = $null
+if ($variantObject.PSObject.Properties["playerTeamID"]) { $variantPlayerTeam = [int]$variantObject.playerTeamID }
+$playerTeamID = if ($null -ne $variantPlayerTeam) { $variantPlayerTeam } elseif ($PlayerController -eq "clean_baseline") { 0 } else { 3 }
+$numUsers = 1 + @($aiSpecs).Count
+
+$bodyBlocks = @($allyTeamBlocks) + @($teamBlocks) + @($aiBlocks)
+$blocksText = $bodyBlocks -join "`r`n`r`n"
+
+$gameType = if ($config.PSObject.Properties["gameType"] -and $config.gameType) { [string]$config.gameType } else { 'Verdance Ashes $VERSION' }
 $startScript = @"
 [GAME]
 {
   MapName=$mapName;
-  GameType=Beyond All Reason `$VERSION;
+  GameType=$gameType;
   GameStartDelay=0;
   StartPosType=3;
   RecordDemo=1;
@@ -190,7 +343,7 @@ $startScript = @"
   IsHost=1;
   FixedRNGSeed=1;
   NumPlayers=1;
-  NumUsers=4;
+  NumUsers=$numUsers;
   HostIP=127.0.0.1;
   HostPort=0;
   NoHelperAIs=0;
@@ -204,138 +357,59 @@ $startScript = @"
     raptor_graceperiodmult=1.0;
     raptor_spawncountmult=1.0;
     va_campaign=1;
+$balanceModOptions
+$extraModOptionsText
     debugcommands=$debugCommands;
   }
 
-  [ALLYTEAM0]
-  {
-    StartRectLeft=0.02;
-    StartRectTop=0.02;
-    StartRectRight=0.32;
-    StartRectBottom=0.36;
-    NumAllies=0;
-  }
-
-  [ALLYTEAM1]
-  {
-    StartRectLeft=0.58;
-    StartRectTop=0.02;
-    StartRectRight=0.98;
-    StartRectBottom=0.58;
-    NumAllies=0;
-  }
-
-  [ALLYTEAM2]
-  {
-    StartRectLeft=0.65;
-    StartRectTop=0.62;
-    StartRectRight=0.98;
-    StartRectBottom=0.98;
-    NumAllies=0;
-  }
-
-  [ALLYTEAM3]
-  {
-    StartRectLeft=0.02;
-    StartRectTop=0.58;
-    StartRectRight=0.38;
-    StartRectBottom=0.98;
-    NumAllies=0;
-  }
-
-  [TEAM0]
-  {
-    Side=Legion;
-    Handicap=0;
-    AllyTeam=0;
-    TeamLeader=0;
-    StartPosX=$([int]($mapSizeX * 0.16));
-    StartPosZ=$([int]($mapSizeZ * 0.18));
-    RgbColor=0.25 0.85 0.35;
-  }
-
-  [TEAM1]
-  {
-    Side=Armada;
-    Handicap=0;
-    AllyTeam=1;
-    TeamLeader=0;
-    StartPosX=$([int]($mapSizeX * 0.80));
-    StartPosZ=$([int]($mapSizeZ * 0.18));
-    RgbColor=0.25 0.48 1.0;
-  }
-
-  [TEAM2]
-  {
-    Side=Cortex;
-    Handicap=0;
-    AllyTeam=2;
-    TeamLeader=0;
-    StartPosX=$([int]($mapSizeX * 0.82));
-    StartPosZ=$([int]($mapSizeZ * 0.82));
-    RgbColor=1.0 0.20 0.16;
-  }
-
-  [TEAM3]
-  {
-    Side=Armada;
-    Handicap=0;
-    AllyTeam=3;
-    TeamLeader=0;
-    StartPosX=$([int]($mapSizeX * 0.18));
-    StartPosZ=$([int]($mapSizeZ * 0.78));
-    RgbColor=0.78 0.14 0.92;
-  }
-
-  [AI0]
-  {
-    Host=0;
-    IsFromDemo=0;
-    Name=SimpleDefenderAI(Armada);
-    ShortName=SimpleDefenderAI;
-    Team=1;
-    Version=<not-versioned>;
-  }
-
-  [AI1]
-  {
-    Host=0;
-    IsFromDemo=0;
-    Name=SimpleDefenderAI(Cortex);
-    ShortName=SimpleDefenderAI;
-    Team=2;
-    Version=<not-versioned>;
-  }
-
-  [AI2]
-  {
-    Host=0;
-    IsFromDemo=0;
-    Name=RaptorsDefenseAI(Verdance);
-    ShortName=RaptorsAI;
-    Team=3;
-    Version=<not-versioned>;
-  }
+$blocksText
 
   [PLAYER0]
   {
     IsFromDemo=0;
     Name=VerdanceCommander;
-    Team=0;
-    Spectator=0;
+    Team=$playerTeamID;
+    Spectator=$playerSpectator;
     Rank=0;
   }
 }
 "@
 Set-Content -Encoding ASCII -Path $startScriptPath -Value $startScript
 
+$scenarioManifest = [ordered]@{
+  generatedAt = (Get-Date).ToString("s")
+  scenarioPath = $ScenarioPath
+  variant = $Variant
+  variantLabel = $variantObject.label
+  map = $scenario.map
+  seedOutbox = $config.seedOutbox
+  seedDestination = $config.seedDestination
+  startScriptPath = $startScriptPath
+  ai = @($aiSpecs)
+  playerController = $PlayerController
+  balanceTest = [bool]$BalanceTest
+  simFrames = $SimFrames
+  extraModOptions = $ExtraModOptions
+  saveName = if ($SaveGame) { $SaveName } else { $null }
+}
+$scenarioManifestPath = Join-Path $runRoot "latest_playable_variant_manifest.json"
+$scenarioManifest | ConvertTo-Json -Depth 50 | Set-Content -Encoding UTF8 -Path $scenarioManifestPath
+
 Write-Host "Installed playable mission seed to workspace: $($config.seedOutbox)"
-Write-Host "Installed playable mission seed to BAR: $($config.seedDestination)"
+if ($installedToBar) {
+  Write-Host "Installed playable mission seed to BAR: $($config.seedDestination)"
+} else {
+  Write-Host "Skipped BAR destination install; workspace seed is ready: $($config.seedOutbox)"
+}
 Write-Host "Installed zone map to BAR: $zoneMapDestination"
 Write-Host "Wrote playable startscript: $startScriptPath"
+Write-Host "Variant: $Variant ($($variantObject.label))"
+Write-Host "Player controller: $PlayerController"
+Write-Host "Wrote variant manifest: $scenarioManifestPath"
 
 $engineName = if ($runHeadless) { "spring-headless.exe" } else { "spring.exe" }
-$engine = Join-Path $config.barDataRoot "engine\recoil_2025.06.24\$engineName"
+$engineDir = Get-BAREngineDir -Config $config -EngineName $engineName
+$engine = Join-Path $engineDir $engineName
 if (!(Test-Path $engine)) { throw "$engineName not found at $engine" }
 
 if ($Launch -or $runHeadless) {
@@ -396,6 +470,7 @@ if ($Launch -or $runHeadless) {
       if (!(Test-Path $saveMetaPath)) { Write-Warning "Save metadata was not created at $saveMetaPath. The .ssf exists, but BAR's load menu may not list it cleanly." }
       @(
         "saveName=$SaveName",
+        "scenarioVariant=$Variant",
         "saveGamePath=$saveGamePath",
         "saveMetaPath=$saveMetaPath",
         "startScriptPath=$startScriptPath",
@@ -412,7 +487,26 @@ if ($Launch -or $runHeadless) {
       if ($proc.ExitCode -ne 0) { throw "spring-headless exited with code $($proc.ExitCode). Check $($config.infolog)" }
     }
   } else {
-    Start-Process -FilePath $engine -WorkingDirectory $config.barDataRoot -ArgumentList $args
-    Write-Host "Launched visible BAR/Recoil process."
+    function Quote-VisibleProcessArg([string]$Arg) {
+      if ($Arg -match '[\s"]') { return '"' + ($Arg.Replace('"', '\"')) + '"' }
+      return $Arg
+    }
+    $visibleArgLine = (@($args) | ForEach-Object { Quote-VisibleProcessArg ([string]$_) }) -join " "
+    $infologBaseline = 0
+    if (Test-Path $config.infolog) {
+      $infologBaseline = (Get-Item -LiteralPath $config.infolog).Length
+    }
+    $proc = Start-Process -FilePath $engine -WorkingDirectory $config.barDataRoot -ArgumentList $visibleArgLine -PassThru
+    $launchManifest = [ordered]@{
+      schemaVersion = "verdance-launch/1.0"
+      pid = $proc.Id
+      engine = $engine
+      startScriptPath = $startScriptPath
+      launchedAt = (Get-Date).ToUniversalTime().ToString("o")
+      infologPath = $config.infolog
+      infologBaselineLength = $infologBaseline
+    }
+    $launchManifest | ConvertTo-Json | Set-Content -Encoding UTF8 -Path (Join-Path $runRoot "latest_launch.json")
+    Write-Host "Launched visible BAR/Recoil process (pid $($proc.Id))."
   }
 }

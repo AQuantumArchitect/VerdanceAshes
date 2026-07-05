@@ -1,5 +1,5 @@
 param(
-  [string]$Workspace = "$env:USERPROFILE\Documents\BAR_Verdance_Workspace",
+  [string]$Workspace = "",
   [int]$Port = 8765,
   [switch]$NoBrowser
 )
@@ -8,6 +8,8 @@ $ErrorActionPreference = "Stop"
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $CommonPath = Join-Path $ScriptDir "_common.ps1"
 if (Test-Path $CommonPath) { . $CommonPath }
+if (Get-Command Get-VerdanceWorkspaceRoot -ErrorAction SilentlyContinue) { $Workspace = Get-VerdanceWorkspaceRoot -Workspace $Workspace }
+elseif (-not $Workspace) { $Workspace = Split-Path -Parent $ScriptDir }
 
 function ConvertTo-JsonSafe {
   param($Object, [int]$Depth = 50)
@@ -39,25 +41,10 @@ function Read-TextFileLocal {
 }
 
 function Get-ConfigLocal {
-  $configPath = Join-Path $Workspace "verdance_config.json"
-  if (Test-Path $configPath) {
-    try { return Get-Content $configPath -Raw | ConvertFrom-Json }
-    catch { }
-  }
-  $barDataRoot = "$env:LOCALAPPDATA\Programs\Beyond-All-Reason\data"
-  $barSdd = Join-Path $barDataRoot "games\BAR.sdd"
-  return [pscustomobject]@{
-    schemaVersion = "0.7-fallback"
-    barDataRoot = $barDataRoot
-    barSdd = $barSdd
-    workspace = $Workspace
-    infolog = (Join-Path $barDataRoot "infolog.txt")
-    seedDestination = (Join-Path $barSdd "singleplayer\verdance_ashes\generated\va_current.lua")
-    resultInbox = (Join-Path $Workspace "inbox\latest_va_result.json")
-    campaignState = (Join-Path $Workspace "state\campaign_state.json")
-    seedOutbox = (Join-Path $Workspace "outbox\va_current.lua")
-    processedLedger = (Join-Path $Workspace "ledger\processed_results.json")
-    exportDir = (Join-Path $Workspace "export")
+  # Layered config with BAR auto-detection lives in _common.ps1 now.
+  try { return Get-VerdanceConfig -Workspace $Workspace }
+  catch {
+    return [pscustomobject]@{ schemaVersion = "0.8-error"; error = $_.Exception.Message; workspace = $Workspace }
   }
 }
 
@@ -116,11 +103,34 @@ function Get-SeedSummary {
   }
 }
 
+function Get-IntentSummary {
+  param([string]$IntentPath)
+  $intent = Read-JsonFileLocal $IntentPath
+  if (-not $intent) { return $null }
+  return [pscustomobject]@{
+    path = $IntentPath
+    schemaVersion = $intent.schemaVersion
+    campaignId = $intent.campaignId
+    missionId = $intent.missionId
+    missionNumber = $intent.missionNumber
+    mapId = $intent.mapId
+    deploymentZoneId = $intent.deploymentZoneId
+    extractionZoneId = $intent.extractionZoneId
+    objective = $intent.objective
+    objectiveTarget = $intent.objectiveTarget
+    expectedEnemyScale = $intent.expectedEnemyScale
+    hazardPolicy = $intent.hazardPolicy
+    storyReason = $intent.storyReason
+  }
+}
+
 function Get-ConsoleStatus {
   $config = Get-ConfigLocal
   $state = Read-JsonFileLocal $config.campaignState
   $result = Read-JsonFileLocal $config.resultInbox
   $ledger = Read-JsonFileLocal $config.processedLedger
+  $intentPath = Join-Path $Workspace "outbox\next_mission_intent.json"
+  $buildManifestPath = Join-Path $Workspace "outbox\next_mission_build_manifest.json"
   $exports = @()
   if (Test-Path $config.exportDir) {
     $exports = Get-ChildItem -Path $config.exportDir -Filter "verdance_handoff_*.zip" -ErrorAction SilentlyContinue |
@@ -184,15 +194,62 @@ function Get-ConsoleStatus {
       seedOutboxExists = (Test-Path $config.seedOutbox)
       seedDestinationExists = (Test-Path $config.seedDestination)
       ledgerExists = (Test-Path $config.processedLedger)
+      nextIntentExists = (Test-Path $intentPath)
+      nextMissionBuildExists = (Test-Path $buildManifestPath)
     }
     config = $config
     state = $stateSummary
     latestResult = $resultSummary
     ledger = $ledgerSummary
+    nextIntent = Get-IntentSummary $intentPath
+    nextMissionBuild = Read-JsonFileLocal $buildManifestPath
     seed = Get-SeedSummary $config.seedOutbox
     installedSeed = Get-SeedSummary $config.seedDestination
+    session = Read-JsonFileLocal (Join-Path $Workspace "outbox\play_session.status.json")
     exports = @($exports)
   }
+}
+
+function Start-DetachedPlaySession {
+  $script = Join-Path $ScriptDir "play_session_v1.ps1"
+  if (-not (Test-Path $script)) {
+    return [pscustomobject]@{ ok = $false; error = "play_session_v1.ps1 not found" }
+  }
+  $statusPath = Join-Path $Workspace "outbox\play_session.status.json"
+  $existing = Read-JsonFileLocal $statusPath
+  if ($existing -and $existing.phase -in @("preflight", "building", "in-game", "extracting", "build-next")) {
+    # A session may still be live; only block if a spring process really exists.
+    $spring = Get-Process -ErrorAction SilentlyContinue | Where-Object { $_.Name -match '^spring(-headless)?$' }
+    if ($spring) {
+      return [pscustomobject]@{ ok = $false; error = "A play session appears to be running (phase: $($existing.phase)). Cancel it first."; session = $existing }
+    }
+  }
+  Start-Process powershell -ArgumentList @(
+    "-NoProfile", "-ExecutionPolicy", "Bypass",
+    "-File", "`"$script`"", "-Workspace", "`"$Workspace`""
+  ) -WindowStyle Hidden
+  return [pscustomobject]@{ ok = $true; started = $true; statusPath = $statusPath }
+}
+
+function Stop-PlaySession {
+  $stopped = @()
+  Get-CimInstance Win32_Process |
+    Where-Object { $_.Name -match '^powershell' -and $_.CommandLine -match 'play_session_v1\.ps1' } |
+    ForEach-Object {
+      try { Stop-Process -Id $_.ProcessId -Force; $stopped += "powershell:$($_.ProcessId)" } catch { }
+    }
+  Get-Process -ErrorAction SilentlyContinue |
+    Where-Object { $_.Name -match '^spring(-headless)?$' } |
+    ForEach-Object {
+      try { Stop-Process -Id $_.Id -Force; $stopped += "$($_.Name):$($_.Id)" } catch { }
+    }
+  $statusPath = Join-Path $Workspace "outbox\play_session.status.json"
+  $status = Read-JsonFileLocal $statusPath
+  if ($status -and $status.PSObject.Properties["phase"]) {
+    $status.phase = "cancelled"
+    try { $status | ConvertTo-Json | Set-Content -Encoding UTF8 -Path $statusPath } catch { }
+  }
+  return [pscustomobject]@{ ok = $true; stopped = $stopped }
 }
 
 function Get-FilePayload {
@@ -205,6 +262,8 @@ function Get-FilePayload {
     seed = $config.seedOutbox
     installedSeed = $config.seedDestination
     config = (Join-Path $Workspace "verdance_config.json")
+    nextIntent = (Join-Path $Workspace "outbox\next_mission_intent.json")
+    nextMissionBuild = (Join-Path $Workspace "outbox\next_mission_build_manifest.json")
   }
   if (-not $map.ContainsKey($Name)) { return [pscustomobject]@{ ok=$false; error="Unknown file key: $Name" } }
   $path = $map[$Name]
@@ -243,6 +302,12 @@ while ($listener.IsListening) {
       continue
     }
     if ($path -eq "/api/status") { Write-Response $ctx (ConvertTo-JsonSafe (Get-ConsoleStatus)) ; continue }
+    if ($path -eq "/api/sessionStatus") {
+      $sessionStatus = Read-JsonFileLocal (Join-Path $Workspace "outbox\play_session.status.json")
+      if (-not $sessionStatus) { $sessionStatus = [pscustomobject]@{ phase = "idle" } }
+      Write-Response $ctx (ConvertTo-JsonSafe $sessionStatus)
+      continue
+    }
     if ($path -eq "/api/file") {
       $name = $ctx.Request.QueryString["name"]
       Write-Response $ctx (ConvertTo-JsonSafe (Get-FilePayload $name))
@@ -253,6 +318,18 @@ while ($listener.IsListening) {
     if ($path -eq "/api/advance") { Write-Response $ctx (ConvertTo-JsonSafe (Invoke-ConsoleScript "advance_campaign.ps1")) ; continue }
     if ($path -eq "/api/advanceForce") { Write-Response $ctx (ConvertTo-JsonSafe (Invoke-ConsoleScript "advance_campaign.ps1" @("-ForceNext"))) ; continue }
     if ($path -eq "/api/runCycle") { Write-Response $ctx (ConvertTo-JsonSafe (Invoke-ConsoleScript "run_full_cycle.ps1")) ; continue }
+    if ($path -eq "/api/advanceV1") { Write-Response $ctx (ConvertTo-JsonSafe (Invoke-ConsoleScript "advance_campaign_v1.ps1" @("-WriteState"))) ; continue }
+    if ($path -eq "/api/runCycleV1") { Write-Response $ctx (ConvertTo-JsonSafe (Invoke-ConsoleScript "run_full_cycle_v1.ps1" @("-WriteState"))) ; continue }
+    if ($path -eq "/api/playSession") { Write-Response $ctx (ConvertTo-JsonSafe (Start-DetachedPlaySession)) ; continue }
+    if ($path -eq "/api/cancelSession") { Write-Response $ctx (ConvertTo-JsonSafe (Stop-PlaySession)) ; continue }
+    if ($path -eq "/api/migrateState") { Write-Response $ctx (ConvertTo-JsonSafe (Invoke-ConsoleScript "migrate_state_v1.ps1")) ; continue }
+    if ($path -eq "/api/installMod") { Write-Response $ctx (ConvertTo-JsonSafe (Invoke-ConsoleScript "install_mod_archive.ps1")) ; continue }
+    if ($path -eq "/api/buildNextMissionV1") { Write-Response $ctx (ConvertTo-JsonSafe (Invoke-ConsoleScript "build_next_mission_v1.ps1")) ; continue }
+    if ($path -eq "/api/playNextMissionV1") { Write-Response $ctx (ConvertTo-JsonSafe (Invoke-ConsoleScript "build_next_mission_v1.ps1" @("-Launch"))) ; continue }
+    if ($path -eq "/api/createNextMissionSaveV1") { Write-Response $ctx (ConvertTo-JsonSafe (Invoke-ConsoleScript "build_next_mission_v1.ps1" @("-SaveGame"))) ; continue }
+    if ($path -eq "/api/processHealth") { Write-Response $ctx (ConvertTo-JsonSafe (Invoke-ConsoleScript "verdance_process_health.ps1")) ; continue }
+    if ($path -eq "/api/stopSpring") { Write-Response $ctx (ConvertTo-JsonSafe (Invoke-ConsoleScript "verdance_process_health.ps1" @("-StopSpring"))) ; continue }
+    if ($path -eq "/api/stopVerdanceSlop") { Write-Response $ctx (ConvertTo-JsonSafe (Invoke-ConsoleScript "verdance_process_health.ps1" @("-StopAllVerdance"))) ; continue }
     if ($path -eq "/api/export") { Write-Response $ctx (ConvertTo-JsonSafe (Invoke-ConsoleScript "export_for_chatgpt.ps1")) ; continue }
     if ($path -eq "/api/runAndExport") { Write-Response $ctx (ConvertTo-JsonSafe (Invoke-ConsoleScript "run_and_export.ps1")) ; continue }
     if ($path -eq "/api/openWorkspace") { Start-Process $Workspace; Write-Response $ctx (ConvertTo-JsonSafe ([pscustomobject]@{ ok=$true; opened=$Workspace })) ; continue }

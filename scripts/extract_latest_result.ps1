@@ -1,6 +1,7 @@
-param([string]$Workspace = "$env:USERPROFILE\Documents\BAR_Verdance_Workspace")
+param([string]$Workspace = "")
 $ErrorActionPreference = "Stop"
 . (Join-Path (Split-Path -Parent $MyInvocation.MyCommand.Path) "_common.ps1")
+$Workspace = Get-VerdanceWorkspaceRoot -Workspace $Workspace
 
 function Get-BalancedJsonAfterMarker {
   param([string]$Text, [string]$Marker)

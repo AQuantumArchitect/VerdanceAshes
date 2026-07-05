@@ -1,19 +1,22 @@
 param(
-  [string]$Workspace = "$env:USERPROFILE\Documents\BAR_Verdance_Workspace",
+  [string]$Workspace = "",
   [string]$MapName = "All That Simmers v1.1.1",
   [int]$TimeoutSeconds = 75
 )
 
 $ErrorActionPreference = "Stop"
 . (Join-Path (Split-Path -Parent $MyInvocation.MyCommand.Path) "_common.ps1")
+$Workspace = Get-VerdanceWorkspaceRoot -Workspace $Workspace
 
 $config = Get-VerdanceConfig -Workspace $Workspace
 $zoneMapDestination = Install-VerdanceZoneMap -Config $config
 if ($zoneMapDestination) {
   Write-Host "Installed zone map to BAR: $zoneMapDestination"
 }
-$engine = Join-Path $config.barDataRoot "engine\recoil_2025.06.24\spring-headless.exe"
+$engineDir = Get-BAREngineDir -Config $config -EngineName "spring-headless.exe"
+$engine = Join-Path $engineDir "spring-headless.exe"
 if (!(Test-Path $engine)) { throw "spring-headless.exe not found at $engine" }
+$gameType = if ($config.PSObject.Properties["gameType"] -and $config.gameType) { [string]$config.gameType } else { 'Verdance Ashes $VERSION' }
 
 $runRoot = Join-Path $Workspace "headless_runs"
 New-Item -ItemType Directory -Force -Path $runRoot | Out-Null
@@ -24,7 +27,7 @@ $startScript = @"
 [GAME]
 {
   MapName=$MapName;
-  GameType=Beyond All Reason `$VERSION;
+  GameType=$gameType;
   GameStartDelay=0;
   StartPosType=0;
   RecordDemo=0;
