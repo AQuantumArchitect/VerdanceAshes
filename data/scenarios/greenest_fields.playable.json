@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "verdance-playable-scenario/0.1",
+  "map": {
+    "id": "greenest_fields",
+    "name": "Greenest Fields 1.3.1",
+    "sizeX": 1024,
+    "sizeZ": 1024
+  },
+  "zoneMapPath": "data/zone_maps/greenest_fields.zone_map.json",
+  "defaultVariant": "clean_baseline",
+  "notes": "No metal map. First pass should measure lane pressure, converter expansion, and how quickly the AI learns to convert energy into economy.",
+  "missionBase": {
+    "schemaVersion": "0.10-playable",
+    "campaignId": "verdance_ashes",
+    "missionNumber": 902,
+    "pathSignal": "G",
+    "title": "Verdance Calibration Slice: Greenest Fields",
+    "zone": "Greenest Fields",
+    "objective": {
+      "id": "gf_clean_baseline_proxy",
+      "kind": "playable_proxy",
+      "requiredFrames": 1800,
+      "description": "Greenest Fields baseline. No metal spots, so the test emphasizes energy economy, lane pressure, and converter timing."
+    },
+    "economy": {
+      "metalIncome": 0,
+      "energyIncome": 0,
+      "buildPower": 0
+    },
+    "graph": {},
+    "reputation": {},
+    "companions": []
+  },
+  "baseRecipes": {},
+  "layout": {
+    "allyTeams": [
+      { "id": 0, "startRect": [0.02, 0.02, 0.48, 0.48] },
+      { "id": 1, "startRect": [0.52, 0.52, 0.98, 0.98] }
+    ],
+    "teams": [
+      { "id": 0, "side": "Legion", "allyTeam": 0, "base": [0.16, 0.16], "rgb": [0.25, 0.85, 0.35], "label": "Legion Aggressive" },
+      { "id": 1, "side": "Cortex", "allyTeam": 1, "base": [0.84, 0.84], "rgb": [1.0, 0.20, 0.16], "label": "Cortex SimpleAI" }
+    ]
+  },
+  "forces": [],
+  "variants": [
+    {
+      "id": "clean_baseline",
+      "label": "Clean Baseline",
+      "notes": "Two-team no-metal baseline. Legion is BARbarIAn aggressive; Cortex is SimpleAI. Use this to learn lane formation and early converter timing.",
+      "ai": [
+        { "name": "BARbarIAn(Legion Aggressive)", "shortName": "BARb", "team": 0, "version": "stable", "options": { "profile": "hard_aggressive" } },
+        { "name": "SimpleAI(Cortex)", "shortName": "SimpleDefenderAI", "team": 1, "version": "<not-versioned>" }
+      ]
+    }
+  ]
+}

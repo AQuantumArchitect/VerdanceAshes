@@ -1,0 +1,113 @@
+﻿{
+    "schemaVersion":  "verdance-zone-map/0.2",
+    "mapId":  "koom_valley",
+    "mapName":  "Koom Valley",
+    "coordinateSystem":  "normalized_to_elmos",
+    "authoringStatus":  "authored_from_20260623_grid_battle_survey_v0_1",
+    "notes":  "Coarse authored Verdance zones promoted from 8x8 battle-grid survey. Rectangles may overlap; earlier zones win in the current telemetry classifier.",
+    "zones":  [
+                  {
+                      "zoneId":  "KOOM_NW_GREEN_SHELF",
+                      "label":  "Northwest Green Shelf",
+                      "role":  "legion_start",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0,
+                                     "xMax":  0.26,
+                                     "zMin":  0,
+                                     "zMax":  0.28
+                                 },
+                      "tags":  [
+                                   "start",
+                                   "northwest",
+                                   "shelf"
+                               ]
+                  },
+                  {
+                      "zoneId":  "KOOM_SE_GREEN_SHELF",
+                      "label":  "Southeast Green Shelf",
+                      "role":  "defender_start",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0.72,
+                                     "xMax":  1,
+                                     "zMin":  0.7,
+                                     "zMax":  1
+                                 },
+                      "tags":  [
+                                   "start",
+                                   "southeast",
+                                   "shelf"
+                               ]
+                  },
+                  {
+                      "zoneId":  "KOOM_NORTH_SCAR_MOUTH",
+                      "label":  "North Scar Mouth",
+                      "role":  "scar_entrance",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0.32,
+                                     "xMax":  0.62,
+                                     "zMin":  0,
+                                     "zMax":  0.25
+                                 },
+                      "tags":  [
+                                   "north",
+                                   "scar",
+                                   "approach"
+                               ]
+                  },
+                  {
+                      "zoneId":  "KOOM_CENTRAL_FLUID_SCAR",
+                      "label":  "Central Fluid Scar",
+                      "role":  "primary_lane",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0.34,
+                                     "xMax":  0.66,
+                                     "zMin":  0.2,
+                                     "zMax":  0.82
+                                 },
+                      "tags":  [
+                                   "center",
+                                   "lane",
+                                   "scar",
+                                   "low"
+                               ]
+                  },
+                  {
+                      "zoneId":  "KOOM_WEST_RIDGE_POCKET",
+                      "label":  "West Ridge Pocket",
+                      "role":  "flank_pocket",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0,
+                                     "xMax":  0.34,
+                                     "zMin":  0.24,
+                                     "zMax":  0.76
+                                 },
+                      "tags":  [
+                                   "west",
+                                   "ridge",
+                                   "flank"
+                               ]
+                  },
+                  {
+                      "zoneId":  "KOOM_EAST_RIDGE_POCKET",
+                      "label":  "East Ridge Pocket",
+                      "role":  "flank_pocket",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0.66,
+                                     "xMax":  1,
+                                     "zMin":  0.24,
+                                     "zMax":  0.76
+                                 },
+                      "tags":  [
+                                   "east",
+                                   "ridge",
+                                   "flank"
+                               ]
+                  }
+              ]
+}

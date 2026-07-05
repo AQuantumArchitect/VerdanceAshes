@@ -1,0 +1,135 @@
+﻿{
+    "schemaVersion":  "verdance-zone-map/0.2",
+    "mapId":  "all_that_simmers",
+    "mapName":  "All That Simmers",
+    "coordinateSystem":  "normalized_to_elmos",
+    "authoringStatus":  "authored_from_20260623_grid_battle_survey_v0_1",
+    "notes":  "Coarse authored Verdance zones promoted from 8x8 battle-grid survey. Rectangles may overlap; earlier zones win in the current telemetry classifier.",
+    "zones":  [
+                  {
+                      "zoneId":  "ATS_CENTRAL_HIVE_FLATS",
+                      "label":  "Central Hive Flats",
+                      "role":  "raptor_hazard",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0.36,
+                                     "xMax":  0.62,
+                                     "zMin":  0.34,
+                                     "zMax":  0.62
+                                 },
+                      "tags":  [
+                                   "center",
+                                   "wilds",
+                                   "raptors",
+                                   "hazard"
+                               ]
+                  },
+                  {
+                      "zoneId":  "ATS_NW_CANOPY_START",
+                      "label":  "Northwest Canopy Start",
+                      "role":  "legion_start",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0,
+                                     "xMax":  0.3,
+                                     "zMin":  0,
+                                     "zMax":  0.28
+                                 },
+                      "tags":  [
+                                   "start",
+                                   "legion",
+                                   "northwest",
+                                   "canopy"
+                               ]
+                  },
+                  {
+                      "zoneId":  "ATS_NE_ARMADA_RIDGE",
+                      "label":  "Northeast Armada Ridge",
+                      "role":  "armada_start",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0.68,
+                                     "xMax":  1,
+                                     "zMin":  0,
+                                     "zMax":  0.3
+                                 },
+                      "tags":  [
+                                   "start",
+                                   "armada",
+                                   "northeast",
+                                   "ridge"
+                               ]
+                  },
+                  {
+                      "zoneId":  "ATS_SE_CORTEX_BASIN",
+                      "label":  "Southeast Cortex Basin",
+                      "role":  "cortex_start",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0.62,
+                                     "xMax":  1,
+                                     "zMin":  0.64,
+                                     "zMax":  1
+                                 },
+                      "tags":  [
+                                   "start",
+                                   "cortex",
+                                   "southeast",
+                                   "basin"
+                               ]
+                  },
+                  {
+                      "zoneId":  "ATS_SW_ARMADA_LAGOON",
+                      "label":  "Southwest Armada Lagoon",
+                      "role":  "armada_start",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0,
+                                     "xMax":  0.34,
+                                     "zMin":  0.62,
+                                     "zMax":  1
+                                 },
+                      "tags":  [
+                                   "start",
+                                   "armada",
+                                   "southwest",
+                                   "swamp"
+                               ]
+                  },
+                  {
+                      "zoneId":  "ATS_NW_CENTER_APPROACH",
+                      "label":  "Northwest-to-Center Approach",
+                      "role":  "approach_lane",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0.18,
+                                     "xMax":  0.48,
+                                     "zMin":  0.18,
+                                     "zMax":  0.46
+                                 },
+                      "tags":  [
+                                   "approach",
+                                   "canopy",
+                                   "flank"
+                               ]
+                  },
+                  {
+                      "zoneId":  "ATS_SW_NE_SWAMP_LANE",
+                      "label":  "Southwest-to-Northeast Swamp Lane",
+                      "role":  "primary_lane",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0.22,
+                                     "xMax":  0.82,
+                                     "zMin":  0.22,
+                                     "zMax":  0.82
+                                 },
+                      "tags":  [
+                                   "lane",
+                                   "swamp",
+                                   "diagonal",
+                                   "low"
+                               ]
+                  }
+              ]
+}

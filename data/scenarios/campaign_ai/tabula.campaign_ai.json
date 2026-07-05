@@ -1,0 +1,155 @@
+﻿{
+    "schemaVersion":  "verdance-campaign-ai-scenario/0.1",
+    "map":  {
+                "id":  "tabula",
+                "name":  "Tabula_Remake 1.5",
+                "sizeX":  8192,
+                "sizeZ":  7168,
+                "sizeStatus":  "measured_from_headless_engine"
+            },
+    "zoneMapPath":  "data/zone_maps/authored/tabula.authored.zone_map.json",
+    "defaultVariant":  "player_team_0_aggressive",
+    "notes":  "Campaign AI baseline matrix. Player slot is simulated by BARbarIAn hard_aggressive; NPCs default to SimpleAI; raptor/wild teams remain RaptorsAI.",
+    "missionBase":  {
+                        "schemaVersion":  "0.10-playable",
+                        "campaignId":  "verdance_ashes",
+                        "missionNumber":  1100,
+                        "pathSignal":  "CAMPAIGN_AI_BASELINE",
+                        "title":  "Verdance Campaign AI Baseline: Tabula",
+                        "zone":  "Tabula",
+                        "objective":  {
+                                          "id":  "tabula_authored_survey",
+                                          "kind":  "authored_zone_survey",
+                                          "requiredFrames":  1800,
+                                          "description":  "Headless BAR-AI authored-zone survey."
+                                      },
+                        "economy":  {
+                                        "metalIncome":  0,
+                                        "energyIncome":  0,
+                                        "buildPower":  0
+                                    },
+                        "graph":  {
+
+                                  },
+                        "reputation":  {
+
+                                       },
+                        "companions":  [
+
+                                       ]
+                    },
+    "baseRecipes":  {
+
+                    },
+    "layout":  {
+                   "allyTeams":  [
+                                     {
+                                         "id":  0,
+                                         "startRect":  [
+                                                           0.02,
+                                                           0.02,
+                                                           0.48,
+                                                           0.48
+                                                       ]
+                                     },
+                                     {
+                                         "id":  1,
+                                         "startRect":  [
+                                                           0.52,
+                                                           0.52,
+                                                           0.98,
+                                                           0.98
+                                                       ]
+                                     }
+                                 ],
+                   "teams":  [
+                                 {
+                                     "id":  0,
+                                     "side":  "Legion",
+                                     "allyTeam":  0,
+                                     "base":  [
+                                                  0.16,
+                                                  0.16
+                                              ],
+                                     "rgb":  [
+                                                 0.25,
+                                                 0.85,
+                                                 0.35
+                                             ],
+                                     "label":  "Legion BARb Aggressive"
+                                 },
+                                 {
+                                     "id":  1,
+                                     "side":  "Armada",
+                                     "allyTeam":  1,
+                                     "base":  [
+                                                  0.84,
+                                                  0.84
+                                              ],
+                                     "rgb":  [
+                                                 1,
+                                                 0.2,
+                                                 0.16
+                                             ],
+                                     "label":  "Armada SimpleAI Defender"
+                                 }
+                             ]
+               },
+    "forces":  [
+
+               ],
+    "variants":  [
+                     {
+                         "id":  "player_team_0_aggressive",
+                         "label":  "Player-as-Legion Team 0 Aggressive",
+                         "playerTeamID":  0,
+                         "playerSide":  "Legion",
+                         "playerStartLabel":  "Legion BARb Aggressive",
+                         "npcAiShortName":  "SimpleAI",
+                         "notes":  "Simulates a human commander taking over Legion BARb Aggressive with BARbarIAn hard_aggressive; all other non-wild teams use SimpleAI.",
+                         "ai":  [
+                                    {
+                                        "name":  "BARbarIAn(Player Legion Team 0 Aggressive)",
+                                        "shortName":  "BARb",
+                                        "team":  0,
+                                        "version":  "stable",
+                                        "options":  {
+                                                        "profile":  "hard_aggressive"
+                                                    }
+                                    },
+                                    {
+                                        "name":  "SimpleAI(NPC Armada Team 1)",
+                                        "shortName":  "SimpleAI",
+                                        "team":  1,
+                                        "version":  "\u003cnot-versioned\u003e"
+                                    }
+                                ]
+                     },
+                     {
+                         "id":  "player_team_1_aggressive",
+                         "label":  "Player-as-Armada Team 1 Aggressive",
+                         "playerTeamID":  1,
+                         "playerSide":  "Armada",
+                         "playerStartLabel":  "Armada SimpleAI Defender",
+                         "npcAiShortName":  "SimpleAI",
+                         "notes":  "Simulates a human commander taking over Armada SimpleAI Defender with BARbarIAn hard_aggressive; all other non-wild teams use SimpleAI.",
+                         "ai":  [
+                                    {
+                                        "name":  "SimpleAI(NPC Legion Team 0)",
+                                        "shortName":  "SimpleAI",
+                                        "team":  0,
+                                        "version":  "\u003cnot-versioned\u003e"
+                                    },
+                                    {
+                                        "name":  "BARbarIAn(Player Armada Team 1 Aggressive)",
+                                        "shortName":  "BARb",
+                                        "team":  1,
+                                        "version":  "stable",
+                                        "options":  {
+                                                        "profile":  "hard_aggressive"
+                                                    }
+                                    }
+                                ]
+                     }
+                 ]
+}

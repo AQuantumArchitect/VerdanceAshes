@@ -1,0 +1,87 @@
+{
+  "schemaVersion": "verdance-seven-map-pool/0.1",
+  "notes": "Canonical Verdance calibration pool. Keep this file narrow: do not expand it to the full local BAR map catalog.",
+  "maps": [
+    {
+      "id": "all_that_simmers",
+      "title": "All That Simmers",
+      "mapName": "All That Simmers v1.1.1",
+      "archivePattern": "all_that_simmers_v1.1.1.sd7",
+      "minimapKey": "All_That_Simmers_v1.1.1",
+      "descriptor": "The Default High-Conflict Swamp",
+      "wilds": true,
+      "raptors": true,
+      "heuristics": { "hydrology": 0.35, "wind": "W4-12 avg6e/t", "metal": "1.8mu/s" },
+      "campaignForces": { "ARM": "M1 So1 D1", "NMC": "M1 D1", "COR": "M1" },
+      "baseline": "Legion BARb aggressive in upper-left; Armada SimpleAI upper-right and lower-left; Cortex SimpleAI lower-right; RaptorsAI center."
+    },
+    {
+      "id": "koom_valley",
+      "title": "Koom Valley",
+      "mapName": "Koom Valley 3 3.1",
+      "archivePattern": "koom_valley_3_3.1.sd7",
+      "minimapKey": "koom_valley_3_3.1",
+      "descriptor": "The Fluid Scar",
+      "heuristics": { "hydrology": 0.35, "wind": "W10-22 avg12e/t", "metal": "2.8mu/s" },
+      "campaignForces": { "ARM": "M6 So2 Wi2 D1", "NMC": "M3 Wi1 D2", "COR": "" },
+      "baseline": "Legion BARb aggressive vs Armada SimpleAI across the main valley, with optional neutral/simple third force only after topology is measured."
+    },
+    {
+      "id": "tabula",
+      "title": "Tabula",
+      "mapName": "Tabula_Remake 1.5",
+      "archivePattern": "tabula_remake_1.5.sd7",
+      "minimapKey": "Tabula_Remake_1.5.1",
+      "descriptor": "The Tiered Plateau",
+      "heuristics": { "hydrology": 0.35, "wind": "W18-36 avg20e/t", "metal": "2.1mu/s" },
+      "campaignForces": { "ARM": "M2 So1 Wi1 D1", "NMC": "M2 Wi1 D1", "COR": "" },
+      "baseline": "Legion BARb aggressive vs Armada SimpleAI, tuned around tier/plateau transitions rather than flat lane distance."
+    },
+    {
+      "id": "ancient_bastion",
+      "title": "Ancient Bastion",
+      "mapName": "Ancient Bastion Remake 0.5",
+      "archivePattern": "ancient_bastion_remake_0.5.sd7",
+      "minimapKey": "Ancient_Bastion_Remake_0.5",
+      "descriptor": "Taelith-Armada Citadel",
+      "heuristics": { "hydrology": null, "wind": "W12-28 avg15e/t", "metal": "2.9mu/s" },
+      "campaignForces": { "ARM": "M9 So4 Wi3 D8", "NMC": "", "COR": "D1" },
+      "baseline": "Armada SimpleAI citadel defender vs Legion BARb aggressive siege pressure, with Cortex defense as optional secondary anchor."
+    },
+    {
+      "id": "the_rock_jungle",
+      "title": "The Rock Jungle",
+      "mapName": "The Rock Jungle 2.1.1",
+      "archivePattern": "the_rock_jungle_2.1.1.sd7",
+      "minimapKey": "The_Rock_Jungle_2.1.1",
+      "descriptor": "Limestone Spire Labyrinth",
+      "wilds": true,
+      "raptors": true,
+      "heuristics": { "hydrology": null, "wind": "W6-16 avg8e/t", "metal": "1.5mu/s" },
+      "campaignForces": { "ARM": "", "NMC": "M2 D1", "COR": "" },
+      "baseline": "PVE-style Legion BARb aggressive pathing/survival test against SimpleAI or RaptorsAI placed to expose chokepoints."
+    },
+    {
+      "id": "eye_of_horus",
+      "title": "Eye of Horus",
+      "mapName": "Eye Of Horus 1.7",
+      "archivePattern": "eye_of_horus_1.7.sd7",
+      "minimapKey": "Eye_Of_Horus_1.7.1",
+      "descriptor": "The MIRV Glassed Core",
+      "heuristics": { "hydrology": null, "wind": "W14-30 avg17e/t", "metal": "3.1mu/s" },
+      "campaignForces": { "ARM": "", "NMC": "", "COR": "M5 So3 D5" },
+      "baseline": "Cortex SimpleAI dealer/fortress benchmark vs Legion BARb aggressive; measure late-tech spike lanes and central exposure."
+    },
+    {
+      "id": "greenest_fields",
+      "title": "Greenest Fields",
+      "mapName": "Greenest Fields 1.3",
+      "archivePattern": "greenest_fields_1.3.sd7",
+      "minimapKey": "Greenest_Fields_1.3.1",
+      "descriptor": "The Synthesized Utopia",
+      "heuristics": { "hydrology": null, "wind": "W8-20 avg11e/t", "metal": "0mu/s" },
+      "campaignForces": { "ARM": "So6 Wi4 D2", "NMC": "So1 Wi2 D1", "COR": "" },
+      "baseline": "No-metal converter economy benchmark: Legion BARb aggressive vs Cortex or Armada SimpleAI, with timing focused on energy-to-metal conversion."
+    }
+  ]
+}

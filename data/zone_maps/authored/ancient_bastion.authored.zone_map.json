@@ -1,0 +1,113 @@
+﻿{
+    "schemaVersion":  "verdance-zone-map/0.2",
+    "mapId":  "ancient_bastion",
+    "mapName":  "Ancient Bastion",
+    "coordinateSystem":  "normalized_to_elmos",
+    "authoringStatus":  "authored_from_20260623_grid_battle_survey_v0_1",
+    "notes":  "Coarse authored Verdance zones promoted from 8x8 battle-grid survey. Rectangles may overlap; earlier zones win in the current telemetry classifier.",
+    "zones":  [
+                  {
+                      "zoneId":  "AB_WESTERN_MUSTER_GROUNDS",
+                      "label":  "Western Muster Grounds",
+                      "role":  "legion_start",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0,
+                                     "xMax":  0.28,
+                                     "zMin":  0,
+                                     "zMax":  0.3
+                                 },
+                      "tags":  [
+                                   "start",
+                                   "west",
+                                   "muster"
+                               ]
+                  },
+                  {
+                      "zoneId":  "AB_CITADEL_GATEFIELD",
+                      "label":  "Citadel Gatefield",
+                      "role":  "siege_approach",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0.24,
+                                     "xMax":  0.52,
+                                     "zMin":  0.22,
+                                     "zMax":  0.62
+                                 },
+                      "tags":  [
+                                   "approach",
+                                   "gatefield",
+                                   "siege"
+                               ]
+                  },
+                  {
+                      "zoneId":  "AB_CENTRAL_KILLFIELD",
+                      "label":  "Central Killfield",
+                      "role":  "exposed_crossing",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0.46,
+                                     "xMax":  0.66,
+                                     "zMin":  0.18,
+                                     "zMax":  0.76
+                                 },
+                      "tags":  [
+                                   "center",
+                                   "killfield",
+                                   "open"
+                               ]
+                  },
+                  {
+                      "zoneId":  "AB_EASTERN_BASTION_WALL",
+                      "label":  "Eastern Bastion Wall",
+                      "role":  "fortress",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0.66,
+                                     "xMax":  1,
+                                     "zMin":  0.4,
+                                     "zMax":  0.82
+                                 },
+                      "tags":  [
+                                   "bastion",
+                                   "fortress",
+                                   "east",
+                                   "defense"
+                               ]
+                  },
+                  {
+                      "zoneId":  "AB_NORTHERN_FLANKING_LEDGE",
+                      "label":  "Northern Flanking Ledge",
+                      "role":  "flank_lane",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0.24,
+                                     "xMax":  1,
+                                     "zMin":  0,
+                                     "zMax":  0.24
+                                 },
+                      "tags":  [
+                                   "north",
+                                   "flank",
+                                   "ledge"
+                               ]
+                  },
+                  {
+                      "zoneId":  "AB_SOUTHERN_SERVICE_ROAD",
+                      "label":  "Southern Service Road",
+                      "role":  "secondary_route",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0.24,
+                                     "xMax":  1,
+                                     "zMin":  0.72,
+                                     "zMax":  1
+                                 },
+                      "tags":  [
+                                   "south",
+                                   "road",
+                                   "flank"
+                               ]
+                  }
+              ]
+}

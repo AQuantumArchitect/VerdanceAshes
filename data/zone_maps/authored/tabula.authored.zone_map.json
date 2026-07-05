@@ -1,0 +1,129 @@
+﻿{
+    "schemaVersion":  "verdance-zone-map/0.2",
+    "mapId":  "tabula",
+    "mapName":  "Tabula",
+    "coordinateSystem":  "normalized_to_elmos",
+    "authoringStatus":  "authored_from_20260623_grid_battle_survey_v0_1",
+    "notes":  "Coarse authored Verdance zones promoted from 8x8 battle-grid survey. Rectangles may overlap; earlier zones win in the current telemetry classifier.",
+    "zones":  [
+                  {
+                      "zoneId":  "TAB_NW_PLATEAU",
+                      "label":  "Northwest Plateau",
+                      "role":  "legion_start",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0,
+                                     "xMax":  0.28,
+                                     "zMin":  0,
+                                     "zMax":  0.28
+                                 },
+                      "tags":  [
+                                   "start",
+                                   "plateau",
+                                   "northwest"
+                               ]
+                  },
+                  {
+                      "zoneId":  "TAB_SE_PLATEAU",
+                      "label":  "Southeast Plateau",
+                      "role":  "defender_start",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0.72,
+                                     "xMax":  1,
+                                     "zMin":  0.72,
+                                     "zMax":  1
+                                 },
+                      "tags":  [
+                                   "start",
+                                   "plateau",
+                                   "southeast"
+                               ]
+                  },
+                  {
+                      "zoneId":  "TAB_CENTRAL_BOWL",
+                      "label":  "Central Bowl",
+                      "role":  "central_objective",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0.36,
+                                     "xMax":  0.64,
+                                     "zMin":  0.34,
+                                     "zMax":  0.66
+                                 },
+                      "tags":  [
+                                   "center",
+                                   "bowl",
+                                   "low"
+                               ]
+                  },
+                  {
+                      "zoneId":  "TAB_NORTH_RIM_TERRACES",
+                      "label":  "North Rim Terraces",
+                      "role":  "rim_control",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0.2,
+                                     "xMax":  0.8,
+                                     "zMin":  0,
+                                     "zMax":  0.28
+                                 },
+                      "tags":  [
+                                   "north",
+                                   "rim",
+                                   "terrace"
+                               ]
+                  },
+                  {
+                      "zoneId":  "TAB_SOUTH_RIM_TERRACES",
+                      "label":  "South Rim Terraces",
+                      "role":  "rim_control",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0.2,
+                                     "xMax":  0.8,
+                                     "zMin":  0.72,
+                                     "zMax":  1
+                                 },
+                      "tags":  [
+                                   "south",
+                                   "rim",
+                                   "terrace"
+                               ]
+                  },
+                  {
+                      "zoneId":  "TAB_WESTERN_ROCK_GATES",
+                      "label":  "Western Rock Gates",
+                      "role":  "approach_gate",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0,
+                                     "xMax":  0.32,
+                                     "zMin":  0.24,
+                                     "zMax":  0.76
+                                 },
+                      "tags":  [
+                                   "west",
+                                   "gate",
+                                   "rock"
+                               ]
+                  },
+                  {
+                      "zoneId":  "TAB_EASTERN_ROCK_GATES",
+                      "label":  "Eastern Rock Gates",
+                      "role":  "approach_gate",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0.68,
+                                     "xMax":  1,
+                                     "zMin":  0.24,
+                                     "zMax":  0.76
+                                 },
+                      "tags":  [
+                                   "east",
+                                   "gate",
+                                   "rock"
+                               ]
+                  }
+              ]
+}

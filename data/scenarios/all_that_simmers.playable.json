@@ -1,0 +1,164 @@
+{
+  "schemaVersion": "verdance-playable-scenario/0.1",
+  "map": {
+    "id": "all_that_simmers",
+    "name": "All That Simmers v1.1.1",
+    "sizeX": 7168,
+    "sizeZ": 10240
+  },
+  "zoneMapPath": "data/zone_maps/all_that_simmers.zone_map.json",
+  "defaultVariant": "pressure_mix",
+  "missionBase": {
+    "schemaVersion": "0.10-playable",
+    "campaignId": "verdance_ashes",
+    "missionNumber": 901,
+    "pathSignal": "B",
+    "title": "Verdance Playable Slice: All That Simmers",
+    "zone": "All That Simmers",
+    "objective": {
+      "id": "ats_playable_proxy_breakout",
+      "kind": "playable_proxy",
+      "requiredFrames": 1800,
+      "description": "Clans start upper-left. Armada holds upper-right and center. Cortex anchors bottom-right. Raptors infest bottom-left."
+    },
+    "economy": {
+      "metalIncome": 18,
+      "energyIncome": 42,
+      "buildPower": 75
+    },
+    "graph": {
+      "q0_armada_cortex": 0.23,
+      "q2_void_structure": 0.15,
+      "q3_biogenesis_memory": 0.28,
+      "q4_ai_human": 0.72,
+      "q6_contested": 0.73,
+      "q6_independent": 0.34,
+      "q7_scarcity": 0.98
+    },
+    "reputation": {
+      "armada": 34,
+      "cortex": 18,
+      "clans": 66,
+      "nullmercs": 47,
+      "sev": 56
+    },
+    "companions": [
+      {
+        "id": "ketha_rhekk_line",
+        "displayName": "Ketha of Rhekk's Line",
+        "unitDefName": "legcen",
+        "xp": 0.504,
+        "morale": 80,
+        "loyalty": 85,
+        "stress": 6,
+        "autonomy": 0.35,
+        "commandMode": "hybrid"
+      }
+    ]
+  },
+  "baseRecipes": {
+    "legion_player_anchor": [
+      { "unitDefName": "legck", "count": 1, "dx": 60, "dz": 40, "spacing": 90 },
+      { "unitDefName": "legmex", "count": 4, "atMetalSpots": true, "dx": -160, "dz": 120, "spacing": 120 },
+      { "unitDefName": "legwin", "count": 5, "dx": 120, "dz": 180, "spacing": 90 },
+      { "unitDefName": "legsolar", "count": 3, "dx": 260, "dz": 120, "spacing": 100 },
+      { "unitDefName": "leglht", "count": 4, "dx": -120, "dz": -140, "spacing": 130 },
+      { "unitDefName": "legcen", "count": 6, "dx": 80, "dz": -220, "spacing": 95, "patrolX": 0.34, "patrolZ": 0.34 },
+      { "unitDefName": "legjav", "count": 8, "dx": 300, "dz": -260, "spacing": 120, "patrolX": 0.44, "patrolZ": 0.40 }
+    ],
+    "armada_bastion": [
+      { "unitDefName": "armmex", "count": 4, "atMetalSpots": true, "dx": -160, "dz": 120, "spacing": 120 },
+      { "unitDefName": "armwin", "count": 6, "dx": 130, "dz": 120, "spacing": 85 },
+      { "unitDefName": "armsolar", "count": 4, "dx": 240, "dz": -20, "spacing": 90 },
+      { "unitDefName": "armllt", "count": 6, "dx": -180, "dz": -180, "spacing": 120 },
+      { "unitDefName": "armrl", "count": 2, "dx": -20, "dz": -160, "spacing": 130 },
+      { "unitDefName": "armwar", "count": 8, "dx": -40, "dz": -300, "spacing": 90, "patrolX": 0.58, "patrolZ": 0.44 }
+    ],
+    "armada_center_checkpoint": [
+      { "unitDefName": "armmex", "count": 2, "atMetalSpots": true, "dx": -120, "dz": 80, "spacing": 120 },
+      { "unitDefName": "armllt", "count": 7, "dx": 0, "dz": 0, "spacing": 130 },
+      { "unitDefName": "armrl", "count": 2, "dx": 160, "dz": 40, "spacing": 120 },
+      { "unitDefName": "armwar", "count": 10, "dx": -220, "dz": 120, "spacing": 85, "patrolX": 0.42, "patrolZ": 0.58 },
+      { "unitDefName": "armpw", "count": 14, "dx": 120, "dz": -140, "spacing": 75, "patrolX": 0.32, "patrolZ": 0.62 }
+    ],
+    "cortex_island_hold": [
+      { "unitDefName": "cormex", "count": 4, "atMetalSpots": true, "dx": -120, "dz": -100, "spacing": 120 },
+      { "unitDefName": "corwin", "count": 6, "dx": 120, "dz": -80, "spacing": 90 },
+      { "unitDefName": "corsolar", "count": 4, "dx": 220, "dz": 80, "spacing": 90 },
+      { "unitDefName": "corllt", "count": 6, "dx": -180, "dz": 180, "spacing": 120 },
+      { "unitDefName": "corrl", "count": 2, "dx": -20, "dz": 220, "spacing": 130 },
+      { "unitDefName": "corgator", "count": 8, "dx": -260, "dz": -230, "spacing": 90, "patrolX": 0.62, "patrolZ": 0.66 },
+      { "unitDefName": "corthud", "count": 4, "dx": -40, "dz": -320, "spacing": 95, "patrolX": 0.56, "patrolZ": 0.62 }
+    ],
+    "raptor_nest": [
+      { "unitDefName": "raptor_hive", "count": 1, "dx": 0, "dz": 0, "spacing": 80 },
+      { "unitDefName": "raptor_turret_basic_t2_v1", "count": 4, "dx": -160, "dz": 80, "spacing": 130 },
+      { "unitDefName": "raptor_land_swarmer_basic_t1_v1", "count": 16, "dx": 120, "dz": -80, "spacing": 70, "patrolX": 0.35, "patrolZ": 0.60 },
+      { "unitDefName": "raptor_land_swarmer_basic_t2_v1", "count": 8, "dx": -220, "dz": -160, "spacing": 80, "patrolX": 0.42, "patrolZ": 0.58 },
+      { "unitDefName": "raptor_land_assault_basic_t2_v1", "count": 4, "dx": 180, "dz": 150, "spacing": 90, "patrolX": 0.48, "patrolZ": 0.52 }
+    ]
+  },
+  "layout": {
+    "allyTeams": [
+      { "id": 0, "startRect": [0.02, 0.02, 0.32, 0.36] },
+      { "id": 1, "startRect": [0.58, 0.02, 0.98, 0.58] },
+      { "id": 2, "startRect": [0.65, 0.62, 0.98, 0.98] },
+      { "id": 3, "startRect": [0.02, 0.58, 0.38, 0.98] }
+    ],
+    "teams": [
+      { "id": 0, "side": "Armada", "allyTeam": 3, "base": [0.18, 0.78], "rgb": [0.78, 0.14, 0.92], "label": "Raptors Bottom-Left" },
+      { "id": 1, "side": "Armada", "allyTeam": 1, "base": [0.80, 0.18], "rgb": [0.25, 0.48, 1.0], "label": "Armada Blue" },
+      { "id": 2, "side": "Cortex", "allyTeam": 2, "base": [0.82, 0.82], "rgb": [1.0, 0.20, 0.16], "label": "Cortex Red" },
+      { "id": 3, "side": "Legion", "allyTeam": 0, "base": [0.16, 0.18], "rgb": [0.25, 0.85, 0.35], "label": "Legion Green Player" }
+    ]
+  },
+  "forces": [
+    { "id": "clans_upper_left", "label": "Clans / Player Upper-Left", "teamID": 3, "side": "Legion", "role": "player_anchor", "base": { "x": 0.16, "z": 0.18 }, "recipe": "legion_player_anchor" },
+    { "id": "armada_upper_right", "label": "Armada Upper-Right Bastion", "teamID": 1, "side": "Armada", "role": "defender", "base": { "x": 0.80, "z": 0.18 }, "recipe": "armada_bastion" },
+    { "id": "armada_center_lane", "label": "Armada Center-Lane Hold", "teamID": 1, "side": "Armada", "role": "center_hold", "base": { "x": 0.57, "z": 0.48 }, "recipe": "armada_center_checkpoint" },
+    { "id": "cortex_bottom_right", "label": "Cortex Bottom-Right Island", "teamID": 2, "side": "Cortex", "role": "defender", "base": { "x": 0.82, "z": 0.82 }, "recipe": "cortex_island_hold" },
+    { "id": "raptors_bottom_left", "label": "Raptor Bottom-Left Infestation", "teamID": 0, "side": "Raptors", "role": "wild_pressure", "base": { "x": 0.18, "z": 0.78 }, "recipe": "raptor_nest" }
+  ],
+  "variants": [
+    {
+      "id": "pressure_mix",
+      "label": "Pressure Mix",
+      "notes": "Default playable slice. Proxy bases are prebuilt; Armada and Cortex eco/defend; Raptors supply wild pressure.",
+      "ai": [
+        { "name": "SimpleAI(Armada)", "shortName": "SimpleDefenderAI", "team": 1, "version": "<not-versioned>" },
+        { "name": "SimpleAI(Cortex)", "shortName": "SimpleDefenderAI", "team": 2, "version": "<not-versioned>" },
+        { "name": "RaptorsDefenseAI(Verdance)", "shortName": "RaptorsAI", "team": 0, "version": "<not-versioned>" }
+      ]
+    },
+    {
+      "id": "simple_defenders",
+      "label": "Simple Defender Baseline",
+      "notes": "Low-volatility comparison run. All non-raptor factions sit, build, and defend.",
+      "ai": [
+        { "name": "SimpleAI(Armada)", "shortName": "SimpleDefenderAI", "team": 1, "version": "<not-versioned>" },
+        { "name": "SimpleAI(Cortex)", "shortName": "SimpleDefenderAI", "team": 2, "version": "<not-versioned>" },
+        { "name": "RaptorsDefenseAI(Verdance)", "shortName": "RaptorsAI", "team": 0, "version": "<not-versioned>" }
+      ]
+    },
+    {
+      "id": "barbarian_hard",
+      "label": "BARbarIAn Hard",
+      "notes": "Lets Armada and Cortex simulate active RTS players from the same authored base layout.",
+      "ai": [
+        { "name": "BARbarIAn(Armada Hard)", "shortName": "BARb", "team": 1, "version": "stable", "options": { "profile": "hard" } },
+        { "name": "BARbarIAn(Cortex Hard)", "shortName": "BARb", "team": 2, "version": "stable", "options": { "profile": "hard" } },
+        { "name": "RaptorsDefenseAI(Verdance)", "shortName": "RaptorsAI", "team": 0, "version": "<not-versioned>" }
+      ]
+    },
+    {
+      "id": "barbarian_aggressive",
+      "label": "BARbarIAn Hard Aggressive",
+      "notes": "Attack-forward stress test. Useful for asking whether a mission survives contact with active enemies.",
+      "ai": [
+        { "name": "BARbarIAn(Armada Aggressive)", "shortName": "BARb", "team": 1, "version": "stable", "options": { "profile": "hard_aggressive" } },
+        { "name": "BARbarIAn(Cortex Aggressive)", "shortName": "BARb", "team": 2, "version": "stable", "options": { "profile": "hard_aggressive" } },
+        { "name": "RaptorsDefenseAI(Verdance)", "shortName": "RaptorsAI", "team": 0, "version": "<not-versioned>" }
+      ]
+    }
+  ]
+}

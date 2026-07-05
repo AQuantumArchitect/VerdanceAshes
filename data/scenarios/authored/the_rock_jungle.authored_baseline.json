@@ -1,0 +1,155 @@
+﻿{
+    "schemaVersion":  "verdance-playable-scenario/0.1",
+    "map":  {
+                "id":  "the_rock_jungle",
+                "name":  "The Rock Jungle 2.1.1",
+                "sizeX":  10240,
+                "sizeZ":  8192,
+                "sizeStatus":  "measured_from_headless_engine"
+            },
+    "zoneMapPath":  "data/zone_maps/authored/the_rock_jungle.authored.zone_map.json",
+    "defaultVariant":  "authored_baseline",
+    "notes":  "Authored-zone long-run survey scenario. Wild maps include RaptorsAI spawn(s).",
+    "missionBase":  {
+                        "schemaVersion":  "0.10-playable",
+                        "campaignId":  "verdance_ashes",
+                        "missionNumber":  1100,
+                        "pathSignal":  "SURVEY_AUTHORED",
+                        "title":  "Verdance Authored Survey: The Rock Jungle",
+                        "zone":  "The Rock Jungle",
+                        "objective":  {
+                                          "id":  "the_rock_jungle_authored_survey",
+                                          "kind":  "authored_zone_survey",
+                                          "requiredFrames":  1800,
+                                          "description":  "Headless BAR-AI authored-zone survey."
+                                      },
+                        "economy":  {
+                                        "metalIncome":  0,
+                                        "energyIncome":  0,
+                                        "buildPower":  0
+                                    },
+                        "graph":  {
+
+                                  },
+                        "reputation":  {
+
+                                       },
+                        "companions":  [
+
+                                       ]
+                    },
+    "baseRecipes":  {
+
+                    },
+    "layout":  {
+                   "allyTeams":  [
+                                     {
+                                         "id":  0,
+                                         "startRect":  [
+                                                           0.02,
+                                                           0.02,
+                                                           0.42,
+                                                           0.42
+                                                       ]
+                                     },
+                                     {
+                                         "id":  1,
+                                         "startRect":  [
+                                                           0.58,
+                                                           0.58,
+                                                           0.98,
+                                                           0.98
+                                                       ]
+                                     },
+                                     {
+                                         "id":  2,
+                                         "startRect":  [
+                                                           0.34,
+                                                           0.34,
+                                                           0.66,
+                                                           0.66
+                                                       ]
+                                     }
+                                 ],
+                   "teams":  [
+                                 {
+                                     "id":  0,
+                                     "side":  "Legion",
+                                     "allyTeam":  0,
+                                     "base":  [
+                                                  0.16,
+                                                  0.16
+                                              ],
+                                     "rgb":  [
+                                                 0.25,
+                                                 0.85,
+                                                 0.35
+                                             ],
+                                     "label":  "Legion BARb Aggressive"
+                                 },
+                                 {
+                                     "id":  1,
+                                     "side":  "Armada",
+                                     "allyTeam":  1,
+                                     "base":  [
+                                                  0.84,
+                                                  0.84
+                                              ],
+                                     "rgb":  [
+                                                 0.25,
+                                                 0.48,
+                                                 1
+                                             ],
+                                     "label":  "Armada SimpleAI"
+                                 },
+                                 {
+                                     "id":  2,
+                                     "side":  "Armada",
+                                     "allyTeam":  2,
+                                     "base":  [
+                                                  0.5,
+                                                  0.5
+                                              ],
+                                     "rgb":  [
+                                                 0.78,
+                                                 0.14,
+                                                 0.92
+                                             ],
+                                     "label":  "RaptorsAI Jungle Wilds"
+                                 }
+                             ]
+               },
+    "forces":  [
+
+               ],
+    "variants":  [
+                     {
+                         "id":  "authored_baseline",
+                         "label":  "Authored Baseline",
+                         "notes":  "PVE-style Legion BARb aggressive pathing/survival test against SimpleAI or RaptorsAI placed to expose chokepoints.",
+                         "ai":  [
+                                    {
+                                        "name":  "BARbarIAn(Legion Aggressive)",
+                                        "shortName":  "BARb",
+                                        "team":  0,
+                                        "version":  "stable",
+                                        "options":  {
+                                                        "profile":  "hard_aggressive"
+                                                    }
+                                    },
+                                    {
+                                        "name":  "SimpleAI(Armada Defender)",
+                                        "shortName":  "SimpleDefenderAI",
+                                        "team":  1,
+                                        "version":  "\u003cnot-versioned\u003e"
+                                    },
+                                    {
+                                        "name":  "RaptorsDefenseAI(Jungle Wilds)",
+                                        "shortName":  "RaptorsAI",
+                                        "team":  2,
+                                        "version":  "\u003cnot-versioned\u003e"
+                                    }
+                                ]
+                     }
+                 ]
+}

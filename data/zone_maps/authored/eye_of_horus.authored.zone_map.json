@@ -1,0 +1,113 @@
+﻿{
+    "schemaVersion":  "verdance-zone-map/0.2",
+    "mapId":  "eye_of_horus",
+    "mapName":  "Eye of Horus",
+    "coordinateSystem":  "normalized_to_elmos",
+    "authoringStatus":  "authored_from_20260623_grid_battle_survey_v0_1",
+    "notes":  "Coarse authored Verdance zones promoted from 8x8 battle-grid survey. Rectangles may overlap; earlier zones win in the current telemetry classifier.",
+    "zones":  [
+                  {
+                      "zoneId":  "EOH_NW_CRATER_CAMP",
+                      "label":  "Northwest Crater Camp",
+                      "role":  "legion_start",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0,
+                                     "xMax":  0.3,
+                                     "zMin":  0,
+                                     "zMax":  0.3
+                                 },
+                      "tags":  [
+                                   "start",
+                                   "northwest",
+                                   "crater"
+                               ]
+                  },
+                  {
+                      "zoneId":  "EOH_SE_CORTEX_POCKET",
+                      "label":  "Southeast Cortex Pocket",
+                      "role":  "cortex_start",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0.68,
+                                     "xMax":  1,
+                                     "zMin":  0.68,
+                                     "zMax":  1
+                                 },
+                      "tags":  [
+                                   "start",
+                                   "southeast",
+                                   "cortex",
+                                   "pocket"
+                               ]
+                  },
+                  {
+                      "zoneId":  "EOH_GLASSED_CENTER",
+                      "label":  "Glassed Center",
+                      "role":  "central_objective",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0.34,
+                                     "xMax":  0.66,
+                                     "zMin":  0.32,
+                                     "zMax":  0.66
+                                 },
+                      "tags":  [
+                                   "center",
+                                   "open",
+                                   "glassed"
+                               ]
+                  },
+                  {
+                      "zoneId":  "EOH_WESTERN_DEBRIS_LANE",
+                      "label":  "Western Debris Lane",
+                      "role":  "approach_lane",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0,
+                                     "xMax":  0.34,
+                                     "zMin":  0.24,
+                                     "zMax":  0.78
+                                 },
+                      "tags":  [
+                                   "west",
+                                   "debris",
+                                   "lane"
+                               ]
+                  },
+                  {
+                      "zoneId":  "EOH_EASTERN_DEBRIS_LANE",
+                      "label":  "Eastern Debris Lane",
+                      "role":  "approach_lane",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0.66,
+                                     "xMax":  1,
+                                     "zMin":  0.24,
+                                     "zMax":  0.78
+                                 },
+                      "tags":  [
+                                   "east",
+                                   "debris",
+                                   "lane"
+                               ]
+                  },
+                  {
+                      "zoneId":  "EOH_SOUTHERN_CROSSFIRE_SHELF",
+                      "label":  "Southern Crossfire Shelf",
+                      "role":  "crossfire_route",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0.22,
+                                     "xMax":  0.78,
+                                     "zMin":  0.76,
+                                     "zMax":  1
+                                 },
+                      "tags":  [
+                                   "south",
+                                   "crossfire",
+                                   "shelf"
+                               ]
+                  }
+              ]
+}

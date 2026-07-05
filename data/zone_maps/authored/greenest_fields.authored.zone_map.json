@@ -1,0 +1,115 @@
+﻿{
+    "schemaVersion":  "verdance-zone-map/0.2",
+    "mapId":  "greenest_fields",
+    "mapName":  "Greenest Fields",
+    "coordinateSystem":  "normalized_to_elmos",
+    "authoringStatus":  "authored_from_20260623_grid_battle_survey_v0_1",
+    "notes":  "Coarse authored Verdance zones promoted from 8x8 battle-grid survey. Rectangles may overlap; earlier zones win in the current telemetry classifier.",
+    "zones":  [
+                  {
+                      "zoneId":  "GF_NW_GREEN_START",
+                      "label":  "Northwest Green Start",
+                      "role":  "legion_start",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0,
+                                     "xMax":  0.3,
+                                     "zMin":  0,
+                                     "zMax":  0.3
+                                 },
+                      "tags":  [
+                                   "start",
+                                   "northwest",
+                                   "green"
+                               ]
+                  },
+                  {
+                      "zoneId":  "GF_SE_SYNTH_START",
+                      "label":  "Southeast Synth Start",
+                      "role":  "defender_start",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0.68,
+                                     "xMax":  1,
+                                     "zMin":  0.68,
+                                     "zMax":  1
+                                 },
+                      "tags":  [
+                                   "start",
+                                   "southeast",
+                                   "synth",
+                                   "economy"
+                               ]
+                  },
+                  {
+                      "zoneId":  "GF_CENTRAL_OPEN_GRASSLAND",
+                      "label":  "Central Open Grassland",
+                      "role":  "main_field",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0.25,
+                                     "xMax":  0.75,
+                                     "zMin":  0.25,
+                                     "zMax":  0.75
+                                 },
+                      "tags":  [
+                                   "center",
+                                   "open",
+                                   "field"
+                               ]
+                  },
+                  {
+                      "zoneId":  "GF_NORTH_DESERT_EDGE",
+                      "label":  "North Desert Edge",
+                      "role":  "energy_edge",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0.6,
+                                     "xMax":  1,
+                                     "zMin":  0,
+                                     "zMax":  0.34
+                                 },
+                      "tags":  [
+                                   "north",
+                                   "desert",
+                                   "wind",
+                                   "solar"
+                               ]
+                  },
+                  {
+                      "zoneId":  "GF_SOUTH_DESERT_EDGE",
+                      "label":  "South Desert Edge",
+                      "role":  "energy_edge",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0,
+                                     "xMax":  0.4,
+                                     "zMin":  0.62,
+                                     "zMax":  1
+                                 },
+                      "tags":  [
+                                   "south",
+                                   "desert",
+                                   "wind",
+                                   "solar"
+                               ]
+                  },
+                  {
+                      "zoneId":  "GF_MIDFIELD_PROBE_CORRIDOR",
+                      "label":  "Midfield Probe Corridor",
+                      "role":  "probe_lane",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0.44,
+                                     "xMax":  0.74,
+                                     "zMin":  0.36,
+                                     "zMax":  0.7
+                                 },
+                      "tags":  [
+                                   "midfield",
+                                   "probe",
+                                   "lane"
+                               ]
+                  }
+              ]
+}

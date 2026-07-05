@@ -1,0 +1,132 @@
+﻿{
+    "schemaVersion":  "verdance-zone-map/0.2",
+    "mapId":  "the_rock_jungle",
+    "mapName":  "The Rock Jungle",
+    "coordinateSystem":  "normalized_to_elmos",
+    "authoringStatus":  "authored_from_20260623_grid_battle_survey_v0_1",
+    "notes":  "Coarse authored Verdance zones promoted from 8x8 battle-grid survey. Rectangles may overlap; earlier zones win in the current telemetry classifier.",
+    "zones":  [
+                  {
+                      "zoneId":  "RJ_CENTRAL_LAGOON_MAZE",
+                      "label":  "Central Lagoon Maze",
+                      "role":  "raptor_wilds",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0.26,
+                                     "xMax":  0.7,
+                                     "zMin":  0.24,
+                                     "zMax":  0.74
+                                 },
+                      "tags":  [
+                                   "center",
+                                   "wilds",
+                                   "raptors",
+                                   "water",
+                                   "maze",
+                                   "low"
+                               ]
+                  },
+                  {
+                      "zoneId":  "RJ_NW_JUNGLE_SHELF",
+                      "label":  "Northwest Jungle Shelf",
+                      "role":  "legion_start",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0,
+                                     "xMax":  0.28,
+                                     "zMin":  0,
+                                     "zMax":  0.28
+                                 },
+                      "tags":  [
+                                   "start",
+                                   "northwest",
+                                   "jungle"
+                               ]
+                  },
+                  {
+                      "zoneId":  "RJ_SE_JUNGLE_SHELF",
+                      "label":  "Southeast Jungle Shelf",
+                      "role":  "defender_start",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0.7,
+                                     "xMax":  1,
+                                     "zMin":  0.7,
+                                     "zMax":  1
+                                 },
+                      "tags":  [
+                                   "start",
+                                   "southeast",
+                                   "jungle"
+                               ]
+                  },
+                  {
+                      "zoneId":  "RJ_WESTERN_CAUSEWAY",
+                      "label":  "Western Causeway",
+                      "role":  "causeway",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0,
+                                     "xMax":  0.24,
+                                     "zMin":  0.22,
+                                     "zMax":  0.82
+                                 },
+                      "tags":  [
+                                   "west",
+                                   "causeway",
+                                   "pathing"
+                               ]
+                  },
+                  {
+                      "zoneId":  "RJ_EASTERN_CAUSEWAY",
+                      "label":  "Eastern Causeway",
+                      "role":  "causeway",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0.68,
+                                     "xMax":  1,
+                                     "zMin":  0.12,
+                                     "zMax":  0.72
+                                 },
+                      "tags":  [
+                                   "east",
+                                   "causeway",
+                                   "pathing"
+                               ]
+                  },
+                  {
+                      "zoneId":  "RJ_NORTHERN_ISLAND_CHAIN",
+                      "label":  "Northern Island Chain",
+                      "role":  "island_chain",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0.2,
+                                     "xMax":  0.72,
+                                     "zMin":  0,
+                                     "zMax":  0.24
+                                 },
+                      "tags":  [
+                                   "north",
+                                   "islands",
+                                   "water"
+                               ]
+                  },
+                  {
+                      "zoneId":  "RJ_SOUTHERN_ISLAND_CHAIN",
+                      "label":  "Southern Island Chain",
+                      "role":  "island_chain",
+                      "shape":  "rect",
+                      "bounds":  {
+                                     "xMin":  0.2,
+                                     "xMax":  0.72,
+                                     "zMin":  0.72,
+                                     "zMax":  1
+                                 },
+                      "tags":  [
+                                   "south",
+                                   "islands",
+                                   "water"
+                               ]
+                  }
+              ]
+}

@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "verdance-playable-scenario/0.1",
+  "map": {
+    "id": "all_that_simmers",
+    "name": "All That Simmers v1.1.1",
+    "sizeX": 7168,
+    "sizeZ": 10240
+  },
+  "zoneMapPath": "data/zone_maps/all_that_simmers.zone_map.json",
+  "defaultVariant": "clean_baseline",
+  "notes": "No pre-authored forces. All teams start from standard BAR commander drops. Used to learn what organic AI game-shapes look like at different time horizons. This is the calibration dataset for the Hermitian translation matrix.",
+  "missionBase": {
+    "schemaVersion": "0.10-playable",
+    "campaignId": "verdance_ashes",
+    "missionNumber": 0,
+    "pathSignal": "B",
+    "title": "ATS Clean Baseline",
+    "zone": "All That Simmers",
+    "objective": {
+      "id": "ats_clean_baseline_proxy",
+      "kind": "playable_proxy",
+      "requiredFrames": 1800,
+      "description": "Clean AI baseline. No authored forces. Standard commander drops."
+    },
+    "economy": { "metalIncome": 0, "energyIncome": 0, "buildPower": 0 },
+    "graph": {},
+    "reputation": {},
+    "companions": []
+  },
+  "baseRecipes": {},
+  "layout": {
+    "allyTeams": [
+      { "id": 0, "startRect": [0.02, 0.02, 0.48, 0.48] },
+      { "id": 1, "startRect": [0.52, 0.02, 0.98, 0.48] },
+      { "id": 2, "startRect": [0.52, 0.52, 0.98, 0.98] },
+      { "id": 3, "startRect": [0.02, 0.52, 0.48, 0.98] },
+      { "id": 4, "startRect": [0.36, 0.36, 0.64, 0.64] }
+    ],
+    "teams": [
+      { "id": 0, "side": "Legion",  "allyTeam": 0, "base": [0.14, 0.14], "rgb": [0.25, 0.85, 0.35], "label": "Legion Upper-Left (Aggressive)" },
+      { "id": 1, "side": "Armada",  "allyTeam": 1, "base": [0.82, 0.14], "rgb": [0.25, 0.48, 1.0],  "label": "Armada Upper-Right (Simple Defender)" },
+      { "id": 2, "side": "Cortex",  "allyTeam": 2, "base": [0.82, 0.82], "rgb": [1.0, 0.20, 0.16],  "label": "Cortex Lower-Right (Simple)" },
+      { "id": 3, "side": "Armada",  "allyTeam": 3, "base": [0.14, 0.82], "rgb": [0.10, 0.75, 0.85], "label": "Armada Lower-Left (Simple Defender)" },
+      { "id": 4, "side": "Armada",  "allyTeam": 4, "base": [0.50, 0.50], "rgb": [0.78, 0.14, 0.92], "label": "Raptors Center" }
+    ]
+  },
+  "forces": [],
+  "variants": [
+    {
+      "id": "clean_baseline",
+      "label": "Clean Baseline",
+      "notes": "No authored forces. Standard commander drops only. Legion aggressive vs Simple Armada/Cortex defenders. Raptors at center.",
+      "ai": [
+        { "name": "BARbarIAn(Legion Aggressive)", "shortName": "BARb", "team": 0, "version": "stable", "options": { "profile": "hard_aggressive" } },
+        { "name": "SimpleAI(Armada Blue)", "shortName": "SimpleDefenderAI", "team": 1, "version": "<not-versioned>" },
+        { "name": "SimpleAI(Cortex Red)", "shortName": "SimpleDefenderAI", "team": 2, "version": "<not-versioned>" },
+        { "name": "SimpleAI(Armada Teal)", "shortName": "SimpleDefenderAI", "team": 3, "version": "<not-versioned>" },
+        { "name": "RaptorsDefenseAI(Center)", "shortName": "RaptorsAI", "team": 4, "version": "<not-versioned>" }
+      ]
+    }
+  ]
+}

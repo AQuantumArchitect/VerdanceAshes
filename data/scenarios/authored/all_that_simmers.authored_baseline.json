@@ -1,0 +1,215 @@
+﻿{
+    "schemaVersion":  "verdance-playable-scenario/0.1",
+    "map":  {
+                "id":  "all_that_simmers",
+                "name":  "All That Simmers v1.1.1",
+                "sizeX":  7168,
+                "sizeZ":  10240,
+                "sizeStatus":  "measured_from_headless_engine"
+            },
+    "zoneMapPath":  "data/zone_maps/authored/all_that_simmers.authored.zone_map.json",
+    "defaultVariant":  "authored_baseline",
+    "notes":  "Authored-zone long-run survey scenario. Wild maps include RaptorsAI spawn(s).",
+    "missionBase":  {
+                        "schemaVersion":  "0.10-playable",
+                        "campaignId":  "verdance_ashes",
+                        "missionNumber":  1100,
+                        "pathSignal":  "SURVEY_AUTHORED",
+                        "title":  "Verdance Authored Survey: All That Simmers",
+                        "zone":  "All That Simmers",
+                        "objective":  {
+                                          "id":  "all_that_simmers_authored_survey",
+                                          "kind":  "authored_zone_survey",
+                                          "requiredFrames":  1800,
+                                          "description":  "Headless BAR-AI authored-zone survey."
+                                      },
+                        "economy":  {
+                                        "metalIncome":  0,
+                                        "energyIncome":  0,
+                                        "buildPower":  0
+                                    },
+                        "graph":  {
+
+                                  },
+                        "reputation":  {
+
+                                       },
+                        "companions":  [
+
+                                       ]
+                    },
+    "baseRecipes":  {
+
+                    },
+    "layout":  {
+                   "allyTeams":  [
+                                     {
+                                         "id":  0,
+                                         "startRect":  [
+                                                           0.02,
+                                                           0.02,
+                                                           0.48,
+                                                           0.48
+                                                       ]
+                                     },
+                                     {
+                                         "id":  1,
+                                         "startRect":  [
+                                                           0.52,
+                                                           0.02,
+                                                           0.98,
+                                                           0.48
+                                                       ]
+                                     },
+                                     {
+                                         "id":  2,
+                                         "startRect":  [
+                                                           0.52,
+                                                           0.52,
+                                                           0.98,
+                                                           0.98
+                                                       ]
+                                     },
+                                     {
+                                         "id":  3,
+                                         "startRect":  [
+                                                           0.02,
+                                                           0.52,
+                                                           0.48,
+                                                           0.98
+                                                       ]
+                                     },
+                                     {
+                                         "id":  4,
+                                         "startRect":  [
+                                                           0.36,
+                                                           0.36,
+                                                           0.64,
+                                                           0.64
+                                                       ]
+                                     }
+                                 ],
+                   "teams":  [
+                                 {
+                                     "id":  0,
+                                     "side":  "Legion",
+                                     "allyTeam":  0,
+                                     "base":  [
+                                                  0.14,
+                                                  0.14
+                                              ],
+                                     "rgb":  [
+                                                 0.25,
+                                                 0.85,
+                                                 0.35
+                                             ],
+                                     "label":  "Legion BARb Aggressive"
+                                 },
+                                 {
+                                     "id":  1,
+                                     "side":  "Armada",
+                                     "allyTeam":  1,
+                                     "base":  [
+                                                  0.82,
+                                                  0.14
+                                              ],
+                                     "rgb":  [
+                                                 0.25,
+                                                 0.48,
+                                                 1
+                                             ],
+                                     "label":  "Armada SimpleAI Blue"
+                                 },
+                                 {
+                                     "id":  2,
+                                     "side":  "Cortex",
+                                     "allyTeam":  2,
+                                     "base":  [
+                                                  0.82,
+                                                  0.82
+                                              ],
+                                     "rgb":  [
+                                                 1,
+                                                 0.2,
+                                                 0.16
+                                             ],
+                                     "label":  "Cortex SimpleAI Red"
+                                 },
+                                 {
+                                     "id":  3,
+                                     "side":  "Armada",
+                                     "allyTeam":  3,
+                                     "base":  [
+                                                  0.14,
+                                                  0.82
+                                              ],
+                                     "rgb":  [
+                                                 0.1,
+                                                 0.75,
+                                                 0.85
+                                             ],
+                                     "label":  "Armada SimpleAI Teal"
+                                 },
+                                 {
+                                     "id":  4,
+                                     "side":  "Armada",
+                                     "allyTeam":  4,
+                                     "base":  [
+                                                  0.5,
+                                                  0.5
+                                              ],
+                                     "rgb":  [
+                                                 0.78,
+                                                 0.14,
+                                                 0.92
+                                             ],
+                                     "label":  "RaptorsAI Center Wilds"
+                                 }
+                             ]
+               },
+    "forces":  [
+
+               ],
+    "variants":  [
+                     {
+                         "id":  "authored_baseline",
+                         "label":  "Authored Baseline",
+                         "notes":  "Legion BARb aggressive in upper-left; Armada SimpleAI upper-right and lower-left; Cortex SimpleAI lower-right; RaptorsAI center.",
+                         "ai":  [
+                                    {
+                                        "name":  "BARbarIAn(Legion Aggressive)",
+                                        "shortName":  "BARb",
+                                        "team":  0,
+                                        "version":  "stable",
+                                        "options":  {
+                                                        "profile":  "hard_aggressive"
+                                                    }
+                                    },
+                                    {
+                                        "name":  "SimpleAI(Armada Blue)",
+                                        "shortName":  "SimpleDefenderAI",
+                                        "team":  1,
+                                        "version":  "\u003cnot-versioned\u003e"
+                                    },
+                                    {
+                                        "name":  "SimpleAI(Cortex Red)",
+                                        "shortName":  "SimpleDefenderAI",
+                                        "team":  2,
+                                        "version":  "\u003cnot-versioned\u003e"
+                                    },
+                                    {
+                                        "name":  "SimpleAI(Armada Teal)",
+                                        "shortName":  "SimpleDefenderAI",
+                                        "team":  3,
+                                        "version":  "\u003cnot-versioned\u003e"
+                                    },
+                                    {
+                                        "name":  "RaptorsDefenseAI(Center Wilds)",
+                                        "shortName":  "RaptorsAI",
+                                        "team":  4,
+                                        "version":  "\u003cnot-versioned\u003e"
+                                    }
+                                ]
+                     }
+                 ]
+}
