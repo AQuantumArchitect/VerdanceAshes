@@ -92,6 +92,8 @@ local terminalReason = ""
 local targetZoneRect = nil              -- {x1, z1, x2, z2} in elmos
 local extractionZoneRect = nil
 local debugAutoProgressAllowed = false
+local testKillObjectiveFrame = nil      -- modoption va_test_killobjective_frame (verification harness)
+local testKillObjectiveDone = false
 
 local function clamp(x, lo, hi)
   if x < lo then return lo end
@@ -305,7 +307,7 @@ local function resultJson()
     '"missionNumber":' .. jnum(mission.missionNumber or 0),
     '"pathSignal":' .. jstr(mission.pathSignal or "B"),
     '"status":' .. jstr(status),
-    '"resultKey":' .. jstr((mission.campaignId or "verdance_ashes") .. "|" .. (mission.missionId or "va_unknown") .. "|" .. tostring(mission.missionNumber or 0)),
+    '"resultKey":' .. jstr((mission.campaignId or "verdance_ashes") .. "|" .. (mission.missionId or "va_unknown") .. "|" .. tostring(mission.missionNumber or 0) .. "|" .. status),
     '"holdFrames":' .. jnum(holdFrames),
     '"requiredFrames":' .. jnum(req),
     '"frame":' .. jnum(frame),
@@ -1184,6 +1186,7 @@ function gadget:Initialize()
   playerAllyTeamID = teamAllyTeam[playerTeamID] or 0
   gaiaAllyTeamID = teamAllyTeam[gaiaTeamID] or -1
   debugAutoProgressAllowed = headlessFastWin or truthy(modOptions.va_debug_autoprogress)
+  testKillObjectiveFrame = tonumber(modOptions.va_test_killobjective_frame or "")
   local obj = mission.objective or {}
   targetZoneRect = zoneRectFor(obj.targetZoneId)
   extractionZoneRect = zoneRectFor(mission.extractionZoneId or obj.extractionZoneId)
@@ -1254,6 +1257,15 @@ function gadget:GameFrame(frame)
     Spring.Echo("VA_HEADLESS_QUIT")
     Spring.SendCommands("quitforce")
     headlessQuitFrame = nil
+  end
+
+  -- Verification harness: destroy tracked objective targets at a scripted frame.
+  if testKillObjectiveFrame and not testKillObjectiveDone and frame >= testKillObjectiveFrame then
+    testKillObjectiveDone = true
+    local ids = {}
+    for unitID in pairs(objectiveTargets) do ids[#ids + 1] = unitID end
+    for _, unitID in ipairs(ids) do Spring.DestroyUnit(unitID, false, false) end
+    Spring.Echo("VA_TEST_KILLOBJECTIVE destroyed=" .. tostring(#ids) .. " frame=" .. tostring(frame))
   end
 
   -- Objective automation checks (playable sessions)

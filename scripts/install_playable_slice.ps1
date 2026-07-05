@@ -11,6 +11,7 @@ param(
   [switch]$SaveGame,
   [string]$SaveName = "verdance_playable_ats_001",
   [string]$ExtraModOptions = "",
+  [string]$DebugCommandsOverride = "",
   [int]$TimeoutSeconds = 90
 )
 
@@ -275,7 +276,9 @@ $mapSizeX = [int]$scenario.map.sizeX
 $mapSizeZ = [int]$scenario.map.sizeZ
 $runHeadless = $Headless -or $SaveGame -or $BalanceTest
 if ($SaveGame -and $TimeoutSeconds -eq 90) { $TimeoutSeconds = 240 }
-$debugCommands = if ($BalanceTest) {
+$debugCommands = if ($DebugCommandsOverride) {
+  $DebugCommandsOverride
+} elseif ($BalanceTest) {
   "90:luarules vazones|120:luarules vastatus"
 } elseif ($SaveGame) {
   "90:luarules vazones|120:luarules vastatus|180:savegame $SaveName"

@@ -73,6 +73,18 @@
       "beadIndex": 1,
       "elapsedMinutes": null,
       "seededFromLegacyHistory": true
+    },
+    "verdance_ashes|va_001|1": {
+      "processedAt": "2026-07-05T15:02:49Z",
+      "beadIndex": 0,
+      "elapsedMinutes": null,
+      "seededFromLegacyHistory": true
+    },
+    "verdance_ashes|va_002|2": {
+      "processedAt": "2026-07-05T15:02:49Z",
+      "beadIndex": 1,
+      "elapsedMinutes": null,
+      "seededFromLegacyHistory": true
     }
   },
   "zoneMemory": {
