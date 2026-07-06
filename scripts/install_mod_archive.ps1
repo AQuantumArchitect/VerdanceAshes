@@ -10,9 +10,15 @@ $ErrorActionPreference = "Stop"
 $Workspace = Get-VerdanceWorkspaceRoot -Workspace $Workspace
 $config = Get-VerdanceConfig -Workspace $Workspace
 
-$modSource = Join-Path $Workspace "mod\VerdanceAshes.sdd"
-if (!(Test-Path (Join-Path $modSource "modinfo.lua"))) {
-  throw "Mod source not found or missing modinfo.lua: $modSource"
+# Dev repo keeps the mod at <workspace>\mod\; the release package keeps it
+# at the package root, next to the workspace folder.
+$modSourceCandidates = @(
+  (Join-Path $Workspace "mod\VerdanceAshes.sdd"),
+  (Join-Path (Split-Path -Parent $Workspace) "VerdanceAshes.sdd")
+)
+$modSource = $modSourceCandidates | Where-Object { Test-Path (Join-Path $_ "modinfo.lua") } | Select-Object -First 1
+if (-not $modSource) {
+  throw "Mod source not found or missing modinfo.lua. Looked in: $($modSourceCandidates -join '; ')"
 }
 $modDest = $config.modSdd
 $gamesDir = Split-Path -Parent $modDest

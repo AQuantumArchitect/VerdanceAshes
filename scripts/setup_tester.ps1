@@ -42,9 +42,11 @@ $config | ConvertTo-Json | Set-Content -Encoding UTF8 -Path $configPath
 Write-Host "Wrote $configPath"
 
 # ---- install the mod ----------------------------------------------------
-$modArgs = @()
-if (-not $Junction) { $modArgs += "-Copy" }
-& (Join-Path $ScriptDir "install_mod_archive.ps1") -Workspace $Workspace @modArgs
+if ($Junction) {
+  & (Join-Path $ScriptDir "install_mod_archive.ps1") -Workspace $Workspace
+} else {
+  & (Join-Path $ScriptDir "install_mod_archive.ps1") -Workspace $Workspace -Copy
+}
 
 # ---- fresh campaign state -----------------------------------------------
 $statePath = Join-Path $Workspace "state\campaign_state.json"
