@@ -68,6 +68,35 @@ The gadget emits `VA_RESULT_JSON_*` markers with a 4-part idempotency key
 - `scripts/verify_campaign_arc.ps1 -Missions N` chains N missions headlessly
   (state snapshot/restore) and writes `reports/arc_verify.latest.json`.
 
+## Force design (v3)
+
+Camps are assembled from faction rings around an **objective centerpiece** —
+only the centerpiece is objective-tagged, so destruction missions are surgical
+strikes into a defended camp, not base-wipes:
+
+| objective | centerpiece | camp |
+|---|---|---|
+| economy_disrupt | fusion + adv solars + converter farm + storage | Cortex synth works |
+| strike_relay | targeting facility + adv radar + fusion | Cortex relay installation |
+| destroy_key_structure | LRPC + fusion + fortification walls | Armada bastion wing |
+| seize_lane / gate_control | none (zone hold) | pure garrison, no eco |
+| hive_clear_or_bypass | raptor hives (the hive IS the objective team) | swarm + spore turrets |
+| choose_target_then_extract | two rival camps (Armada post / Cortex works) on separate allyteams | raptor swarm between them |
+
+Perimeter turrets/walls face the player's approach; patrols screen the camp on
+destruction missions and hold the zone on presence missions. Enemy commanders
+keep building, so camps develop organically over the mission. Missions 1–2 run
+an onboarding ramp (0.7×/0.85×).
+
+## Balance methodology
+
+`scripts/run_headless_balance_test.ps1 -ScenarioPath data\scenarios\generated\next_mission_intent.playable.json -Variant alpha_player -PlayerControllers simple,barbarian_aggressive -SimFrames 21600 -TimeoutSeconds 2400`
+runs the generated mission with AI in the player seat (team 0, full player kit
++ commander). Target band: BARb-aggressive gains advantage/clears by the
+mission horizon while SimpleAI stalls. Caveat: BARb walks its commander into
+combat, so commander-loss defeats in these probes are an AI artifact — check
+`VA_OBJECTIVE_TARGET_DOWN` counts in the infolog for objective progress too.
+
 ## Current Alpha Limitations
 
 - Deployment and extraction zones are often the same zone, so destroy-objectives

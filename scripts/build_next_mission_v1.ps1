@@ -303,7 +303,7 @@ $description = Get-ObjectiveDescription $intent
 $diffCoeff = if ($intent.economy -and $intent.economy.difficultyCoefficient) { [double]$intent.economy.difficultyCoefficient } else { 1.0 }
 $scaleCenter = if ($intent.expectedEnemyScale -and $intent.expectedEnemyScale.center) { [double]$intent.expectedEnemyScale.center } else { 6000.0 }
 # Onboarding ramp: the first two sorties ease in regardless of lore pressure.
-$rampFactor = [Math]::Min(1.0, 0.8 + 0.1 * ($missionNumber - 1))
+$rampFactor = [Math]::Min(1.0, 0.7 + 0.15 * ($missionNumber - 1))
 $enemyScale = [Math]::Round(([Math]::Max(0.7, [Math]::Min(2.2, $scaleCenter / 6000.0)) * $diffCoeff * $rampFactor), 3)
 $fortify = $enemyScale -ge 1.4
 $maxHazard = if ($intent.offscreenPressureSummary -and $intent.offscreenPressureSummary.maxHazard) { [double]$intent.offscreenPressureSummary.maxHazard } else { 0.0 }
@@ -318,7 +318,11 @@ $faceZ = [Math]::Sign($deployCenter[1] - $enemyCenter[1]); if ($faceZ -eq 0) { $
 $patrolTarget = if ($presenceKind) {
   @($enemyCenter[0], $enemyCenter[1])
 } else {
-  @((($deployCenter[0] + $enemyCenter[0]) / 2.0), (($deployCenter[1] + $enemyCenter[1]) / 2.0))
+  # Destruction objectives: patrols screen the camp approaches (2/3 toward
+  # camp from the midline) rather than camping the middle of the map.
+  $midX = ($deployCenter[0] + $enemyCenter[0]) / 2.0
+  $midZ = ($deployCenter[1] + $enemyCenter[1]) / 2.0
+  @((($midX + 2.0 * $enemyCenter[0]) / 3.0), (($midZ + 2.0 * $enemyCenter[1]) / 3.0))
 }
 
 function Clamp01 { param([double]$V) return [Math]::Max(0.03, [Math]::Min(0.97, $V)) }
