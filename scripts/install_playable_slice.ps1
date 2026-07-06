@@ -202,7 +202,7 @@ function Render-AI {
 }
 
 function New-PlayerControllerAI {
-  param([string]$Controller)
+  param([string]$Controller, [int]$Team = 3)
   switch ($Controller) {
     "human" { return $null }
     "clean_baseline" { return $null }
@@ -210,7 +210,7 @@ function New-PlayerControllerAI {
       return [pscustomobject]@{
         name = "SimpleAI(Player Legion)"
         shortName = "SimpleDefenderAI"
-        team = 3
+        team = $Team
         version = "<not-versioned>"
       }
     }
@@ -218,7 +218,7 @@ function New-PlayerControllerAI {
       return [pscustomobject]@{
         name = "BARbarIAn(Player Hard)"
         shortName = "BARb"
-        team = 3
+        team = $Team
         version = "stable"
         options = [pscustomobject]@{ profile = "hard" }
       }
@@ -227,7 +227,7 @@ function New-PlayerControllerAI {
       return [pscustomobject]@{
         name = "BARbarIAn(Player Aggressive)"
         shortName = "BARb"
-        team = 3
+        team = $Team
         version = "stable"
         options = [pscustomobject]@{ profile = "hard_aggressive" }
       }
@@ -270,7 +270,11 @@ if ($ListVariants) {
   return
 }
 
-$playerAi = New-PlayerControllerAI $PlayerController
+# The player-controller AI takes over whichever team the variant assigns the
+# human player (campaign missions use team 0); legacy scenarios default to 3.
+$controllerTeam = 3
+if ($variantObject.PSObject.Properties["playerTeamID"]) { $controllerTeam = [int]$variantObject.playerTeamID }
+$playerAi = New-PlayerControllerAI $PlayerController $controllerTeam
 $mapName = [string]$scenario.map.name
 $mapSizeX = [int]$scenario.map.sizeX
 $mapSizeZ = [int]$scenario.map.sizeZ

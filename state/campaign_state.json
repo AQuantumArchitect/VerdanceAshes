@@ -1,92 +1,37 @@
 {
   "schemaVersion": "verdance-campaign-state/1.0",
   "campaignId": "verdance_ashes",
-  "missionNumber": 3,
-  "currentMissionId": "va_003",
+  "missionNumber": 1,
+  "currentMissionId": "va_001",
   "pathSignal": "B",
   "campaignClockMinutes": 0.0,
   "graph": {
-    "q0_armada_cortex": 0.23,
+    "q0_armada_cortex": 0.77,
     "q2_void_structure": 0.15,
-    "q6_contested": 0.73,
-    "q6_independent": 0.33999999999999997,
+    "q6_contested": 0.85,
+    "q6_independent": 0.24,
     "q7_resource_scarcity": 0.98,
     "pathSignalA": 0.0,
     "pathSignalB": 0.1,
-    "pathSignalC": 0.0,
-    "q3_biogenesis_memory": 0.28,
-    "q4_ai_human": 0.72
+    "pathSignalC": 0.0
   },
   "reputation": {
-    "armada": 34,
-    "cortex": 18,
-    "clans": 66,
-    "nullmercs": 47,
-    "sev": 56
+    "armada": 42,
+    "cortex": 21,
+    "clans": 50,
+    "nullmercs": 43,
+    "sev": 50
   },
   "companion": {
-    "id": "ketha_rhekk_line",
-    "name": "Ketha of Rhekk's Line",
-    "xp": 0.504,
-    "morale": 80,
-    "loyalty": 85,
-    "stress": 6,
-    "displayName": "Ketha of Rhekk's Line",
-    "unitDefName": "armwar",
-    "autonomy": 0.35,
-    "commandMode": "hybrid",
-    "alive": true
+    "id": "ketha",
+    "name": "Ketha",
+    "xp": 0.0,
+    "morale": 70,
+    "loyalty": 75,
+    "stress": 12
   },
-  "history": [
-    {
-      "time": "2026-06-19T02:23:01",
-      "missionId": "va_001",
-      "status": "victory",
-      "pathSignal": "B",
-      "holdFrames": 600,
-      "requiredFrames": 600,
-      "q6_contested": 0.79,
-      "q6_independent": 0.29,
-      "companionXp": 0.424
-    },
-    {
-      "time": "2026-06-19T02:25:15",
-      "missionId": "va_002",
-      "status": "victory",
-      "pathSignal": "B",
-      "holdFrames": 100269,
-      "requiredFrames": 750,
-      "q6_contested": 0.73,
-      "q6_independent": 0.33999999999999997,
-      "companionXp": 0.504
-    }
-  ],
-  "processedResults": {
-    "verdance_ashes|va_001|1|victory": {
-      "processedAt": "2026-07-05T14:02:37Z",
-      "beadIndex": 0,
-      "elapsedMinutes": null,
-      "seededFromLegacyHistory": true
-    },
-    "verdance_ashes|va_002|2|victory": {
-      "processedAt": "2026-07-05T14:02:37Z",
-      "beadIndex": 1,
-      "elapsedMinutes": null,
-      "seededFromLegacyHistory": true
-    },
-    "verdance_ashes|va_001|1": {
-      "processedAt": "2026-07-05T15:02:49Z",
-      "beadIndex": 0,
-      "elapsedMinutes": null,
-      "seededFromLegacyHistory": true
-    },
-    "verdance_ashes|va_002|2": {
-      "processedAt": "2026-07-05T15:02:49Z",
-      "beadIndex": 1,
-      "elapsedMinutes": null,
-      "seededFromLegacyHistory": true
-    }
-  },
+  "history": [],
+  "processedResults": {},
   "zoneMemory": {
     "all_that_simmers": {
       "ATS_CENTRAL_HIVE_FLATS": {
@@ -1181,9 +1126,5 @@
       "Wild/hive pressure is separated from normal army value.",
       "Human objectives should be smaller than full AI wipeout thresholds."
     ]
-  },
-  "legacyState": {
-    "schemaVersion": "0.5",
-    "migratedAt": "2026-07-05T14:01:18Z"
   }
 }

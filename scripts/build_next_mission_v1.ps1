@@ -58,8 +58,14 @@ function Get-MapEntry {
 function Get-EnemySide {
   param([string]$MapId, $Intent)
   if ($Intent.objectiveTarget -and $Intent.objectiveTarget.targetZoneId -match "CORTEX|COR") { return "Cortex" }
+  # Story-bible faction identities: Cortex is industrial pressure (synth
+  # economies, dealer relays); Armada is old order (valleys, gates, bastions).
   switch ($MapId) {
+    "greenest_fields" { return "Cortex" }
     "eye_of_horus" { return "Cortex" }
+    "koom_valley" { return "Armada" }
+    "tabula" { return "Armada" }
+    "ancient_bastion" { return "Armada" }
     "all_that_simmers" { return "Armada" }
     default { return "Armada" }
   }
@@ -96,15 +102,35 @@ function Get-RequiredFrames {
   }
 }
 
-function New-PlayerRecipe {
-  return @(
-    [ordered]@{ unitDefName = "legmex"; count = 3; atMetalSpots = $true; dx = -140; dz = 120; spacing = 120 },
-    [ordered]@{ unitDefName = "legwin"; count = 4; dx = 120; dz = 160; spacing = 90 },
-    [ordered]@{ unitDefName = "legsolar"; count = 2; dx = 240; dz = 80; spacing = 90 },
-    [ordered]@{ unitDefName = "leglht"; count = 3; dx = -120; dz = -120; spacing = 120 },
-    [ordered]@{ unitDefName = "legcen"; count = 4; dx = 80; dz = -210; spacing = 95 },
-    [ordered]@{ unitDefName = "legjav"; count = 2; dx = 260; dz = -230; spacing = 110 }
-  )
+# ============================================================================
+# THEMED FORCE CONSTRUCTION
+# Camps are assembled from faction rings (eco / perimeter / production /
+# patrol) around an objective CENTERPIECE. Only the centerpiece force carries
+# role=objective_target, so destruction missions are surgical strikes into a
+# defended camp instead of base-wipes. Armada camps read as ordered garrisons
+# (walls, turret arcs, Guardians); Cortex camps as industrial works (dense
+# energy, converter farms, Thud/AK packs, Punishers).
+# ============================================================================
+
+$FACTION = @{
+  Armada = @{
+    mex = "armmex"; wind = "armwin"; solar = "armsolar"; advsolar = "armadvsol"
+    llt = "armllt"; hlt = "armbeamer"; aa = "armrl"; radar = "armrad"; wall = "armdrag"
+    mstor = "armmstor"; estor = "armestor"; conv = "armmakr"; lab = "armlab"; nano = "armnanotc"
+    raider = "armpw"; skirm = "armham"; assault = "armwar"
+    bigGun = "armguard"; popup = "armpb"; fus = "armfus"; arad = "armarad"; targ = "armtarg"
+    fort = "armfort"; lrpc = "armbrtha"
+    rgb = @(0.25, 0.48, 1.0)
+  }
+  Cortex = @{
+    mex = "cormex"; wind = "corwin"; solar = "corsolar"; advsolar = "coradvsol"
+    llt = "corllt"; hlt = "corhlt"; aa = "corrl"; radar = "corrad"; wall = "cordrag"
+    mstor = "cormstor"; estor = "corestor"; conv = "cormakr"; lab = "corlab"; nano = "cornanotc"
+    raider = "corak"; skirm = "corthud"; assault = "corstorm"
+    bigGun = "corpun"; popup = "corvipe"; fus = "corfus"; arad = "corarad"; targ = "cortarg"
+    fort = "corfort"; lrpc = "corint"
+    rgb = @(1.0, 0.20, 0.16)
+  }
 }
 
 function Get-ScaledCount {
@@ -112,57 +138,123 @@ function Get-ScaledCount {
   return [int][Math]::Max(1, [Math]::Round($Base * $Scale))
 }
 
-function New-ArmadaRecipe {
-  param([double]$Scale = 1.0, [double[]]$PatrolTarget = $null, [switch]$Fortify)
-  $recipe = @(
-    [ordered]@{ unitDefName = "armmex"; count = 4; atMetalSpots = $true; dx = -160; dz = 120; spacing = 120 },
-    [ordered]@{ unitDefName = "armwin"; count = (Get-ScaledCount 5 $Scale); dx = 120; dz = 120; spacing = 85 },
-    [ordered]@{ unitDefName = "armsolar"; count = (Get-ScaledCount 3 $Scale); dx = 240; dz = -20; spacing = 90 },
-    [ordered]@{ unitDefName = "armllt"; count = (Get-ScaledCount 5 $Scale); dx = -150; dz = -170; spacing = 120 },
-    [ordered]@{ unitDefName = "armrl"; count = (Get-ScaledCount 2 $Scale); dx = 20; dz = -190; spacing = 130 },
-    [ordered]@{ unitDefName = "armwar"; count = (Get-ScaledCount 7 $Scale); dx = -40; dz = -300; spacing = 90 }
-  )
-  if ($Fortify) {
-    $recipe += [ordered]@{ unitDefName = "armbeamer"; count = 2; dx = -60; dz = -80; spacing = 160 }
-  }
-  if ($PatrolTarget) {
-    $recipe += [ordered]@{ unitDefName = "armpw"; count = (Get-ScaledCount 4 $Scale); dx = 160; dz = -340; spacing = 80; patrolX = $PatrolTarget[0]; patrolZ = $PatrolTarget[1] }
-  }
-  return $recipe
+function Spec {
+  param([string]$Def, [int]$Count, [int]$Dx, [int]$Dz, [int]$Spacing = 90, [bool]$AtSpots = $false, $PatrolX = $null, $PatrolZ = $null)
+  $s = [ordered]@{ unitDefName = $Def; count = [Math]::Max(1, $Count); dx = $Dx; dz = $Dz; spacing = $Spacing }
+  if ($AtSpots) { $s.atMetalSpots = $true }
+  if ($null -ne $PatrolX) { $s.patrolX = [double]$PatrolX; $s.patrolZ = [double]$PatrolZ }
+  return $s
 }
 
-function New-CortexRecipe {
-  param([double]$Scale = 1.0, [double[]]$PatrolTarget = $null, [switch]$Fortify)
-  $recipe = @(
-    [ordered]@{ unitDefName = "cormex"; count = 4; atMetalSpots = $true; dx = -140; dz = 120; spacing = 120 },
-    [ordered]@{ unitDefName = "corwin"; count = (Get-ScaledCount 5 $Scale); dx = 120; dz = 120; spacing = 90 },
-    [ordered]@{ unitDefName = "corsolar"; count = (Get-ScaledCount 3 $Scale); dx = 230; dz = 0; spacing = 90 },
-    [ordered]@{ unitDefName = "corllt"; count = (Get-ScaledCount 5 $Scale); dx = -160; dz = -170; spacing = 120 },
-    [ordered]@{ unitDefName = "corrl"; count = (Get-ScaledCount 2 $Scale); dx = 20; dz = -190; spacing = 130 },
-    [ordered]@{ unitDefName = "corgator"; count = (Get-ScaledCount 7 $Scale); dx = -40; dz = -300; spacing = 90 }
+function New-PlayerKit {
+  param([string]$Family)
+  $kit = @(
+    (Spec "legmex" 3 -140 120 120 $true),
+    (Spec "legwin" 4 120 160 90),
+    (Spec "legsolar" 2 240 80 90),
+    (Spec "legrad" 1 40 -60 100),
+    (Spec "leglht" 2 -120 -120 130),
+    (Spec "legmg" 1 60 -160 100),
+    (Spec "legcen" 3 80 -210 95),
+    (Spec "legjav" 2 260 -230 110)
   )
-  if ($Fortify) {
-    $recipe += [ordered]@{ unitDefName = "corhlt"; count = 2; dx = -60; dz = -80; spacing = 160 }
+  switch ($Family) {
+    "economy" { $kit += @((Spec "legck" 2 180 240 90), (Spec "legwin" 2 320 200 85)) }
+    "tempo"   { $kit += @((Spec "leggat" 2 -60 -260 90), (Spec "legcen" 1 140 -260 95)) }
+    "siege"   { $kit += @((Spec "legjav" 2 -200 -200 110), (Spec "legrl" 1 -40 -60 100)) }
+    "wild"    { $kit += @((Spec "legmg" 1 -180 -60 100), (Spec "leglht" 1 200 -140 130)) }
   }
-  if ($PatrolTarget) {
-    $recipe += [ordered]@{ unitDefName = "corak"; count = (Get-ScaledCount 4 $Scale); dx = 160; dz = -340; spacing = 80; patrolX = $PatrolTarget[0]; patrolZ = $PatrolTarget[1] }
-  }
-  return $recipe
+  return $kit
 }
 
-function New-RaptorRecipe {
-  param([double]$HazardLevel = 0.0)
-  $swarmScale = 1.0 + (2.0 * [Math]::Max(0.0, [Math]::Min(1.0, $HazardLevel)))
-  $recipe = @(
-    [ordered]@{ unitDefName = "raptor_hive"; count = 1; dx = 0; dz = 0; spacing = 80 },
-    [ordered]@{ unitDefName = "raptor_turret_basic_t2_v1"; count = 2; dx = -130; dz = 70; spacing = 120 },
-    [ordered]@{ unitDefName = "raptor_land_swarmer_basic_t1_v1"; count = (Get-ScaledCount 10 $swarmScale); dx = 120; dz = -90; spacing = 70 },
-    [ordered]@{ unitDefName = "raptor_land_swarmer_basic_t2_v1"; count = (Get-ScaledCount 4 $swarmScale); dx = -190; dz = -140; spacing = 80 }
+function Ring-Eco {
+  param($T, [double]$S)
+  @(
+    (Spec $T.mex 4 -160 120 120 $true),
+    (Spec $T.wind (Get-ScaledCount 4 $S) 140 170 85),
+    (Spec $T.solar (Get-ScaledCount 2 $S) 260 60 95),
+    (Spec $T.mstor 1 60 240 100),
+    (Spec $T.conv (Get-ScaledCount 2 $S) 320 170 95)
   )
-  if ($HazardLevel -gt 0.5) {
-    $recipe += [ordered]@{ unitDefName = "raptor_hive"; count = 1; dx = 260; dz = 200; spacing = 80 }
-  }
-  return $recipe
+}
+
+function Ring-Perimeter {
+  param($T, [double]$S, [int]$FX, [int]$FZ)
+  # FX/FZ point from the camp toward the player: defenses face the approach.
+  @(
+    (Spec $T.llt (Get-ScaledCount 4 $S) (170 * $FX) (150 * $FZ) 150),
+    (Spec $T.wall (Get-ScaledCount 8 $S) (270 * $FX) (240 * $FZ) 40),
+    (Spec $T.aa 2 (-90 * $FX) (60 * $FZ) 170),
+    (Spec $T.radar 1 0 -80 100)
+  )
+}
+
+function Ring-Production {
+  param($T)
+  @((Spec $T.lab 1 -300 -150 120), (Spec $T.nano 2 -210 -240 90))
+}
+
+function Ring-Patrol {
+  param($T, [double]$S, [double]$PX, [double]$PZ)
+  @(
+    (Spec $T.raider (Get-ScaledCount 4 $S) 120 -300 80 $false $PX $PZ),
+    (Spec $T.skirm (Get-ScaledCount 3 $S) -140 -320 90 $false $PX $PZ),
+    (Spec $T.assault (Get-ScaledCount 3 $S) 20 -390 95 $false $PX $PZ)
+  )
+}
+
+function Ring-Fortify {
+  param($T, [int]$FX, [int]$FZ)
+  @(
+    (Spec $T.hlt 2 (110 * $FX) (-70 * $FZ) 180),
+    (Spec $T.popup 1 (200 * $FX) (120 * $FZ) 100),
+    (Spec $T.bigGun 1 -50 40 100)
+  )
+}
+
+function Centerpiece-Relay {
+  param($T)
+  @((Spec $T.targ 1 0 0 100), (Spec $T.arad 1 120 60 100), (Spec $T.fus 1 -130 70 110))
+}
+
+function Centerpiece-LRPC {
+  param($T)
+  @((Spec $T.lrpc 1 0 0 100), (Spec $T.fus 1 140 80 110), (Spec $T.fort 6 -90 -120 42))
+}
+
+function Centerpiece-EcoWorks {
+  param($T, [double]$S)
+  @(
+    (Spec $T.fus 1 0 0 110),
+    (Spec $T.advsolar (Get-ScaledCount 3 $S) 150 60 100),
+    (Spec $T.conv (Get-ScaledCount 4 $S) -150 80 90),
+    (Spec $T.estor 1 40 180 100)
+  )
+}
+
+function Centerpiece-CommandPost {
+  param($T)
+  @((Spec $T.arad 1 0 0 100), (Spec $T.fus 1 130 60 110), (Spec $T.hlt 1 -110 -60 120))
+}
+
+function Centerpiece-Hives {
+  param([double]$Hazard)
+  $specs = @(
+    (Spec "raptor_hive" 1 -120 -40 240),
+    (Spec "raptor_hive" 1 140 80 240)
+  )
+  if ($Hazard -gt 0.5) { $specs += (Spec "raptor_hive" 1 0 -220 240) }
+  return $specs
+}
+
+function Ring-RaptorGarrison {
+  param([double]$Hazard)
+  $swarmScale = 1.0 + (2.0 * [Math]::Max(0.0, [Math]::Min(1.0, $Hazard)))
+  @(
+    (Spec "raptor_turret_basic_t2_v1" 3 -140 90 150),
+    (Spec "raptor_land_swarmer_basic_t1_v1" (Get-ScaledCount 10 $swarmScale) 130 -100 70),
+    (Spec "raptor_land_swarmer_basic_t2_v1" (Get-ScaledCount 4 $swarmScale) -200 -150 80)
+  )
 }
 
 if (-not $IntentPath) { $IntentPath = Join-Path $Workspace "outbox\next_mission_intent.json" }
@@ -210,47 +302,112 @@ $description = Get-ObjectiveDescription $intent
 # difficulty coefficient tracks q6_contested. Both were computed by the engine.
 $diffCoeff = if ($intent.economy -and $intent.economy.difficultyCoefficient) { [double]$intent.economy.difficultyCoefficient } else { 1.0 }
 $scaleCenter = if ($intent.expectedEnemyScale -and $intent.expectedEnemyScale.center) { [double]$intent.expectedEnemyScale.center } else { 6000.0 }
-$enemyScale = [Math]::Round(([Math]::Max(0.7, [Math]::Min(2.2, $scaleCenter / 6000.0)) * $diffCoeff), 3)
+# Onboarding ramp: the first two sorties ease in regardless of lore pressure.
+$rampFactor = [Math]::Min(1.0, 0.8 + 0.1 * ($missionNumber - 1))
+$enemyScale = [Math]::Round(([Math]::Max(0.7, [Math]::Min(2.2, $scaleCenter / 6000.0)) * $diffCoeff * $rampFactor), 3)
 $fortify = $enemyScale -ge 1.4
 $maxHazard = if ($intent.offscreenPressureSummary -and $intent.offscreenPressureSummary.maxHazard) { [double]$intent.offscreenPressureSummary.maxHazard } else { 0.0 }
 $objectiveKind = if ($intent.objectiveTarget -and $intent.objectiveTarget.kind) { [string]$intent.objectiveTarget.kind } else { [string]$intent.objective }
 $presenceKind = $objectiveKind -in @("seize_lane", "gate_control")
-# Presence objectives: enemy patrols defend the target zone. Destruction
-# objectives: enemy patrols pressure the midpoint toward the player.
+$mapFamily = if ($intent.environment -and $intent.environment.mapFamily) { [string]$intent.environment.mapFamily } else { "tempo" }
+
+# Defenses face the player's approach; patrols defend presence zones or
+# pressure the midline on destruction objectives.
+$faceX = [Math]::Sign($deployCenter[0] - $enemyCenter[0]); if ($faceX -eq 0) { $faceX = 1 }
+$faceZ = [Math]::Sign($deployCenter[1] - $enemyCenter[1]); if ($faceZ -eq 0) { $faceZ = 1 }
 $patrolTarget = if ($presenceKind) {
   @($enemyCenter[0], $enemyCenter[1])
 } else {
   @((($deployCenter[0] + $enemyCenter[0]) / 2.0), (($deployCenter[1] + $enemyCenter[1]) / 2.0))
 }
 
-$baseRecipes = [ordered]@{
-  legion_sortie_start = New-PlayerRecipe
-  armada_sortie_target = (New-ArmadaRecipe -Scale $enemyScale -PatrolTarget $patrolTarget -Fortify:$fortify)
-  cortex_sortie_target = (New-CortexRecipe -Scale $enemyScale -PatrolTarget $patrolTarget -Fortify:$fortify)
-  raptor_pressure_nest = (New-RaptorRecipe -HazardLevel $maxHazard)
+function Clamp01 { param([double]$V) return [Math]::Max(0.03, [Math]::Min(0.97, $V)) }
+
+# --- Camp assembly ---------------------------------------------------------
+# Each camp -> one team on its own allyteam. Camps carry a small
+# objective-tagged centerpiece force plus an untagged garrison shell.
+$baseRecipes = [ordered]@{ legion_player_kit = @(New-PlayerKit $mapFamily) }
+$allyTeams = @([ordered]@{ id = 0; startRect = New-StartRect $deployCenter 0.20 })
+$teams = @([ordered]@{ id = 0; side = "Legion"; allyTeam = 0; base = @($deployCenter[0], $deployCenter[1]); rgb = @(0.25, 0.85, 0.35); label = "Legion Green Player" })
+$forces = @([ordered]@{ id = "player_deployment"; label = "Player Deployment - $($intent.deploymentZoneId)"; teamID = 0; side = "Legion"; role = "player_anchor"; base = [ordered]@{ x = $deployCenter[0]; z = $deployCenter[1] }; recipe = "legion_player_kit" })
+$ai = @()
+$nextTeam = 1
+
+function Add-FactionCamp {
+  param([string]$Side, [double[]]$Center, $CenterpieceSpecs, [string]$CenterpieceLabel, [bool]$WithEco = $true, [bool]$WithProduction = $false)
+  $T = $FACTION[$Side]
+  $teamID = $script:nextTeam; $script:nextTeam += 1
+  $script:allyTeams += [ordered]@{ id = $teamID; startRect = New-StartRect $Center 0.20 }
+  $script:teams += [ordered]@{ id = $teamID; side = $Side; allyTeam = $teamID; base = @($Center[0], $Center[1]); rgb = $T.rgb; label = "$Side - $CenterpieceLabel" }
+
+  if ($CenterpieceSpecs) {
+    $coreRecipe = "camp${teamID}_core"
+    $script:baseRecipes[$coreRecipe] = @($CenterpieceSpecs)
+    $script:forces += [ordered]@{ id = "camp${teamID}_objective"; label = $CenterpieceLabel; teamID = $teamID; side = $Side; role = "objective_target"; base = [ordered]@{ x = $Center[0]; z = $Center[1] }; recipe = $coreRecipe }
+  }
+
+  $garrison = @()
+  if ($WithEco) { $garrison += Ring-Eco $T $enemyScale }
+  $garrison += Ring-Perimeter $T $enemyScale $faceX $faceZ
+  if ($WithProduction) { $garrison += Ring-Production $T }
+  $garrison += Ring-Patrol $T $enemyScale $patrolTarget[0] $patrolTarget[1]
+  if ($fortify) { $garrison += Ring-Fortify $T $faceX $faceZ }
+  $garrisonRecipe = "camp${teamID}_garrison"
+  $script:baseRecipes[$garrisonRecipe] = @($garrison)
+  $script:forces += [ordered]@{ id = "camp${teamID}_garrison"; label = "$Side garrison"; teamID = $teamID; side = $Side; role = "garrison"; base = [ordered]@{ x = $Center[0]; z = $Center[1] }; recipe = $garrisonRecipe }
+
+  $script:ai += [ordered]@{ name = "SimpleAI($Side $CenterpieceLabel)"; shortName = "SimpleAI"; team = $teamID; version = "<not-versioned>" }
 }
 
-$allyTeams = @(
-  [ordered]@{ id = 0; startRect = New-StartRect $deployCenter 0.20 },
-  [ordered]@{ id = 1; startRect = New-StartRect $enemyCenter 0.22 }
-)
-$teams = @(
-  [ordered]@{ id = 0; side = "Legion"; allyTeam = 0; base = @($deployCenter[0], $deployCenter[1]); rgb = @(0.25, 0.85, 0.35); label = "Legion Green Player" },
-  [ordered]@{ id = 1; side = $enemySide; allyTeam = 1; base = @($enemyCenter[0], $enemyCenter[1]); rgb = $enemyRgb; label = "$enemySide Mission Target" }
-)
-$forces = @(
-  [ordered]@{ id = "player_deployment"; label = "Player Deployment - $($intent.deploymentZoneId)"; teamID = 0; side = "Legion"; role = "player_anchor"; base = [ordered]@{ x = $deployCenter[0]; z = $deployCenter[1] }; recipe = "legion_sortie_start" },
-  [ordered]@{ id = "primary_objective_force"; label = $description; teamID = 1; side = $enemySide; role = "objective_target"; base = [ordered]@{ x = $enemyCenter[0]; z = $enemyCenter[1] }; recipe = $enemyRecipe }
-)
-$ai = @(
-  [ordered]@{ name = "SimpleAI($enemySide Target)"; shortName = "SimpleAI"; team = 1; version = "<not-versioned>" }
-)
+function Add-RaptorCamp {
+  param([double[]]$Center, [bool]$AsObjective, [string]$Label)
+  $teamID = $script:nextTeam; $script:nextTeam += 1
+  $script:allyTeams += [ordered]@{ id = $teamID; startRect = New-StartRect $Center 0.18 }
+  $script:teams += [ordered]@{ id = $teamID; side = "Armada"; allyTeam = $teamID; base = @($Center[0], $Center[1]); rgb = @(0.78, 0.14, 0.92); label = $Label }
+  if ($AsObjective) {
+    $script:baseRecipes["camp${teamID}_hives"] = @(Centerpiece-Hives $maxHazard)
+    $script:forces += [ordered]@{ id = "camp${teamID}_objective"; label = $Label; teamID = $teamID; side = "Raptors"; role = "objective_target"; base = [ordered]@{ x = $Center[0]; z = $Center[1] }; recipe = "camp${teamID}_hives" }
+  }
+  $script:baseRecipes["camp${teamID}_swarm"] = @(Ring-RaptorGarrison $maxHazard)
+  $script:forces += [ordered]@{ id = "camp${teamID}_swarm"; label = "Raptor swarm"; teamID = $teamID; side = "Raptors"; role = $(if ($AsObjective) { "garrison" } else { "wild_pressure" }); base = [ordered]@{ x = $Center[0]; z = $Center[1] }; recipe = "camp${teamID}_swarm" }
+  $script:ai += [ordered]@{ name = "RaptorsDefenseAI(Verdance)"; shortName = "RaptorsAI"; team = $teamID; version = "<not-versioned>" }
+}
 
-if ($hasWild) {
-  $allyTeams += [ordered]@{ id = 2; startRect = New-StartRect $wildCenter 0.18 }
-  $teams += [ordered]@{ id = 2; side = "Armada"; allyTeam = 2; base = @($wildCenter[0], $wildCenter[1]); rgb = @(0.78, 0.14, 0.92); label = "Raptor Wild Pressure" }
-  $forces += [ordered]@{ id = "wild_pressure"; label = "Raptor pressure nest"; teamID = 2; side = "Raptors"; role = "wild_pressure"; base = [ordered]@{ x = $wildCenter[0]; z = $wildCenter[1] }; recipe = "raptor_pressure_nest" }
-  $ai += [ordered]@{ name = "RaptorsDefenseAI(Verdance)"; shortName = "RaptorsAI"; team = 2; version = "<not-versioned>" }
+switch ($objectiveKind) {
+  "strike_relay" {
+    $T = $FACTION[$enemySide]
+    Add-FactionCamp $enemySide $enemyCenter (Centerpiece-Relay $T) $description -WithEco $true
+  }
+  "destroy_key_structure" {
+    $T = $FACTION[$enemySide]
+    Add-FactionCamp $enemySide $enemyCenter (Centerpiece-LRPC $T) $description -WithEco $true -WithProduction $true
+  }
+  "economy_disrupt" {
+    $T = $FACTION[$enemySide]
+    Add-FactionCamp $enemySide $enemyCenter (Centerpiece-EcoWorks $T $enemyScale) $description -WithEco $true
+  }
+  "hive_clear_or_bypass" {
+    Add-RaptorCamp $enemyCenter $true $description
+  }
+  "choose_target_then_extract" {
+    # Two rival faction camps flanking the contested center; they are on
+    # separate allyteams and will pressure each other while you choose.
+    $armadaCenter = @((Clamp01 ($enemyCenter[0] - 0.16)), (Clamp01 ($enemyCenter[1] - 0.05)))
+    $cortexCenter = @((Clamp01 ($enemyCenter[0] + 0.16)), (Clamp01 ($enemyCenter[1] + 0.08)))
+    Add-FactionCamp "Armada" $armadaCenter (Centerpiece-CommandPost $FACTION["Armada"]) "Armada command post" -WithEco $true
+    Add-FactionCamp "Cortex" $cortexCenter (Centerpiece-CommandPost $FACTION["Cortex"]) "Cortex forward works" -WithEco $true
+  }
+  default {
+    # Presence objectives (seize_lane / gate_control): a garrison holds the
+    # zone - no eco, just teeth. Victory is standing where they stood.
+    $T = $FACTION[$enemySide]
+    Add-FactionCamp $enemySide $enemyCenter $null $description -WithEco $false
+  }
+}
+
+# Wild pressure nest on wild-family maps whose objective is not already the hive.
+if ($hasWild -and $objectiveKind -ne "hive_clear_or_bypass") {
+  Add-RaptorCamp $wildCenter $false "Raptor wild pressure"
 }
 
 $graph = if ($state -and $state.graph) { $state.graph } else { [pscustomobject]@{} }

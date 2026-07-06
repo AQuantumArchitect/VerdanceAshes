@@ -1,5 +1,5 @@
 param(
-  [string]$Workspace = "$env:USERPROFILE\Documents\BAR_Verdance_Workspace",
+  [string]$Workspace = "",
   [string]$ScenarioPath = "",
   [string]$Variant = "simple_defenders",
   [string[]]$PlayerControllers = @("simple", "barbarian_aggressive"),
@@ -10,6 +10,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 . (Join-Path (Split-Path -Parent $MyInvocation.MyCommand.Path) "_common.ps1")
+$Workspace = Get-VerdanceWorkspaceRoot -Workspace $Workspace
 
 if (-not $ScenarioPath) {
   $ScenarioPath = Join-Path $Workspace "data\scenarios\all_that_simmers.playable.json"
