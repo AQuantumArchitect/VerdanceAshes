@@ -54,6 +54,20 @@ The gadget emits `VA_RESULT_JSON_*` markers with a 4-part idempotency key
   (cheat-kills targets, expects the gadget's own victory path).
 - `python -m unittest discover tests` — story engine unit tests.
 
+## Story & Difficulty (v2)
+
+- Mission titles, Ketha briefing lines, and outcome-keyed debrief lines are generated
+  by the engine from `data/story/ketha_voice.json` (deterministic per campaign moment —
+  edit that file to retune the voice, no code changes needed).
+- A briefing card shows for the first 45 seconds in-game (Space dismisses); a debrief
+  screen with Ketha's reaction and extraction quality shows at mission end.
+- Enemy force size scales with `expectedEnemyScale` (zone memory) × the difficulty
+  coefficient (q6_contested); at ≥1.4 the enemy base gains tier-2 defenses. Enemy
+  patrols defend the target zone on presence objectives and pressure the midline on
+  destruction objectives. Raptor nests scale with accumulated hazard pressure.
+- `scripts/verify_campaign_arc.ps1 -Missions N` chains N missions headlessly
+  (state snapshot/restore) and writes `reports/arc_verify.latest.json`.
+
 ## Current Alpha Limitations
 
 - Deployment and extraction zones are often the same zone, so destroy-objectives

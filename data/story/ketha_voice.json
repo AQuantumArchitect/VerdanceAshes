@@ -1,0 +1,140 @@
+{
+  "schemaVersion": "verdance-ketha-voice/2.0",
+  "speaker": "ketha",
+  "notes": "Ketha of Rhekk's Line. Short, grounded, reactive. She counts costs out loud and never wastes a sentence. Community translators: keep lines under ~90 characters.",
+  "pools": {
+    "briefing.family.tempo": [
+      "Fast ground. Whoever hesitates here feeds the other side's map.",
+      "This is a running fight, not a siege. Pack light, hit the mark, walk away.",
+      "The lanes here reward the first mover. Be the first mover."
+    ],
+    "briefing.family.economy": [
+      "This world still produces. That makes it a target twice over.",
+      "Every extractor we hold is a sentence in the argument that we exist.",
+      "Fight over the fields, not in them. The grass has seen enough."
+    ],
+    "briefing.family.siege": [
+      "Old walls, old guns, old certainty. We bring none of those. Good.",
+      "The Bastion has been digging in while we were elsewhere. It shows.",
+      "Nobody takes a fortress whole. We take one bite and leave before it swallows."
+    ],
+    "briefing.family.wild": [
+      "The wilds don't take sides. They take stragglers.",
+      "Hives don't negotiate and don't sleep. Mind the clock out there.",
+      "Everything on this map is hungry. Try to be brief."
+    ],
+    "briefing.objective.strike_relay": [
+      "One relay. When it drops, their dealers go quiet for a season.",
+      "Cut the relay and the chain forgets a link. Then leave."
+    ],
+    "briefing.objective.destroy_key_structure": [
+      "One structure holds their line together. Remove it and let gravity work.",
+      "We are not here to win the field. We are here to break one bone."
+    ],
+    "briefing.objective.economy_disrupt": [
+      "Starve the works, spare the workers. The synths rebuild slower than they claim.",
+      "Their economy is a promise to their soldiers. Make it a lie."
+    ],
+    "briefing.objective.seize_lane": [
+      "Stand on the scar and stay standing. That's the whole order.",
+      "Ground is only ours while we're on it. So be on it."
+    ],
+    "briefing.objective.gate_control": [
+      "Hold the gate, count to enough, and walk out through it.",
+      "Gates decide who moves. Today the gate answers to us."
+    ],
+    "briefing.objective.hive_clear_or_bypass": [
+      "Burn the hive or slip past it. Pride picks the first. Sense picks either.",
+      "You don't have to kill the nest. You have to outlive the visit."
+    ],
+    "briefing.objective.choose_target_then_extract": [
+      "Three enemies, one sortie. Pick the wound that bleeds longest.",
+      "Choose your target like the clans are watching. They are."
+    ],
+    "briefing.graph.contested_high": [
+      "The whole front is loose in its socket. One push either way decides it.",
+      "Contested space everywhere. That's danger, and it's also the door."
+    ],
+    "briefing.graph.scarcity_high": [
+      "Metal is short everywhere. Waste nothing, not even wrecks.",
+      "Scarcity does our recruiting for us. It also does theirs."
+    ],
+    "briefing.graph.independent_rising": [
+      "The clans hold more sky than they did last season. Because of this line.",
+      "Free space is growing. It grows exactly as fast as we defend it."
+    ],
+    "briefing.companion.high_stress": [
+      "I'm still standing. Don't spend me like I'm not.",
+      "Ask me for one more clean job, not ten loud ones."
+    ],
+    "briefing.companion.high_morale": [
+      "The line feels good today. Use that. It doesn't keep.",
+      "Rhekk's Line is with you. All of it."
+    ],
+    "briefing.hazard.rising": [
+      "The hives kept building while we were gone. Expect the bill.",
+      "Whatever we didn't kill last time has had time to multiply."
+    ],
+    "briefing.fortress.pressure": [
+      "Their defenses matured offscreen. Assume every approach is answered.",
+      "They've had time to pour ferrocrete. Respect it, then route around it."
+    ],
+    "briefing.path.A": [
+      "Order has its uses. Just remember whose order it was first.",
+      "Stabilize the grid if you must. The clans will ask what it cost."
+    ],
+    "briefing.path.B": [
+      "The clans are listening. That matters more than the map says.",
+      "Every sortie signs the same sentence: we govern ourselves."
+    ],
+    "briefing.path.C": [
+      "The jump-spire route needs metal and quiet. Earn both.",
+      "Escape isn't retreat if we choose the day. Keep the ledger growing."
+    ],
+    "debrief.victory": [
+      "Done is done. Mark the map and move.",
+      "That's a win. Say it plainly and reload.",
+      "The field is ours to leave. Best kind of ownership."
+    ],
+    "debrief.victory_clean": [
+      "Clean exit. That matters more than the scorch marks.",
+      "In and out with the line intact. The clans will hear about this one.",
+      "No one chased us out. We simply finished."
+    ],
+    "debrief.partial": [
+      "Not a win. Not a loss. A hinge.",
+      "We got out with half the job done. Half-jobs collect interest.",
+      "Call it what it is: a withdrawal with a receipt."
+    ],
+    "debrief.defeat": [
+      "We lost ground, not the thread. But the thread is thinner.",
+      "Write it down exactly as it happened. Flattery kills the next sortie.",
+      "The map will remember this. So will I. Differently."
+    ],
+    "debrief.defeat_commander": [
+      "The command walker is scrap. The command is not. Rebuild.",
+      "They took the walker. They did not take the line."
+    ],
+    "debrief.objective_destroyed": [
+      "That target stays gone. The rest of the front will learn around the hole.",
+      "One less piece of their machine. It was a load-bearing piece."
+    ],
+    "debrief.streak.wins": [
+      "Three fields in a row answered to us. Careful. Confidence is a debt too.",
+      "The line hasn't lost in a while. That is when lines get lost."
+    ],
+    "debrief.streak.losses": [
+      "Two down in a row. The next one is not about the map. It's about us.",
+      "Losing teaches faster. We are apparently enrolled."
+    ]
+  },
+  "titles": {
+    "greenest_fields": ["The Quiet Harvest", "Grass Over Wire", "What the Fields Owe"],
+    "eye_of_horus": ["The Dealer's Debt", "A Hole in the Chain", "Glass Under the Eye"],
+    "koom_valley": ["Standing on the Scar", "The Valley Answers", "Fluid Ground"],
+    "tabula": ["The Gate Decides", "Blank Stone", "Through the Rock Doors"],
+    "ancient_bastion": ["One Bite of the Wall", "Old Guns, New Debts", "The Bastion Diminished"],
+    "the_rock_jungle": ["Outlive the Visit", "Green Teeth", "The Causeway Toll"],
+    "all_that_simmers": ["Choose Your Wound", "Everything Hungry", "The Simmering Ledger"]
+  }
+}

@@ -10,6 +10,9 @@ and tell us where the loop broke or felt wrong.
 2. **Objectives** — did the objective panel make sense? Did victory/defeat trigger when
    it should have? (Destroy-objectives complete when the target structures die; then you
    return to the extraction zone to finish.)
+   A briefing card with Ketha's read on the situation shows at mission start (Space
+   dismisses it); a debrief screen shows at mission end. Tell us if the lines fit what
+   actually happened — that's generated, not scripted.
 3. **Difficulty and pacing** — was the generated opposition trivial, fair, or hopeless?
    How long did the sortie take?
 4. **Campaign feel** — after a few missions, does the world state (graph values, mission

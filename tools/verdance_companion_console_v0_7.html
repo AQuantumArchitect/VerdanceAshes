@@ -309,11 +309,16 @@ function render(s){
   $('progressBar').style.width = `${p}%`;
   $('resultProgress').textContent = result.missionId ? `Latest extracted result progress: ${p}% (${result.holdFrames}/${result.requiredFrames})` : 'Run /varesult in BAR, then extract.';
   $('seedSummary').innerHTML = seed.missionId ? `<b>${esc(seed.missionId)}</b><br>${esc(seed.title || '')}<br><span class="muted">requiredFrames ${esc(seed.requiredFrames)}</span>` : 'No installed seed found.';
-  $('intentSummary').innerHTML = intent.missionId ? `<b>${esc(intent.missionId)}</b> on <b>${esc(intent.mapId)}</b><br>
+  const briefingHtml = (intent.briefing && intent.briefing.lines && intent.briefing.lines.length)
+    ? '<div style="margin-top:8px;border-left:2px solid var(--line);padding-left:10px">' +
+      intent.briefing.lines.map(l => `<div style="color:#a7c9a7;font-style:italic">&ldquo;${esc(l.text)}&rdquo;</div>`).join('') +
+      '</div>'
+    : '';
+  $('intentSummary').innerHTML = intent.missionId ? `${intent.title ? `<b style="font-size:15px">${esc(intent.title)}</b><br>` : ''}<b>${esc(intent.missionId)}</b> on <b>${esc(intent.mapId)}</b><br>
     Deploy: ${esc(intent.deploymentZoneId || '?')}<br>
     Extract: ${esc(intent.extractionZoneId || '?')}<br>
     Objective: ${esc((intent.objectiveTarget && intent.objectiveTarget.label) || intent.objective || '?')}<br>
-    <span class="muted">${esc(intent.storyReason || '')}</span>` : 'No next mission intent found. Run Advance v1 once to materialize one.';
+    <span class="muted">${esc(intent.storyReason || '')}</span>${briefingHtml}` : 'No next mission intent found. Run Advance v1 once to materialize one.';
   const graph = state.graph || {};
   const rep = state.reputation || {};
   const rows = [];

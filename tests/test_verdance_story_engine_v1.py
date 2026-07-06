@@ -220,5 +220,50 @@ class StoryEngineV1Tests(unittest.TestCase):
             self.assertEqual(intent["hazardPolicy"], "escalating_reset")
 
 
+class StoryVoiceTests(unittest.TestCase):
+    def test_pick_line_is_deterministic_and_within_pool(self):
+        voice = engine.load_ketha_voice(ROOT)
+        first = engine.pick_line(voice, "debrief.victory", "verdance_ashes", "va_007", "victory")
+        second = engine.pick_line(voice, "debrief.victory", "verdance_ashes", "va_007", "victory")
+        self.assertEqual(first, second)
+        self.assertIn(first, voice["pools"]["debrief.victory"])
+        other = engine.pick_line(voice, "debrief.victory", "verdance_ashes", "va_008", "victory")
+        self.assertIn(other, voice["pools"]["debrief.victory"])
+
+    def test_intent_carries_briefing_title_and_debrief_candidates(self):
+        state = sample_state()
+        state["graph"]["q7_resource_scarcity"] = 0.95
+        intent = engine.materialize_next_intent(state, ROOT)
+        self.assertTrue(intent["title"])
+        tags = [line["tag"] for line in intent["briefing"]["lines"]]
+        self.assertIn("situation", tags)
+        self.assertIn("objective", tags)
+        self.assertIn("pressure", tags)
+        self.assertIn("path", tags)
+        for key in ("victory", "defeat", "partial"):
+            self.assertIn(key, intent["debriefCandidates"])
+
+    def test_missing_voice_file_falls_back_without_error(self):
+        with make_workspace() as tmp:
+            root = Path(tmp)
+            intent = engine.materialize_next_intent(sample_state(), root)
+            self.assertIsNone(intent["title"])
+            self.assertEqual(intent["briefing"]["lines"], [])
+            self.assertIn("victory", intent["debriefCandidates"])
+
+    def test_story_events_use_commander_loss_and_streak_pools(self):
+        state = sample_state()
+        state["history"] = [
+            {"missionId": "va_001", "status": "defeat"},
+            {"missionId": "va_002", "status": "defeat"},
+        ]
+        result = sample_result(status="defeat", terminalReason="commander_lost", destroyedObjectiveIds=[])
+        events = engine.generate_story_events(state, result, {"storyTags": ["defeat"]}, True, ROOT)
+        texts = [e["text"] for e in events["events"] if e["kind"] == "dialogue"]
+        voice = engine.load_ketha_voice(ROOT)
+        self.assertIn(texts[0], voice["pools"]["debrief.defeat_commander"])
+        self.assertTrue(any(t in voice["pools"]["debrief.streak.losses"] for t in texts[1:]))
+
+
 if __name__ == "__main__":
     unittest.main()

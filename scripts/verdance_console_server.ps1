@@ -121,6 +121,8 @@ function Get-IntentSummary {
     expectedEnemyScale = $intent.expectedEnemyScale
     hazardPolicy = $intent.hazardPolicy
     storyReason = $intent.storyReason
+    title = $intent.title
+    briefing = $intent.briefing
   }
 }
 

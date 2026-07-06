@@ -107,35 +107,62 @@ function New-PlayerRecipe {
   )
 }
 
+function Get-ScaledCount {
+  param([int]$Base, [double]$Scale)
+  return [int][Math]::Max(1, [Math]::Round($Base * $Scale))
+}
+
 function New-ArmadaRecipe {
-  return @(
+  param([double]$Scale = 1.0, [double[]]$PatrolTarget = $null, [switch]$Fortify)
+  $recipe = @(
     [ordered]@{ unitDefName = "armmex"; count = 4; atMetalSpots = $true; dx = -160; dz = 120; spacing = 120 },
-    [ordered]@{ unitDefName = "armwin"; count = 5; dx = 120; dz = 120; spacing = 85 },
-    [ordered]@{ unitDefName = "armsolar"; count = 3; dx = 240; dz = -20; spacing = 90 },
-    [ordered]@{ unitDefName = "armllt"; count = 5; dx = -150; dz = -170; spacing = 120 },
-    [ordered]@{ unitDefName = "armrl"; count = 2; dx = 20; dz = -190; spacing = 130 },
-    [ordered]@{ unitDefName = "armwar"; count = 7; dx = -40; dz = -300; spacing = 90 }
+    [ordered]@{ unitDefName = "armwin"; count = (Get-ScaledCount 5 $Scale); dx = 120; dz = 120; spacing = 85 },
+    [ordered]@{ unitDefName = "armsolar"; count = (Get-ScaledCount 3 $Scale); dx = 240; dz = -20; spacing = 90 },
+    [ordered]@{ unitDefName = "armllt"; count = (Get-ScaledCount 5 $Scale); dx = -150; dz = -170; spacing = 120 },
+    [ordered]@{ unitDefName = "armrl"; count = (Get-ScaledCount 2 $Scale); dx = 20; dz = -190; spacing = 130 },
+    [ordered]@{ unitDefName = "armwar"; count = (Get-ScaledCount 7 $Scale); dx = -40; dz = -300; spacing = 90 }
   )
+  if ($Fortify) {
+    $recipe += [ordered]@{ unitDefName = "armbeamer"; count = 2; dx = -60; dz = -80; spacing = 160 }
+  }
+  if ($PatrolTarget) {
+    $recipe += [ordered]@{ unitDefName = "armpw"; count = (Get-ScaledCount 4 $Scale); dx = 160; dz = -340; spacing = 80; patrolX = $PatrolTarget[0]; patrolZ = $PatrolTarget[1] }
+  }
+  return $recipe
 }
 
 function New-CortexRecipe {
-  return @(
+  param([double]$Scale = 1.0, [double[]]$PatrolTarget = $null, [switch]$Fortify)
+  $recipe = @(
     [ordered]@{ unitDefName = "cormex"; count = 4; atMetalSpots = $true; dx = -140; dz = 120; spacing = 120 },
-    [ordered]@{ unitDefName = "corwin"; count = 5; dx = 120; dz = 120; spacing = 90 },
-    [ordered]@{ unitDefName = "corsolar"; count = 3; dx = 230; dz = 0; spacing = 90 },
-    [ordered]@{ unitDefName = "corllt"; count = 5; dx = -160; dz = -170; spacing = 120 },
-    [ordered]@{ unitDefName = "corrl"; count = 2; dx = 20; dz = -190; spacing = 130 },
-    [ordered]@{ unitDefName = "corgator"; count = 7; dx = -40; dz = -300; spacing = 90 }
+    [ordered]@{ unitDefName = "corwin"; count = (Get-ScaledCount 5 $Scale); dx = 120; dz = 120; spacing = 90 },
+    [ordered]@{ unitDefName = "corsolar"; count = (Get-ScaledCount 3 $Scale); dx = 230; dz = 0; spacing = 90 },
+    [ordered]@{ unitDefName = "corllt"; count = (Get-ScaledCount 5 $Scale); dx = -160; dz = -170; spacing = 120 },
+    [ordered]@{ unitDefName = "corrl"; count = (Get-ScaledCount 2 $Scale); dx = 20; dz = -190; spacing = 130 },
+    [ordered]@{ unitDefName = "corgator"; count = (Get-ScaledCount 7 $Scale); dx = -40; dz = -300; spacing = 90 }
   )
+  if ($Fortify) {
+    $recipe += [ordered]@{ unitDefName = "corhlt"; count = 2; dx = -60; dz = -80; spacing = 160 }
+  }
+  if ($PatrolTarget) {
+    $recipe += [ordered]@{ unitDefName = "corak"; count = (Get-ScaledCount 4 $Scale); dx = 160; dz = -340; spacing = 80; patrolX = $PatrolTarget[0]; patrolZ = $PatrolTarget[1] }
+  }
+  return $recipe
 }
 
 function New-RaptorRecipe {
-  return @(
+  param([double]$HazardLevel = 0.0)
+  $swarmScale = 1.0 + (2.0 * [Math]::Max(0.0, [Math]::Min(1.0, $HazardLevel)))
+  $recipe = @(
     [ordered]@{ unitDefName = "raptor_hive"; count = 1; dx = 0; dz = 0; spacing = 80 },
     [ordered]@{ unitDefName = "raptor_turret_basic_t2_v1"; count = 2; dx = -130; dz = 70; spacing = 120 },
-    [ordered]@{ unitDefName = "raptor_land_swarmer_basic_t1_v1"; count = 10; dx = 120; dz = -90; spacing = 70 },
-    [ordered]@{ unitDefName = "raptor_land_swarmer_basic_t2_v1"; count = 4; dx = -190; dz = -140; spacing = 80 }
+    [ordered]@{ unitDefName = "raptor_land_swarmer_basic_t1_v1"; count = (Get-ScaledCount 10 $swarmScale); dx = 120; dz = -90; spacing = 70 },
+    [ordered]@{ unitDefName = "raptor_land_swarmer_basic_t2_v1"; count = (Get-ScaledCount 4 $swarmScale); dx = -190; dz = -140; spacing = 80 }
   )
+  if ($HazardLevel -gt 0.5) {
+    $recipe += [ordered]@{ unitDefName = "raptor_hive"; count = 1; dx = 260; dz = 200; spacing = 80 }
+  }
+  return $recipe
 }
 
 if (-not $IntentPath) { $IntentPath = Join-Path $Workspace "outbox\next_mission_intent.json" }
@@ -170,15 +197,37 @@ $hasWild = ($map.PSObject.Properties["wilds"] -and $map.wilds) -or ($map.PSObjec
 
 $missionNumber = if ($intent.missionNumber) { [int]$intent.missionNumber } elseif ($state -and $state.missionNumber) { [int]$state.missionNumber } else { 1 }
 $missionId = if ($intent.missionId) { [string]$intent.missionId } else { "va_$('{0:d3}' -f $missionNumber)" }
-$title = "Verdance Alpha: $($map.title)"
+$title = if ($intent.PSObject.Properties["title"] -and $intent.title) {
+  "$($intent.title) - $($map.title)"
+} else {
+  "Verdance Alpha: $($map.title)"
+}
 $requiredFrames = Get-RequiredFrames $intent
 $description = Get-ObjectiveDescription $intent
 
+# --- Difficulty scaling from campaign state -------------------------------
+# expectedEnemyScale.center comes from zone-memory abstract presence; the
+# difficulty coefficient tracks q6_contested. Both were computed by the engine.
+$diffCoeff = if ($intent.economy -and $intent.economy.difficultyCoefficient) { [double]$intent.economy.difficultyCoefficient } else { 1.0 }
+$scaleCenter = if ($intent.expectedEnemyScale -and $intent.expectedEnemyScale.center) { [double]$intent.expectedEnemyScale.center } else { 6000.0 }
+$enemyScale = [Math]::Round(([Math]::Max(0.7, [Math]::Min(2.2, $scaleCenter / 6000.0)) * $diffCoeff), 3)
+$fortify = $enemyScale -ge 1.4
+$maxHazard = if ($intent.offscreenPressureSummary -and $intent.offscreenPressureSummary.maxHazard) { [double]$intent.offscreenPressureSummary.maxHazard } else { 0.0 }
+$objectiveKind = if ($intent.objectiveTarget -and $intent.objectiveTarget.kind) { [string]$intent.objectiveTarget.kind } else { [string]$intent.objective }
+$presenceKind = $objectiveKind -in @("seize_lane", "gate_control")
+# Presence objectives: enemy patrols defend the target zone. Destruction
+# objectives: enemy patrols pressure the midpoint toward the player.
+$patrolTarget = if ($presenceKind) {
+  @($enemyCenter[0], $enemyCenter[1])
+} else {
+  @((($deployCenter[0] + $enemyCenter[0]) / 2.0), (($deployCenter[1] + $enemyCenter[1]) / 2.0))
+}
+
 $baseRecipes = [ordered]@{
   legion_sortie_start = New-PlayerRecipe
-  armada_sortie_target = New-ArmadaRecipe
-  cortex_sortie_target = New-CortexRecipe
-  raptor_pressure_nest = New-RaptorRecipe
+  armada_sortie_target = (New-ArmadaRecipe -Scale $enemyScale -PatrolTarget $patrolTarget -Fortify:$fortify)
+  cortex_sortie_target = (New-CortexRecipe -Scale $enemyScale -PatrolTarget $patrolTarget -Fortify:$fortify)
+  raptor_pressure_nest = (New-RaptorRecipe -HazardLevel $maxHazard)
 }
 
 $allyTeams = @(
@@ -255,6 +304,12 @@ $scenario = [ordered]@{
       extractionZoneId = $intent.extractionZoneId
     }
     economy = if ($state -and $state.economy) { $state.economy } else { [ordered]@{ metalIncome = 0; energyIncome = 0; buildPower = 0 } }
+    difficulty = [ordered]@{
+      enemyScale = $enemyScale
+      difficultyCoefficient = $diffCoeff
+      hazardLevel = [Math]::Round($maxHazard, 3)
+      fortified = $fortify
+    }
     graph = $graph
     reputation = $reputation
     companions = $companions

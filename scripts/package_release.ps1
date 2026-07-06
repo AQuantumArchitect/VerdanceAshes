@@ -64,6 +64,7 @@ Copy-Into (Join-Path $Workspace "tools\verdance_companion_console_v0_7.html") (J
 Copy-Into (Join-Path $Workspace "data\map_pool\seven_maps.json") (Join-Path $ws "data\map_pool\seven_maps.json")
 Copy-Into (Join-Path $Workspace "data\zone_maps\authored") (Join-Path $ws "data\zone_maps\authored")
 Copy-Into (Join-Path $Workspace "data\scenarios\authored") (Join-Path $ws "data\scenarios\authored")
+Copy-Into (Join-Path $Workspace "data\story\ketha_voice.json") (Join-Path $ws "data\story\ketha_voice.json")
 Copy-Into (Join-Path $Workspace "verdance_config.template.json") (Join-Path $ws "verdance_config.template.json")
 
 # ---- empty runtime dirs ---------------------------------------------------

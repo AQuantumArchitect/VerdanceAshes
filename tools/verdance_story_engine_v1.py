@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import copy
 import datetime as _dt
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -857,7 +858,132 @@ def extraction_zone_for(map_id: str, deployment_zone: str) -> str:
     return deployment_zone
 
 
-def materialize_next_intent(state: Dict[str, Any]) -> Dict[str, Any]:
+# ---------------------------------------------------------------------------
+# Ketha voice: data-driven, deterministic dialogue selection.
+# Lines live in data/story/ketha_voice.json so the community can retune the
+# voice without touching engine code. Selection is hash-seeded (campaign +
+# mission + pool) so the same campaign moment always says the same thing.
+# ---------------------------------------------------------------------------
+
+FALLBACK_VOICE = {
+    "speaker": "ketha",
+    "pools": {
+        "debrief.victory": ["Done is done. Mark the map and move."],
+        "debrief.partial": ["Not a win. Not a loss. A hinge."],
+        "debrief.defeat": ["We lost ground, not the thread. But the thread is thinner."],
+    },
+    "titles": {},
+}
+
+_VOICE_CACHE: Dict[str, Dict[str, Any]] = {}
+
+
+def load_ketha_voice(workspace: Optional[Path]) -> Dict[str, Any]:
+    if workspace is None:
+        return FALLBACK_VOICE
+    key = str(workspace)
+    if key in _VOICE_CACHE:
+        return _VOICE_CACHE[key]
+    path = Path(workspace) / "data" / "story" / "ketha_voice.json"
+    voice = FALLBACK_VOICE
+    if path.exists():
+        try:
+            data = load_json(path)
+            if isinstance(data, dict) and isinstance(data.get("pools"), dict):
+                voice = data
+        except (json.JSONDecodeError, OSError):
+            pass
+    _VOICE_CACHE[key] = voice
+    return voice
+
+
+def pick_line(voice: Dict[str, Any], pool_key: str, *seed_parts: Any) -> Optional[str]:
+    pool = voice.get("pools", {}).get(pool_key) or []
+    if not pool:
+        return None
+    digest = hashlib.sha256("|".join([pool_key] + [str(p) for p in seed_parts]).encode("utf-8")).digest()
+    return str(pool[digest[0] % len(pool)])
+
+
+def pick_title(voice: Dict[str, Any], map_id: str, *seed_parts: Any) -> Optional[str]:
+    titles = voice.get("titles", {}).get(map_id) or []
+    if not titles:
+        return None
+    digest = hashlib.sha256("|".join([map_id, "title"] + [str(p) for p in seed_parts]).encode("utf-8")).digest()
+    return str(titles[digest[0] % len(titles)])
+
+
+def result_streak(state: Dict[str, Any]) -> Tuple[str, int]:
+    """Return (kind, length) of the trailing victory/defeat streak in history."""
+    history = state.get("history", []) or []
+    streak_kind = ""
+    streak = 0
+    for bead in reversed(history):
+        status = str(bead.get("status", ""))
+        kind = "win" if status == "victory" else ("loss" if status in ("defeat", "failed", "failure") else "")
+        if not kind:
+            break
+        if streak_kind and kind != streak_kind:
+            break
+        streak_kind = kind
+        streak += 1
+    return streak_kind, streak
+
+
+def generate_briefing(state: Dict[str, Any], voice: Dict[str, Any], map_id: str, family: str,
+                      objective: Dict[str, Any], pressure: Dict[str, Any]) -> Dict[str, Any]:
+    seed = (state.get("campaignId", CAMPAIGN_ID), state.get("missionNumber", 1))
+    graph = state.get("graph", {})
+    comp = state.get("companion", {})
+    lines: List[Dict[str, str]] = []
+
+    def add(pool_key: str, tag: str) -> None:
+        text = pick_line(voice, pool_key, *seed)
+        if text:
+            lines.append({"speaker": voice.get("speaker", "ketha"), "text": text, "tag": tag})
+
+    add("briefing.family." + family, "situation")
+    add("briefing.objective." + str(objective.get("kind", "")), "objective")
+
+    # One conditional line: highest-priority campaign pressure wins.
+    conditions = [
+        (float(comp.get("stress", 0) or 0) >= 40, "briefing.companion.high_stress"),
+        (pressure.get("maxHazard", 0) > 0.5, "briefing.hazard.rising"),
+        (pressure.get("maxFortification", 0) > 0.55, "briefing.fortress.pressure"),
+        (float(graph.get("q7_resource_scarcity", graph.get("q7_scarcity", 0)) or 0) > 0.85, "briefing.graph.scarcity_high"),
+        (float(graph.get("q6_contested", 0) or 0) > 0.7, "briefing.graph.contested_high"),
+        (float(graph.get("q6_independent", 0) or 0) > 0.45, "briefing.graph.independent_rising"),
+        (float(comp.get("morale", 0) or 0) >= 75, "briefing.companion.high_morale"),
+    ]
+    for triggered, pool_key in conditions:
+        if triggered:
+            add(pool_key, "pressure")
+            break
+
+    add("briefing.path." + str(state.get("pathSignal", "B")), "path")
+    return {"lines": lines}
+
+
+def generate_debrief_candidates(state: Dict[str, Any], voice: Dict[str, Any]) -> Dict[str, str]:
+    """Outcome-keyed lines embedded in the mission seed so the in-game HUD can
+    react to the terminal state without waiting for campaign advancement."""
+    seed = (state.get("campaignId", CAMPAIGN_ID), state.get("missionNumber", 1), "debrief")
+    candidates = {}
+    for key, pool in [
+        ("victory", "debrief.victory"),
+        ("victoryClean", "debrief.victory_clean"),
+        ("partial", "debrief.partial"),
+        ("defeat", "debrief.defeat"),
+        ("defeatCommander", "debrief.defeat_commander"),
+        ("objectiveDestroyed", "debrief.objective_destroyed"),
+    ]:
+        text = pick_line(voice, pool, *seed)
+        if text:
+            candidates[key] = text
+    return candidates
+
+
+def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = None) -> Dict[str, Any]:
     map_id, deploy_zone = choose_next_map_zone(state)
     objective = objective_for_map(map_id, state)
     pressure = zone_pressure_summary(state, map_id)
@@ -872,6 +998,8 @@ def materialize_next_intent(state: Dict[str, Any]) -> Dict[str, Any]:
                 "snapshot": snapshot,
             })
     family = map_family(map_id)
+    voice = load_ketha_voice(workspace)
+    title = pick_title(voice, map_id, state.get("campaignId", CAMPAIGN_ID), state.get("missionNumber", 1))
     return {
         "schemaVersion": INTENT_SCHEMA,
         "campaignId": state.get("campaignId", CAMPAIGN_ID),
@@ -882,6 +1010,9 @@ def materialize_next_intent(state: Dict[str, Any]) -> Dict[str, Any]:
         "extractionZoneId": extraction_zone_for(map_id, deploy_zone),
         "objective": objective["kind"],
         "objectiveTarget": objective,
+        "title": title,
+        "briefing": generate_briefing(state, voice, map_id, family, objective, pressure),
+        "debriefCandidates": generate_debrief_candidates(state, voice),
         "storyTags": intent_story_tags(map_id, family, pressure),
         "persistentBaseRehydrate": rehydrate,
         "offscreenPressureSummary": pressure,
@@ -933,7 +1064,8 @@ def story_reason_for_intent(map_id: str, family: str, pressure: Dict[str, Any]) 
     return "Current graph pressure favors a short objective sortie over full map conquest."
 
 
-def generate_story_events(state: Dict[str, Any], result: Dict[str, Any], bead: Optional[Dict[str, Any]], processed: bool) -> Dict[str, Any]:
+def generate_story_events(state: Dict[str, Any], result: Dict[str, Any], bead: Optional[Dict[str, Any]],
+                          processed: bool, workspace: Optional[Path] = None) -> Dict[str, Any]:
     events: List[Dict[str, Any]] = []
     if not processed:
         events.append({
@@ -942,21 +1074,43 @@ def generate_story_events(state: Dict[str, Any], result: Dict[str, Any], bead: O
             "text": "Duplicate result skipped; campaign state was not mutated.",
         })
     else:
+        voice = load_ketha_voice(workspace)
         tags = bead.get("storyTags", []) if bead else []
-        text = "The map gave us a measurement. Now it starts lying again."
-        if "objective-destroyed" in tags:
-            text = "That target stays gone. The rest of the front will learn around the hole."
+        status = str(result.get("status", "unknown"))
+        seed = (state.get("campaignId", CAMPAIGN_ID), result.get("missionId", "va_unknown"), status)
+
+        # Primary debrief line: most specific matching pool wins.
+        pool_key = "debrief.victory"
+        if status in ("defeat", "failed", "failure"):
+            pool_key = "debrief.defeat_commander" if result.get("terminalReason") == "commander_lost" else "debrief.defeat"
+        elif status in ("partial", "extracted"):
+            pool_key = "debrief.partial"
+        elif result.get("destroyedObjectiveIds"):
+            pool_key = "debrief.objective_destroyed"
         elif any(str(t).startswith("extract-clean") for t in tags):
-            text = "Clean exit. That matters more than the scorch marks."
-        elif result.get("status") in ("defeat", "failed", "failure"):
-            text = "We lost ground, not the thread. But the thread is thinner."
+            pool_key = "debrief.victory_clean"
+        text = pick_line(voice, pool_key, *seed) or "The map gave us a measurement. Now it starts lying again."
         events.append({
             "kind": "dialogue",
-            "speaker": "ketha",
+            "speaker": voice.get("speaker", "ketha"),
             "tone": "field",
             "text": text,
             "tags": tags,
         })
+
+        # Streak commentary: the line notices runs of results.
+        streak_kind, streak_len = result_streak(state)
+        if streak_len >= 3 and streak_kind == "win":
+            streak_text = pick_line(voice, "debrief.streak.wins", *seed)
+            if streak_text:
+                events.append({"kind": "dialogue", "speaker": voice.get("speaker", "ketha"),
+                               "tone": "reflective", "text": streak_text, "tags": ["streak", "wins-" + str(streak_len)]})
+        elif streak_len >= 2 and streak_kind == "loss":
+            streak_text = pick_line(voice, "debrief.streak.losses", *seed)
+            if streak_text:
+                events.append({"kind": "dialogue", "speaker": voice.get("speaker", "ketha"),
+                               "tone": "reflective", "text": streak_text, "tags": ["streak", "losses-" + str(streak_len)]})
+
         events.append({
             "kind": "mission_hook",
             "tags": ["next-intent"],
@@ -978,8 +1132,8 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
     key = result_key(result)
     processed = key not in state.setdefault("processedResults", {})
     if not processed:
-        intent = materialize_next_intent(state)
-        events = generate_story_events(state, result, None, False)
+        intent = materialize_next_intent(state, workspace)
+        events = generate_story_events(state, result, None, False, workspace)
         return state, {"processed": False, "reason": "duplicate", "resultKey": key}, intent, events
 
     old_clock = float(state.get("campaignClockMinutes", 0.0) or 0.0)
@@ -999,8 +1153,8 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
     result_number = int(result.get("missionNumber", state.get("missionNumber", 1)))
     state["missionNumber"] = max(int(state.get("missionNumber", 1)) + 1, result_number + 1)
     state["currentMissionId"] = mission_id(state["missionNumber"])
-    intent = materialize_next_intent(state)
-    events = generate_story_events(state, result, bead, True)
+    intent = materialize_next_intent(state, workspace)
+    events = generate_story_events(state, result, bead, True, workspace)
     report = {
         "processed": True,
         "resultKey": key,
@@ -1045,7 +1199,7 @@ def command_intent(args: argparse.Namespace) -> int:
     raw = load_json(state_path) if state_path.exists() else default_v1_state()
     state = migrate_state(raw)
     ensure_zone_memory(state, workspace)
-    intent = materialize_next_intent(state)
+    intent = materialize_next_intent(state, workspace)
     save_json(outdir / "next_mission_intent.json", intent)
     print(json.dumps({"missionId": intent.get("missionId"), "mapId": intent.get("mapId"), "objective": intent.get("objective")}, indent=2))
     return 0

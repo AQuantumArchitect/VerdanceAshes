@@ -1072,6 +1072,8 @@ local function setTerminal(newStatus, reason)
   Spring.SetGameRulesParam("va_terminal", 1, { public = true })
   Spring.SetGameRulesParam("va_result_code", (newStatus == "victory" and 1) or (newStatus == "defeat" and 2) or 3, { public = true })
   Spring.SetGameRulesParam("va_status", newStatus, { public = true })
+  Spring.SetGameRulesParam("va_terminal_reason", terminalReason, { public = true })
+  Spring.SetGameRulesParam("va_extraction_clean", extractionClean and 1 or 0, { public = true })
   Spring.Echo("VA_TERMINAL status=" .. status .. " reason=" .. terminalReason)
   logResult()
   if SendToUnsynced then SendToUnsynced("VERDANCE_MISSION_EVENT", status, terminalReason) end
