@@ -13,5 +13,10 @@ try {
 } catch {
   Write-Warning "Telemetry extraction failed; v1 advancement will use result-only/default elapsed behavior. $($_.Exception.Message)"
 }
+try {
+  & (Join-Path $ScriptDir "extract_latest_translation.ps1") -Workspace $Workspace
+} catch {
+  Write-Warning "Translation-packet extraction failed; graph will fall back to proxy measurement (Level 1). $($_.Exception.Message)"
+}
 & (Join-Path $ScriptDir "advance_campaign_v1.ps1") -Workspace $Workspace -WriteState:$WriteState
 

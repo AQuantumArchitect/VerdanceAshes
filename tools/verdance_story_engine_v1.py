@@ -49,6 +49,26 @@ ALPHA_SPINE = [
     ("all_that_simmers", "ATS_NW_CANOPY_START"),
 ]
 
+# Display metadata for the War Map (Pillar A). Kept in-engine so the front-end
+# has names/descriptors without loading the map pool file.
+MAP_DISPLAY = {
+    "greenest_fields": ("Greenest Fields", "The Synthesized Utopia"),
+    "eye_of_horus": ("Eye of Horus", "The Glassed Core"),
+    "koom_valley": ("Koom Valley", "The Fluid Scar"),
+    "tabula": ("Tabula", "The Tiered Plateau"),
+    "ancient_bastion": ("Ancient Bastion", "Taelith-Armada Citadel"),
+    "the_rock_jungle": ("The Rock Jungle", "Limestone Spire Labyrinth"),
+    "all_that_simmers": ("All That Simmers", "The High-Conflict Swamp"),
+}
+
+# Front decay (Pillar A consequence): an Ashwalker-held zone left unvisited while
+# a strong Armada/Cortex presence builds on the same map slowly erodes until it
+# flips. Erosion only bites once the offscreen war has actually developed enemy
+# military pressure, so a fresh campaign never loses ground prematurely.
+FRONT_DECAY_MIN_PRESSURE = 0.35   # enemy militaryPressure on the map must exceed this
+FRONT_DECAY_RATE = 0.05           # encroachment gained per (pressure * minute)
+FRONT_EVENTS_KEEP = 24
+
 FAMILY_CALIBRATION = {
     "tempo": {
         "presenceDivisor": 6000.0,
@@ -182,6 +202,22 @@ def default_v1_state() -> Dict[str, Any]:
             "stress": 12,
         },
         "history": [],
+        "frontEvents": [],
+        # Pillar C: the warband the player carries between missions. The
+        # commander is a persistent hero that levels; the cadre is the veteran
+        # roster (count-by-type) that grows from survivors and attrites on loss.
+        "roster": {
+            "commander": {
+                "name": "Ash-Captain Vane",
+                "unitDef": "legcom",
+                "level": 1,
+                "xp": 0.0,
+                "perks": [],
+                "scars": [],
+            },
+            "cadre": {},
+            "cadreCap": 12,
+        },
         "processedResults": {},
         "zoneMemory": {},
         "offscreenActors": {},
@@ -241,6 +277,16 @@ def zone_maps_from_workspace(workspace: Path) -> Dict[str, Dict[str, Any]]:
     return maps
 
 
+# The standing conflict of the campaign world: Null Mercs vs Armada. Armada
+# holds the defended ground; the Null Mercs keep one foothold per map (first
+# authored flank/edge zone); Cortex survives only as accent pockets around
+# explicitly Cortex-named zones. The player's clans thread through that war.
+NULLMERC_FOOTHOLD_ROLES = (
+    "energy_edge", "flank_pocket", "flank_lane", "causeway", "rim_control",
+    "secondary_route", "island_chain", "approach_lane", "crossfire_route",
+)
+
+
 def ensure_zone_memory(state: Dict[str, Any], workspace: Path) -> None:
     zone_maps = zone_maps_from_workspace(workspace)
     zone_memory = state.setdefault("zoneMemory", {})
@@ -249,6 +295,10 @@ def ensure_zone_memory(state: Dict[str, Any], workspace: Path) -> None:
     for map_id, zone_map in zone_maps.items():
         zones = zone_memory.setdefault(map_id, {})
         map_actors = actors.setdefault(map_id, {})
+        merc_assigned = any(
+            (z.get("controllingFaction") or z.get("abstract", {}).get("control")) == "nullmercs"
+            for z in zones.values()
+        )
         for zone in zone_map.get("zones", []) or []:
             zone_id = zone.get("zoneId")
             if not zone_id:
@@ -261,9 +311,22 @@ def ensure_zone_memory(state: Dict[str, Any], workspace: Path) -> None:
             elif "start" in tags and ("legion" in role or "player" in role):
                 actor = "Ashwalkers"
                 control = "ashwalkers"
+            elif ("cortex" in role or "synth" in role or "synth" in tags
+                  or "CORTEX" in str(zone_id).upper() or "SYNTH" in str(zone_id).upper()):
+                # Cortex holds its own maps (synth economies, dealer hideouts).
+                # It is the accent power and never garrisons alongside Armada.
+                actor = "SimpleAI"
+                control = "cortex"
             elif "fortress" in tags or "defense" in tags or "bastion" in tags:
                 actor = "SimpleDefenderAI"
                 control = "armada"
+            elif "defender" in role or "armada" in role:
+                actor = "SimpleAI"
+                control = "armada"
+            elif not merc_assigned and any(r in role for r in NULLMERC_FOOTHOLD_ROLES):
+                actor = "NullMercsAI"
+                control = "nullmercs"
+                merc_assigned = True
             else:
                 actor = "SimpleAI"
                 control = "neutral"
@@ -365,10 +428,17 @@ def is_raptorish(side: str, unit_counts: Dict[str, Any], zone_id: str) -> bool:
 
 
 def faction_from_team(team: Dict[str, Any], zone_id: str) -> str:
+    # Explicit faction tag wins: the mission seed labels Null Merc and Cortex
+    # contractor teams whose start-script side (chassis) would misclassify.
+    explicit = str(team.get("faction", "") or "").lower()
+    if explicit in ("armada", "cortex", "ashwalkers", "nullmercs", "wild", "neutral"):
+        return explicit
     side = str(team.get("side", "") or "").lower()
     unit_counts = team.get("unitCountsByDef", {}) or {}
     if is_raptorish(side, unit_counts, zone_id):
         return "wild"
+    if "merc" in side or "null" in side:
+        return "nullmercs"
     if "legion" in side or "clan" in side:
         return "ashwalkers"
     if "armada" in side or side == "arm":
@@ -561,6 +631,8 @@ def actor_for_zone(state: Dict[str, Any], map_id: str, zone_id: str, zone_mem: D
     control = zone_mem.get("controllingFaction") or zone_mem.get("abstract", {}).get("control")
     if control == "ashwalkers":
         return "Ashwalkers"
+    if control == "nullmercs":
+        return "NullMercsAI"
     if map_family(map_id) == "siege":
         return "SimpleDefenderAI"
     return "SimpleAI"
@@ -602,6 +674,15 @@ def tick_zone(zone_mem: Dict[str, Any], actor: str, map_id: str, dt_minutes: flo
         abstract["economyMomentum"] = clamp(abstract["economyMomentum"] + 0.002 * dt_minutes)
         abstract["militaryPressure"] = clamp(abstract["militaryPressure"] + 0.0018 * dt_minutes)
         abstract["instability"] = clamp(abstract["instability"] - 0.001 * dt_minutes)
+    elif actor == "NullMercsAI":
+        # Mercs fight Armada for pay: pressure grows fast, roots grow slowly,
+        # and a paid line is never a settled one.
+        abstract["militaryPressure"] = clamp(abstract["militaryPressure"] + 0.006 * dt_minutes)
+        abstract["baseStrength"] = clamp(abstract["baseStrength"] + 0.004 * dt_minutes)
+        abstract["economyMomentum"] = clamp(abstract["economyMomentum"] + 0.003 * dt_minutes)
+        abstract["instability"] = clamp(max(abstract["instability"], 0.45) + 0.002 * dt_minutes)
+        zone_mem["controllingFaction"] = "nullmercs"
+        abstract["control"] = "nullmercs"
     else:
         growth = calib["simpleGrowthPerMinute"]
         abstract["baseStrength"] = clamp(abstract["baseStrength"] + growth * dt_minutes)
@@ -648,6 +729,75 @@ def tick_offscreen_zones(state: Dict[str, Any], active_map_id: str, measured_zon
             tick_zone(zone_mem, actor, canonical_map_id(map_id), dt_minutes, state, active=active)
 
 
+def record_front_event(state: Dict[str, Any], event: Dict[str, Any]) -> None:
+    events = state.setdefault("frontEvents", [])
+    event = dict(event)
+    event.setdefault("atMinute", round(float(state.get("campaignClockMinutes", 0.0)), 2))
+    event.setdefault("missionNumber", int(state.get("missionNumber", 1)))
+    event.setdefault("at", utc_now())
+    events.append(event)
+    if len(events) > FRONT_EVENTS_KEEP:
+        del events[:-FRONT_EVENTS_KEEP]
+
+
+def apply_front_decay(state: Dict[str, Any], active_map_id: str, measured_zones: Iterable[str], dt_minutes: float) -> List[Dict[str, Any]]:
+    """Neglected Ashwalker ground erodes toward the strongest Armada/Cortex
+    presence on the same map; visiting a zone resets its encroachment. The graph
+    steers it: a more contested world (q6_contested) erodes faster, and which
+    mortal enemy takes the ground is biased by who is ascendant (q0). Returns
+    the flip events so callers can surface them."""
+    active_map_id = canonical_map_id(active_map_id)
+    measured = set(measured_zones)
+    graph = state.get("graph", {}) or {}
+    q0 = float(graph.get("q0_armada_cortex", 0.5) or 0.5)      # 0=Armada, 1=Cortex ascendant
+    q6c = float(graph.get("q6_contested", 0.5) or 0.5)
+    rate = FRONT_DECAY_RATE * (0.6 + q6c)                       # contested world bites harder
+    flips: List[Dict[str, Any]] = []
+    for map_id, zones in state.get("zoneMemory", {}).items():
+        cmid = canonical_map_id(map_id)
+        # Strongest Armada and Cortex presence on this map, tracked separately so
+        # the ascendant faction (q0) can claim contested ground.
+        pressure = {"armada": 0.0, "cortex": 0.0}
+        for z in zones.values():
+            ctrl = z.get("controllingFaction") or z.get("abstract", {}).get("control")
+            if ctrl in pressure:
+                pressure[ctrl] = max(pressure[ctrl], float(z.get("abstract", {}).get("militaryPressure", 0.0) or 0.0))
+        enemy_faction, enemy_pressure = None, 0.0
+        both = pressure["armada"] >= FRONT_DECAY_MIN_PRESSURE and pressure["cortex"] >= FRONT_DECAY_MIN_PRESSURE
+        if both and q0 >= 0.55:
+            enemy_faction, enemy_pressure = "cortex", pressure["cortex"]
+        elif both and q0 <= 0.45:
+            enemy_faction, enemy_pressure = "armada", pressure["armada"]
+        else:
+            enemy_faction = "cortex" if pressure["cortex"] > pressure["armada"] else "armada"
+            enemy_pressure = pressure[enemy_faction]
+        for zone_id, zone_mem in zones.items():
+            active = (cmid == active_map_id and zone_id in measured)
+            if active:
+                zone_mem["encroachment"] = 0.0
+                continue
+            ctrl = zone_mem.get("controllingFaction") or zone_mem.get("abstract", {}).get("control")
+            if ctrl != "ashwalkers" or not enemy_faction or enemy_pressure < FRONT_DECAY_MIN_PRESSURE:
+                continue
+            enc = float(zone_mem.get("encroachment", 0.0) or 0.0) + enemy_pressure * rate * dt_minutes
+            if enc >= 1.0:
+                zone_mem["encroachment"] = 0.0
+                zone_mem["controllingFaction"] = enemy_faction
+                zone_mem.setdefault("abstract", {})["control"] = enemy_faction
+                flip = {
+                    "type": "zone_lost",
+                    "mapId": cmid,
+                    "zoneId": zone_id,
+                    "label": zone_mem.get("label", zone_id),
+                    "toFaction": enemy_faction,
+                }
+                record_front_event(state, flip)
+                flips.append(flip)
+            else:
+                zone_mem["encroachment"] = round(enc, 4)
+    return flips
+
+
 def apply_graph_deltas(state: Dict[str, Any], result: Dict[str, Any], elapsed: float) -> Dict[str, float]:
     status = result.get("status", "unknown")
     extraction = result.get("extractionStatus", "")
@@ -687,6 +837,219 @@ def apply_graph_deltas(state: Dict[str, Any], result: Dict[str, Any], elapsed: f
     return deltas
 
 
+# The graph is a low-pass measurement of the world: one mission eases each
+# resurrected axis a quarter of the way toward what the battle export shows.
+GRAPH_MEASURE_EASE = 0.25
+
+
+def world_faction_masses(state: Dict[str, Any]) -> Tuple[Dict[str, float], List[float], List[float], List[float], set]:
+    """Measured 'mass' each faction holds across the known world, read from the
+    zoneMemory abstract state left by the battle export. A zone's mass is its
+    dominant pressure dimension; also returns economy/hazard/instability samples."""
+    masses: Dict[str, float] = {}
+    eco_vals: List[float] = []
+    hazard_vals: List[float] = []
+    instab_vals: List[float] = []
+    active: set = set()
+    for _map_id, zones in state.get("zoneMemory", {}).items():
+        for zone_mem in zones.values():
+            ab = zone_mem.get("abstract", {}) or {}
+            mass = max(
+                float(ab.get("baseStrength", 0.0) or 0.0),
+                float(ab.get("militaryPressure", 0.0) or 0.0),
+                float(ab.get("fortification", 0.0) or 0.0),
+            )
+            ctrl = zone_mem.get("controllingFaction") or ab.get("control") or "neutral"
+            masses[ctrl] = masses.get(ctrl, 0.0) + mass
+            if mass > 0.02 and ctrl != "neutral":
+                active.add(ctrl)
+            eco_vals.append(float(ab.get("economyMomentum", 0.0) or 0.0))
+            hazard_vals.append(float(ab.get("hazardPressure", 0.0) or 0.0))
+            instab_vals.append(float(ab.get("instability", 0.5) or 0.5))
+    return masses, eco_vals, hazard_vals, instab_vals, active
+
+
+def roster_clan_mass(state: Dict[str, Any]) -> float:
+    """The carried warband read as clan military mass in the world (synced,
+    bottom-up: the survivors the player keeps ARE the clans' power projection)."""
+    roster = state.get("roster", {}) or {}
+    cadre = roster.get("cadre", {}) or {}
+    n = sum(int(v) for v in cadre.values() if v)
+    lvl = int((roster.get("commander") or {}).get("level", 1) or 1)
+    return clamp(n * 0.02 + (lvl - 1) * 0.03, 0.0, 0.6)
+
+
+# ---------------------------------------------------------------------------
+# Level 2: the measurement loop. The gadget already builds a Hermitian observable
+# of the battlefield (VA_TRANSLATION_PACKET). Here we eigen-decompose it (pure
+# stdlib Jacobi) and project the dominant mode onto the q-axes, so the graph is a
+# genuine spectral measurement of what was fought, not just a proxy.
+# ---------------------------------------------------------------------------
+
+def jacobi_eigen(mat: List[List[float]], max_sweeps: int = 60, tol: float = 1e-12) -> Tuple[List[float], List[List[float]]]:
+    """Eigenvalues and eigenvectors of a small real-symmetric matrix via cyclic
+    Jacobi rotations (no numpy). Returns (eigenvalues, eigenvectors) where
+    eigenvectors[k] is the column vector for eigenvalues[k]. Deterministic."""
+    n = len(mat)
+    a = [[float(mat[i][j]) for j in range(n)] for i in range(n)]
+    v = [[1.0 if i == j else 0.0 for j in range(n)] for i in range(n)]
+    for _ in range(max_sweeps):
+        off = sum(a[i][j] * a[i][j] for i in range(n) for j in range(i + 1, n))
+        if off <= tol:
+            break
+        for p in range(n):
+            for q in range(p + 1, n):
+                if abs(a[p][q]) < 1e-18:
+                    continue
+                theta = (a[q][q] - a[p][p]) / (2.0 * a[p][q])
+                sign = 1.0 if theta >= 0 else -1.0
+                t = sign / (abs(theta) + math.sqrt(theta * theta + 1.0))
+                c = 1.0 / math.sqrt(t * t + 1.0)
+                s = t * c
+                for k in range(n):
+                    akp, akq = a[k][p], a[k][q]
+                    a[k][p] = c * akp - s * akq
+                    a[k][q] = s * akp + c * akq
+                for k in range(n):
+                    apk, aqk = a[p][k], a[q][k]
+                    a[p][k] = c * apk - s * aqk
+                    a[q][k] = s * apk + c * aqk
+                for k in range(n):
+                    vkp, vkq = v[k][p], v[k][q]
+                    v[k][p] = c * vkp - s * vkq
+                    v[k][q] = s * vkp + c * vkq
+    eigenvalues = [a[i][i] for i in range(n)]
+    eigenvectors = [[v[i][k] for i in range(n)] for k in range(n)]
+    return eigenvalues, eigenvectors
+
+
+def reconstruct_hermitian(packet: Dict[str, Any]) -> Tuple[Optional[List[List[float]]], List[str]]:
+    """Rebuild the (N+1)x(N+1) Hermitian matrix from a VA_TRANSLATION_PACKET:
+    node densities on the diagonal, entanglement couplings off-diagonal, plus the
+    hydrology anchor row/col. Returns (matrix, zoneIds); (None, []) if empty."""
+    nodes = packet.get("nodes", []) or []
+    n = len(nodes)
+    if n == 0:
+        return None, []
+    size = n + 1
+    h = [[0.0] * size for _ in range(size)]
+    ids: List[str] = []
+    for i, nd in enumerate(nodes):
+        h[i][i] = float(nd.get("density", 0.0) or 0.0)
+        hc = float(nd.get("hydroCoupling", 0.0) or 0.0)
+        h[i][n] = hc
+        h[n][i] = hc
+        ids.append(str(nd.get("zoneId", "")))
+    hydro = (packet.get("global", {}) or {}).get("hydrology", {}) or {}
+    h[n][n] = float(hydro.get("saturation", 0.0) or 0.0)
+    for ent in packet.get("entanglements", []) or []:
+        zids = ent.get("zoneIds") or []
+        if len(zids) == 2 and str(zids[0]) in ids and str(zids[1]) in ids:
+            i = ids.index(str(zids[0]))
+            j = ids.index(str(zids[1]))
+            c = float(ent.get("coupling", 0.0) or 0.0)
+            h[i][j] = c
+            h[j][i] = c
+    return h, ids
+
+
+def _stdev(values: List[float]) -> float:
+    if not values:
+        return 0.0
+    m = sum(values) / len(values)
+    return math.sqrt(sum((x - m) ** 2 for x in values) / len(values))
+
+
+def spectral_summary(packet: Dict[str, Any], state: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """Eigen-decompose the battlefield observable and read its dominant mode:
+    total energy (trace), participation (how many zones the principal mode spans =
+    entanglement breadth), spectral spread (disorder), and the mode's weight on
+    each faction's zones."""
+    h, ids = reconstruct_hermitian(packet)
+    if not h:
+        return None
+    n = len(ids)
+    vals, vecs = jacobi_eigen(h)
+    dom = max(range(len(vals)), key=lambda k: vals[k])
+    lam = vals[dom]
+    vec = vecs[dom]
+    zone_w = [vec[i] * vec[i] for i in range(n)]
+    total_w = sum(zone_w) or 1e-9
+    zone_w = [w / total_w for w in zone_w]
+    denom = sum(w * w for w in zone_w) or 1e-9
+    part_ratio = (sum(zone_w) ** 2) / denom  # in [1, n]
+    participation = clamp((part_ratio - 1.0) / max(1.0, n - 1)) if n > 1 else 0.0
+    ctrl_by_zone: Dict[str, str] = {}
+    for _m, zones in state.get("zoneMemory", {}).items():
+        for zid, zm in zones.items():
+            ctrl_by_zone[zid] = zm.get("controllingFaction") or zm.get("abstract", {}).get("control") or "neutral"
+    fac: Dict[str, float] = {}
+    for i, zid in enumerate(ids):
+        f = ctrl_by_zone.get(zid, "neutral")
+        fac[f] = fac.get(f, 0.0) + zone_w[i]
+    return {
+        "dominantEigenvalue": round(lam, 4),
+        "energy": round(sum(vals), 4),
+        "participation": round(participation, 4),
+        "spread": round(clamp(_stdev(vals)), 4),
+        "factionWeights": {k: round(v, 4) for k, v in fac.items()},
+        "zones": n,
+    }
+
+
+def measure_graph_from_world(state: Dict[str, Any], result: Dict[str, Any], spectral: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    """Battle export -> graph (the 'collapse' the docstring promises). Eases the
+    resurrected axes (q0/q2/q7) toward what the world now measures. When a spectral
+    summary of the battlefield observable is present (Level 2), it is blended in as
+    a sharper measurement of the active battle. The warband props up clan
+    sovereignty (q6_independent) as a non-punishing floor; q6_contested stays on
+    its proven outcome heuristic."""
+    graph = state.setdefault("graph", {})
+    for key, default in default_v1_state()["graph"].items():
+        graph.setdefault(key, default)
+    masses, eco_vals, hazard_vals, instab_vals, active = world_faction_masses(state)
+    clan_mass = masses.get("ashwalkers", 0.0) + roster_clan_mass(state)
+    total = sum(masses.values()) + roster_clan_mass(state)
+    targets: Dict[str, float] = {}
+    armada = masses.get("armada", 0.0)
+    cortex = masses.get("cortex", 0.0)
+    if armada + cortex > 1e-6:
+        targets["q0_armada_cortex"] = clamp(cortex / (armada + cortex))
+    if eco_vals:
+        targets["q7_resource_scarcity"] = clamp(1.0 - sum(eco_vals) / len(eco_vals))
+    if instab_vals:
+        mean_haz = (sum(hazard_vals) / len(hazard_vals)) if hazard_vals else 0.0
+        spread = clamp((len(active) - 1) / 4.0)
+        targets["q2_void_structure"] = clamp(0.10 + 0.5 * mean_haz + 0.25 * spread)
+
+    # Level 2: blend the spectral measurement of the battlefield observable into
+    # the same axes as a sharper, half-weighted signal (never drives alone).
+    spectral_floor_ind = 0.0
+    if spectral:
+        fw = spectral.get("factionWeights", {}) or {}
+        s_arm = float(fw.get("armada", 0.0) or 0.0)
+        s_cor = float(fw.get("cortex", 0.0) or 0.0)
+        if s_arm + s_cor > 1e-6:
+            s_q0 = clamp(s_cor / (s_arm + s_cor))
+            targets["q0_armada_cortex"] = 0.5 * targets.get("q0_armada_cortex", s_q0) + 0.5 * s_q0
+        s_q2 = clamp(float(spectral.get("spread", 0.0) or 0.0))
+        targets["q2_void_structure"] = 0.5 * targets.get("q2_void_structure", s_q2) + 0.5 * s_q2
+        spectral_floor_ind = clamp(float(fw.get("ashwalkers", 0.0) or 0.0) * 0.5, 0.0, 0.35)
+
+    measured: Dict[str, Any] = {}
+    for key, target in targets.items():
+        cur = float(graph.get(key, 0.0) or 0.0)
+        graph[key] = round(clamp(cur + (target - cur) * GRAPH_MEASURE_EASE), 4)
+        measured[key] = {"target": round(target, 4), "value": graph[key]}
+    # Warband floor on clan sovereignty (never drags q6_independent DOWN), plus a
+    # spectral floor from the dominant mode's Ashwalker weight. Both monotonic.
+    floor = round(max(clamp(clan_mass * 0.5, 0.0, 0.35), spectral_floor_ind), 4)
+    if floor > float(graph.get("q6_independent", 0.0) or 0.0):
+        graph["q6_independent"] = floor
+        measured["q6_independent"] = {"floor": floor, "value": floor}
+    return measured
+
+
 def apply_reputation_companion(state: Dict[str, Any], result: Dict[str, Any], elapsed: float) -> Dict[str, Any]:
     status = result.get("status", "unknown")
     extraction = result.get("extractionStatus", "")
@@ -706,11 +1069,128 @@ def apply_reputation_companion(state: Dict[str, Any], result: Dict[str, Any], el
         comp["stress"] = clamp(float(comp.get("stress", 12)) - (5 if clean_extract else 1), 0, 100)
     elif status in ("defeat", "failed", "failure"):
         rep["clans"] = clamp(float(rep.get("clans", 50)) - 2.0, 0, 100)
+        # Mercs respect winners; a lost field costs standing with the Null line.
+        rep["nullmercs"] = clamp(float(rep.get("nullmercs", 43)) - 1.0, 0, 100)
         comp["morale"] = clamp(float(comp.get("morale", 70)) - 5, 0, 100)
         comp["stress"] = clamp(float(comp.get("stress", 12)) + 8 + max(0, elapsed - 20) * 0.1, 0, 100)
     else:
         comp["stress"] = clamp(float(comp.get("stress", 12)) + 2, 0, 100)
     return {"reputation": rep, "companion": comp}
+
+
+# Pillar C: commander progression. XP accrues per sortie; each level unlocks one
+# perk the compiler/gadget turns into a tangible starting-force bonus.
+ROSTER_XP_PER_LEVEL = 100.0
+ROSTER_MAX_LEVEL = 5
+PERK_LADDER = {
+    2: "field_repair",     # extra starting build power
+    3: "veteran_cadre",    # +6 cadre cap
+    4: "rapid_deploy",     # one bonus starting unit
+    5: "ash_resolve",      # tougher commander
+}
+CADRE_CAP_BASE = 12
+
+
+def ensure_roster(state: Dict[str, Any]) -> Dict[str, Any]:
+    default = default_v1_state()["roster"]
+    roster = state.setdefault("roster", copy.deepcopy(default))
+    commander = roster.setdefault("commander", {})
+    for key, value in default["commander"].items():
+        commander.setdefault(key, copy.deepcopy(value))
+    roster.setdefault("cadre", {})
+    roster.setdefault("cadreCap", CADRE_CAP_BASE)
+    return roster
+
+
+def roster_level_for_xp(xp: float) -> int:
+    return int(min(ROSTER_MAX_LEVEL, 1 + int(max(0.0, xp) // ROSTER_XP_PER_LEVEL)))
+
+
+def commander_cadre_cap(commander: Dict[str, Any]) -> int:
+    cap = CADRE_CAP_BASE
+    if "veteran_cadre" in (commander.get("perks") or []):
+        cap += 6
+    return cap
+
+
+def expire_scars(commander: Dict[str, Any], mission_number: int) -> None:
+    kept = []
+    for scar in commander.get("scars", []) or []:
+        if int(scar.get("untilMission", 0)) > mission_number:
+            kept.append(scar)
+    commander["scars"] = kept
+
+
+def update_roster(state: Dict[str, Any], result: Dict[str, Any], success: bool, clean: bool) -> Dict[str, Any]:
+    """Grow the warband from survivors, level the commander, scar it on defeat.
+    Backward-compatible: a result without playerSurvivors leaves the cadre as-is."""
+    roster = ensure_roster(state)
+    commander = roster["commander"]
+    status = result.get("status", "unknown")
+    defeat = status in ("defeat", "failed", "failure")
+
+    # XP: winning teaches most, a rout still teaches something.
+    if success:
+        gain = 44.0 + (10.0 if clean else 0.0)
+    elif defeat:
+        gain = 8.0
+    else:
+        gain = 16.0
+    commander["xp"] = round(float(commander.get("xp", 0.0) or 0.0) + gain, 2)
+    new_level = roster_level_for_xp(commander["xp"])
+    if new_level > int(commander.get("level", 1)):
+        for lvl in range(int(commander.get("level", 1)) + 1, new_level + 1):
+            perk = PERK_LADDER.get(lvl)
+            if perk and perk not in commander.setdefault("perks", []):
+                commander["perks"].append(perk)
+        commander["level"] = new_level
+    roster["cadreCap"] = commander_cadre_cap(commander)
+
+    # Cadre: survivors carry; a defeat routs most of them.
+    survivors = result.get("playerSurvivors")
+    if isinstance(survivors, dict) and survivors:
+        keep_fraction = 0.4 if defeat else 1.0
+        carried: Dict[str, int] = {}
+        for unit_def, count in survivors.items():
+            kept = int(math.floor(float(count) * keep_fraction))
+            if kept > 0:
+                carried[str(unit_def)] = kept
+        roster["cadre"] = trim_cadre(carried, roster["cadreCap"])
+    elif defeat and roster.get("cadre"):
+        # No survivor report but a defeat: rout the carried cadre by 40%.
+        routed = {d: int(math.floor(c * 0.6)) for d, c in roster["cadre"].items()}
+        roster["cadre"] = {d: c for d, c in routed.items() if c > 0}
+
+    # Scars: a lost commander limps into the next sortie (perks suppressed then).
+    expire_scars(commander, int(state.get("missionNumber", 1)))
+    if defeat:
+        commander.setdefault("scars", []).append({
+            "kind": "wounded",
+            "sinceMission": int(state.get("missionNumber", 1)),
+            "untilMission": int(state.get("missionNumber", 1)) + 1,
+        })
+    return roster
+
+
+def trim_cadre(cadre: Dict[str, int], cap: int) -> Dict[str, int]:
+    total = sum(cadre.values())
+    if total <= cap:
+        return {d: int(c) for d, c in cadre.items() if c > 0}
+    # Proportionally scale down to the cap; deterministic order by unit def.
+    scale = cap / float(total)
+    trimmed: Dict[str, int] = {}
+    for unit_def in sorted(cadre):
+        kept = int(math.floor(cadre[unit_def] * scale))
+        if kept > 0:
+            trimmed[unit_def] = kept
+    return trimmed
+
+
+def commander_active_perks(commander: Dict[str, Any]) -> List[str]:
+    """Perks in effect this mission — suppressed while the commander is scarred."""
+    if commander.get("scars"):
+        return []
+    return list(commander.get("perks", []) or [])
 
 
 def update_destroyed_objectives(state: Dict[str, Any], result: Dict[str, Any]) -> None:
@@ -811,6 +1291,157 @@ def choose_next_map_zone(state: Dict[str, Any]) -> Tuple[str, str]:
         return canonical_map_id(requested.get("mapId")), requested.get("deploymentZoneId", "unknown_zone")
     number = int(state.get("missionNumber", 1))
     return ALPHA_SPINE[(number - 1) % len(ALPHA_SPINE)]
+
+
+def dominant_faction(control_counts: Dict[str, int]) -> str:
+    """The faction that holds a region for War Map coloring: the strict leader
+    among real factions (neutral ignored); ties or empty read as 'contested'."""
+    factions = {k: v for k, v in control_counts.items() if k and k != "neutral"}
+    if not factions:
+        return "neutral"
+    ranked = sorted(factions.items(), key=lambda kv: kv[1], reverse=True)
+    if len(ranked) > 1 and ranked[0][1] == ranked[1][1]:
+        return "contested"
+    return ranked[0][0]
+
+
+def threat_band(center: float) -> str:
+    if center < 4000:
+        return "light"
+    if center < 9000:
+        return "standard"
+    if center < 16000:
+        return "reinforced"
+    return "heavy"
+
+
+def summarize_front(state: Dict[str, Any], map_id: str) -> Dict[str, Any]:
+    """A map's strategic picture from zone memory: who holds it, how hot it is,
+    and whether clan ground there is eroding."""
+    mid = canonical_map_id(map_id)
+    zones = state.get("zoneMemory", {}).get(mid, {})
+    control_counts: Dict[str, int] = {}
+    threat_center = 0.0
+    max_encroach = 0.0
+    ashwalker_zones = 0
+    for zone_mem in zones.values():
+        ctrl = zone_mem.get("controllingFaction") or zone_mem.get("abstract", {}).get("control") or "neutral"
+        control_counts[ctrl] = control_counts.get(ctrl, 0) + 1
+        if ctrl == "ashwalkers":
+            ashwalker_zones += 1
+            max_encroach = max(max_encroach, float(zone_mem.get("encroachment", 0.0) or 0.0))
+        else:
+            band = expected_presence_band(mid, zone_mem)
+            threat_center = max(threat_center, float(band.get("center", 0.0)))
+    # Dominant enemy faction (ignore player/neutral) for "who's pushing here".
+    enemy_counts = {k: v for k, v in control_counts.items() if k in ("armada", "cortex", "nullmercs", "wild")}
+    dominant_enemy = max(enemy_counts.items(), key=lambda kv: kv[1])[0] if enemy_counts else None
+    name, descriptor = MAP_DISPLAY.get(mid, (mid, ""))
+    return {
+        "mapId": mid,
+        "displayName": name,
+        "descriptor": descriptor,
+        "family": map_family(mid),
+        "controlCounts": control_counts,
+        "dominantEnemy": dominant_enemy,
+        "threatCenter": int(threat_center),
+        "threatBand": threat_band(threat_center),
+        "ashwalkerZones": ashwalker_zones,
+        "maxEncroachment": round(max_encroach, 3),
+        "atRisk": max_encroach >= 0.5,
+    }
+
+
+def consequence_note(front: Dict[str, Any]) -> str:
+    """One line on what happens if the player ignores this front."""
+    if front.get("atRisk"):
+        loser = front.get("dominantEnemy") or "the enemy"
+        return "Clan ground here is eroding — leave it and {} takes a zone.".format(loser)
+    fam = front.get("family")
+    if fam == "wild":
+        return "Hives keep multiplying — the hazard only grows the longer it waits."
+    dom = front.get("dominantEnemy")
+    if dom == "armada":
+        return "Armada keeps entrenching — every mission skipped means heavier walls."
+    if dom == "cortex":
+        return "The Cortex works keep humming — their economy compounds untouched."
+    if dom == "nullmercs":
+        return "The mercs hold, but an unpaid line drifts if you never show."
+    return "Pressure keeps building here while your attention is elsewhere."
+
+
+def enumerate_front_targets(state: Dict[str, Any], limit: int = 3) -> List[Dict[str, Any]]:
+    """2-4 candidate fronts the player can choose between. The ALPHA_SPINE map
+    for the current mission number is always offered (recommended); the rest are
+    the most salient alternatives (eroding clan ground first, then hottest)."""
+    number = int(state.get("missionNumber", 1))
+    spine_map, _ = ALPHA_SPINE[(number - 1) % len(ALPHA_SPINE)]
+    limit = max(2, min(limit, len(ALPHA_SPINE)))
+    fronts = []
+    for map_id, deploy_zone in ALPHA_SPINE:
+        front = summarize_front(state, map_id)
+        objective = objective_for_map(map_id, state)
+        front["deploymentZoneId"] = deploy_zone
+        front["objective"] = {"kind": objective.get("kind"), "label": objective.get("label")}
+        front["recommended"] = (map_id == spine_map)
+        front["consequenceIfIgnored"] = consequence_note(front)
+        fronts.append(front)
+    spine = [f for f in fronts if f["recommended"]]
+    others = [f for f in fronts if not f["recommended"]]
+    # Salience: eroding clan ground first, then hottest enemy presence. Stable
+    # tie-break on mapId keeps output deterministic for tests.
+    others.sort(key=lambda f: (f["atRisk"], f["threatCenter"], f["mapId"]), reverse=True)
+    return spine + others[: max(0, limit - len(spine))]
+
+
+def build_war_map(state: Dict[str, Any]) -> Dict[str, Any]:
+    """The strategic snapshot the console renders during the next-ready pause:
+    faction control per region, the offered fronts, and recent territory swings."""
+    regions = []
+    for map_id, _ in ALPHA_SPINE:
+        front = summarize_front(state, map_id)
+        front["control"] = dominant_faction(front.get("controlCounts", {}))
+        regions.append(front)
+    return {
+        "schemaVersion": "verdance-war-map/1.0",
+        "campaignId": state.get("campaignId", CAMPAIGN_ID),
+        "missionNumber": int(state.get("missionNumber", 1)),
+        "generatedAt": utc_now(),
+        "regions": regions,
+        "candidates": enumerate_front_targets(state),
+        "frontEvents": list(state.get("frontEvents", []))[-6:],
+        "reputation": dict(state.get("reputation", {}) or {}),
+        "voidThreat": round(float(state.get("graph", {}).get("q2_void_structure", 0.0) or 0.0), 3),
+        "graph": {k: round(float(v), 3) for k, v in (state.get("graph", {}) or {}).items() if isinstance(v, (int, float))},
+        "worldReading": world_reading(state.get("graph", {}) or {}),
+        "pendingChoice": state.get("nextMapOverride"),
+    }
+
+
+def world_reading(graph: Dict[str, Any]) -> List[str]:
+    """Plain-English readout of the quantum graph for the War Map header."""
+    q0 = float(graph.get("q0_armada_cortex", 0.5) or 0.5)
+    q2 = float(graph.get("q2_void_structure", 0.0) or 0.0)
+    q6c = float(graph.get("q6_contested", 0.5) or 0.5)
+    q6i = float(graph.get("q6_independent", 0.0) or 0.0)
+    q7 = float(graph.get("q7_resource_scarcity", 0.0) or 0.0)
+    lines = []
+    if q0 >= 0.6:
+        lines.append("Cortex is ascendant across the front.")
+    elif q0 <= 0.4:
+        lines.append("Armada holds the upper hand.")
+    else:
+        lines.append("Armada and Cortex are deadlocked.")
+    lines.append(("The line-world is tearing apart." if q6c > 0.7 else "The front is holding, for now.") )
+    if q6i >= 0.45:
+        lines.append("Ashwalker sovereignty is rising.")
+    elif q6i <= 0.2:
+        lines.append("The clans are a fringe force.")
+    if q7 > 0.85:
+        lines.append("Tenebrium is all but gone — scarcity bites.")
+    if q2 > 0.5:
+        lines.append("The void is bleeding through — verge zones destabilizing.")
+    return lines
 
 
 def zone_pressure_summary(state: Dict[str, Any], map_id: str) -> Dict[str, Any]:
@@ -945,6 +1576,22 @@ def generate_briefing(state: Dict[str, Any], voice: Dict[str, Any], map_id: str,
     add("briefing.family." + family, "situation")
     add("briefing.objective." + str(objective.get("kind", "")), "objective")
 
+    # The standing war line: Null Mercs vs Armada is the main conflict, and
+    # Ketha reads the mercs by reputation - allied guns or wary neighbors.
+    rep = state.get("reputation", {})
+    merc_rep = float(rep.get("nullmercs", 43) or 0)
+    add("briefing.war.mercs_allied" if merc_rep >= 40 else "briefing.war.mercs_wary", "war")
+
+    # Pillar D: Ketha reacts to the emergent world. A wounded commander and the
+    # extremes of the Armada/Cortex axis each earn a line when they hold.
+    if (state.get("roster", {}).get("commander", {}) or {}).get("scars"):
+        add("briefing.commander.scarred", "warband")
+    q0 = float(graph.get("q0_armada_cortex", 0.5) or 0.5)
+    if q0 >= 0.62:
+        add("briefing.world.cortex_ascendant", "world")
+    elif q0 <= 0.38:
+        add("briefing.world.armada_ascendant", "world")
+
     # One conditional line: highest-priority campaign pressure wins.
     conditions = [
         (float(comp.get("stress", 0) or 0) >= 40, "briefing.companion.high_stress"),
@@ -983,7 +1630,52 @@ def generate_debrief_candidates(state: Dict[str, Any], voice: Dict[str, Any]) ->
     return candidates
 
 
+def merc_foothold_scale(reputation: float) -> float:
+    """How much Null Merc presence stands with you, scaled by standing. Allied
+    lines (>=40) field a fuller foothold; wary lines show up thin."""
+    if reputation >= 40.0:
+        return round(clamp(0.85 + (reputation - 40.0) / 60.0 * 0.5, 0.85, 1.35), 3)
+    # Wary lines stay strictly below the allied floor: alliance is a clean step up.
+    return round(clamp(0.55 + reputation / 40.0 * 0.25, 0.55, 0.8), 3)
+
+
+def build_roster_intent(state: Dict[str, Any]) -> Dict[str, Any]:
+    roster = ensure_roster(state)
+    commander = roster["commander"]
+    return {
+        "commander": {
+            "name": commander.get("name"),
+            "unitDef": commander.get("unitDef", "legcom"),
+            "level": int(commander.get("level", 1)),
+            "xp": round(float(commander.get("xp", 0.0) or 0.0), 1),
+            "perks": list(commander.get("perks", []) or []),
+            "activePerks": commander_active_perks(commander),
+            "scarred": bool(commander.get("scars")),
+        },
+        "cadre": {str(d): int(c) for d, c in (roster.get("cadre") or {}).items() if c},
+        "cadreCap": int(roster.get("cadreCap", CADRE_CAP_BASE)),
+        "availableAllies": available_allies(state),
+    }
+
+
+def available_allies(state: Dict[str, Any]) -> List[str]:
+    """Who will stand with the clans, read from the graph + reputation. The
+    ascendant mortal enemy sheds defectors; a courted merc line shows up."""
+    graph = state.get("graph", {}) or {}
+    rep = state.get("reputation", {}) or {}
+    q0 = float(graph.get("q0_armada_cortex", 0.5) or 0.5)
+    allies = ["ashwalkers"]
+    if float(rep.get("nullmercs", 0) or 0) >= 40:
+        allies.append("nullmercs")
+    if q0 >= 0.6:
+        allies.append("cortex_defectors")
+    elif q0 <= 0.4:
+        allies.append("armada_deserters")
+    return allies
+
+
 def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = None) -> Dict[str, Any]:
+    ensure_roster(state)
     map_id, deploy_zone = choose_next_map_zone(state)
     objective = objective_for_map(map_id, state)
     pressure = zone_pressure_summary(state, map_id)
@@ -1000,6 +1692,8 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
     family = map_family(map_id)
     voice = load_ketha_voice(workspace)
     title = pick_title(voice, map_id, state.get("campaignId", CAMPAIGN_ID), state.get("missionNumber", 1))
+    rep = state.get("reputation", {}) or {}
+    merc_rep = float(rep.get("nullmercs", 43) or 43)
     return {
         "schemaVersion": INTENT_SCHEMA,
         "campaignId": state.get("campaignId", CAMPAIGN_ID),
@@ -1016,10 +1710,25 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
         "storyTags": intent_story_tags(map_id, family, pressure),
         "persistentBaseRehydrate": rehydrate,
         "offscreenPressureSummary": pressure,
+        "roster": build_roster_intent(state),
+        "worldConflict": {
+            "primaryEnemy": "armada",
+            "accentFaction": "cortex",
+            "nullMercs": {
+                "reputation": round(merc_rep, 1),
+                "alliedWithPlayer": merc_rep >= 40.0,
+                "footholdScale": merc_foothold_scale(merc_rep),
+                "footholdZoneIds": [
+                    zid for zid, z in zones.items()
+                    if (z.get("controllingFaction") or z.get("abstract", {}).get("control")) == "nullmercs"
+                ],
+            },
+        },
         "expectedEnemyScale": expected_map_enemy_scale(state, map_id),
         "hazardPolicy": "escalating_reset" if family == "wild" else "none",
         "economy": {
             "difficultyCoefficient": round(1.0 + float(state.get("graph", {}).get("q6_contested", 0.5)) * 0.25, 3),
+            "resourceModifier": round(clamp(1.15 - float(state.get("graph", {}).get("q7_resource_scarcity", 0.0) or 0.0) * 0.35, 0.8, 1.15), 3),
         },
         "environment": {
             "mapFamily": family,
@@ -1098,6 +1807,18 @@ def generate_story_events(state: Dict[str, Any], result: Dict[str, Any], bead: O
             "tags": tags,
         })
 
+        # Pillar D: Ketha names the ground the campaign lost to front decay while
+        # the player was elsewhere ({zone} interpolated from the latest flip).
+        if "territory-lost" in tags:
+            lost = [e for e in state.get("frontEvents", []) if e.get("type") == "zone_lost"]
+            if lost:
+                zone_label = lost[-1].get("label") or lost[-1].get("zoneId") or "a foothold"
+                line = pick_line(voice, "debrief.territory_lost", *seed)
+                if line:
+                    events.append({"kind": "dialogue", "speaker": voice.get("speaker", "ketha"),
+                                   "tone": "grim", "text": line.replace("{zone}", str(zone_label)),
+                                   "tags": ["territory-lost", str(lost[-1].get("zoneId", ""))]})
+
         # Streak commentary: the line notices runs of results.
         streak_kind, streak_len = result_streak(state)
         if streak_len >= 3 and streak_kind == "win":
@@ -1124,7 +1845,7 @@ def generate_story_events(state: Dict[str, Any], result: Dict[str, Any], bead: O
     }
 
 
-def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Optional[Dict[str, Any]], workspace: Path) -> Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any], Dict[str, Any]]:
+def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Optional[Dict[str, Any]], workspace: Path, translation: Optional[Dict[str, Any]] = None) -> Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any], Dict[str, Any]]:
     state = migrate_state(state)
     ensure_zone_memory(state, workspace)
     map_id = canonical_map_id(result.get("deploymentMapId") or result.get("mapId") or (telemetry or {}).get("map", {}).get("mapId"))
@@ -1141,10 +1862,23 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
     measured_zones = update_measured_zone_memory(state, result, telemetry, workspace)
     graph_delta = apply_graph_deltas(state, result, elapsed)
     apply_reputation_companion(state, result, elapsed)
+    clean_extract = result.get("extractionStatus", "") in ("clean", "success")
+    success = result.get("status") == "victory" or clean_extract or bool(result.get("destroyedObjectiveIds"))
+    update_roster(state, result, success, clean_extract)
+    # Battle export dictates the graph: collapse the measured world (incl. the
+    # carried warband) and, when present, the eigen-decomposed battlefield
+    # observable onto the resurrected q-axes.
+    spectral = spectral_summary(translation, state) if translation else None
+    if spectral:
+        state["lastSpectral"] = spectral
+    graph_measured = measure_graph_from_world(state, result, spectral)
     update_destroyed_objectives(state, result)
     reset_live_raptors_but_escalate(state, result, elapsed)
     tick_offscreen_zones(state, map_id, measured_zones, elapsed)
+    front_flips = apply_front_decay(state, map_id, measured_zones, elapsed)
     bead = append_history_bead(state, result, elapsed, graph_delta)
+    if front_flips:
+        bead.setdefault("storyTags", []).append("territory-lost")
     state["processedResults"][key] = {
         "processedAt": bead["timestamp"],
         "beadIndex": len(state["history"]) - 1,
@@ -1153,6 +1887,9 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
     result_number = int(result.get("missionNumber", state.get("missionNumber", 1)))
     state["missionNumber"] = max(int(state.get("missionNumber", 1)) + 1, result_number + 1)
     state["currentMissionId"] = mission_id(state["missionNumber"])
+    # The map choice is spent once its mission has been played; clear it so the
+    # next mission falls back to the spine (or a fresh War Map pick).
+    state.pop("nextMapOverride", None)
     intent = materialize_next_intent(state, workspace)
     events = generate_story_events(state, result, bead, True, workspace)
     report = {
@@ -1162,6 +1899,8 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
         "campaignClockMinutes": state["campaignClockMinutes"],
         "measuredZones": measured_zones,
         "graphDelta": graph_delta,
+        "graphMeasured": graph_measured,
+        "spectral": spectral,
         "bead": bead,
     }
     return state, report, intent, events
@@ -1172,11 +1911,13 @@ def command_advance(args: argparse.Namespace) -> int:
     state_path = Path(args.state) if args.state else workspace / "state" / "campaign_state.json"
     result_path = Path(args.result) if args.result else workspace / "inbox" / "latest_va_result.json"
     telemetry_path = Path(args.telemetry) if args.telemetry else workspace / "outbox" / "bar_zone_telemetry.latest.json"
+    translation_path = Path(args.translation) if getattr(args, "translation", "") else workspace / "inbox" / "latest_va_translation.json"
     outdir = Path(args.outdir) if args.outdir else workspace / "outbox"
     state_raw = load_json(state_path) if state_path.exists() else default_v1_state()
     result = load_json(result_path)
     telemetry = load_json(telemetry_path) if telemetry_path.exists() else None
-    state, report, intent, events = process_result(state_raw, result, telemetry, workspace)
+    translation = load_json(translation_path) if translation_path.exists() else None
+    state, report, intent, events = process_result(state_raw, result, telemetry, workspace, translation)
 
     if args.write_state:
         if state_path.exists() and state_raw.get("schemaVersion") != STATE_SCHEMA:
@@ -1187,6 +1928,7 @@ def command_advance(args: argparse.Namespace) -> int:
     save_json(outdir / "advance_report.v1.json", report)
     save_json(outdir / "next_mission_intent.json", intent)
     save_json(outdir / "story_events.latest.json", events)
+    save_json(outdir / "war_map.json", build_war_map(state))
     print(json.dumps(report, indent=2))
     return 0
 
@@ -1201,6 +1943,7 @@ def command_intent(args: argparse.Namespace) -> int:
     ensure_zone_memory(state, workspace)
     intent = materialize_next_intent(state, workspace)
     save_json(outdir / "next_mission_intent.json", intent)
+    save_json(outdir / "war_map.json", build_war_map(state))
     print(json.dumps({"missionId": intent.get("missionId"), "mapId": intent.get("mapId"), "objective": intent.get("objective")}, indent=2))
     return 0
 
@@ -1242,6 +1985,7 @@ def build_parser() -> argparse.ArgumentParser:
     adv.add_argument("--state", default="")
     adv.add_argument("--result", default="")
     adv.add_argument("--telemetry", default="")
+    adv.add_argument("--translation", default="")
     adv.add_argument("--outdir", default="")
     adv.add_argument("--write-state", action="store_true")
     adv.set_defaults(func=command_advance)

@@ -266,11 +266,64 @@ function Get-FilePayload {
     config = (Join-Path $Workspace "verdance_config.json")
     nextIntent = (Join-Path $Workspace "outbox\next_mission_intent.json")
     nextMissionBuild = (Join-Path $Workspace "outbox\next_mission_build_manifest.json")
+    warMap = (Join-Path $Workspace "outbox\war_map.json")
   }
   if (-not $map.ContainsKey($Name)) { return [pscustomobject]@{ ok=$false; error="Unknown file key: $Name" } }
   $path = $map[$Name]
   if (-not (Test-Path $path)) { return [pscustomobject]@{ ok=$false; path=$path; error="File not found" } }
   return [pscustomobject]@{ ok=$true; name=$Name; path=$path; text=(Get-Content $path -Raw) }
+}
+
+function Set-PlayerMapChoice {
+  # War Map (Pillar A): the player picks the next front during the next-ready
+  # pause. Writes state.nextMapOverride, then re-materializes the intent + war
+  # map so the subsequent build targets the chosen map (build reads the intent
+  # file directly and does not re-run the engine itself).
+  param([string]$Body)
+  $config = Get-ConfigLocal
+  $statePath = $config.campaignState
+  if (-not (Test-Path $statePath)) { return [pscustomobject]@{ ok=$false; error="Campaign state not found." } }
+  $choice = $null
+  try { $choice = $Body | ConvertFrom-Json } catch { return [pscustomobject]@{ ok=$false; error="Malformed choice body." } }
+  if (-not $choice -or -not $choice.mapId) { return [pscustomobject]@{ ok=$false; error="mapId is required." } }
+
+  # Only choose while idle or paused at next-ready; never mid-session (a live
+  # build/play would race the seed files).
+  $session = Read-JsonFileLocal (Join-Path $Workspace "outbox\play_session.status.json")
+  if ($session -and $session.PSObject.Properties["phase"] -and
+      $session.phase -in @("preflight", "building", "in-game", "extracting", "build-next")) {
+    return [pscustomobject]@{ ok=$false; error="Cannot change front mid-session (phase: $($session.phase))." }
+  }
+
+  $state = Get-Content $statePath -Raw | ConvertFrom-Json
+  $override = [pscustomobject]@{
+    mapId = [string]$choice.mapId
+    deploymentZoneId = [string]$choice.deploymentZoneId
+  }
+  $state | Add-Member -NotePropertyName nextMapOverride -NotePropertyValue $override -Force
+  ($state | ConvertTo-Json -Depth 60) | Set-Content -Encoding UTF8 -Path $statePath
+
+  $regen = [pscustomobject]@{ ok=$false; error="intent not regenerated" }
+  try {
+    $py = if (Get-Command Get-VerdancePython -ErrorAction SilentlyContinue) { Get-VerdancePython -Workspace $Workspace } else { "python" }
+    $engine = Join-Path $Workspace "tools\verdance_story_engine_v1.py"
+    $outdir = Join-Path $Workspace "outbox"
+    $out = & $py $engine intent --workspace $Workspace --state $statePath --outdir $outdir 2>&1
+    $regen = [pscustomobject]@{ ok=$true; stdout=($out -join "`n") }
+  } catch {
+    $regen = [pscustomobject]@{ ok=$false; error=$_.Exception.Message }
+  }
+  return [pscustomobject]@{ ok=$true; choice=$override; intent=$regen }
+}
+
+function Read-RequestBody {
+  param($Context)
+  try {
+    $reader = New-Object System.IO.StreamReader($Context.Request.InputStream, $Context.Request.ContentEncoding)
+    $body = $reader.ReadToEnd()
+    $reader.Close()
+    return $body
+  } catch { return "" }
 }
 
 $prefix = "http://127.0.0.1:$Port/"
@@ -322,6 +375,7 @@ while ($listener.IsListening) {
     if ($path -eq "/api/runCycle") { Write-Response $ctx (ConvertTo-JsonSafe (Invoke-ConsoleScript "run_full_cycle.ps1")) ; continue }
     if ($path -eq "/api/advanceV1") { Write-Response $ctx (ConvertTo-JsonSafe (Invoke-ConsoleScript "advance_campaign_v1.ps1" @("-WriteState"))) ; continue }
     if ($path -eq "/api/runCycleV1") { Write-Response $ctx (ConvertTo-JsonSafe (Invoke-ConsoleScript "run_full_cycle_v1.ps1" @("-WriteState"))) ; continue }
+    if ($path -eq "/api/setPlayerMapChoice") { Write-Response $ctx (ConvertTo-JsonSafe (Set-PlayerMapChoice (Read-RequestBody $ctx))) ; continue }
     if ($path -eq "/api/playSession") { Write-Response $ctx (ConvertTo-JsonSafe (Start-DetachedPlaySession)) ; continue }
     if ($path -eq "/api/cancelSession") { Write-Response $ctx (ConvertTo-JsonSafe (Stop-PlaySession)) ; continue }
     if ($path -eq "/api/migrateState") { Write-Response $ctx (ConvertTo-JsonSafe (Invoke-ConsoleScript "migrate_state_v1.ps1")) ; continue }

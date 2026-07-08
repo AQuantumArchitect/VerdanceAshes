@@ -74,6 +74,7 @@ local playerAllyTeamID = 0
 local gaiaTeamID = -1
 local gaiaAllyTeamID = -1
 local teamAllyTeam = {}                 -- teamID -> allyTeamID
+local teamFaction = {}                  -- teamID -> world faction (nullmercs/armada/cortex/...)
 local objectiveTargets = {}             -- unitID -> forceId (objective_target structures)
 local objectiveTargetCount = 0
 local objectiveTargetsDestroyed = 0
@@ -86,6 +87,21 @@ local extractionHoldFrames = 0
 local extractionClean = true
 local playerLeftExtraction = false
 local playerCommanders = {}             -- unitID -> true
+
+-- Pillar B: in-mission dynamism (escalation waves, hot extraction, callable
+-- merc reinforcements). Enemy reinforcements are inferred from the enemy team's
+-- own composition, so no seed/compiler change is needed. Disabled during
+-- headless/balance profiling unless va_escalation forces it on.
+local escalationEnabled = false
+local waveIntervalFrames = 2700         -- ~90s between enemy reinforcement waves
+local nextWaveFrame = 1800              -- first wave ~60s in
+local wavesSpawned = 0
+local maxWaves = 4
+local waveBaseSize = 4
+local objectiveTeamID = nil             -- team the objective camp belongs to
+local mercTeamID = nil                  -- allied Null Merc foothold team, if any
+local mercsAllied = false
+local mercWaveUsed = false
 local sawPlayerCommander = false
 local terminal = false
 local terminalReason = ""
@@ -296,6 +312,30 @@ local function objectiveResultsJson()
   }, ',') .. '}]'
 end
 
+-- Pillar C: the player's surviving mobile combat units by def, so the campaign
+-- engine can carry a veteran cadre forward and attrite losses. Self-contained
+-- (the shared unit helpers are defined further down, after this function).
+local function playerSurvivorsJson()
+  local counts = {}
+  local units = Spring.GetTeamUnits(playerTeamID) or {}
+  for i = 1, #units do
+    local uID = units[i]
+    local dID = Spring.GetUnitDefID(uID)
+    local ud = dID and UnitDefs[dID]
+    if ud then
+      local structure = ud.isBuilding or ud.isFactory or (ud.speed == 0)
+      local commander = ud.customParams and ud.customParams.iscommander
+      local fights = ud.canAttack or (ud.weapons and #ud.weapons > 0)
+      if (not structure) and (not commander) and fights then
+        counts[ud.name] = (counts[ud.name] or 0) + 1
+      end
+    end
+  end
+  local parts = {}
+  for name, c in pairs(counts) do parts[#parts + 1] = jstr(name) .. ':' .. jnum(c) end
+  return '{' .. table.concat(parts, ',') .. '}'
+end
+
 local function resultJson()
   local alive, total = companionCounts()
   local req = mission.objective and mission.objective.requiredFrames or 600
@@ -320,6 +360,7 @@ local function resultJson()
     '"extractionStatus":' .. jstr(extractionStatusString()),
     '"extractionZoneId":' .. jstr(mission.extractionZoneId or (mission.objective and mission.objective.extractionZoneId) or ""),
     '"chosenTargetForceId":' .. jstr(chosenTargetForceId or ""),
+    '"playerSurvivors":' .. playerSurvivorsJson(),
     '"destroyedObjectiveIds":' .. destroyedObjectiveIdsJson(),
     '"objectiveResults":' .. objectiveResultsJson(),
     '"companionsAlive":' .. jnum(alive),
@@ -352,6 +393,11 @@ local function logJsonChunked(prefix, json)
   Spring.Echo(prefix .. "_END")
 end
 
+-- Forward declaration: the Hermitian-observable emitter is defined later (it
+-- depends on the zone-scan helpers), but the terminal paths above need to call
+-- it. Assigning to this file-scope local at its definition site wires them up.
+local logAndBroadcastTranslation
+
 local function logResult()
   local json = resultJson()
   Spring.Echo("VA_RESULT_JSON_COMPACT " .. json)
@@ -369,6 +415,7 @@ local function finishHeadlessResult(outcome)
   Spring.SetGameRulesParam("va_hold_frames", holdFrames, { public = true })
   Spring.Echo("VA_HEADLESS_RESULT_READY mission=" .. tostring(mission.missionId) .. " status=" .. status)
   logResult()
+  if logAndBroadcastTranslation then logAndBroadcastTranslation() end
   if headlessQuit then
     headlessQuitFrame = Spring.GetGameFrame() + 2
   end
@@ -546,8 +593,16 @@ local function spawnPlayableSetup()
   local forces = setup.forces or {}
   local claimedMetalSpots = {}
   local totalSpawned = 0
+  local enemyCampTeamID = nil
   for _, force in ipairs(forces) do
     local teamID = tonumber(force.teamID or 0) or 0
+    if force.faction and force.faction ~= "" then
+      teamFaction[teamID] = tostring(force.faction)
+    end
+    -- Pillar B: remember which teams reinforcements/mercs come from.
+    if force.role == "objective_target" and not objectiveTeamID then objectiveTeamID = teamID end
+    if (force.faction == "armada" or force.faction == "cortex") and not enemyCampTeamID then enemyCampTeamID = teamID end
+    if (force.faction == "nullmercs" or force.role == "merc_foothold") and not mercTeamID then mercTeamID = teamID end
     local base = force.base or {}
     local baseX = normalizedToElmos(base.x or 0.5, Game.mapSizeX or 0)
     local baseZ = normalizedToElmos(base.z or 0.5, Game.mapSizeZ or 0)
@@ -562,9 +617,14 @@ local function spawnPlayableSetup()
     totalSpawned = totalSpawned + forceSpawned
     Spring.Echo("VA_PLAYABLE_FORCE id=" .. tostring(force.id or "?") .. " team=" .. tostring(teamID) .. " role=" .. tostring(force.role or "") .. " units=" .. tostring(forceSpawned))
   end
+  -- Presence objectives have no objective_target force; fall back to the camp.
+  objectiveTeamID = objectiveTeamID or enemyCampTeamID
+  if mercTeamID and Spring.AreTeamsAllied(playerTeamID, mercTeamID) then mercsAllied = true end
+  Spring.SetGameRulesParam("va_mercs_available", (mercsAllied and not mercWaveUsed) and 1 or 0, { public = true })
   Spring.SetGameRulesParam("va_objective_total", objectiveTargetCount, { public = true })
   Spring.SetGameRulesParam("va_objective_destroyed", 0, { public = true })
   Spring.Echo("VA_PLAYABLE_SETUP spawned forces=" .. tostring(#forces) .. " units=" .. tostring(totalSpawned))
+  Spring.Echo("VA_ESCALATION_SETUP enemyTeam=" .. tostring(objectiveTeamID) .. " mercTeam=" .. tostring(mercTeamID) .. " mercsAllied=" .. tostring(mercsAllied))
   Spring.Echo("VA_OBJECTIVE_ARMED kind=" .. tostring(mission.objective and mission.objective.kind or "none") .. " targets=" .. tostring(objectiveTargetCount))
 end
 
@@ -655,6 +715,7 @@ local function makeTeamBucket(teamID)
     teamId = teamID,
     allyTeamId = tonumber(allyTeam or -1) or -1,
     side = side or "",
+    faction = teamFaction[teamID] or "",
     isDead = isDead and true or false,
     isAi = isAiTeam and true or false,
     metrics = emptyMetrics(),
@@ -667,6 +728,7 @@ local function teamBucketJson(bucket)
     '"teamId":' .. jnum(bucket.teamId),
     '"allyTeamId":' .. jnum(bucket.allyTeamId),
     '"side":' .. jstr(bucket.side or ""),
+    '"faction":' .. jstr(bucket.faction or ""),
     '"isDead":' .. tostring(bucket.isDead == true),
     '"isAi":' .. tostring(bucket.isAi == true),
     '"metrics":' .. metricsJson(bucket.metrics),
@@ -728,7 +790,7 @@ local function telemetryJson()
   local enemyValue = 0
   local enemyUnitCount = 0
   for teamID, bucket in pairs(teamBuckets) do
-    if teamID ~= playerTeam and teamID ~= 0 then
+    if teamID ~= playerTeam and teamID ~= 0 and not Spring.AreTeamsAllied(playerTeam, teamID) then
       enemyValue = enemyValue + bucket.metrics.totalUnitValue
       enemyUnitCount = enemyUnitCount + bucket.metrics.unitCount
     end
@@ -957,7 +1019,7 @@ local function serializeTranslationPacket(p)
   )
 end
 
-local function logAndBroadcastTranslation()
+function logAndBroadcastTranslation()
   -- We need fresh zoneBuckets - rebuild them inline
   local zoneBucketsLive = {}
   if zoneMap and type(zoneMap.zones) == "table" then
@@ -1046,12 +1108,68 @@ local function scanZoneRect(rect)
       local team = Spring.GetUnitTeam(uid)
       if team == playerTeamID then
         playerPresent = true
-      elseif team ~= gaiaTeamID and teamAllyTeam[team] ~= playerAllyTeamID then
+      elseif team ~= gaiaTeamID and not Spring.AreTeamsAllied(playerTeamID, team) then
+        -- Alliance-aware: allied Null Merc teams (allied via start-script Ally
+        -- lines, distinct allyTeamID) are NOT enemy combat.
         if canFight(Spring.GetUnitDefID(uid)) then enemyCombat = true end
       end
     end
   end
   return playerPresent, enemyCombat
+end
+
+-- Pillar B wave machinery -----------------------------------------------------
+local function teamUnitCentroid(teamID)
+  local units = Spring.GetTeamUnits(teamID) or {}
+  local n, sx, sz = 0, 0, 0
+  for i = 1, #units do
+    local x, _, z = Spring.GetUnitPosition(units[i])
+    if x then sx = sx + x; sz = sz + z; n = n + 1 end
+  end
+  if n == 0 then return nil end
+  return sx / n, sz / n
+end
+
+local function teamCombatDefNames(teamID)
+  -- Sample the team's live mobile combat unit types; reinforcements are "more of
+  -- what this force already fields", so no faction recipe is needed here.
+  local seen, defs = {}, {}
+  local units = Spring.GetTeamUnits(teamID) or {}
+  for i = 1, #units do
+    local dID = Spring.GetUnitDefID(units[i])
+    local ud = dID and UnitDefs[dID]
+    if ud and not (ud.isBuilding or ud.isFactory or ud.speed == 0) then
+      local fights = ud.canAttack or (ud.weapons and #ud.weapons > 0)
+      if fights and not seen[ud.name] then seen[ud.name] = true; defs[#defs + 1] = ud.name end
+    end
+  end
+  return defs
+end
+
+local function spawnWave(fromTeamID, count, targetX, targetZ, label)
+  if not fromTeamID or count < 1 then return 0 end
+  local defs = teamCombatDefNames(fromTeamID)
+  if #defs == 0 then return 0 end
+  local cx, cz = teamUnitCentroid(fromTeamID)
+  if not cx then return 0 end
+  local spawned = 0
+  for i = 1, count do
+    local defName = defs[((i - 1) % #defs) + 1]
+    local ang = (i / count) * 6.28318
+    local x = cx + math.cos(ang) * 120
+    local z = cz + math.sin(ang) * 120
+    local uID = Spring.CreateUnit(defName, x, Spring.GetGroundHeight(x, z), z, 0, fromTeamID)
+    if uID then
+      spawned = spawned + 1
+      if targetX and CMD and CMD.FIGHT then
+        Spring.GiveOrderToUnit(uID, CMD.FIGHT, { targetX, Spring.GetGroundHeight(targetX, targetZ), targetZ }, {})
+      end
+    end
+  end
+  if spawned > 0 then
+    Spring.Echo("VA_WAVE_SPAWNED team=" .. tostring(fromTeamID) .. " count=" .. tostring(spawned) .. " kind=" .. tostring(label or "reinforce"))
+  end
+  return spawned
 end
 
 local function onObjectiveComplete(how)
@@ -1061,6 +1179,12 @@ local function onObjectiveComplete(how)
   Spring.SetGameRulesParam("va_objective_complete", 1, { public = true })
   Spring.Echo("VA_OBJECTIVE_COMPLETE mission=" .. tostring(mission.missionId) .. " how=" .. objectiveCompleteHow)
   if SendToUnsynced then SendToUnsynced("VERDANCE_MISSION_EVENT", "objective_complete", objectiveCompleteHow) end
+  -- Pillar B: hot extraction. The moment the objective falls, the enemy throws a
+  -- counterattack at the player so the walk-back to the LZ is the climax.
+  if escalationEnabled and objectiveTeamID then
+    local px, pz = teamUnitCentroid(playerTeamID)
+    spawnWave(objectiveTeamID, waveBaseSize + 2, px, pz, "hot_extraction")
+  end
 end
 
 local function setTerminal(newStatus, reason)
@@ -1076,6 +1200,9 @@ local function setTerminal(newStatus, reason)
   Spring.SetGameRulesParam("va_extraction_clean", extractionClean and 1 or 0, { public = true })
   Spring.Echo("VA_TERMINAL status=" .. status .. " reason=" .. terminalReason)
   logResult()
+  -- Level 2: emit the Hermitian battlefield observable at terminal so the
+  -- campaign engine can eigen-decompose it and collapse it onto the graph.
+  logAndBroadcastTranslation()
   if SendToUnsynced then SendToUnsynced("VERDANCE_MISSION_EVENT", status, terminalReason) end
   local profilingRun = headlessAutoStart or balanceExportFrame or (#fibMilestones > 0)
   if profilingRun then
@@ -1189,6 +1316,23 @@ function gadget:Initialize()
   gaiaAllyTeamID = teamAllyTeam[gaiaTeamID] or -1
   debugAutoProgressAllowed = headlessFastWin or truthy(modOptions.va_debug_autoprogress)
   testKillObjectiveFrame = tonumber(modOptions.va_test_killobjective_frame or "")
+
+  -- Pillar B escalation: default ON in real playable sessions, OFF during
+  -- headless/balance profiling; va_escalation forces either way.
+  local profiling = headlessAutoStart or balanceExportFrame or (#fibMilestones > 0)
+  local escOpt = modOptions.va_escalation
+  if escOpt ~= nil and tostring(escOpt) ~= "" then
+    escalationEnabled = truthy(escOpt)
+  else
+    escalationEnabled = not profiling
+  end
+  local escScale = tonumber(mission.difficulty and mission.difficulty.enemyScale) or 1.0
+  waveBaseSize = math.max(2, math.floor(4 * math.min(1.5, escScale) + 0.5))
+  maxWaves = tonumber(mission.escalation and mission.escalation.maxWaves) or 4
+  waveIntervalFrames = tonumber(mission.escalation and mission.escalation.intervalFrames) or 2700
+  nextWaveFrame = tonumber(mission.escalation and mission.escalation.firstWaveFrame) or 1800
+  local wi = tonumber(modOptions.va_wave_interval or ""); if wi and wi > 0 then waveIntervalFrames = wi end
+  local wf = tonumber(modOptions.va_first_wave or ""); if wf and wf > 0 then nextWaveFrame = wf end
   local obj = mission.objective or {}
   targetZoneRect = zoneRectFor(obj.targetZoneId)
   extractionZoneRect = zoneRectFor(mission.extractionZoneId or obj.extractionZoneId)
@@ -1209,8 +1353,45 @@ function gadget:Initialize()
   if zoneMap then Spring.Echo("VA_ZONES_LOADED mapId=" .. tostring(zoneMap.mapId or "unknown") .. " count=" .. tostring(zoneCount())) end
 end
 
+-- Pillar C: turn the commander's earned level/perks into tangible start-of-
+-- mission bonuses. Perks the compiler cannot bake into the seed (resources,
+-- commander experience/toughness) are applied live here once units exist.
+local function applyCommanderPerks()
+  local roster = mission and mission.storyIntent and mission.storyIntent.roster
+  local commander = roster and roster.commander
+  if not commander then return end
+  local perks = commander.activePerks or {}
+  local set = {}
+  for _, p in ipairs(perks) do set[p] = true end
+  local level = tonumber(commander.level or 1) or 1
+  if set.field_repair then
+    pcall(Spring.AddTeamResource, playerTeamID, "metal", 250)
+    pcall(Spring.AddTeamResource, playerTeamID, "energy", 600)
+  end
+  local units = Spring.GetTeamUnits(playerTeamID) or {}
+  for i = 1, #units do
+    local uID = units[i]
+    local dID = Spring.GetUnitDefID(uID)
+    local ud = dID and UnitDefs[dID]
+    if ud and ud.customParams and ud.customParams.iscommander then
+      if Spring.SetUnitExperience then pcall(Spring.SetUnitExperience, uID, math.max(0, (level - 1) * 0.25)) end
+      if set.ash_resolve and Spring.SetUnitMaxHealth then
+        local _, maxH = Spring.GetUnitHealth(uID)
+        if maxH then
+          pcall(Spring.SetUnitMaxHealth, uID, maxH * 1.25)
+          pcall(Spring.SetUnitHealth, uID, maxH * 1.25)
+        end
+      end
+      Spring.SetUnitRulesParam(uID, "va_commander_level", level, { public = true })
+      break
+    end
+  end
+  Spring.Echo("VA_COMMANDER_PERKS level=" .. tostring(level) .. " perks=" .. table.concat(perks, ","))
+end
+
 function gadget:GameStart()
   spawnPlayableSetup()
+  applyCommanderPerks()
   if headlessAutoStart and not headlessStarted then
     headlessStarted = true
     startMission()
@@ -1275,6 +1456,16 @@ function gadget:GameFrame(frame)
     checkPresenceObjective(frame)
     checkExtraction(frame)
     checkPlayerWipe(frame)
+  end
+
+  -- Pillar B: timed enemy reinforcement waves that build pressure over the sortie.
+  if escalationEnabled and status == "active" and not terminal and not objectiveComplete
+     and objectiveTeamID and frame >= nextWaveFrame and wavesSpawned < maxWaves then
+    local px, pz = teamUnitCentroid(playerTeamID)
+    spawnWave(objectiveTeamID, waveBaseSize, px, pz, "escalation")
+    wavesSpawned = wavesSpawned + 1
+    nextWaveFrame = frame + waveIntervalFrames
+    Spring.SetGameRulesParam("va_waves_spawned", wavesSpawned, { public = true })
   end
 
   -- Debug/fastwin auto-progress timer (only armed via modoption)
@@ -1384,6 +1575,21 @@ local function runVerdanceCommand(cmd)
   elseif cmd == "vatranslation" then logAndBroadcastTranslation()
   elseif cmd == "varesult" or cmd == "vaexport" then logResult()
   elseif cmd == "vaheadless" then startMission(); finishHeadlessResult("victory")
+  elseif cmd == "vacallmercs" then
+    -- Pillar B / C payoff: at high standing the Null Mercs answer one call.
+    if mercsAllied and mercTeamID and not mercWaveUsed then
+      local px, pz = teamUnitCentroid(playerTeamID)
+      local ex, ez = teamUnitCentroid(objectiveTeamID)
+      local n = spawnWave(mercTeamID, waveBaseSize + 2, ex or px, ez or pz, "merc_call")
+      if n > 0 then
+        mercWaveUsed = true
+        Spring.SetGameRulesParam("va_mercs_available", 0, { public = true })
+        Spring.SetGameRulesParam("va_mercs_called", 1, { public = true })
+        Spring.Echo("VA_MERCS_CALLED count=" .. tostring(n))
+      end
+    else
+      Spring.Echo("VA_MERCS_UNAVAILABLE allied=" .. tostring(mercsAllied) .. " used=" .. tostring(mercWaveUsed))
+    end
   elseif cmd == "vareset" then status = "inactive"; holdFrames = 0; debugAutoProgress = 0; echoStatus()
   else return false end
   return true

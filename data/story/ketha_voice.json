@@ -51,6 +51,16 @@
       "Three enemies, one sortie. Pick the wound that bleeds longest.",
       "Choose your target like the clans are watching. They are."
     ],
+    "briefing.war.mercs_allied": [
+      "Null flags on our flank today. Paid guns, pointed the right way. Use them.",
+      "The Null Mercs hold their ground against Armada. Today their ground is next to ours.",
+      "Mercs fight Armada for coin. We fight for the map. Same trigger, different reasons."
+    ],
+    "briefing.war.mercs_wary": [
+      "Null Mercs on the field. Not ours. Just aimed at the same people.",
+      "Give the Null camps room. Their contract doesn't mention us either way.",
+      "The mercs' war with Armada is older than our part in it. Stay out of the crossfire."
+    ],
     "briefing.graph.contested_high": [
       "The whole front is loose in its socket. One push either way decides it.",
       "Contested space everywhere. That's danger, and it's also the door."
@@ -126,6 +136,24 @@
     "debrief.streak.losses": [
       "Two down in a row. The next one is not about the map. It's about us.",
       "Losing teaches faster. We are apparently enrolled."
+    ],
+    "briefing.commander.scarred": [
+      "You're carrying wounds into this one. Don't lead with them.",
+      "The commander's still bleeding from the last field. Fight careful.",
+      "Scarred and standing. That'll have to be enough today."
+    ],
+    "briefing.world.cortex_ascendant": [
+      "Cortex is winning the wider war. Every map tilts their way now.",
+      "The Cortex ascendancy is real. We fight uphill until that changes."
+    ],
+    "briefing.world.armada_ascendant": [
+      "Armada holds the upper hand across the front. Expect walls, and patience.",
+      "Armada is ascendant. Their lines are thick and getting thicker."
+    ],
+    "debrief.territory_lost": [
+      "We lost {zone} while we looked away. The map keeps a ledger too.",
+      "{zone} is gone - taken while we were elsewhere. Ground doesn't wait for us.",
+      "That's {zone} off our board. Stretch too thin and this is the bill."
     ]
   },
   "titles": {

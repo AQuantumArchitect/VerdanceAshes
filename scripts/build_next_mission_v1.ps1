@@ -57,18 +57,14 @@ function Get-MapEntry {
 
 function Get-EnemySide {
   param([string]$MapId, $Intent)
-  if ($Intent.objectiveTarget -and $Intent.objectiveTarget.targetZoneId -match "CORTEX|COR") { return "Cortex" }
-  # Story-bible faction identities: Cortex is industrial pressure (synth
-  # economies, dealer relays); Armada is old order (valleys, gates, bastions).
-  switch ($MapId) {
-    "greenest_fields" { return "Cortex" }
-    "eye_of_horus" { return "Cortex" }
-    "koom_valley" { return "Armada" }
-    "tabula" { return "Armada" }
-    "ancient_bastion" { return "Armada" }
-    "all_that_simmers" { return "Armada" }
-    default { return "Armada" }
-  }
+  # The standing war of the campaign world is Null Mercs vs Armada, so Armada
+  # is the default enemy power on most maps. Cortex is an ACCENT: it holds its
+  # own maps (the synth economy, the desolate dealer hideout) and never shares
+  # a camp with Armada - the two are mortal enemies. A camp is one faction.
+  $tz = if ($Intent.objectiveTarget -and $Intent.objectiveTarget.targetZoneId) { [string]$Intent.objectiveTarget.targetZoneId } else { "" }
+  if ($tz -match "CORTEX|SYNTH") { return "Cortex" }
+  if ($MapId -eq "eye_of_horus") { return "Cortex" }
+  return "Armada"
 }
 
 function Get-EnemyRecipeName {
@@ -133,6 +129,17 @@ $FACTION = @{
   }
 }
 
+# Null Mercs field Legion-family scrap-line chassis like the player's clans -
+# outsider tech on both - but fly ash-grey null colors. Their camps are lean:
+# quick eco, light teeth, and patrols that press the Armada approaches.
+$MERC = @{
+  mex = "legmex"; wind = "legwin"; solar = "legsolar"; radar = "legrad"
+  llt = "leglht"; mg = "legmg"; aa = "legrl"; wall = "legdrag"; mstor = "legmstor"
+  lab = "leglab"; nano = "legnanotc"
+  raider = "leggat"; skirm = "legcen"; assault = "legjav"
+  rgb = @(0.63, 0.62, 0.66)
+}
+
 function Get-ScaledCount {
   param([int]$Base, [double]$Scale)
   return [int][Math]::Max(1, [Math]::Round($Base * $Scale))
@@ -163,6 +170,41 @@ function New-PlayerKit {
     "tempo"   { $kit += @((Spec "leggat" 2 -60 -260 90), (Spec "legcen" 1 140 -260 95)) }
     "siege"   { $kit += @((Spec "legjav" 2 -200 -200 110), (Spec "legrl" 1 -40 -60 100)) }
     "wild"    { $kit += @((Spec "legmg" 1 -180 -60 100), (Spec "leglht" 1 200 -140 130)) }
+  }
+  return $kit
+}
+
+function New-PlayerKitFromRoster {
+  # Pillar C: the player's starting force IS their persistent warband - a
+  # commander hero plus the veteran cadre they carried out of prior sorties -
+  # on top of an economy floor so a wiped roster still yields a playable base.
+  param([string]$Family, $Roster, [double]$ResourceMod = 1.0)
+  # q7 scarcity thins the economy floor (resourceModifier from the graph).
+  $wind = [Math]::Max(2, [int][Math]::Round(4 * $ResourceMod))
+  $kit = @(
+    (Spec "legmex" 3 -140 120 120 $true),
+    (Spec "legwin" $wind 120 160 90),
+    (Spec "legsolar" 2 240 80 90),
+    (Spec "legrad" 1 40 -60 100)
+  )
+  $comDef = if ($Roster.commander -and $Roster.commander.unitDef) { [string]$Roster.commander.unitDef } else { "legcom" }
+  $kit += (Spec $comDef 1 0 40 100)
+  $cadreTotal = 0
+  if ($Roster.cadre) {
+    foreach ($p in $Roster.cadre.PSObject.Properties) {
+      $cnt = [int]$p.Value
+      if ($cnt -gt 0) { $kit += (Spec ([string]$p.Name) $cnt -120 -160 95); $cadreTotal += $cnt }
+    }
+  }
+  # Floor: a thin cadre (fresh campaign or a rout) still fields a minimum strike element.
+  if ($cadreTotal -lt 4) { $kit += (Spec "legcen" (4 - $cadreTotal) 80 -210 95) }
+  $active = @(); if ($Roster.commander -and $Roster.commander.activePerks) { $active = @($Roster.commander.activePerks) }
+  if ($active -contains "rapid_deploy") { $kit += (Spec "legjav" 1 200 -230 110) }
+  switch ($Family) {
+    "economy" { $kit += (Spec "legck" 1 180 240 90) }
+    "tempo"   { $kit += (Spec "leggat" 1 -60 -260 90) }
+    "siege"   { $kit += (Spec "legrl" 1 -40 -60 100) }
+    "wild"    { $kit += (Spec "leglht" 1 200 -140 130) }
   }
   return $kit
 }
@@ -212,6 +254,17 @@ function Ring-Fortify {
   )
 }
 
+function Ring-Jammers {
+  # Cortex hideout flavor: radar jammer towers + a cloaking field so the base
+  # reads as hidden/desolate until you are on top of it (eye_of_horus).
+  param($T)
+  @(
+    (Spec "corjamt" 2 -60 120 160),
+    (Spec "corjamt" 1 180 -40 160),
+    (Spec "corshroud" 1 0 -30 100)
+  )
+}
+
 function Centerpiece-Relay {
   param($T)
   @((Spec $T.targ 1 0 0 100), (Spec $T.arad 1 120 60 100), (Spec $T.fus 1 -130 70 110))
@@ -245,6 +298,27 @@ function Centerpiece-Hives {
   )
   if ($Hazard -gt 0.5) { $specs += (Spec "raptor_hive" 1 0 -220 240) }
   return $specs
+}
+
+function New-MercFoothold {
+  param([double]$S, [double]$PX, [double]$PZ, [int]$FX, [int]$FZ)
+  # FX/FZ face the Armada camp: the mercs' war, not the player's approach.
+  @(
+    (Spec $MERC.mex 3 -140 110 120 $true),
+    (Spec $MERC.wind (Get-ScaledCount 4 $S) 130 160 85),
+    (Spec $MERC.solar 1 250 70 95),
+    (Spec $MERC.mstor 1 60 230 100),
+    (Spec $MERC.radar 1 0 -70 100),
+    (Spec $MERC.llt (Get-ScaledCount 3 $S) (160 * $FX) (140 * $FZ) 150),
+    (Spec $MERC.mg 1 (230 * $FX) (90 * $FZ) 110),
+    (Spec $MERC.aa 1 (-80 * $FX) (60 * $FZ) 160),
+    (Spec $MERC.wall (Get-ScaledCount 6 $S) (260 * $FX) (220 * $FZ) 40),
+    (Spec $MERC.lab 1 -290 -140 120),
+    (Spec $MERC.nano 1 -200 -230 90),
+    (Spec $MERC.raider (Get-ScaledCount 3 $S) 110 -290 80 $false $PX $PZ),
+    (Spec $MERC.skirm (Get-ScaledCount 2 $S) -130 -310 90 $false $PX $PZ),
+    (Spec $MERC.assault (Get-ScaledCount 2 $S) 10 -370 95 $false $PX $PZ)
+  )
 }
 
 function Ring-RaptorGarrison {
@@ -305,11 +379,26 @@ $scaleCenter = if ($intent.expectedEnemyScale -and $intent.expectedEnemyScale.ce
 # Onboarding ramp: the first two sorties ease in regardless of lore pressure.
 $rampFactor = [Math]::Min(1.0, 0.7 + 0.15 * ($missionNumber - 1))
 $enemyScale = [Math]::Round(([Math]::Max(0.7, [Math]::Min(2.2, $scaleCenter / 6000.0)) * $diffCoeff * $rampFactor), 3)
-$fortify = $enemyScale -ge 1.4
 $maxHazard = if ($intent.offscreenPressureSummary -and $intent.offscreenPressureSummary.maxHazard) { [double]$intent.offscreenPressureSummary.maxHazard } else { 0.0 }
 $objectiveKind = if ($intent.objectiveTarget -and $intent.objectiveTarget.kind) { [string]$intent.objectiveTarget.kind } else { [string]$intent.objective }
 $presenceKind = $objectiveKind -in @("seize_lane", "gate_control")
 $mapFamily = if ($intent.environment -and $intent.environment.mapFamily) { [string]$intent.environment.mapFamily } else { "tempo" }
+
+# --- The standing war: Null Mercs vs Armada ---------------------------------
+# The mercs keep a foothold on every faction-war mission. Reputation decides
+# whether their guns tolerate the player (allied) or merely share a target
+# (wary, hostile-to-all). Allied mercs tip the field, so the Armada garrison
+# scales up slightly to compensate.
+$mercInfo = if ($intent.PSObject.Properties["worldConflict"] -and $intent.worldConflict.nullMercs) { $intent.worldConflict.nullMercs } else { $null }
+$mercRep = if ($mercInfo -and $null -ne $mercInfo.reputation) { [double]$mercInfo.reputation }
+           elseif ($state -and $state.reputation -and $null -ne $state.reputation.nullmercs) { [double]$state.reputation.nullmercs }
+           else { 43.0 }
+$mercsAllied = if ($mercInfo -and $null -ne $mercInfo.alliedWithPlayer) { [bool]$mercInfo.alliedWithPlayer } else { $mercRep -ge 40.0 }
+# Standing scales the merc foothold: allied lines field a fuller camp, wary thinner.
+$mercFootholdScale = if ($mercInfo -and $null -ne $mercInfo.footholdScale) { [double]$mercInfo.footholdScale } else { 1.0 }
+$mercsPresent = $objectiveKind -ne "hive_clear_or_bypass"
+if ($mercsPresent -and $mercsAllied) { $enemyScale = [Math]::Round($enemyScale * 1.1, 3) }
+$fortify = $enemyScale -ge 1.4
 
 # Defenses face the player's approach; patrols defend presence zones or
 # pressure the midline on destruction objectives.
@@ -328,37 +417,49 @@ $patrolTarget = if ($presenceKind) {
 function Clamp01 { param([double]$V) return [Math]::Max(0.03, [Math]::Min(0.97, $V)) }
 
 # --- Camp assembly ---------------------------------------------------------
-# Each camp -> one team on its own allyteam. Camps carry a small
-# objective-tagged centerpiece force plus an untagged garrison shell.
-$baseRecipes = [ordered]@{ legion_player_kit = @(New-PlayerKit $mapFamily) }
+# Each camp -> one team on its own allyteam (contractor centerpieces share the
+# garrison's allyteam). Camps carry a small objective-tagged centerpiece force
+# plus an untagged garrison shell. Teams carry an explicit faction tag so
+# telemetry reads the world war (nullmercs/armada/cortex), not the chassis.
+$roster = if ($intent.PSObject.Properties["roster"] -and $intent.roster) { $intent.roster } else { $null }
+$resourceMod = if ($intent.economy -and $null -ne $intent.economy.resourceModifier) { [double]$intent.economy.resourceModifier } else { 1.0 }
+$playerKit = if ($roster) { New-PlayerKitFromRoster $mapFamily $roster $resourceMod } else { New-PlayerKit $mapFamily }
+$baseRecipes = [ordered]@{ legion_player_kit = @($playerKit) }
 $allyTeams = @([ordered]@{ id = 0; startRect = New-StartRect $deployCenter 0.20 })
-$teams = @([ordered]@{ id = 0; side = "Legion"; allyTeam = 0; base = @($deployCenter[0], $deployCenter[1]); rgb = @(0.25, 0.85, 0.35); label = "Legion Green Player" })
-$forces = @([ordered]@{ id = "player_deployment"; label = "Player Deployment - $($intent.deploymentZoneId)"; teamID = 0; side = "Legion"; role = "player_anchor"; base = [ordered]@{ x = $deployCenter[0]; z = $deployCenter[1] }; recipe = "legion_player_kit" })
+$teams = @([ordered]@{ id = 0; side = "Legion"; allyTeam = 0; base = @($deployCenter[0], $deployCenter[1]); rgb = @(0.25, 0.85, 0.35); label = "Legion Green Player"; faction = "ashwalkers" })
+$forces = @([ordered]@{ id = "player_deployment"; label = "Player Deployment - $($intent.deploymentZoneId)"; teamID = 0; side = "Legion"; faction = "ashwalkers"; role = "player_anchor"; base = [ordered]@{ x = $deployCenter[0]; z = $deployCenter[1] }; recipe = "legion_player_kit" })
 $ai = @()
+$alliances = @()
 $nextTeam = 1
+$nextAllyTeam = 1
 
 function Add-FactionCamp {
-  param([string]$Side, [double[]]$Center, $CenterpieceSpecs, [string]$CenterpieceLabel, [bool]$WithEco = $true, [bool]$WithProduction = $false)
+  param([string]$Side, [double[]]$Center, $CenterpieceSpecs, [string]$CenterpieceLabel, [bool]$WithEco = $true, [bool]$WithProduction = $false, [bool]$WithJammers = $false)
+  # A camp is ONE faction end to end - Armada and Cortex are mortal enemies and
+  # never share a team or allyteam. The centerpiece (objective) and its garrison
+  # are the same side.
   $T = $FACTION[$Side]
   $teamID = $script:nextTeam; $script:nextTeam += 1
-  $script:allyTeams += [ordered]@{ id = $teamID; startRect = New-StartRect $Center 0.20 }
-  $script:teams += [ordered]@{ id = $teamID; side = $Side; allyTeam = $teamID; base = @($Center[0], $Center[1]); rgb = $T.rgb; label = "$Side - $CenterpieceLabel" }
+  $allyID = $script:nextAllyTeam; $script:nextAllyTeam += 1
+  $script:allyTeams += [ordered]@{ id = $allyID; startRect = New-StartRect $Center 0.20 }
+  $script:teams += [ordered]@{ id = $teamID; side = $Side; allyTeam = $allyID; base = @($Center[0], $Center[1]); rgb = $T.rgb; label = "$Side - $CenterpieceLabel"; faction = $Side.ToLower() }
 
   if ($CenterpieceSpecs) {
     $coreRecipe = "camp${teamID}_core"
     $script:baseRecipes[$coreRecipe] = @($CenterpieceSpecs)
-    $script:forces += [ordered]@{ id = "camp${teamID}_objective"; label = $CenterpieceLabel; teamID = $teamID; side = $Side; role = "objective_target"; base = [ordered]@{ x = $Center[0]; z = $Center[1] }; recipe = $coreRecipe }
+    $script:forces += [ordered]@{ id = "camp${teamID}_objective"; label = $CenterpieceLabel; teamID = $teamID; side = $Side; faction = $Side.ToLower(); role = "objective_target"; base = [ordered]@{ x = $Center[0]; z = $Center[1] }; recipe = $coreRecipe }
   }
 
   $garrison = @()
   if ($WithEco) { $garrison += Ring-Eco $T $enemyScale }
   $garrison += Ring-Perimeter $T $enemyScale $faceX $faceZ
   if ($WithProduction) { $garrison += Ring-Production $T }
+  if ($WithJammers) { $garrison += Ring-Jammers $T }
   $garrison += Ring-Patrol $T $enemyScale $patrolTarget[0] $patrolTarget[1]
   if ($fortify) { $garrison += Ring-Fortify $T $faceX $faceZ }
   $garrisonRecipe = "camp${teamID}_garrison"
   $script:baseRecipes[$garrisonRecipe] = @($garrison)
-  $script:forces += [ordered]@{ id = "camp${teamID}_garrison"; label = "$Side garrison"; teamID = $teamID; side = $Side; role = "garrison"; base = [ordered]@{ x = $Center[0]; z = $Center[1] }; recipe = $garrisonRecipe }
+  $script:forces += [ordered]@{ id = "camp${teamID}_garrison"; label = "$Side garrison"; teamID = $teamID; side = $Side; faction = $Side.ToLower(); role = "garrison"; base = [ordered]@{ x = $Center[0]; z = $Center[1] }; recipe = $garrisonRecipe }
 
   $script:ai += [ordered]@{ name = "SimpleAI($Side $CenterpieceLabel)"; shortName = "SimpleAI"; team = $teamID; version = "<not-versioned>" }
 }
@@ -366,27 +467,48 @@ function Add-FactionCamp {
 function Add-RaptorCamp {
   param([double[]]$Center, [bool]$AsObjective, [string]$Label)
   $teamID = $script:nextTeam; $script:nextTeam += 1
-  $script:allyTeams += [ordered]@{ id = $teamID; startRect = New-StartRect $Center 0.18 }
-  $script:teams += [ordered]@{ id = $teamID; side = "Armada"; allyTeam = $teamID; base = @($Center[0], $Center[1]); rgb = @(0.78, 0.14, 0.92); label = $Label }
+  $allyID = $script:nextAllyTeam; $script:nextAllyTeam += 1
+  $script:allyTeams += [ordered]@{ id = $allyID; startRect = New-StartRect $Center 0.18 }
+  $script:teams += [ordered]@{ id = $teamID; side = "Armada"; allyTeam = $allyID; base = @($Center[0], $Center[1]); rgb = @(0.78, 0.14, 0.92); label = $Label; faction = "wild" }
   if ($AsObjective) {
     $script:baseRecipes["camp${teamID}_hives"] = @(Centerpiece-Hives $maxHazard)
-    $script:forces += [ordered]@{ id = "camp${teamID}_objective"; label = $Label; teamID = $teamID; side = "Raptors"; role = "objective_target"; base = [ordered]@{ x = $Center[0]; z = $Center[1] }; recipe = "camp${teamID}_hives" }
+    $script:forces += [ordered]@{ id = "camp${teamID}_objective"; label = $Label; teamID = $teamID; side = "Raptors"; faction = "wild"; role = "objective_target"; base = [ordered]@{ x = $Center[0]; z = $Center[1] }; recipe = "camp${teamID}_hives" }
   }
   $script:baseRecipes["camp${teamID}_swarm"] = @(Ring-RaptorGarrison $maxHazard)
-  $script:forces += [ordered]@{ id = "camp${teamID}_swarm"; label = "Raptor swarm"; teamID = $teamID; side = "Raptors"; role = $(if ($AsObjective) { "garrison" } else { "wild_pressure" }); base = [ordered]@{ x = $Center[0]; z = $Center[1] }; recipe = "camp${teamID}_swarm" }
+  $script:forces += [ordered]@{ id = "camp${teamID}_swarm"; label = "Raptor swarm"; teamID = $teamID; side = "Raptors"; faction = "wild"; role = $(if ($AsObjective) { "garrison" } else { "wild_pressure" }); base = [ordered]@{ x = $Center[0]; z = $Center[1] }; recipe = "camp${teamID}_swarm" }
   $script:ai += [ordered]@{ name = "RaptorsDefenseAI(Verdance)"; shortName = "RaptorsAI"; team = $teamID; version = "<not-versioned>" }
+}
+
+function Add-NullMercCamp {
+  param([double[]]$Center, [double]$Scale, [bool]$Allied)
+  $teamID = $script:nextTeam; $script:nextTeam += 1
+  $allyID = $script:nextAllyTeam; $script:nextAllyTeam += 1
+  $script:allyTeams += [ordered]@{ id = $allyID; startRect = New-StartRect $Center 0.16 }
+  $script:teams += [ordered]@{ id = $teamID; side = "Legion"; allyTeam = $allyID; base = @($Center[0], $Center[1]); rgb = $MERC.rgb; label = "Null Mercs foothold"; faction = "nullmercs" }
+  $mfx = [Math]::Sign($enemyCenter[0] - $Center[0]); if ($mfx -eq 0) { $mfx = 1 }
+  $mfz = [Math]::Sign($enemyCenter[1] - $Center[1]); if ($mfz -eq 0) { $mfz = 1 }
+  $script:baseRecipes["camp${teamID}_mercs"] = @(New-MercFoothold $Scale $patrolTarget[0] $patrolTarget[1] $mfx $mfz)
+  $script:forces += [ordered]@{ id = "camp${teamID}_mercs"; label = "Null Mercs foothold"; teamID = $teamID; side = "Legion"; faction = "nullmercs"; role = "merc_foothold"; base = [ordered]@{ x = $Center[0]; z = $Center[1] }; recipe = "camp${teamID}_mercs" }
+  $script:ai += [ordered]@{ name = "SimpleAI(Null Mercs)"; shortName = "SimpleAI"; team = $teamID; version = "<not-versioned>" }
+  if ($Allied) {
+    $script:alliances += [ordered]@{ allyTeamA = 0; allyTeamB = $allyID; allied = $true }
+  }
 }
 
 switch ($objectiveKind) {
   "strike_relay" {
+    # The dealer relay sits in a desolate Cortex hideout: jammers everywhere.
     $T = $FACTION[$enemySide]
-    Add-FactionCamp $enemySide $enemyCenter (Centerpiece-Relay $T) $description -WithEco $true
+    $jam = $enemySide -eq "Cortex"
+    Add-FactionCamp $enemySide $enemyCenter (Centerpiece-Relay $T) $description -WithEco $true -WithJammers $jam
   }
   "destroy_key_structure" {
     $T = $FACTION[$enemySide]
     Add-FactionCamp $enemySide $enemyCenter (Centerpiece-LRPC $T) $description -WithEco $true -WithProduction $true
   }
   "economy_disrupt" {
+    # Synth works are a Cortex economy: the whole camp is Cortex (garrison +
+    # works). Armada never protects Cortex - they are mortal enemies.
     $T = $FACTION[$enemySide]
     Add-FactionCamp $enemySide $enemyCenter (Centerpiece-EcoWorks $T $enemyScale) $description -WithEco $true
   }
@@ -407,6 +529,33 @@ switch ($objectiveKind) {
     $T = $FACTION[$enemySide]
     Add-FactionCamp $enemySide $enemyCenter $null $description -WithEco $false
   }
+}
+
+# Null Merc foothold: a flank camp perpendicular to the deploy->target axis,
+# kept clear of the player start and the wild center. Their patrols press the
+# same Armada approaches the garrison screens - the war happens on the map.
+if ($mercsPresent) {
+  $axisX = $enemyCenter[0] - $deployCenter[0]
+  $axisZ = $enemyCenter[1] - $deployCenter[1]
+  $axisLen = [Math]::Sqrt($axisX * $axisX + $axisZ * $axisZ)
+  if ($axisLen -lt 0.001) { $axisLen = 0.001 }
+  $perpX = -$axisZ / $axisLen
+  $perpZ = $axisX / $axisLen
+  $midX = ($deployCenter[0] + $enemyCenter[0]) / 2.0
+  $midZ = ($deployCenter[1] + $enemyCenter[1]) / 2.0
+  $candidates = @(
+    @((Clamp01 ($midX + 0.26 * $perpX)), (Clamp01 ($midZ + 0.26 * $perpZ))),
+    @((Clamp01 ($midX - 0.26 * $perpX)), (Clamp01 ($midZ - 0.26 * $perpZ)))
+  )
+  $mercCenter = $candidates[0]
+  $bestScore = -1.0
+  foreach ($cand in $candidates) {
+    $dxD = $cand[0] - $deployCenter[0]; $dzD = $cand[1] - $deployCenter[1]
+    $dxW = $cand[0] - $wildCenter[0]; $dzW = $cand[1] - $wildCenter[1]
+    $score = [Math]::Min([Math]::Sqrt($dxD * $dxD + $dzD * $dzD), [Math]::Sqrt($dxW * $dxW + $dzW * $dzW))
+    if ($score -gt $bestScore) { $bestScore = $score; $mercCenter = $cand }
+  }
+  Add-NullMercCamp $mercCenter ([Math]::Max(0.5, $enemyScale * 0.75 * $mercFootholdScale)) $mercsAllied
 }
 
 # Wild pressure nest on wild-family maps whose objective is not already the hive.
@@ -480,6 +629,7 @@ $scenario = [ordered]@{
   layout = [ordered]@{
     allyTeams = $allyTeams
     teams = $teams
+    alliances = $alliances
   }
   forces = $forces
   variants = @(
@@ -542,6 +692,7 @@ $manifest = [ordered]@{
   deploymentZoneId = $intent.deploymentZoneId
   objectiveTarget = $intent.objectiveTarget
   enemySide = $enemySide
+  nullMercs = [ordered]@{ present = [bool]$mercsPresent; allied = [bool]$mercsAllied; reputation = $mercRep }
   hasWild = [bool]$hasWild
   saveName = if ($SaveGame) { $SaveName } else { $null }
   seedOutbox = $config.seedOutbox

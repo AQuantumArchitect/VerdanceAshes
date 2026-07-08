@@ -98,16 +98,26 @@ function widget:ViewResize(x, y)
   vsx, vsy = x, y
 end
 
+-- Spring.GetGameRulesParam returns ZERO values (not nil) for an unset param,
+-- so tonumber(sp(name)) would call tonumber() with no argument and throw.
+-- Capture into a local first, then coerce with a default.
+local function numParam(name, default)
+  local v = Spring.GetGameRulesParam(name)
+  return tonumber(v) or default
+end
+
 local function poll()
   local sp = Spring.GetGameRulesParam
-  state.objectiveTotal = tonumber(sp("va_objective_total")) or 0
-  state.objectiveDestroyed = tonumber(sp("va_objective_destroyed")) or 0
-  state.objectiveComplete = (tonumber(sp("va_objective_complete")) or 0) == 1
-  state.terminal = (tonumber(sp("va_terminal")) or 0) == 1
-  state.resultCode = tonumber(sp("va_result_code")) or 0
-  state.zoneHold = tonumber(sp("va_zone_hold")) or 0
-  state.extractionHold = tonumber(sp("va_extraction_hold")) or 0
-  state.extractionClean = (tonumber(sp("va_extraction_clean")) or 1) == 1
+  state.objectiveTotal = numParam("va_objective_total", 0)
+  state.objectiveDestroyed = numParam("va_objective_destroyed", 0)
+  state.objectiveComplete = numParam("va_objective_complete", 0) == 1
+  state.terminal = numParam("va_terminal", 0) == 1
+  state.resultCode = numParam("va_result_code", 0)
+  state.zoneHold = numParam("va_zone_hold", 0)
+  state.extractionHold = numParam("va_extraction_hold", 0)
+  state.extractionClean = numParam("va_extraction_clean", 1) == 1
+  state.wavesSpawned = numParam("va_waves_spawned", 0)
+  state.mercsAvailable = numParam("va_mercs_available", 0) == 1
   local st = sp("va_status")
   if type(st) == "string" and st ~= "" then state.status = st end
   local reason = sp("va_terminal_reason")
@@ -212,6 +222,16 @@ local function drawObjectiveBar()
     local held = math.floor(state.extractionHold / 30)
     local need = math.floor(EXTRACTION_HOLD_FRAMES / 30)
     text(string.format("Return to extraction zone: %ds / %ds", held, need), vsx * 0.5, y, 13, COL.warn)
+    y = y - 17
+  end
+
+  if not state.terminal and (state.wavesSpawned or 0) > 0 then
+    text(string.format("Enemy reinforcements committed: %d", state.wavesSpawned), vsx * 0.5, y, 11, COL.bad)
+    y = y - 15
+  end
+  if not state.terminal and state.mercsAvailable then
+    text("Null Mercs standing by  \226\128\148  /vacallmercs", vsx * 0.5, y, 11, COL.blue)
+    y = y - 15
   end
 end
 

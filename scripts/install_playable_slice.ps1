@@ -111,6 +111,7 @@ function Expand-ScenarioForces {
       label = $force.label
       teamID = $force.teamID
       side = $force.side
+      faction = if ($force.PSObject.Properties["faction"] -and $force.faction) { [string]$force.faction } else { "" }
       role = $force.role
       base = $force.base
       recipe = $recipeName
@@ -158,16 +159,38 @@ function New-MissionObject {
   return $mission
 }
 
+function Get-AllyTeamAllies {
+  # Spring alliances are symmetric per allyteam. Compute the allied allyTeamIds
+  # for one allyteam by scanning the scenario's alliances list directly
+  # ({ allyTeamA, allyTeamB, allied }); avoids PS hashtable int-key quirks.
+  param($Scenario, [int]$AllyTeamId)
+  $allies = New-Object System.Collections.Generic.List[int]
+  if (-not ($Scenario.layout.PSObject.Properties["alliances"])) { return @() }
+  foreach ($pact in @($Scenario.layout.alliances)) {
+    if (-not $pact.allied) { continue }
+    $a = [int]$pact.allyTeamA
+    $b = [int]$pact.allyTeamB
+    if ($a -eq $AllyTeamId -and -not $allies.Contains($b)) { $allies.Add($b) }
+    elseif ($b -eq $AllyTeamId -and -not $allies.Contains($a)) { $allies.Add($a) }
+  }
+  return @($allies)
+}
+
 function Render-AllyTeam {
-  param($AllyTeam)
+  param($AllyTeam, $Allies = @())
   $rect = @($AllyTeam.startRect)
+  # Only count real allies; drop any null/empty entries defensively.
+  $allyList = @(@($Allies) | Where-Object { $_ -ne $null -and "$_" -ne "" })
   $lines = @(
     "StartRectLeft=$(Format-StartScriptNumber ([double]$rect[0]));",
     "StartRectTop=$(Format-StartScriptNumber ([double]$rect[1]));",
     "StartRectRight=$(Format-StartScriptNumber ([double]$rect[2]));",
     "StartRectBottom=$(Format-StartScriptNumber ([double]$rect[3]));",
-    "NumAllies=0;"
+    "NumAllies=$($allyList.Count);"
   )
+  for ($i = 0; $i -lt $allyList.Count; $i++) {
+    $lines += "Ally$i=$($allyList[$i]);"
+  }
   return Render-StartScriptBlock ("ALLYTEAM" + $AllyTeam.id) $lines
 }
 
@@ -319,7 +342,10 @@ $zoneMapDestination = Install-VerdanceZoneMap -Config $config
 $safeMapId = if ($scenario.map.id) { [string]$scenario.map.id } else { ($mapName -replace '[^A-Za-z0-9_-]', '_') }
 $safeMapId = $safeMapId -replace '[^A-Za-z0-9_-]', '_'
 $startScriptPath = Join-Path $runRoot "verdance_playable_${safeMapId}_$Variant.txt"
-$allyTeamBlocks = @($scenario.layout.allyTeams) | ForEach-Object { Render-AllyTeam $_ }
+$allyTeamBlocks = @($scenario.layout.allyTeams) | ForEach-Object {
+  $allies = Get-AllyTeamAllies $scenario ([int]$_.id)
+  Render-AllyTeam $_ $allies
+}
 $teamBlocks = @($scenario.layout.teams) | ForEach-Object { Render-Team $_ $mapSizeX $mapSizeZ }
 $aiSpecs = @($variantObject.ai)
 if ($playerAi) { $aiSpecs += $playerAi }

@@ -106,6 +106,24 @@
     .error { color: var(--bad); }
     .warnText { color: var(--warn); }
     @media (max-width: 1000px) { .top, .two, .cards { grid-template-columns: 1fr; } }
+    /* War Map (Pillar A) */
+    #warMapPanel { border-color: rgba(199,166,255,.35); }
+    .warmap-legend { display:flex; gap:12px; flex-wrap:wrap; margin:2px 0 12px; font-size:12px; color:var(--muted); }
+    .warmap-regions { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin-bottom:16px; }
+    .region { border:1px solid var(--line); border-radius:12px; padding:10px; background:rgba(0,0,0,.22); }
+    .region .name { font-weight:700; font-size:14px; }
+    .region .ctrl { font-size:12px; margin-top:5px; text-transform:capitalize; }
+    .faction-dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:middle; }
+    .warmap-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:12px; }
+    .frontcard { border:1px solid var(--line); border-radius:14px; padding:14px; background:linear-gradient(180deg, rgba(23,40,31,.9), rgba(13,25,18,.9)); display:flex; flex-direction:column; gap:8px; }
+    .frontcard.recommended { border-color:rgba(199,166,255,.55); }
+    .frontcard.chosen { border-color:var(--good); box-shadow:0 0 0 1px var(--good) inset; }
+    .frontcard .ttl { font-weight:750; font-size:15px; }
+    .frontcard .desc { color:var(--muted); font-size:12px; margin-top:-2px; }
+    .frontcard .obj { font-size:13px; }
+    .frontcard .note { font-size:12px; color:var(--warn); }
+    .frontcard .note.risk { color:var(--bad); }
+    .badge { font-size:11px; padding:2px 8px; border-radius:999px; border:1px solid var(--line); color:var(--muted); }
   </style>
 </head>
 <body>
@@ -158,6 +176,12 @@
         <div style="margin-top:10px" class="bar"><span id="progressBar"></span></div>
         <div id="resultProgress" class="muted" style="margin-top:8px"></div>
       </div>
+    </section>
+
+    <section class="panel" id="warMapPanel" style="display:none">
+      <h2>War Map <span class="muted" style="font-size:14px">&mdash; Null Mercs vs Armada, Cortex the accent</span></h2>
+      <div class="warmap-legend" id="warMapLegend"></div>
+      <div id="warMapBody" class="muted">Surveying the front...</div>
     </section>
 
     <section class="grid cards">
@@ -231,8 +255,81 @@ async function refresh(){
     const s = await getJSON('/api/status');
     statusCache = s;
     render(s);
+    renderWarMap(s);
   } catch(e) {
     $('console').textContent = 'Could not reach companion server. Launch LAUNCH_VERDANCE_CONSOLE.bat again.\n' + e.message;
+  }
+}
+const FACTION_COLOR = {
+  ashwalkers:'var(--good)', armada:'var(--blue)', cortex:'var(--bad)',
+  nullmercs:'var(--violet)', wild:'var(--warn)', contested:'var(--muted)', neutral:'var(--line)'
+};
+function factionColor(f){ return FACTION_COLOR[f] || 'var(--muted)'; }
+const WARMAP_HIDDEN_PHASES = ['preflight','building','in-game','extracting','build-next'];
+async function renderWarMap(s){
+  const panel = $('warMapPanel');
+  if(!panel) return;
+  const phase = s.session && s.session.phase;
+  if(WARMAP_HIDDEN_PHASES.includes(phase)){ panel.style.display = 'none'; return; }
+  panel.style.display = '';
+  let wm = null;
+  try {
+    const payload = await getJSON('/api/file?name=warMap');
+    if(payload && payload.ok && payload.text){ wm = JSON.parse(payload.text); }
+  } catch(e) {}
+  if(!wm){ $('warMapBody').innerHTML = '<p class="muted">No war map yet. Run <b>Advance v1 Only</b> once to survey the front.</p>'; return; }
+  const legendFactions = ['ashwalkers','armada','cortex','nullmercs','wild','contested'];
+  $('warMapLegend').innerHTML = legendFactions.map(f =>
+    `<span><span class="faction-dot" style="background:${factionColor(f)}"></span>${esc(f)}</span>`).join('');
+  const regions = (wm.regions||[]).map(r => {
+    const col = factionColor(r.control);
+    return `<div class="region"><div class="name">${esc(r.displayName)}</div>
+      <div class="ctrl"><span class="faction-dot" style="background:${col}"></span>${esc(r.control)}</div>
+      <div class="muted" style="font-size:11px;margin-top:4px">threat: ${esc(r.threatBand)}</div></div>`;
+  }).join('');
+  const pending = (wm.pendingChoice && wm.pendingChoice.mapId) || null;
+  const cards = (wm.candidates||[]).map(c => {
+    const chosen = pending && pending === c.mapId;
+    const cls = 'frontcard' + (c.recommended?' recommended':'') + (chosen?' chosen':'');
+    const badges = [];
+    if(c.recommended) badges.push('<span class="badge" style="color:var(--violet);border-color:rgba(199,166,255,.5)">spine</span>');
+    if(chosen) badges.push('<span class="badge" style="color:var(--good);border-color:rgba(124,255,156,.5)">chosen</span>');
+    const obj = (c.objective && (c.objective.label || c.objective.kind)) || '?';
+    return `<div class="${cls}">
+      <div class="ttl">${esc(c.displayName)} ${badges.join(' ')}</div>
+      <div class="desc">${esc(c.descriptor||'')}</div>
+      <div class="obj"><b>Objective:</b> ${esc(obj)}</div>
+      <div><span class="badge">threat: ${esc(c.threatBand)}</span>${c.dominantEnemy?` <span class="badge">${esc(c.dominantEnemy)}</span>`:''}</div>
+      <div class="note${c.atRisk?' risk':''}">${esc(c.consequenceIfIgnored||'')}</div>
+      <button class="primary" onclick="chooseFront('${esc(c.mapId)}','${esc(c.deploymentZoneId)}','${esc(c.displayName)}')">Commit to this front</button>
+    </div>`;
+  }).join('');
+  const reading = (wm.worldReading || []);
+  const readingHtml = reading.length
+    ? `<div style="margin:2px 0 14px;padding:10px 12px;border-left:2px solid var(--violet);background:rgba(199,166,255,.06)">` +
+      reading.map(r => `<div style="color:var(--violet)">${esc(r)}</div>`).join('') + `</div>`
+    : '';
+  $('warMapBody').innerHTML =
+    readingHtml +
+    `<div class="warmap-regions">${regions}</div>
+     <h3 style="margin:6px 0 10px">Choose your next front</h3>
+     <div class="warmap-cards">${cards}</div>`;
+}
+async function chooseFront(mapId, zoneId, name){
+  if(busy) return;
+  busy = true;
+  $('console').textContent = 'Committing to ' + name + '...';
+  try {
+    const data = await getJSON('/api/setPlayerMapChoice', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({mapId:mapId, deploymentZoneId:zoneId})
+    });
+    setConsole('Choose Front: ' + name, data);
+  } catch(e) {
+    setConsole('Choose Front', {ok:false, stderr:e.message});
+  } finally {
+    busy = false;
+    await refresh();
   }
 }
 const SESSION_PHASES = ['preflight','building','in-game','extracting','build-next','next-ready'];

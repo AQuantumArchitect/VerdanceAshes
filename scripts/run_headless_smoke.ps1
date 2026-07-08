@@ -43,6 +43,7 @@ $startScript = @"
   [MODOPTIONS]
   {
     deathmode=neverend;
+    experimentallegionfaction=1;
     va_campaign=1;
     va_headless_autostart=1;
     va_headless_fastwin=1;

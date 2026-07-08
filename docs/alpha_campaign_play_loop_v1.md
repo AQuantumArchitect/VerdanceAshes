@@ -68,6 +68,29 @@ The gadget emits `VA_RESULT_JSON_*` markers with a 4-part idempotency key
 - `scripts/verify_campaign_arc.ps1 -Missions N` chains N missions headlessly
   (state snapshot/restore) and writes `reports/arc_verify.latest.json`.
 
+## World conflict (v4)
+
+The standing war of the world is **Null Mercs vs Armada**. Armada is the default
+garrison power on every faction map; the Null Mercs (outsider Legion-chassis
+scrap-line crews in ash-grey null colors) hold **one foothold per map** and press
+the Armada approaches on their own contract. **Cortex is an accent only** — it
+survives as contractor pockets around explicitly Cortex-named zones (the dealer
+relay on eye_of_horus) and as Cortex-built objective centerpieces that an Armada
+garrison protects (the synth works). The player's clans (Ashwalkers) thread
+through that war.
+
+- Faction control is assigned in the story engine (`ensure_zone_memory`): Armada
+  on defender/fortress zones, Cortex only on `cortex_*`/`*CORTEX*` zones, the
+  first flank/edge zone becomes the single Null Merc foothold, everything else
+  neutral. Offscreen, merc footholds grow military pressure fast but root slowly.
+- Reputation drives the alliance: `nullmercs ≥ 40` → the merc foothold is **allied
+  to the player** (start-script `Ally` lines); below that they merely share a
+  target. Allied mercs tip the field, so the Armada garrison scales ×1.1 to
+  compensate. Ketha's briefing carries a war line keyed to the same threshold.
+- Every team carries an explicit `faction` tag through the seed into telemetry,
+  so post-mission zone-control attribution reads the world war, not the chassis
+  (mercs on Legion units would otherwise misread as Ashwalkers).
+
 ## Force design (v3)
 
 Camps are assembled from faction rings around an **objective centerpiece** —
@@ -76,17 +99,19 @@ strikes into a defended camp, not base-wipes:
 
 | objective | centerpiece | camp |
 |---|---|---|
-| economy_disrupt | fusion + adv solars + converter farm + storage | Cortex synth works |
-| strike_relay | targeting facility + adv radar + fusion | Cortex relay installation |
+| economy_disrupt | Cortex fusion + adv solars + converter farm (contractor pocket) | Armada garrison protecting Cortex synth works |
+| strike_relay | targeting facility + adv radar + fusion | Cortex dealer relay (the one Cortex-primary map) |
 | destroy_key_structure | LRPC + fusion + fortification walls | Armada bastion wing |
-| seize_lane / gate_control | none (zone hold) | pure garrison, no eco |
-| hive_clear_or_bypass | raptor hives (the hive IS the objective team) | swarm + spore turrets |
+| seize_lane / gate_control | none (zone hold) | pure Armada garrison, no eco |
+| hive_clear_or_bypass | raptor hives (the hive IS the objective team) | swarm + spore turrets (no mercs) |
 | choose_target_then_extract | two rival camps (Armada post / Cortex works) on separate allyteams | raptor swarm between them |
 
-Perimeter turrets/walls face the player's approach; patrols screen the camp on
-destruction missions and hold the zone on presence missions. Enemy commanders
-keep building, so camps develop organically over the mission. Missions 1–2 run
-an onboarding ramp (0.7×/0.85×).
+Every faction-war mission also spawns a **Null Merc foothold** on a flank
+perpendicular to the deploy→target axis (kept clear of the player start and the
+wild center). Perimeter turrets/walls face the player's approach; patrols screen
+the camp on destruction missions and hold the zone on presence missions. Enemy
+commanders keep building, so camps develop organically over the mission. Missions
+1–2 run an onboarding ramp (0.7×/0.85×).
 
 ## Balance methodology
 
