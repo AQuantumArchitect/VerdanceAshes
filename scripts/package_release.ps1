@@ -32,8 +32,15 @@ function Copy-Into {
 }
 
 # ---- docs ---------------------------------------------------------------
-foreach ($doc in @("README.md", "INSTALL.md", "PLAYTESTING.md")) {
-  Copy-Into (Join-Path $Workspace "docs\release\$doc") (Join-Path $staging $doc)
+foreach ($doc in @("README.md", "INSTALL.md", "PLAYTESTING.md", "START_HERE.txt")) {
+  $src = Join-Path $Workspace "docs\release\$doc"
+  if (Test-Path $src) {
+    Copy-Into $src (Join-Path $staging $doc)
+  }
+}
+# Top-level START_HERE for zip browsers that never open docs/
+if (Test-Path (Join-Path $Workspace "docs\release\START_HERE.txt")) {
+  Copy-Into (Join-Path $Workspace "docs\release\START_HERE.txt") (Join-Path $staging "START_HERE.txt")
 }
 
 # ---- mod archive (exclude per-mission generated seeds; keep the fallback) ----
@@ -66,6 +73,14 @@ Copy-Into (Join-Path $Workspace "data\zone_maps\authored") (Join-Path $ws "data\
 Copy-Into (Join-Path $Workspace "data\scenarios\authored") (Join-Path $ws "data\scenarios\authored")
 Copy-Into (Join-Path $Workspace "data\story\ketha_voice.json") (Join-Path $ws "data\story\ketha_voice.json")
 Copy-Into (Join-Path $Workspace "verdance_config.template.json") (Join-Path $ws "verdance_config.template.json")
+# Zone graph + world atlas for adjacent continues / minimap (WO-020a / L1)
+$zoneGraph = Join-Path $Workspace "data\zone_maps\world_zone_graph.v1.json"
+if (Test-Path $zoneGraph) {
+  Copy-Into $zoneGraph (Join-Path $ws "data\zone_maps\world_zone_graph.v1.json")
+}
+Get-ChildItem (Join-Path $Workspace "data\zone_maps") -Filter "*.json" -ErrorAction SilentlyContinue |
+  Where-Object { $_.Name -match 'adjacency|zone_map' } |
+  ForEach-Object { Copy-Into $_.FullName (Join-Path $ws "data\zone_maps\$($_.Name)") }
 
 # ---- empty runtime dirs ---------------------------------------------------
 foreach ($d in @("state", "inbox", "outbox", "ledger", "playable_runs", "headless_runs", "data\scenarios\generated", "reports")) {
@@ -87,7 +102,19 @@ pause
 @echo off
 powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\verdance_console_server.ps1"
 '@ | Set-Content -Encoding ASCII (Join-Path $ws "LAUNCH_CONSOLE.bat")
-Copy-Into (Join-Path $Workspace "RESET_CAMPAIGN.bat") (Join-Path $ws "RESET_CAMPAIGN.bat")
+$resetSrc = Join-Path $Workspace "RESET_CAMPAIGN.bat"
+if (Test-Path $resetSrc) {
+  Copy-Into $resetSrc (Join-Path $ws "RESET_CAMPAIGN.bat")
+} else {
+  @'
+@echo off
+echo Resetting campaign state...
+if exist "%~dp0state" rmdir /s /q "%~dp0state"
+mkdir "%~dp0state" 2>nul
+echo Done. Run PLAY_SESSION.bat for a fresh start.
+pause
+'@ | Set-Content -Encoding ASCII (Join-Path $ws "RESET_CAMPAIGN.bat")
+}
 
 # ---- embedded python ------------------------------------------------------
 if (-not $SkipPython) {

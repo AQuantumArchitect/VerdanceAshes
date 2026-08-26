@@ -78,15 +78,28 @@ function Get-BAREngineDir {
 
 function Get-VerdancePython {
   param([string]$Workspace)
-  if ($env:VERDANCE_PYTHON -and (Test-Path $env:VERDANCE_PYTHON)) { return $env:VERDANCE_PYTHON }
+  # Prefer explicit env (PLAY/_env.bat sets VERDANCE_PY)
+  foreach ($envName in @("VERDANCE_PY", "VERDANCE_PYTHON")) {
+    $v = [Environment]::GetEnvironmentVariable($envName)
+    if ($v -and (Test-Path $v)) { return $v }
+  }
   if ($Workspace) {
     $embedded = Join-Path $Workspace "runtime\python\python.exe"
     if (Test-Path $embedded) { return $embedded }
   }
-  foreach ($candidate in @("python", "py")) {
-    $cmd = Get-Command $candidate -ErrorAction SilentlyContinue
-    if ($cmd) { return $cmd.Source }
+  # Prefer full python.exe over WindowsApps stub when possible
+  $cmd = Get-Command python -ErrorAction SilentlyContinue
+  if ($cmd -and $cmd.Source -and ($cmd.Source -notmatch 'WindowsApps')) {
+    return $cmd.Source
   }
+  $pyLauncher = Get-Command py -ErrorAction SilentlyContinue
+  if ($pyLauncher) {
+    try {
+      $exe = & py -3 -c "import sys; print(sys.executable)" 2>$null
+      if ($exe -and (Test-Path $exe.Trim())) { return $exe.Trim() }
+    } catch {}
+  }
+  if ($cmd) { return $cmd.Source }
   throw "No Python interpreter found. Install Python 3 or place an embeddable Python at runtime\python\."
 }
 

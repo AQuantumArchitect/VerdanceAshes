@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "verdance-cloud-bar/1.1",
+  "notes": "AWS Windows EC2 for BAR living-shell bakes. Copy to cloud_config.json (gitignored). Fill host (public IPv4 or MagicDNS after Tailscale), privateKeyPath (.pem or ed25519). Stop the instance when idle.",
+  "provider": "aws",
+  "aws": {
+    "region": "us-east-1",
+    "instanceName": "verdance-bar-bake",
+    "instanceId": "",
+    "instanceType": "t3.xlarge",
+    "yurtNode": "aws"
+  },
+  "host": "YOUR.EC2.PUBLIC.IP",
+  "port": 22,
+  "user": "Administrator",
+  "auth": {
+    "method": "key",
+    "privateKeyPath": "C:\\Users\\Luke Spooner\\.ssh\\verdance_bar_aws",
+    "passwordEnv": "VERDANCE_CLOUD_SSH_PASSWORD"
+  },
+  "remoteOs": "windows",
+  "remoteRoot": "C:\\verdance_cloud",
+  "remoteBarData": "C:\\verdance_cloud\\bar_data",
+  "remoteEngineRel": "engine\\recoil_2025.06.24",
+  "remoteJobs": "C:\\verdance_cloud\\jobs",
+  "remoteResults": "C:\\verdance_cloud\\results",
+  "localBundleRoot": "headless_runs\\cloud",
+  "engineTag": "recoil_2025.06.24",
+  "sync": {
+    "engine": true,
+    "sevenMaps": true,
+    "barSdd": true,
+    "verdanceMod": true,
+    "force": false
+  },
+  "bake": {
+    "mapOrder": [
+      "the_rock_jungle",
+      "koom_valley",
+      "all_that_simmers",
+      "eye_of_horus",
+      "greenest_fields",
+      "tabula",
+      "ancient_bastion"
+    ],
+    "defaultTimeoutSeconds": 0,
+    "maxParallel": 1
+  },
+  "headlessSettings": {
+    "UnitIconsAsUI": 0,
+    "UnitIconDist": 99999,
+    "MinimapIconScale": 0.1,
+    "LuaUI": 0
+  }
+}

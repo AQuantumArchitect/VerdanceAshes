@@ -1,0 +1,13 @@
+{
+  "schema": "organic-difficulty/1.0",
+  "at": "2026-08-14T02:47:45+00:00",
+  "difficulty": 2.2,
+  "reason": "simple_saturated_bump",
+  "signals": {
+    "prev": 2.2,
+    "simpleWin": 1.0,
+    "barbWin": 0.5
+  },
+  "floor": 1.0,
+  "cap": 2.2
+}

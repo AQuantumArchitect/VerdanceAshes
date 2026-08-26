@@ -1,0 +1,1175 @@
+{
+  "schemaVersion": "verdance-hub-state/1.0",
+  "campaignId": "verdance_ashes",
+  "missionNumber": 1,
+  "arc": {
+    "id": 1,
+    "title": "First Scar",
+    "maxCaptureMarks": 1,
+    "maxMissionsInArc": 5
+  },
+  "pathSignal": "B",
+  "seed": 28,
+  "generatedAt": "2026-08-02T09:12:28Z",
+  "tagline": "Home is the Rock Jungle. Raid for Tenebrium. Clear the wilds when you can scale.",
+  "sessionMode": "same_map",
+  "sessionHomeMap": "the_rock_jungle",
+  "theater": {
+    "mapId": "the_rock_jungle",
+    "zones": [
+      {
+        "zoneId": "RJ_CENTRAL_LAGOON_MAZE",
+        "label": "Central Lagoon Maze",
+        "control": "wild",
+        "confidence": "estimated",
+        "openTarget": false,
+        "claimed": false,
+        "preferred": false,
+        "hazard": 0.0
+      },
+      {
+        "zoneId": "RJ_NW_JUNGLE_SHELF",
+        "label": "Northwest Jungle Shelf",
+        "control": "ashwalkers",
+        "confidence": "estimated",
+        "openTarget": false,
+        "claimed": false,
+        "preferred": false,
+        "hazard": 0.0
+      },
+      {
+        "zoneId": "RJ_SE_JUNGLE_SHELF",
+        "label": "Southeast Jungle Shelf",
+        "control": "armada",
+        "confidence": "estimated",
+        "openTarget": false,
+        "claimed": false,
+        "preferred": false,
+        "hazard": 0.0
+      },
+      {
+        "zoneId": "RJ_WESTERN_CAUSEWAY",
+        "label": "Western Causeway",
+        "control": "nullmercs",
+        "confidence": "estimated",
+        "openTarget": false,
+        "claimed": false,
+        "preferred": false,
+        "hazard": 0.0
+      },
+      {
+        "zoneId": "RJ_EASTERN_CAUSEWAY",
+        "label": "Eastern Causeway",
+        "control": "neutral",
+        "confidence": "estimated",
+        "openTarget": false,
+        "claimed": false,
+        "preferred": false,
+        "hazard": 0.0
+      },
+      {
+        "zoneId": "RJ_NORTHERN_ISLAND_CHAIN",
+        "label": "Northern Island Chain",
+        "control": "neutral",
+        "confidence": "estimated",
+        "openTarget": false,
+        "claimed": false,
+        "preferred": false,
+        "hazard": 0.0
+      },
+      {
+        "zoneId": "RJ_SOUTHERN_ISLAND_CHAIN",
+        "label": "Southern Island Chain",
+        "control": "neutral",
+        "confidence": "estimated",
+        "openTarget": false,
+        "claimed": false,
+        "preferred": false,
+        "hazard": 0.0
+      }
+    ],
+    "openTargets": [],
+    "intelByZone": {
+      "RJ_CENTRAL_LAGOON_MAZE": {
+        "zoneId": "RJ_CENTRAL_LAGOON_MAZE",
+        "label": "Central Lagoon Maze",
+        "control": "wild",
+        "confidence": "estimated",
+        "openTarget": false,
+        "claimed": false,
+        "preferred": false,
+        "hazard": 0.0
+      },
+      "RJ_NW_JUNGLE_SHELF": {
+        "zoneId": "RJ_NW_JUNGLE_SHELF",
+        "label": "Northwest Jungle Shelf",
+        "control": "ashwalkers",
+        "confidence": "estimated",
+        "openTarget": false,
+        "claimed": false,
+        "preferred": false,
+        "hazard": 0.0
+      },
+      "RJ_SE_JUNGLE_SHELF": {
+        "zoneId": "RJ_SE_JUNGLE_SHELF",
+        "label": "Southeast Jungle Shelf",
+        "control": "armada",
+        "confidence": "estimated",
+        "openTarget": false,
+        "claimed": false,
+        "preferred": false,
+        "hazard": 0.0
+      },
+      "RJ_WESTERN_CAUSEWAY": {
+        "zoneId": "RJ_WESTERN_CAUSEWAY",
+        "label": "Western Causeway",
+        "control": "nullmercs",
+        "confidence": "estimated",
+        "openTarget": false,
+        "claimed": false,
+        "preferred": false,
+        "hazard": 0.0
+      },
+      "RJ_EASTERN_CAUSEWAY": {
+        "zoneId": "RJ_EASTERN_CAUSEWAY",
+        "label": "Eastern Causeway",
+        "control": "neutral",
+        "confidence": "estimated",
+        "openTarget": false,
+        "claimed": false,
+        "preferred": false,
+        "hazard": 0.0
+      },
+      "RJ_NORTHERN_ISLAND_CHAIN": {
+        "zoneId": "RJ_NORTHERN_ISLAND_CHAIN",
+        "label": "Northern Island Chain",
+        "control": "neutral",
+        "confidence": "estimated",
+        "openTarget": false,
+        "claimed": false,
+        "preferred": false,
+        "hazard": 0.0
+      },
+      "RJ_SOUTHERN_ISLAND_CHAIN": {
+        "zoneId": "RJ_SOUTHERN_ISLAND_CHAIN",
+        "label": "Southern Island Chain",
+        "control": "neutral",
+        "confidence": "estimated",
+        "openTarget": false,
+        "claimed": false,
+        "preferred": false,
+        "hazard": 0.0
+      }
+    }
+  },
+  "homeCamp": {
+    "level": 0,
+    "mapId": "the_rock_jungle",
+    "label": "Jungle shelf camp"
+  },
+  "flags": {
+    "mode": "hub",
+    "deployStub": false,
+    "hubHostHint": "app/bin/HUB_HOST.bat \u2192 http://127.0.0.1:8770/",
+    "source": "apply_result_to_hub_v1",
+    "shopSurface": true,
+    "deployCompileLaunch": true,
+    "resultPull": true,
+    "densityMatrix": true,
+    "campaignRho": true,
+    "modeASameMap": true,
+    "captureNodeClaims": true,
+    "noFreeTnbMint": true,
+    "livePurchase": true
+  },
+  "homeEval": {
+    "homeClearReady": false,
+    "homeCleared": false,
+    "keyHeld": 1,
+    "centerControl": "wild",
+    "tenebrium": 0,
+    "campLevel": 0
+  },
+  "occupationModel": "living_shell",
+  "captureMode": "clear_hold_shell",
+  "freeTnbMint": false,
+  "captureContracts": [
+    {
+      "schemaVersion": "verdance-hub-capture-contract/1.0",
+      "contractId": "capture:greenest_fields:GF_CENTRAL_OPEN_GRASSLAND",
+      "mapId": "greenest_fields",
+      "targetZoneId": "GF_CENTRAL_OPEN_GRASSLAND",
+      "fromZoneIds": [
+        "GF_NORTH_DESERT_EDGE",
+        "GF_SE_STAGING"
+      ],
+      "label": "Central Open Grassland",
+      "objectiveArchetype": "eco_raid",
+      "captureMode": "raid_scar",
+      "occupationModel": "living_shell",
+      "sessionMode": "same_map",
+      "freeTnbMint": false,
+      "clearFraction": 0.6,
+      "holdUnderRegrow": true,
+      "emptyGrassClaim": false,
+      "score": 1.944,
+      "against": "armada",
+      "patron": "nullmercs",
+      "sortie": {
+        "schemaVersion": "verdance-sortie-order/1.0",
+        "mapId": "greenest_fields",
+        "targetZoneId": "GF_CENTRAL_OPEN_GRASSLAND",
+        "fromZoneIds": [
+          "GF_NORTH_DESERT_EDGE",
+          "GF_SE_STAGING"
+        ],
+        "patron": "nullmercs",
+        "against": "armada",
+        "objectiveArchetype": "eco_raid",
+        "captureMode": null,
+        "freeTnbMint": false,
+        "occupationModel": "living_shell",
+        "sessionMode": "same_map",
+        "label": "Central Open Grassland",
+        "score": 1.944,
+        "source": "quest_generator_v1",
+        "graphEdgeKind": "same_map",
+        "captureZoneIds": [
+          "GF_CENTRAL_OPEN_GRASSLAND"
+        ]
+      },
+      "source": "capture_node_claims+quest_gen"
+    },
+    {
+      "schemaVersion": "verdance-hub-capture-contract/1.0",
+      "contractId": "capture:greenest_fields:GF_SOUTH_DESERT_EDGE",
+      "mapId": "greenest_fields",
+      "targetZoneId": "GF_SOUTH_DESERT_EDGE",
+      "fromZoneIds": [
+        "GF_SE_STAGING"
+      ],
+      "label": "South Desert Edge",
+      "objectiveArchetype": "eco_raid",
+      "captureMode": "raid_scar",
+      "occupationModel": "living_shell",
+      "sessionMode": "same_map",
+      "freeTnbMint": false,
+      "clearFraction": 0.6,
+      "holdUnderRegrow": true,
+      "emptyGrassClaim": false,
+      "score": 1.944,
+      "against": "armada",
+      "patron": "nullmercs",
+      "sortie": {
+        "schemaVersion": "verdance-sortie-order/1.0",
+        "mapId": "greenest_fields",
+        "targetZoneId": "GF_SOUTH_DESERT_EDGE",
+        "fromZoneIds": [
+          "GF_SE_STAGING"
+        ],
+        "patron": "nullmercs",
+        "against": "armada",
+        "objectiveArchetype": "eco_raid",
+        "captureMode": null,
+        "freeTnbMint": false,
+        "occupationModel": "living_shell",
+        "sessionMode": "same_map",
+        "label": "South Desert Edge",
+        "score": 1.944,
+        "source": "quest_generator_v1",
+        "graphEdgeKind": "same_map",
+        "captureZoneIds": [
+          "GF_SOUTH_DESERT_EDGE"
+        ]
+      },
+      "source": "capture_node_claims+quest_gen"
+    },
+    {
+      "schemaVersion": "verdance-hub-capture-contract/1.0",
+      "contractId": "capture:all_that_simmers:ATS_SW_NE_SWAMP_LANE",
+      "mapId": "all_that_simmers",
+      "targetZoneId": "ATS_SW_NE_SWAMP_LANE",
+      "fromZoneIds": [
+        "ATS_NW_CANOPY_START",
+        "ATS_NW_CENTER_APPROACH"
+      ],
+      "label": "Southwest-to-Northeast Swamp Lane",
+      "objectiveArchetype": "seize_lane",
+      "captureMode": "clear_hold_shell",
+      "occupationModel": "living_shell",
+      "sessionMode": "same_map",
+      "freeTnbMint": false,
+      "clearFraction": 0.6,
+      "holdUnderRegrow": true,
+      "emptyGrassClaim": false,
+      "score": 1.89,
+      "against": "armada",
+      "patron": "nullmercs",
+      "sortie": {
+        "schemaVersion": "verdance-sortie-order/1.0",
+        "mapId": "all_that_simmers",
+        "targetZoneId": "ATS_SW_NE_SWAMP_LANE",
+        "fromZoneIds": [
+          "ATS_NW_CANOPY_START",
+          "ATS_NW_CENTER_APPROACH"
+        ],
+        "patron": "nullmercs",
+        "against": "armada",
+        "objectiveArchetype": "seize_lane",
+        "captureMode": "clear_hold_shell",
+        "freeTnbMint": false,
+        "occupationModel": "living_shell",
+        "sessionMode": "same_map",
+        "label": "Southwest-to-Northeast Swamp Lane",
+        "score": 1.89,
+        "source": "quest_generator_v1",
+        "graphEdgeKind": "same_map",
+        "captureZoneIds": [
+          "ATS_SW_NE_SWAMP_LANE"
+        ],
+        "captureRules": {
+          "model": "clear_hold_shell",
+          "clearFraction": 0.6,
+          "holdUnderRegrow": true,
+          "emptyGrassClaim": false,
+          "freeTnbMint": false
+        }
+      },
+      "source": "capture_node_claims+quest_gen"
+    },
+    {
+      "schemaVersion": "verdance-hub-capture-contract/1.0",
+      "contractId": "capture:ancient_bastion:AB_CENTRAL_KILLFIELD",
+      "mapId": "ancient_bastion",
+      "targetZoneId": "AB_CENTRAL_KILLFIELD",
+      "fromZoneIds": [
+        "AB_NORTHERN_FLANKING_LEDGE"
+      ],
+      "label": "Central Killfield",
+      "objectiveArchetype": "seize_lane",
+      "captureMode": "clear_hold_shell",
+      "occupationModel": "living_shell",
+      "sessionMode": "same_map",
+      "freeTnbMint": false,
+      "clearFraction": 0.6,
+      "holdUnderRegrow": true,
+      "emptyGrassClaim": false,
+      "score": 1.89,
+      "against": "armada",
+      "patron": "nullmercs",
+      "sortie": {
+        "schemaVersion": "verdance-sortie-order/1.0",
+        "mapId": "ancient_bastion",
+        "targetZoneId": "AB_CENTRAL_KILLFIELD",
+        "fromZoneIds": [
+          "AB_NORTHERN_FLANKING_LEDGE"
+        ],
+        "patron": "nullmercs",
+        "against": "armada",
+        "objectiveArchetype": "seize_lane",
+        "captureMode": "clear_hold_shell",
+        "freeTnbMint": false,
+        "occupationModel": "living_shell",
+        "sessionMode": "same_map",
+        "label": "Central Killfield",
+        "score": 1.89,
+        "source": "quest_generator_v1",
+        "graphEdgeKind": "same_map",
+        "captureZoneIds": [
+          "AB_CENTRAL_KILLFIELD"
+        ],
+        "captureRules": {
+          "model": "clear_hold_shell",
+          "clearFraction": 0.6,
+          "holdUnderRegrow": true,
+          "emptyGrassClaim": false,
+          "freeTnbMint": false
+        }
+      },
+      "source": "capture_node_claims+quest_gen"
+    },
+    {
+      "schemaVersion": "verdance-hub-capture-contract/1.0",
+      "contractId": "capture:ancient_bastion:AB_CITADEL_GATEFIELD",
+      "mapId": "ancient_bastion",
+      "targetZoneId": "AB_CITADEL_GATEFIELD",
+      "fromZoneIds": [
+        "AB_NORTHERN_FLANKING_LEDGE",
+        "AB_WESTERN_MUSTER_GROUNDS"
+      ],
+      "label": "Citadel Gatefield",
+      "objectiveArchetype": "seize_lane",
+      "captureMode": "clear_hold_shell",
+      "occupationModel": "living_shell",
+      "sessionMode": "same_map",
+      "freeTnbMint": false,
+      "clearFraction": 0.6,
+      "holdUnderRegrow": true,
+      "emptyGrassClaim": false,
+      "score": 1.89,
+      "against": "armada",
+      "patron": "nullmercs",
+      "sortie": {
+        "schemaVersion": "verdance-sortie-order/1.0",
+        "mapId": "ancient_bastion",
+        "targetZoneId": "AB_CITADEL_GATEFIELD",
+        "fromZoneIds": [
+          "AB_NORTHERN_FLANKING_LEDGE",
+          "AB_WESTERN_MUSTER_GROUNDS"
+        ],
+        "patron": "nullmercs",
+        "against": "armada",
+        "objectiveArchetype": "seize_lane",
+        "captureMode": "clear_hold_shell",
+        "freeTnbMint": false,
+        "occupationModel": "living_shell",
+        "sessionMode": "same_map",
+        "label": "Citadel Gatefield",
+        "score": 1.89,
+        "source": "quest_generator_v1",
+        "graphEdgeKind": "same_map",
+        "captureZoneIds": [
+          "AB_CITADEL_GATEFIELD"
+        ],
+        "captureRules": {
+          "model": "clear_hold_shell",
+          "clearFraction": 0.6,
+          "holdUnderRegrow": true,
+          "emptyGrassClaim": false,
+          "freeTnbMint": false
+        }
+      },
+      "source": "capture_node_claims+quest_gen"
+    },
+    {
+      "schemaVersion": "verdance-hub-capture-contract/1.0",
+      "contractId": "capture:eye_of_horus:EOH_GLASSED_CENTER",
+      "mapId": "eye_of_horus",
+      "targetZoneId": "EOH_GLASSED_CENTER",
+      "fromZoneIds": [
+        "EOH_NW_CRATER_CAMP",
+        "EOH_WESTERN_DEBRIS_LANE"
+      ],
+      "label": "Glassed Center",
+      "objectiveArchetype": "seize_lane",
+      "captureMode": "clear_hold_shell",
+      "occupationModel": "living_shell",
+      "sessionMode": "same_map",
+      "freeTnbMint": false,
+      "clearFraction": 0.6,
+      "holdUnderRegrow": true,
+      "emptyGrassClaim": false,
+      "score": 1.89,
+      "against": "armada",
+      "patron": "nullmercs",
+      "sortie": {
+        "schemaVersion": "verdance-sortie-order/1.0",
+        "mapId": "eye_of_horus",
+        "targetZoneId": "EOH_GLASSED_CENTER",
+        "fromZoneIds": [
+          "EOH_NW_CRATER_CAMP",
+          "EOH_WESTERN_DEBRIS_LANE"
+        ],
+        "patron": "nullmercs",
+        "against": "armada",
+        "objectiveArchetype": "seize_lane",
+        "captureMode": "clear_hold_shell",
+        "freeTnbMint": false,
+        "occupationModel": "living_shell",
+        "sessionMode": "same_map",
+        "label": "Glassed Center",
+        "score": 1.89,
+        "source": "quest_generator_v1",
+        "graphEdgeKind": "same_map",
+        "captureZoneIds": [
+          "EOH_GLASSED_CENTER"
+        ],
+        "captureRules": {
+          "model": "clear_hold_shell",
+          "clearFraction": 0.6,
+          "holdUnderRegrow": true,
+          "emptyGrassClaim": false,
+          "freeTnbMint": false
+        }
+      },
+      "source": "capture_node_claims+quest_gen"
+    }
+  ],
+  "claimedNodes": {
+    "occupationModel": "living_shell",
+    "captureMode": "clear_hold_shell",
+    "freeTnbMint": false,
+    "clearFraction": 0.6,
+    "nodes": [],
+    "count": 0
+  },
+  "nodeClaims": {},
+  "factionBanks": {
+    "armada": 0,
+    "cortex": 2,
+    "nullmercs": 0,
+    "ashwalkers": 0
+  },
+  "tenebrium": 0,
+  "graph": {
+    "q0_armada_cortex": 0.77,
+    "q2_void_structure": 0.15,
+    "q6_contested": 0.85,
+    "q6_independent": 0.24,
+    "q7_resource_scarcity": 0.98,
+    "pathSignalA": 0.0,
+    "pathSignalB": 0.1,
+    "pathSignalC": 0.0
+  },
+  "spectral": {
+    "dominantEigenvalue": 1.255,
+    "energy": 2.99,
+    "participation": 0.622,
+    "spread": 0.51,
+    "factionWeights": {
+      "ashwalkers": 0.2,
+      "armada": 0.35,
+      "nullmercs": 0.2,
+      "neutral": 0.25
+    }
+  },
+  "campaignRho": {
+    "schemaVersion": "verdance-campaign-rho/1.0",
+    "source": "graph_qubits",
+    "axes": {
+      "arm_cor": 0.54,
+      "schism": -0.52,
+      "void_struct": -0.7,
+      "zone_control": 0.7,
+      "tenebrium": -0.96,
+      "phi": 0.0,
+      "path_a": 0.33,
+      "path_b": 0.1,
+      "path_c": 0.33
+    },
+    "packedDiag": [
+      0.23,
+      0.77,
+      0.76,
+      0.24,
+      0.85,
+      0.15,
+      0.15,
+      0.85,
+      0.98,
+      0.02
+    ],
+    "purity": 0.68,
+    "entropy": 0.855,
+    "width": 0.6675,
+    "sessionHomeMap": "the_rock_jungle",
+    "missionNumber": 1
+  },
+  "reputation": {
+    "armada": 18,
+    "cortex": 70,
+    "nullmercs": 48.0,
+    "sev": 50
+  },
+  "companion": {
+    "id": "ketha",
+    "name": "Ketha",
+    "morale": 70,
+    "loyalty": 75,
+    "stress": 12
+  },
+  "bay": {
+    "unlocked": true,
+    "threshold": 40,
+    "label": "Null Mercs mod bay",
+    "hint": "Bay open \u2014 loadouts land in G8."
+  },
+  "commerce": {
+    "schemaVersion": "verdance-hub-commerce/1.0",
+    "resource": {
+      "id": "tenebrium",
+      "label": "Tenebrium",
+      "shortLabel": "Tnb",
+      "lore": "Black-hole distillate metal from BAR lore. Scarce since the Generic Disaster. In Verdance, every unit with build power costs \u22651 Tnb (ceil(buildSpeed/150)); that stake lives on the unit and survives as wreck/heap/debris until reclaimed or truly vaporized. Infinite storage (display number). Q7 is the scarcity qubit. Armada spent their entire stock on a continent of farming decoy commanders (wind/solar/converter farms) \u2014 crisis, bank 0.",
+      "storage": "infinite"
+    },
+    "credits": {
+      "id": "scrap_credits",
+      "label": "Scrap Credits"
+    },
+    "tenebrium": 0,
+    "scrapCredits": 40,
+    "owned": {
+      "punch_of_thugs": {
+        "qty": 1,
+        "loan": true,
+        "unitDef": "corthud",
+        "loanCount": 6,
+        "kind": "loan_package",
+        "source": "starter"
+      }
+    },
+    "upgrades": {},
+    "shop": [
+      {
+        "id": "punch_of_thugs",
+        "label": "Punch of Thugs",
+        "blurb": "Broker loan: a smoking pack of Cortex Thugs (corthud). You start the campaign with them. Return them healthier than you took them \u2014 they soak early repair downtime on purpose.",
+        "kind": "loan_package",
+        "unitDef": "corthud",
+        "count": 6,
+        "tenebriumCost": 0,
+        "creditCost": 0,
+        "builds": false,
+        "loan": true,
+        "starterOwned": true,
+        "available": false,
+        "blockedReason": "already owned",
+        "owned": true,
+        "repMin": {},
+        "arcMin": 1,
+        "tags": [
+          "merc",
+          "loan",
+          "chaff_tank"
+        ],
+        "requires": null
+      },
+      {
+        "id": "crash_of_brutes",
+        "label": "Crash of Brutes",
+        "blurb": "Buy a short column of Cortex Brutes (corraid) for a hammer push. Paid in scrap credits; no Tenebrium \u2014 they do not build.",
+        "kind": "purchase_package",
+        "unitDef": "corraid",
+        "count": 4,
+        "tenebriumCost": 0,
+        "creditCost": 180,
+        "builds": false,
+        "loan": false,
+        "starterOwned": false,
+        "available": false,
+        "blockedReason": "need 180 scrap credits (have 40)",
+        "owned": false,
+        "repMin": {
+          "nullmercs": 35
+        },
+        "arcMin": 1,
+        "tags": [
+          "merc",
+          "armor"
+        ],
+        "requires": null
+      },
+      {
+        "id": "cortex_grunt_fab",
+        "label": "Cortex Grunt Fab (locked)",
+        "blurb": "A little Cortex bot lab locked to print Grunts (corak) on repeat. Arc 1 chaff stream for the mercenary band. Arc 2 can bolt on build power.",
+        "kind": "unit_printer",
+        "unitDef": "corlab",
+        "count": 4,
+        "tenebriumCost": 1,
+        "creditCost": 100,
+        "builds": true,
+        "loan": false,
+        "starterOwned": false,
+        "available": false,
+        "blockedReason": "need 1 Tenebrium (have 0)",
+        "owned": false,
+        "repMin": {
+          "cortex": 20
+        },
+        "arcMin": 1,
+        "tags": [
+          "fab",
+          "stream",
+          "cortex"
+        ],
+        "requires": null
+      },
+      {
+        "id": "grunt_fab_build_power",
+        "label": "Grunt Fab Build Power",
+        "blurb": "Arc 2+: park nanos on the locked fab and thicken the metal/energy trickle so the grunt stream keeps up with tempo missions.",
+        "kind": "printer_upgrade",
+        "unitDef": null,
+        "count": null,
+        "tenebriumCost": 1,
+        "creditCost": 75,
+        "builds": true,
+        "loan": false,
+        "starterOwned": false,
+        "available": false,
+        "blockedReason": "requires cortex_grunt_fab",
+        "owned": false,
+        "repMin": {},
+        "arcMin": 2,
+        "tags": [
+          "fab",
+          "upgrade",
+          "arc2"
+        ],
+        "requires": "cortex_grunt_fab"
+      },
+      {
+        "id": "armada_constructor",
+        "label": "Armada Constructor",
+        "blurb": "High Armada reputation opens their construction bots for hire. Costs Tenebrium \u2014 you are buying the right to *build*.",
+        "kind": "constructor",
+        "unitDef": "armck",
+        "count": 1,
+        "tenebriumCost": 1,
+        "creditCost": 90,
+        "builds": true,
+        "loan": false,
+        "starterOwned": false,
+        "available": false,
+        "blockedReason": "need armada rep \u2265 60 (have 18)",
+        "owned": false,
+        "repMin": {
+          "armada": 60
+        },
+        "arcMin": 1,
+        "tags": [
+          "constructor",
+          "armada"
+        ],
+        "requires": null
+      },
+      {
+        "id": "cortex_constructor",
+        "label": "Cortex Constructor",
+        "blurb": "High Cortex reputation opens their construction bots for hire. Costs Tenebrium.",
+        "kind": "constructor",
+        "unitDef": "corck",
+        "count": 1,
+        "tenebriumCost": 1,
+        "creditCost": 90,
+        "builds": true,
+        "loan": false,
+        "starterOwned": false,
+        "available": false,
+        "blockedReason": "need 1 Tenebrium (have 0)",
+        "owned": false,
+        "repMin": {
+          "cortex": 60
+        },
+        "arcMin": 1,
+        "tags": [
+          "constructor",
+          "cortex"
+        ],
+        "requires": null
+      },
+      {
+        "id": "wheelie_tech_spoke",
+        "label": "Contract: Spoke (Wheelie Tech)",
+        "blurb": "Null Merc scout specialist. Spoke rides a Wheelie and banks XP from every scout that dies \u2014 new Wheelies mint with that floor. Not a default ace; unlocks when the bay trusts you.",
+        "kind": "hero_contract",
+        "unitDef": "legscout",
+        "count": null,
+        "tenebriumCost": 0,
+        "creditCost": 120,
+        "builds": false,
+        "loan": false,
+        "starterOwned": false,
+        "available": false,
+        "blockedReason": "need nullmercs rep \u2265 55 (have 48)",
+        "owned": false,
+        "repMin": {
+          "nullmercs": 55
+        },
+        "arcMin": 1,
+        "tags": [
+          "hero",
+          "scout",
+          "wheelie",
+          "nullmercs",
+          "unlock"
+        ],
+        "requires": null
+      }
+    ],
+    "deployKit": [
+      {
+        "listingId": "punch_of_thugs",
+        "kind": "loan_package",
+        "unitDef": "corthud",
+        "count": 6,
+        "loan": true,
+        "label": "Punch of Thugs"
+      }
+    ],
+    "ledger": [],
+    "notes": "Tenebrium is black-hole metal (scarce since the Generic Disaster). Anything that builds costs \u22651. Ashwalkers/Null Mercs start at 0.",
+    "catalogSchema": "verdance-commerce-catalog/1.0",
+    "armadaCrisis": true,
+    "startingBalanceHint": {
+      "ashwalkers": 0,
+      "nullmercs": 0,
+      "armada": 0,
+      "cortex": 2
+    }
+  },
+  "aces": [
+    {
+      "id": "vane",
+      "name": "Ash-Captain Vane",
+      "faction": "ashwalkers",
+      "unitDef": "legbal",
+      "level": 1,
+      "rank": "Runner",
+      "campaignXp": 1480.0,
+      "wounds": 0,
+      "status": "active",
+      "scars": [],
+      "deployable": true,
+      "bonds": {
+        "ketha": 10
+      },
+      "loadout": {
+        "modules": [],
+        "bayTier": 0
+      }
+    },
+    {
+      "id": "ketha",
+      "name": "Ketha",
+      "faction": "ashwalkers",
+      "unitDef": "legcen",
+      "level": 1,
+      "rank": "Runner",
+      "campaignXp": 1120.0,
+      "wounds": 0,
+      "status": "active",
+      "scars": [],
+      "deployable": true,
+      "bonds": {
+        "vane": 10
+      },
+      "loadout": {
+        "modules": [],
+        "bayTier": 0
+      }
+    }
+  ],
+  "regions": [
+    {
+      "mapId": "greenest_fields",
+      "displayName": "Greenest Fields",
+      "descriptor": "The Synthesized Utopia",
+      "family": "economy",
+      "control": "contested",
+      "dominantEnemy": "armada",
+      "threatBand": "light",
+      "controlCounts": {
+        "ashwalkers": 1,
+        "armada": 1,
+        "neutral": 3,
+        "nullmercs": 1
+      },
+      "selectable": true
+    },
+    {
+      "mapId": "eye_of_horus",
+      "displayName": "Eye of Horus",
+      "descriptor": "The Glassed Core",
+      "family": "tempo",
+      "control": "contested",
+      "dominantEnemy": "cortex",
+      "threatBand": "light",
+      "controlCounts": {
+        "ashwalkers": 1,
+        "cortex": 1,
+        "neutral": 3,
+        "nullmercs": 1
+      },
+      "selectable": true
+    },
+    {
+      "mapId": "koom_valley",
+      "displayName": "Koom Valley",
+      "descriptor": "The Fluid Scar",
+      "family": "tempo",
+      "control": "contested",
+      "dominantEnemy": "armada",
+      "threatBand": "light",
+      "controlCounts": {
+        "ashwalkers": 1,
+        "armada": 1,
+        "neutral": 3,
+        "nullmercs": 1
+      },
+      "selectable": true
+    },
+    {
+      "mapId": "tabula",
+      "displayName": "Tabula",
+      "descriptor": "The Tiered Plateau",
+      "family": "tempo",
+      "control": "contested",
+      "dominantEnemy": "armada",
+      "threatBand": "light",
+      "controlCounts": {
+        "ashwalkers": 1,
+        "armada": 1,
+        "neutral": 4,
+        "nullmercs": 1
+      },
+      "selectable": true
+    },
+    {
+      "mapId": "ancient_bastion",
+      "displayName": "Ancient Bastion",
+      "descriptor": "Taelith-Armada Citadel",
+      "family": "siege",
+      "control": "contested",
+      "dominantEnemy": "armada",
+      "threatBand": "light",
+      "controlCounts": {
+        "ashwalkers": 1,
+        "neutral": 3,
+        "armada": 1,
+        "nullmercs": 1
+      },
+      "selectable": true
+    },
+    {
+      "mapId": "the_rock_jungle",
+      "displayName": "The Rock Jungle",
+      "descriptor": "Limestone Spire Labyrinth",
+      "family": "wild",
+      "control": "contested",
+      "dominantEnemy": "wild",
+      "threatBand": "light",
+      "controlCounts": {
+        "wild": 1,
+        "ashwalkers": 1,
+        "armada": 1,
+        "nullmercs": 1,
+        "neutral": 3
+      },
+      "selectable": true
+    },
+    {
+      "mapId": "all_that_simmers",
+      "displayName": "All That Simmers",
+      "descriptor": "The High-Conflict Swamp",
+      "family": "wild",
+      "control": "armada",
+      "dominantEnemy": "armada",
+      "threatBand": "light",
+      "controlCounts": {
+        "wild": 1,
+        "ashwalkers": 1,
+        "armada": 2,
+        "cortex": 1,
+        "nullmercs": 1,
+        "neutral": 1
+      },
+      "selectable": true
+    }
+  ],
+  "node": {
+    "id": "hub_open_m1",
+    "kind": "choice",
+    "speaker": "ketha",
+    "text": "Back from the_rock_jungle. State_Sync. Aces updated. Mark the next board when you're ready.",
+    "regionHint": "the_rock_jungle",
+    "sessionHomeMap": "the_rock_jungle",
+    "choices": [
+      {
+        "id": "c_mode_a_0_RJ_NORTHERN_ISLAND_CHAIN",
+        "label": "Take Northern Island Chain",
+        "blurb": "Stand on the scar and stay standing.",
+        "kind": "deploy",
+        "effect": {
+          "mapId": "the_rock_jungle",
+          "contractKind": "seize_lane",
+          "deployAces": [
+            "vane",
+            "ketha"
+          ],
+          "preferredCaptureZoneId": "RJ_NORTHERN_ISLAND_CHAIN",
+          "preferredDeployZoneId": "RJ_NW_JUNGLE_SHELF",
+          "sessionMode": "same_map",
+          "source": "quest_batch"
+        }
+      },
+      {
+        "id": "c_mode_a_1_RJ_SOUTHERN_ISLAND_CHAIN",
+        "label": "Take Southern Island Chain",
+        "blurb": "Stand on the scar and stay standing.",
+        "kind": "deploy",
+        "effect": {
+          "mapId": "the_rock_jungle",
+          "contractKind": "seize_lane",
+          "deployAces": [
+            "vane",
+            "ketha"
+          ],
+          "preferredCaptureZoneId": "RJ_SOUTHERN_ISLAND_CHAIN",
+          "preferredDeployZoneId": "RJ_WESTERN_CAUSEWAY",
+          "sessionMode": "same_map",
+          "source": "quest_batch"
+        }
+      },
+      {
+        "id": "c_mode_a_2_RJ_CENTRAL_LAGOON_MAZE",
+        "label": "Take Central Lagoon Maze",
+        "blurb": "Stand on the scar and stay standing.",
+        "kind": "deploy",
+        "effect": {
+          "mapId": "the_rock_jungle",
+          "contractKind": "seize_lane",
+          "deployAces": [
+            "vane",
+            "ketha"
+          ],
+          "preferredCaptureZoneId": "RJ_CENTRAL_LAGOON_MAZE",
+          "preferredDeployZoneId": "RJ_NW_JUNGLE_SHELF",
+          "sessionMode": "same_map",
+          "source": "quest_batch"
+        }
+      },
+      {
+        "id": "c_home_build",
+        "label": "Raise the jungle camp (L0 \u2192 L1)",
+        "blurb": "Spend 1 Tnb + 25 scrap on the shelf. Without Tenebrium you cannot scale build power at home.",
+        "kind": "home_build",
+        "effect": {
+          "mapId": "the_rock_jungle",
+          "tenebriumCost": 1,
+          "creditCost": 25,
+          "campLevel": 0
+        }
+      },
+      {
+        "id": "c_raid_tnb_greenest_fields",
+        "label": "Raid Greenest Fields for Tenebrium",
+        "blurb": "Home stays hungry without Tnb. Hit their works, print, return.",
+        "kind": "deploy",
+        "effect": {
+          "mapId": "greenest_fields",
+          "contractKind": "eco_raid",
+          "deployAces": [
+            "vane",
+            "ketha"
+          ],
+          "sessionMode": "map_travel",
+          "against": "armada"
+        }
+      },
+      {
+        "id": "c_raid_crater",
+        "label": "Strike the Horus crater",
+        "blurb": "Cortex still smiles at customers \u2014 until you glass their gear.",
+        "kind": "deploy",
+        "effect": {
+          "mapId": "eye_of_horus",
+          "contractKind": "destroy_key_structure",
+          "deployAces": [
+            "vane",
+            "ketha"
+          ],
+          "sessionMode": "map_travel",
+          "against": "cortex"
+        }
+      },
+      {
+        "id": "c_shop",
+        "label": "See the broker",
+        "blurb": "Merc loans, scrap, and the odd printer upgrade.",
+        "kind": "shop",
+        "effect": {
+          "panel": "shop"
+        }
+      },
+      {
+        "id": "c_talk_ketha",
+        "label": "Talk with Ketha",
+        "blurb": "A quiet minute by the fire. Bonds hold better than armor.",
+        "kind": "talk",
+        "effect": {
+          "social": "vane_ketha_hearth",
+          "bondDelta": {
+            "vane": {
+              "ketha": 2
+            },
+            "ketha": {
+              "vane": 2
+            }
+          }
+        }
+      },
+      {
+        "id": "c_rest",
+        "label": "Rest the company",
+        "blurb": "Bandage the wounded. Let the stress bleed off.",
+        "kind": "rest",
+        "effect": {
+          "healWounds": 1,
+          "stressDelta": -5
+        }
+      },
+      {
+        "id": "c_bay_locked",
+        "label": "Null Mercs garage",
+        "blurb": "Still welding. Come back when the contract deepens.",
+        "kind": "bay",
+        "effect": {
+          "note": "The bay is locked for now \u2014 not open in this build."
+        }
+      }
+    ]
+  },
+  "lastResult": {
+    "at": "2026-08-02T09:12:28Z",
+    "choiceId": null,
+    "mapId": "the_rock_jungle",
+    "contractKind": "hive_clear_or_bypass",
+    "deployAces": [],
+    "deployPlan": {
+      "schemaVersion": "verdance-deploy-plan/1.0",
+      "mapId": "the_rock_jungle",
+      "contractKind": "hive_clear_or_bypass",
+      "deployAces": [],
+      "choiceId": null,
+      "repDelta": {},
+      "arcId": null,
+      "maxCaptureMarks": null,
+      "marks": {
+        "deployZoneId": "RJ_CENTRAL_LAGOON_MAZE",
+        "extractZoneId": "RJ_NW_JUNGLE_SHELF",
+        "captureZoneIds": [
+          "RJ_CENTRAL_LAGOON_MAZE"
+        ]
+      },
+      "patron": "nullmercs",
+      "against": "armada",
+      "pathSignal": null,
+      "sessionMode": "same_map",
+      "occupationModel": "living_shell",
+      "stampedAt": "2026-08-02T09:10:53Z"
+    },
+    "verdict": "state_sync",
+    "resultKey": null,
+    "zoneFlipped": false,
+    "terminalReason": null,
+    "headline": null,
+    "changed": [],
+    "nextAction": null,
+    "duplicate": false,
+    "debrief": null,
+    "tokens": [
+      "rep.nullmercs=48.0",
+      "modeA=the_rock_jungle:3"
+    ],
+    "source": "apply_result_to_hub_v1"
+  },
+  "history": [
+    {
+      "at": "2026-08-02T09:12:28Z",
+      "msg": "BAR result state_sync \u00b7 the_rock_jungle \u00b7 rep.nullmercs=48.0, modeA=the_rock_jungle:3"
+    }
+  ]
+}

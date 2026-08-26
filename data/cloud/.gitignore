@@ -1,0 +1,4 @@
+cloud_config.json
+*.pem
+*.key
+local_secrets.json

@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "verdance-wrath-pack/1.0",
+  "packId": "cortex_qrf_v1",
+  "label": "Cortex QRF",
+  "faction": "cortex",
+  "ephemeral": true,
+  "notes": "Eye of Horus dealer-pocket response. Session-only.",
+  "telegraphBark": "Contact. Cortex QRF inbound - cut the relay and leave.",
+  "spawnMode": "airdrop_near_player",
+  "scatterElmos": 160,
+  "units": [
+    { "unitDefName": "corak", "count": 12 },
+    { "unitDefName": "corthud", "count": 4 },
+    { "unitDefName": "corstorm", "count": 3 },
+    { "unitDefName": "corbw", "count": 3 }
+  ],
+  "fallbackUnits": [
+    { "unitDefName": "corak", "count": 14 },
+    { "unitDefName": "corthud", "count": 6 }
+  ]
+}

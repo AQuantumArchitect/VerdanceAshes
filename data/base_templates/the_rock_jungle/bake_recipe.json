@@ -1,0 +1,100 @@
+﻿{
+    "schemaVersion":  "verdance-shell-bake-recipe/1.0",
+    "mapId":  "the_rock_jungle",
+    "mapName":  "The Rock Jungle 2.1.1",
+    "templateId":  "living_shell_v1",
+    "character":  "Limestone Spire Labyrinth - sparse Null scrap + wild center (not a city)",
+    "characterCard":  {
+                          "descriptor":  "Limestone Spire Labyrinth",
+                          "blurb":  "PVE outlier. Sparse Null scrap only; center is raptor wilds (not baked buildings). Do not use for global eco tuning.",
+                          "shellAtT0":  "Thin Null scrap + wilds",
+                          "growMix":  "2Ã— scrap Null only",
+                          "arcKinds":  [
+                                           "survive_wilds"
+                                       ],
+                          "raidHint":  "survive_pathing",
+                          "captureLater":  "corridor",
+                          "wrath":  {
+                                        "packId":  "wild_thin_v1",
+                                        "responseSeconds":  150
+                                    },
+                          "source":  "bake",
+                          "realBakeStatus":  "baked_local_headed_gpu",
+                          "bakedAt":  "2026-07-28T20:15:43",
+                          "templatePath":  "data/base_templates/the_rock_jungle/living_shell_v1.json"
+                      },
+    "arcKinds":  [
+                     "survive_wilds"
+                 ],
+    "raidHint":  "survive_pathing",
+    "captureLater":  "corridor",
+    "faction":  "nullmercs",
+    "side":  "Legion",
+    "growMinutes":  7,
+    "growFrames":  12600,
+    "peacefulCoGrow":  true,
+    "aiShortName":  "SimpleAI",
+    "teamCount":  2,
+    "fixedRngSeed":  66,
+    "notes":  "PVE outlier. Only sparse Null scrap via short SimpleAI scrap profile. Center lagoon is raptor wilds - never shell buildings. Do not use for global eco tuning.",
+    "occupation":  {
+                       "decoyCommanders":  true,
+                       "decoyPerPocket":  1,
+                       "notes":  "Sparse Null decoy footholds only. Wild center stays unshelled. Sims use normal commanders."
+                   },
+    "playerClear":  {
+                        "zoneId":  "RJ_NW_JUNGLE_SHELF",
+                        "bounds":  {
+                                       "xMin":  0.0,
+                                       "xMax":  0.28,
+                                       "zMin":  0.0,
+                                       "zMax":  0.28
+                                   },
+                        "notes":  "NW jungle shelf legion start."
+                    },
+    "starts":  [
+                   {
+                       "pocketId":  "rj_se_scrap",
+                       "zoneId":  "RJ_SE_JUNGLE_SHELF",
+                       "label":  "Southeast Jungle Shelf Scrap",
+                       "kind":  "scrap",
+                       "faction":  "nullmercs",
+                       "side":  "Legion",
+                       "growProfile":  "scrap",
+                       "x":  0.85,
+                       "z":  0.85,
+                       "primaryCandidate":  true,
+                       "densityScale":  0.7
+                   },
+                   {
+                       "pocketId":  "rj_east_causeway",
+                       "zoneId":  "RJ_EASTERN_CAUSEWAY",
+                       "label":  "Eastern Causeway Mouth",
+                       "kind":  "scrap",
+                       "faction":  "nullmercs",
+                       "side":  "Legion",
+                       "growProfile":  "scrap",
+                       "x":  0.84,
+                       "z":  0.42,
+                       "densityScale":  0.55
+                   }
+               ],
+    "placeholderDensity":  {
+                               "solarPerPocket":  3,
+                               "windPerPocket":  3,
+                               "converterPerPocket":  0,
+                               "advSolarPerPocket":  0,
+                               "estorPerPocket":  0,
+                               "mexPerPocket":  2,
+                               "lltPerPocket":  4,
+                               "hltPerPocket":  0,
+                               "wallPerPocket":  4,
+                               "radarPerPocket":  1,
+                               "scatterRadius":  0.04
+                           },
+    "wrathDefault":  {
+                         "packId":  "wild_thin_v1",
+                         "responseSeconds":  150,
+                         "startOn":  "first_contact"
+                     }
+}

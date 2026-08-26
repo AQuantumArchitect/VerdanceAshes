@@ -1,0 +1,552 @@
+{
+  "schema": "bar-brain-ul/1.1",
+  "family": "width_action+eco_action",
+  "families": [
+    "width_action",
+    "eco_action"
+  ],
+  "total_accruals": 144738,
+  "total_reinforces": 5103,
+  "missions": 2463,
+  "updated_at": "2026-08-14T02:47:45.245257+00:00",
+  "params": {
+    "narrow|PUSH_OBJECTIVE": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "narrow|PROBE": {
+      "value": 1.35,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "narrow|FLANK": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "narrow|HOLD_AND_HEAL": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "narrow|RALLY": {
+      "value": 3.44,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "narrow|FALLBACK": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "narrow|EXTRACT": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "narrow|WAIT": {
+      "value": 0.215,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "narrow|BUILD_MEX": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "narrow|BUILD_ENERGY": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "narrow|BUILD_CON": {
+      "value": 10.7075,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "narrow|EXPAND_FRONT": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "narrow|RECLAIM": {
+      "value": 0.215,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "narrow|TECH_UP": {
+      "value": 0.215,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "narrow|DEFEND_BASE": {
+      "value": 0.215,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "open|PUSH_OBJECTIVE": {
+      "value": 11.765035,
+      "sigma": 0.004035,
+      "update_count": 2463
+    },
+    "open|PROBE": {
+      "value": 0.55,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "open|FLANK": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "open|HOLD_AND_HEAL": {
+      "value": 11.985856,
+      "sigma": 0.115129,
+      "update_count": 3
+    },
+    "open|RALLY": {
+      "value": 3.44,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "open|FALLBACK": {
+      "value": 11.375241,
+      "sigma": 0.008399,
+      "update_count": 567
+    },
+    "open|EXTRACT": {
+      "value": 12.0,
+      "sigma": 0.115129,
+      "update_count": 3
+    },
+    "open|WAIT": {
+      "value": 0.215,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "open|BUILD_MEX": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "open|BUILD_ENERGY": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "open|BUILD_CON": {
+      "value": 10.7075,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "open|EXPAND_FRONT": {
+      "value": 5.4,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "open|RECLAIM": {
+      "value": 0.215,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "open|TECH_UP": {
+      "value": 0.215,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "open|DEFEND_BASE": {
+      "value": 0.215,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "wide|PUSH_OBJECTIVE": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "wide|PROBE": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "wide|FLANK": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "wide|HOLD_AND_HEAL": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "wide|RALLY": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "wide|FALLBACK": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "wide|EXTRACT": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "wide|WAIT": {
+      "value": 0.215,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "wide|BUILD_MEX": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "wide|BUILD_ENERGY": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "wide|BUILD_CON": {
+      "value": 10.7075,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "wide|EXPAND_FRONT": {
+      "value": 10.8,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "wide|RECLAIM": {
+      "value": 0.215,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "wide|TECH_UP": {
+      "value": 0.215,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "wide|DEFEND_BASE": {
+      "value": 0.215,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "dry|PUSH_OBJECTIVE": {
+      "value": 11.713436,
+      "sigma": 0.004763,
+      "update_count": 1763
+    },
+    "dry|PROBE": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "dry|FLANK": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "dry|HOLD_AND_HEAL": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "dry|RALLY": {
+      "value": 2.792,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "dry|FALLBACK": {
+      "value": 11.62008,
+      "sigma": 0.011469,
+      "update_count": 304
+    },
+    "dry|EXTRACT": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "dry|WAIT": {
+      "value": 0.212,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "dry|BUILD_MEX": {
+      "value": 3.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "dry|BUILD_ENERGY": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "dry|BUILD_CON": {
+      "value": 1.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "dry|EXPAND_FRONT": {
+      "value": 10.1,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "dry|RECLAIM": {
+      "value": 0.212,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "dry|TECH_UP": {
+      "value": 0.212,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "dry|DEFEND_BASE": {
+      "value": 0.212,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "thin|PUSH_OBJECTIVE": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "thin|PROBE": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "thin|FLANK": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "thin|HOLD_AND_HEAL": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "thin|RALLY": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "thin|FALLBACK": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "thin|EXTRACT": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "thin|WAIT": {
+      "value": 0.212,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "thin|BUILD_MEX": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "thin|BUILD_ENERGY": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "thin|BUILD_CON": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "thin|EXPAND_FRONT": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "thin|RECLAIM": {
+      "value": 0.212,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "thin|TECH_UP": {
+      "value": 0.212,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "thin|DEFEND_BASE": {
+      "value": 0.212,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "steady|PUSH_OBJECTIVE": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "steady|PROBE": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "steady|FLANK": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "steady|HOLD_AND_HEAL": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "steady|RALLY": {
+      "value": 2.792,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "steady|FALLBACK": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "steady|EXTRACT": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "steady|WAIT": {
+      "value": 0.212,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "steady|BUILD_MEX": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "steady|BUILD_ENERGY": {
+      "value": 5.4,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "steady|BUILD_CON": {
+      "value": 6.4,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "steady|EXPAND_FRONT": {
+      "value": 8.75,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "steady|RECLAIM": {
+      "value": 0.212,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "steady|TECH_UP": {
+      "value": 0.212,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "steady|DEFEND_BASE": {
+      "value": 0.212,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "fat|PUSH_OBJECTIVE": {
+      "value": 3.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "fat|PROBE": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "fat|FLANK": {
+      "value": 1.5,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "fat|HOLD_AND_HEAL": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "fat|RALLY": {
+      "value": 2.792,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "fat|FALLBACK": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "fat|EXTRACT": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "fat|WAIT": {
+      "value": 0.212,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "fat|BUILD_MEX": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "fat|BUILD_ENERGY": {
+      "value": 12.0,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "fat|BUILD_CON": {
+      "value": 8.606,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "fat|EXPAND_FRONT": {
+      "value": 10.1,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "fat|RECLAIM": {
+      "value": 0.212,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "fat|TECH_UP": {
+      "value": 1.5,
+      "sigma": 1.5,
+      "update_count": 0
+    },
+    "fat|DEFEND_BASE": {
+      "value": 0.212,
+      "sigma": 1.5,
+      "update_count": 0
+    }
+  },
+  "nWidthParams": 45,
+  "nEcoParams": 60,
+  "summary": {
+    "ulFamily": "width_action+eco_action",
+    "ulUpdateCount": 5103,
+    "ulMeanSigma": 1.4168,
+    "ulMissions": 2463,
+    "ulTotalAccruals": 144738,
+    "ulTotalReinforces": 5103,
+    "nParams": 105,
+    "ulWidthUpdates": 3036,
+    "ulEcoUpdates": 2067
+  }
+}

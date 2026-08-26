@@ -28,3 +28,14 @@ if (-not $IntentOnly) {
 & $python @args
 if ($LASTEXITCODE -ne 0) { throw "Verdance Story Engine v1 failed with exit code $LASTEXITCODE" }
 
+# G4/G5: refresh war-map hub after campaign advance (aces, ρ, Mode A home, shop bag).
+$applyHub = Join-Path $Workspace "tools\apply_result_to_hub_v1.py"
+if ((Test-Path $applyHub) -and $WriteState -and -not $IntentOnly) {
+  try {
+    & $python $applyHub --workspace $Workspace --skip-advance 2>$null | Out-Null
+    Write-Host "Hub state refreshed from campaign advance."
+  } catch {
+    Write-Warning "Hub refresh after advance skipped: $($_.Exception.Message)"
+  }
+}
+

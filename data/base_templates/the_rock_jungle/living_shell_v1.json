@@ -1,0 +1,234 @@
+{
+ "schemaVersion": "verdance-living-shell/1.1",
+ "mapId": "the_rock_jungle",
+ "templateId": "living_shell_v1",
+ "source": "bake",
+ "faction": "nullmercs",
+ "occupation": {
+  "decoyCommanders": true,
+  "decoyPlanted": 2,
+  "notes": "Real commanders stripped after sim; decoy coms planted as autonomous eco-farm swarm (less metal, less danger)."
+ },
+ "bake": {
+  "growMinutes": 7,
+  "teams": 2,
+  "seed": 66,
+  "rawDumpPath": "C:\\Users\\Luke Spooner\\Documents\\BAR_Verdance_Workspace\\headless_runs\\shell_bake_the_rock_jungle_20260728_201311\\shell_raw_units.json",
+  "stripped": 41,
+  "kept": 20,
+  "simCommanders": "normal",
+  "occupationCommanders": "decoy"
+ },
+ "generatedAt": "2026-07-28T20:15:43",
+ "unitCount": 20,
+ "pockets": [
+  {
+   "unitCount": 16,
+   "label": "Southeast Jungle Shelf Scrap",
+   "kind": "scrap",
+   "primaryCandidate": true,
+   "zoneId": "TRJ_SE_MUSTER",
+   "pocketId": "rj_se_scrap",
+   "center": [
+    0.85,
+    0.85
+   ]
+  },
+  {
+   "unitCount": 4,
+   "label": "Eastern Causeway Mouth",
+   "kind": "scrap",
+   "primaryCandidate": false,
+   "zoneId": "TRJ_NE_LANE",
+   "pocketId": "rj_east_causeway",
+   "center": [
+    0.84,
+    0.42
+   ]
+  }
+ ],
+ "units": [
+  {
+   "unitDefName": "legmex",
+   "pocketId": "rj_se_scrap",
+   "facing": 0,
+   "z": 0.9102,
+   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "x": 1.1504,
+   "keepClass": "mex"
+  },
+  {
+   "unitDefName": "legmex",
+   "pocketId": "rj_east_causeway",
+   "facing": 0,
+   "z": 0.4258,
+   "zoneId": "RJ_EASTERN_CAUSEWAY",
+   "x": 1.0977,
+   "keepClass": "mex"
+  },
+  {
+   "unitDefName": "legmex",
+   "pocketId": "rj_se_scrap",
+   "facing": 0,
+   "z": 0.9395,
+   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "x": 1.1406,
+   "keepClass": "mex"
+  },
+  {
+   "unitDefName": "legmex",
+   "pocketId": "rj_east_causeway",
+   "facing": 0,
+   "z": 0.4238,
+   "zoneId": "RJ_EASTERN_CAUSEWAY",
+   "x": 1.0547,
+   "keepClass": "mex"
+  },
+  {
+   "unitDefName": "legmex",
+   "pocketId": "rj_se_scrap",
+   "facing": 0,
+   "z": 0.9141,
+   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "x": 1.1191,
+   "keepClass": "mex"
+  },
+  {
+   "unitDefName": "legmex",
+   "pocketId": "rj_east_causeway",
+   "facing": 0,
+   "z": 0.3945,
+   "zoneId": "RJ_EASTERN_CAUSEWAY",
+   "x": 1.0781,
+   "keepClass": "mex"
+  },
+  {
+   "unitDefName": "legwin",
+   "pocketId": "rj_se_scrap",
+   "facing": 1,
+   "z": 0.9209,
+   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "x": 1.1514,
+   "keepClass": "energy"
+  },
+  {
+   "unitDefName": "legsolar",
+   "pocketId": "rj_se_scrap",
+   "facing": 1,
+   "z": 0.9111,
+   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "x": 1.1729,
+   "keepClass": "energy"
+  },
+  {
+   "unitDefName": "legsolar",
+   "pocketId": "rj_se_scrap",
+   "facing": 3,
+   "z": 0.9209,
+   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "x": 1.1357,
+   "keepClass": "energy"
+  },
+  {
+   "unitDefName": "legwin",
+   "pocketId": "rj_se_scrap",
+   "facing": 0,
+   "z": 0.9326,
+   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "x": 1.1729,
+   "keepClass": "energy"
+  },
+  {
+   "unitDefName": "legwin",
+   "pocketId": "rj_se_scrap",
+   "facing": 3,
+   "z": 0.9404,
+   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "x": 1.1201,
+   "keepClass": "energy"
+  },
+  {
+   "unitDefName": "legwin",
+   "pocketId": "rj_se_scrap",
+   "facing": 3,
+   "z": 0.96,
+   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "x": 1.1162,
+   "keepClass": "energy"
+  },
+  {
+   "unitDefName": "legwin",
+   "pocketId": "rj_se_scrap",
+   "facing": 0,
+   "z": 0.9795,
+   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "x": 1.1416,
+   "keepClass": "energy"
+  },
+  {
+   "unitDefName": "legwin",
+   "pocketId": "rj_se_scrap",
+   "facing": 1,
+   "z": 0.9795,
+   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "x": 1.1592,
+   "keepClass": "energy"
+  },
+  {
+   "unitDefName": "legsolar",
+   "pocketId": "rj_se_scrap",
+   "facing": 2,
+   "z": 0.96,
+   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "x": 1.1592,
+   "keepClass": "energy"
+  },
+  {
+   "unitDefName": "legmstor",
+   "pocketId": "rj_se_scrap",
+   "facing": 0,
+   "z": 0.9395,
+   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "x": 1.1523,
+   "keepClass": "storage"
+  },
+  {
+   "unitDefName": "leglht",
+   "pocketId": "rj_se_scrap",
+   "facing": 1,
+   "z": 0.9336,
+   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "x": 1.1895,
+   "keepClass": "defense"
+  },
+  {
+   "unitDefName": "legmext15",
+   "pocketId": "rj_se_scrap",
+   "facing": 0,
+   "z": 0.957,
+   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "x": 1.0469,
+   "keepClass": "static"
+  },
+  {
+   "keepClass": "decoy_node",
+   "pocketId": "rj_se_scrap",
+   "z": 0.85,
+   "x": 0.85,
+   "role": "autonomous_decoy_farmer",
+   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "facing": 0,
+   "unitDefName": "legdecom"
+  },
+  {
+   "keepClass": "decoy_node",
+   "pocketId": "rj_east_causeway",
+   "z": 0.42,
+   "x": 0.84,
+   "role": "autonomous_decoy_farmer",
+   "zoneId": "RJ_EASTERN_CAUSEWAY",
+   "facing": 0,
+   "unitDefName": "legdecom"
+  }
+ ]
+}

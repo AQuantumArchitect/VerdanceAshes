@@ -23,9 +23,12 @@ if (!(Test-Path $ScenarioPath)) { throw "Scenario not found: $ScenarioPath (run 
 $infologBaseline = 0
 if (Test-Path $config.infolog) { $infologBaseline = (Get-Item -LiteralPath $config.infolog).Length }
 
+# Extraction is now a distinct LZ (not the deploy zone), so the probe teleports
+# the idle player force onto it after the objective falls - validating the full
+# objective -> extraction-hold -> victory loop.
 & (Join-Path $ScriptDir "install_playable_slice.ps1") -Workspace $Workspace `
   -ScenarioPath $ScenarioPath -Headless -TimeoutSeconds $TimeoutSeconds `
-  -ExtraModOptions "va_headless_autostart=1,va_headless_fastwin=0,va_headless_quit=1,va_test_killobjective_frame=600" `
+  -ExtraModOptions "va_headless_autostart=1;va_headless_fastwin=0;va_headless_quit=1;va_test_killobjective_frame=600;va_test_teleport_extract_frame=900" `
   -DebugCommandsOverride "4500:quitforce"
 
 $log = Get-Content -Raw -LiteralPath $config.infolog

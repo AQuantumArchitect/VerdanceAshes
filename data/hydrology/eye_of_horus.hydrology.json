@@ -1,0 +1,222 @@
+{
+  "schemaVersion": "verdance-hydrology/1.0",
+  "mapId": "eye_of_horus",
+  "mapName": "Eye Of Horus 1.7",
+  "res": 96,
+  "seaLevel": 0.0,
+  "amplitude": 0.3,
+  "restingElevation": 209,
+  "levels": [
+    0.0,
+    0.125,
+    0.25,
+    0.375,
+    0.5,
+    0.625,
+    0.75,
+    0.875,
+    1.0
+  ],
+  "elevations": [
+    209,
+    210.8,
+    211.4,
+    211.9,
+    212.3,
+    212.6,
+    212.8,
+    213.2,
+    213.4
+  ],
+  "rungs": [
+    {
+      "level": 0.0,
+      "elevation": 209,
+      "terraformDelta": 209.0,
+      "areaSubmerged": 0.0001,
+      "metalSpotsSubmerged": 0.0,
+      "basins": []
+    },
+    {
+      "level": 0.125,
+      "elevation": 210.8,
+      "terraformDelta": 210.8,
+      "areaSubmerged": 0.0178,
+      "metalSpotsSubmerged": 0.0217,
+      "basins": []
+    },
+    {
+      "level": 0.25,
+      "elevation": 211.4,
+      "terraformDelta": 211.4,
+      "areaSubmerged": 0.0384,
+      "metalSpotsSubmerged": 0.087,
+      "basins": []
+    },
+    {
+      "level": 0.375,
+      "elevation": 211.9,
+      "terraformDelta": 211.9,
+      "areaSubmerged": 0.0592,
+      "metalSpotsSubmerged": 0.1522,
+      "basins": []
+    },
+    {
+      "level": 0.5,
+      "elevation": 212.3,
+      "terraformDelta": 212.3,
+      "areaSubmerged": 0.0729,
+      "metalSpotsSubmerged": 0.1739,
+      "basins": []
+    },
+    {
+      "level": 0.625,
+      "elevation": 212.6,
+      "terraformDelta": 212.6,
+      "areaSubmerged": 0.0914,
+      "metalSpotsSubmerged": 0.1739,
+      "basins": []
+    },
+    {
+      "level": 0.75,
+      "elevation": 212.8,
+      "terraformDelta": 212.8,
+      "areaSubmerged": 0.1057,
+      "metalSpotsSubmerged": 0.1739,
+      "basins": []
+    },
+    {
+      "level": 0.875,
+      "elevation": 213.2,
+      "terraformDelta": 213.2,
+      "areaSubmerged": 0.1376,
+      "metalSpotsSubmerged": 0.1957,
+      "basins": []
+    },
+    {
+      "level": 1.0,
+      "elevation": 213.4,
+      "terraformDelta": 213.4,
+      "areaSubmerged": 0.1527,
+      "metalSpotsSubmerged": 0.1957,
+      "basins": []
+    }
+  ],
+  "basins": [],
+  "basinCells": {},
+  "closedDepressions": {
+    "count": 3,
+    "depressions": [
+      {
+        "cells": 560,
+        "areaShare": 0.0608,
+        "spillLevel": 214.4,
+        "floor": 209
+      },
+      {
+        "cells": 316,
+        "areaShare": 0.0343,
+        "spillLevel": 214.5,
+        "floor": 210.3
+      },
+      {
+        "cells": 213,
+        "areaShare": 0.0231,
+        "spillLevel": 214.4,
+        "floor": 210.3
+      }
+    ]
+  },
+  "zones": {
+    "EOH_NW_CRATER_CAMP": {
+      "submergedAt": [
+        0.0,
+        0.014,
+        0.052,
+        0.094,
+        0.115,
+        0.141,
+        0.161,
+        0.19,
+        0.208
+      ],
+      "floodsAt": null,
+      "restingSubmerged": 0.0
+    },
+    "EOH_SE_CORTEX_POCKET": {
+      "submergedAt": [
+        0.0,
+        0.034,
+        0.069,
+        0.102,
+        0.123,
+        0.148,
+        0.163,
+        0.207,
+        0.222
+      ],
+      "floodsAt": null,
+      "restingSubmerged": 0.0
+    },
+    "EOH_GLASSED_CENTER": {
+      "submergedAt": [
+        0.0,
+        0.002,
+        0.007,
+        0.013,
+        0.016,
+        0.019,
+        0.022,
+        0.026,
+        0.03
+      ],
+      "floodsAt": null,
+      "restingSubmerged": 0.0
+    },
+    "EOH_WESTERN_DEBRIS_LANE": {
+      "submergedAt": [
+        0.0,
+        0.01,
+        0.031,
+        0.048,
+        0.059,
+        0.078,
+        0.094,
+        0.13,
+        0.147
+      ],
+      "floodsAt": null,
+      "restingSubmerged": 0.0
+    },
+    "EOH_EASTERN_DEBRIS_LANE": {
+      "submergedAt": [
+        0.0,
+        0.015,
+        0.029,
+        0.047,
+        0.062,
+        0.086,
+        0.099,
+        0.135,
+        0.149
+      ],
+      "floodsAt": null,
+      "restingSubmerged": 0.0
+    },
+    "EOH_SOUTHERN_CROSSFIRE_SHELF": {
+      "submergedAt": [
+        0.001,
+        0.033,
+        0.053,
+        0.076,
+        0.089,
+        0.101,
+        0.117,
+        0.154,
+        0.17
+      ],
+      "floodsAt": null,
+      "restingSubmerged": 0.001
+    }
+  }
+}

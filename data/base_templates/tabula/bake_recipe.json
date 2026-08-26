@@ -1,0 +1,133 @@
+{
+  "schemaVersion": "verdance-shell-bake-recipe/1.0",
+  "mapId": "tabula",
+  "mapName": "Tabula_Remake 1.5",
+  "templateId": "living_placeholder_v1",
+  "character": "Tiered Plateau - terrace forts, height as resource",
+  "characterCard": {
+    "descriptor": "The Tiered Plateau",
+    "blurb": "Staircase of decisions: denser D on gates/rims, eco on plateaus. hold_plateau owns a step; eco_expand plants on held ground.",
+    "shellAtT0": "Terrace forts",
+    "growMix": "fortify_hard plateau + fortify gates + hold rims + thin bowl",
+    "arcKinds": ["hold_plateau", "eco_expand"],
+    "raidHint": "bite_outer_rings",
+    "captureLater": "step hold",
+    "wrath": { "packId": "armada_gunslinger_response_v1", "responseSeconds": 120 },
+    "source": "placeholder",
+    "realBakeStatus": "pending_cloud_or_iconsatlas"
+  },
+  "arcKinds": ["hold_plateau", "eco_expand"],
+  "raidHint": "bite_outer_rings",
+  "captureLater": "step hold",
+  "faction": "mixed",
+  "growMinutes": 13,
+  "growFrames": 23400,
+  "peacefulCoGrow": true,
+  "aiShortName": "SimpleAI",
+  "teamCount": 6,
+  "fixedRngSeed": 44,
+  "notes": "SE plateau = BARb hard fortress. Gates = BARb medium. Rims = SimpleAI wind hold. Bowl Null = thin scrap. Staircase of decisions (calibration).",
+  "occupation": {
+    "decoyCommanders": true,
+    "decoyPerPocket": 1,
+    "notes": "Decoy coms on terrace eco after strip. Sims use normal commanders."
+  },
+  "playerClear": {
+    "zoneId": "TAB_NW_PLATEAU",
+    "bounds": { "xMin": 0.0, "xMax": 0.28, "zMin": 0.0, "zMax": 0.28 },
+    "notes": "NW plateau legion start."
+  },
+  "starts": [
+    {
+      "pocketId": "tab_se_plateau",
+      "zoneId": "TAB_SE_PLATEAU",
+      "label": "Southeast Plateau",
+      "kind": "fortress",
+      "faction": "armada",
+      "side": "Armada",
+      "growProfile": "fortify_hard",
+      "x": 0.86,
+      "z": 0.86,
+      "primaryCandidate": true,
+      "densityScale": 1.2
+    },
+    {
+      "pocketId": "tab_east_gates",
+      "zoneId": "TAB_EASTERN_ROCK_GATES",
+      "label": "Eastern Rock Gates",
+      "kind": "gate",
+      "faction": "armada",
+      "side": "Armada",
+      "growProfile": "fortify",
+      "x": 0.84,
+      "z": 0.50,
+      "densityScale": 1.1
+    },
+    {
+      "pocketId": "tab_west_gates",
+      "zoneId": "TAB_WESTERN_ROCK_GATES",
+      "label": "Western Rock Gates",
+      "kind": "gate",
+      "faction": "armada",
+      "side": "Armada",
+      "growProfile": "fortify",
+      "x": 0.16,
+      "z": 0.50,
+      "densityScale": 0.95
+    },
+    {
+      "pocketId": "tab_north_rim",
+      "zoneId": "TAB_NORTH_RIM_TERRACES",
+      "label": "North Rim Terraces",
+      "kind": "wind",
+      "faction": "armada",
+      "side": "Armada",
+      "growProfile": "hold",
+      "x": 0.50,
+      "z": 0.14,
+      "densityScale": 0.9
+    },
+    {
+      "pocketId": "tab_south_rim",
+      "zoneId": "TAB_SOUTH_RIM_TERRACES",
+      "label": "South Rim Terraces",
+      "kind": "wind",
+      "faction": "armada",
+      "side": "Armada",
+      "growProfile": "hold",
+      "x": 0.50,
+      "z": 0.86,
+      "densityScale": 0.9
+    },
+    {
+      "pocketId": "tab_bowl_thin",
+      "zoneId": "TAB_CENTRAL_BOWL",
+      "label": "Central Bowl (thin)",
+      "kind": "thin",
+      "faction": "nullmercs",
+      "side": "Legion",
+      "growProfile": "thin",
+      "x": 0.50,
+      "z": 0.50,
+      "densityScale": 0.4
+    }
+  ],
+  "placeholderDensity": {
+    "solarPerPocket": 5,
+    "windPerPocket": 8,
+    "converterPerPocket": 2,
+    "advSolarPerPocket": 1,
+    "estorPerPocket": 1,
+    "mexPerPocket": 3,
+    "lltPerPocket": 7,
+    "hltPerPocket": 2,
+    "wallPerPocket": 12,
+    "radarPerPocket": 1,
+    "scatterRadius": 0.045
+  },
+  "wrathDefault": {
+    "packId": "armada_gunslinger_response_v1",
+    "responseSeconds": 120,
+    "startOn": "first_contact"
+  }
+}

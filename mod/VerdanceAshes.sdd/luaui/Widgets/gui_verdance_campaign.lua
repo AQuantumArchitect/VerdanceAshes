@@ -26,6 +26,60 @@ local function help()
   say("/vaprogress adds 10s; /vaprogressbig completes; /vawin /vafail /vapartial force outcome")
   say("/vaspawn spawns companion; /vareset resets local debug mission state")
   say("/vazones prints loaded zone map; /vaexport aliases /varesult")
+  say("/vacontinue N  continue on this map into debrief pick N (1-3)")
+  say("/vanext N      pick next mission candidate (same as debrief 1/2/3)")
+  say("/vasurface     Phase 4: echo campaign_surface (kernel / mission card)")
+end
+
+-- Phase 4: try known VFS / write paths for campaign_surface.latest.json
+local function tryReadSurface()
+  local paths = {
+    "campaign_surface.latest.json",
+    "LuaUI/Config/verdance_campaign_surface.json",
+    "LuaUI/Widgets/campaign_surface.latest.json",
+  }
+  for _, p in ipairs(paths) do
+    if VFS and VFS.FileExists and VFS.FileExists(p) then
+      local raw = VFS.LoadFile(p)
+      if raw and #raw > 0 then
+        return p, raw
+      end
+    end
+  end
+  -- io may be restricted; best-effort
+  if io and io.open then
+    local candidates = {
+      "campaign_surface.latest.json",
+    }
+    for _, p in ipairs(candidates) do
+      local f = io.open(p, "r")
+      if f then
+        local raw = f:read("*a")
+        f:close()
+        if raw and #raw > 0 then
+          return p, raw
+        end
+      end
+    end
+  end
+  return nil, nil
+end
+
+local function showSurface()
+  local path, raw = tryReadSurface()
+  if not raw then
+    say("VA_SURFACE missing — kernel writes outbox/campaign_surface.latest.json outside BAR.")
+    say("VA_SURFACE Mission card / Ketha line still come from the seed briefing.")
+    send("vastatus")
+    return
+  end
+  say("VA_SURFACE path=" .. tostring(path))
+  -- Log first ~400 chars so infolog stays readable
+  local snippet = raw
+  if #snippet > 400 then
+    snippet = snippet:sub(1, 400) .. "..."
+  end
+  say("VA_SURFACE " .. snippet:gsub("\n", " "))
 end
 
 function widget:Initialize()
@@ -37,12 +91,22 @@ function widget:TextCommand(command)
   local cmd = command:match("^(%S+)")
   if not cmd then return false end
   if cmd == "vahelp" then help(); return true end
+  if cmd == "vasurface" then showSurface(); return true end
+  if cmd == "vacontinue" then
+    send(command) -- full "vacontinue N"
+    return true
+  end
+  if cmd == "vanext" then
+    send(command)
+    return true
+  end
   if cmd == "vastart" or cmd == "vastatus" or cmd == "varesult" or cmd == "vaprogress" or cmd == "vaprogressbig" or cmd == "vawin" or cmd == "vafail" or cmd == "vapartial" or cmd == "vaspawn" or cmd == "vareset" or cmd == "vazones" or cmd == "vaexport" then
     if cmd == "vaexport" then send("varesult") else send(cmd) end
     return true
   end
   return false
 end
+
 
 
 

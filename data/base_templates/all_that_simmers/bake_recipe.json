@@ -1,0 +1,109 @@
+{
+  "schemaVersion": "verdance-shell-bake-recipe/1.0",
+  "mapId": "all_that_simmers",
+  "mapName": "All That Simmers v1.1.1",
+  "templateId": "living_placeholder_v1",
+  "character": "High-Conflict Swamp - multi-faction corners + lane + raptor center",
+  "characterCard": {
+    "descriptor": "The Default High-Conflict Swamp",
+    "blurb": "Calibration anchor. NE Armada ridge, SW Armada lagoon, SE Cortex basin, swamp lane teeth, center raptor hazard. Multipressure picks which shell to bleed.",
+    "shellAtT0": "ARM/COR corners + lane + raptor center",
+    "growMix": "hold/sprawl ARM + fortify_hard COR + fortify lane",
+    "arcKinds": ["seize_lane", "multipressure"],
+    "raidHint": "seize_or_raid_lane",
+    "captureLater": "flip node",
+    "wrath": { "packId": "armada_gunslinger_response_v1", "responseSeconds": 110, "notes": "Default Armada pack; faction-colored answer when contact pocket is Cortex (compiler may swap cortex_qrf)." },
+    "source": "placeholder",
+    "realBakeStatus": "pending_cloud_or_iconsatlas"
+  },
+  "arcKinds": ["seize_lane", "multipressure"],
+  "raidHint": "seize_or_raid_lane",
+  "captureLater": "flip node",
+  "faction": "mixed",
+  "growMinutes": 12,
+  "growFrames": 21600,
+  "peacefulCoGrow": true,
+  "aiShortName": "SimpleAI",
+  "teamCount": 4,
+  "fixedRngSeed": 77,
+  "notes": "Calibration anchor. NE/SW Armada = SimpleAI hold. SE Cortex = BARb hard fortress. Swamp lane = BARb medium teeth. Central hive flats = raptor hazard not shell. Matches seven_maps ATS baseline roles (without live RaptorsAI in bake).",
+  "occupation": {
+    "decoyCommanders": true,
+    "decoyPerPocket": 1,
+    "notes": "Multi-faction decoy swarm after strip (ARM/COR pockets). Sims use normal commanders."
+  },
+  "playerClear": {
+    "zoneId": "ATS_NW_CANOPY_START",
+    "bounds": { "xMin": 0.0, "xMax": 0.30, "zMin": 0.0, "zMax": 0.28 },
+    "notes": "NW canopy legion start."
+  },
+  "starts": [
+    {
+      "pocketId": "ats_ne_armada",
+      "zoneId": "ATS_NE_ARMADA_RIDGE",
+      "label": "Northeast Armada Ridge",
+      "kind": "mixed",
+      "faction": "armada",
+      "side": "Armada",
+      "growProfile": "hold",
+      "x": 0.84,
+      "z": 0.15,
+      "primaryCandidate": true,
+      "densityScale": 1.05
+    },
+    {
+      "pocketId": "ats_sw_armada",
+      "zoneId": "ATS_SW_ARMADA_LAGOON",
+      "label": "Southwest Armada Lagoon",
+      "kind": "mixed",
+      "faction": "armada",
+      "side": "Armada",
+      "growProfile": "sprawl",
+      "x": 0.17,
+      "z": 0.81,
+      "densityScale": 1.0
+    },
+    {
+      "pocketId": "ats_se_cortex",
+      "zoneId": "ATS_SE_CORTEX_BASIN",
+      "label": "Southeast Cortex Basin",
+      "kind": "fortress",
+      "faction": "cortex",
+      "side": "Cortex",
+      "growProfile": "fortify_hard",
+      "x": 0.81,
+      "z": 0.82,
+      "densityScale": 1.1
+    },
+    {
+      "pocketId": "ats_swamp_lane",
+      "zoneId": "ATS_SW_NE_SWAMP_LANE",
+      "label": "Swamp Diagonal Lane",
+      "kind": "lane",
+      "faction": "armada",
+      "side": "Armada",
+      "growProfile": "fortify",
+      "x": 0.52,
+      "z": 0.52,
+      "densityScale": 0.7
+    }
+  ],
+  "placeholderDensity": {
+    "solarPerPocket": 6,
+    "windPerPocket": 4,
+    "converterPerPocket": 2,
+    "advSolarPerPocket": 1,
+    "estorPerPocket": 1,
+    "mexPerPocket": 3,
+    "lltPerPocket": 6,
+    "hltPerPocket": 1,
+    "wallPerPocket": 8,
+    "radarPerPocket": 1,
+    "scatterRadius": 0.05
+  },
+  "wrathDefault": {
+    "packId": "armada_gunslinger_response_v1",
+    "responseSeconds": 110,
+    "startOn": "first_contact"
+  }
+}

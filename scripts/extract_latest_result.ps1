@@ -81,7 +81,23 @@ if (-not $json) {
 
 if (-not $json) {
   $tail = ($raw -split "`r?`n" | Select-Object -Last 40) -join "`n"
-  throw "Could not extract Verdance result JSON from infolog. Run /varesult again after installing v0.7.1. Tail:`n$tail"
+  $beginCount = ([regex]::Matches($raw, "VA_RESULT_JSON_BEGIN")).Count
+  $compactCount = ([regex]::Matches($raw, "VA_RESULT_JSON_COMPACT")).Count
+  $failPath = Join-Path $Workspace "outbox\result_harvest_fail.latest.json"
+  try {
+    New-Item -ItemType Directory -Force -Path (Split-Path -Parent $failPath) | Out-Null
+    $diag = @{
+      schemaVersion = "verdance-result-harvest-fail/1.0"
+      at = (Get-Date).ToUniversalTime().ToString("o")
+      infolog = $infolog
+      markerCounts = @{ VA_RESULT_JSON_BEGIN = $beginCount; VA_RESULT_JSON_COMPACT = $compactCount }
+      tail = $tail
+      hint = "No complete VA_RESULT in infolog. Play a sortie to terminal, or Abandon from hub."
+    } | ConvertTo-Json -Depth 6
+    Set-Content -Encoding UTF8 -Path $failPath -Value $diag
+    Write-Host "Harvest fail diagnostics: $failPath"
+  } catch { }
+  throw "Could not extract Verdance result JSON from infolog. See outbox\result_harvest_fail.latest.json. Tail:`n$tail"
 }
 
 try {
@@ -92,6 +108,38 @@ try {
 
 $out = $config.resultInbox
 New-Item -ItemType Directory -Force -Path (Split-Path -Parent $out) | Out-Null
-Set-Content -Encoding UTF8 -Path $out -Value ($parsed | ConvertTo-Json -Depth 50 -Compress)
+$payload = ($parsed | ConvertTo-Json -Depth 50 -Compress)
+Set-Content -Encoding UTF8 -Path $out -Value $payload
 Write-Host "Extracted latest BAR result to: $out"
-Write-Host ($parsed | ConvertTo-Json -Depth 50 -Compress)
+Write-Host $payload
+
+# Protocol: extract ONLY writes inbox (+ archive). Campaign advance / hub rebuild
+# is owned solely by kernel.bring_home / apply_result (no half-apply here).
+try {
+  $rk = $null
+  if ($parsed.PSObject.Properties.Name -contains "resultKey") { $rk = [string]$parsed.resultKey }
+  if ([string]::IsNullOrWhiteSpace($rk)) { $rk = "unknown_" + (Get-Date -Format "yyyyMMdd_HHmmss") }
+  $safeKey = ($rk -replace '[\\/:*?"<>|]', '_')
+  $archiveDir = Join-Path $Workspace "inbox\archive"
+  New-Item -ItemType Directory -Force -Path $archiveDir | Out-Null
+  $archivePath = Join-Path $archiveDir ($safeKey + ".json")
+  Set-Content -Encoding UTF8 -Path $archivePath -Value $payload
+  Write-Host "Archived result: $archivePath"
+} catch {
+  Write-Warning "Result archive skipped: $($_.Exception.Message)"
+}
+
+# WO-042: harvest in-engine next-mission pick from debrief (if player pressed 1/2/3).
+$choiceJson = Get-BalancedJsonAfterMarker -Text $raw -Marker 'VA_NEXT_SORTIE_CHOICE'
+if ($choiceJson) {
+  try {
+    $choice = $choiceJson | ConvertFrom-Json
+    $choicePath = Join-Path $Workspace "outbox\next_sortie_choice.json"
+    if (-not $choice.patron) { $choice | Add-Member -NotePropertyName patron -NotePropertyValue "nullmercs" -Force }
+    if (-not $choice.schemaVersion) { $choice | Add-Member -NotePropertyName schemaVersion -NotePropertyValue "verdance-sortie-order/1.0" -Force }
+    $choice | ConvertTo-Json -Depth 20 | Set-Content -Encoding UTF8 -Path $choicePath
+    Write-Host "Extracted next sortie choice to: $choicePath"
+  } catch {
+    Write-Warning "VA_NEXT_SORTIE_CHOICE present but not valid JSON: $($_.Exception.Message)"
+  }
+}

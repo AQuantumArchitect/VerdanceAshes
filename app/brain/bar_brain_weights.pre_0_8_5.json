@@ -1,0 +1,589 @@
+{
+  "version": "0.2",
+  "samples": 77785,
+  "wins": 1230,
+  "losses": 375,
+  "action_counts": {
+    "PUSH_OBJECTIVE": 62709.35000001854,
+    "FLANK": 439.2000000000023,
+    "PROBE": 261.2499999999993,
+    "HOLD_AND_HEAL": 866.0000000000044,
+    "BUILD_ENERGY": 242.69999999999945,
+    "BUILD_MEX": 150.2499999999997,
+    "BUILD_CON": 70.05000000000003,
+    "EXPAND_FRONT": 82.49999999999997,
+    "EXTRACT": 284.4999999999997,
+    "FALLBACK": 4270.850000000585,
+    "RALLY": 21.600000000000005
+  },
+  "context_action": {
+    "APPROACH|light|empty|dry": {
+      "PROBE": 89.64999999999993,
+      "FLANK": 55.35000000000004,
+      "PUSH_OBJECTIVE": 1115.800000000005,
+      "BUILD_ENERGY": 10.799999999999999
+    },
+    "APPROACH|none|empty|dry": {
+      "PROBE": 67.50000000000003,
+      "PUSH_OBJECTIVE": 218.6999999999994,
+      "BUILD_ENERGY": 2.7,
+      "FLANK": 1.35
+    },
+    "FIGHT|none|empty|dry": {
+      "PUSH_OBJECTIVE": 12.149999999999999
+    },
+    "FIGHT|none|started|dry": {
+      "PUSH_OBJECTIVE": 35.100000000000016
+    },
+    "FIGHT|none|half|dry": {
+      "PUSH_OBJECTIVE": 30.800000000000015,
+      "HOLD_AND_HEAL": 12.149999999999999,
+      "FLANK": 16.2
+    },
+    "FIGHT|none|nearly|dry": {
+      "PUSH_OBJECTIVE": 6.75
+    },
+    "HOLD|none|nearly|dry": {
+      "PUSH_OBJECTIVE": 328.05000000000047
+    },
+    "FIGHT|light|empty|dry": {
+      "PUSH_OBJECTIVE": 498.15000000000333
+    },
+    "FIGHT|light|started|dry": {
+      "PUSH_OBJECTIVE": 982.8000000000114,
+      "FLANK": 35.100000000000016,
+      "HOLD_AND_HEAL": 2.7
+    },
+    "FIGHT|light|half|dry": {
+      "PUSH_OBJECTIVE": 1242.3499999999856,
+      "FLANK": 20.250000000000004,
+      "HOLD_AND_HEAL": 6.75
+    },
+    "HOLD|light|nearly|dry": {
+      "PUSH_OBJECTIVE": 2647.349999999903
+    },
+    "HOLD|none|done|dry": {
+      "EXTRACT": 54.000000000000036
+    },
+    "EXTRACT|none|done|dry": {
+      "EXTRACT": 27.00000000000001
+    },
+    "HOLD|none|half|dry": {
+      "PUSH_OBJECTIVE": 35.100000000000016
+    },
+    "HOLD|light|done|dry": {
+      "EXTRACT": 10.799999999999999,
+      "PUSH_OBJECTIVE": 1.35
+    },
+    "APPROACH|moderate|empty|dry": {
+      "FLANK": 2.7,
+      "PUSH_OBJECTIVE": 24.10000000000001
+    },
+    "APPROACH|none|empty|thin": {
+      "BUILD_ENERGY": 35.100000000000016,
+      "BUILD_MEX": 5.4,
+      "PROBE": 1.35,
+      "FLANK": 1.35,
+      "PUSH_OBJECTIVE": 45.90000000000003
+    },
+    "APPROACH|none|started|thin": {
+      "BUILD_MEX": 18.900000000000002,
+      "EXPAND_FRONT": 13.499999999999998
+    },
+    "APPROACH|light|started|thin": {
+      "EXPAND_FRONT": 6.75,
+      "BUILD_ENERGY": 1.35
+    },
+    "APPROACH|none|started|steady": {
+      "PUSH_OBJECTIVE": 22.950000000000006,
+      "BUILD_ENERGY": 5.4
+    },
+    "APPROACH|light|started|steady": {
+      "PUSH_OBJECTIVE": 10.799999999999999
+    },
+    "FIGHT|none|half|steady": {
+      "PUSH_OBJECTIVE": 40.50000000000002
+    },
+    "FIGHT|light|half|steady": {
+      "PUSH_OBJECTIVE": 97.1999999999999,
+      "FLANK": 16.2,
+      "BUILD_CON": 1.35,
+      "HOLD_AND_HEAL": 9.45
+    },
+    "HOLD|light|nearly|steady": {
+      "PUSH_OBJECTIVE": 67.50000000000003
+    },
+    "HOLD|none|nearly|steady": {
+      "PUSH_OBJECTIVE": 18.900000000000002
+    },
+    "HOLD|none|done|steady": {
+      "EXTRACT": 54.000000000000036
+    },
+    "EXTRACT|none|done|steady": {
+      "EXTRACT": 24.300000000000008
+    },
+    "APPROACH|light|empty|thin": {
+      "BUILD_ENERGY": 117.29999999999981,
+      "BUILD_MEX": 62.100000000000044,
+      "FLANK": 43.200000000000024,
+      "BUILD_CON": 20.250000000000004,
+      "PUSH_OBJECTIVE": 715.7000000000036,
+      "PROBE": 62.100000000000044,
+      "EXPAND_FRONT": 4.050000000000001
+    },
+    "APPROACH|none|half|steady": {
+      "PUSH_OBJECTIVE": 9.45
+    },
+    "FIGHT|light|nearly|steady": {
+      "PUSH_OBJECTIVE": 5.4
+    },
+    "FIGHT|light|empty|thin": {
+      "PUSH_OBJECTIVE": 167.3999999999996,
+      "FLANK": 33.750000000000014,
+      "BUILD_CON": 31.050000000000015,
+      "EXPAND_FRONT": 18.900000000000002,
+      "PROBE": 39.15000000000002,
+      "BUILD_MEX": 14.849999999999998,
+      "BUILD_ENERGY": 12.149999999999999
+    },
+    "FIGHT|light|started|thin": {
+      "PUSH_OBJECTIVE": 549.6500000000053,
+      "BUILD_CON": 2.7,
+      "FLANK": 4.050000000000001,
+      "EXPAND_FRONT": 4.050000000000001,
+      "BUILD_MEX": 4.050000000000001,
+      "BUILD_ENERGY": 4.050000000000001
+    },
+    "FIGHT|light|half|thin": {
+      "EXPAND_FRONT": 9.45,
+      "PUSH_OBJECTIVE": 701.0999999999941
+    },
+    "APPROACH|moderate|empty|thin": {
+      "FLANK": 4.050000000000001,
+      "BUILD_ENERGY": 5.4,
+      "BUILD_MEX": 2.7,
+      "PUSH_OBJECTIVE": 47.20000000000001
+    },
+    "APPROACH|light|empty|steady": {
+      "PUSH_OBJECTIVE": 5.4
+    },
+    "FIGHT|light|empty|steady": {
+      "PUSH_OBJECTIVE": 24.300000000000008,
+      "FLANK": 2.7,
+      "BUILD_CON": 1.35
+    },
+    "FIGHT|light|started|steady": {
+      "PUSH_OBJECTIVE": 63.450000000000045,
+      "FLANK": 47.25000000000003,
+      "EXPAND_FRONT": 4.050000000000001,
+      "BUILD_CON": 1.35
+    },
+    "FIGHT|moderate|started|steady": {
+      "FLANK": 22.950000000000006,
+      "PUSH_OBJECTIVE": 72.9,
+      "EXPAND_FRONT": 2.7,
+      "BUILD_CON": 1.35
+    },
+    "FIGHT|moderate|empty|thin": {
+      "FLANK": 79.14999999999996,
+      "BUILD_MEX": 33.500000000000014,
+      "BUILD_CON": 9.45,
+      "PUSH_OBJECTIVE": 1752.2999999999538,
+      "BUILD_ENERGY": 41.050000000000026,
+      "EXPAND_FRONT": 5.4
+    },
+    "FIGHT|moderate|half|steady": {
+      "PUSH_OBJECTIVE": 82.34999999999997,
+      "HOLD_AND_HEAL": 2.7,
+      "FLANK": 2.7
+    },
+    "HOLD|moderate|nearly|steady": {
+      "PUSH_OBJECTIVE": 17.55
+    },
+    "FIGHT|moderate|started|thin": {
+      "PUSH_OBJECTIVE": 1212.6999999999937,
+      "FLANK": 6.75,
+      "EXPAND_FRONT": 8.1,
+      "BUILD_ENERGY": 5.4,
+      "BUILD_MEX": 5.4
+    },
+    "FIGHT|moderate|half|thin": {
+      "FLANK": 5.4,
+      "PUSH_OBJECTIVE": 1001.0999999999876,
+      "EXPAND_FRONT": 2.7
+    },
+    "HOLD|moderate|nearly|thin": {
+      "PUSH_OBJECTIVE": 128.24999999999977
+    },
+    "HOLD|moderate|done|thin": {
+      "EXTRACT": 9.45
+    },
+    "HOLD|light|done|thin": {
+      "EXTRACT": 6.75
+    },
+    "EXTRACT|light|done|thin": {
+      "EXTRACT": 5.4
+    },
+    "HOLD|light|done|steady": {
+      "EXTRACT": 62.100000000000044
+    },
+    "FIGHT|moderate|empty|steady": {
+      "PUSH_OBJECTIVE": 24.300000000000008
+    },
+    "EXTRACT|light|done|steady": {
+      "EXTRACT": 17.55
+    },
+    "HOLD|light|half|dry": {
+      "PUSH_OBJECTIVE": 642.6000000000057
+    },
+    "EXTRACT|light|done|dry": {
+      "EXTRACT": 2.7
+    },
+    "EXTRACT|light|nearly|steady": {
+      "EXTRACT": 6.75
+    },
+    "HOLD|light|nearly|thin": {
+      "PUSH_OBJECTIVE": 12.149999999999999
+    },
+    "FIGHT|none|started|steady": {
+      "PUSH_OBJECTIVE": 5.4
+    },
+    "FIGHT|light|nearly|dry": {
+      "PUSH_OBJECTIVE": 177.1499999999996
+    },
+    "EXTRACT|none|nearly|dry": {
+      "EXTRACT": 1.35
+    },
+    "APPROACH|light|half|steady": {
+      "PUSH_OBJECTIVE": 1.35
+    },
+    "FIGHT|none|nearly|steady": {
+      "PUSH_OBJECTIVE": 1.35
+    },
+    "HOLD|moderate|done|steady": {
+      "PUSH_OBJECTIVE": 1.35
+    },
+    "EXTRACT|moderate|done|steady": {
+      "PUSH_OBJECTIVE": 1.35
+    },
+    "EXTRACT|none|nearly|steady": {
+      "EXTRACT": 1.35
+    },
+    "FIGHT|moderate|nearly|steady": {
+      "PUSH_OBJECTIVE": 1.35
+    },
+    "FIGHT|moderate|empty|dry": {
+      "FLANK": 20.000000000000004,
+      "PUSH_OBJECTIVE": 2215.149999999931
+    },
+    "FIGHT|moderate|started|dry": {
+      "PUSH_OBJECTIVE": 2717.0999999999017,
+      "FLANK": 1.35
+    },
+    "FIGHT|moderate|half|dry": {
+      "PUSH_OBJECTIVE": 2756.799999999926,
+      "FLANK": 4.050000000000001
+    },
+    "FIGHT|heavy|half|dry": {
+      "PUSH_OBJECTIVE": 1313.699999999987
+    },
+    "FIGHT|heavy|nearly|dry": {
+      "PUSH_OBJECTIVE": 997.4000000000116
+    },
+    "HOLD|moderate|nearly|dry": {
+      "PUSH_OBJECTIVE": 2604.149999999906
+    },
+    "FIGHT|moderate|nearly|dry": {
+      "PUSH_OBJECTIVE": 1199.4000000000003
+    },
+    "CRITICAL|moderate|nearly|dry": {
+      "PUSH_OBJECTIVE": 3376.649999999854,
+      "HOLD_AND_HEAL": 378.0000000000013
+    },
+    "FIGHT|heavy|started|dry": {
+      "PUSH_OBJECTIVE": 648.2000000000041
+    },
+    "CRITICAL|heavy|half|dry": {
+      "PUSH_OBJECTIVE": 888.7999999999889,
+      "FALLBACK": 93.89999999999972
+    },
+    "CRITICAL|heavy|nearly|dry": {
+      "PUSH_OBJECTIVE": 434.45000000000226,
+      "HOLD_AND_HEAL": 17.55
+    },
+    "CRITICAL|moderate|half|dry": {
+      "PUSH_OBJECTIVE": 3301.600000000098,
+      "FALLBACK": 655.0499999999985
+    },
+    "CRITICAL|light|half|dry": {
+      "PUSH_OBJECTIVE": 1561.549999999956,
+      "FALLBACK": 204.10000000000045,
+      "HOLD_AND_HEAL": 53.54999999999999
+    },
+    "CRITICAL|light|nearly|dry": {
+      "PUSH_OBJECTIVE": 2256.149999999929,
+      "HOLD_AND_HEAL": 299.7
+    },
+    "FIGHT|heavy|empty|dry": {
+      "FLANK": 0.55,
+      "PUSH_OBJECTIVE": 227.79999999999984
+    },
+    "FIGHT|heavy|empty|thin": {
+      "PUSH_OBJECTIVE": 1660.299999999955,
+      "FLANK": 10.799999999999999,
+      "EXPAND_FRONT": 1.35,
+      "HOLD_AND_HEAL": 1.35,
+      "FALLBACK": 1.35,
+      "BUILD_MEX": 1.35,
+      "RALLY": 6.75
+    },
+    "FIGHT|heavy|started|thin": {
+      "PUSH_OBJECTIVE": 2606.1999999999425,
+      "HOLD_AND_HEAL": 2.7,
+      "FALLBACK": 1.35,
+      "RALLY": 14.849999999999998
+    },
+    "FIGHT|heavy|half|thin": {
+      "PUSH_OBJECTIVE": 1005.1999999999723
+    },
+    "CRITICAL|heavy|half|thin": {
+      "PUSH_OBJECTIVE": 1695.0499999999424,
+      "FALLBACK": 39.04999999999999
+    },
+    "CRITICAL|moderate|half|thin": {
+      "PUSH_OBJECTIVE": 2191.349999999928,
+      "FALLBACK": 476.85000000000673
+    },
+    "CRITICAL|moderate|started|thin": {
+      "PUSH_OBJECTIVE": 3638.2500000004065,
+      "FALLBACK": 1054.3499999999626
+    },
+    "CRITICAL|light|half|thin": {
+      "PUSH_OBJECTIVE": 1082.3999999999603,
+      "FALLBACK": 206.80000000000118,
+      "HOLD_AND_HEAL": 43.44999999999997
+    },
+    "CRITICAL|light|started|thin": {
+      "PUSH_OBJECTIVE": 733.1499999999892,
+      "FALLBACK": 141.34999999999982,
+      "HOLD_AND_HEAL": 22.550000000000015
+    },
+    "FIGHT|heavy|started|steady": {
+      "PUSH_OBJECTIVE": 17.55
+    },
+    "CRITICAL|heavy|started|steady": {
+      "PUSH_OBJECTIVE": 1.35
+    },
+    "FIGHT|heavy|half|steady": {
+      "PUSH_OBJECTIVE": 18.900000000000002
+    },
+    "FIGHT|extreme|half|steady": {
+      "PUSH_OBJECTIVE": 20.250000000000004
+    },
+    "CRITICAL|extreme|half|steady": {
+      "PUSH_OBJECTIVE": 2.7
+    },
+    "CRITICAL|heavy|half|steady": {
+      "PUSH_OBJECTIVE": 25.65000000000001
+    },
+    "HOLD|moderate|half|dry": {
+      "PUSH_OBJECTIVE": 688.5000000000065
+    },
+    "FIGHT|moderate|nearly|thin": {
+      "PUSH_OBJECTIVE": 32.40000000000001
+    },
+    "CRITICAL|heavy|started|thin": {
+      "PUSH_OBJECTIVE": 5106.950000000661,
+      "FALLBACK": 1289.9999999999434
+    },
+    "FIGHT|extreme|started|thin": {
+      "PUSH_OBJECTIVE": 57.74999999999989
+    },
+    "CRITICAL|extreme|started|thin": {
+      "PUSH_OBJECTIVE": 665.4999999999948,
+      "FALLBACK": 106.69999999999965
+    },
+    "CRITICAL|moderate|nearly|thin": {
+      "PUSH_OBJECTIVE": 1.35
+    },
+    "FIGHT|none|half|thin": {
+      "PUSH_OBJECTIVE": 13.750000000000005
+    },
+    "CRITICAL|none|nearly|dry": {
+      "PUSH_OBJECTIVE": 9.45,
+      "HOLD_AND_HEAL": 8.1
+    },
+    "CRITICAL|none|half|dry": {
+      "HOLD_AND_HEAL": 3.25
+    },
+    "FIGHT|extreme|empty|thin": {
+      "PUSH_OBJECTIVE": 9.35
+    },
+    "FIGHT|none|started|thin": {
+      "PUSH_OBJECTIVE": 0.55
+    },
+    "CRITICAL|none|half|thin": {
+      "PUSH_OBJECTIVE": 0.55,
+      "HOLD_AND_HEAL": 0.55
+    },
+    "CRITICAL|extreme|half|thin": {
+      "PUSH_OBJECTIVE": 1.35
+    },
+    "HOLD|moderate|half|thin": {
+      "PUSH_OBJECTIVE": 12.149999999999999
+    },
+    "FIGHT|light|nearly|thin": {
+      "PUSH_OBJECTIVE": 1.35
+    },
+    "HOLD|light|half|thin": {
+      "PUSH_OBJECTIVE": 1.35
+    }
+  },
+  "kind_action": {
+    "eco": {
+      "BUILD_ENERGY": 92.09999999999992,
+      "BUILD_MEX": 31.350000000000012,
+      "EXPAND_FRONT": 26.300000000000008,
+      "PUSH_OBJECTIVE": 6670.350000000499,
+      "EXTRACT": 54.000000000000036,
+      "HOLD_AND_HEAL": 139.04999999999973,
+      "FALLBACK": 16.2
+    },
+    "siege": {
+      "BUILD_ENERGY": 56.000000000000036,
+      "PUSH_OBJECTIVE": 5764.0500000005995,
+      "FLANK": 132.94999999999976,
+      "BUILD_MEX": 37.80000000000002,
+      "BUILD_CON": 24.300000000000008,
+      "PROBE": 2.7,
+      "EXPAND_FRONT": 21.600000000000005,
+      "EXTRACT": 17.55,
+      "HOLD_AND_HEAL": 14.500000000000007,
+      "FALLBACK": 452.0500000000062
+    },
+    "wilds": {
+      "RALLY": 24.600000000000005,
+      "HOLD_AND_HEAL": 2.0,
+      "PROBE": 31.700000000000014,
+      "BUILD_ENERGY": 15.200000000000005,
+      "BUILD_MEX": 16.2,
+      "FLANK": 17.55,
+      "PUSH_OBJECTIVE": 4889.350000000821,
+      "EXPAND_FRONT": 6.75,
+      "EXTRACT": 25.65000000000001,
+      "FALLBACK": 1450.3499999999299
+    },
+    "strike": {
+      "PUSH_OBJECTIVE": 7120.20000000062,
+      "FLANK": 137.49999999999974,
+      "PROBE": 83.84999999999997,
+      "HOLD_AND_HEAL": 10.799999999999999,
+      "BUILD_ENERGY": 29.700000000000014,
+      "BUILD_MEX": 18.900000000000002,
+      "BUILD_CON": 10.799999999999999,
+      "EXTRACT": 2.7,
+      "EXPAND_FRONT": 4.050000000000001
+    },
+    "hold": {
+      "HOLD_AND_HEAL": 702.1500000000037,
+      "PUSH_OBJECTIVE": 38270.39999999036,
+      "FLANK": 155.19999999999976,
+      "PROBE": 144.99999999999972,
+      "EXTRACT": 183.59999999999954,
+      "BUILD_ENERGY": 52.700000000000024,
+      "BUILD_MEX": 47.00000000000002,
+      "BUILD_CON": 33.750000000000014,
+      "EXPAND_FRONT": 24.300000000000008,
+      "FALLBACK": 2352.249999999984
+    }
+  },
+  "eco_action": {
+    "dry": {
+      "BUILD_ENERGY": 17.5,
+      "BUILD_MEX": 3.0,
+      "BUILD_CON": 1.0,
+      "PUSH_OBJECTIVE": 4299.74999999986,
+      "HOLD_AND_HEAL": 137.69999999999973,
+      "FALLBACK": 16.2
+    },
+    "thin": {
+      "BUILD_ENERGY": 224.2999999999995,
+      "BUILD_MEX": 150.7499999999997,
+      "EXPAND_FRONT": 75.75,
+      "FLANK": 188.49999999999957,
+      "BUILD_CON": 63.450000000000045,
+      "PUSH_OBJECTIVE": 26849.69999998274,
+      "PROBE": 102.59999999999988,
+      "EXTRACT": 21.600000000000005,
+      "FALLBACK": 3317.8000000003003,
+      "HOLD_AND_HEAL": 70.59999999999984,
+      "RALLY": 21.600000000000005
+    },
+    "steady": {
+      "EXPAND_FRONT": 8.75,
+      "PUSH_OBJECTIVE": 663.500000000006,
+      "BUILD_CON": 6.4,
+      "EXTRACT": 166.0499999999996,
+      "BUILD_ENERGY": 5.4,
+      "FLANK": 91.79999999999993,
+      "HOLD_AND_HEAL": 12.149999999999999
+    },
+    "fat": {
+      "PUSH_OBJECTIVE": 3.0,
+      "TECH_UP": 1.5,
+      "FLANK": 1.5
+    }
+  },
+  "width_action": {
+    "narrow": {
+      "PUSH_OBJECTIVE": 3605.8499999998385,
+      "FLANK": 17.55,
+      "PROBE": 1.35,
+      "HOLD_AND_HEAL": 43.200000000000024,
+      "FALLBACK": 58.05000000000004
+    },
+    "open": {
+      "FLANK": 30.85000000000002,
+      "PUSH_OBJECTIVE": 22262.949999994475,
+      "FALLBACK": 868.3999999999841,
+      "HOLD_AND_HEAL": 328.2000000000007,
+      "PROBE": 0.55,
+      "BUILD_ENERGY": 83.74999999999996,
+      "BUILD_MEX": 17.299999999999997,
+      "EXPAND_FRONT": 5.4
+    },
+    "wide": {
+      "BUILD_ENERGY": 55.700000000000024,
+      "BUILD_MEX": 16.2,
+      "FLANK": 21.600000000000005,
+      "EXPAND_FRONT": 10.799999999999999,
+      "HOLD_AND_HEAL": 459.350000000003,
+      "FALLBACK": 3344.4000000003034,
+      "PUSH_OBJECTIVE": 35850.69999998442,
+      "RALLY": 21.600000000000005
+    }
+  },
+  "lane_action": {
+    "solid": {
+      "PROBE": 1.9000000000000001,
+      "FLANK": 14.650000000000002,
+      "PUSH_OBJECTIVE": 2300.6499999999305,
+      "BUILD_ENERGY": 25.70000000000001,
+      "BUILD_MEX": 6.5,
+      "EXPAND_FRONT": 2.7
+    },
+    "ragged": {
+      "FLANK": 4.050000000000001,
+      "PUSH_OBJECTIVE": 34915.599999983744,
+      "FALLBACK": 2327.949999999977,
+      "HOLD_AND_HEAL": 673.1500000000037
+    },
+    "broken": {
+      "PUSH_OBJECTIVE": 623.7000000000054,
+      "HOLD_AND_HEAL": 5.4,
+      "FALLBACK": 24.300000000000008
+    }
+  },
+  "manifold_notes": "bar-eco-manifold-five.vercel.app — industrial structure ROI. T1 mex ~50m/500e payback via xm; wind cheap energy; solar steady o; con bp before tech; no-metal maps force energy→converter path.",
+  "updated_at": "2026-07-26T17:45:18.899847+00:00"
+}

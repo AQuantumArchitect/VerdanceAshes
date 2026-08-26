@@ -193,7 +193,10 @@ class StoryEngineV1Tests(unittest.TestCase):
                 state, _report, _intent, _events = engine.process_result(state, result, telemetry, root)
             wall_after = state["zoneMemory"]["ancient_bastion"]["AB_EASTERN_BASTION_WALL"]
             self.assertAlmostEqual(state["campaignClockMinutes"], 60.0, places=3)
-            self.assertGreater(wall_after["abstract"]["fortification"], start_fort + 0.35)
+            # v0.8.4 multi-rate clock: ancient_bastion is a FAR theater (0.25x),
+            # so 60 wall minutes are ~15 effective minutes of defender growth.
+            self.assertEqual(wall_after["offscreenEstimate"]["timeBand"], "far")
+            self.assertGreater(wall_after["abstract"]["fortification"], start_fort + 0.10)
             self.assertEqual(wall_after["offscreenEstimate"]["actor"], "SimpleDefenderAI")
 
     def test_wild_extraction_resets_live_raptors_but_escalates_pressure(self):
@@ -347,7 +350,7 @@ class WarMapTests(unittest.TestCase):
             for c in candidates:
                 self.assertIn(c["mapId"], valid_maps)
                 self.assertIn(c["objective"]["kind"], (
-                    "economy_disrupt", "strike_relay", "seize_lane", "gate_control",
+                    "economy_disrupt", "eco_raid", "strike_relay", "seize_lane", "gate_control",
                     "destroy_key_structure", "hive_clear_or_bypass", "choose_target_then_extract"))
                 self.assertTrue(c["consequenceIfIgnored"])
 
@@ -379,8 +382,10 @@ class WarMapTests(unittest.TestCase):
             west = ab["AB_WESTERN_MUSTER_GROUNDS"]
             self.assertEqual(west["controllingFaction"], "ashwalkers")
             flips = []
-            for _ in range(4):
-                # Active map is elsewhere, so ancient_bastion keeps eroding.
+            for _ in range(6):
+                # Active map is elsewhere, so ancient_bastion keeps eroding —
+                # at the FAR-band rate (0.25x, v0.8.4 multi-rate clock), which
+                # needs ~5 twenty-minute beats before the zone actually falls.
                 flips += engine.apply_front_decay(state, "greenest_fields", [], 20.0)
             self.assertEqual(west["controllingFaction"], "armada")
             self.assertTrue(any(f["zoneId"] == "AB_WESTERN_MUSTER_GROUNDS" for f in flips))
@@ -470,6 +475,46 @@ class RosterTests(unittest.TestCase):
             state["reputation"]["nullmercs"] = 20
             intent2 = engine.materialize_next_intent(state, root)
             self.assertLess(intent2["worldConflict"]["nullMercs"]["footholdScale"], 0.85)
+
+
+class CommerceTests(unittest.TestCase):
+    def test_starter_punch_of_thugs_and_zero_tenebrium(self):
+        with make_workspace() as tmp:
+            root = Path(tmp)
+            # Catalog lives in real workspace; ensure_commerce falls back to tools parent.
+            state = engine.default_v1_state()
+            commerce = engine.ensure_commerce(state, root)
+            self.assertEqual(commerce["tenebrium"], 0)
+            self.assertIn("punch_of_thugs", commerce["owned"])
+            self.assertTrue(commerce["owned"]["punch_of_thugs"].get("loan"))
+            self.assertEqual(int(commerce["owned"]["punch_of_thugs"].get("loanCount") or 0), 6)
+
+    def test_build_items_require_tenebrium_floor(self):
+        with make_workspace() as tmp:
+            root = Path(tmp)
+            state = engine.default_v1_state()
+            engine.ensure_commerce(state, root)
+            blocked = engine.purchase_listing(state, "cortex_grunt_fab", root)
+            self.assertFalse(blocked["ok"])
+            state["commerce"]["tenebrium"] = 1
+            state["commerce"]["credits"] = 200
+            state["reputation"]["cortex"] = 30
+            bought = engine.purchase_listing(state, "cortex_grunt_fab", root)
+            self.assertTrue(bought["ok"], bought)
+            self.assertEqual(bought["tenebriumCost"], 1)
+            self.assertEqual(state["commerce"]["tenebrium"], 0)
+
+    def test_intent_deploys_loan_package(self):
+        with make_workspace() as tmp:
+            root = Path(tmp)
+            state = sample_state()
+            engine.ensure_zone_memory(state, root)
+            intent = engine.materialize_next_intent(state, root)
+            self.assertIn("commerce", intent)
+            self.assertEqual(intent["commerce"]["tenebrium"], 0)
+            packages = [d for d in intent["commerce"]["deploy"] if d.get("kind") == "package"]
+            self.assertTrue(any(d.get("unitDef") == "corthud" for d in packages))
+            self.assertTrue(any(d.get("loan") for d in packages))
 
 
 def _zone(control, mil=0.0, base=0.0, eco=0.0, hazard=0.0, instab=0.5, fort=0.0):
@@ -692,6 +737,812 @@ class KethaReactiveTests(unittest.TestCase):
         self.assertTrue(any("Northwest Green Start" in t for t in texts))
         # The {zone} token must be fully interpolated (no literal placeholder left).
         self.assertFalse(any("{zone}" in t for t in texts))
+
+
+class CraftedWorldTests(unittest.TestCase):
+    """Get-back-on-track: the generator reads the crafted seven_maps world."""
+
+    def test_parse_campaign_forces_grammar(self):
+        self.assertEqual(engine.parse_campaign_forces("So6 Wi4 D2"),
+                         {"mex": 0, "solar": 6, "wind": 4, "defense": 2})
+        self.assertEqual(engine.parse_campaign_forces("M9 So4 Wi3 D8"),
+                         {"mex": 9, "solar": 4, "wind": 3, "defense": 8})
+        self.assertEqual(engine.parse_campaign_forces(""),
+                         {"mex": 0, "solar": 0, "wind": 0, "defense": 0})
+        self.assertEqual(engine.parse_campaign_forces(None)["solar"], 0)
+
+    def test_greenest_fields_objective_is_armada_eco_raid(self):
+        obj = engine.objective_for_map("greenest_fields", {})
+        self.assertEqual(obj["kind"], "eco_raid")
+        self.assertEqual(obj["enemyFaction"], "armada")
+        # The target zone id must NOT trip the compiler's Cortex name heuristic.
+        self.assertNotIn("SYNTH", obj["targetZoneId"].upper())
+
+    def test_zone_infrastructure_reads_crafted_pool(self):
+        # Uses the real data/map_pool/seven_maps.json via the repo root.
+        infra = engine.zone_infrastructure_for("greenest_fields", ROOT)
+        self.assertEqual(infra["primaryFaction"], "armada")
+        self.assertEqual(infra["parsed"]["armada"], {"mex": 0, "solar": 6, "wind": 4, "defense": 2})
+        self.assertEqual(infra["parsed"]["nullmercs"]["wind"], 2)
+        # Greenest Fields is authored with NO Cortex presence.
+        self.assertFalse(any(infra["parsed"]["cortex"].values()))
+        # Eye of Horus is the Cortex accent map.
+        eoh = engine.zone_infrastructure_for("eye_of_horus", ROOT)
+        self.assertEqual(eoh["primaryFaction"], "cortex")
+
+    def test_intent_carries_enemy_infrastructure(self):
+        # Use a clean workspace so live outbox/next_sortie_order.json cannot
+        # override the alpha spine (mission 1 = greenest_fields).
+        with make_workspace() as tmp:
+            root = Path(tmp)
+            # Map pool + zone maps are read from the real repo for infra text.
+            # materialize still needs a Path; copy seven_maps pointer via ROOT
+            # by using ROOT but ignoring sortie: clear override via empty outbox.
+            state = {"campaignId": "verdance_ashes", "missionNumber": 1,
+                     "reputation": {"nullmercs": 43}, "graph": {}, "zoneMemory": {}}
+            engine.ensure_roster(state)
+            # Prefer spine over any live contract: force no sortie in clean outbox.
+            intent = engine.materialize_next_intent(state, root)
+            # Without zone maps / pool in tmp, map still comes from spine.
+            self.assertEqual(intent["mapId"], "greenest_fields")
+            self.assertEqual(intent["objective"], "eco_raid")
+            # Infrastructure from real pool when path is the repo root:
+            intent_real = engine.materialize_next_intent(state, ROOT)
+            # If a live sortie order is present it may retarget the map — assert
+            # infrastructure helper independently so the test stays deterministic.
+            infra = engine.zone_infrastructure_for("greenest_fields", ROOT)
+            self.assertEqual(infra["primaryFaction"], "armada")
+            self.assertEqual(infra["parsed"]["armada"]["solar"], 6)
+            self.assertIn("enemyInfrastructure", intent_real)
+
+
+class HeroRosterTests(unittest.TestCase):
+    """Mission-feel pass: the named Fire-Emblem hero roster."""
+
+    def test_default_state_seeds_critical_heroes(self):
+        # WO-008: missionCritical is UI emphasis only (no longer auto-abort).
+        state = sample_state()
+        roster = engine.ensure_roster(state)
+        ids = {h["heroId"] for h in roster["heroes"]}
+        self.assertIn("vane", ids)
+        self.assertIn("ketha", ids)
+        for hero in roster["heroes"]:
+            self.assertIn("missionCritical", hero)
+            self.assertNotEqual(hero["unitDef"], "legcom")
+            self.assertIn("campaignXp", hero)
+            self.assertGreaterEqual(hero["xp"], 0.0)
+
+    def test_intent_deploys_active_heroes_and_skips_dead(self):
+        state = sample_state()
+        roster = engine.ensure_roster(state)
+        roster["heroes"].append({
+            "heroId": "brakka", "name": "Brakka", "unitDef": "leggat",
+            "missionCritical": False, "status": "dead", "xp": 1.0, "timesWounded": 2,
+        })
+        intent = engine.build_roster_intent(state)
+        ids = [h["heroId"] for h in intent["heroes"]]
+        self.assertIn("vane", ids)
+        self.assertNotIn("brakka", ids)
+
+    def test_wounded_hero_deploys_thinner(self):
+        state = sample_state()
+        roster = engine.ensure_roster(state)
+        for hero in roster["heroes"]:
+            if hero["heroId"] == "ketha":
+                hero["status"] = "wounded"
+        intent = engine.build_roster_intent(state)
+        ketha = next(h for h in intent["heroes"] if h["heroId"] == "ketha")
+        vane = next(h for h in intent["heroes"] if h["heroId"] == "vane")
+        self.assertTrue(ketha["wounded"])
+        self.assertLess(ketha["hpMult"], vane["hpMult"])
+
+    def test_hero_results_update_roster(self):
+        with make_workspace() as tmp:
+            root = Path(tmp)
+            state = sample_state()
+            roster = engine.ensure_roster(state)
+            roster["heroes"].append({
+                "heroId": "brakka", "name": "Brakka", "unitDef": "leggat",
+                "missionCritical": False, "status": "active", "xp": 0.5,
+                "campaignXp": 40.0, "peakBarXp": 0.5, "timesWounded": 0,
+            })
+            # Pin starting bar XP so campaign-ladder floors do not obscure the peak rule.
+            for h in roster["heroes"]:
+                if h["heroId"] == "vane":
+                    h["campaignXp"] = 10.0
+                    h["xp"] = 0.25
+                    h["peakBarXp"] = 0.25
+                if h["heroId"] == "ketha":
+                    h["campaignXp"] = 5.0
+                    h["xp"] = 0.05
+                    h["peakBarXp"] = 0.05
+            result = sample_result(heroResults={
+                "vane": {"status": "survived", "wasDown": False, "xp": 0.61},
+                "ketha": {"status": "wounded", "wasDown": True, "xp": 0.12},
+                "brakka": {"status": "dead", "wasDown": True, "xp": 0.5},
+            })
+            state, report, intent, events = engine.process_result(state, result, None, root)
+            self.assertTrue(report["processed"])
+            heroes = {h["heroId"]: h for h in state["roster"]["heroes"]}
+            self.assertEqual(heroes["vane"]["status"], "active")
+            # Peak BAR xp is sticky; campaign ladder may raise the floor further.
+            self.assertGreaterEqual(heroes["vane"]["xp"], 0.61)
+            self.assertGreater(heroes["vane"]["campaignXp"], 10.0)
+            self.assertEqual(heroes["ketha"]["status"], "wounded")
+            self.assertEqual(heroes["ketha"]["timesWounded"], 1)
+            # Fire Emblem: a non-critical hero left in the wreckage is gone.
+            self.assertEqual(heroes["brakka"]["status"], "dead")
+            # XP NEVER resets on death — peak and campaign ladder stay.
+            self.assertGreaterEqual(heroes["brakka"]["xp"], 0.5)
+            self.assertGreater(heroes["brakka"]["campaignXp"], 40.0)
+            # And the next intent no longer fields them.
+            ids = [h["heroId"] for h in intent["roster"]["heroes"]]
+            self.assertNotIn("brakka", ids)
+
+    def test_xp_never_wiped_on_character_death(self):
+        """Operator rule: death changes status, never zeroes the sheet."""
+        with make_workspace() as tmp:
+            root = Path(tmp)
+            state = sample_state()
+            state["characters"]["vane"]["xp"] = 2000
+            state["characters"]["vane"]["status"] = "active"
+            result = sample_result(namedOutcomes=[
+                {"charId": "vane", "outcome": "dead", "cause": "wreck_destroyed"},
+                {"charId": "ketha", "outcome": "survived"},
+            ], heroResults={
+                "vane": {"status": "dead", "wasDown": True, "xp": 0.9},
+                "ketha": {"status": "survived", "wasDown": False, "xp": 0.2},
+            })
+            state, report, _, _ = engine.process_result(state, result, None, root)
+            self.assertTrue(report["processed"])
+            self.assertEqual(state["characters"]["vane"]["status"], "dead")
+            self.assertGreaterEqual(float(state["characters"]["vane"]["xp"]), 2000)
+            heroes = {h["heroId"]: h for h in state["roster"]["heroes"]}
+            self.assertEqual(heroes["vane"]["status"], "dead")
+            self.assertGreaterEqual(heroes["vane"]["xp"], 0.9)
+
+    def test_cracked_farm_mode_levels_heroes_fast(self):
+        with make_workspace() as tmp:
+            root = Path(tmp)
+            state = sample_state()
+            state["progression"] = {
+                "mode": "cracked_farm",
+                "difficultyDial": 1.0,
+                "xpMultiplier": 1.0,
+                "farmSortiesEnabled": True,
+                "xpPersistOnDeath": True,
+            }
+            roster = engine.ensure_roster(state)
+            for h in roster["heroes"]:
+                h["campaignXp"] = 0.0
+                h["xp"] = 0.1
+                h["peakBarXp"] = 0.1
+            # Several clean victories should put heroes well up the ladder.
+            for n in range(1, 9):
+                mid = f"va_{n:03d}"
+                result = sample_result(
+                    missionNumber=n,
+                    missionId=mid,
+                    resultKey=f"verdance_ashes|{mid}|{n}|victory",
+                    heroResults={
+                        "vane": {"status": "survived", "wasDown": False, "xp": 0.2 + n * 0.05},
+                        "ketha": {"status": "survived", "wasDown": False, "xp": 0.1 + n * 0.04},
+                    },
+                )
+                state, report, intent, _ = engine.process_result(state, result, None, root)
+                self.assertTrue(report["processed"])
+            heroes = {h["heroId"]: h for h in state["roster"]["heroes"]}
+            self.assertGreaterEqual(heroes["vane"]["level"], 5)
+            self.assertGreaterEqual(heroes["vane"]["campaignXp"], 400)
+            # Intent deploys thicker cracked heroes.
+            vane = next(h for h in intent["roster"]["heroes"] if h["heroId"] == "vane")
+            self.assertGreaterEqual(vane["level"], 5)
+            self.assertGreaterEqual(vane["hpMult"], 1.5)
+            self.assertIn(intent["roster"]["progression"]["mode"], ("cracked_farm", "standard"))
+            self.assertTrue(intent["roster"]["progression"]["xpPersistOnDeath"])
+
+    def test_wounds_heal_between_missions(self):
+        with make_workspace() as tmp:
+            root = Path(tmp)
+            state = sample_state()
+            roster = engine.ensure_roster(state)
+            for hero in roster["heroes"]:
+                if hero["heroId"] == "ketha":
+                    hero["status"] = "wounded"
+            result = sample_result(heroResults={
+                "ketha": {"status": "survived", "wasDown": False, "xp": 0.2},
+            })
+            state, report, _, _ = engine.process_result(state, result, None, root)
+            heroes = {h["heroId"]: h for h in state["roster"]["heroes"]}
+            self.assertEqual(heroes["ketha"]["status"], "active")
+
+    def test_hero_lost_result_advances_campaign(self):
+        """WO-008: hero loss is now a wreck decision, not a hard abort.
+        The sortie processes as a defeat, the mission advances, and
+        the story events carry a hero-lost tag for the wreck narrative."""
+        with make_workspace() as tmp:
+            root = Path(tmp)
+            state = sample_state()
+            before = copy.deepcopy(engine.migrate_state(state))
+            result = sample_result(status="defeat", terminalReason="hero_lost_ketha",
+                                   destroyedObjectiveIds=[], extractionStatus="")
+            state, report, intent, events = engine.process_result(state, result, None, root)
+            # Campaign DOES advance — no more hard restart.
+            self.assertTrue(report["processed"])
+            # Mission number incremented.
+            self.assertGreater(state["missionNumber"], before["missionNumber"])
+            # History now has an extra bead.
+            self.assertGreater(len(state["history"]), len(before["history"]))
+
+
+class BeatsAndExtractionTests(unittest.TestCase):
+    """Mission-feel pass: seed-authored beats and distinct extraction zones."""
+
+    def test_intent_carries_beats_with_core_triggers(self):
+        state = {"campaignId": "verdance_ashes", "missionNumber": 1,
+                 "reputation": {"nullmercs": 43}, "graph": {}, "zoneMemory": {}}
+        engine.ensure_roster(state)
+        intent = engine.materialize_next_intent(state, ROOT)
+        beats = intent["beats"]
+        self.assertGreaterEqual(len(beats), 4)
+        triggers = {b["trigger"]["type"] for b in beats}
+        self.assertIn("time", triggers)
+        self.assertIn("objective_complete", triggers)
+        self.assertIn("hero_down", triggers)
+        for beat in beats:
+            for action in beat["actions"]:
+                if action["type"] == "bark":
+                    self.assertTrue(action["text"])
+                    self.assertEqual(action["speaker"], "Ketha")
+
+    def test_beats_are_deterministic_per_campaign_moment(self):
+        state = {"campaignId": "verdance_ashes", "missionNumber": 3,
+                 "reputation": {"nullmercs": 43}, "graph": {}, "zoneMemory": {}}
+        engine.ensure_roster(state)
+        a = engine.materialize_next_intent(copy.deepcopy(state), ROOT)["beats"]
+        b = engine.materialize_next_intent(copy.deepcopy(state), ROOT)["beats"]
+        self.assertEqual(a, b)
+
+    def test_extraction_zone_differs_from_deploy_when_map_allows(self):
+        with make_workspace() as tmp:
+            root = Path(tmp)
+            # greenest_fields fixture has energy_edge zones distinct from deploy.
+            zone = engine.extraction_zone_for("greenest_fields", "GF_NW_GREEN_START",
+                                              root, "GF_SE_SYNTH_START")
+            self.assertNotEqual(zone, "GF_NW_GREEN_START")
+            self.assertNotEqual(zone, "GF_SE_SYNTH_START")
+
+    def test_extraction_zone_falls_back_to_deploy(self):
+        # No workspace zone map available: deploy zone remains the LZ.
+        zone = engine.extraction_zone_for("koom_valley", "KOOM_NW_GREEN_SHELF")
+        self.assertEqual(zone, "KOOM_NW_GREEN_SHELF")
+
+
+class ActStructureTests(unittest.TestCase):
+    """Drop 2: acts — ground control, constrained RTS, path-keyed finales."""
+
+    @staticmethod
+    def _state(mission_number, path="B", graph=None):
+        state = {"campaignId": "verdance_ashes", "missionNumber": mission_number,
+                 "pathSignal": path, "reputation": {"nullmercs": 43},
+                 "graph": dict(graph or {}), "zoneMemory": {}}
+        engine.ensure_roster(state)
+        return state
+
+    def test_act_boundaries(self):
+        self.assertEqual(engine.act_for_mission(1), 1)
+        self.assertEqual(engine.act_for_mission(5), 1)
+        self.assertEqual(engine.act_for_mission(6), 2)
+        self.assertEqual(engine.act_for_mission(10), 2)
+        self.assertEqual(engine.act_for_mission(11), 3)
+        self.assertEqual(engine.act_for_mission(19), 3)
+
+    def test_tech_policy_shapes(self):
+        act1 = engine.tech_policy_for_act(1)
+        self.assertEqual(act1["buildTech"], 1)
+        self.assertFalse(act1["buildStructures"])
+        act2 = engine.tech_policy_for_act(2)
+        self.assertEqual(act2["buildTech"], 1)
+        self.assertTrue(act2["buildStructures"])
+        act3 = engine.tech_policy_for_act(3)
+        self.assertEqual(act3["buildTech"], 3)
+        self.assertTrue(act3["buildStructures"])
+
+    def test_act1_intent_carries_ground_control_policy(self):
+        intent = engine.materialize_next_intent(self._state(2), None)
+        self.assertEqual(intent["act"]["act"], 1)
+        self.assertEqual(intent["techPolicy"]["mode"], "ground_control")
+        self.assertFalse(intent["techPolicy"]["buildStructures"])
+        self.assertIsNone(intent["finale"])
+        self.assertIn("ground_control", intent["storyTags"])
+
+    def test_act2_intent_constrained_rts(self):
+        intent = engine.materialize_next_intent(self._state(7), None)
+        self.assertEqual(intent["act"]["act"], 2)
+        self.assertEqual(intent["techPolicy"]["mode"], "constrained_rts")
+        self.assertEqual(intent["techPolicy"]["buildTech"], 1)
+        self.assertTrue(intent["techPolicy"]["buildStructures"])
+        self.assertIsNone(intent["finale"])
+
+    def test_finale_map_keyed_by_path(self):
+        cases = (
+            ("A", "ancient_bastion", "overthrow"),
+            ("B", "all_that_simmers", "sovereignty"),
+            ("C", "the_rock_jungle", "spire_jump"),
+        )
+        for path, map_id, kind in cases:
+            state = self._state(12, path=path, graph={"pathSignal" + path: 0.9})
+            intent = engine.materialize_next_intent(state, None)
+            self.assertEqual(intent["act"]["act"], 3)
+            self.assertEqual(intent["mapId"], map_id)
+            self.assertEqual(intent["finale"]["kind"], kind)
+            self.assertTrue(intent["finale"]["massiveStart"])
+            self.assertIsNone(intent["extractionZoneId"])
+            self.assertEqual(intent["techPolicy"]["buildTech"], 3)
+            self.assertIn("finale", intent["storyTags"])
+
+    def test_finale_path_leader_beats_stale_letter(self):
+        state = self._state(12, path="B",
+                            graph={"pathSignalA": 0.8, "pathSignalB": 0.2, "pathSignalC": 0.0})
+        self.assertEqual(engine.finale_path_for_state(state), "A")
+
+    def test_finale_current_path_wins_ties(self):
+        state = self._state(12, path="C",
+                            graph={"pathSignalA": 0.5, "pathSignalB": 0.5, "pathSignalC": 0.5})
+        self.assertEqual(engine.finale_path_for_state(state), "C")
+
+    def test_finale_intent_deterministic(self):
+        state = self._state(11, path="B", graph={"pathSignalB": 0.7})
+        first = engine.materialize_next_intent(copy.deepcopy(state), None)
+        second = engine.materialize_next_intent(copy.deepcopy(state), None)
+        self.assertEqual(first["mapId"], second["mapId"])
+        self.assertEqual(first["objectiveTarget"], second["objectiveTarget"])
+        self.assertEqual(first["finale"], second["finale"])
+
+
+class HeroRosterArcTests(unittest.TestCase):
+    """Drop 3 Wave 2: authored hero roster, recruitment beats, act-2 grants."""
+
+    @staticmethod
+    def _state(mission_number, rep=None):
+        state = {"campaignId": "verdance_ashes", "missionNumber": mission_number,
+                 "pathSignal": "B", "reputation": dict(rep or {"nullmercs": 43}),
+                 "graph": {}, "zoneMemory": {}}
+        engine.ensure_roster(state)
+        return state
+
+    def test_roster_file_heroes_merge_locked(self):
+        state = self._state(1)
+        heroes = state["roster"]["heroes"]
+        by_id = {h["heroId"]: h for h in heroes}
+        file_ids = {h["heroId"] for h in engine.load_hero_roster()}
+        self.assertGreaterEqual(len(file_ids), 10)
+        for hid in file_ids:
+            self.assertIn(hid, by_id)
+            self.assertEqual(by_id[hid]["status"], "locked")
+        # Locked heroes never deploy.
+        deployed = {e["heroId"] for e in engine.hero_intent_entries(state["roster"])}
+        self.assertFalse(file_ids & deployed)
+
+    def test_mission_victory_recruits(self):
+        state = self._state(3)
+        joined = engine.apply_recruitment_beats(state, {"missionNumber": 2}, True, 2)
+        ids = {j["heroId"] for j in joined}
+        self.assertIn("rusk", ids)
+        self.assertNotIn("verse", ids)  # verse needs mission 3 won
+        by_id = {h["heroId"]: h for h in state["roster"]["heroes"]}
+        self.assertEqual(by_id["rusk"]["status"], "active")
+        self.assertEqual(by_id["rusk"]["joinedAtMission"], 2)
+        self.assertEqual(state["characters"]["rusk"]["player"], True)
+        self.assertEqual(state["recentHeroJoins"]["missionNumber"], 3)
+
+    def test_no_victory_no_mission_recruit(self):
+        state = self._state(3)
+        engine.apply_recruitment_beats(state, {"missionNumber": 2}, False, 2)
+        by_id = {h["heroId"]: h for h in state["roster"]["heroes"]}
+        self.assertEqual(by_id["rusk"]["status"], "locked")
+
+    def test_rep_recruit_fires_without_victory(self):
+        state = self._state(4, rep={"nullmercs": 70, "ashwalkers": 5})
+        joined = engine.apply_recruitment_beats(state, {"missionNumber": 4}, False, 4)
+        ids = {j["heroId"] for j in joined}
+        self.assertIn("grath", ids)
+        by_id = {h["heroId"]: h for h in state["roster"]["heroes"]}
+        self.assertEqual(by_id["grath"]["status"], "active")
+        self.assertTrue(state["characters"]["grath"]["player"])
+
+    def test_act2_reward_grants_into_cadre(self):
+        state = self._state(7)
+        rec = engine.apply_act_rewards(state, 6, True)
+        self.assertIsNotNone(rec)
+        roster = state["roster"]
+        self.assertGreaterEqual(roster["cadre"].get("legshot", 0), 2)
+        self.assertEqual(len(roster["grants"]), 1)
+        self.assertEqual(roster["cadreCap"], engine.CADRE_CAP_BASE + 2)
+        # Duplicate grant for the same mission is refused.
+        self.assertIsNone(engine.apply_act_rewards(state, 6, True))
+        # Act-1 missions and non-victories mint nothing.
+        self.assertIsNone(engine.apply_act_rewards(state, 3, True))
+        self.assertIsNone(engine.apply_act_rewards(state, 7, False))
+
+    def test_grant_cap_bonus_clamped(self):
+        roster = {"grants": [{"units": {"legshot": 6}}, {"units": {"legamph": 6}}]}
+        self.assertEqual(engine.grant_cap_bonus(roster), engine.GRANT_CAP_BONUS_MAX)
+
+
+class Drop3TextureTests(unittest.TestCase):
+    """Drop 3 Wave 3: objective matrix, finale voice, campaign completion."""
+
+    def test_act1_rotation_prefers_slot_kind(self):
+        import quest_generator_v1 as qg
+        lane = {"zoneId": "Z1", "role": "lane", "tags": []}
+        eco = {"zoneId": "Z2", "role": "energy_edge", "tags": []}
+        state2 = {"missionNumber": 2, "graph": {}, "reputation": {}, "zoneMemory": {}}
+        self.assertGreater(
+            qg.score_candidate(state2, "m", "Z1", lane, "armada"),
+            qg.score_candidate(state2, "m", "Z2", eco, "armada"))
+        state1 = {"missionNumber": 1, "graph": {}, "reputation": {}, "zoneMemory": {}}
+        self.assertGreater(
+            qg.score_candidate(state1, "m", "Z2", eco, "armada"),
+            qg.score_candidate(state1, "m", "Z1", lane, "armada"))
+
+    def test_finale_briefing_speaks_path_voice(self):
+        state = {"campaignId": "verdance_ashes", "missionNumber": 12,
+                 "pathSignal": "A", "reputation": {"nullmercs": 43},
+                 "graph": {"pathSignalA": 0.9}, "zoneMemory": {}}
+        engine.ensure_roster(state)
+        voice = engine.load_ketha_voice(ROOT)
+        briefing = engine.generate_briefing(
+            state, voice, "ancient_bastion", "siege",
+            {"kind": "destroy_key_structure"}, {})
+        tags = [line["tag"] for line in briefing["lines"]]
+        self.assertIn("finale", tags)
+
+    def test_recent_join_earns_briefing_nod(self):
+        state = {"campaignId": "verdance_ashes", "missionNumber": 4,
+                 "pathSignal": "B", "reputation": {"nullmercs": 43},
+                 "graph": {}, "zoneMemory": {},
+                 "recentHeroJoins": {"missionNumber": 4, "names": ["Rusk Halloway"]}}
+        engine.ensure_roster(state)
+        voice = engine.load_ketha_voice(ROOT)
+        briefing = engine.generate_briefing(
+            state, voice, "greenest_fields", "economy", {"kind": "eco_raid"}, {})
+        texts = [line["text"] for line in briefing["lines"]]
+        pool = voice.get("pools", {}).get("briefing.hero_joined") or []
+        self.assertTrue(any(t in pool for t in texts))
+
+    def test_campaign_complete_marks_epilogue_intent(self):
+        state = {"campaignId": "verdance_ashes", "missionNumber": 12,
+                 "pathSignal": "B", "reputation": {"nullmercs": 43},
+                 "graph": {"pathSignalB": 0.7}, "zoneMemory": {},
+                 "campaignComplete": {"missionNumber": 11, "finaleKind": "sovereignty"}}
+        engine.ensure_roster(state)
+        intent = engine.materialize_next_intent(state, None)
+        self.assertIn("epilogue", intent["storyTags"])
+        self.assertTrue(intent["campaignComplete"])
+
+
+class Drop4EscalationTests(unittest.TestCase):
+    """Escalation ladder, secondary objectives, strong objectives, and the
+    stale-sortie fix (Drop 4)."""
+
+    def test_ladder_windows_climb_and_strengths(self):
+        import escalation_ladder_v1 as ladder
+        mids = []
+        for n in range(1, 11):
+            plan = ladder.plan_for_mission(n, False)
+            lo, hi = plan["scaleWindow"]
+            self.assertLess(lo, hi)
+            mids.append((lo + hi) / 2.0)
+        self.assertEqual(mids, sorted(mids))
+        self.assertEqual(ladder.plan_for_mission(4, False)["secondaries"], [{"required": False}])
+        self.assertEqual(ladder.plan_for_mission(6, False)["secondaries"], [{"required": True}])
+        self.assertEqual(ladder.plan_for_mission(9, False)["objectiveStrength"], "raze")
+        self.assertEqual(ladder.plan_for_mission(10, False)["objectiveStrength"], "purge")
+        finale = ladder.plan_for_mission(11, True)
+        self.assertEqual(finale["objectiveStrength"], "finale")
+        self.assertGreaterEqual(finale["scaleWindow"][0], 1.6)
+        self.assertEqual(finale["secondaries"], [])
+
+    def test_clamp_scale_windows_and_dial(self):
+        import escalation_ladder_v1 as ladder
+        self.assertEqual(ladder.clamp_scale(2.145, [0.85, 1.12]), 1.12)
+        self.assertEqual(ladder.clamp_scale(0.3, [0.35, 0.5]), 0.35)
+        self.assertEqual(ladder.clamp_scale(0.9, [0.85, 1.12]), 0.9)
+        # The owner's dial scales the window walls themselves.
+        self.assertEqual(ladder.clamp_scale(2.145, [0.85, 1.12], dial=1.25), 1.4)
+        self.assertEqual(ladder.clamp_scale(1.0, None), 1.0)
+
+    def test_escalation_plan_stamps_secondaries_from_real_board(self):
+        import escalation_map_v1 as emap
+        with emap.make_sandbox(ROOT) as tmp:
+            ws = Path(tmp)
+            state = engine.default_v1_state()
+            state["missionNumber"] = 6
+            state["currentMissionId"] = engine.mission_id(6)
+            intent = engine.materialize_next_intent(state, ws)
+            plan = intent.get("escalationPlan") or {}
+            secs = plan.get("secondaries") or []
+            self.assertEqual(len(secs), 1)
+            self.assertTrue(secs[0]["required"])
+            self.assertTrue(secs[0]["zoneId"])
+            self.assertNotEqual(secs[0]["zoneId"], intent.get("targetZoneId"))
+            state["missionNumber"] = 10
+            state["currentMissionId"] = engine.mission_id(10)
+            i10 = engine.materialize_next_intent(state, ws)
+            self.assertEqual(i10["escalationPlan"]["objectiveStrength"], "purge")
+            self.assertEqual(i10["escalationPlan"]["secondaries"], [])
+
+    def test_bonus_secondary_pays_merc_standing(self):
+        with make_workspace() as tmp:
+            root = Path(tmp)
+            state = sample_state()
+            result = sample_result(
+                secondaryResults=[
+                    {"id": "sec_bonus", "required": False, "completed": True},
+                    {"id": "sec_req", "required": True, "completed": True},
+                ],
+            )
+            rep_before = 43.0
+            state.setdefault("reputation", {})["nullmercs"] = rep_before
+            state, report, _intent, _events = engine.process_result(state, result, None, root)
+            self.assertEqual(report["bonusSecondaries"], 1)
+            self.assertAlmostEqual(
+                float(state["reputation"]["nullmercs"]), rep_before + 1.5, delta=0.6)
+            self.assertIn("secondary-cleared", state["history"][-1]["storyTags"])
+
+    def test_stale_mode_a_sortie_is_consumed(self):
+        with make_workspace() as tmp:
+            root = Path(tmp)
+            outbox = root / "outbox"
+            outbox.mkdir(exist_ok=True)
+            order = {"mapId": "ancient_bastion", "targetZoneId": "AB_EASTERN_BASTION_WALL",
+                     "objectiveArchetype": "seize_lane", "patron": "nullmercs",
+                     "source": "quest_generator_v1"}
+            (outbox / "next_sortie_order.json").write_text(
+                __import__("json").dumps(order), encoding="utf-8")
+            report = engine.consume_played_hub_sorties(
+                root, {"mapId": "ancient_bastion"}, "ancient_bastion")
+            self.assertIn("next_sortie_order.json", report["cleared"])
+            self.assertFalse((outbox / "next_sortie_order.json").exists())
+
+    def test_materialize_discards_order_for_patron_held_zone(self):
+        with make_workspace() as tmp:
+            root = Path(tmp)
+            state = sample_state()
+            engine.ensure_zone_memory(state, root)
+            zm = state["zoneMemory"]["ancient_bastion"]["AB_EASTERN_BASTION_WALL"]
+            zm["controllingFaction"] = "nullmercs"
+            outbox = root / "outbox"
+            outbox.mkdir(exist_ok=True)
+            (outbox / "next_sortie_order.json").write_text(
+                __import__("json").dumps({
+                    "mapId": "ancient_bastion", "targetZoneId": "AB_EASTERN_BASTION_WALL",
+                    "objectiveArchetype": "seize_lane", "patron": "nullmercs"}),
+                encoding="utf-8")
+            intent = engine.materialize_next_intent(state, root)
+            self.assertNotEqual(
+                (intent.get("objectiveTarget") or {}).get("targetZoneId"),
+                "AB_EASTERN_BASTION_WALL")
+
+    def test_anti_repeat_penalizes_last_kind(self):
+        import quest_generator_v1 as qg
+        node = {"role": "lane", "tags": []}
+        base_state = {"missionNumber": 7, "graph": {}, "reputation": {}, "zoneMemory": {}}
+        fresh = qg.score_candidate(base_state, "greenest_fields", "GF_X", node, "armada")
+        repeated = qg.score_candidate(
+            {**base_state, "history": [{"objectiveKind": "seize_lane"}]},
+            "greenest_fields", "GF_X", node, "armada")
+        self.assertAlmostEqual(fresh - repeated, qg.ANTI_REPEAT_PENALTY, places=6)
+
+    def test_zone_vocabulary_maps_to_varied_archetypes(self):
+        import quest_generator_v1 as qg
+        self.assertEqual(qg.archetype_for_node({"role": "causeway"}), "gate_control")
+        self.assertEqual(qg.archetype_for_node({"role": "island_chain"}), "hold_plateau")
+        self.assertEqual(qg.archetype_for_node({"role": "raptor_wilds"}), "survive_wilds")
+        self.assertEqual(qg.archetype_for_node({"role": "fortress"}), "siege")
+        self.assertEqual(qg.archetype_for_node({"role": "", "tags": ["raptors"]}), "survive_wilds")
+
+    def test_briefing_gets_escalation_lines(self):
+        state = {"campaignId": "verdance_ashes", "missionNumber": 9,
+                 "pathSignal": "B", "reputation": {"nullmercs": 43},
+                 "graph": {}, "zoneMemory": {}}
+        engine.ensure_roster(state)
+        voice = engine.load_ketha_voice(ROOT)
+        plan = {"objectiveStrength": "raze",
+                "secondaries": [{"id": "s", "zoneId": "Z", "required": True}]}
+        briefing = engine.generate_briefing(
+            state, voice, "greenest_fields", "economy", {"kind": "strike_relay"}, {}, plan)
+        tags = [line["tag"] for line in briefing["lines"]]
+        self.assertEqual(tags.count("escalation"), 2)
+        texts = [line["text"] for line in briefing["lines"]]
+        raze_pool = voice.get("pools", {}).get("briefing.raze") or []
+        self.assertTrue(any(t in raze_pool for t in texts))
+
+    def test_card_preview_respects_ladder_window(self):
+        state = sample_state()
+        state["missionNumber"] = 6
+        # Inflate zone presence so the raw preview would exceed the m6 window.
+        state["zoneMemory"] = {}
+        pres = engine._difficulty_presentation(state, "ancient_bastion")
+        import escalation_ladder_v1 as ladder
+        lo, hi = ladder.plan_for_mission(6, False)["scaleWindow"]
+        self.assertGreaterEqual(pres["enemyScalePreview"], lo)
+        self.assertLessEqual(pres["enemyScalePreview"], hi)
+
+
+class LivingWorldTests(unittest.TestCase):
+    """The mechanics landed from tools/campaign_flow_matrix_v1.py's already-
+    validated scouting pass: seasons, temperaments, tides, wind, the raptor
+    bloom, and the player's regression arc. Each test pins the mechanism,
+    not the tuning -- the knobs remain guesses by design."""
+
+    def test_the_storm_turns_with_the_season(self):
+        self.assertAlmostEqual(engine.hydrology_storm_phase(1), 0.0, places=9)
+        self.assertAlmostEqual(engine.hydrology_storm_phase(4), 0.9505, places=3)
+        self.assertAlmostEqual(engine.hydrology_storm_phase(8), 0.0, places=3)
+        for n in range(1, 30):
+            self.assertTrue(0.0 <= engine.hydrology_storm_phase(n) <= 1.0)
+
+    def test_koom_valley_never_rises_past_its_cap(self):
+        state = sample_state()
+        cap = engine.HYDRO_LEVEL_CAP["koom_valley"]
+        for n in range(1, 60):
+            state["missionNumber"] = n
+            level = engine.map_waterline(state, "koom_valley", None)["level"]
+            self.assertLessEqual(level, cap + 1e-9)
+
+    def test_a_dry_map_never_swings(self):
+        """Greenest Fields' amplitude is 0 -- it cannot swing, and needs no
+        special case to read that way."""
+        state = sample_state()
+        for n in range(1, 20):
+            state["missionNumber"] = n
+            swing = engine.hydrology_swing(state, None)
+            self.assertEqual(swing["greenest_fields"], 0.0)
+            self.assertTrue(0.0 <= swing["koom_valley"] <= 1.0)
+
+    def test_temperaments_pull_opposite_ways(self):
+        """The owner's judgment call, at the mechanism level: a still map
+        wakes the mercs, a swinging map wakes the armada. Swing is forced by
+        hand-crafting the hydro record with planetWater already present --
+        ensure_planet_hydrology only reseeds levelDelta/peakSwing on a truly
+        fresh (no planetWater) record, and only ever overwrites
+        amplitude/fill/level/basins otherwise, so a pre-set value survives."""
+        state = sample_state()
+        state["hydrology"] = {"planetWater": 1.0, "maps": {
+            "tabula": {"levelDelta": 0.95, "peakSwing": 1.0},
+            "eye_of_horus": {"levelDelta": 0.01, "peakSwing": 1.0},
+        }}
+        activity = engine.hydrology_activity(state, None)
+        self.assertGreater(activity["tabula"]["armada"], activity["tabula"]["nullmercs"])
+        self.assertGreater(activity["eye_of_horus"]["nullmercs"], activity["eye_of_horus"]["armada"])
+
+    def test_cortex_never_reads_swing_only_wind(self):
+        state = sample_state()
+        state["hydrology"] = {"planetWater": 1.0, "maps": {
+            "tabula": {"levelDelta": 0.95, "peakSwing": 1.0},
+        }}
+        activity = engine.hydrology_activity(state, None)
+        self.assertAlmostEqual(activity["tabula"]["cortex"], engine.TEMPERAMENT["cortex"]["base"])
+
+    def test_the_wind_is_real_and_paces_the_windier_map_faster(self):
+        ranges = engine.hydrology_wind_range(ROOT)
+        self.assertIn("tabula", ranges)
+        self.assertLess(ranges["all_that_simmers"]["max"], ranges["tabula"]["max"])
+        state = sample_state()
+        for n in range(1, 10):
+            state["missionNumber"] = n
+            pace = engine.hydrology_wind_pace(state, ROOT)
+            lo, hi = engine.WIND["floor"], engine.WIND["floor"] + engine.WIND["gain"]
+            for value in pace.values():
+                self.assertTrue(lo - 1e-9 <= value <= hi + 1e-9)
+            self.assertGreaterEqual(pace["tabula"], pace["all_that_simmers"])
+
+    def test_wind_pace_is_empty_without_a_map_pool(self):
+        state = sample_state()
+        self.assertEqual(engine.hydrology_wind_pace(state, None), {})
+
+    def test_tick_zone_scales_armada_and_cortex_independently(self):
+        armada = {"zoneId": "z1", "abstract": {"control": "armada"}}
+        engine.tick_zone(armada, "SimpleAI", "tabula", 12.0, {},
+                         activity={"armada": 2.0, "nullmercs": 0.3, "cortex": 1.0})
+        cortex = {"zoneId": "z2", "abstract": {"control": "cortex"}}
+        engine.tick_zone(cortex, "SimpleAI", "tabula", 12.0, {},
+                         activity={"armada": 2.0, "nullmercs": 0.3, "cortex": 1.0})
+        baseline_armada = {"zoneId": "z3", "abstract": {"control": "armada"}}
+        engine.tick_zone(baseline_armada, "SimpleAI", "tabula", 12.0, {})
+        self.assertGreater(armada["abstract"]["baseStrength"],
+                           baseline_armada["abstract"]["baseStrength"])
+        self.assertAlmostEqual(cortex["abstract"]["baseStrength"],
+                               baseline_armada["abstract"]["baseStrength"])
+
+    def test_tick_zone_is_backward_compatible_without_activity(self):
+        zone = {"zoneId": "z1", "abstract": {"control": "armada"}}
+        engine.tick_zone(zone, "SimpleAI", "tabula", 12.0, {})
+        self.assertGreater(zone["abstract"]["baseStrength"], 0.0)
+
+    def test_bloom_fires_after_recession_and_decays_in_still_water(self):
+        state = sample_state()
+        state["hydrology"] = {"planetWater": 1.0, "maps": {"the_rock_jungle": {
+            "levelDeltaPrevious": -0.9, "levelDelta": 0.0}}}
+        first = engine.update_hydrology_bloom(state, "the_rock_jungle", None)
+        self.assertGreater(first, 0.0)
+        state["hydrology"]["maps"]["the_rock_jungle"] = {
+            "levelDeltaPrevious": 0.0, "levelDelta": 0.0}
+        series = [first]
+        for _ in range(6):
+            series.append(engine.update_hydrology_bloom(state, "the_rock_jungle", None))
+        for a, b in zip(series, series[1:]):
+            self.assertLess(b, a)
+
+    def test_the_bloom_only_lives_on_wild_maps(self):
+        state = sample_state()
+        state["hydrology"] = {"maps": {"ancient_bastion": {
+            "levelDeltaPrevious": -0.9, "levelDelta": 0.0}}}
+        self.assertEqual(engine.update_hydrology_bloom(state, "ancient_bastion", None), 0.0)
+
+    def test_tide_feeds_the_bloom_same_mission(self):
+        state = sample_state()
+        state["hydrology"] = {"planetWater": 1.0, "maps": {"the_rock_jungle": {
+            "levelDeltaPrevious": 0.0, "levelDelta": 0.6}}}
+        bloom = engine.update_hydrology_bloom(state, "the_rock_jungle", None)
+        self.assertGreater(bloom, 0.0)
+
+    def test_hydrology_beats_rising_spreads_pulses_falling_is_one_beat(self):
+        rising = engine.hydrology_beats(
+            {"amplitude": 0.8, "level": 0.2, "nextLevel": 0.6}, lambda *_a: None)
+        self.assertEqual(len(rising), engine.TIDE["pulses"])
+        for beat in rising:
+            self.assertTrue(600 <= beat["trigger"]["seconds"] <= 1140)
+        falling = engine.hydrology_beats(
+            {"amplitude": 0.8, "level": 0.6, "nextLevel": 0.2}, lambda *_a: None)
+        self.assertEqual(len(falling), 1)
+        negligible = engine.hydrology_beats(
+            {"amplitude": 0.8, "level": 0.5, "nextLevel": 0.51}, lambda *_a: None)
+        self.assertEqual(negligible, [])
+        dry_map = engine.hydrology_beats(
+            {"amplitude": 0.0, "level": 0.2, "nextLevel": 0.9}, lambda *_a: None)
+        self.assertEqual(dry_map, [])
+
+    def test_player_regression_is_inert_outside_the_window(self):
+        with make_workspace() as tmp:
+            root = Path(tmp)
+            state = sample_state()
+            engine.ensure_zone_memory(state, root)
+            for n in (1, 3, 7, 11):
+                state["missionNumber"] = n
+                flips = engine.apply_player_regression(state, "greenest_fields", [], 20.0, root)
+                self.assertEqual(flips, [])
+
+    def test_player_regression_only_touches_other_maps_ashwalker_ground(self):
+        with make_workspace() as tmp:
+            root = Path(tmp)
+            state = sample_state()
+            engine.ensure_zone_memory(state, root)
+            state["missionNumber"] = 5
+            state["hydrology"] = {"planetWater": 1.0, "maps": {
+                "ancient_bastion": {"levelDelta": 0.95, "peakSwing": 1.0},
+            }}
+            flips = []
+            for _ in range(6):
+                flips += engine.apply_player_regression(state, "greenest_fields", [], 20.0, root)
+            self.assertTrue(any(f["mapId"] == "ancient_bastion" for f in flips))
+            self.assertTrue(any(f["toFaction"] == "armada" for f in flips))
+            # The active map's own ashwalker ground (greenest_fields'
+            # GF_NW_GREEN_START) must never regress -- it is the map being
+            # played, not "another map."
+            gf_start = state["zoneMemory"]["greenest_fields"]["GF_NW_GREEN_START"]
+            self.assertEqual(gf_start["controllingFaction"], "ashwalkers")
+
+    def test_scouting_the_living_world_never_writes_campaign_state(self):
+        path = ROOT / "state" / "campaign_state.json"
+        before = path.read_bytes()
+        state = sample_state()
+        engine.hydrology_activity(state, ROOT)
+        engine.hydrology_wind_pace(state, ROOT)
+        engine.update_hydrology_bloom(state, "the_rock_jungle", ROOT)
+        self.assertEqual(path.read_bytes(), before)
 
 
 if __name__ == "__main__":

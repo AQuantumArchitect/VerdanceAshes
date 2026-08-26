@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "verdance-world-crisis/1.0",
+  "id": "armada_tenebrium_crisis",
+  "label": "Armada Tenebrium Crisis",
+  "active": true,
+  "blurb": "Armada High Command has no Tenebrium left. They spent the black-hole distillate on a continent-scale swarm of autonomous decoy commanders — farming wind, solar, and converters across every scar they could hold. Their occupation eco is already paid for; their ability to field new build-power is frozen.",
+  "faction": "armada",
+  "tenebriumBank": 0,
+  "gameplay": {
+    "blockNewBuildPowerUnits": true,
+    "prePlacedOccupationKeepsStakes": true,
+    "decoyFarmsDropShardsOnDeath": true,
+    "playerCanReclaimTheirStake": true
+  },
+  "graph": {
+    "q7_resource_scarcity_floor": 0.72,
+    "notes": "Q7 is the Tenebrium scarcity qubit; crisis keeps galactic pressure high even when the merc band finds flakes."
+  },
+  "storyHooks": [
+    "briefing.armada.tenebrium_crisis",
+    "debrief.armada.decoy_farms",
+    "ketha.joke.black_hole_budget"
+  ]
+}

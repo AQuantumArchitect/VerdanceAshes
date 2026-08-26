@@ -1,0 +1,234 @@
+{
+ "schemaVersion": "verdance-living-shell/1.1",
+ "mapId": "the_rock_jungle",
+ "templateId": "living_placeholder_v1",
+ "source": "placeholder",
+ "faction": "nullmercs",
+ "character": "Limestone Spire Labyrinth - sparse Null scrap + wild center (not a city)",
+ "characterCard": {
+  "descriptor": "Limestone Spire Labyrinth",
+  "blurb": "PVE outlier. Sparse Null scrap only; center is raptor wilds (not baked buildings). Do not use for global eco tuning.",
+  "shellAtT0": "Thin Null scrap + wilds",
+  "growMix": "2\u00c3\u2014 scrap Null only",
+  "arcKinds": [
+   "survive_wilds"
+  ],
+  "raidHint": "survive_pathing",
+  "captureLater": "corridor",
+  "wrath": {
+   "packId": "wild_thin_v1",
+   "responseSeconds": 150
+  },
+  "source": "placeholder",
+  "realBakeStatus": "pending_cloud_or_iconsatlas"
+ },
+ "arcKinds": [
+  "survive_wilds"
+ ],
+ "raidHint": "survive_pathing",
+ "captureLater": "corridor",
+ "occupation": {
+  "decoyCommanders": true,
+  "notes": "Decoy com nodes (armdecom/cordecom/legdecom) stand in for Armada autonomous eco farmers. Sims use real commanders."
+ },
+ "bake": {
+  "growMinutes": 7,
+  "teams": 2,
+  "seed": 66,
+  "peacefulCoGrow": true,
+  "growProfiles": "rj_se_scrap=scrap; rj_east_causeway=scrap",
+  "simCommanders": "normal",
+  "occupationCommanders": "decoy",
+  "note": "Placeholder density with BARb/SimpleAI rate character + decoy swarm nodes. Replace by bake_living_shell.ps1 for real grow."
+ },
+ "generatedAt": "2026-07-28T20:13:11",
+ "unitCount": 15,
+ "pockets": [
+  {
+   "pocketId": "rj_se_scrap",
+   "zoneId": "TRJ_SE_MUSTER",
+   "label": "Southeast Jungle Shelf Scrap",
+   "kind": "scrap",
+   "faction": "nullmercs",
+   "growProfile": "scrap",
+   "growAI": "SimpleAI",
+   "barbProfile": null,
+   "center": [
+    0.85,
+    0.85
+   ],
+   "unitCount": 9,
+   "primaryCandidate": true,
+   "densityScale": 0.7
+  },
+  {
+   "pocketId": "rj_east_causeway",
+   "zoneId": "TRJ_NE_LANE",
+   "label": "Eastern Causeway Mouth",
+   "kind": "scrap",
+   "faction": "nullmercs",
+   "growProfile": "scrap",
+   "growAI": "SimpleAI",
+   "barbProfile": null,
+   "center": [
+    0.84,
+    0.42
+   ],
+   "unitCount": 6,
+   "primaryCandidate": false,
+   "densityScale": 0.55
+  }
+ ],
+ "units": [
+  {
+   "unitDefName": "legsolar",
+   "x": 0.8546,
+   "z": 0.8665,
+   "facing": 3,
+   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "pocketId": "rj_se_scrap",
+   "keepClass": "energy",
+   "faction": "nullmercs"
+  },
+  {
+   "unitDefName": "legwin",
+   "x": 0.8484,
+   "z": 0.848,
+   "facing": 0,
+   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "pocketId": "rj_se_scrap",
+   "keepClass": "energy",
+   "faction": "nullmercs"
+  },
+  {
+   "unitDefName": "legmex",
+   "x": 0.825,
+   "z": 0.8535,
+   "facing": 0,
+   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "pocketId": "rj_se_scrap",
+   "keepClass": "mex",
+   "faction": "nullmercs"
+  },
+  {
+   "unitDefName": "leglht",
+   "x": 0.8178,
+   "z": 0.8229,
+   "facing": 3,
+   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "pocketId": "rj_se_scrap",
+   "keepClass": "defense",
+   "faction": "nullmercs"
+  },
+  {
+   "unitDefName": "leglht",
+   "x": 0.8895,
+   "z": 0.8511,
+   "facing": 0,
+   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "pocketId": "rj_se_scrap",
+   "keepClass": "defense",
+   "faction": "nullmercs"
+  },
+  {
+   "unitDefName": "legdrag",
+   "x": 0.8503,
+   "z": 0.8858,
+   "facing": 3,
+   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "pocketId": "rj_se_scrap",
+   "keepClass": "wall",
+   "faction": "nullmercs"
+  },
+  {
+   "unitDefName": "legdrag",
+   "x": 0.8082,
+   "z": 0.8597,
+   "facing": 2,
+   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "pocketId": "rj_se_scrap",
+   "keepClass": "wall",
+   "faction": "nullmercs"
+  },
+  {
+   "unitDefName": "legrad",
+   "x": 0.8544,
+   "z": 0.8511,
+   "facing": 0,
+   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "pocketId": "rj_se_scrap",
+   "keepClass": "intel",
+   "faction": "nullmercs"
+  },
+  {
+   "unitDefName": "legdecom",
+   "x": 0.8529,
+   "z": 0.8552,
+   "facing": 2,
+   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "pocketId": "rj_se_scrap",
+   "keepClass": "decoy_node",
+   "faction": "nullmercs"
+  },
+  {
+   "unitDefName": "legmex",
+   "x": 0.8139,
+   "z": 0.4053,
+   "facing": 0,
+   "zoneId": "RJ_EASTERN_CAUSEWAY",
+   "pocketId": "rj_east_causeway",
+   "keepClass": "mex",
+   "faction": "nullmercs"
+  },
+  {
+   "unitDefName": "leglht",
+   "x": 0.8019,
+   "z": 0.4069,
+   "facing": 3,
+   "zoneId": "RJ_EASTERN_CAUSEWAY",
+   "pocketId": "rj_east_causeway",
+   "keepClass": "defense",
+   "faction": "nullmercs"
+  },
+  {
+   "unitDefName": "leglht",
+   "x": 0.8173,
+   "z": 0.3914,
+   "facing": 2,
+   "zoneId": "RJ_EASTERN_CAUSEWAY",
+   "pocketId": "rj_east_causeway",
+   "keepClass": "defense",
+   "faction": "nullmercs"
+  },
+  {
+   "unitDefName": "legdrag",
+   "x": 0.8317,
+   "z": 0.3937,
+   "facing": 2,
+   "zoneId": "RJ_EASTERN_CAUSEWAY",
+   "pocketId": "rj_east_causeway",
+   "keepClass": "wall",
+   "faction": "nullmercs"
+  },
+  {
+   "unitDefName": "legrad",
+   "x": 0.8355,
+   "z": 0.4221,
+   "facing": 0,
+   "zoneId": "RJ_EASTERN_CAUSEWAY",
+   "pocketId": "rj_east_causeway",
+   "keepClass": "intel",
+   "faction": "nullmercs"
+  },
+  {
+   "unitDefName": "legdecom",
+   "x": 0.8438,
+   "z": 0.4165,
+   "facing": 2,
+   "zoneId": "RJ_EASTERN_CAUSEWAY",
+   "pocketId": "rj_east_causeway",
+   "keepClass": "decoy_node",
+   "faction": "nullmercs"
+  }
+ ]
+}

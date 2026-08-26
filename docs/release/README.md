@@ -1,39 +1,47 @@
-# Verdance's Ashes — Procedural Campaign for Beyond All Reason (Alpha)
+# Verdance's Ashes — Campaign for Beyond All Reason (Alpha)
 
-Verdance's Ashes is an experimental **procedural campaign** that runs on top of
-[Beyond All Reason](https://www.beyondallreason.info). You play short sorties in BAR;
-between missions, a local story engine measures what actually happened in your match
-(zone control, army value, economy) and advances a persistent campaign world:
+**The green is dying. Ashwalkers hold the line.**
 
-- a **campaign graph** tracks faction pressure, contested space, scarcity, and your path through the story
-- **zones evolve offscreen** — enemies you ignored keep building while you fight elsewhere
-- your **companion (Ketha)** gains experience, morale, and stress across missions
-- every mission is **generated from campaign state**, not hand-scripted
+A single-player **campaign shell** on top of
+[Beyond All Reason](https://www.beyondallreason.info).
 
-## What's in this package
+You plan the war from a map. You fight short sorties in BAR.
+Between missions the planet digs in — aces gain XP and wounds,
+and the next fight is grown from that living world.
 
-| Piece | What it does |
+## How to play
+
+1. Install Beyond All Reason and launch it once.
+2. Run **`app\bin\PLAY.bat`** (leave the window open).
+3. On the war map:
+   - choose a green **sortie**
+   - mark the ground (defaults are fine)
+   - **Drop into battle**
+4. Play the BAR mission (briefing → objective → extract).
+5. The kernel **BAR bridge** usually brings the result home automatically.
+   If not: **After the fight — bring it home**.
+6. Repeat: hire mercs, rest, talk, or take the next drop.
+
+Architecture: `docs/SHIP_ARCHITECTURE.md` (kernel phases 0–4).
+
+Same-map continues: after a win, press **1 / 2 / 3** on the debrief to keep
+fighting without leaving the map (heroes and warband carry forward).
+
+## Package pieces
+
+| Piece | Role |
 |---|---|
-| `VerdanceAshes.sdd` | A BAR mutator (game archive). Spawns missions, detects objectives, ends the game, and reports results. Installed into your BAR `data\games\` folder. |
-| `workspace\` | The campaign engine: builds the next mission, launches BAR, reads the result out of the match, advances the campaign, and generates the next mission. |
+| War map (`PLAY.bat` → :8770) | Aces, broker, theaters, drop → launch |
+| `VerdanceAshes.sdd` | BAR mutator: mission seed, objectives, debrief |
+| Campaign engine | Builds the next sortie from `campaign_state` |
 
-## Quick start
-
-1. Install and launch Beyond All Reason at least once (so it downloads an engine).
-2. Unzip this package anywhere (e.g. `Documents\VerdanceAshes`).
-3. Run `workspace\SETUP.bat`. It finds your BAR install, installs the mutator, and creates a fresh campaign.
-4. Run `workspace\PLAY_SESSION.bat`. It builds mission 1, launches BAR, and waits.
-5. Play the mission. The objective panel at the top of the screen tells you what to do.
-   Win/loss is detected automatically; when the game ends, the campaign advances itself
-   and the next mission is built.
-6. Run `PLAY_SESSION.bat` again for the next mission. That's the loop.
-
-See `INSTALL.md` for troubleshooting and `PLAYTESTING.md` for how to send feedback.
+A copy in `Documents\My Games\VerdanceAshes` can be installed with
+`scripts\ship.ps1 -InstallToMyGames` (see `docs/DEPLOY_TRUTH.md`).
 
 ## Status
 
-This is an **alpha playtest build**. The campaign spine currently cycles seven maps
-(Greenest Fields → Eye of Horus → Koom Valley → Tabula → Ancient Bastion →
-The Rock Jungle → All That Simmers) with generated objectives, difficulty scaled by
-campaign pressure, and persistent zone memory. Dialogue and story presentation are
-minimal. Expect rough edges — that's what the playtest is for.
+Alpha playtest. Seven theaters (Greenest Fields → … → All That Simmers),
+generated objectives, living occupation, Null Mercs vs Armada world war.
+Expect rough edges — that's the point of the playtest.
+
+See `START_HERE.txt` for the 30-second path and `PLAYTESTING.md` for feedback.

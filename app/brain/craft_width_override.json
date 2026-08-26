@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "craft-width-override/0.1",
+  "source_recipe": "20260726_131147",
+  "knobs": {
+    "difficulty": 1.31,
+    "width_early": 0.18,
+    "width_late": 0.74,
+    "width_ease": 0.66,
+    "decoy_pressure": 2.2,
+    "enemy_aggro": 1.35,
+    "lane_bias": 1.02,
+    "path_purity_target": 0.37,
+    "arc1_scale": 0.94,
+    "arc2_scale": 0.95,
+    "arc3_scale": 1.67
+  },
+  "widths": [
+    0.18,
+    0.2781,
+    0.335,
+    0.3826,
+    0.425,
+    0.4638,
+    0.5001,
+    0.5344,
+    0.5671,
+    0.5984,
+    0.6285,
+    0.6576,
+    0.6858,
+    0.7133,
+    0.74
+  ],
+  "notes": "Consumed by campaign_manifold if present (optional pin after gym)."
+}

@@ -1,0 +1,197 @@
+{
+  "schemaVersion": "verdance-spawn-configs/1.0",
+  "notes": [
+    "Spawn configurations for the zone cartography survey. Each config is a RULE,",
+    "not coordinates: tools/plan_cartography_runs_v1.py resolves it per map against",
+    "that map's terrain raster (authored start positions + buildable/metal cells).",
+    "",
+    "The point of the matrix is that one canonical 1v1 only ever shows you one front.",
+    "Folding the map (adjacent), opening it up (three_way, four_corners) and inverting",
+    "it (center_vs_rim) is what exposes which ground is a lane, which is a shelf nobody",
+    "ever walks, and which middle is contested no matter who starts where.",
+    "",
+    "Sim minutes are budget: ~28 min wall per 21 sim-min headless run on this machine.",
+    "Milestone frames are the Fibonacci minute ladder the profiler already uses."
+  ],
+  "gridRes": 96,
+  "sampleFrames": 300,
+  "milestoneMinutes": [
+    1,
+    2,
+    3,
+    5,
+    8,
+    13,
+    21
+  ],
+  "aiProfiles": {
+    "aggressive": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+    },
+    "balanced": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard"
+    },
+    "defender": {
+      "shortName": "SimpleDefenderAI",
+      "version": "<not-versioned>"
+    },
+    "raptors": {
+      "shortName": "RaptorsAI",
+      "version": "<not-versioned>"
+    }
+  },
+  "configs": [
+    {
+      "id": "mirror_1v1",
+      "label": "Mirror 1v1",
+      "reveals": "The canonical front. Comparable with the June 2026 baseline survey.",
+      "teams": 2,
+      "placement": "spread",
+      "sides": [
+        "Armada",
+        "Cortex"
+      ],
+      "ai": [
+        "aggressive",
+        "aggressive"
+      ],
+      "simMinutes": 21,
+      "mirror": true,
+      "maps": "all"
+    },
+    {
+      "id": "three_way",
+      "label": "Three-way FFA",
+      "reveals": "Contested middles and secondary lanes; which pair never meets.",
+      "teams": 3,
+      "placement": "spread",
+      "sides": [
+        "Armada",
+        "Cortex",
+        "Legion"
+      ],
+      "ai": [
+        "aggressive",
+        "aggressive",
+        "aggressive"
+      ],
+      "simMinutes": 13,
+      "mirror": false,
+      "maps": "all"
+    },
+    {
+      "id": "adjacent_1v1",
+      "label": "Folded 1v1",
+      "reveals": "Which ground becomes the front when the two starts are neighbours.",
+      "teams": 2,
+      "placement": "adjacent",
+      "sides": [
+        "Armada",
+        "Cortex"
+      ],
+      "ai": [
+        "aggressive",
+        "aggressive"
+      ],
+      "simMinutes": 13,
+      "mirror": false,
+      "maps": "all"
+    },
+    {
+      "id": "four_corners",
+      "label": "Four corners",
+      "reveals": "Maximum pressure everywhere -- exposes ground the war NEVER uses.",
+      "teams": 4,
+      "placement": "derived_corners",
+      "sides": [
+        "Armada",
+        "Cortex",
+        "Legion",
+        "Armada"
+      ],
+      "ai": [
+        "aggressive",
+        "aggressive",
+        "aggressive",
+        "aggressive"
+      ],
+      "simMinutes": 8,
+      "mirror": false,
+      "maps": "all"
+    },
+    {
+      "id": "center_vs_rim",
+      "label": "Centre vs rim",
+      "reveals": "Siege geometry: who owns the middle when someone starts in it.",
+      "teams": 3,
+      "placement": "center_and_rim",
+      "sides": [
+        "Cortex",
+        "Armada",
+        "Legion"
+      ],
+      "ai": [
+        "balanced",
+        "aggressive",
+        "aggressive"
+      ],
+      "simMinutes": 8,
+      "mirror": false,
+      "maps": "all"
+    },
+    {
+      "id": "wilds_on",
+      "label": "Wilds pressure",
+      "reveals": "Hazard territory: which ground the raptor pressure owns outright.",
+      "teams": 2,
+      "placement": "spread",
+      "sides": [
+        "Armada",
+        "Cortex"
+      ],
+      "ai": [
+        "aggressive",
+        "aggressive"
+      ],
+      "extraTeams": [
+        {
+          "ai": "raptors",
+          "side": "Armada",
+          "placement": "center"
+        }
+      ],
+      "modOptions": {
+        "raptor_difficulty": "normal",
+        "raptor_graceperiodmult": "1.0",
+        "raptor_spawncountmult": "1.0",
+        "raptor_raptorstart": "avoid"
+      },
+      "simMinutes": 13,
+      "mirror": false,
+      "maps": [
+        "all_that_simmers",
+        "the_rock_jungle"
+      ]
+    }
+  ],
+  "schedule": {
+    "night1": [
+      "terrain",
+      "mirror_1v1"
+    ],
+    "night2": [
+      "three_way",
+      "adjacent_1v1",
+      "wilds_on"
+    ],
+    "night3": [
+      "four_corners",
+      "center_vs_rim"
+    ],
+    "notes": "Runner is resumable (-Resume skips runs whose raster already exists), so a night that ends early just continues next time."
+  }
+}

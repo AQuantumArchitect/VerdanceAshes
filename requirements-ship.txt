@@ -1,0 +1,4 @@
+# Optional extras for the Steam-shaped launcher.
+# Core kernel runs on stdlib only (Python 3.10+).
+
+pywebview>=5.0  # embedded window instead of system browser

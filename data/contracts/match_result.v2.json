@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "verdance-match-result/2.0",
+  "description": "Kernel match result — gadget emits flat v1 fields; adapters normalize to this.",
+  "required": ["resultKey", "mapId", "verdict"],
+  "properties": {
+    "campaignId": { "type": "string" },
+    "resultKey": { "type": "string" },
+    "missionId": { "type": "string" },
+    "missionNumber": { "type": "integer" },
+    "mapId": { "type": "string" },
+    "chapterIndex": { "type": "integer", "default": 0 },
+    "verdict": { "type": "string" },
+    "success": { "type": "boolean" },
+    "cleanExtract": { "type": "boolean" },
+    "zoneFlipped": { "type": "boolean" },
+    "targetZoneId": { "type": ["string", "null"] },
+    "heroes": { "type": "object" },
+    "playerSurvivors": { "type": "object" },
+    "loanUnitHp": {
+      "type": "object",
+      "description": "unitDef -> { count, avgHpFrac, minHpFrac } for loan quality scoring"
+    },
+    "tenebrium": {
+      "type": "object",
+      "properties": {
+        "bank": { "type": "integer" },
+        "looted": { "type": "integer" },
+        "spent": { "type": "integer" },
+        "lost": { "type": "integer" }
+      }
+    },
+    "armadaTenebriumCrisis": { "type": "boolean" },
+    "shellScars": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "mapId": { "type": "string" },
+          "zoneId": { "type": "string" },
+          "pocketId": { "type": "string" },
+          "unitDefName": { "type": "string" },
+          "destroyed": { "type": "boolean" },
+          "damageFrac": { "type": "number" }
+        }
+      }
+    },
+    "destroyedObjectives": { "type": "array" },
+    "elapsedFrames": { "type": "integer" }
+  }
+}

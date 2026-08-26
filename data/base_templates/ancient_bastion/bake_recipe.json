@@ -1,0 +1,122 @@
+{
+  "schemaVersion": "verdance-shell-bake-recipe/1.0",
+  "mapId": "ancient_bastion",
+  "mapName": "Ancient Bastion Remake 0.5",
+  "templateId": "living_placeholder_v1",
+  "character": "Taelith-Armada Citadel - outer belts + eastern fortress spine",
+  "characterCard": {
+    "descriptor": "Taelith-Armada Citadel",
+    "blurb": "Siege benchmark. Outer approach belts + eastern citadel spine (D8). Bite outer rings; do not full-wipe the fortress.",
+    "shellAtT0": "Outer works + citadel teeth",
+    "growMix": "fortify_hard citadel + fortify gate + thin killfield + hold flanks",
+    "arcKinds": ["siege"],
+    "raidHint": "bite_outer_rings",
+    "captureLater": "outer rings",
+    "wrath": { "packId": "bastion_heavy_v1", "responseSeconds": 90 },
+    "source": "placeholder",
+    "realBakeStatus": "pending_cloud_or_iconsatlas"
+  },
+  "arcKinds": ["siege"],
+  "raidHint": "bite_outer_rings",
+  "captureLater": "outer rings",
+  "faction": "armada",
+  "side": "Armada",
+  "growMinutes": 18,
+  "growFrames": 32400,
+  "peacefulCoGrow": true,
+  "aiShortName": "SimpleAI",
+  "teamCount": 5,
+  "fixedRngSeed": 55,
+  "notes": "Citadel wall = BARb hard (D-heavy). Gatefield = BARb medium. Outer flanks = SimpleAI hold. Killfield thin. Siege benchmark - not global eco tuning. campaignForces ARM D8.",
+  "occupation": {
+    "decoyCommanders": true,
+    "decoyPerPocket": 1,
+    "notes": "Decoy coms on outer belts after strip. Citadel remains D-heavy teeth. Sims use normal commanders."
+  },
+  "playerClear": {
+    "zoneId": "AB_WESTERN_MUSTER_GROUNDS",
+    "bounds": { "xMin": 0.0, "xMax": 0.28, "zMin": 0.0, "zMax": 0.30 },
+    "notes": "Western muster - legion siege staging."
+  },
+  "starts": [
+    {
+      "pocketId": "ab_citadel_wall",
+      "zoneId": "AB_EASTERN_BASTION_WALL",
+      "label": "Eastern Bastion Wall",
+      "kind": "citadel",
+      "faction": "armada",
+      "side": "Armada",
+      "growProfile": "fortify_hard",
+      "x": 0.83,
+      "z": 0.61,
+      "primaryCandidate": true,
+      "densityScale": 1.5
+    },
+    {
+      "pocketId": "ab_gatefield",
+      "zoneId": "AB_CITADEL_GATEFIELD",
+      "label": "Citadel Gatefield",
+      "kind": "gate",
+      "faction": "armada",
+      "side": "Armada",
+      "growProfile": "fortify",
+      "x": 0.38,
+      "z": 0.42,
+      "densityScale": 1.1
+    },
+    {
+      "pocketId": "ab_killfield",
+      "zoneId": "AB_CENTRAL_KILLFIELD",
+      "label": "Central Killfield",
+      "kind": "thin",
+      "faction": "armada",
+      "side": "Armada",
+      "growProfile": "thin",
+      "x": 0.56,
+      "z": 0.47,
+      "densityScale": 0.55
+    },
+    {
+      "pocketId": "ab_north_flank",
+      "zoneId": "AB_NORTHERN_FLANKING_LEDGE",
+      "label": "Northern Flanking Ledge",
+      "kind": "mixed",
+      "faction": "armada",
+      "side": "Armada",
+      "growProfile": "hold",
+      "x": 0.62,
+      "z": 0.12,
+      "densityScale": 0.85
+    },
+    {
+      "pocketId": "ab_south_road",
+      "zoneId": "AB_SOUTHERN_SERVICE_ROAD",
+      "label": "Southern Service Road",
+      "kind": "mixed",
+      "faction": "armada",
+      "side": "Armada",
+      "growProfile": "hold",
+      "x": 0.62,
+      "z": 0.86,
+      "densityScale": 0.85
+    }
+  ],
+  "placeholderDensity": {
+    "solarPerPocket": 6,
+    "windPerPocket": 5,
+    "converterPerPocket": 2,
+    "advSolarPerPocket": 2,
+    "estorPerPocket": 1,
+    "mexPerPocket": 4,
+    "lltPerPocket": 10,
+    "hltPerPocket": 3,
+    "wallPerPocket": 16,
+    "radarPerPocket": 1,
+    "scatterRadius": 0.045
+  },
+  "wrathDefault": {
+    "packId": "bastion_heavy_v1",
+    "responseSeconds": 90,
+    "startOn": "first_contact"
+  }
+}

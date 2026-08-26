@@ -1,10 +1,21 @@
-param(
+﻿param(
   [string]$Workspace = "",
-  [int]$MaxSessionMinutes = 120,
+  [int]$MaxSessionMinutes = 240,
+  [int]$MaxMissions = 12,
+  [switch]$SessionHost,
+  [switch]$NoAutoRelaunch,
   [ValidateSet("visible", "headless-fastwin")]
   [string]$EngineMode = "visible",
   [string]$StatusPath = ""
 )
+
+# WO-057: Session host loops build -> launch -> extract/advance -> next until
+# MaxMissions, BAR is closed mid-campaign, or AutoContinue is off.
+# Mode A (same-map continue) keeps one BAR process alive across sorties; we
+# re-arm extraction on every VA_RESULT so each chapter advances campaign state.
+# Mode B (pkt-bar-mode-b-reload-travel): strategic_link hops → session host
+# Reload path (resolve + rebuild + relaunch). Spring.Reload present (capability
+# GO); external relaunch carries until startscript write is available.
 
 $ErrorActionPreference = "Stop"
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -14,8 +25,14 @@ $Workspace = Get-VerdanceWorkspaceRoot -Workspace $Workspace
 $config = Get-VerdanceConfig -Workspace $Workspace
 if (-not $StatusPath) { $StatusPath = Join-Path $Workspace "outbox\play_session.status.json" }
 
+# Default: multi-mission host on unless explicitly disabled.
+$autoRelaunch = $true
+if ($NoAutoRelaunch) { $autoRelaunch = $false }
+if ($SessionHost) { $autoRelaunch = $true }
+if ($EngineMode -eq "headless-fastwin") { $autoRelaunch = $false; $MaxMissions = 1 }
+
 $script:status = [ordered]@{
-  schemaVersion = "verdance-play-session/1.0"
+  schemaVersion = "verdance-play-session/1.2"
   phase = "starting"
   missionId = $null
   missionNumber = $null
@@ -24,6 +41,14 @@ $script:status = [ordered]@{
   updatedAt = $null
   resultStatus = $null
   nextMissionId = $null
+  missionsCompleted = 0
+  maxMissions = $MaxMissions
+  sessionHost = [bool]$autoRelaunch
+  modeB = [ordered]@{
+    reloadCapability = $null
+    lastAction = $null
+    lastHop = $null
+  }
   error = $null
   message = $null
 }
@@ -88,37 +113,122 @@ function Read-NewInfologText {
   }
 }
 
+function Get-ResultKeysFromText {
+  param([string]$Text)
+  $keys = @()
+  if (-not $Text) { return $keys }
+  # Compact JSON line embeds "resultKey":"..."
+  $matches = [regex]::Matches($Text, '"resultKey"\s*:\s*"([^"]+)"')
+  foreach ($m in $matches) { $keys += $m.Groups[1].Value }
+  return $keys
+}
+
+function Update-ModeBCapabilityFromText {
+  param([string]$Text)
+  if (-not $Text) { return }
+  # VA_CAPABILITY {io=...,reload=true,...}
+  $m = [regex]::Match($Text, 'VA_CAPABILITY\s*\{([^}]+)\}')
+  if (-not $m.Success) { return }
+  $body = $m.Groups[1].Value
+  $reload = $false
+  if ($body -match 'reload\s*=\s*true') { $reload = $true }
+  $script:status.modeB.reloadCapability = $reload
+  if ($reload) {
+    Write-Host "[mode-b] VA_CAPABILITY reload=true (Mode B session host path armed)"
+  }
+}
+
+function Invoke-ModeBReloadPath {
+  # Wire strategic_link edges into the session host Reload path before rebuild.
+  # tools/mode_b_reload_travel.py validates next_sortie_choice against the atlas.
+  $py = $null
+  try { $py = Get-VerdancePython -Workspace $Workspace } catch { $py = $null }
+  if (-not $py) {
+    foreach ($c in @("C:\Python313\python.exe", "python", "py")) {
+      $cmd = Get-Command $c -ErrorAction SilentlyContinue
+      if ($cmd) { $py = $cmd.Source; break }
+      if (Test-Path $c) { $py = $c; break }
+    }
+  }
+  if (-not $py) {
+    Write-Warning "Mode B: no Python; skipping strategic_link resolve"
+    return $null
+  }
+  $tool = Join-Path $Workspace "tools\mode_b_reload_travel.py"
+  if (!(Test-Path $tool)) {
+    Write-Warning "Mode B: tools/mode_b_reload_travel.py missing"
+    return $null
+  }
+  Write-SessionStatus "mode-b-travel" "Resolving Mode B strategic_link travel (session host Reload path)..."
+  $raw = & $py $tool --workspace $Workspace --action resolve 2>&1 | Out-String
+  $code = $LASTEXITCODE
+  $modeBPath = Join-Path $Workspace "outbox\mode_b_travel.latest.json"
+  $result = $null
+  if (Test-Path $modeBPath) {
+    try { $result = Get-Content $modeBPath -Raw | ConvertFrom-Json } catch { $result = $null }
+  }
+  if ($result) {
+    $script:status.modeB.lastAction = [string]$result.action
+    if ($result.selectedHop) {
+      $script:status.modeB.lastHop = [ordered]@{
+        from = [string]$result.selectedHop.fromZoneId
+        to = [string]$result.selectedHop.targetZoneId
+        mapId = [string]$result.selectedHop.mapId
+      }
+    }
+    $msg = if ($result.sessionHost -and $result.sessionHost.message) {
+      [string]$result.sessionHost.message
+    } else {
+      "Mode B action=$($result.action)"
+    }
+    Write-Host "[mode-b] $msg (rc=$code)"
+  } else {
+    Write-Host "[mode-b] resolve finished rc=$code (no stamp file)"
+    if ($raw) { Write-Host $raw.Trim() }
+  }
+  return $result
+}
+
 try {
-  # ---- preflight -------------------------------------------------------
-  Write-SessionStatus "preflight" "Checking for running BAR processes..."
+  Write-SessionStatus "preflight" "Session host=$autoRelaunch maxMissions=$MaxMissions. Checking for running BAR..."
   if (Get-RunningSpring) {
     throw "A spring/spring-headless process is already running. Close BAR (or run VERDANCE_PROCESS_HEALTH.bat -StopSpring) and retry."
   }
-  $intentPath = Join-Path $Workspace "outbox\next_mission_intent.json"
-  if (!(Test-Path $intentPath)) {
-    Write-SessionStatus "preflight" "No mission intent found; materializing from campaign state..."
-    & (Join-Path $ScriptDir "advance_campaign_v1.ps1") -Workspace $Workspace -IntentOnly
-  }
-  $intent = Get-Content $intentPath -Raw | ConvertFrom-Json
-  $script:status.missionId = $intent.missionId
-  $script:status.missionNumber = $intent.missionNumber
 
-  # ---- build + launch --------------------------------------------------
-  Write-SessionStatus "building" "Building mission $($intent.missionId) on $($intent.mapId)..."
-  $infologOffset = 0
-  if (Test-Path $config.infolog) {
-    $infologOffset = (Get-Item -LiteralPath $config.infolog).Length
-  }
+  $sessionDeadline = (Get-Date).AddMinutes($MaxSessionMinutes)
+  $missionsDone = 0
+  $seenResultKeys = @{}
 
-  if ($EngineMode -eq "headless-fastwin") {
-    # Verification mode: build, then run the mission headlessly to a fast win.
-    & (Join-Path $ScriptDir "build_next_mission_v1.ps1") -Workspace $Workspace
-    Write-SessionStatus "in-game" "Running headless fast-win verification mission..."
-    $playablePath = Join-Path $Workspace "data\scenarios\generated\next_mission_intent.playable.json"
-    & (Join-Path $ScriptDir "install_playable_slice.ps1") -Workspace $Workspace `
-      -ScenarioPath $playablePath -Headless -TimeoutSeconds 900 `
-      -ExtraModOptions "va_headless_autostart=1,va_headless_fastwin=1,va_headless_quit=1"
-  } else {
+  while ($missionsDone -lt $MaxMissions -and (Get-Date) -lt $sessionDeadline) {
+    $intentPath = Join-Path $Workspace "outbox\next_mission_intent.json"
+    if (!(Test-Path $intentPath)) {
+      Write-SessionStatus "preflight" "No mission intent found; materializing from campaign state..."
+      & (Join-Path $ScriptDir "advance_campaign_v1.ps1") -Workspace $Workspace -IntentOnly
+    }
+    $intent = Get-Content $intentPath -Raw | ConvertFrom-Json
+    $script:status.missionId = $intent.missionId
+    $script:status.missionNumber = $intent.missionNumber
+
+    Write-SessionStatus "building" "Building mission $($intent.missionId) on $($intent.mapId) (slot $($missionsDone + 1)/$MaxMissions)..."
+    $infologOffset = 0
+    if (Test-Path $config.infolog) {
+      $infologOffset = (Get-Item -LiteralPath $config.infolog).Length
+    }
+
+    if ($EngineMode -eq "headless-fastwin") {
+      & (Join-Path $ScriptDir "build_next_mission_v1.ps1") -Workspace $Workspace
+      Write-SessionStatus "in-game" "Running headless fast-win verification mission..."
+      $playablePath = Join-Path $Workspace "data\scenarios\generated\next_mission_intent.playable.json"
+      & (Join-Path $ScriptDir "install_playable_slice.ps1") -Workspace $Workspace `
+        -ScenarioPath $playablePath -Headless -TimeoutSeconds 900 `
+        -ExtraModOptions "va_headless_autostart=1,va_headless_fastwin=1,va_headless_quit=1"
+      Write-SessionStatus "extracting" "Extracting headless result..."
+      Invoke-FullCycle
+      $missionsDone += 1
+      $script:status.missionsCompleted = $missionsDone
+      break
+    }
+
     & (Join-Path $ScriptDir "build_next_mission_v1.ps1") -Workspace $Workspace -Launch
     $launchManifestPath = Join-Path $Workspace "playable_runs\latest_launch.json"
     $springPid = $null
@@ -129,27 +239,57 @@ try {
       } catch { }
     }
     $script:status.springPid = $springPid
-    Write-SessionStatus "in-game" "BAR launched (pid $springPid). Play the mission; results are picked up automatically."
+    Write-SessionStatus "in-game" "BAR launched (pid $springPid). Play; Mode A continues stay in-seat. Results extract live."
 
-    # ---- watcher -------------------------------------------------------
-    $deadline = (Get-Date).AddMinutes($MaxSessionMinutes)
-    $resultSeen = $false
-    $extracted = $false
-    while ((Get-Date) -lt $deadline) {
+    $missionDeadline = (Get-Date).AddMinutes([Math]::Min(90, $MaxSessionMinutes))
+    $chaptersThisLaunch = 0
+    while ((Get-Date) -lt $missionDeadline -and (Get-Date) -lt $sessionDeadline) {
       Start-Sleep -Seconds 3
       $newText = Read-NewInfologText ([ref]$infologOffset)
-      if (-not $resultSeen -and ($newText -match "VA_RESULT_JSON_END" -or $newText -match "VA_RESULT_JSON_COMPACT")) {
-        $resultSeen = $true
-        Write-SessionStatus "extracting" "Mission result detected; extracting and advancing campaign..."
+      Update-ModeBCapabilityFromText $newText
+
+      # Mode A: multiple VA_RESULT lines per launch -- extract each unique resultKey.
+      $newKeys = Get-ResultKeysFromText $newText
+      foreach ($rk in $newKeys) {
+        if ($seenResultKeys.ContainsKey($rk)) { continue }
+        $seenResultKeys[$rk] = $true
+        Write-SessionStatus "extracting" "Sortie result $rk -- advancing campaign..."
         try {
           Invoke-FullCycle
-          $extracted = $true
-          Write-SessionStatus "in-game" "Campaign advanced. Finish/exit the game when ready."
+          # Mode B: if debrief pick was a strategic_link travel, stamp Reload path.
+          Invoke-ModeBReloadPath | Out-Null
+          $chaptersThisLaunch += 1
+          $missionsDone += 1
+          $script:status.missionsCompleted = $missionsDone
+          $script:status.resultStatus = ($rk -split '\|')[-1]
+          Write-SessionStatus "in-game" ("Mission advanced. Count so far: " + $missionsDone + ". Mode A same-map stays in-seat; Mode B travel exits for session host Reload.")
         } catch {
-          Write-Warning "Mid-game extraction failed (will retry on exit): $($_.Exception.Message)"
-          $resultSeen = $false
+          Write-Warning "Extraction failed for $rk : $($_.Exception.Message)"
+          $seenResultKeys.Remove($rk)
         }
       }
+
+      # Protocol: never invent credit-bearing fake resultKeys. Marker without
+      # parseable key → one harvest retry only (idempotent on real key).
+      if ($newKeys.Count -eq 0 -and ($newText -match "VA_RESULT_JSON_END" -or $newText -match "VA_RESULT_JSON_COMPACT")) {
+        $retryTag = "parse_retry_$chaptersThisLaunch"
+        if (-not $seenResultKeys.ContainsKey($retryTag)) {
+          try {
+            Write-SessionStatus "extracting" "Result marker seen (no key parse); retry harvest only..."
+            Invoke-FullCycle
+            Invoke-ModeBReloadPath | Out-Null
+            $seenResultKeys[$retryTag] = $true
+            $chaptersThisLaunch += 1
+            $missionsDone += 1
+            $script:status.missionsCompleted = $missionsDone
+            Write-SessionStatus "in-game" "Harvest retry done. Mode A stays in-seat; Mode B exits for Reload."
+          } catch {
+            Write-Warning "Harvest retry failed (no credit invented): $($_.Exception.Message)"
+            $seenResultKeys[$retryTag] = $true
+          }
+        }
+      }
+
       $proc = $null
       if ($script:status.springPid) {
         $proc = Get-Process -Id $script:status.springPid -ErrorAction SilentlyContinue
@@ -158,46 +298,75 @@ try {
       if (-not $proc) { break }
     }
 
-    if (-not $extracted) {
-      Write-SessionStatus "extracting" "Game exited; extracting result from infolog..."
+    # BAR exited.
+    $script:status.springPid = $null
+    if ($chaptersThisLaunch -eq 0) {
+      Write-SessionStatus "extracting" "Game exited with no live extract; trying infolog harvest..."
       try {
         Invoke-FullCycle
-        $extracted = $true
+        Invoke-ModeBReloadPath | Out-Null
+        $missionsDone += 1
+        $script:status.missionsCompleted = $missionsDone
       } catch {
-        Write-SessionStatus "no-result" "No mission result found. The same mission is still installed - run Play Session again to retry. ($($_.Exception.Message))"
-        return
+        Write-SessionStatus "no-result" "No mission result found. Same mission still installed - run Play Session again. ($($_.Exception.Message))"
+        if (-not $autoRelaunch) { return }
+        # Don't infinite-loop on hard failures: stop session host.
+        break
       }
+    } else {
+      # Final Mode B resolve after exit (travel pick may arrive late).
+      Invoke-ModeBReloadPath | Out-Null
+    }
+
+    # Build next seed for relaunch / next sit-down (Mode B stamps choice first).
+    $modeBMsg = if ($script:status.modeB.lastAction -eq "stamp_reload_travel" -and $script:status.modeB.lastHop) {
+      "Mode B Reload travel → map $($script:status.modeB.lastHop.mapId) ($($script:status.modeB.lastHop.from)→$($script:status.modeB.lastHop.to)). Building..."
+    } else {
+      "Building the next mission seed..."
+    }
+    Write-SessionStatus "build-next" $modeBMsg
+    Backup-CampaignState
+    & (Join-Path $ScriptDir "build_next_mission_v1.ps1") -Workspace $Workspace
+
+    $manifestPath = Join-Path $Workspace "outbox\next_mission_build_manifest.json"
+    if (Test-Path $manifestPath) {
+      try {
+        $manifest = Get-Content $manifestPath -Raw | ConvertFrom-Json
+        $script:status.nextMissionId = $manifest.missionId
+      } catch { }
+    }
+
+    if (-not $autoRelaunch) {
+      Write-SessionStatus "next-ready" "Mission $($script:status.nextMissionId) is built. Run Play Session to continue."
+      try { [System.Media.SystemSounds]::Asterisk.Play() } catch { }
+      break
+    }
+
+    if ($missionsDone -ge $MaxMissions) {
+      Write-SessionStatus "session-complete" "Hit MaxMissions=$MaxMissions. Next seed ready: $($script:status.nextMissionId)."
+      try { [System.Media.SystemSounds]::Asterisk.Play() } catch { }
+      break
+    }
+
+    # Mode B / Mode C map travel: auto-relaunch next mission without another click.
+    # Mode B uses strategic_link-stamped choice; Mode C is generic external relaunch.
+    $relaunchLabel = if ($script:status.modeB.lastAction -eq "stamp_reload_travel") {
+      "Mode B Reload path"
+    } else {
+      "session host"
+    }
+    Write-SessionStatus "relaunch" "Auto-relaunching next mission $($script:status.nextMissionId) in 3s ($relaunchLabel). Close this window to stop."
+    Start-Sleep -Seconds 3
+    if (Get-RunningSpring) {
+      Write-SessionStatus "waiting" "BAR still running - waiting for exit before relaunch..."
+      while (Get-RunningSpring) { Start-Sleep -Seconds 2 }
     }
   }
 
-  if ($EngineMode -eq "headless-fastwin") {
-    Write-SessionStatus "extracting" "Extracting headless result..."
-    Invoke-FullCycle
+  if ($script:status.phase -ne "session-complete" -and $script:status.phase -ne "next-ready" -and $script:status.phase -ne "no-result") {
+    Write-SessionStatus "session-complete" "Session finished. Missions advanced: $missionsDone. Next: $($script:status.nextMissionId)."
+    try { [System.Media.SystemSounds]::Asterisk.Play() } catch { }
   }
-
-  # ---- advance + build next -------------------------------------------
-  $reportPath = Join-Path $Workspace "outbox\advance_report.v1.json"
-  if (Test-Path $reportPath) {
-    try {
-      $report = Get-Content $reportPath -Raw | ConvertFrom-Json
-      $script:status.resultStatus = ($report.resultKey -split '\|')[-1]
-    } catch { }
-  }
-
-  Write-SessionStatus "build-next" "Building the next mission..."
-  Backup-CampaignState
-  & (Join-Path $ScriptDir "build_next_mission_v1.ps1") -Workspace $Workspace
-
-  $manifestPath = Join-Path $Workspace "outbox\next_mission_build_manifest.json"
-  if (Test-Path $manifestPath) {
-    try {
-      $manifest = Get-Content $manifestPath -Raw | ConvertFrom-Json
-      $script:status.nextMissionId = $manifest.missionId
-    } catch { }
-  }
-
-  Write-SessionStatus "next-ready" "Mission $($script:status.nextMissionId) is built and ready. Run Play Session to continue the campaign."
-  try { [System.Media.SystemSounds]::Asterisk.Play() } catch { }
 } catch {
   $script:status.error = $_.Exception.Message
   Write-SessionStatus "error" $_.Exception.Message

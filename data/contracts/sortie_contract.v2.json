@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "verdance-sortie-contract/2.0",
+  "description": "Kernel sortie contract — one shape for order, debrief pick, and intent stamp.",
+  "required": ["mapId", "targetZoneId", "patron", "objectiveArchetype"],
+  "properties": {
+    "campaignId": { "type": "string" },
+    "mapId": { "type": "string" },
+    "targetZoneId": { "type": "string" },
+    "deploymentZoneId": { "type": ["string", "null"] },
+    "extractionZoneId": { "type": ["string", "null"] },
+    "fromZoneIds": { "type": "array", "items": { "type": "string" } },
+    "patron": { "type": "string", "enum": ["nullmercs", "armada", "cortex"] },
+    "against": { "type": "string" },
+    "objectiveArchetype": { "type": "string" },
+    "sessionMode": {
+      "type": "string",
+      "enum": ["same_map", "reload_travel", "external_relaunch"],
+      "default": "same_map",
+      "notes": "Kernel focus is same_map (Mode A)."
+    },
+    "occupationModel": {
+      "type": "string",
+      "enum": ["living_shell", "hand_camp_fallback"],
+      "default": "living_shell"
+    },
+    "difficulty": { "type": ["number", "null"] },
+    "contractXp": { "type": ["number", "null"] },
+    "worldFlags": {
+      "type": "object",
+      "properties": {
+        "armadaTenebriumCrisis": { "type": "boolean", "default": true }
+      }
+    },
+    "continue": {
+      "type": "object",
+      "properties": {
+        "promoteOccupation": { "type": "boolean" },
+        "softClock": { "type": "boolean" },
+        "chapterIndex": { "type": "integer" }
+      }
+    },
+    "valid": { "type": "boolean" }
+  }
+}

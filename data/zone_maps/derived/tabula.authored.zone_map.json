@@ -1,0 +1,2992 @@
+{
+ "schemaVersion": "verdance-zone-map/2.0",
+ "mapId": "tabula",
+ "mapName": "Tabula_Remake 1.5",
+ "coordinateSystem": "normalized-xz",
+ "authoringStatus": "derived",
+ "grid": {
+  "res": 96
+ },
+ "targetZoneRange": [
+  16,
+  16
+ ],
+ "symmetry": {
+  "group": [
+   "identity",
+   "rot180"
+  ],
+  "order": 2,
+  "scores": {
+   "mirror_ew": 0.8517,
+   "mirror_ns": 0.8525,
+   "rot180": 0.9832
+  },
+  "accepted": [
+   "rot180"
+  ]
+ },
+ "hydrologyRef": "data/hydrology/tabula.hydrology.json",
+ "waterline": {
+  "levels": [
+   0.0,
+   0.125,
+   0.25,
+   0.375,
+   0.5,
+   0.625,
+   0.75,
+   0.875,
+   1.0
+  ],
+  "elevations": [
+   0.0,
+   7.5,
+   9.9,
+   15.6,
+   66,
+   128.5,
+   150.5,
+   158.9,
+   161.9
+  ],
+  "routine": 66.0,
+  "basins": [
+   "BASIN_C"
+  ]
+ },
+ "derivedFrom": {
+  "terrain": "data/terrain/tabula.terrain.json",
+  "configs": [
+   "legacy_grid",
+   "legacy_rect"
+  ],
+  "measuredActivity": 1484513.0,
+  "behaviourSource": "legacy_prior"
+ },
+ "notes": "Cut by tools/zone_cartographer_v1.py from measured terrain and AI-vs-AI behaviour. Cells are run-length encoded [startIndex, length] over a row-major cellGrid; bounds are derived for legacy consumers. Anchors are measured buildable/dry/flat camp sites.",
+ "zones": [
+  {
+   "zoneId": "T_C_SPILLWAY",
+   "label": "Central Spillway",
+   "role": "spillway",
+   "shape": "cells",
+   "cellGrid": {
+    "cols": 96,
+    "rows": 96
+   },
+   "cells": [
+    [
+     2360,
+     2
+    ],
+    [
+     2454,
+     5
+    ],
+    [
+     2535,
+     2
+    ],
+    [
+     2548,
+     7
+    ],
+    [
+     2565,
+     1
+    ],
+    [
+     2624,
+     3
+    ],
+    [
+     2630,
+     4
+    ],
+    [
+     2643,
+     10
+    ],
+    [
+     2658,
+     5
+    ],
+    [
+     2720,
+     12
+    ],
+    [
+     2739,
+     12
+    ],
+    [
+     2752,
+     9
+    ],
+    [
+     2815,
+     13
+    ],
+    [
+     2835,
+     22
+    ],
+    [
+     2911,
+     14
+    ],
+    [
+     2929,
+     25
+    ],
+    [
+     3006,
+     53
+    ],
+    [
+     3102,
+     54
+    ],
+    [
+     3191,
+     4
+    ],
+    [
+     3198,
+     55
+    ],
+    [
+     3287,
+     5
+    ],
+    [
+     3294,
+     55
+    ],
+    [
+     3373,
+     15
+    ],
+    [
+     3389,
+     56
+    ],
+    [
+     3468,
+     73
+    ],
+    [
+     3563,
+     74
+    ],
+    [
+     3657,
+     76
+    ],
+    [
+     3753,
+     76
+    ],
+    [
+     3848,
+     77
+    ],
+    [
+     3943,
+     78
+    ],
+    [
+     4038,
+     80
+    ],
+    [
+     4133,
+     82
+    ],
+    [
+     4229,
+     82
+    ],
+    [
+     4325,
+     83
+    ],
+    [
+     4421,
+     84
+    ],
+    [
+     4517,
+     85
+    ]
+   ],
+   "bounds": {
+    "xMin": 0.0521,
+    "xMax": 0.9375,
+    "zMin": 0.25,
+    "zMax": 0.5
+   },
+   "anchor": {
+    "x": 0.7344,
+    "z": 0.3281
+   },
+   "campEligible": true,
+   "deployEligible": true,
+   "extractEligible": true,
+   "symmetryFamily": "F15",
+   "hydrology": {
+    "floodsAt": 0.375,
+    "restingSubmerged": 0.067,
+    "submergedAt": [
+     0.067,
+     0.236,
+     0.433,
+     0.593,
+     0.703,
+     0.813,
+     0.906,
+     0.956,
+     0.971
+    ],
+    "metalSpots": 9,
+    "drownedMetal": 0.778,
+    "anchorAboveWaterline": true
+   },
+   "tags": [
+    "low",
+    "shore",
+    "central"
+   ],
+   "evidence": {
+    "cellCount": 1393.0,
+    "presenceShare": 0.2862,
+    "presenceDensity": 1.8938,
+    "structureDensity": 0.7688,
+    "fightDensity": 0.0,
+    "trafficDensity": 2.4546,
+    "transitDensity": 3.1928,
+    "hazard": 0.0,
+    "defence": 0.1387,
+    "contest": 0.0173,
+    "water": 0.0682,
+    "buildable": 0.775,
+    "slope": 0.061,
+    "metal": 0.4712,
+    "relativeHeight": 0.1617,
+    "choke": 0.5,
+    "hasStart": false,
+    "floodsAt": 0.375,
+    "restingSubmerged": 0.067,
+    "metalSpots": 9,
+    "drownedMetal": 0.778
+   }
+  },
+  {
+   "zoneId": "T_C_INNER_SPILLWAY",
+   "label": "Central Inner Spillway",
+   "role": "spillway",
+   "shape": "cells",
+   "cellGrid": {
+    "cols": 96,
+    "rows": 96
+   },
+   "cells": [
+    [
+     4614,
+     85
+    ],
+    [
+     4711,
+     84
+    ],
+    [
+     4808,
+     83
+    ],
+    [
+     4905,
+     82
+    ],
+    [
+     5001,
+     82
+    ],
+    [
+     5098,
+     80
+    ],
+    [
+     5195,
+     78
+    ],
+    [
+     5291,
+     77
+    ],
+    [
+     5387,
+     76
+    ],
+    [
+     5483,
+     76
+    ],
+    [
+     5579,
+     74
+    ],
+    [
+     5675,
+     73
+    ],
+    [
+     5771,
+     56
+    ],
+    [
+     5828,
+     15
+    ],
+    [
+     5867,
+     55
+    ],
+    [
+     5924,
+     5
+    ],
+    [
+     5963,
+     55
+    ],
+    [
+     6021,
+     4
+    ],
+    [
+     6060,
+     54
+    ],
+    [
+     6157,
+     53
+    ],
+    [
+     6262,
+     25
+    ],
+    [
+     6291,
+     14
+    ],
+    [
+     6359,
+     22
+    ],
+    [
+     6388,
+     13
+    ],
+    [
+     6455,
+     9
+    ],
+    [
+     6465,
+     12
+    ],
+    [
+     6484,
+     12
+    ],
+    [
+     6553,
+     5
+    ],
+    [
+     6563,
+     10
+    ],
+    [
+     6582,
+     4
+    ],
+    [
+     6589,
+     3
+    ],
+    [
+     6650,
+     1
+    ],
+    [
+     6661,
+     7
+    ],
+    [
+     6679,
+     2
+    ],
+    [
+     6757,
+     5
+    ],
+    [
+     6854,
+     2
+    ]
+   ],
+   "bounds": {
+    "xMin": 0.0625,
+    "xMax": 0.9479,
+    "zMin": 0.5,
+    "zMax": 0.75
+   },
+   "anchor": {
+    "x": 0.2552,
+    "z": 0.6615
+   },
+   "campEligible": true,
+   "deployEligible": true,
+   "extractEligible": true,
+   "symmetryFamily": "F15",
+   "hydrology": {
+    "floodsAt": 0.375,
+    "restingSubmerged": 0.049,
+    "submergedAt": [
+     0.049,
+     0.22,
+     0.368,
+     0.543,
+     0.701,
+     0.813,
+     0.91,
+     0.946,
+     0.963
+    ],
+    "metalSpots": 9,
+    "drownedMetal": 0.667,
+    "anchorAboveWaterline": true
+   },
+   "tags": [
+    "low",
+    "metal",
+    "choke",
+    "start",
+    "shore",
+    "central"
+   ],
+   "evidence": {
+    "cellCount": 1393.0,
+    "presenceShare": 0.2862,
+    "presenceDensity": 1.8938,
+    "structureDensity": 0.7688,
+    "fightDensity": 0.0,
+    "trafficDensity": 2.4546,
+    "transitDensity": 3.1928,
+    "hazard": 0.0,
+    "defence": 0.1387,
+    "contest": 0.015,
+    "water": 0.0531,
+    "buildable": 0.7799,
+    "slope": 0.0618,
+    "metal": 0.5638,
+    "relativeHeight": 0.1633,
+    "choke": 0.6875,
+    "hasStart": true,
+    "floodsAt": 0.375,
+    "restingSubmerged": 0.049,
+    "metalSpots": 9,
+    "drownedMetal": 0.667
+   }
+  },
+  {
+   "zoneId": "T_NW_RESERVE",
+   "label": "Northwest Reserve",
+   "role": "reserve",
+   "shape": "cells",
+   "cellGrid": {
+    "cols": 96,
+    "rows": 96
+   },
+   "cells": [
+    [
+     13,
+     54
+    ],
+    [
+     109,
+     54
+    ],
+    [
+     205,
+     54
+    ],
+    [
+     301,
+     54
+    ],
+    [
+     397,
+     53
+    ],
+    [
+     493,
+     53
+    ],
+    [
+     590,
+     52
+    ],
+    [
+     686,
+     53
+    ],
+    [
+     782,
+     53
+    ],
+    [
+     878,
+     54
+    ],
+    [
+     974,
+     54
+    ],
+    [
+     1070,
+     54
+    ],
+    [
+     1166,
+     54
+    ],
+    [
+     1262,
+     41
+    ],
+    [
+     1306,
+     11
+    ],
+    [
+     1358,
+     41
+    ],
+    [
+     1403,
+     11
+    ],
+    [
+     1454,
+     41
+    ],
+    [
+     1500,
+     10
+    ],
+    [
+     1550,
+     41
+    ],
+    [
+     1647,
+     39
+    ],
+    [
+     1747,
+     35
+    ],
+    [
+     1848,
+     30
+    ],
+    [
+     1944,
+     31
+    ],
+    [
+     2040,
+     31
+    ],
+    [
+     2136,
+     32
+    ],
+    [
+     2233,
+     31
+    ],
+    [
+     2333,
+     27
+    ],
+    [
+     2430,
+     24
+    ],
+    [
+     2527,
+     8
+    ],
+    [
+     2537,
+     11
+    ],
+    [
+     2623,
+     1
+    ],
+    [
+     2627,
+     3
+    ],
+    [
+     2634,
+     9
+    ],
+    [
+     2732,
+     7
+    ],
+    [
+     2828,
+     7
+    ],
+    [
+     2925,
+     4
+    ]
+   ],
+   "bounds": {
+    "xMin": 0.1354,
+    "xMax": 0.7292,
+    "zMin": 0.0,
+    "zMax": 0.3229
+   },
+   "anchor": {
+    "x": 0.3073,
+    "z": 0.099
+   },
+   "campEligible": true,
+   "deployEligible": true,
+   "extractEligible": true,
+   "symmetryFamily": "F17",
+   "hydrology": {
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.018,
+    "submergedAt": [
+     0.018,
+     0.019,
+     0.02,
+     0.02,
+     0.038,
+     0.073,
+     0.106,
+     0.16,
+     0.223
+    ],
+    "metalSpots": 7,
+    "drownedMetal": 0.0,
+    "anchorAboveWaterline": true
+   },
+   "tags": [
+    "start",
+    "northwest"
+   ],
+   "evidence": {
+    "cellCount": 1222.0,
+    "presenceShare": 0.068,
+    "presenceDensity": 0.5132,
+    "structureDensity": 0.8473,
+    "fightDensity": 0.0,
+    "trafficDensity": 0.2408,
+    "transitDensity": 0.2842,
+    "hazard": 0.0,
+    "defence": 0.5786,
+    "contest": 0.0078,
+    "water": 0.0183,
+    "buildable": 0.5565,
+    "slope": 0.1306,
+    "metal": 0.4898,
+    "relativeHeight": 0.4373,
+    "choke": 0.5,
+    "hasStart": true,
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.018,
+    "metalSpots": 7,
+    "drownedMetal": 0.0
+   }
+  },
+  {
+   "zoneId": "T_SE_RESERVE",
+   "label": "Southeast Reserve",
+   "role": "reserve",
+   "shape": "cells",
+   "cellGrid": {
+    "cols": 96,
+    "rows": 96
+   },
+   "cells": [
+    [
+     6287,
+     4
+    ],
+    [
+     6381,
+     7
+    ],
+    [
+     6477,
+     7
+    ],
+    [
+     6573,
+     9
+    ],
+    [
+     6586,
+     3
+    ],
+    [
+     6592,
+     1
+    ],
+    [
+     6668,
+     11
+    ],
+    [
+     6681,
+     8
+    ],
+    [
+     6762,
+     24
+    ],
+    [
+     6856,
+     27
+    ],
+    [
+     6952,
+     31
+    ],
+    [
+     7048,
+     32
+    ],
+    [
+     7145,
+     31
+    ],
+    [
+     7241,
+     31
+    ],
+    [
+     7338,
+     30
+    ],
+    [
+     7434,
+     35
+    ],
+    [
+     7530,
+     39
+    ],
+    [
+     7625,
+     41
+    ],
+    [
+     7706,
+     10
+    ],
+    [
+     7721,
+     41
+    ],
+    [
+     7802,
+     11
+    ],
+    [
+     7817,
+     41
+    ],
+    [
+     7899,
+     11
+    ],
+    [
+     7913,
+     41
+    ],
+    [
+     7996,
+     54
+    ],
+    [
+     8092,
+     54
+    ],
+    [
+     8188,
+     54
+    ],
+    [
+     8284,
+     54
+    ],
+    [
+     8381,
+     53
+    ],
+    [
+     8477,
+     53
+    ],
+    [
+     8574,
+     52
+    ],
+    [
+     8670,
+     53
+    ],
+    [
+     8766,
+     53
+    ],
+    [
+     8861,
+     54
+    ],
+    [
+     8957,
+     54
+    ],
+    [
+     9053,
+     54
+    ],
+    [
+     9149,
+     54
+    ]
+   ],
+   "bounds": {
+    "xMin": 0.2708,
+    "xMax": 0.8646,
+    "zMin": 0.6771,
+    "zMax": 1.0
+   },
+   "anchor": {
+    "x": 0.6927,
+    "z": 0.901
+   },
+   "campEligible": true,
+   "deployEligible": true,
+   "extractEligible": true,
+   "symmetryFamily": "F17",
+   "hydrology": {
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.019,
+    "submergedAt": [
+     0.019,
+     0.02,
+     0.021,
+     0.024,
+     0.043,
+     0.085,
+     0.16,
+     0.278,
+     0.296
+    ],
+    "metalSpots": 8,
+    "drownedMetal": 0.0,
+    "anchorAboveWaterline": true
+   },
+   "tags": [
+    "metal",
+    "southeast"
+   ],
+   "evidence": {
+    "cellCount": 1222.0,
+    "presenceShare": 0.068,
+    "presenceDensity": 0.5132,
+    "structureDensity": 0.8473,
+    "fightDensity": 0.0,
+    "trafficDensity": 0.2408,
+    "transitDensity": 0.2842,
+    "hazard": 0.0,
+    "defence": 0.5786,
+    "contest": 0.2795,
+    "water": 0.019,
+    "buildable": 0.5497,
+    "slope": 0.1324,
+    "metal": 0.5213,
+    "relativeHeight": 0.4317,
+    "choke": 0.0,
+    "hasStart": false,
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.019,
+    "metalSpots": 8,
+    "drownedMetal": 0.0
+   }
+  },
+  {
+   "zoneId": "T_NW_MUSTER",
+   "label": "Northwest Muster",
+   "role": "start",
+   "shape": "cells",
+   "cellGrid": {
+    "cols": 96,
+    "rows": 96
+   },
+   "cells": [
+    [
+     0,
+     13
+    ],
+    [
+     96,
+     13
+    ],
+    [
+     192,
+     13
+    ],
+    [
+     288,
+     13
+    ],
+    [
+     384,
+     13
+    ],
+    [
+     480,
+     13
+    ],
+    [
+     576,
+     14
+    ],
+    [
+     672,
+     14
+    ],
+    [
+     768,
+     14
+    ],
+    [
+     864,
+     14
+    ],
+    [
+     960,
+     14
+    ],
+    [
+     1057,
+     13
+    ],
+    [
+     1153,
+     13
+    ],
+    [
+     1251,
+     11
+    ],
+    [
+     1348,
+     10
+    ],
+    [
+     1445,
+     9
+    ],
+    [
+     1542,
+     8
+    ],
+    [
+     1638,
+     7
+    ],
+    [
+     1735,
+     4
+    ],
+    [
+     1831,
+     3
+    ],
+    [
+     1927,
+     2
+    ]
+   ],
+   "bounds": {
+    "xMin": 0.0,
+    "xMax": 0.1458,
+    "zMin": 0.0,
+    "zMax": 0.2188
+   },
+   "anchor": {
+    "x": 0.0781,
+    "z": 0.0885
+   },
+   "campEligible": true,
+   "deployEligible": true,
+   "extractEligible": true,
+   "symmetryFamily": "F3",
+   "hydrology": {
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "submergedAt": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "metalSpots": 3,
+    "drownedMetal": 0.0,
+    "anchorAboveWaterline": true
+   },
+   "tags": [
+    "metal",
+    "choke",
+    "start",
+    "northwest"
+   ],
+   "evidence": {
+    "cellCount": 228.0,
+    "presenceShare": 0.0434,
+    "presenceDensity": 1.7547,
+    "structureDensity": 7.5399,
+    "fightDensity": 0.0,
+    "trafficDensity": 0.7679,
+    "transitDensity": 0.1018,
+    "hazard": 0.0,
+    "defence": 1.5116,
+    "contest": 0.0047,
+    "water": 0.0,
+    "buildable": 0.9307,
+    "slope": 0.0036,
+    "metal": 1.13,
+    "relativeHeight": 0.4359,
+    "choke": 0.625,
+    "hasStart": true,
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "metalSpots": 3,
+    "drownedMetal": 0.0
+   }
+  },
+  {
+   "zoneId": "T_SE_MUSTER",
+   "label": "Southeast Muster",
+   "role": "start",
+   "shape": "cells",
+   "cellGrid": {
+    "cols": 96,
+    "rows": 96
+   },
+   "cells": [
+    [
+     7287,
+     2
+    ],
+    [
+     7382,
+     3
+    ],
+    [
+     7477,
+     4
+    ],
+    [
+     7571,
+     7
+    ],
+    [
+     7666,
+     8
+    ],
+    [
+     7762,
+     9
+    ],
+    [
+     7858,
+     10
+    ],
+    [
+     7954,
+     11
+    ],
+    [
+     8050,
+     13
+    ],
+    [
+     8146,
+     13
+    ],
+    [
+     8242,
+     14
+    ],
+    [
+     8338,
+     14
+    ],
+    [
+     8434,
+     14
+    ],
+    [
+     8530,
+     14
+    ],
+    [
+     8626,
+     14
+    ],
+    [
+     8723,
+     13
+    ],
+    [
+     8819,
+     13
+    ],
+    [
+     8915,
+     13
+    ],
+    [
+     9011,
+     13
+    ],
+    [
+     9107,
+     13
+    ],
+    [
+     9203,
+     13
+    ]
+   ],
+   "bounds": {
+    "xMin": 0.8542,
+    "xMax": 1.0,
+    "zMin": 0.7812,
+    "zMax": 1.0
+   },
+   "anchor": {
+    "x": 0.9219,
+    "z": 0.9115
+   },
+   "campEligible": true,
+   "deployEligible": true,
+   "extractEligible": true,
+   "symmetryFamily": "F3",
+   "hydrology": {
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "submergedAt": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "metalSpots": 3,
+    "drownedMetal": 0.0,
+    "anchorAboveWaterline": true
+   },
+   "tags": [
+    "metal",
+    "start",
+    "southeast"
+   ],
+   "evidence": {
+    "cellCount": 228.0,
+    "presenceShare": 0.0434,
+    "presenceDensity": 1.7547,
+    "structureDensity": 7.5399,
+    "fightDensity": 0.0,
+    "trafficDensity": 0.7679,
+    "transitDensity": 0.1018,
+    "hazard": 0.0,
+    "defence": 1.5116,
+    "contest": 0.1867,
+    "water": 0.0,
+    "buildable": 0.9282,
+    "slope": 0.0037,
+    "metal": 1.0164,
+    "relativeHeight": 0.4367,
+    "choke": 0.3125,
+    "hasStart": true,
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "metalSpots": 3,
+    "drownedMetal": 0.0
+   }
+  },
+  {
+   "zoneId": "T_NW_OUTER_RESERVE",
+   "label": "Northwest Outer Reserve",
+   "role": "reserve",
+   "shape": "cells",
+   "cellGrid": {
+    "cols": 96,
+    "rows": 96
+   },
+   "cells": [
+    [
+     1645,
+     2
+    ],
+    [
+     1739,
+     8
+    ],
+    [
+     1834,
+     14
+    ],
+    [
+     1929,
+     15
+    ],
+    [
+     2023,
+     14
+    ],
+    [
+     2119,
+     14
+    ],
+    [
+     2214,
+     14
+    ],
+    [
+     2309,
+     14
+    ],
+    [
+     2404,
+     14
+    ],
+    [
+     2499,
+     16
+    ],
+    [
+     2595,
+     16
+    ],
+    [
+     2690,
+     18
+    ],
+    [
+     2786,
+     18
+    ],
+    [
+     2883,
+     18
+    ],
+    [
+     2979,
+     18
+    ],
+    [
+     3076,
+     18
+    ],
+    [
+     3173,
+     18
+    ],
+    [
+     3270,
+     17
+    ],
+    [
+     3367,
+     6
+    ],
+    [
+     3464,
+     4
+    ],
+    [
+     3561,
+     2
+    ]
+   ],
+   "bounds": {
+    "xMin": 0.0208,
+    "xMax": 0.25,
+    "zMin": 0.1771,
+    "zMax": 0.3958
+   },
+   "anchor": {
+    "x": 0.1406,
+    "z": 0.2656
+   },
+   "campEligible": true,
+   "deployEligible": true,
+   "extractEligible": true,
+   "symmetryFamily": "F1",
+   "hydrology": {
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "submergedAt": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.068,
+     0.486
+    ],
+    "metalSpots": 2,
+    "drownedMetal": 0.0,
+    "anchorAboveWaterline": true
+   },
+   "tags": [
+    "start",
+    "northwest"
+   ],
+   "evidence": {
+    "cellCount": 278.0,
+    "presenceShare": 0.0333,
+    "presenceDensity": 1.1035,
+    "structureDensity": 0.7057,
+    "fightDensity": 0.0,
+    "trafficDensity": 0.6832,
+    "transitDensity": 0.968,
+    "hazard": 0.0,
+    "defence": 0.2086,
+    "contest": 0.0037,
+    "water": 0.0,
+    "buildable": 0.5911,
+    "slope": 0.1115,
+    "metal": 0.4626,
+    "relativeHeight": 0.4029,
+    "choke": 0.5,
+    "hasStart": true,
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "metalSpots": 2,
+    "drownedMetal": 0.0
+   }
+  },
+  {
+   "zoneId": "T_SE_OUTER_RESERVE",
+   "label": "Southeast Outer Reserve",
+   "role": "reserve",
+   "shape": "cells",
+   "cellGrid": {
+    "cols": 96,
+    "rows": 96
+   },
+   "cells": [
+    [
+     5653,
+     2
+    ],
+    [
+     5748,
+     4
+    ],
+    [
+     5843,
+     6
+    ],
+    [
+     5929,
+     17
+    ],
+    [
+     6025,
+     18
+    ],
+    [
+     6122,
+     18
+    ],
+    [
+     6219,
+     18
+    ],
+    [
+     6315,
+     18
+    ],
+    [
+     6412,
+     18
+    ],
+    [
+     6508,
+     18
+    ],
+    [
+     6605,
+     16
+    ],
+    [
+     6701,
+     16
+    ],
+    [
+     6798,
+     14
+    ],
+    [
+     6893,
+     14
+    ],
+    [
+     6988,
+     14
+    ],
+    [
+     7083,
+     14
+    ],
+    [
+     7179,
+     14
+    ],
+    [
+     7272,
+     15
+    ],
+    [
+     7368,
+     14
+    ],
+    [
+     7469,
+     8
+    ],
+    [
+     7569,
+     2
+    ]
+   ],
+   "bounds": {
+    "xMin": 0.75,
+    "xMax": 0.9792,
+    "zMin": 0.6042,
+    "zMax": 0.8229
+   },
+   "anchor": {
+    "x": 0.8594,
+    "z": 0.7344
+   },
+   "campEligible": true,
+   "deployEligible": true,
+   "extractEligible": true,
+   "symmetryFamily": "F1",
+   "hydrology": {
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "submergedAt": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.072,
+     0.187
+    ],
+    "metalSpots": 2,
+    "drownedMetal": 0.0,
+    "anchorAboveWaterline": true
+   },
+   "tags": [
+    "metal",
+    "contested",
+    "southeast"
+   ],
+   "evidence": {
+    "cellCount": 278.0,
+    "presenceShare": 0.0333,
+    "presenceDensity": 1.1035,
+    "structureDensity": 0.7057,
+    "fightDensity": 0.0,
+    "trafficDensity": 0.6832,
+    "transitDensity": 0.968,
+    "hazard": 0.0,
+    "defence": 0.2086,
+    "contest": 0.9638,
+    "water": 0.0,
+    "buildable": 0.6067,
+    "slope": 0.1102,
+    "metal": 0.6023,
+    "relativeHeight": 0.4009,
+    "choke": 0.25,
+    "hasStart": false,
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "metalSpots": 2,
+    "drownedMetal": 0.0
+   }
+  },
+  {
+   "zoneId": "T_NE_CAUSEWAY",
+   "label": "Northeast Causeway",
+   "role": "causeway",
+   "shape": "cells",
+   "cellGrid": {
+    "cols": 96,
+    "rows": 96
+   },
+   "cells": [
+    [
+     67,
+     29
+    ],
+    [
+     163,
+     29
+    ],
+    [
+     259,
+     29
+    ],
+    [
+     355,
+     29
+    ],
+    [
+     450,
+     30
+    ],
+    [
+     546,
+     30
+    ],
+    [
+     642,
+     30
+    ],
+    [
+     739,
+     29
+    ],
+    [
+     835,
+     29
+    ],
+    [
+     932,
+     28
+    ],
+    [
+     1028,
+     28
+    ],
+    [
+     1124,
+     28
+    ],
+    [
+     1220,
+     28
+    ],
+    [
+     1303,
+     3
+    ],
+    [
+     1317,
+     27
+    ],
+    [
+     1399,
+     4
+    ],
+    [
+     1414,
+     26
+    ],
+    [
+     1495,
+     5
+    ],
+    [
+     1510,
+     26
+    ],
+    [
+     1591,
+     41
+    ],
+    [
+     1686,
+     42
+    ],
+    [
+     1782,
+     42
+    ],
+    [
+     1878,
+     42
+    ],
+    [
+     1975,
+     41
+    ],
+    [
+     2071,
+     41
+    ],
+    [
+     2168,
+     40
+    ],
+    [
+     2264,
+     40
+    ],
+    [
+     2362,
+     38
+    ],
+    [
+     2459,
+     37
+    ],
+    [
+     2555,
+     10
+    ],
+    [
+     2566,
+     26
+    ],
+    [
+     2653,
+     5
+    ],
+    [
+     2663,
+     25
+    ],
+    [
+     2751,
+     1
+    ],
+    [
+     2761,
+     23
+    ],
+    [
+     2857,
+     23
+    ],
+    [
+     2954,
+     22
+    ],
+    [
+     3059,
+     13
+    ],
+    [
+     3156,
+     12
+    ],
+    [
+     3253,
+     11
+    ]
+   ],
+   "bounds": {
+    "xMin": 0.5625,
+    "xMax": 1.0,
+    "zMin": 0.0,
+    "zMax": 0.3542
+   },
+   "anchor": {
+    "x": 0.8073,
+    "z": 0.2448
+   },
+   "campEligible": true,
+   "deployEligible": true,
+   "extractEligible": true,
+   "symmetryFamily": "F16",
+   "hydrology": {
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.216,
+    "submergedAt": [
+     0.216,
+     0.226,
+     0.23,
+     0.236,
+     0.275,
+     0.316,
+     0.338,
+     0.352,
+     0.377
+    ],
+    "metalSpots": 8,
+    "drownedMetal": 0.0,
+    "anchorAboveWaterline": true
+   },
+   "tags": [
+    "metal",
+    "choke",
+    "start",
+    "northeast"
+   ],
+   "evidence": {
+    "cellCount": 1042.0,
+    "presenceShare": 0.0259,
+    "presenceDensity": 0.2292,
+    "structureDensity": 0.2247,
+    "fightDensity": 0.0,
+    "trafficDensity": 0.2212,
+    "transitDensity": 0.8848,
+    "hazard": 0.0,
+    "defence": 0.3131,
+    "contest": 0.2581,
+    "water": 0.2193,
+    "buildable": 0.4129,
+    "slope": 0.1571,
+    "metal": 0.5005,
+    "relativeHeight": 0.3679,
+    "choke": 0.9375,
+    "hasStart": true,
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.216,
+    "metalSpots": 8,
+    "drownedMetal": 0.0
+   }
+  },
+  {
+   "zoneId": "T_SW_CAUSEWAY",
+   "label": "Southwest Causeway",
+   "role": "causeway",
+   "shape": "cells",
+   "cellGrid": {
+    "cols": 96,
+    "rows": 96
+   },
+   "cells": [
+    [
+     5952,
+     11
+    ],
+    [
+     6048,
+     12
+    ],
+    [
+     6144,
+     13
+    ],
+    [
+     6240,
+     22
+    ],
+    [
+     6336,
+     23
+    ],
+    [
+     6432,
+     23
+    ],
+    [
+     6464,
+     1
+    ],
+    [
+     6528,
+     25
+    ],
+    [
+     6558,
+     5
+    ],
+    [
+     6624,
+     26
+    ],
+    [
+     6651,
+     10
+    ],
+    [
+     6720,
+     37
+    ],
+    [
+     6816,
+     38
+    ],
+    [
+     6912,
+     40
+    ],
+    [
+     7008,
+     40
+    ],
+    [
+     7104,
+     41
+    ],
+    [
+     7200,
+     41
+    ],
+    [
+     7296,
+     42
+    ],
+    [
+     7392,
+     42
+    ],
+    [
+     7488,
+     42
+    ],
+    [
+     7584,
+     41
+    ],
+    [
+     7680,
+     26
+    ],
+    [
+     7716,
+     5
+    ],
+    [
+     7776,
+     26
+    ],
+    [
+     7813,
+     4
+    ],
+    [
+     7872,
+     27
+    ],
+    [
+     7910,
+     3
+    ],
+    [
+     7968,
+     28
+    ],
+    [
+     8064,
+     28
+    ],
+    [
+     8160,
+     28
+    ],
+    [
+     8256,
+     28
+    ],
+    [
+     8352,
+     29
+    ],
+    [
+     8448,
+     29
+    ],
+    [
+     8544,
+     30
+    ],
+    [
+     8640,
+     30
+    ],
+    [
+     8736,
+     30
+    ],
+    [
+     8832,
+     29
+    ],
+    [
+     8928,
+     29
+    ],
+    [
+     9024,
+     29
+    ],
+    [
+     9120,
+     29
+    ]
+   ],
+   "bounds": {
+    "xMin": 0.0,
+    "xMax": 0.4375,
+    "zMin": 0.6458,
+    "zMax": 1.0
+   },
+   "anchor": {
+    "x": 0.1927,
+    "z": 0.7552
+   },
+   "campEligible": true,
+   "deployEligible": true,
+   "extractEligible": true,
+   "symmetryFamily": "F16",
+   "hydrology": {
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.211,
+    "submergedAt": [
+     0.211,
+     0.226,
+     0.229,
+     0.237,
+     0.276,
+     0.321,
+     0.384,
+     0.437,
+     0.458
+    ],
+    "metalSpots": 8,
+    "drownedMetal": 0.0,
+    "anchorAboveWaterline": true
+   },
+   "tags": [
+    "metal",
+    "choke",
+    "start",
+    "southwest"
+   ],
+   "evidence": {
+    "cellCount": 1042.0,
+    "presenceShare": 0.0259,
+    "presenceDensity": 0.2292,
+    "structureDensity": 0.2247,
+    "fightDensity": 0.0,
+    "trafficDensity": 0.2212,
+    "transitDensity": 0.8848,
+    "hazard": 0.0,
+    "defence": 0.3131,
+    "contest": 0.0459,
+    "water": 0.217,
+    "buildable": 0.4043,
+    "slope": 0.1571,
+    "metal": 0.568,
+    "relativeHeight": 0.361,
+    "choke": 1.0,
+    "hasStart": true,
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.211,
+    "metalSpots": 8,
+    "drownedMetal": 0.0
+   }
+  },
+  {
+   "zoneId": "T_NW_CAUSEWAY",
+   "label": "Northwest Causeway",
+   "role": "causeway",
+   "shape": "cells",
+   "cellGrid": {
+    "cols": 96,
+    "rows": 96
+   },
+   "cells": [
+    [
+     1056,
+     1
+    ],
+    [
+     1152,
+     1
+    ],
+    [
+     1248,
+     3
+    ],
+    [
+     1344,
+     4
+    ],
+    [
+     1440,
+     5
+    ],
+    [
+     1536,
+     6
+    ],
+    [
+     1632,
+     6
+    ],
+    [
+     1728,
+     7
+    ],
+    [
+     1824,
+     7
+    ],
+    [
+     1920,
+     7
+    ],
+    [
+     2016,
+     7
+    ],
+    [
+     2112,
+     7
+    ],
+    [
+     2208,
+     6
+    ],
+    [
+     2304,
+     5
+    ],
+    [
+     2400,
+     4
+    ],
+    [
+     2496,
+     3
+    ],
+    [
+     2592,
+     3
+    ],
+    [
+     2688,
+     2
+    ],
+    [
+     2784,
+     2
+    ],
+    [
+     2880,
+     3
+    ],
+    [
+     2976,
+     3
+    ],
+    [
+     3072,
+     4
+    ],
+    [
+     3168,
+     5
+    ],
+    [
+     3264,
+     6
+    ],
+    [
+     3360,
+     7
+    ],
+    [
+     3456,
+     8
+    ],
+    [
+     3552,
+     9
+    ],
+    [
+     3648,
+     9
+    ],
+    [
+     3744,
+     9
+    ],
+    [
+     3840,
+     8
+    ],
+    [
+     3936,
+     7
+    ],
+    [
+     4032,
+     6
+    ],
+    [
+     4128,
+     5
+    ],
+    [
+     4224,
+     5
+    ],
+    [
+     4320,
+     5
+    ],
+    [
+     4416,
+     5
+    ]
+   ],
+   "bounds": {
+    "xMin": 0.0,
+    "xMax": 0.0938,
+    "zMin": 0.1146,
+    "zMax": 0.4896
+   },
+   "anchor": {
+    "x": 0.026,
+    "z": 0.276
+   },
+   "campEligible": true,
+   "deployEligible": true,
+   "extractEligible": true,
+   "symmetryFamily": "F2",
+   "hydrology": {
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "submergedAt": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.011,
+     0.274
+    ],
+    "metalSpots": 2,
+    "drownedMetal": 0.0,
+    "anchorAboveWaterline": true
+   },
+   "tags": [
+    "metal",
+    "choke",
+    "start",
+    "northwest"
+   ],
+   "evidence": {
+    "cellCount": 190.0,
+    "presenceShare": 0.0205,
+    "presenceDensity": 0.996,
+    "structureDensity": 0.9894,
+    "fightDensity": 0.0,
+    "trafficDensity": 0.6091,
+    "transitDensity": 0.6157,
+    "hazard": 0.0,
+    "defence": 0.3272,
+    "contest": 0.0037,
+    "water": 0.0,
+    "buildable": 0.7847,
+    "slope": 0.0495,
+    "metal": 0.6099,
+    "relativeHeight": 0.3325,
+    "choke": 0.6875,
+    "hasStart": true,
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "metalSpots": 2,
+    "drownedMetal": 0.0
+   }
+  },
+  {
+   "zoneId": "T_SE_CAUSEWAY",
+   "label": "Southeast Causeway",
+   "role": "causeway",
+   "shape": "cells",
+   "cellGrid": {
+    "cols": 96,
+    "rows": 96
+   },
+   "cells": [
+    [
+     4795,
+     5
+    ],
+    [
+     4891,
+     5
+    ],
+    [
+     4987,
+     5
+    ],
+    [
+     5083,
+     5
+    ],
+    [
+     5178,
+     6
+    ],
+    [
+     5273,
+     7
+    ],
+    [
+     5368,
+     8
+    ],
+    [
+     5463,
+     9
+    ],
+    [
+     5559,
+     9
+    ],
+    [
+     5655,
+     9
+    ],
+    [
+     5752,
+     8
+    ],
+    [
+     5849,
+     7
+    ],
+    [
+     5946,
+     6
+    ],
+    [
+     6043,
+     5
+    ],
+    [
+     6140,
+     4
+    ],
+    [
+     6237,
+     3
+    ],
+    [
+     6333,
+     3
+    ],
+    [
+     6430,
+     2
+    ],
+    [
+     6526,
+     2
+    ],
+    [
+     6621,
+     3
+    ],
+    [
+     6717,
+     3
+    ],
+    [
+     6812,
+     4
+    ],
+    [
+     6907,
+     5
+    ],
+    [
+     7002,
+     6
+    ],
+    [
+     7097,
+     7
+    ],
+    [
+     7193,
+     7
+    ],
+    [
+     7289,
+     7
+    ],
+    [
+     7385,
+     7
+    ],
+    [
+     7481,
+     7
+    ],
+    [
+     7578,
+     6
+    ],
+    [
+     7674,
+     6
+    ],
+    [
+     7771,
+     5
+    ],
+    [
+     7868,
+     4
+    ],
+    [
+     7965,
+     3
+    ],
+    [
+     8063,
+     1
+    ],
+    [
+     8159,
+     1
+    ]
+   ],
+   "bounds": {
+    "xMin": 0.9062,
+    "xMax": 1.0,
+    "zMin": 0.5104,
+    "zMax": 0.8854
+   },
+   "anchor": {
+    "x": 0.974,
+    "z": 0.724
+   },
+   "campEligible": true,
+   "deployEligible": true,
+   "extractEligible": true,
+   "symmetryFamily": "F2",
+   "hydrology": {
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "submergedAt": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.063
+    ],
+    "metalSpots": 2,
+    "drownedMetal": 0.0,
+    "anchorAboveWaterline": true
+   },
+   "tags": [
+    "metal",
+    "choke",
+    "contested",
+    "start",
+    "southeast"
+   ],
+   "evidence": {
+    "cellCount": 190.0,
+    "presenceShare": 0.0205,
+    "presenceDensity": 0.996,
+    "structureDensity": 0.9894,
+    "fightDensity": 0.0,
+    "trafficDensity": 0.6091,
+    "transitDensity": 0.6157,
+    "hazard": 0.0,
+    "defence": 0.3272,
+    "contest": 0.8692,
+    "water": 0.0,
+    "buildable": 0.7842,
+    "slope": 0.0457,
+    "metal": 0.7796,
+    "relativeHeight": 0.3325,
+    "choke": 0.875,
+    "hasStart": true,
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "metalSpots": 2,
+    "drownedMetal": 0.0
+   }
+  },
+  {
+   "zoneId": "T_NW_LANE",
+   "label": "Northwest Lane",
+   "role": "lane",
+   "shape": "cells",
+   "cellGrid": {
+    "cols": 96,
+    "rows": 96
+   },
+   "cells": [
+    [
+     2037,
+     3
+    ],
+    [
+     2133,
+     3
+    ],
+    [
+     2228,
+     5
+    ],
+    [
+     2323,
+     10
+    ],
+    [
+     2418,
+     12
+    ],
+    [
+     2515,
+     12
+    ],
+    [
+     2611,
+     12
+    ],
+    [
+     2708,
+     12
+    ],
+    [
+     2804,
+     11
+    ],
+    [
+     2901,
+     10
+    ],
+    [
+     2997,
+     9
+    ],
+    [
+     3094,
+     8
+    ],
+    [
+     3195,
+     3
+    ],
+    [
+     3292,
+     2
+    ],
+    [
+     3388,
+     1
+    ]
+   ],
+   "bounds": {
+    "xMin": 0.1875,
+    "xMax": 0.3333,
+    "zMin": 0.2188,
+    "zMax": 0.375
+   },
+   "anchor": {
+    "x": 0.2448,
+    "z": 0.2969
+   },
+   "campEligible": true,
+   "deployEligible": true,
+   "extractEligible": true,
+   "symmetryFamily": "F9",
+   "hydrology": {
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "submergedAt": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.027,
+     0.08,
+     0.142,
+     0.168
+    ],
+    "metalSpots": 1,
+    "drownedMetal": 0.0,
+    "anchorAboveWaterline": true
+   },
+   "tags": [
+    "high",
+    "metal",
+    "choke",
+    "start",
+    "northwest"
+   ],
+   "evidence": {
+    "cellCount": 113.0,
+    "presenceShare": 0.0135,
+    "presenceDensity": 1.098,
+    "structureDensity": 0.6515,
+    "fightDensity": 0.0,
+    "trafficDensity": 0.8032,
+    "transitDensity": 1.2329,
+    "hazard": 0.0,
+    "defence": 0.1867,
+    "contest": 0.0036,
+    "water": 0.0,
+    "buildable": 0.0843,
+    "slope": 0.3302,
+    "metal": 0.5691,
+    "relativeHeight": 0.6536,
+    "choke": 0.5625,
+    "hasStart": true,
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "metalSpots": 1,
+    "drownedMetal": 0.0
+   }
+  },
+  {
+   "zoneId": "T_SE_LANE",
+   "label": "Southeast Lane",
+   "role": "lane",
+   "shape": "cells",
+   "cellGrid": {
+    "cols": 96,
+    "rows": 96
+   },
+   "cells": [
+    [
+     5827,
+     1
+    ],
+    [
+     5922,
+     2
+    ],
+    [
+     6018,
+     3
+    ],
+    [
+     6114,
+     8
+    ],
+    [
+     6210,
+     9
+    ],
+    [
+     6305,
+     10
+    ],
+    [
+     6401,
+     11
+    ],
+    [
+     6496,
+     12
+    ],
+    [
+     6593,
+     12
+    ],
+    [
+     6689,
+     12
+    ],
+    [
+     6786,
+     12
+    ],
+    [
+     6883,
+     10
+    ],
+    [
+     6983,
+     5
+    ],
+    [
+     7080,
+     3
+    ],
+    [
+     7176,
+     3
+    ]
+   ],
+   "bounds": {
+    "xMin": 0.6667,
+    "xMax": 0.8125,
+    "zMin": 0.625,
+    "zMax": 0.7812
+   },
+   "anchor": {
+    "x": 0.7552,
+    "z": 0.7031
+   },
+   "campEligible": true,
+   "deployEligible": true,
+   "extractEligible": true,
+   "symmetryFamily": "F9",
+   "hydrology": {
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "submergedAt": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.062,
+     0.071
+    ],
+    "metalSpots": 0,
+    "drownedMetal": 0.0,
+    "anchorAboveWaterline": true
+   },
+   "tags": [
+    "high",
+    "contested",
+    "southeast"
+   ],
+   "evidence": {
+    "cellCount": 113.0,
+    "presenceShare": 0.0135,
+    "presenceDensity": 1.098,
+    "structureDensity": 0.6515,
+    "fightDensity": 0.0,
+    "trafficDensity": 0.8032,
+    "transitDensity": 1.2329,
+    "hazard": 0.0,
+    "defence": 0.1867,
+    "contest": 0.642,
+    "water": 0.0,
+    "buildable": 0.1407,
+    "slope": 0.3132,
+    "metal": 0.2845,
+    "relativeHeight": 0.6646,
+    "choke": 0.0,
+    "hasStart": false,
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "metalSpots": 0,
+    "drownedMetal": 0.0
+   }
+  },
+  {
+   "zoneId": "T_E_CAUSEWAY",
+   "label": "East Causeway",
+   "role": "causeway",
+   "shape": "cells",
+   "cellGrid": {
+    "cols": 96,
+    "rows": 96
+   },
+   "cells": [
+    [
+     3349,
+     11
+    ],
+    [
+     3445,
+     11
+    ],
+    [
+     3541,
+     11
+    ],
+    [
+     3637,
+     11
+    ],
+    [
+     3733,
+     11
+    ],
+    [
+     3829,
+     11
+    ],
+    [
+     3925,
+     11
+    ],
+    [
+     4021,
+     11
+    ],
+    [
+     4118,
+     10
+    ],
+    [
+     4215,
+     9
+    ],
+    [
+     4311,
+     9
+    ],
+    [
+     4408,
+     8
+    ],
+    [
+     4505,
+     12
+    ],
+    [
+     4602,
+     6
+    ]
+   ],
+   "bounds": {
+    "xMin": 0.0,
+    "xMax": 1.0,
+    "zMin": 0.3542,
+    "zMax": 0.5
+   },
+   "anchor": {
+    "x": 0.9115,
+    "z": 0.4219
+   },
+   "campEligible": true,
+   "deployEligible": true,
+   "extractEligible": true,
+   "symmetryFamily": "F6",
+   "hydrology": {
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "submergedAt": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.07,
+     0.324
+    ],
+    "metalSpots": 2,
+    "drownedMetal": 0.0,
+    "anchorAboveWaterline": true
+   },
+   "tags": [
+    "metal",
+    "choke",
+    "contested",
+    "start",
+    "east"
+   ],
+   "evidence": {
+    "cellCount": 142.0,
+    "presenceShare": 0.0091,
+    "presenceDensity": 0.5909,
+    "structureDensity": 0.6383,
+    "fightDensity": 0.0,
+    "trafficDensity": 0.6507,
+    "transitDensity": 1.0195,
+    "hazard": 0.0,
+    "defence": 0.3417,
+    "contest": 0.611,
+    "water": 0.0,
+    "buildable": 0.7796,
+    "slope": 0.1031,
+    "metal": 0.9057,
+    "relativeHeight": 0.3534,
+    "choke": 0.875,
+    "hasStart": true,
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "metalSpots": 2,
+    "drownedMetal": 0.0
+   }
+  },
+  {
+   "zoneId": "T_W_CAUSEWAY",
+   "label": "West Causeway",
+   "role": "causeway",
+   "shape": "cells",
+   "cellGrid": {
+    "cols": 96,
+    "rows": 96
+   },
+   "cells": [
+    [
+     4608,
+     6
+    ],
+    [
+     4699,
+     12
+    ],
+    [
+     4800,
+     8
+    ],
+    [
+     4896,
+     9
+    ],
+    [
+     4992,
+     9
+    ],
+    [
+     5088,
+     10
+    ],
+    [
+     5184,
+     11
+    ],
+    [
+     5280,
+     11
+    ],
+    [
+     5376,
+     11
+    ],
+    [
+     5472,
+     11
+    ],
+    [
+     5568,
+     11
+    ],
+    [
+     5664,
+     11
+    ],
+    [
+     5760,
+     11
+    ],
+    [
+     5856,
+     11
+    ]
+   ],
+   "bounds": {
+    "xMin": 0.0,
+    "xMax": 1.0,
+    "zMin": 0.5,
+    "zMax": 0.6458
+   },
+   "anchor": {
+    "x": 0.0885,
+    "z": 0.5781
+   },
+   "campEligible": true,
+   "deployEligible": true,
+   "extractEligible": true,
+   "symmetryFamily": "F6",
+   "hydrology": {
+    "floodsAt": 1.0,
+    "restingSubmerged": 0.0,
+    "submergedAt": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.021,
+     0.246,
+     0.606
+    ],
+    "metalSpots": 2,
+    "drownedMetal": 1.0,
+    "anchorAboveWaterline": true
+   },
+   "tags": [
+    "metal",
+    "choke",
+    "west"
+   ],
+   "evidence": {
+    "cellCount": 142.0,
+    "presenceShare": 0.0091,
+    "presenceDensity": 0.5909,
+    "structureDensity": 0.6383,
+    "fightDensity": 0.0,
+    "trafficDensity": 0.6507,
+    "transitDensity": 1.0195,
+    "hazard": 0.0,
+    "defence": 0.3417,
+    "contest": 0.0042,
+    "water": 0.0,
+    "buildable": 0.7695,
+    "slope": 0.1079,
+    "metal": 0.5447,
+    "relativeHeight": 0.3534,
+    "choke": 0.75,
+    "hasStart": false,
+    "floodsAt": 1.0,
+    "restingSubmerged": 0.0,
+    "metalSpots": 2,
+    "drownedMetal": 1.0
+   }
+  }
+ ]
+}

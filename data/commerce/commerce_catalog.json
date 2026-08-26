@@ -1,0 +1,156 @@
+{
+  "schemaVersion": "verdance-commerce-catalog/1.0",
+  "resource": {
+    "id": "tenebrium",
+    "label": "Tenebrium",
+    "shortLabel": "Tnb",
+    "lore": "Black-hole distillate metal from BAR lore. Scarce since the Generic Disaster. In Verdance, every unit with build power costs ≥1 Tnb (ceil(buildSpeed/150)); that stake lives on the unit and survives as wreck/heap/debris until reclaimed or truly vaporized. Infinite storage (display number). Q7 is the scarcity qubit. Armada spent their entire stock on a continent of farming decoy commanders (wind/solar/converter farms) — crisis, bank 0.",
+    "startingBalance": {
+      "ashwalkers": 0,
+      "nullmercs": 0,
+      "armada": 0,
+      "cortex": 2
+    },
+    "buildFloor": 1,
+    "inMission": {
+      "costFormula": "max(1, ceil(buildSpeed/150))",
+      "wreckDurable": true,
+      "heapTransfer": true,
+      "lostIfVaporized": true,
+      "storage": "infinite"
+    },
+    "armadaCrisis": {
+      "id": "armada_tenebrium_crisis",
+      "active": true,
+      "detailRef": "data/commerce/armada_tenebrium_crisis.json"
+    }
+  },
+  "credits": {
+    "id": "scrap_credits",
+    "label": "Scrap Credits",
+    "startingBalance": 40,
+    "notes": "Broker scrip for pure combat packages. Not a substitute for Tenebrium on build gear."
+  },
+  "listings": {
+    "punch_of_thugs": {
+      "kind": "loan_package",
+      "label": "Punch of Thugs",
+      "blurb": "Broker loan: a smoking pack of Cortex Thugs (corthud). You start the campaign with them. Return them healthier than you took them — they soak early repair downtime on purpose.",
+      "unitDef": "corthud",
+      "count": 6,
+      "spawnHealthFracMin": 0.32,
+      "spawnHealthFracMax": 0.52,
+      "loan": true,
+      "starterOwned": true,
+      "returnPolicy": "better_shape",
+      "tenebriumCost": 0,
+      "creditCost": 0,
+      "builds": false,
+      "tags": ["merc", "loan", "chaff_tank"]
+    },
+    "crash_of_brutes": {
+      "kind": "purchase_package",
+      "label": "Crash of Brutes",
+      "blurb": "Buy a short column of Cortex Brutes (corraid) for a hammer push. Paid in scrap credits; no Tenebrium — they do not build.",
+      "unitDef": "corraid",
+      "count": 4,
+      "spawnHealthFracMin": 0.9,
+      "spawnHealthFracMax": 1.0,
+      "loan": false,
+      "tenebriumCost": 0,
+      "creditCost": 180,
+      "repMin": { "nullmercs": 35 },
+      "builds": false,
+      "tags": ["merc", "armor"]
+    },
+    "cortex_grunt_fab": {
+      "kind": "unit_printer",
+      "label": "Cortex Grunt Fab (locked)",
+      "blurb": "A little Cortex bot lab locked to print Grunts (corak) on repeat. Arc 1 chaff stream for the mercenary band. Arc 2 can bolt on build power.",
+      "factoryDef": "corlab",
+      "product": "corak",
+      "seedCount": 4,
+      "metalIncome": 8,
+      "energyIncome": 40,
+      "tenebriumCost": 1,
+      "creditCost": 100,
+      "repMin": { "cortex": 20 },
+      "arcMin": 1,
+      "builds": true,
+      "tags": ["fab", "stream", "cortex"]
+    },
+    "grunt_fab_build_power": {
+      "kind": "printer_upgrade",
+      "label": "Grunt Fab Build Power",
+      "blurb": "Arc 2+: park nanos on the locked fab and thicken the metal/energy trickle so the grunt stream keeps up with tempo missions.",
+      "requires": "cortex_grunt_fab",
+      "nanoDef": "cornanotc",
+      "nanoCount": 2,
+      "metalIncomeBonus": 6,
+      "energyIncomeBonus": 25,
+      "tenebriumCost": 1,
+      "creditCost": 75,
+      "arcMin": 2,
+      "builds": true,
+      "tags": ["fab", "upgrade", "arc2"]
+    },
+    "armada_constructor": {
+      "kind": "constructor",
+      "label": "Armada Constructor",
+      "blurb": "High Armada reputation opens their construction bots for hire. Costs Tenebrium — you are buying the right to *build*.",
+      "unitDef": "armck",
+      "count": 1,
+      "tenebriumCost": 1,
+      "creditCost": 90,
+      "repMin": { "armada": 60 },
+      "builds": true,
+      "tags": ["constructor", "armada"]
+    },
+    "cortex_constructor": {
+      "kind": "constructor",
+      "label": "Cortex Constructor",
+      "blurb": "High Cortex reputation opens their construction bots for hire. Costs Tenebrium.",
+      "unitDef": "corck",
+      "count": 1,
+      "tenebriumCost": 1,
+      "creditCost": 90,
+      "repMin": { "cortex": 60 },
+      "builds": true,
+      "tags": ["constructor", "cortex"]
+    },
+    "wheelie_tech_spoke": {
+      "kind": "hero_contract",
+      "label": "Contract: Spoke (Wheelie Tech)",
+      "blurb": "Null Merc scout specialist. Spoke rides a Wheelie and banks XP from every scout that dies — new Wheelies mint with that floor. Not a default ace; unlocks when the bay trusts you.",
+      "heroId": "spoke",
+      "heroName": "Spoke",
+      "unitDef": "legscout",
+      "trait": "wheelie_mentor",
+      "tenebriumCost": 0,
+      "creditCost": 120,
+      "repMin": { "nullmercs": 55 },
+      "builds": false,
+      "tags": ["hero", "scout", "wheelie", "nullmercs", "unlock"]
+    }
+  },
+  "sortieRewards": {
+    "tenebriumOnVictory": { "min": 0, "max": 1, "chance": 0.35 },
+    "tenebriumOnZoneFlip": {
+      "min": 0,
+      "max": 0,
+      "chance": 0.0,
+      "notes": "No free Tnb mint on node claim / zone flip. Liquid Tnb only via reclaim or rare victory scavenge."
+    },
+    "tenebriumOnCleanExtract": { "min": 0, "max": 1, "chance": 0.2 },
+    "creditsOnVictory": { "min": 15, "max": 40 },
+    "loanReturnBonus": {
+      "credits": 25,
+      "nullmercRep": 2.0,
+      "tenebriumChance": 0.15
+    },
+    "loanBreachPenalty": {
+      "credits": -20,
+      "nullmercRep": -3.0
+    }
+  }
+}

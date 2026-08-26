@@ -1,0 +1,1668 @@
+{
+ "schemaVersion": "verdance-living-shell/1.1",
+ "mapId": "koom_valley",
+ "templateId": "living_placeholder_v1",
+ "source": "placeholder",
+ "faction": "mixed",
+ "character": "Fluid Scar - lane eco + ridge pockets, mobility front",
+ "characterCard": {
+  "descriptor": "The Fluid Scar",
+  "blurb": "Moving front: ferrocrete on fluid scar + ridge pockets. seize_lane stands the scar; eco_raid continue promotes a ridge on the same shell.",
+  "shellAtT0": "Lane + ridge pockets",
+  "growMix": "fortify scar + hold ridges + scrap Null + thin mouth + sprawl shelf",
+  "arcKinds": [
+   "seize_lane",
+   "eco_raid"
+  ],
+  "raidHint": "seize_or_raid_lane",
+  "captureLater": "lane node",
+  "wrath": {
+   "packId": "armada_gunslinger_response_v1",
+   "responseSeconds": 120,
+   "holdResponseSeconds": 150
+  },
+  "source": "placeholder",
+  "realBakeStatus": "pending_cloud_or_iconsatlas"
+ },
+ "arcKinds": [
+  "seize_lane",
+  "eco_raid"
+ ],
+ "raidHint": "seize_or_raid_lane",
+ "captureLater": "lane node",
+ "occupation": {
+  "decoyCommanders": true,
+  "notes": "Decoy com nodes (armdecom/cordecom/legdecom) stand in for Armada autonomous eco farmers. Sims use real commanders."
+ },
+ "bake": {
+  "growMinutes": 12,
+  "teams": 5,
+  "seed": 33,
+  "peacefulCoGrow": true,
+  "growProfiles": "koom_fluid_scar=fortify; koom_east_ridge=hold; koom_west_ridge=scrap; koom_se_shelf=sprawl; koom_scar_mouth=thin",
+  "simCommanders": "normal",
+  "occupationCommanders": "decoy",
+  "note": "Placeholder density with BARb/SimpleAI rate character + decoy swarm nodes. Replace by bake_living_shell.ps1 for real grow."
+ },
+ "generatedAt": "2026-07-28T13:35:03",
+ "unitCount": 153,
+ "pockets": [
+  {
+   "pocketId": "koom_fluid_scar",
+   "zoneId": "KV_SW_SPILLWAY",
+   "label": "Central Fluid Scar",
+   "kind": "lane",
+   "faction": "armada",
+   "growProfile": "fortify",
+   "growAI": "BARb",
+   "barbProfile": "medium",
+   "center": [
+    0.5,
+    0.51
+   ],
+   "unitCount": 58,
+   "primaryCandidate": true,
+   "densityScale": 1.15
+  },
+  {
+   "pocketId": "koom_east_ridge",
+   "zoneId": "KV_SE_MUSTER",
+   "label": "East Ridge Pocket",
+   "kind": "mixed",
+   "faction": "armada",
+   "growProfile": "hold",
+   "growAI": "SimpleAI",
+   "barbProfile": null,
+   "center": [
+    0.83,
+    0.5
+   ],
+   "unitCount": 37,
+   "primaryCandidate": false,
+   "densityScale": 0.95
+  },
+  {
+   "pocketId": "koom_west_ridge",
+   "zoneId": "KV_NW_MUSTER",
+   "label": "West Ridge Pocket",
+   "kind": "mixed",
+   "faction": "nullmercs",
+   "growProfile": "scrap",
+   "growAI": "SimpleAI",
+   "barbProfile": null,
+   "center": [
+    0.17,
+    0.5
+   ],
+   "unitCount": 16,
+   "primaryCandidate": false,
+   "densityScale": 0.65
+  },
+  {
+   "pocketId": "koom_se_shelf",
+   "zoneId": "KV_SE_MUSTER",
+   "label": "Southeast Green Shelf",
+   "kind": "mixed",
+   "faction": "armada",
+   "growProfile": "sprawl",
+   "growAI": "SimpleAI",
+   "barbProfile": null,
+   "center": [
+    0.86,
+    0.85
+   ],
+   "unitCount": 36,
+   "primaryCandidate": false,
+   "densityScale": 1
+  },
+  {
+   "pocketId": "koom_scar_mouth",
+   "zoneId": "KV_NW_SPILLWAY",
+   "label": "North Scar Mouth",
+   "kind": "thin",
+   "faction": "armada",
+   "growProfile": "thin",
+   "growAI": "SimpleAI",
+   "barbProfile": null,
+   "center": [
+    0.47,
+    0.125
+   ],
+   "unitCount": 6,
+   "primaryCandidate": false,
+   "densityScale": 0.55
+  }
+ ],
+ "units": [
+  {
+   "unitDefName": "armsolar",
+   "x": 0.5346,
+   "z": 0.5026,
+   "facing": 3,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armsolar",
+   "x": 0.487,
+   "z": 0.5003,
+   "facing": 1,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armsolar",
+   "x": 0.4822,
+   "z": 0.4633,
+   "facing": 0,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armsolar",
+   "x": 0.4637,
+   "z": 0.5237,
+   "facing": 0,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armsolar",
+   "x": 0.4833,
+   "z": 0.5463,
+   "facing": 0,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armwin",
+   "x": 0.4726,
+   "z": 0.4771,
+   "facing": 1,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armwin",
+   "x": 0.4863,
+   "z": 0.5035,
+   "facing": 0,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armwin",
+   "x": 0.5354,
+   "z": 0.497,
+   "facing": 2,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armwin",
+   "x": 0.5397,
+   "z": 0.4926,
+   "facing": 1,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armwin",
+   "x": 0.527,
+   "z": 0.5405,
+   "facing": 2,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armmakr",
+   "x": 0.4909,
+   "z": 0.5197,
+   "facing": 2,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "converter",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armmakr",
+   "x": 0.5057,
+   "z": 0.497,
+   "facing": 0,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "converter",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armadvsol",
+   "x": 0.4845,
+   "z": 0.5274,
+   "facing": 3,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armestor",
+   "x": 0.4938,
+   "z": 0.4928,
+   "facing": 3,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "storage",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armmex",
+   "x": 0.5038,
+   "z": 0.51,
+   "facing": 1,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "mex",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armmex",
+   "x": 0.5197,
+   "z": 0.4849,
+   "facing": 3,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "mex",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armmex",
+   "x": 0.4777,
+   "z": 0.5336,
+   "facing": 0,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "mex",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armmex",
+   "x": 0.4723,
+   "z": 0.492,
+   "facing": 0,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "mex",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armmex",
+   "x": 0.502,
+   "z": 0.504,
+   "facing": 3,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "mex",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.4934,
+   "z": 0.5544,
+   "facing": 1,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.5345,
+   "z": 0.5323,
+   "facing": 1,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.4879,
+   "z": 0.5185,
+   "facing": 1,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.4799,
+   "z": 0.4766,
+   "facing": 1,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.5219,
+   "z": 0.4914,
+   "facing": 3,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.4501,
+   "z": 0.5225,
+   "facing": 1,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.478,
+   "z": 0.5587,
+   "facing": 2,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.4995,
+   "z": 0.5254,
+   "facing": 0,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.4763,
+   "z": 0.5518,
+   "facing": 0,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.4584,
+   "z": 0.535,
+   "facing": 2,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.4961,
+   "z": 0.515,
+   "facing": 0,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armbeamer",
+   "x": 0.4994,
+   "z": 0.5176,
+   "facing": 0,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armbeamer",
+   "x": 0.4877,
+   "z": 0.495,
+   "facing": 1,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.4576,
+   "z": 0.4967,
+   "facing": 3,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.5145,
+   "z": 0.4894,
+   "facing": 0,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.4601,
+   "z": 0.5095,
+   "facing": 1,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.4848,
+   "z": 0.5242,
+   "facing": 2,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.5386,
+   "z": 0.4995,
+   "facing": 0,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.4947,
+   "z": 0.5157,
+   "facing": 2,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.525,
+   "z": 0.5534,
+   "facing": 3,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.4975,
+   "z": 0.5671,
+   "facing": 1,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.5275,
+   "z": 0.4938,
+   "facing": 1,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.4784,
+   "z": 0.55,
+   "facing": 0,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.4724,
+   "z": 0.4659,
+   "facing": 1,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.5496,
+   "z": 0.501,
+   "facing": 1,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.4742,
+   "z": 0.4839,
+   "facing": 3,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.537,
+   "z": 0.5471,
+   "facing": 1,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.5013,
+   "z": 0.4995,
+   "facing": 2,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.5146,
+   "z": 0.4767,
+   "facing": 2,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.5497,
+   "z": 0.5318,
+   "facing": 0,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.4701,
+   "z": 0.4841,
+   "facing": 3,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.469,
+   "z": 0.5122,
+   "facing": 2,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.4649,
+   "z": 0.467,
+   "facing": 3,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.4785,
+   "z": 0.4995,
+   "facing": 3,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.5338,
+   "z": 0.5451,
+   "facing": 1,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.4451,
+   "z": 0.5258,
+   "facing": 2,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.4941,
+   "z": 0.4608,
+   "facing": 2,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armrad",
+   "x": 0.4991,
+   "z": 0.5071,
+   "facing": 3,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "intel",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdecom",
+   "x": 0.4948,
+   "z": 0.5096,
+   "facing": 3,
+   "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+   "pocketId": "koom_fluid_scar",
+   "keepClass": "decoy_node",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armsolar",
+   "x": 0.8205,
+   "z": 0.4874,
+   "facing": 3,
+   "zoneId": "KOOM_EAST_RIDGE_POCKET",
+   "pocketId": "koom_east_ridge",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armsolar",
+   "x": 0.8549,
+   "z": 0.4938,
+   "facing": 2,
+   "zoneId": "KOOM_EAST_RIDGE_POCKET",
+   "pocketId": "koom_east_ridge",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armsolar",
+   "x": 0.8385,
+   "z": 0.5068,
+   "facing": 1,
+   "zoneId": "KOOM_EAST_RIDGE_POCKET",
+   "pocketId": "koom_east_ridge",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armsolar",
+   "x": 0.7988,
+   "z": 0.5153,
+   "facing": 1,
+   "zoneId": "KOOM_EAST_RIDGE_POCKET",
+   "pocketId": "koom_east_ridge",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armsolar",
+   "x": 0.8261,
+   "z": 0.4505,
+   "facing": 1,
+   "zoneId": "KOOM_EAST_RIDGE_POCKET",
+   "pocketId": "koom_east_ridge",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armsolar",
+   "x": 0.8672,
+   "z": 0.5002,
+   "facing": 2,
+   "zoneId": "KOOM_EAST_RIDGE_POCKET",
+   "pocketId": "koom_east_ridge",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armwin",
+   "x": 0.7943,
+   "z": 0.5182,
+   "facing": 1,
+   "zoneId": "KOOM_EAST_RIDGE_POCKET",
+   "pocketId": "koom_east_ridge",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armwin",
+   "x": 0.8145,
+   "z": 0.5257,
+   "facing": 1,
+   "zoneId": "KOOM_EAST_RIDGE_POCKET",
+   "pocketId": "koom_east_ridge",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armwin",
+   "x": 0.8411,
+   "z": 0.4733,
+   "facing": 0,
+   "zoneId": "KOOM_EAST_RIDGE_POCKET",
+   "pocketId": "koom_east_ridge",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armwin",
+   "x": 0.7836,
+   "z": 0.511,
+   "facing": 1,
+   "zoneId": "KOOM_EAST_RIDGE_POCKET",
+   "pocketId": "koom_east_ridge",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armwin",
+   "x": 0.8726,
+   "z": 0.475,
+   "facing": 3,
+   "zoneId": "KOOM_EAST_RIDGE_POCKET",
+   "pocketId": "koom_east_ridge",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armwin",
+   "x": 0.8019,
+   "z": 0.4588,
+   "facing": 3,
+   "zoneId": "KOOM_EAST_RIDGE_POCKET",
+   "pocketId": "koom_east_ridge",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armmakr",
+   "x": 0.8571,
+   "z": 0.4959,
+   "facing": 3,
+   "zoneId": "KOOM_EAST_RIDGE_POCKET",
+   "pocketId": "koom_east_ridge",
+   "keepClass": "converter",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armmakr",
+   "x": 0.8336,
+   "z": 0.5035,
+   "facing": 2,
+   "zoneId": "KOOM_EAST_RIDGE_POCKET",
+   "pocketId": "koom_east_ridge",
+   "keepClass": "converter",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armadvsol",
+   "x": 0.8341,
+   "z": 0.4991,
+   "facing": 2,
+   "zoneId": "KOOM_EAST_RIDGE_POCKET",
+   "pocketId": "koom_east_ridge",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armestor",
+   "x": 0.8315,
+   "z": 0.5199,
+   "facing": 3,
+   "zoneId": "KOOM_EAST_RIDGE_POCKET",
+   "pocketId": "koom_east_ridge",
+   "keepClass": "storage",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armmex",
+   "x": 0.8534,
+   "z": 0.5268,
+   "facing": 1,
+   "zoneId": "KOOM_EAST_RIDGE_POCKET",
+   "pocketId": "koom_east_ridge",
+   "keepClass": "mex",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armmex",
+   "x": 0.8283,
+   "z": 0.5124,
+   "facing": 3,
+   "zoneId": "KOOM_EAST_RIDGE_POCKET",
+   "pocketId": "koom_east_ridge",
+   "keepClass": "mex",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armmex",
+   "x": 0.8149,
+   "z": 0.4817,
+   "facing": 2,
+   "zoneId": "KOOM_EAST_RIDGE_POCKET",
+   "pocketId": "koom_east_ridge",
+   "keepClass": "mex",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armmex",
+   "x": 0.8136,
+   "z": 0.5004,
+   "facing": 3,
+   "zoneId": "KOOM_EAST_RIDGE_POCKET",
+   "pocketId": "koom_east_ridge",
+   "keepClass": "mex",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.7921,
+   "z": 0.4774,
+   "facing": 0,
+   "zoneId": "KOOM_EAST_RIDGE_POCKET",
+   "pocketId": "koom_east_ridge",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.8638,
+   "z": 0.4798,
+   "facing": 2,
+   "zoneId": "KOOM_EAST_RIDGE_POCKET",
+   "pocketId": "koom_east_ridge",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.8227,
+   "z": 0.486,
+   "facing": 3,
+   "zoneId": "KOOM_EAST_RIDGE_POCKET",
+   "pocketId": "koom_east_ridge",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.8246,
+   "z": 0.4932,
+   "facing": 3,
+   "zoneId": "KOOM_EAST_RIDGE_POCKET",
+   "pocketId": "koom_east_ridge",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.8295,
+   "z": 0.4698,
+   "facing": 2,
+   "zoneId": "KOOM_EAST_RIDGE_POCKET",
+   "pocketId": "koom_east_ridge",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.8091,
+   "z": 0.4738,
+   "facing": 1,
+   "zoneId": "KOOM_EAST_RIDGE_POCKET",
+   "pocketId": "koom_east_ridge",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armbeamer",
+   "x": 0.8459,
+   "z": 0.4897,
+   "facing": 1,
+   "zoneId": "KOOM_EAST_RIDGE_POCKET",
+   "pocketId": "koom_east_ridge",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.8048,
+   "z": 0.5211,
+   "facing": 0,
+   "zoneId": "KOOM_EAST_RIDGE_POCKET",
+   "pocketId": "koom_east_ridge",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.8732,
+   "z": 0.4838,
+   "facing": 3,
+   "zoneId": "KOOM_EAST_RIDGE_POCKET",
+   "pocketId": "koom_east_ridge",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.8368,
+   "z": 0.4982,
+   "facing": 2,
+   "zoneId": "KOOM_EAST_RIDGE_POCKET",
+   "pocketId": "koom_east_ridge",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.8632,
+   "z": 0.522,
+   "facing": 1,
+   "zoneId": "KOOM_EAST_RIDGE_POCKET",
+   "pocketId": "koom_east_ridge",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.8718,
+   "z": 0.4951,
+   "facing": 1,
+   "zoneId": "KOOM_EAST_RIDGE_POCKET",
+   "pocketId": "koom_east_ridge",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.8174,
+   "z": 0.4972,
+   "facing": 2,
+   "zoneId": "KOOM_EAST_RIDGE_POCKET",
+   "pocketId": "koom_east_ridge",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.8732,
+   "z": 0.4993,
+   "facing": 3,
+   "zoneId": "KOOM_EAST_RIDGE_POCKET",
+   "pocketId": "koom_east_ridge",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.8346,
+   "z": 0.4599,
+   "facing": 2,
+   "zoneId": "KOOM_EAST_RIDGE_POCKET",
+   "pocketId": "koom_east_ridge",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armrad",
+   "x": 0.8196,
+   "z": 0.4968,
+   "facing": 3,
+   "zoneId": "KOOM_EAST_RIDGE_POCKET",
+   "pocketId": "koom_east_ridge",
+   "keepClass": "intel",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdecom",
+   "x": 0.8312,
+   "z": 0.5074,
+   "facing": 3,
+   "zoneId": "KOOM_EAST_RIDGE_POCKET",
+   "pocketId": "koom_east_ridge",
+   "keepClass": "decoy_node",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "legsolar",
+   "x": 0.138,
+   "z": 0.5211,
+   "facing": 2,
+   "zoneId": "KOOM_WEST_RIDGE_POCKET",
+   "pocketId": "koom_west_ridge",
+   "keepClass": "energy",
+   "faction": "nullmercs"
+  },
+  {
+   "unitDefName": "legsolar",
+   "x": 0.1511,
+   "z": 0.4885,
+   "facing": 1,
+   "zoneId": "KOOM_WEST_RIDGE_POCKET",
+   "pocketId": "koom_west_ridge",
+   "keepClass": "energy",
+   "faction": "nullmercs"
+  },
+  {
+   "unitDefName": "legwin",
+   "x": 0.2146,
+   "z": 0.479,
+   "facing": 3,
+   "zoneId": "KOOM_WEST_RIDGE_POCKET",
+   "pocketId": "koom_west_ridge",
+   "keepClass": "energy",
+   "faction": "nullmercs"
+  },
+  {
+   "unitDefName": "legwin",
+   "x": 0.1385,
+   "z": 0.4718,
+   "facing": 0,
+   "zoneId": "KOOM_WEST_RIDGE_POCKET",
+   "pocketId": "koom_west_ridge",
+   "keepClass": "energy",
+   "faction": "nullmercs"
+  },
+  {
+   "unitDefName": "legmstor",
+   "x": 0.1647,
+   "z": 0.5139,
+   "facing": 2,
+   "zoneId": "KOOM_WEST_RIDGE_POCKET",
+   "pocketId": "koom_west_ridge",
+   "keepClass": "storage",
+   "faction": "nullmercs"
+  },
+  {
+   "unitDefName": "legmex",
+   "x": 0.1332,
+   "z": 0.5052,
+   "facing": 3,
+   "zoneId": "KOOM_WEST_RIDGE_POCKET",
+   "pocketId": "koom_west_ridge",
+   "keepClass": "mex",
+   "faction": "nullmercs"
+  },
+  {
+   "unitDefName": "legmex",
+   "x": 0.1704,
+   "z": 0.514,
+   "facing": 1,
+   "zoneId": "KOOM_WEST_RIDGE_POCKET",
+   "pocketId": "koom_west_ridge",
+   "keepClass": "mex",
+   "faction": "nullmercs"
+  },
+  {
+   "unitDefName": "leglht",
+   "x": 0.191,
+   "z": 0.4519,
+   "facing": 0,
+   "zoneId": "KOOM_WEST_RIDGE_POCKET",
+   "pocketId": "koom_west_ridge",
+   "keepClass": "defense",
+   "faction": "nullmercs"
+  },
+  {
+   "unitDefName": "leglht",
+   "x": 0.1307,
+   "z": 0.5184,
+   "facing": 3,
+   "zoneId": "KOOM_WEST_RIDGE_POCKET",
+   "pocketId": "koom_west_ridge",
+   "keepClass": "defense",
+   "faction": "nullmercs"
+  },
+  {
+   "unitDefName": "leglht",
+   "x": 0.1361,
+   "z": 0.4935,
+   "facing": 0,
+   "zoneId": "KOOM_WEST_RIDGE_POCKET",
+   "pocketId": "koom_west_ridge",
+   "keepClass": "defense",
+   "faction": "nullmercs"
+  },
+  {
+   "unitDefName": "leglht",
+   "x": 0.2073,
+   "z": 0.5288,
+   "facing": 0,
+   "zoneId": "KOOM_WEST_RIDGE_POCKET",
+   "pocketId": "koom_west_ridge",
+   "keepClass": "defense",
+   "faction": "nullmercs"
+  },
+  {
+   "unitDefName": "legdrag",
+   "x": 0.1682,
+   "z": 0.4524,
+   "facing": 3,
+   "zoneId": "KOOM_WEST_RIDGE_POCKET",
+   "pocketId": "koom_west_ridge",
+   "keepClass": "wall",
+   "faction": "nullmercs"
+  },
+  {
+   "unitDefName": "legdrag",
+   "x": 0.1978,
+   "z": 0.4769,
+   "facing": 1,
+   "zoneId": "KOOM_WEST_RIDGE_POCKET",
+   "pocketId": "koom_west_ridge",
+   "keepClass": "wall",
+   "faction": "nullmercs"
+  },
+  {
+   "unitDefName": "legdrag",
+   "x": 0.2117,
+   "z": 0.5162,
+   "facing": 0,
+   "zoneId": "KOOM_WEST_RIDGE_POCKET",
+   "pocketId": "koom_west_ridge",
+   "keepClass": "wall",
+   "faction": "nullmercs"
+  },
+  {
+   "unitDefName": "legrad",
+   "x": 0.1645,
+   "z": 0.4926,
+   "facing": 3,
+   "zoneId": "KOOM_WEST_RIDGE_POCKET",
+   "pocketId": "koom_west_ridge",
+   "keepClass": "intel",
+   "faction": "nullmercs"
+  },
+  {
+   "unitDefName": "legdecom",
+   "x": 0.1728,
+   "z": 0.4958,
+   "facing": 3,
+   "zoneId": "KOOM_WEST_RIDGE_POCKET",
+   "pocketId": "koom_west_ridge",
+   "keepClass": "decoy_node",
+   "faction": "nullmercs"
+  },
+  {
+   "unitDefName": "armsolar",
+   "x": 0.8689,
+   "z": 0.8598,
+   "facing": 3,
+   "zoneId": "KOOM_SE_GREEN_SHELF",
+   "pocketId": "koom_se_shelf",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armsolar",
+   "x": 0.9091,
+   "z": 0.8561,
+   "facing": 3,
+   "zoneId": "KOOM_SE_GREEN_SHELF",
+   "pocketId": "koom_se_shelf",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armsolar",
+   "x": 0.8315,
+   "z": 0.8241,
+   "facing": 2,
+   "zoneId": "KOOM_SE_GREEN_SHELF",
+   "pocketId": "koom_se_shelf",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armsolar",
+   "x": 0.8417,
+   "z": 0.8424,
+   "facing": 2,
+   "zoneId": "KOOM_SE_GREEN_SHELF",
+   "pocketId": "koom_se_shelf",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armsolar",
+   "x": 0.8286,
+   "z": 0.8534,
+   "facing": 2,
+   "zoneId": "KOOM_SE_GREEN_SHELF",
+   "pocketId": "koom_se_shelf",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armsolar",
+   "x": 0.8596,
+   "z": 0.8142,
+   "facing": 3,
+   "zoneId": "KOOM_SE_GREEN_SHELF",
+   "pocketId": "koom_se_shelf",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armsolar",
+   "x": 0.8957,
+   "z": 0.8617,
+   "facing": 3,
+   "zoneId": "KOOM_SE_GREEN_SHELF",
+   "pocketId": "koom_se_shelf",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armwin",
+   "x": 0.838,
+   "z": 0.8186,
+   "facing": 1,
+   "zoneId": "KOOM_SE_GREEN_SHELF",
+   "pocketId": "koom_se_shelf",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armwin",
+   "x": 0.8408,
+   "z": 0.8598,
+   "facing": 2,
+   "zoneId": "KOOM_SE_GREEN_SHELF",
+   "pocketId": "koom_se_shelf",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armwin",
+   "x": 0.8609,
+   "z": 0.8704,
+   "facing": 2,
+   "zoneId": "KOOM_SE_GREEN_SHELF",
+   "pocketId": "koom_se_shelf",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armwin",
+   "x": 0.8799,
+   "z": 0.8827,
+   "facing": 0,
+   "zoneId": "KOOM_SE_GREEN_SHELF",
+   "pocketId": "koom_se_shelf",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armwin",
+   "x": 0.8844,
+   "z": 0.83,
+   "facing": 1,
+   "zoneId": "KOOM_SE_GREEN_SHELF",
+   "pocketId": "koom_se_shelf",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armwin",
+   "x": 0.8506,
+   "z": 0.8611,
+   "facing": 3,
+   "zoneId": "KOOM_SE_GREEN_SHELF",
+   "pocketId": "koom_se_shelf",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armwin",
+   "x": 0.8723,
+   "z": 0.8629,
+   "facing": 0,
+   "zoneId": "KOOM_SE_GREEN_SHELF",
+   "pocketId": "koom_se_shelf",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armmakr",
+   "x": 0.8643,
+   "z": 0.8696,
+   "facing": 0,
+   "zoneId": "KOOM_SE_GREEN_SHELF",
+   "pocketId": "koom_se_shelf",
+   "keepClass": "converter",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armmakr",
+   "x": 0.8624,
+   "z": 0.8235,
+   "facing": 0,
+   "zoneId": "KOOM_SE_GREEN_SHELF",
+   "pocketId": "koom_se_shelf",
+   "keepClass": "converter",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armadvsol",
+   "x": 0.8363,
+   "z": 0.8498,
+   "facing": 3,
+   "zoneId": "KOOM_SE_GREEN_SHELF",
+   "pocketId": "koom_se_shelf",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armestor",
+   "x": 0.8719,
+   "z": 0.8367,
+   "facing": 3,
+   "zoneId": "KOOM_SE_GREEN_SHELF",
+   "pocketId": "koom_se_shelf",
+   "keepClass": "storage",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armmex",
+   "x": 0.8858,
+   "z": 0.8641,
+   "facing": 1,
+   "zoneId": "KOOM_SE_GREEN_SHELF",
+   "pocketId": "koom_se_shelf",
+   "keepClass": "mex",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armmex",
+   "x": 0.8352,
+   "z": 0.8714,
+   "facing": 3,
+   "zoneId": "KOOM_SE_GREEN_SHELF",
+   "pocketId": "koom_se_shelf",
+   "keepClass": "mex",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armmex",
+   "x": 0.8405,
+   "z": 0.8672,
+   "facing": 1,
+   "zoneId": "KOOM_SE_GREEN_SHELF",
+   "pocketId": "koom_se_shelf",
+   "keepClass": "mex",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armmex",
+   "x": 0.8763,
+   "z": 0.8714,
+   "facing": 2,
+   "zoneId": "KOOM_SE_GREEN_SHELF",
+   "pocketId": "koom_se_shelf",
+   "keepClass": "mex",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.8235,
+   "z": 0.8714,
+   "facing": 0,
+   "zoneId": "KOOM_SE_GREEN_SHELF",
+   "pocketId": "koom_se_shelf",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.8593,
+   "z": 0.8842,
+   "facing": 1,
+   "zoneId": "KOOM_SE_GREEN_SHELF",
+   "pocketId": "koom_se_shelf",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.8675,
+   "z": 0.9023,
+   "facing": 1,
+   "zoneId": "KOOM_SE_GREEN_SHELF",
+   "pocketId": "koom_se_shelf",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.8646,
+   "z": 0.8139,
+   "facing": 1,
+   "zoneId": "KOOM_SE_GREEN_SHELF",
+   "pocketId": "koom_se_shelf",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.8898,
+   "z": 0.8834,
+   "facing": 2,
+   "zoneId": "KOOM_SE_GREEN_SHELF",
+   "pocketId": "koom_se_shelf",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armbeamer",
+   "x": 0.8534,
+   "z": 0.8705,
+   "facing": 1,
+   "zoneId": "KOOM_SE_GREEN_SHELF",
+   "pocketId": "koom_se_shelf",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.8433,
+   "z": 0.8235,
+   "facing": 3,
+   "zoneId": "KOOM_SE_GREEN_SHELF",
+   "pocketId": "koom_se_shelf",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.8554,
+   "z": 0.9016,
+   "facing": 3,
+   "zoneId": "KOOM_SE_GREEN_SHELF",
+   "pocketId": "koom_se_shelf",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.8908,
+   "z": 0.8023,
+   "facing": 1,
+   "zoneId": "KOOM_SE_GREEN_SHELF",
+   "pocketId": "koom_se_shelf",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.9081,
+   "z": 0.8379,
+   "facing": 3,
+   "zoneId": "KOOM_SE_GREEN_SHELF",
+   "pocketId": "koom_se_shelf",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.8526,
+   "z": 0.8368,
+   "facing": 3,
+   "zoneId": "KOOM_SE_GREEN_SHELF",
+   "pocketId": "koom_se_shelf",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.8433,
+   "z": 0.8204,
+   "facing": 3,
+   "zoneId": "KOOM_SE_GREEN_SHELF",
+   "pocketId": "koom_se_shelf",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armrad",
+   "x": 0.8622,
+   "z": 0.8571,
+   "facing": 2,
+   "zoneId": "KOOM_SE_GREEN_SHELF",
+   "pocketId": "koom_se_shelf",
+   "keepClass": "intel",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdecom",
+   "x": 0.8544,
+   "z": 0.8521,
+   "facing": 3,
+   "zoneId": "KOOM_SE_GREEN_SHELF",
+   "pocketId": "koom_se_shelf",
+   "keepClass": "decoy_node",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armsolar",
+   "x": 0.4431,
+   "z": 0.1321,
+   "facing": 0,
+   "zoneId": "KOOM_NORTH_SCAR_MOUTH",
+   "pocketId": "koom_scar_mouth",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armwin",
+   "x": 0.4744,
+   "z": 0.1497,
+   "facing": 3,
+   "zoneId": "KOOM_NORTH_SCAR_MOUTH",
+   "pocketId": "koom_scar_mouth",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armestor",
+   "x": 0.4724,
+   "z": 0.1304,
+   "facing": 2,
+   "zoneId": "KOOM_NORTH_SCAR_MOUTH",
+   "pocketId": "koom_scar_mouth",
+   "keepClass": "storage",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.4908,
+   "z": 0.1572,
+   "facing": 0,
+   "zoneId": "KOOM_NORTH_SCAR_MOUTH",
+   "pocketId": "koom_scar_mouth",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.4735,
+   "z": 0.1029,
+   "facing": 3,
+   "zoneId": "KOOM_NORTH_SCAR_MOUTH",
+   "pocketId": "koom_scar_mouth",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armrad",
+   "x": 0.4783,
+   "z": 0.1298,
+   "facing": 1,
+   "zoneId": "KOOM_NORTH_SCAR_MOUTH",
+   "pocketId": "koom_scar_mouth",
+   "keepClass": "intel",
+   "faction": "armada"
+  }
+ ]
+}

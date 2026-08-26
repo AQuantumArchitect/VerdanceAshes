@@ -6,7 +6,8 @@ function widget:GetInfo()
         date      = "2026",
         license   = "GNU GPL, v2 or later",
         layer     = 0,
-        enabled   = true,
+        -- Not the play path (Ash Console = objectives HUD). Off by default.
+        enabled   = false,
         handler   = true
     }
 end

@@ -1,0 +1,1333 @@
+{
+  "schemaVersion": "verdance-campaign-state/1.0",
+  "campaignId": "verdance_ashes",
+  "missionNumber": 1,
+  "currentMissionId": "va_001",
+  "pathSignal": "B",
+  "campaignClockMinutes": 0.0,
+  "graph": {
+    "q0_armada_cortex": 0.77,
+    "q2_void_structure": 0.15,
+    "q6_contested": 0.85,
+    "q6_independent": 0.24,
+    "q7_resource_scarcity": 0.98,
+    "pathSignalA": 0.0,
+    "pathSignalB": 0.1,
+    "pathSignalC": 0.0
+  },
+  "reputation": {
+    "armada": 18,
+    "cortex": 70,
+    "nullmercs": 48.0,
+    "sev": 50
+  },
+  "sessionHomeMap": "the_rock_jungle",
+  "sessionMode": "same_map",
+  "homeCamp": {
+    "level": 0,
+    "mapId": "the_rock_jungle",
+    "label": "Jungle shelf camp"
+  },
+  "flags": {
+    "homeClearReady": false,
+    "homeCleared": false
+  },
+  "characters": {
+    "vane": {
+      "id": "vane",
+      "name": "Ash-Captain Vane",
+      "faction": "ashwalkers",
+      "unitDef": "legbal",
+      "xp": 1480,
+      "player": true,
+      "home": null,
+      "status": "active",
+      "wounds": 0,
+      "scars": []
+    },
+    "ketha": {
+      "id": "ketha",
+      "name": "Ketha",
+      "faction": "ashwalkers",
+      "unitDef": "legcen",
+      "xp": 1120,
+      "player": true,
+      "home": null,
+      "status": "active",
+      "wounds": 0,
+      "scars": []
+    },
+    "anselm": {
+      "id": "anselm",
+      "name": "Broker Anselm Rue",
+      "faction": "nullmercs",
+      "unitDef": "legcen",
+      "xp": 1900,
+      "player": false,
+      "home": [
+        "greenest_fields",
+        "GF_CENTRAL_OPEN_GRASSLAND"
+      ],
+      "status": "active",
+      "wounds": 0,
+      "scars": []
+    },
+    "grath": {
+      "id": "grath",
+      "name": "Grath Unpaid",
+      "faction": "nullmercs",
+      "unitDef": "legkark",
+      "xp": 2400,
+      "player": false,
+      "home": [
+        "koom_valley",
+        "KOOM_WEST_RIDGE_POCKET"
+      ],
+      "status": "active",
+      "wounds": 0,
+      "scars": []
+    },
+    "halq": {
+      "id": "halq",
+      "name": "Sisu Halq",
+      "faction": "nullmercs",
+      "unitDef": "legbal",
+      "xp": 1350,
+      "player": false,
+      "home": [
+        "the_rock_jungle",
+        "RJ_WESTERN_CAUSEWAY"
+      ],
+      "status": "active",
+      "wounds": 0,
+      "scars": []
+    },
+    "brask": {
+      "id": "brask",
+      "name": "Line-Captain Odell Brask",
+      "faction": "armada",
+      "unitDef": "armcom",
+      "xp": 1600,
+      "player": false,
+      "home": [
+        "greenest_fields",
+        "GF_SE_ENERGY_WORKS"
+      ],
+      "status": "active",
+      "wounds": 0,
+      "scars": []
+    },
+    "solvang": {
+      "id": "solvang",
+      "name": "Warden-Marshal Teir Solvang",
+      "faction": "armada",
+      "unitDef": "armcom",
+      "xp": 3100,
+      "player": false,
+      "home": [
+        "ancient_bastion",
+        "AB_EASTERN_BASTION_WALL"
+      ],
+      "status": "active",
+      "wounds": 0,
+      "scars": []
+    },
+    "voren": {
+      "id": "voren",
+      "name": "Bastion-Keeper Ilsa Voren",
+      "faction": "armada",
+      "unitDef": "armcom",
+      "xp": 2050,
+      "player": false,
+      "home": [
+        "tabula",
+        "TAB_SE_PLATEAU"
+      ],
+      "status": "active",
+      "wounds": 0,
+      "scars": []
+    },
+    "ixt": {
+      "id": "ixt",
+      "name": "Dealer-Prime Ixt",
+      "faction": "cortex",
+      "unitDef": "corcom",
+      "xp": 2600,
+      "player": false,
+      "home": [
+        "eye_of_horus",
+        "EOH_SE_CORTEX_POCKET"
+      ],
+      "status": "active",
+      "wounds": 0,
+      "scars": []
+    },
+    "calder": {
+      "id": "calder",
+      "name": "Synthwright Calder Nyx",
+      "faction": "cortex",
+      "unitDef": "corcom",
+      "xp": 1750,
+      "player": false,
+      "home": [
+        "greenest_fields",
+        "GF_SE_SYNTH_START"
+      ],
+      "status": "active",
+      "wounds": 0,
+      "scars": []
+    }
+  },
+  "companion": {
+    "id": "ketha",
+    "name": "Ketha",
+    "xp": 0.0,
+    "morale": 70,
+    "loyalty": 75,
+    "stress": 12
+  },
+  "history": [],
+  "frontEvents": [],
+  "roster": {
+    "commander": {
+      "name": "Ash-Captain Vane",
+      "unitDef": "legcom",
+      "level": 1,
+      "xp": 0.0,
+      "perks": [],
+      "scars": []
+    },
+    "cadre": {},
+    "cadreCap": 12,
+    "heroes": [
+      {
+        "heroId": "vane",
+        "name": "Ash-Captain Vane",
+        "unitDef": "legbal",
+        "missionCritical": false,
+        "status": "active",
+        "xp": 0.25,
+        "timesWounded": 0
+      },
+      {
+        "heroId": "ketha",
+        "name": "Ketha",
+        "unitDef": "legcen",
+        "missionCritical": false,
+        "status": "active",
+        "xp": 0.05,
+        "timesWounded": 0
+      }
+    ]
+  },
+  "processedResults": {},
+  "zoneMemory": {
+    "all_that_simmers": {
+      "ATS_CENTRAL_HIVE_FLATS": {
+        "mapId": "all_that_simmers",
+        "zoneId": "ATS_CENTRAL_HIVE_FLATS",
+        "label": "Central Hive Flats",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "wild",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "wild",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      },
+      "ATS_NW_CANOPY_START": {
+        "mapId": "all_that_simmers",
+        "zoneId": "ATS_NW_CANOPY_START",
+        "label": "Northwest Canopy Start",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "ashwalkers",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "ashwalkers",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      },
+      "ATS_NE_ARMADA_RIDGE": {
+        "mapId": "all_that_simmers",
+        "zoneId": "ATS_NE_ARMADA_RIDGE",
+        "label": "Northeast Armada Ridge",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "armada",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "armada",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      },
+      "ATS_SE_CORTEX_BASIN": {
+        "mapId": "all_that_simmers",
+        "zoneId": "ATS_SE_CORTEX_BASIN",
+        "label": "Southeast Cortex Basin",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "cortex",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "cortex",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      },
+      "ATS_SW_ARMADA_LAGOON": {
+        "mapId": "all_that_simmers",
+        "zoneId": "ATS_SW_ARMADA_LAGOON",
+        "label": "Southwest Armada Lagoon",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "armada",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "armada",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      },
+      "ATS_NW_CENTER_APPROACH": {
+        "mapId": "all_that_simmers",
+        "zoneId": "ATS_NW_CENTER_APPROACH",
+        "label": "Northwest-to-Center Approach",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "nullmercs",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "nullmercs",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      },
+      "ATS_SW_NE_SWAMP_LANE": {
+        "mapId": "all_that_simmers",
+        "zoneId": "ATS_SW_NE_SWAMP_LANE",
+        "label": "Southwest-to-Northeast Swamp Lane",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "neutral",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "neutral",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      }
+    },
+    "ancient_bastion": {
+      "AB_WESTERN_MUSTER_GROUNDS": {
+        "mapId": "ancient_bastion",
+        "zoneId": "AB_WESTERN_MUSTER_GROUNDS",
+        "label": "Western Muster Grounds",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "ashwalkers",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "ashwalkers",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      },
+      "AB_CITADEL_GATEFIELD": {
+        "mapId": "ancient_bastion",
+        "zoneId": "AB_CITADEL_GATEFIELD",
+        "label": "Citadel Gatefield",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "neutral",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "neutral",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      },
+      "AB_CENTRAL_KILLFIELD": {
+        "mapId": "ancient_bastion",
+        "zoneId": "AB_CENTRAL_KILLFIELD",
+        "label": "Central Killfield",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "neutral",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "neutral",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      },
+      "AB_EASTERN_BASTION_WALL": {
+        "mapId": "ancient_bastion",
+        "zoneId": "AB_EASTERN_BASTION_WALL",
+        "label": "Eastern Bastion Wall",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "armada",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "armada",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      },
+      "AB_NORTHERN_FLANKING_LEDGE": {
+        "mapId": "ancient_bastion",
+        "zoneId": "AB_NORTHERN_FLANKING_LEDGE",
+        "label": "Northern Flanking Ledge",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "nullmercs",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "nullmercs",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      },
+      "AB_SOUTHERN_SERVICE_ROAD": {
+        "mapId": "ancient_bastion",
+        "zoneId": "AB_SOUTHERN_SERVICE_ROAD",
+        "label": "Southern Service Road",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "neutral",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "neutral",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      }
+    },
+    "eye_of_horus": {
+      "EOH_NW_CRATER_CAMP": {
+        "mapId": "eye_of_horus",
+        "zoneId": "EOH_NW_CRATER_CAMP",
+        "label": "Northwest Crater Camp",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "ashwalkers",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "ashwalkers",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      },
+      "EOH_SE_CORTEX_POCKET": {
+        "mapId": "eye_of_horus",
+        "zoneId": "EOH_SE_CORTEX_POCKET",
+        "label": "Southeast Cortex Pocket",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "cortex",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "cortex",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      },
+      "EOH_GLASSED_CENTER": {
+        "mapId": "eye_of_horus",
+        "zoneId": "EOH_GLASSED_CENTER",
+        "label": "Glassed Center",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "neutral",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "neutral",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      },
+      "EOH_WESTERN_DEBRIS_LANE": {
+        "mapId": "eye_of_horus",
+        "zoneId": "EOH_WESTERN_DEBRIS_LANE",
+        "label": "Western Debris Lane",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "nullmercs",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "nullmercs",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      },
+      "EOH_EASTERN_DEBRIS_LANE": {
+        "mapId": "eye_of_horus",
+        "zoneId": "EOH_EASTERN_DEBRIS_LANE",
+        "label": "Eastern Debris Lane",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "neutral",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "neutral",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      },
+      "EOH_SOUTHERN_CROSSFIRE_SHELF": {
+        "mapId": "eye_of_horus",
+        "zoneId": "EOH_SOUTHERN_CROSSFIRE_SHELF",
+        "label": "Southern Crossfire Shelf",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "neutral",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "neutral",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      }
+    },
+    "greenest_fields": {
+      "GF_SE_STAGING": {
+        "mapId": "greenest_fields",
+        "zoneId": "GF_SE_STAGING",
+        "label": "Southeast Staging Ground",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "ashwalkers",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "ashwalkers",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      },
+      "GF_SE_ENERGY_WORKS": {
+        "mapId": "greenest_fields",
+        "zoneId": "GF_SE_ENERGY_WORKS",
+        "label": "Southeast Armada Energy Works",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "armada",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "armada",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      },
+      "GF_NW_GREEN_START": {
+        "mapId": "greenest_fields",
+        "zoneId": "GF_NW_GREEN_START",
+        "label": "Northwest Green Reaches",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "neutral",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "neutral",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      },
+      "GF_CENTRAL_OPEN_GRASSLAND": {
+        "mapId": "greenest_fields",
+        "zoneId": "GF_CENTRAL_OPEN_GRASSLAND",
+        "label": "Central Open Grassland",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "neutral",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "neutral",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      },
+      "GF_NORTH_DESERT_EDGE": {
+        "mapId": "greenest_fields",
+        "zoneId": "GF_NORTH_DESERT_EDGE",
+        "label": "North Desert Edge",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "nullmercs",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "nullmercs",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      },
+      "GF_SOUTH_DESERT_EDGE": {
+        "mapId": "greenest_fields",
+        "zoneId": "GF_SOUTH_DESERT_EDGE",
+        "label": "South Desert Edge",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "neutral",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "neutral",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      }
+    },
+    "koom_valley": {
+      "KOOM_NW_GREEN_SHELF": {
+        "mapId": "koom_valley",
+        "zoneId": "KOOM_NW_GREEN_SHELF",
+        "label": "Northwest Green Shelf",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "ashwalkers",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "ashwalkers",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      },
+      "KOOM_SE_GREEN_SHELF": {
+        "mapId": "koom_valley",
+        "zoneId": "KOOM_SE_GREEN_SHELF",
+        "label": "Southeast Green Shelf",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "armada",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "armada",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      },
+      "KOOM_NORTH_SCAR_MOUTH": {
+        "mapId": "koom_valley",
+        "zoneId": "KOOM_NORTH_SCAR_MOUTH",
+        "label": "North Scar Mouth",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "neutral",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "neutral",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      },
+      "KOOM_CENTRAL_FLUID_SCAR": {
+        "mapId": "koom_valley",
+        "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+        "label": "Central Fluid Scar",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "neutral",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "neutral",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      },
+      "KOOM_WEST_RIDGE_POCKET": {
+        "mapId": "koom_valley",
+        "zoneId": "KOOM_WEST_RIDGE_POCKET",
+        "label": "West Ridge Pocket",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "nullmercs",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "nullmercs",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      },
+      "KOOM_EAST_RIDGE_POCKET": {
+        "mapId": "koom_valley",
+        "zoneId": "KOOM_EAST_RIDGE_POCKET",
+        "label": "East Ridge Pocket",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "neutral",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "neutral",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      }
+    },
+    "tabula": {
+      "TAB_NW_PLATEAU": {
+        "mapId": "tabula",
+        "zoneId": "TAB_NW_PLATEAU",
+        "label": "Northwest Plateau",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "ashwalkers",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "ashwalkers",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      },
+      "TAB_SE_PLATEAU": {
+        "mapId": "tabula",
+        "zoneId": "TAB_SE_PLATEAU",
+        "label": "Southeast Plateau",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "armada",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "armada",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      },
+      "TAB_CENTRAL_BOWL": {
+        "mapId": "tabula",
+        "zoneId": "TAB_CENTRAL_BOWL",
+        "label": "Central Bowl",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "neutral",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "neutral",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      },
+      "TAB_NORTH_RIM_TERRACES": {
+        "mapId": "tabula",
+        "zoneId": "TAB_NORTH_RIM_TERRACES",
+        "label": "North Rim Terraces",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "nullmercs",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "nullmercs",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      },
+      "TAB_SOUTH_RIM_TERRACES": {
+        "mapId": "tabula",
+        "zoneId": "TAB_SOUTH_RIM_TERRACES",
+        "label": "South Rim Terraces",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "neutral",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "neutral",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      },
+      "TAB_WESTERN_ROCK_GATES": {
+        "mapId": "tabula",
+        "zoneId": "TAB_WESTERN_ROCK_GATES",
+        "label": "Western Rock Gates",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "neutral",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "neutral",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      },
+      "TAB_EASTERN_ROCK_GATES": {
+        "mapId": "tabula",
+        "zoneId": "TAB_EASTERN_ROCK_GATES",
+        "label": "Eastern Rock Gates",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "neutral",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "neutral",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      }
+    },
+    "the_rock_jungle": {
+      "RJ_CENTRAL_LAGOON_MAZE": {
+        "mapId": "the_rock_jungle",
+        "zoneId": "RJ_CENTRAL_LAGOON_MAZE",
+        "label": "Central Lagoon Maze",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "wild",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "wild",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      },
+      "RJ_NW_JUNGLE_SHELF": {
+        "mapId": "the_rock_jungle",
+        "zoneId": "RJ_NW_JUNGLE_SHELF",
+        "label": "Northwest Jungle Shelf",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "ashwalkers",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "ashwalkers",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      },
+      "RJ_SE_JUNGLE_SHELF": {
+        "mapId": "the_rock_jungle",
+        "zoneId": "RJ_SE_JUNGLE_SHELF",
+        "label": "Southeast Jungle Shelf",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "armada",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "armada",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      },
+      "RJ_WESTERN_CAUSEWAY": {
+        "mapId": "the_rock_jungle",
+        "zoneId": "RJ_WESTERN_CAUSEWAY",
+        "label": "Western Causeway",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "nullmercs",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "nullmercs",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      },
+      "RJ_EASTERN_CAUSEWAY": {
+        "mapId": "the_rock_jungle",
+        "zoneId": "RJ_EASTERN_CAUSEWAY",
+        "label": "Eastern Causeway",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "neutral",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "neutral",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      },
+      "RJ_NORTHERN_ISLAND_CHAIN": {
+        "mapId": "the_rock_jungle",
+        "zoneId": "RJ_NORTHERN_ISLAND_CHAIN",
+        "label": "Northern Island Chain",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "neutral",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "neutral",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      },
+      "RJ_SOUTHERN_ISLAND_CHAIN": {
+        "mapId": "the_rock_jungle",
+        "zoneId": "RJ_SOUTHERN_ISLAND_CHAIN",
+        "label": "Southern Island Chain",
+        "lastMeasuredRaw": {},
+        "abstract": {
+          "baseStrength": 0.0,
+          "militaryPressure": 0.0,
+          "fortification": 0.0,
+          "economyMomentum": 0.0,
+          "hazardPressure": 0.0,
+          "objectiveDamage": 0.0,
+          "control": "neutral",
+          "instability": 0.5
+        },
+        "lastUpdatedCampaignMinute": 0.0,
+        "controllingFaction": "neutral",
+        "objectiveState": {},
+        "baseSnapshot": {},
+        "hazardPressure": 0.0,
+        "confidence": "estimated"
+      }
+    }
+  },
+  "offscreenActors": {
+    "all_that_simmers": {
+      "ATS_CENTRAL_HIVE_FLATS": "RaptorsAI",
+      "ATS_NW_CANOPY_START": "Ashwalkers",
+      "ATS_NE_ARMADA_RIDGE": "SimpleAI",
+      "ATS_SE_CORTEX_BASIN": "SimpleAI",
+      "ATS_SW_ARMADA_LAGOON": "SimpleAI",
+      "ATS_NW_CENTER_APPROACH": "NullMercsAI",
+      "ATS_SW_NE_SWAMP_LANE": "SimpleAI"
+    },
+    "ancient_bastion": {
+      "AB_WESTERN_MUSTER_GROUNDS": "Ashwalkers",
+      "AB_CITADEL_GATEFIELD": "SimpleAI",
+      "AB_CENTRAL_KILLFIELD": "SimpleAI",
+      "AB_EASTERN_BASTION_WALL": "SimpleDefenderAI",
+      "AB_NORTHERN_FLANKING_LEDGE": "NullMercsAI",
+      "AB_SOUTHERN_SERVICE_ROAD": "SimpleAI"
+    },
+    "eye_of_horus": {
+      "EOH_NW_CRATER_CAMP": "Ashwalkers",
+      "EOH_SE_CORTEX_POCKET": "SimpleAI",
+      "EOH_GLASSED_CENTER": "SimpleAI",
+      "EOH_WESTERN_DEBRIS_LANE": "NullMercsAI",
+      "EOH_EASTERN_DEBRIS_LANE": "SimpleAI",
+      "EOH_SOUTHERN_CROSSFIRE_SHELF": "SimpleAI"
+    },
+    "greenest_fields": {
+      "GF_SE_STAGING": "Ashwalkers",
+      "GF_SE_ENERGY_WORKS": "SimpleAI",
+      "GF_NW_GREEN_START": "SimpleAI",
+      "GF_CENTRAL_OPEN_GRASSLAND": "SimpleAI",
+      "GF_NORTH_DESERT_EDGE": "NullMercsAI",
+      "GF_SOUTH_DESERT_EDGE": "SimpleAI"
+    },
+    "koom_valley": {
+      "KOOM_NW_GREEN_SHELF": "Ashwalkers",
+      "KOOM_SE_GREEN_SHELF": "SimpleAI",
+      "KOOM_NORTH_SCAR_MOUTH": "SimpleAI",
+      "KOOM_CENTRAL_FLUID_SCAR": "SimpleAI",
+      "KOOM_WEST_RIDGE_POCKET": "NullMercsAI",
+      "KOOM_EAST_RIDGE_POCKET": "SimpleAI"
+    },
+    "tabula": {
+      "TAB_NW_PLATEAU": "Ashwalkers",
+      "TAB_SE_PLATEAU": "SimpleAI",
+      "TAB_CENTRAL_BOWL": "SimpleAI",
+      "TAB_NORTH_RIM_TERRACES": "NullMercsAI",
+      "TAB_SOUTH_RIM_TERRACES": "SimpleAI",
+      "TAB_WESTERN_ROCK_GATES": "SimpleAI",
+      "TAB_EASTERN_ROCK_GATES": "SimpleAI"
+    },
+    "the_rock_jungle": {
+      "RJ_CENTRAL_LAGOON_MAZE": "RaptorsAI",
+      "RJ_NW_JUNGLE_SHELF": "Ashwalkers",
+      "RJ_SE_JUNGLE_SHELF": "SimpleAI",
+      "RJ_WESTERN_CAUSEWAY": "NullMercsAI",
+      "RJ_EASTERN_CAUSEWAY": "SimpleAI",
+      "RJ_NORTHERN_ISLAND_CHAIN": "SimpleAI",
+      "RJ_SOUTHERN_ISLAND_CHAIN": "SimpleAI"
+    }
+  },
+  "destroyedObjectives": {},
+  "persistentBaseSnapshots": {},
+  "hazardState": {
+    "all_that_simmers": {
+      "ATS_CENTRAL_HIVE_FLATS": {
+        "pressure": 0.0,
+        "hivesSurviving": true,
+        "lastResetAtMinute": 0.0
+      }
+    },
+    "the_rock_jungle": {
+      "RJ_CENTRAL_LAGOON_MAZE": {
+        "pressure": 0.0,
+        "hivesSurviving": true,
+        "lastResetAtMinute": 0.0
+      }
+    }
+  },
+  "calibrationRefs": {
+    "campaign_ai_packet": "_outbox/20260704_151709_campaign_ai_baseline_packet",
+    "authored_long_survey": "reports/map_surveys/authored_long_zone_development_all7.md",
+    "notes": [
+      "Early active bases: 3000-6000 presence.",
+      "Developed sortie-scale bases: 10000-30000 presence.",
+      "Wild/hive pressure is separated from normal army value.",
+      "Human objectives should be smaller than full AI wipeout thresholds."
+    ]
+  },
+  "progression": {
+    "mode": "cracked_farm",
+    "difficultyDial": 1.0,
+    "xpMultiplier": 1.0,
+    "farmSortiesEnabled": true,
+    "xpPersistOnDeath": true
+  },
+  "commerce": {
+    "tenebrium": 0,
+    "credits": 40,
+    "owned": {},
+    "upgrades": {},
+    "ledger": []
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "schemaVersion": "verdance-shell-bake-recipe/1.0",
+  "mapId": "eye_of_horus",
+  "mapName": "Eye Of Horus 1.7",
+  "templateId": "living_placeholder_v1",
+  "character": "MIRV Glassed Core - Cortex dealer pocket + Armada rim",
+  "characterCard": {
+    "descriptor": "The MIRV Glassed Core",
+    "blurb": "Surgical strike on SE Cortex dealer pocket; debris lanes are Armada rim teeth; glass center stays open. Null flank foothold is not a baked city.",
+    "shellAtT0": "Cortex core + Armada rim",
+    "growMix": "fortify_hard COR core + thin glass + hold rims + fortify_easy shelf",
+    "arcKinds": ["strike_relay"],
+    "raidHint": "strike_core_extract",
+    "captureLater": "cut node",
+    "wrath": { "packId": "cortex_qrf_v1", "responseSeconds": 100 },
+    "source": "placeholder",
+    "realBakeStatus": "pending_cloud_or_iconsatlas"
+  },
+  "arcKinds": ["strike_relay"],
+  "raidHint": "strike_core_extract",
+  "captureLater": "cut node",
+  "faction": "mixed",
+  "growMinutes": 12,
+  "growFrames": 21600,
+  "peacefulCoGrow": true,
+  "aiShortName": "SimpleAI",
+  "teamCount": 5,
+  "fixedRngSeed": 22,
+  "notes": "Cortex core = BARb hard fortress (dealer). Armada debris rims = SimpleAI hold. Glass edge stays thin. Source: seven_maps COR M5 So3 D5 + outbound 38.",
+  "occupation": {
+    "decoyCommanders": true,
+    "decoyPerPocket": 1,
+    "notes": "Decoy coms on eco/rim pockets after strip. Sims use normal commanders."
+  },
+  "playerClear": {
+    "zoneId": "EOH_NW_CRATER_CAMP",
+    "bounds": { "xMin": 0.0, "xMax": 0.30, "zMin": 0.0, "zMax": 0.30 },
+    "notes": "Legion crater staging - keep clear of shell seed."
+  },
+  "starts": [
+    {
+      "pocketId": "eoh_cortex_core",
+      "zoneId": "EOH_SE_CORTEX_POCKET",
+      "label": "Southeast Cortex Dealer Pocket",
+      "kind": "fortress",
+      "faction": "cortex",
+      "side": "Cortex",
+      "growProfile": "fortify_hard",
+      "x": 0.84,
+      "z": 0.84,
+      "primaryCandidate": true,
+      "densityScale": 1.35
+    },
+    {
+      "pocketId": "eoh_glass_edge",
+      "zoneId": "EOH_GLASSED_CENTER",
+      "label": "Glassed Center Edge (thin)",
+      "kind": "thin",
+      "faction": "cortex",
+      "side": "Cortex",
+      "growProfile": "thin",
+      "x": 0.58,
+      "z": 0.58,
+      "densityScale": 0.35
+    },
+    {
+      "pocketId": "eoh_west_debris",
+      "zoneId": "EOH_WESTERN_DEBRIS_LANE",
+      "label": "Western Debris Lane",
+      "kind": "rim",
+      "faction": "armada",
+      "side": "Armada",
+      "growProfile": "hold",
+      "x": 0.17,
+      "z": 0.51,
+      "densityScale": 0.75
+    },
+    {
+      "pocketId": "eoh_east_debris",
+      "zoneId": "EOH_EASTERN_DEBRIS_LANE",
+      "label": "Eastern Debris Lane",
+      "kind": "rim",
+      "faction": "armada",
+      "side": "Armada",
+      "growProfile": "hold",
+      "x": 0.83,
+      "z": 0.51,
+      "densityScale": 0.75
+    },
+    {
+      "pocketId": "eoh_south_shelf",
+      "zoneId": "EOH_SOUTHERN_CROSSFIRE_SHELF",
+      "label": "Southern Crossfire Shelf",
+      "kind": "rim",
+      "faction": "armada",
+      "side": "Armada",
+      "growProfile": "fortify_easy",
+      "x": 0.50,
+      "z": 0.88,
+      "densityScale": 0.70
+    }
+  ],
+  "placeholderDensity": {
+    "solarPerPocket": 8,
+    "windPerPocket": 4,
+    "converterPerPocket": 3,
+    "advSolarPerPocket": 2,
+    "estorPerPocket": 1,
+    "mexPerPocket": 3,
+    "lltPerPocket": 7,
+    "hltPerPocket": 2,
+    "wallPerPocket": 10,
+    "radarPerPocket": 1,
+    "scatterRadius": 0.05
+  },
+  "wrathDefault": {
+    "packId": "cortex_qrf_v1",
+    "responseSeconds": 100,
+    "startOn": "first_contact"
+  }
+}

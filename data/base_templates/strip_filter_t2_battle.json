@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "verdance-shell-strip-filter/1.1-t2-battle",
+  "notes": "Battle-farm strip: keep richer T2 static eco + teeth (moho, fus, advanced turrets) + decoy nodes. Still strip real coms, constructors, factories, mobiles. Used optionally via apply_shell_strip -FilterPath for Koom T2 mid claims.",
+  "keepExact": [
+    "armsolar", "armadvsol", "armwin", "armfus", "armageo", "armgeo", "armgmm",
+    "armmakr", "armmmkr", "armestor", "armmstor", "armmex", "armmoho", "armuwmex",
+    "armllt", "armbeamer", "armhlt", "armrl", "armpb", "armguard", "armamb", "armanni",
+    "armdrag", "armfort", "armrad", "armarad", "armjamt", "armeyes", "armvulc",
+    "armdecom",
+    "corsolar", "coradvsol", "corwin", "corfus", "corageo", "corgeo",
+    "cormakr", "cormmkr", "corestor", "cormstor", "cormex", "cormoho",
+    "corllt", "corhlt", "corrl", "corvipe", "corpun", "cortoast", "cordoom",
+    "cordrag", "corfort", "corrad", "corarad", "corjamt",
+    "cordecom",
+    "legsolar", "legwin", "legfus", "legmex", "legmext15", "leglht", "legmg", "legrl",
+    "legdrag", "legrad", "legmstor",
+    "legdecom"
+  ],
+  "keepPrefixes": [
+    "armsolar", "armadv", "armwin", "armfus", "armmakr", "armmmkr", "armestor", "armmstor",
+    "armmex", "armmoho", "armllt", "armbeam", "armhlt", "armrl", "armpb",
+    "armguard", "armamb", "armdrag", "armfort", "armrad", "armarad",
+    "corsolar", "coradv", "corwin", "corfus", "cormakr", "cormmkr", "corestor", "cormstor",
+    "cormex", "cormoho", "corllt", "corhlt", "corrl", "corvipe", "corpun", "cortoast",
+    "cordrag", "corfort", "corrad",
+    "legsolar", "legwin", "legfus", "legmex", "leglht", "legmg", "legrl", "legdrag"
+  ],
+  "stripExact": [
+    "armcom", "armcomcon", "corcom", "corcomcon", "legcom", "legcomlvl2", "legcomlvl3", "legcomlvl4",
+    "armck", "armack", "armch", "armcv", "armca", "armcs",
+    "corck", "corack", "corch", "corcv", "corca", "corcs",
+    "legck", "legack", "legch", "legcv", "legca",
+    "armlab", "armalab", "armvp", "armavp", "armap", "armaap", "armhp", "armfhp", "armamsub",
+    "corlab", "coralab", "corvp", "coravp", "corap", "coraap", "corhp",
+    "leglab", "legalab", "legvp", "legavp", "legap",
+    "armnanotc", "armnanotcplat", "cornanotc", "legnanotc"
+  ],
+  "stripPrefixes": [
+    "armcom", "corcom", "legcom",
+    "armck", "armack", "armcv", "armca", "armcs", "armch",
+    "corck", "corack", "corcv", "corca", "corcs", "corch",
+    "legck", "legack", "legcv", "legca", "legch",
+    "armlab", "armalab", "armvp", "armavp", "armap", "armaap", "armhp", "armfhp",
+    "corlab", "coralab", "corvp", "coravp", "corap", "coraap", "corhp",
+    "leglab", "legalab", "legvp", "legavp", "legap",
+    "armnano", "cornano", "legnano"
+  ],
+  "stripIfMobileCombat": true,
+  "keepClasses": {
+    "energy": ["armsolar", "armadvsol", "armwin", "armfus", "armgeo", "armageo", "corsolar", "coradvsol", "corwin", "corfus", "legsolar", "legwin", "legfus"],
+    "converter": ["armmakr", "armmmkr", "cormakr", "cormmkr"],
+    "storage": ["armestor", "armmstor", "corestor", "cormstor", "legmstor"],
+    "mex": ["armmex", "armmoho", "cormex", "cormoho", "legmex"],
+    "defense": ["armllt", "armbeamer", "armhlt", "armrl", "armpb", "armguard", "armamb", "corllt", "corhlt", "corrl", "corvipe", "corpun", "cortoast", "leglht", "legmg", "legrl"],
+    "wall": ["armdrag", "armfort", "cordrag", "corfort", "legdrag"],
+    "intel": ["armrad", "armarad", "armjamt", "corrad", "corarad", "corjamt", "legrad"],
+    "decoy_node": ["armdecom", "cordecom", "legdecom"]
+  },
+  "decoyCommanders": {
+    "enabledByDefault": true,
+    "perPocket": 1,
+    "skipKinds": [],
+    "defs": {
+      "armada": "armdecom",
+      "cortex": "cordecom",
+      "nullmercs": "legdecom",
+      "legion": "legdecom"
+    }
+  },
+  "notesGameplay": "T2 battle mid claim: keep advanced statics so the mid feels like a 3v3-style pad without factories."
+}

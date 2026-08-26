@@ -1,0 +1,22 @@
+VERDANCE'S ASHES - 30 SECOND PITCH
+==================================
+
+"A campaign shell for Beyond All Reason: aces, a war map, sorties that feed the story."
+
+You command from an HTML hub (Steam-bound shell path):
+  - C&C theater map — pick the next scar
+  - Fire Emblem aces — XP, ranks, wounds, bonds
+  - Broker shop — Tenebrium + merc packs from the commerce catalog
+  - BAR sorties — Deploy stamps a board plan → compile + launch via HUB_HOST
+
+Kernel paint on the hub: sessionMode, occupationModel, factionBanks, tenebrium.
+
+Null Mercs bay + MechWarrior-lite kit = post-playtest pillars
+  (minigun on a Centurion fantasy — when rep is high enough)
+
+Demo: open index.html  (or SHOW_OFF.bat)
+Rebuild hub: python tools/build_hub_state_v1.py
+Live Deploy: app\bin\HUB_HOST.bat → http://127.0.0.1:8770/
+In BAR: /vastory · minimap zones for the committed contract
+
+Tagline: Aces, a war map, and sorties that feed the story.

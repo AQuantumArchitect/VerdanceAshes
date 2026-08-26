@@ -1,0 +1,2751 @@
+{
+ "schemaVersion": "verdance-zone-map/2.0",
+ "mapId": "eye_of_horus",
+ "mapName": "Eye Of Horus 1.7",
+ "coordinateSystem": "normalized-xz",
+ "authoringStatus": "derived",
+ "grid": {
+  "res": 96
+ },
+ "targetZoneRange": [
+  12,
+  12
+ ],
+ "symmetry": {
+  "group": [
+   "identity",
+   "rot180"
+  ],
+  "order": 2,
+  "scores": {
+   "mirror_ew": 0.8739,
+   "mirror_ns": 0.8756,
+   "rot180": 0.966
+  },
+  "accepted": [
+   "rot180"
+  ]
+ },
+ "hydrologyRef": "data/hydrology/eye_of_horus.hydrology.json",
+ "waterline": {
+  "levels": [
+   0.0,
+   0.125,
+   0.25,
+   0.375,
+   0.5,
+   0.625,
+   0.75,
+   0.875,
+   1.0
+  ],
+  "elevations": [
+   209,
+   210.8,
+   211.4,
+   211.9,
+   212.3,
+   212.6,
+   212.8,
+   213.2,
+   213.4
+  ],
+  "routine": 212.3,
+  "basins": []
+ },
+ "derivedFrom": {
+  "terrain": "data/terrain/eye_of_horus.terrain.json",
+  "configs": [
+   "legacy_grid",
+   "legacy_rect"
+  ],
+  "measuredActivity": 188270.0,
+  "behaviourSource": "legacy_prior"
+ },
+ "notes": "Cut by tools/zone_cartographer_v1.py from measured terrain and AI-vs-AI behaviour. Cells are run-length encoded [startIndex, length] over a row-major cellGrid; bounds are derived for legacy consumers. Anchors are measured buildable/dry/flat camp sites.",
+ "zones": [
+  {
+   "zoneId": "EOH_NW_BASTION",
+   "label": "Northwest Bastion",
+   "role": "fortress",
+   "shape": "cells",
+   "cellGrid": {
+    "cols": 96,
+    "rows": 96
+   },
+   "cells": [
+    [
+     15,
+     20
+    ],
+    [
+     111,
+     20
+    ],
+    [
+     207,
+     20
+    ],
+    [
+     302,
+     21
+    ],
+    [
+     397,
+     22
+    ],
+    [
+     492,
+     21
+    ],
+    [
+     587,
+     22
+    ],
+    [
+     683,
+     22
+    ],
+    [
+     779,
+     20
+    ],
+    [
+     876,
+     18
+    ],
+    [
+     973,
+     16
+    ],
+    [
+     1070,
+     15
+    ],
+    [
+     1167,
+     14
+    ],
+    [
+     1264,
+     13
+    ],
+    [
+     1362,
+     11
+    ],
+    [
+     1458,
+     10
+    ],
+    [
+     1554,
+     10
+    ],
+    [
+     1650,
+     9
+    ],
+    [
+     1743,
+     11
+    ],
+    [
+     1838,
+     12
+    ],
+    [
+     1933,
+     13
+    ],
+    [
+     2027,
+     15
+    ],
+    [
+     2122,
+     16
+    ],
+    [
+     2217,
+     17
+    ],
+    [
+     2304,
+     26
+    ],
+    [
+     2400,
+     27
+    ],
+    [
+     2496,
+     28
+    ],
+    [
+     2592,
+     28
+    ],
+    [
+     2690,
+     26
+    ],
+    [
+     2788,
+     24
+    ],
+    [
+     2890,
+     18
+    ],
+    [
+     2987,
+     15
+    ],
+    [
+     3084,
+     14
+    ],
+    [
+     3182,
+     12
+    ],
+    [
+     3279,
+     4
+    ]
+   ],
+   "bounds": {
+    "xMin": 0.0,
+    "xMax": 0.3646,
+    "zMin": 0.0,
+    "zMax": 0.3646
+   },
+   "anchor": {
+    "x": 0.1927,
+    "z": 0.1823
+   },
+   "campEligible": true,
+   "deployEligible": true,
+   "extractEligible": true,
+   "symmetryFamily": "F4",
+   "hydrology": {
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "submergedAt": [
+     0.0,
+     0.008,
+     0.025,
+     0.038,
+     0.051,
+     0.064,
+     0.075,
+     0.092,
+     0.103
+    ],
+    "metalSpots": 2,
+    "drownedMetal": 0.0,
+    "anchorAboveWaterline": true
+   },
+   "tags": [
+    "low",
+    "choke",
+    "northwest"
+   ],
+   "evidence": {
+    "cellCount": 610.0,
+    "presenceShare": 0.2203,
+    "presenceDensity": 3.3289,
+    "structureDensity": 2.6542,
+    "fightDensity": 0.0,
+    "trafficDensity": 3.0393,
+    "transitDensity": 1.1451,
+    "hazard": 0.0,
+    "defence": 0.4687,
+    "contest": 0.0,
+    "water": 0.0,
+    "buildable": 0.6313,
+    "slope": 0.1142,
+    "metal": 0.4754,
+    "relativeHeight": 0.1235,
+    "choke": 0.9091,
+    "hasStart": false,
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "metalSpots": 2,
+    "drownedMetal": 0.0
+   }
+  },
+  {
+   "zoneId": "EOH_SE_BASTION",
+   "label": "Southeast Bastion",
+   "role": "fortress",
+   "shape": "cells",
+   "cellGrid": {
+    "cols": 96,
+    "rows": 96
+   },
+   "cells": [
+    [
+     5933,
+     4
+    ],
+    [
+     6022,
+     12
+    ],
+    [
+     6118,
+     14
+    ],
+    [
+     6214,
+     15
+    ],
+    [
+     6308,
+     18
+    ],
+    [
+     6404,
+     24
+    ],
+    [
+     6500,
+     26
+    ],
+    [
+     6596,
+     28
+    ],
+    [
+     6692,
+     28
+    ],
+    [
+     6789,
+     27
+    ],
+    [
+     6886,
+     26
+    ],
+    [
+     6982,
+     17
+    ],
+    [
+     7078,
+     16
+    ],
+    [
+     7174,
+     15
+    ],
+    [
+     7270,
+     13
+    ],
+    [
+     7366,
+     12
+    ],
+    [
+     7462,
+     11
+    ],
+    [
+     7557,
+     9
+    ],
+    [
+     7652,
+     10
+    ],
+    [
+     7748,
+     10
+    ],
+    [
+     7843,
+     11
+    ],
+    [
+     7939,
+     13
+    ],
+    [
+     8035,
+     14
+    ],
+    [
+     8131,
+     15
+    ],
+    [
+     8227,
+     16
+    ],
+    [
+     8322,
+     18
+    ],
+    [
+     8417,
+     20
+    ],
+    [
+     8511,
+     22
+    ],
+    [
+     8607,
+     22
+    ],
+    [
+     8703,
+     21
+    ],
+    [
+     8797,
+     22
+    ],
+    [
+     8893,
+     21
+    ],
+    [
+     8989,
+     20
+    ],
+    [
+     9085,
+     20
+    ],
+    [
+     9181,
+     20
+    ]
+   ],
+   "bounds": {
+    "xMin": 0.6354,
+    "xMax": 1.0,
+    "zMin": 0.6354,
+    "zMax": 1.0
+   },
+   "anchor": {
+    "x": 0.8073,
+    "z": 0.8177
+   },
+   "campEligible": true,
+   "deployEligible": true,
+   "extractEligible": true,
+   "symmetryFamily": "F4",
+   "hydrology": {
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "submergedAt": [
+     0.0,
+     0.025,
+     0.052,
+     0.067,
+     0.077,
+     0.1,
+     0.115,
+     0.152,
+     0.164
+    ],
+    "metalSpots": 2,
+    "drownedMetal": 0.0,
+    "anchorAboveWaterline": true
+   },
+   "tags": [
+    "low",
+    "southeast"
+   ],
+   "evidence": {
+    "cellCount": 610.0,
+    "presenceShare": 0.2203,
+    "presenceDensity": 3.3289,
+    "structureDensity": 2.6542,
+    "fightDensity": 0.0,
+    "trafficDensity": 3.0393,
+    "transitDensity": 1.1451,
+    "hazard": 0.0,
+    "defence": 0.4687,
+    "contest": 0.0594,
+    "water": 0.0,
+    "buildable": 0.6013,
+    "slope": 0.1168,
+    "metal": 0.4754,
+    "relativeHeight": 0.1362,
+    "choke": 0.5455,
+    "hasStart": false,
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "metalSpots": 2,
+    "drownedMetal": 0.0
+   }
+  },
+  {
+   "zoneId": "EOH_NW_MUSTER",
+   "label": "Northwest Muster",
+   "role": "start",
+   "shape": "cells",
+   "cellGrid": {
+    "cols": 96,
+    "rows": 96
+   },
+   "cells": [
+    [
+     0,
+     15
+    ],
+    [
+     96,
+     15
+    ],
+    [
+     192,
+     15
+    ],
+    [
+     288,
+     14
+    ],
+    [
+     384,
+     13
+    ],
+    [
+     480,
+     12
+    ],
+    [
+     576,
+     11
+    ],
+    [
+     672,
+     11
+    ],
+    [
+     768,
+     11
+    ],
+    [
+     864,
+     12
+    ],
+    [
+     960,
+     13
+    ],
+    [
+     1056,
+     14
+    ],
+    [
+     1152,
+     15
+    ],
+    [
+     1248,
+     16
+    ],
+    [
+     1344,
+     18
+    ],
+    [
+     1440,
+     18
+    ],
+    [
+     1536,
+     18
+    ],
+    [
+     1632,
+     18
+    ],
+    [
+     1728,
+     15
+    ],
+    [
+     1824,
+     14
+    ],
+    [
+     1920,
+     13
+    ],
+    [
+     2016,
+     11
+    ],
+    [
+     2112,
+     10
+    ],
+    [
+     2208,
+     9
+    ]
+   ],
+   "bounds": {
+    "xMin": 0.0,
+    "xMax": 0.1875,
+    "zMin": 0.0,
+    "zMax": 0.25
+   },
+   "anchor": {
+    "x": 0.0885,
+    "z": 0.1198
+   },
+   "campEligible": true,
+   "deployEligible": true,
+   "extractEligible": true,
+   "symmetryFamily": "F2",
+   "hydrology": {
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "submergedAt": [
+     0.0,
+     0.021,
+     0.088,
+     0.172,
+     0.205,
+     0.245,
+     0.278,
+     0.317,
+     0.344
+    ],
+    "metalSpots": 3,
+    "drownedMetal": 0.0,
+    "anchorAboveWaterline": true
+   },
+   "tags": [
+    "low",
+    "metal",
+    "choke",
+    "start",
+    "northwest"
+   ],
+   "evidence": {
+    "cellCount": 331.0,
+    "presenceShare": 0.1506,
+    "presenceDensity": 4.1944,
+    "structureDensity": 6.4646,
+    "fightDensity": 0.0,
+    "trafficDensity": 4.0009,
+    "transitDensity": 0.6189,
+    "hazard": 0.0,
+    "defence": 0.9156,
+    "contest": 0.0,
+    "water": 0.0,
+    "buildable": 0.9104,
+    "slope": 0.0159,
+    "metal": 1.3689,
+    "relativeHeight": 0.0304,
+    "choke": 0.7273,
+    "hasStart": true,
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "metalSpots": 3,
+    "drownedMetal": 0.0
+   }
+  },
+  {
+   "zoneId": "EOH_SE_MUSTER",
+   "label": "Southeast Muster",
+   "role": "start",
+   "shape": "cells",
+   "cellGrid": {
+    "cols": 96,
+    "rows": 96
+   },
+   "cells": [
+    [
+     6999,
+     9
+    ],
+    [
+     7094,
+     10
+    ],
+    [
+     7189,
+     11
+    ],
+    [
+     7283,
+     13
+    ],
+    [
+     7378,
+     14
+    ],
+    [
+     7473,
+     15
+    ],
+    [
+     7566,
+     18
+    ],
+    [
+     7662,
+     18
+    ],
+    [
+     7758,
+     18
+    ],
+    [
+     7854,
+     18
+    ],
+    [
+     7952,
+     16
+    ],
+    [
+     8049,
+     15
+    ],
+    [
+     8146,
+     14
+    ],
+    [
+     8243,
+     13
+    ],
+    [
+     8340,
+     12
+    ],
+    [
+     8437,
+     11
+    ],
+    [
+     8533,
+     11
+    ],
+    [
+     8629,
+     11
+    ],
+    [
+     8724,
+     12
+    ],
+    [
+     8819,
+     13
+    ],
+    [
+     8914,
+     14
+    ],
+    [
+     9009,
+     15
+    ],
+    [
+     9105,
+     15
+    ],
+    [
+     9201,
+     15
+    ]
+   ],
+   "bounds": {
+    "xMin": 0.8125,
+    "xMax": 1.0,
+    "zMin": 0.75,
+    "zMax": 1.0
+   },
+   "anchor": {
+    "x": 0.9115,
+    "z": 0.8802
+   },
+   "campEligible": true,
+   "deployEligible": true,
+   "extractEligible": true,
+   "symmetryFamily": "F2",
+   "hydrology": {
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "submergedAt": [
+     0.0,
+     0.063,
+     0.121,
+     0.178,
+     0.208,
+     0.23,
+     0.248,
+     0.299,
+     0.326
+    ],
+    "metalSpots": 3,
+    "drownedMetal": 0.0,
+    "anchorAboveWaterline": true
+   },
+   "tags": [
+    "low",
+    "metal",
+    "start",
+    "southeast"
+   ],
+   "evidence": {
+    "cellCount": 331.0,
+    "presenceShare": 0.1506,
+    "presenceDensity": 4.1944,
+    "structureDensity": 6.4646,
+    "fightDensity": 0.0,
+    "trafficDensity": 4.0009,
+    "transitDensity": 0.6189,
+    "hazard": 0.0,
+    "defence": 0.9156,
+    "contest": 0.0537,
+    "water": 0.0,
+    "buildable": 0.8713,
+    "slope": 0.0194,
+    "metal": 1.3038,
+    "relativeHeight": 0.0347,
+    "choke": 0.5455,
+    "hasStart": true,
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "metalSpots": 3,
+    "drownedMetal": 0.0
+   }
+  },
+  {
+   "zoneId": "EOH_C_GATE",
+   "label": "Central Gate",
+   "role": "gate",
+   "shape": "cells",
+   "cellGrid": {
+    "cols": 96,
+    "rows": 96
+   },
+   "cells": [
+    [
+     1564,
+     2
+    ],
+    [
+     1659,
+     3
+    ],
+    [
+     1754,
+     14
+    ],
+    [
+     1850,
+     15
+    ],
+    [
+     1946,
+     17
+    ],
+    [
+     2042,
+     18
+    ],
+    [
+     2138,
+     18
+    ],
+    [
+     2234,
+     18
+    ],
+    [
+     2330,
+     18
+    ],
+    [
+     2427,
+     17
+    ],
+    [
+     2524,
+     16
+    ],
+    [
+     2620,
+     16
+    ],
+    [
+     2656,
+     10
+    ],
+    [
+     2716,
+     16
+    ],
+    [
+     2751,
+     12
+    ],
+    [
+     2812,
+     16
+    ],
+    [
+     2846,
+     14
+    ],
+    [
+     2908,
+     16
+    ],
+    [
+     2941,
+     16
+    ],
+    [
+     3003,
+     17
+    ],
+    [
+     3036,
+     19
+    ],
+    [
+     3100,
+     14
+    ],
+    [
+     3132,
+     20
+    ],
+    [
+     3197,
+     12
+    ],
+    [
+     3228,
+     22
+    ],
+    [
+     3294,
+     10
+    ],
+    [
+     3324,
+     23
+    ],
+    [
+     3389,
+     11
+    ],
+    [
+     3421,
+     23
+    ],
+    [
+     3485,
+     11
+    ],
+    [
+     3517,
+     22
+    ],
+    [
+     3581,
+     11
+    ],
+    [
+     3613,
+     21
+    ],
+    [
+     3676,
+     12
+    ],
+    [
+     3709,
+     21
+    ],
+    [
+     3772,
+     13
+    ],
+    [
+     3806,
+     18
+    ],
+    [
+     3868,
+     15
+    ],
+    [
+     3903,
+     17
+    ],
+    [
+     3964,
+     16
+    ],
+    [
+     3994,
+     20
+    ],
+    [
+     4060,
+     17
+    ],
+    [
+     4089,
+     21
+    ],
+    [
+     4156,
+     17
+    ],
+    [
+     4184,
+     22
+    ],
+    [
+     4252,
+     17
+    ],
+    [
+     4279,
+     21
+    ],
+    [
+     4348,
+     17
+    ],
+    [
+     4373,
+     22
+    ],
+    [
+     4444,
+     17
+    ],
+    [
+     4468,
+     16
+    ],
+    [
+     4485,
+     5
+    ],
+    [
+     4540,
+     17
+    ],
+    [
+     4564,
+     16
+    ]
+   ],
+   "bounds": {
+    "xMin": 0.2708,
+    "xMax": 0.875,
+    "zMin": 0.1667,
+    "zMax": 0.5
+   },
+   "anchor": {
+    "x": 0.4531,
+    "z": 0.3281
+   },
+   "campEligible": true,
+   "deployEligible": true,
+   "extractEligible": true,
+   "symmetryFamily": "F13",
+   "hydrology": {
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "submergedAt": [
+     0.0,
+     0.003,
+     0.015,
+     0.037,
+     0.052,
+     0.068,
+     0.08,
+     0.098,
+     0.108
+    ],
+    "metalSpots": 4,
+    "drownedMetal": 0.0,
+    "anchorAboveWaterline": true
+   },
+   "tags": [
+    "low",
+    "metal",
+    "choke",
+    "central"
+   ],
+   "evidence": {
+    "cellCount": 865.0,
+    "presenceShare": 0.0543,
+    "presenceDensity": 0.5789,
+    "structureDensity": 0.3004,
+    "fightDensity": 0.0,
+    "trafficDensity": 0.7129,
+    "transitDensity": 2.373,
+    "hazard": 0.0,
+    "defence": 0.3094,
+    "contest": 0.0594,
+    "water": 0.0,
+    "buildable": 0.7003,
+    "slope": 0.0876,
+    "metal": 0.6624,
+    "relativeHeight": 0.0913,
+    "choke": 1.0,
+    "hasStart": false,
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "metalSpots": 4,
+    "drownedMetal": 0.0
+   }
+  },
+  {
+   "zoneId": "EOH_C_INNER_GATE",
+   "label": "Central Inner Gate",
+   "role": "gate",
+   "shape": "cells",
+   "cellGrid": {
+    "cols": 96,
+    "rows": 96
+   },
+   "cells": [
+    [
+     4636,
+     16
+    ],
+    [
+     4659,
+     17
+    ],
+    [
+     4726,
+     5
+    ],
+    [
+     4732,
+     16
+    ],
+    [
+     4755,
+     17
+    ],
+    [
+     4821,
+     22
+    ],
+    [
+     4851,
+     17
+    ],
+    [
+     4916,
+     21
+    ],
+    [
+     4947,
+     17
+    ],
+    [
+     5010,
+     22
+    ],
+    [
+     5043,
+     17
+    ],
+    [
+     5106,
+     21
+    ],
+    [
+     5139,
+     17
+    ],
+    [
+     5202,
+     20
+    ],
+    [
+     5236,
+     16
+    ],
+    [
+     5296,
+     17
+    ],
+    [
+     5333,
+     15
+    ],
+    [
+     5392,
+     18
+    ],
+    [
+     5431,
+     13
+    ],
+    [
+     5486,
+     21
+    ],
+    [
+     5528,
+     12
+    ],
+    [
+     5582,
+     21
+    ],
+    [
+     5624,
+     11
+    ],
+    [
+     5677,
+     22
+    ],
+    [
+     5720,
+     11
+    ],
+    [
+     5772,
+     23
+    ],
+    [
+     5816,
+     11
+    ],
+    [
+     5869,
+     23
+    ],
+    [
+     5912,
+     10
+    ],
+    [
+     5966,
+     22
+    ],
+    [
+     6007,
+     12
+    ],
+    [
+     6064,
+     20
+    ],
+    [
+     6102,
+     14
+    ],
+    [
+     6161,
+     19
+    ],
+    [
+     6196,
+     17
+    ],
+    [
+     6259,
+     16
+    ],
+    [
+     6292,
+     16
+    ],
+    [
+     6356,
+     14
+    ],
+    [
+     6388,
+     16
+    ],
+    [
+     6453,
+     12
+    ],
+    [
+     6484,
+     16
+    ],
+    [
+     6550,
+     10
+    ],
+    [
+     6580,
+     16
+    ],
+    [
+     6676,
+     16
+    ],
+    [
+     6772,
+     17
+    ],
+    [
+     6868,
+     18
+    ],
+    [
+     6964,
+     18
+    ],
+    [
+     7060,
+     18
+    ],
+    [
+     7156,
+     18
+    ],
+    [
+     7253,
+     17
+    ],
+    [
+     7351,
+     15
+    ],
+    [
+     7448,
+     14
+    ],
+    [
+     7554,
+     3
+    ],
+    [
+     7650,
+     2
+    ]
+   ],
+   "bounds": {
+    "xMin": 0.125,
+    "xMax": 0.7292,
+    "zMin": 0.5,
+    "zMax": 0.8333
+   },
+   "anchor": {
+    "x": 0.5677,
+    "z": 0.6615
+   },
+   "campEligible": true,
+   "deployEligible": true,
+   "extractEligible": true,
+   "symmetryFamily": "F13",
+   "hydrology": {
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "submergedAt": [
+     0.0,
+     0.034,
+     0.067,
+     0.101,
+     0.117,
+     0.138,
+     0.146,
+     0.176,
+     0.192
+    ],
+    "metalSpots": 3,
+    "drownedMetal": 0.0,
+    "anchorAboveWaterline": true
+   },
+   "tags": [
+    "low",
+    "metal",
+    "choke",
+    "contested",
+    "central"
+   ],
+   "evidence": {
+    "cellCount": 865.0,
+    "presenceShare": 0.0543,
+    "presenceDensity": 0.5789,
+    "structureDensity": 0.3004,
+    "fightDensity": 0.0,
+    "trafficDensity": 0.7129,
+    "transitDensity": 2.373,
+    "hazard": 0.0,
+    "defence": 0.3094,
+    "contest": 0.414,
+    "water": 0.0,
+    "buildable": 0.7081,
+    "slope": 0.0832,
+    "metal": 0.6543,
+    "relativeHeight": 0.0825,
+    "choke": 0.6364,
+    "hasStart": false,
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "metalSpots": 3,
+    "drownedMetal": 0.0
+   }
+  },
+  {
+   "zoneId": "EOH_NE_CAUSEWAY",
+   "label": "Northeast Causeway",
+   "role": "causeway",
+   "shape": "cells",
+   "cellGrid": {
+    "cols": 96,
+    "rows": 96
+   },
+   "cells": [
+    [
+     35,
+     61
+    ],
+    [
+     131,
+     61
+    ],
+    [
+     227,
+     61
+    ],
+    [
+     323,
+     61
+    ],
+    [
+     419,
+     61
+    ],
+    [
+     513,
+     63
+    ],
+    [
+     609,
+     63
+    ],
+    [
+     705,
+     63
+    ],
+    [
+     799,
+     65
+    ],
+    [
+     894,
+     66
+    ],
+    [
+     989,
+     67
+    ],
+    [
+     1085,
+     67
+    ],
+    [
+     1181,
+     67
+    ],
+    [
+     1277,
+     67
+    ],
+    [
+     1373,
+     67
+    ],
+    [
+     1468,
+     68
+    ],
+    [
+     1566,
+     66
+    ],
+    [
+     1662,
+     66
+    ],
+    [
+     1768,
+     56
+    ],
+    [
+     1865,
+     55
+    ],
+    [
+     1963,
+     53
+    ],
+    [
+     2060,
+     52
+    ],
+    [
+     2156,
+     52
+    ],
+    [
+     2252,
+     52
+    ],
+    [
+     2348,
+     52
+    ],
+    [
+     2444,
+     52
+    ],
+    [
+     2540,
+     52
+    ],
+    [
+     2636,
+     20
+    ],
+    [
+     2666,
+     22
+    ],
+    [
+     2732,
+     19
+    ],
+    [
+     2763,
+     21
+    ],
+    [
+     2828,
+     18
+    ],
+    [
+     2860,
+     20
+    ],
+    [
+     2924,
+     17
+    ],
+    [
+     2957,
+     19
+    ],
+    [
+     3002,
+     1
+    ],
+    [
+     3024,
+     12
+    ],
+    [
+     3055,
+     17
+    ],
+    [
+     3098,
+     2
+    ],
+    [
+     3122,
+     10
+    ],
+    [
+     3152,
+     16
+    ],
+    [
+     3194,
+     3
+    ],
+    [
+     3219,
+     5
+    ],
+    [
+     3225,
+     3
+    ],
+    [
+     3250,
+     14
+    ],
+    [
+     3283,
+     11
+    ],
+    [
+     3347,
+     13
+    ],
+    [
+     3378,
+     11
+    ],
+    [
+     3444,
+     12
+    ],
+    [
+     3474,
+     11
+    ],
+    [
+     3539,
+     13
+    ],
+    [
+     3570,
+     11
+    ],
+    [
+     3634,
+     14
+    ],
+    [
+     3665,
+     11
+    ],
+    [
+     3730,
+     14
+    ],
+    [
+     3760,
+     12
+    ],
+    [
+     3824,
+     16
+    ],
+    [
+     3854,
+     14
+    ],
+    [
+     3920,
+     16
+    ],
+    [
+     3949,
+     15
+    ],
+    [
+     4014,
+     18
+    ],
+    [
+     4044,
+     16
+    ],
+    [
+     4110,
+     18
+    ],
+    [
+     4140,
+     16
+    ],
+    [
+     4206,
+     18
+    ],
+    [
+     4236,
+     16
+    ],
+    [
+     4300,
+     20
+    ],
+    [
+     4332,
+     16
+    ],
+    [
+     4395,
+     21
+    ],
+    [
+     4428,
+     16
+    ],
+    [
+     4484,
+     1
+    ],
+    [
+     4490,
+     22
+    ],
+    [
+     4524,
+     16
+    ],
+    [
+     4580,
+     27
+    ]
+   ],
+   "bounds": {
+    "xMin": 0.125,
+    "xMax": 1.0,
+    "zMin": 0.0,
+    "zMax": 0.5
+   },
+   "anchor": {
+    "x": 0.6406,
+    "z": 0.2969
+   },
+   "campEligible": true,
+   "deployEligible": true,
+   "extractEligible": true,
+   "symmetryFamily": "F10",
+   "hydrology": {
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "submergedAt": [
+     0.0,
+     0.01,
+     0.029,
+     0.045,
+     0.057,
+     0.078,
+     0.094,
+     0.129,
+     0.143
+    ],
+    "metalSpots": 12,
+    "drownedMetal": 0.0,
+    "anchorAboveWaterline": true
+   },
+   "tags": [
+    "low",
+    "metal",
+    "choke",
+    "start",
+    "northeast"
+   ],
+   "evidence": {
+    "cellCount": 2310.0,
+    "presenceShare": 0.0394,
+    "presenceDensity": 0.1572,
+    "structureDensity": 0.1811,
+    "fightDensity": 0.0,
+    "trafficDensity": 0.1507,
+    "transitDensity": 0.6027,
+    "hazard": 0.0,
+    "defence": 0.6846,
+    "contest": 0.1623,
+    "water": 0.0,
+    "buildable": 0.6031,
+    "slope": 0.1163,
+    "metal": 0.8514,
+    "relativeHeight": 0.13,
+    "choke": 0.9091,
+    "hasStart": true,
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "metalSpots": 12,
+    "drownedMetal": 0.0
+   }
+  },
+  {
+   "zoneId": "EOH_SW_CAUSEWAY",
+   "label": "Southwest Causeway",
+   "role": "causeway",
+   "shape": "cells",
+   "cellGrid": {
+    "cols": 96,
+    "rows": 96
+   },
+   "cells": [
+    [
+     4609,
+     27
+    ],
+    [
+     4676,
+     16
+    ],
+    [
+     4704,
+     22
+    ],
+    [
+     4731,
+     1
+    ],
+    [
+     4772,
+     16
+    ],
+    [
+     4800,
+     21
+    ],
+    [
+     4868,
+     16
+    ],
+    [
+     4896,
+     20
+    ],
+    [
+     4964,
+     16
+    ],
+    [
+     4992,
+     18
+    ],
+    [
+     5060,
+     16
+    ],
+    [
+     5088,
+     18
+    ],
+    [
+     5156,
+     16
+    ],
+    [
+     5184,
+     18
+    ],
+    [
+     5252,
+     15
+    ],
+    [
+     5280,
+     16
+    ],
+    [
+     5348,
+     14
+    ],
+    [
+     5376,
+     16
+    ],
+    [
+     5444,
+     12
+    ],
+    [
+     5472,
+     14
+    ],
+    [
+     5540,
+     11
+    ],
+    [
+     5568,
+     14
+    ],
+    [
+     5635,
+     11
+    ],
+    [
+     5664,
+     13
+    ],
+    [
+     5731,
+     11
+    ],
+    [
+     5760,
+     12
+    ],
+    [
+     5827,
+     11
+    ],
+    [
+     5856,
+     13
+    ],
+    [
+     5922,
+     11
+    ],
+    [
+     5952,
+     14
+    ],
+    [
+     5988,
+     3
+    ],
+    [
+     5992,
+     5
+    ],
+    [
+     6019,
+     3
+    ],
+    [
+     6048,
+     16
+    ],
+    [
+     6084,
+     10
+    ],
+    [
+     6116,
+     2
+    ],
+    [
+     6144,
+     17
+    ],
+    [
+     6180,
+     12
+    ],
+    [
+     6213,
+     1
+    ],
+    [
+     6240,
+     19
+    ],
+    [
+     6275,
+     17
+    ],
+    [
+     6336,
+     20
+    ],
+    [
+     6370,
+     18
+    ],
+    [
+     6432,
+     21
+    ],
+    [
+     6465,
+     19
+    ],
+    [
+     6528,
+     22
+    ],
+    [
+     6560,
+     20
+    ],
+    [
+     6624,
+     52
+    ],
+    [
+     6720,
+     52
+    ],
+    [
+     6816,
+     52
+    ],
+    [
+     6912,
+     52
+    ],
+    [
+     7008,
+     52
+    ],
+    [
+     7104,
+     52
+    ],
+    [
+     7200,
+     53
+    ],
+    [
+     7296,
+     55
+    ],
+    [
+     7392,
+     56
+    ],
+    [
+     7488,
+     66
+    ],
+    [
+     7584,
+     66
+    ],
+    [
+     7680,
+     68
+    ],
+    [
+     7776,
+     67
+    ],
+    [
+     7872,
+     67
+    ],
+    [
+     7968,
+     67
+    ],
+    [
+     8064,
+     67
+    ],
+    [
+     8160,
+     67
+    ],
+    [
+     8256,
+     66
+    ],
+    [
+     8352,
+     65
+    ],
+    [
+     8448,
+     63
+    ],
+    [
+     8544,
+     63
+    ],
+    [
+     8640,
+     63
+    ],
+    [
+     8736,
+     61
+    ],
+    [
+     8832,
+     61
+    ],
+    [
+     8928,
+     61
+    ],
+    [
+     9024,
+     61
+    ],
+    [
+     9120,
+     61
+    ]
+   ],
+   "bounds": {
+    "xMin": 0.0,
+    "xMax": 0.875,
+    "zMin": 0.5,
+    "zMax": 1.0
+   },
+   "anchor": {
+    "x": 0.3594,
+    "z": 0.7031
+   },
+   "campEligible": true,
+   "deployEligible": true,
+   "extractEligible": true,
+   "symmetryFamily": "F10",
+   "hydrology": {
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "submergedAt": [
+     0.0,
+     0.026,
+     0.04,
+     0.055,
+     0.065,
+     0.082,
+     0.099,
+     0.139,
+     0.156
+    ],
+    "metalSpots": 12,
+    "drownedMetal": 0.0,
+    "anchorAboveWaterline": true
+   },
+   "tags": [
+    "low",
+    "metal",
+    "choke",
+    "contested",
+    "start",
+    "southwest"
+   ],
+   "evidence": {
+    "cellCount": 2310.0,
+    "presenceShare": 0.0394,
+    "presenceDensity": 0.1572,
+    "structureDensity": 0.1811,
+    "fightDensity": 0.0,
+    "trafficDensity": 0.1507,
+    "transitDensity": 0.6027,
+    "hazard": 0.0,
+    "defence": 0.6846,
+    "contest": 0.6973,
+    "water": 0.0,
+    "buildable": 0.5955,
+    "slope": 0.1181,
+    "metal": 0.784,
+    "relativeHeight": 0.1381,
+    "choke": 0.7273,
+    "hasStart": true,
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "metalSpots": 12,
+    "drownedMetal": 0.0
+   }
+  },
+  {
+   "zoneId": "EOH_C_LANE",
+   "label": "Central Lane",
+   "role": "lane",
+   "shape": "cells",
+   "cellGrid": {
+    "cols": 96,
+    "rows": 96
+   },
+   "cells": [
+    [
+     3020,
+     4
+    ],
+    [
+     3114,
+     8
+    ],
+    [
+     3209,
+     10
+    ],
+    [
+     3224,
+     1
+    ],
+    [
+     3304,
+     20
+    ],
+    [
+     3400,
+     21
+    ],
+    [
+     3496,
+     21
+    ],
+    [
+     3592,
+     21
+    ],
+    [
+     3688,
+     21
+    ],
+    [
+     3785,
+     21
+    ],
+    [
+     3883,
+     20
+    ],
+    [
+     3980,
+     14
+    ],
+    [
+     4077,
+     12
+    ],
+    [
+     4173,
+     11
+    ],
+    [
+     4269,
+     10
+    ],
+    [
+     4365,
+     8
+    ],
+    [
+     4461,
+     7
+    ],
+    [
+     4557,
+     7
+    ]
+   ],
+   "bounds": {
+    "xMin": 0.4167,
+    "xMax": 0.6562,
+    "zMin": 0.3229,
+    "zMax": 0.5
+   },
+   "anchor": {
+    "x": 0.526,
+    "z": 0.4115
+   },
+   "campEligible": true,
+   "deployEligible": true,
+   "extractEligible": true,
+   "symmetryFamily": "F7",
+   "hydrology": {
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "submergedAt": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.004,
+     0.004,
+     0.004
+    ],
+    "metalSpots": 1,
+    "drownedMetal": 0.0,
+    "anchorAboveWaterline": true
+   },
+   "tags": [
+    "low",
+    "metal",
+    "central"
+   ],
+   "evidence": {
+    "cellCount": 237.0,
+    "presenceShare": 0.0242,
+    "presenceDensity": 0.941,
+    "structureDensity": 0.4191,
+    "fightDensity": 0.0,
+    "trafficDensity": 1.5081,
+    "transitDensity": 3.5985,
+    "hazard": 0.0,
+    "defence": 0.2725,
+    "contest": 0.035,
+    "water": 0.0,
+    "buildable": 0.5227,
+    "slope": 0.1449,
+    "metal": 0.6568,
+    "relativeHeight": 0.1255,
+    "choke": 0.1818,
+    "hasStart": false,
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "metalSpots": 1,
+    "drownedMetal": 0.0
+   }
+  },
+  {
+   "zoneId": "EOH_C_INNER_LANE",
+   "label": "Central Inner Lane",
+   "role": "lane",
+   "shape": "cells",
+   "cellGrid": {
+    "cols": 96,
+    "rows": 96
+   },
+   "cells": [
+    [
+     4652,
+     7
+    ],
+    [
+     4748,
+     7
+    ],
+    [
+     4843,
+     8
+    ],
+    [
+     4937,
+     10
+    ],
+    [
+     5032,
+     11
+    ],
+    [
+     5127,
+     12
+    ],
+    [
+     5222,
+     14
+    ],
+    [
+     5313,
+     20
+    ],
+    [
+     5410,
+     21
+    ],
+    [
+     5507,
+     21
+    ],
+    [
+     5603,
+     21
+    ],
+    [
+     5699,
+     21
+    ],
+    [
+     5795,
+     21
+    ],
+    [
+     5892,
+     20
+    ],
+    [
+     5991,
+     1
+    ],
+    [
+     5997,
+     10
+    ],
+    [
+     6094,
+     8
+    ],
+    [
+     6192,
+     4
+    ]
+   ],
+   "bounds": {
+    "xMin": 0.3438,
+    "xMax": 0.5833,
+    "zMin": 0.5,
+    "zMax": 0.6771
+   },
+   "anchor": {
+    "x": 0.474,
+    "z": 0.5885
+   },
+   "campEligible": true,
+   "deployEligible": true,
+   "extractEligible": true,
+   "symmetryFamily": "F7",
+   "hydrology": {
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "submergedAt": [
+     0.0,
+     0.0,
+     0.0,
+     0.004,
+     0.008,
+     0.013,
+     0.013,
+     0.013,
+     0.021
+    ],
+    "metalSpots": 2,
+    "drownedMetal": 0.0,
+    "anchorAboveWaterline": true
+   },
+   "tags": [
+    "low",
+    "metal",
+    "central"
+   ],
+   "evidence": {
+    "cellCount": 237.0,
+    "presenceShare": 0.0242,
+    "presenceDensity": 0.941,
+    "structureDensity": 0.4191,
+    "fightDensity": 0.0,
+    "trafficDensity": 1.5081,
+    "transitDensity": 3.5985,
+    "hazard": 0.0,
+    "defence": 0.2725,
+    "contest": 0.035,
+    "water": 0.0,
+    "buildable": 0.4687,
+    "slope": 0.1761,
+    "metal": 0.8054,
+    "relativeHeight": 0.1543,
+    "choke": 0.3636,
+    "hasStart": false,
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "metalSpots": 2,
+    "drownedMetal": 0.0
+   }
+  },
+  {
+   "zoneId": "EOH_W_LANE",
+   "label": "West Lane",
+   "role": "lane",
+   "shape": "cells",
+   "cellGrid": {
+    "cols": 96,
+    "rows": 96
+   },
+   "cells": [
+    [
+     2688,
+     2
+    ],
+    [
+     2784,
+     4
+    ],
+    [
+     2880,
+     10
+    ],
+    [
+     2976,
+     11
+    ],
+    [
+     3072,
+     12
+    ],
+    [
+     3168,
+     14
+    ],
+    [
+     3264,
+     15
+    ],
+    [
+     3360,
+     18
+    ],
+    [
+     3456,
+     18
+    ],
+    [
+     3552,
+     18
+    ],
+    [
+     3648,
+     17
+    ],
+    [
+     3744,
+     16
+    ],
+    [
+     3840,
+     14
+    ],
+    [
+     3936,
+     13
+    ],
+    [
+     4032,
+     12
+    ],
+    [
+     4128,
+     12
+    ],
+    [
+     4224,
+     12
+    ],
+    [
+     4320,
+     12
+    ],
+    [
+     4416,
+     12
+    ],
+    [
+     4512,
+     12
+    ],
+    [
+     4607,
+     1
+    ]
+   ],
+   "bounds": {
+    "xMin": 0.0,
+    "xMax": 1.0,
+    "zMin": 0.2917,
+    "zMax": 0.5
+   },
+   "anchor": {
+    "x": 0.0677,
+    "z": 0.3802
+   },
+   "campEligible": true,
+   "deployEligible": true,
+   "extractEligible": true,
+   "symmetryFamily": "F11",
+   "hydrology": {
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "submergedAt": [
+     0.0,
+     0.0,
+     0.016,
+     0.035,
+     0.047,
+     0.063,
+     0.067,
+     0.078,
+     0.098
+    ],
+    "metalSpots": 1,
+    "drownedMetal": 0.0,
+    "anchorAboveWaterline": true
+   },
+   "tags": [
+    "low",
+    "metal",
+    "west"
+   ],
+   "evidence": {
+    "cellCount": 255.0,
+    "presenceShare": 0.0111,
+    "presenceDensity": 0.4005,
+    "structureDensity": 0.2809,
+    "fightDensity": 0.0,
+    "trafficDensity": 0.4218,
+    "transitDensity": 1.5017,
+    "hazard": 0.0,
+    "defence": 0.3926,
+    "contest": 0.0005,
+    "water": 0.0,
+    "buildable": 0.6612,
+    "slope": 0.1015,
+    "metal": 0.5551,
+    "relativeHeight": 0.1079,
+    "choke": 0.1818,
+    "hasStart": false,
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "metalSpots": 1,
+    "drownedMetal": 0.0
+   }
+  },
+  {
+   "zoneId": "EOH_E_LANE",
+   "label": "East Lane",
+   "role": "lane",
+   "shape": "cells",
+   "cellGrid": {
+    "cols": 96,
+    "rows": 96
+   },
+   "cells": [
+    [
+     4608,
+     1
+    ],
+    [
+     4692,
+     12
+    ],
+    [
+     4788,
+     12
+    ],
+    [
+     4884,
+     12
+    ],
+    [
+     4980,
+     12
+    ],
+    [
+     5076,
+     12
+    ],
+    [
+     5172,
+     12
+    ],
+    [
+     5267,
+     13
+    ],
+    [
+     5362,
+     14
+    ],
+    [
+     5456,
+     16
+    ],
+    [
+     5551,
+     17
+    ],
+    [
+     5646,
+     18
+    ],
+    [
+     5742,
+     18
+    ],
+    [
+     5838,
+     18
+    ],
+    [
+     5937,
+     15
+    ],
+    [
+     6034,
+     14
+    ],
+    [
+     6132,
+     12
+    ],
+    [
+     6229,
+     11
+    ],
+    [
+     6326,
+     10
+    ],
+    [
+     6428,
+     4
+    ],
+    [
+     6526,
+     2
+    ]
+   ],
+   "bounds": {
+    "xMin": 0.0,
+    "xMax": 1.0,
+    "zMin": 0.5,
+    "zMax": 0.7083
+   },
+   "anchor": {
+    "x": 0.9323,
+    "z": 0.6198
+   },
+   "campEligible": true,
+   "deployEligible": true,
+   "extractEligible": true,
+   "symmetryFamily": "F11",
+   "hydrology": {
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "submergedAt": [
+     0.0,
+     0.012,
+     0.016,
+     0.031,
+     0.059,
+     0.075,
+     0.082,
+     0.141,
+     0.165
+    ],
+    "metalSpots": 1,
+    "drownedMetal": 0.0,
+    "anchorAboveWaterline": true
+   },
+   "tags": [
+    "low",
+    "metal",
+    "contested",
+    "east"
+   ],
+   "evidence": {
+    "cellCount": 255.0,
+    "presenceShare": 0.0111,
+    "presenceDensity": 0.4005,
+    "structureDensity": 0.2809,
+    "fightDensity": 0.0,
+    "trafficDensity": 0.4218,
+    "transitDensity": 1.5017,
+    "hazard": 0.0,
+    "defence": 0.3926,
+    "contest": 0.8861,
+    "water": 0.0,
+    "buildable": 0.6905,
+    "slope": 0.078,
+    "metal": 0.6379,
+    "relativeHeight": 0.077,
+    "choke": 0.1818,
+    "hasStart": false,
+    "floodsAt": 2.0,
+    "restingSubmerged": 0.0,
+    "metalSpots": 1,
+    "drownedMetal": 0.0
+   }
+  }
+ ]
+}

@@ -106,7 +106,7 @@ function Expand-ScenarioForces {
   foreach ($force in @($Scenario.forces)) {
     $recipeName = [string]$force.recipe
     $recipe = Get-RequiredProperty $Scenario.baseRecipes $recipeName "baseRecipes"
-    $forces += [ordered]@{
+    $expanded = [ordered]@{
       id = $force.id
       label = $force.label
       teamID = $force.teamID
@@ -118,10 +118,22 @@ function Expand-ScenarioForces {
       groups = @(
         [ordered]@{
           id = $recipeName
-          units = $recipe
+          # @() guards against PowerShell unrolling single-spec recipes into a
+          # bare object (which would flatten the Lua units list and spawn 0).
+          units = @($recipe)
         }
       )
     }
+    # Drop 4: secondary-objective forces carry their ledger identity into the
+    # seed -- the gadget books groups by secondaryId and gates victory on
+    # required marks. Only stamped when present (whitelist stays tight).
+    if ($force.PSObject.Properties["secondaryId"] -and $force.secondaryId) {
+      $expanded.secondaryId = [string]$force.secondaryId
+    }
+    if ($force.PSObject.Properties["required"] -and $null -ne $force.required) {
+      $expanded.required = [bool]$force.required
+    }
+    $forces += $expanded
   }
   return @($forces)
 }

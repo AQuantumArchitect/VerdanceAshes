@@ -1,0 +1,72 @@
+{
+  "schemaVersion": "verdance-shell-strip-filter/1.1",
+  "notes": "Keep static eco + static teeth + optional decoy-commander swarm nodes. Strip real commanders, production, builders, and mobiles. Sims still grow with normal armcom/corcom/legcom; occupation plants armdecom/cordecom/legdecom after strip (Armada autonomous decoy farmers). Used by apply_shell_strip.ps1 after a bake dump.",
+  "keepExact": [
+    "armsolar", "armadvsol", "armwin", "armfus", "armageo", "armgeo",
+    "armmakr", "armestor", "armmstor", "armmex", "armmoho", "armuwmex",
+    "armllt", "armbeamer", "armhlt", "armrl", "armpb", "armguard", "armamb",
+    "armdrag", "armfort", "armrad", "armarad", "armjamt", "armeyes",
+    "armdecom",
+    "corsolar", "coradvsol", "corwin", "corfus", "corageo", "corgeo",
+    "cormakr", "corestor", "cormstor", "cormex", "cormoho",
+    "corllt", "corhlt", "corrl", "corvipe", "corpun", "cordrag", "corfort",
+    "corrad", "corarad", "corjamt",
+    "cordecom",
+    "legsolar", "legwin", "legmex", "leglht", "legmg", "legrl", "legdrag",
+    "legrad", "legmstor",
+    "legdecom"
+  ],
+  "keepPrefixes": [
+    "armsolar", "armadv", "armwin", "armfus", "armmakr", "armestor", "armmstor",
+    "armmex", "armmoho", "armllt", "armbeam", "armhlt", "armrl", "armpb",
+    "armguard", "armdrag", "armfort", "armrad", "armarad",
+    "corsolar", "coradv", "corwin", "corfus", "cormakr", "corestor", "cormstor",
+    "cormex", "cormoho", "corllt", "corhlt", "corrl", "corvipe", "corpun",
+    "cordrag", "corfort", "corrad",
+    "legsolar", "legwin", "legmex", "leglht", "legmg", "legrl", "legdrag"
+  ],
+  "stripExact": [
+    "armcom", "armcomcon", "corcom", "corcomcon", "legcom", "legcomlvl2", "legcomlvl3", "legcomlvl4",
+    "armck", "armack", "armch", "armcv", "armca", "armcs",
+    "corck", "corack", "corch", "corcv", "corca", "corcs",
+    "legck", "legack", "legch", "legcv", "legca",
+    "armlab", "armalab", "armvp", "armavp", "armap", "armaap", "armhp", "armfhp", "armamsub",
+    "corlab", "coralab", "corvp", "coravp", "corap", "coraap", "corhp",
+    "leglab", "legalab", "legvp", "legavp", "legap",
+    "armnanotc", "armnanotcplat", "cornanotc", "legnanotc"
+  ],
+  "stripPrefixes": [
+    "armcom", "corcom", "legcom",
+    "armck", "armack", "armcv", "armca", "armcs", "armch",
+    "corck", "corack", "corcv", "corca", "corcs", "corch",
+    "legck", "legack", "legcv", "legca", "legch",
+    "armlab", "armalab", "armvp", "armavp", "armap", "armaap", "armhp", "armfhp",
+    "corlab", "coralab", "corvp", "coravp", "corap", "coraap", "corhp",
+    "leglab", "legalab", "legvp", "legavp", "legap",
+    "armnano", "cornano", "legnano"
+  ],
+  "stripIfMobileCombat": true,
+  "keepClasses": {
+    "energy": ["armsolar", "armadvsol", "armwin", "armfus", "armgeo", "armageo", "corsolar", "coradvsol", "corwin", "corfus", "legsolar", "legwin"],
+    "converter": ["armmakr", "cormakr"],
+    "storage": ["armestor", "armmstor", "corestor", "cormstor", "legmstor"],
+    "mex": ["armmex", "armmoho", "cormex", "cormoho", "legmex"],
+    "defense": ["armllt", "armbeamer", "armhlt", "armrl", "armpb", "armguard", "corllt", "corhlt", "corrl", "corvipe", "corpun", "leglht", "legmg", "legrl"],
+    "wall": ["armdrag", "armfort", "cordrag", "corfort", "legdrag"],
+    "intel": ["armrad", "armarad", "armjamt", "corrad", "corarad", "corjamt", "legrad"],
+    "decoy_node": ["armdecom", "cordecom", "legdecom"]
+  },
+  "decoyCommanders": {
+    "enabledByDefault": true,
+    "perPocket": 1,
+    "skipKinds": ["thin"],
+    "defs": {
+      "armada": "armdecom",
+      "cortex": "cordecom",
+      "nullmercs": "legdecom",
+      "legion": "legdecom"
+    },
+    "notes": "Plant after strip. Real coms are never kept. Decoys = ~770 metal, weak death, can light-build — Armada autonomous farmer swarm fiction. Sims still use normal commanders."
+  },
+  "notesGameplay": "If a unit is not in keepExact/keepPrefixes and looks like a factory/com/con/mobile, strip it. Prefer false-negative (extra strip) over leaving a constructor that rebuilds the map. Keep armdecom/cordecom/legdecom as occupation flavor only."
+}

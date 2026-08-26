@@ -1,0 +1,6209 @@
+{
+  "schemaVersion": "verdance-world-zone-graph/1.0",
+  "nodeCount": 102,
+  "edgeCount": 190,
+  "nodes": [
+    {
+      "zoneId": "ATS_C_BASTION",
+      "mapId": "all_that_simmers",
+      "mapName": "All That Simmers v1.1.1",
+      "label": "Central Bastion",
+      "role": "fortress",
+      "tags": [
+        "metal",
+        "choke",
+        "central"
+      ],
+      "bounds": {
+        "xMin": 0.3438,
+        "xMax": 0.6667,
+        "zMin": 0.2604,
+        "zMax": 0.5
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.5052,
+        "z": 0.4115
+      },
+      "evidence": {
+        "cellCount": 574.0,
+        "presenceShare": 0.2141,
+        "presenceDensity": 3.4372,
+        "structureDensity": 4.1999,
+        "fightDensity": 0.0,
+        "trafficDensity": 2.5518,
+        "transitDensity": 0.6076,
+        "hazard": 0.0,
+        "defence": 0.6273,
+        "contest": 0.0013,
+        "water": 0.0016,
+        "buildable": 0.9001,
+        "slope": 0.071,
+        "metal": 1.2413,
+        "relativeHeight": 0.4951,
+        "choke": 0.7879,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.002,
+        "metalSpots": 11,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "ATS_C_INNER_BASTION",
+      "mapId": "all_that_simmers",
+      "mapName": "All That Simmers v1.1.1",
+      "label": "Central Inner Bastion",
+      "role": "fortress",
+      "tags": [
+        "metal",
+        "choke",
+        "central"
+      ],
+      "bounds": {
+        "xMin": 0.3333,
+        "xMax": 0.6562,
+        "zMin": 0.5,
+        "zMax": 0.7396
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.4948,
+        "z": 0.5885
+      },
+      "evidence": {
+        "cellCount": 574.0,
+        "presenceShare": 0.2141,
+        "presenceDensity": 3.4372,
+        "structureDensity": 4.1999,
+        "fightDensity": 0.0,
+        "trafficDensity": 2.5518,
+        "transitDensity": 0.6076,
+        "hazard": 0.0,
+        "defence": 0.6273,
+        "contest": 0.002,
+        "water": 0.0062,
+        "buildable": 0.877,
+        "slope": 0.0739,
+        "metal": 1.3135,
+        "relativeHeight": 0.4757,
+        "choke": 0.6061,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.007,
+        "metalSpots": 11,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "ATS_NW_SPILLWAY",
+      "mapId": "all_that_simmers",
+      "mapName": "All That Simmers v1.1.1",
+      "label": "Northwest Spillway",
+      "role": "spillway",
+      "tags": [
+        "low",
+        "metal",
+        "choke",
+        "start",
+        "shore",
+        "northwest"
+      ],
+      "bounds": {
+        "xMin": 0.0,
+        "xMax": 1.0,
+        "zMin": 0.125,
+        "zMax": 0.5
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.3073,
+        "z": 0.3698
+      },
+      "evidence": {
+        "cellCount": 1266.0,
+        "presenceShare": 0.1006,
+        "presenceDensity": 0.7324,
+        "structureDensity": 0.4459,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.9813,
+        "transitDensity": 2.2007,
+        "hazard": 0.0,
+        "defence": 0.2256,
+        "contest": 0.0454,
+        "water": 0.1795,
+        "buildable": 0.5773,
+        "slope": 0.1429,
+        "metal": 0.7965,
+        "relativeHeight": 0.2899,
+        "choke": 0.8182,
+        "hasStart": true,
+        "floodsAt": 0.5,
+        "restingSubmerged": 0.182,
+        "metalSpots": 16,
+        "drownedMetal": 0.375
+      }
+    },
+    {
+      "zoneId": "ATS_SE_SPILLWAY",
+      "mapId": "all_that_simmers",
+      "mapName": "All That Simmers v1.1.1",
+      "label": "Southeast Spillway",
+      "role": "spillway",
+      "tags": [
+        "low",
+        "metal",
+        "choke",
+        "start",
+        "shore",
+        "southeast"
+      ],
+      "bounds": {
+        "xMin": 0.0,
+        "xMax": 1.0,
+        "zMin": 0.5,
+        "zMax": 0.875
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.7552,
+        "z": 0.6719
+      },
+      "evidence": {
+        "cellCount": 1266.0,
+        "presenceShare": 0.1006,
+        "presenceDensity": 0.7324,
+        "structureDensity": 0.4459,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.9813,
+        "transitDensity": 2.2007,
+        "hazard": 0.0,
+        "defence": 0.2256,
+        "contest": 0.0745,
+        "water": 0.1762,
+        "buildable": 0.5644,
+        "slope": 0.1501,
+        "metal": 0.8517,
+        "relativeHeight": 0.2892,
+        "choke": 0.5758,
+        "hasStart": true,
+        "floodsAt": 0.5,
+        "restingSubmerged": 0.182,
+        "metalSpots": 17,
+        "drownedMetal": 0.471
+      }
+    },
+    {
+      "zoneId": "ATS_NE_GATE",
+      "mapId": "all_that_simmers",
+      "mapName": "All That Simmers v1.1.1",
+      "label": "Northeast Gate",
+      "role": "gate",
+      "tags": [
+        "metal",
+        "choke",
+        "northeast"
+      ],
+      "bounds": {
+        "xMin": 0.5312,
+        "xMax": 1.0,
+        "zMin": 0.1042,
+        "zMax": 0.4688
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.724,
+        "z": 0.3073
+      },
+      "evidence": {
+        "cellCount": 773.0,
+        "presenceShare": 0.063,
+        "presenceDensity": 0.7516,
+        "structureDensity": 0.6394,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.8342,
+        "transitDensity": 1.3048,
+        "hazard": 0.0,
+        "defence": 0.3932,
+        "contest": 0.0165,
+        "water": 0.0,
+        "buildable": 0.8975,
+        "slope": 0.0476,
+        "metal": 1.2385,
+        "relativeHeight": 0.5256,
+        "choke": 1.0,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 16,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "ATS_SW_GATE",
+      "mapId": "all_that_simmers",
+      "mapName": "All That Simmers v1.1.1",
+      "label": "Southwest Gate",
+      "role": "gate",
+      "tags": [
+        "metal",
+        "start",
+        "southwest"
+      ],
+      "bounds": {
+        "xMin": 0.0,
+        "xMax": 0.4688,
+        "zMin": 0.5312,
+        "zMax": 0.8958
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.276,
+        "z": 0.6927
+      },
+      "evidence": {
+        "cellCount": 773.0,
+        "presenceShare": 0.063,
+        "presenceDensity": 0.7516,
+        "structureDensity": 0.6394,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.8342,
+        "transitDensity": 1.3048,
+        "hazard": 0.0,
+        "defence": 0.3932,
+        "contest": 0.0562,
+        "water": 0.0,
+        "buildable": 0.9236,
+        "slope": 0.0479,
+        "metal": 1.0355,
+        "relativeHeight": 0.5211,
+        "choke": 0.4697,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 15,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "ATS_NE_PLATEAU",
+      "mapId": "all_that_simmers",
+      "mapName": "All That Simmers v1.1.1",
+      "label": "Northeast Plateau",
+      "role": "plateau",
+      "tags": [
+        "high",
+        "metal",
+        "choke",
+        "start",
+        "northeast"
+      ],
+      "bounds": {
+        "xMin": 0.7396,
+        "xMax": 1.0,
+        "zMin": 0.0,
+        "zMax": 0.3229
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.8698,
+        "z": 0.1823
+      },
+      "evidence": {
+        "cellCount": 545.0,
+        "presenceShare": 0.0481,
+        "presenceDensity": 0.8126,
+        "structureDensity": 0.7656,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.7576,
+        "transitDensity": 0.9895,
+        "hazard": 0.0,
+        "defence": 0.4172,
+        "contest": 0.1436,
+        "water": 0.0,
+        "buildable": 0.9124,
+        "slope": 0.0484,
+        "metal": 1.0632,
+        "relativeHeight": 0.5934,
+        "choke": 0.5606,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 10,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "ATS_SW_PLATEAU",
+      "mapId": "all_that_simmers",
+      "mapName": "All That Simmers v1.1.1",
+      "label": "Southwest Plateau",
+      "role": "plateau",
+      "tags": [
+        "high",
+        "metal",
+        "start",
+        "southwest"
+      ],
+      "bounds": {
+        "xMin": 0.0,
+        "xMax": 0.2604,
+        "zMin": 0.6771,
+        "zMax": 1.0
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.1302,
+        "z": 0.8177
+      },
+      "evidence": {
+        "cellCount": 545.0,
+        "presenceShare": 0.0481,
+        "presenceDensity": 0.8126,
+        "structureDensity": 0.7656,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.7576,
+        "transitDensity": 0.9895,
+        "hazard": 0.0,
+        "defence": 0.4172,
+        "contest": 0.1113,
+        "water": 0.0,
+        "buildable": 0.9096,
+        "slope": 0.0502,
+        "metal": 0.9947,
+        "relativeHeight": 0.5932,
+        "choke": 0.3636,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 10,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "ATS_N_SHORE",
+      "mapId": "all_that_simmers",
+      "mapName": "All That Simmers v1.1.1",
+      "label": "North Shore",
+      "role": "shoreline",
+      "tags": [
+        "low",
+        "metal",
+        "start",
+        "shore",
+        "north"
+      ],
+      "bounds": {
+        "xMin": 0.3229,
+        "xMax": 0.5833,
+        "zMin": 0.0,
+        "zMax": 0.3125
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.474,
+        "z": 0.2865
+      },
+      "evidence": {
+        "cellCount": 557.0,
+        "presenceShare": 0.0266,
+        "presenceDensity": 0.4401,
+        "structureDensity": 0.2569,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.6027,
+        "transitDensity": 2.3456,
+        "hazard": 0.0,
+        "defence": 0.2243,
+        "contest": 0.0032,
+        "water": 0.077,
+        "buildable": 0.8034,
+        "slope": 0.0436,
+        "metal": 1.1233,
+        "relativeHeight": 0.2642,
+        "choke": 0.2727,
+        "hasStart": true,
+        "floodsAt": 0.5,
+        "restingSubmerged": 0.077,
+        "metalSpots": 11,
+        "drownedMetal": 0.636
+      }
+    },
+    {
+      "zoneId": "ATS_S_SHORE",
+      "mapId": "all_that_simmers",
+      "mapName": "All That Simmers v1.1.1",
+      "label": "South Shore",
+      "role": "shoreline",
+      "tags": [
+        "low",
+        "metal",
+        "start",
+        "shore",
+        "south"
+      ],
+      "bounds": {
+        "xMin": 0.4167,
+        "xMax": 0.6771,
+        "zMin": 0.6875,
+        "zMax": 1.0
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.526,
+        "z": 0.7031
+      },
+      "evidence": {
+        "cellCount": 557.0,
+        "presenceShare": 0.0266,
+        "presenceDensity": 0.4401,
+        "structureDensity": 0.2569,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.6027,
+        "transitDensity": 2.3456,
+        "hazard": 0.0,
+        "defence": 0.2243,
+        "contest": 0.069,
+        "water": 0.2059,
+        "buildable": 0.6386,
+        "slope": 0.068,
+        "metal": 1.1859,
+        "relativeHeight": 0.2386,
+        "choke": 0.2576,
+        "hasStart": true,
+        "floodsAt": 0.375,
+        "restingSubmerged": 0.214,
+        "metalSpots": 11,
+        "drownedMetal": 0.545
+      }
+    },
+    {
+      "zoneId": "ATS_NW_SHORE",
+      "mapId": "all_that_simmers",
+      "mapName": "All That Simmers v1.1.1",
+      "label": "Northwest Shore",
+      "role": "shoreline",
+      "tags": [
+        "low",
+        "metal",
+        "contested",
+        "start",
+        "shore",
+        "northwest"
+      ],
+      "bounds": {
+        "xMin": 0.0,
+        "xMax": 0.4167,
+        "zMin": 0.0,
+        "zMax": 0.25
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.151,
+        "z": 0.0781
+      },
+      "evidence": {
+        "cellCount": 530.0,
+        "presenceShare": 0.0236,
+        "presenceDensity": 0.4098,
+        "structureDensity": 0.3723,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.5751,
+        "transitDensity": 1.5448,
+        "hazard": 0.0,
+        "defence": 0.2572,
+        "contest": 0.8948,
+        "water": 0.2568,
+        "buildable": 0.6459,
+        "slope": 0.0496,
+        "metal": 0.6038,
+        "relativeHeight": 0.2263,
+        "choke": 0.303,
+        "hasStart": true,
+        "floodsAt": 0.375,
+        "restingSubmerged": 0.264,
+        "metalSpots": 6,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "ATS_SE_SHORE",
+      "mapId": "all_that_simmers",
+      "mapName": "All That Simmers v1.1.1",
+      "label": "Southeast Shore",
+      "role": "shoreline",
+      "tags": [
+        "low",
+        "metal",
+        "start",
+        "shore",
+        "southeast"
+      ],
+      "bounds": {
+        "xMin": 0.5833,
+        "xMax": 1.0,
+        "zMin": 0.75,
+        "zMax": 1.0
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.849,
+        "z": 0.9219
+      },
+      "evidence": {
+        "cellCount": 530.0,
+        "presenceShare": 0.0236,
+        "presenceDensity": 0.4098,
+        "structureDensity": 0.3723,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.5751,
+        "transitDensity": 1.5448,
+        "hazard": 0.0,
+        "defence": 0.2572,
+        "contest": 0.1552,
+        "water": 0.2373,
+        "buildable": 0.6696,
+        "slope": 0.0452,
+        "metal": 0.6928,
+        "relativeHeight": 0.2345,
+        "choke": 0.303,
+        "hasStart": true,
+        "floodsAt": 0.5,
+        "restingSubmerged": 0.238,
+        "metalSpots": 6,
+        "drownedMetal": 0.167
+      }
+    },
+    {
+      "zoneId": "ATS_NE_OUTER_PLATEAU",
+      "mapId": "all_that_simmers",
+      "mapName": "All That Simmers v1.1.1",
+      "label": "Northeast Outer Plateau",
+      "role": "plateau",
+      "tags": [
+        "high",
+        "metal",
+        "contested",
+        "start",
+        "northeast"
+      ],
+      "bounds": {
+        "xMin": 0.5729,
+        "xMax": 0.8229,
+        "zMin": 0.0,
+        "zMax": 0.1562
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.7344,
+        "z": 0.0677
+      },
+      "evidence": {
+        "cellCount": 249.0,
+        "presenceShare": 0.0149,
+        "presenceDensity": 0.5533,
+        "structureDensity": 0.8712,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.515,
+        "transitDensity": 0.5912,
+        "hazard": 0.0,
+        "defence": 0.7088,
+        "contest": 0.8378,
+        "water": 0.0,
+        "buildable": 0.8512,
+        "slope": 0.0571,
+        "metal": 1.481,
+        "relativeHeight": 0.5885,
+        "choke": 0.3636,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 6,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "ATS_SW_OUTER_PLATEAU",
+      "mapId": "all_that_simmers",
+      "mapName": "All That Simmers v1.1.1",
+      "label": "Southwest Outer Plateau",
+      "role": "plateau",
+      "tags": [
+        "high",
+        "metal",
+        "start",
+        "southwest"
+      ],
+      "bounds": {
+        "xMin": 0.1771,
+        "xMax": 0.4271,
+        "zMin": 0.8438,
+        "zMax": 1.0
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.2656,
+        "z": 0.9323
+      },
+      "evidence": {
+        "cellCount": 249.0,
+        "presenceShare": 0.0149,
+        "presenceDensity": 0.5533,
+        "structureDensity": 0.8712,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.515,
+        "transitDensity": 0.5912,
+        "hazard": 0.0,
+        "defence": 0.7088,
+        "contest": 0.0773,
+        "water": 0.0,
+        "buildable": 0.8544,
+        "slope": 0.0527,
+        "metal": 1.5094,
+        "relativeHeight": 0.5841,
+        "choke": 0.2121,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 6,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "ATS_NE_MUSTER",
+      "mapId": "all_that_simmers",
+      "mapName": "All That Simmers v1.1.1",
+      "label": "Northeast Muster",
+      "role": "start",
+      "tags": [
+        "high",
+        "metal",
+        "start",
+        "northeast"
+      ],
+      "bounds": {
+        "xMin": 0.8854,
+        "xMax": 1.0,
+        "zMin": 0.0,
+        "zMax": 0.1562
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.9531,
+        "z": 0.0677
+      },
+      "evidence": {
+        "cellCount": 114.0,
+        "presenceShare": 0.0091,
+        "presenceDensity": 0.7355,
+        "structureDensity": 1.4375,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.6527,
+        "transitDensity": 0.454,
+        "hazard": 0.0,
+        "defence": 0.8571,
+        "contest": 0.1759,
+        "water": 0.0,
+        "buildable": 0.9256,
+        "slope": 0.0002,
+        "metal": 2.1719,
+        "relativeHeight": 0.5902,
+        "choke": 0.3636,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 4,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "ATS_SW_MUSTER",
+      "mapId": "all_that_simmers",
+      "mapName": "All That Simmers v1.1.1",
+      "label": "Southwest Muster",
+      "role": "start",
+      "tags": [
+        "high",
+        "metal",
+        "start",
+        "southwest"
+      ],
+      "bounds": {
+        "xMin": 0.0,
+        "xMax": 0.1146,
+        "zMin": 0.8438,
+        "zMax": 1.0
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.0469,
+        "z": 0.9323
+      },
+      "evidence": {
+        "cellCount": 114.0,
+        "presenceShare": 0.0091,
+        "presenceDensity": 0.7355,
+        "structureDensity": 1.4375,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.6527,
+        "transitDensity": 0.454,
+        "hazard": 0.0,
+        "defence": 0.8571,
+        "contest": 0.0773,
+        "water": 0.0,
+        "buildable": 0.9227,
+        "slope": 0.0008,
+        "metal": 2.1719,
+        "relativeHeight": 0.5886,
+        "choke": 0.1515,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 4,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "AB_NW_LANE",
+      "mapId": "ancient_bastion",
+      "mapName": "Ancient Bastion Remake 0.5",
+      "label": "Northwest Lane",
+      "role": "lane",
+      "tags": [
+        "low",
+        "metal",
+        "choke",
+        "start",
+        "northwest"
+      ],
+      "bounds": {
+        "xMin": 0.0,
+        "xMax": 0.5521,
+        "zMin": 0.0,
+        "zMax": 0.5
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.4115,
+        "z": 0.3385
+      },
+      "evidence": {
+        "cellCount": 1434.0,
+        "presenceShare": 0.1818,
+        "presenceDensity": 1.1686,
+        "structureDensity": 0.5307,
+        "fightDensity": 0.0,
+        "trafficDensity": 1.7835,
+        "transitDensity": 3.3606,
+        "hazard": 0.0,
+        "defence": 0.2299,
+        "contest": 0.1297,
+        "water": 0.0,
+        "buildable": 0.7932,
+        "slope": 0.0995,
+        "metal": 0.6704,
+        "relativeHeight": 0.2809,
+        "choke": 1.0,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 21,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "AB_SW_LANE",
+      "mapId": "ancient_bastion",
+      "mapName": "Ancient Bastion Remake 0.5",
+      "label": "Southwest Lane",
+      "role": "lane",
+      "tags": [
+        "low",
+        "metal",
+        "start",
+        "southwest"
+      ],
+      "bounds": {
+        "xMin": 0.0,
+        "xMax": 0.5521,
+        "zMin": 0.5,
+        "zMax": 1.0
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.401,
+        "z": 0.6406
+      },
+      "evidence": {
+        "cellCount": 1434.0,
+        "presenceShare": 0.1818,
+        "presenceDensity": 1.1686,
+        "structureDensity": 0.5307,
+        "fightDensity": 0.0,
+        "trafficDensity": 1.7835,
+        "transitDensity": 3.3606,
+        "hazard": 0.0,
+        "defence": 0.2299,
+        "contest": 0.2965,
+        "water": 0.0,
+        "buildable": 0.7902,
+        "slope": 0.1004,
+        "metal": 0.8619,
+        "relativeHeight": 0.2812,
+        "choke": 0.4348,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 24,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "AB_NE_RESERVE",
+      "mapId": "ancient_bastion",
+      "mapName": "Ancient Bastion Remake 0.5",
+      "label": "Northeast Reserve",
+      "role": "reserve",
+      "tags": [
+        "contested",
+        "northeast"
+      ],
+      "bounds": {
+        "xMin": 0.5312,
+        "xMax": 1.0,
+        "zMin": 0.0,
+        "zMax": 0.4688
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.8177,
+        "z": 0.2865
+      },
+      "evidence": {
+        "cellCount": 1702.0,
+        "presenceShare": 0.0959,
+        "presenceDensity": 0.5191,
+        "structureDensity": 0.711,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.2854,
+        "transitDensity": 0.4014,
+        "hazard": 0.0,
+        "defence": 0.6841,
+        "contest": 0.5068,
+        "water": 0.0,
+        "buildable": 0.5426,
+        "slope": 0.0693,
+        "metal": 0.2152,
+        "relativeHeight": 0.4013,
+        "choke": 0.3913,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 6,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "AB_SE_RESERVE",
+      "mapId": "ancient_bastion",
+      "mapName": "Ancient Bastion Remake 0.5",
+      "label": "Southeast Reserve",
+      "role": "reserve",
+      "tags": [
+        "southeast"
+      ],
+      "bounds": {
+        "xMin": 0.5312,
+        "xMax": 1.0,
+        "zMin": 0.5312,
+        "zMax": 1.0
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.8177,
+        "z": 0.7135
+      },
+      "evidence": {
+        "cellCount": 1702.0,
+        "presenceShare": 0.0959,
+        "presenceDensity": 0.5191,
+        "structureDensity": 0.711,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.2854,
+        "transitDensity": 0.4014,
+        "hazard": 0.0,
+        "defence": 0.6841,
+        "contest": 0.0916,
+        "water": 0.0,
+        "buildable": 0.534,
+        "slope": 0.0722,
+        "metal": 0.1614,
+        "relativeHeight": 0.4144,
+        "choke": 0.0,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 7,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "AB_NW_BASTION",
+      "mapId": "ancient_bastion",
+      "mapName": "Ancient Bastion Remake 0.5",
+      "label": "Northwest Bastion",
+      "role": "fortress",
+      "tags": [
+        "metal",
+        "northwest"
+      ],
+      "bounds": {
+        "xMin": 0.0,
+        "xMax": 0.2812,
+        "zMin": 0.0,
+        "zMax": 0.3229
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.1094,
+        "z": 0.1719
+      },
+      "evidence": {
+        "cellCount": 478.0,
+        "presenceShare": 0.0836,
+        "presenceDensity": 1.6117,
+        "structureDensity": 2.8418,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.8398,
+        "transitDensity": 0.2955,
+        "hazard": 0.0,
+        "defence": 0.9024,
+        "contest": 0.1705,
+        "water": 0.0,
+        "buildable": 0.6579,
+        "slope": 0.154,
+        "metal": 1.0535,
+        "relativeHeight": 0.3959,
+        "choke": 0.4348,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 9,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "AB_SW_BASTION",
+      "mapId": "ancient_bastion",
+      "mapName": "Ancient Bastion Remake 0.5",
+      "label": "Southwest Bastion",
+      "role": "fortress",
+      "tags": [
+        "metal",
+        "contested",
+        "southwest"
+      ],
+      "bounds": {
+        "xMin": 0.0,
+        "xMax": 0.2812,
+        "zMin": 0.6771,
+        "zMax": 1.0
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.1094,
+        "z": 0.8281
+      },
+      "evidence": {
+        "cellCount": 478.0,
+        "presenceShare": 0.0836,
+        "presenceDensity": 1.6117,
+        "structureDensity": 2.8418,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.8398,
+        "transitDensity": 0.2955,
+        "hazard": 0.0,
+        "defence": 0.9024,
+        "contest": 0.5235,
+        "water": 0.0,
+        "buildable": 0.675,
+        "slope": 0.1394,
+        "metal": 0.9577,
+        "relativeHeight": 0.396,
+        "choke": 0.0,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 9,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "AB_NW_CITADEL",
+      "mapId": "ancient_bastion",
+      "mapName": "Ancient Bastion Remake 0.5",
+      "label": "Northwest Citadel",
+      "role": "citadel",
+      "tags": [
+        "low",
+        "northwest"
+      ],
+      "bounds": {
+        "xMin": 0.1146,
+        "xMax": 0.4062,
+        "zMin": 0.0,
+        "zMax": 0.2604
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.2135,
+        "z": 0.099
+      },
+      "evidence": {
+        "cellCount": 458.0,
+        "presenceShare": 0.0544,
+        "presenceDensity": 1.0941,
+        "structureDensity": 1.1006,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.6472,
+        "transitDensity": 0.5881,
+        "hazard": 0.0,
+        "defence": 0.5155,
+        "contest": 0.1746,
+        "water": 0.0,
+        "buildable": 0.848,
+        "slope": 0.0549,
+        "metal": 0.2999,
+        "relativeHeight": 0.1916,
+        "choke": 0.2609,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 5,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "AB_SW_CITADEL",
+      "mapId": "ancient_bastion",
+      "mapName": "Ancient Bastion Remake 0.5",
+      "label": "Southwest Citadel",
+      "role": "citadel",
+      "tags": [
+        "low",
+        "contested",
+        "southwest"
+      ],
+      "bounds": {
+        "xMin": 0.1146,
+        "xMax": 0.4062,
+        "zMin": 0.7396,
+        "zMax": 1.0
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.2135,
+        "z": 0.901
+      },
+      "evidence": {
+        "cellCount": 458.0,
+        "presenceShare": 0.0544,
+        "presenceDensity": 1.0941,
+        "structureDensity": 1.1006,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.6472,
+        "transitDensity": 0.5881,
+        "hazard": 0.0,
+        "defence": 0.5155,
+        "contest": 0.5235,
+        "water": 0.0,
+        "buildable": 0.8502,
+        "slope": 0.0561,
+        "metal": 0.1999,
+        "relativeHeight": 0.192,
+        "choke": 0.0,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 5,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "AB_W_LANE",
+      "mapId": "ancient_bastion",
+      "mapName": "Ancient Bastion Remake 0.5",
+      "label": "West Lane",
+      "role": "lane",
+      "tags": [
+        "low",
+        "west"
+      ],
+      "bounds": {
+        "xMin": 0.2188,
+        "xMax": 0.3854,
+        "zMin": 0.3438,
+        "zMax": 0.5
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.3177,
+        "z": 0.4635
+      },
+      "evidence": {
+        "cellCount": 123.0,
+        "presenceShare": 0.0383,
+        "presenceDensity": 2.8687,
+        "structureDensity": 0.8457,
+        "fightDensity": 0.0,
+        "trafficDensity": 5.0252,
+        "transitDensity": 5.9423,
+        "hazard": 0.0,
+        "defence": 0.1482,
+        "contest": 0.0444,
+        "water": 0.0,
+        "buildable": 0.811,
+        "slope": 0.1107,
+        "metal": 0.3722,
+        "relativeHeight": 0.1798,
+        "choke": 0.2174,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 1,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "AB_W_INNER_LANE",
+      "mapId": "ancient_bastion",
+      "mapName": "Ancient Bastion Remake 0.5",
+      "label": "West Inner Lane",
+      "role": "lane",
+      "tags": [
+        "low",
+        "metal",
+        "start",
+        "west"
+      ],
+      "bounds": {
+        "xMin": 0.2188,
+        "xMax": 0.3854,
+        "zMin": 0.5,
+        "zMax": 0.6562
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.3177,
+        "z": 0.5365
+      },
+      "evidence": {
+        "cellCount": 123.0,
+        "presenceShare": 0.0383,
+        "presenceDensity": 2.8687,
+        "structureDensity": 0.8457,
+        "fightDensity": 0.0,
+        "trafficDensity": 5.0252,
+        "transitDensity": 5.9423,
+        "hazard": 0.0,
+        "defence": 0.1482,
+        "contest": 0.0444,
+        "water": 0.0,
+        "buildable": 0.8028,
+        "slope": 0.1134,
+        "metal": 0.7444,
+        "relativeHeight": 0.1805,
+        "choke": 0.1739,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 3,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "AB_E_BASTION",
+      "mapId": "ancient_bastion",
+      "mapName": "Ancient Bastion Remake 0.5",
+      "label": "East Bastion",
+      "role": "fortress",
+      "tags": [
+        "east"
+      ],
+      "bounds": {
+        "xMin": 0.6354,
+        "xMax": 1.0,
+        "zMin": 0.3854,
+        "zMax": 0.5
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.7448,
+        "z": 0.4635
+      },
+      "evidence": {
+        "cellCount": 176.0,
+        "presenceShare": 0.0237,
+        "presenceDensity": 1.2423,
+        "structureDensity": 2.1351,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.5602,
+        "transitDensity": 0.2624,
+        "hazard": 0.0,
+        "defence": 0.8591,
+        "contest": 0.0391,
+        "water": 0.0,
+        "buildable": 0.5982,
+        "slope": 0.0659,
+        "metal": 0.0,
+        "relativeHeight": 0.3584,
+        "choke": 0.3478,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 0,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "AB_E_OUTER_BASTION",
+      "mapId": "ancient_bastion",
+      "mapName": "Ancient Bastion Remake 0.5",
+      "label": "East Outer Bastion",
+      "role": "fortress",
+      "tags": [
+        "metal",
+        "east"
+      ],
+      "bounds": {
+        "xMin": 0.6354,
+        "xMax": 1.0,
+        "zMin": 0.5,
+        "zMax": 0.6146
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.7552,
+        "z": 0.5365
+      },
+      "evidence": {
+        "cellCount": 176.0,
+        "presenceShare": 0.0237,
+        "presenceDensity": 1.2423,
+        "structureDensity": 2.1351,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.5602,
+        "transitDensity": 0.2624,
+        "hazard": 0.0,
+        "defence": 0.8591,
+        "contest": 0.039,
+        "water": 0.0,
+        "buildable": 0.682,
+        "slope": 0.0568,
+        "metal": 0.7803,
+        "relativeHeight": 0.3771,
+        "choke": 0.1304,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 2,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "AB_NE_CITADEL",
+      "mapId": "ancient_bastion",
+      "mapName": "Ancient Bastion Remake 0.5",
+      "label": "Northeast Citadel",
+      "role": "citadel",
+      "tags": [
+        "low",
+        "metal",
+        "contested",
+        "northeast"
+      ],
+      "bounds": {
+        "xMin": 0.5417,
+        "xMax": 0.6771,
+        "zMin": 0.2188,
+        "zMax": 0.5
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.6198,
+        "z": 0.3594
+      },
+      "evidence": {
+        "cellCount": 237.0,
+        "presenceShare": 0.0223,
+        "presenceDensity": 0.8677,
+        "structureDensity": 1.2433,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.6337,
+        "transitDensity": 0.5097,
+        "hazard": 0.0,
+        "defence": 0.7252,
+        "contest": 0.4097,
+        "water": 0.0,
+        "buildable": 0.7576,
+        "slope": 0.0588,
+        "metal": 0.5795,
+        "relativeHeight": 0.1517,
+        "choke": 0.3043,
+        "hasStart": false,
+        "floodsAt": 1.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 2,
+        "drownedMetal": 1.0
+      }
+    },
+    {
+      "zoneId": "AB_SE_CITADEL",
+      "mapId": "ancient_bastion",
+      "mapName": "Ancient Bastion Remake 0.5",
+      "label": "Southeast Citadel",
+      "role": "citadel",
+      "tags": [
+        "low",
+        "metal",
+        "contested",
+        "southeast"
+      ],
+      "bounds": {
+        "xMin": 0.5417,
+        "xMax": 0.6771,
+        "zMin": 0.5,
+        "zMax": 0.7812
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.5885,
+        "z": 0.6198
+      },
+      "evidence": {
+        "cellCount": 237.0,
+        "presenceShare": 0.0223,
+        "presenceDensity": 0.8677,
+        "structureDensity": 1.2433,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.6337,
+        "transitDensity": 0.5097,
+        "hazard": 0.0,
+        "defence": 0.7252,
+        "contest": 0.3716,
+        "water": 0.0,
+        "buildable": 0.9044,
+        "slope": 0.0225,
+        "metal": 0.5795,
+        "relativeHeight": 0.1619,
+        "choke": 0.1304,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 2,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "EOH_NW_BASTION",
+      "mapId": "eye_of_horus",
+      "mapName": "Eye Of Horus 1.7",
+      "label": "Northwest Bastion",
+      "role": "fortress",
+      "tags": [
+        "low",
+        "choke",
+        "northwest"
+      ],
+      "bounds": {
+        "xMin": 0.0,
+        "xMax": 0.3646,
+        "zMin": 0.0,
+        "zMax": 0.3646
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.1927,
+        "z": 0.1823
+      },
+      "evidence": {
+        "cellCount": 610.0,
+        "presenceShare": 0.2203,
+        "presenceDensity": 3.3289,
+        "structureDensity": 2.6542,
+        "fightDensity": 0.0,
+        "trafficDensity": 3.0393,
+        "transitDensity": 1.1451,
+        "hazard": 0.0,
+        "defence": 0.4687,
+        "contest": 0.0,
+        "water": 0.0,
+        "buildable": 0.6313,
+        "slope": 0.1142,
+        "metal": 0.4754,
+        "relativeHeight": 0.1235,
+        "choke": 0.9091,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 2,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "EOH_SE_BASTION",
+      "mapId": "eye_of_horus",
+      "mapName": "Eye Of Horus 1.7",
+      "label": "Southeast Bastion",
+      "role": "fortress",
+      "tags": [
+        "low",
+        "southeast"
+      ],
+      "bounds": {
+        "xMin": 0.6354,
+        "xMax": 1.0,
+        "zMin": 0.6354,
+        "zMax": 1.0
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.8073,
+        "z": 0.8177
+      },
+      "evidence": {
+        "cellCount": 610.0,
+        "presenceShare": 0.2203,
+        "presenceDensity": 3.3289,
+        "structureDensity": 2.6542,
+        "fightDensity": 0.0,
+        "trafficDensity": 3.0393,
+        "transitDensity": 1.1451,
+        "hazard": 0.0,
+        "defence": 0.4687,
+        "contest": 0.0594,
+        "water": 0.0,
+        "buildable": 0.6013,
+        "slope": 0.1168,
+        "metal": 0.4754,
+        "relativeHeight": 0.1362,
+        "choke": 0.5455,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 2,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "EOH_NW_MUSTER",
+      "mapId": "eye_of_horus",
+      "mapName": "Eye Of Horus 1.7",
+      "label": "Northwest Muster",
+      "role": "start",
+      "tags": [
+        "low",
+        "metal",
+        "choke",
+        "start",
+        "northwest"
+      ],
+      "bounds": {
+        "xMin": 0.0,
+        "xMax": 0.1875,
+        "zMin": 0.0,
+        "zMax": 0.25
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.0885,
+        "z": 0.1198
+      },
+      "evidence": {
+        "cellCount": 331.0,
+        "presenceShare": 0.1506,
+        "presenceDensity": 4.1944,
+        "structureDensity": 6.4646,
+        "fightDensity": 0.0,
+        "trafficDensity": 4.0009,
+        "transitDensity": 0.6189,
+        "hazard": 0.0,
+        "defence": 0.9156,
+        "contest": 0.0,
+        "water": 0.0,
+        "buildable": 0.9104,
+        "slope": 0.0159,
+        "metal": 1.3689,
+        "relativeHeight": 0.0304,
+        "choke": 0.7273,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 3,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "EOH_SE_MUSTER",
+      "mapId": "eye_of_horus",
+      "mapName": "Eye Of Horus 1.7",
+      "label": "Southeast Muster",
+      "role": "start",
+      "tags": [
+        "low",
+        "metal",
+        "start",
+        "southeast"
+      ],
+      "bounds": {
+        "xMin": 0.8125,
+        "xMax": 1.0,
+        "zMin": 0.75,
+        "zMax": 1.0
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.9115,
+        "z": 0.8802
+      },
+      "evidence": {
+        "cellCount": 331.0,
+        "presenceShare": 0.1506,
+        "presenceDensity": 4.1944,
+        "structureDensity": 6.4646,
+        "fightDensity": 0.0,
+        "trafficDensity": 4.0009,
+        "transitDensity": 0.6189,
+        "hazard": 0.0,
+        "defence": 0.9156,
+        "contest": 0.0537,
+        "water": 0.0,
+        "buildable": 0.8713,
+        "slope": 0.0194,
+        "metal": 1.3038,
+        "relativeHeight": 0.0347,
+        "choke": 0.5455,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 3,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "EOH_C_GATE",
+      "mapId": "eye_of_horus",
+      "mapName": "Eye Of Horus 1.7",
+      "label": "Central Gate",
+      "role": "gate",
+      "tags": [
+        "low",
+        "metal",
+        "choke",
+        "central"
+      ],
+      "bounds": {
+        "xMin": 0.2708,
+        "xMax": 0.875,
+        "zMin": 0.1667,
+        "zMax": 0.5
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.4531,
+        "z": 0.3281
+      },
+      "evidence": {
+        "cellCount": 865.0,
+        "presenceShare": 0.0543,
+        "presenceDensity": 0.5789,
+        "structureDensity": 0.3004,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.7129,
+        "transitDensity": 2.373,
+        "hazard": 0.0,
+        "defence": 0.3094,
+        "contest": 0.0594,
+        "water": 0.0,
+        "buildable": 0.7003,
+        "slope": 0.0876,
+        "metal": 0.6624,
+        "relativeHeight": 0.0913,
+        "choke": 1.0,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 4,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "EOH_C_INNER_GATE",
+      "mapId": "eye_of_horus",
+      "mapName": "Eye Of Horus 1.7",
+      "label": "Central Inner Gate",
+      "role": "gate",
+      "tags": [
+        "low",
+        "metal",
+        "choke",
+        "contested",
+        "central"
+      ],
+      "bounds": {
+        "xMin": 0.125,
+        "xMax": 0.7292,
+        "zMin": 0.5,
+        "zMax": 0.8333
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.5677,
+        "z": 0.6615
+      },
+      "evidence": {
+        "cellCount": 865.0,
+        "presenceShare": 0.0543,
+        "presenceDensity": 0.5789,
+        "structureDensity": 0.3004,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.7129,
+        "transitDensity": 2.373,
+        "hazard": 0.0,
+        "defence": 0.3094,
+        "contest": 0.414,
+        "water": 0.0,
+        "buildable": 0.7081,
+        "slope": 0.0832,
+        "metal": 0.6543,
+        "relativeHeight": 0.0825,
+        "choke": 0.6364,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 3,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "EOH_NE_CAUSEWAY",
+      "mapId": "eye_of_horus",
+      "mapName": "Eye Of Horus 1.7",
+      "label": "Northeast Causeway",
+      "role": "causeway",
+      "tags": [
+        "low",
+        "metal",
+        "choke",
+        "start",
+        "northeast"
+      ],
+      "bounds": {
+        "xMin": 0.125,
+        "xMax": 1.0,
+        "zMin": 0.0,
+        "zMax": 0.5
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.6406,
+        "z": 0.2969
+      },
+      "evidence": {
+        "cellCount": 2310.0,
+        "presenceShare": 0.0394,
+        "presenceDensity": 0.1572,
+        "structureDensity": 0.1811,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.1507,
+        "transitDensity": 0.6027,
+        "hazard": 0.0,
+        "defence": 0.6846,
+        "contest": 0.1623,
+        "water": 0.0,
+        "buildable": 0.6031,
+        "slope": 0.1163,
+        "metal": 0.8514,
+        "relativeHeight": 0.13,
+        "choke": 0.9091,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 12,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "EOH_SW_CAUSEWAY",
+      "mapId": "eye_of_horus",
+      "mapName": "Eye Of Horus 1.7",
+      "label": "Southwest Causeway",
+      "role": "causeway",
+      "tags": [
+        "low",
+        "metal",
+        "choke",
+        "contested",
+        "start",
+        "southwest"
+      ],
+      "bounds": {
+        "xMin": 0.0,
+        "xMax": 0.875,
+        "zMin": 0.5,
+        "zMax": 1.0
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.3594,
+        "z": 0.7031
+      },
+      "evidence": {
+        "cellCount": 2310.0,
+        "presenceShare": 0.0394,
+        "presenceDensity": 0.1572,
+        "structureDensity": 0.1811,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.1507,
+        "transitDensity": 0.6027,
+        "hazard": 0.0,
+        "defence": 0.6846,
+        "contest": 0.6973,
+        "water": 0.0,
+        "buildable": 0.5955,
+        "slope": 0.1181,
+        "metal": 0.784,
+        "relativeHeight": 0.1381,
+        "choke": 0.7273,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 12,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "EOH_C_LANE",
+      "mapId": "eye_of_horus",
+      "mapName": "Eye Of Horus 1.7",
+      "label": "Central Lane",
+      "role": "lane",
+      "tags": [
+        "low",
+        "metal",
+        "central"
+      ],
+      "bounds": {
+        "xMin": 0.4167,
+        "xMax": 0.6562,
+        "zMin": 0.3229,
+        "zMax": 0.5
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.526,
+        "z": 0.4115
+      },
+      "evidence": {
+        "cellCount": 237.0,
+        "presenceShare": 0.0242,
+        "presenceDensity": 0.941,
+        "structureDensity": 0.4191,
+        "fightDensity": 0.0,
+        "trafficDensity": 1.5081,
+        "transitDensity": 3.5985,
+        "hazard": 0.0,
+        "defence": 0.2725,
+        "contest": 0.035,
+        "water": 0.0,
+        "buildable": 0.5227,
+        "slope": 0.1449,
+        "metal": 0.6568,
+        "relativeHeight": 0.1255,
+        "choke": 0.1818,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 1,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "EOH_C_INNER_LANE",
+      "mapId": "eye_of_horus",
+      "mapName": "Eye Of Horus 1.7",
+      "label": "Central Inner Lane",
+      "role": "lane",
+      "tags": [
+        "low",
+        "metal",
+        "central"
+      ],
+      "bounds": {
+        "xMin": 0.3438,
+        "xMax": 0.5833,
+        "zMin": 0.5,
+        "zMax": 0.6771
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.474,
+        "z": 0.5885
+      },
+      "evidence": {
+        "cellCount": 237.0,
+        "presenceShare": 0.0242,
+        "presenceDensity": 0.941,
+        "structureDensity": 0.4191,
+        "fightDensity": 0.0,
+        "trafficDensity": 1.5081,
+        "transitDensity": 3.5985,
+        "hazard": 0.0,
+        "defence": 0.2725,
+        "contest": 0.035,
+        "water": 0.0,
+        "buildable": 0.4687,
+        "slope": 0.1761,
+        "metal": 0.8054,
+        "relativeHeight": 0.1543,
+        "choke": 0.3636,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 2,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "EOH_W_LANE",
+      "mapId": "eye_of_horus",
+      "mapName": "Eye Of Horus 1.7",
+      "label": "West Lane",
+      "role": "lane",
+      "tags": [
+        "low",
+        "metal",
+        "west"
+      ],
+      "bounds": {
+        "xMin": 0.0,
+        "xMax": 1.0,
+        "zMin": 0.2917,
+        "zMax": 0.5
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.0677,
+        "z": 0.3802
+      },
+      "evidence": {
+        "cellCount": 255.0,
+        "presenceShare": 0.0111,
+        "presenceDensity": 0.4005,
+        "structureDensity": 0.2809,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.4218,
+        "transitDensity": 1.5017,
+        "hazard": 0.0,
+        "defence": 0.3926,
+        "contest": 0.0005,
+        "water": 0.0,
+        "buildable": 0.6612,
+        "slope": 0.1015,
+        "metal": 0.5551,
+        "relativeHeight": 0.1079,
+        "choke": 0.1818,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 1,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "EOH_E_LANE",
+      "mapId": "eye_of_horus",
+      "mapName": "Eye Of Horus 1.7",
+      "label": "East Lane",
+      "role": "lane",
+      "tags": [
+        "low",
+        "metal",
+        "contested",
+        "east"
+      ],
+      "bounds": {
+        "xMin": 0.0,
+        "xMax": 1.0,
+        "zMin": 0.5,
+        "zMax": 0.7083
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.9323,
+        "z": 0.6198
+      },
+      "evidence": {
+        "cellCount": 255.0,
+        "presenceShare": 0.0111,
+        "presenceDensity": 0.4005,
+        "structureDensity": 0.2809,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.4218,
+        "transitDensity": 1.5017,
+        "hazard": 0.0,
+        "defence": 0.3926,
+        "contest": 0.8861,
+        "water": 0.0,
+        "buildable": 0.6905,
+        "slope": 0.078,
+        "metal": 0.6379,
+        "relativeHeight": 0.077,
+        "choke": 0.1818,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 1,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "GF_NW_BASTION",
+      "mapId": "greenest_fields",
+      "mapName": "Greenest Fields 1.3",
+      "label": "Northwest Bastion",
+      "role": "fortress",
+      "tags": [
+        "low",
+        "choke",
+        "northwest"
+      ],
+      "bounds": {
+        "xMin": 0.0,
+        "xMax": 0.3333,
+        "zMin": 0.0,
+        "zMax": 0.5
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.099,
+        "z": 0.2135
+      },
+      "evidence": {
+        "cellCount": 853.0,
+        "presenceShare": 0.1844,
+        "presenceDensity": 1.9928,
+        "structureDensity": 1.9709,
+        "fightDensity": 0.0,
+        "trafficDensity": 2.0037,
+        "transitDensity": 1.0166,
+        "hazard": 0.0,
+        "defence": 0.5423,
+        "contest": 0.2079,
+        "water": 0.0,
+        "buildable": 0.9611,
+        "slope": 0.0051,
+        "metal": 0.0,
+        "relativeHeight": 0.2533,
+        "choke": 1.0,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.001,
+        "metalSpots": 0,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "GF_SW_BASTION",
+      "mapId": "greenest_fields",
+      "mapName": "Greenest Fields 1.3",
+      "label": "Southwest Bastion",
+      "role": "fortress",
+      "tags": [
+        "southwest"
+      ],
+      "bounds": {
+        "xMin": 0.0,
+        "xMax": 0.3333,
+        "zMin": 0.5,
+        "zMax": 1.0
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.099,
+        "z": 0.776
+      },
+      "evidence": {
+        "cellCount": 853.0,
+        "presenceShare": 0.1844,
+        "presenceDensity": 1.9928,
+        "structureDensity": 1.9709,
+        "fightDensity": 0.0,
+        "trafficDensity": 2.0037,
+        "transitDensity": 1.0166,
+        "hazard": 0.0,
+        "defence": 0.5423,
+        "contest": 0.0136,
+        "water": 0.0,
+        "buildable": 0.9661,
+        "slope": 0.0015,
+        "metal": 0.0,
+        "relativeHeight": 0.3344,
+        "choke": 0.375,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 0,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "GF_NW_MUSTER",
+      "mapId": "greenest_fields",
+      "mapName": "Greenest Fields 1.3",
+      "label": "Northwest Muster",
+      "role": "start",
+      "tags": [
+        "low",
+        "choke",
+        "northwest"
+      ],
+      "bounds": {
+        "xMin": 0.0417,
+        "xMax": 0.2812,
+        "zMin": 0.0,
+        "zMax": 0.25
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.151,
+        "z": 0.1094
+      },
+      "evidence": {
+        "cellCount": 392.0,
+        "presenceShare": 0.1618,
+        "presenceDensity": 3.8046,
+        "structureDensity": 3.6436,
+        "fightDensity": 0.0,
+        "trafficDensity": 4.0945,
+        "transitDensity": 1.1238,
+        "hazard": 0.0,
+        "defence": 0.5181,
+        "contest": 0.1106,
+        "water": 0.0,
+        "buildable": 0.9857,
+        "slope": 0.002,
+        "metal": 0.0,
+        "relativeHeight": 0.2207,
+        "choke": 0.875,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 0,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "GF_SW_MUSTER",
+      "mapId": "greenest_fields",
+      "mapName": "Greenest Fields 1.3",
+      "label": "Southwest Muster",
+      "role": "start",
+      "tags": [
+        "low",
+        "choke",
+        "start",
+        "southwest"
+      ],
+      "bounds": {
+        "xMin": 0.0417,
+        "xMax": 0.2812,
+        "zMin": 0.75,
+        "zMax": 1.0
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.151,
+        "z": 0.8906
+      },
+      "evidence": {
+        "cellCount": 392.0,
+        "presenceShare": 0.1618,
+        "presenceDensity": 3.8046,
+        "structureDensity": 3.6436,
+        "fightDensity": 0.0,
+        "trafficDensity": 4.0945,
+        "transitDensity": 1.1238,
+        "hazard": 0.0,
+        "defence": 0.5181,
+        "contest": 0.0054,
+        "water": 0.0,
+        "buildable": 0.9857,
+        "slope": 0.0013,
+        "metal": 0.0,
+        "relativeHeight": 0.2526,
+        "choke": 0.625,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 0,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "GF_NW_CITADEL",
+      "mapId": "greenest_fields",
+      "mapName": "Greenest Fields 1.3",
+      "label": "Northwest Citadel",
+      "role": "citadel",
+      "tags": [
+        "choke",
+        "contested",
+        "northwest"
+      ],
+      "bounds": {
+        "xMin": 0.1667,
+        "xMax": 0.625,
+        "zMin": 0.0,
+        "zMax": 0.5
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.3385,
+        "z": 0.2552
+      },
+      "evidence": {
+        "cellCount": 949.0,
+        "presenceShare": 0.1031,
+        "presenceDensity": 1.0009,
+        "structureDensity": 1.103,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.8435,
+        "transitDensity": 0.7647,
+        "hazard": 0.0,
+        "defence": 0.6168,
+        "contest": 0.9763,
+        "water": 0.0,
+        "buildable": 0.976,
+        "slope": 0.0021,
+        "metal": 0.0,
+        "relativeHeight": 0.4076,
+        "choke": 0.75,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 0,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "GF_SW_CITADEL",
+      "mapId": "greenest_fields",
+      "mapName": "Greenest Fields 1.3",
+      "label": "Southwest Citadel",
+      "role": "citadel",
+      "tags": [
+        "southwest"
+      ],
+      "bounds": {
+        "xMin": 0.1667,
+        "xMax": 0.625,
+        "zMin": 0.5,
+        "zMax": 1.0
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.3385,
+        "z": 0.7448
+      },
+      "evidence": {
+        "cellCount": 949.0,
+        "presenceShare": 0.1031,
+        "presenceDensity": 1.0009,
+        "structureDensity": 1.103,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.8435,
+        "transitDensity": 0.7647,
+        "hazard": 0.0,
+        "defence": 0.6168,
+        "contest": 0.0636,
+        "water": 0.0,
+        "buildable": 0.9785,
+        "slope": 0.0031,
+        "metal": 0.0,
+        "relativeHeight": 0.4689,
+        "choke": 0.375,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 0,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "GF_N_PLATEAU",
+      "mapId": "greenest_fields",
+      "mapName": "Greenest Fields 1.3",
+      "label": "North Plateau",
+      "role": "plateau",
+      "tags": [
+        "high",
+        "north"
+      ],
+      "bounds": {
+        "xMin": 0.4479,
+        "xMax": 0.6979,
+        "zMin": 0.0833,
+        "zMax": 0.4375
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.526,
+        "z": 0.3385
+      },
+      "evidence": {
+        "cellCount": 515.0,
+        "presenceShare": 0.0254,
+        "presenceDensity": 0.454,
+        "structureDensity": 0.4811,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.411,
+        "transitDensity": 0.8542,
+        "hazard": 0.0,
+        "defence": 0.5937,
+        "contest": 0.1876,
+        "water": 0.0,
+        "buildable": 1.0,
+        "slope": 0.005,
+        "metal": 0.0,
+        "relativeHeight": 0.6506,
+        "choke": 0.5,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 0,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "GF_S_PLATEAU",
+      "mapId": "greenest_fields",
+      "mapName": "Greenest Fields 1.3",
+      "label": "South Plateau",
+      "role": "plateau",
+      "tags": [
+        "high",
+        "choke",
+        "south"
+      ],
+      "bounds": {
+        "xMin": 0.4479,
+        "xMax": 0.6979,
+        "zMin": 0.5625,
+        "zMax": 0.9167
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.526,
+        "z": 0.6615
+      },
+      "evidence": {
+        "cellCount": 515.0,
+        "presenceShare": 0.0254,
+        "presenceDensity": 0.454,
+        "structureDensity": 0.4811,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.411,
+        "transitDensity": 0.8542,
+        "hazard": 0.0,
+        "defence": 0.5937,
+        "contest": 0.1984,
+        "water": 0.0,
+        "buildable": 1.0,
+        "slope": 0.002,
+        "metal": 0.0,
+        "relativeHeight": 0.6525,
+        "choke": 0.625,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 0,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "GF_C_GATE",
+      "mapId": "greenest_fields",
+      "mapName": "Greenest Fields 1.3",
+      "label": "Central Gate",
+      "role": "gate",
+      "tags": [
+        "high",
+        "choke",
+        "central"
+      ],
+      "bounds": {
+        "xMin": 0.4479,
+        "xMax": 0.75,
+        "zMin": 0.4375,
+        "zMax": 0.5
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.5156,
+        "z": 0.474
+      },
+      "evidence": {
+        "cellCount": 159.0,
+        "presenceShare": 0.0161,
+        "presenceDensity": 0.9313,
+        "structureDensity": 0.8413,
+        "fightDensity": 0.0,
+        "trafficDensity": 1.0674,
+        "transitDensity": 1.2688,
+        "hazard": 0.0,
+        "defence": 0.4854,
+        "contest": 0.1984,
+        "water": 0.0,
+        "buildable": 1.0,
+        "slope": 0.0021,
+        "metal": 0.0,
+        "relativeHeight": 0.6596,
+        "choke": 0.75,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 0,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "GF_C_INNER_GATE",
+      "mapId": "greenest_fields",
+      "mapName": "Greenest Fields 1.3",
+      "label": "Central Inner Gate",
+      "role": "gate",
+      "tags": [
+        "high",
+        "choke",
+        "central"
+      ],
+      "bounds": {
+        "xMin": 0.4479,
+        "xMax": 0.75,
+        "zMin": 0.5,
+        "zMax": 0.5625
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.526,
+        "z": 0.526
+      },
+      "evidence": {
+        "cellCount": 159.0,
+        "presenceShare": 0.0161,
+        "presenceDensity": 0.9313,
+        "structureDensity": 0.8413,
+        "fightDensity": 0.0,
+        "trafficDensity": 1.0674,
+        "transitDensity": 1.2688,
+        "hazard": 0.0,
+        "defence": 0.4854,
+        "contest": 0.1151,
+        "water": 0.0,
+        "buildable": 1.0,
+        "slope": 0.0021,
+        "metal": 0.0,
+        "relativeHeight": 0.6627,
+        "choke": 0.625,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 0,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "GF_NE_PLATEAU",
+      "mapId": "greenest_fields",
+      "mapName": "Greenest Fields 1.3",
+      "label": "Northeast Plateau",
+      "role": "plateau",
+      "tags": [
+        "high",
+        "choke",
+        "start",
+        "northeast"
+      ],
+      "bounds": {
+        "xMin": 0.5625,
+        "xMax": 1.0,
+        "zMin": 0.0,
+        "zMax": 0.5
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.724,
+        "z": 0.2344
+      },
+      "evidence": {
+        "cellCount": 1740.0,
+        "presenceShare": 0.0092,
+        "presenceDensity": 0.0488,
+        "structureDensity": 0.0404,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.0643,
+        "transitDensity": 0.2573,
+        "hazard": 0.0,
+        "defence": 0.4081,
+        "contest": 0.1859,
+        "water": 0.0,
+        "buildable": 0.9841,
+        "slope": 0.0029,
+        "metal": 0.0,
+        "relativeHeight": 0.871,
+        "choke": 0.875,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 0,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "GF_SE_PLATEAU",
+      "mapId": "greenest_fields",
+      "mapName": "Greenest Fields 1.3",
+      "label": "Southeast Plateau",
+      "role": "plateau",
+      "tags": [
+        "high",
+        "choke",
+        "start",
+        "southeast"
+      ],
+      "bounds": {
+        "xMin": 0.5625,
+        "xMax": 1.0,
+        "zMin": 0.5,
+        "zMax": 1.0
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.724,
+        "z": 0.7656
+      },
+      "evidence": {
+        "cellCount": 1740.0,
+        "presenceShare": 0.0092,
+        "presenceDensity": 0.0488,
+        "structureDensity": 0.0404,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.0643,
+        "transitDensity": 0.2573,
+        "hazard": 0.0,
+        "defence": 0.4081,
+        "contest": 0.0,
+        "water": 0.0,
+        "buildable": 0.9834,
+        "slope": 0.0031,
+        "metal": 0.0,
+        "relativeHeight": 0.716,
+        "choke": 0.875,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 0,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "KV_NW_MUSTER",
+      "mapId": "koom_valley",
+      "mapName": "Koom Valley 3 3.1",
+      "label": "Northwest Muster",
+      "role": "start",
+      "tags": [
+        "metal",
+        "choke",
+        "start",
+        "northwest"
+      ],
+      "bounds": {
+        "xMin": 0.0,
+        "xMax": 0.3542,
+        "zMin": 0.0,
+        "zMax": 0.4375
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.1406,
+        "z": 0.1927
+      },
+      "evidence": {
+        "cellCount": 1009.0,
+        "presenceShare": 0.1187,
+        "presenceDensity": 1.084,
+        "structureDensity": 1.651,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.6996,
+        "transitDensity": 0.4237,
+        "hazard": 0.0,
+        "defence": 0.6937,
+        "contest": 0.0,
+        "water": 0.0,
+        "buildable": 0.6833,
+        "slope": 0.1082,
+        "metal": 0.6301,
+        "relativeHeight": 0.5334,
+        "choke": 0.878,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 14,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "KV_NE_MUSTER",
+      "mapId": "koom_valley",
+      "mapName": "Koom Valley 3 3.1",
+      "label": "Northeast Muster",
+      "role": "start",
+      "tags": [
+        "metal",
+        "choke",
+        "start",
+        "northeast"
+      ],
+      "bounds": {
+        "xMin": 0.6458,
+        "xMax": 1.0,
+        "zMin": 0.0,
+        "zMax": 0.4375
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.8594,
+        "z": 0.1927
+      },
+      "evidence": {
+        "cellCount": 1009.0,
+        "presenceShare": 0.1187,
+        "presenceDensity": 1.084,
+        "structureDensity": 1.651,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.6996,
+        "transitDensity": 0.4237,
+        "hazard": 0.0,
+        "defence": 0.6937,
+        "contest": 0.0418,
+        "water": 0.0,
+        "buildable": 0.6662,
+        "slope": 0.1117,
+        "metal": 0.6116,
+        "relativeHeight": 0.5314,
+        "choke": 0.6341,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 14,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "KV_SE_MUSTER",
+      "mapId": "koom_valley",
+      "mapName": "Koom Valley 3 3.1",
+      "label": "Southeast Muster",
+      "role": "start",
+      "tags": [
+        "metal",
+        "contested",
+        "start",
+        "southeast"
+      ],
+      "bounds": {
+        "xMin": 0.6458,
+        "xMax": 1.0,
+        "zMin": 0.5625,
+        "zMax": 1.0
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.8594,
+        "z": 0.8073
+      },
+      "evidence": {
+        "cellCount": 1009.0,
+        "presenceShare": 0.1187,
+        "presenceDensity": 1.084,
+        "structureDensity": 1.651,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.6996,
+        "transitDensity": 0.4237,
+        "hazard": 0.0,
+        "defence": 0.6937,
+        "contest": 0.6785,
+        "water": 0.0,
+        "buildable": 0.6571,
+        "slope": 0.1148,
+        "metal": 0.7413,
+        "relativeHeight": 0.5294,
+        "choke": 0.5122,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 14,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "KV_SW_MUSTER",
+      "mapId": "koom_valley",
+      "mapName": "Koom Valley 3 3.1",
+      "label": "Southwest Muster",
+      "role": "start",
+      "tags": [
+        "metal",
+        "start",
+        "southwest"
+      ],
+      "bounds": {
+        "xMin": 0.0,
+        "xMax": 0.3542,
+        "zMin": 0.5625,
+        "zMax": 1.0
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.1406,
+        "z": 0.7969
+      },
+      "evidence": {
+        "cellCount": 1009.0,
+        "presenceShare": 0.1187,
+        "presenceDensity": 1.084,
+        "structureDensity": 1.651,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.6996,
+        "transitDensity": 0.4237,
+        "hazard": 0.0,
+        "defence": 0.6937,
+        "contest": 0.0004,
+        "water": 0.0,
+        "buildable": 0.6422,
+        "slope": 0.1205,
+        "metal": 0.6487,
+        "relativeHeight": 0.5318,
+        "choke": 0.4634,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 14,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "KV_NW_SPILLWAY",
+      "mapId": "koom_valley",
+      "mapName": "Koom Valley 3 3.1",
+      "label": "Northwest Spillway",
+      "role": "spillway",
+      "tags": [
+        "low",
+        "metal",
+        "choke",
+        "start",
+        "shore",
+        "northwest"
+      ],
+      "bounds": {
+        "xMin": 0.1771,
+        "xMax": 0.5,
+        "zMin": 0.0,
+        "zMax": 0.5
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.3281,
+        "z": 0.3802
+      },
+      "evidence": {
+        "cellCount": 1001.0,
+        "presenceShare": 0.091,
+        "presenceDensity": 0.8378,
+        "structureDensity": 0.4149,
+        "fightDensity": 0.0,
+        "trafficDensity": 1.1427,
+        "transitDensity": 2.7541,
+        "hazard": 0.0,
+        "defence": 0.2338,
+        "contest": 0.0123,
+        "water": 0.0,
+        "buildable": 0.709,
+        "slope": 0.0998,
+        "metal": 0.9714,
+        "relativeHeight": 0.1876,
+        "choke": 1.0,
+        "hasStart": true,
+        "floodsAt": 0.5,
+        "restingSubmerged": 0.0,
+        "metalSpots": 15,
+        "drownedMetal": 0.8
+      }
+    },
+    {
+      "zoneId": "KV_NE_SPILLWAY",
+      "mapId": "koom_valley",
+      "mapName": "Koom Valley 3 3.1",
+      "label": "Northeast Spillway",
+      "role": "spillway",
+      "tags": [
+        "low",
+        "metal",
+        "choke",
+        "shore",
+        "northeast"
+      ],
+      "bounds": {
+        "xMin": 0.5,
+        "xMax": 0.8229,
+        "zMin": 0.0,
+        "zMax": 0.5
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.6719,
+        "z": 0.3802
+      },
+      "evidence": {
+        "cellCount": 1001.0,
+        "presenceShare": 0.091,
+        "presenceDensity": 0.8378,
+        "structureDensity": 0.4149,
+        "fightDensity": 0.0,
+        "trafficDensity": 1.1427,
+        "transitDensity": 2.7541,
+        "hazard": 0.0,
+        "defence": 0.2338,
+        "contest": 0.0288,
+        "water": 0.0,
+        "buildable": 0.7022,
+        "slope": 0.0984,
+        "metal": 1.0275,
+        "relativeHeight": 0.1933,
+        "choke": 1.0,
+        "hasStart": false,
+        "floodsAt": 0.5,
+        "restingSubmerged": 0.0,
+        "metalSpots": 15,
+        "drownedMetal": 0.8
+      }
+    },
+    {
+      "zoneId": "KV_SE_SPILLWAY",
+      "mapId": "koom_valley",
+      "mapName": "Koom Valley 3 3.1",
+      "label": "Southeast Spillway",
+      "role": "spillway",
+      "tags": [
+        "low",
+        "metal",
+        "start",
+        "shore",
+        "southeast"
+      ],
+      "bounds": {
+        "xMin": 0.5,
+        "xMax": 0.8229,
+        "zMin": 0.5,
+        "zMax": 1.0
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.6719,
+        "z": 0.6406
+      },
+      "evidence": {
+        "cellCount": 1001.0,
+        "presenceShare": 0.091,
+        "presenceDensity": 0.8378,
+        "structureDensity": 0.4149,
+        "fightDensity": 0.0,
+        "trafficDensity": 1.1427,
+        "transitDensity": 2.7541,
+        "hazard": 0.0,
+        "defence": 0.2338,
+        "contest": 0.0824,
+        "water": 0.0,
+        "buildable": 0.7127,
+        "slope": 0.0946,
+        "metal": 0.8967,
+        "relativeHeight": 0.1861,
+        "choke": 0.439,
+        "hasStart": true,
+        "floodsAt": 0.5,
+        "restingSubmerged": 0.0,
+        "metalSpots": 15,
+        "drownedMetal": 0.8
+      }
+    },
+    {
+      "zoneId": "KV_SW_SPILLWAY",
+      "mapId": "koom_valley",
+      "mapName": "Koom Valley 3 3.1",
+      "label": "Southwest Spillway",
+      "role": "spillway",
+      "tags": [
+        "low",
+        "metal",
+        "shore",
+        "southwest"
+      ],
+      "bounds": {
+        "xMin": 0.1771,
+        "xMax": 0.5,
+        "zMin": 0.5,
+        "zMax": 1.0
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.3281,
+        "z": 0.6302
+      },
+      "evidence": {
+        "cellCount": 1001.0,
+        "presenceShare": 0.091,
+        "presenceDensity": 0.8378,
+        "structureDensity": 0.4149,
+        "fightDensity": 0.0,
+        "trafficDensity": 1.1427,
+        "transitDensity": 2.7541,
+        "hazard": 0.0,
+        "defence": 0.2338,
+        "contest": 0.0128,
+        "water": 0.0,
+        "buildable": 0.677,
+        "slope": 0.0951,
+        "metal": 0.8407,
+        "relativeHeight": 0.1955,
+        "choke": 0.4634,
+        "hasStart": false,
+        "floodsAt": 0.5,
+        "restingSubmerged": 0.0,
+        "metalSpots": 15,
+        "drownedMetal": 0.8
+      }
+    },
+    {
+      "zoneId": "KV_W_LANE",
+      "mapId": "koom_valley",
+      "mapName": "Koom Valley 3 3.1",
+      "label": "West Lane",
+      "role": "lane",
+      "tags": [
+        "high",
+        "metal",
+        "choke",
+        "start",
+        "west"
+      ],
+      "bounds": {
+        "xMin": 0.0,
+        "xMax": 0.1042,
+        "zMin": 0.2292,
+        "zMax": 0.4688
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.0469,
+        "z": 0.3385
+      },
+      "evidence": {
+        "cellCount": 181.0,
+        "presenceShare": 0.0263,
+        "presenceDensity": 1.3409,
+        "structureDensity": 0.8332,
+        "fightDensity": 0.0,
+        "trafficDensity": 1.5657,
+        "transitDensity": 1.8791,
+        "hazard": 0.0,
+        "defence": 0.2908,
+        "contest": 0.0,
+        "water": 0.0,
+        "buildable": 0.4952,
+        "slope": 0.1152,
+        "metal": 0.8265,
+        "relativeHeight": 0.6299,
+        "choke": 0.561,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 3,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "KV_E_LANE",
+      "mapId": "koom_valley",
+      "mapName": "Koom Valley 3 3.1",
+      "label": "East Lane",
+      "role": "lane",
+      "tags": [
+        "high",
+        "metal",
+        "start",
+        "east"
+      ],
+      "bounds": {
+        "xMin": 0.8958,
+        "xMax": 1.0,
+        "zMin": 0.2292,
+        "zMax": 0.4688
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.9531,
+        "z": 0.3385
+      },
+      "evidence": {
+        "cellCount": 181.0,
+        "presenceShare": 0.0263,
+        "presenceDensity": 1.3409,
+        "structureDensity": 0.8332,
+        "fightDensity": 0.0,
+        "trafficDensity": 1.5657,
+        "transitDensity": 1.8791,
+        "hazard": 0.0,
+        "defence": 0.2908,
+        "contest": 0.0419,
+        "water": 0.0,
+        "buildable": 0.4828,
+        "slope": 0.1127,
+        "metal": 0.6199,
+        "relativeHeight": 0.6259,
+        "choke": 0.3415,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 3,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "KV_E_OUTER_LANE",
+      "mapId": "koom_valley",
+      "mapName": "Koom Valley 3 3.1",
+      "label": "East Outer Lane",
+      "role": "lane",
+      "tags": [
+        "high",
+        "metal",
+        "start",
+        "east"
+      ],
+      "bounds": {
+        "xMin": 0.8958,
+        "xMax": 1.0,
+        "zMin": 0.5312,
+        "zMax": 0.7708
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.9635,
+        "z": 0.6615
+      },
+      "evidence": {
+        "cellCount": 181.0,
+        "presenceShare": 0.0263,
+        "presenceDensity": 1.3409,
+        "structureDensity": 0.8332,
+        "fightDensity": 0.0,
+        "trafficDensity": 1.5657,
+        "transitDensity": 1.8791,
+        "hazard": 0.0,
+        "defence": 0.2908,
+        "contest": 0.1735,
+        "water": 0.0,
+        "buildable": 0.4538,
+        "slope": 0.1356,
+        "metal": 0.6199,
+        "relativeHeight": 0.624,
+        "choke": 0.5122,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 3,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "KV_W_OUTER_LANE",
+      "mapId": "koom_valley",
+      "mapName": "Koom Valley 3 3.1",
+      "label": "West Outer Lane",
+      "role": "lane",
+      "tags": [
+        "high",
+        "metal",
+        "start",
+        "west"
+      ],
+      "bounds": {
+        "xMin": 0.0,
+        "xMax": 0.1042,
+        "zMin": 0.5312,
+        "zMax": 0.7708
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.0469,
+        "z": 0.6615
+      },
+      "evidence": {
+        "cellCount": 181.0,
+        "presenceShare": 0.0263,
+        "presenceDensity": 1.3409,
+        "structureDensity": 0.8332,
+        "fightDensity": 0.0,
+        "trafficDensity": 1.5657,
+        "transitDensity": 1.8791,
+        "hazard": 0.0,
+        "defence": 0.2908,
+        "contest": 0.0,
+        "water": 0.0,
+        "buildable": 0.5,
+        "slope": 0.1144,
+        "metal": 0.7232,
+        "relativeHeight": 0.6317,
+        "choke": 0.3415,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 3,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "KV_W_UPPER_LANE",
+      "mapId": "koom_valley",
+      "mapName": "Koom Valley 3 3.1",
+      "label": "West Upper Lane",
+      "role": "lane",
+      "tags": [
+        "high",
+        "metal",
+        "west"
+      ],
+      "bounds": {
+        "xMin": 0.0,
+        "xMax": 0.1875,
+        "zMin": 0.4062,
+        "zMax": 0.5
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.1094,
+        "z": 0.4635
+      },
+      "evidence": {
+        "cellCount": 113.0,
+        "presenceShare": 0.014,
+        "presenceDensity": 1.1409,
+        "structureDensity": 0.6371,
+        "fightDensity": 0.0,
+        "trafficDensity": 1.5122,
+        "transitDensity": 2.3736,
+        "hazard": 0.0,
+        "defence": 0.2625,
+        "contest": 0.0,
+        "water": 0.0,
+        "buildable": 0.5841,
+        "slope": 0.2055,
+        "metal": 0.6619,
+        "relativeHeight": 0.8785,
+        "choke": 0.1707,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 1,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "KV_E_UPPER_LANE",
+      "mapId": "koom_valley",
+      "mapName": "Koom Valley 3 3.1",
+      "label": "East Upper Lane",
+      "role": "lane",
+      "tags": [
+        "high",
+        "east"
+      ],
+      "bounds": {
+        "xMin": 0.8125,
+        "xMax": 1.0,
+        "zMin": 0.4062,
+        "zMax": 0.5
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.8906,
+        "z": 0.4635
+      },
+      "evidence": {
+        "cellCount": 113.0,
+        "presenceShare": 0.014,
+        "presenceDensity": 1.1409,
+        "structureDensity": 0.6371,
+        "fightDensity": 0.0,
+        "trafficDensity": 1.5122,
+        "transitDensity": 2.3736,
+        "hazard": 0.0,
+        "defence": 0.2625,
+        "contest": 0.0419,
+        "water": 0.0,
+        "buildable": 0.5172,
+        "slope": 0.2578,
+        "metal": 0.331,
+        "relativeHeight": 0.8616,
+        "choke": 0.3415,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 1,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "KV_E_LOWER_LANE",
+      "mapId": "koom_valley",
+      "mapName": "Koom Valley 3 3.1",
+      "label": "East Lower Lane",
+      "role": "lane",
+      "tags": [
+        "high",
+        "metal",
+        "start",
+        "east"
+      ],
+      "bounds": {
+        "xMin": 0.8125,
+        "xMax": 1.0,
+        "zMin": 0.5,
+        "zMax": 0.5938
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.8906,
+        "z": 0.5365
+      },
+      "evidence": {
+        "cellCount": 113.0,
+        "presenceShare": 0.014,
+        "presenceDensity": 1.1409,
+        "structureDensity": 0.6371,
+        "fightDensity": 0.0,
+        "trafficDensity": 1.5122,
+        "transitDensity": 2.3736,
+        "hazard": 0.0,
+        "defence": 0.2625,
+        "contest": 0.0419,
+        "water": 0.0,
+        "buildable": 0.5152,
+        "slope": 0.2321,
+        "metal": 0.9929,
+        "relativeHeight": 0.8589,
+        "choke": 0.4878,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 2,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "KV_W_LOWER_LANE",
+      "mapId": "koom_valley",
+      "mapName": "Koom Valley 3 3.1",
+      "label": "West Lower Lane",
+      "role": "lane",
+      "tags": [
+        "high",
+        "metal",
+        "west"
+      ],
+      "bounds": {
+        "xMin": 0.0,
+        "xMax": 0.1875,
+        "zMin": 0.5,
+        "zMax": 0.5938
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.1094,
+        "z": 0.5365
+      },
+      "evidence": {
+        "cellCount": 113.0,
+        "presenceShare": 0.014,
+        "presenceDensity": 1.1409,
+        "structureDensity": 0.6371,
+        "fightDensity": 0.0,
+        "trafficDensity": 1.5122,
+        "transitDensity": 2.3736,
+        "hazard": 0.0,
+        "defence": 0.2625,
+        "contest": 0.0,
+        "water": 0.0,
+        "buildable": 0.4896,
+        "slope": 0.2345,
+        "metal": 0.6619,
+        "relativeHeight": 0.8675,
+        "choke": 0.1707,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 2,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "T_C_SPILLWAY",
+      "mapId": "tabula",
+      "mapName": "Tabula_Remake 1.5",
+      "label": "Central Spillway",
+      "role": "spillway",
+      "tags": [
+        "low",
+        "shore",
+        "central"
+      ],
+      "bounds": {
+        "xMin": 0.0521,
+        "xMax": 0.9375,
+        "zMin": 0.25,
+        "zMax": 0.5
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.7344,
+        "z": 0.3281
+      },
+      "evidence": {
+        "cellCount": 1393.0,
+        "presenceShare": 0.2862,
+        "presenceDensity": 1.8938,
+        "structureDensity": 0.7688,
+        "fightDensity": 0.0,
+        "trafficDensity": 2.4546,
+        "transitDensity": 3.1928,
+        "hazard": 0.0,
+        "defence": 0.1387,
+        "contest": 0.0173,
+        "water": 0.0682,
+        "buildable": 0.775,
+        "slope": 0.061,
+        "metal": 0.4712,
+        "relativeHeight": 0.1617,
+        "choke": 0.5,
+        "hasStart": false,
+        "floodsAt": 0.375,
+        "restingSubmerged": 0.067,
+        "metalSpots": 9,
+        "drownedMetal": 0.778
+      }
+    },
+    {
+      "zoneId": "T_C_INNER_SPILLWAY",
+      "mapId": "tabula",
+      "mapName": "Tabula_Remake 1.5",
+      "label": "Central Inner Spillway",
+      "role": "spillway",
+      "tags": [
+        "low",
+        "metal",
+        "choke",
+        "start",
+        "shore",
+        "central"
+      ],
+      "bounds": {
+        "xMin": 0.0625,
+        "xMax": 0.9479,
+        "zMin": 0.5,
+        "zMax": 0.75
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.2552,
+        "z": 0.6615
+      },
+      "evidence": {
+        "cellCount": 1393.0,
+        "presenceShare": 0.2862,
+        "presenceDensity": 1.8938,
+        "structureDensity": 0.7688,
+        "fightDensity": 0.0,
+        "trafficDensity": 2.4546,
+        "transitDensity": 3.1928,
+        "hazard": 0.0,
+        "defence": 0.1387,
+        "contest": 0.015,
+        "water": 0.0531,
+        "buildable": 0.7799,
+        "slope": 0.0618,
+        "metal": 0.5638,
+        "relativeHeight": 0.1633,
+        "choke": 0.6875,
+        "hasStart": true,
+        "floodsAt": 0.375,
+        "restingSubmerged": 0.049,
+        "metalSpots": 9,
+        "drownedMetal": 0.667
+      }
+    },
+    {
+      "zoneId": "T_NW_RESERVE",
+      "mapId": "tabula",
+      "mapName": "Tabula_Remake 1.5",
+      "label": "Northwest Reserve",
+      "role": "reserve",
+      "tags": [
+        "start",
+        "northwest"
+      ],
+      "bounds": {
+        "xMin": 0.1354,
+        "xMax": 0.7292,
+        "zMin": 0.0,
+        "zMax": 0.3229
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.3073,
+        "z": 0.099
+      },
+      "evidence": {
+        "cellCount": 1222.0,
+        "presenceShare": 0.068,
+        "presenceDensity": 0.5132,
+        "structureDensity": 0.8473,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.2408,
+        "transitDensity": 0.2842,
+        "hazard": 0.0,
+        "defence": 0.5786,
+        "contest": 0.0078,
+        "water": 0.0183,
+        "buildable": 0.5565,
+        "slope": 0.1306,
+        "metal": 0.4898,
+        "relativeHeight": 0.4373,
+        "choke": 0.5,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.018,
+        "metalSpots": 7,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "T_SE_RESERVE",
+      "mapId": "tabula",
+      "mapName": "Tabula_Remake 1.5",
+      "label": "Southeast Reserve",
+      "role": "reserve",
+      "tags": [
+        "metal",
+        "southeast"
+      ],
+      "bounds": {
+        "xMin": 0.2708,
+        "xMax": 0.8646,
+        "zMin": 0.6771,
+        "zMax": 1.0
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.6927,
+        "z": 0.901
+      },
+      "evidence": {
+        "cellCount": 1222.0,
+        "presenceShare": 0.068,
+        "presenceDensity": 0.5132,
+        "structureDensity": 0.8473,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.2408,
+        "transitDensity": 0.2842,
+        "hazard": 0.0,
+        "defence": 0.5786,
+        "contest": 0.2795,
+        "water": 0.019,
+        "buildable": 0.5497,
+        "slope": 0.1324,
+        "metal": 0.5213,
+        "relativeHeight": 0.4317,
+        "choke": 0.0,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.019,
+        "metalSpots": 8,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "T_NW_MUSTER",
+      "mapId": "tabula",
+      "mapName": "Tabula_Remake 1.5",
+      "label": "Northwest Muster",
+      "role": "start",
+      "tags": [
+        "metal",
+        "choke",
+        "start",
+        "northwest"
+      ],
+      "bounds": {
+        "xMin": 0.0,
+        "xMax": 0.1458,
+        "zMin": 0.0,
+        "zMax": 0.2188
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.0781,
+        "z": 0.0885
+      },
+      "evidence": {
+        "cellCount": 228.0,
+        "presenceShare": 0.0434,
+        "presenceDensity": 1.7547,
+        "structureDensity": 7.5399,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.7679,
+        "transitDensity": 0.1018,
+        "hazard": 0.0,
+        "defence": 1.5116,
+        "contest": 0.0047,
+        "water": 0.0,
+        "buildable": 0.9307,
+        "slope": 0.0036,
+        "metal": 1.13,
+        "relativeHeight": 0.4359,
+        "choke": 0.625,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 3,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "T_SE_MUSTER",
+      "mapId": "tabula",
+      "mapName": "Tabula_Remake 1.5",
+      "label": "Southeast Muster",
+      "role": "start",
+      "tags": [
+        "metal",
+        "start",
+        "southeast"
+      ],
+      "bounds": {
+        "xMin": 0.8542,
+        "xMax": 1.0,
+        "zMin": 0.7812,
+        "zMax": 1.0
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.9219,
+        "z": 0.9115
+      },
+      "evidence": {
+        "cellCount": 228.0,
+        "presenceShare": 0.0434,
+        "presenceDensity": 1.7547,
+        "structureDensity": 7.5399,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.7679,
+        "transitDensity": 0.1018,
+        "hazard": 0.0,
+        "defence": 1.5116,
+        "contest": 0.1867,
+        "water": 0.0,
+        "buildable": 0.9282,
+        "slope": 0.0037,
+        "metal": 1.0164,
+        "relativeHeight": 0.4367,
+        "choke": 0.3125,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 3,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "T_NW_OUTER_RESERVE",
+      "mapId": "tabula",
+      "mapName": "Tabula_Remake 1.5",
+      "label": "Northwest Outer Reserve",
+      "role": "reserve",
+      "tags": [
+        "start",
+        "northwest"
+      ],
+      "bounds": {
+        "xMin": 0.0208,
+        "xMax": 0.25,
+        "zMin": 0.1771,
+        "zMax": 0.3958
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.1406,
+        "z": 0.2656
+      },
+      "evidence": {
+        "cellCount": 278.0,
+        "presenceShare": 0.0333,
+        "presenceDensity": 1.1035,
+        "structureDensity": 0.7057,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.6832,
+        "transitDensity": 0.968,
+        "hazard": 0.0,
+        "defence": 0.2086,
+        "contest": 0.0037,
+        "water": 0.0,
+        "buildable": 0.5911,
+        "slope": 0.1115,
+        "metal": 0.4626,
+        "relativeHeight": 0.4029,
+        "choke": 0.5,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 2,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "T_SE_OUTER_RESERVE",
+      "mapId": "tabula",
+      "mapName": "Tabula_Remake 1.5",
+      "label": "Southeast Outer Reserve",
+      "role": "reserve",
+      "tags": [
+        "metal",
+        "contested",
+        "southeast"
+      ],
+      "bounds": {
+        "xMin": 0.75,
+        "xMax": 0.9792,
+        "zMin": 0.6042,
+        "zMax": 0.8229
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.8594,
+        "z": 0.7344
+      },
+      "evidence": {
+        "cellCount": 278.0,
+        "presenceShare": 0.0333,
+        "presenceDensity": 1.1035,
+        "structureDensity": 0.7057,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.6832,
+        "transitDensity": 0.968,
+        "hazard": 0.0,
+        "defence": 0.2086,
+        "contest": 0.9638,
+        "water": 0.0,
+        "buildable": 0.6067,
+        "slope": 0.1102,
+        "metal": 0.6023,
+        "relativeHeight": 0.4009,
+        "choke": 0.25,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 2,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "T_NE_CAUSEWAY",
+      "mapId": "tabula",
+      "mapName": "Tabula_Remake 1.5",
+      "label": "Northeast Causeway",
+      "role": "causeway",
+      "tags": [
+        "metal",
+        "choke",
+        "start",
+        "northeast"
+      ],
+      "bounds": {
+        "xMin": 0.5625,
+        "xMax": 1.0,
+        "zMin": 0.0,
+        "zMax": 0.3542
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.8073,
+        "z": 0.2448
+      },
+      "evidence": {
+        "cellCount": 1042.0,
+        "presenceShare": 0.0259,
+        "presenceDensity": 0.2292,
+        "structureDensity": 0.2247,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.2212,
+        "transitDensity": 0.8848,
+        "hazard": 0.0,
+        "defence": 0.3131,
+        "contest": 0.2581,
+        "water": 0.2193,
+        "buildable": 0.4129,
+        "slope": 0.1571,
+        "metal": 0.5005,
+        "relativeHeight": 0.3679,
+        "choke": 0.9375,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.216,
+        "metalSpots": 8,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "T_SW_CAUSEWAY",
+      "mapId": "tabula",
+      "mapName": "Tabula_Remake 1.5",
+      "label": "Southwest Causeway",
+      "role": "causeway",
+      "tags": [
+        "metal",
+        "choke",
+        "start",
+        "southwest"
+      ],
+      "bounds": {
+        "xMin": 0.0,
+        "xMax": 0.4375,
+        "zMin": 0.6458,
+        "zMax": 1.0
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.1927,
+        "z": 0.7552
+      },
+      "evidence": {
+        "cellCount": 1042.0,
+        "presenceShare": 0.0259,
+        "presenceDensity": 0.2292,
+        "structureDensity": 0.2247,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.2212,
+        "transitDensity": 0.8848,
+        "hazard": 0.0,
+        "defence": 0.3131,
+        "contest": 0.0459,
+        "water": 0.217,
+        "buildable": 0.4043,
+        "slope": 0.1571,
+        "metal": 0.568,
+        "relativeHeight": 0.361,
+        "choke": 1.0,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.211,
+        "metalSpots": 8,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "T_NW_CAUSEWAY",
+      "mapId": "tabula",
+      "mapName": "Tabula_Remake 1.5",
+      "label": "Northwest Causeway",
+      "role": "causeway",
+      "tags": [
+        "metal",
+        "choke",
+        "start",
+        "northwest"
+      ],
+      "bounds": {
+        "xMin": 0.0,
+        "xMax": 0.0938,
+        "zMin": 0.1146,
+        "zMax": 0.4896
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.026,
+        "z": 0.276
+      },
+      "evidence": {
+        "cellCount": 190.0,
+        "presenceShare": 0.0205,
+        "presenceDensity": 0.996,
+        "structureDensity": 0.9894,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.6091,
+        "transitDensity": 0.6157,
+        "hazard": 0.0,
+        "defence": 0.3272,
+        "contest": 0.0037,
+        "water": 0.0,
+        "buildable": 0.7847,
+        "slope": 0.0495,
+        "metal": 0.6099,
+        "relativeHeight": 0.3325,
+        "choke": 0.6875,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 2,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "T_SE_CAUSEWAY",
+      "mapId": "tabula",
+      "mapName": "Tabula_Remake 1.5",
+      "label": "Southeast Causeway",
+      "role": "causeway",
+      "tags": [
+        "metal",
+        "choke",
+        "contested",
+        "start",
+        "southeast"
+      ],
+      "bounds": {
+        "xMin": 0.9062,
+        "xMax": 1.0,
+        "zMin": 0.5104,
+        "zMax": 0.8854
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.974,
+        "z": 0.724
+      },
+      "evidence": {
+        "cellCount": 190.0,
+        "presenceShare": 0.0205,
+        "presenceDensity": 0.996,
+        "structureDensity": 0.9894,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.6091,
+        "transitDensity": 0.6157,
+        "hazard": 0.0,
+        "defence": 0.3272,
+        "contest": 0.8692,
+        "water": 0.0,
+        "buildable": 0.7842,
+        "slope": 0.0457,
+        "metal": 0.7796,
+        "relativeHeight": 0.3325,
+        "choke": 0.875,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 2,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "T_NW_LANE",
+      "mapId": "tabula",
+      "mapName": "Tabula_Remake 1.5",
+      "label": "Northwest Lane",
+      "role": "lane",
+      "tags": [
+        "high",
+        "metal",
+        "choke",
+        "start",
+        "northwest"
+      ],
+      "bounds": {
+        "xMin": 0.1875,
+        "xMax": 0.3333,
+        "zMin": 0.2188,
+        "zMax": 0.375
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.2448,
+        "z": 0.2969
+      },
+      "evidence": {
+        "cellCount": 113.0,
+        "presenceShare": 0.0135,
+        "presenceDensity": 1.098,
+        "structureDensity": 0.6515,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.8032,
+        "transitDensity": 1.2329,
+        "hazard": 0.0,
+        "defence": 0.1867,
+        "contest": 0.0036,
+        "water": 0.0,
+        "buildable": 0.0843,
+        "slope": 0.3302,
+        "metal": 0.5691,
+        "relativeHeight": 0.6536,
+        "choke": 0.5625,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 1,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "T_SE_LANE",
+      "mapId": "tabula",
+      "mapName": "Tabula_Remake 1.5",
+      "label": "Southeast Lane",
+      "role": "lane",
+      "tags": [
+        "high",
+        "contested",
+        "southeast"
+      ],
+      "bounds": {
+        "xMin": 0.6667,
+        "xMax": 0.8125,
+        "zMin": 0.625,
+        "zMax": 0.7812
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.7552,
+        "z": 0.7031
+      },
+      "evidence": {
+        "cellCount": 113.0,
+        "presenceShare": 0.0135,
+        "presenceDensity": 1.098,
+        "structureDensity": 0.6515,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.8032,
+        "transitDensity": 1.2329,
+        "hazard": 0.0,
+        "defence": 0.1867,
+        "contest": 0.642,
+        "water": 0.0,
+        "buildable": 0.1407,
+        "slope": 0.3132,
+        "metal": 0.2845,
+        "relativeHeight": 0.6646,
+        "choke": 0.0,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 0,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "T_E_CAUSEWAY",
+      "mapId": "tabula",
+      "mapName": "Tabula_Remake 1.5",
+      "label": "East Causeway",
+      "role": "causeway",
+      "tags": [
+        "metal",
+        "choke",
+        "contested",
+        "start",
+        "east"
+      ],
+      "bounds": {
+        "xMin": 0.0,
+        "xMax": 1.0,
+        "zMin": 0.3542,
+        "zMax": 0.5
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.9115,
+        "z": 0.4219
+      },
+      "evidence": {
+        "cellCount": 142.0,
+        "presenceShare": 0.0091,
+        "presenceDensity": 0.5909,
+        "structureDensity": 0.6383,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.6507,
+        "transitDensity": 1.0195,
+        "hazard": 0.0,
+        "defence": 0.3417,
+        "contest": 0.611,
+        "water": 0.0,
+        "buildable": 0.7796,
+        "slope": 0.1031,
+        "metal": 0.9057,
+        "relativeHeight": 0.3534,
+        "choke": 0.875,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 2,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "T_W_CAUSEWAY",
+      "mapId": "tabula",
+      "mapName": "Tabula_Remake 1.5",
+      "label": "West Causeway",
+      "role": "causeway",
+      "tags": [
+        "metal",
+        "choke",
+        "west"
+      ],
+      "bounds": {
+        "xMin": 0.0,
+        "xMax": 1.0,
+        "zMin": 0.5,
+        "zMax": 0.6458
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.0885,
+        "z": 0.5781
+      },
+      "evidence": {
+        "cellCount": 142.0,
+        "presenceShare": 0.0091,
+        "presenceDensity": 0.5909,
+        "structureDensity": 0.6383,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.6507,
+        "transitDensity": 1.0195,
+        "hazard": 0.0,
+        "defence": 0.3417,
+        "contest": 0.0042,
+        "water": 0.0,
+        "buildable": 0.7695,
+        "slope": 0.1079,
+        "metal": 0.5447,
+        "relativeHeight": 0.3534,
+        "choke": 0.75,
+        "hasStart": false,
+        "floodsAt": 1.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 2,
+        "drownedMetal": 1.0
+      }
+    },
+    {
+      "zoneId": "TRJ_NW_MUSTER",
+      "mapId": "the_rock_jungle",
+      "mapName": "The Rock Jungle 2.1.1",
+      "label": "Northwest Muster",
+      "role": "start",
+      "tags": [
+        "metal",
+        "choke",
+        "start",
+        "northwest"
+      ],
+      "bounds": {
+        "xMin": 0.125,
+        "xMax": 0.6667,
+        "zMin": 0.0,
+        "zMax": 0.4688
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.3802,
+        "z": 0.2448
+      },
+      "evidence": {
+        "cellCount": 1731.0,
+        "presenceShare": 0.1878,
+        "presenceDensity": 0.9998,
+        "structureDensity": 1.0544,
+        "fightDensity": 0.0,
+        "trafficDensity": 1.0021,
+        "transitDensity": 0.9504,
+        "hazard": 0.0,
+        "defence": 0.3634,
+        "contest": 0.0158,
+        "water": 0.1805,
+        "buildable": 0.4485,
+        "slope": 0.1037,
+        "metal": 0.5901,
+        "relativeHeight": 0.452,
+        "choke": 1.0,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.18,
+        "metalSpots": 19,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "TRJ_SE_MUSTER",
+      "mapId": "the_rock_jungle",
+      "mapName": "The Rock Jungle 2.1.1",
+      "label": "Southeast Muster",
+      "role": "start",
+      "tags": [
+        "metal",
+        "start",
+        "southeast"
+      ],
+      "bounds": {
+        "xMin": 0.3333,
+        "xMax": 0.875,
+        "zMin": 0.5312,
+        "zMax": 1.0
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.6198,
+        "z": 0.7552
+      },
+      "evidence": {
+        "cellCount": 1731.0,
+        "presenceShare": 0.1878,
+        "presenceDensity": 0.9998,
+        "structureDensity": 1.0544,
+        "fightDensity": 0.0,
+        "trafficDensity": 1.0021,
+        "transitDensity": 0.9504,
+        "hazard": 0.0,
+        "defence": 0.3634,
+        "contest": 0.0197,
+        "water": 0.1666,
+        "buildable": 0.4661,
+        "slope": 0.0928,
+        "metal": 0.6952,
+        "relativeHeight": 0.4492,
+        "choke": 0.5,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.174,
+        "metalSpots": 19,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "TRJ_NE_SHALLOWS",
+      "mapId": "the_rock_jungle",
+      "mapName": "The Rock Jungle 2.1.1",
+      "label": "Northeast Shallows",
+      "role": "island_chain",
+      "tags": [
+        "water",
+        "low",
+        "metal",
+        "start",
+        "flood",
+        "water",
+        "northeast"
+      ],
+      "bounds": {
+        "xMin": 0.3854,
+        "xMax": 0.9479,
+        "zMin": 0.1771,
+        "zMax": 0.5
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.6094,
+        "z": 0.4427
+      },
+      "evidence": {
+        "cellCount": 611.0,
+        "presenceShare": 0.1092,
+        "presenceDensity": 1.6472,
+        "structureDensity": 1.8543,
+        "fightDensity": 0.0,
+        "trafficDensity": 1.3877,
+        "transitDensity": 0.7484,
+        "hazard": 0.0,
+        "defence": 0.4248,
+        "contest": 0.0006,
+        "water": 0.7453,
+        "buildable": 0.0838,
+        "slope": 0.1374,
+        "metal": 0.6421,
+        "relativeHeight": 0.1541,
+        "choke": 0.0,
+        "hasStart": true,
+        "floodsAt": 0.0,
+        "restingSubmerged": 0.755,
+        "metalSpots": 7,
+        "drownedMetal": 0.571
+      }
+    },
+    {
+      "zoneId": "TRJ_SW_SHALLOWS",
+      "mapId": "the_rock_jungle",
+      "mapName": "The Rock Jungle 2.1.1",
+      "label": "Southwest Shallows",
+      "role": "island_chain",
+      "tags": [
+        "water",
+        "low",
+        "start",
+        "flood",
+        "water",
+        "southwest"
+      ],
+      "bounds": {
+        "xMin": 0.0521,
+        "xMax": 0.6146,
+        "zMin": 0.5,
+        "zMax": 0.8229
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.3906,
+        "z": 0.5573
+      },
+      "evidence": {
+        "cellCount": 611.0,
+        "presenceShare": 0.1092,
+        "presenceDensity": 1.6472,
+        "structureDensity": 1.8543,
+        "fightDensity": 0.0,
+        "trafficDensity": 1.3877,
+        "transitDensity": 0.7484,
+        "hazard": 0.0,
+        "defence": 0.4248,
+        "contest": 0.0018,
+        "water": 0.7297,
+        "buildable": 0.0904,
+        "slope": 0.1472,
+        "metal": 0.4929,
+        "relativeHeight": 0.1574,
+        "choke": 0.0,
+        "hasStart": true,
+        "floodsAt": 0.0,
+        "restingSubmerged": 0.738,
+        "metalSpots": 6,
+        "drownedMetal": 0.5
+      }
+    },
+    {
+      "zoneId": "TRJ_NW_GATE",
+      "mapId": "the_rock_jungle",
+      "mapName": "The Rock Jungle 2.1.1",
+      "label": "Northwest Gate",
+      "role": "gate",
+      "tags": [
+        "choke",
+        "start",
+        "northwest"
+      ],
+      "bounds": {
+        "xMin": 0.0,
+        "xMax": 0.9792,
+        "zMin": 0.1771,
+        "zMax": 0.5
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.224,
+        "z": 0.349
+      },
+      "evidence": {
+        "cellCount": 578.0,
+        "presenceShare": 0.0624,
+        "presenceDensity": 0.9943,
+        "structureDensity": 0.3183,
+        "fightDensity": 0.0,
+        "trafficDensity": 1.1438,
+        "transitDensity": 3.5938,
+        "hazard": 0.0,
+        "defence": 0.0991,
+        "contest": 0.0251,
+        "water": 0.1338,
+        "buildable": 0.5351,
+        "slope": 0.1056,
+        "metal": 0.2366,
+        "relativeHeight": 0.5203,
+        "choke": 1.0,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.137,
+        "metalSpots": 3,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "TRJ_SE_GATE",
+      "mapId": "the_rock_jungle",
+      "mapName": "The Rock Jungle 2.1.1",
+      "label": "Southeast Gate",
+      "role": "gate",
+      "tags": [
+        "choke",
+        "start",
+        "southeast"
+      ],
+      "bounds": {
+        "xMin": 0.0208,
+        "xMax": 1.0,
+        "zMin": 0.5,
+        "zMax": 0.8229
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.776,
+        "z": 0.651
+      },
+      "evidence": {
+        "cellCount": 578.0,
+        "presenceShare": 0.0624,
+        "presenceDensity": 0.9943,
+        "structureDensity": 0.3183,
+        "fightDensity": 0.0,
+        "trafficDensity": 1.1438,
+        "transitDensity": 3.5938,
+        "hazard": 0.0,
+        "defence": 0.0991,
+        "contest": 0.0165,
+        "water": 0.1296,
+        "buildable": 0.5322,
+        "slope": 0.1,
+        "metal": 0.2212,
+        "relativeHeight": 0.5132,
+        "choke": 1.0,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.13,
+        "metalSpots": 3,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "TRJ_C_SPILLWAY",
+      "mapId": "the_rock_jungle",
+      "mapName": "The Rock Jungle 2.1.1",
+      "label": "Central Spillway",
+      "role": "spillway",
+      "tags": [
+        "water",
+        "low",
+        "metal",
+        "choke",
+        "shore",
+        "water",
+        "central"
+      ],
+      "bounds": {
+        "xMin": 0.2292,
+        "xMax": 0.7917,
+        "zMin": 0.3542,
+        "zMax": 0.5
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.401,
+        "z": 0.4427
+      },
+      "evidence": {
+        "cellCount": 219.0,
+        "presenceShare": 0.0422,
+        "presenceDensity": 1.7748,
+        "structureDensity": 2.5484,
+        "fightDensity": 0.0,
+        "trafficDensity": 1.4545,
+        "transitDensity": 0.5708,
+        "hazard": 0.0,
+        "defence": 0.5554,
+        "contest": 0.0006,
+        "water": 0.4294,
+        "buildable": 0.2313,
+        "slope": 0.1795,
+        "metal": 0.5,
+        "relativeHeight": 0.2809,
+        "choke": 1.0,
+        "hasStart": false,
+        "floodsAt": 0.5,
+        "restingSubmerged": 0.438,
+        "metalSpots": 2,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "TRJ_C_INNER_SPILLWAY",
+      "mapId": "the_rock_jungle",
+      "mapName": "The Rock Jungle 2.1.1",
+      "label": "Central Inner Spillway",
+      "role": "spillway",
+      "tags": [
+        "water",
+        "low",
+        "metal",
+        "choke",
+        "shore",
+        "water",
+        "central"
+      ],
+      "bounds": {
+        "xMin": 0.2083,
+        "xMax": 0.7708,
+        "zMin": 0.5,
+        "zMax": 0.6458
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.599,
+        "z": 0.5573
+      },
+      "evidence": {
+        "cellCount": 219.0,
+        "presenceShare": 0.0422,
+        "presenceDensity": 1.7748,
+        "structureDensity": 2.5484,
+        "fightDensity": 0.0,
+        "trafficDensity": 1.4545,
+        "transitDensity": 0.5708,
+        "hazard": 0.0,
+        "defence": 0.5554,
+        "contest": 0.001,
+        "water": 0.4248,
+        "buildable": 0.2303,
+        "slope": 0.1891,
+        "metal": 0.5,
+        "relativeHeight": 0.2832,
+        "choke": 1.0,
+        "hasStart": false,
+        "floodsAt": 0.5,
+        "restingSubmerged": 0.447,
+        "metalSpots": 2,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "TRJ_NE_LANE",
+      "mapId": "the_rock_jungle",
+      "mapName": "The Rock Jungle 2.1.1",
+      "label": "Northeast Lane",
+      "role": "lane",
+      "tags": [
+        "metal",
+        "start",
+        "northeast"
+      ],
+      "bounds": {
+        "xMin": 0.6562,
+        "xMax": 1.0,
+        "zMin": 0.0,
+        "zMax": 0.4062
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.8177,
+        "z": 0.2135
+      },
+      "evidence": {
+        "cellCount": 812.0,
+        "presenceShare": 0.0357,
+        "presenceDensity": 0.4049,
+        "structureDensity": 0.3016,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.4821,
+        "transitDensity": 1.5981,
+        "hazard": 0.0,
+        "defence": 0.2052,
+        "contest": 0.002,
+        "water": 0.1426,
+        "buildable": 0.5809,
+        "slope": 0.0849,
+        "metal": 0.6962,
+        "relativeHeight": 0.4752,
+        "choke": 0.3333,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.145,
+        "metalSpots": 10,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "TRJ_SW_LANE",
+      "mapId": "the_rock_jungle",
+      "mapName": "The Rock Jungle 2.1.1",
+      "label": "Southwest Lane",
+      "role": "lane",
+      "tags": [
+        "metal",
+        "start",
+        "southwest"
+      ],
+      "bounds": {
+        "xMin": 0.0,
+        "xMax": 0.3438,
+        "zMin": 0.5938,
+        "zMax": 1.0
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.1927,
+        "z": 0.776
+      },
+      "evidence": {
+        "cellCount": 812.0,
+        "presenceShare": 0.0357,
+        "presenceDensity": 0.4049,
+        "structureDensity": 0.3016,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.4821,
+        "transitDensity": 1.5981,
+        "hazard": 0.0,
+        "defence": 0.2052,
+        "contest": 0.0092,
+        "water": 0.1259,
+        "buildable": 0.604,
+        "slope": 0.0809,
+        "metal": 0.6291,
+        "relativeHeight": 0.4718,
+        "choke": 0.1667,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.131,
+        "metalSpots": 10,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "TRJ_NW_OUTER_MUSTER",
+      "mapId": "the_rock_jungle",
+      "mapName": "The Rock Jungle 2.1.1",
+      "label": "Northwest Outer Muster",
+      "role": "start",
+      "tags": [
+        "high",
+        "metal",
+        "choke",
+        "start",
+        "northwest"
+      ],
+      "bounds": {
+        "xMin": 0.0,
+        "xMax": 0.1354,
+        "zMin": 0.0,
+        "zMax": 0.1979
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.0677,
+        "z": 0.0885
+      },
+      "evidence": {
+        "cellCount": 217.0,
+        "presenceShare": 0.025,
+        "presenceDensity": 1.0607,
+        "structureDensity": 1.0859,
+        "fightDensity": 0.0,
+        "trafficDensity": 1.1625,
+        "transitDensity": 1.0705,
+        "hazard": 0.0,
+        "defence": 0.3555,
+        "contest": 0.1979,
+        "water": 0.0,
+        "buildable": 0.8261,
+        "slope": 0.0362,
+        "metal": 0.8831,
+        "relativeHeight": 0.733,
+        "choke": 1.0,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 3,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "TRJ_SE_OUTER_MUSTER",
+      "mapId": "the_rock_jungle",
+      "mapName": "The Rock Jungle 2.1.1",
+      "label": "Southeast Outer Muster",
+      "role": "start",
+      "tags": [
+        "high",
+        "metal",
+        "start",
+        "southeast"
+      ],
+      "bounds": {
+        "xMin": 0.8646,
+        "xMax": 1.0,
+        "zMin": 0.8021,
+        "zMax": 1.0
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.9323,
+        "z": 0.9115
+      },
+      "evidence": {
+        "cellCount": 217.0,
+        "presenceShare": 0.025,
+        "presenceDensity": 1.0607,
+        "structureDensity": 1.0859,
+        "fightDensity": 0.0,
+        "trafficDensity": 1.1625,
+        "transitDensity": 1.0705,
+        "hazard": 0.0,
+        "defence": 0.3555,
+        "contest": 0.0352,
+        "water": 0.0,
+        "buildable": 0.8282,
+        "slope": 0.0333,
+        "metal": 0.7147,
+        "relativeHeight": 0.731,
+        "choke": 0.5,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 3,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "TRJ_NE_RIM",
+      "mapId": "the_rock_jungle",
+      "mapName": "The Rock Jungle 2.1.1",
+      "label": "Northeast Rim",
+      "role": "rim_control",
+      "tags": [
+        "metal",
+        "start",
+        "northeast"
+      ],
+      "bounds": {
+        "xMin": 0.8438,
+        "xMax": 1.0,
+        "zMin": 0.1354,
+        "zMax": 0.4688
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.9427,
+        "z": 0.276
+      },
+      "evidence": {
+        "cellCount": 278.0,
+        "presenceShare": 0.0224,
+        "presenceDensity": 0.744,
+        "structureDensity": 0.7893,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.8539,
+        "transitDensity": 1.0818,
+        "hazard": 0.0,
+        "defence": 0.32,
+        "contest": 0.0021,
+        "water": 0.0911,
+        "buildable": 0.7784,
+        "slope": 0.0136,
+        "metal": 0.5254,
+        "relativeHeight": 0.4575,
+        "choke": 0.3333,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.09,
+        "metalSpots": 3,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "TRJ_SW_RIM",
+      "mapId": "the_rock_jungle",
+      "mapName": "The Rock Jungle 2.1.1",
+      "label": "Southwest Rim",
+      "role": "rim_control",
+      "tags": [
+        "metal",
+        "start",
+        "southwest"
+      ],
+      "bounds": {
+        "xMin": 0.0,
+        "xMax": 0.1562,
+        "zMin": 0.5312,
+        "zMax": 0.8646
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.0573,
+        "z": 0.724
+      },
+      "evidence": {
+        "cellCount": 278.0,
+        "presenceShare": 0.0224,
+        "presenceDensity": 0.744,
+        "structureDensity": 0.7893,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.8539,
+        "transitDensity": 1.0818,
+        "hazard": 0.0,
+        "defence": 0.32,
+        "contest": 0.0113,
+        "water": 0.0887,
+        "buildable": 0.7549,
+        "slope": 0.0163,
+        "metal": 0.5898,
+        "relativeHeight": 0.4426,
+        "choke": 0.1667,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.086,
+        "metalSpots": 3,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "TRJ_W_MUSTER",
+      "mapId": "the_rock_jungle",
+      "mapName": "The Rock Jungle 2.1.1",
+      "label": "West Muster",
+      "role": "start",
+      "tags": [
+        "metal",
+        "choke",
+        "start",
+        "west"
+      ],
+      "bounds": {
+        "xMin": 0.0,
+        "xMax": 1.0,
+        "zMin": 0.2812,
+        "zMax": 0.5
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.0781,
+        "z": 0.3802
+      },
+      "evidence": {
+        "cellCount": 162.0,
+        "presenceShare": 0.0154,
+        "presenceDensity": 0.8747,
+        "structureDensity": 1.2827,
+        "fightDensity": 0.0,
+        "trafficDensity": 1.0169,
+        "transitDensity": 0.7928,
+        "hazard": 0.0,
+        "defence": 0.4426,
+        "contest": 0.011,
+        "water": 0.1324,
+        "buildable": 0.6944,
+        "slope": 0.0828,
+        "metal": 1.0139,
+        "relativeHeight": 0.3756,
+        "choke": 0.8333,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.136,
+        "metalSpots": 3,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "TRJ_E_MUSTER",
+      "mapId": "the_rock_jungle",
+      "mapName": "The Rock Jungle 2.1.1",
+      "label": "East Muster",
+      "role": "start",
+      "tags": [
+        "metal",
+        "start",
+        "east"
+      ],
+      "bounds": {
+        "xMin": 0.0,
+        "xMax": 1.0,
+        "zMin": 0.5,
+        "zMax": 0.7188
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.9219,
+        "z": 0.6198
+      },
+      "evidence": {
+        "cellCount": 162.0,
+        "presenceShare": 0.0154,
+        "presenceDensity": 0.8747,
+        "structureDensity": 1.2827,
+        "fightDensity": 0.0,
+        "trafficDensity": 1.0169,
+        "transitDensity": 0.7928,
+        "hazard": 0.0,
+        "defence": 0.4426,
+        "contest": 0.0062,
+        "water": 0.131,
+        "buildable": 0.6766,
+        "slope": 0.0886,
+        "metal": 1.0139,
+        "relativeHeight": 0.3768,
+        "choke": 0.5,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.136,
+        "metalSpots": 3,
+        "drownedMetal": 0.0
+      }
+    }
+  ],
+  "edges": [
+    {
+      "from": "ATS_C_BASTION",
+      "to": "ATS_C_INNER_BASTION",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "all_that_simmers"
+    },
+    {
+      "from": "ATS_C_BASTION",
+      "to": "ATS_NE_GATE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "all_that_simmers"
+    },
+    {
+      "from": "ATS_C_BASTION",
+      "to": "ATS_NW_SPILLWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "all_that_simmers"
+    },
+    {
+      "from": "ATS_C_BASTION",
+      "to": "ATS_N_SHORE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "all_that_simmers"
+    },
+    {
+      "from": "ATS_C_INNER_BASTION",
+      "to": "ATS_SE_SPILLWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "all_that_simmers"
+    },
+    {
+      "from": "ATS_C_INNER_BASTION",
+      "to": "ATS_SW_GATE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "all_that_simmers"
+    },
+    {
+      "from": "ATS_C_INNER_BASTION",
+      "to": "ATS_S_SHORE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "all_that_simmers"
+    },
+    {
+      "from": "ATS_NW_SPILLWAY",
+      "to": "ATS_NE_GATE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "all_that_simmers"
+    },
+    {
+      "from": "ATS_NW_SPILLWAY",
+      "to": "ATS_NW_SHORE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "all_that_simmers"
+    },
+    {
+      "from": "ATS_NW_SPILLWAY",
+      "to": "ATS_N_SHORE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "all_that_simmers"
+    },
+    {
+      "from": "ATS_NW_SPILLWAY",
+      "to": "ATS_SE_SPILLWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "all_that_simmers"
+    },
+    {
+      "from": "ATS_SE_SPILLWAY",
+      "to": "ATS_SE_SHORE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "all_that_simmers"
+    },
+    {
+      "from": "ATS_SE_SPILLWAY",
+      "to": "ATS_SW_GATE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "all_that_simmers"
+    },
+    {
+      "from": "ATS_SE_SPILLWAY",
+      "to": "ATS_S_SHORE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "all_that_simmers"
+    },
+    {
+      "from": "ATS_NE_GATE",
+      "to": "ATS_NE_OUTER_PLATEAU",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "all_that_simmers"
+    },
+    {
+      "from": "ATS_NE_GATE",
+      "to": "ATS_NE_PLATEAU",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "all_that_simmers"
+    },
+    {
+      "from": "ATS_NE_GATE",
+      "to": "ATS_N_SHORE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "all_that_simmers"
+    },
+    {
+      "from": "ATS_SW_GATE",
+      "to": "ATS_SW_OUTER_PLATEAU",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "all_that_simmers"
+    },
+    {
+      "from": "ATS_SW_GATE",
+      "to": "ATS_SW_PLATEAU",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "all_that_simmers"
+    },
+    {
+      "from": "ATS_SW_GATE",
+      "to": "ATS_S_SHORE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "all_that_simmers"
+    },
+    {
+      "from": "ATS_NE_PLATEAU",
+      "to": "ATS_NE_MUSTER",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "all_that_simmers"
+    },
+    {
+      "from": "ATS_NE_PLATEAU",
+      "to": "ATS_NE_OUTER_PLATEAU",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "all_that_simmers"
+    },
+    {
+      "from": "ATS_SW_PLATEAU",
+      "to": "ATS_SW_MUSTER",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "all_that_simmers"
+    },
+    {
+      "from": "ATS_SW_PLATEAU",
+      "to": "ATS_SW_OUTER_PLATEAU",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "all_that_simmers"
+    },
+    {
+      "from": "ATS_N_SHORE",
+      "to": "ATS_NE_OUTER_PLATEAU",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "all_that_simmers"
+    },
+    {
+      "from": "ATS_N_SHORE",
+      "to": "ATS_NW_SHORE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "all_that_simmers"
+    },
+    {
+      "from": "ATS_S_SHORE",
+      "to": "ATS_SE_SHORE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "all_that_simmers"
+    },
+    {
+      "from": "ATS_S_SHORE",
+      "to": "ATS_SW_OUTER_PLATEAU",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "all_that_simmers"
+    },
+    {
+      "from": "AB_NW_LANE",
+      "to": "AB_NE_CITADEL",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "ancient_bastion"
+    },
+    {
+      "from": "AB_NW_LANE",
+      "to": "AB_NE_RESERVE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "ancient_bastion"
+    },
+    {
+      "from": "AB_NW_LANE",
+      "to": "AB_NW_BASTION",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "ancient_bastion"
+    },
+    {
+      "from": "AB_NW_LANE",
+      "to": "AB_NW_CITADEL",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "ancient_bastion"
+    },
+    {
+      "from": "AB_NW_LANE",
+      "to": "AB_SW_LANE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "ancient_bastion"
+    },
+    {
+      "from": "AB_NW_LANE",
+      "to": "AB_W_LANE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "ancient_bastion"
+    },
+    {
+      "from": "AB_SW_LANE",
+      "to": "AB_SE_CITADEL",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "ancient_bastion"
+    },
+    {
+      "from": "AB_SW_LANE",
+      "to": "AB_SE_RESERVE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "ancient_bastion"
+    },
+    {
+      "from": "AB_SW_LANE",
+      "to": "AB_SW_BASTION",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "ancient_bastion"
+    },
+    {
+      "from": "AB_SW_LANE",
+      "to": "AB_SW_CITADEL",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "ancient_bastion"
+    },
+    {
+      "from": "AB_SW_LANE",
+      "to": "AB_W_INNER_LANE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "ancient_bastion"
+    },
+    {
+      "from": "AB_NE_RESERVE",
+      "to": "AB_E_BASTION",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "ancient_bastion"
+    },
+    {
+      "from": "AB_NE_RESERVE",
+      "to": "AB_NE_CITADEL",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "ancient_bastion"
+    },
+    {
+      "from": "AB_SE_RESERVE",
+      "to": "AB_E_OUTER_BASTION",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "ancient_bastion"
+    },
+    {
+      "from": "AB_SE_RESERVE",
+      "to": "AB_SE_CITADEL",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "ancient_bastion"
+    },
+    {
+      "from": "AB_NW_BASTION",
+      "to": "AB_NW_CITADEL",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "ancient_bastion"
+    },
+    {
+      "from": "AB_SW_BASTION",
+      "to": "AB_SW_CITADEL",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "ancient_bastion"
+    },
+    {
+      "from": "AB_W_LANE",
+      "to": "AB_W_INNER_LANE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "ancient_bastion"
+    },
+    {
+      "from": "AB_E_BASTION",
+      "to": "AB_E_OUTER_BASTION",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "ancient_bastion"
+    },
+    {
+      "from": "AB_E_BASTION",
+      "to": "AB_NE_CITADEL",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "ancient_bastion"
+    },
+    {
+      "from": "AB_E_OUTER_BASTION",
+      "to": "AB_SE_CITADEL",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "ancient_bastion"
+    },
+    {
+      "from": "AB_NE_CITADEL",
+      "to": "AB_SE_CITADEL",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "ancient_bastion"
+    },
+    {
+      "from": "EOH_NW_BASTION",
+      "to": "EOH_C_GATE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "eye_of_horus"
+    },
+    {
+      "from": "EOH_NW_BASTION",
+      "to": "EOH_NE_CAUSEWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "eye_of_horus"
+    },
+    {
+      "from": "EOH_NW_BASTION",
+      "to": "EOH_NW_MUSTER",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "eye_of_horus"
+    },
+    {
+      "from": "EOH_NW_BASTION",
+      "to": "EOH_W_LANE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "eye_of_horus"
+    },
+    {
+      "from": "EOH_SE_BASTION",
+      "to": "EOH_C_INNER_GATE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "eye_of_horus"
+    },
+    {
+      "from": "EOH_SE_BASTION",
+      "to": "EOH_E_LANE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "eye_of_horus"
+    },
+    {
+      "from": "EOH_SE_BASTION",
+      "to": "EOH_SE_MUSTER",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "eye_of_horus"
+    },
+    {
+      "from": "EOH_SE_BASTION",
+      "to": "EOH_SW_CAUSEWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "eye_of_horus"
+    },
+    {
+      "from": "EOH_C_GATE",
+      "to": "EOH_C_INNER_GATE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "eye_of_horus"
+    },
+    {
+      "from": "EOH_C_GATE",
+      "to": "EOH_C_LANE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "eye_of_horus"
+    },
+    {
+      "from": "EOH_C_GATE",
+      "to": "EOH_NE_CAUSEWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "eye_of_horus"
+    },
+    {
+      "from": "EOH_C_INNER_GATE",
+      "to": "EOH_C_INNER_LANE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "eye_of_horus"
+    },
+    {
+      "from": "EOH_C_INNER_GATE",
+      "to": "EOH_SW_CAUSEWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "eye_of_horus"
+    },
+    {
+      "from": "EOH_NE_CAUSEWAY",
+      "to": "EOH_C_LANE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "eye_of_horus"
+    },
+    {
+      "from": "EOH_NE_CAUSEWAY",
+      "to": "EOH_E_LANE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "eye_of_horus"
+    },
+    {
+      "from": "EOH_NE_CAUSEWAY",
+      "to": "EOH_SW_CAUSEWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "eye_of_horus"
+    },
+    {
+      "from": "EOH_NE_CAUSEWAY",
+      "to": "EOH_W_LANE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "eye_of_horus"
+    },
+    {
+      "from": "EOH_SW_CAUSEWAY",
+      "to": "EOH_C_INNER_LANE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "eye_of_horus"
+    },
+    {
+      "from": "EOH_SW_CAUSEWAY",
+      "to": "EOH_E_LANE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "eye_of_horus"
+    },
+    {
+      "from": "EOH_SW_CAUSEWAY",
+      "to": "EOH_W_LANE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "eye_of_horus"
+    },
+    {
+      "from": "EOH_C_LANE",
+      "to": "EOH_C_INNER_LANE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "eye_of_horus"
+    },
+    {
+      "from": "GF_NW_BASTION",
+      "to": "GF_NW_CITADEL",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "greenest_fields"
+    },
+    {
+      "from": "GF_NW_BASTION",
+      "to": "GF_NW_MUSTER",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "greenest_fields"
+    },
+    {
+      "from": "GF_NW_BASTION",
+      "to": "GF_SW_BASTION",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "greenest_fields"
+    },
+    {
+      "from": "GF_SW_BASTION",
+      "to": "GF_SW_CITADEL",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "greenest_fields"
+    },
+    {
+      "from": "GF_SW_BASTION",
+      "to": "GF_SW_MUSTER",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "greenest_fields"
+    },
+    {
+      "from": "GF_NW_MUSTER",
+      "to": "GF_NW_CITADEL",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "greenest_fields"
+    },
+    {
+      "from": "GF_SW_MUSTER",
+      "to": "GF_SW_CITADEL",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "greenest_fields"
+    },
+    {
+      "from": "GF_NW_CITADEL",
+      "to": "GF_C_GATE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "greenest_fields"
+    },
+    {
+      "from": "GF_NW_CITADEL",
+      "to": "GF_NE_PLATEAU",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "greenest_fields"
+    },
+    {
+      "from": "GF_NW_CITADEL",
+      "to": "GF_N_PLATEAU",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "greenest_fields"
+    },
+    {
+      "from": "GF_NW_CITADEL",
+      "to": "GF_SW_CITADEL",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "greenest_fields"
+    },
+    {
+      "from": "GF_SW_CITADEL",
+      "to": "GF_C_INNER_GATE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "greenest_fields"
+    },
+    {
+      "from": "GF_SW_CITADEL",
+      "to": "GF_SE_PLATEAU",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "greenest_fields"
+    },
+    {
+      "from": "GF_SW_CITADEL",
+      "to": "GF_S_PLATEAU",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "greenest_fields"
+    },
+    {
+      "from": "GF_N_PLATEAU",
+      "to": "GF_C_GATE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "greenest_fields"
+    },
+    {
+      "from": "GF_N_PLATEAU",
+      "to": "GF_NE_PLATEAU",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "greenest_fields"
+    },
+    {
+      "from": "GF_S_PLATEAU",
+      "to": "GF_C_INNER_GATE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "greenest_fields"
+    },
+    {
+      "from": "GF_S_PLATEAU",
+      "to": "GF_SE_PLATEAU",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "greenest_fields"
+    },
+    {
+      "from": "GF_C_GATE",
+      "to": "GF_C_INNER_GATE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "greenest_fields"
+    },
+    {
+      "from": "GF_C_GATE",
+      "to": "GF_NE_PLATEAU",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "greenest_fields"
+    },
+    {
+      "from": "GF_C_INNER_GATE",
+      "to": "GF_SE_PLATEAU",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "greenest_fields"
+    },
+    {
+      "from": "GF_NE_PLATEAU",
+      "to": "GF_SE_PLATEAU",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "greenest_fields"
+    },
+    {
+      "from": "KV_NW_MUSTER",
+      "to": "KV_NW_SPILLWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "koom_valley"
+    },
+    {
+      "from": "KV_NW_MUSTER",
+      "to": "KV_W_LANE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "koom_valley"
+    },
+    {
+      "from": "KV_NE_MUSTER",
+      "to": "KV_E_LANE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "koom_valley"
+    },
+    {
+      "from": "KV_NE_MUSTER",
+      "to": "KV_NE_SPILLWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "koom_valley"
+    },
+    {
+      "from": "KV_SE_MUSTER",
+      "to": "KV_E_LOWER_LANE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "koom_valley"
+    },
+    {
+      "from": "KV_SE_MUSTER",
+      "to": "KV_E_OUTER_LANE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "koom_valley"
+    },
+    {
+      "from": "KV_SE_MUSTER",
+      "to": "KV_SE_SPILLWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "koom_valley"
+    },
+    {
+      "from": "KV_SW_MUSTER",
+      "to": "KV_SW_SPILLWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "koom_valley"
+    },
+    {
+      "from": "KV_SW_MUSTER",
+      "to": "KV_W_LOWER_LANE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "koom_valley"
+    },
+    {
+      "from": "KV_SW_MUSTER",
+      "to": "KV_W_OUTER_LANE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "koom_valley"
+    },
+    {
+      "from": "KV_NW_SPILLWAY",
+      "to": "KV_NE_SPILLWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "koom_valley"
+    },
+    {
+      "from": "KV_NW_SPILLWAY",
+      "to": "KV_SW_SPILLWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "koom_valley"
+    },
+    {
+      "from": "KV_NE_SPILLWAY",
+      "to": "KV_SE_SPILLWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "koom_valley"
+    },
+    {
+      "from": "KV_SE_SPILLWAY",
+      "to": "KV_SW_SPILLWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "koom_valley"
+    },
+    {
+      "from": "KV_W_LANE",
+      "to": "KV_W_UPPER_LANE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "koom_valley"
+    },
+    {
+      "from": "KV_E_LANE",
+      "to": "KV_E_UPPER_LANE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "koom_valley"
+    },
+    {
+      "from": "KV_E_OUTER_LANE",
+      "to": "KV_E_LOWER_LANE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "koom_valley"
+    },
+    {
+      "from": "KV_W_OUTER_LANE",
+      "to": "KV_W_LOWER_LANE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "koom_valley"
+    },
+    {
+      "from": "KV_W_UPPER_LANE",
+      "to": "KV_W_LOWER_LANE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "koom_valley"
+    },
+    {
+      "from": "KV_E_UPPER_LANE",
+      "to": "KV_E_LOWER_LANE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "koom_valley"
+    },
+    {
+      "from": "T_C_SPILLWAY",
+      "to": "T_C_INNER_SPILLWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "tabula"
+    },
+    {
+      "from": "T_C_SPILLWAY",
+      "to": "T_E_CAUSEWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "tabula"
+    },
+    {
+      "from": "T_C_SPILLWAY",
+      "to": "T_NE_CAUSEWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "tabula"
+    },
+    {
+      "from": "T_C_SPILLWAY",
+      "to": "T_NW_CAUSEWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "tabula"
+    },
+    {
+      "from": "T_C_SPILLWAY",
+      "to": "T_NW_LANE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "tabula"
+    },
+    {
+      "from": "T_C_SPILLWAY",
+      "to": "T_NW_OUTER_RESERVE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "tabula"
+    },
+    {
+      "from": "T_C_SPILLWAY",
+      "to": "T_NW_RESERVE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "tabula"
+    },
+    {
+      "from": "T_C_INNER_SPILLWAY",
+      "to": "T_SE_CAUSEWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "tabula"
+    },
+    {
+      "from": "T_C_INNER_SPILLWAY",
+      "to": "T_SE_LANE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "tabula"
+    },
+    {
+      "from": "T_C_INNER_SPILLWAY",
+      "to": "T_SE_OUTER_RESERVE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "tabula"
+    },
+    {
+      "from": "T_C_INNER_SPILLWAY",
+      "to": "T_SE_RESERVE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "tabula"
+    },
+    {
+      "from": "T_C_INNER_SPILLWAY",
+      "to": "T_SW_CAUSEWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "tabula"
+    },
+    {
+      "from": "T_C_INNER_SPILLWAY",
+      "to": "T_W_CAUSEWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "tabula"
+    },
+    {
+      "from": "T_NW_RESERVE",
+      "to": "T_NE_CAUSEWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "tabula"
+    },
+    {
+      "from": "T_NW_RESERVE",
+      "to": "T_NW_LANE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "tabula"
+    },
+    {
+      "from": "T_NW_RESERVE",
+      "to": "T_NW_MUSTER",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "tabula"
+    },
+    {
+      "from": "T_NW_RESERVE",
+      "to": "T_NW_OUTER_RESERVE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "tabula"
+    },
+    {
+      "from": "T_SE_RESERVE",
+      "to": "T_SE_LANE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "tabula"
+    },
+    {
+      "from": "T_SE_RESERVE",
+      "to": "T_SE_MUSTER",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "tabula"
+    },
+    {
+      "from": "T_SE_RESERVE",
+      "to": "T_SE_OUTER_RESERVE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "tabula"
+    },
+    {
+      "from": "T_SE_RESERVE",
+      "to": "T_SW_CAUSEWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "tabula"
+    },
+    {
+      "from": "T_NW_MUSTER",
+      "to": "T_NW_CAUSEWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "tabula"
+    },
+    {
+      "from": "T_NW_MUSTER",
+      "to": "T_NW_OUTER_RESERVE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "tabula"
+    },
+    {
+      "from": "T_SE_MUSTER",
+      "to": "T_SE_CAUSEWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "tabula"
+    },
+    {
+      "from": "T_SE_MUSTER",
+      "to": "T_SE_OUTER_RESERVE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "tabula"
+    },
+    {
+      "from": "T_NW_OUTER_RESERVE",
+      "to": "T_NW_CAUSEWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "tabula"
+    },
+    {
+      "from": "T_NW_OUTER_RESERVE",
+      "to": "T_NW_LANE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "tabula"
+    },
+    {
+      "from": "T_SE_OUTER_RESERVE",
+      "to": "T_SE_CAUSEWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "tabula"
+    },
+    {
+      "from": "T_SE_OUTER_RESERVE",
+      "to": "T_SE_LANE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "tabula"
+    },
+    {
+      "from": "T_NE_CAUSEWAY",
+      "to": "T_E_CAUSEWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "tabula"
+    },
+    {
+      "from": "T_SW_CAUSEWAY",
+      "to": "T_W_CAUSEWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "tabula"
+    },
+    {
+      "from": "T_NW_CAUSEWAY",
+      "to": "T_E_CAUSEWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "tabula"
+    },
+    {
+      "from": "T_SE_CAUSEWAY",
+      "to": "T_W_CAUSEWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "tabula"
+    },
+    {
+      "from": "T_E_CAUSEWAY",
+      "to": "T_W_CAUSEWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "tabula"
+    },
+    {
+      "from": "TRJ_NW_MUSTER",
+      "to": "TRJ_C_SPILLWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "the_rock_jungle"
+    },
+    {
+      "from": "TRJ_NW_MUSTER",
+      "to": "TRJ_NE_LANE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "the_rock_jungle"
+    },
+    {
+      "from": "TRJ_NW_MUSTER",
+      "to": "TRJ_NE_SHALLOWS",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "the_rock_jungle"
+    },
+    {
+      "from": "TRJ_NW_MUSTER",
+      "to": "TRJ_NW_GATE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "the_rock_jungle"
+    },
+    {
+      "from": "TRJ_NW_MUSTER",
+      "to": "TRJ_NW_OUTER_MUSTER",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "the_rock_jungle"
+    },
+    {
+      "from": "TRJ_SE_MUSTER",
+      "to": "TRJ_C_INNER_SPILLWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "the_rock_jungle"
+    },
+    {
+      "from": "TRJ_SE_MUSTER",
+      "to": "TRJ_SE_GATE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "the_rock_jungle"
+    },
+    {
+      "from": "TRJ_SE_MUSTER",
+      "to": "TRJ_SE_OUTER_MUSTER",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "the_rock_jungle"
+    },
+    {
+      "from": "TRJ_SE_MUSTER",
+      "to": "TRJ_SW_LANE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "the_rock_jungle"
+    },
+    {
+      "from": "TRJ_SE_MUSTER",
+      "to": "TRJ_SW_SHALLOWS",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "the_rock_jungle"
+    },
+    {
+      "from": "TRJ_NE_SHALLOWS",
+      "to": "TRJ_C_INNER_SPILLWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "the_rock_jungle"
+    },
+    {
+      "from": "TRJ_NE_SHALLOWS",
+      "to": "TRJ_C_SPILLWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "the_rock_jungle"
+    },
+    {
+      "from": "TRJ_NE_SHALLOWS",
+      "to": "TRJ_NE_LANE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "the_rock_jungle"
+    },
+    {
+      "from": "TRJ_NE_SHALLOWS",
+      "to": "TRJ_NE_RIM",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "the_rock_jungle"
+    },
+    {
+      "from": "TRJ_NE_SHALLOWS",
+      "to": "TRJ_NW_GATE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "the_rock_jungle"
+    },
+    {
+      "from": "TRJ_NE_SHALLOWS",
+      "to": "TRJ_SW_SHALLOWS",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "the_rock_jungle"
+    },
+    {
+      "from": "TRJ_SW_SHALLOWS",
+      "to": "TRJ_C_INNER_SPILLWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "the_rock_jungle"
+    },
+    {
+      "from": "TRJ_SW_SHALLOWS",
+      "to": "TRJ_C_SPILLWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "the_rock_jungle"
+    },
+    {
+      "from": "TRJ_SW_SHALLOWS",
+      "to": "TRJ_SE_GATE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "the_rock_jungle"
+    },
+    {
+      "from": "TRJ_SW_SHALLOWS",
+      "to": "TRJ_SW_LANE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "the_rock_jungle"
+    },
+    {
+      "from": "TRJ_SW_SHALLOWS",
+      "to": "TRJ_SW_RIM",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "the_rock_jungle"
+    },
+    {
+      "from": "TRJ_NW_GATE",
+      "to": "TRJ_C_SPILLWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "the_rock_jungle"
+    },
+    {
+      "from": "TRJ_NW_GATE",
+      "to": "TRJ_NE_RIM",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "the_rock_jungle"
+    },
+    {
+      "from": "TRJ_NW_GATE",
+      "to": "TRJ_NW_OUTER_MUSTER",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "the_rock_jungle"
+    },
+    {
+      "from": "TRJ_NW_GATE",
+      "to": "TRJ_SE_GATE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "the_rock_jungle"
+    },
+    {
+      "from": "TRJ_NW_GATE",
+      "to": "TRJ_W_MUSTER",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "the_rock_jungle"
+    },
+    {
+      "from": "TRJ_SE_GATE",
+      "to": "TRJ_C_INNER_SPILLWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "the_rock_jungle"
+    },
+    {
+      "from": "TRJ_SE_GATE",
+      "to": "TRJ_E_MUSTER",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "the_rock_jungle"
+    },
+    {
+      "from": "TRJ_SE_GATE",
+      "to": "TRJ_SE_OUTER_MUSTER",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "the_rock_jungle"
+    },
+    {
+      "from": "TRJ_SE_GATE",
+      "to": "TRJ_SW_RIM",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "the_rock_jungle"
+    },
+    {
+      "from": "TRJ_C_SPILLWAY",
+      "to": "TRJ_C_INNER_SPILLWAY",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "the_rock_jungle"
+    },
+    {
+      "from": "TRJ_NE_LANE",
+      "to": "TRJ_NE_RIM",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "the_rock_jungle"
+    },
+    {
+      "from": "TRJ_SW_LANE",
+      "to": "TRJ_SW_RIM",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "the_rock_jungle"
+    },
+    {
+      "from": "TRJ_NE_RIM",
+      "to": "TRJ_W_MUSTER",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "the_rock_jungle"
+    },
+    {
+      "from": "TRJ_SW_RIM",
+      "to": "TRJ_E_MUSTER",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "the_rock_jungle"
+    },
+    {
+      "from": "TRJ_W_MUSTER",
+      "to": "TRJ_E_MUSTER",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "the_rock_jungle"
+    },
+    {
+      "from": "GF_C_INNER_GATE",
+      "to": "EOH_NW_BASTION",
+      "kind": "strategic_link",
+      "cost": 2,
+      "notes": "Greenest -> Eye corridor"
+    },
+    {
+      "from": "EOH_SE_BASTION",
+      "to": "KV_NW_MUSTER",
+      "kind": "strategic_link",
+      "cost": 2,
+      "notes": "Eye -> Koom approach"
+    },
+    {
+      "from": "KV_SE_MUSTER",
+      "to": "T_NW_RESERVE",
+      "kind": "strategic_link",
+      "cost": 2,
+      "notes": "Koom south -> Tabula north"
+    },
+    {
+      "from": "T_SE_RESERVE",
+      "to": "AB_NW_BASTION",
+      "kind": "strategic_link",
+      "cost": 2,
+      "notes": "Tabula -> Bastion"
+    },
+    {
+      "from": "T_C_SPILLWAY",
+      "to": "TRJ_NW_MUSTER",
+      "kind": "strategic_link",
+      "cost": 3,
+      "notes": "Tabula east -> Rock Jungle"
+    },
+    {
+      "from": "AB_SE_RESERVE",
+      "to": "ATS_NW_SPILLWAY",
+      "kind": "strategic_link",
+      "cost": 3,
+      "notes": "Bastion -> All That Simmers"
+    },
+    {
+      "from": "TRJ_SE_MUSTER",
+      "to": "ATS_SW_PLATEAU",
+      "kind": "strategic_link",
+      "cost": 3,
+      "notes": "Jungle south -> Simmers"
+    }
+  ],
+  "notes": "Same-map edges from zone_adjacency.json; strategic_link edges authored for campaign arc."
+}

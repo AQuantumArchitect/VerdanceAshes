@@ -1,0 +1,122 @@
+{
+  "schemaVersion": "verdance-shell-bake-recipe/1.0",
+  "mapId": "koom_valley",
+  "mapName": "Koom Valley 3 3.1",
+  "templateId": "living_placeholder_v1",
+  "character": "Fluid Scar - lane eco + ridge pockets, mobility front",
+  "characterCard": {
+    "descriptor": "The Fluid Scar",
+    "blurb": "Moving front: ferrocrete on fluid scar + ridge pockets. seize_lane stands the scar; eco_raid continue promotes a ridge on the same shell.",
+    "shellAtT0": "Lane + ridge pockets",
+    "growMix": "fortify scar + hold ridges + scrap Null + thin mouth + sprawl shelf",
+    "arcKinds": ["seize_lane", "eco_raid"],
+    "raidHint": "seize_or_raid_lane",
+    "captureLater": "lane node",
+    "wrath": { "packId": "armada_gunslinger_response_v1", "responseSeconds": 120, "holdResponseSeconds": 150 },
+    "source": "placeholder",
+    "realBakeStatus": "pending_cloud_or_iconsatlas"
+  },
+  "arcKinds": ["seize_lane", "eco_raid"],
+  "raidHint": "seize_or_raid_lane",
+  "captureLater": "lane node",
+  "faction": "mixed",
+  "growMinutes": 12,
+  "growFrames": 21600,
+  "peacefulCoGrow": true,
+  "aiShortName": "SimpleAI",
+  "teamCount": 5,
+  "fixedRngSeed": 33,
+  "notes": "Central scar = BARb medium (lane teeth). Ridges/shelves = SimpleAI hold. Null west = scrap. Mouth stays thin. Lane membrane (Koom 3-5) reads shell geometry later. Sims: normal commanders. Occupation: decoy commander swarm nodes after strip. For T2 mid battle farm see bake_recipe_t2_battle_1v1.json.",
+  "occupation": {
+    "decoyCommanders": true,
+    "decoyPerPocket": 1,
+    "notes": "Armada autonomous decoy coms on eco islands — less dangerous, less metal reward."
+  },
+  "playerClear": {
+    "zoneId": "KOOM_NW_GREEN_SHELF",
+    "bounds": { "xMin": 0.0, "xMax": 0.26, "zMin": 0.0, "zMax": 0.28 },
+    "notes": "NW green shelf legion start."
+  },
+  "starts": [
+    {
+      "pocketId": "koom_fluid_scar",
+      "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+      "label": "Central Fluid Scar",
+      "kind": "lane",
+      "faction": "armada",
+      "side": "Armada",
+      "growProfile": "fortify",
+      "x": 0.50,
+      "z": 0.51,
+      "primaryCandidate": true,
+      "densityScale": 1.15
+    },
+    {
+      "pocketId": "koom_east_ridge",
+      "zoneId": "KOOM_EAST_RIDGE_POCKET",
+      "label": "East Ridge Pocket",
+      "kind": "mixed",
+      "faction": "armada",
+      "side": "Armada",
+      "growProfile": "hold",
+      "x": 0.83,
+      "z": 0.50,
+      "densityScale": 0.95
+    },
+    {
+      "pocketId": "koom_west_ridge",
+      "zoneId": "KOOM_WEST_RIDGE_POCKET",
+      "label": "West Ridge Pocket",
+      "kind": "mixed",
+      "faction": "nullmercs",
+      "side": "Legion",
+      "growProfile": "scrap",
+      "x": 0.17,
+      "z": 0.50,
+      "densityScale": 0.65
+    },
+    {
+      "pocketId": "koom_se_shelf",
+      "zoneId": "KOOM_SE_GREEN_SHELF",
+      "label": "Southeast Green Shelf",
+      "kind": "mixed",
+      "faction": "armada",
+      "side": "Armada",
+      "growProfile": "sprawl",
+      "x": 0.86,
+      "z": 0.85,
+      "densityScale": 1.0
+    },
+    {
+      "pocketId": "koom_scar_mouth",
+      "zoneId": "KOOM_NORTH_SCAR_MOUTH",
+      "label": "North Scar Mouth",
+      "kind": "thin",
+      "faction": "armada",
+      "side": "Armada",
+      "growProfile": "thin",
+      "x": 0.47,
+      "z": 0.125,
+      "densityScale": 0.55
+    }
+  ],
+  "placeholderDensity": {
+    "solarPerPocket": 6,
+    "windPerPocket": 6,
+    "converterPerPocket": 2,
+    "advSolarPerPocket": 1,
+    "estorPerPocket": 1,
+    "mexPerPocket": 4,
+    "lltPerPocket": 6,
+    "hltPerPocket": 1,
+    "wallPerPocket": 8,
+    "radarPerPocket": 1,
+    "scatterRadius": 0.05
+  },
+  "wrathDefault": {
+    "packId": "armada_gunslinger_response_v1",
+    "responseSeconds": 120,
+    "holdResponseSeconds": 150,
+    "startOn": "first_contact"
+  }
+}

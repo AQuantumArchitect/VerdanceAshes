@@ -1,0 +1,172 @@
+"""Tests for hub deploy stamp + contract v2 hub field preservation."""
+from __future__ import annotations
+
+import json
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+TOOLS = ROOT / "tools"
+sys.path.insert(0, str(TOOLS))
+
+from contract_v2 import normalize_sortie, sortie_v2_to_v1_order  # noqa: E402
+from stamp_deploy_plan_v1 import normalize_plan, plan_to_sortie, stamp  # noqa: E402
+
+
+def test_normalize_plan_marks():
+    raw = {
+        "mapId": "greenest_fields",
+        "contractKind": "eco_raid",
+        "deployAces": ["vane", "ketha"],
+        "choiceId": "c1",
+        "marks": {
+            "deployZoneId": "GF_SE_STAGING",
+            "extractZoneId": "GF_SE_STAGING",
+            "captureZoneIds": ["GF_SE_ENERGY_WORKS", "GF_NORTH_DESERT_EDGE"],
+        },
+    }
+    p = normalize_plan(raw)
+    assert p["mapId"] == "greenest_fields"
+    assert p["marks"]["captureZoneIds"][0] == "GF_SE_ENERGY_WORKS"
+    assert len(p["marks"]["captureZoneIds"]) == 2
+
+
+def test_plan_to_sortie_secondary():
+    plan = normalize_plan({
+        "mapId": "greenest_fields",
+        "contractKind": "eco_raid",
+        "choiceId": "c_multi",
+        "deployAces": ["vane"],
+        "marks": {
+            "deployZoneId": "D",
+            "extractZoneId": "E",
+            "captureZoneIds": ["A", "B"],
+        },
+    })
+    s = plan_to_sortie(plan, {})
+    assert s["targetZoneId"] == "A"
+    assert s["secondaryCaptureZoneIds"] == ["B"]
+    assert s["deploymentZoneId"] == "D"
+    assert s["extractionZoneId"] == "E"
+    assert s["hubChoiceId"] == "c_multi"
+    assert s["deployAces"] == ["vane"]
+    assert s["valid"] is True
+
+
+def test_contract_v2_preserves_hub_fields():
+    raw = {
+        "mapId": "koom_valley",
+        "targetZoneId": "KOOM_CENTRAL_FLUID_SCAR",
+        "deploymentZoneId": "KOOM_NW_GREEN_SHELF",
+        "extractionZoneId": "KOOM_NW_GREEN_SHELF",
+        "captureZoneIds": ["KOOM_CENTRAL_FLUID_SCAR", "KOOM_EAST_RIDGE_POCKET"],
+        "hubChoiceId": "c_hub",
+        "deployAces": ["vane", "ketha"],
+        "patron": "nullmercs",
+        "against": "armada",
+        "objectiveArchetype": "seize_lane",
+    }
+    v1 = sortie_v2_to_v1_order(normalize_sortie(raw))
+    assert v1["deploymentZoneId"] == "KOOM_NW_GREEN_SHELF"
+    assert v1["extractionZoneId"] == "KOOM_NW_GREEN_SHELF"
+    assert v1["hubChoiceId"] == "c_hub"
+    assert v1["deployAces"] == ["vane", "ketha"]
+    assert v1["secondaryCaptureZoneIds"] == ["KOOM_EAST_RIDGE_POCKET"]
+    assert "KOOM_CENTRAL_FLUID_SCAR" in v1["captureZoneIds"]
+
+
+def test_stamp_writes_outbox(tmp_path: Path | None = None):
+    # Use real workspace outbox (idempotent) if available
+    ws = ROOT
+    if not (ws / "state" / "campaign_state.json").is_file():
+        return
+    plan = {
+        "mapId": "greenest_fields",
+        "contractKind": "eco_raid",
+        "choiceId": "c_test_pytest",
+        "deployAces": ["vane", "ketha"],
+        "sessionMode": "same_map",
+        "marks": {
+            "deployZoneId": "GF_SE_STAGING",
+            "extractZoneId": "GF_SE_STAGING",
+            "captureZoneIds": ["GF_SE_ENERGY_WORKS"],
+        },
+    }
+    report = stamp(plan, ws)
+    assert report["ok"] is True
+    assert report["hubChoiceId"] == "c_test_pytest"
+    order = json.loads((ws / "outbox" / "next_sortie_order.json").read_text(encoding="utf-8-sig"))
+    assert order["hubChoiceId"] == "c_test_pytest"
+    assert order["targetZoneId"] == "GF_SE_ENERGY_WORKS"
+    assert order["source"] == "hub_deploy_plan"
+    assert order["sessionMode"] == "same_map"
+    home = json.loads((ws / "outbox" / "session_home.latest.json").read_text(encoding="utf-8-sig"))
+    assert home["sessionHomeMap"] == "greenest_fields"
+
+
+def test_consume_played_hub_sorties():
+    from verdance_story_engine_v1 import consume_played_hub_sorties, save_json  # noqa: E402
+
+    import tempfile
+    import shutil
+
+    td = Path(tempfile.mkdtemp())
+    try:
+        out = td / "outbox"
+        out.mkdir()
+        hub_order = {
+            "mapId": "greenest_fields",
+            "targetZoneId": "GF_SE_ENERGY_WORKS",
+            "hubChoiceId": "c1",
+            "source": "hub_deploy_plan",
+        }
+        debrief = {
+            "mapId": "greenest_fields",
+            "targetZoneId": "GF_NORTH_DESERT_EDGE",
+            "source": "debrief",
+            "fromDebrief": True,
+        }
+        save_json(out / "next_sortie_order.json", hub_order)
+        save_json(out / "next_sortie_choice.json", debrief)
+        report = consume_played_hub_sorties(
+            td,
+            {"mapId": "greenest_fields", "targetZoneId": "GF_SE_ENERGY_WORKS"},
+            "greenest_fields",
+        )
+        assert "next_sortie_order.json" in report["cleared"]
+        assert not (out / "next_sortie_order.json").is_file()
+        assert (out / "next_sortie_choice.json").is_file()  # debrief kept
+        assert any(k.get("reason") == "debrief_pick" for k in report["kept"])
+    finally:
+        shutil.rmtree(td, ignore_errors=True)
+
+
+def test_campaign_rho_projection():
+    from build_hub_state_v1 import project_campaign_rho  # noqa: E402
+
+    state = {
+        "graph": {
+            "q0_armada_cortex": 0.7,
+            "q2_void_structure": 0.2,
+            "q6_contested": 0.8,
+            "q6_independent": 0.3,
+            "q7_resource_scarcity": 0.9,
+        },
+        "sessionHomeMap": "koom_valley",
+    }
+    rho = project_campaign_rho(state, 3)
+    assert rho["schemaVersion"] == "verdance-campaign-rho/1.0"
+    assert rho["axes"]["arm_cor"] > 0  # Armada lean
+    assert rho["axes"]["phi"] > 0
+    assert len(rho["packedDiag"]) >= 8
+    assert rho["sessionHomeMap"] == "koom_valley"
+
+
+if __name__ == "__main__":
+    test_normalize_plan_marks()
+    test_plan_to_sortie_secondary()
+    test_contract_v2_preserves_hub_fields()
+    test_stamp_writes_outbox()
+    test_consume_played_hub_sorties()
+    test_campaign_rho_projection()
+    print("ok")

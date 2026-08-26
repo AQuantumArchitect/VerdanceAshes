@@ -1,0 +1,95 @@
+{
+  "schemaVersion": "verdance-shell-bake-recipe/1.1",
+  "mapId": "koom_valley",
+  "mapName": "Koom Valley 3 3.1",
+  "templateId": "living_t2_mid_v1",
+  "recipeKind": "battle_farm",
+  "character": "Koom Fluid Scar — 1v1 BARb hard_aggressive war mid; freeze at T2 for a claimable mid-base start",
+  "faction": "mixed",
+  "growMinutes": 22,
+  "growFrames": 39600,
+  "peacefulCoGrow": false,
+  "aiShortName": "BARb",
+  "teamCount": 2,
+  "fixedRngSeed": 77,
+  "notes": "BATTLE FARM (not peaceful co-grow). Two BARb hard_aggressive commanders fight a real 1v1 on Koom Valley until ~T2. Dump → strip factories/mobiles/real coms → keep T2 static eco+teeth + plant decoy nodes on mid. Goal: a denser mid scar than peaceful multi-pocket grow — usable as a T2 starting position (3v3-feel mid without running full 3v3 first). Sims always use NORMAL commanders; occupation uses decoy coms. Optional follow-up: bake_recipe_t2_battle_3v3.json if mid is still too thin.",
+  "occupation": {
+    "decoyCommanders": true,
+    "decoyPerPocket": 1,
+    "notes": "After strip, plant decoy farmers on surviving pockets (including mid claim)."
+  },
+  "playerClear": {
+    "zoneId": "KOOM_NW_GREEN_SHELF",
+    "bounds": { "xMin": 0.0, "xMax": 0.22, "zMin": 0.0, "zMax": 0.22 },
+    "notes": "Reserve NW corner if player later spawns on a shelf; mid claim is the prize."
+  },
+  "claim": {
+    "mode": "mid_base_t2_start",
+    "primaryPocketId": "koom_battle_mid",
+    "useAs": "t2_starting_position",
+    "notes": "Compiler / capture phase: treat mid pocket shell as a T2 launch pad (eco + teeth + decoy node), not a full factory base."
+  },
+  "starts": [
+    {
+      "pocketId": "koom_battle_nw",
+      "zoneId": "KOOM_NW_GREEN_SHELF",
+      "label": "NW Green Shelf (BARb hard_agg Armada)",
+      "kind": "fortress",
+      "faction": "armada",
+      "side": "Armada",
+      "growProfile": "aggressive_core",
+      "aiStart": true,
+      "x": 0.14,
+      "z": 0.14,
+      "densityScale": 1.0
+    },
+    {
+      "pocketId": "koom_battle_se",
+      "zoneId": "KOOM_SE_GREEN_SHELF",
+      "label": "SE Green Shelf (BARb hard_agg Cortex)",
+      "kind": "fortress",
+      "faction": "cortex",
+      "side": "Cortex",
+      "growProfile": "aggressive_core",
+      "aiStart": true,
+      "x": 0.86,
+      "z": 0.86,
+      "densityScale": 1.0
+    },
+    {
+      "pocketId": "koom_battle_mid",
+      "zoneId": "KOOM_CENTRAL_FLUID_SCAR",
+      "label": "Central Fluid Scar (claim / T2 mid)",
+      "kind": "lane",
+      "faction": "armada",
+      "side": "Armada",
+      "growProfile": "fortify",
+      "aiStart": false,
+      "x": 0.50,
+      "z": 0.51,
+      "primaryCandidate": true,
+      "densityScale": 1.2,
+      "notes": "Claim pocket only — not an AI. Strip clustering + decoy plant + T2 start pad."
+    }
+  ],
+  "placeholderDensity": {
+    "solarPerPocket": 8,
+    "windPerPocket": 6,
+    "converterPerPocket": 3,
+    "advSolarPerPocket": 2,
+    "estorPerPocket": 2,
+    "mexPerPocket": 5,
+    "lltPerPocket": 8,
+    "hltPerPocket": 2,
+    "wallPerPocket": 10,
+    "radarPerPocket": 1,
+    "scatterRadius": 0.06,
+    "notes": "Placeholder only if battle bake not yet run. Real density comes from BARb 1v1 dump."
+  },
+  "wrathDefault": {
+    "packId": "armada_gunslinger_response_v1",
+    "responseSeconds": 90,
+    "holdResponseSeconds": 120,
+    "startOn": "first_contact"
+  }
+}

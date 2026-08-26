@@ -20,3 +20,16 @@ try {
 }
 & (Join-Path $ScriptDir "advance_campaign_v1.ps1") -Workspace $Workspace -WriteState:$WriteState
 
+# Explicit hub pull so play_session / operator paths always leave hub_result.latest.json
+# in sync even if advance script hub-refresh is skipped.
+$applyHub = Join-Path $Workspace "tools\apply_result_to_hub_v1.py"
+if ((Test-Path $applyHub) -and $WriteState) {
+  try {
+    . (Join-Path $ScriptDir "_common.ps1")
+    $py = Get-VerdancePython -Workspace $Workspace
+    & $py $applyHub --workspace $Workspace --skip-advance 2>$null | Out-Null
+  } catch {
+    Write-Warning "Hub apply after full cycle skipped: $($_.Exception.Message)"
+  }
+}
+

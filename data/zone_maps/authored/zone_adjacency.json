@@ -1,0 +1,586 @@
+{
+  "all_that_simmers": {
+    "ATS_C_BASTION": [
+      "ATS_C_INNER_BASTION",
+      "ATS_NE_GATE",
+      "ATS_NW_SPILLWAY",
+      "ATS_N_SHORE"
+    ],
+    "ATS_C_INNER_BASTION": [
+      "ATS_C_BASTION",
+      "ATS_SE_SPILLWAY",
+      "ATS_SW_GATE",
+      "ATS_S_SHORE"
+    ],
+    "ATS_NW_SPILLWAY": [
+      "ATS_C_BASTION",
+      "ATS_NE_GATE",
+      "ATS_NW_SHORE",
+      "ATS_N_SHORE",
+      "ATS_SE_SPILLWAY"
+    ],
+    "ATS_SE_SPILLWAY": [
+      "ATS_C_INNER_BASTION",
+      "ATS_NW_SPILLWAY",
+      "ATS_SE_SHORE",
+      "ATS_SW_GATE",
+      "ATS_S_SHORE"
+    ],
+    "ATS_NE_GATE": [
+      "ATS_C_BASTION",
+      "ATS_NE_OUTER_PLATEAU",
+      "ATS_NE_PLATEAU",
+      "ATS_NW_SPILLWAY",
+      "ATS_N_SHORE"
+    ],
+    "ATS_SW_GATE": [
+      "ATS_C_INNER_BASTION",
+      "ATS_SE_SPILLWAY",
+      "ATS_SW_OUTER_PLATEAU",
+      "ATS_SW_PLATEAU",
+      "ATS_S_SHORE"
+    ],
+    "ATS_NE_PLATEAU": [
+      "ATS_NE_GATE",
+      "ATS_NE_MUSTER",
+      "ATS_NE_OUTER_PLATEAU"
+    ],
+    "ATS_SW_PLATEAU": [
+      "ATS_SW_GATE",
+      "ATS_SW_MUSTER",
+      "ATS_SW_OUTER_PLATEAU"
+    ],
+    "ATS_N_SHORE": [
+      "ATS_C_BASTION",
+      "ATS_NE_GATE",
+      "ATS_NE_OUTER_PLATEAU",
+      "ATS_NW_SHORE",
+      "ATS_NW_SPILLWAY"
+    ],
+    "ATS_S_SHORE": [
+      "ATS_C_INNER_BASTION",
+      "ATS_SE_SHORE",
+      "ATS_SE_SPILLWAY",
+      "ATS_SW_GATE",
+      "ATS_SW_OUTER_PLATEAU"
+    ],
+    "ATS_NW_SHORE": [
+      "ATS_NW_SPILLWAY",
+      "ATS_N_SHORE"
+    ],
+    "ATS_SE_SHORE": [
+      "ATS_SE_SPILLWAY",
+      "ATS_S_SHORE"
+    ],
+    "ATS_NE_OUTER_PLATEAU": [
+      "ATS_NE_GATE",
+      "ATS_NE_PLATEAU",
+      "ATS_N_SHORE"
+    ],
+    "ATS_SW_OUTER_PLATEAU": [
+      "ATS_SW_GATE",
+      "ATS_SW_PLATEAU",
+      "ATS_S_SHORE"
+    ],
+    "ATS_NE_MUSTER": [
+      "ATS_NE_PLATEAU"
+    ],
+    "ATS_SW_MUSTER": [
+      "ATS_SW_PLATEAU"
+    ]
+  },
+  "ancient_bastion": {
+    "AB_NW_LANE": [
+      "AB_NE_CITADEL",
+      "AB_NE_RESERVE",
+      "AB_NW_BASTION",
+      "AB_NW_CITADEL",
+      "AB_SW_LANE",
+      "AB_W_LANE"
+    ],
+    "AB_SW_LANE": [
+      "AB_NW_LANE",
+      "AB_SE_CITADEL",
+      "AB_SE_RESERVE",
+      "AB_SW_BASTION",
+      "AB_SW_CITADEL",
+      "AB_W_INNER_LANE"
+    ],
+    "AB_NE_RESERVE": [
+      "AB_E_BASTION",
+      "AB_NE_CITADEL",
+      "AB_NW_LANE"
+    ],
+    "AB_SE_RESERVE": [
+      "AB_E_OUTER_BASTION",
+      "AB_SE_CITADEL",
+      "AB_SW_LANE"
+    ],
+    "AB_NW_BASTION": [
+      "AB_NW_CITADEL",
+      "AB_NW_LANE"
+    ],
+    "AB_SW_BASTION": [
+      "AB_SW_CITADEL",
+      "AB_SW_LANE"
+    ],
+    "AB_NW_CITADEL": [
+      "AB_NW_BASTION",
+      "AB_NW_LANE"
+    ],
+    "AB_SW_CITADEL": [
+      "AB_SW_BASTION",
+      "AB_SW_LANE"
+    ],
+    "AB_W_LANE": [
+      "AB_NW_LANE",
+      "AB_W_INNER_LANE"
+    ],
+    "AB_W_INNER_LANE": [
+      "AB_SW_LANE",
+      "AB_W_LANE"
+    ],
+    "AB_E_BASTION": [
+      "AB_E_OUTER_BASTION",
+      "AB_NE_CITADEL",
+      "AB_NE_RESERVE"
+    ],
+    "AB_E_OUTER_BASTION": [
+      "AB_E_BASTION",
+      "AB_SE_CITADEL",
+      "AB_SE_RESERVE"
+    ],
+    "AB_NE_CITADEL": [
+      "AB_E_BASTION",
+      "AB_NE_RESERVE",
+      "AB_NW_LANE",
+      "AB_SE_CITADEL"
+    ],
+    "AB_SE_CITADEL": [
+      "AB_E_OUTER_BASTION",
+      "AB_NE_CITADEL",
+      "AB_SE_RESERVE",
+      "AB_SW_LANE"
+    ]
+  },
+  "eye_of_horus": {
+    "EOH_NW_BASTION": [
+      "EOH_C_GATE",
+      "EOH_NE_CAUSEWAY",
+      "EOH_NW_MUSTER",
+      "EOH_W_LANE"
+    ],
+    "EOH_SE_BASTION": [
+      "EOH_C_INNER_GATE",
+      "EOH_E_LANE",
+      "EOH_SE_MUSTER",
+      "EOH_SW_CAUSEWAY"
+    ],
+    "EOH_NW_MUSTER": [
+      "EOH_NW_BASTION"
+    ],
+    "EOH_SE_MUSTER": [
+      "EOH_SE_BASTION"
+    ],
+    "EOH_C_GATE": [
+      "EOH_C_INNER_GATE",
+      "EOH_C_LANE",
+      "EOH_NE_CAUSEWAY",
+      "EOH_NW_BASTION"
+    ],
+    "EOH_C_INNER_GATE": [
+      "EOH_C_GATE",
+      "EOH_C_INNER_LANE",
+      "EOH_SE_BASTION",
+      "EOH_SW_CAUSEWAY"
+    ],
+    "EOH_NE_CAUSEWAY": [
+      "EOH_C_GATE",
+      "EOH_C_LANE",
+      "EOH_E_LANE",
+      "EOH_NW_BASTION",
+      "EOH_SW_CAUSEWAY",
+      "EOH_W_LANE"
+    ],
+    "EOH_SW_CAUSEWAY": [
+      "EOH_C_INNER_GATE",
+      "EOH_C_INNER_LANE",
+      "EOH_E_LANE",
+      "EOH_NE_CAUSEWAY",
+      "EOH_SE_BASTION",
+      "EOH_W_LANE"
+    ],
+    "EOH_C_LANE": [
+      "EOH_C_GATE",
+      "EOH_C_INNER_LANE",
+      "EOH_NE_CAUSEWAY"
+    ],
+    "EOH_C_INNER_LANE": [
+      "EOH_C_INNER_GATE",
+      "EOH_C_LANE",
+      "EOH_SW_CAUSEWAY"
+    ],
+    "EOH_W_LANE": [
+      "EOH_NE_CAUSEWAY",
+      "EOH_NW_BASTION",
+      "EOH_SW_CAUSEWAY"
+    ],
+    "EOH_E_LANE": [
+      "EOH_NE_CAUSEWAY",
+      "EOH_SE_BASTION",
+      "EOH_SW_CAUSEWAY"
+    ]
+  },
+  "greenest_fields": {
+    "GF_NW_BASTION": [
+      "GF_NW_CITADEL",
+      "GF_NW_MUSTER",
+      "GF_SW_BASTION"
+    ],
+    "GF_SW_BASTION": [
+      "GF_NW_BASTION",
+      "GF_SW_CITADEL",
+      "GF_SW_MUSTER"
+    ],
+    "GF_NW_MUSTER": [
+      "GF_NW_BASTION",
+      "GF_NW_CITADEL"
+    ],
+    "GF_SW_MUSTER": [
+      "GF_SW_BASTION",
+      "GF_SW_CITADEL"
+    ],
+    "GF_NW_CITADEL": [
+      "GF_C_GATE",
+      "GF_NE_PLATEAU",
+      "GF_NW_BASTION",
+      "GF_NW_MUSTER",
+      "GF_N_PLATEAU",
+      "GF_SW_CITADEL"
+    ],
+    "GF_SW_CITADEL": [
+      "GF_C_INNER_GATE",
+      "GF_NW_CITADEL",
+      "GF_SE_PLATEAU",
+      "GF_SW_BASTION",
+      "GF_SW_MUSTER",
+      "GF_S_PLATEAU"
+    ],
+    "GF_N_PLATEAU": [
+      "GF_C_GATE",
+      "GF_NE_PLATEAU",
+      "GF_NW_CITADEL"
+    ],
+    "GF_S_PLATEAU": [
+      "GF_C_INNER_GATE",
+      "GF_SE_PLATEAU",
+      "GF_SW_CITADEL"
+    ],
+    "GF_C_GATE": [
+      "GF_C_INNER_GATE",
+      "GF_NE_PLATEAU",
+      "GF_NW_CITADEL",
+      "GF_N_PLATEAU"
+    ],
+    "GF_C_INNER_GATE": [
+      "GF_C_GATE",
+      "GF_SE_PLATEAU",
+      "GF_SW_CITADEL",
+      "GF_S_PLATEAU"
+    ],
+    "GF_NE_PLATEAU": [
+      "GF_C_GATE",
+      "GF_NW_CITADEL",
+      "GF_N_PLATEAU",
+      "GF_SE_PLATEAU"
+    ],
+    "GF_SE_PLATEAU": [
+      "GF_C_INNER_GATE",
+      "GF_NE_PLATEAU",
+      "GF_SW_CITADEL",
+      "GF_S_PLATEAU"
+    ]
+  },
+  "koom_valley": {
+    "KV_NW_MUSTER": [
+      "KV_NW_SPILLWAY",
+      "KV_W_LANE"
+    ],
+    "KV_NE_MUSTER": [
+      "KV_E_LANE",
+      "KV_NE_SPILLWAY"
+    ],
+    "KV_SE_MUSTER": [
+      "KV_E_LOWER_LANE",
+      "KV_E_OUTER_LANE",
+      "KV_SE_SPILLWAY"
+    ],
+    "KV_SW_MUSTER": [
+      "KV_SW_SPILLWAY",
+      "KV_W_LOWER_LANE",
+      "KV_W_OUTER_LANE"
+    ],
+    "KV_NW_SPILLWAY": [
+      "KV_NE_SPILLWAY",
+      "KV_NW_MUSTER",
+      "KV_SW_SPILLWAY"
+    ],
+    "KV_NE_SPILLWAY": [
+      "KV_NE_MUSTER",
+      "KV_NW_SPILLWAY",
+      "KV_SE_SPILLWAY"
+    ],
+    "KV_SE_SPILLWAY": [
+      "KV_NE_SPILLWAY",
+      "KV_SE_MUSTER",
+      "KV_SW_SPILLWAY"
+    ],
+    "KV_SW_SPILLWAY": [
+      "KV_NW_SPILLWAY",
+      "KV_SE_SPILLWAY",
+      "KV_SW_MUSTER"
+    ],
+    "KV_W_LANE": [
+      "KV_NW_MUSTER",
+      "KV_W_UPPER_LANE"
+    ],
+    "KV_E_LANE": [
+      "KV_E_UPPER_LANE",
+      "KV_NE_MUSTER"
+    ],
+    "KV_E_OUTER_LANE": [
+      "KV_E_LOWER_LANE",
+      "KV_SE_MUSTER"
+    ],
+    "KV_W_OUTER_LANE": [
+      "KV_SW_MUSTER",
+      "KV_W_LOWER_LANE"
+    ],
+    "KV_W_UPPER_LANE": [
+      "KV_W_LANE",
+      "KV_W_LOWER_LANE"
+    ],
+    "KV_E_UPPER_LANE": [
+      "KV_E_LANE",
+      "KV_E_LOWER_LANE"
+    ],
+    "KV_E_LOWER_LANE": [
+      "KV_E_OUTER_LANE",
+      "KV_E_UPPER_LANE",
+      "KV_SE_MUSTER"
+    ],
+    "KV_W_LOWER_LANE": [
+      "KV_SW_MUSTER",
+      "KV_W_OUTER_LANE",
+      "KV_W_UPPER_LANE"
+    ]
+  },
+  "tabula": {
+    "T_C_SPILLWAY": [
+      "T_C_INNER_SPILLWAY",
+      "T_E_CAUSEWAY",
+      "T_NE_CAUSEWAY",
+      "T_NW_CAUSEWAY",
+      "T_NW_LANE",
+      "T_NW_OUTER_RESERVE",
+      "T_NW_RESERVE"
+    ],
+    "T_C_INNER_SPILLWAY": [
+      "T_C_SPILLWAY",
+      "T_SE_CAUSEWAY",
+      "T_SE_LANE",
+      "T_SE_OUTER_RESERVE",
+      "T_SE_RESERVE",
+      "T_SW_CAUSEWAY",
+      "T_W_CAUSEWAY"
+    ],
+    "T_NW_RESERVE": [
+      "T_C_SPILLWAY",
+      "T_NE_CAUSEWAY",
+      "T_NW_LANE",
+      "T_NW_MUSTER",
+      "T_NW_OUTER_RESERVE"
+    ],
+    "T_SE_RESERVE": [
+      "T_C_INNER_SPILLWAY",
+      "T_SE_LANE",
+      "T_SE_MUSTER",
+      "T_SE_OUTER_RESERVE",
+      "T_SW_CAUSEWAY"
+    ],
+    "T_NW_MUSTER": [
+      "T_NW_CAUSEWAY",
+      "T_NW_OUTER_RESERVE",
+      "T_NW_RESERVE"
+    ],
+    "T_SE_MUSTER": [
+      "T_SE_CAUSEWAY",
+      "T_SE_OUTER_RESERVE",
+      "T_SE_RESERVE"
+    ],
+    "T_NW_OUTER_RESERVE": [
+      "T_C_SPILLWAY",
+      "T_NW_CAUSEWAY",
+      "T_NW_LANE",
+      "T_NW_MUSTER",
+      "T_NW_RESERVE"
+    ],
+    "T_SE_OUTER_RESERVE": [
+      "T_C_INNER_SPILLWAY",
+      "T_SE_CAUSEWAY",
+      "T_SE_LANE",
+      "T_SE_MUSTER",
+      "T_SE_RESERVE"
+    ],
+    "T_NE_CAUSEWAY": [
+      "T_C_SPILLWAY",
+      "T_E_CAUSEWAY",
+      "T_NW_RESERVE"
+    ],
+    "T_SW_CAUSEWAY": [
+      "T_C_INNER_SPILLWAY",
+      "T_SE_RESERVE",
+      "T_W_CAUSEWAY"
+    ],
+    "T_NW_CAUSEWAY": [
+      "T_C_SPILLWAY",
+      "T_E_CAUSEWAY",
+      "T_NW_MUSTER",
+      "T_NW_OUTER_RESERVE"
+    ],
+    "T_SE_CAUSEWAY": [
+      "T_C_INNER_SPILLWAY",
+      "T_SE_MUSTER",
+      "T_SE_OUTER_RESERVE",
+      "T_W_CAUSEWAY"
+    ],
+    "T_NW_LANE": [
+      "T_C_SPILLWAY",
+      "T_NW_OUTER_RESERVE",
+      "T_NW_RESERVE"
+    ],
+    "T_SE_LANE": [
+      "T_C_INNER_SPILLWAY",
+      "T_SE_OUTER_RESERVE",
+      "T_SE_RESERVE"
+    ],
+    "T_E_CAUSEWAY": [
+      "T_C_SPILLWAY",
+      "T_NE_CAUSEWAY",
+      "T_NW_CAUSEWAY",
+      "T_W_CAUSEWAY"
+    ],
+    "T_W_CAUSEWAY": [
+      "T_C_INNER_SPILLWAY",
+      "T_E_CAUSEWAY",
+      "T_SE_CAUSEWAY",
+      "T_SW_CAUSEWAY"
+    ]
+  },
+  "the_rock_jungle": {
+    "TRJ_NW_MUSTER": [
+      "TRJ_C_SPILLWAY",
+      "TRJ_NE_LANE",
+      "TRJ_NE_SHALLOWS",
+      "TRJ_NW_GATE",
+      "TRJ_NW_OUTER_MUSTER"
+    ],
+    "TRJ_SE_MUSTER": [
+      "TRJ_C_INNER_SPILLWAY",
+      "TRJ_SE_GATE",
+      "TRJ_SE_OUTER_MUSTER",
+      "TRJ_SW_LANE",
+      "TRJ_SW_SHALLOWS"
+    ],
+    "TRJ_NE_SHALLOWS": [
+      "TRJ_C_INNER_SPILLWAY",
+      "TRJ_C_SPILLWAY",
+      "TRJ_NE_LANE",
+      "TRJ_NE_RIM",
+      "TRJ_NW_GATE",
+      "TRJ_NW_MUSTER",
+      "TRJ_SW_SHALLOWS"
+    ],
+    "TRJ_SW_SHALLOWS": [
+      "TRJ_C_INNER_SPILLWAY",
+      "TRJ_C_SPILLWAY",
+      "TRJ_NE_SHALLOWS",
+      "TRJ_SE_GATE",
+      "TRJ_SE_MUSTER",
+      "TRJ_SW_LANE",
+      "TRJ_SW_RIM"
+    ],
+    "TRJ_NW_GATE": [
+      "TRJ_C_SPILLWAY",
+      "TRJ_NE_RIM",
+      "TRJ_NE_SHALLOWS",
+      "TRJ_NW_MUSTER",
+      "TRJ_NW_OUTER_MUSTER",
+      "TRJ_SE_GATE",
+      "TRJ_W_MUSTER"
+    ],
+    "TRJ_SE_GATE": [
+      "TRJ_C_INNER_SPILLWAY",
+      "TRJ_E_MUSTER",
+      "TRJ_NW_GATE",
+      "TRJ_SE_MUSTER",
+      "TRJ_SE_OUTER_MUSTER",
+      "TRJ_SW_RIM",
+      "TRJ_SW_SHALLOWS"
+    ],
+    "TRJ_C_SPILLWAY": [
+      "TRJ_C_INNER_SPILLWAY",
+      "TRJ_NE_SHALLOWS",
+      "TRJ_NW_GATE",
+      "TRJ_NW_MUSTER",
+      "TRJ_SW_SHALLOWS"
+    ],
+    "TRJ_C_INNER_SPILLWAY": [
+      "TRJ_C_SPILLWAY",
+      "TRJ_NE_SHALLOWS",
+      "TRJ_SE_GATE",
+      "TRJ_SE_MUSTER",
+      "TRJ_SW_SHALLOWS"
+    ],
+    "TRJ_NE_LANE": [
+      "TRJ_NE_RIM",
+      "TRJ_NE_SHALLOWS",
+      "TRJ_NW_MUSTER"
+    ],
+    "TRJ_SW_LANE": [
+      "TRJ_SE_MUSTER",
+      "TRJ_SW_RIM",
+      "TRJ_SW_SHALLOWS"
+    ],
+    "TRJ_NW_OUTER_MUSTER": [
+      "TRJ_NW_GATE",
+      "TRJ_NW_MUSTER"
+    ],
+    "TRJ_SE_OUTER_MUSTER": [
+      "TRJ_SE_GATE",
+      "TRJ_SE_MUSTER"
+    ],
+    "TRJ_NE_RIM": [
+      "TRJ_NE_LANE",
+      "TRJ_NE_SHALLOWS",
+      "TRJ_NW_GATE",
+      "TRJ_W_MUSTER"
+    ],
+    "TRJ_SW_RIM": [
+      "TRJ_E_MUSTER",
+      "TRJ_SE_GATE",
+      "TRJ_SW_LANE",
+      "TRJ_SW_SHALLOWS"
+    ],
+    "TRJ_W_MUSTER": [
+      "TRJ_E_MUSTER",
+      "TRJ_NE_RIM",
+      "TRJ_NW_GATE"
+    ],
+    "TRJ_E_MUSTER": [
+      "TRJ_SE_GATE",
+      "TRJ_SW_RIM",
+      "TRJ_W_MUSTER"
+    ]
+  }
+}

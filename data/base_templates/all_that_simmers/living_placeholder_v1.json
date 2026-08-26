@@ -1,0 +1,1911 @@
+{
+ "schemaVersion": "verdance-living-shell/1.1",
+ "mapId": "all_that_simmers",
+ "templateId": "living_placeholder_v1",
+ "source": "placeholder",
+ "faction": "mixed",
+ "character": "High-Conflict Swamp - multi-faction corners + lane + raptor center",
+ "characterCard": {
+  "descriptor": "The Default High-Conflict Swamp",
+  "blurb": "Calibration anchor. NE Armada ridge, SW Armada lagoon, SE Cortex basin, swamp lane teeth, center raptor hazard. Multipressure picks which shell to bleed.",
+  "shellAtT0": "ARM/COR corners + lane + raptor center",
+  "growMix": "hold/sprawl ARM + fortify_hard COR + fortify lane",
+  "arcKinds": [
+   "seize_lane",
+   "multipressure"
+  ],
+  "raidHint": "seize_or_raid_lane",
+  "captureLater": "flip node",
+  "wrath": {
+   "packId": "armada_gunslinger_response_v1",
+   "responseSeconds": 110,
+   "notes": "Default Armada pack; faction-colored answer when contact pocket is Cortex (compiler may swap cortex_qrf)."
+  },
+  "source": "placeholder",
+  "realBakeStatus": "pending_cloud_or_iconsatlas"
+ },
+ "arcKinds": [
+  "seize_lane",
+  "multipressure"
+ ],
+ "raidHint": "seize_or_raid_lane",
+ "captureLater": "flip node",
+ "occupation": {
+  "decoyCommanders": true,
+  "notes": "Decoy com nodes (armdecom/cordecom/legdecom) stand in for Armada autonomous eco farmers. Sims use real commanders."
+ },
+ "bake": {
+  "growMinutes": 12,
+  "teams": 4,
+  "seed": 77,
+  "peacefulCoGrow": true,
+  "growProfiles": "ats_ne_armada=hold; ats_sw_armada=sprawl; ats_se_cortex=fortify_hard; ats_swamp_lane=fortify",
+  "simCommanders": "normal",
+  "occupationCommanders": "decoy",
+  "note": "Placeholder density with BARb/SimpleAI rate character + decoy swarm nodes. Replace by bake_living_shell.ps1 for real grow."
+ },
+ "generatedAt": "2026-07-28T13:35:05",
+ "unitCount": 179,
+ "pockets": [
+  {
+   "pocketId": "ats_ne_armada",
+   "zoneId": "ATS_NE_PLATEAU",
+   "label": "Northeast Armada Ridge",
+   "kind": "mixed",
+   "faction": "armada",
+   "growProfile": "hold",
+   "growAI": "SimpleAI",
+   "barbProfile": null,
+   "center": [
+    0.84,
+    0.15
+   ],
+   "unitCount": 36,
+   "primaryCandidate": true,
+   "densityScale": 1.05
+  },
+  {
+   "pocketId": "ats_sw_armada",
+   "zoneId": "ATS_SW_PLATEAU",
+   "label": "Southwest Armada Lagoon",
+   "kind": "mixed",
+   "faction": "armada",
+   "growProfile": "sprawl",
+   "growAI": "SimpleAI",
+   "barbProfile": null,
+   "center": [
+    0.17,
+    0.81
+   ],
+   "unitCount": 33,
+   "primaryCandidate": false,
+   "densityScale": 1
+  },
+  {
+   "pocketId": "ats_se_cortex",
+   "zoneId": "ATS_SE_SPILLWAY",
+   "label": "Southeast Cortex Basin",
+   "kind": "fortress",
+   "faction": "cortex",
+   "growProfile": "fortify_hard",
+   "growAI": "BARb",
+   "barbProfile": "hard",
+   "center": [
+    0.81,
+    0.82
+   ],
+   "unitCount": 76,
+   "primaryCandidate": false,
+   "densityScale": 1.1
+  },
+  {
+   "pocketId": "ats_swamp_lane",
+   "zoneId": "ATS_C_BASTION",
+   "label": "Swamp Diagonal Lane",
+   "kind": "lane",
+   "faction": "armada",
+   "growProfile": "fortify",
+   "growAI": "BARb",
+   "barbProfile": "medium",
+   "center": [
+    0.52,
+    0.52
+   ],
+   "unitCount": 34,
+   "primaryCandidate": false,
+   "densityScale": 0.7
+  }
+ ],
+ "units": [
+  {
+   "unitDefName": "armsolar",
+   "x": 0.8707,
+   "z": 0.1407,
+   "facing": 2,
+   "zoneId": "ATS_NE_ARMADA_RIDGE",
+   "pocketId": "ats_ne_armada",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armsolar",
+   "x": 0.8892,
+   "z": 0.1479,
+   "facing": 3,
+   "zoneId": "ATS_NE_ARMADA_RIDGE",
+   "pocketId": "ats_ne_armada",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armsolar",
+   "x": 0.8288,
+   "z": 0.1574,
+   "facing": 2,
+   "zoneId": "ATS_NE_ARMADA_RIDGE",
+   "pocketId": "ats_ne_armada",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armsolar",
+   "x": 0.8365,
+   "z": 0.1438,
+   "facing": 2,
+   "zoneId": "ATS_NE_ARMADA_RIDGE",
+   "pocketId": "ats_ne_armada",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armsolar",
+   "x": 0.8067,
+   "z": 0.1353,
+   "facing": 3,
+   "zoneId": "ATS_NE_ARMADA_RIDGE",
+   "pocketId": "ats_ne_armada",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armsolar",
+   "x": 0.8576,
+   "z": 0.1662,
+   "facing": 2,
+   "zoneId": "ATS_NE_ARMADA_RIDGE",
+   "pocketId": "ats_ne_armada",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armwin",
+   "x": 0.8413,
+   "z": 0.1321,
+   "facing": 0,
+   "zoneId": "ATS_NE_ARMADA_RIDGE",
+   "pocketId": "ats_ne_armada",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armwin",
+   "x": 0.8397,
+   "z": 0.1464,
+   "facing": 3,
+   "zoneId": "ATS_NE_ARMADA_RIDGE",
+   "pocketId": "ats_ne_armada",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armwin",
+   "x": 0.8403,
+   "z": 0.1613,
+   "facing": 0,
+   "zoneId": "ATS_NE_ARMADA_RIDGE",
+   "pocketId": "ats_ne_armada",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armwin",
+   "x": 0.8039,
+   "z": 0.1771,
+   "facing": 0,
+   "zoneId": "ATS_NE_ARMADA_RIDGE",
+   "pocketId": "ats_ne_armada",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armmakr",
+   "x": 0.8173,
+   "z": 0.1303,
+   "facing": 1,
+   "zoneId": "ATS_NE_ARMADA_RIDGE",
+   "pocketId": "ats_ne_armada",
+   "keepClass": "converter",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armmakr",
+   "x": 0.8622,
+   "z": 0.1376,
+   "facing": 0,
+   "zoneId": "ATS_NE_ARMADA_RIDGE",
+   "pocketId": "ats_ne_armada",
+   "keepClass": "converter",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armadvsol",
+   "x": 0.849,
+   "z": 0.1287,
+   "facing": 2,
+   "zoneId": "ATS_NE_ARMADA_RIDGE",
+   "pocketId": "ats_ne_armada",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armestor",
+   "x": 0.8332,
+   "z": 0.1358,
+   "facing": 0,
+   "zoneId": "ATS_NE_ARMADA_RIDGE",
+   "pocketId": "ats_ne_armada",
+   "keepClass": "storage",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armmex",
+   "x": 0.8593,
+   "z": 0.1875,
+   "facing": 2,
+   "zoneId": "ATS_NE_ARMADA_RIDGE",
+   "pocketId": "ats_ne_armada",
+   "keepClass": "mex",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armmex",
+   "x": 0.8153,
+   "z": 0.1311,
+   "facing": 2,
+   "zoneId": "ATS_NE_ARMADA_RIDGE",
+   "pocketId": "ats_ne_armada",
+   "keepClass": "mex",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armmex",
+   "x": 0.827,
+   "z": 0.1266,
+   "facing": 1,
+   "zoneId": "ATS_NE_ARMADA_RIDGE",
+   "pocketId": "ats_ne_armada",
+   "keepClass": "mex",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.803,
+   "z": 0.1696,
+   "facing": 0,
+   "zoneId": "ATS_NE_ARMADA_RIDGE",
+   "pocketId": "ats_ne_armada",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.8207,
+   "z": 0.1335,
+   "facing": 1,
+   "zoneId": "ATS_NE_ARMADA_RIDGE",
+   "pocketId": "ats_ne_armada",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.814,
+   "z": 0.1102,
+   "facing": 3,
+   "zoneId": "ATS_NE_ARMADA_RIDGE",
+   "pocketId": "ats_ne_armada",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.8388,
+   "z": 0.1449,
+   "facing": 1,
+   "zoneId": "ATS_NE_ARMADA_RIDGE",
+   "pocketId": "ats_ne_armada",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.8292,
+   "z": 0.1568,
+   "facing": 1,
+   "zoneId": "ATS_NE_ARMADA_RIDGE",
+   "pocketId": "ats_ne_armada",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.8208,
+   "z": 0.1898,
+   "facing": 3,
+   "zoneId": "ATS_NE_ARMADA_RIDGE",
+   "pocketId": "ats_ne_armada",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.8457,
+   "z": 0.1202,
+   "facing": 1,
+   "zoneId": "ATS_NE_ARMADA_RIDGE",
+   "pocketId": "ats_ne_armada",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armbeamer",
+   "x": 0.842,
+   "z": 0.1569,
+   "facing": 2,
+   "zoneId": "ATS_NE_ARMADA_RIDGE",
+   "pocketId": "ats_ne_armada",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.8801,
+   "z": 0.134,
+   "facing": 0,
+   "zoneId": "ATS_NE_ARMADA_RIDGE",
+   "pocketId": "ats_ne_armada",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.7986,
+   "z": 0.1701,
+   "facing": 2,
+   "zoneId": "ATS_NE_ARMADA_RIDGE",
+   "pocketId": "ats_ne_armada",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.7917,
+   "z": 0.1585,
+   "facing": 1,
+   "zoneId": "ATS_NE_ARMADA_RIDGE",
+   "pocketId": "ats_ne_armada",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.8381,
+   "z": 0.1249,
+   "facing": 0,
+   "zoneId": "ATS_NE_ARMADA_RIDGE",
+   "pocketId": "ats_ne_armada",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.8673,
+   "z": 0.1663,
+   "facing": 1,
+   "zoneId": "ATS_NE_ARMADA_RIDGE",
+   "pocketId": "ats_ne_armada",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.8323,
+   "z": 0.1287,
+   "facing": 0,
+   "zoneId": "ATS_NE_ARMADA_RIDGE",
+   "pocketId": "ats_ne_armada",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.7966,
+   "z": 0.1139,
+   "facing": 2,
+   "zoneId": "ATS_NE_ARMADA_RIDGE",
+   "pocketId": "ats_ne_armada",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.87,
+   "z": 0.1097,
+   "facing": 3,
+   "zoneId": "ATS_NE_ARMADA_RIDGE",
+   "pocketId": "ats_ne_armada",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.8458,
+   "z": 0.18,
+   "facing": 3,
+   "zoneId": "ATS_NE_ARMADA_RIDGE",
+   "pocketId": "ats_ne_armada",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armrad",
+   "x": 0.8327,
+   "z": 0.1379,
+   "facing": 0,
+   "zoneId": "ATS_NE_ARMADA_RIDGE",
+   "pocketId": "ats_ne_armada",
+   "keepClass": "intel",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdecom",
+   "x": 0.8435,
+   "z": 0.1496,
+   "facing": 1,
+   "zoneId": "ATS_NE_ARMADA_RIDGE",
+   "pocketId": "ats_ne_armada",
+   "keepClass": "decoy_node",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armsolar",
+   "x": 0.1487,
+   "z": 0.7749,
+   "facing": 2,
+   "zoneId": "ATS_SW_ARMADA_LAGOON",
+   "pocketId": "ats_sw_armada",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armsolar",
+   "x": 0.1518,
+   "z": 0.8256,
+   "facing": 0,
+   "zoneId": "ATS_SW_ARMADA_LAGOON",
+   "pocketId": "ats_sw_armada",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armsolar",
+   "x": 0.15,
+   "z": 0.8242,
+   "facing": 1,
+   "zoneId": "ATS_SW_ARMADA_LAGOON",
+   "pocketId": "ats_sw_armada",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armsolar",
+   "x": 0.1919,
+   "z": 0.7754,
+   "facing": 3,
+   "zoneId": "ATS_SW_ARMADA_LAGOON",
+   "pocketId": "ats_sw_armada",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armsolar",
+   "x": 0.1867,
+   "z": 0.8276,
+   "facing": 1,
+   "zoneId": "ATS_SW_ARMADA_LAGOON",
+   "pocketId": "ats_sw_armada",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armsolar",
+   "x": 0.1641,
+   "z": 0.7966,
+   "facing": 0,
+   "zoneId": "ATS_SW_ARMADA_LAGOON",
+   "pocketId": "ats_sw_armada",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armsolar",
+   "x": 0.1666,
+   "z": 0.8484,
+   "facing": 0,
+   "zoneId": "ATS_SW_ARMADA_LAGOON",
+   "pocketId": "ats_sw_armada",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armwin",
+   "x": 0.1821,
+   "z": 0.8015,
+   "facing": 3,
+   "zoneId": "ATS_SW_ARMADA_LAGOON",
+   "pocketId": "ats_sw_armada",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armwin",
+   "x": 0.1896,
+   "z": 0.8216,
+   "facing": 1,
+   "zoneId": "ATS_SW_ARMADA_LAGOON",
+   "pocketId": "ats_sw_armada",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armwin",
+   "x": 0.1393,
+   "z": 0.7772,
+   "facing": 3,
+   "zoneId": "ATS_SW_ARMADA_LAGOON",
+   "pocketId": "ats_sw_armada",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armwin",
+   "x": 0.1506,
+   "z": 0.8489,
+   "facing": 3,
+   "zoneId": "ATS_SW_ARMADA_LAGOON",
+   "pocketId": "ats_sw_armada",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armwin",
+   "x": 0.1524,
+   "z": 0.7827,
+   "facing": 2,
+   "zoneId": "ATS_SW_ARMADA_LAGOON",
+   "pocketId": "ats_sw_armada",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armmakr",
+   "x": 0.1602,
+   "z": 0.7932,
+   "facing": 3,
+   "zoneId": "ATS_SW_ARMADA_LAGOON",
+   "pocketId": "ats_sw_armada",
+   "keepClass": "converter",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armmakr",
+   "x": 0.186,
+   "z": 0.8105,
+   "facing": 2,
+   "zoneId": "ATS_SW_ARMADA_LAGOON",
+   "pocketId": "ats_sw_armada",
+   "keepClass": "converter",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armadvsol",
+   "x": 0.1687,
+   "z": 0.8124,
+   "facing": 0,
+   "zoneId": "ATS_SW_ARMADA_LAGOON",
+   "pocketId": "ats_sw_armada",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armestor",
+   "x": 0.1754,
+   "z": 0.8126,
+   "facing": 0,
+   "zoneId": "ATS_SW_ARMADA_LAGOON",
+   "pocketId": "ats_sw_armada",
+   "keepClass": "storage",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armmex",
+   "x": 0.1297,
+   "z": 0.7981,
+   "facing": 3,
+   "zoneId": "ATS_SW_ARMADA_LAGOON",
+   "pocketId": "ats_sw_armada",
+   "keepClass": "mex",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armmex",
+   "x": 0.2038,
+   "z": 0.7975,
+   "facing": 2,
+   "zoneId": "ATS_SW_ARMADA_LAGOON",
+   "pocketId": "ats_sw_armada",
+   "keepClass": "mex",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armmex",
+   "x": 0.1432,
+   "z": 0.8356,
+   "facing": 2,
+   "zoneId": "ATS_SW_ARMADA_LAGOON",
+   "pocketId": "ats_sw_armada",
+   "keepClass": "mex",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.1876,
+   "z": 0.7854,
+   "facing": 0,
+   "zoneId": "ATS_SW_ARMADA_LAGOON",
+   "pocketId": "ats_sw_armada",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.1684,
+   "z": 0.7617,
+   "facing": 1,
+   "zoneId": "ATS_SW_ARMADA_LAGOON",
+   "pocketId": "ats_sw_armada",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.1331,
+   "z": 0.8241,
+   "facing": 3,
+   "zoneId": "ATS_SW_ARMADA_LAGOON",
+   "pocketId": "ats_sw_armada",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.1988,
+   "z": 0.7857,
+   "facing": 3,
+   "zoneId": "ATS_SW_ARMADA_LAGOON",
+   "pocketId": "ats_sw_armada",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.1681,
+   "z": 0.8029,
+   "facing": 3,
+   "zoneId": "ATS_SW_ARMADA_LAGOON",
+   "pocketId": "ats_sw_armada",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armbeamer",
+   "x": 0.1721,
+   "z": 0.8226,
+   "facing": 1,
+   "zoneId": "ATS_SW_ARMADA_LAGOON",
+   "pocketId": "ats_sw_armada",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.1358,
+   "z": 0.837,
+   "facing": 0,
+   "zoneId": "ATS_SW_ARMADA_LAGOON",
+   "pocketId": "ats_sw_armada",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.1682,
+   "z": 0.8034,
+   "facing": 0,
+   "zoneId": "ATS_SW_ARMADA_LAGOON",
+   "pocketId": "ats_sw_armada",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.1635,
+   "z": 0.8254,
+   "facing": 3,
+   "zoneId": "ATS_SW_ARMADA_LAGOON",
+   "pocketId": "ats_sw_armada",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.2046,
+   "z": 0.8177,
+   "facing": 0,
+   "zoneId": "ATS_SW_ARMADA_LAGOON",
+   "pocketId": "ats_sw_armada",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.1517,
+   "z": 0.8343,
+   "facing": 2,
+   "zoneId": "ATS_SW_ARMADA_LAGOON",
+   "pocketId": "ats_sw_armada",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.2196,
+   "z": 0.8255,
+   "facing": 0,
+   "zoneId": "ATS_SW_ARMADA_LAGOON",
+   "pocketId": "ats_sw_armada",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armrad",
+   "x": 0.1763,
+   "z": 0.8057,
+   "facing": 1,
+   "zoneId": "ATS_SW_ARMADA_LAGOON",
+   "pocketId": "ats_sw_armada",
+   "keepClass": "intel",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdecom",
+   "x": 0.1681,
+   "z": 0.8168,
+   "facing": 1,
+   "zoneId": "ATS_SW_ARMADA_LAGOON",
+   "pocketId": "ats_sw_armada",
+   "keepClass": "decoy_node",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "corsolar",
+   "x": 0.8196,
+   "z": 0.8391,
+   "facing": 2,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "energy",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "corsolar",
+   "x": 0.8148,
+   "z": 0.8655,
+   "facing": 3,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "energy",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "corsolar",
+   "x": 0.8518,
+   "z": 0.827,
+   "facing": 1,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "energy",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "corsolar",
+   "x": 0.8147,
+   "z": 0.8694,
+   "facing": 0,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "energy",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "corsolar",
+   "x": 0.7913,
+   "z": 0.8189,
+   "facing": 1,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "energy",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "corsolar",
+   "x": 0.8371,
+   "z": 0.8014,
+   "facing": 2,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "energy",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "corsolar",
+   "x": 0.7845,
+   "z": 0.8008,
+   "facing": 0,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "energy",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "corwin",
+   "x": 0.8365,
+   "z": 0.7948,
+   "facing": 0,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "energy",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "corwin",
+   "x": 0.8336,
+   "z": 0.853,
+   "facing": 0,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "energy",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "corwin",
+   "x": 0.8139,
+   "z": 0.792,
+   "facing": 3,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "energy",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "corwin",
+   "x": 0.8251,
+   "z": 0.8151,
+   "facing": 2,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "energy",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cormakr",
+   "x": 0.7876,
+   "z": 0.8077,
+   "facing": 3,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "converter",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cormakr",
+   "x": 0.8001,
+   "z": 0.8202,
+   "facing": 0,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "converter",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "coradvsol",
+   "x": 0.8116,
+   "z": 0.8183,
+   "facing": 2,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "energy",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "corestor",
+   "x": 0.804,
+   "z": 0.8168,
+   "facing": 1,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "storage",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cormex",
+   "x": 0.7791,
+   "z": 0.8246,
+   "facing": 2,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "mex",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cormex",
+   "x": 0.8013,
+   "z": 0.7784,
+   "facing": 3,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "mex",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cormex",
+   "x": 0.81,
+   "z": 0.7847,
+   "facing": 1,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "mex",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cormex",
+   "x": 0.7952,
+   "z": 0.8378,
+   "facing": 2,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "mex",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "corllt",
+   "x": 0.7958,
+   "z": 0.8267,
+   "facing": 0,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "defense",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "corllt",
+   "x": 0.8118,
+   "z": 0.7923,
+   "facing": 1,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "defense",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "corllt",
+   "x": 0.7815,
+   "z": 0.8272,
+   "facing": 3,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "defense",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "corllt",
+   "x": 0.757,
+   "z": 0.8211,
+   "facing": 2,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "defense",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "corllt",
+   "x": 0.7762,
+   "z": 0.8295,
+   "facing": 1,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "defense",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "corllt",
+   "x": 0.7661,
+   "z": 0.8373,
+   "facing": 1,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "defense",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "corllt",
+   "x": 0.7802,
+   "z": 0.8247,
+   "facing": 1,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "defense",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "corllt",
+   "x": 0.8458,
+   "z": 0.7925,
+   "facing": 0,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "defense",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "corllt",
+   "x": 0.7973,
+   "z": 0.818,
+   "facing": 1,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "defense",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "corllt",
+   "x": 0.8219,
+   "z": 0.8415,
+   "facing": 1,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "defense",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "corllt",
+   "x": 0.8165,
+   "z": 0.845,
+   "facing": 0,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "defense",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "corllt",
+   "x": 0.8157,
+   "z": 0.8331,
+   "facing": 3,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "defense",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "corllt",
+   "x": 0.8264,
+   "z": 0.8275,
+   "facing": 3,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "defense",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "corllt",
+   "x": 0.8086,
+   "z": 0.8388,
+   "facing": 3,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "defense",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "corhlt",
+   "x": 0.7891,
+   "z": 0.8332,
+   "facing": 2,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "defense",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "corhlt",
+   "x": 0.8216,
+   "z": 0.8253,
+   "facing": 2,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "defense",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "corhlt",
+   "x": 0.7962,
+   "z": 0.8219,
+   "facing": 3,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "defense",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "corhlt",
+   "x": 0.8305,
+   "z": 0.8315,
+   "facing": 3,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "defense",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cordrag",
+   "x": 0.8156,
+   "z": 0.8616,
+   "facing": 1,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "wall",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cordrag",
+   "x": 0.8361,
+   "z": 0.8298,
+   "facing": 0,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "wall",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cordrag",
+   "x": 0.8373,
+   "z": 0.8347,
+   "facing": 0,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "wall",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cordrag",
+   "x": 0.7796,
+   "z": 0.8252,
+   "facing": 2,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "wall",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cordrag",
+   "x": 0.789,
+   "z": 0.8414,
+   "facing": 1,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "wall",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cordrag",
+   "x": 0.7888,
+   "z": 0.848,
+   "facing": 2,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "wall",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cordrag",
+   "x": 0.7936,
+   "z": 0.7991,
+   "facing": 0,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "wall",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cordrag",
+   "x": 0.7756,
+   "z": 0.7995,
+   "facing": 2,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "wall",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cordrag",
+   "x": 0.7713,
+   "z": 0.8171,
+   "facing": 3,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "wall",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cordrag",
+   "x": 0.8033,
+   "z": 0.7726,
+   "facing": 3,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "wall",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cordrag",
+   "x": 0.7902,
+   "z": 0.8256,
+   "facing": 1,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "wall",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cordrag",
+   "x": 0.8139,
+   "z": 0.8761,
+   "facing": 2,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "wall",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cordrag",
+   "x": 0.805,
+   "z": 0.8168,
+   "facing": 3,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "wall",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cordrag",
+   "x": 0.7869,
+   "z": 0.8117,
+   "facing": 3,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "wall",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cordrag",
+   "x": 0.8087,
+   "z": 0.7643,
+   "facing": 2,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "wall",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cordrag",
+   "x": 0.8487,
+   "z": 0.7918,
+   "facing": 3,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "wall",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cordrag",
+   "x": 0.8096,
+   "z": 0.8403,
+   "facing": 3,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "wall",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cordrag",
+   "x": 0.7923,
+   "z": 0.8536,
+   "facing": 2,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "wall",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cordrag",
+   "x": 0.8279,
+   "z": 0.7775,
+   "facing": 0,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "wall",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cordrag",
+   "x": 0.8001,
+   "z": 0.7787,
+   "facing": 3,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "wall",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cordrag",
+   "x": 0.7818,
+   "z": 0.8391,
+   "facing": 2,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "wall",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cordrag",
+   "x": 0.8124,
+   "z": 0.827,
+   "facing": 0,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "wall",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cordrag",
+   "x": 0.7952,
+   "z": 0.835,
+   "facing": 1,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "wall",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cordrag",
+   "x": 0.8276,
+   "z": 0.773,
+   "facing": 1,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "wall",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cordrag",
+   "x": 0.8107,
+   "z": 0.8029,
+   "facing": 0,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "wall",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cordrag",
+   "x": 0.7776,
+   "z": 0.8615,
+   "facing": 2,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "wall",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cordrag",
+   "x": 0.855,
+   "z": 0.8207,
+   "facing": 3,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "wall",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cordrag",
+   "x": 0.8233,
+   "z": 0.7827,
+   "facing": 2,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "wall",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cordrag",
+   "x": 0.8297,
+   "z": 0.8139,
+   "facing": 2,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "wall",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cordrag",
+   "x": 0.7905,
+   "z": 0.788,
+   "facing": 1,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "wall",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cordrag",
+   "x": 0.7564,
+   "z": 0.8254,
+   "facing": 1,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "wall",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cordrag",
+   "x": 0.8287,
+   "z": 0.8321,
+   "facing": 3,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "wall",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cordrag",
+   "x": 0.8157,
+   "z": 0.8623,
+   "facing": 3,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "wall",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cordrag",
+   "x": 0.7692,
+   "z": 0.8113,
+   "facing": 2,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "wall",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cordrag",
+   "x": 0.7924,
+   "z": 0.7859,
+   "facing": 1,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "wall",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cordrag",
+   "x": 0.7715,
+   "z": 0.8,
+   "facing": 1,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "wall",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "corrad",
+   "x": 0.8036,
+   "z": 0.8121,
+   "facing": 3,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "intel",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "corfus",
+   "x": 0.7995,
+   "z": 0.8199,
+   "facing": 3,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "energy",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "cordecom",
+   "x": 0.8158,
+   "z": 0.8207,
+   "facing": 3,
+   "zoneId": "ATS_SE_CORTEX_BASIN",
+   "pocketId": "ats_se_cortex",
+   "keepClass": "decoy_node",
+   "faction": "cortex"
+  },
+  {
+   "unitDefName": "armsolar",
+   "x": 0.5442,
+   "z": 0.5248,
+   "facing": 3,
+   "zoneId": "ATS_SW_NE_SWAMP_LANE",
+   "pocketId": "ats_swamp_lane",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armsolar",
+   "x": 0.4787,
+   "z": 0.5284,
+   "facing": 2,
+   "zoneId": "ATS_SW_NE_SWAMP_LANE",
+   "pocketId": "ats_swamp_lane",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armsolar",
+   "x": 0.5484,
+   "z": 0.5203,
+   "facing": 3,
+   "zoneId": "ATS_SW_NE_SWAMP_LANE",
+   "pocketId": "ats_swamp_lane",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armwin",
+   "x": 0.5524,
+   "z": 0.4952,
+   "facing": 3,
+   "zoneId": "ATS_SW_NE_SWAMP_LANE",
+   "pocketId": "ats_swamp_lane",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armwin",
+   "x": 0.5257,
+   "z": 0.5369,
+   "facing": 1,
+   "zoneId": "ATS_SW_NE_SWAMP_LANE",
+   "pocketId": "ats_swamp_lane",
+   "keepClass": "energy",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armmakr",
+   "x": 0.5032,
+   "z": 0.5029,
+   "facing": 0,
+   "zoneId": "ATS_SW_NE_SWAMP_LANE",
+   "pocketId": "ats_swamp_lane",
+   "keepClass": "converter",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armestor",
+   "x": 0.5222,
+   "z": 0.5269,
+   "facing": 0,
+   "zoneId": "ATS_SW_NE_SWAMP_LANE",
+   "pocketId": "ats_swamp_lane",
+   "keepClass": "storage",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armmex",
+   "x": 0.5272,
+   "z": 0.545,
+   "facing": 2,
+   "zoneId": "ATS_SW_NE_SWAMP_LANE",
+   "pocketId": "ats_swamp_lane",
+   "keepClass": "mex",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armmex",
+   "x": 0.5166,
+   "z": 0.5252,
+   "facing": 3,
+   "zoneId": "ATS_SW_NE_SWAMP_LANE",
+   "pocketId": "ats_swamp_lane",
+   "keepClass": "mex",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.4656,
+   "z": 0.5167,
+   "facing": 0,
+   "zoneId": "ATS_SW_NE_SWAMP_LANE",
+   "pocketId": "ats_swamp_lane",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.5054,
+   "z": 0.517,
+   "facing": 2,
+   "zoneId": "ATS_SW_NE_SWAMP_LANE",
+   "pocketId": "ats_swamp_lane",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.5435,
+   "z": 0.5132,
+   "facing": 1,
+   "zoneId": "ATS_SW_NE_SWAMP_LANE",
+   "pocketId": "ats_swamp_lane",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.5337,
+   "z": 0.523,
+   "facing": 3,
+   "zoneId": "ATS_SW_NE_SWAMP_LANE",
+   "pocketId": "ats_swamp_lane",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.5468,
+   "z": 0.4837,
+   "facing": 0,
+   "zoneId": "ATS_SW_NE_SWAMP_LANE",
+   "pocketId": "ats_swamp_lane",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.4751,
+   "z": 0.5263,
+   "facing": 3,
+   "zoneId": "ATS_SW_NE_SWAMP_LANE",
+   "pocketId": "ats_swamp_lane",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armllt",
+   "x": 0.4891,
+   "z": 0.5397,
+   "facing": 1,
+   "zoneId": "ATS_SW_NE_SWAMP_LANE",
+   "pocketId": "ats_swamp_lane",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armbeamer",
+   "x": 0.4967,
+   "z": 0.5179,
+   "facing": 0,
+   "zoneId": "ATS_SW_NE_SWAMP_LANE",
+   "pocketId": "ats_swamp_lane",
+   "keepClass": "defense",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.5496,
+   "z": 0.4773,
+   "facing": 1,
+   "zoneId": "ATS_SW_NE_SWAMP_LANE",
+   "pocketId": "ats_swamp_lane",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.5502,
+   "z": 0.4773,
+   "facing": 3,
+   "zoneId": "ATS_SW_NE_SWAMP_LANE",
+   "pocketId": "ats_swamp_lane",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.5103,
+   "z": 0.5379,
+   "facing": 2,
+   "zoneId": "ATS_SW_NE_SWAMP_LANE",
+   "pocketId": "ats_swamp_lane",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.5179,
+   "z": 0.4797,
+   "facing": 1,
+   "zoneId": "ATS_SW_NE_SWAMP_LANE",
+   "pocketId": "ats_swamp_lane",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.5127,
+   "z": 0.4861,
+   "facing": 2,
+   "zoneId": "ATS_SW_NE_SWAMP_LANE",
+   "pocketId": "ats_swamp_lane",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.4981,
+   "z": 0.5381,
+   "facing": 3,
+   "zoneId": "ATS_SW_NE_SWAMP_LANE",
+   "pocketId": "ats_swamp_lane",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.564,
+   "z": 0.5155,
+   "facing": 1,
+   "zoneId": "ATS_SW_NE_SWAMP_LANE",
+   "pocketId": "ats_swamp_lane",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.5151,
+   "z": 0.5537,
+   "facing": 1,
+   "zoneId": "ATS_SW_NE_SWAMP_LANE",
+   "pocketId": "ats_swamp_lane",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.5607,
+   "z": 0.4926,
+   "facing": 2,
+   "zoneId": "ATS_SW_NE_SWAMP_LANE",
+   "pocketId": "ats_swamp_lane",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.4881,
+   "z": 0.4746,
+   "facing": 2,
+   "zoneId": "ATS_SW_NE_SWAMP_LANE",
+   "pocketId": "ats_swamp_lane",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.4823,
+   "z": 0.4768,
+   "facing": 0,
+   "zoneId": "ATS_SW_NE_SWAMP_LANE",
+   "pocketId": "ats_swamp_lane",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.5627,
+   "z": 0.4988,
+   "facing": 1,
+   "zoneId": "ATS_SW_NE_SWAMP_LANE",
+   "pocketId": "ats_swamp_lane",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.5366,
+   "z": 0.5289,
+   "facing": 1,
+   "zoneId": "ATS_SW_NE_SWAMP_LANE",
+   "pocketId": "ats_swamp_lane",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.4755,
+   "z": 0.5387,
+   "facing": 3,
+   "zoneId": "ATS_SW_NE_SWAMP_LANE",
+   "pocketId": "ats_swamp_lane",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdrag",
+   "x": 0.5336,
+   "z": 0.5333,
+   "facing": 0,
+   "zoneId": "ATS_SW_NE_SWAMP_LANE",
+   "pocketId": "ats_swamp_lane",
+   "keepClass": "wall",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armrad",
+   "x": 0.5227,
+   "z": 0.5072,
+   "facing": 1,
+   "zoneId": "ATS_SW_NE_SWAMP_LANE",
+   "pocketId": "ats_swamp_lane",
+   "keepClass": "intel",
+   "faction": "armada"
+  },
+  {
+   "unitDefName": "armdecom",
+   "x": 0.5196,
+   "z": 0.521,
+   "facing": 0,
+   "zoneId": "ATS_SW_NE_SWAMP_LANE",
+   "pocketId": "ats_swamp_lane",
+   "keepClass": "decoy_node",
+   "faction": "armada"
+  }
+ ]
+}

@@ -1,0 +1,1945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="theme-color" content="#070e0b"/>
+<title>Verdance's Ashes</title>
+<style>
+/* Ash Console tokens — lock to docs/UI_ASH_CONSOLE.md + va_ash_tokens.lua */
+:root {
+  --bg:#040907; --ink:#eef6ee; --muted:#7d9584; --edge:#3d8f55;
+  --gold:#d4c49a; --ketha:#a6d1a6; --steam:#7ec8ff;
+  --panel:rgba(8,16,12,.90);
+  --warn:#e0a060; --good:#7dff8a; --bad:#ff7d7d; --tnb:#c9a0ff;
+  --ash:#9a8b72;
+}
+* { box-sizing:border-box; }
+html,body { margin:0; height:100%; background:var(--bg); color:var(--ink);
+  font-family:"Segoe UI",system-ui,sans-serif; overflow:hidden; }
+button { font-family:inherit; cursor:pointer; }
+button:disabled { opacity:.45; cursor:not-allowed; }
+
+.app {
+  display:grid; grid-template-columns: 15.5rem 1fr 17.5rem;
+  grid-template-rows: auto 1fr auto;
+  height:100%; gap:0;
+}
+.top {
+  grid-column:1 / -1;
+  display:flex; justify-content:space-between; align-items:center;
+  padding:.7rem 1.1rem; border-bottom:1px solid rgba(61,143,85,.3);
+  background:
+    linear-gradient(90deg, rgba(212,196,154,.06), transparent 40%),
+    linear-gradient(180deg, rgba(14,32,22,.98), rgba(6,14,10,.94));
+  gap:.75rem; flex-wrap:wrap;
+}
+.brand { font-size:.62rem; letter-spacing:.2em; text-transform:uppercase; color:var(--ash); }
+.brand strong { display:block; font-size:1.05rem; letter-spacing:.04em; color:var(--gold);
+  text-transform:none; margin-top:.14rem; font-weight:600; }
+.badges { display:flex; flex-wrap:wrap; gap:.3rem; justify-content:flex-end; }
+.badge {
+  font-size:.62rem; letter-spacing:.07em; text-transform:uppercase;
+  padding:.2rem .5rem; border-radius:999px;
+  border:1px solid rgba(61,143,85,.4); color:var(--edge);
+  background:rgba(0,0,0,.35);
+}
+.badge.gold { color:var(--gold); border-color:rgba(212,196,154,.35); }
+.badge.steam { color:var(--steam); border-color:rgba(126,200,255,.35); }
+.badge.good { color:var(--good); border-color:rgba(125,255,138,.35); }
+.badge.warn { color:var(--warn); border-color:rgba(224,160,96,.4); }
+.badge.tnb { color:var(--tnb); border-color:rgba(201,160,255,.4); }
+.badge.live { color:#9ff; border-color:rgba(120,220,255,.5); box-shadow:0 0 8px rgba(120,220,255,.2); }
+
+.col {
+  overflow:auto; padding:.7rem .75rem;
+  border-right:1px solid rgba(61,143,85,.2);
+  background:var(--panel);
+}
+.col.right { border-right:0; border-left:1px solid rgba(61,143,85,.2); }
+.main {
+  overflow:auto; padding:1rem 1.15rem 1.4rem;
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(212,196,154,.07), transparent 42%),
+    radial-gradient(ellipse at 80% 10%, rgba(61,143,85,.14), transparent 45%),
+    linear-gradient(180deg, #0a1611 0%, #040907 70%);
+}
+.foot {
+  grid-column:1 / -1;
+  padding:.45rem 1rem; border-top:1px solid rgba(61,143,85,.3);
+  display:flex; justify-content:space-between; align-items:center; gap:.75rem;
+  font-size:.72rem; color:var(--muted); background:rgba(0,0,0,.35);
+  flex-wrap:wrap;
+}
+.foot a { color:var(--steam); }
+
+h2 {
+  margin:0 0 .45rem; font-size:.72rem; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--steam); font-weight:600;
+}
+h3 { margin:.8rem 0 .35rem; font-size:.78rem; color:var(--gold); font-weight:600; }
+.panel-card {
+  background:rgba(0,0,0,.28); border:1px solid rgba(61,143,85,.28);
+  border-radius:10px; padding:.55rem .65rem; margin-bottom:.45rem;
+}
+.panel-card .name { color:var(--gold); font-size:.88rem; font-weight:600; }
+.panel-card .meta { color:var(--muted); font-size:.72rem; margin-top:.15rem; }
+.panel-card .row { display:flex; justify-content:space-between; gap:.4rem; font-size:.72rem; margin-top:.2rem; }
+.ace.wounded { border-color:rgba(255,125,125,.4); }
+.region { cursor:pointer; transition: border-color .15s; }
+.region:hover, .region.focus { border-color:var(--gold); }
+.region .ctrl { text-transform:uppercase; letter-spacing:.06em; font-size:.62rem; }
+
+.kicker { color:var(--ash); letter-spacing:.16em; text-transform:uppercase; font-size:.68rem; }
+.voice {
+  margin:.85rem 0 0; max-width:40rem;
+  border-left:3px solid var(--edge); padding:.7rem .95rem .75rem;
+  background:linear-gradient(90deg, rgba(61,143,85,.12), rgba(0,0,0,.22));
+  border-radius:0 12px 12px 0;
+}
+.voice .who {
+  font-size:.62rem; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--edge); margin:0 0 .35rem; font-style:normal; font-weight:600;
+}
+.voice .line {
+  font-style:italic; color:var(--gold); font-size:.95rem; line-height:1.45; margin:0;
+}
+
+/* Homecoming card — hub twin of BAR debrief (Ash Console) */
+.homecoming {
+  display:none; margin:1rem 0 0; max-width:40rem;
+  border:1px solid rgba(61,143,85,.35); border-radius:12px;
+  background:linear-gradient(135deg, rgba(8,16,12,.95), rgba(4,9,7,.92));
+  border-left:3px solid var(--edge);
+  padding:.75rem .95rem .85rem;
+  box-shadow:0 12px 40px rgba(0,0,0,.35);
+}
+.homecoming.show { display:block; }
+.homecoming .hc-kicker {
+  font-size:.58rem; letter-spacing:.16em; text-transform:uppercase; color:var(--ash);
+}
+.homecoming .hc-banner {
+  font-size:1.15rem; font-weight:600; letter-spacing:.06em; margin:.2rem 0 .15rem;
+}
+.homecoming .hc-banner.victory { color:var(--good); }
+.homecoming .hc-banner.partial { color:var(--warn); }
+.homecoming .hc-banner.defeat { color:var(--bad); }
+.homecoming .hc-banner.abandon { color:var(--muted); }
+.homecoming .hc-banner.incomplete { color:var(--steam); }
+.homecoming .hc-headline {
+  color:var(--gold); font-size:.95rem; margin:0 0 .35rem; font-weight:600;
+}
+.homecoming .hc-hint {
+  font-size:.78rem; color:var(--muted); line-height:1.4; margin:0 0 .4rem;
+}
+.homecoming .hc-chips {
+  display:flex; flex-wrap:wrap; gap:.25rem; margin:.35rem 0 .15rem;
+}
+.homecoming .hc-chip {
+  font-size:.58rem; letter-spacing:.06em; text-transform:uppercase;
+  padding:.15rem .4rem; border-radius:999px;
+  border:1px solid rgba(61,143,85,.35); color:var(--steam);
+  background:rgba(0,0,0,.3);
+}
+.homecoming .hc-chip.warn { color:var(--warn); border-color:rgba(224,160,96,.4); }
+.homecoming .hc-chip.good { color:var(--good); border-color:rgba(125,255,138,.35); }
+.homecoming .hc-chip.bad { color:var(--bad); border-color:rgba(255,125,125,.4); }
+.homecoming .hc-actions {
+  display:flex; flex-wrap:wrap; gap:.35rem; margin-top:.55rem; justify-content:flex-end;
+}
+.badge.abandon { color:var(--muted); border-color:rgba(125,149,132,.4); }
+.badge.incomplete { color:var(--steam); border-color:rgba(126,200,255,.4); }
+.badge.partial { color:var(--warn); border-color:rgba(224,160,96,.4); }
+.badge.defeat { color:var(--bad); border-color:rgba(255,125,125,.4); }
+.badge.victory { color:var(--good); border-color:rgba(125,255,138,.35); }
+.choices { display:flex; flex-direction:column; gap:.45rem; margin-top:1.1rem; max-width:36rem; }
+.choice {
+  text-align:left; background:rgba(0,0,0,.42); border:1px solid rgba(61,143,85,.38);
+  color:var(--ink); border-radius:12px; padding:.7rem .9rem;
+  transition: border-color .15s, background .15s, transform .12s;
+}
+.choice:hover:not(:disabled) {
+  border-color:var(--gold); background:rgba(61,143,85,.14);
+  transform: translateX(2px);
+}
+.choice.deploy.battle {
+  border-color:rgba(125,255,138,.28);
+  background:linear-gradient(135deg, rgba(30,70,45,.35), rgba(0,0,0,.4));
+}
+.choice.deploy.battle:hover:not(:disabled) {
+  border-color:var(--good); box-shadow:0 0 18px rgba(61,143,85,.18);
+}
+.choice .kind {
+  display:inline-block; font-size:.58rem; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--steam); margin-bottom:.22rem;
+}
+.choice .label { font-size:.92rem; font-weight:600; color:var(--ink); }
+.choice .blurb { font-size:.74rem; color:var(--muted); margin-top:.28rem; line-height:1.35; }
+.choice.deploy .kind { color:var(--good); }
+.choice.shop .kind { color:var(--tnb); }
+.choice.talk .kind { color:var(--gold); }
+.log {
+  margin-top:1rem; max-width:40rem; font-size:.78rem; color:var(--muted);
+  border-top:1px solid rgba(61,143,85,.25); padding-top:.55rem;
+}
+.log div { margin:.2rem 0; padding-left:.4rem; border-left:2px solid rgba(61,143,85,.3); }
+
+.shop-balances {
+  display:grid; grid-template-columns:1fr 1fr; gap:.35rem; margin-bottom:.55rem;
+}
+.bal {
+  background:rgba(0,0,0,.35); border:1px solid rgba(61,143,85,.3);
+  border-radius:8px; padding:.4rem .5rem; font-size:.7rem; color:var(--muted);
+}
+.bal strong { display:block; font-size:1.05rem; margin-top:.1rem; }
+.bal.tnb strong { color:var(--tnb); }
+.bal.cred strong { color:var(--gold); }
+
+.listing {
+  background:rgba(0,0,0,.28); border:1px solid rgba(61,143,85,.28);
+  border-radius:10px; padding:.5rem .55rem; margin-bottom:.4rem;
+}
+.listing.owned { border-color:rgba(125,255,138,.3); }
+.listing.locked { opacity:.72; }
+.listing .title { display:flex; justify-content:space-between; gap:.35rem; align-items:flex-start; }
+.listing .title strong { color:var(--gold); font-size:.82rem; }
+.listing .blurb { font-size:.7rem; color:var(--muted); margin:.25rem 0; line-height:1.35; }
+.listing .cost { font-size:.68rem; color:var(--steam); }
+.listing .block { font-size:.66rem; color:var(--warn); margin-top:.2rem; }
+.listing .tags { display:flex; flex-wrap:wrap; gap:.2rem; margin-top:.3rem; }
+.listing .tag {
+  font-size:.55rem; letter-spacing:.06em; text-transform:uppercase;
+  padding:.1rem .35rem; border-radius:999px; border:1px solid rgba(126,200,255,.25);
+  color:var(--steam);
+}
+.btn-buy, .btn-sm, .btn-primary, .btn-ghost {
+  border-radius:8px; padding:.35rem .65rem; font-size:.72rem;
+  border:1px solid rgba(61,143,85,.45); background:rgba(0,0,0,.4); color:var(--ink);
+}
+.btn-primary {
+  background:linear-gradient(135deg, #2d6b42, #1a3f2a);
+  border-color:var(--edge); color:var(--ink); padding:.55rem 1.1rem; font-size:.85rem;
+}
+.btn-primary:hover:not(:disabled) { filter:brightness(1.12); }
+.btn-buy { color:var(--tnb); border-color:rgba(201,160,255,.4); margin-top:.3rem; }
+.btn-buy:hover:not(:disabled) { background:rgba(201,160,255,.1); }
+.btn-ghost:hover:not(:disabled) { border-color:var(--gold); color:var(--gold); }
+
+.kit-line { font-size:.7rem; color:var(--muted); margin:.15rem 0; }
+.kit-line b { color:var(--ink); }
+
+/* Theater board (main view) — Ash Console map-first sortie */
+.theater {
+  margin:1rem 0 0; max-width:48rem;
+  border:1px solid rgba(61,143,85,.35); border-radius:14px;
+  background:linear-gradient(135deg, rgba(8,16,12,.94), rgba(4,9,7,.9));
+  padding:.7rem .85rem .85rem;
+  box-shadow:0 12px 40px rgba(0,0,0,.28);
+}
+.theater-head {
+  display:flex; flex-wrap:wrap; justify-content:space-between; gap:.5rem;
+  align-items:flex-start; margin-bottom:.5rem;
+}
+.theater-head h2 { margin:0; color:var(--gold); font-size:.95rem; letter-spacing:.04em; text-transform:none; }
+.theater-sub { color:var(--muted); font-size:.75rem; margin:.15rem 0 0; line-height:1.35; max-width:28rem; }
+.board-wrap {
+  position:relative; width:100%; aspect-ratio:1.35;
+  background:
+    linear-gradient(rgba(61,143,85,.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(61,143,85,.08) 1px, transparent 1px),
+    #0c1a14;
+  background-size: 8% 8%, 8% 8%, auto;
+  border:1px solid rgba(61,143,85,.35); border-radius:12px;
+  overflow:hidden; margin-bottom:.55rem;
+}
+#board-zones { position:absolute; inset:0; z-index:1; }
+.board-route {
+  position:absolute; inset:0; width:100%; height:100%;
+  pointer-events:none; z-index:3;
+}
+.zone {
+  position:absolute; border:1px solid rgba(126,200,255,.28);
+  background:rgba(20,40,30,.45); border-radius:6px; font-size:.58rem;
+  color:var(--ink); padding:.15rem .25rem; overflow:hidden; cursor:pointer;
+  transition: background .12s, border-color .12s, box-shadow .12s;
+  z-index:1;
+}
+.zone:hover { border-color:var(--gold); z-index:4; }
+.zone.capturable { border-color:rgba(61,143,85,.55); }
+.zone.open-target { box-shadow:inset 0 0 0 1px rgba(224,160,96,.45); }
+.zone.claimed { background:rgba(125,255,138,.12); }
+.zone.ctrl-ashwalkers, .zone.ctrl-nullmercs { background:rgba(61,143,85,.28); }
+.zone.ctrl-armada { background:rgba(126,200,255,.12); }
+.zone.ctrl-cortex { background:rgba(201,160,255,.14); }
+.zone.ctrl-wild { background:rgba(224,160,96,.12); }
+.zone.est { opacity:.88; }
+/* Ash Console marks: infil=good, target=warn, exfil=steam */
+.zone.deploy-mark {
+  background:rgba(125,255,138,.22); border-color:var(--good);
+  box-shadow:0 0 0 1px var(--edge), 0 0 12px rgba(125,255,138,.2); z-index:5;
+}
+.zone.extract-mark {
+  outline:1px dashed var(--steam); border-color:var(--steam);
+  box-shadow:0 0 0 1px rgba(126,200,255,.35); z-index:5;
+}
+.zone.capture-mark {
+  background:rgba(224,160,96,.28); border-color:var(--warn);
+  box-shadow:0 0 12px rgba(224,160,96,.3); z-index:5;
+}
+.zone.rim-eligible.mode-rim:hover { border-color:var(--steam); }
+.zone.midfield.mode-rim { cursor:not-allowed; opacity:.72; }
+.zone-label { pointer-events:none; line-height:1.15; }
+.zone-chip {
+  display:inline-block; font-size:.5rem; letter-spacing:.05em; text-transform:uppercase;
+  padding:0 .25rem; border-radius:4px; margin-top:.1rem;
+  border:1px solid rgba(224,160,96,.4); color:var(--warn);
+}
+.mode-bar { display:flex; flex-wrap:wrap; gap:.35rem; margin-bottom:.45rem; align-items:center; }
+.mode-bar .label { font-size:.7rem; color:var(--muted); margin-right:.25rem; }
+.mode-btn {
+  font-size:.68rem; padding:.3rem .55rem; border-radius:999px;
+  border:1px solid rgba(61,143,85,.4); background:rgba(0,0,0,.35); color:var(--ink);
+}
+.mode-btn.active { border-color:var(--gold); color:var(--gold); background:rgba(212,196,154,.1); }
+.theater-actions {
+  display:flex; flex-wrap:wrap; gap:.45rem; justify-content:space-between;
+  align-items:center; margin-top:.35rem;
+}
+.marks-sum { font-size:.75rem; color:var(--muted); line-height:1.45; flex:1; min-width:12rem; }
+.marks-sum b { color:var(--ink); }
+.legend-row {
+  display:flex; flex-wrap:wrap; gap:.45rem; font-size:.58rem; color:var(--muted);
+  margin:.2rem 0 .45rem; letter-spacing:.04em; text-transform:uppercase;
+}
+.legend-row span::before {
+  content:""; display:inline-block; width:.45rem; height:.45rem; border-radius:2px;
+  margin-right:.25rem; vertical-align:middle;
+}
+.legend-row .lg-infil::before { background:var(--good); }
+.legend-row .lg-target::before { background:var(--warn); }
+.legend-row .lg-exfil::before { background:var(--steam); }
+.legend-row .lg-open::before { background:transparent; border:1px solid var(--warn); }
+
+/* Legacy modal kept hidden — theater is main view */
+.overlay { display:none !important; }
+.status-toast {
+  position:fixed; left:50%; bottom:1.2rem; transform:translateX(-50%);
+  z-index:50; max-width:min(32rem,92vw); padding:.55rem .9rem;
+  background:rgba(6,14,10,.92); border:1px solid rgba(126,200,255,.3);
+  border-radius:10px; font-size:.8rem; display:none;
+}
+.status-toast.show { display:block; }
+.status-toast.err { border-color:rgba(255,125,125,.45); color:var(--bad); }
+.status-toast.ok { border-color:rgba(125,255,138,.4); color:var(--good); }
+
+.tabs { display:flex; gap:.3rem; margin-bottom:.5rem; }
+.tab {
+  flex:1; font-size:.68rem; letter-spacing:.06em; text-transform:uppercase;
+  padding:.35rem; border-radius:8px; border:1px solid rgba(61,143,85,.3);
+  background:transparent; color:var(--muted);
+}
+.tab.active { color:var(--gold); border-color:rgba(212,196,154,.4); background:rgba(0,0,0,.3); }
+
+/* Density matrix (war-map ρ room) */
+.rho-wrap { overflow:auto; max-height:14rem; }
+.rho-table { border-collapse:collapse; font-size:.55rem; font-family:ui-monospace,Consolas,monospace; }
+.rho-table th, .rho-table td {
+  width:1.35rem; height:1.35rem; text-align:center; border:1px solid rgba(0,0,0,.35);
+  cursor:pointer; padding:0;
+}
+.rho-table th { color:var(--muted); font-weight:500; background:rgba(0,0,0,.25); max-width:2.2rem;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding:0 .1rem; }
+.rho-table td.sel { outline:1px solid var(--gold); }
+.ent-svg { width:100%; height:9rem; background:rgba(0,0,0,.25); border-radius:8px; margin:.4rem 0; }
+.scalar-row { display:flex; flex-wrap:wrap; gap:.3rem; margin:.35rem 0; }
+.scalar-pill {
+  font-size:.62rem; padding:.2rem .4rem; border-radius:6px;
+  background:rgba(0,0,0,.35); border:1px solid rgba(61,143,85,.3); color:var(--steam);
+}
+.scalar-pill b { color:var(--gold); font-weight:600; }
+.spec-bar {
+  height:.45rem; border-radius:4px; background:rgba(0,0,0,.4); overflow:hidden; margin:.25rem 0 .5rem;
+}
+.spec-bar > i { display:block; height:100%; background:linear-gradient(90deg,var(--edge),var(--steam)); }
+.foot-actions { display:flex; flex-wrap:wrap; gap:.35rem; align-items:center; }
+.foot-actions button {
+  font-size:.68rem; padding:.28rem .55rem; border-radius:8px;
+  border:1px solid rgba(61,143,85,.4); background:rgba(0,0,0,.35); color:var(--ink);
+}
+.foot-actions button.primary { border-color:rgba(212,196,154,.45); color:var(--gold); }
+
+/* Standing orders + welcome */
+.next-step {
+  margin: .95rem 0 0; max-width: 40rem;
+  border: 1px solid rgba(212,196,154,.22); border-radius: 12px;
+  background: linear-gradient(135deg, rgba(28,40,28,.5), rgba(6,12,10,.75));
+  padding: .75rem .9rem;
+  border-left: 3px solid var(--gold);
+}
+.next-step .ns-kicker {
+  font-size: .6rem; letter-spacing: .14em; text-transform: uppercase; color: var(--ash);
+}
+.next-step .ns-title { color: var(--gold); font-size: .98rem; font-weight: 600; margin: .18rem 0 .28rem; }
+.next-step .ns-body { color: var(--muted); font-size: .8rem; line-height: 1.45; }
+.next-step .ns-body b { color: var(--ink); }
+.coach {
+  position: fixed; inset: 0; z-index: 60; display: none;
+  background: rgba(2,5,4,.92); backdrop-filter: blur(8px);
+  align-items: center; justify-content: center; padding: 1rem;
+}
+.coach.show { display: flex; }
+.coach-card {
+  width: min(30rem, 94vw); background:
+    radial-gradient(ellipse at 30% 0%, rgba(61,143,85,.18), transparent 55%),
+    #0a1410;
+  border: 1px solid rgba(212,196,154,.35); border-radius: 18px;
+  padding: 1.4rem 1.45rem 1.25rem; box-shadow: 0 28px 90px rgba(0,0,0,.65);
+}
+.coach-card .epigraph {
+  font-size: .62rem; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--ash); margin: 0 0 .55rem;
+}
+.coach-card h1 { margin: 0; font-size: 1.4rem; color: var(--gold); font-weight: 600; line-height: 1.25; }
+.coach-card .lede {
+  margin: .65rem 0 0; font-size: .9rem; color: var(--ink); line-height: 1.5;
+}
+.coach-card .lede b { color: var(--gold); font-weight: 600; }
+.coach-card .steps { margin: 1rem 0 .85rem; padding: 0; list-style: none; }
+.coach-card .steps li {
+  display: flex; gap: .7rem; align-items: flex-start;
+  margin: .5rem 0; font-size: .86rem; color: var(--ink); line-height: 1.4;
+}
+.coach-card .steps .n {
+  flex: 0 0 1.55rem; height: 1.55rem; border-radius: 999px;
+  background: rgba(61,143,85,.22); border: 1px solid rgba(212,196,154,.4);
+  color: var(--gold); display: flex; align-items: center; justify-content: center;
+  font-size: .72rem; font-weight: 600;
+}
+.coach-card .hint { font-size: .74rem; color: var(--muted); line-height: 1.45; margin: 0 0 .95rem; }
+.coach-actions { display: flex; gap: .45rem; justify-content: flex-end; flex-wrap: wrap; }
+.choice .kind.battle { color: var(--good); }
+.rep-name { text-transform: capitalize; }
+details.advanced {
+  margin-top: .55rem; font-size: .7rem; color: var(--muted);
+}
+details.advanced summary { cursor: pointer; color: var(--steam); }
+
+@media (max-width: 980px) {
+  .app { grid-template-columns: 1fr; grid-template-rows: auto auto 1fr auto auto; }
+  .col, .col.right { border:0; border-bottom:1px solid rgba(61,143,85,.2); max-height:28vh; }
+}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <header class="top">
+    <div class="brand">VERDANCE'S ASHES
+      <strong id="hud-title">Loading…</strong>
+    </div>
+    <div class="badges" id="hud-badges"></div>
+  </header>
+
+  <aside class="col" id="col-aces">
+    <h2>The company</h2>
+    <div id="aces"></div>
+    <h3>Standing</h3>
+    <div id="rep"></div>
+    <h3>The war</h3>
+    <div id="kernel"></div>
+  </aside>
+
+  <main class="main" id="main">
+    <div class="kicker" id="kicker">Ashwalker command</div>
+    <h1 id="title" style="margin:.3rem 0 0;font-size:clamp(1.35rem,2.9vw,2rem);color:var(--gold);font-weight:600;line-height:1.2">…</h1>
+    <p id="sub" style="color:var(--muted);margin:.45rem 0 0;max-width:40rem;font-size:.9rem;line-height:1.45"></p>
+    <div class="voice" id="voice-wrap">
+      <div class="who" id="voice-who">Ketha</div>
+      <p class="line" id="voice">…</p>
+    </div>
+    <div class="homecoming" id="homecoming" aria-live="polite">
+      <div class="hc-kicker">Sortie home</div>
+      <div class="hc-banner" id="hc-banner">—</div>
+      <div class="hc-headline" id="hc-headline"></div>
+      <p class="hc-hint" id="hc-hint"></p>
+      <div class="hc-chips" id="hc-chips"></div>
+      <div class="hc-actions">
+        <button type="button" class="btn-ghost" id="hc-dismiss">Dismiss</button>
+      </div>
+    </div>
+    <div class="next-step" id="next-step" aria-live="polite">
+      <div class="ns-kicker">Standing orders</div>
+      <div class="ns-title" id="ns-title">Loading…</div>
+      <div class="ns-body" id="ns-body"></div>
+    </div>
+
+    <section class="theater" id="theater" aria-label="Theater map">
+      <div class="theater-head">
+        <div>
+          <h2 id="theater-title">Theater</h2>
+          <p class="theater-sub" id="theater-sub">Click a wound (target). Infil and exfil stay on the rim. Arrows show the route.</p>
+        </div>
+        <div class="mode-bar" style="margin:0">
+          <span class="label">Mark</span>
+          <button type="button" class="mode-btn active" data-mode="capture">Target</button>
+          <button type="button" class="mode-btn" data-mode="deploy">Infil</button>
+          <button type="button" class="mode-btn" data-mode="extract">Exfil</button>
+        </div>
+      </div>
+      <div class="legend-row">
+        <span class="lg-infil">Infil (rim)</span>
+        <span class="lg-target">Target</span>
+        <span class="lg-exfil">Exfil (rim)</span>
+        <span class="lg-open">Open wound</span>
+      </div>
+      <div class="board-wrap" id="board">
+        <div id="board-zones"></div>
+        <svg class="board-route" id="board-route" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg>
+      </div>
+      <div class="theater-actions">
+        <div class="marks-sum" id="marks-sum">Pick a target on the map.</div>
+        <div style="display:flex;gap:.4rem;flex-wrap:wrap">
+          <button type="button" class="btn-ghost" id="btn-clear-marks" title="Reset marks to defaults">Reset route</button>
+          <button type="button" class="btn-primary" id="btn-deploy">Drop into battle</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="choices" id="choices"></div>
+    <div class="log" id="log"></div>
+  </main>
+
+  <aside class="col right" id="col-right">
+    <div class="tabs">
+      <button type="button" class="tab active" data-tab="shop" id="tab-shop">Broker</button>
+      <button type="button" class="tab" data-tab="theaters" id="tab-theaters">Theaters</button>
+      <button type="button" class="tab" data-tab="manifold" id="tab-manifold">Front sense</button>
+    </div>
+    <div id="panel-shop">
+      <h2>Broker</h2>
+      <div class="shop-balances" id="shop-balances"></div>
+      <p id="shop-note" style="font-size:.68rem;color:var(--muted);margin:0 0 .5rem;line-height:1.35"></p>
+      <h3>In the bag</h3>
+      <div id="deploy-kit"></div>
+      <h3>For hire</h3>
+      <div id="shop-list"></div>
+    </div>
+    <div id="panel-theaters" hidden>
+      <h2>Theaters</h2>
+      <div id="regions"></div>
+    </div>
+    <div id="panel-manifold" hidden>
+      <h2>Front sense</h2>
+      <p style="font-size:.68rem;color:var(--muted);margin:0 0 .45rem;line-height:1.35">
+        How the planet feels under your feet — pressure, scarcity, the tug of contested ground.
+        Every sortie leaves a bruise here.
+      </p>
+      <div class="scalar-row" id="graph-scalars"></div>
+      <div class="spec-bar" id="spec-bar" title="war energy"><i style="width:40%"></i></div>
+      <div id="spec-meta" class="meta" style="font-size:.68rem;color:var(--muted);margin-bottom:.4rem"></div>
+      <svg class="ent-svg" id="ent-svg" viewBox="0 0 280 140" preserveAspectRatio="xMidYMid meet"></svg>
+      <div class="rho-wrap"><table class="rho-table" id="rho-table"></table></div>
+      <div id="rho-inspect" style="font-size:.68rem;color:var(--steam);margin-top:.35rem"></div>
+      <details class="advanced"><summary>Engine readouts</summary>
+        <div id="rho-advanced" style="margin-top:.35rem;font-family:ui-monospace,Consolas,monospace;font-size:.62rem;line-height:1.4"></div>
+      </details>
+    </div>
+  </aside>
+
+  <footer class="foot">
+    <span id="foot-left">Verdance's Ashes</span>
+    <div class="foot-actions">
+      <button type="button" class="primary" id="btn-pull-result" title="Bring the last sortie home (auto when the bridge is live)">After the fight — bring it home</button>
+      <button type="button" id="btn-abandon" title="Leave the field with no zone flip or fake win — unlocks the next Drop">Abandon sortie</button>
+      <button type="button" id="btn-sync-hub" title="Refresh the map from campaign progress">Refresh</button>
+      <button type="button" id="btn-help" title="How this works">How this works</button>
+      <a href="story_autoplay.html" title="Optional cinematic reel">Story reel</a>
+    </div>
+  </footer>
+</div>
+
+<div class="coach" id="coach" role="dialog" aria-modal="true" aria-labelledby="coach-title">
+  <div class="coach-card">
+    <p class="epigraph">A campaign for Beyond All Reason</p>
+    <h1 id="coach-title">The ashes remember commanders</h1>
+    <p class="lede">
+      You are an <b>Ashwalker</b>. Home is the <b>Rock Jungle</b>.
+      Raid abroad for <b>Tenebrium</b> so you can scale build power — then clear your wilds.
+      Plan on this map. Fight in <b>Beyond All Reason</b>.
+    </p>
+    <ol class="steps">
+      <li><span class="n">1</span><span><b>Click a wound</b> on the theater map (target). Open wounds glow amber.</span></li>
+      <li><span class="n">2</span><span><b>Infil</b> and <b>exfil</b> only on the <b>rim</b>. Arrows show the route. Then <b>Drop into battle</b>.</span></li>
+      <li><span class="n">3</span><span>In BAR, take the objective. When the match ends, return here and <b>bring it home</b>.</span></li>
+      <li><span class="n">4</span><span>Raise the jungle camp, raid for Tnb, hire mercs. Cortex starts friendly — bomb their crater and they remember.</span></li>
+    </ol>
+    <p class="hint">Lost? Hit <b>How this works</b> in the bar below anytime.</p>
+    <div class="coach-actions">
+      <button type="button" class="btn-ghost" id="coach-skip">I've been here</button>
+      <button type="button" class="btn-primary" id="coach-go">Open the map</button>
+    </div>
+  </div>
+</div>
+
+<div class="status-toast" id="toast"></div>
+
+<script src="hub_state.embed.js"></script>
+<script src="boards.embed.js"></script>
+<script>
+(function () {
+  const H = window.HUB_STATE || {};
+  const BOARDS = window.ZONE_BOARDS || {};
+  const state = {
+    hub: JSON.parse(JSON.stringify(H)),
+    focusMap: null,
+    hostLive: false,
+    hostBase: "", // "" = same-origin; else http://127.0.0.1:8770
+    hostInfo: null,
+    markMode: "capture",
+    plan: null,
+    log: [],
+    rhoSel: { i: 0, j: 0 },
+    lastResultAt: null,
+  };
+
+  function api(path) {
+    const base = state.hostBase || "";
+    return base + path;
+  }
+
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  })[c]);
+
+  /* Ash Console copy table — keep in sync with match_credit_v1 + va_ash_tokens */
+  const VERDICT_UI = {
+    victory: { banner: "SECURED", headline: "Secured." },
+    partial: { banner: "HINGE", headline: "Hinge. Not a win." },
+    defeat: { banner: "FIELD COSTS", headline: "Field costs." },
+    abandon: { banner: "LEFT THE FIELD", headline: "Left the field." },
+    incomplete: { banner: "RESULT NOT HOME", headline: "Result not home — Retry extract or Abandon." },
+  };
+
+  function showHomecoming(opts) {
+    const el = $("homecoming");
+    if (!el) return;
+    const verdict = String((opts && opts.verdict) || "incomplete").toLowerCase();
+    const ui = VERDICT_UI[verdict] || VERDICT_UI.incomplete;
+    const banner = $("hc-banner");
+    const headline = $("hc-headline");
+    const hint = $("hc-hint");
+    const chips = $("hc-chips");
+    if (banner) {
+      banner.textContent = (opts && opts.banner) || ui.banner;
+      banner.className = "hc-banner " + verdict;
+    }
+    if (headline) headline.textContent = (opts && opts.headline) || ui.headline;
+    if (hint) hint.textContent = (opts && (opts.reasonHint || opts.hint)) || "";
+    if (chips) {
+      chips.innerHTML = "";
+      const list = (opts && opts.chips) || [];
+      list.forEach((c) => {
+        if (!c) return;
+        const span = document.createElement("span");
+        const s = String(c);
+        span.className = "hc-chip";
+        if (/flip|claim|xp|secured/i.test(s)) span.classList.add("good");
+        else if (/hinge|partial|scar|no free/i.test(s)) span.classList.add("warn");
+        else if (/defeat|wiped|lost/i.test(s)) span.classList.add("bad");
+        span.textContent = s;
+        chips.appendChild(span);
+      });
+    }
+    el.classList.add("show");
+  }
+
+  function hideHomecoming() {
+    const el = $("homecoming");
+    if (el) el.classList.remove("show");
+  }
+
+  function toast(msg, kind) {
+    const el = $("toast");
+    el.textContent = msg;
+    el.className = "status-toast show" + (kind ? " " + kind : "");
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => el.classList.remove("show"), 4200);
+  }
+
+  function logLine(text) {
+    state.log.unshift(text);
+    state.log = state.log.slice(0, 12);
+    $("log").innerHTML = state.log.map(t => `<div>${esc(t)}</div>`).join("");
+  }
+
+  function commerce() {
+    return state.hub.commerce || { shop: [], deployKit: [], tenebrium: 0, scrapCredits: 0, owned: {}, upgrades: {} };
+  }
+
+  function arcMax() {
+    return (state.hub.arc && state.hub.arc.maxCaptureMarks) || 1;
+  }
+
+  function prettyMap(id) {
+    if (!id) return "—";
+    const r = (state.hub.regions || []).find(x => x.mapId === id);
+    if (r && r.displayName) return r.displayName;
+    return String(id).replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+  }
+
+  function sessionLabel(mode) {
+    return (mode === "map_travel") ? "On the road" : "Holding this ground";
+  }
+
+  function occupationLabel(model) {
+    const m = String(model || "living_shell");
+    if (m.indexOf("living") >= 0) return "Clear, hold, fortify";
+    if (m.indexOf("raid") >= 0) return "Raid and leave scars";
+    return m.replace(/_/g, " ");
+  }
+
+  function kindLabel(kind) {
+    const k = String(kind || "choice").toLowerCase();
+    if (k === "deploy") return "sortie";
+    if (k === "home_build") return "camp";
+    if (k === "shop") return "broker";
+    if (k === "talk") return "hearth";
+    if (k === "rest") return "rest";
+    if (k === "bay") return "garage";
+    return k;
+  }
+
+  async function doHomeBuild() {
+    if (state.hostLive) {
+      try {
+        toast("Raising the jungle camp…");
+        const res = await fetch(api("/api/home-build"), { method: "POST" });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || data.ok === false) {
+          return toast((data && data.error) || "Camp build failed", "err");
+        }
+        if (data.homeCamp) state.hub.homeCamp = data.homeCamp;
+        if (data.flags) state.hub.flags = Object.assign(state.hub.flags || {}, data.flags);
+        if (data.tenebrium != null) {
+          state.hub.tenebrium = data.tenebrium;
+          if (state.hub.commerce) state.hub.commerce.tenebrium = data.tenebrium;
+        }
+        if (data.commerce) state.hub.commerce = data.commerce;
+        logLine(`Jungle camp raised to L${(data.homeCamp && data.homeCamp.level) || "?"}.`);
+        toast("Camp raised — scale at home", "ok");
+        await pullHubState();
+        refreshTheaterForFocus();
+        return;
+      } catch (e) {
+        return toast(String(e.message || e), "err");
+      }
+    }
+    const c = commerce();
+    const tnb = Number(c.tenebrium || 0);
+    const scrap = Number(c.scrapCredits != null ? c.scrapCredits : c.credits || 0);
+    if (tnb < 1) return toast("Need 1 Tenebrium — raid to print", "err");
+    if (scrap < 25) return toast("Need 25 scrap", "err");
+    c.tenebrium = tnb - 1;
+    if (c.scrapCredits != null) c.scrapCredits = scrap - 25;
+    else c.credits = scrap - 25;
+    state.hub.homeCamp = state.hub.homeCamp || { level: 0, mapId: "the_rock_jungle" };
+    state.hub.homeCamp.level = (state.hub.homeCamp.level || 0) + 1;
+    state.hub.flags = state.hub.flags || {};
+    if (state.hub.homeCamp.level >= 1 || c.tenebrium >= 3) state.hub.flags.homeClearReady = true;
+    state.hub.tenebrium = c.tenebrium;
+    logLine(`Demo camp → L${state.hub.homeCamp.level}`);
+    toast("Camp raised (demo bag)", "ok");
+    renderBadges();
+    renderNode();
+    renderBoard();
+  }
+
+  function repLabel(k) {
+    const map = {
+      armada: "Armada", cortex: "Cortex", nullmercs: "Null Mercs",
+      ashwalkers: "Ashwalkers", sev: "Sev",
+    };
+    return map[k] || String(k).replace(/_/g, " ");
+  }
+
+  function renderNextStep() {
+    const live = state.hostLive;
+    const home = state.hub.sessionHomeMap || (state.hub.node && state.hub.node.regionHint);
+    const m = state.hub.missionNumber || 1;
+    const title = $("ns-title");
+    const body = $("ns-body");
+    if (!title || !body) return;
+    if (!live) {
+      title.textContent = "Campfire map — the wire is dark";
+      body.innerHTML =
+        `You can study the war from here, but you cannot drop into a fight. ` +
+        `Run <b>PLAY_CAMPAIGN.bat</b> (leave it open), then choose a green <b>sortie</b> and <b>Drop into battle</b>.`;
+      return;
+    }
+    if (m <= 1) {
+      title.textContent = `First blood on ${prettyMap(home)}`;
+      body.innerHTML =
+        `Take a green <b>sortie</b> below. Confirm the objective on the briefing table, then <b>Drop into battle</b>. ` +
+        `When the match ends, come back and <b>bring it home</b> so the ashes keep score.`;
+      return;
+    }
+    title.textContent = `Mission ${m} — the front still moves`;
+    body.innerHTML =
+      `Home ground: <b>${esc(prettyMap(home))}</b> · ${esc(sessionLabel(state.hub.sessionMode))}. ` +
+      `Pick a sortie, fight in BAR, then bring the result home so your aces and the map remember.`;
+  }
+
+  function renderBadges() {
+    const h = state.hub;
+    const live = state.hostLive;
+    const arc = h.arc || {};
+    $("hud-title").textContent =
+      `${(arc.title) || "First Scar"} · sortie ${h.missionNumber || 1}`;
+    const home = h.sessionHomeMap || (h.node && h.node.regionHint);
+    const bits = [
+      `<span class="badge ${live ? "live" : "warn"}">${live ? "Wire open" : "Map only"}</span>`,
+      `<span class="badge steam">${esc(prettyMap(home))}</span>`,
+      `<span class="badge">${esc(sessionLabel(h.sessionMode))}</span>`,
+      `<span class="badge tnb">Tenebrium ${h.tenebrium ?? commerce().tenebrium ?? 0}</span>`,
+      `<span class="badge gold">Scrap ${commerce().scrapCredits ?? commerce().credits ?? 0}</span>`,
+    ];
+    $("hud-badges").innerHTML = bits.join("");
+    $("foot-left").textContent = live
+      ? `Wire open · sortie ${h.missionNumber || 1}`
+      : `Map only · run PLAY_CAMPAIGN.bat to fight`;
+    renderNextStep();
+  }
+
+  function renderAces() {
+    const aces = state.hub.aces || [];
+    $("aces").innerHTML = aces.map(a => {
+      const bonds = Object.entries(a.bonds || {}).map(([k,v]) => `${repLabel(k)} ${v}`).join(" · ") || "—";
+      const wound = a.wounds ? ` · wounded ×${a.wounds}` : "";
+      return `<div class="panel-card ace ${a.wounds ? "wounded" : ""}">
+        <div class="name">${esc(a.name || a.id)}</div>
+        <div class="meta">${esc(a.rank || "Runner")} · Level ${a.level || 1}${wound}</div>
+        <div class="row"><span>XP ${Math.round(Number(a.campaignXp||0))}</span><span>${esc(a.status || "active")}</span></div>
+        <div class="meta">Bonds · ${esc(bonds)}</div>
+      </div>`;
+    }).join("") || `<div class="panel-card meta">No aces yet — the first drop names the company.</div>`;
+
+    const rep = state.hub.reputation || {};
+    $("rep").innerHTML = Object.entries(rep).map(([k,v]) =>
+      `<div class="panel-card"><div class="row"><span class="rep-name">${esc(repLabel(k))}</span><strong>${esc(v)}</strong></div></div>`
+    ).join("");
+
+    const home = state.hub.sessionHomeMap || (state.hub.node && state.hub.node.regionHint);
+    const companion = state.hub.companion || {};
+    $("kernel").innerHTML = `
+      <div class="panel-card">
+        <div class="meta">Home ground</div>
+        <div class="name" style="font-size:.82rem">${esc(prettyMap(home))}</div>
+      </div>
+      <div class="panel-card">
+        <div class="meta">How we fight</div>
+        <div class="name" style="font-size:.82rem">${esc(sessionLabel(state.hub.sessionMode))} · ${esc(occupationLabel(state.hub.occupationModel))}</div>
+      </div>
+      <div class="panel-card">
+        <div class="meta">Ketha of Rhekk's Line</div>
+        <div class="meta">Morale ${esc(companion.morale ?? "—")} · Stress ${esc(companion.stress ?? "—")}</div>
+      </div>
+      <div class="panel-card">
+        <div class="meta">Null bay</div>
+        <div class="meta">${esc((state.hub.bay && state.hub.bay.hint) || "Still welding")}</div>
+      </div>`;
+  }
+
+  function renderRegions() {
+    const focus = state.focusMap || (state.hub.node && state.hub.node.regionHint);
+    $("regions").innerHTML = (state.hub.regions || []).map(r => {
+      const cls = r.mapId === focus ? "panel-card region focus" : "panel-card region";
+      return `<div class="${cls}" data-map="${esc(r.mapId)}">
+        <div class="name">${esc(r.displayName || r.mapId)}</div>
+        <div class="meta">${esc(r.descriptor || r.family)}</div>
+        <div class="row">
+          <span class="ctrl">${esc(r.control)}</span>
+          <span>${esc(r.threatBand)} · ${esc(r.dominantEnemy)}</span>
+        </div>
+      </div>`;
+    }).join("");
+    $("regions").querySelectorAll(".region").forEach(el => {
+      el.onclick = () => {
+        state.focusMap = el.dataset.map;
+        renderRegions();
+        renderQuantum();
+        refreshTheaterForFocus();
+        logLine(`Focus theater → ${state.focusMap}`);
+      };
+    });
+  }
+
+  function renderShop() {
+    const c = commerce();
+    $("shop-balances").innerHTML = `
+      <div class="bal tnb">Tenebrium<strong>${c.tenebrium ?? 0}</strong>∞ storage</div>
+      <div class="bal cred">Scrap credits<strong>${c.scrapCredits ?? c.credits ?? 0}</strong>broker scrip</div>`;
+    $("shop-note").textContent = c.notes ||
+      (state.hostLive
+        ? "Buy before you drop. Fabricators eat Tenebrium."
+        : "Campfire broker — purchases stick when the wire is open.");
+
+    const kit = c.deployKit || [];
+    $("deploy-kit").innerHTML = kit.length
+      ? kit.map(k => `<div class="kit-line"><b>${esc(k.label || k.listingId)}</b>
+          ${k.count ? " · ×" + esc(k.count) : ""}
+          ${k.loan ? " · loan" : ""}
+          ${k.factoryDef ? " · fabricator" : ""}</div>`).join("")
+      : `<div class="kit-line">Empty bag — loans show after the first real export.</div>`;
+
+    const shop = c.shop || [];
+    $("shop-list").innerHTML = shop.map(item => {
+      const locked = !item.available;
+      const owned = item.owned;
+      const costs = [];
+      if (item.tenebriumCost) costs.push(`${item.tenebriumCost} Tnb`);
+      if (item.creditCost) costs.push(`${item.creditCost} scrap`);
+      if (!costs.length) costs.push(item.starterOwned ? "starter loan" : "free");
+      return `<div class="listing ${owned ? "owned" : ""} ${locked ? "locked" : ""}" data-id="${esc(item.id)}">
+        <div class="title">
+          <strong>${esc(item.label)}</strong>
+          <span class="cost">${esc(costs.join(" · "))}</span>
+        </div>
+        <div class="blurb">${esc(item.blurb)}</div>
+        <div class="cost">${esc(item.kind)}${item.unitDef ? " · " + esc(item.unitDef) : ""}${item.count ? " ×" + esc(item.count) : ""}${item.builds ? " · builds" : ""}</div>
+        ${locked ? `<div class="block">${esc(item.blockedReason || "locked")}</div>` : ""}
+        ${owned ? `<div class="block" style="color:var(--good)">In bag / installed</div>` : ""}
+        <div class="tags">${(item.tags || []).map(t => `<span class="tag">${esc(t)}</span>`).join("")}</div>
+        ${!owned && !item.starterOwned ? `<button type="button" class="btn-buy" data-buy="${esc(item.id)}" ${locked ? "disabled" : ""}>${state.hostLive ? "Buy" : "Preview buy"}</button>` : ""}
+      </div>`;
+    }).join("") || `<div class="panel-card meta">Broker is empty — re-export the campaign pack.</div>`;
+
+    $("shop-list").querySelectorAll("[data-buy]").forEach(btn => {
+      btn.onclick = () => tryBuy(btn.dataset.buy);
+    });
+  }
+
+  function recomputeShopAvailability() {
+    const c = commerce();
+    const rep = state.hub.reputation || {};
+    const mission = state.hub.missionNumber || 1;
+    const arcN = mission <= 5 ? 1 : mission <= 10 ? 2 : 3;
+    const owned = c.owned || {};
+    const upgrades = c.upgrades || {};
+    (c.shop || []).forEach(item => {
+      let ok = true, reason = null;
+      const kind = item.kind || "";
+      if (kind === "printer_upgrade" && upgrades[item.id]) { ok = false; reason = "upgrade already installed"; }
+      if ((kind === "unit_printer" || kind === "loan_package") && owned[item.id]) { ok = false; reason = "already owned"; }
+      if (item.starterOwned && owned[item.id]) { ok = false; reason = "already owned (starter loan)"; }
+      if (item.requires && !owned[item.requires]) { ok = false; reason = "requires " + item.requires; }
+      if ((item.arcMin || 1) > arcN) { ok = false; reason = "arc " + item.arcMin + "+ only"; }
+      const repMin = item.repMin || {};
+      for (const f of Object.keys(repMin)) {
+        if (Number(rep[f] || 0) < Number(repMin[f])) {
+          ok = false; reason = `need ${f} rep ≥ ${repMin[f]}`;
+        }
+      }
+      const tcost = Number(item.tenebriumCost || 0);
+      const ccost = Number(item.creditCost || 0);
+      if (Number(c.tenebrium || 0) < tcost) { ok = false; reason = `need ${tcost} Tenebrium`; }
+      if (Number(c.scrapCredits || 0) < ccost) { ok = false; reason = `need ${ccost} scrap credits`; }
+      item.available = ok;
+      item.blockedReason = ok ? null : reason;
+      item.owned = !!(owned[item.id] || upgrades[item.id]);
+    });
+    // rebuild deploy kit labels lightly
+    const kit = [];
+    for (const [lid, rec] of Object.entries(owned)) {
+      if (!rec || typeof rec !== "object") continue;
+      const listing = (c.shop || []).find(s => s.id === lid) || {};
+      kit.push({
+        listingId: lid,
+        kind: rec.kind || listing.kind,
+        unitDef: rec.unitDef || listing.unitDef,
+        count: rec.loanCount || rec.count || listing.count,
+        loan: !!(rec.loan || listing.loan),
+        label: listing.label || lid,
+        factoryDef: rec.factoryDef,
+        product: rec.product,
+      });
+    }
+    for (const uid of Object.keys(upgrades)) {
+      const listing = (c.shop || []).find(s => s.id === uid) || {};
+      kit.push({ listingId: uid, kind: "printer_upgrade", label: listing.label || uid });
+    }
+    c.deployKit = kit;
+    state.hub.tenebrium = c.tenebrium;
+    if (state.hub.factionBanks) {
+      state.hub.factionBanks.nullmercs = c.tenebrium;
+      state.hub.factionBanks.ashwalkers = c.tenebrium;
+    }
+  }
+
+  async function tryBuy(listingId) {
+    const c = commerce();
+    const item = (c.shop || []).find(s => s.id === listingId);
+    if (!item) return toast("Unknown listing", "err");
+    recomputeShopAvailability();
+    if (!item.available) return toast(item.blockedReason || "Locked", "err");
+    const tcost = Number(item.tenebriumCost || 0);
+    const ccost = Number(item.creditCost || 0);
+
+    // Live path: mutate campaign_state via host → story engine purchase_listing
+    if (state.hostLive) {
+      try {
+        toast("Purchasing…");
+        const res = await fetch(api("/api/purchase"), {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ listingId }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || data.ok === false) {
+          return toast((data && (data.error || data.reason)) || `Buy failed (${res.status})`, "err");
+        }
+        if (data.commerce) state.hub.commerce = data.commerce;
+        if (data.tenebrium != null) state.hub.tenebrium = data.tenebrium;
+        if (data.aces) state.hub.aces = data.aces;
+        recomputeShopAvailability();
+        renderShop();
+        renderBadges();
+        logLine(`Bought ${item.label} (−${tcost} Tnb, −${ccost} scrap) · campaign bag live`);
+        toast(`Bought ${item.label}`, "ok");
+        await pullHubState();
+        return;
+      } catch (e) {
+        return toast("Purchase error: " + e.message, "err");
+      }
+    }
+
+    // Offline demo bag (file://) — does not touch campaign_state
+    c.tenebrium = Number(c.tenebrium || 0) - tcost;
+    c.scrapCredits = Number(c.scrapCredits || 0) - ccost;
+    c.owned = c.owned || {};
+    c.upgrades = c.upgrades || {};
+    if (item.kind === "printer_upgrade") {
+      c.upgrades[listingId] = { installedAtMission: state.hub.missionNumber || 1, requires: item.requires };
+    } else {
+      c.owned[listingId] = {
+        qty: 1,
+        loan: !!item.loan,
+        unitDef: item.unitDef,
+        loanCount: item.count,
+        count: item.count,
+        kind: item.kind,
+        source: "hub_demo_buy",
+      };
+    }
+    c.ledger = c.ledger || [];
+    c.ledger.push({ op: "hub_demo_purchase", listingId, tcost, ccost, at: new Date().toISOString() });
+    recomputeShopAvailability();
+    renderShop();
+    renderBadges();
+    renderAces();
+    logLine(`Acquired ${item.label} (−${tcost} Tnb, −${ccost} scrap). Demo bag only until campaign settle.`);
+    toast(`Acquired ${item.label} (demo)`, "ok");
+    downloadJson(`hub_purchase_${listingId}.json`, {
+      schemaVersion: "verdance-hub-purchase-demo/1.0",
+      listingId,
+      label: item.label,
+      tenebriumCost: tcost,
+      creditCost: ccost,
+      bag: { tenebrium: c.tenebrium, scrapCredits: c.scrapCredits, owned: c.owned, upgrades: c.upgrades },
+      note: "Hub demo mutation. Live: HUB_HOST.bat → POST /api/purchase.",
+    });
+  }
+
+  function renderNode() {
+    const h = state.hub;
+    const node = h.node || {};
+    const home = h.sessionHomeMap || node.regionHint;
+    const arcTitle = (h.arc && h.arc.title) || "First Scar";
+    $("kicker").textContent =
+      `${arcTitle} · sortie ${h.missionNumber || 1} · ${prettyMap(home)}`;
+    $("title").textContent = h.tagline || "The green is dying. Ashwalkers hold the line.";
+    const nullRep = Number((h.reputation || {}).nullmercs || 0);
+    $("sub").textContent =
+      `${sessionLabel(h.sessionMode)} · ${occupationLabel(h.occupationModel)}` +
+      (nullRep ? ` · Null Mercs know you (${nullRep})` : "");
+    const speaker = (node.speaker || "ketha");
+    const speakerName = speaker === "ketha" ? "Ketha of Rhekk's Line" :
+      (speaker.charAt(0).toUpperCase() + speaker.slice(1));
+    if ($("voice-who")) $("voice-who").textContent = speakerName;
+    $("voice").textContent = node.text || "The line is quiet. That never lasts.";
+    const choices = node.choices || [];
+    $("choices").innerHTML = choices.map(ch => {
+      const kl = kindLabel(ch.kind);
+      const isSortie = ch.kind === "deploy";
+      const cls = isSortie ? "deploy battle" : (ch.kind || "");
+      const blurb = ch.blurb
+        || (isSortie ? "Mark the ground. Drop. Come home." : "");
+      return `<button type="button" class="choice ${esc(cls)}" data-choice="${esc(ch.id)}">
+        <div class="kind ${esc(kl)}">${esc(kl)}</div>
+        <div class="label">${esc(ch.label)}</div>
+        ${blurb ? `<div class="blurb">${esc(blurb)}</div>` : ""}
+      </button>`;
+    }).join("");
+    $("choices").querySelectorAll(".choice").forEach(btn => {
+      btn.onclick = () => onChoice(btn.dataset.choice);
+    });
+    renderNextStep();
+  }
+
+  function onChoice(id) {
+    const ch = ((state.hub.node || {}).choices || []).find(c => c.id === id);
+    if (!ch) return;
+    const kind = ch.kind || "";
+    if (kind === "deploy") {
+      openDeploy(ch);
+      return;
+    }
+    if (kind === "home_build") {
+      doHomeBuild();
+      return;
+    }
+    if (kind === "shop") {
+      document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === "shop"));
+      $("panel-shop").hidden = false;
+      $("panel-theaters").hidden = true;
+      if ($("panel-manifold")) $("panel-manifold").hidden = true;
+      logLine("The broker's tent is open.");
+      toast("Broker — hire before you drop", "ok");
+      return;
+    }
+    if (kind === "talk") {
+      const delta = (ch.effect && ch.effect.bondDelta) || {};
+      for (const ace of state.hub.aces || []) {
+        const d = delta[ace.id];
+        if (d) {
+          ace.bonds = ace.bonds || {};
+          for (const [k, v] of Object.entries(d)) ace.bonds[k] = (ace.bonds[k] || 0) + Number(v);
+        }
+      }
+      logLine("Ketha stays by the fire a little longer. Bonds warm.");
+      toast("The hearth holds", "ok");
+      renderAces();
+      return;
+    }
+    if (kind === "rest") {
+      for (const ace of state.hub.aces || []) {
+        if (ace.wounds > 0) ace.wounds = Math.max(0, ace.wounds - 1);
+      }
+      if (state.hub.companion && state.hub.companion.stress != null) {
+        state.hub.companion.stress = Math.max(0, Number(state.hub.companion.stress) - 5);
+      }
+      logLine("The company sleeps. Wounds ease. Stress bleeds off.");
+      toast("The company rests", "ok");
+      renderAces();
+      return;
+    }
+    if (kind === "bay") {
+      toast((ch.effect && ch.effect.note) || "Bay still locked", "err");
+      logLine("Null bay is still welding. Come back when the contract deepens.");
+      return;
+    }
+    logLine(`Choice ${id} (${kind})`);
+  }
+
+  const RIM_THRESHOLD = 0.28;
+
+  function edgeScore(z) {
+    if (z && z.edgeScore != null) return Number(z.edgeScore);
+    const b = (z && z.bounds) || {};
+    const cx = ((Number(b.xMin) || 0) + (Number(b.xMax) || 1)) / 2;
+    const cz = ((Number(b.zMin) || 0) + (Number(b.zMax) || 1)) / 2;
+    return Math.min(cx, 1 - cx, cz, 1 - cz);
+  }
+
+  function isRimZone(z) {
+    return edgeScore(z) <= RIM_THRESHOLD;
+  }
+
+  function zoneCenter(z) {
+    const b = (z && z.bounds) || {};
+    return {
+      x: (((Number(b.xMin) || 0) + (Number(b.xMax) || 1)) / 2) * 100,
+      y: (((Number(b.zMin) || 0) + (Number(b.zMax) || 1)) / 2) * 100,
+    };
+  }
+
+  function intelFor(mapId, zoneId) {
+    const theater = state.hub.theater || {};
+    if (theater.mapId === mapId && theater.intelByZone && theater.intelByZone[zoneId]) {
+      return theater.intelByZone[zoneId];
+    }
+    const zones = (theater.zones || []);
+    return zones.find(z => z.zoneId === zoneId) || null;
+  }
+
+  function defaultMarks(mapId) {
+    const board = BOARDS[mapId] || {};
+    const zones = board.zones || [];
+    // Infil / exfil must sit on the map rim (low edgeScore), never midfield.
+    const byEdge = zones.slice().sort((a, b) => edgeScore(a) - edgeScore(b));
+    const rim = byEdge.filter(z => isRimZone(z));
+    const deployPool = rim.length ? rim : byEdge;
+    const deploy =
+      deployPool.find(z => z.deployDefault) ||
+      deployPool.find(z => /start|staging|shelf|camp/i.test(String(z.role || "") + " " + (z.tags || []).join(" "))) ||
+      deployPool[0] ||
+      zones[0];
+    const extract =
+      deployPool.find(z => z.extractDefault && z !== deploy) ||
+      deployPool.find(z => z.extractDefault) ||
+      deploy ||
+      zones[0];
+    const theater = state.hub.theater || {};
+    const openId = ((theater.openTargets || [])[0] || {}).zoneId;
+    const caps = zones.filter(z => z.capturable || z.preferredObjective);
+    const pick =
+      (openId && zones.find(z => z.zoneId === openId)) ||
+      caps.find(z => z.preferredObjective && z.zoneId !== (deploy && deploy.zoneId)) ||
+      caps.find(z => z.preferredObjective) ||
+      caps[0] ||
+      zones[0];
+    return {
+      deployZoneId: deploy && deploy.zoneId,
+      extractZoneId: extract && extract.zoneId,
+      captureZoneIds: pick ? [pick.zoneId] : [],
+    };
+  }
+
+  function jobLabel(kind) {
+    return ({
+      eco_raid: "Raid their economy",
+      seize_lane: "Seize and hold the lane",
+      strike_relay: "Cut the relay",
+      destroy_key_structure: "Break the key structure",
+      hive_clear_or_bypass: "Clear or bypass the hive",
+      gate_control: "Hold the gate",
+      home_clear: "Clear the home wilds",
+    })[kind] || String(kind || "Sortie").replace(/_/g, " ");
+  }
+
+  function ensureTheaterPlan(choice) {
+    const effect = (choice && choice.effect) || {};
+    const mapId = effect.mapId
+      || state.focusMap
+      || state.hub.sessionHomeMap
+      || (state.hub.node && state.hub.node.regionHint)
+      || "the_rock_jungle";
+    const marks = defaultMarks(mapId);
+    if (effect.preferredCaptureZoneId) {
+      marks.captureZoneIds = [effect.preferredCaptureZoneId];
+    }
+    if (effect.preferredDeployZoneId) {
+      const board = BOARDS[mapId] || {};
+      const z = (board.zones || []).find(x => x.zoneId === effect.preferredDeployZoneId);
+      if (z && isRimZone(z)) {
+        marks.deployZoneId = effect.preferredDeployZoneId;
+        if (!marks.extractZoneId) marks.extractZoneId = effect.preferredDeployZoneId;
+      }
+    }
+    const against = effect.against
+      || (mapId === "eye_of_horus" ? "cortex" : mapId === "the_rock_jungle" ? "wild" : "armada");
+    state.plan = {
+      schemaVersion: "verdance-deploy-plan/1.0",
+      mapId,
+      contractKind: effect.contractKind || (mapId === "the_rock_jungle" ? "hive_clear_or_bypass" : "seize_lane"),
+      deployAces: effect.deployAces || (state.hub.aces || []).filter(a => a.deployable).map(a => a.id).slice(0, 2),
+      choiceId: (choice && choice.id) || "c_theater",
+      repDelta: effect.repDelta || {},
+      arcId: (state.hub.arc && state.hub.arc.id) || 1,
+      maxCaptureMarks: arcMax(),
+      marks,
+      pathSignal: state.hub.pathSignal,
+      sessionMode: effect.sessionMode || state.hub.sessionMode || "same_map",
+      occupationModel: state.hub.occupationModel || "living_shell",
+      commerceDeploy: {
+        tenebrium: commerce().tenebrium,
+        kit: commerce().deployKit || [],
+      },
+      patron: "nullmercs",
+      against,
+    };
+    state.markMode = state.markMode || "capture";
+    state.focusMap = mapId;
+    return state.plan;
+  }
+
+  function openDeploy(choice) {
+    ensureTheaterPlan(choice);
+    state.markMode = "capture";
+    document.querySelectorAll(".mode-btn").forEach(b => b.classList.toggle("active", b.dataset.mode === state.markMode));
+    const launchBtn = $("btn-deploy");
+    if (launchBtn) {
+      launchBtn.textContent = state.hostLive ? "Drop into battle" : "Save plan (map only)";
+    }
+    renderBoard();
+    const plan = state.plan;
+    logLine(`Route briefing — ${prettyMap(plan.mapId)} · ${jobLabel(plan.contractKind)}`);
+    toast(`Mark the target on ${prettyMap(plan.mapId)}`, "ok");
+    const th = $("theater");
+    if (th) th.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  function refreshTheaterForFocus() {
+    const mapId = state.focusMap
+      || state.hub.sessionHomeMap
+      || (state.hub.node && state.hub.node.regionHint)
+      || "the_rock_jungle";
+    // Prefer a deploy choice matching this map if present
+    const choices = ((state.hub.node || {}).choices || []).filter(c => c.kind === "deploy");
+    const match = choices.find(c => (c.effect || {}).mapId === mapId) || choices[0] || null;
+    if (match) ensureTheaterPlan(match);
+    else ensureTheaterPlan({ id: "c_theater", effect: { mapId } });
+    renderBoard();
+  }
+
+  function drawRouteArrows(plan, zones) {
+    const svg = $("board-route");
+    if (!svg) return;
+    const m = (plan && plan.marks) || {};
+    const byId = Object.fromEntries((zones || []).map(z => [z.zoneId, z]));
+    const infil = byId[m.deployZoneId];
+    const targetId = (m.captureZoneIds || [])[0];
+    const target = byId[targetId];
+    const exfil = byId[m.extractZoneId];
+    const parts = [];
+    parts.push(`<defs>
+      <marker id="arr-warn" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto">
+        <path d="M0,0 L5,2.5 L0,5 Z" fill="#e0a060"/></marker>
+      <marker id="arr-steam" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto">
+        <path d="M0,0 L5,2.5 L0,5 Z" fill="#7ec8ff"/></marker>
+    </defs>`);
+    if (infil && target) {
+      const a = zoneCenter(infil), b = zoneCenter(target);
+      parts.push(`<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}"
+        stroke="#e0a060" stroke-width="0.9" stroke-opacity="0.9"
+        marker-end="url(#arr-warn)"/>`);
+    }
+    if (target && exfil) {
+      const a = zoneCenter(target), b = zoneCenter(exfil);
+      parts.push(`<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}"
+        stroke="#7ec8ff" stroke-width="0.85" stroke-opacity="0.85" stroke-dasharray="2 1.5"
+        marker-end="url(#arr-steam)"/>`);
+    }
+    svg.innerHTML = parts.join("");
+  }
+
+  function renderBoard() {
+    if (!state.plan) refreshTheaterForFocus();
+    const plan = state.plan;
+    if (!plan) return;
+    const board = BOARDS[plan.mapId] || { zones: [] };
+    const zones = board.zones || [];
+    const el = $("board-zones") || $("board");
+    const title = $("theater-title");
+    const sub = $("theater-sub");
+    if (title) title.textContent = prettyMap(plan.mapId);
+    if (sub) {
+      const camp = (state.hub.homeCamp && state.hub.homeCamp.level) || 0;
+      const flags = state.hub.flags || {};
+      const homeNote = plan.mapId === "the_rock_jungle"
+        ? (flags.homeCleared
+          ? " · home cleared"
+          : ` · camp L${camp}${flags.homeClearReady ? " · clear ready" : " · need Tnb to scale"}`)
+        : "";
+      sub.textContent =
+        `${jobLabel(plan.contractKind)} · ${(plan.deployAces || []).join(", ") || "your aces"}${homeNote}`;
+    }
+    const rimMode = state.markMode === "deploy" || state.markMode === "extract";
+    if (!zones.length) {
+      el.innerHTML = `<div style="padding:1rem;color:var(--muted);font-size:.85rem">
+        No zone board for <b>${esc(plan.mapId)}</b>. Run tools/build_zone_boards_v1.py.</div>`;
+      drawRouteArrows(plan, []);
+    } else {
+      el.innerHTML = zones.map(z => {
+        const b = z.bounds || { xMin:0, xMax:0.2, zMin:0, zMax:0.2 };
+        const left = (b.xMin || 0) * 100;
+        const top = (b.zMin || 0) * 100;
+        const w = Math.max(4, ((b.xMax || 0) - (b.xMin || 0)) * 100);
+        const h = Math.max(4, ((b.zMax || 0) - (b.zMin || 0)) * 100);
+        const m = plan.marks || {};
+        const intel = intelFor(plan.mapId, z.zoneId) || {};
+        const cls = ["zone"];
+        if (z.capturable) cls.push("capturable");
+        if (isRimZone(z)) cls.push("rim-eligible");
+        else cls.push("midfield");
+        if (rimMode) cls.push("mode-rim");
+        if (intel.openTarget || intel.preferred) cls.push("open-target");
+        if (intel.claimed) cls.push("claimed");
+        if (intel.control) cls.push("ctrl-" + String(intel.control).replace(/[^a-z]/g, ""));
+        if (intel.confidence === "estimated") cls.push("est");
+        if (m.deployZoneId === z.zoneId) cls.push("deploy-mark");
+        if (m.extractZoneId === z.zoneId) cls.push("extract-mark");
+        if ((m.captureZoneIds || []).includes(z.zoneId)) cls.push("capture-mark");
+        const chip = (intel.openTarget || intel.preferred)
+          ? `<div class="zone-chip">open</div>` : "";
+        return `<div class="${cls.join(" ")}" data-zone="${esc(z.zoneId)}"
+          style="left:${left}%;top:${top}%;width:${w}%;height:${h}%"
+          title="${esc(z.label || z.zoneId)}${intel.control ? " · " + intel.control : ""}">
+          <div class="zone-label">${esc(z.label || z.zoneId)}</div>${chip}
+        </div>`;
+      }).join("");
+      el.querySelectorAll(".zone").forEach(z => {
+        z.onclick = () => markZone(z.dataset.zone);
+      });
+      drawRouteArrows(plan, zones);
+    }
+    const m = plan.marks || {};
+    const zoneName = (id) => {
+      if (!id) return "—";
+      const z = zones.find(x => x.zoneId === id);
+      return (z && z.label) || id;
+    };
+    const modeLabel = ({ capture: "target", deploy: "infil", extract: "exfil" })[state.markMode] || state.markMode;
+    $("marks-sum").innerHTML =
+      `<b>Infil</b> ${esc(zoneName(m.deployZoneId))} · <b>Target</b> ${(m.captureZoneIds || []).map(z => esc(zoneName(z))).join(", ") || "—"} · <b>Exfil</b> ${esc(zoneName(m.extractZoneId))}<br>` +
+      `route arrows · marking <b>${esc(modeLabel)}</b> · rim only for infil/exfil`;
+    const launchBtn = $("btn-deploy");
+    if (launchBtn) {
+      launchBtn.textContent = state.hostLive ? "Drop into battle" : "Save plan (map only)";
+    }
+  }
+
+  function markZone(zoneId) {
+    const plan = state.plan;
+    if (!plan) return;
+    const board = BOARDS[plan.mapId] || {};
+    const z = (board.zones || []).find(x => x.zoneId === zoneId);
+    const m = plan.marks;
+    if (state.markMode === "deploy" || state.markMode === "extract") {
+      if (z && !isRimZone(z)) {
+        toast("Infil and exfil stay on the rim of the map", "err");
+        return;
+      }
+      if (state.markMode === "deploy") {
+        m.deployZoneId = zoneId;
+        if (!m.extractZoneId) m.extractZoneId = zoneId;
+      } else {
+        m.extractZoneId = zoneId;
+      }
+    } else {
+      // Target is a different mark type from landing
+      const caps = m.captureZoneIds || [];
+      const i = caps.indexOf(zoneId);
+      if (i >= 0) caps.splice(i, 1);
+      else {
+        if (caps.length >= (plan.maxCaptureMarks || 1)) caps.shift();
+        caps.push(zoneId);
+      }
+      m.captureZoneIds = caps;
+    }
+    renderBoard();
+  }
+
+  function downloadJson(filename, obj) {
+    const blob = new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+  }
+
+  async function commitDeploy(launch) {
+    const plan = state.plan;
+    if (!plan) return;
+    if (!(plan.marks && plan.marks.captureZoneIds && plan.marks.captureZoneIds.length)) {
+      return toast("Mark a target (wound) on the map first", "err");
+    }
+    if (!plan.marks.deployZoneId) {
+      return toast("Mark an infil zone on the rim", "err");
+    }
+    const board = BOARDS[plan.mapId] || {};
+    const zones = board.zones || [];
+    const dep = zones.find(z => z.zoneId === plan.marks.deployZoneId);
+    const ext = zones.find(z => z.zoneId === (plan.marks.extractZoneId || plan.marks.deployZoneId));
+    if (dep && !isRimZone(dep)) {
+      return toast("Infil must be on the rim — pick an edge zone", "err");
+    }
+    if (ext && !isRimZone(ext)) {
+      return toast("Exfil must be on the rim — pick an edge zone", "err");
+    }
+    plan.commerceDeploy = { tenebrium: commerce().tenebrium, kit: commerce().deployKit || [] };
+
+    if (state.hostLive) {
+      try {
+        toast(launch ? "Sealing the drop — opening Beyond All Reason…" : "Sealing the drop…");
+        const q = launch ? "?launch=1" : "";
+        const res = await fetch(api("/api/deploy" + q), {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(plan),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || data.ok === false) {
+          logLine("The drop did not go through — check the toast.");
+          toast((data && (data.error || data.reason)) || `Drop failed (${res.status})`, "err");
+          return;
+        }
+        const launched = !!(data.launch && data.launch.ok !== false && !data.launch.skipped);
+        logLine(launched
+          ? `Dropping on ${prettyMap(plan.mapId)}. Fight the match, then bring it home.`
+          : `Sortie ready on ${prettyMap(plan.mapId)}. Open BAR if it did not start.`);
+        toast(launched
+          ? "Beyond All Reason is opening — good hunting."
+          : "Sortie sealed. Open BAR if it did not launch.", "ok");
+        state.hub.flags = state.hub.flags || {};
+        state.hub.flags.deployStub = false;
+        state.hub.lastResult = { kind: "deploy_committed", at: new Date().toISOString(), seedHint: data.seedHint };
+        renderBadges();
+        const ns = $("ns-title");
+        const nb = $("ns-body");
+        if (ns && nb) {
+          ns.textContent = "The company is in the field";
+          nb.innerHTML = `When the match ends, the <b>bridge brings it home</b> automatically if it can. ` +
+            `If the map does not move, click <b>After the fight — bring it home</b>.`;
+        }
+      } catch (e) {
+        toast("Wire error: " + e.message, "err");
+      }
+      return;
+    }
+
+    // Offline map-only: download plan, guide player to PLAY_CAMPAIGN
+    downloadJson("hub_deploy_plan.json", plan);
+    logLine(`Map-only plan for ${prettyMap(plan.mapId)}. Run PLAY_CAMPAIGN.bat to fight.`);
+    toast("Map only — run PLAY_CAMPAIGN.bat to open the wire and drop for real.", "err");
+    $("deploy-overlay").classList.remove("show");
+    state.hub.lastResult = { kind: "deploy_stub", mapId: plan.mapId, contractKind: plan.contractKind };
+  }
+
+  async function probeHost() {
+    const candidates = [];
+    if (location.protocol === "http:" || location.protocol === "https:") {
+      candidates.push(""); // same origin first
+    }
+    candidates.push("http://127.0.0.1:8770");
+    state.hostLive = false;
+    state.hostBase = "";
+    for (const base of candidates) {
+      try {
+        const res = await fetch((base || "") + "/api/status", { cache: "no-store" });
+        if (!res.ok) continue;
+        const data = await res.json();
+        if (!(data.schemaVersion && String(data.schemaVersion).indexOf("hub-host") >= 0) &&
+            !(data.capabilities && data.capabilities.stamp)) continue;
+        state.hostLive = true;
+        state.hostBase = base;
+        state.hostInfo = data;
+        if (state.hub.flags) state.hub.flags.deployStub = false;
+        logLine(`Wire open (${base || location.origin})`);
+        break;
+      } catch (_) { /* try next */ }
+    }
+    if (!state.hostLive && state.hub.flags) state.hub.flags.deployStub = true;
+    if (!state.hostLive) {
+      logLine("Map only — run PLAY_CAMPAIGN.bat to fight in BAR.");
+    }
+    renderBadges();
+    if (state.hostLive) {
+      startResultPoll();
+      pullHubState().catch(() => {});
+    }
+  }
+
+  function heatColor(v) {
+    // v in [0,1] → dark green to gold
+    const t = Math.max(0, Math.min(1, v));
+    const r = Math.round(20 + t * 200);
+    const g = Math.round(40 + t * 160);
+    const b = Math.round(30 + t * 40);
+    return `rgb(${r},${g},${b})`;
+  }
+
+  function buildRho(mapId) {
+    const board = BOARDS[mapId];
+    const zones = (board && board.zones) || [];
+    if (!zones.length) return { labels: [], matrix: [], zones: [] };
+    const n = zones.length;
+    const centers = zones.map(z => {
+      const b = z.bounds || {};
+      return {
+        x: ((b.xMin || 0) + (b.xMax || 1)) / 2,
+        z: ((b.zMin || 0) + (b.zMax || 1)) / 2,
+        zone: z,
+      };
+    });
+    const matrix = Array.from({ length: n }, () => Array(n).fill(0));
+    const g = state.hub.graph || {};
+    const contest = Math.min(1.5, Number(g.q6_contested) || 0.85);
+    const voidS = Number(g.q2_void_structure) || 0.15;
+    for (let i = 0; i < n; i++) {
+      const ctrl = (zones[i].control || zones[i].defaultControl || "neutral");
+      const diag = 0.35 + 0.4 * contest * (ctrl === "contested" || ctrl === "armada" ? 1 : 0.6);
+      matrix[i][i] = Math.min(1, diag);
+      for (let j = i + 1; j < n; j++) {
+        const dx = centers[i].x - centers[j].x;
+        const dz = centers[i].z - centers[j].z;
+        const dist = Math.sqrt(dx * dx + dz * dz) || 0.01;
+        let coh = Math.exp(-dist * (2.2 + voidS * 2)) * contest * 0.85;
+        if (zones[i].capturable && zones[j].capturable) coh *= 1.15;
+        coh = Math.min(0.95, coh);
+        matrix[i][j] = coh;
+        matrix[j][i] = coh;
+      }
+    }
+    // Normalize row-ish for display
+    let mx = 0.001;
+    for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) mx = Math.max(mx, matrix[i][j]);
+    for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) matrix[i][j] = matrix[i][j] / mx;
+    return {
+      labels: zones.map(z => (z.label || z.zoneId || "?").slice(0, 10)),
+      matrix,
+      zones,
+      centers,
+    };
+  }
+
+  function renderQuantum() {
+    const mapId = state.focusMap
+      || state.hub.sessionHomeMap
+      || (state.hub.node && state.hub.node.regionHint)
+      || ((state.hub.regions || [])[0] && (state.hub.regions || [])[0].mapId);
+    const g = state.hub.graph || {};
+    const rhoCamp = state.hub.campaignRho || {};
+    const axes = rhoCamp.axes || {};
+    const keys = [
+      ["Armada↔Cortex", g.q0_armada_cortex],
+      ["Void scars", g.q2_void_structure],
+      ["Contested", g.q6_contested],
+      ["Independents", g.q6_independent],
+      ["Scarcity", g.q7_resource_scarcity],
+    ];
+    if (axes.arm_cor != null) {
+      keys.push(["Faction pull", axes.arm_cor], ["Path tilt", axes.phi], ["Tenebrium pressure", axes.tenebrium]);
+    }
+    $("graph-scalars").innerHTML = keys.map(([k, v]) =>
+      `<span class="scalar-pill">${k} <b>${Number(v || 0).toFixed(2)}</b></span>`
+    ).join("");
+    const sp = state.hub.spectral || {};
+    const energy = Number(sp.energy || keys.reduce((s, [, v]) => s + Math.abs(Number(v || 0)), 0));
+    const barPct = Math.min(100, Math.round((energy / 6) * 100));
+    $("spec-bar").innerHTML = `<i style="width:${barPct}%"></i>`;
+    const pur = rhoCamp.purity != null ? Number(rhoCamp.purity).toFixed(2) : "—";
+    const ent = rhoCamp.entropy != null ? Number(rhoCamp.entropy).toFixed(2) : "—";
+    $("spec-meta").textContent =
+      `Theater: ${prettyMap(mapId)} · war energy ${energy.toFixed(2)} · focus ${pur} · chaos ${ent}`;
+    const adv = $("rho-advanced");
+    if (adv) {
+      adv.textContent =
+        `q0=${Number(g.q0_armada_cortex||0).toFixed(3)} q2=${Number(g.q2_void_structure||0).toFixed(3)} ` +
+        `q6c=${Number(g.q6_contested||0).toFixed(3)} q7=${Number(g.q7_resource_scarcity||0).toFixed(3)} ` +
+        `λ=${Number(sp.dominantEigenvalue||0).toFixed(3)} path=${state.hub.pathSignal||"B"}`;
+    }
+
+    const rho = buildRho(mapId);
+    const n = rho.matrix.length;
+    if (!n) {
+      $("rho-table").innerHTML = "<tr><td style='color:var(--muted);padding:.4rem'>No zone board — run build_zone_boards_v1.py</td></tr>";
+      $("ent-svg").innerHTML = "";
+      $("rho-inspect").textContent = "";
+      return;
+    }
+    // Clamp selection
+    state.rhoSel.i = Math.min(state.rhoSel.i, n - 1);
+    state.rhoSel.j = Math.min(state.rhoSel.j, n - 1);
+
+    let head = "<tr><th></th>" + rho.labels.map(l => `<th title="${esc(l)}">${esc(l.slice(0, 4))}</th>`).join("") + "</tr>";
+    let body = "";
+    for (let i = 0; i < n; i++) {
+      body += `<tr><th title="${esc(rho.labels[i])}">${esc(rho.labels[i].slice(0, 4))}</th>`;
+      for (let j = 0; j < n; j++) {
+        const v = rho.matrix[i][j];
+        const sel = (state.rhoSel.i === i && state.rhoSel.j === j) ? " sel" : "";
+        body += `<td class="${sel}" data-i="${i}" data-j="${j}" style="background:${heatColor(v)}" title="${v.toFixed(3)}"></td>`;
+      }
+      body += "</tr>";
+    }
+    $("rho-table").innerHTML = head + body;
+    $("rho-table").querySelectorAll("td[data-i]").forEach(td => {
+      td.onclick = () => {
+        state.rhoSel = { i: +td.dataset.i, j: +td.dataset.j };
+        renderQuantum();
+      };
+    });
+    const si = state.rhoSel.i, sj = state.rhoSel.j;
+    $("rho-inspect").textContent =
+      `Link ${rho.matrix[si][sj].toFixed(2)} · ${rho.labels[si]} ↔ ${rho.labels[sj]}`;
+
+    // Entanglement SVG — edges for strong off-diagonals
+    const W = 280, H = 140, pad = 18;
+    const pts = (rho.centers || []).map((c, idx) => ({
+      x: pad + c.x * (W - 2 * pad),
+      y: pad + c.z * (H - 2 * pad),
+      i: idx,
+    }));
+    let edges = "";
+    for (let i = 0; i < n; i++) {
+      for (let j = i + 1; j < n; j++) {
+        const v = rho.matrix[i][j];
+        if (v < 0.35) continue;
+        edges += `<line x1="${pts[i].x}" y1="${pts[i].y}" x2="${pts[j].x}" y2="${pts[j].y}"
+          stroke="rgba(126,200,255,${0.15 + v * 0.7})" stroke-width="${0.6 + v * 2.2}"/>`;
+      }
+    }
+    const nodes = pts.map((p, i) => {
+      const hot = i === si || i === sj;
+      return `<circle cx="${p.x}" cy="${p.y}" r="${hot ? 5.5 : 3.5}"
+        fill="${hot ? "var(--gold)" : "var(--edge)"}" opacity="0.9"/>`;
+    }).join("");
+    $("ent-svg").innerHTML = edges + nodes;
+  }
+
+  function mergeHubPatch(patch) {
+    if (!patch) return;
+    if (patch.aces) state.hub.aces = patch.aces;
+    if (patch.missionNumber != null) {
+      state.hub.missionNumber = patch.missionNumber;
+      // arc rebuild light
+      const n = patch.missionNumber;
+      state.hub.arc = n <= 5
+        ? { id: 1, title: "First Scar", maxCaptureMarks: 1 }
+        : n <= 10
+          ? { id: 2, title: "Second Scar", maxCaptureMarks: 2 }
+          : { id: 3, title: "Third Scar", maxCaptureMarks: 3 };
+    }
+    if (patch.reputation) state.hub.reputation = patch.reputation;
+    if (patch.graph) state.hub.graph = patch.graph;
+    if (patch.spectral) state.hub.spectral = patch.spectral;
+    if (patch.node) state.hub.node = patch.node;
+    if (patch.lastResult) state.hub.lastResult = patch.lastResult;
+    if (patch.regions && Array.isArray(patch.regions)) {
+      const byId = Object.fromEntries(patch.regions.map(r => [r.mapId, r]));
+      (state.hub.regions || []).forEach(r => {
+        const u = byId[r.mapId];
+        if (u && u.control) r.control = u.control;
+      });
+    }
+    if (state.hub.flags) state.hub.flags.deployStub = false;
+    const debrief = patch.debrief || (patch.lastResult && patch.lastResult.debrief) || null;
+    const tokens = (patch.lastResult && patch.lastResult.tokens) || (debrief && debrief.changed) || [];
+    const auto = !!(patch.autoApplied || (patch.lastResult && patch.lastResult.autoApplied));
+    const headline = (debrief && debrief.headline)
+      || patch.headline
+      || (patch.lastResult && patch.lastResult.headline)
+      || null;
+    const verdict = (debrief && debrief.verdict) || patch.verdict || (patch.lastResult && patch.lastResult.verdict);
+    const reasonHint = (debrief && debrief.reasonHint)
+      || patch.reasonHint
+      || (patch.lastResult && patch.lastResult.reasonHint)
+      || "";
+    if (headline || tokens.length || auto || verdict) {
+      const prefix = auto ? "Bridge: " : (verdict === "incomplete" ? "Incomplete: " : "Brought home: ");
+      logLine(prefix + (headline || tokens.slice(0, 8).join(" · ") || "campaign advanced"));
+      showHomecoming({
+        verdict: verdict || "incomplete",
+        banner: (debrief && debrief.banner) || patch.banner,
+        headline: headline,
+        reasonHint: reasonHint,
+        chips: tokens.slice(0, 10),
+      });
+      if (verdict === "incomplete") {
+        toast(headline || "Result not home — retry bring-home or Abandon", "err");
+      } else if (verdict === "abandon") {
+        toast(headline || "Left the field — mark the next board", "warn");
+      } else if (debrief && debrief.duplicate) {
+        toast("Already applied — state unchanged", "ok");
+      } else {
+        toast(auto
+          ? (headline || "Bridge brought the sortie home")
+          : (headline || "The ashes keep score — company and map updated"), "ok");
+      }
+    }
+    renderBadges();
+    renderAces();
+    renderRegions();
+    renderShop();
+    renderNode();
+    renderQuantum();
+  }
+
+  async function pullHubState() {
+    if (!state.hostLive) return;
+    const res = await fetch(api("/api/hub-state"), { cache: "no-store" });
+    const j = await res.json();
+    if (j.ok && j.hub) {
+      const focus = state.focusMap;
+      state.hub = j.hub;
+      state.focusMap = focus || j.hub.sessionHomeMap || (j.hub.node && j.hub.node.regionHint);
+      if (state.hub.flags) state.hub.flags.deployStub = false;
+      renderBadges();
+      renderAces();
+      renderRegions();
+      renderShop();
+      renderNode();
+      renderQuantum();
+      refreshTheaterForFocus();
+      logLine("Map refreshed from the living campaign");
+    }
+  }
+
+  async function pullBarResult() {
+    if (!state.hostLive) {
+      return toast("Open the wire first — run PLAY.bat", "err");
+    }
+    toast("Listening for the last sortie…");
+    try {
+      const res = await fetch(api("/api/advance?extract=1"), { method: "POST" });
+      const j = await res.json().catch(() => ({}));
+      const rr = await fetch(api("/api/result"), { cache: "no-store" });
+      const rj = await rr.json().catch(() => ({}));
+      if (rj.present && rj.result) {
+        state.lastResultAt = rj.result.at;
+        mergeHubPatch({
+          ...rj.result,
+          debrief: j.debrief || rj.result.debrief,
+          headline: j.headline || rj.result.headline,
+          verdict: j.verdict || rj.result.verdict,
+        });
+      } else if (j.debrief || (j.apply && j.apply.lastResult) || j.incomplete) {
+        mergeHubPatch({
+          lastResult: (j.apply && j.apply.lastResult) || j.lastResult,
+          debrief: j.debrief,
+          headline: j.headline,
+          verdict: j.verdict,
+          missionNumber: j.apply && j.apply.missionNumber,
+        });
+        if (!j.incomplete) await pullHubState();
+      } else if (!j.ok) {
+        toast((j.error || (j.apply && j.apply.error) || "Nothing to bring home yet — finish a match or Abandon"), "err");
+      } else {
+        await pullHubState();
+        toast("Map refreshed — no new scars this pass", "ok");
+      }
+    } catch (e) {
+      toast("Could not bring it home: " + e.message, "err");
+    }
+  }
+
+  async function abandonSortie() {
+    if (!state.hostLive) {
+      return toast("Open the wire first — run PLAY.bat", "err");
+    }
+    if (!confirm("Abandon this sortie? No zone flip, no fake win. Next Drop unlocks.")) return;
+    try {
+      const res = await fetch(api("/api/abandon"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reason: "player_abandon" }),
+      });
+      const j = await res.json().catch(() => ({}));
+      if (j.ok || j.abandon) {
+        mergeHubPatch({
+          debrief: j.debrief,
+          headline: j.headline || "Left the field.",
+          verdict: "abandon",
+          lastResult: { verdict: "abandon", debrief: j.debrief, at: j.at },
+        });
+        await pullHubState();
+      } else {
+        toast(j.error || "Abandon failed", "err");
+      }
+    } catch (e) {
+      toast("Abandon failed: " + e.message, "err");
+    }
+  }
+
+  function showCoach(force) {
+    try {
+      if (!force && localStorage.getItem("va_coach_seen_v2") === "1") return;
+    } catch (_) { /* private mode */ }
+    $("coach").classList.add("show");
+  }
+  function hideCoach(remember) {
+    $("coach").classList.remove("show");
+    if (remember) {
+      try { localStorage.setItem("va_coach_seen_v2", "1"); } catch (_) { /* */ }
+    }
+  }
+
+  function startResultPoll() {
+    if (startResultPoll._on) return;
+    startResultPoll._on = true;
+    setInterval(async () => {
+      if (!state.hostLive) return;
+      try {
+        const rr = await fetch(api("/api/result"), { cache: "no-store" });
+        const rj = await rr.json();
+        if (rj.present && rj.result && rj.result.at && rj.result.at !== state.lastResultAt) {
+          state.lastResultAt = rj.result.at;
+          // Phase 2: bridge may set autoApplied on hub_result
+          mergeHubPatch({
+            ...rj.result,
+            autoApplied: !!(rj.result.autoApplied),
+            lastResult: rj.result.lastResult || rj.result,
+          });
+        }
+      } catch (_) { /* host down */ }
+    }, 8000);
+  }
+
+  // Tabs
+  document.querySelectorAll(".tab").forEach(tab => {
+    tab.onclick = () => {
+      document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t === tab));
+      const name = tab.dataset.tab;
+      $("panel-shop").hidden = name !== "shop";
+      $("panel-theaters").hidden = name !== "theaters";
+      $("panel-manifold").hidden = name !== "manifold";
+      if (name === "manifold") renderQuantum();
+    };
+  });
+
+  document.querySelectorAll(".mode-btn").forEach(btn => {
+    btn.onclick = () => {
+      state.markMode = btn.dataset.mode;
+      document.querySelectorAll(".mode-btn").forEach(b => b.classList.toggle("active", b === btn));
+      renderBoard();
+    };
+  });
+
+  if ($("btn-clear-marks")) {
+    $("btn-clear-marks").onclick = () => {
+      if (!state.plan) return;
+      state.plan.marks = defaultMarks(state.plan.mapId);
+      renderBoard();
+      toast("Route reset", "ok");
+    };
+  }
+  $("btn-deploy").onclick = () => commitDeploy(true);
+  $("btn-pull-result").onclick = () => pullBarResult();
+  if ($("btn-abandon")) $("btn-abandon").onclick = () => abandonSortie();
+  if ($("hc-dismiss")) $("hc-dismiss").onclick = () => hideHomecoming();
+  $("btn-sync-hub").onclick = async () => {
+    if (!state.hostLive) return toast("Run PLAY.bat for a live map", "err");
+    try {
+      await fetch(api("/api/rebuild-hub"), { method: "POST" });
+      await pullHubState();
+      toast("Map refreshed", "ok");
+    } catch (e) {
+      toast("Refresh failed: " + e.message, "err");
+    }
+  };
+  $("btn-help").onclick = () => showCoach(true);
+  $("coach-go").onclick = () => hideCoach(true);
+  $("coach-skip").onclick = () => hideCoach(true);
+
+  // Boot
+  if (!window.HUB_STATE) {
+    $("title").textContent = "The map is blank";
+    $("voice").textContent = "Rebuild the hub (build_hub_state_v1.py), then open this again.";
+    return;
+  }
+  state.focusMap = H.sessionHomeMap || (H.node && H.node.regionHint) || (H.regions && H.regions[0] && H.regions[0].mapId) || "the_rock_jungle";
+  renderBadges();
+  renderAces();
+  renderRegions();
+  renderShop();
+  renderNode();
+  renderQuantum();
+  refreshTheaterForFocus();
+  logLine(`The map answers · home ${prettyMap(state.focusMap)} · ${(commerce().shop||[]).length} broker listings`);
+  probeHost();
+  showCoach(false);
+})();
+</script>
+</body>
+</html>

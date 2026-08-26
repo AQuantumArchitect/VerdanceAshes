@@ -1,0 +1,2712 @@
+{
+ "schemaVersion": "verdance-cartography-run-plan/1.0",
+ "gridRes": 96,
+ "sampleFrames": 300,
+ "schedule": {
+  "night1": [
+   "terrain",
+   "mirror_1v1"
+  ],
+  "night2": [
+   "three_way",
+   "adjacent_1v1",
+   "wilds_on"
+  ],
+  "night3": [
+   "four_corners",
+   "center_vs_rim"
+  ],
+  "notes": "Runner is resumable (-Resume skips runs whose raster already exists), so a night that ends early just continues next time."
+ },
+ "warnings": [],
+ "runCount": 44,
+ "estimatedWallMinutes": 980,
+ "runs": [
+  {
+   "runId": "all_that_simmers__mirror_1v1__a",
+   "mapId": "all_that_simmers",
+   "mapName": "All That Simmers v1.1.1",
+   "configId": "mirror_1v1",
+   "variant": "a",
+   "label": "Mirror 1v1 (a)",
+   "reveals": "The canonical front. Comparable with the June 2026 baseline survey.",
+   "simMinutes": 21,
+   "maxFrame": 37800,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400,
+    23400,
+    37800
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "spread",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Armada",
+     "x": 6900.0,
+     "z": 450.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Cortex",
+     "x": 300.0,
+     "z": 9770.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "all_that_simmers__mirror_1v1__b",
+   "mapId": "all_that_simmers",
+   "mapName": "All That Simmers v1.1.1",
+   "configId": "mirror_1v1",
+   "variant": "b",
+   "label": "Mirror 1v1 (b)",
+   "reveals": "The canonical front. Comparable with the June 2026 baseline survey.",
+   "simMinutes": 21,
+   "maxFrame": 37800,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400,
+    23400,
+    37800
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "spread",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Armada",
+     "x": 300.0,
+     "z": 9770.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Cortex",
+     "x": 6900.0,
+     "z": 450.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "all_that_simmers__three_way__a",
+   "mapId": "all_that_simmers",
+   "mapName": "All That Simmers v1.1.1",
+   "configId": "three_way",
+   "variant": "a",
+   "label": "Three-way FFA (a)",
+   "reveals": "Contested middles and secondary lanes; which pair never meets.",
+   "simMinutes": 13,
+   "maxFrame": 23400,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400,
+    23400
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "spread",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Armada",
+     "x": 6900.0,
+     "z": 450.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Cortex",
+     "x": 300.0,
+     "z": 9770.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 2,
+     "allyTeam": 2,
+     "side": "Legion",
+     "x": 850.0,
+     "z": 850.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "all_that_simmers__adjacent_1v1__a",
+   "mapId": "all_that_simmers",
+   "mapName": "All That Simmers v1.1.1",
+   "configId": "adjacent_1v1",
+   "variant": "a",
+   "label": "Folded 1v1 (a)",
+   "reveals": "Which ground becomes the front when the two starts are neighbours.",
+   "simMinutes": 13,
+   "maxFrame": 23400,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400,
+    23400
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "adjacent",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Armada",
+     "x": 3200.0,
+     "z": 2000.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Cortex",
+     "x": 3322.0,
+     "z": 750.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "all_that_simmers__four_corners__a",
+   "mapId": "all_that_simmers",
+   "mapName": "All That Simmers v1.1.1",
+   "configId": "four_corners",
+   "variant": "a",
+   "label": "Four corners (a)",
+   "reveals": "Maximum pressure everywhere -- exposes ground the war NEVER uses.",
+   "simMinutes": 8,
+   "maxFrame": 14400,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "derived_corners",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Armada",
+     "x": 1680.0,
+     "z": 2080.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Cortex",
+     "x": 5637.3,
+     "z": 2506.7,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 2,
+     "allyTeam": 2,
+     "side": "Legion",
+     "x": 1530.7,
+     "z": 7733.3,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 3,
+     "allyTeam": 3,
+     "side": "Armada",
+     "x": 5413.3,
+     "z": 7946.7,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "all_that_simmers__center_vs_rim__a",
+   "mapId": "all_that_simmers",
+   "mapName": "All That Simmers v1.1.1",
+   "configId": "center_vs_rim",
+   "variant": "a",
+   "label": "Centre vs rim (a)",
+   "reveals": "Siege geometry: who owns the middle when someone starts in it.",
+   "simMinutes": 8,
+   "maxFrame": 14400,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "center_and_rim",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Cortex",
+     "x": 3173.3,
+     "z": 4853.3,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard"
+     },
+     "aiKey": "balanced"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Armada",
+     "x": 6900.0,
+     "z": 450.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 2,
+     "allyTeam": 2,
+     "side": "Legion",
+     "x": 300.0,
+     "z": 9770.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "all_that_simmers__wilds_on__a",
+   "mapId": "all_that_simmers",
+   "mapName": "All That Simmers v1.1.1",
+   "configId": "wilds_on",
+   "variant": "a",
+   "label": "Wilds pressure (a)",
+   "reveals": "Hazard territory: which ground the raptor pressure owns outright.",
+   "simMinutes": 13,
+   "maxFrame": 23400,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400,
+    23400
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {
+    "raptor_difficulty": "normal",
+    "raptor_graceperiodmult": "1.0",
+    "raptor_spawncountmult": "1.0",
+    "raptor_raptorstart": "avoid"
+   },
+   "placement": "spread",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Armada",
+     "x": 6900.0,
+     "z": 450.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Cortex",
+     "x": 300.0,
+     "z": 9770.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 2,
+     "allyTeam": 2,
+     "side": "Armada",
+     "x": 3173.3,
+     "z": 4853.3,
+     "ai": {
+      "shortName": "RaptorsAI",
+      "version": "<not-versioned>"
+     },
+     "aiKey": "raptors"
+    }
+   ]
+  },
+  {
+   "runId": "koom_valley__mirror_1v1__a",
+   "mapId": "koom_valley",
+   "mapName": "Koom Valley 3 3.1",
+   "configId": "mirror_1v1",
+   "variant": "a",
+   "label": "Mirror 1v1 (a)",
+   "reveals": "The canonical front. Comparable with the June 2026 baseline survey.",
+   "simMinutes": 21,
+   "maxFrame": 37800,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400,
+    23400,
+    37800
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "spread",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Armada",
+     "x": 393.0,
+     "z": 5461.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Cortex",
+     "x": 11969.0,
+     "z": 2558.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "koom_valley__mirror_1v1__b",
+   "mapId": "koom_valley",
+   "mapName": "Koom Valley 3 3.1",
+   "configId": "mirror_1v1",
+   "variant": "b",
+   "label": "Mirror 1v1 (b)",
+   "reveals": "The canonical front. Comparable with the June 2026 baseline survey.",
+   "simMinutes": 21,
+   "maxFrame": 37800,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400,
+    23400,
+    37800
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "spread",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Armada",
+     "x": 11969.0,
+     "z": 2558.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Cortex",
+     "x": 393.0,
+     "z": 5461.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "koom_valley__three_way__a",
+   "mapId": "koom_valley",
+   "mapName": "Koom Valley 3 3.1",
+   "configId": "three_way",
+   "variant": "a",
+   "label": "Three-way FFA (a)",
+   "reveals": "Contested middles and secondary lanes; which pair never meets.",
+   "simMinutes": 13,
+   "maxFrame": 23400,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400,
+    23400
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "spread",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Armada",
+     "x": 393.0,
+     "z": 5461.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Cortex",
+     "x": 11969.0,
+     "z": 2558.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 2,
+     "allyTeam": 2,
+     "side": "Legion",
+     "x": 10371.0,
+     "z": 7503.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "koom_valley__adjacent_1v1__a",
+   "mapId": "koom_valley",
+   "mapName": "Koom Valley 3 3.1",
+   "configId": "adjacent_1v1",
+   "variant": "a",
+   "label": "Folded 1v1 (a)",
+   "reveals": "Which ground becomes the front when the two starts are neighbours.",
+   "simMinutes": 13,
+   "maxFrame": 23400,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400,
+    23400
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "adjacent",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Armada",
+     "x": 1942.0,
+     "z": 5757.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Cortex",
+     "x": 393.0,
+     "z": 5461.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "koom_valley__four_corners__a",
+   "mapId": "koom_valley",
+   "mapName": "Koom Valley 3 3.1",
+   "configId": "four_corners",
+   "variant": "a",
+   "label": "Four corners (a)",
+   "reveals": "Maximum pressure everywhere -- exposes ground the war NEVER uses.",
+   "simMinutes": 8,
+   "maxFrame": 14400,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "derived_corners",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Armada",
+     "x": 3136.0,
+     "z": 2005.3,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Cortex",
+     "x": 9536.0,
+     "z": 2261.3,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 2,
+     "allyTeam": 2,
+     "side": "Legion",
+     "x": 3136.0,
+     "z": 6186.7,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 3,
+     "allyTeam": 3,
+     "side": "Armada",
+     "x": 9024.0,
+     "z": 6186.7,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "koom_valley__center_vs_rim__a",
+   "mapId": "koom_valley",
+   "mapName": "Koom Valley 3 3.1",
+   "configId": "center_vs_rim",
+   "variant": "a",
+   "label": "Centre vs rim (a)",
+   "reveals": "Siege geometry: who owns the middle when someone starts in it.",
+   "simMinutes": 8,
+   "maxFrame": 14400,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "center_and_rim",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Cortex",
+     "x": 5568.0,
+     "z": 3968.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard"
+     },
+     "aiKey": "balanced"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Armada",
+     "x": 393.0,
+     "z": 5461.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 2,
+     "allyTeam": 2,
+     "side": "Legion",
+     "x": 11969.0,
+     "z": 2558.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "tabula__mirror_1v1__a",
+   "mapId": "tabula",
+   "mapName": "Tabula_Remake 1.5",
+   "configId": "mirror_1v1",
+   "variant": "a",
+   "label": "Mirror 1v1 (a)",
+   "reveals": "The canonical front. Comparable with the June 2026 baseline survey.",
+   "simMinutes": 21,
+   "maxFrame": 37800,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400,
+    23400,
+    37800
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "spread",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Armada",
+     "x": 535.0,
+     "z": 517.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Cortex",
+     "x": 8829.0,
+     "z": 5609.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "tabula__mirror_1v1__b",
+   "mapId": "tabula",
+   "mapName": "Tabula_Remake 1.5",
+   "configId": "mirror_1v1",
+   "variant": "b",
+   "label": "Mirror 1v1 (b)",
+   "reveals": "The canonical front. Comparable with the June 2026 baseline survey.",
+   "simMinutes": 21,
+   "maxFrame": 37800,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400,
+    23400,
+    37800
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "spread",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Armada",
+     "x": 8829.0,
+     "z": 5609.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Cortex",
+     "x": 535.0,
+     "z": 517.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "tabula__three_way__a",
+   "mapId": "tabula",
+   "mapName": "Tabula_Remake 1.5",
+   "configId": "three_way",
+   "variant": "a",
+   "label": "Three-way FFA (a)",
+   "reveals": "Contested middles and secondary lanes; which pair never meets.",
+   "simMinutes": 13,
+   "maxFrame": 23400,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400,
+    23400
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "spread",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Armada",
+     "x": 535.0,
+     "z": 517.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Cortex",
+     "x": 8829.0,
+     "z": 5609.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 2,
+     "allyTeam": 2,
+     "side": "Legion",
+     "x": 8774.0,
+     "z": 609.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "tabula__adjacent_1v1__a",
+   "mapId": "tabula",
+   "mapName": "Tabula_Remake 1.5",
+   "configId": "adjacent_1v1",
+   "variant": "a",
+   "label": "Folded 1v1 (a)",
+   "reveals": "Which ground becomes the front when the two starts are neighbours.",
+   "simMinutes": 13,
+   "maxFrame": 23400,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400,
+    23400
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "adjacent",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Armada",
+     "x": 8774.0,
+     "z": 609.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Cortex",
+     "x": 7760.0,
+     "z": 756.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "tabula__four_corners__a",
+   "mapId": "tabula",
+   "mapName": "Tabula_Remake 1.5",
+   "configId": "four_corners",
+   "variant": "a",
+   "label": "Four corners (a)",
+   "reveals": "Maximum pressure everywhere -- exposes ground the war NEVER uses.",
+   "simMinutes": 8,
+   "maxFrame": 14400,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "derived_corners",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Armada",
+     "x": 2261.3,
+     "z": 1008.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Cortex",
+     "x": 6698.7,
+     "z": 1605.3,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 2,
+     "allyTeam": 2,
+     "side": "Legion",
+     "x": 1493.3,
+     "z": 5562.7,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 3,
+     "allyTeam": 3,
+     "side": "Armada",
+     "x": 5930.7,
+     "z": 6160.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "tabula__center_vs_rim__a",
+   "mapId": "tabula",
+   "mapName": "Tabula_Remake 1.5",
+   "configId": "center_vs_rim",
+   "variant": "a",
+   "label": "Centre vs rim (a)",
+   "reveals": "Siege geometry: who owns the middle when someone starts in it.",
+   "simMinutes": 8,
+   "maxFrame": 14400,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "center_and_rim",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Cortex",
+     "x": 4138.7,
+     "z": 2874.7,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard"
+     },
+     "aiKey": "balanced"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Armada",
+     "x": 535.0,
+     "z": 517.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 2,
+     "allyTeam": 2,
+     "side": "Legion",
+     "x": 8829.0,
+     "z": 5609.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "ancient_bastion__mirror_1v1__a",
+   "mapId": "ancient_bastion",
+   "mapName": "Ancient Bastion Remake 0.5",
+   "configId": "mirror_1v1",
+   "variant": "a",
+   "label": "Mirror 1v1 (a)",
+   "reveals": "The canonical front. Comparable with the June 2026 baseline survey.",
+   "simMinutes": 21,
+   "maxFrame": 37800,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400,
+    23400,
+    37800
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "spread",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Armada",
+     "x": 431.0,
+     "z": 3042.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Cortex",
+     "x": 4452.0,
+     "z": 4107.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "ancient_bastion__mirror_1v1__b",
+   "mapId": "ancient_bastion",
+   "mapName": "Ancient Bastion Remake 0.5",
+   "configId": "mirror_1v1",
+   "variant": "b",
+   "label": "Mirror 1v1 (b)",
+   "reveals": "The canonical front. Comparable with the June 2026 baseline survey.",
+   "simMinutes": 21,
+   "maxFrame": 37800,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400,
+    23400,
+    37800
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "spread",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Armada",
+     "x": 4452.0,
+     "z": 4107.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Cortex",
+     "x": 431.0,
+     "z": 3042.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "ancient_bastion__three_way__a",
+   "mapId": "ancient_bastion",
+   "mapName": "Ancient Bastion Remake 0.5",
+   "configId": "three_way",
+   "variant": "a",
+   "label": "Three-way FFA (a)",
+   "reveals": "Contested middles and secondary lanes; which pair never meets.",
+   "simMinutes": 13,
+   "maxFrame": 23400,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400,
+    23400
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "spread",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Armada",
+     "x": 431.0,
+     "z": 3042.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Cortex",
+     "x": 4452.0,
+     "z": 4107.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 2,
+     "allyTeam": 2,
+     "side": "Legion",
+     "x": 2803.0,
+     "z": 5588.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "ancient_bastion__adjacent_1v1__a",
+   "mapId": "ancient_bastion",
+   "mapName": "Ancient Bastion Remake 0.5",
+   "configId": "adjacent_1v1",
+   "variant": "a",
+   "label": "Folded 1v1 (a)",
+   "reveals": "Which ground becomes the front when the two starts are neighbours.",
+   "simMinutes": 13,
+   "maxFrame": 23400,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400,
+    23400
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "adjacent",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Armada",
+     "x": 431.0,
+     "z": 5171.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Cortex",
+     "x": 431.0,
+     "z": 3042.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "ancient_bastion__four_corners__a",
+   "mapId": "ancient_bastion",
+   "mapName": "Ancient Bastion Remake 0.5",
+   "configId": "four_corners",
+   "variant": "a",
+   "label": "Four corners (a)",
+   "reveals": "Maximum pressure everywhere -- exposes ground the war NEVER uses.",
+   "simMinutes": 8,
+   "maxFrame": 14400,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "derived_corners",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Armada",
+     "x": 4010.7,
+     "z": 1408.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Cortex",
+     "x": 11861.3,
+     "z": 2432.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 2,
+     "allyTeam": 2,
+     "side": "Legion",
+     "x": 2986.7,
+     "z": 6101.3,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 3,
+     "allyTeam": 3,
+     "side": "Armada",
+     "x": 12373.3,
+     "z": 5760.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "ancient_bastion__center_vs_rim__a",
+   "mapId": "ancient_bastion",
+   "mapName": "Ancient Bastion Remake 0.5",
+   "configId": "center_vs_rim",
+   "variant": "a",
+   "label": "Centre vs rim (a)",
+   "reveals": "Siege geometry: who owns the middle when someone starts in it.",
+   "simMinutes": 8,
+   "maxFrame": 14400,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "center_and_rim",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Cortex",
+     "x": 7936.0,
+     "z": 3456.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard"
+     },
+     "aiKey": "balanced"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Armada",
+     "x": 431.0,
+     "z": 3042.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 2,
+     "allyTeam": 2,
+     "side": "Legion",
+     "x": 4452.0,
+     "z": 4107.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "the_rock_jungle__mirror_1v1__a",
+   "mapId": "the_rock_jungle",
+   "mapName": "The Rock Jungle 2.1.1",
+   "configId": "mirror_1v1",
+   "variant": "a",
+   "label": "Mirror 1v1 (a)",
+   "reveals": "The canonical front. Comparable with the June 2026 baseline survey.",
+   "simMinutes": 21,
+   "maxFrame": 37800,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400,
+    23400,
+    37800
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "spread",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Armada",
+     "x": 717.0,
+     "z": 614.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Cortex",
+     "x": 9585.0,
+     "z": 7537.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "the_rock_jungle__mirror_1v1__b",
+   "mapId": "the_rock_jungle",
+   "mapName": "The Rock Jungle 2.1.1",
+   "configId": "mirror_1v1",
+   "variant": "b",
+   "label": "Mirror 1v1 (b)",
+   "reveals": "The canonical front. Comparable with the June 2026 baseline survey.",
+   "simMinutes": 21,
+   "maxFrame": 37800,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400,
+    23400,
+    37800
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "spread",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Armada",
+     "x": 9585.0,
+     "z": 7537.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Cortex",
+     "x": 717.0,
+     "z": 614.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "the_rock_jungle__three_way__a",
+   "mapId": "the_rock_jungle",
+   "mapName": "The Rock Jungle 2.1.1",
+   "configId": "three_way",
+   "variant": "a",
+   "label": "Three-way FFA (a)",
+   "reveals": "Contested middles and secondary lanes; which pair never meets.",
+   "simMinutes": 13,
+   "maxFrame": 23400,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400,
+    23400
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "spread",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Armada",
+     "x": 717.0,
+     "z": 614.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Cortex",
+     "x": 9585.0,
+     "z": 7537.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 2,
+     "allyTeam": 2,
+     "side": "Legion",
+     "x": 9789.0,
+     "z": 573.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "the_rock_jungle__adjacent_1v1__a",
+   "mapId": "the_rock_jungle",
+   "mapName": "The Rock Jungle 2.1.1",
+   "configId": "adjacent_1v1",
+   "variant": "a",
+   "label": "Folded 1v1 (a)",
+   "reveals": "Which ground becomes the front when the two starts are neighbours.",
+   "simMinutes": 13,
+   "maxFrame": 23400,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400,
+    23400
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "adjacent",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Armada",
+     "x": 9789.0,
+     "z": 573.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Cortex",
+     "x": 9810.0,
+     "z": 1475.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "the_rock_jungle__four_corners__a",
+   "mapId": "the_rock_jungle",
+   "mapName": "The Rock Jungle 2.1.1",
+   "configId": "four_corners",
+   "variant": "a",
+   "label": "Four corners (a)",
+   "reveals": "Maximum pressure everywhere -- exposes ground the war NEVER uses.",
+   "simMinutes": 8,
+   "maxFrame": 14400,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "derived_corners",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Armada",
+     "x": 2826.7,
+     "z": 2261.3,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Cortex",
+     "x": 7626.7,
+     "z": 1493.3,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 2,
+     "allyTeam": 2,
+     "side": "Legion",
+     "x": 2613.3,
+     "z": 6698.7,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 3,
+     "allyTeam": 3,
+     "side": "Armada",
+     "x": 7946.7,
+     "z": 7040.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "the_rock_jungle__center_vs_rim__a",
+   "mapId": "the_rock_jungle",
+   "mapName": "The Rock Jungle 2.1.1",
+   "configId": "center_vs_rim",
+   "variant": "a",
+   "label": "Centre vs rim (a)",
+   "reveals": "Siege geometry: who owns the middle when someone starts in it.",
+   "simMinutes": 8,
+   "maxFrame": 14400,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "center_and_rim",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Cortex",
+     "x": 4106.7,
+     "z": 3626.7,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard"
+     },
+     "aiKey": "balanced"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Armada",
+     "x": 717.0,
+     "z": 614.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 2,
+     "allyTeam": 2,
+     "side": "Legion",
+     "x": 9585.0,
+     "z": 7537.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "the_rock_jungle__wilds_on__a",
+   "mapId": "the_rock_jungle",
+   "mapName": "The Rock Jungle 2.1.1",
+   "configId": "wilds_on",
+   "variant": "a",
+   "label": "Wilds pressure (a)",
+   "reveals": "Hazard territory: which ground the raptor pressure owns outright.",
+   "simMinutes": 13,
+   "maxFrame": 23400,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400,
+    23400
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {
+    "raptor_difficulty": "normal",
+    "raptor_graceperiodmult": "1.0",
+    "raptor_spawncountmult": "1.0",
+    "raptor_raptorstart": "avoid"
+   },
+   "placement": "spread",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Armada",
+     "x": 717.0,
+     "z": 614.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Cortex",
+     "x": 9585.0,
+     "z": 7537.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 2,
+     "allyTeam": 2,
+     "side": "Armada",
+     "x": 4106.7,
+     "z": 3626.7,
+     "ai": {
+      "shortName": "RaptorsAI",
+      "version": "<not-versioned>"
+     },
+     "aiKey": "raptors"
+    }
+   ]
+  },
+  {
+   "runId": "eye_of_horus__mirror_1v1__a",
+   "mapId": "eye_of_horus",
+   "mapName": "Eye Of Horus 1.7",
+   "configId": "mirror_1v1",
+   "variant": "a",
+   "label": "Mirror 1v1 (a)",
+   "reveals": "The canonical front. Comparable with the June 2026 baseline survey.",
+   "simMinutes": 21,
+   "maxFrame": 37800,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400,
+    23400,
+    37800
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "spread",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Armada",
+     "x": 573.0,
+     "z": 1075.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Cortex",
+     "x": 5557.0,
+     "z": 6078.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "eye_of_horus__mirror_1v1__b",
+   "mapId": "eye_of_horus",
+   "mapName": "Eye Of Horus 1.7",
+   "configId": "mirror_1v1",
+   "variant": "b",
+   "label": "Mirror 1v1 (b)",
+   "reveals": "The canonical front. Comparable with the June 2026 baseline survey.",
+   "simMinutes": 21,
+   "maxFrame": 37800,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400,
+    23400,
+    37800
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "spread",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Armada",
+     "x": 5557.0,
+     "z": 6078.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Cortex",
+     "x": 573.0,
+     "z": 1075.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "eye_of_horus__three_way__a",
+   "mapId": "eye_of_horus",
+   "mapName": "Eye Of Horus 1.7",
+   "configId": "three_way",
+   "variant": "a",
+   "label": "Three-way FFA (a)",
+   "reveals": "Contested middles and secondary lanes; which pair never meets.",
+   "simMinutes": 13,
+   "maxFrame": 23400,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400,
+    23400
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "spread",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Armada",
+     "x": 573.0,
+     "z": 1075.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Cortex",
+     "x": 5557.0,
+     "z": 6078.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 2,
+     "allyTeam": 2,
+     "side": "Legion",
+     "x": 5170.0,
+     "z": 989.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "eye_of_horus__adjacent_1v1__a",
+   "mapId": "eye_of_horus",
+   "mapName": "Eye Of Horus 1.7",
+   "configId": "adjacent_1v1",
+   "variant": "a",
+   "label": "Folded 1v1 (a)",
+   "reveals": "Which ground becomes the front when the two starts are neighbours.",
+   "simMinutes": 13,
+   "maxFrame": 23400,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400,
+    23400
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "adjacent",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Armada",
+     "x": 3308.0,
+     "z": 5992.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Cortex",
+     "x": 5557.0,
+     "z": 6078.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "eye_of_horus__four_corners__a",
+   "mapId": "eye_of_horus",
+   "mapName": "Eye Of Horus 1.7",
+   "configId": "four_corners",
+   "variant": "a",
+   "label": "Four corners (a)",
+   "reveals": "Maximum pressure everywhere -- exposes ground the war NEVER uses.",
+   "simMinutes": 8,
+   "maxFrame": 14400,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "derived_corners",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Armada",
+     "x": 992.0,
+     "z": 2053.3,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Cortex",
+     "x": 5152.0,
+     "z": 1829.3,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 2,
+     "allyTeam": 2,
+     "side": "Legion",
+     "x": 992.0,
+     "z": 5338.7,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 3,
+     "allyTeam": 3,
+     "side": "Armada",
+     "x": 5152.0,
+     "z": 5114.7,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "eye_of_horus__center_vs_rim__a",
+   "mapId": "eye_of_horus",
+   "mapName": "Eye Of Horus 1.7",
+   "configId": "center_vs_rim",
+   "variant": "a",
+   "label": "Centre vs rim (a)",
+   "reveals": "Siege geometry: who owns the middle when someone starts in it.",
+   "simMinutes": 8,
+   "maxFrame": 14400,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "center_and_rim",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Cortex",
+     "x": 3040.0,
+     "z": 2949.3,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard"
+     },
+     "aiKey": "balanced"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Armada",
+     "x": 573.0,
+     "z": 1075.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 2,
+     "allyTeam": 2,
+     "side": "Legion",
+     "x": 5557.0,
+     "z": 6078.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "greenest_fields__mirror_1v1__a",
+   "mapId": "greenest_fields",
+   "mapName": "Greenest Fields 1.3",
+   "configId": "mirror_1v1",
+   "variant": "a",
+   "label": "Mirror 1v1 (a)",
+   "reveals": "The canonical front. Comparable with the June 2026 baseline survey.",
+   "simMinutes": 21,
+   "maxFrame": 37800,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400,
+    23400,
+    37800
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "spread",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Armada",
+     "x": 1200.0,
+     "z": 6992.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Cortex",
+     "x": 6992.0,
+     "z": 1200.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "greenest_fields__mirror_1v1__b",
+   "mapId": "greenest_fields",
+   "mapName": "Greenest Fields 1.3",
+   "configId": "mirror_1v1",
+   "variant": "b",
+   "label": "Mirror 1v1 (b)",
+   "reveals": "The canonical front. Comparable with the June 2026 baseline survey.",
+   "simMinutes": 21,
+   "maxFrame": 37800,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400,
+    23400,
+    37800
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "spread",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Armada",
+     "x": 6992.0,
+     "z": 1200.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Cortex",
+     "x": 1200.0,
+     "z": 6992.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "greenest_fields__three_way__a",
+   "mapId": "greenest_fields",
+   "mapName": "Greenest Fields 1.3",
+   "configId": "three_way",
+   "variant": "a",
+   "label": "Three-way FFA (a)",
+   "reveals": "Contested middles and secondary lanes; which pair never meets.",
+   "simMinutes": 13,
+   "maxFrame": 23400,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400,
+    23400
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "spread",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Armada",
+     "x": 6992.0,
+     "z": 6992.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Cortex",
+     "x": 1200.0,
+     "z": 6992.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 2,
+     "allyTeam": 2,
+     "side": "Legion",
+     "x": 6992.0,
+     "z": 1200.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "greenest_fields__adjacent_1v1__a",
+   "mapId": "greenest_fields",
+   "mapName": "Greenest Fields 1.3",
+   "configId": "adjacent_1v1",
+   "variant": "a",
+   "label": "Folded 1v1 (a)",
+   "reveals": "Which ground becomes the front when the two starts are neighbours.",
+   "simMinutes": 13,
+   "maxFrame": 23400,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400,
+    23400
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "adjacent",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Armada",
+     "x": 6992.0,
+     "z": 6992.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Cortex",
+     "x": 1200.0,
+     "z": 6992.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "greenest_fields__four_corners__a",
+   "mapId": "greenest_fields",
+   "mapName": "Greenest Fields 1.3",
+   "configId": "four_corners",
+   "variant": "a",
+   "label": "Four corners (a)",
+   "reveals": "Maximum pressure everywhere -- exposes ground the war NEVER uses.",
+   "simMinutes": 8,
+   "maxFrame": 14400,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "derived_corners",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Armada",
+     "x": 1664.0,
+     "z": 1664.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Cortex",
+     "x": 7296.0,
+     "z": 1664.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 2,
+     "allyTeam": 2,
+     "side": "Legion",
+     "x": 5077.3,
+     "z": 7893.3,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 3,
+     "allyTeam": 3,
+     "side": "Armada",
+     "x": 7040.0,
+     "z": 4309.3,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  },
+  {
+   "runId": "greenest_fields__center_vs_rim__a",
+   "mapId": "greenest_fields",
+   "mapName": "Greenest Fields 1.3",
+   "configId": "center_vs_rim",
+   "variant": "a",
+   "label": "Centre vs rim (a)",
+   "reveals": "Siege geometry: who owns the middle when someone starts in it.",
+   "simMinutes": 8,
+   "maxFrame": 14400,
+   "milestoneFrames": [
+    1800,
+    3600,
+    5400,
+    9000,
+    14400
+   ],
+   "gridRes": 96,
+   "sampleFrames": 300,
+   "modOptions": {},
+   "placement": "center_and_rim",
+   "usedAuthoredStarts": true,
+   "teams": [
+    {
+     "team": 0,
+     "allyTeam": 0,
+     "side": "Cortex",
+     "x": 4736.0,
+     "z": 2432.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard"
+     },
+     "aiKey": "balanced"
+    },
+    {
+     "team": 1,
+     "allyTeam": 1,
+     "side": "Armada",
+     "x": 6992.0,
+     "z": 6992.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    },
+    {
+     "team": 2,
+     "allyTeam": 2,
+     "side": "Legion",
+     "x": 1200.0,
+     "z": 6992.0,
+     "ai": {
+      "shortName": "BARb",
+      "version": "stable",
+      "profile": "hard_aggressive"
+     },
+     "aiKey": "aggressive"
+    }
+   ]
+  }
+ ]
+}

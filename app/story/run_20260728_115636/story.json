@@ -1,0 +1,373 @@
+{
+  "schemaVersion": "verdance-proxy-story/0.2",
+  "generatedAt": "2026-07-28T11:57:12.967594+00:00",
+  "title": "Verdance First Arc — Proxy Player Story",
+  "agent": "local_tools",
+  "billing": "free",
+  "cleared": true,
+  "hard_wins": 5,
+  "missions": 5,
+  "seed": 11,
+  "difficulty": 1.31,
+  "use_ant": false,
+  "ant_every_n": null,
+  "llm_calls": 0,
+  "arc_blurb": "The proxy player cleared the first arc of Verdance's Ashes — five sorties, strike team only, no base building — reading only the briefing, the coarse HUD, and an imperfect belief graph.",
+  "arcs": [
+    {
+      "id": "3",
+      "title": "Third Scar",
+      "blurb": "Siege, wilds, multipressure.",
+      "wins": 5,
+      "total": 5,
+      "cleared": true,
+      "chapter_ids": [
+        "va_011",
+        "va_012",
+        "va_013",
+        "va_014",
+        "va_015"
+      ]
+    }
+  ],
+  "by_arc": {},
+  "chapters": [
+    {
+      "id": "va_011",
+      "title": "Bastion — Outer Ring",
+      "map_name": "Ancient Bastion",
+      "kind": "siege",
+      "verdict": "objective_complete",
+      "won": true,
+      "ticks": 17,
+      "progress": 1.0,
+      "heroes_alive_frac": 1.0,
+      "backends": {
+        "local_tools+brain": 15,
+        "local_tools": 2
+      },
+      "top_actions": [
+        "PUSH_OBJECTIVE"
+      ],
+      "situation": "Taelith-Armada citadel. Outer ring guns. This is a siege approach — build pressure, break the ring, do not charge the keep yet.",
+      "objective": "Breach and hold the outer ring long enough to crack it.",
+      "briefing_lines": [
+        {
+          "speaker": "ketha",
+          "text": "Walls don't care about speeches. Feed the siege."
+        },
+        {
+          "speaker": "vane",
+          "text": "If we starve for metal here, the bastion eats us."
+        }
+      ],
+      "narrative_open": [
+        "Taelith-Armada citadel. Outer ring guns. This is a siege approach — build pressure, break the ring, do not charge the keep yet.",
+        "Orders: Siege rhythm: eco → pressure → heal → pressure. Flank dead angles. Soft clock ~15 min."
+      ],
+      "beats": [
+        "t000 [chassis] committed on the objective — HUD APPROACH/light · belief: agg=-0.33 caut=-0.66 foc=-0.55 press=-0.64 coh=-0.26 mom=-0.75 | obj=0.63 thr=0.70 clk=0.67 adv=0.90 · “bar_brain overlay: BUILD_ENERGY→PUSH_OBJECTIVE (0.91)”",
+        "t001 [chassis] committed on the objective — HUD FIGHT/moderate · belief: agg=+0.29 caut=-0.31 foc=+0.05 press=-0.42 coh=+0.17 mom=-0.24 | obj=0.41 thr=0.62 clk=0.47 adv=0.81 · “bar_brain overlay: BUILD_ENERGY→PUSH_OBJECTIVE (0.92)”",
+        "t016 [chassis] committed on the objective — HUD HOLD/moderate · belief: agg=+0.58 caut=-0.04 foc=+0.74 press=+0.32 coh=+0.30 mom=+0.73 | obj=0.81 thr=0.54 clk=0.17 adv=0.53 · “bar_brain overlay: EXTRACT→PUSH_OBJECTIVE (0.91)”"
+      ],
+      "ant_thoughts": [],
+      "closing_thoughts": [
+        "bar_brain scar: BUILD_ENERGY→PUSH_OBJECTIVE (bar_brain overlay: BUILD_ENERGY→PUSH_OBJECTIVE (0.92))",
+        "phase=FIGHT contact=moderate obj=half team=steady eco=dry → PUSH_OBJECTIVE",
+        "phase=FIGHT contact=heavy obj=nearly team=steady eco=dry → PUSH_OBJECTIVE",
+        "phase=FIGHT contact=moderate obj=nearly team=steady eco=dry → PUSH_OBJECTIVE",
+        "bar_brain scar: EXTRACT→PUSH_OBJECTIVE (bar_brain overlay: EXTRACT→PUSH_OBJECTIVE (0.91))",
+        "phase=HOLD contact=moderate obj=done team=steady eco=dry → PUSH_OBJECTIVE"
+      ],
+      "verdict_line": "**Bastion — Outer Ring** — mission complete (objective complete)."
+    },
+    {
+      "id": "va_012",
+      "title": "Bastion — Breach the Keep",
+      "map_name": "Ancient Bastion",
+      "kind": "siege",
+      "verdict": "objective_complete",
+      "won": true,
+      "ticks": 19,
+      "progress": 0.7394,
+      "heroes_alive_frac": 1.0,
+      "backends": {
+        "local_tools+brain": 19
+      },
+      "top_actions": [
+        "PUSH_OBJECTIVE"
+      ],
+      "situation": "Outer ring cracked. Inner keep still breathes. Finish the citadel before Armada reconstitutes the ring.",
+      "objective": "Destroy the inner keep objective and extract.",
+      "briefing_lines": [
+        {
+          "speaker": "ketha",
+          "text": "The keep is a mouth. Don't stand in it longer than you need."
+        }
+      ],
+      "narrative_open": [
+        "Outer ring cracked. Inner keep still breathes. Finish the citadel before Armada reconstitutes the ring.",
+        "Orders: Commit with eco behind you. Heroes must live. Soft clock ~14 min."
+      ],
+      "beats": [
+        "t000 [chassis] committed on the objective — HUD APPROACH/light · belief: agg=+0.54 caut=-0.37 foc=+0.47 press=-0.44 coh=+0.80 mom=+0.31 | obj=0.61 thr=0.42 clk=0.15 adv=0.62 · “bar_brain overlay: BUILD_ENERGY→PUSH_OBJECTIVE (0.88)”",
+        "t001 [chassis] committed on the objective — HUD FIGHT/moderate · belief: agg=+0.64 caut=-0.18 foc=+0.46 press=-0.31 coh=+0.74 mom=+0.19 | obj=0.39 thr=0.45 clk=0.16 adv=0.64 · “bar_brain overlay: BUILD_ENERGY→PUSH_OBJECTIVE (0.88)”",
+        "t018 [chassis] committed on the objective — HUD FIGHT/heavy · belief: agg=+0.65 caut=+0.42 foc=+0.67 press=+0.32 coh=-0.06 mom=+0.49 | obj=0.58 thr=0.72 clk=0.17 adv=0.32 · “bar_brain overlay: HOLD_AND_HEAL→PUSH_OBJECTIVE (0.88)”"
+      ],
+      "ant_thoughts": [],
+      "closing_thoughts": [
+        "bar_brain scar: HOLD_AND_HEAL→PUSH_OBJECTIVE (bar_brain overlay: HOLD_AND_HEAL→PUSH_OBJECTIVE (0.88))",
+        "phase=FIGHT contact=heavy obj=nearly team=strained eco=thin → PUSH_OBJECTIVE",
+        "bar_brain scar: HOLD_AND_HEAL→PUSH_OBJECTIVE (bar_brain overlay: HOLD_AND_HEAL→PUSH_OBJECTIVE (0.88))",
+        "phase=FIGHT contact=heavy obj=half team=strained eco=thin → PUSH_OBJECTIVE",
+        "bar_brain scar: HOLD_AND_HEAL→PUSH_OBJECTIVE (bar_brain overlay: HOLD_AND_HEAL→PUSH_OBJECTIVE (0.88))",
+        "phase=FIGHT contact=heavy obj=half team=strained eco=thin → PUSH_OBJECTIVE"
+      ],
+      "verdict_line": "**Bastion — Breach the Keep** — mission complete (objective complete)."
+    },
+    {
+      "id": "va_013",
+      "title": "Rock Jungle — Wild Corridor",
+      "map_name": "The Rock Jungle",
+      "kind": "survive_wilds",
+      "verdict": "extracted",
+      "won": true,
+      "ticks": 27,
+      "progress": 1.0,
+      "heroes_alive_frac": 1.0,
+      "backends": {
+        "local_tools+brain": 27
+      },
+      "top_actions": [
+        "PUSH_OBJECTIVE"
+      ],
+      "situation": "Limestone labyrinth. Wilds and raptors own the dark. Pathing and survival beat pure DPS.",
+      "objective": "Traverse the wild corridor and hold the north notch.",
+      "briefing_lines": [
+        {
+          "speaker": "ketha",
+          "text": "The jungle doesn't hate you. It just doesn't care."
+        },
+        {
+          "speaker": "vane",
+          "text": "Keep the knot tight. Split once and the stones eat us."
+        }
+      ],
+      "narrative_open": [
+        "Limestone labyrinth. Wilds and raptors own the dark. Pathing and survival beat pure DPS.",
+        "Orders: Rally when scattered. Fall back when chewed. Probe chokes. Soft clock ~13 min."
+      ],
+      "beats": [
+        "t000 [chassis] committed on the objective — HUD APPROACH/none · belief: agg=+0.58 caut=-0.44 foc=+0.46 press=-0.44 coh=+0.79 mom=+0.31 | obj=0.46 thr=0.42 clk=0.16 adv=0.52 · “bar_brain overlay: BUILD_ENERGY→PUSH_OBJECTIVE (0.87)”",
+        "t001 [chassis] committed on the objective — HUD FIGHT/moderate · belief: agg=+0.66 caut=-0.22 foc=+0.46 press=-0.31 coh=+0.67 mom=+0.19 | obj=0.30 thr=0.45 clk=0.16 adv=0.53 · “bar_brain overlay: BUILD_ENERGY→PUSH_OBJECTIVE (0.87)”",
+        "t020 [chassis] committed on the objective — HUD HOLD/moderate · belief: agg=+0.58 caut=+0.35 foc=+0.76 press=+0.32 coh=-0.06 mom=+0.75 | obj=0.95 thr=0.57 clk=0.17 adv=0.38 · “bar_brain overlay: EXTRACT→PUSH_OBJECTIVE (0.87)”",
+        "t022 [chassis] committed on the objective — HUD FIGHT/heavy · belief: agg=+0.60 caut=+0.39 foc=+0.76 press=+0.32 coh=-0.07 mom=+0.74 | obj=0.95 thr=0.62 clk=0.17 adv=0.36 · “bar_brain overlay: EXTRACT→PUSH_OBJECTIVE (0.87)”",
+        "t025 [chassis] committed on the objective — HUD EXTRACT/moderate · belief: agg=+0.57 caut=+0.35 foc=+0.71 press=+0.32 coh=-0.07 mom=+0.75 | obj=0.96 thr=0.56 clk=0.17 adv=0.38 · “bar_brain overlay: EXTRACT→PUSH_OBJECTIVE (0.87)”",
+        "t026 [chassis] committed on the objective — HUD EXTRACT/moderate · belief: agg=+0.53 caut=+0.34 foc=+0.69 press=+0.32 coh=-0.07 mom=+0.74 | obj=0.96 thr=0.54 clk=0.17 adv=0.39 · “bar_brain overlay: EXTRACT→PUSH_OBJECTIVE (0.87)”"
+      ],
+      "ant_thoughts": [],
+      "closing_thoughts": [
+        "bar_brain scar: EXTRACT→PUSH_OBJECTIVE (bar_brain overlay: EXTRACT→PUSH_OBJECTIVE (0.87))",
+        "phase=FIGHT contact=moderate obj=done team=strained eco=thin → PUSH_OBJECTIVE",
+        "bar_brain scar: EXTRACT→PUSH_OBJECTIVE (bar_brain overlay: EXTRACT→PUSH_OBJECTIVE (0.87))",
+        "phase=EXTRACT contact=moderate obj=done team=strained eco=thin → PUSH_OBJECTIVE",
+        "bar_brain scar: EXTRACT→PUSH_OBJECTIVE (bar_brain overlay: EXTRACT→PUSH_OBJECTIVE (0.87))",
+        "phase=EXTRACT contact=moderate obj=done team=strained eco=thin → PUSH_OBJECTIVE"
+      ],
+      "verdict_line": "**Rock Jungle — Wild Corridor** — mission complete (extracted)."
+    },
+    {
+      "id": "va_014",
+      "title": "Simmers — Choose Your Scar",
+      "map_name": "All That Simmers",
+      "kind": "multipressure",
+      "verdict": "extracted",
+      "won": true,
+      "ticks": 29,
+      "progress": 1.0,
+      "heroes_alive_frac": 1.0,
+      "backends": {
+        "local_tools+brain": 29
+      },
+      "top_actions": [
+        "PUSH_OBJECTIVE"
+      ],
+      "situation": "Full faction and wild pressure. You must choose: break Armada eco, hold the lane, or cut Cortex. The knot only yields to a committed plan.",
+      "objective": "Resolve the central pressure knot under multipressure.",
+      "briefing_lines": [
+        {
+          "speaker": "ketha",
+          "text": "Pick a scar and own it. Half-choices drown here."
+        }
+      ],
+      "narrative_open": [
+        "Full faction and wild pressure. You must choose: break Armada eco, hold the lane, or cut Cortex. The knot only yields to a committed plan.",
+        "Orders: Pick a line early (eco wreck, lane hold, or strike). Mix expand with combat. Soft clock ~14 min."
+      ],
+      "beats": [
+        "t000 [chassis] committed on the objective — HUD APPROACH/light · belief: agg=+0.53 caut=-0.36 foc=+0.46 press=-0.44 coh=+0.79 mom=+0.31 | obj=0.61 thr=0.45 clk=0.20 adv=0.54 · “bar_brain overlay: BUILD_ENERGY→PUSH_OBJECTIVE (0.89)”",
+        "t001 [chassis] committed on the objective — HUD FIGHT/moderate · belief: agg=+0.64 caut=-0.18 foc=+0.46 press=-0.31 coh=+0.67 mom=+0.19 | obj=0.40 thr=0.47 clk=0.19 adv=0.54 · “bar_brain overlay: BUILD_ENERGY→PUSH_OBJECTIVE (0.89)”",
+        "t019 [chassis] committed on the objective — HUD HOLD/moderate · belief: agg=+0.58 caut=+0.35 foc=+0.75 press=+0.32 coh=-0.06 mom=+0.75 | obj=0.92 thr=0.55 clk=0.17 adv=0.39 · “bar_brain overlay: EXTRACT→PUSH_OBJECTIVE (0.89)”",
+        "t020 [chassis] committed on the objective — HUD FIGHT/heavy · belief: agg=+0.62 caut=+0.39 foc=+0.75 press=+0.32 coh=-0.06 mom=+0.74 | obj=0.94 thr=0.63 clk=0.17 adv=0.36 · “bar_brain overlay: EXTRACT→PUSH_OBJECTIVE (0.89)”",
+        "t021 [chassis] committed on the objective — HUD HOLD/moderate · belief: agg=+0.55 caut=+0.36 foc=+0.76 press=+0.32 coh=-0.07 mom=+0.74 | obj=0.94 thr=0.58 clk=0.17 adv=0.38 · “bar_brain overlay: EXTRACT→PUSH_OBJECTIVE (0.89)”",
+        "t023 [chassis] committed on the objective — HUD FIGHT/heavy · belief: agg=+0.59 caut=+0.39 foc=+0.76 press=+0.32 coh=-0.07 mom=+0.74 | obj=0.95 thr=0.62 clk=0.17 adv=0.36 · “bar_brain overlay: EXTRACT→PUSH_OBJECTIVE (0.89)”",
+        "t024 [chassis] committed on the objective — HUD HOLD/moderate · belief: agg=+0.54 caut=+0.36 foc=+0.76 press=+0.32 coh=-0.07 mom=+0.74 | obj=0.95 thr=0.57 clk=0.17 adv=0.38 · “bar_brain overlay: EXTRACT→PUSH_OBJECTIVE (0.89)”",
+        "t028 [chassis] committed on the objective — HUD EXTRACT/moderate · belief: agg=+0.50 caut=+0.34 foc=+0.69 press=+0.32 coh=-0.07 mom=+0.74 | obj=0.96 thr=0.51 clk=0.17 adv=0.40 · “bar_brain overlay: EXTRACT→PUSH_OBJECTIVE (0.89)”"
+      ],
+      "ant_thoughts": [],
+      "closing_thoughts": [
+        "bar_brain scar: EXTRACT→PUSH_OBJECTIVE (bar_brain overlay: EXTRACT→PUSH_OBJECTIVE (0.89))",
+        "phase=HOLD contact=moderate obj=done team=strained eco=thin → PUSH_OBJECTIVE",
+        "bar_brain scar: EXTRACT→PUSH_OBJECTIVE (bar_brain overlay: EXTRACT→PUSH_OBJECTIVE (0.89))",
+        "phase=EXTRACT contact=moderate obj=done team=strained eco=thin → PUSH_OBJECTIVE",
+        "bar_brain scar: EXTRACT→PUSH_OBJECTIVE (bar_brain overlay: EXTRACT→PUSH_OBJECTIVE (0.89))",
+        "phase=EXTRACT contact=moderate obj=done team=strained eco=thin → PUSH_OBJECTIVE"
+      ],
+      "verdict_line": "**Simmers — Choose Your Scar** — mission complete (extracted)."
+    },
+    {
+      "id": "va_015",
+      "title": "Simmers — Final Pressure",
+      "map_name": "All That Simmers",
+      "kind": "multipressure",
+      "verdict": "objective_complete",
+      "won": true,
+      "ticks": 39,
+      "progress": 0.8705,
+      "heroes_alive_frac": 1.0,
+      "backends": {
+        "local_tools+brain": 39
+      },
+      "top_actions": [
+        "PUSH_OBJECTIVE"
+      ],
+      "situation": "Campaign climax on the swamp. Collapse the remaining pressure node. Roster may be tired. Eco and heroes both matter.",
+      "objective": "Collapse the final pressure node and extract clean.",
+      "briefing_lines": [
+        {
+          "speaker": "ketha",
+          "text": "Last knot. Don't get poetic. Cut it."
+        },
+        {
+          "speaker": "vane",
+          "text": "If we leave names on this mud, make them theirs."
+        }
+      ],
+      "narrative_open": [
+        "Campaign climax on the swamp. Collapse the remaining pressure node. Roster may be tired. Eco and heroes both matter.",
+        "Orders: Finish the objective. Live. Extract. Soft clock ~15 min."
+      ],
+      "beats": [
+        "t000 [chassis] committed on the objective — HUD APPROACH/light · belief: agg=+0.53 caut=-0.36 foc=+0.46 press=-0.44 coh=+0.79 mom=+0.31 | obj=0.61 thr=0.41 clk=0.20 adv=0.54 · “bar_brain overlay: BUILD_ENERGY→PUSH_OBJECTIVE (0.89)”",
+        "t001 [chassis] committed on the objective — HUD FIGHT/moderate · belief: agg=+0.64 caut=-0.18 foc=+0.46 press=-0.31 coh=+0.67 mom=+0.19 | obj=0.40 thr=0.45 clk=0.19 adv=0.55 · “bar_brain overlay: BUILD_ENERGY→PUSH_OBJECTIVE (0.89)”",
+        "t020 [chassis] committed on the objective — HUD HOLD/moderate · belief: agg=+0.56 caut=+0.37 foc=+0.73 press=+0.32 coh=-0.06 mom=+0.69 | obj=0.82 thr=0.64 clk=0.17 adv=0.35 · “bar_brain overlay: HOLD_AND_HEAL→PUSH_OBJECTIVE (0.89)”",
+        "t021 [chassis] committed on the objective — HUD FIGHT/moderate · belief: agg=+0.65 caut=+0.35 foc=+0.73 press=+0.32 coh=-0.06 mom=+0.73 | obj=0.82 thr=0.58 clk=0.17 adv=0.37 · “bar_brain overlay: HOLD_AND_HEAL→PUSH_OBJECTIVE (0.89)”",
+        "t023 [chassis] committed on the objective — HUD HOLD/moderate · belief: agg=+0.56 caut=+0.36 foc=+0.73 press=+0.32 coh=-0.07 mom=+0.69 | obj=0.83 thr=0.59 clk=0.17 adv=0.37 · “bar_brain overlay: HOLD_AND_HEAL→PUSH_OBJECTIVE (0.89)”",
+        "t026 [chassis] committed on the objective — HUD FIGHT/moderate · belief: agg=+0.63 caut=+0.34 foc=+0.73 press=+0.32 coh=-0.07 mom=+0.73 | obj=0.83 thr=0.52 clk=0.17 adv=0.40 · “bar_brain overlay: HOLD_AND_HEAL→PUSH_OBJECTIVE (0.89)”",
+        "t027 [chassis] committed on the objective — HUD HOLD/moderate · belief: agg=+0.55 caut=+0.34 foc=+0.73 press=+0.32 coh=-0.07 mom=+0.70 | obj=0.83 thr=0.51 clk=0.17 adv=0.40 · “bar_brain overlay: HOLD_AND_HEAL→PUSH_OBJECTIVE (0.89)”",
+        "t038 [chassis] committed on the objective — HUD FIGHT/moderate · belief: agg=+0.63 caut=+0.34 foc=+0.73 press=+0.54 coh=-0.07 mom=+0.73 | obj=0.83 thr=0.50 clk=0.42 adv=0.40 · “bar_brain overlay: HOLD_AND_HEAL→PUSH_OBJECTIVE (0.89)”"
+      ],
+      "ant_thoughts": [],
+      "closing_thoughts": [
+        "bar_brain scar: HOLD_AND_HEAL→PUSH_OBJECTIVE (bar_brain overlay: HOLD_AND_HEAL→PUSH_OBJECTIVE (0.89))",
+        "phase=HOLD contact=moderate obj=nearly team=strained eco=thin → PUSH_OBJECTIVE",
+        "bar_brain scar: HOLD_AND_HEAL→PUSH_OBJECTIVE (bar_brain overlay: HOLD_AND_HEAL→PUSH_OBJECTIVE (0.89))",
+        "phase=HOLD contact=moderate obj=nearly team=strained eco=thin → PUSH_OBJECTIVE",
+        "bar_brain scar: HOLD_AND_HEAL→PUSH_OBJECTIVE (bar_brain overlay: HOLD_AND_HEAL→PUSH_OBJECTIVE (0.89))",
+        "phase=FIGHT contact=moderate obj=nearly team=strained eco=thin → PUSH_OBJECTIVE"
+      ],
+      "verdict_line": "**Simmers — Final Pressure** — mission complete (objective complete)."
+    }
+  ],
+  "barks": [
+    {
+      "speaker": "overmind",
+      "text": "Bastion — Outer Ring: Breach and hold the outer ring long enough to crack it."
+    },
+    {
+      "speaker": "ketha",
+      "text": "Walls don't care about speeches. Feed the siege."
+    },
+    {
+      "speaker": "vane",
+      "text": "If we starve for metal here, the bastion eats us."
+    },
+    {
+      "speaker": "overmind",
+      "text": "Bastion — Outer Ring — mission complete (objective complete)."
+    },
+    {
+      "speaker": "overmind",
+      "text": "Bastion — Breach the Keep: Destroy the inner keep objective and extract."
+    },
+    {
+      "speaker": "ketha",
+      "text": "The keep is a mouth. Don't stand in it longer than you need."
+    },
+    {
+      "speaker": "overmind",
+      "text": "Bastion — Breach the Keep — mission complete (objective complete)."
+    },
+    {
+      "speaker": "overmind",
+      "text": "Rock Jungle — Wild Corridor: Traverse the wild corridor and hold the north notch."
+    },
+    {
+      "speaker": "ketha",
+      "text": "The jungle doesn't hate you. It just doesn't care."
+    },
+    {
+      "speaker": "vane",
+      "text": "Keep the knot tight. Split once and the stones eat us."
+    },
+    {
+      "speaker": "overmind",
+      "text": "Rock Jungle — Wild Corridor — mission complete (extracted)."
+    },
+    {
+      "speaker": "overmind",
+      "text": "Simmers — Choose Your Scar: Resolve the central pressure knot under multipressure."
+    },
+    {
+      "speaker": "ketha",
+      "text": "Pick a scar and own it. Half-choices drown here."
+    },
+    {
+      "speaker": "overmind",
+      "text": "Simmers — Choose Your Scar — mission complete (extracted)."
+    },
+    {
+      "speaker": "overmind",
+      "text": "Simmers — Final Pressure: Collapse the final pressure node and extract clean."
+    },
+    {
+      "speaker": "ketha",
+      "text": "Last knot. Don't get poetic. Cut it."
+    },
+    {
+      "speaker": "vane",
+      "text": "If we leave names on this mud, make them theirs."
+    },
+    {
+      "speaker": "overmind",
+      "text": "Simmers — Final Pressure — mission complete (objective complete)."
+    }
+  ],
+  "markdown": "# Verdance First Arc — Proxy Player Story\n\n*Told through the quantum graph · agent=`local_tools` · billing=`free` · seed=11 · difficulty=1.31*\n\nThe proxy player cleared the first arc of Verdance's Ashes — five sorties, strike team only, no base building — reading only the briefing, the coarse HUD, and an imperfect belief graph.\n\n## ✦ Arc 3: Third Scar\n\n*Siege, wilds, multipressure. Cut the last knot.*\n\n### Chapter 1: Bastion — Outer Ring\n\n**Map:** Ancient Bastion · **Kind:** `siege`\n\nTaelith-Armada citadel. Outer ring guns. This is a siege approach — build pressure, break the ring, do not charge the keep yet.\n\nOrders: Siege rhythm: eco → pressure → heal → pressure. Flank dead angles. Soft clock ~15 min.\n\n> **ketha:** Walls don't care about speeches. Feed the siege.\n> **vane:** If we starve for metal here, the bastion eats us.\n\n#### Through the graph\n\n- t000 [chassis] committed on the objective — HUD APPROACH/light · belief: agg=-0.33 caut=-0.66 foc=-0.55 press=-0.64 coh=-0.26 mom=-0.75 | obj=0.63 thr=0.70 clk=0.67 adv=0.90 · “bar_brain overlay: BUILD_ENERGY→PUSH_OBJECTIVE (0.91)”\n- t001 [chassis] committed on the objective — HUD FIGHT/moderate · belief: agg=+0.29 caut=-0.31 foc=+0.05 press=-0.42 coh=+0.17 mom=-0.24 | obj=0.41 thr=0.62 clk=0.47 adv=0.81 · “bar_brain overlay: BUILD_ENERGY→PUSH_OBJECTIVE (0.92)”\n- t016 [chassis] committed on the objective — HUD HOLD/moderate · belief: agg=+0.58 caut=-0.04 foc=+0.74 press=+0.32 coh=+0.30 mom=+0.73 | obj=0.81 thr=0.54 clk=0.17 adv=0.53 · “bar_brain overlay: EXTRACT→PUSH_OBJECTIVE (0.91)”\n\n**Bastion — Outer Ring** — mission complete (objective complete).\n\n### Chapter 2: Bastion — Breach the Keep\n\n**Map:** Ancient Bastion · **Kind:** `siege`\n\nOuter ring cracked. Inner keep still breathes. Finish the citadel before Armada reconstitutes the ring.\n\nOrders: Commit with eco behind you. Heroes must live. Soft clock ~14 min.\n\n> **ketha:** The keep is a mouth. Don't stand in it longer than you need.\n\n#### Through the graph\n\n- t000 [chassis] committed on the objective — HUD APPROACH/light · belief: agg=+0.54 caut=-0.37 foc=+0.47 press=-0.44 coh=+0.80 mom=+0.31 | obj=0.61 thr=0.42 clk=0.15 adv=0.62 · “bar_brain overlay: BUILD_ENERGY→PUSH_OBJECTIVE (0.88)”\n- t001 [chassis] committed on the objective — HUD FIGHT/moderate · belief: agg=+0.64 caut=-0.18 foc=+0.46 press=-0.31 coh=+0.74 mom=+0.19 | obj=0.39 thr=0.45 clk=0.16 adv=0.64 · “bar_brain overlay: BUILD_ENERGY→PUSH_OBJECTIVE (0.88)”\n- t018 [chassis] committed on the objective — HUD FIGHT/heavy · belief: agg=+0.65 caut=+0.42 foc=+0.67 press=+0.32 coh=-0.06 mom=+0.49 | obj=0.58 thr=0.72 clk=0.17 adv=0.32 · “bar_brain overlay: HOLD_AND_HEAL→PUSH_OBJECTIVE (0.88)”\n\n**Bastion — Breach the Keep** — mission complete (objective complete).\n\n### Chapter 3: Rock Jungle — Wild Corridor\n\n**Map:** The Rock Jungle · **Kind:** `survive_wilds`\n\nLimestone labyrinth. Wilds and raptors own the dark. Pathing and survival beat pure DPS.\n\nOrders: Rally when scattered. Fall back when chewed. Probe chokes. Soft clock ~13 min.\n\n> **ketha:** The jungle doesn't hate you. It just doesn't care.\n> **vane:** Keep the knot tight. Split once and the stones eat us.\n\n#### Through the graph\n\n- t000 [chassis] committed on the objective — HUD APPROACH/none · belief: agg=+0.58 caut=-0.44 foc=+0.46 press=-0.44 coh=+0.79 mom=+0.31 | obj=0.46 thr=0.42 clk=0.16 adv=0.52 · “bar_brain overlay: BUILD_ENERGY→PUSH_OBJECTIVE (0.87)”\n- t001 [chassis] committed on the objective — HUD FIGHT/moderate · belief: agg=+0.66 caut=-0.22 foc=+0.46 press=-0.31 coh=+0.67 mom=+0.19 | obj=0.30 thr=0.45 clk=0.16 adv=0.53 · “bar_brain overlay: BUILD_ENERGY→PUSH_OBJECTIVE (0.87)”\n- t020 [chassis] committed on the objective — HUD HOLD/moderate · belief: agg=+0.58 caut=+0.35 foc=+0.76 press=+0.32 coh=-0.06 mom=+0.75 | obj=0.95 thr=0.57 clk=0.17 adv=0.38 · “bar_brain overlay: EXTRACT→PUSH_OBJECTIVE (0.87)”\n- t022 [chassis] committed on the objective — HUD FIGHT/heavy · belief: agg=+0.60 caut=+0.39 foc=+0.76 press=+0.32 coh=-0.07 mom=+0.74 | obj=0.95 thr=0.62 clk=0.17 adv=0.36 · “bar_brain overlay: EXTRACT→PUSH_OBJECTIVE (0.87)”\n- t025 [chassis] committed on the objective — HUD EXTRACT/moderate · belief: agg=+0.57 caut=+0.35 foc=+0.71 press=+0.32 coh=-0.07 mom=+0.75 | obj=0.96 thr=0.56 clk=0.17 adv=0.38 · “bar_brain overlay: EXTRACT→PUSH_OBJECTIVE (0.87)”\n- t026 [chassis] committed on the objective — HUD EXTRACT/moderate · belief: agg=+0.53 caut=+0.34 foc=+0.69 press=+0.32 coh=-0.07 mom=+0.74 | obj=0.96 thr=0.54 clk=0.17 adv=0.39 · “bar_brain overlay: EXTRACT→PUSH_OBJECTIVE (0.87)”\n\n**Rock Jungle — Wild Corridor** — mission complete (extracted).\n\n### Chapter 4: Simmers — Choose Your Scar\n\n**Map:** All That Simmers · **Kind:** `multipressure`\n\nFull faction and wild pressure. You must choose: break Armada eco, hold the lane, or cut Cortex. The knot only yields to a committed plan.\n\nOrders: Pick a line early (eco wreck, lane hold, or strike). Mix expand with combat. Soft clock ~14 min.\n\n> **ketha:** Pick a scar and own it. Half-choices drown here.\n\n#### Through the graph\n\n- t000 [chassis] committed on the objective — HUD APPROACH/light · belief: agg=+0.53 caut=-0.36 foc=+0.46 press=-0.44 coh=+0.79 mom=+0.31 | obj=0.61 thr=0.45 clk=0.20 adv=0.54 · “bar_brain overlay: BUILD_ENERGY→PUSH_OBJECTIVE (0.89)”\n- t001 [chassis] committed on the objective — HUD FIGHT/moderate · belief: agg=+0.64 caut=-0.18 foc=+0.46 press=-0.31 coh=+0.67 mom=+0.19 | obj=0.40 thr=0.47 clk=0.19 adv=0.54 · “bar_brain overlay: BUILD_ENERGY→PUSH_OBJECTIVE (0.89)”\n- t019 [chassis] committed on the objective — HUD HOLD/moderate · belief: agg=+0.58 caut=+0.35 foc=+0.75 press=+0.32 coh=-0.06 mom=+0.75 | obj=0.92 thr=0.55 clk=0.17 adv=0.39 · “bar_brain overlay: EXTRACT→PUSH_OBJECTIVE (0.89)”\n- t020 [chassis] committed on the objective — HUD FIGHT/heavy · belief: agg=+0.62 caut=+0.39 foc=+0.75 press=+0.32 coh=-0.06 mom=+0.74 | obj=0.94 thr=0.63 clk=0.17 adv=0.36 · “bar_brain overlay: EXTRACT→PUSH_OBJECTIVE (0.89)”\n- t021 [chassis] committed on the objective — HUD HOLD/moderate · belief: agg=+0.55 caut=+0.36 foc=+0.76 press=+0.32 coh=-0.07 mom=+0.74 | obj=0.94 thr=0.58 clk=0.17 adv=0.38 · “bar_brain overlay: EXTRACT→PUSH_OBJECTIVE (0.89)”\n- t023 [chassis] committed on the objective — HUD FIGHT/heavy · belief: agg=+0.59 caut=+0.39 foc=+0.76 press=+0.32 coh=-0.07 mom=+0.74 | obj=0.95 thr=0.62 clk=0.17 adv=0.36 · “bar_brain overlay: EXTRACT→PUSH_OBJECTIVE (0.89)”\n- t024 [chassis] committed on the objective — HUD HOLD/moderate · belief: agg=+0.54 caut=+0.36 foc=+0.76 press=+0.32 coh=-0.07 mom=+0.74 | obj=0.95 thr=0.57 clk=0.17 adv=0.38 · “bar_brain overlay: EXTRACT→PUSH_OBJECTIVE (0.89)”\n- t028 [chassis] committed on the objective — HUD EXTRACT/moderate · belief: agg=+0.50 caut=+0.34 foc=+0.69 press=+0.32 coh=-0.07 mom=+0.74 | obj=0.96 thr=0.51 clk=0.17 adv=0.40 · “bar_brain overlay: EXTRACT→PUSH_OBJECTIVE (0.89)”\n\n**Simmers — Choose Your Scar** — mission complete (extracted).\n\n### Chapter 5: Simmers — Final Pressure\n\n**Map:** All That Simmers · **Kind:** `multipressure`\n\nCampaign climax on the swamp. Collapse the remaining pressure node. Roster may be tired. Eco and heroes both matter.\n\nOrders: Finish the objective. Live. Extract. Soft clock ~15 min.\n\n> **ketha:** Last knot. Don't get poetic. Cut it.\n> **vane:** If we leave names on this mud, make them theirs.\n\n#### Through the graph\n\n- t000 [chassis] committed on the objective — HUD APPROACH/light · belief: agg=+0.53 caut=-0.36 foc=+0.46 press=-0.44 coh=+0.79 mom=+0.31 | obj=0.61 thr=0.41 clk=0.20 adv=0.54 · “bar_brain overlay: BUILD_ENERGY→PUSH_OBJECTIVE (0.89)”\n- t001 [chassis] committed on the objective — HUD FIGHT/moderate · belief: agg=+0.64 caut=-0.18 foc=+0.46 press=-0.31 coh=+0.67 mom=+0.19 | obj=0.40 thr=0.45 clk=0.19 adv=0.55 · “bar_brain overlay: BUILD_ENERGY→PUSH_OBJECTIVE (0.89)”\n- t020 [chassis] committed on the objective — HUD HOLD/moderate · belief: agg=+0.56 caut=+0.37 foc=+0.73 press=+0.32 coh=-0.06 mom=+0.69 | obj=0.82 thr=0.64 clk=0.17 adv=0.35 · “bar_brain overlay: HOLD_AND_HEAL→PUSH_OBJECTIVE (0.89)”\n- t021 [chassis] committed on the objective — HUD FIGHT/moderate · belief: agg=+0.65 caut=+0.35 foc=+0.73 press=+0.32 coh=-0.06 mom=+0.73 | obj=0.82 thr=0.58 clk=0.17 adv=0.37 · “bar_brain overlay: HOLD_AND_HEAL→PUSH_OBJECTIVE (0.89)”\n- t023 [chassis] committed on the objective — HUD HOLD/moderate · belief: agg=+0.56 caut=+0.36 foc=+0.73 press=+0.32 coh=-0.07 mom=+0.69 | obj=0.83 thr=0.59 clk=0.17 adv=0.37 · “bar_brain overlay: HOLD_AND_HEAL→PUSH_OBJECTIVE (0.89)”\n- t026 [chassis] committed on the objective — HUD FIGHT/moderate · belief: agg=+0.63 caut=+0.34 foc=+0.73 press=+0.32 coh=-0.07 mom=+0.73 | obj=0.83 thr=0.52 clk=0.17 adv=0.40 · “bar_brain overlay: HOLD_AND_HEAL→PUSH_OBJECTIVE (0.89)”\n- t027 [chassis] committed on the objective — HUD HOLD/moderate · belief: agg=+0.55 caut=+0.34 foc=+0.73 press=+0.32 coh=-0.07 mom=+0.70 | obj=0.83 thr=0.51 clk=0.17 adv=0.40 · “bar_brain overlay: HOLD_AND_HEAL→PUSH_OBJECTIVE (0.89)”\n- t038 [chassis] committed on the objective — HUD FIGHT/moderate · belief: agg=+0.63 caut=+0.34 foc=+0.73 press=+0.54 coh=-0.07 mom=+0.73 | obj=0.83 thr=0.50 clk=0.42 adv=0.40 · “bar_brain overlay: HOLD_AND_HEAL→PUSH_OBJECTIVE (0.89)”\n\n**Simmers — Final Pressure** — mission complete (objective complete).\n\n---\n\n**Campaign result:** 5/5 hard wins · cleared=True · ant_calls=0",
+  "tagline": "A mind that commits under fog — and walks the campaign home.",
+  "fairness": {
+    "sees": [
+      "PlayerFacingCard",
+      "FairHUD",
+      "eco bands (when building allowed)",
+      "umwelt belief graph",
+      "tool thoughts"
+    ],
+    "never_sees": [
+      "SimTruth",
+      "enemy_scale",
+      "raw HP",
+      "RNG"
+    ]
+  }
+}

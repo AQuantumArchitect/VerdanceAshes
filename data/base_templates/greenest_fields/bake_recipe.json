@@ -1,0 +1,159 @@
+{
+  "schemaVersion": "verdance-shell-bake-recipe/1.0",
+  "mapId": "greenest_fields",
+  "mapName": "Greenest Fields 1.3",
+  "templateId": "armada_t15_v1",
+  "character": "Synthesized Utopia - energy islands + LLTs (0 metal), converter sprawl",
+  "characterCard": {
+    "descriptor": "The Synthesized Utopia",
+    "blurb": "Energy sprawl, converter utopia. Raid pockets, extract before contact wrath. No native metal — solar/wind/converter islands with light LLT teeth.",
+    "shellAtT0": "Energy islands + LLTs (0 metal)",
+    "growMix": "7× sprawl + 1× fortify_easy",
+    "arcKinds": ["eco_raid", "eco_expand"],
+    "raidHint": "raid_eco_extract",
+    "captureLater": "deny only",
+    "wrath": { "packId": "armada_gunslinger_response_v1", "responseSeconds": 480 },
+    "source": "placeholder",
+    "realBakeStatus": "pending_cloud_or_iconsatlas"
+  },
+  "arcKinds": ["eco_raid", "eco_expand"],
+  "raidHint": "raid_eco_extract",
+  "captureLater": "deny only",
+  "faction": "armada",
+  "side": "Armada",
+  "growMinutes": 15,
+  "growFrames": 27000,
+  "peacefulCoGrow": true,
+  "aiShortName": "SimpleDefenderAI",
+  "teamCount": 8,
+  "fixedRngSeed": 11,
+  "notes": "Mostly SimpleAI sprawl (no-metal utopia). One BARb easy island adds light teeth without deathball texture. Source: seven_maps + outbound 37/38. No mexPerPocket — 0 native metal is the character.",
+  "occupation": {
+    "decoyCommanders": true,
+    "decoyPerPocket": 1,
+    "notes": "Decoy coms farm solar/converter fiction after strip. Sims use normal commanders."
+  },
+  "playerClear": {
+    "zoneId": "GF_SE_STAGING",
+    "bounds": { "xMin": 0.46, "xMax": 0.68, "zMin": 0.48, "zMax": 0.70 },
+    "notes": "Strike team staging - never seed shell units here."
+  },
+  "starts": [
+    {
+      "pocketId": "gf_se_works",
+      "zoneId": "GF_SE_ENERGY_WORKS",
+      "label": "Southeast Armada Energy Works",
+      "kind": "mixed",
+      "faction": "armada",
+      "side": "Armada",
+      "growProfile": "sprawl",
+      "x": 0.80,
+      "z": 0.80,
+      "primaryCandidate": true,
+      "densityScale": 1.15
+    },
+    {
+      "pocketId": "gf_n_desert",
+      "zoneId": "GF_NORTH_DESERT_EDGE",
+      "label": "North Desert Edge",
+      "kind": "wind",
+      "faction": "armada",
+      "side": "Armada",
+      "growProfile": "sprawl",
+      "x": 0.80,
+      "z": 0.17,
+      "densityScale": 1.0
+    },
+    {
+      "pocketId": "gf_s_desert",
+      "zoneId": "GF_SOUTH_DESERT_EDGE",
+      "label": "South Desert Edge",
+      "kind": "solar",
+      "faction": "armada",
+      "side": "Armada",
+      "growProfile": "sprawl",
+      "x": 0.20,
+      "z": 0.81,
+      "densityScale": 1.0
+    },
+    {
+      "pocketId": "gf_nw_green",
+      "zoneId": "GF_NW_GREEN_START",
+      "label": "Northwest Green Reaches",
+      "kind": "mixed",
+      "faction": "armada",
+      "side": "Armada",
+      "growProfile": "sprawl",
+      "x": 0.15,
+      "z": 0.15,
+      "densityScale": 0.95
+    },
+    {
+      "pocketId": "gf_central_n",
+      "zoneId": "GF_CENTRAL_OPEN_GRASSLAND",
+      "label": "Central Grassland North",
+      "kind": "wind",
+      "faction": "armada",
+      "side": "Armada",
+      "growProfile": "sprawl",
+      "x": 0.40,
+      "z": 0.30,
+      "densityScale": 1.0
+    },
+    {
+      "pocketId": "gf_central_s",
+      "zoneId": "GF_CENTRAL_OPEN_GRASSLAND",
+      "label": "Central Grassland South",
+      "kind": "solar",
+      "faction": "armada",
+      "side": "Armada",
+      "growProfile": "sprawl",
+      "x": 0.35,
+      "z": 0.50,
+      "densityScale": 1.0
+    },
+    {
+      "pocketId": "gf_east_mid",
+      "zoneId": "GF_NORTH_DESERT_EDGE",
+      "label": "East Mid Energy Bleed",
+      "kind": "mixed",
+      "faction": "armada",
+      "side": "Armada",
+      "growProfile": "fortify_easy",
+      "x": 0.72,
+      "z": 0.45,
+      "densityScale": 1.05,
+      "notes": "BARb easy - light teeth island among sprawl."
+    },
+    {
+      "pocketId": "gf_west_mid",
+      "zoneId": "GF_CENTRAL_OPEN_GRASSLAND",
+      "label": "West Mid Works",
+      "kind": "mixed",
+      "faction": "armada",
+      "side": "Armada",
+      "growProfile": "sprawl",
+      "x": 0.25,
+      "z": 0.45,
+      "densityScale": 1.0
+    }
+  ],
+  "placeholderDensity": {
+    "solarPerPocket": 10,
+    "windPerPocket": 8,
+    "converterPerPocket": 4,
+    "advSolarPerPocket": 2,
+    "estorPerPocket": 1,
+    "lltPerPocket": 6,
+    "hltPerPocket": 1,
+    "wallPerPocket": 8,
+    "radarPerPocket": 1,
+    "scatterRadius": 0.055
+  },
+  "wrathDefault": {
+    "packId": "armada_gunslinger_response_v1",
+    "responseSeconds": 480,
+    "startOn": "first_contact",
+    "notes": "Playtest soft-open: 8 min base delay (further scaled by mission number in Arm-WrathFromRecipe)."
+  }
+}

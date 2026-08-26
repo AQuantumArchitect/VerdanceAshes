@@ -1,0 +1,37 @@
+VERDANCE'S ASHES — START HERE
+=============================
+
+The green is dying. Ashwalkers hold the line.
+This is a campaign shell for Beyond All Reason.
+
+ONE PATH
+--------
+1. Install Beyond All Reason and launch it once (downloads the engine).
+2. From the workspace root (design forge or future dist zip):
+     SETUP.bat     (once)
+     PLAY.bat      (every session — leave open)
+3. On the war map:
+     - Choose a green "sortie"
+     - Confirm the objective (green) on the briefing table
+     - Click Drop into battle
+4. Play the sortie in BAR. Space dismisses the briefing.
+   After a win, 1/2/3 can keep fighting on the same map.
+5. When the match ends, the kernel bridge usually brings the result home.
+   If the map does not move: After the fight - bring it home
+6. Talk, rest, hire mercs, or take the next drop.
+
+Deploy truth: docs\DEPLOY_TRUTH.md
+Ship architecture: docs\SHIP_ARCHITECTURE.md
+
+IN-GAME SHORTCUTS
+-----------------
+  /vastory   story panel
+  /vazones   paint deploy / capture / extract marks
+  /vahelp    list commands
+
+WHAT THIS IS
+------------
+Aces + a war map + short BAR sorties that rewrite the campaign.
+Stay on one theater to keep heroes and warband carrying forward.
+
+Feedback: docs\PLAYTESTING.md

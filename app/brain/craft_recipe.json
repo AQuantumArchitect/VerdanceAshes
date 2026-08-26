@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "verdance-craft-recipe/0.1",
+  "source": "campaign_fruit",
+  "stamp": "20260814_024745",
+  "knobs": {
+    "difficulty": 2.2,
+    "width_early": 0.05,
+    "width_late": 1.0,
+    "width_ease": 0.46,
+    "decoy_pressure": 2.2,
+    "enemy_aggro": 2.0,
+    "lane_bias": 1.5,
+    "path_purity_target": 0.15,
+    "arc1_scale": 0.94,
+    "arc2_scale": 0.95,
+    "arc3_scale": 1.9
+  },
+  "craft_score": 0.958,
+  "arc_rates": {
+    "1": 0.8,
+    "2": 0.8,
+    "3": 0.5
+  },
+  "notes": "Apply knobs.width_* via manifold_gym.knobs_width; difficulty via build_full_campaign(difficulty=...).",
+  "fruit_idea_ids": [
+    "fruit-simple-saturated",
+    "fruit-push-monoculture",
+    "fruit-open-push-locked"
+  ],
+  "fruit_notes": [
+    "band_clip:width_early",
+    "band_clip:path_purity_target"
+  ],
+  "updated_at": "2026-08-14T02:47:45+00:00"
+}

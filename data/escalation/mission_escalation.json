@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "verdance-escalation-ladder/1.0",
+  "notes": [
+    "Drop 4 escalation ladder — the authored complexity/difficulty curve.",
+    "scaleWindow [lo, hi]: the compiler computes enemyScale from campaign state, then clamps into this window. The owner's difficulty dial scales the window itself.",
+    "secondaries: side objectives resolved to real zones at intent time. required=false is a bonus mark (pays reputation); required=true gates victory.",
+    "objectiveStrength: surgical (single centerpiece) | raze (the whole camp is the objective) | purge (clear the board of the enemy faction).",
+    "wavesMode: off | light | full — overrides the arc default escalation waves.",
+    "Tune here; tools/escalation_ladder_v1.py carries matching built-in defaults. Chart the result with: python tools/escalation_map_v1.py"
+  ],
+  "defaults": {
+    "scaleWindow": [1.0, 1.6],
+    "secondaries": [],
+    "objectiveStrength": "surgical",
+    "wavesMode": null
+  },
+  "missions": {
+    "1": { "scaleWindow": [0.35, 0.5], "wavesMode": "off" },
+    "2": { "scaleWindow": [0.45, 0.62], "wavesMode": "off" },
+    "3": { "scaleWindow": [0.55, 0.75], "wavesMode": "off" },
+    "4": { "scaleWindow": [0.65, 0.88], "wavesMode": "light", "secondaries": [{ "required": false }] },
+    "5": { "scaleWindow": [0.75, 1.0], "wavesMode": "light", "secondaries": [{ "required": false }] },
+    "6": { "scaleWindow": [0.85, 1.12], "wavesMode": "light", "secondaries": [{ "required": true }] },
+    "7": { "scaleWindow": [0.95, 1.25], "wavesMode": "full", "secondaries": [{ "required": true }] },
+    "8": { "scaleWindow": [1.05, 1.4], "wavesMode": "full", "secondaries": [{ "required": true }, { "required": false }] },
+    "9": { "scaleWindow": [1.15, 1.55], "wavesMode": "full", "objectiveStrength": "raze", "secondaries": [{ "required": true }] },
+    "10": { "scaleWindow": [1.3, 1.7], "wavesMode": "full", "objectiveStrength": "purge" }
+  },
+  "finale": {
+    "scaleWindow": [1.7, 2.6],
+    "wavesMode": "full",
+    "objectiveStrength": "finale",
+    "secondaries": []
+  }
+}

@@ -1,0 +1,38 @@
+﻿{
+    "schemaVersion":  "verdance-dev-mode/0.1",
+    "enabled":  false,
+    "armedAt":  "2026-07-27T05:43:26.316679+00:00",
+    "telemetry":  {
+                      "dense":  true,
+                      "samplePeriodFrames":  150,
+                      "trackPlayerCommands":  true,
+                      "includeArmyComposition":  true,
+                      "includeZoneCentroid":  true,
+                      "includeResourceIncome":  true,
+                      "echoCompactEverySample":  true
+                  },
+    "learning":  {
+                     "humanWeight":  2.4,
+                     "autoHarvestOnSessionEnd":  true,
+                     "trainBarBrain":  true,
+                     "notes":  "Human gold samples count ~2.4× vs proxy sims."
+                 },
+    "craft":  {
+                  "stamp":  "20260726_131147",
+                  "craft_score":  0.96,
+                  "knobs":  {
+                                "difficulty":  1.31,
+                                "width_early":  0.18,
+                                "width_late":  0.74,
+                                "width_ease":  0.66,
+                                "decoy_pressure":  2.2,
+                                "enemy_aggro":  1.35,
+                                "lane_bias":  1.02,
+                                "path_purity_target":  0.37,
+                                "arc1_scale":  0.94,
+                                "arc2_scale":  0.95,
+                                "arc3_scale":  1.67
+                            }
+              },
+    "notes":  "DEV LAUNCH — high telemetry on the human player. Not for customer export. Disarm with --disarm."
+}

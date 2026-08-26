@@ -2,6 +2,7 @@ headless_runs/
 playable_runs/
 logs/
 export/
+_attic/export/
 inbox/
 _outbox/
 reports/
@@ -20,3 +21,5 @@ verdance_config.json
 __pycache__/
 *.tmp
 *.log
+*.pyc
+.pytest_cache/

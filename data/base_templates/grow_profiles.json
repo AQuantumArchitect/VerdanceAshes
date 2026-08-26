@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "verdance-shell-grow-profiles/1.1",
+  "notes": "Canonical grow rates for living-shell bakes. SimpleAI = eco sprawl; BARb = fortify/teeth after strip. Peaceful co-grow shares AllyTeams. Battle-farm recipes (recipeKind=battle_farm) set peacefulCoGrow=false for real 1v1/3v3 war mids. SIMS always use normal commanders; after strip, occupation plants decoy commanders (armdecom/cordecom/legdecom) as Armada autonomous eco-farm swarm — weaker, less metal, on-brand.",
+  "occupation": {
+    "simCommanders": "normal",
+    "occupationCommanders": "decoy",
+    "decoyDefs": { "armada": "armdecom", "cortex": "cordecom", "nullmercs": "legdecom" },
+    "notes": "Decoy coms farm solar/converter fiction without real-com danger or D-gun economy rewards."
+  },
+  "profiles": {
+    "sprawl": {
+      "aiShortName": "SimpleAI",
+      "barbProfile": null,
+      "label": "SimpleAI eco sprawl",
+      "placeholderMul": { "eco": 1.2, "def": 0.9, "wall": 0.85, "mex": 1.0, "hlt": 0.8 },
+      "useWhen": "Converter utopia, energy islands, soft occupation (Greenest default)."
+    },
+    "hold": {
+      "aiShortName": "SimpleAI",
+      "barbProfile": null,
+      "label": "SimpleAI hold / rim",
+      "placeholderMul": { "eco": 1.0, "def": 1.05, "wall": 1.0, "mex": 1.0, "hlt": 1.0 },
+      "useWhen": "Ridge pockets, rims, quiet shelves."
+    },
+    "fortify_easy": {
+      "aiShortName": "BARb",
+      "barbProfile": "easy",
+      "version": "stable",
+      "label": "BARb easy fortify",
+      "placeholderMul": { "eco": 1.0, "def": 1.15, "wall": 1.15, "mex": 1.0, "hlt": 1.1 },
+      "useWhen": "Light teeth without deathball (Greenest secondary islands)."
+    },
+    "fortify": {
+      "aiShortName": "BARb",
+      "barbProfile": "medium",
+      "version": "stable",
+      "label": "BARb medium fortify",
+      "placeholderMul": { "eco": 0.95, "def": 1.35, "wall": 1.4, "mex": 1.05, "hlt": 1.25 },
+      "useWhen": "Lane teeth, gatefields, ridge forts (Koom scar, Tabula gates)."
+    },
+    "fortify_hard": {
+      "aiShortName": "BARb",
+      "barbProfile": "hard",
+      "version": "stable",
+      "label": "BARb hard fortress",
+      "placeholderMul": { "eco": 0.9, "def": 1.55, "wall": 1.65, "mex": 1.1, "hlt": 1.5 },
+      "useWhen": "Citadel spine, Cortex dealer core, plateau fortress."
+    },
+    "aggressive_core": {
+      "aiShortName": "BARb",
+      "barbProfile": "hard_aggressive",
+      "version": "stable",
+      "label": "BARb hard_aggressive core",
+      "placeholderMul": { "eco": 0.95, "def": 1.45, "wall": 1.35, "mex": 1.15, "hlt": 1.4 },
+      "useWhen": "High-pressure faction cores that should feel military after strip (ATS Cortex basin optional)."
+    },
+    "scrap": {
+      "aiShortName": "SimpleAI",
+      "barbProfile": null,
+      "label": "Thin scrap foothold",
+      "placeholderMul": { "eco": 0.55, "def": 0.9, "wall": 0.7, "mex": 0.7, "hlt": 0.5 },
+      "useWhen": "Null scrap only (Rock Jungle, thin Null footholds)."
+    },
+    "thin": {
+      "aiShortName": "SimpleAI",
+      "barbProfile": null,
+      "label": "Thin edge / glass / killfield",
+      "placeholderMul": { "eco": 0.4, "def": 0.55, "wall": 0.45, "mex": 0.45, "hlt": 0.4 },
+      "useWhen": "Glassed center edge, scar mouth, central killfield — never a city."
+    }
+  },
+  "mapDefaults": {
+    "greenest_fields": "sprawl",
+    "eye_of_horus": "fortify_hard",
+    "koom_valley": "fortify",
+    "tabula": "fortify",
+    "ancient_bastion": "fortify_hard",
+    "the_rock_jungle": "scrap",
+    "all_that_simmers": "hold"
+  }
+}

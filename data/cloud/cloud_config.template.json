@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "verdance-cloud-bar/1.0",
+  "notes": "Copy to cloud_config.json (gitignored) and fill host/auth. Primary path: Windows cloud VM with OpenSSH so spring-headless.exe + BARb match local parity. Linux path needs a Linux Recoil engine separately.",
+  "provider": "ssh",
+  "host": "YOUR.CLOUD.HOST.OR.IP",
+  "port": 22,
+  "user": "Administrator",
+  "auth": {
+    "method": "key",
+    "privateKeyPath": "C:\\Users\\Luke Spooner\\.ssh\\id_rsa",
+    "passwordEnv": "VERDANCE_CLOUD_SSH_PASSWORD"
+  },
+  "remoteOs": "windows",
+  "remoteRoot": "C:\\verdance_cloud",
+  "remoteBarData": "C:\\verdance_cloud\\bar_data",
+  "remoteEngineRel": "engine\\recoil_2025.06.24",
+  "remoteJobs": "C:\\verdance_cloud\\jobs",
+  "remoteResults": "C:\\verdance_cloud\\results",
+  "localBundleRoot": "headless_runs\\cloud",
+  "engineTag": "recoil_2025.06.24",
+  "sync": {
+    "engine": true,
+    "sevenMaps": true,
+    "barSdd": true,
+    "verdanceMod": true,
+    "force": false
+  },
+  "bake": {
+    "mapOrder": [
+      "the_rock_jungle",
+      "koom_valley",
+      "all_that_simmers",
+      "eye_of_horus",
+      "greenest_fields",
+      "tabula",
+      "ancient_bastion"
+    ],
+    "defaultTimeoutSeconds": 0,
+    "maxParallel": 1
+  },
+  "headlessSettings": {
+    "UnitIconsAsUI": 0,
+    "UnitIconDist": 99999,
+    "MinimapIconScale": 0.1,
+    "LuaUI": 0
+  }
+}
