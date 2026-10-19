@@ -1,14 +1,47 @@
 {
   "schemaVersion": "verdance-event-classes/0.1",
   "notes": "The event surface. An event class is a thing the world does that a person in the camp has the job of saying. Detectors run per bead (one history entry + its narrative event + its frontEvents + thread history at that turn) or on the final snapshot. Firing an event class does three things: names a witness (the concrete noun for the writer), applies coherence effects to reading pairs (what the event forced apart or left ambiguous), and gives the owning voice an occasion. Levels of readings never come from here; they come from probes in readings.json. Coherence only ever comes from here. cooldownBeads is hysteresis: a class that fired within that many beads stays quiet.",
-  "occasions": ["briefing", "debrief", "camp", "roll"],
+  "occasions": [
+    "briefing",
+    "debrief",
+    "camp",
+    "roll"
+  ],
   "classes": [
+    {
+      "id": "surprise_at_drop",
+      "label": "What we briefed was not what we found",
+      "owner": "yeva",
+      "occasion": "debrief",
+      "detect": {
+        "scope": "bead",
+        "surprise_gte": 0.6
+      },
+      "witness": "{label}: we believed {believed}; we found {found}. Our last word on it was stale.",
+      "coherence": [
+        {
+          "pair": [
+            "hunted",
+            "armada_falling"
+          ],
+          "effect": "renew",
+          "strength": 0.2
+        }
+      ],
+      "cooldownBeads": 0,
+      "note": "surprise is stamped on the bead by belief_homecoming_v1: sum over measured zones of belief confidence times |truth - belief|. Zero on a first visit (nobody had looked)."
+    },
     {
       "id": "drop_held",
       "label": "Ground held",
       "owner": "vane",
       "occasion": "debrief",
-      "detect": { "scope": "bead", "verdict": ["victory"] },
+      "detect": {
+        "scope": "bead",
+        "verdict": [
+          "victory"
+        ]
+      },
       "witness": "{map}: held",
       "coherence": [],
       "cooldownBeads": 0
@@ -18,7 +51,12 @@
       "label": "Unfinished work",
       "owner": "ketha",
       "occasion": "debrief",
-      "detect": { "scope": "bead", "verdict": ["partial"] },
+      "detect": {
+        "scope": "bead",
+        "verdict": [
+          "partial"
+        ]
+      },
       "witness": "{map}: came home with the order half kept",
       "coherence": [],
       "cooldownBeads": 0
@@ -28,10 +66,23 @@
       "label": "Ground lost",
       "owner": "ketha",
       "occasion": "debrief",
-      "detect": { "scope": "bead", "verdict": ["defeat"] },
+      "detect": {
+        "scope": "bead",
+        "verdict": [
+          "defeat"
+        ]
+      },
       "witness": "{map}: lost",
       "coherence": [
-        { "pair": ["rooted", "bleeding"], "effect": "distinguish", "toward": "bleeding", "strength": 0.25 }
+        {
+          "pair": [
+            "rooted",
+            "bleeding"
+          ],
+          "effect": "distinguish",
+          "toward": "bleeding",
+          "strength": 0.25
+        }
       ],
       "cooldownBeads": 0
     },
@@ -40,10 +91,21 @@
       "label": "Everyone walked home",
       "owner": "hearth",
       "occasion": "debrief",
-      "detect": { "scope": "bead", "tag": "extract-clean" },
+      "detect": {
+        "scope": "bead",
+        "tag": "extract-clean"
+      },
       "witness": "clean extraction from {map}",
       "coherence": [
-        { "pair": ["rooted", "bleeding"], "effect": "distinguish", "toward": "rooted", "strength": 0.2 }
+        {
+          "pair": [
+            "rooted",
+            "bleeding"
+          ],
+          "effect": "distinguish",
+          "toward": "rooted",
+          "strength": 0.2
+        }
       ],
       "cooldownBeads": 0
     },
@@ -52,10 +114,26 @@
       "label": "Came home paying",
       "owner": "ketha",
       "occasion": "debrief",
-      "detect": { "scope": "bead", "extraction_not": ["clean"], "verdict": ["victory", "partial"] },
+      "detect": {
+        "scope": "bead",
+        "extraction_not": [
+          "clean"
+        ],
+        "verdict": [
+          "victory",
+          "partial"
+        ]
+      },
       "witness": "extraction from {map}: {extractionText}",
       "coherence": [
-        { "pair": ["rooted", "bleeding"], "effect": "renew", "strength": 0.2 }
+        {
+          "pair": [
+            "rooted",
+            "bleeding"
+          ],
+          "effect": "renew",
+          "strength": 0.2
+        }
       ],
       "cooldownBeads": 0
     },
@@ -64,11 +142,31 @@
       "label": "Flown on Merc paper",
       "owner": "grath",
       "occasion": "briefing",
-      "detect": { "scope": "bead", "tag": "path-b", "not_tag": "ashwalker-gain" },
+      "detect": {
+        "scope": "bead",
+        "tag": "path-b",
+        "not_tag": "ashwalker-gain"
+      },
       "witness": "{map} was a Merc contract and nothing of it stayed ours",
       "coherence": [
-        { "pair": ["auxiliary", "sovereign"], "effect": "distinguish", "toward": "auxiliary", "strength": 0.3 },
-        { "pair": ["auxiliary", "indebted"], "effect": "distinguish", "toward": "auxiliary", "strength": 0.15 }
+        {
+          "pair": [
+            "auxiliary",
+            "sovereign"
+          ],
+          "effect": "distinguish",
+          "toward": "auxiliary",
+          "strength": 0.3
+        },
+        {
+          "pair": [
+            "auxiliary",
+            "indebted"
+          ],
+          "effect": "distinguish",
+          "toward": "auxiliary",
+          "strength": 0.15
+        }
       ],
       "cooldownBeads": 0
     },
@@ -77,10 +175,23 @@
       "label": "Merc paper, our ground",
       "owner": "auditor",
       "occasion": "camp",
-      "detect": { "scope": "bead", "all_tags": ["path-b", "ashwalker-gain"] },
+      "detect": {
+        "scope": "bead",
+        "all_tags": [
+          "path-b",
+          "ashwalker-gain"
+        ]
+      },
       "witness": "{map}: fought under a Merc contract, kept ground under our own name. Nobody has asked yet which it was.",
       "coherence": [
-        { "pair": ["auxiliary", "sovereign"], "effect": "renew", "strength": 0.35 }
+        {
+          "pair": [
+            "auxiliary",
+            "sovereign"
+          ],
+          "effect": "renew",
+          "strength": 0.35
+        }
       ],
       "cooldownBeads": 0
     },
@@ -89,10 +200,22 @@
       "label": "Ground kept under our name",
       "owner": "vane",
       "occasion": "debrief",
-      "detect": { "scope": "bead", "tag": "ashwalker-gain", "not_tag": "path-b" },
+      "detect": {
+        "scope": "bead",
+        "tag": "ashwalker-gain",
+        "not_tag": "path-b"
+      },
       "witness": "{map}: ground kept, no patron's name on it",
       "coherence": [
-        { "pair": ["auxiliary", "sovereign"], "effect": "distinguish", "toward": "sovereign", "strength": 0.35 }
+        {
+          "pair": [
+            "auxiliary",
+            "sovereign"
+          ],
+          "effect": "distinguish",
+          "toward": "sovereign",
+          "strength": 0.35
+        }
       ],
       "cooldownBeads": 0
     },
@@ -101,11 +224,30 @@
       "label": "A claim confirmed",
       "owner": "vane",
       "occasion": "debrief",
-      "detect": { "scope": "bead", "credit": "nodeClaimed" },
+      "detect": {
+        "scope": "bead",
+        "credit": "nodeClaimed"
+      },
       "witness": "a node on {map} confirmed under our claim",
       "coherence": [
-        { "pair": ["auxiliary", "sovereign"], "effect": "distinguish", "toward": "sovereign", "strength": 0.5 },
-        { "pair": ["indebted", "sovereign"], "effect": "distinguish", "toward": "sovereign", "strength": 0.25 }
+        {
+          "pair": [
+            "auxiliary",
+            "sovereign"
+          ],
+          "effect": "distinguish",
+          "toward": "sovereign",
+          "strength": 0.5
+        },
+        {
+          "pair": [
+            "indebted",
+            "sovereign"
+          ],
+          "effect": "distinguish",
+          "toward": "sovereign",
+          "strength": 0.25
+        }
       ],
       "cooldownBeads": 0
     },
@@ -114,11 +256,22 @@
       "label": "A new name on the roster",
       "owner": "ketha",
       "occasion": "camp",
-      "detect": { "scope": "bead", "tag": "hero-joined" },
+      "detect": {
+        "scope": "bead",
+        "tag": "hero-joined"
+      },
       "witness": "someone walked in after {map}",
       "witnessNamed": "{names} walked in after {map}",
       "coherence": [
-        { "pair": ["rooted", "bleeding"], "effect": "distinguish", "toward": "rooted", "strength": 0.15 }
+        {
+          "pair": [
+            "rooted",
+            "bleeding"
+          ],
+          "effect": "distinguish",
+          "toward": "rooted",
+          "strength": 0.15
+        }
       ],
       "cooldownBeads": 0
     },
@@ -127,16 +280,76 @@
       "label": "A promise kept",
       "owner": "by_thread",
       "occasion": "camp",
-      "detect": { "scope": "bead", "thread_stage": "Resolved" },
+      "detect": {
+        "scope": "bead",
+        "thread_stage": "Resolved"
+      },
       "witness": "'{threadTitle}' kept: {text}",
       "coherence": [],
-      "threadOwners": { "place": "hearth", "shelter": "vane", "bring_back": "ketha", "friends": "grath", "dealer": "auditor", "company": "vane" },
+      "threadOwners": {
+        "place": "hearth",
+        "shelter": "vane",
+        "bring_back": "ketha",
+        "friends": "grath",
+        "dealer": "auditor",
+        "company": "vane"
+      },
       "threadCoherence": {
-        "place": [ { "pair": ["haunted", "rooted"], "effect": "distinguish", "toward": "rooted", "strength": 0.35 } ],
-        "shelter": [ { "pair": ["auxiliary", "sovereign"], "effect": "distinguish", "toward": "sovereign", "strength": 0.3 } ],
-        "bring_back": [ { "pair": ["rooted", "bleeding"], "effect": "distinguish", "toward": "rooted", "strength": 0.35 } ],
-        "friends": [ { "pair": ["auxiliary", "sovereign"], "effect": "distinguish", "toward": "auxiliary", "strength": 0.3 } ],
-        "dealer": [ { "pair": ["auxiliary", "indebted"], "effect": "distinguish", "toward": "indebted", "strength": 0.35 } ],
+        "place": [
+          {
+            "pair": [
+              "haunted",
+              "rooted"
+            ],
+            "effect": "distinguish",
+            "toward": "rooted",
+            "strength": 0.35
+          }
+        ],
+        "shelter": [
+          {
+            "pair": [
+              "auxiliary",
+              "sovereign"
+            ],
+            "effect": "distinguish",
+            "toward": "sovereign",
+            "strength": 0.3
+          }
+        ],
+        "bring_back": [
+          {
+            "pair": [
+              "rooted",
+              "bleeding"
+            ],
+            "effect": "distinguish",
+            "toward": "rooted",
+            "strength": 0.35
+          }
+        ],
+        "friends": [
+          {
+            "pair": [
+              "auxiliary",
+              "sovereign"
+            ],
+            "effect": "distinguish",
+            "toward": "auxiliary",
+            "strength": 0.3
+          }
+        ],
+        "dealer": [
+          {
+            "pair": [
+              "auxiliary",
+              "indebted"
+            ],
+            "effect": "distinguish",
+            "toward": "indebted",
+            "strength": 0.35
+          }
+        ],
         "company": []
       },
       "cooldownBeads": 0
@@ -146,15 +359,64 @@
       "label": "A promise missed",
       "owner": "by_thread",
       "occasion": "camp",
-      "detect": { "scope": "bead", "thread_stage": "Changed" },
+      "detect": {
+        "scope": "bead",
+        "thread_stage": "Changed"
+      },
       "witness": "'{threadTitle}' lapsed: {text}",
       "coherence": [],
-      "threadOwners": { "place": "hearth", "shelter": "vane", "bring_back": "ketha", "friends": "grath", "dealer": "auditor", "company": "vane" },
+      "threadOwners": {
+        "place": "hearth",
+        "shelter": "vane",
+        "bring_back": "ketha",
+        "friends": "grath",
+        "dealer": "auditor",
+        "company": "vane"
+      },
       "threadCoherence": {
-        "bring_back": [ { "pair": ["rooted", "bleeding"], "effect": "distinguish", "toward": "bleeding", "strength": 0.35 } ],
-        "shelter": [ { "pair": ["auxiliary", "sovereign"], "effect": "distinguish", "toward": "auxiliary", "strength": 0.2 } ],
-        "friends": [ { "pair": ["auxiliary", "sovereign"], "effect": "renew", "strength": 0.2 } ],
-        "dealer": [ { "pair": ["indebted", "sovereign"], "effect": "distinguish", "toward": "indebted", "strength": 0.25 } ]
+        "bring_back": [
+          {
+            "pair": [
+              "rooted",
+              "bleeding"
+            ],
+            "effect": "distinguish",
+            "toward": "bleeding",
+            "strength": 0.35
+          }
+        ],
+        "shelter": [
+          {
+            "pair": [
+              "auxiliary",
+              "sovereign"
+            ],
+            "effect": "distinguish",
+            "toward": "auxiliary",
+            "strength": 0.2
+          }
+        ],
+        "friends": [
+          {
+            "pair": [
+              "auxiliary",
+              "sovereign"
+            ],
+            "effect": "renew",
+            "strength": 0.2
+          }
+        ],
+        "dealer": [
+          {
+            "pair": [
+              "indebted",
+              "sovereign"
+            ],
+            "effect": "distinguish",
+            "toward": "indebted",
+            "strength": 0.25
+          }
+        ]
       },
       "cooldownBeads": 0
     },
@@ -163,10 +425,24 @@
       "label": "Armada lost ground while we were elsewhere",
       "owner": "auditor",
       "occasion": "briefing",
-      "detect": { "scope": "bead", "front": { "type": "offscreen_zone_flip", "fromFaction": "armada" } },
+      "detect": {
+        "scope": "bead",
+        "front": {
+          "type": "offscreen_zone_flip",
+          "fromFaction": "armada"
+        }
+      },
       "witness": "{label} on {map} went from Armada to {toFaction} while we were at {ourMap}",
       "coherence": [
-        { "pair": ["hunted", "armada_falling"], "effect": "distinguish", "toward": "armada_falling", "strength": 0.3 }
+        {
+          "pair": [
+            "hunted",
+            "armada_falling"
+          ],
+          "effect": "distinguish",
+          "toward": "armada_falling",
+          "strength": 0.3
+        }
       ],
       "cooldownBeads": 1
     },
@@ -175,10 +451,24 @@
       "label": "Ground came to us unasked",
       "owner": "vane",
       "occasion": "briefing",
-      "detect": { "scope": "bead", "front": { "type": "offscreen_zone_flip", "toFaction": "ashwalkers" } },
+      "detect": {
+        "scope": "bead",
+        "front": {
+          "type": "offscreen_zone_flip",
+          "toFaction": "ashwalkers"
+        }
+      },
       "witness": "{label} on {map} came to us while we were at {ourMap}. Nobody planted a flag; the flag was already ours.",
       "coherence": [
-        { "pair": ["auxiliary", "sovereign"], "effect": "distinguish", "toward": "sovereign", "strength": 0.15 }
+        {
+          "pair": [
+            "auxiliary",
+            "sovereign"
+          ],
+          "effect": "distinguish",
+          "toward": "sovereign",
+          "strength": 0.15
+        }
       ],
       "cooldownBeads": 0
     },
@@ -187,10 +477,25 @@
       "label": "Ground changed hands near ours",
       "owner": "yeva",
       "occasion": "briefing",
-      "detect": { "scope": "bead", "front": { "type": "offscreen_zone_flip", "onHeldMap": true, "notToFaction": "ashwalkers" } },
+      "detect": {
+        "scope": "bead",
+        "front": {
+          "type": "offscreen_zone_flip",
+          "onHeldMap": true,
+          "notToFaction": "ashwalkers"
+        }
+      },
       "witness": "{label} on {map} is {toFaction}'s now. Nobody of ours saw it happen.",
       "coherence": [
-        { "pair": ["hunted", "armada_falling"], "effect": "distinguish", "toward": "hunted", "strength": 0.25 }
+        {
+          "pair": [
+            "hunted",
+            "armada_falling"
+          ],
+          "effect": "distinguish",
+          "toward": "hunted",
+          "strength": 0.25
+        }
       ],
       "cooldownBeads": 1
     },
@@ -199,10 +504,24 @@
       "label": "Shelling heard near our ground",
       "owner": "yeva",
       "occasion": "briefing",
-      "detect": { "scope": "bead", "front": { "type": "offscreen_clash", "nearHeld": true } },
+      "detect": {
+        "scope": "bead",
+        "front": {
+          "type": "offscreen_clash",
+          "nearHeld": true
+        }
+      },
       "witness": "{count} clashes touched ground we hold on {map}",
       "coherence": [
-        { "pair": ["hunted", "armada_falling"], "effect": "distinguish", "toward": "hunted", "strength": 0.2 }
+        {
+          "pair": [
+            "hunted",
+            "armada_falling"
+          ],
+          "effect": "distinguish",
+          "toward": "hunted",
+          "strength": 0.2
+        }
       ],
       "cooldownBeads": 1
     },
@@ -211,10 +530,25 @@
       "label": "Scarcity bit",
       "owner": "grath",
       "occasion": "briefing",
-      "detect": { "scope": "bead", "crossing": { "axis": "q7_resource_scarcity", "level": 0.75, "direction": "up" } },
+      "detect": {
+        "scope": "bead",
+        "crossing": {
+          "axis": "q7_resource_scarcity",
+          "level": 0.75,
+          "direction": "up"
+        }
+      },
       "witness": "scarcity crossed {level} after {map}",
       "coherence": [
-        { "pair": ["indebted", "sovereign"], "effect": "distinguish", "toward": "indebted", "strength": 0.2 }
+        {
+          "pair": [
+            "indebted",
+            "sovereign"
+          ],
+          "effect": "distinguish",
+          "toward": "indebted",
+          "strength": 0.2
+        }
       ],
       "cooldownBeads": 3
     },
@@ -223,10 +557,25 @@
       "label": "Scarcity eased",
       "owner": "grath",
       "occasion": "briefing",
-      "detect": { "scope": "bead", "crossing": { "axis": "q7_resource_scarcity", "level": 0.6, "direction": "down" } },
+      "detect": {
+        "scope": "bead",
+        "crossing": {
+          "axis": "q7_resource_scarcity",
+          "level": 0.6,
+          "direction": "down"
+        }
+      },
       "witness": "scarcity fell under {level} after {map}",
       "coherence": [
-        { "pair": ["indebted", "sovereign"], "effect": "distinguish", "toward": "sovereign", "strength": 0.15 }
+        {
+          "pair": [
+            "indebted",
+            "sovereign"
+          ],
+          "effect": "distinguish",
+          "toward": "sovereign",
+          "strength": 0.15
+        }
       ],
       "cooldownBeads": 3
     },
@@ -235,10 +584,25 @@
       "label": "The front came closer",
       "owner": "vane",
       "occasion": "briefing",
-      "detect": { "scope": "bead", "crossing": { "axis": "q6_contested", "level": 0.7, "direction": "up" } },
+      "detect": {
+        "scope": "bead",
+        "crossing": {
+          "axis": "q6_contested",
+          "level": 0.7,
+          "direction": "up"
+        }
+      },
       "witness": "contested pressure crossed {level} after {map}",
       "coherence": [
-        { "pair": ["hunted", "armada_falling"], "effect": "distinguish", "toward": "hunted", "strength": 0.2 }
+        {
+          "pair": [
+            "hunted",
+            "armada_falling"
+          ],
+          "effect": "distinguish",
+          "toward": "hunted",
+          "strength": 0.2
+        }
       ],
       "cooldownBeads": 3
     },
@@ -247,11 +611,30 @@
       "label": "Paper signed",
       "owner": "grath",
       "occasion": "camp",
-      "detect": { "scope": "bead", "ledger_op": "loan" },
+      "detect": {
+        "scope": "bead",
+        "ledger_op": "loan"
+      },
       "witness": "a loan entered the ledger after {map}",
       "coherence": [
-        { "pair": ["indebted", "sovereign"], "effect": "distinguish", "toward": "indebted", "strength": 0.5 },
-        { "pair": ["auxiliary", "indebted"], "effect": "distinguish", "toward": "indebted", "strength": 0.4 }
+        {
+          "pair": [
+            "indebted",
+            "sovereign"
+          ],
+          "effect": "distinguish",
+          "toward": "indebted",
+          "strength": 0.5
+        },
+        {
+          "pair": [
+            "auxiliary",
+            "indebted"
+          ],
+          "effect": "distinguish",
+          "toward": "indebted",
+          "strength": 0.4
+        }
       ],
       "cooldownBeads": 0
     },
@@ -260,10 +643,21 @@
       "label": "Paper burned",
       "owner": "auditor",
       "occasion": "camp",
-      "detect": { "scope": "bead", "ledger_op": "repay" },
+      "detect": {
+        "scope": "bead",
+        "ledger_op": "repay"
+      },
       "witness": "a debt cleared after {map}",
       "coherence": [
-        { "pair": ["indebted", "sovereign"], "effect": "distinguish", "toward": "sovereign", "strength": 0.5 }
+        {
+          "pair": [
+            "indebted",
+            "sovereign"
+          ],
+          "effect": "distinguish",
+          "toward": "sovereign",
+          "strength": 0.5
+        }
       ],
       "cooldownBeads": 0
     },
@@ -272,11 +666,30 @@
       "label": "A name moved to the roll",
       "owner": "ketha",
       "occasion": "roll",
-      "detect": { "scope": "bead", "outcome": "dead" },
+      "detect": {
+        "scope": "bead",
+        "outcome": "dead"
+      },
       "witness": "{hero} fell at {map}. The frame was not brought back.",
       "coherence": [
-        { "pair": ["haunted", "rooted"], "effect": "distinguish", "toward": "haunted", "strength": 0.7 },
-        { "pair": ["rooted", "bleeding"], "effect": "distinguish", "toward": "bleeding", "strength": 0.45 }
+        {
+          "pair": [
+            "haunted",
+            "rooted"
+          ],
+          "effect": "distinguish",
+          "toward": "haunted",
+          "strength": 0.7
+        },
+        {
+          "pair": [
+            "rooted",
+            "bleeding"
+          ],
+          "effect": "distinguish",
+          "toward": "bleeding",
+          "strength": 0.45
+        }
       ],
       "cooldownBeads": 0
     },
@@ -285,11 +698,32 @@
       "label": "A frame brought home",
       "owner": "rusk",
       "occasion": "roll",
-      "detect": { "scope": "bead", "outcome": ["recovered", "wounded"] },
+      "detect": {
+        "scope": "bead",
+        "outcome": [
+          "recovered",
+          "wounded"
+        ]
+      },
       "witness": "{hero} came back from {map} on someone's shoulders",
       "coherence": [
-        { "pair": ["haunted", "rooted"], "effect": "distinguish", "toward": "rooted", "strength": 0.3 },
-        { "pair": ["rooted", "bleeding"], "effect": "renew", "strength": 0.25 }
+        {
+          "pair": [
+            "haunted",
+            "rooted"
+          ],
+          "effect": "distinguish",
+          "toward": "rooted",
+          "strength": 0.3
+        },
+        {
+          "pair": [
+            "rooted",
+            "bleeding"
+          ],
+          "effect": "renew",
+          "strength": 0.25
+        }
       ],
       "cooldownBeads": 0
     },
@@ -298,12 +732,32 @@
       "label": "A name on the roll (legacy save; no bead)",
       "owner": "ketha",
       "occasion": "roll",
-      "detect": { "scope": "snapshot", "character_status": "dead", "unplacedOnly": true },
+      "detect": {
+        "scope": "snapshot",
+        "character_status": "dead",
+        "unplacedOnly": true
+      },
       "witness": "{hero} is on the roll. The frame was not brought back.",
       "aliasOf": "named_dead",
       "coherence": [
-        { "pair": ["haunted", "rooted"], "effect": "distinguish", "toward": "haunted", "strength": 0.7 },
-        { "pair": ["rooted", "bleeding"], "effect": "distinguish", "toward": "bleeding", "strength": 0.45 }
+        {
+          "pair": [
+            "haunted",
+            "rooted"
+          ],
+          "effect": "distinguish",
+          "toward": "haunted",
+          "strength": 0.7
+        },
+        {
+          "pair": [
+            "rooted",
+            "bleeding"
+          ],
+          "effect": "distinguish",
+          "toward": "bleeding",
+          "strength": 0.45
+        }
       ],
       "cooldownBeads": 0,
       "dataGap": "a death in this save predates bead stamping of namedOutcomes, so it cannot be placed on the timeline"
@@ -313,12 +767,31 @@
       "label": "A frame brought home (legacy save; no bead)",
       "owner": "rusk",
       "occasion": "roll",
-      "detect": { "scope": "snapshot", "character_wounds_gt": 0, "unplacedOnly": true },
+      "detect": {
+        "scope": "snapshot",
+        "character_wounds_gt": 0,
+        "unplacedOnly": true
+      },
       "witness": "{hero} came back on someone's shoulders ({wounds} time(s))",
       "aliasOf": "frame_recovered",
       "coherence": [
-        { "pair": ["haunted", "rooted"], "effect": "distinguish", "toward": "rooted", "strength": 0.3 },
-        { "pair": ["rooted", "bleeding"], "effect": "renew", "strength": 0.25 }
+        {
+          "pair": [
+            "haunted",
+            "rooted"
+          ],
+          "effect": "distinguish",
+          "toward": "rooted",
+          "strength": 0.3
+        },
+        {
+          "pair": [
+            "rooted",
+            "bleeding"
+          ],
+          "effect": "renew",
+          "strength": 0.25
+        }
       ],
       "cooldownBeads": 0,
       "dataGap": "a recovery in this save predates bead stamping of namedOutcomes, so it cannot be placed on the timeline"
@@ -328,10 +801,21 @@
       "label": "The commander has no body",
       "owner": "ketha",
       "occasion": "camp",
-      "detect": { "scope": "snapshot", "path": "roster.commander.unlocked", "equals": false },
+      "detect": {
+        "scope": "snapshot",
+        "path": "roster.commander.unlocked",
+        "equals": false
+      },
       "witness": "the command walker is scrap on the shelf; the commander watches through other people's eyes",
       "coherence": [
-        { "pair": ["haunted", "rooted"], "effect": "renew", "strength": 0.15 }
+        {
+          "pair": [
+            "haunted",
+            "rooted"
+          ],
+          "effect": "renew",
+          "strength": 0.15
+        }
       ],
       "cooldownBeads": 0
     },
@@ -340,10 +824,22 @@
       "label": "The commander walks",
       "owner": "ketha",
       "occasion": "camp",
-      "detect": { "scope": "snapshot", "path": "roster.commander.unlocked", "equals": true },
+      "detect": {
+        "scope": "snapshot",
+        "path": "roster.commander.unlocked",
+        "equals": true
+      },
       "witness": "the command walker is fielded",
       "coherence": [
-        { "pair": ["haunted", "rooted"], "effect": "distinguish", "toward": "rooted", "strength": 0.5 }
+        {
+          "pair": [
+            "haunted",
+            "rooted"
+          ],
+          "effect": "distinguish",
+          "toward": "rooted",
+          "strength": 0.5
+        }
       ],
       "cooldownBeads": 0
     },
@@ -352,10 +848,21 @@
       "label": "The old flag is reinforcing",
       "owner": "auditor",
       "occasion": "briefing",
-      "detect": { "scope": "snapshot", "path": "worldResponse.armadaGarrisonScale", "gt": 1.1 },
+      "detect": {
+        "scope": "snapshot",
+        "path": "worldResponse.armadaGarrisonScale",
+        "gt": 1.1
+      },
       "witness": "Armada garrisons are running at {value} of baseline",
       "coherence": [
-        { "pair": ["hunted", "armada_falling"], "effect": "renew", "strength": 0.3 }
+        {
+          "pair": [
+            "hunted",
+            "armada_falling"
+          ],
+          "effect": "renew",
+          "strength": 0.3
+        }
       ],
       "cooldownBeads": 0
     },
@@ -364,7 +871,10 @@
       "label": "Ground nobody has looked at",
       "owner": "yeva",
       "occasion": "briefing",
-      "detect": { "scope": "snapshot", "unobserved_held_maps_gt": 0.5 },
+      "detect": {
+        "scope": "snapshot",
+        "unobserved_held_maps_gt": 0.5
+      },
       "witness": "{n} of {m} zones on maps we hold are estimates; the last measurement there is ours and it is stale",
       "coherence": [],
       "cooldownBeads": 0

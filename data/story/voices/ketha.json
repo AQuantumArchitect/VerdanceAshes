@@ -542,6 +542,14 @@
       "text": "The front's closer than it was. Everyone sleeps with their boots nearer the door tonight."
     },
     {
+      "id": "k.fb.surprise.1",
+      "on": {
+        "class": "surprise_at_drop"
+      },
+      "weight": 0.5,
+      "text": "We briefed {label} as {believed} and it was {found}. Write that down before the objective. The objective was the easy part."
+    },
+    {
       "id": "k.fb.kept.1",
       "on": {
         "class": "promise_kept"

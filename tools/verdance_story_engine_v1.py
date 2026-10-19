@@ -7408,6 +7408,26 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
     from narrative_v1 import accept_result as accept_narrative_result
     narrative_event = accept_narrative_result(state, {**result, **narrative_evidence, "resultKey": key, "mapId": map_id}, credit, workspace, narrative_before)
     sortie_consume = consume_played_hub_sorties(workspace, result, map_id)
+    # Belief world (Umwelt): fold this homecoming into the company's comprehension,
+    # stamp the surprise (briefed vs found) on the bead, split truth from intel.
+    # Skips cleanly when Umwelt is not importable; never blocks homecoming.
+    if workspace is not None:
+        try:
+            import belief_homecoming_v1 as _belief
+            _oc = bead.get("offscreenClash") or {}
+            _new_fronts = int(_oc.get("clashes") or 0) + int(_oc.get("flips") or 0)
+            _before = max(0, len(state.get("frontEvents") or []) - _new_fronts)
+            _bf = _belief.fold_homecoming(state, result, bead, Path(workspace), before_front_count=_before)
+            if _bf.get("skipped"):
+                try:
+                    print(f"VA_BELIEF_SKIP {_bf.get('reason')}")
+                except Exception:
+                    pass
+        except Exception as _bx:
+            try:
+                print(f"VA_BELIEF_FAIL {_bx}")
+            except Exception:
+                pass
     # Readings layer (DERIVE faces; never world truth): rho_N over readings, attractor,
     # and the occasions the cast has to speak to. Written once per homecoming so
     # once-lines and recency carry forward. Failure here must never block homecoming.

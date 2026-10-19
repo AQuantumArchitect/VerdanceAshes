@@ -231,6 +231,53 @@ class CampaignKernel:
                 receipt["narrative"] = self.narrative_surface()["narrative"]
             return receipt
 
+    # ── camp clock (interstitial time, weak measurements, surprise pauses) ──────
+    def camp_surface(self) -> dict[str, Any]:
+        """What the company knows and where its people are. Reads state; writes only
+        outbox/camp.latest.json and outbox/intel.latest.json (DERIVE faces)."""
+        try:
+            import camp_clock_v1 as camp
+        except Exception as e:  # noqa: BLE001
+            return {"ok": False, "error": f"camp_clock import failed: {e}"}
+        p = state_path(self.ws)
+        if not p.is_file():
+            return {"ok": False, "error": "Campaign save is missing."}
+        with self._lock:
+            state = json.loads(p.read_text(encoding="utf-8-sig"))
+            try:
+                return {"ok": True, "camp": camp.surface(state, self.ws)}
+            except Exception as e:  # noqa: BLE001
+                return {"ok": False, "error": str(e)}
+
+    def camp_act(self, body: dict[str, Any]) -> dict[str, Any]:
+        """Run the clock: rest / wait / scout / post / recall. Mutates the campaign
+        save (clock, camp, intel, zone truth via the engine's own offscreen tick) and
+        the persisted belief world; time stops at the first pause."""
+        try:
+            import camp_clock_v1 as camp
+        except Exception as e:  # noqa: BLE001
+            return {"ok": False, "error": f"camp_clock import failed: {e}"}
+        from verdance_story_engine_v1 import save_json
+        action = str((body or {}).get("action") or "")
+        if action not in ("rest", "wait", "scout", "post", "recall"):
+            return {"ok": False, "error": "Unknown camp action."}
+        with self._lock:
+            if self._busy:
+                return {"ok": False, "error": "A campaign operation is in progress. Try again after it completes."}
+            p = state_path(self.ws)
+            if not p.is_file():
+                return {"ok": False, "error": "Campaign save is missing."}
+            state = json.loads(p.read_text(encoding="utf-8-sig"))
+            try:
+                out = camp.act(state, self.ws, action,
+                               hours=float((body or {}).get("hours") or 8.0),
+                               zoneId=(body or {}).get("zoneId"), heroId=(body or {}).get("heroId"))
+            except Exception as e:  # noqa: BLE001
+                return {"ok": False, "error": str(e)}
+            if out.get("ok"):
+                save_json(p, state)
+            return out
+
     def continuity_audit(self, marks: list[str] | None = None) -> dict[str, Any]:
         """Phase 0 continuity membrane inspector (witness vs belief vs reinduce)."""
         try:

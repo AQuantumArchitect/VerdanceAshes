@@ -31,3 +31,5 @@ outbox/*.jsonl
 outbox/*.txt
 _tmp_campaign_restore.lua
 state/saves/
+state/belief/
+_attic/umwelt_src_snapshot_*.zip

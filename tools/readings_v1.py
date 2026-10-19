@@ -189,6 +189,7 @@ class Context:
                 "ledger": [l for l in ledger if l.get("missionNumber") == mission],
                 "threadHistory": th_hist,
                 "namedOutcomes": [o for o in (bead.get("namedOutcomes") or []) if isinstance(o, dict) and o.get("charId")],
+                "surprise": bead.get("surprise") if isinstance(bead.get("surprise"), dict) else None,
                 "joined": [j for j in (bead.get("joined") or []) if isinstance(j, dict)],
                 "graphBefore": graph_before[idx] if idx < len(graph_before) else {},
                 "graphAfter": graph_after[idx] if idx < len(graph_after) else {},
@@ -386,6 +387,13 @@ def detect_bead(cls: Dict[str, Any], bead: Dict[str, Any], ctx: Context) -> List
         return []
     if "credit" in d:
         return [dict(base)] if bead["credits"].get(d["credit"]) else []
+    if "surprise_gte" in d:
+        sp = bead.get("surprise") or {}
+        if float(sp.get("total") or 0.0) < float(d["surprise_gte"]) or not sp.get("top"):
+            return []
+        top = sp["top"][0]
+        return [dict(base, surprise=round(float(sp.get("total") or 0.0), 2), label=top.get("label"), believed=top.get("believed"),
+                     found=("empty" if top.get("found") in (None, "neutral") else top.get("found")), zonesMeasured=sp.get("zones"))]
     if "outcome" in d:
         wanted = d["outcome"] if isinstance(d["outcome"], list) else [d["outcome"]]
         out = []

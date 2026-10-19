@@ -99,11 +99,62 @@ Derived in `occasions.latest.json → roll`: the dead in the order they went, ea
 
 ---
 
+## Pass two: the belief world (Umwelt)
+
+**Law:** Verdance is an Umwelt world. The company's comprehension is a belief field, not
+a record. Truth lives in `state/campaign_state.json` (zoneMemory, frontEvents) and is not
+shown to the player; **intel** is what reached camp. One engine under the house, the hive
+and the war (`AQuantumArchitect/umwelt`; set `UMWELT_SRC=<umwelt>/src`, or keep a checkout at
+`~/ws-win/umwelt`). Verdance stays importable without it: every belief step skips cleanly.
+
+```
+tools/umwelt_world_v1.py        DomainSpec from the zone graph + codex + the six questions; VerdanceWorld host
+tools/umwelt_replay_v1.py       the gate: replay a save, check comprehension (5 checks)
+tools/belief_homecoming_v1.py   fold a homecoming: fog grows, SURPRISE stamped, observe, intel split, save world
+tools/camp_clock_v1.py          interstitial time: rest/wait/scout/post/recall, truth ticks, pauses
+state/belief/verdance.engine.pkl   the company's mind (a legitimate second truth: about the company, never the world)
+outbox/intel.latest.json        intel/1: every axis dark | stale | current, with age and provenance; the six questions as Bloch vectors
+outbox/camp.latest.json         the clock, where everyone is, recent pauses
+```
+
+Spec: zones (`ours`/`held` unitary; `strength`/`threat` dissipative, bridged along adjacency), people
+(`fit`/`pressure`/`frame_intact`), the company (six questions as icon-axes, dissipative and slow so an
+unforced question reopens), one driver: the Verdance day. Passed Umwelt's `spec.validate` gate
+(resolve, schema, topology, bindings-strict, boot-blank, synthetic exercise, save/load).
+
+η: Drop telemetry 1.0 · posted hero 0.7 · scout patrol 0.55 · adjacent inference 0.2 · rumour from a held
+map 0.25–0.35, elsewhere 0.1–0.15 · question pushes = the event class's strength. Boot is primed to
+"nobody has looked" (four 0.5 observations), so a value nobody measured renders **dark**, never zero.
+
+**Surprise** is stamped on every bead by the fold, before looking: Σ over measured zones of belief
+confidence × |truth − belief|. Zero on a first visit. The `surprise_at_drop` event class (Yeva) fires
+at ≥ 0.6 with the top zone's "believed / found".
+
+**The questions as Bloch vectors:** z is the lean, the radius is how committed, and *torn* is a short
+vector after being pushed both ways (tallied per question). `umwelt_replay_v1` checks the Umwelt
+estimator never leans opposite to the readings face on the same evidence.
+
+**The camp clock** (`/api/camp`, `/api/camp-act`): time runs in hourly steps; truth evolves only through
+the engine's own `tick_offscreen_zones` / `run_offscreen_clashes`; the belief world eases; posted people
+measure their ground every hour (looking is keeping); rumours that reach a held map enter `state["intel"]`
+with provenance. Time stops at the first **pause**: contact (a posted hero's ground changed hands), rumour,
+a question changing status, an arrival, or the action's end. Pauses are minor beads on `state.camp.pauses`.
+A hero stands up from the wounded bench after 12 h of rest. People have places: camp / transit (with an
+ETA) / posted / field (a frame, where it fell).
+
+Gate on your archived mission-5 save: 36/36 measured axes track truth, 90/90 unmeasured dark, a rumour
+fades over three silent days, six questions consistent with the face, save/load hash-stable.
+
+Known gaps: `world_zone_graph.v1.json` lacks 6 zones that exist in zoneMemory (handled as unbridged nodes;
+regenerate the graph); the hub still renders `war_map.json` (truth) and should switch to `intel.latest.json`
+(pass three); no casualties on scout/post yet; a Drop with posted heroes should exclude them from the roster.
+
 ## Pipeline
 
 ```
 BAR Drop → MatchResult → bring_home → process_result
    ├─ bead stamped with joined[] and namedOutcomes[]          (patch 1)
+   ├─ belief_homecoming_v1.fold_homecoming → bead.surprise, state.intel, state/belief/, intel.latest.json
    ├─ readings_v1.project  → outbox/readings.latest.json      (patch 2)
    ├─ occasions_v1.build   → outbox/occasions.latest.json/.md (patch 2)
    └─ materialize_next_intent → generate_briefing

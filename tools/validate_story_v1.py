@@ -32,7 +32,8 @@ PROBES = {"const", "rep", "rep_inverse", "graph", "tag_rate", "verdict_rate", "c
           "unobserved_held_maps"}
 PROBE_FIELDS = {"pct", "value", "count", "window", "a", "b", "names", "n", "m", "threshold"}
 BEAD_FIELDS = {"map", "mapId", "ourMap", "verdict", "extraction", "extractionText", "thread", "threadTitle", "text",
-               "count", "label", "toFaction", "fromFaction", "level", "hero", "heroId", "wounds", "outcome", "names", "joinedIds"}
+               "count", "label", "toFaction", "fromFaction", "level", "hero", "heroId", "wounds", "outcome", "names", "joinedIds",
+               "surprise", "believed", "found", "zonesMeasured"}
 SNAPSHOT_FIELDS = {"hero", "heroId", "wounds", "value", "n", "m"}
 COMMON_FIELDS = {"wounded", "dead", "heldCount", "tenebrium", "atTable", "map", "mapId"}
 STANCES = {"care", "ambition", "independence", "pragmatism", "stewardship"}
