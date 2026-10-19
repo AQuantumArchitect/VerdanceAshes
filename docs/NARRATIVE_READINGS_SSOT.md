@@ -149,14 +149,46 @@ Known gaps: `world_zone_graph.v1.json` lacks 6 zones that exist in zoneMemory (h
 regenerate the graph); the hub still renders `war_map.json` (truth) and should switch to `intel.latest.json`
 (pass three); no casualties on scout/post yet; a Drop with posted heroes should exclude them from the roster.
 
+## Pass two, closing: readings read belief; story objects take the S3 shape
+
+**Readings about the world read what the company knows.** Probes `belief_holdings_count`,
+`belief_holdings_ratio`, `belief_dark_share`, `belief_threat_near_held` read `outbox/intel.latest.json`;
+`intel_count` reads `state.intel` (what reached camp); `question` reads the Umwelt Bloch vectors so the
+company's own sense of a question feeds the levels at moderate weight. Readings about the company itself
+(roster, promises, debt, the roll) still read state. Every belief probe falls back to truth on a fresh
+campaign and says so in its witness (`source: truth-fallback`). The four offscreen event classes
+(`armada_flip_away`, `ground_came_to_us`, `ground_changed_hands_near_us`, `clash_near_held`) detect from
+intel rows with `fallbackFront` for legacy saves. Consequence: the cast now speaks to rumours, not to truth.
+
+**The dance tape** (`tools/story_dance_v1.py`, `state.dance`): story objects evolve by the strand-dance verbs
+from S3 — ✨ creation (a thread opens, a hero joins, an attractor entered first) · → push (a Drop advances the
+strand; a thread is committed; a frame carried home) · Δ fission (a commitment splits a thread into an
+obligation with a deadline) · ∇ fusion (the roll grows) · T transform (dominant reading moves, a question
+changes status, an attractor transition) · ∅ null (a promise lapses, a death: **the obligation survives** —
+"recover the frame of Pavise on greenest_fields; read Pavise on the roll"). Append-only, content-addressed,
+parent-linked; `once` keys make a repeated attempt the empty dance.
+
+**Truth / goodness / beauty per bead** (`bead.tgb`, never one score): truth = what happened (verdict,
+extraction, zones measured, surprise, dead, carried); goodness = what was promised (kept, lapsed, still open);
+beauty = how it reads (attractor, dominant reading, transition, scene, the opener line).
+
+**The chronicle** (`tools/chronicle_v1.py` → `outbox/chronicle.latest.json/.md`): the φ record folded the
+brain-ant way. Consecutive Drops under one attractor fold into a chapter row with n, missions, verdicts,
+dead, carried, surprise; named events never fold; "Still owed" lists every ∅/Δ whose obligation no later
+push has answered. Referee: fewer rows than events, every kept icon survives, `last_done` queryable.
+
+Icons are now on every reading, coherence pair, event class and attractor; the validator warns on a
+missing one. One glyph vocabulary across the hub chips, the briefing, the roll and the chronicle.
+
 ## Pipeline
 
 ```
 BAR Drop → MatchResult → bring_home → process_result
    ├─ bead stamped with joined[] and namedOutcomes[]          (patch 1)
    ├─ belief_homecoming_v1.fold_homecoming → bead.surprise, state.intel, state/belief/, intel.latest.json
-   ├─ readings_v1.project  → outbox/readings.latest.json      (patch 2)
+   ├─ readings_v1.project  → outbox/readings.latest.json      (patch 2; reads belief/intel for world facts)
    ├─ occasions_v1.build   → outbox/occasions.latest.json/.md (patch 2)
+   ├─ story_dance_v1.fold_homecoming → state.dance, bead.tgb; chronicle_v1.write → chronicle.latest.*
    └─ materialize_next_intent → generate_briefing
          reads occasions.latest.json for this mission          (patch 3)
          cast lines replace the level-triggered pressure/war lines

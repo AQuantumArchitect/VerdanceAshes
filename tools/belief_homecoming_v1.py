@@ -176,7 +176,7 @@ def fold_homecoming(state: Dict[str, Any], result: Dict[str, Any], bead: Dict[st
                                    ours=1.0 if f.get("toFaction") == "ashwalkers" else 0.0, threat=0.6)
                 if eta >= 0.3:
                     intel.append({"kind": "rumour", "about": "flip", "mapId": f.get("mapId"), "zoneId": zid, "label": f.get("label"),
-                                  "toFaction": f.get("toFaction"), "eta": eta, "source": "word from the road", "missionNumber": mission, "minute": round(now_minute, 1)})
+                                  "toFaction": f.get("toFaction"), "fromFaction": f.get("fromFaction"), "eta": eta, "source": "word from the road", "missionNumber": mission, "minute": round(now_minute, 1)})
     if len(intel) > 400:
         del intel[:len(intel) - 400]
     # 4c. the questions: pushes from the event classes that fired on this bead (and unplaced snapshot ones once)

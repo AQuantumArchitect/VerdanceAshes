@@ -1,6 +1,6 @@
 {
   "schemaVersion": "verdance-readings/0.1",
-  "notes": "Narrative density matrix basis. A reading is one interpretation of the company's situation. The diagonal of rho_N is how much the evidence supports each reading; off-diagonals are coherence: two readings nobody has yet been forced to choose between. Everything here is DERIVED from state/campaign_state.json by tools/readings_v1.py; nothing here is world truth and nothing here is written back. Probes are the only vocabulary a reading may use to touch state; add a probe to the tool before you add one here. Witness strings are for the hub readout and writers, never for character mouths.",
+  "notes": "Narrative density matrix basis. A reading is one interpretation of the company's situation. The diagonal of rho_N is how much the evidence supports each reading; off-diagonals are coherence: two readings nobody has yet been forced to choose between. Everything here is DERIVED from state/campaign_state.json by tools/readings_v1.py; nothing here is world truth and nothing here is written back. Probes are the only vocabulary a reading may use to touch state; add a probe to the tool before you add one here. Witness strings are for the hub readout and writers, never for character mouths. Pass two: readings about the WORLD read belief/intel (outbox/intel.latest.json, state.intel) with truth fallback on a fresh campaign; readings about the COMPANY (roster, promises, debt, the roll) read state. The six questions as Bloch vectors feed the levels at moderate weight.",
   "spine": {
     "missions": 12,
     "note": "Working spine length for attractor pacing. Not a gate; nothing unlocks on mission number."
@@ -17,12 +17,46 @@
       "argues": "grath",
       "resists": "vane",
       "evidence": [
-        { "probe": "rep", "faction": "nullmercs", "weight": 1.0, "witness": "Merc standing at {pct}" },
-        { "probe": "tag_rate", "tag": "path-b", "window": 6, "weight": 0.9, "witness": "{count} of the last {window} Drops flown on Merc paper" },
-        { "probe": "commitment", "thread": "friends", "choice": "merc", "weight": 0.6, "witness": "the company took the Merc hand on 'Friends of Convenience'" },
-        { "probe": "holdings_ratio", "faction": "nullmercs", "against": "ashwalkers", "weight": 0.5, "witness": "Mercs hold {a} zones to our {b}" },
-        { "probe": "const", "value": 0.12, "weight": 1.0, "witness": null }
-      ]
+        {
+          "probe": "rep",
+          "faction": "nullmercs",
+          "weight": 1.0,
+          "witness": "Merc standing at {pct}"
+        },
+        {
+          "probe": "tag_rate",
+          "tag": "path-b",
+          "window": 6,
+          "weight": 0.9,
+          "witness": "{count} of the last {window} Drops flown on Merc paper"
+        },
+        {
+          "probe": "commitment",
+          "thread": "friends",
+          "choice": "merc",
+          "weight": 0.6,
+          "witness": "the company took the Merc hand on 'Friends of Convenience'"
+        },
+        {
+          "probe": "belief_holdings_ratio",
+          "weight": 0.5,
+          "witness": "{a} zones we believe held by others, to {b} we believe ours"
+        },
+        {
+          "probe": "question",
+          "question": "whose_war",
+          "toward": "auxiliary",
+          "weight": 0.5,
+          "witness": "the company's own sense of it leans this way ({value})"
+        },
+        {
+          "probe": "const",
+          "value": 0.12,
+          "weight": 1.0,
+          "witness": null
+        }
+      ],
+      "icon": "🪙"
     },
     {
       "id": "sovereign",
@@ -31,14 +65,59 @@
       "argues": "vane",
       "resists": "grath",
       "evidence": [
-        { "probe": "holdings_count", "faction": "ashwalkers", "scale": 8, "weight": 1.0, "witness": "{count} zones held under our own name" },
-        { "probe": "graph", "axis": "q6_independent", "weight": 0.7, "witness": "independent footing reads {value}" },
-        { "probe": "tag_rate", "tag": "ashwalker-gain", "window": 6, "weight": 0.7, "witness": "{count} of the last {window} Drops left us holding more than we arrived with" },
-        { "probe": "claimed_nodes", "scale": 2, "weight": 0.8, "witness": "{count} confirmed node claims" },
-        { "probe": "thread_resolved", "thread": "shelter", "weight": 0.5, "witness": "the shelter promise was kept" },
-        { "probe": "commitment", "thread": "friends", "choice": "independent", "weight": 0.5, "witness": "the company chose its own course on 'Friends of Convenience'" },
-        { "probe": "const", "value": 0.1, "weight": 1.0, "witness": null }
-      ]
+        {
+          "probe": "belief_holdings_count",
+          "scale": 8,
+          "weight": 1.0,
+          "witness": "{count} zones we believe we hold"
+        },
+        {
+          "probe": "graph",
+          "axis": "q6_independent",
+          "weight": 0.7,
+          "witness": "independent footing reads {value}"
+        },
+        {
+          "probe": "tag_rate",
+          "tag": "ashwalker-gain",
+          "window": 6,
+          "weight": 0.7,
+          "witness": "{count} of the last {window} Drops left us holding more than we arrived with"
+        },
+        {
+          "probe": "claimed_nodes",
+          "scale": 2,
+          "weight": 0.8,
+          "witness": "{count} confirmed node claims"
+        },
+        {
+          "probe": "thread_resolved",
+          "thread": "shelter",
+          "weight": 0.5,
+          "witness": "the shelter promise was kept"
+        },
+        {
+          "probe": "commitment",
+          "thread": "friends",
+          "choice": "independent",
+          "weight": 0.5,
+          "witness": "the company chose its own course on 'Friends of Convenience'"
+        },
+        {
+          "probe": "question",
+          "question": "whose_war",
+          "toward": "sovereign",
+          "weight": 0.5,
+          "witness": "the company's own sense of it leans this way ({value})"
+        },
+        {
+          "probe": "const",
+          "value": 0.1,
+          "weight": 1.0,
+          "witness": null
+        }
+      ],
+      "icon": "🏳"
     },
     {
       "id": "indebted",
@@ -47,13 +126,58 @@
       "argues": "auditor",
       "resists": "ketha",
       "evidence": [
-        { "probe": "flag", "path": "worldResponse.loanScrutiny", "weight": 0.7, "witness": "loan scrutiny is on the company" },
-        { "probe": "ledger_ops", "match": "loan", "scale": 2, "weight": 0.9, "witness": "{count} loan entries on the commerce ledger" },
-        { "probe": "tenebrium_low", "threshold": 6, "weight": 0.8, "witness": "Tenebrium bank at {value} of a {threshold} floor" },
-        { "probe": "commitment", "thread": "dealer", "choice": "dealer", "weight": 0.6, "witness": "the company took the dealer's terms" },
-        { "probe": "thread_stage", "thread": "dealer", "stages": ["Available", "Committed", "Changed"], "weight": 0.3, "witness": "the dealer's grudge is open" },
-        { "probe": "const", "value": 0.08, "weight": 1.0, "witness": null }
-      ]
+        {
+          "probe": "flag",
+          "path": "worldResponse.loanScrutiny",
+          "weight": 0.7,
+          "witness": "loan scrutiny is on the company"
+        },
+        {
+          "probe": "ledger_ops",
+          "match": "loan",
+          "scale": 2,
+          "weight": 0.9,
+          "witness": "{count} loan entries on the commerce ledger"
+        },
+        {
+          "probe": "tenebrium_low",
+          "threshold": 6,
+          "weight": 0.8,
+          "witness": "Tenebrium bank at {value} of a {threshold} floor"
+        },
+        {
+          "probe": "commitment",
+          "thread": "dealer",
+          "choice": "dealer",
+          "weight": 0.6,
+          "witness": "the company took the dealer's terms"
+        },
+        {
+          "probe": "thread_stage",
+          "thread": "dealer",
+          "stages": [
+            "Available",
+            "Committed",
+            "Changed"
+          ],
+          "weight": 0.3,
+          "witness": "the dealer's grudge is open"
+        },
+        {
+          "probe": "question",
+          "question": "whose_paper",
+          "toward": "indebted",
+          "weight": 0.5,
+          "witness": "the company's own sense of it leans this way ({value})"
+        },
+        {
+          "probe": "const",
+          "value": 0.08,
+          "weight": 1.0,
+          "witness": null
+        }
+      ],
+      "icon": "📜"
     },
     {
       "id": "bleeding",
@@ -62,12 +186,50 @@
       "argues": "ketha",
       "resists": "brakhov",
       "evidence": [
-        { "probe": "wounded_named", "scale": 3, "weight": 0.9, "witness": "{count} named on the wounded bench: {names}" },
-        { "probe": "dead_named", "scale": 2, "weight": 0.7, "witness": "{count} named dead: {names}" },
-        { "probe": "verdict_rate", "verdicts": ["defeat", "partial"], "window": 4, "weight": 0.7, "witness": "{count} of the last {window} returns were partial or worse" },
-        { "probe": "thread_distrust", "thread": "bring_back", "scale": 2, "weight": 0.6, "witness": "the 'bring them back' promise has been missed" },
-        { "probe": "const", "value": 0.08, "weight": 1.0, "witness": null }
-      ]
+        {
+          "probe": "wounded_named",
+          "scale": 3,
+          "weight": 0.9,
+          "witness": "{count} named on the wounded bench: {names}"
+        },
+        {
+          "probe": "dead_named",
+          "scale": 2,
+          "weight": 0.7,
+          "witness": "{count} named dead: {names}"
+        },
+        {
+          "probe": "verdict_rate",
+          "verdicts": [
+            "defeat",
+            "partial"
+          ],
+          "window": 4,
+          "weight": 0.7,
+          "witness": "{count} of the last {window} returns were partial or worse"
+        },
+        {
+          "probe": "thread_distrust",
+          "thread": "bring_back",
+          "scale": 2,
+          "weight": 0.6,
+          "witness": "the 'bring them back' promise has been missed"
+        },
+        {
+          "probe": "question",
+          "question": "home_or_hospital",
+          "toward": "bleeding",
+          "weight": 0.5,
+          "witness": "the company's own sense of it leans this way ({value})"
+        },
+        {
+          "probe": "const",
+          "value": 0.08,
+          "weight": 1.0,
+          "witness": null
+        }
+      ],
+      "icon": "🩸"
     },
     {
       "id": "rooted",
@@ -76,14 +238,60 @@
       "argues": "hearth",
       "resists": "vane",
       "evidence": [
-        { "probe": "home_level", "scale": 2, "weight": 1.0, "witness": "home camp at level {value}" },
-        { "probe": "flag", "path": "flags.homeCleared", "weight": 0.6, "witness": "the shelf is cleared" },
-        { "probe": "thread_resolved", "thread": "place", "weight": 0.7, "witness": "'A Place to Stand' was kept" },
-        { "probe": "thread_trust", "thread": "place", "scale": 2, "weight": 0.4, "witness": "trust on the home promise" },
-        { "probe": "tag_rate", "tag": "extract-clean", "window": 4, "weight": 0.6, "witness": "{count} of the last {window} returns came home clean" },
-        { "probe": "commitment", "thread": "shelter", "choice": "builders", "weight": 0.4, "witness": "the company chose to build somewhere worth defending" },
-        { "probe": "const", "value": 0.08, "weight": 1.0, "witness": null }
-      ]
+        {
+          "probe": "home_level",
+          "scale": 2,
+          "weight": 1.0,
+          "witness": "home camp at level {value}"
+        },
+        {
+          "probe": "flag",
+          "path": "flags.homeCleared",
+          "weight": 0.6,
+          "witness": "the shelf is cleared"
+        },
+        {
+          "probe": "thread_resolved",
+          "thread": "place",
+          "weight": 0.7,
+          "witness": "'A Place to Stand' was kept"
+        },
+        {
+          "probe": "thread_trust",
+          "thread": "place",
+          "scale": 2,
+          "weight": 0.4,
+          "witness": "trust on the home promise"
+        },
+        {
+          "probe": "tag_rate",
+          "tag": "extract-clean",
+          "window": 4,
+          "weight": 0.6,
+          "witness": "{count} of the last {window} returns came home clean"
+        },
+        {
+          "probe": "commitment",
+          "thread": "shelter",
+          "choice": "builders",
+          "weight": 0.4,
+          "witness": "the company chose to build somewhere worth defending"
+        },
+        {
+          "probe": "question",
+          "question": "home_or_hospital",
+          "toward": "rooted",
+          "weight": 0.5,
+          "witness": "the company's own sense of it leans this way ({value})"
+        },
+        {
+          "probe": "const",
+          "value": 0.08,
+          "weight": 1.0,
+          "witness": null
+        }
+      ],
+      "icon": "🔥"
     },
     {
       "id": "armada_falling",
@@ -92,13 +300,57 @@
       "argues": "auditor",
       "resists": "hearth",
       "evidence": [
-        { "probe": "flag", "path": "worldFlags.armadaTenebriumCrisis", "weight": 0.8, "witness": "Armada's Tenebrium crisis is declared" },
-        { "probe": "graph", "axis": "q0_armada_cortex", "weight": 0.6, "witness": "the faction axis leans {value} toward Cortex" },
-        { "probe": "front_flips", "from": "armada", "scale": 2, "weight": 0.8, "witness": "{count} zones flipped away from Armada offscreen" },
-        { "probe": "holdings_share_inverse", "faction": "armada", "weight": 0.5, "witness": "Armada holds {pct} of claimed ground" },
-        { "probe": "rep_inverse", "faction": "armada", "weight": 0.4, "witness": "Armada standing at {pct}; the old flag does not answer" },
-        { "probe": "const", "value": 0.1, "weight": 1.0, "witness": null }
-      ]
+        {
+          "probe": "flag",
+          "path": "worldFlags.armadaTenebriumCrisis",
+          "weight": 0.8,
+          "witness": "Armada's Tenebrium crisis is declared"
+        },
+        {
+          "probe": "graph",
+          "axis": "q0_armada_cortex",
+          "weight": 0.6,
+          "witness": "the faction axis leans {value} toward Cortex"
+        },
+        {
+          "probe": "intel_count",
+          "about": "flip",
+          "fromFaction": "armada",
+          "window": 6,
+          "scale": 2,
+          "weight": 0.8,
+          "witness": "{count} words from the road of Armada losing ground"
+        },
+        {
+          "probe": "intel_count",
+          "about": "flip",
+          "fromFaction": "armada",
+          "window": 6,
+          "scale": 3,
+          "weight": 0.5,
+          "witness": "{count} reports of Armada ground changing hands"
+        },
+        {
+          "probe": "rep_inverse",
+          "faction": "armada",
+          "weight": 0.4,
+          "witness": "Armada standing at {pct}; the old flag does not answer"
+        },
+        {
+          "probe": "question",
+          "question": "pressure",
+          "toward": "armada_falling",
+          "weight": 0.5,
+          "witness": "the company's own sense of it leans this way ({value})"
+        },
+        {
+          "probe": "const",
+          "value": 0.1,
+          "weight": 1.0,
+          "witness": null
+        }
+      ],
+      "icon": "🏚"
     },
     {
       "id": "haunted",
@@ -107,11 +359,38 @@
       "argues": "ketha",
       "resists": "rusk",
       "evidence": [
-        { "probe": "dead_named", "scale": 2, "weight": 1.2, "witness": "{count} named dead on the roll: {names}" },
-        { "probe": "walker_locked", "weight": 0.6, "witness": "the command walker is still scrap; the commander has no body on the field" },
-        { "probe": "scars_total", "scale": 4, "weight": 0.4, "witness": "{count} scars across the company" },
-        { "probe": "const", "value": 0.08, "weight": 1.0, "witness": null }
-      ]
+        {
+          "probe": "dead_named",
+          "scale": 2,
+          "weight": 1.2,
+          "witness": "{count} named dead on the roll: {names}"
+        },
+        {
+          "probe": "walker_locked",
+          "weight": 0.6,
+          "witness": "the command walker is still scrap; the commander has no body on the field"
+        },
+        {
+          "probe": "scars_total",
+          "scale": 4,
+          "weight": 0.4,
+          "witness": "{count} scars across the company"
+        },
+        {
+          "probe": "question",
+          "question": "go_back",
+          "toward": "haunted",
+          "weight": 0.5,
+          "witness": "the company's own sense of it leans this way ({value})"
+        },
+        {
+          "probe": "const",
+          "value": 0.08,
+          "weight": 1.0,
+          "witness": null
+        }
+      ],
+      "icon": "🪦"
     },
     {
       "id": "hunted",
@@ -120,51 +399,115 @@
       "argues": "yeva",
       "resists": "hearth",
       "evidence": [
-        { "probe": "graph", "axis": "q6_contested", "weight": 0.8, "witness": "contested pressure reads {value}" },
-        { "probe": "clashes_near_held", "scale": 6, "weight": 0.9, "witness": "{count} offscreen clashes touched ground we hold" },
-        { "probe": "number", "path": "worldResponse.armadaGarrisonScale", "center": 1.0, "scale": 0.5, "weight": 0.6, "witness": "Armada garrisons scaled to {value}" },
-        { "probe": "flag", "path": "worldResponse.denseTeeth", "weight": 0.3, "witness": "the world is answering with denser teeth" },
-        { "probe": "unobserved_held_maps", "weight": 0.5, "witness": "{n} of {m} zones on maps we hold have not been seen since we last stood there" },
-        { "probe": "const", "value": 0.1, "weight": 1.0, "witness": null }
-      ]
+        {
+          "probe": "belief_threat_near_held",
+          "weight": 0.8,
+          "witness": "the threat we believe sits on our ground reads {value}"
+        },
+        {
+          "probe": "intel_count",
+          "about": "shelling",
+          "window": 4,
+          "scale": 6,
+          "weight": 0.9,
+          "witness": "{count} reports of guns near ground we hold"
+        },
+        {
+          "probe": "number",
+          "path": "worldResponse.armadaGarrisonScale",
+          "center": 1.0,
+          "scale": 0.5,
+          "weight": 0.6,
+          "witness": "Armada garrisons scaled to {value}"
+        },
+        {
+          "probe": "flag",
+          "path": "worldResponse.denseTeeth",
+          "weight": 0.3,
+          "witness": "the world is answering with denser teeth"
+        },
+        {
+          "probe": "belief_dark_share",
+          "weight": 0.5,
+          "witness": "{n} of {m} zones on ground we call ours are dark or stale to us"
+        },
+        {
+          "probe": "question",
+          "question": "pressure",
+          "toward": "hunted",
+          "weight": 0.5,
+          "witness": "the company's own sense of it leans this way ({value})"
+        },
+        {
+          "probe": "const",
+          "value": 0.1,
+          "weight": 1.0,
+          "witness": null
+        }
+      ],
+      "icon": "👁"
     }
   ],
   "coherencePairs": [
     {
-      "pair": ["auxiliary", "sovereign"],
+      "pair": [
+        "auxiliary",
+        "sovereign"
+      ],
       "question": "Whose war is this?",
       "gloss": "Merc paper and our own ground have not yet been made incompatible.",
-      "initial": 1.0
+      "initial": 1.0,
+      "icon": "🏳"
     },
     {
-      "pair": ["rooted", "bleeding"],
+      "pair": [
+        "rooted",
+        "bleeding"
+      ],
       "question": "Is the camp a home or a hospital?",
       "gloss": "People come back to it; the question is in what condition.",
-      "initial": 1.0
+      "initial": 1.0,
+      "icon": "🔥"
     },
     {
-      "pair": ["indebted", "sovereign"],
+      "pair": [
+        "indebted",
+        "sovereign"
+      ],
       "question": "Who holds the paper?",
       "gloss": "You can own ground and still owe for it.",
-      "initial": 1.0
+      "initial": 1.0,
+      "icon": "📜"
     },
     {
-      "pair": ["haunted", "rooted"],
+      "pair": [
+        "haunted",
+        "rooted"
+      ],
       "question": "Do we go back for them?",
       "gloss": "A home can be the place the dead are counted or the place the living are kept.",
-      "initial": 1.0
+      "initial": 1.0,
+      "icon": "🪦"
     },
     {
-      "pair": ["hunted", "armada_falling"],
+      "pair": [
+        "hunted",
+        "armada_falling"
+      ],
       "question": "Is the pressure coming or going?",
       "gloss": "A collapsing Armada can mean fewer enemies or desperate ones.",
-      "initial": 1.0
+      "initial": 1.0,
+      "icon": "👁"
     },
     {
-      "pair": ["auxiliary", "indebted"],
+      "pair": [
+        "auxiliary",
+        "indebted"
+      ],
       "question": "Which creditor?",
       "gloss": "The Mercs pay; the dealer lends. The company has not yet learned which one it belongs to.",
-      "initial": 1.0
+      "initial": 1.0,
+      "icon": "🪙"
     }
   ],
   "dynamics": {

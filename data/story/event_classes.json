@@ -1,6 +1,6 @@
 {
   "schemaVersion": "verdance-event-classes/0.1",
-  "notes": "The event surface. An event class is a thing the world does that a person in the camp has the job of saying. Detectors run per bead (one history entry + its narrative event + its frontEvents + thread history at that turn) or on the final snapshot. Firing an event class does three things: names a witness (the concrete noun for the writer), applies coherence effects to reading pairs (what the event forced apart or left ambiguous), and gives the owning voice an occasion. Levels of readings never come from here; they come from probes in readings.json. Coherence only ever comes from here. cooldownBeads is hysteresis: a class that fired within that many beads stays quiet.",
+  "notes": "The event surface. An event class is a thing the world does that a person in the camp has the job of saying. Detectors run per bead (one history entry + its narrative event + its frontEvents + thread history at that turn) or on the final snapshot. Firing an event class does three things: names a witness (the concrete noun for the writer), applies coherence effects to reading pairs (what the event forced apart or left ambiguous), and gives the owning voice an occasion. Levels of readings never come from here; they come from probes in readings.json. Coherence only ever comes from here. cooldownBeads is hysteresis: a class that fired within that many beads stays quiet. Offscreen classes detect from state.intel (what reached camp) when the save has an intel log; legacy saves fall back to frontEvents.",
   "occasions": [
     "briefing",
     "debrief",
@@ -29,7 +29,8 @@
         }
       ],
       "cooldownBeads": 0,
-      "note": "surprise is stamped on the bead by belief_homecoming_v1: sum over measured zones of belief confidence times |truth - belief|. Zero on a first visit (nobody had looked)."
+      "note": "surprise is stamped on the bead by belief_homecoming_v1: sum over measured zones of belief confidence times |truth - belief|. Zero on a first visit (nobody had looked).",
+      "icon": "❗"
     },
     {
       "id": "drop_held",
@@ -44,7 +45,8 @@
       },
       "witness": "{map}: held",
       "coherence": [],
-      "cooldownBeads": 0
+      "cooldownBeads": 0,
+      "icon": "🛡"
     },
     {
       "id": "drop_unfinished",
@@ -59,7 +61,8 @@
       },
       "witness": "{map}: came home with the order half kept",
       "coherence": [],
-      "cooldownBeads": 0
+      "cooldownBeads": 0,
+      "icon": "◐"
     },
     {
       "id": "drop_lost",
@@ -84,7 +87,8 @@
           "strength": 0.25
         }
       ],
-      "cooldownBeads": 0
+      "cooldownBeads": 0,
+      "icon": "✖"
     },
     {
       "id": "clean_return",
@@ -107,7 +111,8 @@
           "strength": 0.2
         }
       ],
-      "cooldownBeads": 0
+      "cooldownBeads": 0,
+      "icon": "🏠"
     },
     {
       "id": "costly_return",
@@ -135,7 +140,8 @@
           "strength": 0.2
         }
       ],
-      "cooldownBeads": 0
+      "cooldownBeads": 0,
+      "icon": "🩹"
     },
     {
       "id": "merc_paper",
@@ -168,7 +174,8 @@
           "strength": 0.15
         }
       ],
-      "cooldownBeads": 0
+      "cooldownBeads": 0,
+      "icon": "🪙"
     },
     {
       "id": "own_ground_on_merc_paper",
@@ -193,7 +200,8 @@
           "strength": 0.35
         }
       ],
-      "cooldownBeads": 0
+      "cooldownBeads": 0,
+      "icon": "⚖"
     },
     {
       "id": "own_ground",
@@ -217,7 +225,8 @@
           "strength": 0.35
         }
       ],
-      "cooldownBeads": 0
+      "cooldownBeads": 0,
+      "icon": "🏳"
     },
     {
       "id": "node_claimed",
@@ -249,7 +258,8 @@
           "strength": 0.25
         }
       ],
-      "cooldownBeads": 0
+      "cooldownBeads": 0,
+      "icon": "📍"
     },
     {
       "id": "hero_joined",
@@ -273,7 +283,8 @@
           "strength": 0.15
         }
       ],
-      "cooldownBeads": 0
+      "cooldownBeads": 0,
+      "icon": "➕"
     },
     {
       "id": "promise_kept",
@@ -352,7 +363,8 @@
         ],
         "company": []
       },
-      "cooldownBeads": 0
+      "cooldownBeads": 0,
+      "icon": "🤝"
     },
     {
       "id": "promise_broken",
@@ -418,7 +430,8 @@
           }
         ]
       },
-      "cooldownBeads": 0
+      "cooldownBeads": 0,
+      "icon": "💔"
     },
     {
       "id": "armada_flip_away",
@@ -427,12 +440,16 @@
       "occasion": "briefing",
       "detect": {
         "scope": "bead",
-        "front": {
+        "intel": {
+          "about": "flip",
+          "fromFaction": "armada"
+        },
+        "fallbackFront": {
           "type": "offscreen_zone_flip",
           "fromFaction": "armada"
         }
       },
-      "witness": "{label} on {map} went from Armada to {toFaction} while we were at {ourMap}",
+      "witness": "{label} on {map} is said to have gone from Armada to {toFaction} while we were at {ourMap}",
       "coherence": [
         {
           "pair": [
@@ -444,7 +461,8 @@
           "strength": 0.3
         }
       ],
-      "cooldownBeads": 1
+      "cooldownBeads": 1,
+      "icon": "🏚"
     },
     {
       "id": "ground_came_to_us",
@@ -453,12 +471,16 @@
       "occasion": "briefing",
       "detect": {
         "scope": "bead",
-        "front": {
+        "intel": {
+          "about": "flip",
+          "toFaction": "ashwalkers"
+        },
+        "fallbackFront": {
           "type": "offscreen_zone_flip",
           "toFaction": "ashwalkers"
         }
       },
-      "witness": "{label} on {map} came to us while we were at {ourMap}. Nobody planted a flag; the flag was already ours.",
+      "witness": "word from the road: {label} on {map} came to us while we were at {ourMap}. Nobody planted a flag.",
       "coherence": [
         {
           "pair": [
@@ -470,7 +492,8 @@
           "strength": 0.15
         }
       ],
-      "cooldownBeads": 0
+      "cooldownBeads": 0,
+      "icon": "🎁"
     },
     {
       "id": "ground_changed_hands_near_us",
@@ -479,13 +502,17 @@
       "occasion": "briefing",
       "detect": {
         "scope": "bead",
-        "front": {
+        "intel": {
+          "about": "flip",
+          "notToFaction": "ashwalkers"
+        },
+        "fallbackFront": {
           "type": "offscreen_zone_flip",
           "onHeldMap": true,
           "notToFaction": "ashwalkers"
         }
       },
-      "witness": "{label} on {map} is {toFaction}'s now. Nobody of ours saw it happen.",
+      "witness": "{label} on {map} is said to be {toFaction}'s now. Nobody of ours saw it.",
       "coherence": [
         {
           "pair": [
@@ -497,7 +524,8 @@
           "strength": 0.25
         }
       ],
-      "cooldownBeads": 1
+      "cooldownBeads": 1,
+      "icon": "🔄"
     },
     {
       "id": "clash_near_held",
@@ -506,12 +534,15 @@
       "occasion": "briefing",
       "detect": {
         "scope": "bead",
-        "front": {
+        "intel": {
+          "about": "shelling"
+        },
+        "fallbackFront": {
           "type": "offscreen_clash",
           "nearHeld": true
         }
       },
-      "witness": "{count} clashes touched ground we hold on {map}",
+      "witness": "{count} reports of guns near ground we hold on {map}",
       "coherence": [
         {
           "pair": [
@@ -523,7 +554,8 @@
           "strength": 0.2
         }
       ],
-      "cooldownBeads": 1
+      "cooldownBeads": 1,
+      "icon": "💥"
     },
     {
       "id": "scarcity_crossed_up",
@@ -550,7 +582,8 @@
           "strength": 0.2
         }
       ],
-      "cooldownBeads": 3
+      "cooldownBeads": 3,
+      "icon": "📉"
     },
     {
       "id": "scarcity_crossed_down",
@@ -577,7 +610,8 @@
           "strength": 0.15
         }
       ],
-      "cooldownBeads": 3
+      "cooldownBeads": 3,
+      "icon": "📈"
     },
     {
       "id": "contested_crossed_up",
@@ -604,7 +638,8 @@
           "strength": 0.2
         }
       ],
-      "cooldownBeads": 3
+      "cooldownBeads": 3,
+      "icon": "⚠"
     },
     {
       "id": "loan_taken",
@@ -636,7 +671,8 @@
           "strength": 0.4
         }
       ],
-      "cooldownBeads": 0
+      "cooldownBeads": 0,
+      "icon": "📜"
     },
     {
       "id": "debt_cleared",
@@ -659,7 +695,8 @@
           "strength": 0.5
         }
       ],
-      "cooldownBeads": 0
+      "cooldownBeads": 0,
+      "icon": "🔥"
     },
     {
       "id": "named_dead",
@@ -691,7 +728,8 @@
           "strength": 0.45
         }
       ],
-      "cooldownBeads": 0
+      "cooldownBeads": 0,
+      "icon": "🪦"
     },
     {
       "id": "frame_recovered",
@@ -725,7 +763,8 @@
           "strength": 0.25
         }
       ],
-      "cooldownBeads": 0
+      "cooldownBeads": 0,
+      "icon": "🫱"
     },
     {
       "id": "named_dead_unplaced",
@@ -760,7 +799,8 @@
         }
       ],
       "cooldownBeads": 0,
-      "dataGap": "a death in this save predates bead stamping of namedOutcomes, so it cannot be placed on the timeline"
+      "dataGap": "a death in this save predates bead stamping of namedOutcomes, so it cannot be placed on the timeline",
+      "icon": "🪦"
     },
     {
       "id": "frame_recovered_unplaced",
@@ -794,7 +834,8 @@
         }
       ],
       "cooldownBeads": 0,
-      "dataGap": "a recovery in this save predates bead stamping of namedOutcomes, so it cannot be placed on the timeline"
+      "dataGap": "a recovery in this save predates bead stamping of namedOutcomes, so it cannot be placed on the timeline",
+      "icon": "🫱"
     },
     {
       "id": "walker_still_scrap",
@@ -817,7 +858,8 @@
           "strength": 0.15
         }
       ],
-      "cooldownBeads": 0
+      "cooldownBeads": 0,
+      "icon": "🦾"
     },
     {
       "id": "walker_rebuilt",
@@ -841,7 +883,8 @@
           "strength": 0.5
         }
       ],
-      "cooldownBeads": 0
+      "cooldownBeads": 0,
+      "icon": "🦿"
     },
     {
       "id": "garrison_scaled_up",
@@ -864,7 +907,8 @@
           "strength": 0.3
         }
       ],
-      "cooldownBeads": 0
+      "cooldownBeads": 0,
+      "icon": "🧱"
     },
     {
       "id": "unobserved_ground",
@@ -877,7 +921,8 @@
       },
       "witness": "{n} of {m} zones on maps we hold are estimates; the last measurement there is ours and it is stale",
       "coherence": [],
-      "cooldownBeads": 0
+      "cooldownBeads": 0,
+      "icon": "🌫"
     }
   ]
 }

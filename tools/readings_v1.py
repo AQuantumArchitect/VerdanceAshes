@@ -99,6 +99,28 @@ class Context:
                 self.holdings[fac] += 1
         self.held_maps = sorted({m for (m, _z), f in self.zone_control.items() if f == OUR_FACTION})
         self.map_titles = self._map_titles()
+        # What the company KNOWS (belief + intel), as opposed to what is true. Readings about
+        # the world read these; readings about the company itself still read state.
+        self.has_intel = isinstance(state.get("intel"), list)
+        self.intel: List[Dict[str, Any]] = [r for r in (state.get("intel") or []) if isinstance(r, dict)]
+        self.belief: Dict[str, Dict[str, Dict[str, Any]]] = {}
+        self.belief_questions: Dict[str, Dict[str, Any]] = {}
+        self.belief_minute: Optional[float] = None
+        frame_path = workspace / "outbox" / "intel.latest.json"
+        if frame_path.exists():
+            try:
+                frame = _load(frame_path)
+                self.belief_minute = frame.get("as_of_minute")
+                for row in frame.get("nodes") or []:
+                    node, role = row.get("node"), row.get("role")
+                    if node and role and not str(node).startswith(("hero:", "map:", "company", "people", "verdance")):
+                        self.belief.setdefault(str(node), {})[str(role)] = {
+                            "value": row.get("value"), "conf": float(row.get("confidence") or 0.0), "state": row.get("state"), "mapId": row.get("mapId")}
+                for q in frame.get("questions") or []:
+                    self.belief_questions[str(q.get("id"))] = q
+            except Exception:
+                self.belief = {}
+        self.has_belief = bool(self.belief)
         self.beads = self._beads()
         self.thread_titles = self._thread_titles()
         # Heroes whose fate is already placed on the timeline by a bead; snapshot
@@ -331,6 +353,103 @@ def probe(spec: Dict[str, Any], ctx: Context) -> Tuple[float, Dict[str, Any]]:
         n = sum(1 for _k, c in zones if c != "measured")
         f.update(n=n, m=m)
         return (_clamp(n / m) if m else 0.0), f
+    # ---- belief-side probes: what the company knows, with truth fallback on a fresh campaign
+    if kind == "belief_holdings_count":
+        if not ctx.has_belief:
+            n = ctx.holdings.get(OUR_FACTION, 0)
+            f.update(count=n, source="truth-fallback")
+            return _clamp(n / float(spec.get("scale", 8))), f
+        n = sum(1 for z, roles in ctx.belief.items() if (roles.get("ours") or {}).get("state") != "dark" and float((roles.get("ours") or {}).get("value") or 0) > 0.5)
+        f.update(count=n, source="belief")
+        return _clamp(n / float(spec.get("scale", 8))), f
+    if kind == "belief_holdings_ratio":
+        if not ctx.has_belief:
+            a = sum(v for k, v in ctx.holdings.items() if k not in (OUR_FACTION, "neutral"))
+            b = ctx.holdings.get(OUR_FACTION, 0)
+        else:
+            a = b = 0
+            for z, roles in ctx.belief.items():
+                o, h = roles.get("ours") or {}, roles.get("held") or {}
+                if o.get("state") == "dark" and h.get("state") == "dark":
+                    continue
+                if float(o.get("value") or 0) > 0.5:
+                    b += 1
+                elif float(h.get("value") or 0) > 0.5:
+                    a += 1
+        f.update(a=a, b=b)
+        return (_clamp(a / (a + b)) if (a + b) else 0.0), f
+    if kind == "belief_dark_share":
+        # share of zones on maps we believe we hold whose ours-axis is dark or stale
+        if not ctx.has_belief:
+            zones = [(k, c) for k, c in ctx.zone_conf.items() if k[0] in ctx.held_maps]
+            m = len(zones); n = sum(1 for _k, c in zones if c != "measured")
+            f.update(n=n, m=m, source="truth-fallback")
+            return (_clamp(n / m) if m else 0.0), f
+        our_maps = {roles.get("ours", {}).get("mapId") for z, roles in ctx.belief.items() if float((roles.get("ours") or {}).get("value") or 0) > 0.5 and (roles.get("ours") or {}).get("state") != "dark"}
+        rows = [roles.get("ours") or {} for z, roles in ctx.belief.items() if (roles.get("ours") or {}).get("mapId") in our_maps]
+        m = len(rows); n = sum(1 for r in rows if r.get("state") in ("dark", "stale"))
+        f.update(n=n, m=m, source="belief")
+        return (_clamp(n / m) if m else 0.0), f
+    if kind == "belief_threat_near_held":
+        if not ctx.has_belief:
+            x = _clamp((st.get("graph") or {}).get("q6_contested", 0.0))
+            f.update(value=f"{x:.2f}", source="truth-fallback")
+            return x, f
+        num = den = 0.0
+        for z, roles in ctx.belief.items():
+            o, t = roles.get("ours") or {}, roles.get("threat") or {}
+            if float(o.get("value") or 0) > 0.5 and o.get("state") != "dark" and t.get("state") != "dark":
+                w = float(t.get("conf") or 0.0)
+                num += w * float(t.get("value") or 0.0); den += w
+        x = (num / den) if den > 0 else 0.0
+        f.update(value=f"{x:.2f}", source="belief")
+        return _clamp(x), f
+    if kind == "intel_count":
+        # rows that reached camp; window in missions (beads)
+        missions = [b["missionNumber"] for b in ctx.beads[-int(spec.get("window", 4)):]]
+        if not ctx.has_intel:
+            # legacy save: fall back to truth fronts of the same kind
+            kind_map = {"flip": "offscreen_zone_flip", "shelling": "offscreen_clash"}
+            n = 0
+            for ev in st.get("frontEvents") or []:
+                if not isinstance(ev, dict) or ev.get("type") != kind_map.get(spec.get("about")):
+                    continue
+                if "fromFaction" in spec and ev.get("fromFaction") != spec["fromFaction"]:
+                    continue
+                if "toFaction" in spec and ev.get("toFaction") != spec["toFaction"]:
+                    continue
+                n += 1
+            f.update(count=n, source="truth-fallback")
+            return _clamp(n / float(spec.get("scale", 3))), f
+        n = 0
+        for r in ctx.intel:
+            if r.get("about") != spec.get("about") and r.get("kind") != spec.get("about"):
+                continue
+            if missions and r.get("missionNumber") is not None and r.get("missionNumber") not in missions:
+                continue
+            if "fromFaction" in spec and r.get("fromFaction") != spec["fromFaction"]:
+                continue
+            if "toFaction" in spec and r.get("toFaction") != spec["toFaction"]:
+                continue
+            if "notToFaction" in spec and r.get("toFaction") == spec["notToFaction"]:
+                continue
+            n += 1
+        f.update(count=n, source="intel")
+        return _clamp(n / float(spec.get("scale", 3))), f
+    if kind == "question":
+        q = ctx.belief_questions.get(spec["question"])
+        if not q:
+            return 0.0, f
+        z = float((q.get("bloch") or [0, 0, 0])[2])
+        toward = spec.get("toward")
+        if toward == q.get("pole_0"):
+            v = max(0.0, z)
+        elif toward == q.get("pole_1"):
+            v = max(0.0, -z)
+        else:
+            v = 0.0
+        f.update(value=f"{z:+.2f}", status=q.get("status"))
+        return _clamp(v), f
     raise KeyError(f"unknown probe {kind!r}")
 
 
@@ -412,6 +531,31 @@ def detect_bead(cls: Dict[str, Any], bead: Dict[str, Any], ctx: Context) -> List
             if h["stage"] == d["thread_stage"]:
                 out.append(dict(base, thread=h["thread"], threadTitle=ctx.thread_titles.get(h["thread"], h["thread"]), text=h["text"]))
         return out
+    if "intel" in d:
+        spec = d["intel"]
+        if ctx.has_intel:
+            hits = []
+            for r in ctx.intel:
+                if r.get("missionNumber") != bead["missionNumber"]:
+                    continue
+                if r.get("about") != spec.get("about"):
+                    continue
+                if "fromFaction" in spec and r.get("fromFaction") != spec["fromFaction"]:
+                    continue
+                if "toFaction" in spec and r.get("toFaction") != spec["toFaction"]:
+                    continue
+                if "notToFaction" in spec and r.get("toFaction") == spec["notToFaction"]:
+                    continue
+                hits.append(r)
+            if not hits:
+                return []
+            if spec.get("about") == "shelling":
+                return [dict(base, count=len(hits), map=ctx.map_name(hits[0].get("mapId")), mapId=hits[0].get("mapId"), eta=hits[0].get("eta"))]
+            return [dict(base, label=r.get("label") or r.get("zoneId"), map=ctx.map_name(r.get("mapId")), mapId=r.get("mapId"),
+                         toFaction=r.get("toFaction"), fromFaction=r.get("fromFaction"), eta=r.get("eta"), source=r.get("source")) for r in hits]
+        if "fallbackFront" not in d:
+            return []
+        d = dict(d, front=d["fallbackFront"])
     if "front" in d:
         hits = [ev for ev in bead["fronts"] if _front_matches(ev, d["front"], ctx)]
         if not hits:

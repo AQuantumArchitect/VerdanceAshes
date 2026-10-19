@@ -29,11 +29,12 @@ PROBES = {"const", "rep", "rep_inverse", "graph", "tag_rate", "verdict_rate", "c
           "holdings_count", "holdings_share_inverse", "claimed_nodes", "thread_resolved", "thread_stage",
           "thread_trust", "thread_distrust", "flag", "number", "ledger_ops", "tenebrium_low", "wounded_named",
           "dead_named", "scars_total", "home_level", "walker_locked", "front_flips", "clashes_near_held",
-          "unobserved_held_maps"}
-PROBE_FIELDS = {"pct", "value", "count", "window", "a", "b", "names", "n", "m", "threshold"}
+          "unobserved_held_maps", "belief_holdings_count", "belief_holdings_ratio", "belief_dark_share",
+          "belief_threat_near_held", "intel_count", "question"}
+PROBE_FIELDS = {"pct", "value", "count", "window", "a", "b", "names", "n", "m", "threshold", "source", "status"}
 BEAD_FIELDS = {"map", "mapId", "ourMap", "verdict", "extraction", "extractionText", "thread", "threadTitle", "text",
                "count", "label", "toFaction", "fromFaction", "level", "hero", "heroId", "wounds", "outcome", "names", "joinedIds",
-               "surprise", "believed", "found", "zonesMeasured"}
+               "surprise", "believed", "found", "zonesMeasured", "eta", "source"}
 SNAPSHOT_FIELDS = {"hero", "heroId", "wounds", "value", "n", "m"}
 COMMON_FIELDS = {"wounded", "dead", "heldCount", "tenebrium", "atTable", "map", "mapId"}
 STANCES = {"care", "ambition", "independence", "pragmatism", "stewardship"}
@@ -67,6 +68,8 @@ def main() -> int:
                 errors.append(f"coherencePairs: unknown reading {x!r}")
         pairs.add(tuple(sorted((a, b))))
     for r in readings["readings"]:
+        if not r.get("icon"):
+            warnings.append(f"reading {r['id']}: no icon")
         for ev in r["evidence"]:
             if ev.get("probe") not in PROBES:
                 errors.append(f"reading {r['id']}: unknown probe {ev.get('probe')!r}")
@@ -80,6 +83,8 @@ def main() -> int:
     class_ids = set()
     for c in classes["classes"]:
         class_ids.add(c["id"])
+        if not c.get("icon"):
+            warnings.append(f"class {c['id']}: no icon")
         scope = c["detect"].get("scope")
         if scope not in ("bead", "snapshot"):
             errors.append(f"class {c['id']}: bad scope {scope!r}")

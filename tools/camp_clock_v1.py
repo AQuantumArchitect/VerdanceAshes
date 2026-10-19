@@ -229,7 +229,7 @@ class Clock:
                         if zid and zid in self.world.host.engine.field.clusters:
                             self.world.observe_zone(str(zid), source="rumour:clash", eta=eta, minute=self.minute, threat=0.8)
                     if on_held:
-                        row = {"kind": "rumour", "about": "shelling", "mapId": f.get("mapId"), "zones": [f.get("zoneA"), f.get("zoneB")], "eta": eta, "source": "scouts heard guns", "minute": round(self.minute, 1)}
+                        row = {"kind": "rumour", "about": "shelling", "mapId": f.get("mapId"), "zones": [f.get("zoneA"), f.get("zoneB")], "eta": eta, "source": "scouts heard guns", "minute": round(self.minute, 1), "missionNumber": int(st.get("missionNumber") or 0), "camp": True}
                         intel.append(row)
                         found.append({"pause": "rumour", "witness": f"guns heard near {self.graph.label.get(str(f.get('zoneA')), f.get('zoneA'))} on {f.get('mapId')}", "row": row})
                 elif f.get("type") == "offscreen_zone_flip":
@@ -239,7 +239,7 @@ class Clock:
                         self.world.observe_zone(str(zid), source="rumour:flip", eta=eta, minute=self.minute, held=1.0,
                                                 ours=1.0 if f.get("toFaction") == "ashwalkers" else 0.0, threat=0.6)
                     if on_held:
-                        row = {"kind": "rumour", "about": "flip", "mapId": f.get("mapId"), "zoneId": zid, "label": f.get("label"), "toFaction": f.get("toFaction"), "eta": eta, "source": "word from the road", "minute": round(self.minute, 1)}
+                        row = {"kind": "rumour", "about": "flip", "mapId": f.get("mapId"), "zoneId": zid, "label": f.get("label"), "toFaction": f.get("toFaction"), "fromFaction": f.get("fromFaction"), "eta": eta, "source": "word from the road", "minute": round(self.minute, 1), "missionNumber": int(st.get("missionNumber") or 0), "camp": True}
                         intel.append(row)
                         found.append({"pause": "rumour", "witness": f"{f.get('label') or zid} is said to be {f.get('toFaction')}'s now", "row": row})
             # posted people: looking is keeping
@@ -300,6 +300,11 @@ class Clock:
         self.camp["clockMinutes"] = self.minute
         for p in pauses:
             self.camp["pauses"].append(p)
+        try:
+            import story_dance_v1 as dance
+            dance.fold_camp(self.state, pauses)
+        except Exception:
+            pass
         if len(self.camp["pauses"]) > 200:
             del self.camp["pauses"][:len(self.camp["pauses"]) - 200]
         return {"elapsedMinutes": round(elapsed, 1), "requestedMinutes": minutes, "paused": bool(pauses) and until_pause, "pauses": pauses}
@@ -344,7 +349,7 @@ class Clock:
             out["scouted"] = {"zoneId": zone_id, "label": self.graph.label.get(zone_id, zone_id), "found": str(truth.get("controllingFaction") or "neutral"),
                               "believed": ("ours" if before["ours"]["value"] > 0.5 else ("held" if before["held"]["value"] > 0.5 else "empty")) if max(before["ours"]["conf"], before["held"]["conf"]) >= 0.15 else "nobody had looked",
                               "surprise": round(s, 3), "before": before, "after": after}
-            self.state.setdefault("intel", []).append({"kind": "scout", "zoneId": zone_id, "label": self.graph.label.get(zone_id, zone_id), "found": out["scouted"]["found"], "eta": SCOUT_ETA, "source": "patrol", "minute": round(self.minute, 1)})
+            self.state.setdefault("intel", []).append({"kind": "scout", "about": "scout", "zoneId": zone_id, "label": self.graph.label.get(zone_id, zone_id), "found": out["scouted"]["found"], "believed": out["scouted"]["believed"], "surprise": out["scouted"]["surprise"], "eta": SCOUT_ETA, "source": "patrol", "minute": round(self.minute, 1), "missionNumber": int(self.state.get("missionNumber") or 0), "camp": True})
             out["pauses"].append({"pause": "arrival", "minute": round(self.minute, 1), "during": f"scout:{zone_id}", "zoneId": zone_id,
                                   "witness": f"patrol back from {self.graph.label.get(zone_id, zone_id)}: {out['scouted']['found']}" + (f" (we believed {out['scouted']['believed']})" if s > 0.3 else "")})
             self.camp["pauses"].append(out["pauses"][-1])

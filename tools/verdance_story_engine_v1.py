@@ -7459,6 +7459,18 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
             _face_path.write_text(json.dumps(_face, indent=2, ensure_ascii=False), encoding="utf-8")
             _occ_path.write_text(json.dumps(_occ, indent=2, ensure_ascii=False), encoding="utf-8")
             (_out / "occasions.latest.md").write_text(_occasions.markdown(_occ), encoding="utf-8")
+            # The dance tape (S3 shape): this homecoming's verbs, truth/goodness/beauty on the
+            # bead, and the chronicle folded the brain-ant way.
+            try:
+                import story_dance_v1 as _dance
+                import chronicle_v1 as _chron
+                _dance.fold_homecoming(state, bead, _face, _occ, _ws, previous_face=_prev_face)
+                _chron.write(state, _ws)
+            except Exception as _dx:
+                try:
+                    print(f"VA_DANCE_FAIL {_dx}")
+                except Exception:
+                    pass
         except Exception as _rx:
             try:
                 print(f"VA_READINGS_FAIL {_rx}")
