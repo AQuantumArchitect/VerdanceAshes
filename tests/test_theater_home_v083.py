@@ -67,38 +67,57 @@ class TestRimStamp(unittest.TestCase):
         self.assertTrue(stamp.is_rim_zone({"xMin": 0, "xMax": 0.2, "zMin": 0, "zMax": 0.2}))
         self.assertFalse(stamp.is_rim_zone({"xMin": 0.35, "xMax": 0.65, "zMin": 0.35, "zMax": 0.65}))
 
-    def test_midfield_deploy_invalidates(self):
-        # Central lagoon maze is midfield on Rock Jungle
+    def test_unowned_midfield_deploy_invalidates(self):
+        # Central spillway is midfield + unowned on Rock Jungle → illegal LZ.
         plan = {
             "mapId": "the_rock_jungle",
             "contractKind": "hive_clear_or_bypass",
             "marks": {
-                "deployZoneId": "RJ_CENTRAL_LAGOON_MAZE",
-                "extractZoneId": "RJ_NW_JUNGLE_SHELF",
-                "captureZoneIds": ["RJ_CENTRAL_LAGOON_MAZE"],
+                "deployZoneId": "TRJ_C_SPILLWAY",
+                "extractZoneId": "TRJ_NE_RIM",
+                "captureZoneIds": ["TRJ_C_SPILLWAY"],
             },
         }
-        warns = stamp.soft_validate(stamp.normalize_plan(plan), ROOT)
-        self.assertTrue(any(w.startswith("RIM_DEPLOY") for w in warns), warns)
+        warns = stamp.soft_validate(stamp.normalize_plan(plan), ROOT, {})
+        self.assertTrue(any(w.startswith("LZ_DEPLOY") for w in warns), warns)
         report = stamp.stamp(plan, ROOT)
         self.assertFalse(report.get("ok"), report)
+
+    def test_ashwalker_midfield_deploy_is_legal(self):
+        import landing_zones_v1 as lz
+
+        state = engine.default_v1_state()
+        engine.ensure_zone_memory(state, ROOT)
+        pad = "TRJ_C_SPILLWAY"
+        lz.seed_ashwalker_pad(state, "the_rock_jungle", pad, stack_weight=2.0)
+        plan = {
+            "mapId": "the_rock_jungle",
+            "contractKind": "hive_clear_or_bypass",
+            "marks": {
+                "deployZoneId": pad,
+                "extractZoneId": pad,
+                "captureZoneIds": ["TRJ_NE_RIM"],
+            },
+        }
+        warns = stamp.soft_validate(stamp.normalize_plan(plan), ROOT, state)
+        self.assertFalse(any(w.startswith("LZ_") for w in warns), warns)
 
 
 class TestHomeCamp(unittest.TestCase):
     def test_home_build_costs_tnb(self):
         st = engine.default_v1_state()
         st["commerce"]["tenebrium"] = 2
-        st["commerce"]["credits"] = 40
+        st["commerce"]["metalK"] = 4
         r = engine.apply_home_build(st, None)
         self.assertTrue(r.get("ok"), r)
         self.assertEqual(st["homeCamp"]["level"], 1)
         self.assertEqual(st["commerce"]["tenebrium"], 1)
-        self.assertEqual(st["commerce"]["credits"], 15)
+        self.assertEqual(st["commerce"]["metalK"], 3)
 
     def test_home_build_blocks_without_tnb(self):
         st = engine.default_v1_state()
         st["commerce"]["tenebrium"] = 0
-        st["commerce"]["credits"] = 100
+        st["commerce"]["metalK"] = 10
         r = engine.apply_home_build(st, None)
         self.assertFalse(r.get("ok"))
 

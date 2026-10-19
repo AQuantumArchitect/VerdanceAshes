@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "verdance-print-spaces/1.1",
+  "notes": "Living logistics origins for broker packs. Explicit fiction — do not gate on war_map controlCounts. Slim catalog: Cortex punch/grunts/brutes + constructors; Armada surplus.",
+  "craft": {
+    "etaSecondsPerCampaignMinute": 10,
+    "sameMapSpoolSeconds": 75,
+    "pawnLauncherSpoolSecondsMin": 60,
+    "pawnLauncherSpoolSecondsMax": 120
+  },
+  "spaces": {
+    "eye_of_horus": {
+      "mapId": "eye_of_horus",
+      "faction": "cortex",
+      "role": "base_of_operations",
+      "label": "Eye of Horus",
+      "blurb": "Sturdy T1 rings — Cortex base of operations. Brute columns ship from here.",
+      "products": ["corraid"],
+      "listings": ["crash_of_brutes"],
+      "mode": "map_web"
+    },
+    "all_that_simmers": {
+      "mapId": "all_that_simmers",
+      "faction": "cortex",
+      "role": "grunt_manufacture",
+      "label": "All That Simmers",
+      "blurb": "Geo vents feed grunt streams through the map gaps.",
+      "products": ["corak"],
+      "listings": ["grunt_stream"],
+      "mode": "map_web"
+    },
+    "pawn_launcher": {
+      "mapId": null,
+      "faction": "nullmercs",
+      "role": "interterritory_launcher",
+      "label": "Pawn launcher",
+      "blurb": "Offscreen interterritory launcher — fires pawn salvos into your infil.",
+      "products": ["corthud", "armpw"],
+      "listings": ["punch_of_thugs", "armada_surplus_pawns"],
+      "mode": "pawn_launcher"
+    }
+  },
+  "mapLabels": {
+    "greenest_fields": "Greenest Fields",
+    "eye_of_horus": "Eye of Horus",
+    "koom_valley": "Koom Valley",
+    "tabula": "Tabula",
+    "ancient_bastion": "Ancient Bastion",
+    "the_rock_jungle": "The Rock Jungle",
+    "all_that_simmers": "All That Simmers"
+  }
+}

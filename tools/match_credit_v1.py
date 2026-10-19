@@ -22,27 +22,33 @@ _INCOMPLETE_STATUSES = frozenset({"incomplete", "unknown", "active", "inactive",
 # Human headlines for hub debrief — keep in sync with docs/UI_ASH_CONSOLE.md
 # and mod/.../va_ash_tokens.lua Ash.VERDICT (+ app/showoff VERDICT_UI).
 _HEADLINES = {
-    "victory": "Secured.",
-    "partial": "Hinge. Not a win.",
-    "defeat": "Field costs.",
-    "abandon": "Left the field.",
-    "incomplete": "Result not home — Retry extract or Abandon.",
+    "victory": "Success.",
+    "partial": "Partial success.",
+    "defeat": "Defeat.",
+    "abandon": "Withdrawn.",
+    "incomplete": "Result pending — retry recovery or withdraw.",
 }
 
 # Short banners for BAR/hub cards (same dialect)
 _BANNERS = {
-    "victory": "SECURED",
-    "partial": "HINGE",
-    "defeat": "FIELD COSTS",
-    "abandon": "LEFT THE FIELD",
-    "incomplete": "RESULT NOT HOME",
+    "victory": "SUCCESS",
+    "partial": "PARTIAL SUCCESS",
+    "defeat": "DEFEAT",
+    "abandon": "WITHDRAWN",
+    "incomplete": "RESULT PENDING",
 }
 
 _REASON_HINTS = {
     "extracted": "Clean pull-out after the objective.",
     "extracted_bypass": "Bypassed the hard target and extracted.",
+    "extracted_bail": "Left early and held extract — partial success.",
+    "extracted_voluntary": "Exfil button — left on purpose; partial success.",
+    "extracted_recruit_lost": "Rescue wreck destroyed; company extracted with partial success.",
     "objective_complete_no_extraction_zone": "Objective done (no extract zone on seed).",
+    "soft_clock_rescue_failed": "Mission timed out after the rescue failed. Extraction was not completed.",
+    "operation_complete_no_extraction": "Operation completed; this mission has no extraction phase.",
     "soft_clock_no_extract": "Objective done; clock hit before extract.",
+    "soft_clock_marks_open": "Primary done; clock hit with marks still open.",
     "soft_clock_timeout": "Soft clock expired mid-fight.",
     "player_wiped": "Force wiped.",
     "force_spent": "No combat power and no production left.",
@@ -303,6 +309,15 @@ def credit_from_result(result: Dict[str, Any]) -> Dict[str, Any]:
         # Keep headline short; hint separate
         pass
     reason_hint = _REASON_HINTS.get(reason, reason or "—")
+    # Prefix side_* bail reasons that share one hint family.
+    if reason_hint == reason and reason.startswith("extracted_side_"):
+        reason_hint = "Side work done, then held extract — partial success."
+
+    objective_failed = _b(
+        result.get("objectiveFailed") or result.get("rescueContractFailed"), False
+    )
+    if objective_failed or reason == "extracted_recruit_lost":
+        changed.append("rescue contract failed")
 
     return {
         "schemaVersion": "verdance-match-credit/1.0",
@@ -316,6 +331,7 @@ def credit_from_result(result: Dict[str, Any]) -> Dict[str, Any]:
         "zoneFlip": zone_flip,
         "fullSuccess": full_success,
         "anyPositive": any_positive,
+        "objectiveFailed": objective_failed,
         "freeTnbMint": False,
         "banner": _BANNERS.get(verdict, _BANNERS["incomplete"]),
         "headline": headline,
@@ -358,6 +374,7 @@ def presentable_debrief(
         "headline": credit.get("headline"),
         "terminalReason": credit.get("terminalReason"),
         "reasonHint": credit.get("reasonHint"),
+        "objectiveFailed": bool(credit.get("objectiveFailed")),
         "changed": changed,
         "nextAction": credit.get("nextAction"),
         "resultKey": credit.get("resultKey"),

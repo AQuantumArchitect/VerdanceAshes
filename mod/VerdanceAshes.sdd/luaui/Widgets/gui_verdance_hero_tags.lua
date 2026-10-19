@@ -26,9 +26,9 @@ local HERO_COL = { 0.490, 1.000, 0.541, 1.0 }  -- good
 local CRIT_COL = { 0.831, 0.769, 0.604, 1.0 }  -- gold
 local WRECK_COL = { 1.000, 0.490, 0.490, 1.0 } -- bad
 do
-  local ok, Ash = pcall(VFS.Include, "luaui/Widgets/include/va_ash_tokens.lua")
+  local ok, Ash = pcall(VFS.Include, "luaui/Include/va_ash_tokens.lua")
   if not ok or type(Ash) ~= "table" then
-    ok, Ash = pcall(VFS.Include, "LuaUI/Widgets/include/va_ash_tokens.lua")
+    ok, Ash = pcall(VFS.Include, "LuaUI/Include/va_ash_tokens.lua")
   end
   if ok and type(Ash) == "table" and Ash.COL then
     HERO_COL = { Ash.COL.good[1], Ash.COL.good[2], Ash.COL.good[3], 1 }
@@ -50,11 +50,16 @@ local function scan()
       local level = tonumber(Spring.GetUnitRulesParam(unitID, "va_hero_level") or 1) or 1
       local rank = Spring.GetUnitRulesParam(unitID, "va_hero_rank")
       if type(rank) ~= "string" or rank == "" then rank = "Runner" end
+      local vetRank = Spring.GetUnitRulesParam(unitID, "va_vet_rank")
+      if type(vetRank) ~= "string" or vetRank == "" or vetRank == "green" then
+        vetRank = nil
+      end
       trackedUnits[unitID] = {
         name = name,
         critical = (Spring.GetUnitRulesParam(unitID, "va_hero_critical") or 0) == 1,
         level = level,
         rank = rank,
+        vetRank = vetRank,
         height = (ud and ud.height or 40) + 22,
       }
     end
@@ -90,8 +95,11 @@ function widget:DrawScreenEffects()
       if x then
         local sx, sy, sz = Spring.WorldToScreenCoords(x, y + rec.height, z)
         if sz and sz <= 1 then
-          -- Clarity: "Vane L5 Captain" so farmed power is visible mid-fight.
+          -- Clarity: "Vane L5 Captain · hardened" so farmed power is visible mid-fight.
           local label = string.format("%s  L%d %s", rec.name, rec.level or 1, rec.rank or "")
+          if rec.vetRank then
+            label = label .. " · " .. tostring(rec.vetRank)
+          end
           drawTag(sx, sy, label, rec.critical and CRIT_COL or HERO_COL)
         end
       end

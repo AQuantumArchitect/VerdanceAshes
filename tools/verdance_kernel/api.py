@@ -6,9 +6,11 @@ rather than invoking scattered .ps1 / .py scripts.
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 import threading
+from functools import wraps
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -24,10 +26,15 @@ from stamp_deploy_plan_v1 import stamp as stamp_plan  # noqa: E402
 from verdance_kernel import steam as steam_mod
 from verdance_kernel import surface as surface_mod
 from verdance_kernel.paths import (
+    backups_dir,
+    field_state_path,
     hub_result_path,
     hub_state_path,
     latest_result_path,
+    live_command_mod_path,
+    live_command_path,
     resolve_workspace,
+    saves_dir,
     session_status_path,
     showoff_dir,
     state_path,
@@ -49,6 +56,65 @@ def _now() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
+def _first_error_line(*reports: dict[str, Any]) -> str:
+    """The most useful single line from a failed pipeline stage.
+
+    The hub shows one short string. PowerShell puts the part that identifies the
+    fault -- script, line, and reason -- at the TOP of stderr, then follows it
+    with several lines of CategoryInfo/FullyQualifiedErrorId noise, so the first
+    non-empty line is the one worth surfacing.
+    """
+    for rep in reports:
+        if not isinstance(rep, dict) or rep.get("ok"):
+            continue
+        for key in ("error", "reason", "stderr_tail", "stderr"):
+            raw = rep.get(key)
+            if not raw:
+                continue
+            for line in str(raw).splitlines():
+                line = line.strip()
+                if line:
+                    return line[:400]
+        for raw in (rep.get("errors") or rep.get("warnings") or []):
+            line = str(raw).strip()
+            if line:
+                return line[:400]
+    return "deploy pipeline failed -- see build.stderr_tail"
+
+
+def _spring_already_open() -> str | None:
+    """Name of a running spring.exe, or None.
+
+    play_session refuses to start when one is already up, but it does that
+    inside a detached process. The hub would otherwise hear "started" and
+    then nothing would open.
+    """
+    if sys.platform != "win32":
+        return None
+    try:
+        r = subprocess.run(
+            ["tasklist", "/FO", "CSV", "/NH"],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+    except Exception:  # noqa: BLE001
+        return None
+    for line in (r.stdout or "").splitlines():
+        name = line.split(",", 1)[0].strip().strip('"').lower()
+        if name in ("spring.exe", "spring-headless.exe"):
+            return name
+    return None
+
+
+def _campaign_lock(method):
+    @wraps(method)
+    def locked(self, *args, **kwargs):
+        with self._lock:
+            return method(self, *args, **kwargs)
+    return locked
+
+
 class CampaignKernel:
     """Authoritative campaign ops for one workspace."""
 
@@ -56,6 +122,11 @@ class CampaignKernel:
         self.ws = resolve_workspace(workspace)
         self._lock = threading.RLock()
         self._busy = False
+        self._deploy_phase = "idle"
+        self._pending_roster: dict[str, Any] | None = None
+        self._roster_gen = 0
+        self._roster_client_gen = 0
+        self._roster_token = ""
         self._last_deploy: dict[str, Any] | None = None
         self._last_launch: dict[str, Any] | None = None
         self._last_advance: dict[str, Any] | None = None
@@ -86,6 +157,7 @@ class CampaignKernel:
             "workspace": str(self.ws),
             "showoff": str(showoff_dir(self.ws)),
             "busy": self._busy,
+            "deployPhase": self._deploy_phase,
             "error": self._error,
             "lastDeploy": self._last_deploy,
             "lastLaunch": self._last_launch,
@@ -105,6 +177,8 @@ class CampaignKernel:
                 "purchase": True,
                 "autoApply": True,
                 "campaignSurface": True,
+                "field": True,
+                "continueField": True,
                 "steamStub": True,
                 "modSync": True,
             },
@@ -131,6 +205,46 @@ class CampaignKernel:
         except Exception as e:  # noqa: BLE001
             return {"present": True, "error": str(e)}
 
+    def narrative_surface(self) -> dict[str, Any]:
+        from narrative_v1 import project
+        p = state_path(self.ws)
+        if not p.is_file():
+            return {"ok": False, "error": "Campaign save is missing."}
+        with self._lock:
+            state = json.loads(p.read_text(encoding="utf-8-sig"))
+            hub = self.get_hub_surface().get("hub") or {}
+            return {"ok": True, "narrative": project(state, (hub.get("node") or {}).get("choices") or [], self.ws)}
+
+    def narrative_choice(self, body: dict[str, Any]) -> dict[str, Any]:
+        from narrative_v1 import choose
+        from verdance_story_engine_v1 import save_json
+        with self._lock:
+            if self._busy:
+                return {"ok": False, "error": "A campaign operation is in progress. Try again after it completes."}
+            p = state_path(self.ws)
+            if not p.is_file():
+                return {"ok": False, "error": "Campaign save is missing."}
+            state = json.loads(p.read_text(encoding="utf-8-sig"))
+            receipt = choose(state, body.get("choiceId"), body.get("expectedRevision"), body.get("requestId"), self.ws)
+            if receipt.get("ok"):
+                save_json(p, state)
+                receipt["narrative"] = self.narrative_surface()["narrative"]
+            return receipt
+
+    def continuity_audit(self, marks: list[str] | None = None) -> dict[str, Any]:
+        """Phase 0 continuity membrane inspector (witness vs belief vs reinduce)."""
+        try:
+            import continuity_audit_v1 as audit
+        except Exception as e:  # noqa: BLE001
+            return {"ok": False, "error": f"continuity_audit import failed: {e}"}
+        try:
+            report = audit.run_audit(self.ws, marked=marks or [])
+            audit.write_outbox(self.ws, report)
+            report["outbox"] = str(self.ws / "outbox" / "continuity_audit.latest.json")
+            return report
+        except Exception as e:  # noqa: BLE001
+            return {"ok": False, "error": str(e)}
+
     def session_status(self) -> dict[str, Any]:
         p = session_status_path(self.ws)
         if not p.is_file():
@@ -143,15 +257,67 @@ class CampaignKernel:
 
     # ── ops ──────────────────────────────────────────────────
 
-    def rebuild_hub(self) -> dict[str, Any]:
+    def rebuild_hub(self, *, skip_apply: bool = False) -> dict[str, Any]:
         out: dict[str, Any] = {}
+        # war_map is required input for hub paint — regenerate from live state.
+        war_path = self.ws / "outbox" / "war_map.json"
+        state_file = self.ws / "state" / "campaign_state.json"
+        if state_file.is_file():
+            try:
+                from verdance_story_engine_v1 import build_war_map, load_json, save_json
+
+                save_json(war_path, build_war_map(load_json(state_file)))
+                out["war_map"] = {"ok": True, "path": str(war_path)}
+            except Exception as e:  # noqa: BLE001
+                raise RuntimeError(f"war_map regenerate failed: {e}") from e
+        elif not war_path.is_file():
+            raise RuntimeError("missing campaign_state.json and outbox/war_map.json")
         py = sys.executable
         for name in ("build_hub_state_v1.py", "build_zone_boards_v1.py"):
             script = self.ws / "tools" / name
             if script.is_file():
                 out[name] = run_cmd([py, str(script)], self.ws, timeout=60)
-        apply_info = apply_result_to_hub(self.ws, skip_advance=True)
+        hub_build = out.get("build_hub_state_v1.py") or {}
+        if hub_build and not hub_build.get("ok"):
+            detail = (
+                hub_build.get("stderr_tail")
+                or hub_build.get("stdout_tail")
+                or hub_build.get("reason")
+                or "build_hub_state_v1 failed"
+            )
+            raise RuntimeError(f"hub rebuild failed: {str(detail).strip()[:400]}")
+        # Campaign reset / wipe must NOT re-ingest results. Calling
+        # apply_result_to_hub(skip_advance=True) still painted lastResult and
+        # could leave the shell on "sortie 2" after a wipe (Sortie 2 ghost).
+        apply_info: dict[str, Any]
+        if skip_apply:
+            apply_info = {"skipped": True, "reason": "skip_apply_no_result_ingest"}
+            # Drop stale debrief paint so the board shows the live missionNumber.
+            stale = self.ws / "outbox" / "hub_result.latest.json"
+            if stale.is_file():
+                try:
+                    stale.unlink()
+                    apply_info["clearedHubResult"] = True
+                except OSError:
+                    apply_info["clearedHubResult"] = False
+        else:
+            apply_info = apply_result_to_hub(self.ws, skip_advance=True)
         hub = self.get_hub_surface()
+        if not hub.get("ok"):
+            raise RuntimeError(
+                f"hub surface unreadable after rebuild: {hub.get('error') or 'missing hub_state.json'}"
+            )
+        # Hard assert: surface mission must match campaign_state (never a ghost).
+        state_path = self.ws / "state" / "campaign_state.json"
+        if state_path.is_file():
+            state = json.loads(state_path.read_text(encoding="utf-8-sig"))
+            want = int(state.get("missionNumber") or 1)
+            got = int((hub.get("hub") or {}).get("missionNumber") or 0)
+            if got != want:
+                raise RuntimeError(
+                    f"hub mission ghost after rebuild: surface={got} state={want}. "
+                    "Refusing to paint over campaign_state with stale hub_state."
+                )
         surface = surface_mod.write_surface(
             self.ws, hub.get("hub") if hub.get("ok") else None
         )
@@ -161,7 +327,368 @@ class CampaignKernel:
             "rebuild": out,
             "apply": apply_info,
             "surface": {"path": surface.get("path")},
+            "missionNumber": (hub.get("hub") or {}).get("missionNumber"),
             "at": _now(),
+        }
+
+    @_campaign_lock
+    def reset_campaign(self, *, confirm: str = "") -> dict[str, Any]:
+        """Full wipe via scripts/player/reset_campaign.ps1. Requires confirm=YES."""
+        if str(confirm).strip().upper() != "YES":
+            return {
+                "ok": False,
+                "error": "type YES to confirm full campaign reset",
+                "at": _now(),
+            }
+        script = self.ws / "scripts" / "player" / "reset_campaign.ps1"
+        if not script.is_file():
+            return {"ok": False, "error": "reset_campaign.ps1 missing", "at": _now()}
+        report = run_ps1(script, self.ws, timeout=180)
+        hub = self.get_hub_surface()
+        return {
+            "ok": bool(report.get("ok", report.get("exitCode", 1) == 0)),
+            "at": _now(),
+            "reset": report,
+            "hub": hub.get("hub") if hub.get("ok") else None,
+            "missionNumber": (hub.get("hub") or {}).get("missionNumber"),
+        }
+
+    @staticmethod
+    def _sanitize_slot(name: str) -> str | None:
+        raw = str(name or "").strip()
+        if not raw:
+            return None
+        # Keep portal prompts simple: letters, digits, dash, underscore, space → underscore
+        cleaned = []
+        for ch in raw:
+            if ch.isalnum() or ch in "-_":
+                cleaned.append(ch)
+            elif ch.isspace():
+                cleaned.append("_")
+        slot = "".join(cleaned).strip("_-")[:48]
+        return slot or None
+
+    def list_saves(self) -> dict[str, Any]:
+        """Named campaign slots under state/saves/."""
+        root = saves_dir(self.ws)
+        root.mkdir(parents=True, exist_ok=True)
+        slots: list[dict[str, Any]] = []
+        for child in sorted(root.iterdir(), key=lambda p: p.name.lower()):
+            if not child.is_dir():
+                continue
+            state_file = child / "campaign_state.json"
+            if not state_file.is_file():
+                continue
+            meta: dict[str, Any] = {}
+            meta_path = child / "meta.json"
+            if meta_path.is_file():
+                try:
+                    meta = json.loads(meta_path.read_text(encoding="utf-8-sig"))
+                except Exception:  # noqa: BLE001
+                    meta = {}
+            mission = meta.get("missionNumber")
+            if mission is None:
+                try:
+                    data = json.loads(state_file.read_text(encoding="utf-8-sig"))
+                    mission = data.get("missionNumber")
+                except Exception:  # noqa: BLE001
+                    mission = None
+            slots.append(
+                {
+                    "id": child.name,
+                    "label": meta.get("label") or child.name,
+                    "savedAt": meta.get("savedAt"),
+                    "missionNumber": mission,
+                    "note": meta.get("note"),
+                }
+            )
+        return {"ok": True, "at": _now(), "saves": slots, "dir": str(root)}
+
+    def order_bro_tzar(self) -> dict[str, Any]:
+        """Hub: Bro, Pass me the Tzar — spend Tnb, queue mission-only call-in."""
+        from company_v1 import hub_company_surface, order_bro_tzar as _order  # type: ignore
+        from verdance_story_engine_v1 import load_json, migrate_state, save_json  # type: ignore
+
+        sp = state_path(self.ws)
+        if not sp.is_file():
+            return {"ok": False, "error": "campaign_state.json missing", "at": _now()}
+        try:
+            state = migrate_state(load_json(sp))
+        except Exception as e:  # noqa: BLE001
+            return {"ok": False, "error": f"load state failed: {e}", "at": _now()}
+        ok, err, payload = _order(state, workspace=self.ws)
+        if not ok:
+            return {"ok": False, "error": err, "at": _now(), **(payload or {})}
+        try:
+            save_json(sp, state)
+        except Exception as e:  # noqa: BLE001
+            return {"ok": False, "error": f"save state failed: {e}", "at": _now()}
+        hub_report = self.rebuild_hub()
+        surface = hub_company_surface(state, self.ws)
+        return {
+            "ok": True,
+            "at": _now(),
+            "toast": payload.get("toast"),
+            "callIn": payload.get("callIn"),
+            "tenebrium": payload.get("tenebrium"),
+            "surface": surface,
+            "hub": hub_report.get("hub") if hub_report.get("ok") else None,
+            "rebuild": hub_report,
+        }
+
+    @_campaign_lock
+    def seal_company(self, *, band: list[str] | None = None) -> dict[str, Any]:
+        """Hub preamble: lock core + exactly seatCap band packs for this run."""
+        from company_v1 import (  # type: ignore
+            company_deploy_aces,
+            company_deploy_band,
+            hub_company_surface,
+            seal_company as _seal,
+        )
+        from verdance_story_engine_v1 import load_json, migrate_state, save_json  # type: ignore
+
+        sp = state_path(self.ws)
+        if not sp.is_file():
+            return {"ok": False, "error": "campaign_state.json missing", "at": _now()}
+        try:
+            state = migrate_state(load_json(sp))
+        except Exception as e:  # noqa: BLE001
+            return {"ok": False, "error": f"load state failed: {e}", "at": _now()}
+        ok, err, company = _seal(state, list(band or []), workspace=self.ws)
+        if not ok:
+            return {"ok": False, "error": err, "company": company, "at": _now()}
+        try:
+            save_json(sp, state)
+        except Exception as e:  # noqa: BLE001
+            return {"ok": False, "error": f"save state failed: {e}", "at": _now()}
+        hub_report = self.rebuild_hub()
+        surface = hub_company_surface(state, self.ws)
+
+        # Post-seal: for mission 1, bake the *canonical opening* with sealed
+        # crew + fieldRecruits. Do NOT call generic materialize_intent here —
+        # that can pick Mode A / extract ghosts and desync the hub theater.
+        seed_report: dict[str, Any] = {"skipped": True}
+        try:
+            from verdance_story_engine_v1 import (  # type: ignore
+                opening_sortie_order,
+                save_json as _save_json,
+            )
+
+            mission_n = int(state.get("missionNumber") or 1)
+            order = opening_sortie_order(state, self.ws) if mission_n == 1 else None
+            if isinstance(order, dict) and order.get("mapId"):
+                outbox = self.ws / "outbox"
+                outbox.mkdir(parents=True, exist_ok=True)
+                # Stamp sealed muster onto the opening packet.
+                order = dict(order)
+                order["deployAces"] = company_deploy_aces(state)
+                order["crewBand"] = company_deploy_band(state)
+                order["seedStaleUntilCompanySeal"] = False
+                _save_json(outbox / "next_sortie_order.json", order)
+                rim = str(order.get("deploymentZoneId") or "")
+                target = str(order.get("targetZoneId") or "")
+                intent = {
+                    "schemaVersion": "verdance-mission-intent/1.0",
+                    "campaignId": order.get("campaignId") or "verdance_ashes",
+                    "missionId": "va_001",
+                    "missionNumber": 1,
+                    "act": 1,
+                    "mapId": order.get("mapId"),
+                    "deploymentZoneId": rim,
+                    "extractionZoneId": str(order.get("extractionZoneId") or rim),
+                    "targetZoneId": target,
+                    "objective": order.get("objectiveArchetype") or "eco_raid",
+                    "objectiveTarget": {
+                        "id": target,
+                        "kind": order.get("objectiveArchetype") or "eco_raid",
+                        "label": f"{order.get('objectiveArchetype') or 'eco_raid'}: {target}",
+                        "targetZoneId": target,
+                        "mapId": order.get("mapId"),
+                        "enemyFaction": order.get("against") or "armada",
+                        "patron": order.get("patron") or "nullmercs",
+                    },
+                    "captureZoneIds": list(order.get("captureZoneIds") or [target]),
+                    "secondaryCaptureZoneIds": list(
+                        order.get("secondaryCaptureZoneIds") or []
+                    ),
+                    "fromZoneIds": list(order.get("fromZoneIds") or [rim]),
+                    "deployAces": list(order.get("deployAces") or []),
+                    "crewBand": list(order.get("crewBand") or []),
+                    "openingMission": True,
+                    "openingDoctrine": order.get("openingDoctrine"),
+                    "patron": order.get("patron") or "nullmercs",
+                    "against": order.get("against") or "armada",
+                    "sessionMode": order.get("sessionMode") or "reload_travel",
+                    "occupationModel": order.get("occupationModel") or "living_shell",
+                    "seededAt": _now(),
+                    "seedReason": "company_seal_opening_bake",
+                }
+                _save_json(outbox / "next_mission_intent.json", intent)
+                # Align hub deploy plan marks with the opening so Drop doesn't
+                # revive a stale NW-bastion / Mode A plan.
+                plan = {
+                    "schemaVersion": "verdance-deploy-plan/1.0",
+                    "mapId": order.get("mapId"),
+                    "contractKind": order.get("objectiveArchetype") or "eco_raid",
+                    "deployAces": list(order.get("deployAces") or []),
+                    "crewBand": list(order.get("crewBand") or []),
+                    "marks": {
+                        "deployZoneId": rim,
+                        "extractZoneId": str(order.get("extractionZoneId") or rim),
+                        "captureZoneIds": list(order.get("captureZoneIds") or [target]),
+                    },
+                    "patron": order.get("patron") or "nullmercs",
+                    "against": order.get("against") or "armada",
+                    "occupationModel": order.get("occupationModel") or "living_shell",
+                    "sessionMode": order.get("sessionMode") or "reload_travel",
+                }
+                _save_json(outbox / "hub_deploy_plan.latest.json", plan)
+                build_report = self.build_mission()
+                seed_report = {
+                    "ok": bool(build_report.get("ok")),
+                    "source": "opening_sortie_order",
+                    "deploymentZoneId": rim,
+                    "targetZoneId": target,
+                    "build": build_report,
+                }
+                (outbox / "seed_status.json").write_text(
+                    json.dumps(
+                        {
+                            "schemaVersion": "verdance-seed-status/1.0",
+                            "stale": not bool(build_report.get("ok")),
+                            "reason": "company_sealed_opening",
+                            "at": _now(),
+                            "deployAces": company_deploy_aces(state),
+                            "crewBand": company_deploy_band(state),
+                            "deploymentZoneId": rim,
+                            "targetZoneId": target,
+                        },
+                        indent=2,
+                    )
+                    + "\n",
+                    encoding="utf-8",
+                )
+            else:
+                # Mid-run seal (rare) — Drop will bake from the player's marks.
+                seed_report = {
+                    "ok": True,
+                    "skipped": True,
+                    "reason": "non_opening_seal_await_drop",
+                }
+                (self.ws / "outbox" / "seed_status.json").write_text(
+                    json.dumps(
+                        {
+                            "schemaVersion": "verdance-seed-status/1.0",
+                            "stale": True,
+                            "reason": "await_drop_bake",
+                            "at": _now(),
+                        },
+                        indent=2,
+                    )
+                    + "\n",
+                    encoding="utf-8",
+                )
+        except Exception as e:  # noqa: BLE001
+            seed_report = {"ok": False, "error": str(e)}
+
+        return {
+            "ok": True,
+            "at": _now(),
+            "company": company,
+            "surface": surface,
+            "deployAces": company_deploy_aces(state),
+            "deployBand": company_deploy_band(state),
+            "hub": hub_report.get("hub") if hub_report.get("ok") else None,
+            "rebuild": hub_report,
+            "seed": seed_report,
+        }
+
+    @_campaign_lock
+    def save_campaign(self, *, slot: str = "", label: str = "", note: str = "") -> dict[str, Any]:
+        """Snapshot campaign_state.json into state/saves/<slot>/."""
+        import shutil
+
+        name = self._sanitize_slot(slot) or self._sanitize_slot(label)
+        if not name:
+            stamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+            name = f"slot_{stamp}"
+        src = state_path(self.ws)
+        if not src.is_file():
+            return {"ok": False, "error": "campaign_state.json missing", "at": _now()}
+        dest_dir = saves_dir(self.ws) / name
+        dest_dir.mkdir(parents=True, exist_ok=True)
+        dest = dest_dir / "campaign_state.json"
+        shutil.copy2(src, dest)
+        mission = None
+        try:
+            data = json.loads(src.read_text(encoding="utf-8-sig"))
+            mission = data.get("missionNumber")
+        except Exception:  # noqa: BLE001
+            data = {}
+        meta = {
+            "schemaVersion": "verdance-save-slot/1.0",
+            "id": name,
+            "label": str(label or name).strip() or name,
+            "note": str(note or "").strip() or None,
+            "savedAt": _now(),
+            "missionNumber": mission,
+        }
+        (dest_dir / "meta.json").write_text(
+            json.dumps(meta, indent=2) + "\n", encoding="utf-8"
+        )
+        # Keep Steam cloud mirror in sync with "I saved"
+        try:
+            steam_mod.cloud_mirror(self.ws)
+        except Exception:  # noqa: BLE001
+            pass
+        return {
+            "ok": True,
+            "at": _now(),
+            "slot": name,
+            "path": str(dest),
+            "meta": meta,
+            "saves": self.list_saves().get("saves"),
+        }
+
+    @_campaign_lock
+    def load_campaign(self, *, slot: str = "", confirm: str = "") -> dict[str, Any]:
+        """Restore a named save over live campaign_state, then rebuild hub."""
+        import shutil
+
+        if str(confirm).strip().upper() != "YES":
+            return {
+                "ok": False,
+                "error": "type YES to confirm load (overwrites live campaign_state)",
+                "at": _now(),
+            }
+        name = self._sanitize_slot(slot)
+        if not name:
+            return {"ok": False, "error": "slot name required", "at": _now()}
+        src = saves_dir(self.ws) / name / "campaign_state.json"
+        if not src.is_file():
+            return {"ok": False, "error": f"save slot not found: {name}", "at": _now()}
+        live = state_path(self.ws)
+        backups_dir(self.ws).mkdir(parents=True, exist_ok=True)
+        stamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+        backup = backups_dir(self.ws) / f"campaign_state.pre_load_{stamp}.json"
+        if live.is_file():
+            shutil.copy2(live, backup)
+        live.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(src, live)
+        hub_report = self.rebuild_hub()
+        try:
+            steam_mod.cloud_mirror(self.ws)
+        except Exception:  # noqa: BLE001
+            pass
+        hub = self.get_hub_surface()
+        return {
+            "ok": bool(hub_report.get("ok", True)),
+            "at": _now(),
+            "slot": name,
+            "backup": str(backup) if live.is_file() else None,
+            "hubRebuild": hub_report,
+            "hub": hub.get("hub") if hub.get("ok") else None,
+            "missionNumber": (hub.get("hub") or {}).get("missionNumber"),
         }
 
     def materialize_intent(self) -> dict[str, Any]:
@@ -190,6 +717,61 @@ class CampaignKernel:
         self._last_mod_sync = report
         return report
 
+    def _seed_hint_from_outbox(self) -> dict[str, Any]:
+        """Read the sealed sortie/intent zones after materialize (truth for Drop)."""
+        out: dict[str, Any] = {}
+        for rel in (
+            "outbox/next_mission_intent.json",
+            "outbox/next_sortie_order.json",
+            "outbox/next_sortie_choice.json",
+        ):
+            path = self.ws / rel
+            if not path.is_file():
+                continue
+            try:
+                data = json.loads(path.read_text(encoding="utf-8-sig"))
+            except Exception:
+                continue
+            if not isinstance(data, dict):
+                continue
+            for key in (
+                "targetZoneId",
+                "deploymentZoneId",
+                "extractionZoneId",
+                "secondaryCaptureZoneIds",
+                "openingMission",
+                "source",
+                "mapId",
+            ):
+                if key in data and data[key] is not None and key not in out:
+                    out[key] = data[key]
+            if out.get("targetZoneId") and out.get("deploymentZoneId"):
+                break
+        return out
+
+    def _sync_customer_seed(self) -> dict[str, Any]:
+        """Mirror va_current.lua into Documents/My Games customer pack (dual-spine)."""
+        import shutil
+
+        src_candidates = [
+            self.ws / "mod" / "VerdanceAshes.sdd" / "singleplayer" / "verdance_ashes" / "generated" / "va_current.lua",
+            self.ws / "outbox" / "va_current.lua",
+        ]
+        src = next((p for p in src_candidates if p.is_file()), None)
+        if src is None:
+            return {"ok": False, "reason": "va_current.lua missing after build"}
+        home = Path.home() / "Documents" / "My Games" / "VerdanceAshes" / "VerdanceAshes.sdd"
+        dest = home / "singleplayer" / "verdance_ashes" / "generated" / "va_current.lua"
+        if not home.is_dir():
+            return {"ok": False, "reason": f"customer pack missing: {home}", "skipped": True}
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(src, dest)
+        # Keep zone map companion in sync when present.
+        zsrc = src.parent / "zone_map_current.lua"
+        if zsrc.is_file():
+            shutil.copy2(zsrc, dest.parent / "zone_map_current.lua")
+        return {"ok": True, "src": str(src), "dest": str(dest)}
+
     def build_mission(self) -> dict[str, Any]:
         script = self._resolve_ps1("build")
         if script is None:
@@ -197,6 +779,13 @@ class CampaignKernel:
         return run_ps1(script, self.ws, timeout=240)
 
     def launch_bar(self, *, max_missions: int = 1, auto_relaunch: bool = False) -> dict[str, Any]:
+        already = _spring_already_open()
+        if already:
+            return {
+                "ok": False,
+                "skipped": True,
+                "reason": "Beyond All Reason is already open. Finish or close that match, then drop again.",
+            }
         script = self._resolve_ps1("session")
         if script is None:
             return {"ok": False, "reason": "play_session script missing"}
@@ -214,6 +803,9 @@ class CampaignKernel:
         ]
         if not auto_relaunch:
             args.append("-NoAutoRelaunch")
+        # Sandbox campaign zip only. A normal hub drop never sets this.
+        if os.environ.get("VERDANCE_ZIP") == "1":
+            args.extend(["-EngineMode", "headless-zip"])
         try:
             proc = subprocess.Popen(
                 args,
@@ -238,53 +830,275 @@ class CampaignKernel:
         except Exception as e:  # noqa: BLE001
             return {"ok": False, "reason": f"{type(e).__name__}: {e}"}
 
+    def update_sortie_roster(self, raw: dict[str, Any] | None) -> dict[str, Any]:
+        """Confirm drop locks the roster. The level is compiled from that list."""
+        del raw
+        with self._lock:
+            phase = self._deploy_phase
+        return {
+            "ok": False,
+            "sealed": True,
+            "phase": phase,
+            "error": "The company locks when you confirm the drop, before the level loads.",
+        }
+
+    def _deploy_async(self, plan: dict[str, Any]) -> None:
+        try:
+            result = self._deploy_body(plan, launch=True)
+            with self._lock:
+                if result.get("ok"):
+                    if self._deploy_phase not in ("launching", "sealing"):
+                        self._deploy_phase = "launching"
+                else:
+                    self._deploy_phase = "failed"
+                    self._error = result.get("error") or self._error
+        except Exception as e:  # noqa: BLE001
+            with self._lock:
+                self._deploy_phase = "failed"
+                self._error = f"{type(e).__name__}: {e}"
+                self._last_deploy = {
+                    "ok": False,
+                    "accepted": False,
+                    "phase": "failed",
+                    "error": self._error,
+                    "at": _now(),
+                }
+        finally:
+            with self._lock:
+                self._busy = False
+
     def commit_deploy(self, plan: dict[str, Any], *, launch: bool = True) -> dict[str, Any]:
+        """Launch returns as soon as the build is accepted. The posted roster is locked."""
+        plan = dict(plan or {})
+        # Hub-only. Must not ride into the stamped intent.
+        token = str(plan.pop("rosterToken", "") or "")
+        if launch:
+            with self._lock:
+                if self._busy:
+                    return {"ok": False, "error": "kernel busy with another deploy"}
+                if _spring_already_open():
+                    err = "Beyond All Reason is already open. Finish or close that match, then drop again."
+                    refused = {
+                        "ok": False,
+                        "error": err,
+                        "at": _now(),
+                        "launch": {"ok": False, "skipped": True, "reason": err},
+                    }
+                    self._last_deploy = refused
+                    self._error = err
+                    self._deploy_phase = "failed"
+                    return refused
+                self._busy = True
+                self._error = None
+                self._deploy_phase = "building"
+                self._pending_roster = None
+                self._roster_gen = 0
+                self._roster_client_gen = 0
+                self._roster_token = token
+            threading.Thread(
+                target=self._deploy_async,
+                args=(plan,),
+                name="va-deploy",
+                daemon=True,
+            ).start()
+            return {"ok": True, "accepted": True, "phase": "building", "at": _now()}
+
         with self._lock:
             if self._busy:
                 return {"ok": False, "error": "kernel busy with another deploy"}
             self._busy = True
             self._error = None
+        try:
+            return self._deploy_body(plan, launch=False)
+        finally:
+            with self._lock:
+                self._busy = False
+
+    def _deploy_body(self, plan: dict[str, Any], *, launch: bool = True) -> dict[str, Any]:
+        # The build used to run under _lock on the request thread, which froze
+        # every other hub call. This block stays indented; the lock is gone.
+        if True:
             try:
-                # Always refresh BAR mutator so Drop does not load a stale SDD
-                mod_report = self.sync_mod(copy=True)
+                if launch and _spring_already_open():
+                    err = "Beyond All Reason is already open. Finish or close that match, then drop again."
+                    refused = {
+                        "ok": False,
+                        "error": err,
+                        "at": _now(),
+                        "launch": {"ok": False, "skipped": True, "reason": err},
+                    }
+                    self._last_deploy = refused
+                    self._error = err
+                    return refused
+
+                # Company preamble gate — drop only after hub seals the run company.
+                try:
+                    from company_v1 import (  # type: ignore
+                        consume_mission_call_ins,
+                        ensure_company,
+                        peek_mission_call_ins,
+                        sortie_roster,
+                    )
+                    from verdance_story_engine_v1 import load_json, migrate_state, save_json  # type: ignore
+
+                    sp = state_path(self.ws)
+                    if sp.is_file():
+                        st = migrate_state(load_json(sp))
+                        ensure_company(st, self.ws)
+                        company = st.get("company") or {}
+                        if not company.get("sealed"):
+                            return {
+                                "ok": False,
+                                "error": "Form the company first — pick 3 packs on the hub preamble",
+                                "at": _now(),
+                                "companyPreambleNeeded": True,
+                            }
+                        # Core always ships. The hub Dropping list is who else comes.
+                        # Missing crewBand means the whole living company (old callers).
+                        # Ids outside the sealed company are dropped.
+                        plan = dict(plan or {})
+                        requested = plan.get("crewBand")
+                        if requested is None:
+                            requested = plan.get("deployAces")
+                        band, aces = sortie_roster(st, requested)
+                        plan["crewBand"] = band
+                        plan["deployAces"] = aces
+                        plan["rosterNote"] = (
+                            f"{len(band)} packs + {len(aces) - len(band)} core"
+                        )
+                        # Bro Tzar (and future call-ins): stamp then consume so one order = one Drop.
+                        calls = peek_mission_call_ins(st)
+                        if calls:
+                            plan["missionCallIns"] = calls
+                            consume_mission_call_ins(st)
+                            try:
+                                save_json(sp, st)
+                            except Exception:  # noqa: BLE001
+                                pass
+                except Exception as e:  # noqa: BLE001
+                    return {
+                        "ok": False,
+                        "error": f"company gate failed: {e}",
+                        "at": _now(),
+                    }
+
+                # Stamp → intent → build FIRST, then sync the built seed into BAR.
+                # Syncing before build used to freeze a stale SDD under data/games
+                # while the workspace seed moved on — hub marks never reached BAR.
                 stamp_report = stamp_plan(plan, self.ws)
+                if not stamp_report.get("ok"):
+                    err = stamp_report.get("error") or _first_error_line(stamp_report)
+                    refused = {
+                        "ok": False,
+                        "error": err,
+                        "at": _now(),
+                        "stamp": stamp_report,
+                        "launch": {"ok": False, "skipped": True, "reason": err},
+                    }
+                    self._last_deploy = refused
+                    self._error = err
+                    return refused
                 intent_report = self.materialize_intent()
                 build_report = (
                     self.build_mission() if intent_report.get("ok") else {"ok": False, "skipped": True}
                 )
+                # Consume armyBudget once the Drop is actually built — escorts already
+                # stamped into the kit from commerce intent preview.
+                army_budget_spent = None
+                if build_report.get("ok"):
+                    try:
+                        from verdance_story_engine_v1 import (  # type: ignore
+                            ensure_commerce,
+                            load_json,
+                            migrate_state,
+                            save_json,
+                            utc_now,
+                        )
+
+                        sp = state_path(self.ws)
+                        if sp.is_file():
+                            st = migrate_state(load_json(sp))
+                            commerce = ensure_commerce(st, self.ws)
+                            prev_army = int(commerce.get("armyBudget") or 0)
+                            if prev_army > 0:
+                                commerce["armyBudget"] = 0
+                                commerce.setdefault("ledger", []).append({
+                                    "op": "army_budget_drop_spend",
+                                    "spent": prev_army,
+                                    "remaining": 0,
+                                    "at": utc_now(),
+                                })
+                                save_json(sp, st)
+                                army_budget_spent = prev_army
+                    except Exception as e:  # noqa: BLE001
+                        army_budget_spent = {"error": str(e)}
+                mod_report: dict[str, Any] = {"skipped": True}
+                if build_report.get("ok"):
+                    mod_report = self.sync_mod(copy=True)
+                    try:
+                        mod_report["customerPack"] = self._sync_customer_seed()
+                    except Exception as e:  # noqa: BLE001
+                        mod_report["customerPack"] = {"ok": False, "reason": str(e)}
                 launch_report: dict[str, Any] = {"skipped": True}
                 if launch and build_report.get("ok"):
+                    # Roster was stamped with this plan before the build. play_session
+                    # recompiles that same intent, then starts the map.
+                    with self._lock:
+                        self._deploy_phase = "launching"
                     launch_report = self.launch_bar()
                 elif launch and not build_report.get("ok"):
                     launch_report = {"ok": False, "reason": "build failed — not launching"}
 
-                result = {
-                    "ok": bool(
+                # Prefer what intent/materialize actually sealed (hub stamp wins),
+                # not the pre-override stamp report alone.
+                intent_zones = self._seed_hint_from_outbox()
+                # The seal asks one question: did the engine start?
+                # A stamp warning must not turn a live launch into "drop failed".
+                engine_started = bool(
+                    launch_report.get("ok") and not launch_report.get("skipped")
+                )
+                if launch:
+                    drop_ok = engine_started
+                else:
+                    drop_ok = bool(
                         stamp_report.get("ok")
                         and intent_report.get("ok")
                         and build_report.get("ok")
-                    ),
+                    )
+                result = {
+                    "ok": drop_ok,
                     "at": _now(),
                     "modSync": mod_report,
                     "stamp": stamp_report,
                     "intent": intent_report,
                     "build": build_report,
                     "launch": launch_report,
+                    "armyBudgetSpent": army_budget_spent,
                     "seedHint": {
-                        "targetZoneId": stamp_report.get("targetZoneId"),
-                        "deploymentZoneId": stamp_report.get("deploymentZoneId"),
-                        "extractionZoneId": stamp_report.get("extractionZoneId"),
-                        "secondaryCaptureZoneIds": stamp_report.get("secondaryCaptureZoneIds"),
+                        "targetZoneId": intent_zones.get("targetZoneId")
+                        or stamp_report.get("targetZoneId"),
+                        "deploymentZoneId": intent_zones.get("deploymentZoneId")
+                        or stamp_report.get("deploymentZoneId"),
+                        "extractionZoneId": intent_zones.get("extractionZoneId")
+                        or stamp_report.get("extractionZoneId"),
+                        "secondaryCaptureZoneIds": intent_zones.get("secondaryCaptureZoneIds")
+                        or stamp_report.get("secondaryCaptureZoneIds"),
+                        "openingMission": intent_zones.get("openingMission"),
+                        "source": intent_zones.get("source") or stamp_report.get("source"),
                     },
                 }
                 self._last_deploy = result
                 if launch:
                     self._last_launch = launch_report
                 if not result["ok"]:
-                    self._error = "deploy pipeline failed — see stamp/intent/build"
+                    err = _first_error_line(build_report, intent_report, stamp_report)
+                    if err.startswith("deploy pipeline failed") and launch_report.get("reason"):
+                        err = str(launch_report["reason"])[:400]
+                    self._error = err
+                    result["error"] = err
                 return result
             finally:
-                self._busy = False
+                pass
 
     def extract_result(self) -> dict[str, Any]:
         script = self._resolve_ps1("extract")
@@ -367,6 +1181,19 @@ class CampaignKernel:
                     result["headline"] = debrief.get("headline")
                     result["resultKey"] = debrief.get("resultKey")
                     result["duplicate"] = debrief.get("duplicate")
+                # Promote wallets so clients that merge the advance response
+                # (without waiting on hub_result) still see post-settle Tnb/km$.
+                for key in (
+                    "tenebrium",
+                    "commerce",
+                    "company",
+                    "factionBanks",
+                    "missionNumber",
+                ):
+                    if hub_apply.get(key) is not None:
+                        result[key] = hub_apply.get(key)
+                    elif isinstance(hub.get("hub"), dict) and hub["hub"].get(key) is not None:
+                        result[key] = hub["hub"].get(key)
                 self._last_advance = result
                 if not result["ok"]:
                     self._error = "advance/hub apply failed"
@@ -377,6 +1204,87 @@ class CampaignKernel:
     def apply_result(self, *, extract: bool = True, skip_advance: bool = False) -> dict[str, Any]:
         """Alias for bring_home (backward compatible)."""
         return self.bring_home(extract=extract, skip_advance=skip_advance, mode="manual")
+
+    def get_field(self) -> dict[str, Any]:
+        """Live soft-terminal / in-field snapshot for the hub command deck."""
+        candidates = [
+            field_state_path(self.ws),
+            live_command_mod_path(self.ws).with_name("va_field.latest.json"),
+        ]
+        p = next((c for c in candidates if c.is_file()), None)
+        if p is None:
+            return {
+                "ok": True,
+                "softContinue": False,
+                "idle": True,
+                "note": "No live field packet yet — BAR writes va_field at soft terminal.",
+            }
+        try:
+            data = json.loads(p.read_text(encoding="utf-8-sig"))
+        except Exception as e:  # noqa: BLE001
+            return {"ok": False, "error": str(e)}
+        data = dict(data) if isinstance(data, dict) else {"raw": data}
+        data.setdefault("ok", True)
+        data["path"] = str(p)
+        return data
+
+    def continue_field(self, body: dict[str, Any] | None = None) -> dict[str, Any]:
+        """Queue a same-map continue command for the paused BAR mutator."""
+        body = dict(body or {})
+        idx = body.get("index") or body.get("candidateIndex")
+        target = body.get("targetZoneId") or body.get("target")
+        kind = body.get("objectiveArchetype") or body.get("kind") or "seize_lane"
+        if idx is None and not target:
+            return {"ok": False, "error": "need candidate index or targetZoneId"}
+        cmd = {
+            "schemaVersion": "verdance-live-command/1.0",
+            "at": _now(),
+            "action": "continue",
+            "index": int(idx) if idx is not None else None,
+            "targetZoneId": target,
+            "objectiveArchetype": kind,
+            "mapId": body.get("mapId"),
+            "requestId": body.get("requestId")
+            or f"hub_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}",
+            "source": "hub",
+        }
+        return self._write_live_command(cmd)
+
+    def extract_leave_field(self, body: dict[str, Any] | None = None) -> dict[str, Any]:
+        """Queue extract_leave so BAR ends the soft-continue chain."""
+        body = dict(body or {})
+        cmd = {
+            "schemaVersion": "verdance-live-command/1.0",
+            "at": _now(),
+            "action": "extract_leave",
+            "requestId": body.get("requestId")
+            or f"hub_leave_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}",
+            "source": "hub",
+        }
+        return self._write_live_command(cmd)
+
+    def _write_live_command(self, cmd: dict[str, Any]) -> dict[str, Any]:
+        """Write command to outbox + mutator generated path (VFS-visible to BAR)."""
+        paths = [live_command_path(self.ws), live_command_mod_path(self.ws)]
+        written: list[str] = []
+        errors: list[str] = []
+        payload = json.dumps(cmd, indent=2) + "\n"
+        for p in paths:
+            try:
+                p.parent.mkdir(parents=True, exist_ok=True)
+                p.write_text(payload, encoding="utf-8")
+                written.append(str(p))
+            except Exception as e:  # noqa: BLE001
+                errors.append(f"{p}: {e}")
+        ok = bool(written)
+        return {
+            "ok": ok,
+            "at": _now(),
+            "command": cmd,
+            "written": written,
+            "errors": errors,
+            "note": "BAR widget polls generated/va_live_command.json while soft-terminal.",
+        }
 
     def _incomplete_home(
         self,
@@ -528,46 +1436,54 @@ class CampaignKernel:
             finally:
                 self._busy = False
 
+    @_campaign_lock
     def purchase(self, listing_id: str) -> dict[str, Any]:
         if not listing_id:
             return {"ok": False, "error": "listingId required"}
         if not state_path(self.ws).is_file():
             return {"ok": False, "error": "missing campaign_state.json"}
-        try:
-            from verdance_story_engine_v1 import (  # noqa: E402
-                load_json,
-                migrate_state,
-                purchase_listing,
-                save_json,
-            )
+        with self._lock:
+            if self._busy:
+                return {"ok": False, "error": "kernel busy — try the buy again in a moment"}
+            self._busy = True
+            try:
+                from verdance_story_engine_v1 import (  # noqa: E402
+                    load_json,
+                    migrate_state,
+                    purchase_listing,
+                    save_json,
+                )
 
-            raw = load_json(state_path(self.ws))
-            state = migrate_state(raw)
-            receipt = purchase_listing(state, listing_id, self.ws)
-            if not receipt.get("ok"):
-                return {"ok": False, **receipt}
-            save_json(state_path(self.ws), state)
-            hub_info = apply_result_to_hub(self.ws, skip_advance=True)
-            hub_payload = self.get_hub_surface()
-            hub = hub_payload.get("hub") if hub_payload.get("ok") else {}
-            steam_mod.unlock_achievement(self.ws, "BROKER_DEAL", detail=listing_id)
-            steam_mod.cloud_mirror(self.ws)
-            surface_mod.write_surface(self.ws, hub)
-            return {
-                "ok": True,
-                "at": _now(),
-                "receipt": receipt,
-                "missionNumber": hub.get("missionNumber") or hub_info.get("missionNumber"),
-                "tenebrium": hub.get("tenebrium"),
-                "commerce": hub.get("commerce"),
-                "aces": hub.get("aces"),
-                "hubResultPath": hub_info.get("hubResultPath"),
-            }
-        except Exception as e:  # noqa: BLE001
-            return {"ok": False, "error": f"{type(e).__name__}: {e}"}
+                raw = load_json(state_path(self.ws))
+                state = migrate_state(raw)
+                receipt = purchase_listing(state, listing_id, self.ws)
+                if not receipt.get("ok"):
+                    return {"ok": False, **receipt}
+                save_json(state_path(self.ws), state)
+                hub_info = apply_result_to_hub(self.ws, skip_advance=True)
+                hub_payload = self.get_hub_surface()
+                hub = hub_payload.get("hub") if hub_payload.get("ok") else {}
+                steam_mod.unlock_achievement(self.ws, "BROKER_DEAL", detail=listing_id)
+                steam_mod.cloud_mirror(self.ws)
+                surface_mod.write_surface(self.ws, hub)
+                return {
+                    "ok": True,
+                    "at": _now(),
+                    "receipt": receipt,
+                    "missionNumber": hub.get("missionNumber") or hub_info.get("missionNumber"),
+                    "tenebrium": hub.get("tenebrium"),
+                    "commerce": hub.get("commerce"),
+                    "aces": hub.get("aces"),
+                    "hubResultPath": hub_info.get("hubResultPath"),
+                }
+            except Exception as e:  # noqa: BLE001
+                return {"ok": False, "error": f"{type(e).__name__}: {e}"}
+            finally:
+                self._busy = False
 
+    @_campaign_lock
     def home_build(self) -> dict[str, Any]:
-        """Raise the Rock Jungle camp (Tnb + scrap). Hub-only scale lever."""
+        """Raise the Rock Jungle camp (Tnb + 1km$ metal). Hub-only scale lever."""
         if not state_path(self.ws).is_file():
             return {"ok": False, "error": "missing campaign_state.json"}
         try:

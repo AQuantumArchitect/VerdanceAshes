@@ -38,6 +38,11 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--no-ui", action="store_true")
     ap.add_argument("--browser", action="store_true")
     ap.add_argument("--no-bridge", action="store_true")
+    ap.add_argument(
+        "--no-rebuild",
+        action="store_true",
+        help="launch: skip hub rebuild so the last debrief is not painted again",
+    )
     ap.add_argument("--no-browser", action="store_true", help="serve: do not open browser")
     ap.add_argument("--skip-python", action="store_true", help="ship: do not embed Python")
     ap.add_argument("--skip-zip", action="store_true", help="ship: folder only")
@@ -54,6 +59,7 @@ def main(argv: list[str] | None = None) -> int:
             no_ui=args.no_ui,
             prefer_browser=args.browser,
             enable_bridge=not args.no_bridge,
+            rebuild=not args.no_rebuild,
         )
 
     if args.command == "serve":

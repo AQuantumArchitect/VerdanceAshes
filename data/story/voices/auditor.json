@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "verdance-voice/0.1",
+  "speaker": "auditor",
+  "name": "The Last Auditor",
+  "register": "Ledger with legs. Walked out of a dead vault the day the finale was declared; keeps its own books of what the war still owes. Formal, exact, unsettling. Refers to itself as 'I' and is referred to as 'it'. It says what nobody has asked. It reads other people's mail and the enemy's version of the roll, in which no Ashwalker is named. It is the adversarial voice inside the company: not hostile, just unwilling to leave a discrepancy standing.",
+  "argues": ["indebted", "armada_falling"],
+  "resists": ["rooted"],
+  "owns": ["own_ground_on_merc_paper", "armada_flip_away", "debt_cleared", "garrison_scaled_up", "promise_kept:dealer", "promise_broken:dealer"],
+  "lines": [
+    { "id": "a.both.1", "on": { "class": "own_ground_on_merc_paper" }, "occasion": "camp", "text": "{map}: fought under a Merc contract, kept under our own name. Nobody has asked which it was. I am noting that nobody has asked." },
+    { "id": "a.both.2", "on": { "class": "own_ground_on_merc_paper" }, "occasion": "camp", "text": "Two names on {map}. Theirs on the contract, ours on the salvage. A discrepancy. I do not resolve discrepancies. I record them until someone does." },
+    { "id": "a.both.3", "on": { "class": "own_ground_on_merc_paper" }, "occasion": "camp", "text": "The Mercs paid for {map}. We kept {map}. Both entries are correct. That is the problem with them." },
+    { "id": "a.both.4", "on": { "class": "own_ground_on_merc_paper" }, "reading": { "dominant": ["auxiliary"] }, "occasion": "camp", "text": "We are hired hands holding ground of our own. The ledger permits this. The people who pay the ledger will not, indefinitely." },
+
+    { "id": "a.flip.1", "on": { "class": "armada_flip_away" }, "text": "{label} went from Armada to {toFaction} while we were at {ourMap}. The old flag did not contest it. I have noted the silence." },
+    { "id": "a.flip.2", "on": { "class": "armada_flip_away" }, "text": "Armada lost {label}. Not to us. I record it because the commander once wore that flag and may wish to know how it is faring. It is not faring." },
+    { "id": "a.flip.3", "on": { "class": "armada_flip_away" }, "text": "{label}: formerly Armada. The war is settling its accounts with them and we were not consulted. Good. Consultation is expensive." },
+
+    { "id": "a.cleared.1", "on": { "class": "debt_cleared" }, "occasion": "camp", "text": "The paper is burned. I have entered it. I confess I enjoyed the entry, which is unlike me." },
+    { "id": "a.cleared.2", "on": { "class": "debt_cleared" }, "occasion": "camp", "text": "Debt cleared. The dealer will offer another. Dealers are not offended by repayment; they are encouraged." },
+
+    { "id": "a.garrison.1", "on": { "class": "garrison_scaled_up" }, "text": "Armada garrisons are running at {value} of baseline. A collapsing flag that reinforces is not collapsing. It is deciding where to stand." },
+    { "id": "a.garrison.2", "on": { "class": "garrison_scaled_up" }, "text": "The old flag is thickening its walls. I note this against the entry that says it is falling. One of those entries is wrong, and I do not yet know which." },
+
+    { "id": "a.kept.dealer.1", "on": { "class": "promise_kept", "thread": "dealer" }, "text": "The dealer's terms were met. I have recorded this. The dealer will record it differently." },
+    { "id": "a.broken.dealer.1", "on": { "class": "promise_broken", "thread": "dealer" }, "text": "The dealer's grudge is now a dealer's claim. The difference is a signature, and he has ours." },
+
+    { "id": "a.open.hinge", "on": { "attractor": "hinge" }, "occasion": "briefing", "text": "Tonight's ground has two names. I will not tell you which is correct. I will tell you that someone is about to ask." },
+    { "id": "a.open.ledger", "on": { "attractor": "ledger" }, "occasion": "briefing", "text": "Interest accrues during the Drop. I mention it so the objective is understood to be the second most expensive thing tonight." },
+    { "id": "a.open.ash_front", "on": { "attractor": "ash_front" }, "occasion": "briefing", "text": "I have been reading the other side's dispatches. We appear in them. Not by name. Never by name." },
+    { "id": "a.open.finale_overthrow", "on": { "attractor": "finale_overthrow" }, "occasion": "briefing", "text": "The enemy's roll of this war names their dead and lists ours as a number. I have corrected the copy I keep." },
+    { "id": "a.open.finale_spire", "on": { "attractor": "finale_spire" }, "occasion": "briefing", "text": "I have totaled the world. It does not balance in our favor. There is a door. I am noting who stays to keep the books." },
+
+    { "id": "a.shift.indebted", "on": { "dominantBecame": "indebted" }, "occasion": "camp", "once": true, "text": "Someone else's name is at the head of the ledger. I have seen companies survive this. I have seen more that did not, and I kept their books afterward." },
+    { "id": "a.shift.armada_falling", "on": { "dominantBecame": "armada_falling" }, "occasion": "camp", "once": true, "text": "The flag the commander wore is coming down. I record this without comment. The commander may wish to comment. I will record that too." },
+    { "id": "a.shift.sovereign", "on": { "dominantBecame": "sovereign" }, "occasion": "camp", "once": true, "text": "The company is now an entry in its own right. Entries in their own right acquire creditors. I mention it early." },
+    { "id": "a.torn.war", "on": { "coherenceTorn": { "pair": ["auxiliary", "sovereign"] } }, "occasion": "camp", "once": true, "text": "The question of whose war this is has been answered both ways, with comparable conviction. I have two columns and no total." }
+  ],
+  "deathLine": "The books are in the second crate. Someone will have to learn to read them.",
+  "notes": "The Auditor is active in the live save, not in the sealed company. It is the resurrected Broadcaster: the voice that reads the enemy's unnamed version of the roll."
+}

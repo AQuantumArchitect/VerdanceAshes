@@ -12,6 +12,7 @@ param(
   [string]$SaveName = "verdance_playable_ats_001",
   [string]$ExtraModOptions = "",
   [string]$DebugCommandsOverride = "",
+  [string]$EngineConfigPath = "",
   [int]$TimeoutSeconds = 90
 )
 
@@ -321,6 +322,10 @@ $debugCommands = if ($DebugCommandsOverride) {
   "90:luarules vazones|120:luarules vastatus"
 } elseif ($SaveGame) {
   "90:luarules vazones|120:luarules vastatus|180:savegame $SaveName"
+} elseif ($Headless -and $ExtraModOptions -match "va_autoplay_zip=1") {
+  # Zip must live long enough for the objective claim, the hold, and the
+  # extract pad. The result quits the engine; 9000 is only a stuck-match stop.
+  "90:luarules vazones|120:luarules vastatus|9000:quitforce"
 } elseif ($Headless) {
   "90:luarules vazones|120:luarules vastatus|600:quitforce"
 } else {
@@ -332,6 +337,11 @@ $balanceModOptions = if ($BalanceTest) {
     va_headless_fastwin=0;
     va_balance_export_frame=$SimFrames;
     va_balance_quit=1;
+"@
+} elseif ($Headless) {
+@"
+    va_headless_autostart=1;
+    va_headless_fastwin=0;
 "@
 } else { "" }
 $extraModOptionsText = Render-ExtraModOptions $ExtraModOptions
@@ -376,13 +386,15 @@ $bodyBlocks = @($allyTeamBlocks) + @($teamBlocks) + @($aiBlocks)
 $blocksText = $bodyBlocks -join "`r`n`r`n"
 
 $gameType = if ($config.PSObject.Properties["gameType"] -and $config.gameType) { [string]$config.gameType } else { 'Verdance Ashes $VERSION' }
+# Rock Jungle home shelf: ~5 min raptor grace (mult≈0.85). Other maps keep ~15 min (2.5).
+$raptorGraceMult = if ($safeMapId -eq "the_rock_jungle") { "0.85" } else { "2.5" }
 $startScript = @"
 [GAME]
 {
   MapName=$mapName;
   GameType=$gameType;
   GameStartDelay=0;
-  StartPosType=3;
+  StartPosType=1;
   RecordDemo=1;
   MyPlayerName=VerdanceCommander;
   IsHost=1;
@@ -399,7 +411,7 @@ $startScript = @"
     experimentallegionfaction=1;
     teamffa_start_boxes_shuffle=0;
     raptor_difficulty=normal;
-    raptor_graceperiodmult=1.0;
+    raptor_graceperiodmult=$raptorGraceMult;
     raptor_spawncountmult=1.0;
     va_campaign=1;
 $balanceModOptions
@@ -427,6 +439,15 @@ $scenarioManifest = [ordered]@{
   variant = $Variant
   variantLabel = $variantObject.label
   map = $scenario.map
+  mission = [ordered]@{
+    id = $scenario.missionBase.missionId
+    number = $scenario.missionBase.missionNumber
+    deploymentZoneId = $scenario.missionBase.deploymentZoneId
+    targetZoneId = $scenario.missionBase.objective.targetZoneId
+    extractionZoneId = $scenario.missionBase.extractionZoneId
+  }
+  startPosType = 1
+  playerTeamID = $playerTeamID
   seedOutbox = $config.seedOutbox
   seedDestination = $config.seedDestination
   startScriptPath = $startScriptPath
@@ -458,7 +479,44 @@ $engine = Join-Path $engineDir $engineName
 if (!(Test-Path $engine)) { throw "$engineName not found at $engine" }
 
 if ($Launch -or $runHeadless) {
-  $args = @("--write-dir", $config.barDataRoot, "--only-local", $startScriptPath)
+  # A map the player does not own is a FATAL content_error in PreGame -- the
+  # engine exits before the mutator loads, so there is no gadget, no log line
+  # of ours, and nothing on screen but a crash. Nothing else in the campaign
+  # path acquires maps (BAR's auto-download is a lobby behaviour and a direct
+  # start-script launch does not inherit it), so this is the only chance to
+  # catch it. Fetches from BAR's own content service; cache hit is a stat call.
+  # Workspace-relative, not script-relative: in a shipped dist the workspace
+  # root IS the dist root, and scripts\ sits beside tools\ there too.
+  $provisioner = Join-Path $Workspace "tools\map_provisioner_v1.py"
+  if (Test-Path -LiteralPath $provisioner) {
+    # Resolving Python is the only step allowed to fail softly. If the
+    # provisioner actually runs and reports the map is unavailable, that is a
+    # hard stop -- launching anyway just trades a clear message for a crash.
+    $mapPy = $null
+    try { $mapPy = Get-VerdancePython $Workspace }
+    catch { Write-Warning "No Python for the map check; relying on the map already being installed." }
+    if ($mapPy) {
+      & $mapPy $provisioner --workspace $Workspace --bar-data-root $config.barDataRoot `
+        --map $mapName --quiet | Out-Host
+      if ($LASTEXITCODE -ne 0) {
+        throw ("Could not provision the map '$mapName'. BAR exits with a fatal " +
+               "content_error without it. Check your connection, or join a BAR " +
+               "lobby on this map once to let the client fetch it.")
+      }
+    }
+  }
+
+  $args = @()
+  if ($runHeadless) {
+    # Headless BAR still creates a graphics context on this Windows build. These
+    # flags keep the engine from scanning/rendering the player's full UI stack.
+    $args += @("--safemode", "--isolation")
+  }
+  if ($EngineConfigPath) {
+    if (!(Test-Path -LiteralPath $EngineConfigPath)) { throw "Engine config not found: $EngineConfigPath" }
+    $args += @("--config", $EngineConfigPath)
+  }
+  $args += @("--write-dir", $config.barDataRoot, "--only-local", $startScriptPath)
   if ($runHeadless) {
     $saveDir = Join-Path $config.barDataRoot "Saves"
     $saveGamePath = Join-Path $saveDir "$SaveName.ssf"
@@ -483,6 +541,13 @@ if ($Launch -or $runHeadless) {
     $psi.Arguments = (@($args) | ForEach-Object { Quote-ProcessArg ([string]$_) }) -join " "
     $proc = [System.Diagnostics.Process]::new()
     $proc.StartInfo = $psi
+    $infologBaselineLines = if (Test-Path -LiteralPath $config.infolog) {
+      @(Get-Content -LiteralPath $config.infolog -ErrorAction SilentlyContinue)
+    } else { @() }
+    $infologBaselineLineCount = $infologBaselineLines.Count
+    $infologBaselineTail = if ($infologBaselineLineCount -gt 0) {
+      [string]$infologBaselineLines[$infologBaselineLineCount - 1]
+    } else { "" }
     [void]$proc.Start()
     if ($SaveGame) {
       $deadline = [DateTime]::UtcNow.AddSeconds($TimeoutSeconds)
@@ -524,12 +589,53 @@ if ($Launch -or $runHeadless) {
       Write-Host "Created BAR savegame: $saveGamePath"
       Write-Host "Wrote savegame manifest: $manifestPath"
     } else {
-      if (-not $proc.WaitForExit($TimeoutSeconds * 1000)) {
+      # A completed Verdance sortie can remain in the BAR process after it has
+      # emitted its result (soft continuation keeps the engine alive for a
+      # human). Headless runs must harvest that result and close BAR promptly;
+      # waiting for process exit turns a valid battle into a false timeout.
+      $deadline = [DateTime]::UtcNow.AddSeconds($TimeoutSeconds)
+      $terminalObserved = $false
+      while ([DateTime]::UtcNow -lt $deadline) {
+        if (Test-Path -LiteralPath $config.infolog) {
+          $allLines = @(Get-Content -LiteralPath $config.infolog -ErrorAction SilentlyContinue)
+          # Isolation may truncate/recreate infolog.txt at process start. In
+          # that case the whole current file is this run.
+          $baselineStillPresent = $infologBaselineLineCount -gt 0 `
+            -and $allLines.Count -ge $infologBaselineLineCount `
+            -and [string]$allLines[$infologBaselineLineCount - 1] -eq $infologBaselineTail
+          $newLines = if ($baselineStillPresent -and $allLines.Count -gt $infologBaselineLineCount) {
+            @($allLines | Select-Object -Skip $infologBaselineLineCount)
+          } elseif ($baselineStillPresent) { @() } else { $allLines }
+          if ($newLines -match "VA_RESULT_JSON_END") {
+            $terminalObserved = $true
+            break
+          }
+        }
+        if ($proc.HasExited) { break }
+        Start-Sleep -Seconds 1
+      }
+      if (-not $terminalObserved -and (Test-Path -LiteralPath $config.infolog)) {
+        $allLines = @(Get-Content -LiteralPath $config.infolog -ErrorAction SilentlyContinue)
+        $baselineStillPresent = $infologBaselineLineCount -gt 0 `
+          -and $allLines.Count -ge $infologBaselineLineCount `
+          -and [string]$allLines[$infologBaselineLineCount - 1] -eq $infologBaselineTail
+        $newLines = if ($baselineStillPresent -and $allLines.Count -gt $infologBaselineLineCount) {
+          @($allLines | Select-Object -Skip $infologBaselineLineCount)
+        } elseif ($baselineStillPresent) { @() } else { $allLines }
+        if ($newLines -match "VA_RESULT_JSON_END") { $terminalObserved = $true }
+      }
+      if ($terminalObserved -and -not $proc.HasExited) {
+        try { $proc.Kill() } catch { }
+        try { $proc.WaitForExit(10000) | Out-Null } catch { }
+        Write-Host "spring-headless stopped after terminal result."
+      } elseif (-not $proc.HasExited) {
         try { $proc.Kill() } catch { }
         throw "spring-headless timed out after $TimeoutSeconds seconds. Check $($config.infolog)"
       }
       Write-Host "spring-headless exit code: $($proc.ExitCode)"
-      if ($proc.ExitCode -ne 0) { throw "spring-headless exited with code $($proc.ExitCode). Check $($config.infolog)" }
+      if (-not $terminalObserved) {
+        throw "spring-headless exited before a terminal result (code $($proc.ExitCode)). Check $($config.infolog)"
+      }
     }
   } else {
     function Quote-VisibleProcessArg([string]$Arg) {

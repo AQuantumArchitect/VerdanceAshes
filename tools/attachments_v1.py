@@ -7,6 +7,7 @@ lines; they never grant god-mode HP or raw enemy tables.
 from __future__ import annotations
 
 import copy
+from itertools import combinations
 from typing import Any, Dict, List, Optional
 
 SCHEMA = "verdance-attachments/1.0"
@@ -262,6 +263,11 @@ def update_attachments_from_result(
                 a["bond"] = _clamp(before + 0.03)
                 deltas["bond"][hid] = deltas["bond"].get(hid, 0) + 0.03
 
+    # Co-deploy support XP — pairs that shared the Drop thicken (FE loop).
+    pair_delta = apply_co_deploy_support(state, result, success=success)
+    if pair_delta.get("pairs"):
+        deltas["pairBonds"] = pair_delta["pairs"]
+
     _log_event(
         att,
         "sortie_settle",
@@ -271,9 +277,110 @@ def update_attachments_from_result(
             "zoneId": zone,
             "status": status,
             "zoneFlipped": zone_flipped,
+            "coDeployPairs": list((pair_delta.get("pairs") or {}).keys()),
         },
     )
+
+    # L3 hero observe — append-only tape (best-effort; never block settle).
+    try:
+        import hero_observe_v1 as _obs  # noqa: WPS433
+
+        obs = _obs.try_append_sortie(
+            state,
+            result,
+            success=success,
+            zone_flipped=zone_flipped,
+            pair_delta=pair_delta,
+            ran_on=str(result.get("ran_on") or result.get("source") or "player"),
+        )
+        if isinstance(obs, dict):
+            deltas["heroObserve"] = {
+                "ok": obs.get("ok"),
+                "skipped": obs.get("skipped"),
+                "key": obs.get("key"),
+            }
+    except Exception:  # noqa: BLE001
+        deltas["heroObserve"] = {"ok": False, "error": "emit_failed"}
+
     return deltas
+
+
+def _deployed_hero_ids(result: Dict[str, Any], state: Dict[str, Any]) -> List[str]:
+    """Best-effort deployed roster from result / plan / company."""
+    ids: List[str] = []
+    for key in ("deployAces", "deployedHeroes", "sortieHeroes"):
+        raw = result.get(key)
+        if isinstance(raw, list):
+            for x in raw:
+                if isinstance(x, dict):
+                    hid = x.get("id") or x.get("heroId")
+                    if hid:
+                        ids.append(str(hid))
+                elif x:
+                    ids.append(str(x))
+    plan = result.get("deployPlan") or {}
+    if isinstance(plan, dict):
+        for x in plan.get("deployAces") or []:
+            ids.append(str(x))
+    # Fall back to living company band+core
+    if not ids:
+        company = state.get("company") or {}
+        for key in ("core", "band", "joinedLater"):
+            for x in company.get(key) or []:
+                if isinstance(x, dict):
+                    hid = x.get("id") or x.get("heroId")
+                    if hid:
+                        ids.append(str(hid))
+                elif x:
+                    ids.append(str(x))
+    # Dedup, drop dead
+    att = ensure_attachments(state)
+    agents = att.get("agents") or {}
+    out: List[str] = []
+    seen = set()
+    for hid in ids:
+        if hid in seen:
+            continue
+        seen.add(hid)
+        a = agents.get(hid)
+        if isinstance(a, dict) and a.get("status") == "dead":
+            continue
+        out.append(hid)
+    return out
+
+
+def apply_co_deploy_support(
+    state: Dict[str, Any],
+    result: Dict[str, Any],
+    *,
+    success: bool,
+) -> Dict[str, Any]:
+    """Raise pair-bond points for every co-deployed pair (survivors).
+
+    Win: +6 points per pair. Partial/extract: +4. Loss: +2 (shared mud still bonds).
+    Caps at 100. Seeds pairBonds rows as needed.
+    """
+    ensure_pair_bonds(state)
+    deployed = _deployed_hero_ids(result, state)
+    if len(deployed) < 2:
+        return {"pairs": {}, "deployed": deployed}
+    if success:
+        status = str(result.get("status") or result.get("verdict") or "")
+        bump = 6.0 if status in ("victory", "victoryClean") else 4.0
+    else:
+        bump = 2.0
+    pairs_out: Dict[str, Any] = {}
+    for a, b in combinations(deployed, 2):
+        r = apply_pair_talk(state, a, b, talk_id=None, delta=bump)
+        if r.get("ok"):
+            pairs_out[str(r.get("pairId"))] = {
+                "a": a,
+                "b": b,
+                "delta": bump,
+                "after": r.get("after"),
+                "rank": r.get("rank"),
+            }
+    return {"pairs": pairs_out, "deployed": deployed, "bump": bump}
 
 
 def _add_grudge(att: Dict[str, Any], faction: str, zone_id: str, intensity: float) -> None:
@@ -338,6 +445,96 @@ def apply_talk_bond(state: Dict[str, Any], hero_id: str = "ketha") -> Dict[str, 
     _push_memory(a, line)
     _log_event(att, "talk", {"heroId": hero_id, "before": before, "after": after})
     return {"ok": True, "heroId": hero_id, "before": before, "after": after, "line": line}
+
+
+def _pair_key(a: str, b: str) -> str:
+    x, y = sorted([str(a), str(b)])
+    return f"{x}__{y}"
+
+
+def ensure_pair_bonds(state: Dict[str, Any]) -> Dict[str, Any]:
+    """Foundation: undirected pair-bond map on attachments (FE support ranks later).
+
+    Values are 0–100 support points (hub aces.bonds style). G0 live channel
+    remains vane↔ketha; the web seeds other pairs at 0 until talks/co-deploy.
+    """
+    att = ensure_attachments(state)
+    pairs = att.setdefault("pairBonds", {})
+    if not isinstance(pairs, dict):
+        pairs = {}
+        att["pairBonds"] = pairs
+    # Seed core channel if missing
+    pk = _pair_key("vane", "ketha")
+    if pk not in pairs:
+        pairs[pk] = {
+            "a": "vane",
+            "b": "ketha",
+            "points": 10,
+            "rank": "C",
+            "talksDone": [],
+        }
+    return pairs
+
+
+def apply_pair_talk(
+    state: Dict[str, Any],
+    hero_a: str,
+    hero_b: str,
+    *,
+    talk_id: Optional[str] = None,
+    delta: float = 8.0,
+) -> Dict[str, Any]:
+    """Foundation mutator: deepen a pair bond after a camp talk stub."""
+    pairs = ensure_pair_bonds(state)
+    att = ensure_attachments(state)
+    a, b = str(hero_a), str(hero_b)
+    if a == b:
+        return {"ok": False, "reason": "same_hero"}
+    pk = _pair_key(a, b)
+    row = pairs.get(pk)
+    if not isinstance(row, dict):
+        row = {"a": a, "b": b, "points": 0, "rank": None, "talksDone": []}
+        pairs[pk] = row
+    before = float(row.get("points") or 0)
+    after = _clamp(before + float(delta), 0.0, 100.0)
+    row["points"] = after
+    # Rank bands: C <25, B <55, A >=55 (mirrors camp_talk unlock bondMin)
+    if after >= 55:
+        row["rank"] = "A"
+    elif after >= 25:
+        row["rank"] = "B"
+    elif after > 0:
+        row["rank"] = "C"
+    else:
+        row["rank"] = None
+    done = list(row.get("talksDone") or [])
+    if talk_id and talk_id not in done:
+        done.append(str(talk_id))
+        row["talksDone"] = done[-12:]
+    # Mirror onto characters.*.bonds for hub aces projection
+    chars = state.setdefault("characters", {})
+    if isinstance(chars, dict):
+        for src, dst, pts in ((a, b, after), (b, a, after)):
+            ch = chars.get(src)
+            if not isinstance(ch, dict):
+                ch = {"id": src, "bonds": {}}
+                chars[src] = ch
+            bonds = ch.setdefault("bonds", {})
+            if isinstance(bonds, dict):
+                bonds[dst] = int(round(pts))
+    _log_event(
+        att,
+        "pair_talk",
+        {"pairId": pk, "talkId": talk_id, "before": before, "after": after},
+    )
+    return {
+        "ok": True,
+        "pairId": pk,
+        "before": before,
+        "after": after,
+        "rank": row.get("rank"),
+        "talkId": talk_id,
+    }
 
 
 def grudge_zone_bias(state: Dict[str, Any]) -> Dict[str, float]:

@@ -1,50 +1,118 @@
 {
   "schemaVersion": "verdance-zone-map/0.1",
   "mapId": "greenest_fields",
-  "mapName": "Greenest Fields 1.3.1",
+  "mapName": "Greenest Fields 1.3",
   "coordinateSystem": "normalized_to_elmos",
   "authoringStatus": "provisional_no_metal_baseline",
-  "notes": "Provisional five-zone scaffold for Greenest Fields. The map is no-metal, so the first-pass zone language emphasizes lanes and field bands rather than mex clusters.",
+  "notes": "Provisional five-zone scaffold for Greenest Fields. The map is no-metal, so the first-pass zone language emphasizes lanes and field bands rather than mex clusters. s3-verdance-greenest-v1 Converter grid named for Converter Crawl. Still no-metal.",
   "zones": [
     {
       "zoneId": "GF_NORTH_LANE",
       "label": "North Lane",
       "role": "approach_lane",
       "shape": "rect",
-      "bounds": { "xMin": 0.18, "xMax": 0.82, "zMin": 0.00, "zMax": 0.22 },
-      "tags": ["north", "lane", "provisional", "no_metal"]
+      "bounds": {
+        "xMin": 0.18,
+        "xMax": 0.82,
+        "zMin": 0.0,
+        "zMax": 0.22
+      },
+      "tags": [
+        "north",
+        "lane",
+        "provisional",
+        "no_metal"
+      ]
     },
     {
       "zoneId": "GF_WEST_FIELDS",
       "label": "West Fields",
       "role": "field_band",
       "shape": "rect",
-      "bounds": { "xMin": 0.00, "xMax": 0.32, "zMin": 0.18, "zMax": 0.82 },
-      "tags": ["west", "field", "provisional", "no_metal"]
+      "bounds": {
+        "xMin": 0.0,
+        "xMax": 0.32,
+        "zMin": 0.18,
+        "zMax": 0.82
+      },
+      "tags": [
+        "west",
+        "field",
+        "provisional",
+        "no_metal"
+      ]
     },
     {
       "zoneId": "GF_CENTER_CROSSING",
       "label": "Center Crossing",
       "role": "center_hold",
       "shape": "rect",
-      "bounds": { "xMin": 0.30, "xMax": 0.70, "zMin": 0.30, "zMax": 0.70 },
-      "tags": ["center", "crossing", "provisional", "no_metal"]
+      "bounds": {
+        "xMin": 0.3,
+        "xMax": 0.7,
+        "zMin": 0.3,
+        "zMax": 0.7
+      },
+      "tags": [
+        "center",
+        "crossing",
+        "provisional",
+        "no_metal"
+      ]
     },
     {
       "zoneId": "GF_EAST_FIELDS",
       "label": "East Fields",
       "role": "field_band",
       "shape": "rect",
-      "bounds": { "xMin": 0.68, "xMax": 1.00, "zMin": 0.18, "zMax": 0.82 },
-      "tags": ["east", "field", "provisional", "no_metal"]
+      "bounds": {
+        "xMin": 0.68,
+        "xMax": 1.0,
+        "zMin": 0.18,
+        "zMax": 0.82
+      },
+      "tags": [
+        "east",
+        "field",
+        "provisional",
+        "no_metal"
+      ]
     },
     {
       "zoneId": "GF_SOUTH_LANE",
       "label": "South Lane",
       "role": "approach_lane",
       "shape": "rect",
-      "bounds": { "xMin": 0.18, "xMax": 0.82, "zMin": 0.78, "zMax": 1.00 },
-      "tags": ["south", "lane", "provisional", "no_metal"]
+      "bounds": {
+        "xMin": 0.18,
+        "xMax": 0.82,
+        "zMin": 0.78,
+        "zMax": 1.0
+      },
+      "tags": [
+        "south",
+        "lane",
+        "provisional",
+        "no_metal"
+      ]
+    },
+    {
+      "zoneId": "GF_CONVERTER_GRID",
+      "label": "Converter Grid",
+      "role": "eco_hold",
+      "shape": "rect",
+      "bounds": {
+        "xMin": 0.38,
+        "xMax": 0.62,
+        "zMin": 0.38,
+        "zMax": 0.62
+      },
+      "tags": [
+        "center",
+        "converter",
+        "eco",
+        "s3-verdance-greenest-v1"
+      ]
     }
   ]
 }

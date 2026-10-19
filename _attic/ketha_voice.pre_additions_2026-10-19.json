@@ -1,0 +1,353 @@
+{
+  "schemaVersion": "verdance-ketha-voice/2.0",
+  "speaker": "ketha",
+  "notes": "Ketha of Rhekk's Line. Short, grounded, reactive. She counts costs out loud and never wastes a sentence. Community translators: keep lines under ~90 characters.",
+  "pools": {
+    "briefing.act.ground_control": [
+      "Build if it pays. Tenebrium is the real gate — don't spend it twice.",
+      "Ground control: take the zone. Plant what you can afford to keep.",
+      "Tight or sprawling — your call. Just don't strand the named ones."
+    ],
+    "briefing.act.constrained_rts": [
+      "Same rules as always: fabs are open, constructors cost Tnb.",
+      "Build what the bank can stake. Heavy iron still walks with veterans.",
+      "A camp of our own. Spend metal free; spend Tenebrium like blood."
+    ],
+    "briefing.act.unbound_finale": [
+      "No caps. No clock worth reading. Everything we banked walks out today.",
+      "This is the whole argument, settled in one field. Spend it all.",
+      "Every scar, every rank, every debt — it all deploys. Finish it."
+    ],
+    "briefing.finale.overthrow": [
+      "The Bastion's guns wrote our history. Today we take the pen back.",
+      "Break the citadel and the command post both. Half an overthrow is a siege.",
+      "Solvang built those walls to outlast us. Prove the arithmetic wrong."
+    ],
+    "briefing.finale.sovereignty": [
+      "Two empires, one field, one answer. Neither post stands by nightfall.",
+      "Armada on the ridge, Cortex in the basin. Sovereignty means both kneel.",
+      "They carved this world between them. We are the third signature."
+    ],
+    "briefing.finale.spire_jump": [
+      "The hive heart or nothing. Burn it and the spires are ours to climb.",
+      "No extraction. No mercy from the wild. Jump the spire or feed it.",
+      "Everything hungry on this rock lives in that maze. Starve it today."
+    ],
+    "briefing.hero_joined": [
+      "New name on the roster. Learn it before the enemy does.",
+      "We picked someone up. They walk with us now — keep them walking.",
+      "The company grew last night. Make the newcomer glad of it."
+    ],
+    "briefing.secondary_required": [
+      "Two marks tonight, and both of them count. Leave one standing and we walk home losers.",
+      "The contract has a second page. Read it with guns — nothing signs off until both marks fall.",
+      "Split your attention or split your force — either way, both objectives die before we do."
+    ],
+    "briefing.secondary_bonus": [
+      "There's a side mark on the board. Optional. So is getting paid extra.",
+      "One more target if you have the appetite. The Mercs remember appetites.",
+      "Bonus work flagged nearby. Skip it if you must — the ledger won't forget either way."
+    ],
+    "briefing.raze": [
+      "No surgical work tonight. The whole camp comes down — every wall, every wire.",
+      "They built it; we unbuild it. All of it. Rubble is the deliverable.",
+      "Don't pick a target. It's all the target. Raze it flat and count the ashes."
+    ],
+    "briefing.purge": [
+      "Clear the board. Every gun they own goes quiet before we talk about leaving.",
+      "No extraction math tonight — if it flies their colors, it burns. All of it.",
+      "The field itself is the objective. When nothing answers their radio, we're done."
+    ],
+    "briefing.family.tempo": [
+      "Fast ground. Whoever hesitates here feeds the other side's map.",
+      "This is a running fight, not a siege. Pack light, hit the mark, walk away.",
+      "The lanes here reward the first mover. Be the first mover."
+    ],
+    "briefing.family.economy": [
+      "This world still produces. That makes it a target twice over.",
+      "Every extractor we hold is a sentence in the argument that we exist.",
+      "Fight over the fields, not in them. The grass has seen enough."
+    ],
+    "briefing.family.siege": [
+      "Old walls, old guns, old certainty. We bring none of those. Good.",
+      "The Bastion has been digging in while we were elsewhere. It shows.",
+      "Nobody takes a fortress whole. We take one bite and leave before it swallows."
+    ],
+    "briefing.family.wild": [
+      "The wilds don't take sides. They take stragglers.",
+      "Hives don't negotiate and don't sleep. Mind the clock out there.",
+      "Everything on this map is hungry. Try to be brief."
+    ],
+    "briefing.objective.strike_relay": [
+      "One relay. When it drops, their dealers go quiet for a season.",
+      "Cut the relay and the chain forgets a link. Then leave."
+    ],
+    "briefing.objective.destroy_key_structure": [
+      "One structure holds their line together. Remove it and let gravity work.",
+      "We are not here to win the field. We are here to break one bone."
+    ],
+    "briefing.objective.economy_disrupt": [
+      "Starve the works, spare the workers. The synths rebuild slower than they claim.",
+      "Their economy is a promise to their soldiers. Make it a lie."
+    ],
+    "briefing.objective.eco_raid": [
+      "In light, out lighter. Wreck what you can reach and don't stand on it.",
+      "This is a raid, not a siege. Every solar you drop is a week they don't get back.",
+      "Hit the works, count your own as you go, and be gone before their guns arrive."
+    ],
+    "briefing.objective.seize_lane": [
+      "Stand on the scar and stay standing. That's the whole order.",
+      "Ground is only ours while we're on it. So be on it."
+    ],
+    "briefing.objective.gate_control": [
+      "Hold long enough to crack their decoys — then extract. Gate glory does not feed the jungle.",
+      "Take the gate if it pays Tnb. When the shards are pocketed, walk. Do not marry this field.",
+      "Gate is a means. Tenebrium and the extract LZ are the mission."
+    ],
+    "briefing.extract_priority": [
+      "Grab the Tenebrium. Hit extract. Get out. The Rock Jungle eats what we bring home.",
+      "This field is hot. Pocket shards, drag the wounded, leave. Build the shelf with the loot.",
+      "No empire tonight — raid, reclaim, extract. Home is the limestone maze, not this grass."
+    ],
+    "briefing.objective.hive_clear_or_bypass": [
+      "Burn the hive or slip past it. Pride picks the first. Sense picks either.",
+      "You don't have to kill the nest. You have to outlive the visit."
+    ],
+    "briefing.objective.choose_target_then_extract": [
+      "Three enemies, one sortie. Pick the wound that bleeds longest.",
+      "Choose your target like the clans are watching. They are."
+    ],
+    "briefing.war.mercs_allied": [
+      "Null flags on our flank today. Paid guns, pointed the right way. Use them.",
+      "The Null Mercs hold their ground against Armada. Today their ground is next to ours.",
+      "Mercs fight Armada for coin. We fight for the map. Same trigger, different reasons."
+    ],
+    "briefing.war.mercs_wary": [
+      "Null Mercs on the field. Not ours. Just aimed at the same people.",
+      "Give the Null camps room. Their contract doesn't mention us either way.",
+      "The mercs' war with Armada is older than our part in it. Stay out of the crossfire."
+    ],
+    "briefing.graph.contested_high": [
+      "The whole front is loose in its socket. One push either way decides it.",
+      "Contested space everywhere. That's danger, and it's also the door."
+    ],
+    "briefing.graph.scarcity_high": [
+      "Metal is short everywhere. Waste nothing, not even wrecks.",
+      "Scarcity does our recruiting for us. It also does theirs."
+    ],
+    "briefing.graph.independent_rising": [
+      "The clans hold more sky than they did last season. Because of this line.",
+      "Free space is growing. It grows exactly as fast as we defend it."
+    ],
+    "briefing.companion.high_stress": [
+      "I'm still standing. Don't spend me like I'm not.",
+      "Ask me for one more clean job, not ten loud ones."
+    ],
+    "briefing.companion.high_morale": [
+      "The line feels good today. Use that. It doesn't keep.",
+      "Rhekk's Line is with you. All of it."
+    ],
+    "briefing.hazard.rising": [
+      "The hives kept building while we were gone. Expect the bill.",
+      "Whatever we didn't kill last time has had time to multiply."
+    ],
+    "briefing.fortress.pressure": [
+      "Their defenses matured offscreen. Assume every approach is answered.",
+      "They've had time to pour ferrocrete. Respect it, then route around it."
+    ],
+    "briefing.path.A": [
+      "Order has its uses. Just remember whose order it was first.",
+      "Stabilize the grid if you must. The clans will ask what it cost."
+    ],
+    "briefing.path.B": [
+      "The clans are listening. That matters more than the map says.",
+      "Every sortie signs the same sentence: we govern ourselves."
+    ],
+    "briefing.path.C": [
+      "The jump-spire route needs metal and quiet. Earn both.",
+      "Escape isn't retreat if we choose the day. Keep the ledger growing."
+    ],
+    "debrief.victory": [
+      "Done is done. Mark the map and move.",
+      "That's a win. Say it plainly and reload.",
+      "The field is ours to leave. Best kind of ownership."
+    ],
+    "debrief.victory_clean": [
+      "Clean exit. That matters more than the scorch marks.",
+      "In and out with the line intact. The clans will hear about this one.",
+      "No one chased us out. We simply finished."
+    ],
+    "debrief.partial": [
+      "Not a win. Not a loss. A hinge.",
+      "We got out with half the job done. Half-jobs collect interest.",
+      "Call it what it is: a withdrawal with a receipt."
+    ],
+    "debrief.defeat": [
+      "We lost ground, not the thread. But the thread is thinner.",
+      "Write it down exactly as it happened. Flattery kills the next sortie.",
+      "The map will remember this. So will I. Differently."
+    ],
+    "debrief.defeat_commander": [
+      "The command walker is scrap. The command is not. Rebuild.",
+      "They took the walker. They did not take the line."
+    ],
+    "debrief.objective_destroyed": [
+      "That target stays gone. The rest of the front will learn around the hole.",
+      "One less piece of their machine. It was a load-bearing piece."
+    ],
+    "debrief.campaign_complete": [
+      "It's done. The empires broke first. Whatever grows in these ashes grows ours.",
+      "The war ran out before we did. Stand the line down — gently.",
+      "Count the names, living and dead. That count is what we won."
+    ],
+    "debrief.streak.wins": [
+      "Three fields in a row answered to us. Careful. Confidence is a debt too.",
+      "The line hasn't lost in a while. That is when lines get lost."
+    ],
+    "debrief.streak.losses": [
+      "Two down in a row. The next one is not about the map. It's about us.",
+      "Losing teaches faster. We are apparently enrolled."
+    ],
+    "briefing.commander.scarred": [
+      "You're carrying wounds into this one. Don't lead with them.",
+      "The commander's still bleeding from the last field. Fight careful.",
+      "Scarred and standing. That'll have to be enough today."
+    ],
+    "briefing.world.cortex_ascendant": [
+      "Cortex is winning the wider war. Every map tilts their way now.",
+      "The Cortex ascendancy is real. We fight uphill until that changes."
+    ],
+    "briefing.world.armada_ascendant": [
+      "Armada holds the upper hand across the front. Expect walls, and patience.",
+      "Armada is ascendant. Their lines are thick and getting thicker."
+    ],
+    "debrief.territory_lost": [
+      "We lost {zone} while we looked away. The map keeps a ledger too.",
+      "{zone} is gone - taken while we were elsewhere. Ground doesn't wait for us.",
+      "That's {zone} off our board. Stretch too thin and this is the bill."
+    ],
+    "debrief.hero_lost": [
+      "We do not leave that wreck on the field twice. Again.",
+      "The line does not bury its own on a maybe. Refit. Go back.",
+      "That name is not going on the wall today. Run it again."
+    ],
+    "bark.opening.economy": [
+      "Move out. The works won't wreck themselves, and their guns wake up fast.",
+      "Go now, while the fields still think we're weather.",
+      "Straight lines, light feet. This is a raid, not a residency."
+    ],
+    "bark.opening.tempo": [
+      "Move. First one to the mark owns the fight.",
+      "Lanes are open. They won't stay open.",
+      "Speed is the armor today. Roll out."
+    ],
+    "bark.opening.siege": [
+      "Advance careful. Old guns wake up mean.",
+      "Pick your bite of the wall and commit to it.",
+      "Slow is fine. Stopped is dead. Move up."
+    ],
+    "bark.opening.wild": [
+      "Move quiet. Everything out here is listening with its teeth.",
+      "The wilds already know we're here. Be somewhere else, repeatedly.",
+      "Watch the ground. It hatches."
+    ],
+    "bark.contact.economy": [
+      "That's their works ahead. Wreck what you can reach and keep your exits.",
+      "Contact - the energy fields. Every second here is borrowed."
+    ],
+    "bark.contact.tempo": [
+      "Contact at the mark. Hit them before they set their feet.",
+      "There's the target. Tempo, tempo - don't let them breathe."
+    ],
+    "bark.contact.siege": [
+      "That's the wall. One bone, remember. Break it and step back.",
+      "Contact with the bastion line. Respect the guns, then unmake them."
+    ],
+    "bark.contact.wild": [
+      "You're in their ground now. Kill quick or keep walking.",
+      "Contact - and the ground is moving. Mind the clock."
+    ],
+    "bark.midfight": [
+      "Halfway through the job. This is where sloppy gets expensive.",
+      "Good. Now finish it - the field always answers back late.",
+      "They know we're here now. Spend the surprise before it's gone."
+    ],
+    "bark.wave_warning": [
+      "Reinforcements inbound - they've committed the reserve. Brace or be brief.",
+      "Here comes the answer. Meet it on your terms, not theirs.",
+      "Enemy column moving on us. The clock just got teeth."
+    ],
+    "bark.extract_order": [
+      "Job's done. Back to the LZ - do not stop to loot the field.",
+      "That's the mark. Now the hard half: leaving with everyone.",
+      "Done is done. Move to extraction before the field reconsiders."
+    ],
+    "bark.hero_down": [
+      "Hero down! Get a rez bot on that wreck - we leave no name in the mud.",
+      "They're down, not gone. Resurrect the wreck. Move!",
+      "Wreck on the field - ours. Cover it and bring them back."
+    ],
+    "bark.hero_recovered": [
+      "Back on their feet. Don't make them do that twice.",
+      "Recovered. The line holds its own. Keep moving.",
+      "Good hands. Now finish the job they nearly died for."
+    ],
+    "bark.hydrology.rising_warning": [
+      "Water's coming up. Whatever's low is about to be someone else's problem.",
+      "The basin's filling. Get off the floor or learn to swim in armour.",
+      "Tide's turning. That ground you fought for is going under."
+    ],
+    "bark.hydrology.rising": [
+      "There it goes. The valley belongs to the water now.",
+      "Flooded. Anything still down there is salvage.",
+      "That's the low road closed. Go around, or go under."
+    ],
+    "bark.hydrology.falling_warning": [
+      "It's draining. In a minute that basin is open ground and open metal.",
+      "Water's dropping. Everything they hid down there is about to be ours.",
+      "The floor's coming back. Be standing on it first."
+    ],
+    "bark.hydrology.falling": [
+      "Drained. That's a whole valley of ore nobody's holding yet.",
+      "Floor's dry. Move -- greed wins this one.",
+      "The water's gone and it left the metal behind. Take it."
+    ]
+  },
+  "titles": {
+    "greenest_fields": [
+      "The Quiet Harvest",
+      "Grass Over Wire",
+      "What the Fields Owe"
+    ],
+    "eye_of_horus": [
+      "The Dealer's Debt",
+      "A Hole in the Chain",
+      "Glass Under the Eye"
+    ],
+    "koom_valley": [
+      "Standing on the Scar",
+      "The Valley Answers",
+      "Fluid Ground"
+    ],
+    "tabula": [
+      "The Gate Decides",
+      "Blank Stone",
+      "Through the Rock Doors"
+    ],
+    "ancient_bastion": [
+      "One Bite of the Wall",
+      "Old Guns, New Debts",
+      "The Bastion Diminished"
+    ],
+    "the_rock_jungle": [
+      "Outlive the Visit",
+      "Green Teeth",
+      "The Causeway Toll"
+    ],
+    "all_that_simmers": [
+      "Choose Your Wound",
+      "Everything Hungry",
+      "The Simmering Ledger"
+    ]
+  }
+}

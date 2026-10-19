@@ -56,7 +56,7 @@ class WorldTickTests(unittest.TestCase):
         state = {
             "missionNumber": 5,
             "campaignClockMinutes": 100,
-            "commerce": {"tenebrium": 9, "credits": 40},
+            "commerce": {"tenebrium": 9, "metalK": 4},
             "nodeClaims": {"koom_valley": [{"z": 1}, {"z": 2}, {"z": 3}]},
             "zoneMemory": {},
             "graph": {},

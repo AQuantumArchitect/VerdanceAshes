@@ -1,0 +1,174 @@
+{
+  "schemaVersion": "verdance-blades/0.1",
+  "notes": "Named-blade tier. Everyone in the codex who is not a voiced lead. A blade has a hook (hero_codex.json voice.hook, not repeated here), a join line, two or three reaction lines keyed to event classes, and a death line for the roll. No camp talks, no arcs. They are recruited, loved for their unit, mourned by name. Lines are selected only when the blade was a participant in the bead. Recommended retire list (demote to unnamed units) if the roster needs thinning: halbard, bro, twitch, consul, kit, stride.",
+  "blades": {
+    "odessa": {
+      "join": "I keep a place. Fords, mostly. I can keep one here.",
+      "held": "The ford held. Water's just another door. This one's ours.",
+      "costly": "We got across. Not everyone dry. I'll hold the crossing till they are.",
+      "death": "Keep the ford. Somebody has to be the far bank."
+    },
+    "cauter": {
+      "join": "I've already won the argument. The cannon's just the period.",
+      "held": "Close, boom, done. No poetry. {map} is ours.",
+      "costly": "We paid for {map} in people. I'd rather have paid in noise.",
+      "death": "Period."
+    },
+    "halq": {
+      "join": "Give me the grid refs. I don't need the names.",
+      "held": "The rockets landed where the map said. The map and I are square.",
+      "costly": "The map lied about one square. I'll argue with it later.",
+      "death": "Last grid ref: here. Write it down."
+    },
+    "verse": {
+      "join": "I count out loud. You'll get used to it or you'll leave. Four. Three.",
+      "held": "Counted down to one and something died first. Same as always.",
+      "costly": "I got to zero. I've never got to zero. I don't like the sound of it.",
+      "death": "Zero."
+    },
+    "stride": {
+      "join": "We don't count shots. We count exits. There's three. Good enough.",
+      "held": "In, loud, out. Manners optional. {map} is yours.",
+      "costly": "Two exits. We took the slow one. Somebody paid for slow.",
+      "death": "Out of exits. First time for everything."
+    },
+    "mira": {
+      "join": "Napalm is confetti! I brought enough for everyone!",
+      "held": "It sparkled! Did you see it sparkle? {map} is so much brighter now.",
+      "costly": "It wasn't a parade this time. I still cheered. Somebody had to.",
+      "death": "Oh. That one wasn't confetti."
+    },
+    "kettle": {
+      "join": "Sky-saint. I keep the air honest. Hymns are included.",
+      "held": "The sky stayed ours over {map}. Hymn number four. You're welcome.",
+      "costly": "The sky was honest. The ground wasn't. I can only bless one at a time.",
+      "death": "Chainsaw's yours. The hymns were never mine."
+    },
+    "warder": {
+      "join": "A circle of dirt. That's all the empire I need. Point to one.",
+      "held": "Nobody crossed the circle. That's the whole report. It's a good report.",
+      "costly": "Somebody crossed it. Once. The beamers and I have discussed it.",
+      "death": "The circle holds. I'm just not in it."
+    },
+    "commando": {
+      "join": "I mine first, argue after. Saves everyone time.",
+      "held": "Mined, inserted, left. They found the argument later. {map}'s quiet.",
+      "costly": "They found the mines the right way and us the wrong way. Even trade. I didn't like it.",
+      "death": "There's one more under the gate. Don't step there."
+    },
+    "infestor": {
+      "join": "The company doesn't recruit. It germinates. I'm the gardener.",
+      "held": "Quiet legs in the dark. {map} grew ours while they were looking elsewhere.",
+      "costly": "Pruned. It happens to gardens. The roots are fine.",
+      "death": "The hive keeps growing. It just doesn't need me to."
+    },
+    "quill": {
+      "join": "Vane has the flock. I have the argument that walks. Two Bulls, one voice.",
+      "held": "Orders walked on treads into {map} and stayed. That's what orders are for.",
+      "costly": "I said it once. Nobody heard the second half. There wasn't a second half.",
+      "death": "Orders stand. I don't."
+    },
+    "kit": {
+      "join": "Fireworks at handshake range. Stand back or shake my hand, your call.",
+      "held": "Something caught! Did you see it catch? {map}'s lit.",
+      "costly": "Caught the wrong thing. It still burned pretty. I'm sorry. A bit.",
+      "death": "That's the big one. Told you to stand back."
+    },
+    "vale": {
+      "join": "Kiln announces himself. I invoice in fog. The wall never sees it coming.",
+      "held": "Two Ambassadors, no witnesses. {map} paid up without knowing it was billed.",
+      "costly": "The fog cleared at the wrong moment. Invoices are embarrassing in daylight.",
+      "death": "Final invoice. Unpaid. Collect it."
+    },
+    "nox": {
+      "join": "Grath owes wages. I owe weather. I'll keep the sky from falling on you. It's a start.",
+      "held": "The sky stayed where it was over {map}. I take that personally. Good day.",
+      "costly": "Something came down. Not the big one. I'm still paying for the big one.",
+      "death": "Sky's still up. That was the whole debt."
+    },
+    "ceil": {
+      "join": "Altitude's an opinion. The roof and I disagree. Five Roughnecks agree with me.",
+      "held": "Argued with every roof on {map}. Won. Roofs are bad at arguing.",
+      "costly": "One roof argued back. I'll grant it that. I won't grant it twice.",
+      "death": "Ceiling wins. Once."
+    },
+    "lumen": {
+      "join": "I tithe heat into the pad. The grid is a congregation. It'll learn.",
+      "held": "The grid kept faith over {map}. It usually does when it's fed.",
+      "costly": "The congregation thinned. I'll preach to what's left. Loudly.",
+      "death": "The tithe's paid. Keep the grid warm. It remembers cold."
+    },
+    "anvil": {
+      "join": "The river learns my weight. So will the rest of it.",
+      "held": "Sat on the ford. The ford reconsidered. {map} is where I left it.",
+      "costly": "Something got under the weight. Rare. Expensive. Noted.",
+      "death": "The river's got my weight now. It'll keep it."
+    },
+    "volt": {
+      "join": "Most eyes hide. I paint. Sight is a wound you give them.",
+      "held": "Saw it, burned it, left. {map} will have the marks for a while.",
+      "costly": "I painted the ford and the ford painted back. Fair. Unpleasant.",
+      "death": "Last thing I saw, I burned. Good."
+    },
+    "halbard": {
+      "join": "Not Pavise. Different spelling, different manners. The Halberd's hungry.",
+      "held": "A door that learned to hover, and {map} learned the door.",
+      "costly": "Fed the Halberd. Fed it too much. We'll talk about portions.",
+      "death": "Hungry till the end. Figures."
+    },
+    "solarium": {
+      "join": "Spreadsheets first, then sunlight. Then more spreadsheets.",
+      "held": "The budget balanced over {map}. With explosions. I've footnoted the explosions.",
+      "costly": "Over budget. I knew it before we dropped. I'd like that in the minutes.",
+      "death": "Check the ledger. Column three. I left it tidy."
+    },
+    "consul": {
+      "join": "Left Armada. Kept the toolkit. Every wall I build is an unpaid apology.",
+      "held": "Fortified {map} like penance. It held like penance too: longer than anyone wanted.",
+      "costly": "Not enough nano, not enough sorry. I'll build more of both.",
+      "death": "Apology accepted, I suppose."
+    },
+    "twitch": {
+      "join": "Build power with bad intentions. You'll find the surprises later. Everyone does.",
+      "held": "Left a few things in the dirt at {map}. They'll find them. Loudly.",
+      "costly": "One of my surprises surprised the wrong people. Bad form. Funny, though.",
+      "death": "There's one under me. Wait for it."
+    },
+    "spoke": {
+      "join": "I trust wheels. Not boots, not bots, not promises. Wheels.",
+      "held": "Rolled through {map}, saw everything, died cheap, minted again. Wheels.",
+      "costly": "Lost the bay. Wheels don't mind. I do, a little.",
+      "death": "Bay's yours. It mints scouts like nervous habits. Keep it nervous."
+    },
+    "tick": {
+      "join": "We are the eyes. Singular is a failure mode. There are many of us. Hello.",
+      "held": "We carpeted the fog over {map}. We died cheap. We are back. We saw it all.",
+      "costly": "Fewer of us came back. We are still plural. Barely.",
+      "death": "One of us. That's all. The rest are watching."
+    },
+    "noctua": {
+      "join": "The bay dreams in flight paths. It woke up here. It likes the sky.",
+      "held": "The cloud of eyes over {map} saw what the ground captains argued about. The cloud was right.",
+      "costly": "The bay dreamed badly. Fewer eyes came home. It'll dream again.",
+      "death": "The bay's still dreaming. Don't wake it for me."
+    },
+    "veil": {
+      "join": "Cortex haze, Armada radar, one invoice. Don't ask. The fog works for you now.",
+      "held": "Fog did its job over {map}. The gremlins have billed you. Pay them in silence.",
+      "costly": "Fog thinned at the worst moment. The invoice still stands. It always does.",
+      "death": "The fog's unpaid. It'll collect. It always collects."
+    },
+    "bro": {
+      "join": "Yeah. I'll take that wall.",
+      "held": "Took the wall at {map}. Wall reconsidered. Next wall?",
+      "costly": "Wall took a bit of me back. Fair's fair. Still available.",
+      "death": "Yeah. That one was a good wall."
+    },
+    "fatboy": {
+      "join": "A pad that got legs. I knock. The house usually answers.",
+      "held": "Knocked on {map} until the house opened. Real estate with a plasma greeting.",
+      "costly": "The house knocked back. Rude. I've noted the address.",
+      "death": "The house learned to knock. I taught it."
+    }
+  }
+}

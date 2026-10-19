@@ -173,6 +173,27 @@ class TestNormalizeLaw(unittest.TestCase):
         self.assertEqual(n["verdict"], "partial")
         self.assertFalse(n["success"])
 
+    def test_normalize_rescue_fail_partial(self):
+        raw = _base(
+            status="partial",
+            terminalReason="extracted_recruit_lost",
+            objectiveFailed=True,
+            objectiveFailReason="wreck_destroyed",
+            objectiveFailHero="fatboy",
+        )
+        c = mc.credit_from_result(raw)
+        self.assertEqual(c["verdict"], "partial")
+        self.assertTrue(c["objectiveFailed"])
+        self.assertIn("rescue", c["reasonHint"].lower())
+        n = normalize_result(raw)
+        self.assertTrue(n["objectiveFailed"])
+        self.assertEqual(n["objectiveFailReason"], "wreck_destroyed")
+        self.assertEqual(n["objectiveFailHero"], "fatboy")
+        self.assertTrue(n["rescueContractFailed"])
+        d = mc.presentable_debrief(c)
+        self.assertTrue(d["objectiveFailed"])
+        self.assertTrue(d.get("reasonHint"))
+
     def test_normalize_includes_credits(self):
         raw = _base(
             status="victory",

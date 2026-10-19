@@ -1,7 +1,7 @@
 {
   "schemaVersion": "verdance-zone-map/0.1",
   "mapId": "all_that_simmers",
-  "mapName": "All That Simmers",
+  "mapName": "All That Simmers v1.1.1",
   "coordinateSystem": "normalized_to_elmos",
   "authoringStatus": "draft_hand_authored_v0_1",
   "notes": "First playable draft. Bounds are normalized fractions of Game.mapSizeX/mapSizeZ and should be adjusted after visual inspection in BAR.",

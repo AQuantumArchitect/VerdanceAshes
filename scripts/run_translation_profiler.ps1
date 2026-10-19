@@ -17,6 +17,9 @@ param(
 
 $ErrorActionPreference = "Stop"
 . (Join-Path (Split-Path -Parent $MyInvocation.MyCommand.Path) "_common.ps1")
+# Packet parsing moved to lib_packet_parse.ps1 so harvest_human_run_v1.ps1 can reuse
+# it -- this file launches a headless match in its own body and cannot be dot-sourced.
+. (Join-Path (Split-Path -Parent $MyInvocation.MyCommand.Path) "lib_packet_parse.ps1")
 
 function Get-FibMilestones {
   param([int]$MaxFrame, [int]$Tick = 900)
@@ -56,125 +59,12 @@ function Get-ExplicitMilestones {
   return @($values.ToArray() | Sort-Object)
 }
 
-function Get-FrameLabel {
-  param([int]$Frame)
-  $seconds = $Frame / 30
-  $minutes = $seconds / 60
-  if ($minutes -lt 1) { return ("{0:F0}sec" -f $seconds) }
-  return ("{0:F1}min" -f $minutes)
-}
-
 function Get-Percentile {
   param([object[]]$Values, [double]$P)
   if (-not $Values -or $Values.Count -eq 0) { return 0 }
   $sorted = @($Values | Sort-Object)
   $idx = [math]::Floor(($sorted.Count - 1) * $P)
   return [double]$sorted[$idx]
-}
-
-function Parse-CompactJsonPackets {
-  param([string]$Infolog, [string]$Marker)
-  $packets = @{}
-  if (!(Test-Path $Infolog)) { return $packets }
-  $pattern = [regex]::Escape($Marker) + '\s+(\{.+\})'
-  $chunkMarker = $Marker -replace '_COMPACT$', ''
-  $beginPattern = [regex]::Escape($chunkMarker) + '_BEGIN'
-  $chunkPattern = [regex]::Escape($chunkMarker) + '_CHUNK\s+\d+/\d+\s+(.*)$'
-  $endPattern = [regex]::Escape($chunkMarker) + '_END'
-  $inChunk = $false
-  $chunks = [System.Collections.Generic.List[string]]::new()
-
-  foreach ($line in (Get-Content -LiteralPath $Infolog -Encoding UTF8)) {
-    if ($line -match $pattern) {
-      try {
-        $packet = $Matches[1] | ConvertFrom-Json
-        $frame = [int]$packet.frame
-        if (-not $packets.ContainsKey($frame)) { $packets[$frame] = $packet }
-      } catch {
-      }
-      continue
-    }
-
-    if ($line -match $beginPattern) {
-      $inChunk = $true
-      $chunks.Clear()
-      continue
-    }
-    if ($inChunk -and $line -match $chunkPattern) {
-      [void]$chunks.Add($Matches[1])
-      continue
-    }
-    if ($inChunk -and $line -match $endPattern) {
-      $inChunk = $false
-      try {
-        $json = -join $chunks
-        $packet = $json | ConvertFrom-Json
-        $frame = [int]$packet.frame
-        if (-not $packets.ContainsKey($frame)) { $packets[$frame] = $packet }
-      } catch {
-      }
-      $chunks.Clear()
-    }
-  }
-  return $packets
-}
-
-function Find-PacketNearFrame {
-  param($Packets, [int]$Frame, [int]$Tolerance = 60)
-  if ($Packets.ContainsKey($Frame)) { return $Packets[$Frame] }
-  foreach ($key in ($Packets.Keys | Sort-Object)) {
-    if ([math]::Abs([int]$key - $Frame) -le $Tolerance) { return $Packets[$key] }
-  }
-  return $null
-}
-
-function Convert-TeamBucketSummary {
-  param($Bucket)
-  if (-not $Bucket) { return $null }
-  $m = $Bucket.metrics
-  $total = [double]$m.armyValue + [double]$m.buildPower + [double]$m.defensiveValue
-  return [ordered]@{
-    teamId = [int]$Bucket.teamId
-    side = [string]$Bucket.side
-    armyValue = [double]$m.armyValue
-    buildPower = [double]$m.buildPower
-    defensiveValue = [double]$m.defensiveValue
-    totalPresence = $total
-    totalUnitValue = [double]$m.totalUnitValue
-    unitCount = [int]$m.unitCount
-    combatUnitCount = [int]$m.combatUnitCount
-    builderUnitCount = [int]$m.builderUnitCount
-    structureCount = [int]$m.structureCount
-    unitCountsByDef = $Bucket.unitCountsByDef
-  }
-}
-
-function Convert-TelemetryZoneSummary {
-  param($Telemetry)
-  $zones = @()
-  if (-not $Telemetry -or -not $Telemetry.zones) { return $zones }
-  foreach ($prop in $Telemetry.zones.PSObject.Properties) {
-    $zone = $prop.Value
-    $teams = @()
-    $total = 0
-    $units = 0
-    foreach ($bucket in @($zone.teams)) {
-      $summary = Convert-TeamBucketSummary $bucket
-      if ($summary) {
-        $teams += $summary
-        $total += [double]$summary.totalPresence
-        $units += [int]$summary.unitCount
-      }
-    }
-    $zones += [ordered]@{
-      zoneId = [string]$zone.zoneId
-      label = [string]$zone.label
-      totalPresence = $total
-      unitCount = $units
-      teams = $teams
-    }
-  }
-  return @($zones | Sort-Object -Descending -Property @{ Expression = { [double]$_.totalPresence } })
 }
 
 if (-not $ScenarioPath) {
@@ -229,8 +119,20 @@ if ($LASTEXITCODE -ne 0) {
 
 $packets = Parse-CompactJsonPackets -Infolog $infolog -Marker "VA_TRANSLATION_PACKET_COMPACT"
 $telemetryPackets = Parse-CompactJsonPackets -Infolog $infolog -Marker "VA_TELEMETRY_JSON_COMPACT"
+# Cumulative border traffic, sampled on its own clock by the campaign gadget.
+# The translation packet's own entanglement list only reports pairs that are
+# coupled *right now*; this is the record of everything that actually moved.
+$zoneFlowPackets = Parse-CompactJsonPackets -Infolog $infolog -Marker "VA_ZONE_FLOW_JSON"
 Write-Host "Found $($packets.Count) translation packet(s)."
 Write-Host "Found $($telemetryPackets.Count) telemetry packet(s)."
+Write-Host "Found $($zoneFlowPackets.Count) zone-flow packet(s)."
+
+$zoneFlowFinal = $null
+if ($zoneFlowPackets.Count -gt 0) {
+  $lastFlowFrame = ($zoneFlowPackets.Keys | Sort-Object | Select-Object -Last 1)
+  $zoneFlowFinal = $zoneFlowPackets[$lastFlowFrame]
+  $zoneFlowFinal | ConvertTo-Json -Depth 40 | Set-Content -Encoding UTF8 -Path (Join-Path $suiteDir "zone_flow.json")
+}
 
 $snapshots = @()
 $allTotals = @()
@@ -330,6 +232,8 @@ $calibData = [ordered]@{
   milestoneFrames = $milestones
   observedPackets = $packets.Count
   observedTelemetryPackets = $telemetryPackets.Count
+  observedZoneFlowPackets = $zoneFlowPackets.Count
+  zoneFlow = $zoneFlowFinal
   stats = $stats
   avDiffStats = $avDiffStats
   proposedTanhDivisor = $proposedDensityDivisor

@@ -55,6 +55,12 @@ function Copy-File([string]$Source, [string]$Dest) {
 # ---- identity ----
 Copy-File (Join-Path $Workspace "VERSION") (Join-Path $staging "VERSION")
 Copy-File (Join-Path $Workspace "docs\release\START_HERE.txt") (Join-Path $staging "START_HERE.txt")
+# A distributed build must carry its own terms. LICENSE also records that the
+# GPL covers mod/data/scripts while tools/ and app/ are reserved -- a split that
+# is meaningless if the file only exists in the repo. NOTICE credits Mupersega's
+# GPL RML reference and records that maps and BAR itself are never redistributed.
+Copy-File (Join-Path $Workspace "LICENSE") (Join-Path $staging "LICENSE")
+Copy-File (Join-Path $Workspace "NOTICE") (Join-Path $staging "NOTICE")
 Copy-File (Join-Path $Workspace "docs\DEPLOY_TRUTH.md") (Join-Path $staging "docs\DEPLOY_TRUTH.md")
 Copy-File (Join-Path $Workspace "docs\SHIP_ARCHITECTURE.md") (Join-Path $staging "docs\SHIP_ARCHITECTURE.md")
 foreach ($doc in @("README.md", "INSTALL.md", "PLAYTESTING.md", "START_HERE.txt")) {
@@ -81,6 +87,10 @@ Copy-Into (Join-Path $Workspace "tools\verdance_kernel") (Join-Path $staging "to
 Get-ChildItem (Join-Path $staging "tools") -Recurse -Directory -Filter "__pycache__" -ErrorAction SilentlyContinue |
   Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
 
+# This list is verified, not maintained by hand: the parity gate below runs
+# tools\ship_parity_check_v1.py over the staged tree and fails the ship if any
+# staged module imports something that is not here. Regenerate with:
+#   python tools\ship_parity_check_v1.py --staging . --closure --entry "<this list>"
 $toolPy = @(
   "apply_result_to_hub_v1.py",
   "stamp_deploy_plan_v1.py",
@@ -92,7 +102,42 @@ $toolPy = @(
   "contract_v2.py",
   "attachments_v1.py",
   "quest_generator_v1.py",
-  "capture_node_claims.py"
+  "capture_node_claims.py",
+  # --- absent from v0.10.0, and absent SILENTLY: every import site is a bare
+  # try/except. Without escalation_ladder_v1 the story engine's
+  # build_escalation_plan returns None, intent.escalationPlan never appears, and
+  # build_next_mission_v1.ps1 pins objectiveStrength to "surgical" for the whole
+  # campaign -- shipping the exact flat difficulty curve Drop 4 removed, with no
+  # symptom to trace. The other two lose mission credit/debrief and the
+  # between-mission offscreen war respectively.
+  "escalation_ladder_v1.py",
+  "match_credit_v1.py",
+  "graph_collapse_v1.py",
+  "narrative_v1.py",
+  "offscreen_clash_v1.py",
+  # Fetches campaign maps from BAR's own content service at play time.
+  "map_provisioner_v1.py",
+  # Continuity / company / commerce / LZ / quantum state — imported by engine +
+  # kernel; missing these silently disables footprint audit, field-pool loss,
+  # delivery packs, and landing-zone resolve on shipped builds.
+  "commerce_delivery_v1.py",
+  "company_v1.py",
+  "continuity_audit_v1.py",
+  "landing_zones_v1.py",
+  "quantum_campaign_state_v1.py",
+  # Hero observe / umwelt / molecule policy (attachments + support web + Stage 1–3 tools).
+  # Missing these silently drops observe stamps and blocks molecule D(u) regen on ship.
+  "hero_observe_v1.py",
+  "map_umwelt_v1.py",
+  "molecule_doctrine_v1.py",
+  "phi_projector_v1.py",
+  "shadow_intent_v1.py",
+  "hero_graph_analyze_v1.py",
+  "support_web_v1.py",
+  "hero_codex_v1.py",
+  # Ship so a player build can self-check; also what the gates below run.
+  "ship_parity_check_v1.py",
+  "validate_map_names_v1.py"
 )
 foreach ($t in $toolPy) {
   Copy-File (Join-Path $Workspace "tools\$t") (Join-Path $staging "tools\$t")
@@ -106,7 +151,15 @@ $dataParts = @(
   "story",
   "commerce",
   "contracts",
-  "base_templates"
+  "base_templates",
+  # Both reached only as Path(workspace) / "data" / <name>, so no "data/x"
+  # substring exists to grep for -- which is why both were missed. escalation
+  # holds mission_escalation.json, the owner-tunable ladder; without it even a
+  # staged escalation_ladder_v1 silently falls back to DEFAULT_LADDER.
+  # hydrology drives the water cycle; without it intent.hydrology is empty
+  # every mission and the seasons/tides work never engages.
+  "escalation",
+  "hydrology"
 )
 foreach ($p in $dataParts) {
   $src = Join-Path $Workspace "data\$p"
@@ -257,6 +310,40 @@ return {
 "@ | Set-Content -Encoding ASCII -Path $flag
 }
 
+# ---- parity gate ----
+# v0.10.0 shipped without escalation_ladder_v1, match_credit_v1,
+# offscreen_clash_v1, data\escalation and data\hydrology. Nothing crashed --
+# every import site is a bare try/except, so the build ran, looked healthy, and
+# was quietly the pre-Drop-4 game. The only way to catch that class of mistake
+# is statically, before the zip exists. Hard failure: a build that cannot import
+# its own subsystems is not a build worth handing anyone.
+$parity = Join-Path $staging "tools\ship_parity_check_v1.py"
+if (Test-Path -LiteralPath $parity) {
+  $py = Get-VerdancePython $Workspace
+  & $py $parity --staging $staging | Out-Host
+  if ($LASTEXITCODE -ne 0) {
+    throw ("Ship parity check failed (see above). The staged tree imports " +
+           "modules or reads data directories it does not contain. Fix " +
+           "`$toolPy / `$dataParts in this script; do not ship around it.")
+  }
+} else {
+  Write-Warning "tools\ship_parity_check_v1.py not staged; parity gate skipped."
+}
+
+# ---- map name gate ----
+# A map name the engine cannot resolve is fatal in PreGame, before the mutator
+# loads, so it surfaces to a player as "crashed on launch" with nothing naming
+# the cause. v0.10.0 shipped two of them. Offline check only: the ship must not
+# depend on a network round trip. Run --online by hand when changing the pool.
+$mapCheck = Join-Path $staging "tools\validate_map_names_v1.py"
+if (Test-Path -LiteralPath $mapCheck) {
+  $py2 = Get-VerdancePython $Workspace
+  & $py2 $mapCheck --root $staging | Out-Host
+  if ($LASTEXITCODE -ne 0) {
+    throw "Map name validation failed (see above). Fix the data before shipping."
+  }
+}
+
 # ---- manifest ----
 $files = Get-ChildItem -Recurse -File $staging
 $manifest = [ordered]@{
@@ -288,13 +375,19 @@ if ($InstallToMyGames) {
   $dest = Join-Path $env:USERPROFILE "Documents\My Games\VerdanceAshes"
   Write-Host "Installing full dist to $dest"
   if (Test-Path $dest) {
-    # preserve state if present
+    # Preserve live campaign progress across ship, but never nest prior
+    # va_ship_state_keep trees (that revived Sortie 5 after RESET + ship).
     $keepState = $null
     $stateSrc = Join-Path $dest "state"
     if (Test-Path $stateSrc) {
       $keepState = Join-Path $env:TEMP "va_ship_state_keep"
       if (Test-Path $keepState) { Remove-Item -Recurse -Force $keepState }
-      Copy-Item -Recurse -Force $stateSrc $keepState
+      New-Item -ItemType Directory -Force -Path $keepState | Out-Null
+      Get-ChildItem -LiteralPath $stateSrc -Force | Where-Object {
+        $_.Name -ne "va_ship_state_keep"
+      } | ForEach-Object {
+        Copy-Item -Recurse -Force -LiteralPath $_.FullName -Destination (Join-Path $keepState $_.Name)
+      }
     }
     Get-ChildItem $dest -Force | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
   } else {
@@ -302,13 +395,29 @@ if ($InstallToMyGames) {
   }
   Copy-Item -Recurse -Force (Join-Path $staging "*") $dest
   if ($keepState) {
-    Copy-Item -Recurse -Force $keepState (Join-Path $dest "state")
+    $destState = Join-Path $dest "state"
+    New-Item -ItemType Directory -Force -Path $destState | Out-Null
+    Get-ChildItem -LiteralPath $keepState -Force | ForEach-Object {
+      Copy-Item -Recurse -Force -LiteralPath $_.FullName -Destination (Join-Path $destState $_.Name)
+    }
   }
   Write-Host "My Games install complete (full kernel dist)."
+  # Playtests must load deployed Lua — not the workspace junction.
+  $pointBar = Join-Path $Workspace "scripts\player\point_bar_mod.ps1"
+  if (Test-Path $pointBar) {
+    Write-Host "Pointing BAR VerdanceAshes.sdd -> My Games mod (deployed play truth)"
+    & powershell -NoProfile -ExecutionPolicy Bypass -File $pointBar -Mode Deployed -Workspace $Workspace
+    if ($LASTEXITCODE -ne 0) {
+      throw "point_bar_mod Deployed failed (exit $LASTEXITCODE)"
+    }
+  } else {
+    Write-Host "WARN: point_bar_mod.ps1 missing — BAR may still junction to workspace."
+  }
 }
 
 Write-Host ""
 Write-Host "=== Ship complete ==="
 Write-Host "Folder: $staging"
 Write-Host "Files:  $($files.Count)"
-Write-Host "Play:   $staging\SETUP.bat then PLAY.bat"
+Write-Host "Play:   Documents\My Games\VerdanceAshes\PLAY.bat (deployed truth)"
+Write-Host "Dev:    point_bar_mod.ps1 -Mode Workspace  then workspace PLAY if needed"

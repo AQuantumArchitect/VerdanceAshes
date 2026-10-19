@@ -23,3 +23,11 @@ __pycache__/
 *.log
 *.pyc
 .pytest_cache/
+outbox/*.md
+outbox/headless_defs_probe/
+outbox/opening_alpha_smoke/
+outbox/quantum_kernel_smoke/
+outbox/*.jsonl
+outbox/*.txt
+_tmp_campaign_restore.lua
+state/saves/

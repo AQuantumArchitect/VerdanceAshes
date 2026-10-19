@@ -1,0 +1,879 @@
+{
+  "schemaVersion": "verdance-hero-codex/1.0",
+  "notes": "Character + typing + doctrine SSOT. Packs=mass/kit; roster=campaign XP/recruit. Temperament tags are personality axes for charts AND support-web chemistry (tools/support_web_v1.py \u2192 data/story/support_web.json + camp_talks.json). Field-effect tags stay in packs. Run: python tools/hero_codex_v1.py chart|list|apply Pavise=core Centurion left hand; Vane=band Phobos swarm; Halbard=corhal.",
+  "temperamentVocab": [
+    "captain",
+    "debt",
+    "gleeful",
+    "saint",
+    "swarm",
+    "fog",
+    "glass",
+    "plod",
+    "pad",
+    "contract",
+    "count",
+    "heat",
+    "door",
+    "mischief",
+    "garden",
+    "sky"
+  ],
+  "positions": [
+    "core_skirm",
+    "core_rez",
+    "eco",
+    "eyes",
+    "line",
+    "skirmish",
+    "siege",
+    "shield"
+  ],
+  "combatVerbs": [
+    "kite",
+    "hold",
+    "push",
+    "plod",
+    "craft",
+    "snipe",
+    "hide",
+    "grow",
+    "sparkle"
+  ],
+  "heroes": [
+    {
+      "heroId": "vane",
+      "name": "Ash-Captain Vane",
+      "position": "band_swarm",
+      "combatVerb": "kite",
+      "temperament": [
+        "captain",
+        "glass"
+      ],
+      "doctrine": "phobos",
+      "preferDefenses": false,
+      "allowBail": true,
+      "allowKite": true,
+      "faction": "legion",
+      "unitDef": "legcen",
+      "voice": {
+        "hook": "Pack is one thought.",
+        "blurb": "Ash-Captain + Phobos (\u00d712). Swarm mind \u2014 hire the flock when you want it.",
+        "fiction": "She does not hold a line; she holds a rhythm. Phobos peel when the lasers paint, reform when the beat returns. Captain means the pack is one thought under fire.",
+        "tagLine": "The pack thinks with her \u2014 when you hire her."
+      },
+      "notes": "band flock captain; packMind=swarm; no longer core left hand"
+    },
+    {
+      "heroId": "pavise",
+      "name": "Pavise",
+      "position": "core_line",
+      "combatVerb": "hold",
+      "temperament": [
+        "shield",
+        "captain"
+      ],
+      "doctrine": "line",
+      "preferDefenses": false,
+      "allowBail": true,
+      "allowKite": false,
+      "faction": "armada",
+      "unitDef": "armwar",
+      "voice": {
+        "hook": "I still walk your left.",
+        "blurb": "War buddy Centurion \u2014 solo, high XP, Centurion HP aura.",
+        "fiction": "Back when you wore a real Armada suit, this was the counterpart who kept the shield side honest. One Centurion. No flock. The aura still remembers every Warrior that stood in the same dirt.",
+        "tagLine": "Left hand. Standing shield."
+      },
+      "notes": "core left hand; packMind=solo; Centurion HP aura"
+    },
+    {
+      "heroId": "ketha",
+      "name": "Ketha",
+      "position": "core_rez",
+      "combatVerb": "craft",
+      "temperament": [
+        "saint"
+      ],
+      "doctrine": "rez",
+      "preferDefenses": false,
+      "allowBail": true,
+      "allowKite": false,
+      "faction": "legion",
+      "unitDef": "legrezbot",
+      "voice": {
+        "hook": "Wrecks are unfinished sentences.",
+        "blurb": "Only rez captain \u2014 life-line of the kettles. Wrecks come home.",
+        "fiction": "Every wreck is an unfinished sentence. Ketha finishes them. She will walk into fire for a name in the mud; she will not chase a kill. The company's memory has one pair of hands.",
+        "tagLine": "Field surgeon \u2014 craft over glory."
+      },
+      "notes": "core rez; no kite chase"
+    },
+    {
+      "heroId": "hearth",
+      "name": "Hearth",
+      "position": "eco",
+      "combatVerb": "hold",
+      "temperament": [
+        "pad"
+      ],
+      "doctrine": "eco_heart",
+      "preferDefenses": false,
+      "allowBail": true,
+      "allowKite": false,
+      "faction": "armada",
+      "unitDef": "armfus",
+      "voice": {
+        "hook": "Quiet sun. Won't go out.",
+        "blurb": "Quiet sun that refuses to go out \u2014 hero fusion, ENERGY field.",
+        "fiction": "Hearth does not tour the map. The pad is a hearth; she is the coal. Keep her alive and the lights stay on. Wanderlust is for captains; she is furniture with a pulse.",
+        "tagLine": "Pad heart \u2014 stay and burn."
+      },
+      "notes": "immobile fantasy even if unit can move"
+    },
+    {
+      "heroId": "solarium",
+      "name": "Solarium",
+      "position": "eco",
+      "combatVerb": "craft",
+      "temperament": [
+        "garden"
+      ],
+      "doctrine": "constructor",
+      "preferDefenses": false,
+      "allowBail": true,
+      "allowKite": true,
+      "faction": "armada",
+      "unitDef": "armnanotc",
+      "voice": {
+        "hook": "Spreadsheets, then sunlight.",
+        "blurb": "Eco nest \u2014 solars, converters, storage, butler. Spreadsheets first.",
+        "fiction": "War is a budget with explosions. Solarium plants sun and converters like crops, then checks the ledger twice. The garden that feeds the guns.",
+        "tagLine": "Eco lab \u2014 grow the pad."
+      },
+      "notes": "garden not swarm"
+    },
+    {
+      "heroId": "consul",
+      "name": "Armada Consul",
+      "position": "eco",
+      "combatVerb": "craft",
+      "temperament": [
+        "contract"
+      ],
+      "doctrine": "constructor",
+      "preferDefenses": false,
+      "allowBail": true,
+      "allowKite": true,
+      "faction": "armada",
+      "unitDef": "armconsul",
+      "voice": {
+        "hook": "Builds like an apology.",
+        "blurb": "Deserted sideways; Consul + nano. Builds like apology.",
+        "fiction": "Left Armada without leaving the toolkit. Fortifies like penance \u2014 every nano an unpaid debt to a flag he no longer salutes. Contract still binds; loyalty does not.",
+        "tagLine": "Field office \u2014 craft the shelf."
+      },
+      "notes": "contract eco"
+    },
+    {
+      "heroId": "twitch",
+      "name": "Twitcher",
+      "position": "eco",
+      "combatVerb": "craft",
+      "temperament": [
+        "mischief"
+      ],
+      "doctrine": "constructor",
+      "preferDefenses": false,
+      "allowBail": true,
+      "allowKite": true,
+      "faction": "cortex",
+      "unitDef": "corfast",
+      "voice": {
+        "hook": "Grins with a welder.",
+        "blurb": "Trouble fabricator \u2014 Twitcher + Cortex nano. Mines and mischief.",
+        "fiction": "Build power with bad intentions. Twitcher grins with a welder and leaves surprises in the dirt. Eco seat that bites.",
+        "tagLine": "Combat engineer \u2014 craft with teeth."
+      },
+      "notes": "mischief eco vs consul contract"
+    },
+    {
+      "heroId": "spoke",
+      "name": "Spoke",
+      "position": "eyes",
+      "combatVerb": "kite",
+      "temperament": [
+        "swarm",
+        "contract"
+      ],
+      "doctrine": "eyes",
+      "preferDefenses": false,
+      "allowBail": true,
+      "allowKite": true,
+      "faction": "legion",
+      "unitDef": "legscout",
+      "voice": {
+        "hook": "Only trusts wheels.",
+        "blurb": "Null Merc kid + Wheelie Bay (\u00d716). Only trusts wheels.",
+        "fiction": "Spoke does not trust boots, bots, or promises \u2014 only wheels. The bay mints scouts like nervous habits. Live to see; die and the bank remembers.",
+        "tagLine": "Wheelie mentor \u2014 speed is sight."
+      },
+      "notes": "swarm=wheels not fleas"
+    },
+    {
+      "heroId": "tick",
+      "name": "Tick Stream",
+      "position": "eyes",
+      "combatVerb": "hide",
+      "temperament": [
+        "swarm"
+      ],
+      "doctrine": "eyes",
+      "preferDefenses": false,
+      "allowBail": true,
+      "allowKite": true,
+      "faction": "armada",
+      "unitDef": "armflea",
+      "voice": {
+        "hook": "Speaks in plurals.",
+        "blurb": "Flea lab + Tick pack (\u00d720). Speaks in plurals.",
+        "fiction": "We are the eyes. Tick is a pronoun with a factory. Carpet the fog, die cheap, mint again. Singular is a failure mode.",
+        "tagLine": "Tick eyes \u2014 vision from the carpet."
+      },
+      "notes": "true swarm vs spoke wheels"
+    },
+    {
+      "heroId": "noctua",
+      "name": "Noctua Bay",
+      "position": "eyes",
+      "combatVerb": "hide",
+      "temperament": [
+        "sky"
+      ],
+      "doctrine": "eyes",
+      "preferDefenses": false,
+      "allowBail": true,
+      "allowKite": true,
+      "faction": "legion",
+      "unitDef": "legap",
+      "voice": {
+        "hook": "Dreams in flight paths.",
+        "blurb": "Drone plant + Noctua wing. Dreams in flight paths.",
+        "fiction": "The bay is the hero. It dreams in flight paths and wakes as a cloud of eyes. Ground captains argue lanes; Noctua argues altitude.",
+        "tagLine": "Air eyes \u2014 sky is a map."
+      },
+      "notes": "sky eyes not swarm"
+    },
+    {
+      "heroId": "veil",
+      "name": "Veil & Compass",
+      "position": "eyes",
+      "combatVerb": "hide",
+      "temperament": [
+        "fog",
+        "contract"
+      ],
+      "doctrine": "eyes",
+      "preferDefenses": false,
+      "allowBail": true,
+      "allowKite": true,
+      "faction": "mixed",
+      "unitDef": "coreter",
+      "voice": {
+        "hook": "Fog is the payroll.",
+        "blurb": "Jammer + Compass + Gremlins. Fog is the answer.",
+        "fiction": "Cortex haze and Armada radar on one invoice. Nobody asks why. The fog works for you; the gremlins collect.",
+        "tagLine": "Veil eyes \u2014 own the unknown."
+      },
+      "notes": "fog+contract"
+    },
+    {
+      "heroId": "grath",
+      "name": "Grath Arrears",
+      "position": "line",
+      "combatVerb": "hold",
+      "temperament": [
+        "debt"
+      ],
+      "doctrine": "line",
+      "preferDefenses": false,
+      "allowBail": true,
+      "allowKite": true,
+      "faction": "legion",
+      "unitDef": "legkark",
+      "voice": {
+        "hook": "Three wars unpaid.",
+        "blurb": "Six Karkinos \u2014 mid-line. Three wars of arrears.",
+        "fiction": "Not unpaid \u2014 arrears. Three wars on the ledger. He holds the middle because credit finally beat the Mercs, and debt makes a man hard to move.",
+        "tagLine": "Merc debt \u2014 hold what you're owed."
+      },
+      "notes": "debt line anchor"
+    },
+    {
+      "heroId": "rusk",
+      "name": "Rusk Halloway",
+      "position": "line",
+      "combatVerb": "hold",
+      "temperament": [
+        "door"
+      ],
+      "doctrine": "line",
+      "preferDefenses": false,
+      "allowBail": true,
+      "allowKite": false,
+      "faction": "legion",
+      "unitDef": "leggat",
+      "voice": {
+        "hook": "Gate, jammed gat, a lie.",
+        "blurb": "Shieldline six. Held a gate with a jammed gat and a lie.",
+        "fiction": "Six hours at a scrap-gate with a jammed gatling and a fiction about reinforcements. Doors are Rusk's religion. He does not kite a threshold.",
+        "tagLine": "Shieldline \u2014 the door stays shut."
+      },
+      "notes": "door/gate; cluster with odessa ford-door \u2014 hooks differ"
+    },
+    {
+      "heroId": "odessa",
+      "name": "Odessa Krail",
+      "position": "line",
+      "combatVerb": "hold",
+      "temperament": [
+        "door"
+      ],
+      "doctrine": "line",
+      "preferDefenses": false,
+      "allowBail": true,
+      "allowKite": true,
+      "faction": "legion",
+      "unitDef": "legamph",
+      "voice": {
+        "hook": "Fords are doors.",
+        "blurb": "Telchine trio \u2014 amph line. Fords are doors.",
+        "fiction": "Oddly line, not gimmick. Water is just another door. Odessa refuses to dry out and treats every ford like a hinge she owns.",
+        "tagLine": "Fordbreaker \u2014 hold the wet door."
+      },
+      "notes": "door/ford vs rusk/gate"
+    },
+    {
+      "heroId": "cauter",
+      "name": "Cauter Bel-Ansa",
+      "position": "line",
+      "combatVerb": "push",
+      "temperament": [
+        "heat"
+      ],
+      "doctrine": "line",
+      "preferDefenses": false,
+      "allowBail": true,
+      "allowKite": false,
+      "faction": "legion",
+      "unitDef": "legshot",
+      "voice": {
+        "hook": "Riot as punctuation.",
+        "blurb": "Shotgun foursome. Closes distance; riot is punctuation.",
+        "fiction": "She has already won the argument. The riot cannon is the period. Line heat \u2014 close, boom, no poetry about kiting.",
+        "tagLine": "Riot breaker \u2014 push the period."
+      },
+      "notes": "heat line not siege plod"
+    },
+    {
+      "heroId": "halq",
+      "name": "Sisu Halq",
+      "position": "line",
+      "combatVerb": "hold",
+      "temperament": [
+        "count"
+      ],
+      "doctrine": "line",
+      "preferDefenses": true,
+      "allowBail": true,
+      "allowKite": true,
+      "faction": "legion",
+      "unitDef": "legbal",
+      "voice": {
+        "hook": "Shoots map coordinates.",
+        "blurb": "Ballista battery. Shoots coordinates, not targets.",
+        "fiction": "Halq does not see units \u2014 he sees grid refs. The rockets land where the map said they would. Line support that argues with math.",
+        "tagLine": "Long arc \u2014 count the dirt."
+      },
+      "notes": "count on line; soft preferDefenses for static poke"
+    },
+    {
+      "heroId": "verse",
+      "name": "Verse Adder",
+      "position": "skirmish",
+      "combatVerb": "kite",
+      "temperament": [
+        "glass",
+        "count"
+      ],
+      "doctrine": "skirm",
+      "preferDefenses": false,
+      "allowBail": true,
+      "allowKite": true,
+      "faction": "legion",
+      "unitDef": "legjav",
+      "voice": {
+        "hook": "Counts missiles out loud.",
+        "blurb": "Javelin pair. Counts missiles out loud. Never hits zero clean.",
+        "fiction": "Each missile is a word. She counts them out loud and has never reached zero without something dying. Glass skirmish with a ledger tongue.",
+        "tagLine": "Deadbolt \u2014 reload is grammar."
+      },
+      "notes": "glass+count vs stride glass only"
+    },
+    {
+      "heroId": "stride",
+      "name": "Saloon Stride",
+      "position": "skirmish",
+      "combatVerb": "kite",
+      "temperament": [
+        "glass"
+      ],
+      "doctrine": "skirm",
+      "preferDefenses": false,
+      "allowBail": true,
+      "allowKite": true,
+      "faction": "armada",
+      "unitDef": "va_mav_stride",
+      "voice": {
+        "hook": "Baked speed, bad manners.",
+        "blurb": "Stride trio \u2014 saloon glass, baked speed, bad manners.",
+        "fiction": "They do not count shots; they count exits. Saloon vintage with manners that would get you thrown out of any bar that still had walls.",
+        "tagLine": "Glass cadence \u2014 leave before the bill."
+      },
+      "notes": "glass manners vs verse count"
+    },
+    {
+      "heroId": "yeva",
+      "name": "Whisper-of-Ash Yeva",
+      "position": "skirmish",
+      "combatVerb": "snipe",
+      "temperament": [
+        "fog"
+      ],
+      "doctrine": "skirm",
+      "preferDefenses": false,
+      "allowBail": true,
+      "allowKite": true,
+      "faction": "armada",
+      "unitDef": "armsnipe",
+      "voice": {
+        "hook": "Ghosts already walked it.",
+        "blurb": "Sharpshooter + five Eidolons. Whisper finds; ghosts walked.",
+        "fiction": "She does not take the lane \u2014 the ghosts already walked it. Whisper is a suggestion; the shot is a fact. Fog that ends careers.",
+        "tagLine": "Unseen \u2014 snipe from the rumor."
+      },
+      "notes": "fog skirm"
+    },
+    {
+      "heroId": "auditor",
+      "name": "The Last Auditor",
+      "position": "skirmish",
+      "combatVerb": "push",
+      "temperament": [
+        "count"
+      ],
+      "doctrine": "skirm",
+      "preferDefenses": false,
+      "allowBail": true,
+      "allowKite": true,
+      "faction": "legion",
+      "unitDef": "legeallterrainmech",
+      "voice": {
+        "hook": "Ledger with legs.",
+        "blurb": "T3 ledger mech \u2014 still skirmishes like it has somewhere to be.",
+        "fiction": "Walked out of a dead vault the day the finale was declared. Keeps its own books of what the war still owes \u2014 and collects in person. Count that can push.",
+        "tagLine": "Ledger reach \u2014 the debt finds you."
+      },
+      "notes": "count skirm T3 vs halq count line"
+    },
+    {
+      "heroId": "brakhov",
+      "name": "Brakhov the Kiln",
+      "position": "siege",
+      "combatVerb": "plod",
+      "temperament": [
+        "heat",
+        "plod"
+      ],
+      "doctrine": "kiln",
+      "preferDefenses": true,
+      "allowBail": false,
+      "allowKite": false,
+      "faction": "legion",
+      "unitDef": "leginc",
+      "voice": {
+        "hook": "Name gone. Forward heat.",
+        "blurb": "Incinerator siege. Name burned off. Always offense \u2014 defenses are food.",
+        "fiction": "He burned his name off the hull so the enemy would learn it the slow way. The Kiln does not kite, does not retreat, does not argue with turrets \u2014 he walks into them and roasts. Personality is a heatray with legs.",
+        "tagLine": "Kiln doctrine \u2014 plod, prefer defenses, no kite."
+      },
+      "notes": "SHOWCASE AI: kiln"
+    },
+    {
+      "heroId": "bro",
+      "name": "Bro",
+      "position": "siege",
+      "combatVerb": "plod",
+      "temperament": [
+        "plod",
+        "contract"
+      ],
+      "doctrine": "siege_plod",
+      "preferDefenses": true,
+      "allowBail": true,
+      "allowKite": false,
+      "faction": "cortex",
+      "unitDef": "corgol",
+      "voice": {
+        "hook": "Yeah. I'll take that wall.",
+        "blurb": "Tzar merc \u2014 casual apocalypse. Yeah, he'll take that wall.",
+        "fiction": "Bro is not angry. Bro is available. Cortex Tzar on a friendly contract: point at a wall, he arrives, the wall reconsidered. Plod with a shrug.",
+        "tagLine": "Tzar contract \u2014 inevitable, casual."
+      },
+      "notes": "plod+contract vs kiln heat"
+    },
+    {
+      "heroId": "fatboy",
+      "name": "Fatboy Contract",
+      "position": "siege",
+      "combatVerb": "plod",
+      "temperament": [
+        "plod",
+        "pad"
+      ],
+      "doctrine": "siege_plod",
+      "preferDefenses": true,
+      "allowBail": true,
+      "allowKite": false,
+      "faction": "armada",
+      "unitDef": "armfboy",
+      "voice": {
+        "hook": "House learned to knock.",
+        "blurb": "One Fatboy \u2014 plasma house that learned to walk so it could knock.",
+        "fiction": "A pad that got legs. The Fatboy Contract is real estate with a plasma greeting. It plods to the door and knocks until there is no door.",
+        "tagLine": "Plasma house \u2014 mobile pad violence."
+      },
+      "notes": "plod+pad vs bro contract"
+    },
+    {
+      "heroId": "mira",
+      "name": "Mira Barrage",
+      "position": "siege",
+      "combatVerb": "sparkle",
+      "temperament": [
+        "gleeful",
+        "heat"
+      ],
+      "doctrine": "arty",
+      "preferDefenses": true,
+      "allowBail": true,
+      "allowKite": true,
+      "faction": "legion",
+      "unitDef": "legbar",
+      "voice": {
+        "hook": "Napalm is confetti.",
+        "blurb": "Parade battery \u2014 Barrage, Cleaver, Lance, Arquebus, Mausers. Confetti!",
+        "fiction": "Hyper-optimistic artillery girl in an ash war. Impacts sparkle; she cheers. Napalm is confetti. She never walks into the argument \u2014 she *is* the fireworks from the back of the parade.",
+        "tagLine": "Sparkle battery \u2014 backline joy, soft kite."
+      },
+      "notes": "gleeful unique in siege"
+    },
+    {
+      "heroId": "kettle",
+      "name": "Saint Kettle",
+      "position": "shield",
+      "combatVerb": "hold",
+      "temperament": [
+        "saint",
+        "sky"
+      ],
+      "doctrine": "aa_saint",
+      "preferDefenses": false,
+      "allowBail": true,
+      "allowKite": false,
+      "faction": "armada",
+      "unitDef": "armaak",
+      "voice": {
+        "hook": "Sky-saint, chainsaw soul.",
+        "blurb": "Archangel + Ferret. Sky-saint so Mira can play. Chainsaw soul.",
+        "fiction": "Reborn from rez-saint to sky-saint. Keeps the air honest with Archangel hymns and a chainsaw temperament. No pawn blob \u2014 holiness is elite. Mira's fireworks need a clear ceiling.",
+        "tagLine": "Sky saint \u2014 hold the air."
+      },
+      "notes": "saint+sky"
+    },
+    {
+      "heroId": "warder",
+      "name": "Warder",
+      "position": "shield",
+      "combatVerb": "hold",
+      "temperament": [
+        "pad"
+      ],
+      "doctrine": "pad",
+      "preferDefenses": true,
+      "allowBail": true,
+      "allowKite": false,
+      "faction": "armada",
+      "unitDef": "armbeamer",
+      "voice": {
+        "hook": "Owns a circle of dirt.",
+        "blurb": "Beamer ring + Ferrets + Thistles + LLTs. Owns a circle of dirt.",
+        "fiction": "The Warder does not chase. A circle of dirt is enough empire. Ferrets wait cloaked; beamers argue with trespassers. Pad tooth with patience.",
+        "tagLine": "Area control \u2014 the circle holds."
+      },
+      "notes": "pad shield vs kettle sky"
+    },
+    {
+      "heroId": "commando",
+      "name": "Cinder Hook",
+      "position": "shield",
+      "combatVerb": "hide",
+      "temperament": [
+        "mischief"
+      ],
+      "doctrine": "dirty",
+      "preferDefenses": false,
+      "allowBail": true,
+      "allowKite": true,
+      "faction": "cortex",
+      "unitDef": "va_cormando",
+      "voice": {
+        "hook": "Mines before the argument.",
+        "blurb": "Commando + Trappers + Hercules. Mines before the argument.",
+        "fiction": "Grew plate instead of patience. Cinder Hook inserts, mines, and leaves the debate for someone else. Mischief with an airlift.",
+        "tagLine": "Trapper pace \u2014 dirty first."
+      },
+      "notes": "mischief shield"
+    },
+    {
+      "heroId": "infestor",
+      "name": "Infestor Hive",
+      "position": "shield",
+      "combatVerb": "grow",
+      "temperament": [
+        "swarm",
+        "garden"
+      ],
+      "doctrine": "hive",
+      "preferDefenses": false,
+      "allowBail": false,
+      "allowKite": false,
+      "faction": "legion",
+      "unitDef": "leginfestor",
+      "voice": {
+        "hook": "Company grows itself.",
+        "blurb": "Infestor seed (\u00d75). Stealth spiders that mint more spiders.",
+        "fiction": "Quiet gardener of legs. The hive does not recruit \u2014 it germinates. All-terrain, stealthed, patient. The company grows itself whether you are watching or not.",
+        "tagLine": "Hive growth \u2014 craft, then creep."
+      },
+      "notes": "swarm+garden"
+    },
+    {
+      "heroId": "quill",
+      "name": "Ash-Marshal Quill",
+      "position": "line",
+      "combatVerb": "push",
+      "temperament": [
+        "captain",
+        "heat"
+      ],
+      "doctrine": "line",
+      "preferDefenses": false,
+      "allowBail": true,
+      "allowKite": false,
+      "faction": "armada",
+      "unitDef": "armbull",
+      "voice": {
+        "hook": "Orders walk on treads.",
+        "blurb": "Bull pair \u2014 tread command. Orders walk; the line salutes itself.",
+        "fiction": "Vane owns the flock. Quill owns the argument that walks. Two Bulls and a voice that does not ask twice. Captain heat \u2014 close the distance because the order already did.",
+        "tagLine": "Tread marshal \u2014 push the sentence."
+      },
+      "notes": "line x captain; only non-Vane captain"
+    },
+    {
+      "heroId": "kit",
+      "name": "Kit Sparkler",
+      "position": "skirmish",
+      "combatVerb": "kite",
+      "temperament": [
+        "gleeful",
+        "mischief"
+      ],
+      "doctrine": "skirm",
+      "preferDefenses": false,
+      "allowBail": true,
+      "allowKite": true,
+      "faction": "legion",
+      "unitDef": "legbart",
+      "voice": {
+        "hook": "Fireworks at walking distance.",
+        "blurb": "Belcher trio \u2014 napalm skirm. Mira's sister energy, but she walks it in.",
+        "fiction": "Mira throws confetti from the parade. Kit brings the fireworks to handshake range and laughs when something catches. Gleeful mischief \u2014 burn, bail, burn again.",
+        "tagLine": "Close confetti \u2014 kite with a grin."
+      },
+      "notes": "skirmish x gleeful; Mira's walking cousin"
+    },
+    {
+      "heroId": "vale",
+      "name": "Vale Soft",
+      "position": "siege",
+      "combatVerb": "hide",
+      "temperament": [
+        "fog",
+        "contract"
+      ],
+      "doctrine": "fog_siege",
+      "preferDefenses": true,
+      "allowBail": true,
+      "allowKite": true,
+      "faction": "armada",
+      "unitDef": "armmerl",
+      "voice": {
+        "hook": "The wall never saw the invoice.",
+        "blurb": "Ambassador pair \u2014 stealth rockets. Soft breach; the wall never saw the bill.",
+        "fiction": "Kiln announces himself with heat. Vale invoices in fog. Two Ambassadors on a quiet contract: prefer the static, never the brawl, leave before the argument learns your name.",
+        "tagLine": "Soft siege \u2014 fog writes the receipt."
+      },
+      "notes": "siege x fog; anti-Kiln personality"
+    },
+    {
+      "heroId": "nox",
+      "name": "Nox Tithe",
+      "position": "shield",
+      "combatVerb": "hold",
+      "temperament": [
+        "debt",
+        "pad"
+      ],
+      "doctrine": "pad",
+      "preferDefenses": false,
+      "allowBail": true,
+      "allowKite": false,
+      "faction": "armada",
+      "unitDef": "armscab",
+      "voice": {
+        "hook": "Still paying for the last sky.",
+        "blurb": "Traveler anti-nuke \u2014 debt pad. Still paying for the last sky.",
+        "fiction": "Grath owes wages. Nox owes weather. One mobile anti-nuke and a ledger that will not close until the sky stays honest. Debt that holds a circle.",
+        "tagLine": "Sky arrears \u2014 hold the tithe."
+      },
+      "notes": "shield x debt; Grath's sky cousin"
+    },
+    {
+      "heroId": "ceil",
+      "name": "Ceil Rat",
+      "position": "skirmish",
+      "combatVerb": "kite",
+      "temperament": [
+        "sky",
+        "glass"
+      ],
+      "doctrine": "skirm",
+      "preferDefenses": false,
+      "allowBail": true,
+      "allowKite": true,
+      "faction": "armada",
+      "unitDef": "armbrawl",
+      "voice": {
+        "hook": "Altitude is an opinion.",
+        "blurb": "Roughneck wing (x5). Gunship manners. Altitude is an opinion.",
+        "fiction": "Noctua dreams flight paths for eyes. Ceil Rat argues with roofs. Five Roughnecks that treat the ceiling like a suggestion and glass like a lifestyle.",
+        "tagLine": "Gunship skirm \u2014 sky with teeth."
+      },
+      "notes": "skirmish x sky; combat sky vs Noctua eyes-factory"
+    },
+    {
+      "heroId": "lumen",
+      "name": "Sister Lumen",
+      "position": "eco",
+      "combatVerb": "hold",
+      "temperament": [
+        "saint",
+        "garden"
+      ],
+      "doctrine": "eco_heart",
+      "preferDefenses": false,
+      "allowBail": true,
+      "allowKite": false,
+      "faction": "armada",
+      "unitDef": "armageo",
+      "voice": {
+        "hook": "Tithe the grid.",
+        "blurb": "Advanced geo \u2014 saint garden. Tithe the grid; keep the lights devout.",
+        "fiction": "Hearth is coal furniture. Lumen is faith with a geothermal throat. She does not tour. She tithes heat into the pad and calls the surplus holy. Eco saint \u2014 stay and feed.",
+        "tagLine": "Grid saint \u2014 garden the power."
+      },
+      "notes": "eco x saint; immobile garden faith"
+    },
+    {
+      "heroId": "anvil",
+      "name": "Anvil Mire",
+      "position": "line",
+      "combatVerb": "plod",
+      "temperament": [
+        "plod",
+        "pad"
+      ],
+      "doctrine": "line",
+      "preferDefenses": true,
+      "allowBail": true,
+      "allowKite": false,
+      "faction": "armada",
+      "unitDef": "armcroc",
+      "voice": {
+        "hook": "The river learns my weight.",
+        "blurb": "Turtle pair \u2014 amph plod. The river learns his weight.",
+        "fiction": "Kiln plods to roast. Anvil plods to occupy. Two Turtles that treat fords like floors and defenses like invitations. Line plod \u2014 weight first, poetry never.",
+        "tagLine": "Wet anvil \u2014 plod the door shut."
+      },
+      "notes": "line x plod; Kiln echo that holds wet ground"
+    },
+    {
+      "heroId": "volt",
+      "name": "Volt Lash",
+      "position": "eyes",
+      "combatVerb": "kite",
+      "temperament": [
+        "heat",
+        "glass"
+      ],
+      "doctrine": "eyes",
+      "preferDefenses": false,
+      "allowBail": true,
+      "allowKite": true,
+      "faction": "armada",
+      "unitDef": "armlatnk",
+      "voice": {
+        "hook": "Sight is a wound you give them.",
+        "blurb": "Jaguar pack (x5). Lightning eyes. Sight is a wound you give them.",
+        "fiction": "Most eyes hide. Volt Lash paints. Five Jaguars that turn reconnaissance into a burn mark \u2014 heat glass, see by hurting, leave a scar on the map.",
+        "tagLine": "Lightning eyes \u2014 kite the wound."
+      },
+      "notes": "eyes x heat; aggressive scout vs fog eyes"
+    },
+    {
+      "heroId": "halbard",
+      "name": "Halbard",
+      "position": "band_siege",
+      "combatVerb": "push",
+      "temperament": [
+        "heavy",
+        "sparkle"
+      ],
+      "doctrine": "line",
+      "preferDefenses": true,
+      "allowBail": true,
+      "allowKite": false,
+      "faction": "cortex",
+      "unitDef": "corhal",
+      "voice": {
+        "hook": "Halberd's hungry.",
+        "blurb": "Drives the Cortex Halberd assault hovertank.",
+        "fiction": "Not Pavise. Different spelling, different manners. The Halberd is a door that learned to hover.",
+        "tagLine": "Hovertank with a name like a weapon."
+      },
+      "notes": "band; corhal; packMind=solo"
+    }
+  ]
+}

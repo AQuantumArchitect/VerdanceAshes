@@ -23,6 +23,7 @@
 - Full Null Mercs loadout bay (G8)  
 - Full FE support-rank web for every NPC  
 - Embedding BAR inside Chromium  
+- **Full cognifold implementation** (BAR×SpaceWheat×hero molecules, live bridge, hub panel) — wishlist in `docs/UMWELT_GYM_PATHWAY.md` (thin hero umwelt molecules may ship earlier; full face is post-playtest)  
 
 ## Arc capture caps (C&C board)
 

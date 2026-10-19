@@ -65,3 +65,32 @@ def test_purchase_missing_listing():
     k = CampaignKernel(ROOT)
     r = k.purchase("")
     assert r.get("ok") is False
+
+
+def test_save_load_campaign_roundtrip(tmp_path=None):
+    """Named portal slots: save → list → load (with YES confirm)."""
+    import shutil
+
+    k = CampaignKernel(ROOT)
+    sp = ROOT / "state" / "campaign_state.json"
+    if not sp.is_file():
+        return  # nothing to snapshot in a bare tree
+    slot = "unit_test_portal_slot"
+    saves = ROOT / "state" / "saves" / slot
+    if saves.exists():
+        shutil.rmtree(saves)
+    try:
+        r = k.save_campaign(slot=slot, label="unit test", note="test_save_load_campaign_roundtrip")
+        assert r.get("ok"), r
+        assert r.get("slot") == slot
+        listed = k.list_saves()
+        assert listed.get("ok")
+        ids = {s["id"] for s in listed.get("saves") or []}
+        assert slot in ids
+        denied = k.load_campaign(slot=slot, confirm="no")
+        assert denied.get("ok") is False
+        loaded = k.load_campaign(slot=slot, confirm="YES")
+        assert loaded.get("ok"), loaded
+    finally:
+        if saves.exists():
+            shutil.rmtree(saves)

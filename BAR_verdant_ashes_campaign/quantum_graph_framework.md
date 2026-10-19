@@ -1,6 +1,8 @@
 # The Fractal Quantum Graph — Formal Framework
 ### *BAR Campaign World-State Engine · Specification v0.1*
 
+**Live product law (thin G, Drop = collapse):** [`../docs/GRAPH_COLLAPSE_SSOT.md`](../docs/GRAPH_COLLAPSE_SSOT.md) — this framework remains the design aspiration; ship grows axes only when a Drop can measure them.
+
 **Primary lore sources:**
 - Armada lore: https://www.beyondallreason.info/lore/armada-background
 - Cortex lore: https://www.beyondallreason.info/lore/cortex-background
@@ -19,6 +21,8 @@ It is not a state machine. There are no hard transitions.
 "Battles" are **measurements** — classical bites taken from the manifold.
 Each measurement collapses the local superposition and threads a bead onto φ.
 Between measurements the world evolves unitarily — coherent, unobserved, uncertain.
+
+**In the playable shell:** one BAR Drop → MatchResult → `bring_home` / `process_result` is that measurement. Hub holds the sparse superposition between Drops.
 
 The player does not move through a decision tree.
 The player moves through **geometry**, and the geometry changes shape as they move.

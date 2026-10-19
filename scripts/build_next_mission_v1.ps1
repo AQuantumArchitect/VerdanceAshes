@@ -5,7 +5,10 @@
   [switch]$Launch,
   [switch]$SaveGame,
   [string]$SaveName = "",
-  [int]$TimeoutSeconds = 300
+  [int]$TimeoutSeconds = 300,
+  # Passed straight through to install_playable_slice.ps1's [MODOPTIONS] block.
+  # Semicolon-separated key=value pairs.
+  [string]$ExtraModOptions = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -71,11 +74,22 @@ function Get-EnemySide {
   # Faction comes from the CRAFTED world (data/map_pool/seven_maps.json), not a
   # guess off the zone name. The standing war is Null Mercs vs Armada; Cortex is
   # an accent that holds only its own authored maps. A camp is one faction.
+  # 0) Wild / Rock Jungle home dig-ins are raptor shelves — never Armada.
+  $againstHint = ""
+  if ($Intent.PSObject.Properties["against"] -and $Intent.against) {
+    $againstHint = [string]$Intent.against
+  } elseif ($Intent.PSObject.Properties["worldConflict"] -and $Intent.worldConflict -and $Intent.worldConflict.primaryEnemy) {
+    $againstHint = [string]$Intent.worldConflict.primaryEnemy
+  }
+  if ($againstHint -eq "wild" -or $MapId -eq "the_rock_jungle") {
+    return "Armada"  # unused when wild home skips faction camps; keep table key valid
+  }
   # 1) Honor the objective's explicit faction when the engine set one.
   if ($Intent.objectiveTarget -and $Intent.objectiveTarget.enemyFaction) {
     switch ([string]$Intent.objectiveTarget.enemyFaction) {
       "cortex" { return "Cortex" }
       "armada" { return "Armada" }
+      "wild" { return "Armada" }
     }
   }
   # 2) Derive from the authored campaignForces: Cortex only where it alone holds
@@ -106,6 +120,15 @@ function Get-EnemyRgb {
 
 function Get-ObjectiveDescription {
   param($Intent)
+  $ok = if ($Intent.objectiveTarget -and $Intent.objectiveTarget.kind) {
+    [string]$Intent.objectiveTarget.kind
+  } else { [string]$Intent.objective }
+  if ($ok -in @("fortify_zone", "secure_foothold", "home_founding")) {
+    $zid = if ($Intent.objectiveTarget -and $Intent.objectiveTarget.targetZoneId) {
+      [string]$Intent.objectiveTarget.targetZoneId
+    } elseif ($Intent.targetZoneId) { [string]$Intent.targetZoneId } else { "the zone" }
+    return "Fortify $zid — raise defense, build power, army, and storage. Defense is what 'secured' means."
+  }
   $target = $Intent.objectiveTarget
   if ($target -and $target.label) { return [string]$target.label }
   if ($Intent.storyReason) { return [string]$Intent.storyReason }
@@ -140,17 +163,13 @@ function Get-ArcProfile {
   param([int]$MissionNumber, [string]$ObjectiveKind)
   $n = [Math]::Max(1, $MissionNumber)
   $id = if ($n -le 3) { "raid_tactics" } elseif ($n -le 6) { "contested_front" } else { "strike_lead" }
-  # Tactics objectives stay commander-free even mid-campaign (seize/raid/strike).
-  $tacticsKinds = @("seize_lane", "eco_raid", "economy_disrupt", "strike_relay", "gate_control", "destroy_key_structure")
-  $isTactics = $tacticsKinds -contains $ObjectiveKind
-  $playerCommanders = if ($id -eq "raid_tactics" -or $isTactics) { 0 } elseif ($id -eq "contested_front") { 0 } else { 1 }
+  # The sortie clock does not field a commander. Story sets that after this profile.
+  $playerCommanders = 0
   $allyPower = if ($n -le 1) { 0.95 } elseif ($n -eq 2) { 0.55 } elseif ($n -eq 3) { 0.35 } elseif ($n -le 5) { 0.25 } else { 0.15 }
   $escalation = if ($id -eq "raid_tactics") { "off" } elseif ($id -eq "contested_front") { "light" } else { "full" }
   $enemyMode = if ($id -eq "raid_tactics") { "static_bases" } elseif ($id -eq "contested_front") { "static_bases" } else { "light_qrf" }
-  $printer = if ($playerCommanders -le 0) {
-    # Arc A prints Phobos (legcen), not Ballistas. Goblins only if we need cheap filler later.
-    [ordered]@{ def = "leglab"; product = "legcen"; count = 1; metalIncome = 10; energyIncome = 50 }
-  } else { $null }
+  # Arc A prints Phobos (legcen), not Ballistas. Later acts clear this printer.
+  $printer = [ordered]@{ def = "leglab"; product = "legcen"; count = 1; metalIncome = 10; energyIncome = 50 }
   return [ordered]@{
     id = $id
     playerCommanders = $playerCommanders
@@ -279,8 +298,8 @@ function New-TacticsPlayerKit {
     "wild"  { $kit += (Spec "leglht" 1 200 -140 130) }
     default { $kit += (Spec "legcen" 2 140 -260 90) }
   }
-  $heroes = if ($Roster -and $Roster.PSObject.Properties["heroes"]) { $Roster.heroes } else { $null }
-  return (Add-HeroSpecs $kit $heroes)
+  # Heroes sealed by hub muster / gadget packs — do not bake roster into seed.
+  return $kit
 }
 
 function Get-ZoneAdjacencyMap {
@@ -290,66 +309,6 @@ function Get-ZoneAdjacencyMap {
   $all = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json
   if ($all.PSObject.Properties[$MapId]) { return $all.$MapId }
   return $null
-}
-
-function Get-ZoneCentroid {
-  param($Zone)
-  if (-not $Zone -or -not $Zone.bounds) { return ,@(0.5, 0.5) }
-  $b = $Zone.bounds
-  $cx = ([double]$b.xMin + [double]$b.xMax) * 0.5
-  $cz = ([double]$b.zMin + [double]$b.zMax) * 0.5
-  return ,@($cx, $cz)
-}
-
-function Enforce-AdjacentZones {
-  # WO-039: deploy adjacent to target; extract = deploy or another neighbor (short walk).
-  param($ZoneMap, $AdjForMap, [string]$DeployId, [string]$TargetId, [string]$ExtractId, [string]$Mode)
-  if (-not $AdjForMap -or -not $TargetId -or ($Mode -ne "required" -and $Mode -ne "preferred")) {
-    return @{ deploy = $DeployId; extract = $ExtractId; changed = $false }
-  }
-  $neighbors = @()
-  if ($AdjForMap.PSObject.Properties[$TargetId]) {
-    $neighbors = @($AdjForMap.$TargetId)
-  }
-  if ($neighbors.Count -eq 0) {
-    return @{ deploy = $DeployId; extract = $ExtractId; changed = $false }
-  }
-  $deployOk = $neighbors -contains $DeployId
-  $newDeploy = $DeployId
-  if (-not $deployOk) {
-    # Pick neighbor closest to old deploy (or first neighbor).
-    $oldC = Get-ZoneCentroid (Get-ZoneById $ZoneMap $DeployId)
-    $best = $neighbors[0]
-    $bestD = 99.0
-    foreach ($n in $neighbors) {
-      $c = Get-ZoneCentroid (Get-ZoneById $ZoneMap $n)
-      $d = [Math]::Sqrt(($c[0] - $oldC[0]) * ($c[0] - $oldC[0]) + ($c[1] - $oldC[1]) * ($c[1] - $oldC[1]))
-      if ($d -lt $bestD) { $bestD = $d; $best = $n }
-    }
-    $newDeploy = $best
-  }
-  # Extract: short walk. Prefer deploy itself (hit target, walk back), or the
-  # NEAREST other neighbor of target to deploy - never the far opposite shelf.
-  $newExtract = $newDeploy
-  $extractNeighbors = @($neighbors | Where-Object { $_ -ne $newDeploy })
-  if ($extractNeighbors.Count -gt 0 -and $Mode -eq "preferred") {
-    # Contested front: allow a slightly different LZ, but still near deploy.
-    $dC = Get-ZoneCentroid (Get-ZoneById $ZoneMap $newDeploy)
-    $bestE = $newDeploy
-    $bestD = 0.0
-    $found = $false
-    foreach ($n in $extractNeighbors) {
-      $c = Get-ZoneCentroid (Get-ZoneById $ZoneMap $n)
-      $d = [Math]::Sqrt(($c[0] - $dC[0]) * ($c[0] - $dC[0]) + ($c[1] - $dC[1]) * ($c[1] - $dC[1]))
-      # Cap: only accept extract neighbors within ~0.35 normalized of deploy.
-      if ($d -le 0.35 -and (-not $found -or $d -lt $bestD)) {
-        $bestD = $d; $bestE = $n; $found = $true
-      }
-    }
-    $newExtract = $bestE
-  }
-  $changed = ($newDeploy -ne $DeployId) -or ($newExtract -ne $ExtractId)
-  return @{ deploy = $newDeploy; extract = $newExtract; changed = $changed }
 }
 
 function New-NextMissionCandidates {
@@ -367,8 +326,10 @@ function New-NextMissionCandidates {
       if (-not $zid -or $zid -eq $CurrentTarget) { continue }
       $label = if ($node.label) { [string]$node.label } else { $zid }
       $flavor = if ($node.kind) { [string]$node.kind } else { "eco_pocket" }
+      $installationId = if ($node.installationId) { [string]$node.installationId } else { "$($MapId)::$zid" }
+      $candidateSlug = $installationId -replace '[^A-Za-z0-9_-]', '_'
       $cands += [ordered]@{
-        id = "cand_occ_$zid"
+        id = "cand_occ_$candidateSlug"
         # Hub language (G4): theater verbs, not raw candidate ids
         title = "Push $label"
         plain = "Same map. Raid the $flavor already on the field at $label, then extract."
@@ -380,6 +341,8 @@ function New-NextMissionCandidates {
         against = "armada"
         preplaced = $true
         occupationKind = $flavor
+        installationId = $installationId
+        pocketId = if ($node.pocketId) { [string]$node.pocketId } else { "" }
         hubLabel = "Push $label"
       }
     }
@@ -387,6 +350,7 @@ function New-NextMissionCandidates {
 
   # 2) Adjacent zone contracts (fallback when occupation list is thin).
   $neighbors = @()
+  if (-not $Occupation) {
   if ($AdjForMap -and $CurrentTarget -and $AdjForMap.PSObject.Properties[$CurrentTarget]) {
     $neighbors = @($AdjForMap.$CurrentTarget)
   }
@@ -409,7 +373,7 @@ function New-NextMissionCandidates {
     $cands += [ordered]@{
       id = "cand_$($cands.Count + 1)_$n"
       title = "$verb $label"
-      plain = "Next chapter: $verb $label ($kind). Same map if you stay; camp refreshes if the zone is empty."
+      plain = "Legacy adjacent contract: $verb $label ($kind)."
       mapId = $MapId
       targetZoneId = $n
       fromZoneIds = $from
@@ -420,23 +384,27 @@ function New-NextMissionCandidates {
       hubLabel = "$verb $label"
     }
   }
+  }
 
   # 3) Extract / leave the map (always offer when we have occupation doctrine).
   if ($ExtractZone -or $CurrentTarget) {
     $ex = if ($ExtractZone) { $ExtractZone } else { $CurrentTarget }
     $cands += [ordered]@{
       id = "cand_extract_$ex"
-      title = "Extract - bank the scar"
+      title = "EXIT - bank and close"
       plain = "Bank the raid. Pull the warband out. Hub reopens for the next board mark."
       mapId = $MapId
       targetZoneId = $ex
       fromZoneIds = $from
       objectiveArchetype = "extract_leave"
+      kind = "extract"
+      accent = "exit"
+      quitPrompt = $true
       patron = "nullmercs"
       against = "armada"
       preplaced = $true
       extractOnly = $true
-      hubLabel = "Extract - bank the scar"
+      hubLabel = "EXIT - bank and close"
     }
   }
 
@@ -459,6 +427,9 @@ function New-MissionCard {
     "farm_patrol" { "Farm sortie: clear the patrol camp for XP, then extract. Campaign clock barely moves." }
     default { "Complete the marked objective, then extract." }
   }
+  if ($Intent.openingMission) {
+    $objLine = "Raid Armada decoy farms in Greenest Fields. Damage the works, then leave before the response builds."
+  }
   $enemyLine = switch ([string]$ArcProfile.enemyMode) {
     "static_bases" { "Pre-built enemy energy works and guns. Static defenders -- not endless off-map waves." }
     "warband" { "Enemy warbands rove this ground -- mobile patrol packs over a thin static shell, not a fortress." }
@@ -477,9 +448,12 @@ function New-MissionCard {
     "You are the strike force. Allies, if any, are secondary."
   }
   $tools = if ([int]$ArcProfile.playerCommanders -le 0) {
-    "No commanders. Lead with named heroes and ground units. Blow the base - do not expand."
+    "The command walker is scrap. Lead with the company."
   } else {
-    "Commander available. Still prioritize the objective over a full eco race."
+    "The command walker walks with you. Still take the objective."
+  }
+  if ($Intent.openingMission) {
+    $tools = "Mercenary pre-buy: Punch of Thugs (6 damaged Cortex Thugs). Support: 2 Legion Karkinos and 6 rez bots."
   }
   if ($XpLine) { $tools = "$tools  |  $XpLine" }
   if ($HeroLine) { $tools = "$tools  |  $HeroLine" }
@@ -555,6 +529,53 @@ function Spec {
   return $s
 }
 
+function Get-CadreXpBag {
+  # roster.cadreXp[def] -> seed xp / craftXp for the next drop.
+  param($Roster, [string]$Def)
+  if (-not $Roster -or -not $Def) { return $null }
+  $bank = $null
+  if ($Roster.PSObject.Properties["cadreXp"] -and $Roster.cadreXp) { $bank = $Roster.cadreXp }
+  if (-not $bank) { return $null }
+  $bag = $null
+  if ($bank.PSObject.Properties[$Def]) { $bag = $bank.$Def }
+  elseif ($bank -is [System.Collections.IDictionary] -and $bank.Contains($Def)) { $bag = $bank[$Def] }
+  if (-not $bag) { return $null }
+  $xp = 0.0
+  $craft = 0.0
+  if ($null -ne $bag.xp) { $xp = [double]$bag.xp }
+  elseif ($null -ne $bag.avgXp) { $xp = [double]$bag.avgXp }
+  elseif ($null -ne $bag.peakXp) { $xp = [double]$bag.peakXp * 0.85 }
+  if ($null -ne $bag.craftXp) { $craft = [double]$bag.craftXp }
+  elseif ($null -ne $bag.avgCraftXp) { $craft = [double]$bag.avgCraftXp }
+  if ($xp -le 0 -and $craft -le 0) { return $null }
+  return [ordered]@{ xp = $xp; craftXp = $craft }
+}
+
+function Set-SpecCadreXp {
+  param($SpecObj, $Roster)
+  if (-not $SpecObj -or -not $Roster) { return $SpecObj }
+  # Named heroes carry their own xp via heroId path — do not overwrite.
+  if ($SpecObj.PSObject.Properties["heroId"] -and $SpecObj.heroId) { return $SpecObj }
+  if ($SpecObj.heroId) { return $SpecObj }
+  $def = [string]$SpecObj.unitDefName
+  $bag = Get-CadreXpBag $Roster $def
+  if (-not $bag) { return $SpecObj }
+  if ($bag.xp -gt 0) { $SpecObj.xp = [double]$bag.xp }
+  if ($bag.craftXp -gt 0) { $SpecObj.craftXp = [double]$bag.craftXp }
+  return $SpecObj
+}
+
+function Apply-CadreXpToKit {
+  # Stamp banked veteran XP onto every non-hero kit unit so BAR SetUnitExperience
+  # restores the majority of field XP between rounds.
+  param($Kit, $Roster)
+  $out = @()
+  foreach ($s in @($Kit)) {
+    if ($s) { $out += ,(Set-SpecCadreXp $s $Roster) }
+  }
+  return $out
+}
+
 function PatrolSweep {
   # Two waypoints straddling a screen point: with CMD.PATROL the unit loops
   # spawn -> wp1 -> wp2 -> spawn, an actual sweep instead of a one-way clump.
@@ -578,8 +599,10 @@ function Add-HeroSpecs {
     if ([string]$h.status -eq "locked") { continue }
     $def = [string]$h.unitDef
     $hid = [string]$h.heroId
-    # Doctrine: Ash-Captain Vane always rides a Karkinos (never Ballista / com).
-    if ($hid -eq "vane" -or ([string]$h.name -match "Vane")) { $def = "legkark" }
+    # Alpha opening roles: Vane is the named Phobos (legcen) striker and Ketha
+    # is the named field rez-bot. Neither role is a commander suit.
+    if ($hid -eq "vane" -or ([string]$h.name -match "Vane")) { $def = "legcen" }
+    if ($hid -eq "ketha" -or ([string]$h.name -match "Ketha")) { $def = "legrezbot" }
     # Spoke — wheelie scout tech specialist
     if ($hid -eq "spoke" -or ([string]$h.trait -eq "wheelie_mentor")) { $def = "legscout" }
     if (-not $def -or $def -like "*com") { $def = "legkark" }
@@ -591,6 +614,13 @@ function Add-HeroSpecs {
     $spec.heroName = [string]$h.name
     $spec.missionCritical = [bool]$h.missionCritical
     $spec.heroHpMult = if ($null -ne $h.hpMult) { [double]$h.hpMult } else { 1.4 }
+    if ($hid -eq "ketha" -or ([string]$h.name -match "Ketha")) {
+      $spec.heroHpMult = [Math]::Max(2.5, [double]$spec.heroHpMult)
+      $spec.heroBuildPowerMult = 3.0
+      $spec.heroRole = "field_rez_support"
+    } elseif ($hid -eq "vane" -or ([string]$h.name -match "Vane")) {
+      $spec.heroRole = "phobos_striker"
+    }
     $spec.heroXp = if ($null -ne $h.xp) { [double]$h.xp } else { 0.25 }
     if ($null -ne $h.level) { $spec.heroLevel = [int]$h.level }
     if ($null -ne $h.rank) { $spec.heroRank = [string]$h.rank }
@@ -625,9 +655,8 @@ function New-PlayerKit {
 }
 
 function New-PlayerKitFromRoster {
-  # Pillar C: the player's starting force IS their persistent warband - a
-  # commander hero plus the veteran cadre they carried out of prior sorties -
-  # on top of an economy floor so a wiped roster still yields a playable base.
+  # Economy floor plus the veteran cadre. The commander, when the arc allows
+  # one, is BAR's single start unit. This kit must not spawn a second legcom.
   param([string]$Family, $Roster, [double]$ResourceMod = 1.0, $Commerce = $null)
   # q7 scarcity thins the economy floor (resourceModifier from the graph).
   $wind = [Math]::Max(2, [int][Math]::Round(4 * $ResourceMod))
@@ -637,13 +666,15 @@ function New-PlayerKitFromRoster {
     (Spec "legsolar" 2 240 80 90),
     (Spec "legrad" 1 40 -60 100)
   )
-  $comDef = if ($Roster.commander -and $Roster.commander.unitDef) { [string]$Roster.commander.unitDef } else { "legcom" }
-  $kit += (Spec $comDef 1 0 40 100)
   $cadreTotal = 0
   if ($Roster.cadre) {
     foreach ($p in $Roster.cadre.PSObject.Properties) {
       $cnt = [int]$p.Value
-      if ($cnt -gt 0) { $kit += (Spec ([string]$p.Name) $cnt -120 -160 95); $cadreTotal += $cnt }
+      $def = [string]$p.Name
+      if ($cnt -gt 0 -and $def -notmatch '^(arm|cor|leg)com') {
+        $kit += (Spec $def $cnt -120 -160 95)
+        $cadreTotal += $cnt
+      }
     }
   }
   # Floor: a thin cadre (fresh campaign or a rout) still fields a minimum strike element.
@@ -659,15 +690,15 @@ function New-PlayerKitFromRoster {
   # A rez bot rides with every warband: hero wrecks must be recoverable.
   $kit += (Spec "legrezbot" 1 -170 60 80)
   $kit = Add-CommerceDeployToKit $kit $Commerce
-  $heroes = if ($Roster -and $Roster.PSObject.Properties["heroes"]) { $Roster.heroes } else { $null }
-  return (Add-HeroSpecs $kit $heroes)
+  # Heroes sealed by hub muster / gadget packs — do not bake roster into seed.
+  return $kit
 }
 
 function New-FinaleKitFromRoster {
   # Drop 2 Act 3: massive starting conditions — the whole campaign walks out.
-  # Commander + established economy + factory floor + defenses + a real army,
-  # then the full carried cadre (uncapped) and every living hero on top.
-  # Verified Legion defs only (same vocabulary as the rest of the compiler).
+  # Established economy + factory floor + defenses + a real army, then the
+  # full carried cadre (uncapped) and every living hero. One commander only:
+  # BAR's start unit, not a second spec in this kit.
   param([string]$Family, $Roster, [double]$ResourceMod = 1.0, $Commerce = $null)
   $kit = @(
     (Spec "legmex" 5 -160 130 120 $true),
@@ -688,15 +719,17 @@ function New-FinaleKitFromRoster {
     (Spec "legkark" 2 170 40 110),
     (Spec "legrezbot" 6 -170 70 80)
   )
-  $comDef = if ($Roster -and $Roster.commander -and $Roster.commander.unitDef) { [string]$Roster.commander.unitDef } else { "legcom" }
-  $kit += (Spec $comDef 1 0 40 100)
   if ($Roster -and $Roster.cadre) {
     foreach ($p in $Roster.cadre.PSObject.Properties) {
       $cnt = [int]$p.Value
-      if ($cnt -gt 0) { $kit += (Spec ([string]$p.Name) $cnt -130 -160 90) }
+      $def = [string]$p.Name
+      if ($cnt -gt 0 -and $def -notmatch '^(arm|cor|leg)com') {
+        $kit += (Spec $def $cnt -130 -160 90)
+      }
     }
   }
   $kit = Add-CommerceDeployToKit $kit $Commerce
+  # Finale: still spawn named heroes from roster (full company walks out).
   $heroes = if ($Roster -and $Roster.PSObject.Properties["heroes"]) { $Roster.heroes } else { $null }
   return (Add-HeroSpecs $kit $heroes)
 }
@@ -706,7 +739,7 @@ function New-StrikeTeam {
   #   - Wheelies (legscout) for the player
   #   - Army of Phobos (legcen) -- NOT Ballistas (legbal / missile bots)
   #   - Pack of Zagreus rez bots (legrezbot)
-  #   - Ash-Captain Vane in a Karkinos (forced in Add-HeroSpecs)
+  #   - Ash-Captain Vane as the named Phobos hero
   #   - No commander suit, no base economy
   #   - WO-043: commerce packs (Punch of Thugs, grunt fab if bought) ride along
   param($Roster, [double]$ResourceMod = 1.0, $Commerce = $null)
@@ -722,21 +755,45 @@ function New-StrikeTeam {
     foreach ($p in $Roster.cadre.PSObject.Properties) {
       $def = [string]$p.Name
       $cnt = [int]$p.Value
-      if ($cnt -gt 0 -and -not ($def -like "*com") -and $def -ne "legbal") {
+      if ($cnt -gt 0 -and -not ($def -like "*com") -and $def -ne "legbal" -and $def -ne "leginc" -and $def -ne "legjav") {
         $kit += (Spec $def $cnt -130 -150 90)
       }
     }
   }
-  $heroes = if ($Roster -and $Roster.PSObject.Properties["heroes"] -and $Roster.heroes) { $Roster.heroes } else { $null }
-  if ($heroes) {
-    $kit = Add-HeroSpecs $kit $heroes
-  } else {
-    $hero = Spec "legkark" 1 0 0 100
-    $hero.hero = $true
-    $hero.heroName = if ($Roster -and $Roster.commander -and $Roster.commander.name) { [string]$Roster.commander.name } else { "Ash-Captain Vane" }
-    $kit += $hero
-  }
+  # Heroes + balance packs are sealed by the HTML hub muster and spawned by the
+  # campaign gadget from mission.crewBand / deployAces — never bake the roster here.
   return $kit
+}
+
+function New-OpeningStrikeTeam {
+  # Mission one is a mercenary pre-bought punch, not a persistent commander
+  # deployment. Keep this explicit so progressed/stale campaign state cannot
+  # leak a second commander, Incinerator, or generic Javelins into the opener.
+  param($Commerce)
+  $vane = Spec "legcen" 1 -70 -80 90
+  $vane.heroId = "vane"
+  $vane.heroName = "Ash-Captain Vane"
+  $vane.heroRole = "phobos_striker"
+  $vane.heroHpMult = 1.65
+  $vane.heroXp = 0.25
+
+  $ketha = Spec "legrezbot" 1 -150 70 80
+  $ketha.heroId = "ketha"
+  $ketha.heroName = "Ketha"
+  $ketha.heroRole = "field_rez_support"
+  $ketha.heroHpMult = 2.5
+  $ketha.heroBuildPowerMult = 3.0
+  $ketha.heroXp = 0.05
+
+  $kit = @(
+    (Spec "legkark" 2 120 20 105),
+    $vane,
+    $ketha,
+    (Spec "legrezbot" 5 -150 70 80)
+  )
+  # Buy-everything: no free Punch. Owned packs (Punch, Crash, fabs, constructors)
+  # ride only via commerce.deploy → Add-CommerceDeployToKit / gadget logistics.
+  return (Add-CommerceDeployToKit $kit $Commerce)
 }
 
 function Ring-Eco {
@@ -845,12 +902,13 @@ function Centerpiece-CommandPost {
 
 function Centerpiece-Hives {
   param([double]$Hazard)
-  $specs = @(
+  # Always three. Two is the stock "nests are gone, send the queen" line if one fails to place.
+  $null = $Hazard
+  @(
     (Spec "raptor_hive" 1 -120 -40 240),
-    (Spec "raptor_hive" 1 140 80 240)
+    (Spec "raptor_hive" 1 140 80 240),
+    (Spec "raptor_hive" 1 0 -220 240)
   )
-  if ($Hazard -gt 0.5) { $specs += (Spec "raptor_hive" 1 0 -220 240) }
-  return $specs
 }
 
 function New-MercFoothold {
@@ -864,16 +922,18 @@ function New-MercFoothold {
     (Spec $MERC.raider (Get-ScaledCount ([Math]::Max(1, [int](3 * $p))) $S) 110 -290 80 -Patrol (PatrolSweep $PX $PZ)),
     (Spec $MERC.skirm (Get-ScaledCount ([Math]::Max(1, [int](2 * $p))) $S) -130 -310 90 -Patrol (PatrolSweep $PX $PZ))
   )
-  # Heavy assault (javelins) only when allies are meant to carry early missions.
+  # Keep the foothold readable as a SimpleAI builder. Do not leak the old
+  # generic Javelin blob into the opener; named Phobos Vane is the only elite
+  # assault signature in the first sortie.
   if ($p -ge 0.7) {
-    $specs += (Spec $MERC.assault (Get-ScaledCount 2 $S) 10 -370 95 -Patrol (PatrolSweep $PX $PZ))
+    $specs += (Spec $MERC.skirm (Get-ScaledCount 2 $S) 10 -370 95 -Patrol (PatrolSweep $PX $PZ))
     $specs += (Spec $MERC.mg 1 (230 * $FX) (90 * $FZ) 110)
     $specs += (Spec $MERC.lab 1 -290 -140 120)
     $specs += (Spec $MERC.nano 1 -200 -230 90)
     $specs += (Spec $MERC.mex 2 -140 110 120 $true)
     $specs += (Spec $MERC.wind (Get-ScaledCount 3 $S) 130 160 85)
   } elseif ($p -ge 0.4) {
-    $specs += (Spec $MERC.assault 1 10 -370 95 -Patrol (PatrolSweep $PX $PZ))
+    $specs += (Spec $MERC.skirm 1 10 -370 95 -Patrol (PatrolSweep $PX $PZ))
     $specs += (Spec $MERC.aa 1 (-80 * $FX) (60 * $FZ) 160)
     $specs += (Spec $MERC.mex 1 -140 110 120 $true)
     $specs += (Spec $MERC.wind 2 130 160 85)
@@ -1102,9 +1162,9 @@ $missionId = if ($intent.missionId) { [string]$intent.missionId } else { "va_$('
 $objectiveKind = if ($intent.objectiveTarget -and $intent.objectiveTarget.kind) { [string]$intent.objectiveTarget.kind } else { [string]$intent.objective }
 # Early arc profile so adjacency + kit can use it before camp assembly.
 $arcProfile = Get-ArcProfile -MissionNumber $missionNumber -ObjectiveKind $objectiveKind
-# Drop 2 act structure: the engine's act stamp overrides the mission-number arcs.
-#   Act 1 ground control (warband, no commander) keeps the existing profile.
-#   Act 2 constrained RTS: commander + T1 base building, T2/T3 as earned units.
+# Drop 2 act structure labels pacing. It does not field the command walker.
+#   Act 1 ground control keeps the existing profile.
+#   Act 2 is base building. The walker stays scrap until a story beat.
 #   Act 3 finale: full unconstrained BAR with massive starting conditions.
 $actNum = if ($intent.PSObject.Properties["act"] -and $intent.act -and $intent.act.act) { [int]$intent.act.act }
           elseif ($missionNumber -le 5) { 1 } elseif ($missionNumber -le 10) { 2 } else { 3 }
@@ -1112,13 +1172,13 @@ $actName = if ($intent.PSObject.Properties["act"] -and $intent.act -and $intent.
            elseif ($actNum -eq 1) { "ground_control" } elseif ($actNum -eq 2) { "constrained_rts" } else { "unbound_finale" }
 $isFinale = [bool]($intent.PSObject.Properties["finale"] -and $intent.finale)
 $finaleKind = if ($isFinale -and $intent.finale.kind) { [string]$intent.finale.kind } else { "" }
+# Unconstrained fab for all acts — Tnb/BP is the only build-power gate.
 $techPolicy = if ($intent.PSObject.Properties["techPolicy"] -and $intent.techPolicy) { $intent.techPolicy }
-              elseif ($actNum -eq 1) { [ordered]@{ act = 1; mode = "ground_control"; buildTech = 1; buildStructures = $false } }
-              elseif ($actNum -eq 2) { [ordered]@{ act = 2; mode = "constrained_rts"; buildTech = 1; buildStructures = $true } }
-              else { [ordered]@{ act = 3; mode = "unbound"; buildTech = 3; buildStructures = $true } }
+              elseif ($actNum -eq 1) { [ordered]@{ act = 1; mode = "ground_control"; buildTech = 3; buildStructures = $true; gateEnabled = $false } }
+              elseif ($actNum -eq 2) { [ordered]@{ act = 2; mode = "constrained_rts"; buildTech = 3; buildStructures = $true; gateEnabled = $false } }
+              else { [ordered]@{ act = 3; mode = "unbound"; buildTech = 3; buildStructures = $true; gateEnabled = $false } }
 if ($actNum -ge 3) {
   $arcProfile.id = "unbound_finale"
-  $arcProfile.playerCommanders = 1
   $arcProfile.playerEco = $true
   $arcProfile.unitPrinter = $null
   $arcProfile.enemyMode = "light_qrf"
@@ -1128,7 +1188,6 @@ if ($actNum -ge 3) {
   $arcProfile.sweepEnemyCommanders = $false
 } elseif ($actNum -eq 2) {
   $arcProfile.id = "constrained_rts"
-  $arcProfile.playerCommanders = 1
   $arcProfile.playerEco = $true
   $arcProfile.unitPrinter = $null
   $arcProfile.enemyMode = "light_qrf"
@@ -1160,9 +1219,18 @@ if ($arcProfile.flavor -eq "com_solar_farm") {
   $arcProfile.sweepEnemyCommanders = $false
   $arcProfile.allowEnemyProduction = $true
   $arcProfile.enemyMode = "com_solar_farm"
-  $arcProfile.playerCommanders = 1
   $arcProfile.unitPrinter = $null
 }
+# Story owns the walker. A missing or false flag is scrap. Level and perks do not field it.
+$commanderUnlocked = $false
+$commanderRow = $null
+if ($state -and $state.roster -and $state.roster.commander) { $commanderRow = $state.roster.commander }
+if (-not $commanderRow -and $intent.roster -and $intent.roster.commander) { $commanderRow = $intent.roster.commander }
+if ($commanderRow -and $commanderRow.PSObject.Properties["unlocked"] -and $commanderRow.unlocked -eq $true) {
+  $commanderUnlocked = $true
+}
+$arcProfile.playerCommanders = $(if ($commanderUnlocked) { 1 } else { 0 })
+Write-Host ("Command walker: {0}" -f $(if ($commanderUnlocked) { "unlocked" } else { "scrap" }))
 # Drop 4 escalation ladder: the engine's authored plan (scale window,
 # objective strength, waves override, secondary objectives). One authority
 # for pacing — the compiler honors every field it stamps.
@@ -1181,39 +1249,102 @@ $deployZoneId = [string]$intent.deploymentZoneId
 $extractZoneId = [string]$intent.extractionZoneId
 $targetZoneId = if ($intent.objectiveTarget -and $intent.objectiveTarget.targetZoneId) { [string]$intent.objectiveTarget.targetZoneId } else { "" }
 $adjForMap = Get-ZoneAdjacencyMap -Workspace $Workspace -MapId ([string]$intent.mapId)
-$adjResult = Enforce-AdjacentZones -ZoneMap $zoneMap -AdjForMap $adjForMap `
-  -DeployId $deployZoneId -TargetId $targetZoneId -ExtractId $extractZoneId `
-  -Mode ([string]$arcProfile.objectiveAdjacency)
-if ($adjResult.changed) {
-  Write-Host ("WO-039 adjacent layout: deploy {0} -> {1}; extract {2} -> {3}" -f `
-    $deployZoneId, $adjResult.deploy, $extractZoneId, $adjResult.extract)
-  $deployZoneId = [string]$adjResult.deploy
-  $extractZoneId = [string]$adjResult.extract
-  $intent.deploymentZoneId = $deployZoneId
-  $intent.extractionZoneId = $extractZoneId
+# A far dry corner is not an exit. Snap infil/exfil onto the nearest dry pad
+# the company can walk to. The running kernel may still have stamped the old
+# cross-river muster; this process reads the fixed story engine from disk.
+if ($targetZoneId -and $intent.mapId) {
+  try {
+    $env:PYTHONPATH = (Join-Path $Workspace "tools")
+    $routeArgs = [ordered]@{
+      mapId = [string]$intent.mapId
+      targetZoneId = [string]$targetZoneId
+      deploymentZoneId = [string]$deployZoneId
+      extractionZoneId = [string]$extractZoneId
+      level = 0.0
+    }
+    if ($intent.hydrology -and $null -ne $intent.hydrology.level) {
+      $routeArgs.level = [double]$intent.hydrology.level
+    }
+    $routeIn = Join-Path $env:TEMP ("va_ground_route_{0}.json" -f [guid]::NewGuid().ToString("N"))
+    $routeOut = Join-Path $env:TEMP ("va_ground_route_out_{0}.json" -f [guid]::NewGuid().ToString("N"))
+    ($routeArgs | ConvertTo-Json -Compress) | Set-Content -LiteralPath $routeIn -Encoding UTF8
+    $pyRoute = @(
+      "import json, sys"
+      "from pathlib import Path"
+      "sys.path.insert(0, r'" + (Join-Path $Workspace "tools") + "')"
+      "from verdance_story_engine_v1 import separate_intent_zones"
+      "args = json.loads(Path(r'" + $routeIn + "').read_text(encoding='utf-8-sig'))"
+      "intent = {'mapId': args['mapId'], 'targetZoneId': args['targetZoneId'], 'deploymentZoneId': args['deploymentZoneId'], 'extractionZoneId': args['extractionZoneId'], 'hydrology': {'level': args.get('level') or 0}}"
+      "separate_intent_zones(intent, Path(r'" + $Workspace + "'))"
+      "Path(r'" + $routeOut + "').write_text(json.dumps({'deploymentZoneId': intent.get('deploymentZoneId'), 'extractionZoneId': intent.get('extractionZoneId')}), encoding='utf-8')"
+    ) -join "; "
+    & python -c $pyRoute
+    if (Test-Path -LiteralPath $routeOut) {
+      $snapped = Get-Content -Raw -LiteralPath $routeOut | ConvertFrom-Json
+      if ($snapped.deploymentZoneId) {
+        $deployZoneId = [string]$snapped.deploymentZoneId
+        Add-OrSetProperty $intent "deploymentZoneId" $deployZoneId
+      }
+      if ($snapped.extractionZoneId) {
+        $extractZoneId = [string]$snapped.extractionZoneId
+        Add-OrSetProperty $intent "extractionZoneId" $extractZoneId
+        if ($intent.objectiveTarget) {
+          Add-OrSetProperty $intent.objectiveTarget "extractionZoneId" $extractZoneId
+        }
+      }
+      if ($extractZoneId -ne [string]$routeArgs.extractionZoneId -or $deployZoneId -ne [string]$routeArgs.deploymentZoneId) {
+        Write-Host ("Ground route snap: deploy {0} -> {1}; extract {2} -> {3}" -f `
+          $routeArgs.deploymentZoneId, $deployZoneId, $routeArgs.extractionZoneId, $extractZoneId)
+      }
+    }
+    Remove-Item -LiteralPath $routeIn, $routeOut -Force -ErrorAction SilentlyContinue
+  } catch {
+    Write-Host ("Ground route snap skipped: {0}" -f $_.Exception.Message)
+  }
 }
+$openingMission = [bool]($intent.PSObject.Properties["openingMission"] -and $intent.openingMission)
 
 $deployZone = Get-ZoneById $zoneMap $deployZoneId
 $targetZone = Get-ZoneById $zoneMap $targetZoneId
 $deployCenter = Get-ZoneCenter $deployZone @(0.16, 0.16)
 $enemyCenter = Get-ZoneCenter $targetZone @(0.84, 0.84)
+# The measured anchor is the dry pad. Sliding it toward a flooded target
+# (Rock Jungle NE lane -> inner spillway) plants the company in the lake
+# even when the interpolated point is still inside the lane's loose box.
+function Test-ZoneWetPad {
+  param($Zone)
+  if (-not $Zone) { return $false }
+  if ($Zone.hydrology -and $null -ne $Zone.hydrology.restingSubmerged -and [double]$Zone.hydrology.restingSubmerged -gt 0.08) {
+    return $true
+  }
+  if ($Zone.tags) {
+    foreach ($tag in @($Zone.tags)) {
+      if ($tag -eq "water" -or $tag -eq "shore" -or $tag -eq "shallows") { return $true }
+    }
+  }
+  return $false
+}
+$deployZoneWet = (Test-ZoneWetPad $deployZone) -or (Test-ZoneWetPad $targetZone)
 # WO-004 front-band: for contracts, slide deploy toward the target border so
 # first contact lands in ~90s instead of a long march from a corner shelf.
 $isContract = ($intent.PSObject.Properties["contractActive"] -and $intent.contractActive) -or ($intent.PSObject.Properties["fromZoneIds"] -and $intent.fromZoneIds -and @($intent.fromZoneIds).Count -gt 0)
-if ($isContract -and $deployZone -and $targetZone) {
+if ($isContract -and $deployZone -and $targetZone -and -not $openingMission -and -not $deployZoneWet) {
   $dx = $deployCenter[0]; $dz = $deployCenter[1]
   $ex = $enemyCenter[0]; $ez = $enemyCenter[1]
   # Adjacent mode: milder slide (already next door).
   $blend = if ([string]$arcProfile.objectiveAdjacency -eq "required") { 0.25 } else { 0.45 }
   $deployCenter = @(((1 - $blend) * $dx + $blend * $ex), ((1 - $blend) * $dz + $blend * $ez))
+} elseif ($deployZoneWet -and $isContract -and -not $openingMission) {
+  Write-Host ("Front-band slide skipped for {0}: anchor stays on the dry pad" -f $deployZoneId)
 }
-$wildCenter = @(0.50, 0.50)
 $frontBand = $isContract -or ($intent.objective -in @("seize_lane", "gate_control"))
 
 $enemySide = Get-EnemySide ([string]$intent.mapId) $intent
 $enemyRecipe = Get-EnemyRecipeName $enemySide
 $enemyRgb = Get-EnemyRgb $enemySide
 $hasWild = ($map.PSObject.Properties["wilds"] -and $map.wilds) -or ($map.PSObject.Properties["raptors"] -and $map.raptors) -or ($intent.hazardPolicy -and $intent.hazardPolicy -ne "none")
+# Rock Jungle is always a raptor shelf — even if map_pool forgot the wilds flag.
+if ([string]$intent.mapId -eq "the_rock_jungle") { $hasWild = $true }
 
 $title = if ($intent.PSObject.Properties["title"] -and $intent.title) {
   "$($intent.title) - $($map.title)"
@@ -1265,41 +1396,421 @@ function Load-WrathPack {
   return (Get-Content -Raw -LiteralPath $p | ConvertFrom-Json)
 }
 
+function Test-HighValueUnitDef {
+  param([string]$DefName)
+  if (-not $DefName) { return $false }
+  $n = $DefName.ToLowerInvariant()
+  # Fusion makers — the optional high-value prize core.
+  return ($n -match 'fus' -or $n -match 'fusion' -or $n -match 'afus' -or $n -match 'cafus')
+}
+
+function Test-HighValueAdjacentDef {
+  param([string]$DefName)
+  if (-not $DefName) { return $false }
+  $n = $DefName.ToLowerInvariant()
+  # Beamers / anni sit on GF fusion vaults; destroying the ring is vault death.
+  if (Test-HighValueUnitDef $n) { return $true }
+  return ($n -match 'beamer' -or $n -match 'annihilator' -or $n -match '^arman[ni]' -or $n -match 'cordoom')
+}
+
+function Get-DestroyedHighValuePockets {
+  param($State, [string]$MapId)
+  # Suppress a fusion vault when the maker died, the beamer ring died hard,
+  # heldInstallations says destroyed, or secondaryResults completed bonus_fus_*.
+  $dead = @{}
+  if (-not $State -or -not $MapId) { return $dead }
+  $bucket = $null
+  if ($State.PSObject.Properties["shellScars"] -and $State.shellScars) {
+    $bucket = $State.shellScars.$MapId
+  }
+  $units = @()
+  if ($bucket -and $bucket.units) { $units = @($bucket.units) }
+  $adjacentHits = @{}
+  foreach ($rec in $units) {
+    if (-not $rec) { continue }
+    if ($rec.destroyed -eq $false) { continue }
+    $def = [string]$(if ($rec.unitDefName) { $rec.unitDefName } else { "" })
+    $pocketId = [string]$(if ($rec.pocketId) { $rec.pocketId } else { "" })
+    if (-not $pocketId) { continue }
+    $flagged = $false
+    if ($rec.PSObject.Properties["highValue"] -and $rec.highValue) { $flagged = $true }
+    if (Test-HighValueUnitDef $def) {
+      $dead[$pocketId] = $true
+      continue
+    }
+    if ($flagged -or (Test-HighValueAdjacentDef $def)) {
+      if (-not $adjacentHits.ContainsKey($pocketId)) { $adjacentHits[$pocketId] = 0 }
+      $adjacentHits[$pocketId] = [int]$adjacentHits[$pocketId] + 1
+    }
+  }
+  # Beamer ring wipe: enough HV-adjacent destroys on the pocket ⇒ vault dead.
+  foreach ($pocketId in @($adjacentHits.Keys)) {
+    if ([int]$adjacentHits[$pocketId] -ge 3) { $dead[$pocketId] = $true }
+  }
+  # Held installs explicitly marked lost also count.
+  if ($State.PSObject.Properties["heldInstallations"] -and $State.heldInstallations) {
+    $mapHeld = $State.heldInstallations.$MapId
+    if ($mapHeld) {
+      foreach ($p in @($mapHeld.PSObject.Properties)) {
+        $rec = $p.Value
+        if ($rec -and [string]$rec.status -eq "destroyed") {
+          $pocketId = [string]$(if ($rec.pocketId) { $rec.pocketId } else { $p.Name })
+          if ($pocketId) { $dead[$pocketId] = $true }
+        }
+      }
+    }
+  }
+  # Completed bonus_fus secondaries from last processed results / history.
+  $hist = @()
+  if ($State.PSObject.Properties["history"] -and $State.history) { $hist = @($State.history) }
+  foreach ($h in $hist) {
+    if (-not $h) { continue }
+    $hMap = [string]$(if ($h.mapId) { $h.mapId } else { "" })
+    if ($hMap -and $hMap -ne $MapId) { continue }
+    $secs = @()
+    if ($h.PSObject.Properties["secondaryResults"] -and $h.secondaryResults) {
+      $secs = @($h.secondaryResults)
+    }
+    foreach ($sr in $secs) {
+      if (-not $sr) { continue }
+      $sid = [string]$(if ($sr.id) { $sr.id } elseif ($sr.objectiveId) { $sr.objectiveId } else { "" })
+      if (-not ($sid -like "bonus_fus_*")) { continue }
+      $done = $false
+      if ($sr.completed -eq $true) { $done = $true }
+      if ($null -ne $sr.destroyed -and [int]$sr.destroyed -gt 0) { $done = $true }
+      if ($null -ne $sr.destroyedCount -and [int]$sr.destroyedCount -gt 0) { $done = $true }
+      if (-not $done) { continue }
+      $pocketId = [string]$(if ($sr.pocketId) { $sr.pocketId } else { ($sid -replace '^bonus_fus_','') })
+      if ($pocketId) { $dead[$pocketId] = $true }
+    }
+  }
+  return $dead
+}
+
+function Get-ScarredZoneSet {
+  param($State, [string]$MapId)
+  # Continuity: pads the player already claimed / scarred must not fully respawn.
+  $scarred = @{}
+  if (-not $State -or -not $MapId) { return $scarred }
+  $claimed = $null
+  if ($State.PSObject.Properties["claimedNodes"] -and $State.claimedNodes) {
+    $claimed = $State.claimedNodes.$MapId
+  }
+  if ($claimed) {
+    foreach ($p in @($claimed.PSObject.Properties)) {
+      $rec = $p.Value
+      if ($rec -and ($rec.pocketCleared -or $rec.nodeClaimed)) {
+        $scarred[[string]$p.Name] = [ordered]@{ reason = "claimed"; scar = 1.0 }
+      }
+    }
+  }
+  $zm = $null
+  if ($State.PSObject.Properties["zoneMemory"] -and $State.zoneMemory) {
+    $zm = $State.zoneMemory.$MapId
+  }
+  if ($zm) {
+    foreach ($p in @($zm.PSObject.Properties)) {
+      $zid = [string]$p.Name
+      $mem = $p.Value
+      if (-not $mem) { continue }
+      $ctrl = [string]$(if ($mem.controllingFaction) { $mem.controllingFaction } else { "" })
+      $scar = 0.0
+      if ($mem.abstract -and $null -ne $mem.abstract.shellScar) { $scar = [double]$mem.abstract.shellScar }
+      if ($ctrl -in @("ashwalkers", "nullmercs") -or $scar -ge 0.25) {
+        if (-not $scarred.ContainsKey($zid)) {
+          $scarred[$zid] = [ordered]@{ reason = $(if ($ctrl -in @("ashwalkers", "nullmercs")) { "player_bloc" } else { "shell_scar" }); scar = [Math]::Max($scar, 0.25) }
+        }
+      }
+    }
+  }
+  $ledger = $null
+  if ($State.PSObject.Properties["shellScars"] -and $State.shellScars) {
+    $bucket = $State.shellScars.$MapId
+    if ($bucket -and $bucket.byZone) { $ledger = $bucket.byZone }
+  }
+  if ($ledger) {
+    foreach ($p in @($ledger.PSObject.Properties)) {
+      $zid = [string]$p.Name
+      $z = $p.Value
+      $destroyed = 0
+      if ($z -and $null -ne $z.destroyedCount) { $destroyed = [int]$z.destroyedCount }
+      # Ambient zone thin only — exact unitDef+pocket suppress lives in
+      # Get-ScarSuppressSet. Keep ≥3 so a single stray kill does not haze the whole pad.
+      if ($destroyed -ge 3) {
+        $scarred[$zid] = [ordered]@{ reason = "destroyed_ledger"; scar = [Math]::Min(1.0, 0.2 * $destroyed) }
+      }
+    }
+  }
+  return $scarred
+}
+
+function Get-ScarSuppressSet {
+  param($State, [string]$MapId)
+  # Exact burned pads: unitDefName|pocketId (fallback unitDefName|zoneId).
+  # Light raids that never cross destroyed≥3 still stay burned on re-Drop.
+  $suppress = @{}
+  if (-not $State -or -not $MapId) { return $suppress }
+  $bucket = $null
+  if ($State.PSObject.Properties["shellScars"] -and $State.shellScars) {
+    $bucket = $State.shellScars.$MapId
+  }
+  $units = @()
+  if ($bucket -and $bucket.units) { $units = @($bucket.units) }
+  foreach ($rec in $units) {
+    if (-not $rec) { continue }
+    if ($rec.destroyed -eq $false) { continue }
+    $def = [string]$(if ($rec.unitDefName) { $rec.unitDefName } else { "" })
+    if (-not $def) { continue }
+    $defKey = $def.ToLowerInvariant()
+    $pocketId = [string]$(if ($rec.pocketId) { $rec.pocketId } else { "" })
+    $zoneId = [string]$(if ($rec.zoneId) { $rec.zoneId } else { "" })
+    if ($pocketId) {
+      $suppress["$defKey|$pocketId"] = $true
+    } elseif ($zoneId) {
+      $suppress["$defKey|$zoneId"] = $true
+    }
+  }
+  return $suppress
+}
+
+function Test-LivingShellPocketOptional {
+  param($Pocket)
+  if (-not $Pocket) { return $false }
+  if ($Pocket.PSObject.Properties["optionalTarget"] -and $Pocket.optionalTarget) { return $true }
+  if ($Pocket.PSObject.Properties["highValue"] -and $Pocket.highValue) { return $true }
+  $kind = [string]$(if ($Pocket.kind) { $Pocket.kind } else { "" })
+  return ($kind -eq "fusion_fort")
+}
+
 function Build-LivingShellFromTemplate {
-  param($Template, [int]$TeamId, [string]$PrimaryZoneId)
+  param($Template, [int]$TeamId, [string]$PrimaryZoneId, [double[]]$PrimaryCenter, [string]$CommanderPolicy = "", $ScarredZones = $null, $DestroyedHvPockets = $null, $HeldInstalls = $null, $ScarSuppress = $null)
+  if (-not $DestroyedHvPockets) { $DestroyedHvPockets = @{} }
+  if (-not $HeldInstalls) { $HeldInstalls = @{} }
+  if (-not $ScarSuppress) { $ScarSuppress = @{} }
   $primaryPocket = $null
-  foreach ($pk in @($Template.pockets)) {
+  $matchedZone = $false
+  $combatPockets = @(@($Template.pockets) | Where-Object { -not (Test-LivingShellPocketOptional $_) })
+  if ($combatPockets.Count -lt 1) { $combatPockets = @($Template.pockets) }
+  foreach ($pk in @($combatPockets)) {
     if ($pk.primaryCandidate) { $primaryPocket = [string]$pk.pocketId; break }
   }
-  if (-not $primaryPocket -and $Template.pockets -and @($Template.pockets).Count -gt 0) {
-    $primaryPocket = [string](@($Template.pockets)[0].pocketId)
+  if (-not $primaryPocket -and $combatPockets.Count -gt 0) {
+    $primaryPocket = [string]($combatPockets[0].pocketId)
   }
-  # Prefer pocket whose zone matches the mission target.
+  # Prefer pocket whose zone matches the mission target (never a fusion bonus).
   if ($PrimaryZoneId) {
-    foreach ($pk in @($Template.pockets)) {
+    foreach ($pk in @($combatPockets)) {
       if ([string]$pk.zoneId -eq $PrimaryZoneId) {
         $primaryPocket = [string]$pk.pocketId
+        $matchedZone = $true
         break
       }
     }
   }
+  # Templates can retain legacy zone ids while the authored map has migrated
+  # to a more precise graph. Select the physically nearest combat pocket instead of
+  # silently spawning a fusion vault / first pocket at an unrelated objective.
+  if (-not $matchedZone -and $PrimaryCenter -and @($PrimaryCenter).Count -ge 2) {
+    $bestDistance = [double]::PositiveInfinity
+    foreach ($pk in @($combatPockets)) {
+      if (-not $pk.center -or @($pk.center).Count -lt 2) { continue }
+      $dx = [double]$pk.center[0] - [double]$PrimaryCenter[0]
+      $dz = [double]$pk.center[1] - [double]$PrimaryCenter[1]
+      $distance = ($dx * $dx) + ($dz * $dz)
+      if ($distance -lt $bestDistance) {
+        $bestDistance = $distance
+        $primaryPocket = [string]$pk.pocketId
+      }
+    }
+    if ($primaryPocket) {
+      Write-Host ("Living shell: zone {0} has no pocket — nearest combat pad {1}" -f $PrimaryZoneId, $primaryPocket)
+    }
+  }
+  $selectedPocketCenter = $null
+  foreach ($pk in @($Template.pockets)) {
+    if ([string]$pk.pocketId -eq [string]$primaryPocket -and $pk.center -and @($pk.center).Count -ge 2) {
+      $selectedPocketCenter = @([double]$pk.center[0], [double]$pk.center[1])
+      break
+    }
+  }
+  $rebaseDx = 0.0
+  $rebaseDz = 0.0
+  if ($PrimaryCenter -and $selectedPocketCenter) {
+    $rebaseDx = [double]$PrimaryCenter[0] - $selectedPocketCenter[0]
+    $rebaseDz = [double]$PrimaryCenter[1] - $selectedPocketCenter[1]
+  }
+  $pocketCenters = @{}
+  foreach ($pk in @($Template.pockets)) {
+    if ($pk -and $pk.pocketId -and $pk.center -and @($pk.center).Count -ge 2) {
+      $pocketCenters[[string]$pk.pocketId] = @([double]$pk.center[0], [double]$pk.center[1])
+    }
+  }
+  # Pocket zone lookup for scar continuity.
+  $pocketZone = @{}
+  $pocketMeta = @{}
+  foreach ($pk in @($Template.pockets)) {
+    if (-not $pk -or -not $pk.pocketId) { continue }
+    $pocketZone[[string]$pk.pocketId] = [string]$pk.zoneId
+    $pocketMeta[[string]$pk.pocketId] = $pk
+  }
+  $suppressedPockets = @{}
+  $thinnedUnits = 0
   $units = @()
+  $coordinateRepairs = 0
+  $shellIndex = 0
+  $thinIndex = 0
   foreach ($u in @($Template.units)) {
-    $units += [ordered]@{
-      unitDefName = [string]$u.unitDefName
-      x = [double]$u.x
-      z = [double]$u.z
+    $uPocket = if ($u.pocketId) { [string]$u.pocketId } else { "" }
+    $uZone = if ($u.zoneId) { [string]$u.zoneId } else { "" }
+    if (-not $uZone -and $uPocket -and $pocketZone.ContainsKey($uPocket)) {
+      $uZone = [string]$pocketZone[$uPocket]
+    }
+    $uDef = [string]$(if ($u.unitDefName) { $u.unitDefName } elseif ($u.def) { $u.def } else { "" })
+    $uDefKey = $uDef.ToLowerInvariant()
+    # Exact scar suppress: burned unitDef+pocket stays burned (light raids too).
+    if ($uDefKey -and $ScarSuppress -and $ScarSuppress.Count -gt 0) {
+      $hit = $false
+      if ($uPocket -and $ScarSuppress.ContainsKey("$uDefKey|$uPocket")) { $hit = $true }
+      elseif ($uZone -and $ScarSuppress.ContainsKey("$uDefKey|$uZone")) { $hit = $true }
+      if ($hit) {
+        if ($uPocket) { $suppressedPockets[$uPocket] = $true }
+        $thinnedUnits++
+        continue
+      }
+    }
+    $scarInfo = $null
+    if ($ScarredZones -and $uZone -and $ScarredZones.ContainsKey($uZone)) {
+      $scarInfo = $ScarredZones[$uZone]
+    }
+    $pkMeta = if ($uPocket -and $pocketMeta.ContainsKey($uPocket)) { $pocketMeta[$uPocket] } else { $null }
+    $isOptional = $false
+    if ($pkMeta) {
+      $isOptional = ($pkMeta.PSObject.Properties["optionalTarget"] -and $pkMeta.optionalTarget) `
+        -or ($pkMeta.PSObject.Properties["highValue"] -and $pkMeta.highValue) `
+        -or ([string]$pkMeta.kind -eq "fusion_fort")
+    }
+    # Fusion vault continuity: only despawn when the vault itself died.
+    # Ambient zone scars / player_bloc used to wipe the whole beamer ring —
+    # that felt like the prize teleported out between sorties.
+    $hvDead = ($uPocket -and $DestroyedHvPockets.ContainsKey($uPocket))
+    $heldByPlayer = $false
+    if ($isOptional -and $hvDead) {
+      $suppressedPockets[$uPocket] = $true
+      $thinnedUnits++
+      continue
+    }
+    if ($scarInfo) {
+      $scar = 0.25
+      if ($scarInfo.scar) { $scar = [double]$scarInfo.scar }
+      $reason = [string]$(if ($scarInfo.reason) { $scarInfo.reason } else { "" })
+      if ($isOptional) {
+        if ($reason -in @("player_bloc", "claimed")) {
+          # Prize stays; ownership flips to the company on re-entry.
+          $heldByPlayer = $true
+        }
+        # Else: contested vault still standing — keep enemy-owned unless HV-dead above.
+      } elseif ($reason -in @("claimed", "player_bloc")) {
+        # Owned dirt: full wipe enemy occupation. Company pads come back via
+        # playerFootprints merge — do not leave residual enemy on the same pad.
+        $suppressedPockets[$uPocket] = $true
+        $thinnedUnits++
+        continue
+      } else {
+        # Partial combat scars (shell_scar / destroyed_ledger):
+        # ALWAYS leave a thin residual — never empty the whole map because a
+        # few solars died. Cap effective scar so keepChance stays ≥ ~28%.
+        # Use a per-unit thin index (not shellIndex): shellIndex only advances
+        # on kept units, so a sticky hash used to wipe the entire remainder.
+        $effScar = [Math]::Min([double]$scar, 0.70)
+        $keepChance = [Math]::Max(0.28, 1.0 - $effScar)
+        $thinIndex++
+        $hash = ([Math]::Abs(($thinIndex * 2654435761) % 1000) / 1000.0)
+        if ($hash -gt $keepChance) {
+          $thinnedUnits++
+          continue
+        }
+      }
+    }
+    # heldInstallations.owner=player even without claim/scar reason → flip.
+    if (-not $heldByPlayer -and $uPocket -and $HeldInstalls) {
+      $heldRec = $null
+      try { $heldRec = $HeldInstalls.$uPocket } catch { $heldRec = $null }
+      if ($heldRec -and [string]$heldRec.owner -eq "player" -and [string]$heldRec.status -ne "destroyed") {
+        $heldByPlayer = $true
+      }
+    }
+    $x = [double]$u.x
+    $z = [double]$u.z
+    # A shell template is normalized to 0..1. Older Rock Jungle data carried
+    # a few accidental 1.x coordinates, which put every affected unit beyond
+    # the map and made the game appear to spawn them underwater.
+    $needsRepair = ($x -lt 0.0 -or $x -gt 1.0 -or $z -lt 0.0 -or $z -gt 1.0)
+    if ($needsRepair) {
+      $center = $null
+      if ($u.pocketId -and $pocketCenters.ContainsKey([string]$u.pocketId)) {
+        $center = $pocketCenters[[string]$u.pocketId]
+      }
+      if ($center) {
+        $slot = $shellIndex % 12
+        $x = [double]$center[0] + (0.014 * (($slot % 4) - 1.5))
+        $z = [double]$center[1] + (0.014 * ([Math]::Floor($slot / 4) - 1.0))
+      }
+      $coordinateRepairs++
+    }
+    if ($u.pocketId -and [string]$u.pocketId -eq [string]$primaryPocket -and $selectedPocketCenter) {
+      # Keep a selected legacy pocket's formation together, but center it on
+      # the current authored target anchor after zone-id migration.
+      $x += $rebaseDx
+      $z += $rebaseDz
+    }
+    $x = [Math]::Max(0.04, [Math]::Min(0.96, $x))
+    $z = [Math]::Max(0.04, [Math]::Min(0.96, $z))
+    $unitDefName = [string]$u.unitDefName
+    $keepClass = if ($u.keepClass) { [string]$u.keepClass } else { "static" }
+    if ($CommanderPolicy -eq "decoy" -and $unitDefName -match "^(arm|cor|leg)com$") {
+      # Greenest is a farm of decoy command nodes. Real commanders would turn
+      # the visual fiction into an extra autonomous player and duplicate the
+      # economy/AI role. Preserve the installation as a decoy instead.
+      $unitDefName = if ($unitDefName -match "^arm") { "armdecom" }
+                      elseif ($unitDefName -match "^cor") { "cordecom" }
+                      else { "legdecom" }
+      $keepClass = "decoy_node"
+    }
+    $unitRow = [ordered]@{
+      unitDefName = $unitDefName
+      x = $x
+      z = $z
       facing = if ($null -ne $u.facing) { [int]$u.facing } else { 0 }
-      zoneId = if ($u.zoneId) { [string]$u.zoneId } else { "" }
+      zoneId = if ($uZone) { $uZone } elseif ($u.zoneId) { [string]$u.zoneId } else { "" }
       pocketId = if ($u.pocketId) { [string]$u.pocketId } else { "" }
-      keepClass = if ($u.keepClass) { [string]$u.keepClass } else { "static" }
+      keepClass = $keepClass
       faction = if ($u.faction) { [string]$u.faction } else { "" }
     }
+    if ($heldByPlayer) {
+      $unitRow.heldByPlayer = $true
+      $unitRow.forceRole = "held_install"
+    }
+    $units += $unitRow
+    $shellIndex++
+  }
+  if ($thinnedUnits -gt 0) {
+    Write-Host ("Living shell continuity: suppressed {0} units on scarred/claimed pads ({1} pockets)" -f `
+      $thinnedUnits, $suppressedPockets.Count)
   }
   $pockets = @()
   foreach ($pk in @($Template.pockets)) {
-    $pockets += [ordered]@{
-      pocketId = [string]$pk.pocketId
+    $zid = [string]$pk.zoneId
+    $pocketId = [string]$pk.pocketId
+    $scarredPocket = ($ScarredZones -and $zid -and $ScarredZones.ContainsKey($zid))
+    $isOptionalPk = ($pk.PSObject.Properties["optionalTarget"] -and $pk.optionalTarget) `
+      -or ($pk.PSObject.Properties["highValue"] -and $pk.highValue) `
+      -or ([string]$pk.kind -eq "fusion_fort")
+    $hvDeadPocket = ($DestroyedHvPockets -and $pocketId -and $DestroyedHvPockets.ContainsKey($pocketId))
+    # Drop optional fusion/HV marks only when the vault itself is dead — not
+    # when a neighboring combat pad is scarred (that left blown vaults highlighted).
+    if ($isOptionalPk -and $hvDeadPocket) { continue }
+    $pocketRow = [ordered]@{
+      pocketId = $pocketId
       zoneId = [string]$pk.zoneId
       label = [string]$pk.label
       kind = if ($pk.kind) { [string]$pk.kind } else { "mixed" }
@@ -1307,7 +1818,19 @@ function Build-LivingShellFromTemplate {
       center = @([double]$pk.center[0], [double]$pk.center[1])
       unitCount = if ($null -ne $pk.unitCount) { [int]$pk.unitCount } else { 0 }
       primaryCandidate = [bool]$pk.primaryCandidate
+      scarred = [bool]$scarredPocket
     }
+    if ($pk.PSObject.Properties["optionalTarget"] -and $pk.optionalTarget) {
+      $pocketRow.optionalTarget = $true
+    }
+    if ($pk.PSObject.Properties["highValue"] -and $pk.highValue) {
+      $pocketRow.highValue = $true
+    }
+    if ([string]$pocketRow.kind -eq "fusion_fort") {
+      $pocketRow.optionalTarget = $true
+      $pocketRow.highValue = $true
+    }
+    $pockets += $pocketRow
   }
   return [ordered]@{
     enabled = $true
@@ -1317,6 +1840,10 @@ function Build-LivingShellFromTemplate {
     primaryZoneId = $PrimaryZoneId
     primaryPocketId = $primaryPocket
     unitCount = $units.Count
+    coordinateRepairs = $coordinateRepairs
+    # Persistent battlefield doctrine: every authored pocket exists before the
+    # first contract starts. Same-map selection only promotes surviving units.
+    localPocketOnly = $false
     units = $units
     pockets = $pockets
   }
@@ -1412,10 +1939,68 @@ function Try-ApplyLivingShell {
       base = [ordered]@{ x = $EnemyCenter[0]; z = $EnemyCenter[1] }
       recipe = "shell_anchor"
     }
-    $script:livingShellPayload = Build-LivingShellFromTemplate -Template $shellTpl -TeamId $teamID -PrimaryZoneId $PrimaryZoneId
-    foreach ($pk in @($shellTpl.pockets)) {
-      $isPrimary = ($script:livingShellPayload.primaryPocketId -and [string]$pk.pocketId -eq [string]$script:livingShellPayload.primaryPocketId)
-      $script:mapOccupation += [ordered]@{
+    $commanderPolicy = if ([string]$MapId -eq "greenest_fields") { "decoy" } else { "" }
+    $scarredZones = Get-ScarredZoneSet -State $state -MapId $MapId
+    $destroyedHv = Get-DestroyedHighValuePockets -State $state -MapId $MapId
+    $scarSuppress = Get-ScarSuppressSet -State $state -MapId $MapId
+    $mapHeld = $null
+    if ($state -and $state.PSObject.Properties["heldInstallations"] -and $state.heldInstallations) {
+      $mapHeld = $state.heldInstallations.$MapId
+    }
+    if ($scarredZones.Count -gt 0) {
+      Write-Host ("Shell scars on {0}: {1}" -f $MapId, (($scarredZones.Keys | ForEach-Object { "$_=$($scarredZones[$_].reason)" }) -join ", "))
+    }
+    if ($destroyedHv.Count -gt 0) {
+      Write-Host ("Destroyed HV pockets on {0}: {1}" -f $MapId, ($destroyedHv.Keys -join ", "))
+    }
+    if ($scarSuppress.Count -gt 0) {
+      Write-Host ("Exact scar suppress on {0}: {1} keys" -f $MapId, $scarSuppress.Count)
+    }
+    $script:livingShellPayload = Build-LivingShellFromTemplate -Template $shellTpl `
+      -TeamId $teamID -PrimaryZoneId $PrimaryZoneId -PrimaryCenter $EnemyCenter `
+      -CommanderPolicy $commanderPolicy -ScarredZones $scarredZones `
+      -DestroyedHvPockets $destroyedHv -HeldInstalls $mapHeld `
+      -ScarSuppress $scarSuppress
+    $script:livingShellPayload = Merge-PlayerFootprintIntoShell -State $state -MapId $MapId `
+      -ShellPayload $script:livingShellPayload
+    $script:livingShellPayload.commanderPolicy = if ($commanderPolicy) { $commanderPolicy } else { "normal" }
+    $selectedPocket = @($script:livingShellPayload.pockets | Where-Object {
+      [string]$_.pocketId -eq [string]$script:livingShellPayload.primaryPocketId
+    }) | Select-Object -First 1
+    # Keep raid bookkeeping on the pocket that actually exists. Hub marks like
+    # GF_NE_PLATEAU may have no shell pad — remapping prevents empty eco_raid.
+    if ($selectedPocket -and $selectedPocket.zoneId) {
+      $pocketZone = [string]$selectedPocket.zoneId
+      if ($pocketZone -and $pocketZone -ne [string]$PrimaryZoneId) {
+        Write-Host ("Living shell: remapping objective zone {0} -> {1} (pocket {2})" -f `
+          $PrimaryZoneId, $pocketZone, $script:livingShellPayload.primaryPocketId)
+        $script:livingShellPayload.primaryZoneId = $pocketZone
+        $script:livingShellPayload.requestedZoneId = [string]$PrimaryZoneId
+        $script:shellRemappedZoneId = $pocketZone
+        if ($script:forces) {
+          foreach ($force in @($script:forces)) {
+            if ($force -and [string]$force.id -eq "living_shell_anchor") {
+              $force.zoneId = $pocketZone
+            }
+          }
+        }
+      }
+    }
+    $script:livingShellPayload.spawnLimit = [int]$script:livingShellPayload.unitCount
+    if ($script:livingShellPayload.spawnLimit -lt 1) { $script:livingShellPayload.spawnLimit = 51 }
+    if ($intent.openingMission) {
+      # Builder historically wrote openingPocketOnly; gadget reads both.
+      $script:livingShellPayload.openingPocketOnly = $true
+      $script:livingShellPayload.localPocketOnly = $true
+    }
+    # Prefer payload pockets (already HV-dead filtered) over raw template.
+    $occPockets = @($script:livingShellPayload.pockets)
+    if ($occPockets.Count -lt 1) { $occPockets = @($shellTpl.pockets) }
+    foreach ($pk in $occPockets) {
+      $pocketId = [string]$pk.pocketId
+      if ($destroyedHv -and $pocketId -and $destroyedHv.ContainsKey($pocketId)) { continue }
+      $isPrimary = ($script:livingShellPayload.primaryPocketId -and $pocketId -eq [string]$script:livingShellPayload.primaryPocketId)
+      $occ = [ordered]@{
         zoneId = [string]$pk.zoneId
         label = [string]$pk.label
         kind = if ($pk.kind) { [string]$pk.kind } else { "mixed" }
@@ -1423,9 +2008,18 @@ function Try-ApplyLivingShell {
         teamID = $teamID
         preplaced = $true
         primary = [bool]$isPrimary
-        pocketId = [string]$pk.pocketId
+        pocketId = $pocketId
         livingShell = $true
+        commanderPolicy = if ($commanderPolicy) { $commanderPolicy } else { "normal" }
       }
+      $isOptional = ($pk.PSObject.Properties["optionalTarget"] -and $pk.optionalTarget) `
+        -or ($pk.PSObject.Properties["highValue"] -and $pk.highValue) `
+        -or ([string]$pk.kind -eq "fusion_fort")
+      if ($isOptional) {
+        $occ.optionalTarget = $true
+        $occ.highValue = $true
+      }
+      $script:mapOccupation += $occ
     }
     $script:wrathPayload = Arm-WrathFromRecipe -Ws $Ws -MapId $MapId -MissionNumber $missionNumber
     if ($script:wrathPayload) {
@@ -1519,8 +2113,29 @@ if ($isFinale) {
   Write-Host ("Finale scale: kind={0} -> enemyScale={1}" -f $finaleKind, $enemyScale)
 }
 $maxHazard = if ($intent.offscreenPressureSummary -and $intent.offscreenPressureSummary.maxHazard) { [double]$intent.offscreenPressureSummary.maxHazard } else { 0.0 }
-$presenceKind = $objectiveKind -in @("seize_lane", "gate_control")
+$presenceKind = $objectiveKind -in @("seize_lane", "gate_control", "hold_plateau")
+$fortifyKind = $objectiveKind -in @("fortify_zone", "secure_foothold", "home_founding")
 $mapFamily = if ($intent.environment -and $intent.environment.mapFamily) { [string]$intent.environment.mapFamily } else { "tempo" }
+# Rock Jungle founding / dig-in: empty deep wilds (raptors only). No Armada/Cortex camps,
+# no living-shell scrap occupation, no Null Merc foothold on the shelf.
+$againstFaction = ""
+if ($intent.PSObject.Properties["against"] -and $intent.against) {
+  $againstFaction = [string]$intent.against
+} elseif ($intent.PSObject.Properties["worldConflict"] -and $intent.worldConflict -and $intent.worldConflict.primaryEnemy) {
+  $againstFaction = [string]$intent.worldConflict.primaryEnemy
+}
+$journeyId = ""
+if ($intent.PSObject.Properties["journey"] -and $intent.journey) { $journeyId = [string]$intent.journey }
+$isRockJungle = ([string]$intent.mapId -eq "the_rock_jungle")
+$isWildHomeFounding = $isRockJungle -and (
+  $fortifyKind -or
+  $againstFaction -eq "wild" -or
+  $journeyId -eq "home_founding" -or
+  $objectiveKind -eq "survive_wilds"
+)
+if ($isWildHomeFounding) {
+  Write-Host "Rock Jungle wild home: empty shelf (raptors only; no empire camps / living-shell scrap)."
+}
 
 # XP / mode strings (band label recomputed after merc scale just before card).
 $xpMode = if ($intent.progression -and $intent.progression.mode) { [string]$intent.progression.mode }
@@ -1553,7 +2168,7 @@ $mercRep = if ($mercInfo -and $null -ne $mercInfo.reputation) { [double]$mercInf
 $mercsAllied = if ($mercInfo -and $null -ne $mercInfo.alliedWithPlayer) { [bool]$mercInfo.alliedWithPlayer } else { $mercRep -ge 40.0 }
 # Standing scales the merc foothold: allied lines field a fuller camp, wary thinner.
 $mercFootholdScale = if ($mercInfo -and $null -ne $mercInfo.footholdScale) { [double]$mercInfo.footholdScale } else { 1.0 }
-$mercsPresent = $objectiveKind -ne "hive_clear_or_bypass"
+$mercsPresent = ($objectiveKind -ne "hive_clear_or_bypass") -and (-not $isWildHomeFounding)
 if ($mercsPresent -and $mercsAllied) { $enemyScale = [Math]::Round($enemyScale * 1.1, 3) }
 # Drop 4: clamp the final scale into the ladder's authored window. Campaign
 # state still moves the needle INSIDE the window; the owner's difficulty dial
@@ -1591,6 +2206,27 @@ $patrolTarget = if ($presenceKind) {
 
 function Clamp01 { param([double]$V) return [Math]::Max(0.03, [Math]::Min(0.97, $V)) }
 
+# Same rim rule as player infil — reinforcements / footholds / wild nests stay on edges.
+function EdgeScoreNorm([double]$x, [double]$z) {
+  return [Math]::Min([Math]::Min($x, 1.0 - $x), [Math]::Min($z, 1.0 - $z))
+}
+function PushToRim([double[]]$c, [double]$threshold = 0.28) {
+  $x = [double]$c[0]; $z = [double]$c[1]
+  if ((EdgeScoreNorm $x $z) -le $threshold) { return @((Clamp01 $x), (Clamp01 $z)) }
+  for ($i = 0; $i -lt 24; $i++) {
+    $toLeft = $x; $toRight = 1.0 - $x; $toTop = $z; $toBottom = 1.0 - $z
+    $min = [Math]::Min([Math]::Min($toLeft, $toRight), [Math]::Min($toTop, $toBottom))
+    if ($min -eq $toLeft) { $x -= 0.04 }
+    elseif ($min -eq $toRight) { $x += 0.04 }
+    elseif ($min -eq $toTop) { $z -= 0.04 }
+    else { $z += 0.04 }
+    $x = Clamp01 $x; $z = Clamp01 $z
+    if ((EdgeScoreNorm $x $z) -le $threshold) { break }
+  }
+  return @($x, $z)
+}
+$wildCenter = PushToRim @(0.08, 0.50)
+
 # --- Camp assembly ---------------------------------------------------------
 # Each camp -> one team on its own allyteam (contractor centerpieces share the
 # garrison's allyteam). Camps carry a small objective-tagged centerpiece force
@@ -1604,7 +2240,10 @@ $strikeDoctrine = ([int]$arcProfile.playerCommanders -le 0) -or ($objectiveKind 
 # Drop 2: act 2+ is base-building doctrine even on raid contracts; act 3 is the
 # finale kit (massive start).
 if ($actNum -ge 2) { $strikeDoctrine = $false }
-if ($actNum -ge 3 -or $isFinale) {
+if ($openingMission) {
+  $playerKit = New-OpeningStrikeTeam $commerce
+  Write-Host "Opening kit: mercenary Punch of Thugs + 2 Karkinos + Phobos Vane + durable rez-bot Ketha; no commander suit."
+} elseif ($actNum -ge 3 -or $isFinale) {
   $playerKit = New-FinaleKitFromRoster $mapFamily $roster $resourceMod $commerce
 } elseif ($actNum -ge 2 -and $roster) {
   $playerKit = New-PlayerKitFromRoster $mapFamily $roster $resourceMod $commerce
@@ -1620,9 +2259,20 @@ if ($actNum -ge 3 -or $isFinale) {
 }
 if ($commerce) {
   $tnb = if ($null -ne $commerce.tenebrium) { $commerce.tenebrium } else { 0 }
-  $scr = if ($null -ne $commerce.credits) { $commerce.credits } else { 0 }
+  $mk = if ($null -ne $commerce.metalK) { $commerce.metalK } elseif ($null -ne $commerce.credits) { $commerce.credits } else { 0 }
   $depN = if ($commerce.deploy) { @($commerce.deploy).Count } else { 0 }
-  Write-Host ("Commerce: Tenebrium={0} credits={1} deployables={2}" -f $tnb, $scr, $depN)
+  Write-Host ("Commerce: Tenebrium={0} metalK={1} deployables={2}" -f $tnb, $mk, $depN)
+}
+# Stamp banked veteran XP onto kit units (majority retain between rounds).
+if ($roster) {
+  $playerKit = Apply-CadreXpToKit $playerKit $roster
+  $xpStamped = 0
+  foreach ($s in @($playerKit)) {
+    if ($s -and $null -ne $s.xp -and [double]$s.xp -gt 0) { $xpStamped += 1 }
+  }
+  if ($xpStamped -gt 0) {
+    Write-Host ("Cadre XP stamped on {0} kit unit groups (majority retain)." -f $xpStamped)
+  }
 }
 # Chassis side stays Legion (BAR unit tree); presentation is Ashwalkers.
 $baseRecipes = [ordered]@{ ashwalker_player_kit = @($playerKit); legion_player_kit = @($playerKit) }
@@ -1630,8 +2280,12 @@ $baseRecipes = [ordered]@{ ashwalker_player_kit = @($playerKit); legion_player_k
 $diffBand = if ($enemyScale -ge 1.6) { "heavy" } elseif ($enemyScale -ge 1.2) { "reinforced" } elseif ($enemyScale -le 0.85) { "light" } else { "standard" }
 $difficultyLine = "Expected opposition: $diffBand (scale $enemyScale) | dial $([Math]::Round($difficultyDial, 2))"
 if ($isFarmSortie) { $difficultyLine = "$difficultyLine | FARM SORTIE (bonus XP, lighter camp)" }
+$extractZone = Get-ZoneById $zoneMap ([string]$intent.extractionZoneId)
+$deployLabel = if ($deployZone -and $deployZone.label) { [string]$deployZone.label } else { [string]$intent.deploymentZoneId }
+$targetLabel = if ($targetZone -and $targetZone.label) { [string]$targetZone.label } else { [string]$targetZoneId }
+$extractLabel = if ($extractZone -and $extractZone.label) { [string]$extractZone.label } else { [string]$intent.extractionZoneId }
 $missionCard = New-MissionCard $intent $arcProfile $map.title $description `
-  ([string]$intent.deploymentZoneId) $targetZoneId ([string]$intent.extractionZoneId) `
+  $deployLabel $targetLabel $extractLabel `
   -DifficultyLine $difficultyLine -XpLine $xpLine -HeroLine $heroLine
 # G4: stamp hub C&C language onto the in-BAR briefing card
 if ($intent.hubChoiceId -or $intent.captureZoneIds -or $intent.deployAces) {
@@ -1641,10 +2295,9 @@ if ($intent.hubChoiceId -or $intent.captureZoneIds -or $intent.deployAces) {
   if ($intent.secondaryCaptureZoneIds) { $secBits = @($intent.secondaryCaptureZoneIds) }
   $aceBits = @()
   if ($intent.deployAces) { $aceBits = @($intent.deployAces) }
-  $hubLine = "Hub board: primary $($targetZoneId)"
+  $hubLine = "Required target: $($targetZoneId)"
   if ($secBits.Count -gt 0) { $hubLine = "$hubLine · secondary $($secBits -join ', ')" }
   if ($aceBits.Count -gt 0) { $hubLine = "$hubLine · aces $($aceBits -join '+')" }
-  if ($intent.hubChoiceId) { $hubLine = "$hubLine · choice $($intent.hubChoiceId)" }
   if ($missionCard -is [hashtable] -or $missionCard -is [System.Collections.IDictionary] -or $missionCard.PSObject) {
     try {
       if ($missionCard.situation) {
@@ -1660,6 +2313,12 @@ if ($intent.hubChoiceId -or $intent.captureZoneIds -or $intent.deployAces) {
         $missionCard["situation"] = "$($missionCard['situation'])  |  $hubLine"
       }
     }
+  }
+}
+if ($intent.operationSummary) {
+  $missionCard["howItEnds"] = "$($missionCard['howItEnds']) $($intent.operationSummary.bringHome)"
+  if ($intent.narrativeContext) {
+    $missionCard["situation"] = [string]$intent.narrativeContext.purpose
   }
 }
 Write-Host ("Arc profile: id={0} playerCommanders={1} enemyMode={2} allyPower={3} escalation={4} ai={5} flavor={6}" -f `
@@ -1753,7 +2412,12 @@ function Add-RaptorCamp {
     $script:baseRecipes["camp${teamID}_hives"] = @(Centerpiece-Hives $maxHazard)
     $script:forces += [ordered]@{ id = "camp${teamID}_objective"; label = $Label; teamID = $teamID; side = "Raptors"; faction = "wild"; role = "objective_target"; base = [ordered]@{ x = $Center[0]; z = $Center[1] }; recipe = "camp${teamID}_hives" }
   }
-  $script:baseRecipes["camp${teamID}_swarm"] = @(Ring-RaptorGarrison $maxHazard)
+  $swarmSpecs = @(Ring-RaptorGarrison $maxHazard)
+  if (-not $AsObjective) {
+    # Wild pressure has no objective heart. Same three hives, so the jungle is already occupied.
+    $swarmSpecs += Centerpiece-Hives $maxHazard
+  }
+  $script:baseRecipes["camp${teamID}_swarm"] = $swarmSpecs
   $script:forces += [ordered]@{ id = "camp${teamID}_swarm"; label = "Raptor swarm"; teamID = $teamID; side = "Raptors"; faction = "wild"; role = $(if ($AsObjective) { "garrison" } else { "wild_pressure" }); base = [ordered]@{ x = $Center[0]; z = $Center[1] }; recipe = "camp${teamID}_swarm" }
   $script:ai += [ordered]@{ name = "RaptorsDefenseAI(Verdance)"; shortName = "RaptorsAI"; team = $teamID; version = "<not-versioned>" }
 }
@@ -1767,7 +2431,12 @@ function Add-NullMercCamp {
   $mfx = [Math]::Sign($enemyCenter[0] - $Center[0]); if ($mfx -eq 0) { $mfx = 1 }
   $mfz = [Math]::Sign($enemyCenter[1] - $Center[1]); if ($mfz -eq 0) { $mfz = 1 }
   $allyP = if ($null -ne $arcProfile.allyPower) { [double]$arcProfile.allyPower } else { 1.0 }
-  $script:baseRecipes["camp${teamID}_mercs"] = @(New-MercFoothold $Scale $patrolTarget[0] $patrolTarget[1] $mfx $mfz $allyP)
+  # SimpleAI supplies its own single commander at game start. Do not add a
+  # second commander to the authored recipe: the engine commander is the
+  # foothold's builder anchor, while the Ashwalker player kit stays
+  # commander-free until the campaign explicitly reaches a base-building act.
+  $mercRecipe = @(New-MercFoothold $Scale $patrolTarget[0] $patrolTarget[1] $mfx $mfz $allyP)
+  $script:baseRecipes["camp${teamID}_mercs"] = $mercRecipe
   $script:forces += [ordered]@{ id = "camp${teamID}_mercs"; label = "Null Mercs foothold"; teamID = $teamID; side = "Legion"; faction = "nullmercs"; role = "merc_foothold"; base = [ordered]@{ x = $Center[0]; z = $Center[1] }; recipe = "camp${teamID}_mercs" }
   $script:ai += [ordered]@{ name = "SimpleAI(Null Mercs)"; shortName = "SimpleAI"; team = $teamID; version = "<not-versioned>" }
   if ($Allied) {
@@ -1876,6 +2545,167 @@ function Add-SecondaryObjectiveCamp {
   return [ordered]@{ id = $SecondaryId; label = $Label; required = [bool]$Required; x = $Center[0]; z = $Center[1]; teamID = $teamID }
 }
 
+function Get-CompanyTravelStructureDefs {
+  # Hero bodies and the structures that ship inside their pack. Those travel
+  # with the dropping list. Rehydrating them paints a second Solarium (and
+  # the rest of that nest) onto wherever they stood last time, often the target.
+  param($State)
+  $skip = New-Object 'System.Collections.Generic.HashSet[string]'
+  if (-not $State -or -not $State.company) { return $skip }
+  $packPath = Join-Path $script:Workspace "data\story\crew_packs.json"
+  if (-not (Test-Path -LiteralPath $packPath)) { return $skip }
+  $doc = $null
+  try { $doc = Get-Content -Raw -LiteralPath $packPath | ConvertFrom-Json } catch { return $skip }
+  $heroes = $doc.heroes
+  if (-not $heroes) { return $skip }
+  $ids = @()
+  foreach ($k in @("core", "band", "joinedLater")) {
+    $bag = $State.company.$k
+    if ($bag) { $ids += @($bag) }
+  }
+  foreach ($raw in $ids) {
+    $id = [string]$raw
+    if (-not $id -or -not $heroes.PSObject.Properties[$id]) { continue }
+    $h = $heroes.$id
+    if ($h.unitDef) { [void]$skip.Add(([string]$h.unitDef).ToLower()) }
+    if ($h.escorts) {
+      foreach ($e in @($h.escorts)) {
+        if ($e -and $e.unitDef) { [void]$skip.Add(([string]$e.unitDef).ToLower()) }
+      }
+    }
+  }
+  return $skip
+}
+
+function Merge-PlayerFootprintIntoShell {
+  # Concrete SoT for company-built pads. Living-shell scars/claims suppress
+  # enemy occupation; this appends the player's own structures so claimed
+  # zones are not empty dirt on the next Drop. Coords are Spring elmos
+  # (living_shell.lua shellCoord accepts elmos when value > 1.5).
+  # Hero packs are not pads. They spawn from the dropping list, once.
+  param($State, [string]$MapId, $ShellPayload)
+  if (-not $State -or -not $MapId) { return $ShellPayload }
+  $fp = $null
+  if ($State.PSObject.Properties["playerFootprints"] -and $State.playerFootprints) {
+    $fp = $State.playerFootprints.$MapId
+  }
+  if (-not $fp -or -not $fp.units) { return $ShellPayload }
+  # Footprint-only shell when occupation path skipped (kind/template miss).
+  if (-not $ShellPayload) {
+    $ShellPayload = [ordered]@{
+      enabled = $true
+      templateId = "player_footprint_only"
+      source = "player_footprints"
+      teamID = 1
+      primaryZoneId = [string]$(if ($fp.deploymentZoneId) { $fp.deploymentZoneId } else { "" })
+      primaryPocketId = ""
+      unitCount = 0
+      localPocketOnly = $false
+      units = @()
+      pockets = @()
+      spawnLimit = 64
+    }
+  }
+  $units = @()
+  if ($ShellPayload.units) { $units = @($ShellPayload.units) }
+  $added = 0
+  $skippedTravel = 0
+  $skippedLattice = 0
+  $fpSizeX = 0.0
+  $fpSizeZ = 0.0
+  $fpBaseline = Join-Path $Workspace "data\scenarios\authored\$MapId.authored_baseline.json"
+  if (Test-Path -LiteralPath $fpBaseline) {
+    try {
+      $fpAuthored = Get-Content -Raw -LiteralPath $fpBaseline | ConvertFrom-Json
+      if ($fpAuthored.map) {
+        $fpSizeX = [double]$fpAuthored.map.sizeX
+        $fpSizeZ = [double]$fpAuthored.map.sizeZ
+      }
+    } catch {}
+  }
+  $travelDefs = Get-CompanyTravelStructureDefs $State
+  foreach ($u in @($fp.units)) {
+    if (-not $u) { continue }
+    $def = [string]$(if ($u.unitDefName) { $u.unitDefName } elseif ($u.def) { $u.def } else { "" })
+    if (-not $def) { continue }
+    if ($travelDefs.Contains($def.ToLower())) {
+      $skippedTravel++
+      continue
+    }
+    $x = 0.0; $z = 0.0
+    try { $x = [double]$u.x } catch { continue }
+    try { $z = [double]$u.z } catch { continue }
+    if ($fpSizeX -gt 512 -and $fpSizeZ -gt 512 -and $x -gt 1.5 -and $z -gt 1.5) {
+      $dx = [Math]::Abs($x / $fpSizeX - 0.5)
+      $dz = [Math]::Abs($z / $fpSizeZ - 0.5)
+      $hitX = ([Math]::Abs($dx - 0.007) -lt 0.002) -or ([Math]::Abs($dx - 0.021) -lt 0.002)
+      $hitZ = ([Math]::Abs($dz - 0.007) -lt 0.002) -or ([Math]::Abs($dz - 0.021) -lt 0.002)
+      if ($hitX -and $hitZ) {
+        $skippedLattice++
+        continue
+      }
+    }
+    $facing = 0
+    try { $facing = [int]$u.facing } catch { $facing = 0 }
+    $zoneId = [string]$(if ($u.zoneId) { $u.zoneId } else { "" })
+    $units += [ordered]@{
+      unitDefName = $def
+      x = $x
+      z = $z
+      facing = $facing
+      zoneId = $zoneId
+      pocketId = ""
+      keepClass = "static"
+      heldByPlayer = $true
+      forceRole = "player_footprint"
+      faction = "ashwalkers"
+    }
+    $added++
+    if ($added -ge 64) { break }
+  }
+  if ($added -gt 0) {
+    $ShellPayload.units = $units
+    $ShellPayload.unitCount = $units.Count
+    $ShellPayload.enabled = $true
+    $curLimit = 0
+    try { $curLimit = [int]$ShellPayload.spawnLimit } catch { $curLimit = 0 }
+    $ShellPayload.spawnLimit = [Math]::Max($curLimit, $units.Count)
+    Write-Host ("Player footprint: rehydrating {0} structures onto living shell" -f $added)
+  }
+  if ($skippedTravel -gt 0) {
+    Write-Host ("Player footprint: left {0} hero-pack structures with the company (not painted onto the map)" -f $skippedTravel)
+  }
+  if ($skippedLattice -gt 0) {
+    Write-Host ("Player footprint: left {0} center-snap ghosts off the map" -f $skippedLattice)
+  }
+  return $ShellPayload
+}
+
+function Ensure-PlayerFootprintShell {
+  # When Try-ApplyLivingShell did not run (kind/template miss), still emit a
+  # minimal livingShell so company pads from playerFootprints respawn.
+  param($State, [string]$MapId, [string]$PrimaryZoneId)
+  if ($script:livingShellPayload) {
+    $script:livingShellPayload = Merge-PlayerFootprintIntoShell -State $State -MapId $MapId `
+      -ShellPayload $script:livingShellPayload
+    return $false
+  }
+  $fp = $null
+  if ($State -and $State.PSObject.Properties["playerFootprints"] -and $State.playerFootprints) {
+    $fp = $State.playerFootprints.$MapId
+  }
+  if (-not $fp -or -not $fp.units -or @($fp.units).Count -lt 1) { return $false }
+  $payload = Merge-PlayerFootprintIntoShell -State $State -MapId $MapId -ShellPayload $null
+  if (-not $payload -or -not $payload.units -or @($payload.units).Count -lt 1) { return $false }
+  if ($PrimaryZoneId -and -not $payload.primaryZoneId) {
+    $payload.primaryZoneId = $PrimaryZoneId
+  }
+  $script:livingShellPayload = $payload
+  $script:usedShell = $true
+  Write-Host ("Player footprint: footprint-only living shell ({0} units)" -f @($payload.units).Count)
+  return $true
+}
+
 function New-RehydrateSpecs {
   # Drop 3 finale dressing: turn a persistent-base snapshot (zone telemetry's
   # unitCountsByDef) back into placeable specs. Approximate by design — top
@@ -1910,7 +2740,59 @@ function New-RehydrateSpecs {
 # Hand-scattered mapOccupation camps are deprecated fallback when no template exists.
 # Prefer living-shell occupation for all shell-capable kinds (outbound 37/38/44).
 $usedShell = $false
-if ($script:shellCapableKinds -contains $objectiveKind) {
+$script:shellRemappedZoneId = $null
+# Continuity: never aim sortie/story at a fusion vault the player already blew.
+$preDestroyedHv = Get-DestroyedHighValuePockets -State $state -MapId ([string]$intent.mapId)
+if ($preDestroyedHv.Count -gt 0 -and $targetZoneId) {
+  $deadZones = @{}
+  foreach ($pair in @(
+    @{ p = "gf_c_gate_fus"; z = "GF_C_GATE" },
+    @{ p = "gf_c_inner_fus"; z = "GF_C_INNER_GATE" }
+  )) {
+    if ($preDestroyedHv.ContainsKey([string]$pair.p)) { $deadZones[[string]$pair.z] = $true }
+  }
+  if ($state.PSObject.Properties["heldInstallations"] -and $state.heldInstallations) {
+    $mapHeld = $state.heldInstallations.([string]$intent.mapId)
+    if ($mapHeld) {
+      foreach ($pocketId in @($preDestroyedHv.Keys)) {
+        $rec = $mapHeld.$pocketId
+        if ($rec -and $rec.zoneId) { $deadZones[[string]$rec.zoneId] = $true }
+      }
+    }
+  }
+  if ($deadZones.ContainsKey($targetZoneId)) {
+    $alt = $null
+    foreach ($cand in @("GF_NW_BASTION", "GF_SE_PLATEAU", "GF_SW_BASTION", "GF_NE_PLATEAU")) {
+      if (-not $deadZones.ContainsKey($cand) -and $cand -ne $deployZoneId) { $alt = $cand; break }
+    }
+    if ($alt) {
+      Write-Host ("Continuity: retarget away from destroyed fusion zone {0} -> {1}" -f $targetZoneId, $alt)
+      $targetZoneId = $alt
+      $targetZone = Get-ZoneById $zoneMap $targetZoneId
+      $enemyCenter = Get-ZoneCenter $targetZone $enemyCenter
+      if ($intent.objectiveTarget) { $intent.objectiveTarget.targetZoneId = $alt }
+      if ($intent.PSObject.Properties["targetZoneId"]) { $intent.targetZoneId = $alt }
+      if ($intent.PSObject.Properties["storyIntent"] -and $intent.storyIntent) {
+        $intent.storyIntent.targetZoneId = $alt
+        if ($intent.storyIntent.objectiveTarget) {
+          $intent.storyIntent.objectiveTarget.targetZoneId = $alt
+        }
+      }
+      # Strip dead fusion pads from hub capture marks / secondaries.
+      if ($intent.PSObject.Properties["captureZoneIds"] -and $intent.captureZoneIds) {
+        $intent.captureZoneIds = @($intent.captureZoneIds | Where-Object { -not $deadZones.ContainsKey([string]$_) })
+      }
+      if ($intent.PSObject.Properties["secondaryCaptureZoneIds"] -and $intent.secondaryCaptureZoneIds) {
+        $intent.secondaryCaptureZoneIds = @($intent.secondaryCaptureZoneIds | Where-Object { -not $deadZones.ContainsKey([string]$_) })
+      }
+    }
+  }
+}
+$usedShell = $false
+if ($isWildHomeFounding) {
+  # Founding shelf stays empty — player builds the Ashwalker pad; raptors are the only pressure.
+  Write-Host "Skipping living-shell occupation on Rock Jungle wild home founding."
+} elseif ($script:shellCapableKinds -contains $objectiveKind) {
   $anchorSide = $enemySide
   if ($objectiveKind -eq "eco_raid" -or $objectiveKind -eq "eco_expand") { $anchorSide = "Armada" }
   if ($objectiveKind -eq "survive_wilds") { $anchorSide = "Legion" }
@@ -1918,6 +2800,19 @@ if ($script:shellCapableKinds -contains $objectiveKind) {
   if (([string]$intent.mapId) -eq "ancient_bastion") { $anchorSide = "Armada" }
   $usedShell = Try-ApplyLivingShell -Ws $Workspace -MapId ([string]$intent.mapId) `
     -PrimaryZoneId $targetZoneId -Description $description -EnemyCenter $enemyCenter -AnchorSide $anchorSide
+  if ($usedShell -and $script:shellRemappedZoneId) {
+    $targetZoneId = [string]$script:shellRemappedZoneId
+    if ($intent.objectiveTarget) {
+      $intent.objectiveTarget.targetZoneId = $targetZoneId
+    }
+  }
+}
+# DRY: company pads always rehydrate when we have a footprint bag — even if
+# the occupation shell path skipped (non-capable kind / missing template).
+if (-not $usedShell) {
+  $fpOnly = Ensure-PlayerFootprintShell -State $state -MapId ([string]$intent.mapId) `
+    -PrimaryZoneId $targetZoneId
+  if ($fpOnly) { $usedShell = $true }
 }
 
 # Drop 2 finale setpieces: authored camps keyed by path (no living shell —
@@ -2027,9 +2922,12 @@ switch ($objectiveKind) {
     Add-FactionCamp "Cortex" $cortexCenter (Centerpiece-CommandPost $FACTION["Cortex"]) "Cortex forward works" -WithEco $true
   }
   default {
-    # Presence objectives (seize_lane / gate_control / siege): shell preferred above.
-    # Fallback = thin front-band garrison + reinforcement packs (WO-004).
-    if (-not $usedShell) {
+    if ($isWildHomeFounding -or $againstFaction -eq "wild") {
+      # Empty wilds dig-in / fortify: raptor pressure only (added below via hasWild).
+      Write-Host ("Wild objective {0}: no empire faction camp." -f $objectiveKind)
+    } elseif (-not $usedShell) {
+      # Presence objectives (seize_lane / gate_control / siege): shell preferred above.
+      # Fallback = thin front-band garrison + reinforcement packs (WO-004).
       $T = $FACTION[$enemySide]
       Add-FactionCamp $enemySide $enemyCenter $null $description -WithEco $false -FrontBand $true
     }
@@ -2061,6 +2959,45 @@ if ($escSecondaries.Count -gt 0 -and -not $isFinale -and $zoneMap -and $zoneMap.
       $secMeta.zoneId = $secZid
       $script:secondaryMeta += $secMeta
     }
+  }
+}
+
+# Living-shell optional high-value pockets (e.g. Greenest center fusion vaults).
+# These are already pre-placed in the shell — register bonus secondary meta only
+# (required=false). Lua books the fusion keepClass=high_value into the ledger.
+if ($script:livingShellPayload -and $script:livingShellPayload.pockets -and -not $isFinale) {
+  $seenSec = @{}
+  foreach ($sm in @($script:secondaryMeta)) {
+    if ($sm -and $sm.id) { $seenSec[[string]$sm.id] = $true }
+  }
+  foreach ($pk in @($script:livingShellPayload.pockets)) {
+    if (-not $pk) { continue }
+    $isOptional = ($pk.PSObject.Properties["optionalTarget"] -and $pk.optionalTarget) `
+      -or ($pk.PSObject.Properties["highValue"] -and $pk.highValue) `
+      -or ([string]$pk.kind -eq "fusion_fort")
+    if (-not $isOptional) { continue }
+    $secZid = [string]$pk.zoneId
+    if (-not $secZid -or $secZid -eq $targetZoneId -or $secZid -eq $deployZoneId) { continue }
+    $secId = "bonus_fus_" + ([string]$pk.pocketId).ToLower()
+    if ($seenSec.ContainsKey($secId)) { continue }
+    $cx = 0.5; $cz = 0.5
+    if ($pk.center -and @($pk.center).Count -ge 2) {
+      $cx = [double]$pk.center[0]; $cz = [double]$pk.center[1]
+    }
+    $secLabel = if ($pk.label) { [string]$pk.label } else { $secZid }
+    $script:secondaryMeta += [ordered]@{
+      id = $secId
+      label = $secLabel
+      required = $false
+      x = $cx
+      z = $cz
+      zoneId = $secZid
+      pocketId = [string]$pk.pocketId
+      source = "living_shell_optional"
+      highValue = $true
+    }
+    $seenSec[$secId] = $true
+    Write-Host ("Optional high-value mark: {0} at {1} ({2:n2}, {3:n2}) — bonus, not required" -f $secId, $secZid, $cx, $cz)
   }
 }
 
@@ -2102,9 +3039,8 @@ if ($isFinale -and $intent.PSObject.Properties["persistentBaseRehydrate"] -and $
   if ($rehydrated -gt 0) { Write-Host ("Finale rehydration: {0} standing bases restored from campaign memory." -f $rehydrated) }
 }
 
-# Null Merc foothold: a flank camp perpendicular to the deploy->target axis,
-# kept clear of the player start and the wild center. Their patrols press the
-# same Armada approaches the garrison screens - the war happens on the map.
+# Null Merc foothold: same rim constraint as player infil — enter from an edge
+# lane on the flank, not a mid-map pop-in on the deploy→target axis.
 if ($mercsPresent) {
   $axisX = $enemyCenter[0] - $deployCenter[0]
   $axisZ = $enemyCenter[1] - $deployCenter[1]
@@ -2115,15 +3051,16 @@ if ($mercsPresent) {
   $midX = ($deployCenter[0] + $enemyCenter[0]) / 2.0
   $midZ = ($deployCenter[1] + $enemyCenter[1]) / 2.0
   $candidates = @(
-    @((Clamp01 ($midX + 0.26 * $perpX)), (Clamp01 ($midZ + 0.26 * $perpZ))),
-    @((Clamp01 ($midX - 0.26 * $perpX)), (Clamp01 ($midZ - 0.26 * $perpZ)))
+    (PushToRim @((Clamp01 ($midX + 0.26 * $perpX)), (Clamp01 ($midZ + 0.26 * $perpZ)))),
+    (PushToRim @((Clamp01 ($midX - 0.26 * $perpX)), (Clamp01 ($midZ - 0.26 * $perpZ))))
   )
   $mercCenter = $candidates[0]
   $bestScore = -1.0
   foreach ($cand in $candidates) {
     $dxD = $cand[0] - $deployCenter[0]; $dzD = $cand[1] - $deployCenter[1]
     $dxW = $cand[0] - $wildCenter[0]; $dzW = $cand[1] - $wildCenter[1]
-    $score = [Math]::Min([Math]::Sqrt($dxD * $dxD + $dzD * $dzD), [Math]::Sqrt($dxW * $dxW + $dzW * $dzW))
+    $rimBonus = 1.0 - (EdgeScoreNorm $cand[0] $cand[1])
+    $score = [Math]::Min([Math]::Sqrt($dxD * $dxD + $dzD * $dzD), [Math]::Sqrt($dxW * $dxW + $dzW * $dzW)) + (0.35 * $rimBonus)
     if ($score -gt $bestScore) { $bestScore = $score; $mercCenter = $cand }
   }
   # Drop 3: finales field a full-war merc foothold — the standing war shows up.
@@ -2185,19 +3122,84 @@ for ($ii = 0; $ii -lt $playerAllied.Count; $ii++) {
   }
 }
 
+# Stable installation identity is map + authored pocket. It survives candidate
+# regeneration and lets Lua retarget a specific pre-existing installation even
+# when several pockets share one authored zone.
+$installationOrdinal = 0
+foreach ($node in @($script:mapOccupation)) {
+  $installationOrdinal += 1
+  $pocketKey = if ($node.pocketId) { [string]$node.pocketId } else { "zone_$([string]$node.zoneId)_$installationOrdinal" }
+  $stableInstallationId = "$([string]$intent.mapId)::$pocketKey"
+  if ($node -is [System.Collections.IDictionary]) {
+    $node["installationId"] = $stableInstallationId
+  } else {
+    Add-OrSetProperty $node "installationId" $stableInstallationId
+  }
+}
+
 # Debrief picks after occupation is known -- point at live camps / extract.
 $occupationForPicks = @($script:mapOccupation | Where-Object { -not $_.primary })
 $nextMissionCandidates = New-NextMissionCandidates -ZoneMap $zoneMap -AdjForMap $adjForMap `
   -MapId ([string]$intent.mapId) -CurrentTarget $targetZoneId -MissionNumber $missionNumber `
   -Occupation $occupationForPicks -ExtractZone ([string]$intent.extractionZoneId)
 
-# Hero manifest for the HUD/name tags (id/name/critical/level/rank/xp).
-# Spawnable hero specs already ride inside the player kit recipes.
+# Held fusion vaults under pending aggression → defend sorties first.
+# Taking territory generates these: a justified wave that would wipe the pad
+# becomes a playable defend contract instead of a silent offscreen delete.
+$defendCands = @()
+if ($state -and $state.PSObject.Properties["pendingDefendThreats"] -and $state.pendingDefendThreats) {
+  $mapThreats = $state.pendingDefendThreats.([string]$intent.mapId)
+  if ($mapThreats) {
+    foreach ($tp in @($mapThreats.PSObject.Properties)) {
+      $threat = $tp.Value
+      if (-not $threat) { continue }
+      $tz = [string]$(if ($threat.zoneId) { $threat.zoneId } else { "" })
+      $tpocket = [string]$(if ($threat.pocketId) { $threat.pocketId } else { $tp.Name })
+      if (-not $tz) { continue }
+      $defendCands += [ordered]@{
+        id = "cand_defend_$tpocket"
+        title = "Defend fusion vault — $tz"
+        plain = "A response wave is coming for your vault at $tz. Hold the beamer ring — if it falls, the pad is gone."
+        mapId = [string]$intent.mapId
+        targetZoneId = $tz
+        fromZoneIds = @($targetZoneId)
+        objectiveArchetype = "defend_install"
+        pocketId = $tpocket
+        highValue = $true
+        defendInstall = $true
+        preplaced = $true
+        patron = "nullmercs"
+        against = "armada"
+        hubLabel = "Defend $tz"
+      }
+    }
+  }
+}
+if ($defendCands.Count -gt 0) {
+  $nextMissionCandidates = @($defendCands) + @($nextMissionCandidates)
+  Write-Host ("Defend threats armed: {0}" -f (($defendCands | ForEach-Object { $_.pocketId }) -join ", "))
+}
+
+# Hero manifest for the HUD/name tags — the hub dropping list only.
+# deployAces is core + the packs on this sheet. Do not union crewBand on top
+# of it, and do not invent Vane/Ketha when the sheet left them home.
 $heroManifest = @()
+$hubDeployAcesEarly = @()
+if ($intent.deployAces) { $hubDeployAcesEarly = @($intent.deployAces) }
+$hubCrewBand = @()
+if ($intent.PSObject.Properties["crewBand"] -and $intent.crewBand) { $hubCrewBand = @($intent.crewBand) }
+$deployAllow = New-Object 'System.Collections.Generic.HashSet[string]'
+if (@($hubDeployAcesEarly).Count -gt 0) {
+  foreach ($id in $hubDeployAcesEarly) { if ($id) { [void]$deployAllow.Add([string]$id) } }
+} else {
+  foreach ($id in $hubCrewBand) { if ($id) { [void]$deployAllow.Add([string]$id) } }
+}
 if ($roster -and $roster.PSObject.Properties["heroes"] -and $roster.heroes) {
   foreach ($h in $roster.heroes) {
+    $hid = [string]$h.heroId
+    if (-not $deployAllow.Contains($hid)) { continue }
     $heroManifest += [ordered]@{
-      id = [string]$h.heroId
+      id = $hid
       name = [string]$h.name
       unitDefName = [string]$h.unitDef
       missionCritical = [bool]$h.missionCritical
@@ -2207,6 +3209,39 @@ if ($roster -and $roster.PSObject.Properties["heroes"] -and $roster.heroes) {
       campaignXp = if ($null -ne $h.campaignXp) { [double]$h.campaignXp } else { 0.0 }
       hpMult = if ($null -ne $h.hpMult) { [double]$h.hpMult } else { 1.35 }
     }
+  }
+}
+# Ensure every deployAllow id appears on the HUD (core + sealed band).
+# Roster sheets sometimes omit band packs; crew_packs / characters fill gaps.
+$crewPackHeroes = $null
+$crewPackPath = Join-Path $Workspace "data\story\crew_packs.json"
+if (Test-Path $crewPackPath) {
+  try { $crewPackHeroes = (Get-Content $crewPackPath -Raw | ConvertFrom-Json).heroes } catch { $crewPackHeroes = $null }
+}
+foreach ($needId in @($deployAllow)) {
+  $have = $false
+  foreach ($hm in $heroManifest) { if ([string]$hm.id -eq $needId) { $have = $true; break } }
+  if ($have) { continue }
+  $pack = $null
+  if ($crewPackHeroes -and $crewPackHeroes.PSObject.Properties[$needId]) {
+    $pack = $crewPackHeroes.$needId
+  }
+  $ch = $null
+  if ($state -and $state.characters -and $state.characters.PSObject.Properties[$needId]) {
+    $ch = $state.characters.$needId
+  }
+  $fallbackName = $(if ($needId -eq "vane") { "Ash-Captain Vane" } elseif ($needId -eq "ketha") { "Ketha" } else { $needId })
+  $fallbackDef = $(if ($needId -eq "vane") { "legcen" } elseif ($needId -eq "ketha") { "legrezbot" } else { "legcen" })
+  $heroManifest += [ordered]@{
+    id = [string]$needId
+    name = [string]$(if ($pack -and $pack.name) { $pack.name } elseif ($ch -and $ch.name) { $ch.name } else { $fallbackName })
+    unitDefName = [string]$(if ($pack -and $pack.unitDef) { $pack.unitDef } elseif ($ch -and $ch.unitDef) { $ch.unitDef } else { $fallbackDef })
+    missionCritical = ($needId -eq "ketha") -or ($pack -and $pack.missionCritical -eq $true)
+    level = 1
+    rank = "Runner"
+    xp = 0.0
+    campaignXp = 0.0
+    hpMult = $(if ($needId -eq "ketha") { 2.5 } elseif ($needId -eq "vane") { 1.65 } else { 1.35 })
   }
 }
 
@@ -2222,11 +3257,15 @@ $graph = if ($state -and $state.graph) { $state.graph } else { [pscustomobject]@
 $reputation = if ($state -and $state.reputation) { $state.reputation } else { [pscustomobject]@{} }
 $companions = @()
 if ($state -and $state.companion) {
+  $compDef = if ($state.companion.unitDefName) { [string]$state.companion.unitDefName } else { "legcen" }
+  $compXp = if ($null -ne $state.companion.xp) { [double]$state.companion.xp } else { 0.0 }
+  $bag = Get-CadreXpBag $roster $compDef
+  if ($bag -and $bag.xp -gt $compXp) { $compXp = [double]$bag.xp }
   $companions = @([ordered]@{
     id = $state.companion.id
     displayName = $state.companion.displayName
-    unitDefName = if ($state.companion.unitDefName) { $state.companion.unitDefName } else { "legcen" }
-    xp = $state.companion.xp
+    unitDefName = $compDef
+    xp = $compXp
     morale = $state.companion.morale
     loyalty = $state.companion.loyalty
     stress = $state.companion.stress
@@ -2262,6 +3301,175 @@ elseif ($intent.objectiveTarget -and $intent.objectiveTarget.secondaryCaptureZon
 }
 $hubChoiceIdVal = if ($intent.hubChoiceId) { [string]$intent.hubChoiceId } else { $null }
 $hubDeployAces = if ($intent.deployAces) { @($intent.deployAces) } else { @() }
+# Preserve hub muster band for the gadget (sealed packet — no in-game select).
+if (-not $hubCrewBand) { $hubCrewBand = @() }
+if ($intent.PSObject.Properties["crewBand"] -and $intent.crewBand) { $hubCrewBand = @($intent.crewBand) }
+
+# Field recruits: belief-field ranked wild heroes for this sortie.
+# Marked hub zones (target / infil) collapse attention onto that pad's hero —
+# so a Fatboy zone you clicked actually seeds Fatboy, not two random GF wilds.
+# Wreck-rez modes stamp spawnAsWreck so BAR seeds a corpse, not a live poof.
+$fieldRecruits = @()
+$fieldRecruitCap = 2
+$markedRecruitZones = @()
+if ($intent.captureZoneIds) { $markedRecruitZones += @($intent.captureZoneIds) }
+if ($intent.PSObject.Properties["marks"] -and $intent.marks) {
+  if ($intent.marks.captureZoneIds) { $markedRecruitZones += @($intent.marks.captureZoneIds) }
+  if ($intent.marks.deployZoneId) { $markedRecruitZones += @([string]$intent.marks.deployZoneId) }
+}
+if ($intent.deploymentZoneId) { $markedRecruitZones += @([string]$intent.deploymentZoneId) }
+if ($targetZoneId) { $markedRecruitZones += @([string]$targetZoneId) }
+$markedRecruitZones = @($markedRecruitZones | Where-Object { $_ } | Select-Object -Unique)
+if ($state -and $state.PSObject.Properties["fieldPool"] -and $state.fieldPool) {
+  $sortieMapId = [string]$intent.mapId
+  $ranked = @()
+  try {
+    $env:PYTHONPATH = (Join-Path $Workspace "tools")
+    $archForRecruits = [string]($intent.objectiveArchetype)
+    if (-not $archForRecruits -and $intent.PSObject.Properties["contractKind"]) {
+      $archForRecruits = [string]$intent.contractKind
+    }
+    $rankArgs = [ordered]@{
+      statePath = $StatePath
+      workspace = $Workspace
+      mapId = $sortieMapId
+      limit = $fieldRecruitCap
+      markedZoneIds = @($markedRecruitZones)
+      objectiveArchetype = $archForRecruits
+    }
+    $rankArgsPath = Join-Path $env:TEMP ("va_field_recruit_args_{0}.json" -f [guid]::NewGuid().ToString("N"))
+    $rankOutPath = Join-Path $env:TEMP ("va_field_recruit_out_{0}.json" -f [guid]::NewGuid().ToString("N"))
+    ($rankArgs | ConvertTo-Json -Compress -Depth 5) | Set-Content -LiteralPath $rankArgsPath -Encoding UTF8
+    $pyRank = @(
+      "import json, sys"
+      "from pathlib import Path"
+      "sys.path.insert(0, r'" + (Join-Path $Workspace "tools") + "')"
+      "from company_v1 import field_recruits_for_map"
+      "args = json.loads(Path(r'" + $rankArgsPath + "').read_text(encoding='utf-8-sig'))"
+      "state = json.loads(Path(args['statePath']).read_text(encoding='utf-8-sig'))"
+      "rows = field_recruits_for_map(state, args['mapId'], workspace=Path(args['workspace']), limit=int(args.get('limit') or 2), marked_zone_ids=list(args.get('markedZoneIds') or []), objective_archetype=args.get('objectiveArchetype') or '')"
+      "Path(r'" + $rankOutPath + "').write_text(json.dumps({'rows': rows}), encoding='utf-8')"
+    ) -join "; "
+    & python -c $pyRank
+    if (Test-Path -LiteralPath $rankOutPath) {
+      $rankPayload = Get-Content -Raw -LiteralPath $rankOutPath | ConvertFrom-Json
+      if ($rankPayload -and $rankPayload.PSObject.Properties["rows"]) {
+        $ranked = @($rankPayload.rows)
+      } else {
+        $ranked = @($rankPayload)
+      }
+    }
+    Remove-Item -LiteralPath $rankArgsPath, $rankOutPath -Force -ErrorAction SilentlyContinue
+  } catch {
+    Write-Host ("Field recruit belief rank failed ({0}); falling back." -f $_.Exception.Message)
+    $ranked = @()
+  }
+  # Fallback: marked-zone first, then any wild on map (old behavior, but prioritized).
+  if (-not $ranked -or $ranked.Count -eq 0) {
+    $fallback = @()
+    foreach ($prop in @($state.fieldPool.PSObject.Properties)) {
+      $entry = $prop.Value
+      if (-not $entry) { continue }
+      if ([string]$entry.status -ne "wild") { continue }
+      $recruit = $entry.recruit
+      $homeLoc = @(); if ($entry.home) { $homeLoc = @($entry.home) }
+      $rMap = $null
+      if ($recruit -and $recruit.mapId) { $rMap = [string]$recruit.mapId }
+      elseif ($homeLoc.Count -ge 1) { $rMap = [string]$homeLoc[0] }
+      if (-not $rMap -or $rMap -ne $sortieMapId) { continue }
+      $rZone = $null
+      if ($recruit -and $recruit.zoneId) { $rZone = [string]$recruit.zoneId }
+      elseif ($homeLoc.Count -ge 2) { $rZone = [string]$homeLoc[1] }
+      $pri = if ($rZone -and ($markedRecruitZones -contains $rZone)) { 0 } else { 1 }
+      $fallback += [pscustomobject]@{
+        pri = $pri
+        heroId = [string]$(if ($entry.heroId) { $entry.heroId } else { $prop.Name })
+        name = [string]$(if ($entry.name) { $entry.name } else { $prop.Name })
+        unitDef = [string]$(if ($entry.unitDef) { $entry.unitDef } else { "legcen" })
+        zoneId = $rZone
+        recruitMode = [string]$(if ($recruit -and $recruit.type) { $recruit.type } else { "wreck_rez" })
+        requiresVictory = [bool]($recruit -and $recruit.requiresVictory)
+        optionalJoin = [bool]($recruit -and $recruit.optionalJoin)
+        seedXp = $(if ($recruit -and $null -ne $recruit.seedXp) { [double]$recruit.seedXp } else { 0.2 })
+        beliefScore = $(if ($pri -eq 0) { 10.0 } else { 0.15 })
+        spawnAsWreck = $true
+        blurb = $(if ($recruit -and $recruit.blurb) { [string]$recruit.blurb } else { $null })
+      }
+    }
+    $ranked = @($fallback | Sort-Object pri, heroId | Select-Object -First $fieldRecruitCap)
+  }
+  # Trust company_v1 ranking (already applied limit + marked-zone floor).
+  # Re-capping at 2 here used to drop marked wrecks after belief expanded the seat.
+  $rankIndex = 0
+  foreach ($row in @($ranked)) {
+    if (-not $row) { continue }
+    $rankIndex++
+    $rZone = if ($row.zoneId) { [string]$row.zoneId } else { $null }
+    $nx = 0.55; $nz = 0.55
+    if ($rZone -and $zoneMap) {
+      $fz = Get-ZoneById $zoneMap $rZone
+      if ($fz) {
+        $fc = Get-ZoneCenter $fz @($enemyCenter[0], $enemyCenter[1])
+        if ($fc) { $nx = [double]$fc[0]; $nz = [double]$fc[1] }
+      }
+    } elseif ($enemyCenter) {
+      $nx = [Math]::Min(0.92, [double]$enemyCenter[0] + 0.04)
+      $nz = [Math]::Min(0.92, [double]$enemyCenter[1] + 0.04)
+    }
+    # Spread stacked same-pad wrecks so CreateUnit does not collide.
+    $nx = [Math]::Min(0.96, $nx + (($rankIndex - 1) * 0.012))
+    $nz = [Math]::Min(0.96, $nz + (($rankIndex - 1) * 0.008))
+    $mode = [string]$(if ($row.recruitMode) { $row.recruitMode } else { "wreck_rez" })
+    $asWreck = $true
+    if ($null -ne $row.spawnAsWreck) { $asWreck = [bool]$row.spawnAsWreck }
+    elseif ($mode -notin @("wreck_rez", "retrieve_stash")) { $asWreck = $false }
+    $heroDef = [string]$(if ($row.unitDef) { $row.unitDef } elseif ($row.unitDefName) { $row.unitDefName } else { "legcen" })
+    $wreckDef = $null
+    if ($row.PSObject.Properties["wreckUnitDef"] -and $row.wreckUnitDef) {
+      $wreckDef = [string]$row.wreckUnitDef
+    }
+    $entry = [ordered]@{
+      heroId = [string]$row.heroId
+      heroName = [string]$(if ($row.name) { $row.name } elseif ($row.heroName) { $row.heroName } else { $row.heroId })
+      unitDefName = $heroDef
+      zoneId = $rZone
+      x = [Math]::Round($nx, 4)
+      z = [Math]::Round($nz, 4)
+      recruitable = $true
+      recruitMode = $mode
+      requiresVictory = [bool]$row.requiresVictory
+      optionalJoin = [bool]$row.optionalJoin
+      heroHpMult = 1.5
+      heroXp = $(
+        $sx = 0.2
+        try {
+          if ($null -ne $row.seedXp -and "$($row.seedXp)" -ne "" -and $row.seedXp -isnot [System.Array]) {
+            $sx = [double]$row.seedXp
+          }
+        } catch { $sx = 0.2 }
+        [Math]::Round($sx, 3)
+      )
+      beliefScore = $(
+        $bs = 0.0
+        try {
+          if ($null -ne $row.beliefScore -and "$($row.beliefScore)" -ne "" -and $row.beliefScore -isnot [System.Array]) {
+            $bs = [double]$row.beliefScore
+          }
+        } catch { $bs = 0.0 }
+        [Math]::Round($bs, 3)
+      )
+      spawnAsWreck = $asWreck
+      blurb = $(if ($row.blurb) { [string]$row.blurb } else { $null })
+    }
+    if ($wreckDef) { $entry["wreckUnitDef"] = $wreckDef }
+    $fieldRecruits += $entry
+  }
+}
+if ($fieldRecruits.Count -gt 0) {
+  Write-Host ("Field recruits on {0}: {1} (marks={2})" -f $intent.mapId, `
+    (($fieldRecruits | ForEach-Object { "{0}@{1} b={2}" -f $_.heroId, $_.zoneId, $_.beliefScore }) -join ", "), `
+    ($markedRecruitZones -join "|"))
+}
 
 $scenario = [ordered]@{
   schemaVersion = "verdance-playable-scenario/1.0-alpha"
@@ -2295,6 +3503,17 @@ $scenario = [ordered]@{
     hydrology = $(if ($intent.PSObject.Properties["hydrology"] -and $intent.hydrology) { $intent.hydrology }
                   else { [ordered]@{ level = 0.0; amplitude = 0.0 } })
     finale = $(if ($isFinale) { $intent.finale } else { $null })
+    campaignQuantumState = $(
+      if ($intent.PSObject.Properties["campaignQuantumState"] -and $intent.campaignQuantumState) {
+        $intent.campaignQuantumState
+      } else { $null }
+    )
+    battlefieldManifest = [ordered]@{
+      schemaVersion = "verdance-battlefield-manifest/1.0"
+      initializationEndsFrame = 90
+      installations = @($script:mapOccupation)
+      staticAfterInitialization = $true
+    }
     missionCard = $missionCard
     pathSignal = if ($state -and $state.pathSignal) { $state.pathSignal } else { "B" }
     title = $title
@@ -2321,6 +3540,11 @@ $scenario = [ordered]@{
       requiredHoldFrames = $(if ($presenceKind) { 900 } else { $null })
       clearFraction = $(if ($presenceKind) { 0.6 } else { $null })
       freeTnbMint = $false
+      # Fortify / secure foothold: defensive value = "secured" signal.
+      fortifyDefensiveValue = $(if ($fortifyKind) { 800 } else { $null })
+      fortifyBuildPower = $(if ($fortifyKind) { 90 } else { $null })
+      fortifyArmyValue = $(if ($fortifyKind) { 500 } else { $null })
+      fortifyStorageStructures = $(if ($fortifyKind) { 1 } else { $null })
       # Drop 4: surgical | raze (whole camp tagged) | purge (clear the board).
       strength = $objectiveStrength
     }
@@ -2328,6 +3552,13 @@ $scenario = [ordered]@{
     secondaries = @($script:secondaryMeta)
     hubChoiceId = $hubChoiceIdVal
     deployAces = @($hubDeployAces)
+    crewBand = @($hubCrewBand)
+    missionCallIns = $(
+      if ($intent.PSObject.Properties["missionCallIns"] -and $intent.missionCallIns) {
+        @($intent.missionCallIns)
+      } else { @() }
+    )
+    fieldRecruits = @($fieldRecruits)
     economy = if ($state -and $state.economy) { $state.economy } else { [ordered]@{ metalIncome = 0; energyIncome = 0; buildPower = 0 } }
     difficulty = [ordered]@{
       enemyScale = $enemyScale
@@ -2374,17 +3605,14 @@ $scenario = [ordered]@{
       freeTnbMint = $false
       livingShell = [bool]($null -ne $script:livingShellPayload)
     }
+    # Honest flags only — unread carry*/snap*/metal* keys removed (Mode A is
+    # soft-continue in-seat, not a restart carry bag).
     continueRules = [ordered]@{
       sameMapContinue = $true
-      carryHeroes = $true
-      carryCombatUnits = $true
-      carryWrecks = $true
-      snapDistantUnitsToDeploy = $true
-      # Occupied-map / living shell: do not wipe the next scar -- promote instead.
-      # Capture continues also prefer promote (claim next pocket on same shell).
-      clearEnemyOnContinue = ($objectiveKind -ne "eco_raid" -and -not $presenceKind)
-      promoteOccupationOnContinue = ($objectiveKind -eq "eco_raid" -or $presenceKind)
-      metalCarryFraction = 0.5
+      # Occupied-map / living shell: promote standing pads; never spawnContinueCamp.
+      promoteOccupationOnContinue = $true
+      clearEnemyOnContinue = $false
+      spawnInfrastructureOnContinue = $false
     }
     flavor = $arcProfile.flavor
     escalation = $(
@@ -2424,6 +3652,25 @@ $scenario = [ordered]@{
       }
     )
     heroes = $heroManifest
+    # Per-def veteran XP bank — gadget seeds SetUnitExperience / craft XP on spawn.
+    cadreXp = $(
+      $cx = [ordered]@{}
+      if ($roster -and $roster.PSObject.Properties["cadreXp"] -and $roster.cadreXp) {
+        foreach ($p in $roster.cadreXp.PSObject.Properties) {
+          $b = $p.Value
+          if (-not $b) { continue }
+          $cx[[string]$p.Name] = [ordered]@{
+            xp = if ($null -ne $b.xp) { [double]$b.xp } else { 0.0 }
+            craftXp = if ($null -ne $b.craftXp) { [double]$b.craftXp } else { 0.0 }
+            peakXp = if ($null -ne $b.peakXp) { [double]$b.peakXp } else { 0.0 }
+            peakCraftXp = if ($null -ne $b.peakCraftXp) { [double]$b.peakCraftXp } else { 0.0 }
+            avgXp = if ($null -ne $b.avgXp) { [double]$b.avgXp } else { 0.0 }
+            avgCraftXp = if ($null -ne $b.avgCraftXp) { [double]$b.avgCraftXp } else { 0.0 }
+          }
+        }
+      }
+      $cx
+    )
     beats = if ($intent.PSObject.Properties["beats"] -and $intent.beats) { @($intent.beats) } else { @() }
     graph = $graph
     reputation = $reputation
@@ -2491,15 +3738,42 @@ if (-not $SaveName) {
 }
 
 $installer = Join-Path $ScriptDir "install_playable_slice.ps1"
-if ($Launch -and $SaveGame) {
-  & $installer -Workspace $Workspace -ScenarioPath $scenarioPath -Variant "alpha_player" -PlayerController "human" -TimeoutSeconds $TimeoutSeconds -Launch -SaveGame -SaveName $SaveName
-} elseif ($Launch) {
-  & $installer -Workspace $Workspace -ScenarioPath $scenarioPath -Variant "alpha_player" -PlayerController "human" -TimeoutSeconds $TimeoutSeconds -Launch
-} elseif ($SaveGame) {
-  & $installer -Workspace $Workspace -ScenarioPath $scenarioPath -Variant "alpha_player" -PlayerController "human" -TimeoutSeconds $TimeoutSeconds -SaveGame -SaveName $SaveName
-} else {
-  & $installer -Workspace $Workspace -ScenarioPath $scenarioPath -Variant "alpha_player" -PlayerController "human" -TimeoutSeconds $TimeoutSeconds
+# One call site, so the modoption passthrough cannot be forgotten on one of the four
+# branches this replaced. play_tracked_v1.ps1 uses it to arm va_play_track; without a
+# route from the launcher to [MODOPTIONS] a played mission emits no telemetry at all.
+#
+# HASHTABLE, not an array. This is the whole bug that broke every launch path:
+# PowerShell splats an array POSITIONALLY and never re-parses its "-Name" strings as
+# parameter names -- only a hashtable splat binds by name. With an array, element 4
+# ("-Variant") lands on install_playable_slice.ps1's 5th positional parameter,
+# [int]$SimFrames, and the binder throws
+#   Cannot convert value "-Variant" to type "System.Int32"
+# before the installer executes a single statement. $ErrorActionPreference = "Stop"
+# turns that into exit 1, the kernel reports "build failed -- not launching", and BAR
+# is never started -- from the hub, play_session_v1, play_tracked_v1, all of them.
+$installerArgs = @{
+  Workspace        = $Workspace
+  ScenarioPath     = $scenarioPath
+  Variant          = "alpha_player"
+  PlayerController = "human"
+  TimeoutSeconds   = $TimeoutSeconds
 }
+# Rock Jungle / wild home: ~5 min raptor grace (stock mult 1.0). Other maps keep
+# the installer's default 2.5 (~15 min) unless ExtraModOptions already sets it.
+$extraMods = @()
+if ($ExtraModOptions) { $extraMods += $ExtraModOptions }
+if ($isWildHomeFounding -or ($isRockJungle -and $againstFaction -eq "wild")) {
+  if ($extraMods -notmatch "raptor_graceperiodmult=") {
+    $extraMods += "raptor_graceperiodmult=0.85"
+    Write-Host "Raptor grace: mult=0.85 (~5 min) for Rock Jungle wild home."
+  }
+}
+if ($extraMods.Count -gt 0) {
+  $installerArgs.ExtraModOptions = ($extraMods -join ";")
+}
+if ($Launch)          { $installerArgs.Launch = $true }
+if ($SaveGame)        { $installerArgs.SaveGame = $true; $installerArgs.SaveName = $SaveName }
+& $installer @installerArgs
 
 $manifest = [ordered]@{
   ok = $true

@@ -21,6 +21,15 @@ CATALOG_PATH = ROOT / "data" / "commerce" / "commerce_catalog.json"
 OUT_JSON = ROOT / "app" / "showoff" / "hub_state.json"
 OUT_EMBED = ROOT / "app" / "showoff" / "hub_state.embed.js"
 
+# Mission selection is owned by the story engine. This module only projects
+# the canonical order into the C&C board; it must not invent a second route.
+from verdance_story_engine_v1 import opening_hub_choice
+
+try:
+    from commerce_delivery_v1 import delivery_eta
+except ImportError:  # pragma: no cover
+    from tools.commerce_delivery_v1 import delivery_eta  # type: ignore
+
 BAY_THRESHOLD = 40
 
 
@@ -85,6 +94,167 @@ def build_aces(state: dict) -> list[dict]:
     return aces
 
 
+def _support_web_surface(
+    aces: list, company_surface: dict, state: dict | None = None
+) -> dict:
+    """FE support-web projection for hub (hearth + highlights)."""
+    web_path = ROOT / "data" / "story" / "support_web.json"
+    talks_path = ROOT / "data" / "story" / "camp_talks.json"
+    out: dict = {
+        "schemaVersion": "verdance-support-web-surface/1.0",
+        "available": False,
+        "edgeCount": 0,
+        "talkCount": 0,
+        "topPairs": [],
+        "eligibleTalks": [],
+        "note": "Parametric relationship web — hearth talks wire next.",
+    }
+    if not web_path.is_file():
+        return out
+    try:
+        web = json.loads(web_path.read_text(encoding="utf-8-sig"))
+    except Exception:  # noqa: BLE001
+        return out
+
+    ace_ids = {str(a.get("id")) for a in (aces or []) if a.get("id")}
+
+    def _as_hid(raw) -> str | None:
+        if isinstance(raw, dict):
+            hid = raw.get("id") or raw.get("heroId")
+            return str(hid) if hid else None
+        if raw is None:
+            return None
+        s = str(raw).strip()
+        return s or None
+
+    # Company band + core are the camp circle; fall back to all aces.
+    circle = set()
+    if isinstance(company_surface, dict):
+        for key in ("core", "band", "joinedLater"):
+            for raw in company_surface.get(key) or []:
+                hid = _as_hid(raw)
+                if hid:
+                    circle.add(hid)
+    if not circle:
+        circle = set(ace_ids)
+
+    def _pair_row(e: dict) -> dict:
+        return {
+            "id": e.get("id"),
+            "a": e.get("a"),
+            "b": e.get("b"),
+            "aName": e.get("aName"),
+            "bName": e.get("bName"),
+            "score": e.get("score"),
+            "polarity": e.get("polarity"),
+            "motif": (e.get("motifs") or [None])[0],
+            "authored": bool(e.get("authored")),
+        }
+
+    all_edges = [e for e in (web.get("edges") or []) if isinstance(e, dict)]
+    all_edges.sort(key=lambda e: -float(e.get("score") or 0))
+    circle_edges = [
+        e
+        for e in all_edges
+        if str(e.get("a")) in circle and str(e.get("b")) in circle
+    ]
+    authored = [e for e in all_edges if e.get("authored")]
+    out["available"] = True
+    out["edgeCount"] = len(all_edges)
+    out["circleEdgeCount"] = len(circle_edges)
+    out["circle"] = sorted(circle)
+    # Camp-circle pairs first (hearth-eligible); fall back to authored highlights.
+    out["topPairs"] = [_pair_row(e) for e in (circle_edges or authored)[:12]]
+    out["highlights"] = [_pair_row(e) for e in authored[:12]]
+
+    pair_points: dict = {}
+    if isinstance(state, dict):
+        att = state.get("attachments") or {}
+        for pk, row in (att.get("pairBonds") or {}).items():
+            if isinstance(row, dict):
+                pair_points[str(pk)] = {
+                    "points": float(row.get("points") or 0),
+                    "rank": row.get("rank"),
+                    "talksDone": list(row.get("talksDone") or []),
+                }
+    out["pairBonds"] = pair_points
+
+    if talks_path.is_file():
+        try:
+            talks_doc = json.loads(talks_path.read_text(encoding="utf-8-sig"))
+            talks = talks_doc.get("talks") or []
+            out["talkCount"] = len(talks)
+            out["authoredTalkCount"] = sum(
+                1 for t in talks if isinstance(t, dict) and t.get("generated") is False
+            )
+
+            def _eligible_rank(t: dict) -> bool:
+                """Next unread rank for this pair given bond points."""
+                if not isinstance(t, dict):
+                    return False
+                pid = str(t.get("pairId") or "")
+                rank = str(t.get("rank") or "C")
+                pb = pair_points.get(pid) or {}
+                done = set(pb.get("talksDone") or [])
+                tid = str(t.get("id") or "")
+                if tid in done:
+                    return False
+                pts = float(pb.get("points") or 0)
+                bond_min = float((t.get("unlock") or {}).get("bondMin") or 0)
+                if pts < bond_min:
+                    return False
+                # Prefer lowest unread rank
+                return True
+
+            eligible = []
+            for t in talks:
+                if not isinstance(t, dict):
+                    continue
+                if str(t.get("a")) not in circle or str(t.get("b")) not in circle:
+                    continue
+                if not _eligible_rank(t):
+                    continue
+                eligible.append(
+                    {
+                        "id": t.get("id"),
+                        "pairId": t.get("pairId"),
+                        "title": t.get("title"),
+                        "polarity": t.get("polarity"),
+                        "motif": t.get("motif"),
+                        "rank": t.get("rank"),
+                        "a": t.get("a"),
+                        "b": t.get("b"),
+                        "authored": t.get("generated") is False,
+                        "beats": list(t.get("beats") or [])[:10],
+                        "unlock": t.get("unlock") or {},
+                    }
+                )
+            # Prefer authored, then C, then score-ish by rank letter
+            rank_ord = {"C": 0, "B": 1, "A": 2}
+
+            def _sort_key(x: dict):
+                return (
+                    0 if x.get("authored") else 1,
+                    rank_ord.get(str(x.get("rank")), 9),
+                    str(x.get("id") or ""),
+                )
+
+            eligible.sort(key=_sort_key)
+            # One talk per pair (lowest rank first)
+            seen_pairs = set()
+            deduped = []
+            for t in eligible:
+                pid = t.get("pairId")
+                if pid in seen_pairs:
+                    continue
+                seen_pairs.add(pid)
+                deduped.append(t)
+            out["eligibleTalks"] = deduped[:12]
+        except Exception:  # noqa: BLE001
+            pass
+    return out
+
+
 def build_regions(war: dict) -> list[dict]:
     regions = []
     for r in war.get("regions") or []:
@@ -105,13 +275,34 @@ def build_regions(war: dict) -> list[dict]:
 
 
 HOME_MAP_ID = "the_rock_jungle"
+# Raid theaters must never steal sessionHomeMap from the Ashwalker camp.
+RAID_THEATER_MAPS = {
+    "greenest_fields",
+    "eye_of_horus",
+    "koom_valley",
+    "tabula",
+    "ancient_bastion",
+    "all_that_simmers",
+}
+
+
+def repair_session_home(state: dict) -> str:
+    """Keep sessionHomeMap on homeCamp; raid sorties used to overwrite it to Greenest."""
+    camp = (state.get("homeCamp") or {}).get("mapId") or state.get("homeMapId") or HOME_MAP_ID
+    camp = str(camp)
+    home = str(state.get("sessionHomeMap") or camp)
+    if home in RAID_THEATER_MAPS and camp == HOME_MAP_ID:
+        state["sessionHomeMap"] = camp
+        return camp
+    state.setdefault("sessionHomeMap", camp)
+    return str(state.get("sessionHomeMap") or camp)
 
 
 def pick_focus_region(regions: list[dict], state: dict | None = None) -> str:
     """Mode A: stay on session home map when set; default Ashwalker home = Rock Jungle."""
     st = state or {}
     session_mode = st.get("sessionMode") or "same_map"
-    home = st.get("sessionHomeMap") or st.get("homeMapId") or HOME_MAP_ID
+    home = repair_session_home(st)
     region_ids = {r.get("mapId") for r in regions}
     if session_mode == "same_map" and home and home in region_ids:
         return home
@@ -127,6 +318,28 @@ def pick_focus_region(regions: list[dict], state: dict | None = None) -> str:
         if r.get("family") in ("wild", "economy"):
             return r["mapId"]
     return regions[0]["mapId"] if regions else HOME_MAP_ID
+
+
+def _near_ground_pad(map_id: str, target_zone: str) -> str | None:
+    """Nearest dry pad-sized shore to the objective. None if the map has no pads."""
+    try:
+        from verdance_story_engine_v1 import ground_pads_by_distance
+
+        ranked = ground_pads_by_distance(map_id, target_zone, ROOT, 0.0)
+    except Exception:  # noqa: BLE001
+        return None
+    return ranked[0][1] if ranked else None
+
+
+def _pad_is_near(zone_id: str, map_id: str, target_zone: str) -> bool:
+    if not zone_id:
+        return False
+    try:
+        from verdance_story_engine_v1 import ground_pad_is_near
+
+        return bool(ground_pad_is_near(zone_id, map_id, target_zone, ROOT, 0.0))
+    except Exception:  # noqa: BLE001
+        return False
 
 
 def _quest_continue_choices(
@@ -164,12 +377,16 @@ def _quest_continue_choices(
         "gate_control": "Hold the gate until the map answers to us.",
         "economy_disrupt": "Make their economy a lie.",
     }
+    spent = state.get("spentTheaters") if isinstance(state.get("spentTheaters"), dict) else {}
     for i, q in enumerate(cands[:limit]):
         if not isinstance(q, dict):
             continue
         map_id = q.get("mapId") or focus
         # Mode A: only same-map continues when session is locked
         if (state.get("sessionMode") or "same_map") == "same_map" and map_id != focus:
+            continue
+        # Blank / spent raid theaters must not reappear as Mode A continues.
+        if map_id in spent and map_id in RAID_THEATER_MAPS:
             continue
         zone = q.get("targetZoneId") or q.get("zoneId")
         if not zone:
@@ -188,6 +405,12 @@ def _quest_continue_choices(
         verb = arch_verb.get(str(arch), "Strike")
         label = f"{verb} {zl}" if len(zl) < 40 else f"{verb} this pocket"
         blurb = arch_blurb.get(str(arch), "Drop in, cut the objective, come home.")
+        from_ids = q.get("fromZoneIds") if isinstance(q.get("fromZoneIds"), list) else []
+        from_pad = from_ids[0] if from_ids else q.get("deploymentZoneId")
+        near_pad = _near_ground_pad(str(map_id), str(zone))
+        deploy_pad = from_pad
+        if near_pad and not _pad_is_near(str(from_pad or ""), str(map_id), str(zone)):
+            deploy_pad = near_pad
         out.append(
             {
                 "id": f"c_mode_a_{i}_{zone}",
@@ -199,9 +422,8 @@ def _quest_continue_choices(
                     "contractKind": arch,
                     "deployAces": deploy_aces,
                     "preferredCaptureZoneId": zone,
-                    "preferredDeployZoneId": (q.get("fromZoneIds") or [None])[0]
-                    if isinstance(q.get("fromZoneIds"), list)
-                    else q.get("deploymentZoneId"),
+                    "preferredDeployZoneId": deploy_pad,
+                    "preferredExtractionZoneId": near_pad or deploy_pad,
                     "sessionMode": "same_map",
                     "source": "quest_batch",
                 },
@@ -284,6 +506,35 @@ def build_theater(state: dict, map_id: str, capture_contracts: list | None = Non
     }
 
 
+def _wet_reach_choices(state: dict, deploy_aces: list) -> tuple[list[dict], str | None]:
+    """The collapsed three. Each card says where you are and where you are heading."""
+    try:
+        from wet_reach_v1 import collapse_sorties
+    except ImportError:
+        return [], None
+    try:
+        collapsed = collapse_sorties(state, ROOT)
+    except Exception as exc:  # noqa: BLE001
+        print(f"VA_WET_REACH_HUB_FAIL {exc}")
+        return [], None
+    choices: list[dict] = []
+    for card in collapsed.get("cards") or []:
+        if not isinstance(card, dict):
+            continue
+        effect = dict(card.get("effect") or {})
+        effect["deployAces"] = list(deploy_aces)
+        choices.append({
+            "id": card.get("id"),
+            "label": card.get("label"),
+            "blurb": card.get("blurb"),
+            "kind": "deploy",
+            "recommended": bool(card.get("recommended")),
+            "effect": effect,
+        })
+    voice = str(collapsed.get("voice") or "") or None
+    return choices, voice
+
+
 def build_open_node(state: dict, regions: list[dict], aces: list[dict], rep: dict) -> dict:
     mission_n = int(state.get("missionNumber") or 1)
     focus = pick_focus_region(regions, state)
@@ -297,6 +548,7 @@ def build_open_node(state: dict, regions: list[dict], aces: list[dict], rep: dic
     tnb = int((state.get("commerce") or {}).get("tenebrium") or 0)
     home_ready = bool(flags.get("homeClearReady")) or tnb >= 3 or camp_level >= 1
     home_cleared = bool(flags.get("homeCleared"))
+    fresh_opening = mission_n == 1 and not state.get("history") and not state.get("lastResult")
 
     # Prefer a raid theater (economy / crater) when sitting on home wilds.
     raid_map = "greenest_fields"
@@ -308,15 +560,37 @@ def build_open_node(state: dict, regions: list[dict], aces: list[dict], rep: dic
 
     deploy_aces = [a["id"] for a in aces if a.get("deployable")][:2]
 
-    # Prefer same-map continues (quest candidates) as the primary battle picks.
-    mode_a = _quest_continue_choices(state, focus, deploy_aces, limit=3)
-    if mode_a:
-        choices = []
-        for ch in mode_a:
-            effect = dict(ch.get("effect") or {})
-            choices.append({**ch, "effect": effect})
+    # The authored opening is a Greenest Fields raid. Rock Jungle is the locked
+    # future home/camp objective, not the first recommended sortie. The story
+    # engine owns the route and force; this builder only projects that choice.
+    if fresh_opening:
+        opening_choice = opening_hub_choice(state, ROOT)
+        if not opening_choice:
+            raise RuntimeError("fresh campaign has no canonical opening contract")
+        choices = [opening_choice]
     else:
-        if focus == HOME_MAP_ID:
+        spent_early = (
+            state.get("spentTheaters")
+            if isinstance(state.get("spentTheaters"), dict)
+            else {}
+        )
+        focus_spent = focus in spent_early and focus in RAID_THEATER_MAPS
+        # Prefer same-map continues (quest candidates) as the primary battle picks.
+        # Skip when focus is a spent raid theater — outflow doors own that beat.
+        mode_a = (
+            []
+            if focus_spent
+            else _quest_continue_choices(state, focus, deploy_aces, limit=3)
+        )
+        if mode_a:
+            choices = []
+            for ch in mode_a:
+                effect = dict(ch.get("effect") or {})
+                choices.append({**ch, "effect": effect})
+        elif focus_spent:
+            # Empty primary; Journey A (home) + need_outflow (Eye / return) fill in.
+            choices = []
+        elif focus == HOME_MAP_ID:
             clear_blurb = (
                 "The lagoon maze still breeds. You need Tenebrium scale — or a camp — to finish this."
                 if not home_ready
@@ -331,7 +605,7 @@ def build_open_node(state: dict, regions: list[dict], aces: list[dict], rep: dic
                     "effect": {
                         "mapId": HOME_MAP_ID,
                         "contractKind": "hive_clear_or_bypass",
-                        "preferredCaptureZoneId": "RJ_CENTRAL_LAGOON_MAZE",
+                        "preferredCaptureZoneId": "TRJ_C_SPILLWAY",
                         "deployAces": deploy_aces,
                         "sessionMode": "same_map",
                         "against": "wild",
@@ -362,52 +636,149 @@ def build_open_node(state: dict, regions: list[dict], aces: list[dict], rep: dic
                 },
             ]
 
-    # Home camp build (hub spend — not a BAR freebuild).
-    if not home_cleared:
+    # Journey A — found / hold the Rock Jungle base (viable first pick, not "later").
+    # Eco, raptor defence, constructors if Tnb wasn't spent on heroes.
+    already_home_deploy = any(
+        c.get("kind") == "deploy"
+        and str((c.get("effect") or {}).get("mapId") or "") == HOME_MAP_ID
+        for c in choices
+    )
+    if not home_cleared and not already_home_deploy:
         choices.append(
             {
-                "id": "c_home_build",
-                "label": f"Raise the jungle camp (L{camp_level} → L{camp_level + 1})",
-                "blurb": (
-                    f"Spend {1} Tnb + {25} scrap on the shelf. "
-                    "Without Tenebrium you cannot scale build power at home."
+                "id": "c_home_probe" if fresh_opening or not home_ready else "c_home_clear",
+                "label": (
+                    "Found the Rock Jungle camp"
+                    if fresh_opening or camp_level <= 0
+                    else ("Clear the Rock Jungle" if home_ready else "Hold the jungle shelf")
                 ),
-                "kind": "home_build",
+                "blurb": (
+                    "Start the new Ashwalker base: plant eco, dig in against raptor pests, "
+                    "and maybe mint a small exfil force. Spend leftover Tnb on constructors "
+                    "at the broker if you did not seat expensive heroes."
+                    if fresh_opening or camp_level <= 0
+                    else (
+                        "The lagoon maze still breeds. You need Tenebrium scale — or a camp — to finish this."
+                        if not home_ready
+                        else "Enough metal in the blood. Take the wilds. This is the Ashwalker win."
+                    )
+                ),
+                "kind": "deploy",
                 "effect": {
                     "mapId": HOME_MAP_ID,
-                    "tenebriumCost": 1,
-                    "creditCost": 25,
-                    "campLevel": camp_level,
+                    # Founding / dig-in uses fortify (DV-only = secured).
+                    # Full hive clear only when the camp exists and the player is ready.
+                    "contractKind": (
+                        "hive_clear_or_bypass"
+                        if (camp_level >= 1 and home_ready and not home_cleared and not fresh_opening)
+                        else "fortify_zone"
+                    ),
+                    "preferredCaptureZoneId": (
+                        "TRJ_C_SPILLWAY"
+                        if (camp_level >= 1 and home_ready and not home_cleared and not fresh_opening)
+                        else "TRJ_NW_GATE"
+                    ),
+                    "preferredDeployZoneId": "TRJ_NW_OUTER_MUSTER",
+                    "preferredExtractionZoneId": "TRJ_NW_OUTER_MUSTER",
+                    "deployAces": deploy_aces,
+                    "sessionMode": "same_map",
+                    "against": "wild",
+                    "homeClearAttempt": bool(
+                        camp_level >= 1 and home_ready and not home_cleared and not fresh_opening
+                    ),
+                    "journey": "home_founding",
                 },
             }
         )
+    elif already_home_deploy:
+        # Retitle the existing home deploy so founding fiction sticks.
+        for c in choices:
+            if c.get("kind") == "deploy" and str((c.get("effect") or {}).get("mapId") or "") == HOME_MAP_ID:
+                if fresh_opening or camp_level <= 0:
+                    c["label"] = "Found the Rock Jungle camp"
+                    c["blurb"] = (
+                        "Start the new Ashwalker base: plant eco, dig in against raptor pests, "
+                        "and maybe mint a small exfil force. Spend leftover Tnb on constructors "
+                        "at the broker if you did not seat expensive heroes."
+                    )
+                effect = dict(c.get("effect") or {})
+                effect["journey"] = "home_founding"
+                # Upgrade stale hive-march home probes into fortify dig-ins.
+                if camp_level <= 0 or fresh_opening:
+                    effect["contractKind"] = "fortify_zone"
+                    effect.setdefault("preferredCaptureZoneId", "TRJ_NW_GATE")
+                    effect.setdefault("preferredDeployZoneId", "TRJ_NW_OUTER_MUSTER")
+                    effect.setdefault("preferredExtractionZoneId", "TRJ_NW_OUTER_MUSTER")
+                    effect["homeClearAttempt"] = False
+                c["effect"] = effect
+                break
 
-    # Raid abroad for Tnb when home is focus.
-    if focus == HOME_MAP_ID or home == HOME_MAP_ID:
+    # Home camp raise lives on the left-bar camp overlay (not main journeys).
+
+    # Journey B — raid abroad for Tnb (skip if opening already seats that map).
+    already_raid_maps = {
+        str((c.get("effect") or {}).get("mapId") or "")
+        for c in choices
+        if c.get("kind") == "deploy"
+    }
+    spent = state.get("spentTheaters") if isinstance(state.get("spentTheaters"), dict) else {}
+    last_sortie = str(state.get("lastSortieMapId") or "")
+    # Outflow when sitting on / returning from a spent raid theater (esp. Greenest).
+    # World spine: GF → Eye → Koom → Tabula → Bastion/Jungle. Hub PLAY has no
+    # Mode B Reload host, so these doors are the real cross-map flow.
+    need_outflow = (
+        focus == "greenest_fields"
+        or last_sortie == "greenest_fields"
+        or "greenest_fields" in spent
+        or focus == HOME_MAP_ID
+        or home == HOME_MAP_ID
+    )
+    if need_outflow:
         raid_name = next(
             (r["displayName"] for r in regions if r["mapId"] == raid_map), raid_map
         )
-        choices.append(
-            {
-                "id": f"c_raid_tnb_{raid_map}",
-                "label": f"Raid {raid_name} for Tenebrium",
-                "blurb": "Home stays hungry without Tnb. Hit their works, print, return.",
-                "kind": "deploy",
-                "effect": {
-                    "mapId": raid_map,
-                    "contractKind": "eco_raid",
-                    "deployAces": deploy_aces,
-                    "sessionMode": "map_travel",
-                    "against": "armada",
-                },
-            }
+        gf_spent = "greenest_fields" in spent or last_sortie == "greenest_fields"
+        # Never re-offer a spent raid theater as the Tnb door.
+        skip_raid = (
+            raid_map in already_raid_maps
+            or raid_map in spent
+            or (gf_spent and raid_map == "greenest_fields")
         )
-        if crater:
+        if not skip_raid:
+            choices.append(
+                {
+                    "id": f"c_raid_tnb_{raid_map}",
+                    "label": f"Raid {raid_name} for Tenebrium",
+                    "blurb": (
+                        "Jump the Fields on the way: crack Armada decoy farms for Tnb, "
+                        "optionally plant a presence, then haul loot home to fund the jungle camp."
+                    ),
+                    "kind": "deploy",
+                    "effect": {
+                        "mapId": raid_map,
+                        "contractKind": "eco_raid",
+                        "deployAces": deploy_aces,
+                        "sessionMode": "map_travel",
+                        "against": "armada",
+                        "journey": "tnb_raid",
+                    },
+                }
+            )
+        if crater and crater not in already_raid_maps:
             choices.append(
                 {
                     "id": "c_raid_crater",
-                    "label": "Strike the Horus crater",
-                    "blurb": "Cortex still smiles at customers — until you glass their gear.",
+                    "label": (
+                        "Leave the Fields — strike the Horus crater"
+                        if (focus == "greenest_fields" or gf_spent)
+                        else "Strike the Horus crater"
+                    ),
+                    "blurb": (
+                        "Greenest is spent. Take the corridor into the glassed Eye — "
+                        "Cortex still smiles at customers until you glass their gear."
+                        if (focus == "greenest_fields" or gf_spent)
+                        else "Cortex still smiles at customers — until you glass their gear."
+                    ),
                     "kind": "deploy",
                     "effect": {
                         "mapId": "eye_of_horus",
@@ -415,84 +786,137 @@ def build_open_node(state: dict, regions: list[dict], aces: list[dict], rep: dic
                         "deployAces": deploy_aces,
                         "sessionMode": "map_travel",
                         "against": "cortex",
+                        "journey": "spine_outflow",
+                    },
+                }
+            )
+        # Explicit home return when focus/last sortie is a raid theater.
+        if focus != HOME_MAP_ID and HOME_MAP_ID not in already_raid_maps:
+            choices.append(
+                {
+                    "id": "c_return_home_shelf",
+                    "label": "Return to the Rock Jungle shelf",
+                    "blurb": (
+                        "Bank the Fields. Dig the Ashwalker camp back on limestone — "
+                        "raptors, eco, and a pad you own."
+                    ),
+                    "kind": "deploy",
+                    "effect": {
+                        "mapId": HOME_MAP_ID,
+                        "contractKind": "fortify_zone",
+                        "preferredCaptureZoneId": "TRJ_NW_GATE",
+                        "preferredDeployZoneId": "TRJ_NW_OUTER_MUSTER",
+                        "preferredExtractionZoneId": "TRJ_NW_OUTER_MUSTER",
+                        "deployAces": deploy_aces,
+                        "sessionMode": "map_travel",
+                        "against": "wild",
+                        "journey": "home_founding",
                     },
                 }
             )
 
-    choices.extend(
-        [
-            {
-                "id": "c_shop",
-                "label": "See the broker",
-                "blurb": "Merc loans, scrap, and the odd printer upgrade.",
-                "kind": "shop",
-                "effect": {"panel": "shop"},
-            },
-            {
-                "id": "c_talk_ketha",
-                "label": "Talk with Ketha",
-                "blurb": "A quiet minute by the fire. Bonds hold better than armor.",
-                "kind": "talk",
-                "effect": {
-                    "social": "vane_ketha_hearth",
-                    "bondDelta": {"vane": {"ketha": 2}, "ketha": {"vane": 2}},
-                },
-            },
-            {
-                "id": "c_rest",
-                "label": "Rest the company",
-                "blurb": "Bandage the wounded. Let the stress bleed off.",
-                "kind": "rest",
-                "effect": {"healWounds": 1, "stressDelta": -5},
-            },
-        ]
-    )
+    # After the opener, the doors are the collapse. The hardcoded Jungle
+    # pockets, Greenest raid, and Horus strike are not the campaign.
+    wet_voice = None
+    if not fresh_opening:
+        wet_choices, wet_voice = _wet_reach_choices(state, deploy_aces)
+        if wet_choices:
+            choices = wet_choices
 
-    if null_rep >= BAY_THRESHOLD:
-        choices.append(
-            {
-                "id": "c_bay_locked",
-                "label": "Null Mercs garage",
-                "blurb": "Still welding. Come back when the contract deepens.",
-                "kind": "bay",
-                "effect": {"note": "The bay is locked for now — not open in this build."},
-            }
-        )
+    # Camp / broker / hearth / bay are left-bar or right-tab surfaces —
+    # main journeys stay deploy-only (mission pick).
 
     home_name = next(
         (r["displayName"] for r in regions if r["mapId"] == home), "Rock Jungle"
     )
-    if home_cleared:
+    true_home = (camp.get("mapId") or HOME_MAP_ID)
+    true_home_name = next(
+        (r["displayName"] for r in regions if r["mapId"] == true_home), "Rock Jungle"
+    )
+    chars = state.get("characters") or {}
+    dead_names = [
+        str((chars[k] or {}).get("name") or k)
+        for k in chars
+        if isinstance(chars.get(k), dict) and str(chars[k].get("status") or "") == "dead"
+    ]
+    dead_hint = ""
+    if dead_names:
+        shown = ", ".join(dead_names[:2])
+        more = f" +{len(dead_names) - 2}" if len(dead_names) > 2 else ""
+        dead_hint = f" We already lost {shown}{more}."
+
+    if fresh_opening:
+        ketha_line = (
+            "Two roads from the ash: found our new base in the Rock Jungle "
+            "(eco, raptor defence, leftover Tnb on constructors), "
+            "or jump Greenest Fields first — raid decoy farms for Tenebrium, "
+            "optionally plant a presence, then haul it home to build."
+        )
+    elif home_cleared:
         ketha_line = (
             f"The Rock Jungle is ours. The shelves hold. "
             f"Raid if you must — but home no longer begs."
         )
     elif mission_n <= 1:
         ketha_line = (
-            f"Home is the limestone maze — {home_name}. "
-            f"We cannot clear the wilds without Tenebrium. "
-            f"Mark a wound on the map, or raid their fields to print."
+            f"We are founding {home_name}. "
+            f"Raid Greenest Fields for Tenebrium when the camp needs metal in the blood, "
+            f"or dig in at home against the wilds."
         )
-    elif focus == HOME_MAP_ID:
+    elif focus == true_home or focus == HOME_MAP_ID:
         ketha_line = (
             f"Still under the spires. Camp L{camp_level}. Tnb {tnb}. "
             f"{'Scale enough — take the maze.' if home_ready else 'Raid. Print. Build the camp. Then we clear.'}"
         )
+    elif camp_level <= 0 and tnb < 6:
+        # Hot raid fantasy: grab Tnb, extract, haul loot home, raise the shelf.
+        ketha_line = (
+            f"Mission {mission_n} on {focus_name} is hot — do not settle here."
+            f"{dead_hint} "
+            f"Crack decoy farms for Tenebrium, hit extract, haul the loot to "
+            f"{true_home_name}. Camp is still L{camp_level}; we build with what we bring back."
+        )
     else:
         ketha_line = (
-            f"Mission {mission_n} off home ground. {focus_name} bleeds metal. "
-            f"Bring Tnb back to the jungle."
+            f"Mission {mission_n} off home ground. {focus_name} bleeds metal."
+            f"{dead_hint} "
+            f"Pocket the Tnb, extract clean, bring it back to {true_home_name}."
         )
     if null_rep >= BAY_THRESHOLD and mission_n > 1:
         ketha_line += " They still say your name in the bay."
+
+    # World graph G pressure (Drop will collapse these axes on homecoming).
+    try:
+        from graph_collapse_v1 import pressure_brief  # type: ignore
+
+        pressure = pressure_brief(state.get("graph") or {})
+    except Exception:
+        pressure = ""
+    if wet_voice:
+        ketha_line = wet_voice
+    if pressure and mission_n > 1:
+        ketha_line += f" World reads: {pressure}."
+
+    # Theater should show the recommended sortie map, not only home ground.
+    # Home stays on sessionHomeMap / badges; regionHint drives the briefing table.
+    recommended_map = None
+    for c in choices:
+        if c.get("recommended") and c.get("kind") == "deploy":
+            recommended_map = str((c.get("effect") or {}).get("mapId") or "") or None
+            break
+    if not recommended_map and fresh_opening:
+        recommended_map = "greenest_fields"
+    theater_hint = recommended_map or focus
 
     return {
         "id": f"hub_open_m{mission_n}",
         "kind": "choice",
         "speaker": "ketha",
         "text": ketha_line,
-        "regionHint": focus,
+        "regionHint": theater_hint,
+        "sortieMapId": recommended_map or theater_hint,
         "sessionHomeMap": home or focus,
+        "graphPressure": pressure or None,
         "choices": choices,
     }
 
@@ -583,7 +1007,7 @@ def listing_available_ui(
         return False, "upgrade already installed"
     if kind in ("unit_printer", "loan_package") and listing_id in owned:
         return False, "already owned"
-    if listing.get("starterOwned") and listing_id in owned:
+    if listing.get("starterOwned") and listing.get("loan") and listing_id in owned:
         return False, "already owned (starter loan)"
     req = listing.get("requires")
     if req and req not in owned:
@@ -599,11 +1023,15 @@ def listing_available_ui(
     tcost = int(listing.get("tenebriumCost") or 0)
     if listing.get("builds") and tcost < 1:
         tcost = 1
-    ccost = int(listing.get("creditCost") or 0)
+    if listing.get("metalCostK") is not None:
+        mcost = int(listing.get("metalCostK") or 0)
+    else:
+        mcost = int(listing.get("creditCost") or 0)
     if int(commerce.get("tenebrium") or 0) < tcost:
         return False, f"need {tcost} Tenebrium (have {commerce.get('tenebrium', 0)})"
-    if int(commerce.get("credits") or 0) < ccost:
-        return False, f"need {ccost} scrap credits (have {commerce.get('credits', 0)})"
+    metal_have = int(commerce.get("metalK") if "metalK" in commerce else commerce.get("credits") or 0)
+    if metal_have < mcost:
+        return False, f"need {mcost}×1km$ metal (have {metal_have})"
     return True, "ok"
 
 
@@ -611,15 +1039,16 @@ def build_commerce_surface(state: dict, mission_n: int) -> dict:
     """Project catalog + campaign bag into hub_state.commerce for the shop UI."""
     catalog = load_catalog()
     bag = dict(state.get("commerce") or {})
-    credits_meta = catalog.get("credits") or {}
+    metal_meta = catalog.get("metal") or catalog.get("credits") or {}
     resource = catalog.get("resource") or {}
     starting = resource.get("startingBalance") or {}
     tenebrium = int(bag.get("tenebrium") if "tenebrium" in bag else 0)
-    credits = int(
-        bag.get("credits")
-        if "credits" in bag
-        else (credits_meta.get("startingBalance") or 40)
-    )
+    if "metalK" in bag:
+        metal_k = int(bag.get("metalK") or 0)
+    elif "credits" in bag:
+        metal_k = int(bag.get("credits") or 0) // 10
+    else:
+        metal_k = int(metal_meta.get("startingBalanceK") or 0)
     owned = dict(bag.get("owned") or {})
     upgrades = dict(bag.get("upgrades") or {})
     # Seed starter-owned listings into the surface if bag is empty of them
@@ -631,17 +1060,37 @@ def build_commerce_surface(state: dict, mission_n: int) -> dict:
                 "qty": 1,
                 "loan": bool(listing.get("loan")),
                 "unitDef": listing.get("unitDef"),
-                "loanCount": int(listing.get("count") or 0),
-                "kind": listing.get("kind") or "loan_package",
+                "loanCount": int(listing.get("count") or 0) if listing.get("loan") else None,
+                "kind": listing.get("kind") or "purchase_package",
                 "source": "starter",
             }
 
+    dest_map = str(
+        state.get("plannedMapId")
+        or state.get("sessionHomeMap")
+        or "greenest_fields"
+    )
+    stamp = ROOT / "outbox" / "hub_deploy_stamp.latest.json"
+    if stamp.exists():
+        try:
+            st = json.loads(stamp.read_text(encoding="utf-8-sig"))
+            if isinstance(st, dict):
+                dest_map = str(
+                    st.get("mapId")
+                    or st.get("deploymentMapId")
+                    or (st.get("plan") or {}).get("mapId")
+                    or dest_map
+                )
+        except Exception:
+            pass
+
     commerce_view = {
         "tenebrium": tenebrium,
-        "credits": credits,
+        "metalK": metal_k,
         "owned": owned,
         "upgrades": upgrades,
         "ledger": list(bag.get("ledger") or [])[-12:],
+        "pendingDeliveries": list(bag.get("pendingDeliveries") or []),
     }
 
     shop: list[dict] = []
@@ -652,6 +1101,12 @@ def build_commerce_surface(state: dict, mission_n: int) -> dict:
         tcost = int(listing.get("tenebriumCost") or 0)
         if listing.get("builds") and tcost < 1:
             tcost = 1
+        eta = delivery_eta(
+            listing=listing,
+            listing_id=lid,
+            dest_map_id=dest_map,
+            workspace=ROOT,
+        )
         shop.append(
             {
                 "id": lid,
@@ -661,21 +1116,42 @@ def build_commerce_surface(state: dict, mission_n: int) -> dict:
                 "unitDef": listing.get("unitDef") or listing.get("factoryDef") or listing.get("product"),
                 "count": listing.get("count") or listing.get("seedCount"),
                 "tenebriumCost": tcost,
-                "creditCost": int(listing.get("creditCost") or 0),
+                "metalCostK": int(
+                    listing.get("metalCostK")
+                    if listing.get("metalCostK") is not None
+                    else listing.get("creditCost")
+                    or 0
+                ),
                 "builds": bool(listing.get("builds")),
                 "loan": bool(listing.get("loan")),
                 "starterOwned": bool(listing.get("starterOwned")),
+                "shelf": listing.get("shelf") or (
+                    "armada" if "armada" in list(listing.get("tags") or []) else
+                    "nullmercs" if ("nullmercs" in list(listing.get("tags") or []) or listing.get("kind") == "hero_contract") else
+                    "cortex"
+                ),
                 "available": ok,
                 "blockedReason": None if ok else reason,
                 "owned": lid in owned or lid in upgrades,
+                "ownedQty": int((owned.get(lid) or {}).get("qty") or (1 if lid in owned else 0)),
                 "repMin": listing.get("repMin") or {},
                 "arcMin": int(listing.get("arcMin") or 1),
                 "tags": list(listing.get("tags") or []),
                 "requires": listing.get("requires"),
+                "delivery": {
+                    "mode": eta.get("mode"),
+                    "deferred": bool(eta.get("deferred")),
+                    "sourceLabel": eta.get("sourceLabel"),
+                    "etaSeconds": eta.get("etaSeconds"),
+                    "etaText": eta.get("etaText"),
+                    "summary": eta.get("summary"),
+                    "routeLabels": eta.get("routeLabels"),
+                },
             }
         )
 
     deploy_kit: list[dict] = []
+    inbound: list[dict] = []
     listings = catalog.get("listings") or {}
     for lid, rec in owned.items():
         if not isinstance(rec, dict):
@@ -683,18 +1159,36 @@ def build_commerce_surface(state: dict, mission_n: int) -> dict:
         listing = listings.get(lid) or {}
         kind = str(rec.get("kind") or listing.get("kind") or "purchase_package")
         unit_def = rec.get("unitDef") or listing.get("unitDef")
+        qty = int(rec.get("qty") or 1)
         count = int(rec.get("loanCount") or rec.get("count") or listing.get("count") or 0)
+        if kind == "purchase_package":
+            count = int(listing.get("count") or count or 0) * max(1, qty)
+        eta = delivery_eta(
+            listing=listing,
+            listing_id=lid,
+            dest_map_id=dest_map,
+            workspace=ROOT,
+        )
         if unit_def and count > 0:
-            deploy_kit.append(
-                {
-                    "listingId": lid,
-                    "kind": kind,
-                    "unitDef": unit_def,
-                    "count": count,
-                    "loan": bool(rec.get("loan") or listing.get("loan")),
-                    "label": listing.get("label") or lid,
-                }
-            )
+            row = {
+                "listingId": lid,
+                "kind": kind,
+                "unitDef": unit_def,
+                "count": count,
+                "loan": bool(rec.get("loan") or listing.get("loan")),
+                "label": listing.get("label") or lid,
+                "delivery": {
+                    "mode": eta.get("mode"),
+                    "deferred": bool(eta.get("deferred")),
+                    "etaText": eta.get("etaText"),
+                    "summary": eta.get("summary"),
+                    "sourceLabel": eta.get("sourceLabel"),
+                },
+            }
+            if eta.get("deferred") and kind == "purchase_package":
+                inbound.append(row)
+            else:
+                deploy_kit.append(row)
         if kind == "unit_printer" or listing.get("factoryDef"):
             deploy_kit.append(
                 {
@@ -727,20 +1221,27 @@ def build_commerce_surface(state: dict, mission_n: int) -> dict:
             "lore": resource.get("lore") or "",
             "storage": "infinite",
         },
-        "credits": {
-            "id": credits_meta.get("id") or "scrap_credits",
-            "label": credits_meta.get("label") or "Scrap Credits",
+        "metal": {
+            "id": metal_meta.get("id") or "campaign_metal",
+            "label": metal_meta.get("label") or "Metal",
+            "shortLabel": metal_meta.get("shortLabel") or "1km$",
+            "unitMetal": int(metal_meta.get("unitMetal") or 1000),
         },
         "tenebrium": tenebrium,
-        "scrapCredits": credits,
+        "metalK": metal_k,
+        "armyBudget": int(bag.get("armyBudget") or 0),
         "owned": owned,
         "upgrades": upgrades,
         "shop": shop,
         "deployKit": deploy_kit,
+        "inbound": inbound,
+        "pendingDeliveries": commerce_view["pendingDeliveries"],
+        "destMapId": dest_map,
         "ledger": commerce_view["ledger"],
         "notes": (
             "Tenebrium is black-hole metal (scarce since the Generic Disaster). "
-            "Anything that builds costs ≥1. Ashwalkers/Null Mercs start at 0."
+            "Campaign metal banks as floor(endMetal/1000) 1km$ units. "
+            "Combat packs ship via Eye of Horus / All That Simmers / pawn launcher with field ETAs."
         ),
         "catalogSchema": catalog.get("schemaVersion"),
         "armadaCrisis": (resource.get("armadaCrisis") or {}).get("active", True),
@@ -770,6 +1271,7 @@ def build_faction_banks(state: dict, commerce: dict) -> dict:
 
 
 def build_hub(state: dict, war: dict) -> dict:
+    repair_session_home(state)
     rep = dict(state.get("reputation") or {})
     null_rep = float(rep.get("nullmercs") or 0)
     aces = build_aces(state)
@@ -784,8 +1286,32 @@ def build_hub(state: dict, war: dict) -> dict:
     except Exception:  # noqa: BLE001
         home_eval = {}
     node = build_open_node(state, regions, aces, rep)
+    # Soft unlock: chips / Theaters tab only light maps that appear in journeys
+    # (plus home / recommended sortie). Scales as more deploy choices are emitted.
+    open_maps: set[str] = set()
+    for ch in node.get("choices") or []:
+        if not isinstance(ch, dict) or ch.get("kind") != "deploy":
+            continue
+        mid = str((ch.get("effect") or {}).get("mapId") or "").strip()
+        if mid:
+            open_maps.add(mid)
+    for key in ("sessionHomeMap",):
+        v = state.get(key)
+        if v:
+            open_maps.add(str(v))
+    for key in ("sortieMapId", "regionHint", "sessionHomeMap"):
+        v = (node or {}).get(key)
+        if v:
+            open_maps.add(str(v))
+    camp_map = ((state.get("homeCamp") or {}).get("mapId")) or HOME_MAP_ID
+    open_maps.add(str(camp_map))
+    if not open_maps:
+        open_maps.update({"greenest_fields", HOME_MAP_ID})
+    for r in regions:
+        r["selectable"] = str(r.get("mapId") or "") in open_maps
     companion = state.get("companion") or {}
     mission_n = int(state.get("missionNumber") or war.get("missionNumber") or 1)
+    fresh_opening = mission_n == 1 and not state.get("history") and not state.get("lastResult")
     arc = arc_from_mission(mission_n)
     graph = dict(state.get("graph") or {})
     # Ensure canonical qubits for the density-matrix room (framework defaults).
@@ -797,6 +1323,15 @@ def build_hub(state: dict, war: dict) -> dict:
     graph.setdefault("pathSignalA", 0.0)
     graph.setdefault("pathSignalB", 0.1)
     graph.setdefault("pathSignalC", 0.0)
+    try:
+        from graph_collapse_v1 import pressure_brief  # type: ignore
+
+        graph_pressure = pressure_brief(graph)
+    except Exception:
+        graph_pressure = (
+            f"contested={float(graph.get('q6_contested') or 0):.2f} · "
+            f"scarcity={float(graph.get('q7_resource_scarcity') or 0):.2f}"
+        )
     spectral = state.get("lastSpectral") or {
         "dominantEigenvalue": round(1.0 + float(graph.get("q6_contested") or 0) * 0.3, 4),
         "energy": round(
@@ -823,6 +1358,31 @@ def build_hub(state: dict, war: dict) -> dict:
     session_home = state.get("sessionHomeMap") or pick_focus_region(regions, state)
     campaign_rho = project_campaign_rho(state, mission_n)
 
+    company_surface: dict = {}
+    try:
+        sys.path.insert(0, str(ROOT / "tools"))
+        from company_v1 import ensure_company, hub_company_surface  # type: ignore
+        try:
+            from verdance_story_engine_v1 import ensure_roster  # type: ignore
+
+            ensure_roster(state)
+        except Exception:  # noqa: BLE001
+            pass
+
+        ensure_company(state, ROOT)
+        company_surface = hub_company_surface(state, ROOT)
+    except Exception:  # noqa: BLE001
+        company_surface = {
+            "sealed": bool((state.get("company") or {}).get("sealed")),
+            "preambleNeeded": not bool((state.get("company") or {}).get("sealed")),
+            "core": [],
+            "band": list((state.get("company") or {}).get("band") or []),
+            "joinedLater": list((state.get("company") or {}).get("joinedLater") or []),
+            "seatCap": 3,
+            "pool": [],
+            "wild": [],
+        }
+
     # Hub capture: claimed nodes + open contracts (clear + hold under regrow).
     capture_contracts: list = []
     claim_surface: dict = {
@@ -848,16 +1408,48 @@ def build_hub(state: dict, war: dict) -> dict:
     if home_eval:
         flags["homeClearReady"] = home_eval.get("homeClearReady")
         flags["homeCleared"] = home_eval.get("homeCleared")
+    # Camp overlay surface (left bar) — raise is hub spend, not a main journey.
+    camp_level = int(home_camp.get("level") or 0)
+    home_cleared = bool(flags.get("homeCleared") or (home_eval or {}).get("homeCleared"))
+    tnb_bag = int(commerce.get("tenebrium") or 0)
+    metal_k_bag = int(commerce.get("metalK") or 0)
+    can_raise = (not home_cleared) and tnb_bag >= 1 and metal_k_bag >= 1
+    home_camp["canRaise"] = can_raise
+    home_camp["raiseTnbCost"] = 1
+    home_camp["raiseMetalCostK"] = 1
+    home_camp["cleared"] = home_cleared
+    home_camp["clearReady"] = bool(flags.get("homeClearReady") or (home_eval or {}).get("homeClearReady"))
+    home_camp["level"] = camp_level
+    try:
+        from verdance_story_engine_v1 import commander_is_unlocked  # type: ignore
 
+        walker_on = commander_is_unlocked(state)
+    except Exception:  # noqa: BLE001
+        commander = ((state.get("roster") or {}).get("commander") or {})
+        walker_on = isinstance(commander, dict) and commander.get("unlocked") is True
+    home_camp["commanderUnlocked"] = walker_on
+    home_camp["commanderLine"] = (
+        "The command walker walks with you."
+        if walker_on
+        else "The command walker is scrap. The company is the line until the story rebuilds it."
+    )
+
+    from narrative_v1 import project as narrative_project
     return {
         "schemaVersion": "verdance-hub-state/1.0",
+        "narrative": narrative_project(state, node.get("choices") or [], ROOT),
+        "features": {"commandConsole": (state.get("features") or {}).get("commandConsole", True)},
         "campaignId": state.get("campaignId") or war.get("campaignId") or "verdance_ashes",
         "missionNumber": mission_n,
         "arc": arc,
         "pathSignal": state.get("pathSignal") or "B",
         "seed": state.get("seed") or 28,
         "generatedAt": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "tagline": "Home is the Rock Jungle. Raid for Tenebrium. Clear the wilds when you can scale.",
+        "tagline": (
+            "Found the Rock Jungle camp — or raid Greenest Fields for Tenebrium to fund it."
+            if fresh_opening
+            else "Home is the Rock Jungle. Raid the Fields for Tenebrium. Clear the wilds when you can scale."
+        ),
         "sessionMode": session_mode,
         "sessionHomeMap": session_home,
         "theater": theater,
@@ -873,6 +1465,7 @@ def build_hub(state: dict, war: dict) -> dict:
         "factionBanks": faction_banks,
         "tenebrium": commerce.get("tenebrium", 0),
         "graph": graph,
+        "graphPressure": graph_pressure,
         "spectral": spectral,
         "campaignRho": campaign_rho,
         "reputation": rep,
@@ -895,6 +1488,8 @@ def build_hub(state: dict, war: dict) -> dict:
         },
         "commerce": commerce,
         "aces": aces,
+        "supportWeb": _support_web_surface(aces, company_surface, state),
+        "company": company_surface,
         "regions": regions,
         "node": node,
         "lastResult": _load_last_hub_result(),
@@ -914,6 +1509,10 @@ def build_hub(state: dict, war: dict) -> dict:
             "captureNodeClaims": True,
             "noFreeTnbMint": True,
             "livePurchase": True,
+            "companyPreamble": True,
+            "companySealed": bool(company_surface.get("sealed")),
+            "homeClearReady": flags.get("homeClearReady"),
+            "homeCleared": flags.get("homeCleared"),
         },
     }
 
@@ -924,7 +1523,29 @@ def _load_last_hub_result():
         return None
     try:
         data = load_json(p)
-        return data.get("lastResult") or data
+        payload = data.get("lastResult") or data
+        # Sortie-2 ghost guard: after a wipe, campaign_state is mission 1 with
+        # empty history, but a leftover hub_result.latest.json can still paint
+        # "sortie 2" chrome. Ignore stale result paint in that case.
+        state_path = ROOT / "state" / "campaign_state.json"
+        if state_path.is_file():
+            try:
+                state = load_json(state_path)
+                mission_n = int(state.get("missionNumber") or 1)
+                hist = state.get("history") or []
+                if mission_n <= 1 and not hist:
+                    return None
+                painted = int(
+                    (payload or {}).get("missionNumber")
+                    or data.get("missionNumber")
+                    or 0
+                )
+                # Result from a later mission must not override an earlier state.
+                if painted and painted > mission_n:
+                    return None
+            except Exception:  # noqa: BLE001
+                pass
+        return payload
     except Exception:  # noqa: BLE001
         return None
 
@@ -939,6 +1560,40 @@ def main() -> int:
 
     state = load_json(STATE_PATH)
     war = load_json(WAR_MAP_PATH)
+    # Persist company scaffolding / authored roster so Drop gate + ace list match hub.
+    try:
+        sys.path.insert(0, str(ROOT / "tools"))
+        from company_v1 import ensure_company  # type: ignore
+        from verdance_story_engine_v1 import ensure_roster  # type: ignore
+
+        snap = json.dumps(
+            {
+                "company": state.get("company"),
+                "fieldPool": state.get("fieldPool"),
+                "unlockPool": state.get("unlockPool"),
+                "roster": state.get("roster"),
+                "characters": state.get("characters"),
+            },
+            sort_keys=True,
+        )
+        ensure_roster(state)
+        ensure_company(state, ROOT)
+        snap2 = json.dumps(
+            {
+                "company": state.get("company"),
+                "fieldPool": state.get("fieldPool"),
+                "unlockPool": state.get("unlockPool"),
+                "roster": state.get("roster"),
+                "characters": state.get("characters"),
+            },
+            sort_keys=True,
+        )
+        if snap != snap2:
+            STATE_PATH.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
+            print(f"updated roster/company fields on {STATE_PATH}")
+    except Exception as e:  # noqa: BLE001
+        print(f"company/roster ensure skipped: {e}", file=sys.stderr)
+
     hub = build_hub(state, war)
 
     OUT_JSON.parent.mkdir(parents=True, exist_ok=True)
@@ -949,12 +1604,14 @@ def main() -> int:
     )
     shop_n = len((hub.get("commerce") or {}).get("shop") or [])
     avail = sum(1 for s in ((hub.get("commerce") or {}).get("shop") or []) if s.get("available"))
+    company = hub.get("company") or {}
     print(f"wrote {OUT_JSON}")
     print(f"wrote {OUT_EMBED}")
     print(
         f"aces={len(hub['aces'])} regions={len(hub['regions'])} "
         f"choices={len(hub['node']['choices'])} shop={shop_n} available={avail} "
-        f"tnb={hub.get('tenebrium')} mode={hub.get('sessionMode')}"
+        f"tnb={hub.get('tenebrium')} mode={hub.get('sessionMode')} "
+        f"companySealed={bool(company.get('sealed'))} pool={len(company.get('pool') or [])}"
     )
     return 0
 

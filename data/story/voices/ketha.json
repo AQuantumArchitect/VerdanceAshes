@@ -1,0 +1,655 @@
+{
+  "schemaVersion": "verdance-voice/0.1",
+  "speaker": "ketha",
+  "name": "Ketha",
+  "register": "Short, grounded, dry. Counts costs out loud and never wastes a sentence. She keeps the roll and reads it by name; she keeps the parts of the commander's walker and pretends she doesn't. Never sentimental about the dead, never casual about them. Under ~90 characters where possible. She does not say 'measurement', 'collapse', 'axis', 'estimate' or 'uncertain'; she says 'we were there', 'nobody's looked', 'what we found instead'.",
+  "argues": [
+    "haunted",
+    "bleeding"
+  ],
+  "resists": [
+    "indebted"
+  ],
+  "owns": [
+    "drop_unfinished",
+    "drop_lost",
+    "costly_return",
+    "hero_joined",
+    "named_dead",
+    "walker_still_scrap",
+    "walker_rebuilt",
+    "promise_kept:bring_back",
+    "promise_broken:bring_back"
+  ],
+  "lines": [
+    {
+      "id": "k.unfinished.1",
+      "on": {
+        "class": "drop_unfinished"
+      },
+      "text": "We brought back a company. We didn't bring back the order. Both go in the report."
+    },
+    {
+      "id": "k.unfinished.2",
+      "on": {
+        "class": "drop_unfinished"
+      },
+      "text": "Half a job at {map}. The half we kept has names in it. I'll take that half."
+    },
+    {
+      "id": "k.unfinished.3",
+      "on": {
+        "class": "drop_unfinished"
+      },
+      "text": "{map} isn't finished. Nobody on this roster is finished either. That's the order I count in."
+    },
+    {
+      "id": "k.unfinished.4",
+      "on": {
+        "class": "drop_unfinished"
+      },
+      "reading": {
+        "dominant": [
+          "auxiliary"
+        ]
+      },
+      "text": "The client will ask which half of the order we meant to keep. Decide before they ask."
+    },
+    {
+      "id": "k.unfinished.5",
+      "on": {
+        "class": "drop_unfinished"
+      },
+      "reading": {
+        "dominant": [
+          "bleeding",
+          "haunted"
+        ]
+      },
+      "text": "Unfinished at {map}. Good. Finished is what the other list is for."
+    },
+    {
+      "id": "k.lost.1",
+      "on": {
+        "class": "drop_lost"
+      },
+      "text": "{map} is theirs. Write it plain. Nobody reads a report that apologizes."
+    },
+    {
+      "id": "k.lost.2",
+      "on": {
+        "class": "drop_lost"
+      },
+      "text": "We lost {map}. I want the roster read before anyone says the word ground."
+    },
+    {
+      "id": "k.lost.3",
+      "on": {
+        "class": "drop_lost"
+      },
+      "text": "Lost. I've written that word before. It gets shorter every time and it never gets smaller."
+    },
+    {
+      "id": "k.lost.4",
+      "on": {
+        "class": "drop_lost"
+      },
+      "reading": {
+        "dominant": [
+          "rooted"
+        ]
+      },
+      "text": "{map} is gone. The camp isn't. Say both in that order."
+    },
+    {
+      "id": "k.costly.1",
+      "on": {
+        "class": "costly_return"
+      },
+      "text": "We got out of {map}. Not clean. I'll tell you what it cost when I've finished counting."
+    },
+    {
+      "id": "k.costly.2",
+      "on": {
+        "class": "costly_return"
+      },
+      "text": "Home from {map} with the bill attached. Read it before you spend anything else."
+    },
+    {
+      "id": "k.costly.3",
+      "on": {
+        "class": "costly_return"
+      },
+      "text": "Extraction: {extractionText}. That's a phrase that means somebody carried somebody."
+    },
+    {
+      "id": "k.joined.named.1",
+      "on": {
+        "class": "hero_joined"
+      },
+      "text": "{names}. On the roster as of tonight. Learn the name before the enemy does."
+    },
+    {
+      "id": "k.joined.named.2",
+      "on": {
+        "class": "hero_joined"
+      },
+      "text": "{names} walked in after {map}. I've put a chair out. Don't make me take it back."
+    },
+    {
+      "id": "k.joined.named.3",
+      "on": {
+        "class": "hero_joined"
+      },
+      "reading": {
+        "dominant": [
+          "haunted",
+          "bleeding"
+        ]
+      },
+      "text": "{names}. Roster, not roll. I wrote it slowly so I'd remember which page."
+    },
+    {
+      "id": "k.joined.1",
+      "on": {
+        "class": "hero_joined"
+      },
+      "text": "New name on the roster. Learn it before the enemy does."
+    },
+    {
+      "id": "k.joined.2",
+      "on": {
+        "class": "hero_joined"
+      },
+      "text": "Someone walked in after {map}. They walk with us now. Keep them walking."
+    },
+    {
+      "id": "k.joined.3",
+      "on": {
+        "class": "hero_joined"
+      },
+      "text": "The company grew last night. The table didn't. Somebody find a chair."
+    },
+    {
+      "id": "k.joined.4",
+      "on": {
+        "class": "hero_joined"
+      },
+      "reading": {
+        "dominant": [
+          "haunted"
+        ]
+      },
+      "text": "A new name. I put it on the roster, not the roll. I'd like to keep it that way."
+    },
+    {
+      "id": "k.joined.5",
+      "on": {
+        "class": "hero_joined"
+      },
+      "reading": {
+        "dominant": [
+          "bleeding"
+        ]
+      },
+      "text": "Someone joined. I counted twice to be sure the number went the right direction."
+    },
+    {
+      "id": "k.dead.1",
+      "on": {
+        "class": "named_dead"
+      },
+      "occasion": "roll",
+      "text": "{hero}. The frame stayed where it fell. I've written where."
+    },
+    {
+      "id": "k.dead.2",
+      "on": {
+        "class": "named_dead"
+      },
+      "occasion": "roll",
+      "text": "{hero} is on the roll. Nobody reads it for them. We read it for us."
+    },
+    {
+      "id": "k.dead.3",
+      "on": {
+        "class": "named_dead"
+      },
+      "occasion": "roll",
+      "text": "{hero}. I don't finish sentences. I write down the ones that stopped."
+    },
+    {
+      "id": "k.dead.pavise.1",
+      "on": {
+        "class": "named_dead",
+        "heroId": "pavise"
+      },
+      "occasion": "roll",
+      "once": true,
+      "text": "Pavise is first because Pavise was first. The one who knew you before the ash. I've written that too."
+    },
+    {
+      "id": "k.dead.pavise.2",
+      "on": {
+        "class": "named_dead",
+        "heroId": "pavise"
+      },
+      "occasion": "roll",
+      "text": "Pavise kept your left side under a real flag. Nobody's keeping it now. I notice that every Drop."
+    },
+    {
+      "id": "k.dead.pavise.3",
+      "on": {
+        "class": "named_dead",
+        "heroId": "pavise"
+      },
+      "occasion": "roll",
+      "reading": {
+        "dominant": [
+          "sovereign",
+          "rooted"
+        ]
+      },
+      "text": "Pavise would have asked what the flag's called. I don't have an answer yet. I have a list."
+    },
+    {
+      "id": "k.scrap.1",
+      "on": {
+        "class": "walker_still_scrap"
+      },
+      "occasion": "camp",
+      "text": "Your walker's still on the shelf. You fight through other people's eyes. They know it."
+    },
+    {
+      "id": "k.scrap.2",
+      "on": {
+        "class": "walker_still_scrap"
+      },
+      "occasion": "camp",
+      "text": "I've been keeping the parts. Don't tell anyone. They'll think it means something."
+    },
+    {
+      "id": "k.scrap.3",
+      "on": {
+        "class": "walker_still_scrap"
+      },
+      "occasion": "camp",
+      "reading": {
+        "dominant": [
+          "haunted"
+        ]
+      },
+      "text": "The roll has names on it. You're not on the roster yet. I'd like to fix one of those."
+    },
+    {
+      "id": "k.scrap.4",
+      "on": {
+        "class": "walker_still_scrap"
+      },
+      "occasion": "camp",
+      "reading": {
+        "dominant": [
+          "sovereign"
+        ]
+      },
+      "text": "A flag without a commander standing under it. I've seen that. It's called a memorial."
+    },
+    {
+      "id": "k.rebuilt.1",
+      "on": {
+        "class": "walker_rebuilt"
+      },
+      "occasion": "camp",
+      "once": true,
+      "text": "It walks. Don't thank me. Thank whoever didn't come back so I could learn how."
+    },
+    {
+      "id": "k.rebuilt.2",
+      "on": {
+        "class": "walker_rebuilt"
+      },
+      "occasion": "camp",
+      "text": "You've got legs again. Use them to go back for people. That's what they're for."
+    },
+    {
+      "id": "k.kept.bring_back.1",
+      "on": {
+        "class": "promise_kept",
+        "thread": "bring_back"
+      },
+      "text": "You said people before salvage and the report agrees with you. I noticed."
+    },
+    {
+      "id": "k.kept.bring_back.2",
+      "on": {
+        "class": "promise_kept",
+        "thread": "bring_back"
+      },
+      "text": "Everyone home. The empty chair stayed empty on purpose. That was the plan."
+    },
+    {
+      "id": "k.broken.bring_back.1",
+      "on": {
+        "class": "promise_broken",
+        "thread": "bring_back"
+      },
+      "text": "You promised a clean return. I remember it. I also remember what the field gave us instead."
+    },
+    {
+      "id": "k.broken.bring_back.2",
+      "on": {
+        "class": "promise_broken",
+        "thread": "bring_back"
+      },
+      "text": "The promise lapsed. I don't hold it against you. I hold it. That's different."
+    },
+    {
+      "id": "k.fb.held.1",
+      "on": {
+        "class": "drop_held"
+      },
+      "weight": 0.5,
+      "text": "{map}: held. Everyone who went is accounted for. I'll say the second part first next time."
+    },
+    {
+      "id": "k.fb.held.2",
+      "on": {
+        "class": "drop_held"
+      },
+      "weight": 0.5,
+      "text": "We held {map}. Good. Holding is the cheap part. Keeping is the bill."
+    },
+    {
+      "id": "k.fb.held.3",
+      "on": {
+        "class": "drop_held"
+      },
+      "weight": 0.5,
+      "text": "{map} stayed ours. I wrote it down without an asterisk. That's rare."
+    },
+    {
+      "id": "k.fb.clean.1",
+      "on": {
+        "class": "clean_return"
+      },
+      "weight": 0.5,
+      "text": "Everyone walked home from {map}. The roll didn't get longer. That's the whole report."
+    },
+    {
+      "id": "k.fb.clean.2",
+      "on": {
+        "class": "clean_return"
+      },
+      "weight": 0.5,
+      "text": "Clean from {map}. I counted at the table. The number matched the number that left."
+    },
+    {
+      "id": "k.fb.clean.3",
+      "on": {
+        "class": "clean_return"
+      },
+      "weight": 0.5,
+      "text": "Clean. I don't get to write that often. I've underlined it."
+    },
+    {
+      "id": "k.fb.both.1",
+      "on": {
+        "class": "own_ground_on_merc_paper"
+      },
+      "occasion": "camp",
+      "weight": 0.5,
+      "text": "Merc paper on {map}, our name on the ground. Nobody's asked which. I'd rather we decided before they do."
+    },
+    {
+      "id": "k.fb.both.2",
+      "on": {
+        "class": "own_ground_on_merc_paper"
+      },
+      "occasion": "camp",
+      "weight": 0.5,
+      "text": "{map}: paid by them, held by us. Two true things. Somebody's going to make us pick."
+    },
+    {
+      "id": "k.fb.came.1",
+      "on": {
+        "class": "ground_came_to_us"
+      },
+      "weight": 0.5,
+      "text": "{label} is ours and none of us were there. I don't trust ground I didn't bleed on. I'll take it anyway."
+    },
+    {
+      "id": "k.fb.clash.1",
+      "on": {
+        "class": "clash_near_held"
+      },
+      "weight": 0.5,
+      "text": "Fighting near our ground on {map} while we were elsewhere. {count} times. Nobody's told me who won. That means nobody."
+    },
+    {
+      "id": "k.fb.changed.1",
+      "on": {
+        "class": "ground_changed_hands_near_us"
+      },
+      "weight": 0.5,
+      "text": "{label} changed hands. None of ours saw it. I'd like eyes on what we hold before we hold more."
+    },
+    {
+      "id": "k.fb.garrison.1",
+      "on": {
+        "class": "garrison_scaled_up"
+      },
+      "weight": 0.5,
+      "text": "The old flag's thickened its walls. Falling things don't usually do that. Keep that in mind out there."
+    },
+    {
+      "id": "k.fb.paper.1",
+      "on": {
+        "class": "merc_paper"
+      },
+      "weight": 0.5,
+      "text": "{map} was a Merc contract and nothing of it stayed ours. Paid, though. I'll take paid."
+    },
+    {
+      "id": "k.fb.flip.1",
+      "on": {
+        "class": "armada_flip_away"
+      },
+      "weight": 0.5,
+      "text": "{label} went from Armada to {toFaction} while we were at {ourMap}. Your old flag's losing ground it didn't fight for."
+    },
+    {
+      "id": "k.fb.unseen.1",
+      "on": {
+        "class": "unobserved_ground"
+      },
+      "weight": 0.5,
+      "text": "{n} of {m} zones on our maps, nobody's looked at since we stood there. We're the last word on them, and we left."
+    },
+    {
+      "id": "k.fb.rec.1",
+      "on": {
+        "class": "frame_recovered"
+      },
+      "occasion": "roll",
+      "weight": 0.5,
+      "text": "{hero}, carried home. On the bench, not the roll. I'll take the bench every time."
+    },
+    {
+      "id": "k.fb.rec.2",
+      "on": {
+        "class": "frame_recovered"
+      },
+      "occasion": "roll",
+      "weight": 0.5,
+      "text": "{hero} came back on someone's shoulders. I didn't ask whose. I wrote down that someone had shoulders."
+    },
+    {
+      "id": "k.fb.own.1",
+      "on": {
+        "class": "own_ground"
+      },
+      "weight": 0.5,
+      "text": "{map} kept under our name. No patron's mark. I don't know what that makes us yet. I know it costs more."
+    },
+    {
+      "id": "k.fb.claim.1",
+      "on": {
+        "class": "node_claimed"
+      },
+      "weight": 0.5,
+      "text": "A claim confirmed on {map}. Now it's ours to lose. Those are the only kind worth having."
+    },
+    {
+      "id": "k.fb.loan.1",
+      "on": {
+        "class": "loan_taken"
+      },
+      "occasion": "camp",
+      "weight": 0.5,
+      "text": "A loan. Someone else's name goes above mine on the ledger now. I don't like reading from the second line."
+    },
+    {
+      "id": "k.fb.cleared.1",
+      "on": {
+        "class": "debt_cleared"
+      },
+      "occasion": "camp",
+      "weight": 0.5,
+      "text": "Paper's burned. First line's ours again. I'd like it to stay that way for more than a month."
+    },
+    {
+      "id": "k.fb.scarce.1",
+      "on": {
+        "class": "scarcity_crossed_up"
+      },
+      "weight": 0.5,
+      "text": "Scarcity bit after {map}. Everything costs more tomorrow. Count tonight's dinner twice."
+    },
+    {
+      "id": "k.fb.scarce.down.1",
+      "on": {
+        "class": "scarcity_crossed_down"
+      },
+      "weight": 0.5,
+      "text": "Scarcity eased after {map}. Don't celebrate. It eases right before it doesn't."
+    },
+    {
+      "id": "k.fb.contested.1",
+      "on": {
+        "class": "contested_crossed_up"
+      },
+      "weight": 0.5,
+      "text": "The front's closer than it was. Everyone sleeps with their boots nearer the door tonight."
+    },
+    {
+      "id": "k.fb.kept.1",
+      "on": {
+        "class": "promise_kept"
+      },
+      "weight": 0.3,
+      "text": "'{threadTitle}', kept. The report backs you. I noticed."
+    },
+    {
+      "id": "k.fb.broken.1",
+      "on": {
+        "class": "promise_broken"
+      },
+      "weight": 0.3,
+      "text": "'{threadTitle}' lapsed. I don't hold it against you. I hold it."
+    },
+    {
+      "id": "k.open.shelf",
+      "on": {
+        "attractor": "shelf"
+      },
+      "occasion": "briefing",
+      "text": "Tonight's list: who's standing, what's loaded, where we're going. Nothing else is real yet."
+    },
+    {
+      "id": "k.open.infirmary",
+      "on": {
+        "attractor": "infirmary"
+      },
+      "occasion": "briefing",
+      "text": "Before the objective: who isn't here. {wounded}. Now the objective."
+    },
+    {
+      "id": "k.open.roll",
+      "on": {
+        "attractor": "roll"
+      },
+      "occasion": "briefing",
+      "text": "The roll first. {dead}. Then the map."
+    },
+    {
+      "id": "k.open.hinge",
+      "on": {
+        "attractor": "hinge"
+      },
+      "occasion": "briefing",
+      "text": "Two names on this ground and neither is ours on paper. I'll read the paper. You read the ground."
+    },
+    {
+      "id": "k.open.finale_overthrow",
+      "on": {
+        "attractor": "finale_overthrow"
+      },
+      "occasion": "briefing",
+      "text": "Their gate, their paper, our people. I've read the roll. Go make it longer slowly."
+    },
+    {
+      "id": "k.open.finale_sovereignty",
+      "on": {
+        "attractor": "finale_sovereignty"
+      },
+      "occasion": "briefing",
+      "text": "Nobody's paying for this one. I checked twice. That's the briefing."
+    },
+    {
+      "id": "k.open.finale_spire",
+      "on": {
+        "attractor": "finale_spire"
+      },
+      "occasion": "briefing",
+      "text": "Whatever we take off this world, the roll stays. I'll cut the names myself."
+    },
+    {
+      "id": "k.shift.haunted",
+      "on": {
+        "dominantBecame": "haunted"
+      },
+      "occasion": "camp",
+      "once": true,
+      "text": "The roll is longer than the roster tonight. I counted. I'd like someone to tell me I counted wrong."
+    },
+    {
+      "id": "k.shift.bleeding",
+      "on": {
+        "dominantBecame": "bleeding"
+      },
+      "occasion": "camp",
+      "once": true,
+      "text": "More people on the bench than on the line. I've run camps like this. They're called hospitals."
+    },
+    {
+      "id": "k.shift.rooted",
+      "on": {
+        "dominantBecame": "rooted"
+      },
+      "occasion": "camp",
+      "once": true,
+      "text": "People are coming back here on purpose now. I didn't build that. I'm not sure who did."
+    },
+    {
+      "id": "k.shift.indebted",
+      "on": {
+        "dominantBecame": "indebted"
+      },
+      "occasion": "camp",
+      "once": true,
+      "text": "Somebody else's name is at the top of the ledger. Mine's at the top of the roll. We'll see which gets paid first."
+    }
+  ],
+  "deathLine": null,
+  "notes": "Ketha cannot die in the current design (core). If that changes, her death line is the roll being read by someone else, badly."
+}

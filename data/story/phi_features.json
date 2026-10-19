@@ -1,0 +1,140 @@
+{
+  "schemaVersion": "verdance-phi-features/0.1",
+  "notes": "Sparse battlefield cue → molecule-axis projector (Stage 2). φ lives in the same 10 axes as hero molecules. Honest zeros when a cue is unknown. mapPressure may blend in as slow prior.",
+  "axes": [
+    "energy",
+    "offense",
+    "mobility",
+    "sight",
+    "pad",
+    "craft",
+    "heat",
+    "fog",
+    "sky",
+    "ledger"
+  ],
+  "blend": {
+    "mapPressureWeight": 0.35,
+    "featureWeight": 1.0,
+    "clamp": [-1.0, 1.0]
+  },
+  "features": [
+    {
+      "id": "energy_surplus",
+      "label": "Energy surplus / converters humming",
+      "axes": { "energy": 0.85, "craft": 0.35, "heat": -0.15 }
+    },
+    {
+      "id": "energy_drought",
+      "label": "Energy drought / stall",
+      "axes": { "energy": -0.9, "heat": 0.35, "craft": -0.2, "offense": 0.1 }
+    },
+    {
+      "id": "statics_nearby",
+      "label": "Enemy statics / defenses in range",
+      "axes": { "pad": 0.45, "offense": 0.55, "heat": 0.25, "mobility": -0.2 }
+    },
+    {
+      "id": "open_kite_room",
+      "label": "Open ground / kite lanes",
+      "axes": { "mobility": 0.8, "pad": -0.45, "sight": 0.15 }
+    },
+    {
+      "id": "jammer_radar",
+      "label": "Jammer / radar / fog fight",
+      "axes": { "fog": 0.75, "sight": 0.55, "pad": 0.1 }
+    },
+    {
+      "id": "aa_presence",
+      "label": "AA umbrella / sky denied",
+      "axes": { "sky": -0.7, "pad": 0.25, "mobility": -0.1 }
+    },
+    {
+      "id": "sky_open",
+      "label": "Sky lanes open",
+      "axes": { "sky": 0.75, "mobility": 0.25, "pad": -0.15 }
+    },
+    {
+      "id": "heat_ash",
+      "label": "Heat / ash / glass theater",
+      "axes": { "heat": 0.85, "offense": 0.35, "energy": -0.45, "fog": 0.1 }
+    },
+    {
+      "id": "pad_owned",
+      "label": "Friendly pad / hold ground owned",
+      "axes": { "pad": 0.8, "craft": 0.25, "mobility": -0.35, "energy": 0.1 }
+    },
+    {
+      "id": "pad_contested",
+      "label": "Pad contested / hinge fight",
+      "axes": { "pad": 0.55, "offense": 0.4, "ledger": 0.2 }
+    },
+    {
+      "id": "ledger_pressure",
+      "label": "Ledger / extract / contract pressure",
+      "axes": { "ledger": 0.7, "offense": 0.2, "mobility": 0.15 }
+    },
+    {
+      "id": "threat_envelope",
+      "label": "Threat envelope / under fire",
+      "axes": { "mobility": 0.45, "offense": -0.15, "fog": 0.2, "pad": -0.1 }
+    },
+    {
+      "id": "craft_opportunity",
+      "label": "Wrecks / build slots / rez work",
+      "axes": { "craft": 0.8, "energy": 0.2, "offense": -0.25, "pad": 0.15 }
+    },
+    {
+      "id": "siege_line",
+      "label": "Siege line forming",
+      "axes": { "offense": 0.55, "pad": 0.4, "heat": 0.3, "mobility": -0.35 }
+    },
+    {
+      "id": "scout_screen",
+      "label": "Scout screen / mark opportunity",
+      "axes": { "sight": 0.7, "fog": 0.45, "mobility": 0.25, "offense": -0.1 }
+    }
+  ],
+  "beliefHooks": {
+    "notes": "Best-effort BeliefField leaf → feature weights. Missing leaf = honest zero contribution.",
+    "hooks": [
+      {
+        "leaf": "threat",
+        "when": "high",
+        "threshold": 0.55,
+        "feature": "threat_envelope",
+        "weightFrom": "value"
+      },
+      {
+        "leaf": "pain",
+        "when": "high",
+        "threshold": 0.5,
+        "feature": "threat_envelope",
+        "weightFrom": "value",
+        "scale": 0.7
+      },
+      {
+        "leaf": "craft",
+        "when": "high",
+        "threshold": 0.45,
+        "feature": "craft_opportunity",
+        "weightFrom": "value"
+      },
+      {
+        "leaf": "hold",
+        "when": "high",
+        "threshold": 0.5,
+        "feature": "pad_owned",
+        "weightFrom": "value"
+      },
+      {
+        "leaf": "pressure",
+        "when": "high",
+        "threshold": 0.55,
+        "feature": "ledger_pressure",
+        "weightFrom": "value",
+        "scale": 0.8
+      }
+    ]
+  }
+}

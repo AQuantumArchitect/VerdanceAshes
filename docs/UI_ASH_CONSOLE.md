@@ -66,7 +66,7 @@ Secondary: `reasonHint` from credit table; never invent a third dialect.
 | Surface | File | Role |
 |---|---|---|
 | Hub | `app/showoff/index.html` | Company, Drop board, homecoming card, Abandon |
-| BAR command deck | `gui_verdance_objectives.lua` | Briefing, phase strip, barks, debrief + 1/2/3 |
+| BAR command deck | `gui_verdance_objectives.lua` | Briefing, phase strip, barks, debrief + clickable picks / 1-4 |
 | Hero tags | `gui_verdance_hero_tags.lua` | World labels |
 | Zone minimap | `gui_verdance_zone_minimap.lua` | Enfil / obj / extract |
 | Proxy story | `gui_verdance_proxy_story.lua` | Optional archive (`/vastoryshow`) |
@@ -91,6 +91,7 @@ Operator live smoke after SETUP:
 
 - [ ] Briefing dismissible (Space), reopenable (`/vabrief`)
 - [ ] Phase + clock readable under BAR resource bar
+- [ ] Debrief contracts selectable by click, number key, arrows + Enter
 - [ ] Partial debrief ≠ green victory (HINGE / Hinge. Not a win.)
 - [ ] Hub homecoming shows same verdict word as BAR
 - [ ] Abandon / incomplete obvious on hub

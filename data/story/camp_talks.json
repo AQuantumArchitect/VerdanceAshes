@@ -1,0 +1,5583 @@
+{
+  "schemaVersion": "verdance-camp-talks/1.0",
+  "notes": "Camp/base talk stubs keyed by pairId + rank (C/B/A). Parametric from support_web_v1; hand scripts in camp_talks_authored.json win on merge (generated=false).",
+  "talks": [
+    {
+      "id": "anvil__volt:C",
+      "pairId": "anvil__volt",
+      "a": "anvil",
+      "b": "volt",
+      "rank": "C",
+      "title": "Weight and the burn-map",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Mud that stays. Lightning that won't."
+        },
+        {
+          "speaker": "anvil",
+          "line": "The river learns my weight."
+        },
+        {
+          "speaker": "volt",
+          "line": "Sight is a wound you give them. I draw the ford before you sit on it."
+        },
+        {
+          "speaker": "anvil",
+          "line": "Draw quiet. I arrive loud enough."
+        },
+        {
+          "speaker": "volt",
+          "line": "Quiet's optional. Accurate isn't. Stay heavy — I'll keep the map bleeding where it should."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Spot meets siege. The ford gets a rumor, then a Turtle."
+        }
+      ]
+    },
+    {
+      "pairId": "anvil__volt",
+      "a": "anvil",
+      "b": "volt",
+      "rank": "B",
+      "title": "spot meets siege",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Spot meets siege. Something in Anvil Mire makes Volt Lash stay one more minute."
+        },
+        {
+          "speaker": "anvil",
+          "line": "The river learns my weight."
+        },
+        {
+          "speaker": "volt",
+          "line": "Sight is a wound you give them."
+        },
+        {
+          "speaker": "narrator",
+          "line": "line seat beside eyes. The hearth notices before either of you does."
+        },
+        {
+          "speaker": "anvil",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "volt",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "anvil__volt:B"
+    },
+    {
+      "pairId": "anvil__auditor",
+      "a": "auditor",
+      "b": "anvil",
+      "rank": "C",
+      "title": "kite vs hold",
+      "polarity": "tension",
+      "motif": "kite vs hold",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Kite vs hold. The room gets smaller when both of you stand in it."
+        },
+        {
+          "speaker": "auditor",
+          "line": "Ledger with legs."
+        },
+        {
+          "speaker": "anvil",
+          "line": "The river learns my weight."
+        },
+        {
+          "speaker": "narrator",
+          "line": "skirmish seat beside line. Not enemies. Not easy."
+        }
+      ],
+      "generated": true,
+      "id": "anvil__auditor:C"
+    },
+    {
+      "pairId": "anvil__auditor",
+      "a": "auditor",
+      "b": "anvil",
+      "rank": "B",
+      "title": "kite vs hold",
+      "polarity": "tension",
+      "motif": "kite vs hold",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Kite vs hold. The room gets smaller when both of you stand in it."
+        },
+        {
+          "speaker": "auditor",
+          "line": "Ledger with legs."
+        },
+        {
+          "speaker": "anvil",
+          "line": "The river learns my weight."
+        },
+        {
+          "speaker": "narrator",
+          "line": "skirmish seat beside line. Not enemies. Not easy."
+        },
+        {
+          "speaker": "auditor",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "anvil",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "anvil__auditor:B"
+    },
+    {
+      "id": "anvil__brakhov:C",
+      "pairId": "anvil__brakhov",
+      "a": "anvil",
+      "b": "brakhov",
+      "rank": "C",
+      "title": "Ways of arriving",
+      "polarity": "mirror",
+      "motif": "roast plod and wet plod",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Two slow things. One burns. One sinks and keeps going."
+        },
+        {
+          "speaker": "brakhov",
+          "line": "Name gone. Forward heat."
+        },
+        {
+          "speaker": "anvil",
+          "line": "The river learns my weight. Heat is optional."
+        },
+        {
+          "speaker": "brakhov",
+          "line": "Optional is how walls survive."
+        },
+        {
+          "speaker": "anvil",
+          "line": "Then I'll sit on the ford you ignore. Arrive how you like — I'll still be there."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Plod recognizes plod. The map gets heavier."
+        }
+      ]
+    },
+    {
+      "pairId": "anvil__brakhov",
+      "a": "brakhov",
+      "b": "anvil",
+      "rank": "B",
+      "title": "Ways of arriving",
+      "polarity": "mirror",
+      "motif": "roast plod and wet plod",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Roast plod and wet plod. Same ledger, different ink."
+        },
+        {
+          "speaker": "brakhov",
+          "line": "Name gone. Forward heat."
+        },
+        {
+          "speaker": "anvil",
+          "line": "The river learns my weight."
+        },
+        {
+          "speaker": "narrator",
+          "line": "siege seat beside line. Looking at Anvil Mire, Brakhov the Kiln almost recognizes a face."
+        },
+        {
+          "speaker": "brakhov",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "anvil",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "anvil__brakhov:B"
+    },
+    {
+      "pairId": "anvil__brakhov",
+      "a": "brakhov",
+      "b": "anvil",
+      "rank": "A",
+      "title": "Ways of arriving",
+      "polarity": "mirror",
+      "motif": "roast plod and wet plod",
+      "unlock": {
+        "coDeploy": 3,
+        "campLevelMin": 2,
+        "bondMin": 55
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Roast plod and wet plod. Same ledger, different ink."
+        },
+        {
+          "speaker": "brakhov",
+          "line": "Name gone. Forward heat."
+        },
+        {
+          "speaker": "anvil",
+          "line": "The river learns my weight."
+        },
+        {
+          "speaker": "narrator",
+          "line": "siege seat beside line. Looking at Anvil Mire, Brakhov the Kiln almost recognizes a face."
+        },
+        {
+          "speaker": "brakhov",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "anvil",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        },
+        {
+          "speaker": "brakhov",
+          "line": "If the next wall takes one of us, the other finishes the work."
+        },
+        {
+          "speaker": "anvil",
+          "line": "That's not a promise. That's logistics."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Support locks. Brakhov the Kiln and Anvil Mire leave the hearth different."
+        }
+      ],
+      "generated": true,
+      "id": "anvil__brakhov:A"
+    },
+    {
+      "pairId": "brakhov__bro",
+      "a": "brakhov",
+      "b": "bro",
+      "rank": "C",
+      "title": "two ways to arrive",
+      "polarity": "mirror",
+      "motif": "two ways to arrive",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Two ways to arrive. Same ledger, different ink."
+        },
+        {
+          "speaker": "brakhov",
+          "line": "Name gone. Forward heat."
+        },
+        {
+          "speaker": "bro",
+          "line": "Yeah. I'll take that wall."
+        },
+        {
+          "speaker": "narrator",
+          "line": "siege seat beside siege. Looking at Bro, Brakhov the Kiln almost recognizes a face."
+        }
+      ],
+      "generated": true,
+      "id": "brakhov__bro:C"
+    },
+    {
+      "pairId": "brakhov__bro",
+      "a": "brakhov",
+      "b": "bro",
+      "rank": "B",
+      "title": "two ways to arrive",
+      "polarity": "mirror",
+      "motif": "two ways to arrive",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Two ways to arrive. Same ledger, different ink."
+        },
+        {
+          "speaker": "brakhov",
+          "line": "Name gone. Forward heat."
+        },
+        {
+          "speaker": "bro",
+          "line": "Yeah. I'll take that wall."
+        },
+        {
+          "speaker": "narrator",
+          "line": "siege seat beside siege. Looking at Bro, Brakhov the Kiln almost recognizes a face."
+        },
+        {
+          "speaker": "brakhov",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "bro",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "brakhov__bro:B"
+    },
+    {
+      "pairId": "brakhov__fatboy",
+      "a": "brakhov",
+      "b": "fatboy",
+      "rank": "C",
+      "title": "two ways to arrive",
+      "polarity": "mirror",
+      "motif": "two ways to arrive",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Two ways to arrive. Same ledger, different ink."
+        },
+        {
+          "speaker": "brakhov",
+          "line": "Name gone. Forward heat."
+        },
+        {
+          "speaker": "fatboy",
+          "line": "House learned to knock."
+        },
+        {
+          "speaker": "narrator",
+          "line": "siege seat beside siege. Looking at Fatboy Contract, Brakhov the Kiln almost recognizes a face."
+        }
+      ],
+      "generated": true,
+      "id": "brakhov__fatboy:C"
+    },
+    {
+      "pairId": "brakhov__fatboy",
+      "a": "brakhov",
+      "b": "fatboy",
+      "rank": "B",
+      "title": "two ways to arrive",
+      "polarity": "mirror",
+      "motif": "two ways to arrive",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Two ways to arrive. Same ledger, different ink."
+        },
+        {
+          "speaker": "brakhov",
+          "line": "Name gone. Forward heat."
+        },
+        {
+          "speaker": "fatboy",
+          "line": "House learned to knock."
+        },
+        {
+          "speaker": "narrator",
+          "line": "siege seat beside siege. Looking at Fatboy Contract, Brakhov the Kiln almost recognizes a face."
+        },
+        {
+          "speaker": "brakhov",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "fatboy",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "brakhov__fatboy:B"
+    },
+    {
+      "id": "brakhov__vale:C",
+      "pairId": "brakhov__vale",
+      "a": "brakhov",
+      "b": "vale",
+      "rank": "C",
+      "title": "Heat and the bill",
+      "polarity": "rivalry",
+      "motif": "roast vs soft invoice",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "One smells like slag. The other like cooled oil and paperwork."
+        },
+        {
+          "speaker": "brakhov",
+          "line": "Name gone. Forward heat."
+        },
+        {
+          "speaker": "vale",
+          "line": "The wall never saw the invoice. Yours always does. That's the problem."
+        },
+        {
+          "speaker": "brakhov",
+          "line": "Walls are food."
+        },
+        {
+          "speaker": "vale",
+          "line": "Walls are clients. You eat the contract before it's signed."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Same wall. Different religion. The hearth records both heresies."
+        }
+      ]
+    },
+    {
+      "id": "brakhov__vale:B",
+      "pairId": "brakhov__vale",
+      "a": "brakhov",
+      "b": "vale",
+      "rank": "B",
+      "title": "Heat and the bill",
+      "polarity": "rivalry",
+      "motif": "roast vs soft invoice",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "After a Drop where both arrived late to the same ruin."
+        },
+        {
+          "speaker": "vale",
+          "line": "You roasted the jammer. My rockets had nothing quiet left to kill."
+        },
+        {
+          "speaker": "brakhov",
+          "line": "Then walk faster. Or stay fog."
+        },
+        {
+          "speaker": "vale",
+          "line": "Or you learn to leave one hinge standing so I can invoice it."
+        },
+        {
+          "speaker": "brakhov",
+          "line": "…One hinge. Not two."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Rivalry learns a rule. Dangerous."
+        }
+      ]
+    },
+    {
+      "pairId": "brakhov__vale",
+      "a": "brakhov",
+      "b": "vale",
+      "rank": "A",
+      "title": "Heat and the bill",
+      "polarity": "rivalry",
+      "motif": "roast vs soft invoice",
+      "unlock": {
+        "coDeploy": 3,
+        "campLevelMin": 2,
+        "bondMin": 55
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Roast vs soft invoice. Brakhov the Kiln does not blink first. Neither does Vale Soft."
+        },
+        {
+          "speaker": "brakhov",
+          "line": "Name gone. Forward heat."
+        },
+        {
+          "speaker": "vale",
+          "line": "The wall never saw the invoice."
+        },
+        {
+          "speaker": "narrator",
+          "line": "siege seat beside siege. Same wall. Different religion."
+        },
+        {
+          "speaker": "brakhov",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "vale",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        },
+        {
+          "speaker": "brakhov",
+          "line": "If the next wall takes one of us, the other finishes the work."
+        },
+        {
+          "speaker": "vale",
+          "line": "That's not a promise. That's logistics."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Support locks. Brakhov the Kiln and Vale Soft leave the hearth different."
+        }
+      ],
+      "generated": true,
+      "id": "brakhov__vale:A"
+    },
+    {
+      "pairId": "bro__fatboy",
+      "a": "bro",
+      "b": "fatboy",
+      "rank": "C",
+      "title": "weight that stays",
+      "polarity": "attract",
+      "motif": "weight that stays",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Weight that stays. Something in Bro makes Fatboy Contract stay one more minute."
+        },
+        {
+          "speaker": "bro",
+          "line": "Yeah. I'll take that wall."
+        },
+        {
+          "speaker": "fatboy",
+          "line": "House learned to knock."
+        },
+        {
+          "speaker": "narrator",
+          "line": "siege seat beside siege. The hearth notices before either of you does."
+        }
+      ],
+      "generated": true,
+      "id": "bro__fatboy:C"
+    },
+    {
+      "pairId": "bro__fatboy",
+      "a": "bro",
+      "b": "fatboy",
+      "rank": "B",
+      "title": "weight that stays",
+      "polarity": "attract",
+      "motif": "weight that stays",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Weight that stays. Something in Bro makes Fatboy Contract stay one more minute."
+        },
+        {
+          "speaker": "bro",
+          "line": "Yeah. I'll take that wall."
+        },
+        {
+          "speaker": "fatboy",
+          "line": "House learned to knock."
+        },
+        {
+          "speaker": "narrator",
+          "line": "siege seat beside siege. The hearth notices before either of you does."
+        },
+        {
+          "speaker": "bro",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "fatboy",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "bro__fatboy:B"
+    },
+    {
+      "pairId": "bro__volt",
+      "a": "bro",
+      "b": "volt",
+      "rank": "C",
+      "title": "anvil vs kite",
+      "polarity": "friction",
+      "motif": "anvil vs kite",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Anvil vs kite. Bro's method scrapes Volt Lash's."
+        },
+        {
+          "speaker": "bro",
+          "line": "Yeah. I'll take that wall."
+        },
+        {
+          "speaker": "volt",
+          "line": "Sight is a wound you give them."
+        },
+        {
+          "speaker": "narrator",
+          "line": "siege seat beside eyes. The camp hears the argument before the words."
+        }
+      ],
+      "generated": true,
+      "id": "bro__volt:C"
+    },
+    {
+      "pairId": "bro__volt",
+      "a": "bro",
+      "b": "volt",
+      "rank": "B",
+      "title": "anvil vs kite",
+      "polarity": "friction",
+      "motif": "anvil vs kite",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Anvil vs kite. Bro's method scrapes Volt Lash's."
+        },
+        {
+          "speaker": "bro",
+          "line": "Yeah. I'll take that wall."
+        },
+        {
+          "speaker": "volt",
+          "line": "Sight is a wound you give them."
+        },
+        {
+          "speaker": "narrator",
+          "line": "siege seat beside eyes. The camp hears the argument before the words."
+        },
+        {
+          "speaker": "bro",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "volt",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "bro__volt:B"
+    },
+    {
+      "pairId": "cauter__ceil",
+      "a": "cauter",
+      "b": "ceil",
+      "rank": "C",
+      "title": "kite vs hold",
+      "polarity": "tension",
+      "motif": "kite vs hold",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Kite vs hold. The room gets smaller when both of you stand in it."
+        },
+        {
+          "speaker": "cauter",
+          "line": "Riot as punctuation."
+        },
+        {
+          "speaker": "ceil",
+          "line": "Altitude is an opinion."
+        },
+        {
+          "speaker": "narrator",
+          "line": "line seat beside skirmish. Not enemies. Not easy."
+        }
+      ],
+      "generated": true,
+      "id": "cauter__ceil:C"
+    },
+    {
+      "pairId": "cauter__ceil",
+      "a": "cauter",
+      "b": "ceil",
+      "rank": "B",
+      "title": "kite vs hold",
+      "polarity": "tension",
+      "motif": "kite vs hold",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Kite vs hold. The room gets smaller when both of you stand in it."
+        },
+        {
+          "speaker": "cauter",
+          "line": "Riot as punctuation."
+        },
+        {
+          "speaker": "ceil",
+          "line": "Altitude is an opinion."
+        },
+        {
+          "speaker": "narrator",
+          "line": "line seat beside skirmish. Not enemies. Not easy."
+        },
+        {
+          "speaker": "cauter",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "ceil",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "cauter__ceil:B"
+    },
+    {
+      "pairId": "cauter__kit",
+      "a": "cauter",
+      "b": "kit",
+      "rank": "C",
+      "title": "kite vs hold",
+      "polarity": "tension",
+      "motif": "kite vs hold",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Kite vs hold. The room gets smaller when both of you stand in it."
+        },
+        {
+          "speaker": "cauter",
+          "line": "Riot as punctuation."
+        },
+        {
+          "speaker": "kit",
+          "line": "Fireworks at walking distance."
+        },
+        {
+          "speaker": "narrator",
+          "line": "line seat beside skirmish. Not enemies. Not easy."
+        }
+      ],
+      "generated": true,
+      "id": "cauter__kit:C"
+    },
+    {
+      "pairId": "cauter__kit",
+      "a": "cauter",
+      "b": "kit",
+      "rank": "B",
+      "title": "kite vs hold",
+      "polarity": "tension",
+      "motif": "kite vs hold",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Kite vs hold. The room gets smaller when both of you stand in it."
+        },
+        {
+          "speaker": "cauter",
+          "line": "Riot as punctuation."
+        },
+        {
+          "speaker": "kit",
+          "line": "Fireworks at walking distance."
+        },
+        {
+          "speaker": "narrator",
+          "line": "line seat beside skirmish. Not enemies. Not easy."
+        },
+        {
+          "speaker": "cauter",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "kit",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "cauter__kit:B"
+    },
+    {
+      "pairId": "anvil__ceil",
+      "a": "ceil",
+      "b": "anvil",
+      "rank": "C",
+      "title": "kite vs hold",
+      "polarity": "tension",
+      "motif": "kite vs hold",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Kite vs hold. The room gets smaller when both of you stand in it."
+        },
+        {
+          "speaker": "ceil",
+          "line": "Altitude is an opinion."
+        },
+        {
+          "speaker": "anvil",
+          "line": "The river learns my weight."
+        },
+        {
+          "speaker": "narrator",
+          "line": "skirmish seat beside line. Not enemies. Not easy."
+        }
+      ],
+      "generated": true,
+      "id": "anvil__ceil:C"
+    },
+    {
+      "pairId": "anvil__ceil",
+      "a": "ceil",
+      "b": "anvil",
+      "rank": "B",
+      "title": "kite vs hold",
+      "polarity": "tension",
+      "motif": "kite vs hold",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Kite vs hold. The room gets smaller when both of you stand in it."
+        },
+        {
+          "speaker": "ceil",
+          "line": "Altitude is an opinion."
+        },
+        {
+          "speaker": "anvil",
+          "line": "The river learns my weight."
+        },
+        {
+          "speaker": "narrator",
+          "line": "skirmish seat beside line. Not enemies. Not easy."
+        },
+        {
+          "speaker": "ceil",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "anvil",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "anvil__ceil:B"
+    },
+    {
+      "id": "commando__nox:C",
+      "pairId": "commando__nox",
+      "a": "commando",
+      "b": "nox",
+      "rank": "C",
+      "title": "Mines under the tithe",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Sky debt. Dirt jokes."
+        },
+        {
+          "speaker": "nox",
+          "line": "Still paying for the last sky."
+        },
+        {
+          "speaker": "commando",
+          "line": "Mines before the argument. Your circle's expensive — I'll make trespass cost more."
+        },
+        {
+          "speaker": "nox",
+          "line": "Don't mine the exit. I still have to leave when the sky settles."
+        },
+        {
+          "speaker": "commando",
+          "line": "Exit stays clean. Approaches get punchlines. Deal?"
+        },
+        {
+          "speaker": "narrator",
+          "line": "Debt and mischief — a pad that bites sideways."
+        }
+      ]
+    },
+    {
+      "pairId": "commando__nox",
+      "a": "commando",
+      "b": "nox",
+      "rank": "B",
+      "title": "spot meets siege",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Spot meets siege. Something in Cinder Hook makes Nox Tithe stay one more minute."
+        },
+        {
+          "speaker": "commando",
+          "line": "Mines before the argument."
+        },
+        {
+          "speaker": "nox",
+          "line": "Still paying for the last sky."
+        },
+        {
+          "speaker": "narrator",
+          "line": "shield seat beside shield. The hearth notices before either of you does."
+        },
+        {
+          "speaker": "commando",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "nox",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "commando__nox:B"
+    },
+    {
+      "pairId": "fatboy__lumen",
+      "a": "fatboy",
+      "b": "lumen",
+      "rank": "C",
+      "title": "push meets refuse",
+      "polarity": "attract",
+      "motif": "push meets refuse",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Push meets refuse. Something in Fatboy Contract makes Sister Lumen stay one more minute."
+        },
+        {
+          "speaker": "fatboy",
+          "line": "House learned to knock."
+        },
+        {
+          "speaker": "lumen",
+          "line": "Tithe the grid."
+        },
+        {
+          "speaker": "narrator",
+          "line": "siege seat beside eco. The hearth notices before either of you does."
+        }
+      ],
+      "generated": true,
+      "id": "fatboy__lumen:C"
+    },
+    {
+      "pairId": "fatboy__lumen",
+      "a": "fatboy",
+      "b": "lumen",
+      "rank": "B",
+      "title": "push meets refuse",
+      "polarity": "attract",
+      "motif": "push meets refuse",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Push meets refuse. Something in Fatboy Contract makes Sister Lumen stay one more minute."
+        },
+        {
+          "speaker": "fatboy",
+          "line": "House learned to knock."
+        },
+        {
+          "speaker": "lumen",
+          "line": "Tithe the grid."
+        },
+        {
+          "speaker": "narrator",
+          "line": "siege seat beside eco. The hearth notices before either of you does."
+        },
+        {
+          "speaker": "fatboy",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "lumen",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "fatboy__lumen:B"
+    },
+    {
+      "id": "fatboy__volt:C",
+      "pairId": "fatboy__volt",
+      "a": "fatboy",
+      "b": "volt",
+      "rank": "C",
+      "title": "Knock cadence",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "A plasma house that learned to walk. A Jaguar that learned to listen for footsteps."
+        },
+        {
+          "speaker": "fatboy",
+          "line": "House learned to knock."
+        },
+        {
+          "speaker": "volt",
+          "line": "Sight is a wound you give them. Your knock is a wound you give *me* if I'm still on the porch."
+        },
+        {
+          "speaker": "fatboy",
+          "line": "Then leave the porch. I don't aim for friends. Friends aim for elsewhere."
+        },
+        {
+          "speaker": "volt",
+          "line": "Teach me the cadence. I'll burn the map — just not while you're rewriting it."
+        },
+        {
+          "speaker": "narrator",
+          "line": "First lesson: when the house knocks, the eyes are already gone."
+        }
+      ]
+    },
+    {
+      "id": "fatboy__volt:B",
+      "pairId": "fatboy__volt",
+      "a": "fatboy",
+      "b": "volt",
+      "rank": "B",
+      "title": "Knock cadence",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "After a Drop where Volt's pack ghosted the splash before it landed."
+        },
+        {
+          "speaker": "volt",
+          "line": "Three knocks. I counted. We weren't there for the fourth."
+        },
+        {
+          "speaker": "fatboy",
+          "line": "Good. Porch stays empty when the door learns manners."
+        },
+        {
+          "speaker": "volt",
+          "line": "Bro's Tzar shrugs the same rhythm. Different house. Same homework."
+        },
+        {
+          "speaker": "fatboy",
+          "line": "Learn both cadences. I don't share a contract with regret."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Support becomes timing. Timing becomes not dying to friends."
+        }
+      ]
+    },
+    {
+      "pairId": "auditor__grath",
+      "a": "grath",
+      "b": "auditor",
+      "rank": "C",
+      "title": "kite vs hold",
+      "polarity": "tension",
+      "motif": "kite vs hold",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Kite vs hold. The room gets smaller when both of you stand in it."
+        },
+        {
+          "speaker": "grath",
+          "line": "Three wars unpaid."
+        },
+        {
+          "speaker": "auditor",
+          "line": "Ledger with legs."
+        },
+        {
+          "speaker": "narrator",
+          "line": "line seat beside skirmish. Not enemies. Not easy."
+        }
+      ],
+      "generated": true,
+      "id": "auditor__grath:C"
+    },
+    {
+      "pairId": "auditor__grath",
+      "a": "grath",
+      "b": "auditor",
+      "rank": "B",
+      "title": "kite vs hold",
+      "polarity": "tension",
+      "motif": "kite vs hold",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Kite vs hold. The room gets smaller when both of you stand in it."
+        },
+        {
+          "speaker": "grath",
+          "line": "Three wars unpaid."
+        },
+        {
+          "speaker": "auditor",
+          "line": "Ledger with legs."
+        },
+        {
+          "speaker": "narrator",
+          "line": "line seat beside skirmish. Not enemies. Not easy."
+        },
+        {
+          "speaker": "grath",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "auditor",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "auditor__grath:B"
+    },
+    {
+      "id": "grath__yeva:C",
+      "pairId": "grath__yeva",
+      "a": "grath",
+      "b": "yeva",
+      "rank": "C",
+      "title": "Wages and whispers",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Unpaid wars. Careers that end quietly."
+        },
+        {
+          "speaker": "grath",
+          "line": "Three wars unpaid."
+        },
+        {
+          "speaker": "yeva",
+          "line": "Ghosts already walked it. Some of them are still waiting on your invoice."
+        },
+        {
+          "speaker": "grath",
+          "line": "I shoot wages. You shoot rumors."
+        },
+        {
+          "speaker": "yeva",
+          "line": "Whisper me the hinge that owes you. I'll collect interest the soft way."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Line and fog — arrears with a silencer."
+        }
+      ]
+    },
+    {
+      "pairId": "grath__yeva",
+      "a": "grath",
+      "b": "yeva",
+      "rank": "B",
+      "title": "spot meets siege",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Spot meets siege. Something in Grath Arrears makes Whisper-of-Ash Yeva stay one more minute."
+        },
+        {
+          "speaker": "grath",
+          "line": "Three wars unpaid."
+        },
+        {
+          "speaker": "yeva",
+          "line": "Ghosts already walked it."
+        },
+        {
+          "speaker": "narrator",
+          "line": "line seat beside skirmish. The hearth notices before either of you does."
+        },
+        {
+          "speaker": "grath",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "yeva",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "grath__yeva:B"
+    },
+    {
+      "pairId": "auditor__halq",
+      "a": "halq",
+      "b": "auditor",
+      "rank": "C",
+      "title": "kite vs hold",
+      "polarity": "tension",
+      "motif": "kite vs hold",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Kite vs hold. The room gets smaller when both of you stand in it."
+        },
+        {
+          "speaker": "halq",
+          "line": "Shoots map coordinates."
+        },
+        {
+          "speaker": "auditor",
+          "line": "Ledger with legs."
+        },
+        {
+          "speaker": "narrator",
+          "line": "line seat beside skirmish. Not enemies. Not easy."
+        }
+      ],
+      "generated": true,
+      "id": "auditor__halq:C"
+    },
+    {
+      "pairId": "auditor__halq",
+      "a": "halq",
+      "b": "auditor",
+      "rank": "B",
+      "title": "kite vs hold",
+      "polarity": "tension",
+      "motif": "kite vs hold",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Kite vs hold. The room gets smaller when both of you stand in it."
+        },
+        {
+          "speaker": "halq",
+          "line": "Shoots map coordinates."
+        },
+        {
+          "speaker": "auditor",
+          "line": "Ledger with legs."
+        },
+        {
+          "speaker": "narrator",
+          "line": "line seat beside skirmish. Not enemies. Not easy."
+        },
+        {
+          "speaker": "halq",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "auditor",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "auditor__halq:B"
+    },
+    {
+      "pairId": "halq__kit",
+      "a": "halq",
+      "b": "kit",
+      "rank": "C",
+      "title": "kite vs hold",
+      "polarity": "tension",
+      "motif": "kite vs hold",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Kite vs hold. The room gets smaller when both of you stand in it."
+        },
+        {
+          "speaker": "halq",
+          "line": "Shoots map coordinates."
+        },
+        {
+          "speaker": "kit",
+          "line": "Fireworks at walking distance."
+        },
+        {
+          "speaker": "narrator",
+          "line": "line seat beside skirmish. Not enemies. Not easy."
+        }
+      ],
+      "generated": true,
+      "id": "halq__kit:C"
+    },
+    {
+      "pairId": "halq__kit",
+      "a": "halq",
+      "b": "kit",
+      "rank": "B",
+      "title": "kite vs hold",
+      "polarity": "tension",
+      "motif": "kite vs hold",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Kite vs hold. The room gets smaller when both of you stand in it."
+        },
+        {
+          "speaker": "halq",
+          "line": "Shoots map coordinates."
+        },
+        {
+          "speaker": "kit",
+          "line": "Fireworks at walking distance."
+        },
+        {
+          "speaker": "narrator",
+          "line": "line seat beside skirmish. Not enemies. Not easy."
+        },
+        {
+          "speaker": "halq",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "kit",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "halq__kit:B"
+    },
+    {
+      "pairId": "halq__yeva",
+      "a": "halq",
+      "b": "yeva",
+      "rank": "C",
+      "title": "spot meets siege",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Spot meets siege. Something in Sisu Halq makes Whisper-of-Ash Yeva stay one more minute."
+        },
+        {
+          "speaker": "halq",
+          "line": "Shoots map coordinates."
+        },
+        {
+          "speaker": "yeva",
+          "line": "Ghosts already walked it."
+        },
+        {
+          "speaker": "narrator",
+          "line": "line seat beside skirmish. The hearth notices before either of you does."
+        }
+      ],
+      "generated": true,
+      "id": "halq__yeva:C"
+    },
+    {
+      "pairId": "halq__yeva",
+      "a": "halq",
+      "b": "yeva",
+      "rank": "B",
+      "title": "spot meets siege",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Spot meets siege. Something in Sisu Halq makes Whisper-of-Ash Yeva stay one more minute."
+        },
+        {
+          "speaker": "halq",
+          "line": "Shoots map coordinates."
+        },
+        {
+          "speaker": "yeva",
+          "line": "Ghosts already walked it."
+        },
+        {
+          "speaker": "narrator",
+          "line": "line seat beside skirmish. The hearth notices before either of you does."
+        },
+        {
+          "speaker": "halq",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "yeva",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "halq__yeva:B"
+    },
+    {
+      "id": "brakhov__hearth:C",
+      "pairId": "brakhov__hearth",
+      "a": "hearth",
+      "b": "brakhov",
+      "rank": "C",
+      "title": "Supply meets hunger",
+      "polarity": "bond",
+      "motif": "supply meets hunger",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "One refuses to tour. One refuses to cool. The pad feels both."
+        },
+        {
+          "speaker": "hearth",
+          "line": "Quiet sun. Won't go out."
+        },
+        {
+          "speaker": "brakhov",
+          "line": "Name gone. Forward heat."
+        },
+        {
+          "speaker": "hearth",
+          "line": "Then eat from me, not from the wiring. Hunger that chews the grid kills the lights."
+        },
+        {
+          "speaker": "brakhov",
+          "line": "…Feed the roast. Walls after."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Supply meets hunger. Neither calls it friendship. The company does."
+        }
+      ]
+    },
+    {
+      "pairId": "brakhov__hearth",
+      "a": "hearth",
+      "b": "brakhov",
+      "rank": "B",
+      "title": "supply meets hunger",
+      "polarity": "bond",
+      "motif": "supply meets hunger",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Supply meets hunger. Hearth keeps the quiet. Brakhov the Kiln fills it."
+        },
+        {
+          "speaker": "hearth",
+          "line": "Quiet sun. Won't go out."
+        },
+        {
+          "speaker": "brakhov",
+          "line": "Name gone. Forward heat."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eco seat beside siege. You two keep finding the same fire."
+        },
+        {
+          "speaker": "hearth",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "brakhov",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "brakhov__hearth:B"
+    },
+    {
+      "pairId": "bro__hearth",
+      "a": "hearth",
+      "b": "bro",
+      "rank": "C",
+      "title": "supply meets hunger",
+      "polarity": "bond",
+      "motif": "supply meets hunger",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Supply meets hunger. Hearth keeps the quiet. Bro fills it."
+        },
+        {
+          "speaker": "hearth",
+          "line": "Quiet sun. Won't go out."
+        },
+        {
+          "speaker": "bro",
+          "line": "Yeah. I'll take that wall."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eco seat beside siege. You two keep finding the same fire."
+        }
+      ],
+      "generated": true,
+      "id": "bro__hearth:C"
+    },
+    {
+      "pairId": "bro__hearth",
+      "a": "hearth",
+      "b": "bro",
+      "rank": "B",
+      "title": "supply meets hunger",
+      "polarity": "bond",
+      "motif": "supply meets hunger",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Supply meets hunger. Hearth keeps the quiet. Bro fills it."
+        },
+        {
+          "speaker": "hearth",
+          "line": "Quiet sun. Won't go out."
+        },
+        {
+          "speaker": "bro",
+          "line": "Yeah. I'll take that wall."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eco seat beside siege. You two keep finding the same fire."
+        },
+        {
+          "speaker": "hearth",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "bro",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "bro__hearth:B"
+    },
+    {
+      "pairId": "fatboy__hearth",
+      "a": "hearth",
+      "b": "fatboy",
+      "rank": "C",
+      "title": "supply meets hunger",
+      "polarity": "bond",
+      "motif": "supply meets hunger",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Supply meets hunger. Hearth keeps the quiet. Fatboy Contract fills it."
+        },
+        {
+          "speaker": "hearth",
+          "line": "Quiet sun. Won't go out."
+        },
+        {
+          "speaker": "fatboy",
+          "line": "House learned to knock."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eco seat beside siege. You two keep finding the same fire."
+        }
+      ],
+      "generated": true,
+      "id": "fatboy__hearth:C"
+    },
+    {
+      "pairId": "fatboy__hearth",
+      "a": "hearth",
+      "b": "fatboy",
+      "rank": "B",
+      "title": "supply meets hunger",
+      "polarity": "bond",
+      "motif": "supply meets hunger",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Supply meets hunger. Hearth keeps the quiet. Fatboy Contract fills it."
+        },
+        {
+          "speaker": "hearth",
+          "line": "Quiet sun. Won't go out."
+        },
+        {
+          "speaker": "fatboy",
+          "line": "House learned to knock."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eco seat beside siege. You two keep finding the same fire."
+        },
+        {
+          "speaker": "hearth",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "fatboy",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "fatboy__hearth:B"
+    },
+    {
+      "id": "hearth__lumen:C",
+      "pairId": "hearth__lumen",
+      "a": "hearth",
+      "b": "lumen",
+      "rank": "C",
+      "title": "Quiet suns",
+      "polarity": "bond",
+      "motif": "coal furniture and grid saint",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Neither moves much. The pad is warmer for it."
+        },
+        {
+          "speaker": "hearth",
+          "line": "Quiet sun. Won't go out."
+        },
+        {
+          "speaker": "lumen",
+          "line": "Tithe the grid. I'll make the surplus mean something."
+        },
+        {
+          "speaker": "hearth",
+          "line": "Don't tour. Touring burns wrong."
+        },
+        {
+          "speaker": "lumen",
+          "line": "I don't tour. I root."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Two kinds of stay. The lights approve."
+        }
+      ]
+    },
+    {
+      "pairId": "hearth__lumen",
+      "a": "hearth",
+      "b": "lumen",
+      "rank": "B",
+      "title": "Quiet suns",
+      "polarity": "bond",
+      "motif": "coal furniture and grid saint",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Coal furniture and grid saint. Hearth keeps the quiet. Sister Lumen fills it."
+        },
+        {
+          "speaker": "hearth",
+          "line": "Quiet sun. Won't go out."
+        },
+        {
+          "speaker": "lumen",
+          "line": "Tithe the grid."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eco seat beside eco. You two keep finding the same fire."
+        },
+        {
+          "speaker": "hearth",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "lumen",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "hearth__lumen:B"
+    },
+    {
+      "pairId": "hearth__lumen",
+      "a": "hearth",
+      "b": "lumen",
+      "rank": "A",
+      "title": "Quiet suns",
+      "polarity": "bond",
+      "motif": "coal furniture and grid saint",
+      "unlock": {
+        "coDeploy": 3,
+        "campLevelMin": 2,
+        "bondMin": 55
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Coal furniture and grid saint. Hearth keeps the quiet. Sister Lumen fills it."
+        },
+        {
+          "speaker": "hearth",
+          "line": "Quiet sun. Won't go out."
+        },
+        {
+          "speaker": "lumen",
+          "line": "Tithe the grid."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eco seat beside eco. You two keep finding the same fire."
+        },
+        {
+          "speaker": "hearth",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "lumen",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        },
+        {
+          "speaker": "hearth",
+          "line": "If the next wall takes one of us, the other finishes the work."
+        },
+        {
+          "speaker": "lumen",
+          "line": "That's not a promise. That's logistics."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Support locks. Hearth and Sister Lumen leave the hearth different."
+        }
+      ],
+      "generated": true,
+      "id": "hearth__lumen:A"
+    },
+    {
+      "pairId": "kettle__warder",
+      "a": "kettle",
+      "b": "warder",
+      "rank": "C",
+      "title": "dirt circle and sky hymn",
+      "polarity": "bond",
+      "motif": "dirt circle and sky hymn",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Dirt circle and sky hymn. Saint Kettle keeps the quiet. Warder fills it."
+        },
+        {
+          "speaker": "kettle",
+          "line": "Sky-saint, chainsaw soul."
+        },
+        {
+          "speaker": "warder",
+          "line": "Owns a circle of dirt."
+        },
+        {
+          "speaker": "narrator",
+          "line": "shield seat beside shield. You two keep finding the same fire."
+        }
+      ],
+      "generated": true,
+      "id": "kettle__warder:C"
+    },
+    {
+      "pairId": "kettle__warder",
+      "a": "kettle",
+      "b": "warder",
+      "rank": "B",
+      "title": "dirt circle and sky hymn",
+      "polarity": "bond",
+      "motif": "dirt circle and sky hymn",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Dirt circle and sky hymn. Saint Kettle keeps the quiet. Warder fills it."
+        },
+        {
+          "speaker": "kettle",
+          "line": "Sky-saint, chainsaw soul."
+        },
+        {
+          "speaker": "warder",
+          "line": "Owns a circle of dirt."
+        },
+        {
+          "speaker": "narrator",
+          "line": "shield seat beside shield. You two keep finding the same fire."
+        },
+        {
+          "speaker": "kettle",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "warder",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "kettle__warder:B"
+    },
+    {
+      "id": "kettle__mira:C",
+      "pairId": "kettle__mira",
+      "a": "mira",
+      "b": "kettle",
+      "rank": "C",
+      "title": "Ceiling for confetti",
+      "polarity": "bond",
+      "motif": "fireworks need a clear sky",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Mira has glitter on her gauntlet. Kettle has a sky map on his."
+        },
+        {
+          "speaker": "mira",
+          "line": "If I paint the ridge pink, will you scold the clouds?"
+        },
+        {
+          "speaker": "kettle",
+          "line": "I scold anything with wings. You just make it holy work."
+        },
+        {
+          "speaker": "mira",
+          "line": "Napalm is confetti."
+        },
+        {
+          "speaker": "kettle",
+          "line": "Then I'll keep your ceiling honest so the party doesn't die mid-cheer."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Joy and saint — a ridiculous, necessary pair."
+        }
+      ]
+    },
+    {
+      "pairId": "kettle__mira",
+      "a": "mira",
+      "b": "kettle",
+      "rank": "B",
+      "title": "Ceiling for confetti",
+      "polarity": "bond",
+      "motif": "fireworks need a clear sky",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Fireworks need a clear sky. Mira Barrage keeps the quiet. Saint Kettle fills it."
+        },
+        {
+          "speaker": "mira",
+          "line": "Napalm is confetti."
+        },
+        {
+          "speaker": "kettle",
+          "line": "Sky-saint, chainsaw soul."
+        },
+        {
+          "speaker": "narrator",
+          "line": "siege seat beside shield. You two keep finding the same fire."
+        },
+        {
+          "speaker": "mira",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "kettle",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "kettle__mira:B"
+    },
+    {
+      "pairId": "kettle__mira",
+      "a": "mira",
+      "b": "kettle",
+      "rank": "A",
+      "title": "Ceiling for confetti",
+      "polarity": "bond",
+      "motif": "fireworks need a clear sky",
+      "unlock": {
+        "coDeploy": 3,
+        "campLevelMin": 2,
+        "bondMin": 55
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Fireworks need a clear sky. Mira Barrage keeps the quiet. Saint Kettle fills it."
+        },
+        {
+          "speaker": "mira",
+          "line": "Napalm is confetti."
+        },
+        {
+          "speaker": "kettle",
+          "line": "Sky-saint, chainsaw soul."
+        },
+        {
+          "speaker": "narrator",
+          "line": "siege seat beside shield. You two keep finding the same fire."
+        },
+        {
+          "speaker": "mira",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "kettle",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        },
+        {
+          "speaker": "mira",
+          "line": "If the next wall takes one of us, the other finishes the work."
+        },
+        {
+          "speaker": "kettle",
+          "line": "That's not a promise. That's logistics."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Support locks. Mira Barrage and Saint Kettle leave the hearth different."
+        }
+      ],
+      "generated": true,
+      "id": "kettle__mira:A"
+    },
+    {
+      "id": "kit__mira:C",
+      "pairId": "kit__mira",
+      "a": "kit",
+      "b": "mira",
+      "rank": "C",
+      "title": "Two confettis",
+      "polarity": "mirror",
+      "motif": "parade and walking fireworks",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Two grins. One safe. One criminal."
+        },
+        {
+          "speaker": "mira",
+          "line": "You walk the fireworks in. That's cheating."
+        },
+        {
+          "speaker": "kit",
+          "line": "Fireworks at walking distance. You're just shy."
+        },
+        {
+          "speaker": "mira",
+          "line": "I'm artistic."
+        },
+        {
+          "speaker": "kit",
+          "line": "I'm closer. Race you to the next soft target."
+        },
+        {
+          "speaker": "narrator",
+          "line": "The company will regret encouraging this."
+        }
+      ]
+    },
+    {
+      "pairId": "kit__mira",
+      "a": "mira",
+      "b": "kit",
+      "rank": "B",
+      "title": "Two confettis",
+      "polarity": "mirror",
+      "motif": "parade and walking fireworks",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Parade and walking fireworks. Same ledger, different ink."
+        },
+        {
+          "speaker": "mira",
+          "line": "Napalm is confetti."
+        },
+        {
+          "speaker": "kit",
+          "line": "Fireworks at walking distance."
+        },
+        {
+          "speaker": "narrator",
+          "line": "siege seat beside skirmish. Looking at Kit Sparkler, Mira Barrage almost recognizes a face."
+        },
+        {
+          "speaker": "mira",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "kit",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "kit__mira:B"
+    },
+    {
+      "pairId": "kit__mira",
+      "a": "mira",
+      "b": "kit",
+      "rank": "A",
+      "title": "Two confettis",
+      "polarity": "mirror",
+      "motif": "parade and walking fireworks",
+      "unlock": {
+        "coDeploy": 3,
+        "campLevelMin": 2,
+        "bondMin": 55
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Parade and walking fireworks. Same ledger, different ink."
+        },
+        {
+          "speaker": "mira",
+          "line": "Napalm is confetti."
+        },
+        {
+          "speaker": "kit",
+          "line": "Fireworks at walking distance."
+        },
+        {
+          "speaker": "narrator",
+          "line": "siege seat beside skirmish. Looking at Kit Sparkler, Mira Barrage almost recognizes a face."
+        },
+        {
+          "speaker": "mira",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "kit",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        },
+        {
+          "speaker": "mira",
+          "line": "If the next wall takes one of us, the other finishes the work."
+        },
+        {
+          "speaker": "kit",
+          "line": "That's not a promise. That's logistics."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Support locks. Mira Barrage and Kit Sparkler leave the hearth different."
+        }
+      ],
+      "generated": true,
+      "id": "kit__mira:A"
+    },
+    {
+      "pairId": "lumen__noctua",
+      "a": "noctua",
+      "b": "lumen",
+      "rank": "C",
+      "title": "spot meets siege",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Spot meets siege. Something in Noctua Bay makes Sister Lumen stay one more minute."
+        },
+        {
+          "speaker": "noctua",
+          "line": "Dreams in flight paths."
+        },
+        {
+          "speaker": "lumen",
+          "line": "Tithe the grid."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eyes seat beside eco. The hearth notices before either of you does."
+        }
+      ],
+      "generated": true,
+      "id": "lumen__noctua:C"
+    },
+    {
+      "pairId": "lumen__noctua",
+      "a": "noctua",
+      "b": "lumen",
+      "rank": "B",
+      "title": "spot meets siege",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Spot meets siege. Something in Noctua Bay makes Sister Lumen stay one more minute."
+        },
+        {
+          "speaker": "noctua",
+          "line": "Dreams in flight paths."
+        },
+        {
+          "speaker": "lumen",
+          "line": "Tithe the grid."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eyes seat beside eco. The hearth notices before either of you does."
+        },
+        {
+          "speaker": "noctua",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "lumen",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "lumen__noctua:B"
+    },
+    {
+      "pairId": "auditor__odessa",
+      "a": "odessa",
+      "b": "auditor",
+      "rank": "C",
+      "title": "kite vs hold",
+      "polarity": "tension",
+      "motif": "kite vs hold",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Kite vs hold. The room gets smaller when both of you stand in it."
+        },
+        {
+          "speaker": "odessa",
+          "line": "Fords are doors."
+        },
+        {
+          "speaker": "auditor",
+          "line": "Ledger with legs."
+        },
+        {
+          "speaker": "narrator",
+          "line": "line seat beside skirmish. Not enemies. Not easy."
+        }
+      ],
+      "generated": true,
+      "id": "auditor__odessa:C"
+    },
+    {
+      "pairId": "auditor__odessa",
+      "a": "odessa",
+      "b": "auditor",
+      "rank": "B",
+      "title": "kite vs hold",
+      "polarity": "tension",
+      "motif": "kite vs hold",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Kite vs hold. The room gets smaller when both of you stand in it."
+        },
+        {
+          "speaker": "odessa",
+          "line": "Fords are doors."
+        },
+        {
+          "speaker": "auditor",
+          "line": "Ledger with legs."
+        },
+        {
+          "speaker": "narrator",
+          "line": "line seat beside skirmish. Not enemies. Not easy."
+        },
+        {
+          "speaker": "odessa",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "auditor",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "auditor__odessa:B"
+    },
+    {
+      "pairId": "odessa__yeva",
+      "a": "odessa",
+      "b": "yeva",
+      "rank": "C",
+      "title": "spot meets siege",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Spot meets siege. Something in Odessa Krail makes Whisper-of-Ash Yeva stay one more minute."
+        },
+        {
+          "speaker": "odessa",
+          "line": "Fords are doors."
+        },
+        {
+          "speaker": "yeva",
+          "line": "Ghosts already walked it."
+        },
+        {
+          "speaker": "narrator",
+          "line": "line seat beside skirmish. The hearth notices before either of you does."
+        }
+      ],
+      "generated": true,
+      "id": "odessa__yeva:C"
+    },
+    {
+      "pairId": "odessa__yeva",
+      "a": "odessa",
+      "b": "yeva",
+      "rank": "B",
+      "title": "spot meets siege",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Spot meets siege. Something in Odessa Krail makes Whisper-of-Ash Yeva stay one more minute."
+        },
+        {
+          "speaker": "odessa",
+          "line": "Fords are doors."
+        },
+        {
+          "speaker": "yeva",
+          "line": "Ghosts already walked it."
+        },
+        {
+          "speaker": "narrator",
+          "line": "line seat beside skirmish. The hearth notices before either of you does."
+        },
+        {
+          "speaker": "odessa",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "yeva",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "odessa__yeva:B"
+    },
+    {
+      "pairId": "ceil__quill",
+      "a": "quill",
+      "b": "ceil",
+      "rank": "C",
+      "title": "kite vs hold",
+      "polarity": "tension",
+      "motif": "kite vs hold",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Kite vs hold. The room gets smaller when both of you stand in it."
+        },
+        {
+          "speaker": "quill",
+          "line": "Orders walk on treads."
+        },
+        {
+          "speaker": "ceil",
+          "line": "Altitude is an opinion."
+        },
+        {
+          "speaker": "narrator",
+          "line": "line seat beside skirmish. Not enemies. Not easy."
+        }
+      ],
+      "generated": true,
+      "id": "ceil__quill:C"
+    },
+    {
+      "pairId": "ceil__quill",
+      "a": "quill",
+      "b": "ceil",
+      "rank": "B",
+      "title": "kite vs hold",
+      "polarity": "tension",
+      "motif": "kite vs hold",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Kite vs hold. The room gets smaller when both of you stand in it."
+        },
+        {
+          "speaker": "quill",
+          "line": "Orders walk on treads."
+        },
+        {
+          "speaker": "ceil",
+          "line": "Altitude is an opinion."
+        },
+        {
+          "speaker": "narrator",
+          "line": "line seat beside skirmish. Not enemies. Not easy."
+        },
+        {
+          "speaker": "quill",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "ceil",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "ceil__quill:B"
+    },
+    {
+      "pairId": "kit__quill",
+      "a": "quill",
+      "b": "kit",
+      "rank": "C",
+      "title": "kite vs hold",
+      "polarity": "tension",
+      "motif": "kite vs hold",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Kite vs hold. The room gets smaller when both of you stand in it."
+        },
+        {
+          "speaker": "quill",
+          "line": "Orders walk on treads."
+        },
+        {
+          "speaker": "kit",
+          "line": "Fireworks at walking distance."
+        },
+        {
+          "speaker": "narrator",
+          "line": "line seat beside skirmish. Not enemies. Not easy."
+        }
+      ],
+      "generated": true,
+      "id": "kit__quill:C"
+    },
+    {
+      "pairId": "kit__quill",
+      "a": "quill",
+      "b": "kit",
+      "rank": "B",
+      "title": "kite vs hold",
+      "polarity": "tension",
+      "motif": "kite vs hold",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Kite vs hold. The room gets smaller when both of you stand in it."
+        },
+        {
+          "speaker": "quill",
+          "line": "Orders walk on treads."
+        },
+        {
+          "speaker": "kit",
+          "line": "Fireworks at walking distance."
+        },
+        {
+          "speaker": "narrator",
+          "line": "line seat beside skirmish. Not enemies. Not easy."
+        },
+        {
+          "speaker": "quill",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "kit",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "kit__quill:B"
+    },
+    {
+      "pairId": "auditor__rusk",
+      "a": "rusk",
+      "b": "auditor",
+      "rank": "C",
+      "title": "kite vs hold",
+      "polarity": "tension",
+      "motif": "kite vs hold",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Kite vs hold. The room gets smaller when both of you stand in it."
+        },
+        {
+          "speaker": "rusk",
+          "line": "Gate, jammed gat, a lie."
+        },
+        {
+          "speaker": "auditor",
+          "line": "Ledger with legs."
+        },
+        {
+          "speaker": "narrator",
+          "line": "line seat beside skirmish. Not enemies. Not easy."
+        }
+      ],
+      "generated": true,
+      "id": "auditor__rusk:C"
+    },
+    {
+      "pairId": "auditor__rusk",
+      "a": "rusk",
+      "b": "auditor",
+      "rank": "B",
+      "title": "kite vs hold",
+      "polarity": "tension",
+      "motif": "kite vs hold",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Kite vs hold. The room gets smaller when both of you stand in it."
+        },
+        {
+          "speaker": "rusk",
+          "line": "Gate, jammed gat, a lie."
+        },
+        {
+          "speaker": "auditor",
+          "line": "Ledger with legs."
+        },
+        {
+          "speaker": "narrator",
+          "line": "line seat beside skirmish. Not enemies. Not easy."
+        },
+        {
+          "speaker": "rusk",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "auditor",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "auditor__rusk:B"
+    },
+    {
+      "pairId": "rusk__yeva",
+      "a": "rusk",
+      "b": "yeva",
+      "rank": "C",
+      "title": "spot meets siege",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Spot meets siege. Something in Rusk Halloway makes Whisper-of-Ash Yeva stay one more minute."
+        },
+        {
+          "speaker": "rusk",
+          "line": "Gate, jammed gat, a lie."
+        },
+        {
+          "speaker": "yeva",
+          "line": "Ghosts already walked it."
+        },
+        {
+          "speaker": "narrator",
+          "line": "line seat beside skirmish. The hearth notices before either of you does."
+        }
+      ],
+      "generated": true,
+      "id": "rusk__yeva:C"
+    },
+    {
+      "pairId": "rusk__yeva",
+      "a": "rusk",
+      "b": "yeva",
+      "rank": "B",
+      "title": "spot meets siege",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Spot meets siege. Something in Rusk Halloway makes Whisper-of-Ash Yeva stay one more minute."
+        },
+        {
+          "speaker": "rusk",
+          "line": "Gate, jammed gat, a lie."
+        },
+        {
+          "speaker": "yeva",
+          "line": "Ghosts already walked it."
+        },
+        {
+          "speaker": "narrator",
+          "line": "line seat beside skirmish. The hearth notices before either of you does."
+        },
+        {
+          "speaker": "rusk",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "yeva",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "rusk__yeva:B"
+    },
+    {
+      "id": "noctua__solarium:C",
+      "pairId": "noctua__solarium",
+      "a": "noctua",
+      "b": "solarium",
+      "rank": "C",
+      "title": "Altitude feeds roots",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "A bay that dreams upward. A garden that refuses to leave."
+        },
+        {
+          "speaker": "noctua",
+          "line": "Dreams in flight paths."
+        },
+        {
+          "speaker": "solarium",
+          "line": "Then dream useful. Roots need a map before they spend light."
+        },
+        {
+          "speaker": "noctua",
+          "line": "Eyes first. Your constructors can argue with dirt after."
+        },
+        {
+          "speaker": "solarium",
+          "line": "Bring me the soft ground. I'll grow the hard answer."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Sky map, pad garden. Spot meets stay — and both get fed."
+        }
+      ]
+    },
+    {
+      "pairId": "noctua__solarium",
+      "a": "solarium",
+      "b": "noctua",
+      "rank": "B",
+      "title": "spot meets siege",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Spot meets siege. Something in Solarium makes Noctua Bay stay one more minute."
+        },
+        {
+          "speaker": "solarium",
+          "line": "Spreadsheets, then sunlight."
+        },
+        {
+          "speaker": "noctua",
+          "line": "Dreams in flight paths."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eco seat beside eyes. The hearth notices before either of you does."
+        },
+        {
+          "speaker": "solarium",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "noctua",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "noctua__solarium:B"
+    },
+    {
+      "pairId": "solarium__tick",
+      "a": "solarium",
+      "b": "tick",
+      "rank": "C",
+      "title": "spot meets siege",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Spot meets siege. Something in Solarium makes Tick Stream stay one more minute."
+        },
+        {
+          "speaker": "solarium",
+          "line": "Spreadsheets, then sunlight."
+        },
+        {
+          "speaker": "tick",
+          "line": "Speaks in plurals."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eco seat beside eyes. The hearth notices before either of you does."
+        }
+      ],
+      "generated": true,
+      "id": "solarium__tick:C"
+    },
+    {
+      "pairId": "solarium__tick",
+      "a": "solarium",
+      "b": "tick",
+      "rank": "B",
+      "title": "spot meets siege",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Spot meets siege. Something in Solarium makes Tick Stream stay one more minute."
+        },
+        {
+          "speaker": "solarium",
+          "line": "Spreadsheets, then sunlight."
+        },
+        {
+          "speaker": "tick",
+          "line": "Speaks in plurals."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eco seat beside eyes. The hearth notices before either of you does."
+        },
+        {
+          "speaker": "solarium",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "tick",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "solarium__tick:B"
+    },
+    {
+      "pairId": "grath__spoke",
+      "a": "spoke",
+      "b": "grath",
+      "rank": "C",
+      "title": "spot meets siege",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Spot meets siege. Something in Spoke makes Grath Arrears stay one more minute."
+        },
+        {
+          "speaker": "spoke",
+          "line": "Only trusts wheels."
+        },
+        {
+          "speaker": "grath",
+          "line": "Three wars unpaid."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eyes seat beside line. The hearth notices before either of you does."
+        }
+      ],
+      "generated": true,
+      "id": "grath__spoke:C"
+    },
+    {
+      "pairId": "grath__spoke",
+      "a": "spoke",
+      "b": "grath",
+      "rank": "B",
+      "title": "spot meets siege",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Spot meets siege. Something in Spoke makes Grath Arrears stay one more minute."
+        },
+        {
+          "speaker": "spoke",
+          "line": "Only trusts wheels."
+        },
+        {
+          "speaker": "grath",
+          "line": "Three wars unpaid."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eyes seat beside line. The hearth notices before either of you does."
+        },
+        {
+          "speaker": "spoke",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "grath",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "grath__spoke:B"
+    },
+    {
+      "pairId": "halq__spoke",
+      "a": "spoke",
+      "b": "halq",
+      "rank": "C",
+      "title": "spot meets siege",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Spot meets siege. Something in Spoke makes Sisu Halq stay one more minute."
+        },
+        {
+          "speaker": "spoke",
+          "line": "Only trusts wheels."
+        },
+        {
+          "speaker": "halq",
+          "line": "Shoots map coordinates."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eyes seat beside line. The hearth notices before either of you does."
+        }
+      ],
+      "generated": true,
+      "id": "halq__spoke:C"
+    },
+    {
+      "pairId": "halq__spoke",
+      "a": "spoke",
+      "b": "halq",
+      "rank": "B",
+      "title": "spot meets siege",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Spot meets siege. Something in Spoke makes Sisu Halq stay one more minute."
+        },
+        {
+          "speaker": "spoke",
+          "line": "Only trusts wheels."
+        },
+        {
+          "speaker": "halq",
+          "line": "Shoots map coordinates."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eyes seat beside line. The hearth notices before either of you does."
+        },
+        {
+          "speaker": "spoke",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "halq",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "halq__spoke:B"
+    },
+    {
+      "pairId": "lumen__spoke",
+      "a": "spoke",
+      "b": "lumen",
+      "rank": "C",
+      "title": "spot meets siege",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Spot meets siege. Something in Spoke makes Sister Lumen stay one more minute."
+        },
+        {
+          "speaker": "spoke",
+          "line": "Only trusts wheels."
+        },
+        {
+          "speaker": "lumen",
+          "line": "Tithe the grid."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eyes seat beside eco. The hearth notices before either of you does."
+        }
+      ],
+      "generated": true,
+      "id": "lumen__spoke:C"
+    },
+    {
+      "pairId": "lumen__spoke",
+      "a": "spoke",
+      "b": "lumen",
+      "rank": "B",
+      "title": "spot meets siege",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Spot meets siege. Something in Spoke makes Sister Lumen stay one more minute."
+        },
+        {
+          "speaker": "spoke",
+          "line": "Only trusts wheels."
+        },
+        {
+          "speaker": "lumen",
+          "line": "Tithe the grid."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eyes seat beside eco. The hearth notices before either of you does."
+        },
+        {
+          "speaker": "spoke",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "lumen",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "lumen__spoke:B"
+    },
+    {
+      "id": "nox__spoke:C",
+      "pairId": "nox__spoke",
+      "a": "nox",
+      "b": "spoke",
+      "rank": "C",
+      "title": "Wheels under the tithe",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Anti-nuke that won't tour. A kid who only trusts wheels."
+        },
+        {
+          "speaker": "nox",
+          "line": "Still paying for the last sky."
+        },
+        {
+          "speaker": "spoke",
+          "line": "Only trusts wheels. Sky's a rumor until rubber confirms it."
+        },
+        {
+          "speaker": "nox",
+          "line": "Confirm the approaches. If something falls, I want warning, not poetry."
+        },
+        {
+          "speaker": "spoke",
+          "line": "Wheels don't do poetry. They do early."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Tithe gets a scout. Scout gets a reason to come home."
+        }
+      ]
+    },
+    {
+      "pairId": "nox__spoke",
+      "a": "spoke",
+      "b": "nox",
+      "rank": "B",
+      "title": "spot meets siege",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Spot meets siege. Something in Spoke makes Nox Tithe stay one more minute."
+        },
+        {
+          "speaker": "spoke",
+          "line": "Only trusts wheels."
+        },
+        {
+          "speaker": "nox",
+          "line": "Still paying for the last sky."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eyes seat beside shield. The hearth notices before either of you does."
+        },
+        {
+          "speaker": "spoke",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "nox",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "nox__spoke:B"
+    },
+    {
+      "pairId": "quill__stride",
+      "a": "stride",
+      "b": "quill",
+      "rank": "C",
+      "title": "kite vs hold",
+      "polarity": "tension",
+      "motif": "kite vs hold",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Kite vs hold. The room gets smaller when both of you stand in it."
+        },
+        {
+          "speaker": "stride",
+          "line": "Baked speed, bad manners."
+        },
+        {
+          "speaker": "quill",
+          "line": "Orders walk on treads."
+        },
+        {
+          "speaker": "narrator",
+          "line": "skirmish seat beside line. Not enemies. Not easy."
+        }
+      ],
+      "generated": true,
+      "id": "quill__stride:C"
+    },
+    {
+      "pairId": "quill__stride",
+      "a": "stride",
+      "b": "quill",
+      "rank": "B",
+      "title": "kite vs hold",
+      "polarity": "tension",
+      "motif": "kite vs hold",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Kite vs hold. The room gets smaller when both of you stand in it."
+        },
+        {
+          "speaker": "stride",
+          "line": "Baked speed, bad manners."
+        },
+        {
+          "speaker": "quill",
+          "line": "Orders walk on treads."
+        },
+        {
+          "speaker": "narrator",
+          "line": "skirmish seat beside line. Not enemies. Not easy."
+        },
+        {
+          "speaker": "stride",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "quill",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "quill__stride:B"
+    },
+    {
+      "id": "lumen__tick:C",
+      "pairId": "lumen__tick",
+      "a": "lumen",
+      "b": "tick",
+      "rank": "C",
+      "title": "Tithe and the carpet",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "A saint of surplus. A pronoun with a factory."
+        },
+        {
+          "speaker": "lumen",
+          "line": "Tithe the grid."
+        },
+        {
+          "speaker": "tick",
+          "line": "Speaks in plurals. Your grid is one mouth. We are many eyes."
+        },
+        {
+          "speaker": "lumen",
+          "line": "Then carpet the fog and bring the surplus a reason."
+        },
+        {
+          "speaker": "tick",
+          "line": "We die cheap. We mint again. Keep the lights — we'll keep the unknown honest."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Holy furniture. Swarm sight. The pad learns it has peripheral vision."
+        }
+      ]
+    },
+    {
+      "pairId": "lumen__tick",
+      "a": "tick",
+      "b": "lumen",
+      "rank": "B",
+      "title": "spot meets siege",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Spot meets siege. Something in Tick Stream makes Sister Lumen stay one more minute."
+        },
+        {
+          "speaker": "tick",
+          "line": "Speaks in plurals."
+        },
+        {
+          "speaker": "lumen",
+          "line": "Tithe the grid."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eyes seat beside eco. The hearth notices before either of you does."
+        },
+        {
+          "speaker": "tick",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "lumen",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "lumen__tick:B"
+    },
+    {
+      "pairId": "kit__twitch",
+      "a": "twitch",
+      "b": "kit",
+      "rank": "C",
+      "title": "grins that escalate",
+      "polarity": "mirror",
+      "motif": "grins that escalate",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Grins that escalate. Same ledger, different ink."
+        },
+        {
+          "speaker": "twitch",
+          "line": "Grins with a welder."
+        },
+        {
+          "speaker": "kit",
+          "line": "Fireworks at walking distance."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eco seat beside skirmish. Looking at Kit Sparkler, Twitcher almost recognizes a face."
+        }
+      ],
+      "generated": true,
+      "id": "kit__twitch:C"
+    },
+    {
+      "pairId": "kit__twitch",
+      "a": "twitch",
+      "b": "kit",
+      "rank": "B",
+      "title": "grins that escalate",
+      "polarity": "mirror",
+      "motif": "grins that escalate",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Grins that escalate. Same ledger, different ink."
+        },
+        {
+          "speaker": "twitch",
+          "line": "Grins with a welder."
+        },
+        {
+          "speaker": "kit",
+          "line": "Fireworks at walking distance."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eco seat beside skirmish. Looking at Kit Sparkler, Twitcher almost recognizes a face."
+        },
+        {
+          "speaker": "twitch",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "kit",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "kit__twitch:B"
+    },
+    {
+      "pairId": "mira__twitch",
+      "a": "twitch",
+      "b": "mira",
+      "rank": "C",
+      "title": "push meets refuse",
+      "polarity": "attract",
+      "motif": "push meets refuse",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Push meets refuse. Something in Twitcher makes Mira Barrage stay one more minute."
+        },
+        {
+          "speaker": "twitch",
+          "line": "Grins with a welder."
+        },
+        {
+          "speaker": "mira",
+          "line": "Napalm is confetti."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eco seat beside siege. The hearth notices before either of you does."
+        }
+      ],
+      "generated": true,
+      "id": "mira__twitch:C"
+    },
+    {
+      "pairId": "mira__twitch",
+      "a": "twitch",
+      "b": "mira",
+      "rank": "B",
+      "title": "push meets refuse",
+      "polarity": "attract",
+      "motif": "push meets refuse",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Push meets refuse. Something in Twitcher makes Mira Barrage stay one more minute."
+        },
+        {
+          "speaker": "twitch",
+          "line": "Grins with a welder."
+        },
+        {
+          "speaker": "mira",
+          "line": "Napalm is confetti."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eco seat beside siege. The hearth notices before either of you does."
+        },
+        {
+          "speaker": "twitch",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "mira",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "mira__twitch:B"
+    },
+    {
+      "pairId": "twitch__veil",
+      "a": "twitch",
+      "b": "veil",
+      "rank": "C",
+      "title": "spot meets siege",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Spot meets siege. Something in Twitcher makes Veil & Compass stay one more minute."
+        },
+        {
+          "speaker": "twitch",
+          "line": "Grins with a welder."
+        },
+        {
+          "speaker": "veil",
+          "line": "Fog is the payroll."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eco seat beside eyes. The hearth notices before either of you does."
+        }
+      ],
+      "generated": true,
+      "id": "twitch__veil:C"
+    },
+    {
+      "pairId": "twitch__veil",
+      "a": "twitch",
+      "b": "veil",
+      "rank": "B",
+      "title": "spot meets siege",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Spot meets siege. Something in Twitcher makes Veil & Compass stay one more minute."
+        },
+        {
+          "speaker": "twitch",
+          "line": "Grins with a welder."
+        },
+        {
+          "speaker": "veil",
+          "line": "Fog is the payroll."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eco seat beside eyes. The hearth notices before either of you does."
+        },
+        {
+          "speaker": "twitch",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "veil",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "twitch__veil:B"
+    },
+    {
+      "pairId": "nox__vale",
+      "a": "vale",
+      "b": "nox",
+      "rank": "C",
+      "title": "spot meets siege",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Spot meets siege. Something in Vale Soft makes Nox Tithe stay one more minute."
+        },
+        {
+          "speaker": "vale",
+          "line": "The wall never saw the invoice."
+        },
+        {
+          "speaker": "nox",
+          "line": "Still paying for the last sky."
+        },
+        {
+          "speaker": "narrator",
+          "line": "siege seat beside shield. The hearth notices before either of you does."
+        }
+      ],
+      "generated": true,
+      "id": "nox__vale:C"
+    },
+    {
+      "pairId": "nox__vale",
+      "a": "vale",
+      "b": "nox",
+      "rank": "B",
+      "title": "spot meets siege",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Spot meets siege. Something in Vale Soft makes Nox Tithe stay one more minute."
+        },
+        {
+          "speaker": "vale",
+          "line": "The wall never saw the invoice."
+        },
+        {
+          "speaker": "nox",
+          "line": "Still paying for the last sky."
+        },
+        {
+          "speaker": "narrator",
+          "line": "siege seat beside shield. The hearth notices before either of you does."
+        },
+        {
+          "speaker": "vale",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "nox",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "nox__vale:B"
+    },
+    {
+      "pairId": "ceil__vane",
+      "a": "vane",
+      "b": "ceil",
+      "rank": "C",
+      "title": "pack and brittle edge",
+      "polarity": "mentor",
+      "motif": "pack and brittle edge",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Pack and brittle edge. Ash-Captain Vane sets the pace. Ceil Rat learns the cost."
+        },
+        {
+          "speaker": "vane",
+          "line": "Pack is one thought."
+        },
+        {
+          "speaker": "ceil",
+          "line": "Altitude is an opinion."
+        },
+        {
+          "speaker": "narrator",
+          "line": "core_skirm seat beside skirmish. Orders travel farther when someone younger carries them."
+        }
+      ],
+      "generated": true,
+      "id": "ceil__vane:C"
+    },
+    {
+      "pairId": "ceil__vane",
+      "a": "vane",
+      "b": "ceil",
+      "rank": "B",
+      "title": "pack and brittle edge",
+      "polarity": "mentor",
+      "motif": "pack and brittle edge",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Pack and brittle edge. Ash-Captain Vane sets the pace. Ceil Rat learns the cost."
+        },
+        {
+          "speaker": "vane",
+          "line": "Pack is one thought."
+        },
+        {
+          "speaker": "ceil",
+          "line": "Altitude is an opinion."
+        },
+        {
+          "speaker": "narrator",
+          "line": "core_skirm seat beside skirmish. Orders travel farther when someone younger carries them."
+        },
+        {
+          "speaker": "vane",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "ceil",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "ceil__vane:B"
+    },
+    {
+      "pairId": "odessa__vane",
+      "a": "vane",
+      "b": "odessa",
+      "rank": "C",
+      "title": "flock vs tread command",
+      "polarity": "tension",
+      "motif": "flock vs tread command",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Flock vs tread command. The room gets smaller when both of you stand in it."
+        },
+        {
+          "speaker": "vane",
+          "line": "Pack is one thought."
+        },
+        {
+          "speaker": "odessa",
+          "line": "Fords are doors."
+        },
+        {
+          "speaker": "narrator",
+          "line": "core_skirm seat beside line. Not enemies. Not easy."
+        }
+      ],
+      "generated": true,
+      "id": "odessa__vane:C"
+    },
+    {
+      "pairId": "odessa__vane",
+      "a": "vane",
+      "b": "odessa",
+      "rank": "B",
+      "title": "flock vs tread command",
+      "polarity": "tension",
+      "motif": "flock vs tread command",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Flock vs tread command. The room gets smaller when both of you stand in it."
+        },
+        {
+          "speaker": "vane",
+          "line": "Pack is one thought."
+        },
+        {
+          "speaker": "odessa",
+          "line": "Fords are doors."
+        },
+        {
+          "speaker": "narrator",
+          "line": "core_skirm seat beside line. Not enemies. Not easy."
+        },
+        {
+          "speaker": "vane",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "odessa",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "odessa__vane:B"
+    },
+    {
+      "id": "quill__vane:C",
+      "pairId": "quill__vane",
+      "a": "quill",
+      "b": "vane",
+      "rank": "C",
+      "title": "Who gives the order",
+      "polarity": "tension",
+      "motif": "flock captain vs tread marshal",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Phobos pace against Bull idle. The camp feels the argument in its boots."
+        },
+        {
+          "speaker": "quill",
+          "line": "Orders walk on treads. Your pack scatters the sentence."
+        },
+        {
+          "speaker": "vane",
+          "line": "Pack is one thought. Yours is a parade that arrives late and loud."
+        },
+        {
+          "speaker": "quill",
+          "line": "Loud wins gates."
+        },
+        {
+          "speaker": "vane",
+          "line": "Thought wins exits. Pick which war you're in."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Two captains. One company. The hearth does not pick a side — yet."
+        }
+      ]
+    },
+    {
+      "pairId": "quill__vane",
+      "a": "vane",
+      "b": "quill",
+      "rank": "B",
+      "title": "Who gives the order",
+      "polarity": "tension",
+      "motif": "flock captain vs tread marshal",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Flock captain vs tread marshal. The room gets smaller when both of you stand in it."
+        },
+        {
+          "speaker": "vane",
+          "line": "Pack is one thought."
+        },
+        {
+          "speaker": "quill",
+          "line": "Orders walk on treads."
+        },
+        {
+          "speaker": "narrator",
+          "line": "core_skirm seat beside line. Not enemies. Not easy."
+        },
+        {
+          "speaker": "vane",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "quill",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "quill__vane:B"
+    },
+    {
+      "pairId": "quill__vane",
+      "a": "vane",
+      "b": "quill",
+      "rank": "A",
+      "title": "Who gives the order",
+      "polarity": "tension",
+      "motif": "flock captain vs tread marshal",
+      "unlock": {
+        "coDeploy": 3,
+        "campLevelMin": 2,
+        "bondMin": 55
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Flock captain vs tread marshal. The room gets smaller when both of you stand in it."
+        },
+        {
+          "speaker": "vane",
+          "line": "Pack is one thought."
+        },
+        {
+          "speaker": "quill",
+          "line": "Orders walk on treads."
+        },
+        {
+          "speaker": "narrator",
+          "line": "core_skirm seat beside line. Not enemies. Not easy."
+        },
+        {
+          "speaker": "vane",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "quill",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        },
+        {
+          "speaker": "vane",
+          "line": "If the next wall takes one of us, the other finishes the work."
+        },
+        {
+          "speaker": "quill",
+          "line": "That's not a promise. That's logistics."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Support locks. Ash-Captain Vane and Ash-Marshal Quill leave the hearth different."
+        }
+      ],
+      "generated": true,
+      "id": "quill__vane:A"
+    },
+    {
+      "pairId": "rusk__vane",
+      "a": "vane",
+      "b": "rusk",
+      "rank": "C",
+      "title": "flock vs tread command",
+      "polarity": "tension",
+      "motif": "flock vs tread command",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Flock vs tread command. The room gets smaller when both of you stand in it."
+        },
+        {
+          "speaker": "vane",
+          "line": "Pack is one thought."
+        },
+        {
+          "speaker": "rusk",
+          "line": "Gate, jammed gat, a lie."
+        },
+        {
+          "speaker": "narrator",
+          "line": "core_skirm seat beside line. Not enemies. Not easy."
+        }
+      ],
+      "generated": true,
+      "id": "rusk__vane:C"
+    },
+    {
+      "pairId": "rusk__vane",
+      "a": "vane",
+      "b": "rusk",
+      "rank": "B",
+      "title": "flock vs tread command",
+      "polarity": "tension",
+      "motif": "flock vs tread command",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Flock vs tread command. The room gets smaller when both of you stand in it."
+        },
+        {
+          "speaker": "vane",
+          "line": "Pack is one thought."
+        },
+        {
+          "speaker": "rusk",
+          "line": "Gate, jammed gat, a lie."
+        },
+        {
+          "speaker": "narrator",
+          "line": "core_skirm seat beside line. Not enemies. Not easy."
+        },
+        {
+          "speaker": "vane",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "rusk",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "rusk__vane:B"
+    },
+    {
+      "pairId": "grath__veil",
+      "a": "veil",
+      "b": "grath",
+      "rank": "C",
+      "title": "spot meets siege",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Spot meets siege. Something in Veil & Compass makes Grath Arrears stay one more minute."
+        },
+        {
+          "speaker": "veil",
+          "line": "Fog is the payroll."
+        },
+        {
+          "speaker": "grath",
+          "line": "Three wars unpaid."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eyes seat beside line. The hearth notices before either of you does."
+        }
+      ],
+      "generated": true,
+      "id": "grath__veil:C"
+    },
+    {
+      "pairId": "grath__veil",
+      "a": "veil",
+      "b": "grath",
+      "rank": "B",
+      "title": "spot meets siege",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Spot meets siege. Something in Veil & Compass makes Grath Arrears stay one more minute."
+        },
+        {
+          "speaker": "veil",
+          "line": "Fog is the payroll."
+        },
+        {
+          "speaker": "grath",
+          "line": "Three wars unpaid."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eyes seat beside line. The hearth notices before either of you does."
+        },
+        {
+          "speaker": "veil",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "grath",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "grath__veil:B"
+    },
+    {
+      "pairId": "halq__veil",
+      "a": "veil",
+      "b": "halq",
+      "rank": "C",
+      "title": "spot meets siege",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Spot meets siege. Something in Veil & Compass makes Sisu Halq stay one more minute."
+        },
+        {
+          "speaker": "veil",
+          "line": "Fog is the payroll."
+        },
+        {
+          "speaker": "halq",
+          "line": "Shoots map coordinates."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eyes seat beside line. The hearth notices before either of you does."
+        }
+      ],
+      "generated": true,
+      "id": "halq__veil:C"
+    },
+    {
+      "pairId": "halq__veil",
+      "a": "veil",
+      "b": "halq",
+      "rank": "B",
+      "title": "spot meets siege",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Spot meets siege. Something in Veil & Compass makes Sisu Halq stay one more minute."
+        },
+        {
+          "speaker": "veil",
+          "line": "Fog is the payroll."
+        },
+        {
+          "speaker": "halq",
+          "line": "Shoots map coordinates."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eyes seat beside line. The hearth notices before either of you does."
+        },
+        {
+          "speaker": "veil",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "halq",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "halq__veil:B"
+    },
+    {
+      "id": "nox__veil:C",
+      "pairId": "nox__veil",
+      "a": "nox",
+      "b": "veil",
+      "rank": "C",
+      "title": "Sky debt, fog payroll",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "One pays for weather. One invoices the unknown."
+        },
+        {
+          "speaker": "nox",
+          "line": "Still paying for the last sky."
+        },
+        {
+          "speaker": "veil",
+          "line": "Fog is the payroll. Your sky stays honest if my unknown stays employed."
+        },
+        {
+          "speaker": "nox",
+          "line": "Hold the tithe. Don't bill me for ghosts I didn't order."
+        },
+        {
+          "speaker": "veil",
+          "line": "Ghosts are free. Trespassers aren't. Point the circle — I'll own the dark around it."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Debt pad. Fog contract. The ledger and the haze shake hands."
+        }
+      ]
+    },
+    {
+      "pairId": "nox__veil",
+      "a": "veil",
+      "b": "nox",
+      "rank": "B",
+      "title": "spot meets siege",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Spot meets siege. Something in Veil & Compass makes Nox Tithe stay one more minute."
+        },
+        {
+          "speaker": "veil",
+          "line": "Fog is the payroll."
+        },
+        {
+          "speaker": "nox",
+          "line": "Still paying for the last sky."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eyes seat beside shield. The hearth notices before either of you does."
+        },
+        {
+          "speaker": "veil",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "nox",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "nox__veil:B"
+    },
+    {
+      "pairId": "quill__verse",
+      "a": "verse",
+      "b": "quill",
+      "rank": "C",
+      "title": "kite vs hold",
+      "polarity": "tension",
+      "motif": "kite vs hold",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Kite vs hold. The room gets smaller when both of you stand in it."
+        },
+        {
+          "speaker": "verse",
+          "line": "Counts missiles out loud."
+        },
+        {
+          "speaker": "quill",
+          "line": "Orders walk on treads."
+        },
+        {
+          "speaker": "narrator",
+          "line": "skirmish seat beside line. Not enemies. Not easy."
+        }
+      ],
+      "generated": true,
+      "id": "quill__verse:C"
+    },
+    {
+      "pairId": "quill__verse",
+      "a": "verse",
+      "b": "quill",
+      "rank": "B",
+      "title": "kite vs hold",
+      "polarity": "tension",
+      "motif": "kite vs hold",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Kite vs hold. The room gets smaller when both of you stand in it."
+        },
+        {
+          "speaker": "verse",
+          "line": "Counts missiles out loud."
+        },
+        {
+          "speaker": "quill",
+          "line": "Orders walk on treads."
+        },
+        {
+          "speaker": "narrator",
+          "line": "skirmish seat beside line. Not enemies. Not easy."
+        },
+        {
+          "speaker": "verse",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "quill",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "quill__verse:B"
+    },
+    {
+      "id": "commando__warder:C",
+      "pairId": "commando__warder",
+      "a": "warder",
+      "b": "commando",
+      "rank": "C",
+      "title": "Same circle, different tooth",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Beamer hush. Something under the dirt is already grinning."
+        },
+        {
+          "speaker": "warder",
+          "line": "Owns a circle of dirt."
+        },
+        {
+          "speaker": "commando",
+          "line": "Mines before the argument. Your circle's a stage. I dress it."
+        },
+        {
+          "speaker": "warder",
+          "line": "Don't dress it so loud the trespassers hear the punchline."
+        },
+        {
+          "speaker": "commando",
+          "line": "They hear the punchline when they step wrong. You just keep the lights honest."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Pad tooth. Dirty tooth. Same radius — finally useful to each other."
+        }
+      ]
+    },
+    {
+      "id": "commando__warder:B",
+      "pairId": "commando__warder",
+      "a": "warder",
+      "b": "commando",
+      "rank": "B",
+      "title": "Same circle, different tooth",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "After a Drop where the ring held and the mines wrote the footnotes."
+        },
+        {
+          "speaker": "commando",
+          "line": "Your Ferrets waited. My Trappers didn't have to introduce themselves twice."
+        },
+        {
+          "speaker": "warder",
+          "line": "I don't chase. You don't announce. That worked."
+        },
+        {
+          "speaker": "commando",
+          "line": "Mark your circle on the next map. I'll seed the jokes inside it."
+        },
+        {
+          "speaker": "warder",
+          "line": "…Keep them inside. Outside the circle is someone else's comedy."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Support thickens. Trespassers will not enjoy the collaboration."
+        }
+      ]
+    },
+    {
+      "id": "anvil__yeva:C",
+      "pairId": "anvil__yeva",
+      "a": "anvil",
+      "b": "yeva",
+      "rank": "C",
+      "title": "Ghosts ahead of weight",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Something already walked the lane. Something else is about to occupy it."
+        },
+        {
+          "speaker": "yeva",
+          "line": "Ghosts already walked it."
+        },
+        {
+          "speaker": "anvil",
+          "line": "Then I'll sit where they finished. Ghosts don't hold fords."
+        },
+        {
+          "speaker": "yeva",
+          "line": "They hold rumors. I end careers. You end geography."
+        },
+        {
+          "speaker": "anvil",
+          "line": "Whisper the hinge. I'll be the door."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Snipe and plod — a cruel, complete sentence."
+        }
+      ]
+    },
+    {
+      "pairId": "anvil__yeva",
+      "a": "yeva",
+      "b": "anvil",
+      "rank": "B",
+      "title": "spot meets siege",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Spot meets siege. Something in Whisper-of-Ash Yeva makes Anvil Mire stay one more minute."
+        },
+        {
+          "speaker": "yeva",
+          "line": "Ghosts already walked it."
+        },
+        {
+          "speaker": "anvil",
+          "line": "The river learns my weight."
+        },
+        {
+          "speaker": "narrator",
+          "line": "skirmish seat beside line. The hearth notices before either of you does."
+        },
+        {
+          "speaker": "yeva",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "anvil",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "anvil__yeva:B"
+    },
+    {
+      "pairId": "hearth__odessa",
+      "a": "hearth",
+      "b": "odessa",
+      "rank": "C",
+      "title": "threshold and hearth",
+      "polarity": "attract",
+      "motif": "threshold and hearth",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Threshold and hearth. Something in Hearth makes Odessa Krail stay one more minute."
+        },
+        {
+          "speaker": "hearth",
+          "line": "Quiet sun. Won't go out."
+        },
+        {
+          "speaker": "odessa",
+          "line": "Fords are doors."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eco seat beside line. The hearth notices before either of you does."
+        }
+      ],
+      "generated": true,
+      "id": "hearth__odessa:C"
+    },
+    {
+      "pairId": "hearth__odessa",
+      "a": "hearth",
+      "b": "odessa",
+      "rank": "B",
+      "title": "threshold and hearth",
+      "polarity": "attract",
+      "motif": "threshold and hearth",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Threshold and hearth. Something in Hearth makes Odessa Krail stay one more minute."
+        },
+        {
+          "speaker": "hearth",
+          "line": "Quiet sun. Won't go out."
+        },
+        {
+          "speaker": "odessa",
+          "line": "Fords are doors."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eco seat beside line. The hearth notices before either of you does."
+        },
+        {
+          "speaker": "hearth",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "odessa",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "hearth__odessa:B"
+    },
+    {
+      "pairId": "twitch__vale",
+      "a": "twitch",
+      "b": "vale",
+      "rank": "C",
+      "title": "push meets refuse",
+      "polarity": "attract",
+      "motif": "push meets refuse",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Push meets refuse. Something in Twitcher makes Vale Soft stay one more minute."
+        },
+        {
+          "speaker": "twitch",
+          "line": "Grins with a welder."
+        },
+        {
+          "speaker": "vale",
+          "line": "The wall never saw the invoice."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eco seat beside siege. The hearth notices before either of you does."
+        }
+      ],
+      "generated": true,
+      "id": "twitch__vale:C"
+    },
+    {
+      "pairId": "twitch__vale",
+      "a": "twitch",
+      "b": "vale",
+      "rank": "B",
+      "title": "push meets refuse",
+      "polarity": "attract",
+      "motif": "push meets refuse",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Push meets refuse. Something in Twitcher makes Vale Soft stay one more minute."
+        },
+        {
+          "speaker": "twitch",
+          "line": "Grins with a welder."
+        },
+        {
+          "speaker": "vale",
+          "line": "The wall never saw the invoice."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eco seat beside siege. The hearth notices before either of you does."
+        },
+        {
+          "speaker": "twitch",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "vale",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "twitch__vale:B"
+    },
+    {
+      "pairId": "infestor__volt",
+      "a": "infestor",
+      "b": "volt",
+      "rank": "C",
+      "title": "grow quiet vs see loud",
+      "polarity": "tension",
+      "motif": "grow quiet vs see loud",
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Grow quiet vs see loud. The room gets smaller when both of you stand in it."
+        },
+        {
+          "speaker": "infestor",
+          "line": "Company grows itself."
+        },
+        {
+          "speaker": "volt",
+          "line": "Sight is a wound you give them."
+        },
+        {
+          "speaker": "narrator",
+          "line": "shield seat beside eyes. Not enemies. Not easy."
+        }
+      ],
+      "generated": true,
+      "id": "infestor__volt:C"
+    },
+    {
+      "pairId": "infestor__volt",
+      "a": "infestor",
+      "b": "volt",
+      "rank": "B",
+      "title": "grow quiet vs see loud",
+      "polarity": "tension",
+      "motif": "grow quiet vs see loud",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Grow quiet vs see loud. The room gets smaller when both of you stand in it."
+        },
+        {
+          "speaker": "infestor",
+          "line": "Company grows itself."
+        },
+        {
+          "speaker": "volt",
+          "line": "Sight is a wound you give them."
+        },
+        {
+          "speaker": "narrator",
+          "line": "shield seat beside eyes. Not enemies. Not easy."
+        },
+        {
+          "speaker": "infestor",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "volt",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "infestor__volt:B"
+    },
+    {
+      "id": "ketha__vane:C",
+      "pairId": "ketha__vane",
+      "a": "ketha",
+      "b": "vane",
+      "rank": "C",
+      "title": "Pack memory",
+      "polarity": "bond",
+      "motif": "captain and unfinished sentences",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Embers. Two cups. The pack sleeps in a ring outside the shelf."
+        },
+        {
+          "speaker": "vane",
+          "line": "If I fall mid-stride, finish the sentence."
+        },
+        {
+          "speaker": "ketha",
+          "line": "I don't finish sentences. I haul the body that still owes one."
+        },
+        {
+          "speaker": "vane",
+          "line": "Pack is one thought."
+        },
+        {
+          "speaker": "ketha",
+          "line": "Then keep thinking. I'm expensive to replace."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Neither smiles. The hearth does it for them."
+        }
+      ]
+    },
+    {
+      "id": "ketha__vane:B",
+      "pairId": "ketha__vane",
+      "a": "ketha",
+      "b": "vane",
+      "rank": "B",
+      "title": "Pack memory",
+      "polarity": "bond",
+      "motif": "captain and unfinished sentences",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Rain on the shelf. Phobos ghosts drip oil into the mud."
+        },
+        {
+          "speaker": "ketha",
+          "line": "You keep spending the pack like verbs."
+        },
+        {
+          "speaker": "vane",
+          "line": "They're the only grammar I trust."
+        },
+        {
+          "speaker": "ketha",
+          "line": "Trust me with the wrecks, then. Don't make me invent your last word."
+        },
+        {
+          "speaker": "vane",
+          "line": "…Stay close on the next Drop."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Support thickens. The company notices without naming it."
+        }
+      ]
+    },
+    {
+      "pairId": "ketha__vane",
+      "a": "vane",
+      "b": "ketha",
+      "rank": "A",
+      "title": "Pack memory",
+      "polarity": "bond",
+      "motif": "captain and unfinished sentences",
+      "unlock": {
+        "coDeploy": 3,
+        "campLevelMin": 2,
+        "bondMin": 55
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Captain and unfinished sentences. Ash-Captain Vane keeps the quiet. Ketha fills it."
+        },
+        {
+          "speaker": "vane",
+          "line": "Pack is one thought."
+        },
+        {
+          "speaker": "ketha",
+          "line": "Wrecks are unfinished sentences."
+        },
+        {
+          "speaker": "narrator",
+          "line": "core_skirm seat beside core_rez. You two keep finding the same fire."
+        },
+        {
+          "speaker": "vane",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "ketha",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        },
+        {
+          "speaker": "vane",
+          "line": "If the next wall takes one of us, the other finishes the work."
+        },
+        {
+          "speaker": "ketha",
+          "line": "That's not a promise. That's logistics."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Support locks. Ash-Captain Vane and Ketha leave the hearth different."
+        }
+      ],
+      "generated": true,
+      "id": "ketha__vane:A"
+    },
+    {
+      "id": "veil__volt:C",
+      "pairId": "veil__volt",
+      "a": "veil",
+      "b": "volt",
+      "rank": "C",
+      "title": "See or hide",
+      "polarity": "friction",
+      "motif": "fog payroll vs lightning wound",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "One sells unknown. One sells scars that glow."
+        },
+        {
+          "speaker": "veil",
+          "line": "Fog is the payroll."
+        },
+        {
+          "speaker": "volt",
+          "line": "Sight is a wound you give them."
+        },
+        {
+          "speaker": "veil",
+          "line": "Wounds report. Fog collects."
+        },
+        {
+          "speaker": "volt",
+          "line": "Then stay paid. I'll keep drawing the map in burns."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Eyes department, divided. Productive. Loud."
+        }
+      ]
+    },
+    {
+      "pairId": "veil__volt",
+      "a": "veil",
+      "b": "volt",
+      "rank": "B",
+      "title": "See or hide",
+      "polarity": "friction",
+      "motif": "fog payroll vs lightning wound",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Fog payroll vs lightning wound. Veil & Compass's method scrapes Volt Lash's."
+        },
+        {
+          "speaker": "veil",
+          "line": "Fog is the payroll."
+        },
+        {
+          "speaker": "volt",
+          "line": "Sight is a wound you give them."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eyes seat beside eyes. The camp hears the argument before the words."
+        },
+        {
+          "speaker": "veil",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "volt",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "veil__volt:B"
+    },
+    {
+      "pairId": "veil__volt",
+      "a": "veil",
+      "b": "volt",
+      "rank": "A",
+      "title": "See or hide",
+      "polarity": "friction",
+      "motif": "fog payroll vs lightning wound",
+      "unlock": {
+        "coDeploy": 3,
+        "campLevelMin": 2,
+        "bondMin": 55
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Fog payroll vs lightning wound. Veil & Compass's method scrapes Volt Lash's."
+        },
+        {
+          "speaker": "veil",
+          "line": "Fog is the payroll."
+        },
+        {
+          "speaker": "volt",
+          "line": "Sight is a wound you give them."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eyes seat beside eyes. The camp hears the argument before the words."
+        },
+        {
+          "speaker": "veil",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "volt",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        },
+        {
+          "speaker": "veil",
+          "line": "If the next wall takes one of us, the other finishes the work."
+        },
+        {
+          "speaker": "volt",
+          "line": "That's not a promise. That's logistics."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Support locks. Veil & Compass and Volt Lash leave the hearth different."
+        }
+      ],
+      "generated": true,
+      "id": "veil__volt:A"
+    },
+    {
+      "id": "grath__nox:C",
+      "pairId": "grath__nox",
+      "a": "grath",
+      "b": "nox",
+      "rank": "C",
+      "title": "Two debts",
+      "polarity": "mirror",
+      "motif": "wages and weather arrears",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Ledgers open. Neither man likes the light."
+        },
+        {
+          "speaker": "grath",
+          "line": "Three wars unpaid."
+        },
+        {
+          "speaker": "nox",
+          "line": "Still paying for the last sky."
+        },
+        {
+          "speaker": "grath",
+          "line": "Wages I can shoot. Weather I can't."
+        },
+        {
+          "speaker": "nox",
+          "line": "Then hold the dirt. I'll hold what's above it. We clear different columns."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Arrears recognize arrears."
+        }
+      ]
+    },
+    {
+      "pairId": "grath__nox",
+      "a": "grath",
+      "b": "nox",
+      "rank": "B",
+      "title": "Two debts",
+      "polarity": "mirror",
+      "motif": "wages and weather arrears",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Wages and weather arrears. Same ledger, different ink."
+        },
+        {
+          "speaker": "grath",
+          "line": "Three wars unpaid."
+        },
+        {
+          "speaker": "nox",
+          "line": "Still paying for the last sky."
+        },
+        {
+          "speaker": "narrator",
+          "line": "line seat beside shield. Looking at Nox Tithe, Grath Arrears almost recognizes a face."
+        },
+        {
+          "speaker": "grath",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "nox",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "grath__nox:B"
+    },
+    {
+      "pairId": "grath__nox",
+      "a": "grath",
+      "b": "nox",
+      "rank": "A",
+      "title": "Two debts",
+      "polarity": "mirror",
+      "motif": "wages and weather arrears",
+      "unlock": {
+        "coDeploy": 3,
+        "campLevelMin": 2,
+        "bondMin": 55
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Wages and weather arrears. Same ledger, different ink."
+        },
+        {
+          "speaker": "grath",
+          "line": "Three wars unpaid."
+        },
+        {
+          "speaker": "nox",
+          "line": "Still paying for the last sky."
+        },
+        {
+          "speaker": "narrator",
+          "line": "line seat beside shield. Looking at Nox Tithe, Grath Arrears almost recognizes a face."
+        },
+        {
+          "speaker": "grath",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "nox",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        },
+        {
+          "speaker": "grath",
+          "line": "If the next wall takes one of us, the other finishes the work."
+        },
+        {
+          "speaker": "nox",
+          "line": "That's not a promise. That's logistics."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Support locks. Grath Arrears and Nox Tithe leave the hearth different."
+        }
+      ],
+      "generated": true,
+      "id": "grath__nox:A"
+    },
+    {
+      "id": "spoke__tick:C",
+      "pairId": "spoke__tick",
+      "a": "spoke",
+      "b": "tick",
+      "rank": "C",
+      "title": "How eyes multiply",
+      "polarity": "sibling",
+      "motif": "wheels and plurals",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "A kid who trusts wheels. A pronoun with a factory."
+        },
+        {
+          "speaker": "spoke",
+          "line": "Only trusts wheels."
+        },
+        {
+          "speaker": "tick",
+          "line": "Speaks in plurals. Wheels are a singular fetish."
+        },
+        {
+          "speaker": "spoke",
+          "line": "Plural dies cheap. Wheels come back."
+        },
+        {
+          "speaker": "tick",
+          "line": "We come back cheaper. Race you to the fog line."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Sight, two dialects. The company is richer for the argument."
+        }
+      ]
+    },
+    {
+      "pairId": "spoke__tick",
+      "a": "spoke",
+      "b": "tick",
+      "rank": "B",
+      "title": "How eyes multiply",
+      "polarity": "sibling",
+      "motif": "wheels and plurals",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Wheels and plurals. Same dirt. Different scar."
+        },
+        {
+          "speaker": "spoke",
+          "line": "Only trusts wheels."
+        },
+        {
+          "speaker": "tick",
+          "line": "Speaks in plurals."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eyes seat beside eyes. You argue like people who already shared a trench."
+        },
+        {
+          "speaker": "spoke",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "tick",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "spoke__tick:B"
+    },
+    {
+      "id": "ceil__noctua:C",
+      "pairId": "ceil__noctua",
+      "a": "ceil",
+      "b": "noctua",
+      "rank": "C",
+      "title": "Altitude arguments",
+      "polarity": "tension",
+      "motif": "flight paths vs gunship manners",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "A bay that dreams. A rat that argues with roofs."
+        },
+        {
+          "speaker": "noctua",
+          "line": "Dreams in flight paths. You scratch them."
+        },
+        {
+          "speaker": "ceil",
+          "line": "Altitude is an opinion. Yours is a spreadsheet with wings."
+        },
+        {
+          "speaker": "noctua",
+          "line": "Eyes first."
+        },
+        {
+          "speaker": "ceil",
+          "line": "Teeth first. Then eyes, if anything's left to see."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Sky is big. Their disagreement is not."
+        }
+      ]
+    },
+    {
+      "pairId": "ceil__noctua",
+      "a": "noctua",
+      "b": "ceil",
+      "rank": "B",
+      "title": "Altitude arguments",
+      "polarity": "tension",
+      "motif": "flight paths vs gunship manners",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Flight paths vs gunship manners. The room gets smaller when both of you stand in it."
+        },
+        {
+          "speaker": "noctua",
+          "line": "Dreams in flight paths."
+        },
+        {
+          "speaker": "ceil",
+          "line": "Altitude is an opinion."
+        },
+        {
+          "speaker": "narrator",
+          "line": "eyes seat beside skirmish. Not enemies. Not easy."
+        },
+        {
+          "speaker": "noctua",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "ceil",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "ceil__noctua:B"
+    },
+    {
+      "id": "odessa__rusk:C",
+      "pairId": "odessa__rusk",
+      "a": "odessa",
+      "b": "rusk",
+      "rank": "C",
+      "title": "Two hinges",
+      "polarity": "sibling",
+      "motif": "gate door and ford door",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Dry hinge. Wet hinge. Same religion, different weather."
+        },
+        {
+          "speaker": "rusk",
+          "line": "Gate, jammed gat, a lie."
+        },
+        {
+          "speaker": "odessa",
+          "line": "Fords are doors. Yours just pretend they're walls."
+        },
+        {
+          "speaker": "rusk",
+          "line": "Walls stay shut."
+        },
+        {
+          "speaker": "odessa",
+          "line": "Until the river votes. Then we both hold whatever's left."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Sibling dirt. They'll die arguing which threshold mattered."
+        }
+      ]
+    },
+    {
+      "pairId": "odessa__rusk",
+      "a": "rusk",
+      "b": "odessa",
+      "rank": "B",
+      "title": "Two hinges",
+      "polarity": "sibling",
+      "motif": "gate door and ford door",
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Gate door and ford door. Same dirt. Different scar."
+        },
+        {
+          "speaker": "rusk",
+          "line": "Gate, jammed gat, a lie."
+        },
+        {
+          "speaker": "odessa",
+          "line": "Fords are doors."
+        },
+        {
+          "speaker": "narrator",
+          "line": "line seat beside line. You argue like people who already shared a trench."
+        },
+        {
+          "speaker": "rusk",
+          "line": "Still hearing you in the kit after the Drop."
+        },
+        {
+          "speaker": "odessa",
+          "line": "Then keep hearing it. The ash does not edit us clean."
+        }
+      ],
+      "generated": true,
+      "id": "odessa__rusk:B"
+    },
+    {
+      "id": "bro__yeva:C",
+      "pairId": "bro__yeva",
+      "a": "bro",
+      "b": "yeva",
+      "rank": "C",
+      "title": "Casual apocalypse, prior appointment",
+      "polarity": "attract",
+      "motif": "spot meets siege",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "A shrug with a Tzar. A whisper with a career-ending hobby."
+        },
+        {
+          "speaker": "bro",
+          "line": "Yeah. I'll take that wall."
+        },
+        {
+          "speaker": "yeva",
+          "line": "Ghosts already walked it. Try not to take the ghosts too."
+        },
+        {
+          "speaker": "bro",
+          "line": "I don't aim personal. Walls are impersonal."
+        },
+        {
+          "speaker": "yeva",
+          "line": "Then I'll be elsewhere when you get casual. Whistle once if the shrug is loading."
+        },
+        {
+          "speaker": "narrator",
+          "line": "She starts learning the whistle. He pretends he doesn't notice. He notices."
+        }
+      ]
+    }
+  ],
+  "authoredCount": 28
+}

@@ -81,13 +81,15 @@ class KernelPhaseTests(unittest.TestCase):
     def test_loan_quality_miss(self):
         state = engine.default_v1_state()
         commerce = engine.ensure_commerce(state, WS)
-        commerce["owned"]["punch_of_thugs"] = {
+        # Synthetic loan (punch is auto-retired by ensure_commerce).
+        commerce["owned"]["test_loan_thugs"] = {
             "loan": True,
             "loanCount": 6,
             "unitDef": "corthud",
             "healthFrac": 0.4,
+            "kind": "loan_package",
         }
-        commerce["credits"] = 50
+        commerce["metalK"] = 5
         commerce["tenebrium"] = 0
         result = {
             "resultKey": "loan-q-1",
@@ -95,6 +97,8 @@ class KernelPhaseTests(unittest.TestCase):
             "playerSurvivors": {"corthud": 6},
             "loanUnitHp": {"corthud": {"count": 6, "avgHpFrac": 0.35, "minHpFrac": 0.2}},
             "tenebriumBank": 0,
+            "metalStored": 0,
+            "metalKExtracted": 0,
         }
         settle = engine.settle_commerce_after_sortie(state, result, True, True, False, WS)
         note_blob = " ".join(settle.get("notes") or [])
@@ -107,19 +111,22 @@ class KernelPhaseTests(unittest.TestCase):
     def test_loan_quality_ok(self):
         state = engine.default_v1_state()
         commerce = engine.ensure_commerce(state, WS)
-        commerce["owned"]["punch_of_thugs"] = {
+        commerce["owned"]["test_loan_thugs"] = {
             "loan": True,
             "loanCount": 6,
             "unitDef": "corthud",
             "healthFrac": 0.4,
+            "kind": "loan_package",
         }
-        commerce["credits"] = 50
+        commerce["metalK"] = 5
         result = {
             "resultKey": "loan-q-2",
             "status": "victory",
             "playerSurvivors": {"corthud": 6},
             "loanUnitHp": {"corthud": {"count": 6, "avgHpFrac": 0.75, "minHpFrac": 0.5}},
             "tenebriumBank": 1,
+            "metalStored": 2500,
+            "metalKExtracted": 2,
         }
         settle = engine.settle_commerce_after_sortie(state, result, True, True, False, WS)
         note_blob = " ".join(settle.get("notes") or [])

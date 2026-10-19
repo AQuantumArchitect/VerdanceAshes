@@ -13,7 +13,7 @@ making the base heroes (Vane / Ketha) depend on it.
 
 | Path | Requirement |
 |---|---|
-| Broker contract | Listing `wheelie_tech_spoke` — 120 scrap, Null Mercs rep ≥ 55 |
+| Broker contract | Listing `wheelie_tech_spoke` — 3×1km$ metal, Null Mercs rep ≥ 55 |
 | Soft auto | Null Mercs rep ≥ 55 on any roster ensure (intent / advance) |
 
 Locked heroes never deploy (`status: locked` skipped in kit + intent).

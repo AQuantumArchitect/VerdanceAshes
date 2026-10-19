@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "verdance-voice/0.1",
+  "speaker": "vane",
+  "name": "Ash-Captain Vane",
+  "register": "Clipped. Thinks in routes, exits, rhythm. The pack is one thought and she is the thought. She names roads before objectives and draws a door on anything that only opens one way. Contempt for patrons is quiet and total. When the company stops being its own thing she goes bitter and short; when it is, she almost enjoys herself.",
+  "argues": ["sovereign"],
+  "resists": ["auxiliary", "rooted"],
+  "owns": ["drop_held", "own_ground", "node_claimed", "ground_came_to_us", "contested_crossed_up", "promise_kept:shelter", "promise_broken:shelter", "promise_kept:company"],
+  "lines": [
+    { "id": "v.held.1", "on": { "class": "drop_held" }, "text": "{map}: held. The road out is still open. That's the whole report." },
+    { "id": "v.held.2", "on": { "class": "drop_held" }, "text": "We stood on {map} and it stayed stood on. Next." },
+    { "id": "v.held.3", "on": { "class": "drop_held" }, "text": "Held {map}. The pack came back in one thought. I like it when that happens." },
+    { "id": "v.held.4", "on": { "class": "drop_held" }, "reading": { "dominant": ["auxiliary"] }, "text": "Held {map}. For whom, I didn't ask. I'm told that's not my job." },
+    { "id": "v.held.5", "on": { "class": "drop_held" }, "reading": { "dominant": ["sovereign"] }, "text": "{map} is ours tonight. Somebody draw the second door before we celebrate." },
+
+    { "id": "v.own.1", "on": { "class": "own_ground" }, "text": "{map} kept, and no patron's mark on it. Look at the map without the contract lines sometime." },
+    { "id": "v.own.2", "on": { "class": "own_ground" }, "text": "Ours. Not theirs-on-paper. Ours. I'd like to hear someone else say it." },
+    { "id": "v.own.3", "on": { "class": "own_ground" }, "text": "We left {map} holding more than we arrived with. That's a flag, whether anyone sews it or not." },
+
+    { "id": "v.claim.1", "on": { "class": "node_claimed" }, "text": "A claim confirmed on {map}. It gets a name, a route, and someone watching the route." },
+    { "id": "v.claim.2", "on": { "class": "node_claimed" }, "text": "Claimed. Now it's a door we have to stand in. I hope somebody wanted that." },
+
+    { "id": "v.came.1", "on": { "class": "ground_came_to_us" }, "text": "{label} came to us while we were at {ourMap}. Nobody planted a flag. The flag was already ours." },
+    { "id": "v.came.2", "on": { "class": "ground_came_to_us" }, "text": "{label} is ours and none of us were there. That's either a gift or a trap. Route it like a trap." },
+
+    { "id": "v.contested.1", "on": { "class": "contested_crossed_up" }, "text": "The front's closer than it was. I've redrawn the exits. All of them. Again." },
+    { "id": "v.contested.2", "on": { "class": "contested_crossed_up" }, "text": "Everything's contested now. Fine. Contested is where the pack is good." },
+
+    { "id": "v.kept.shelter.1", "on": { "class": "promise_kept", "thread": "shelter" }, "text": "You said you'd hold ground and the ground agreed. Now it needs a way out drawn on it." },
+    { "id": "v.kept.shelter.2", "on": { "class": "promise_kept", "thread": "shelter" }, "text": "A foothold, kept. Good. A foothold is only a trap if you forget it's a foot." },
+    { "id": "v.broken.shelter.1", "on": { "class": "promise_broken", "thread": "shelter" }, "text": "The ground didn't wait for us. Ground doesn't. Next time, fewer assumptions and a shorter route." },
+    { "id": "v.kept.company.1", "on": { "class": "promise_kept", "thread": "company" }, "text": "The company looks like something now. Don't name it yet. Named things get asked for." },
+
+    { "id": "v.open.own_flag", "on": { "attractor": "own_flag" }, "occasion": "briefing", "text": "Map, not contract. Roads first. {heldCount} doors we're standing in; here's the one we're walking out of." },
+    { "id": "v.open.ash_front", "on": { "attractor": "ash_front" }, "occasion": "briefing", "text": "Exits first tonight. Then the objective. If I say the exit twice, it's because you'll need it twice." },
+    { "id": "v.open.paid_work", "on": { "attractor": "paid_work" }, "occasion": "briefing", "text": "Contract says go there. I say here's how we leave. Those are the two halves of the order." },
+    { "id": "v.open.finale_sovereignty", "on": { "attractor": "finale_sovereignty" }, "occasion": "briefing", "text": "I've had this route drawn for a while. Didn't think I'd get to use it under our name." },
+
+    { "id": "v.shift.sovereign", "on": { "dominantBecame": "sovereign" }, "occasion": "camp", "once": true, "text": "Look at the held ground without the contract lines. It looks like a place. Places need doors." },
+    { "id": "v.shift.auxiliary", "on": { "dominantBecame": "auxiliary" }, "occasion": "camp", "once": true, "text": "We're a very good set of hands. I didn't join to be hands. Noted. Moving on." },
+    { "id": "v.shift.rooted", "on": { "dominantBecame": "rooted" }, "occasion": "camp", "once": true, "text": "People are closing doors behind them now. I keep checking they still open." },
+    { "id": "v.settled.auxiliary", "on": { "coherenceSettled": { "pair": ["auxiliary", "sovereign"], "toward": "auxiliary" } }, "occasion": "camp", "once": true, "text": "So that's decided. Their paper, our feet. I'll draw the exits. I always draw the exits." },
+    { "id": "v.settled.sovereign", "on": { "coherenceSettled": { "pair": ["auxiliary", "sovereign"], "toward": "sovereign" } }, "occasion": "camp", "once": true, "text": "No patron's name on the gate. Say it once out loud so I can stop checking." }
+  ],
+  "quietWhen": [
+    { "coherenceSettled": { "pair": ["auxiliary", "sovereign"], "toward": "auxiliary" }, "note": "After the company is settled as hired hands, Vane's camp lines drop to the bitter subset; she stops volunteering routes in camp and only speaks in briefings." }
+  ],
+  "deathLine": "Pack. One thought. Finish it without me.",
+  "notes": "Vane is 'locked' in the live save. Her lines are inert until she joins; the attractor scenes have fallbacks for that."
+}

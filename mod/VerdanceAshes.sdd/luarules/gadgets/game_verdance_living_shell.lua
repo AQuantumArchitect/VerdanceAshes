@@ -54,6 +54,38 @@ local function nrm(v, size)
   return v * size
 end
 
+local function shellCoord(v, size, fallback, slot)
+  local n = tonumber(v)
+  size = size or 1
+  -- Player pads are stored as Spring elmos. A value above 1 is a real
+  -- map position, not a broken normalized coordinate. Snapping those to
+  -- the map center is what moved a base onto the other side.
+  if n and n > 1.5 then
+    if size > 1 and n > size - 8 then n = size - 8 end
+    if n < 8 then n = 8 end
+    return n
+  end
+  local repaired = (not n) or n < 0 or n > 1
+  if repaired then n = tonumber(fallback) end
+  if not n or n < 0 or n > 1 then n = 0.5 end
+  if repaired and slot then
+    n = n + 0.014 * ((slot % 4) - 1.5)
+  end
+  n = math.max(0.04, math.min(0.96, n))
+  return n * size
+end
+
+-- The old center-snap parked pads on four points: 0.5 ± 0.007 and ± 0.021.
+local function centerSnapArtifact(x, z, sizeX, sizeZ)
+  if not x or not z or not sizeX or not sizeZ then return false end
+  if x < 1.5 or z < 1.5 or sizeX < 512 or sizeZ < 512 then return false end
+  local function hit(v, size)
+    local d = math.abs(v / size - 0.5)
+    return math.abs(d - 0.007) < 0.002 or math.abs(d - 0.021) < 0.002
+  end
+  return hit(x, sizeX) and hit(z, sizeZ)
+end
+
 local function inRect(x, z, rect)
   if not rect then return false end
   return x >= rect[1] and z >= rect[2] and x <= rect[3] and z <= rect[4]
@@ -101,32 +133,105 @@ local function spawnShell()
   end
   S.enemyTeam = teamID
   S.primaryZoneId = shell.primaryZoneId and tostring(shell.primaryZoneId) or nil
+  local primaryPocketId = shell.primaryPocketId and tostring(shell.primaryPocketId) or nil
   local primaryRect = zoneRect(S.primaryZoneId)
+  local pocketCenters = {}
+  for _, pocket in ipairs(shell.pockets or {}) do
+    if pocket.pocketId and pocket.center then
+      pocketCenters[tostring(pocket.pocketId)] = pocket.center
+    end
+  end
   local spawned = 0
   local objectiveTagged = 0
-  for _, u in ipairs(shell.units) do
+  local spawnLimit = tonumber(shell.spawnLimit or shell.openingSpawnLimit or "")
+  local shellUnits = shell.units
+  -- openingPocketOnly is the builder alias; localPocketOnly is the live flag.
+  local pocketOnly = shell.localPocketOnly or shell.openingPocketOnly
+  if pocketOnly and primaryPocketId then
+    shellUnits = {}
+    for _, u in ipairs(shell.units) do
+      local forceRole = tostring(u.forceRole or "")
+      local isFp = (forceRole == "player_footprint") or (u.role == "player_footprint")
+      -- Company pads always spawn even when occupation is pocket-gated.
+      if isFp or (u.pocketId and tostring(u.pocketId) == primaryPocketId) then
+        shellUnits[#shellUnits + 1] = u
+      end
+    end
+  end
+  for _, u in ipairs(shellUnits) do
+    if spawnLimit and spawned >= spawnLimit then break end
     local defName = u.unitDefName or u.def
     if defName and UnitDefNames and UnitDefNames[defName] then
-      local x = nrm(u.x, S.mapSizeX)
-      local z = nrm(u.z, S.mapSizeZ)
+      local rawX = tonumber(u.x)
+      local rawZ = tonumber(u.z)
+      local center = u.pocketId and pocketCenters[tostring(u.pocketId)]
+      local fallbackX = center and center[1]
+      local fallbackZ = center and center[2]
+      local x = shellCoord(rawX, S.mapSizeX, fallbackX, spawned)
+      local z = shellCoord(rawZ, S.mapSizeZ, fallbackZ, spawned)
+      local forceRoleEarly = tostring(u.forceRole or "")
+      local footprintEarly = (forceRoleEarly == "player_footprint") or (u.role == "player_footprint")
+      if footprintEarly and centerSnapArtifact(rawX, rawZ, S.mapSizeX, S.mapSizeZ) then
+        -- A previous drop saved the teleported pile. Leave it off the map.
+        x = nil
+      end
+      if x then
       local y = Spring.GetGroundHeight(x, z)
       local facing = tonumber(u.facing) or 0
-      local unitID = Spring.CreateUnit(defName, x, y, z, facing, teamID)
+      -- Held prizes (player-bloc continuity): spawn on the company team so the
+      -- fusion + beamer ring is still here when you come back to defend it.
+      -- player_footprint: company-built pads from prior Drop (not occupation).
+      local spawnTeam = teamID
+      local forceRole = tostring(u.forceRole or "")
+      local isFootprint = (forceRole == "player_footprint")
+        or (u.role == "player_footprint")
+      local held = (u.heldByPlayer == true or u.heldByPlayer == 1
+        or forceRole == "held_install" or isFootprint)
+      if held and S.playerTeam ~= nil then
+        spawnTeam = S.playerTeam
+      end
+      local unitID = Spring.CreateUnit(defName, x, y, z, facing, spawnTeam)
       if unitID then
         spawned = spawned + 1
-        S.shellUnitSet[unitID] = true
-        Spring.SetUnitRulesParam(unitID, "va_living_shell", 1, { public = true })
+        if not isFootprint then
+          S.shellUnitSet[unitID] = true
+          Spring.SetUnitRulesParam(unitID, "va_living_shell", 1, { public = true })
+        else
+          Spring.SetUnitRulesParam(unitID, "va_player_footprint", 1, { public = true })
+        end
         if u.pocketId then
           Spring.SetUnitRulesParam(unitID, "va_shell_pocket", tostring(u.pocketId), { public = true })
         end
         if u.zoneId then
           Spring.SetUnitRulesParam(unitID, "va_shell_zone", tostring(u.zoneId), { public = true })
         end
+        if u.keepClass then
+          Spring.SetUnitRulesParam(unitID, "va_keep_class", tostring(u.keepClass), { public = true })
+        end
         -- Decoy commanders: Armada autonomous eco-farm swarm nodes (not real coms).
         local isDecoy = (u.keepClass == "decoy_node")
           or (u.role == "autonomous_decoy_farmer")
           or (defName == "armdecom" or defName == "cordecom" or defName == "legdecom")
-        if isDecoy then
+        -- Optional high-value marks (e.g. Greenest center fusion vaults):
+        -- fusion keepClass=high_value becomes a bonus secondary, not the primary raid.
+        local isHighValue = (u.keepClass == "high_value")
+        if isFootprint then
+          Spring.SetUnitRulesParam(unitID, "va_force_role", "player_footprint", { public = true })
+          if CMD then
+            if CMD.FIRE_STATE then pcall(Spring.GiveOrderToUnit, unitID, CMD.FIRE_STATE, { 2 }, {}) end
+            if CMD.MOVE_STATE then pcall(Spring.GiveOrderToUnit, unitID, CMD.MOVE_STATE, { 0 }, {}) end
+          end
+        elseif held then
+          Spring.SetUnitRulesParam(unitID, "va_held_install", 1, { public = true })
+          Spring.SetUnitRulesParam(unitID, "va_force_role", "held_install", { public = true })
+          if isHighValue then
+            Spring.SetUnitRulesParam(unitID, "va_high_value", 1, { public = true })
+          end
+          if CMD then
+            if CMD.FIRE_STATE then pcall(Spring.GiveOrderToUnit, unitID, CMD.FIRE_STATE, { 2 }, {}) end
+            if CMD.MOVE_STATE then pcall(Spring.GiveOrderToUnit, unitID, CMD.MOVE_STATE, { 0 }, {}) end
+          end
+        elseif isDecoy then
           Spring.SetUnitRulesParam(unitID, "va_decoy_node", 1, { public = true })
           Spring.SetUnitRulesParam(unitID, "va_force_role", "decoy_farmer", { public = true })
           -- Occupation farmers: they already built the pocket, but must look alive —
@@ -146,6 +251,12 @@ local function spawnShell()
               pcall(Spring.GiveOrderToUnit, unitID, CMD.FIGHT, { x + 80, y, z + 80 }, {})
             end
           end
+        elseif isHighValue then
+          local sid = "bonus_fus_" .. tostring(u.pocketId or u.zoneId or "mark"):lower()
+          Spring.SetUnitRulesParam(unitID, "va_force_role", "objective_secondary", { public = true })
+          Spring.SetUnitRulesParam(unitID, "va_secondary_id", sid, { public = true })
+          Spring.SetUnitRulesParam(unitID, "va_secondary_required", 0, { public = true })
+          Spring.SetUnitRulesParam(unitID, "va_high_value", 1, { public = true })
         else
           -- Tag primary-pocket eco as raid objective structures.
           local isPrimary = false
@@ -165,10 +276,13 @@ local function spawnShell()
           end
         end
       end
+      end
     end
   end
   Spring.Echo("VA_SHELL_SPAWNED count=" .. tostring(spawned)
     .. " objectiveEco=" .. tostring(objectiveTagged)
+    .. " limit=" .. tostring(spawnLimit or 0)
+    .. " pocket=" .. tostring(primaryPocketId or "all")
     .. " team=" .. tostring(teamID)
     .. " template=" .. tostring(shell.templateId or "?"))
   return spawned

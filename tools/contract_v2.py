@@ -104,6 +104,7 @@ def normalize_sortie(raw: Dict[str, Any], *, campaign_id: str = "verdance_ashes"
         "secondaryCaptureZoneIds": [_s(z) for z in secondary if z],
         "hubChoiceId": raw.get("hubChoiceId") or raw.get("choiceId"),
         "deployAces": list(raw.get("deployAces") or []),
+        "crewBand": list(raw.get("crewBand") or raw.get("crew_band") or []),
         "repDelta": raw.get("repDelta") if isinstance(raw.get("repDelta"), dict) else {},
         "patron": _s(raw.get("patron") or "nullmercs"),
         "against": _s(raw.get("against") or raw.get("enemyFaction") or "armada"),
@@ -139,6 +140,12 @@ def normalize_sortie(raw: Dict[str, Any], *, campaign_id: str = "verdance_ashes"
         },
         "valid": _b(raw.get("valid"), True),
         "sourceSchemas": [raw.get("schemaVersion")] if raw.get("schemaVersion") else [],
+        "source": raw.get("source"),
+        "derived": raw.get("derived") if isinstance(raw.get("derived"), dict) else None,
+        "openingMission": raw.get("openingMission"),
+        "openingDoctrine": raw.get("openingDoctrine"),
+        "fromDebrief": raw.get("fromDebrief"),
+        "debriefPick": raw.get("debriefPick"),
     }
 
 
@@ -156,6 +163,7 @@ def sortie_v2_to_v1_order(s: Dict[str, Any]) -> Dict[str, Any]:
         "secondaryCaptureZoneIds": list(s.get("secondaryCaptureZoneIds") or []),
         "hubChoiceId": s.get("hubChoiceId"),
         "deployAces": list(s.get("deployAces") or []),
+        "crewBand": list(s.get("crewBand") or []),
         "repDelta": s.get("repDelta") if isinstance(s.get("repDelta"), dict) else {},
         "patron": s.get("patron"),
         "against": s.get("against"),
@@ -170,6 +178,10 @@ def sortie_v2_to_v1_order(s: Dict[str, Any]) -> Dict[str, Any]:
         "occupationModel": s.get("occupationModel"),
         "captureMode": s.get("captureMode"),
         "freeTnbMint": s.get("freeTnbMint"),
+        # Provenance — hub stamp vs opening vs debrief (materialize priority).
+        "source": s.get("source"),
+        "derived": s.get("derived") if isinstance(s.get("derived"), dict) else None,
+        "openingMission": s.get("openingMission"),
     }
 
 
@@ -190,6 +202,9 @@ def normalize_result(raw: Dict[str, Any], *, campaign_id: str = "verdance_ashes"
     )
     heroes = raw.get("heroes") or raw.get("heroResults") or {}
     survivors = raw.get("playerSurvivors") if isinstance(raw.get("playerSurvivors"), dict) else {}
+    survivor_xp = (
+        raw.get("playerSurvivorXp") if isinstance(raw.get("playerSurvivorXp"), dict) else {}
+    )
     loan_hp = raw.get("loanUnitHp") if isinstance(raw.get("loanUnitHp"), dict) else {}
     scars = raw.get("shellScars") or raw.get("scars") or []
     capture_mode = (
@@ -275,10 +290,32 @@ def normalize_result(raw: Dict[str, Any], *, campaign_id: str = "verdance_ashes"
             _b(raw.get("objectiveComplete"), False),
         ),
         "objectiveBypassed": _b(raw.get("objectiveBypassed"), False),
+        # Rescue-contract fail latch from gadget (partial RTB path).
+        "objectiveFailed": _b(
+            raw.get("objectiveFailed") or raw.get("rescueContractFailed"), False
+        ),
+        "objectiveFailReason": _s(
+            raw.get("objectiveFailReason") or raw.get("rescueContractFailReason") or ""
+        ),
+        "objectiveFailHero": _s(
+            raw.get("objectiveFailHero")
+            or raw.get("rescueFailHero")
+            or raw.get("rescueContractFailHero")
+            or ""
+        ),
+        "rescueContractFailed": _b(
+            raw.get("rescueContractFailed") or raw.get("objectiveFailed"), False
+        ),
         "heroes": heroes,
         "heroResults": raw.get("heroResults") if isinstance(raw.get("heroResults"), dict) else heroes,
         "namedOutcomes": raw.get("namedOutcomes") if isinstance(raw.get("namedOutcomes"), list) else [],
+        "recruitedHeroIds": (
+            list(raw.get("recruitedHeroIds") or raw.get("recruitedHeroes") or [])
+            if isinstance(raw.get("recruitedHeroIds") or raw.get("recruitedHeroes") or [], list)
+            else []
+        ),
         "playerSurvivors": survivors,
+        "playerSurvivorXp": survivor_xp,
         "loanUnitHp": loan_hp,
         "tenebrium": {
             "bank": _i(raw.get("tenebriumBank"), -1),
@@ -290,8 +327,27 @@ def normalize_result(raw: Dict[str, Any], *, campaign_id: str = "verdance_ashes"
         "tenebriumLooted": _i(raw.get("tenebriumLooted"), 0),
         "tenebriumSpent": _i(raw.get("tenebriumSpent"), 0),
         "tenebriumLost": _i(raw.get("tenebriumLost"), 0),
+        "metalStored": raw.get("metalStored"),
+        "metalStorage": raw.get("metalStorage"),
+        "metalKExtracted": _i(raw.get("metalKExtracted"), -1),
         "armadaTenebriumCrisis": _b(raw.get("armadaTenebriumCrisis"), True),
         "shellScars": scars,
+        "survivingInstalls": (
+            raw.get("survivingInstalls")
+            if isinstance(raw.get("survivingInstalls"), list)
+            else (raw.get("survivingInstallations") if isinstance(raw.get("survivingInstallations"), list) else [])
+        ),
+        # None when absent — apply_player_footprint must not wipe prior pads
+        # on truncated/legacy results. Explicit [] still clears.
+        "playerFootprint": (
+            raw.get("playerFootprint")
+            if isinstance(raw.get("playerFootprint"), list)
+            else (raw.get("zoneFootprint") if isinstance(raw.get("zoneFootprint"), list) else None)
+        ),
+        "playerFootprintPresent": (
+            isinstance(raw.get("playerFootprint"), list)
+            or isinstance(raw.get("zoneFootprint"), list)
+        ),
         "destroyedObjectives": raw.get("destroyedObjectives") or raw.get("destroyedObjectiveIds") or [],
         "destroyedObjectiveIds": raw.get("destroyedObjectiveIds") or raw.get("destroyedObjectives") or [],
         "objectiveResults": raw.get("objectiveResults") or [],
@@ -349,17 +405,33 @@ def result_v2_to_v1_fields(r: Dict[str, Any]) -> Dict[str, Any]:
         "extractionStatus": r.get("extractionStatus"),
         "objectiveComplete": r.get("objectiveComplete"),
         "objectiveBypassed": r.get("objectiveBypassed"),
+        "objectiveFailed": r.get("objectiveFailed"),
+        "objectiveFailReason": r.get("objectiveFailReason"),
+        "objectiveFailHero": r.get("objectiveFailHero"),
+        "rescueContractFailed": r.get("rescueContractFailed") or r.get("objectiveFailed"),
         "heroes": r.get("heroes"),
         "heroResults": r.get("heroResults") or r.get("heroes"),
         "namedOutcomes": r.get("namedOutcomes") or [],
+        "recruitedHeroIds": list(r.get("recruitedHeroIds") or []),
         "playerSurvivors": r.get("playerSurvivors"),
+        "playerSurvivorXp": r.get("playerSurvivorXp"),
         "loanUnitHp": r.get("loanUnitHp"),
         "tenebriumBank": (tnb.get("bank") if isinstance(tnb, dict) else r.get("tenebriumBank")),
         "tenebriumLooted": (tnb.get("looted") if isinstance(tnb, dict) else r.get("tenebriumLooted", 0)),
         "tenebriumSpent": (tnb.get("spent") if isinstance(tnb, dict) else r.get("tenebriumSpent", 0)),
         "tenebriumLost": (tnb.get("lost") if isinstance(tnb, dict) else r.get("tenebriumLost", 0)),
+        "metalStored": r.get("metalStored"),
+        "metalStorage": r.get("metalStorage"),
+        "metalKExtracted": r.get("metalKExtracted"),
         "armadaTenebriumCrisis": r.get("armadaTenebriumCrisis"),
         "shellScars": r.get("shellScars"),
+        "survivingInstalls": r.get("survivingInstalls") or [],
+        # Preserve absent vs explicit-empty for footprint credit (no silent wipe).
+        **(
+            {"playerFootprint": r.get("playerFootprint")}
+            if r.get("playerFootprintPresent") or isinstance(r.get("playerFootprint"), list)
+            else {}
+        ),
         "destroyedObjectives": r.get("destroyedObjectives"),
         "destroyedObjectiveIds": r.get("destroyedObjectiveIds") or r.get("destroyedObjectives"),
         "objectiveResults": r.get("objectiveResults") or [],
@@ -402,6 +474,8 @@ def intent_from_sortie_v2(s: Dict[str, Any], base_intent: Optional[Dict[str, Any
         intent["hubChoiceId"] = s.get("hubChoiceId")
     if s.get("deployAces"):
         intent["deployAces"] = list(s.get("deployAces") or [])
+    if s.get("crewBand"):
+        intent["crewBand"] = list(s.get("crewBand") or [])
     intent["objective"] = s.get("objectiveArchetype") or intent.get("objective")
     intent["patron"] = s.get("patron")
     intent["sessionMode"] = s.get("sessionMode") or "same_map"

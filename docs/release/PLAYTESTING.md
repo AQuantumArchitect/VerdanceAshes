@@ -19,7 +19,9 @@ app\bin\PLAY.bat
 6. **Bring it home** — bridge usually auto-applies. Fallback: **After the fight — bring it home**.
 7. Hire mercs, talk to Ketha, rest, or take the next drop.
 
-Optional seat-only path (no war map): `app\bin\PLAY_AS_PLAYER.bat` or operator `PLAY_SESSION_V1`.
+Optional seat-only path (no war map): run `scripts\play_session_v1.ps1`.
+(An older note here pointed at `app\bin\PLAY_AS_PLAYER.bat`; that file lives
+under `app\bin\forge\`, which is a workspace-only tool and is never shipped.)
 
 ## What we're testing
 

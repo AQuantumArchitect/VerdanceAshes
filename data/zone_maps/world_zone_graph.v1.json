@@ -6160,6 +6160,7 @@
       "to": "EOH_NW_BASTION",
       "kind": "strategic_link",
       "cost": 2,
+      "travelMinutes": 14,
       "notes": "Greenest -> Eye corridor"
     },
     {
@@ -6167,6 +6168,7 @@
       "to": "KV_NW_MUSTER",
       "kind": "strategic_link",
       "cost": 2,
+      "travelMinutes": 16,
       "notes": "Eye -> Koom approach"
     },
     {
@@ -6174,6 +6176,7 @@
       "to": "T_NW_RESERVE",
       "kind": "strategic_link",
       "cost": 2,
+      "travelMinutes": 15,
       "notes": "Koom south -> Tabula north"
     },
     {
@@ -6181,6 +6184,7 @@
       "to": "AB_NW_BASTION",
       "kind": "strategic_link",
       "cost": 2,
+      "travelMinutes": 18,
       "notes": "Tabula -> Bastion"
     },
     {
@@ -6188,6 +6192,7 @@
       "to": "TRJ_NW_MUSTER",
       "kind": "strategic_link",
       "cost": 3,
+      "travelMinutes": 22,
       "notes": "Tabula east -> Rock Jungle"
     },
     {
@@ -6195,6 +6200,7 @@
       "to": "ATS_NW_SPILLWAY",
       "kind": "strategic_link",
       "cost": 3,
+      "travelMinutes": 24,
       "notes": "Bastion -> All That Simmers"
     },
     {
@@ -6202,7 +6208,16 @@
       "to": "ATS_SW_PLATEAU",
       "kind": "strategic_link",
       "cost": 3,
+      "travelMinutes": 20,
       "notes": "Jungle south -> Simmers"
+    },
+    {
+      "from": "GF_NW_MUSTER",
+      "to": "TRJ_NW_OUTER_MUSTER",
+      "kind": "strategic_link",
+      "cost": 2,
+      "travelMinutes": 16,
+      "notes": "Greenest north muster -> Rock Jungle home shelf"
     }
   ],
   "notes": "Same-map edges from zone_adjacency.json; strategic_link edges authored for campaign arc."

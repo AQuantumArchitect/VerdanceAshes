@@ -24,8 +24,9 @@ and the next fight is grown from that living world.
 
 Architecture: `docs/SHIP_ARCHITECTURE.md` (kernel phases 0–4).
 
-Same-map continues: after a win, press **1 / 2 / 3** on the debrief to keep
-fighting without leaving the map (heroes and warband carry forward).
+Same-map continues: after a win, click a debrief contract or press **1 / 2 / 3 / 4**
+and **Enter** to keep fighting without leaving the map (heroes and warband carry
+forward). Arrow keys move the focus.
 
 ## Package pieces
 

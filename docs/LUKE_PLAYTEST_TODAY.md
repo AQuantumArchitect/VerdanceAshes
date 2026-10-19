@@ -77,7 +77,8 @@ Latest residual (wargen organic units):
 ### 3. Systems to poke (while you play)
 
 - [ ] Theater map visible; route arrows infil → target → exfil  
-- [ ] Midfield infil/exfil **rejected** (rim only)  
+- [ ] Midfield infil/exfil **allowed** only on Ashwalker-held pads; quiet rim otherwise  
+
 - [ ] Tnb bank **0** → can't fab/con freely; after scavenge, BP unlocks  
 - [ ] BP chip used/max makes sense  
 - [ ] Bring-home advances the war clock / offscreen note  

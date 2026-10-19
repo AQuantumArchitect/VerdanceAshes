@@ -36,9 +36,9 @@ local COL = {
   warn = { 0.878, 0.627, 0.376 },
 }
 do
-  local ok, Ash = pcall(VFS.Include, "luaui/Widgets/include/va_ash_tokens.lua")
+  local ok, Ash = pcall(VFS.Include, "luaui/Include/va_ash_tokens.lua")
   if not ok or type(Ash) ~= "table" then
-    ok, Ash = pcall(VFS.Include, "LuaUI/Widgets/include/va_ash_tokens.lua")
+    ok, Ash = pcall(VFS.Include, "LuaUI/Include/va_ash_tokens.lua")
   end
   if ok and type(Ash) == "table" and Ash.COL then
     COL.panel = Ash.COL.panel

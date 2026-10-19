@@ -4,7 +4,7 @@
   [int]$MaxMissions = 12,
   [switch]$SessionHost,
   [switch]$NoAutoRelaunch,
-  [ValidateSet("visible", "headless-fastwin")]
+  [ValidateSet("visible", "headless-fastwin", "headless-zip")]
   [string]$EngineMode = "visible",
   [string]$StatusPath = ""
 )
@@ -29,7 +29,7 @@ if (-not $StatusPath) { $StatusPath = Join-Path $Workspace "outbox\play_session.
 $autoRelaunch = $true
 if ($NoAutoRelaunch) { $autoRelaunch = $false }
 if ($SessionHost) { $autoRelaunch = $true }
-if ($EngineMode -eq "headless-fastwin") { $autoRelaunch = $false; $MaxMissions = 1 }
+if ($EngineMode -eq "headless-fastwin" -or $EngineMode -eq "headless-zip") { $autoRelaunch = $false; $MaxMissions = 1 }
 
 $script:status = [ordered]@{
   schemaVersion = "verdance-play-session/1.2"
@@ -37,6 +37,7 @@ $script:status = [ordered]@{
   missionId = $null
   missionNumber = $null
   springPid = $null
+  matchReady = $false
   startedAt = (Get-Date).ToUniversalTime().ToString("o")
   updatedAt = $null
   resultStatus = $null
@@ -70,6 +71,19 @@ function Get-RunningSpring {
 
 function Invoke-FullCycle {
   & (Join-Path $ScriptDir "run_full_cycle_v1.ps1") -Workspace $Workspace -WriteState
+  # A receipt certifies persisted campaign truth, not that a subprocess returned.
+  $savedCampaign = Get-Content -LiteralPath $config.campaignState -Raw | ConvertFrom-Json
+  $savedKeys = @()
+  if ($savedCampaign.processedResults) {
+    $savedKeys = @($savedCampaign.processedResults.PSObject.Properties.Name)
+  }
+  $receiptDirectory = Join-Path $config.barDataRoot "LuaUI\Config"
+  New-Item -ItemType Directory -Force -Path $receiptDirectory | Out-Null
+  $receiptPath = Join-Path $receiptDirectory "va_campaign_receipts.json"
+  $receiptTemp = $receiptPath + ".tmp"
+  $receiptJson = @{schemaVersion="verdance-save-receipts/1.0";resultKeys=$savedKeys} | ConvertTo-Json -Depth 4
+  [IO.File]::WriteAllText($receiptTemp, $receiptJson, [Text.UTF8Encoding]::new($false))
+  Move-Item -LiteralPath $receiptTemp -Destination $receiptPath -Force
 }
 
 function Backup-CampaignState {
@@ -215,13 +229,36 @@ try {
       $infologOffset = (Get-Item -LiteralPath $config.infolog).Length
     }
 
-    if ($EngineMode -eq "headless-fastwin") {
+    # Stamp session-host so in-BAR Mode B travel rows only appear when Reload can fire.
+    $hostOpt = if ($autoRelaunch) { "va_session_host=1" } else { "" }
+
+    if ($EngineMode -eq "headless-fastwin" -or $EngineMode -eq "headless-zip") {
       & (Join-Path $ScriptDir "build_next_mission_v1.ps1") -Workspace $Workspace
-      Write-SessionStatus "in-game" "Running headless fast-win verification mission..."
       $playablePath = Join-Path $Workspace "data\scenarios\generated\next_mission_intent.playable.json"
-      & (Join-Path $ScriptDir "install_playable_slice.ps1") -Workspace $Workspace `
-        -ScenarioPath $playablePath -Headless -TimeoutSeconds 900 `
-        -ExtraModOptions "va_headless_autostart=1,va_headless_fastwin=1,va_headless_quit=1"
+      $headlessOpts = "va_headless_autostart=1,va_headless_fastwin=1,va_headless_quit=1"
+      $headlessLabel = "headless fast-win"
+      if ($EngineMode -eq "headless-zip") {
+        # Real objective and extract. Zip teleports the company and explodes
+        # hostiles. fastwin stays 0 so the gadget does not stamp a fake victory.
+        $headlessOpts = "va_headless_autostart=1,va_headless_fastwin=0,va_headless_quit=1,va_autoplay_zip=1"
+        $headlessLabel = "headless zip"
+      }
+      Write-SessionStatus "in-game" "Running $headlessLabel verification mission..."
+      if ($hostOpt) { $headlessOpts = "$headlessOpts,$hostOpt" }
+      $installArgs = @{
+        Workspace = $Workspace
+        ScenarioPath = $playablePath
+        Headless = $true
+        TimeoutSeconds = 480
+        ExtraModOptions = $headlessOpts
+      }
+      if ($EngineMode -eq "headless-zip") {
+        # The default headless script quits at frame 600. A real hold plus the
+        # extract pad needs longer. 9000 is only a stuck-match backstop;
+        # va_headless_quit closes the engine once the result is logged.
+        $installArgs.DebugCommandsOverride = "90:luarules vazones|120:luarules vastatus|9000:quitforce"
+      }
+      & (Join-Path $ScriptDir "install_playable_slice.ps1") @installArgs
       Write-SessionStatus "extracting" "Extracting headless result..."
       Invoke-FullCycle
       $missionsDone += 1
@@ -229,7 +266,12 @@ try {
       break
     }
 
-    & (Join-Path $ScriptDir "build_next_mission_v1.ps1") -Workspace $Workspace -Launch
+    if ($hostOpt) {
+      & (Join-Path $ScriptDir "build_next_mission_v1.ps1") -Workspace $Workspace -Launch `
+        -ExtraModOptions $hostOpt
+    } else {
+      & (Join-Path $ScriptDir "build_next_mission_v1.ps1") -Workspace $Workspace -Launch
+    }
     $launchManifestPath = Join-Path $Workspace "playable_runs\latest_launch.json"
     $springPid = $null
     if (Test-Path $launchManifestPath) {
@@ -239,14 +281,28 @@ try {
       } catch { }
     }
     $script:status.springPid = $springPid
-    Write-SessionStatus "in-game" "BAR launched (pid $springPid). Play; Mode A continues stay in-seat. Results extract live."
+    $script:status.matchReady = $false
+    # Process start is not the match. Who spawned was compiled into this
+    # startscript; the sheet stays on Dropping until the level is actually in.
+    Write-SessionStatus "dropping" "Dropping. The company is locked and the level is loading (pid $springPid)."
 
     $missionDeadline = (Get-Date).AddMinutes([Math]::Min(90, $MaxSessionMinutes))
     $chaptersThisLaunch = 0
+    $returnToHub = $false
+    $travelDeparture = $false
     while ((Get-Date) -lt $missionDeadline -and (Get-Date) -lt $sessionDeadline) {
       Start-Sleep -Seconds 3
       $newText = Read-NewInfologText ([ref]$infologOffset)
+      if ($newText -match "VA_RETURN_TO_HUB") { $returnToHub = $true }
+      if ($newText -match "VA_TRAVEL_DEPARTURE") { $travelDeparture = $true }
+      if ($newText -match "VA_RETRY_RESULT") {
+        try { Invoke-FullCycle } catch { Write-SessionStatus "save-pending" "Campaign save failed; report retained for retry. $($_.Exception.Message)" }
+      }
       Update-ModeBCapabilityFromText $newText
+      if ($script:status.phase -eq "dropping" -and $newText -and ($newText -match "VA_PLAYABLE_SETUP" -or $newText -match "GameID:")) {
+        $script:status.matchReady = $true
+        Write-SessionStatus "in-game" "Level is in. Recoil is open (pid $($script:status.springPid))."
+      }
 
       # Mode A: multiple VA_RESULT lines per launch -- extract each unique resultKey.
       $newKeys = Get-ResultKeysFromText $newText
@@ -256,8 +312,7 @@ try {
         Write-SessionStatus "extracting" "Sortie result $rk -- advancing campaign..."
         try {
           Invoke-FullCycle
-          # Mode B: if debrief pick was a strategic_link travel, stamp Reload path.
-          Invoke-ModeBReloadPath | Out-Null
+
           $chaptersThisLaunch += 1
           $missionsDone += 1
           $script:status.missionsCompleted = $missionsDone
@@ -277,7 +332,6 @@ try {
           try {
             Write-SessionStatus "extracting" "Result marker seen (no key parse); retry harvest only..."
             Invoke-FullCycle
-            Invoke-ModeBReloadPath | Out-Null
             $seenResultKeys[$retryTag] = $true
             $chaptersThisLaunch += 1
             $missionsDone += 1
@@ -298,6 +352,24 @@ try {
       if (-not $proc) { break }
     }
 
+    # Catch a departure marker flushed between the last poll and process exit.
+    $finalText = Read-NewInfologText ([ref]$infologOffset)
+    if ($finalText -match "VA_RETURN_TO_HUB") { $returnToHub = $true }
+    if ($finalText -match "VA_TRAVEL_DEPARTURE") { $travelDeparture = $true }
+    foreach ($rk in (Get-ResultKeysFromText $finalText)) {
+      if (-not $seenResultKeys.ContainsKey($rk)) {
+        try {
+          Invoke-FullCycle
+          $seenResultKeys[$rk] = $true
+          $chaptersThisLaunch += 1
+          $missionsDone += 1
+          $script:status.missionsCompleted = $missionsDone
+        } catch {
+          Write-SessionStatus "no-result" "Final report could not be processed; recover it from the hub. $($_.Exception.Message)"
+          return
+        }
+      }
+    }
     # BAR exited.
     $script:status.springPid = $null
     if ($chaptersThisLaunch -eq 0) {
@@ -314,8 +386,15 @@ try {
         break
       }
     } else {
-      # Final Mode B resolve after exit (travel pick may arrive late).
-      Invoke-ModeBReloadPath | Out-Null
+      # Only an acknowledged travel departure may stamp another map here.
+      if ($travelDeparture -and -not $returnToHub) { Invoke-ModeBReloadPath | Out-Null }
+    }
+
+    # An explicit hub destination ends this host, even in auto-relaunch mode.
+    # Result harvest above still runs, so returning never skips campaign credit.
+    if ($returnToHub -or -not $travelDeparture) {
+      Write-SessionStatus "next-ready" "Returned to hub. Campaign result processed."
+      break
     }
 
     # Build next seed for relaunch / next sit-down (Mode B stamps choice first).
@@ -326,7 +405,12 @@ try {
     }
     Write-SessionStatus "build-next" $modeBMsg
     Backup-CampaignState
-    & (Join-Path $ScriptDir "build_next_mission_v1.ps1") -Workspace $Workspace
+    if ($autoRelaunch) {
+      & (Join-Path $ScriptDir "build_next_mission_v1.ps1") -Workspace $Workspace `
+        -ExtraModOptions "va_session_host=1"
+    } else {
+      & (Join-Path $ScriptDir "build_next_mission_v1.ps1") -Workspace $Workspace
+    }
 
     $manifestPath = Join-Path $Workspace "outbox\next_mission_build_manifest.json"
     if (Test-Path $manifestPath) {

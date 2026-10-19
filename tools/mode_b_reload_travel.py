@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -277,28 +278,46 @@ def self_test(ws: Path) -> int:
     assert stats.get("source") == "world_zone_graph", stats
     edges = wzg.strategic_link_edges(ws)
     assert len(edges) >= 7, f"expected >=7 strategic_link edges, got {len(edges)}"
-    # Greenest staging → Eye crater
-    hops = wzg.mode_b_travel_candidates(ws, ["GF_SE_STAGING"])
-    assert hops, "GF_SE_STAGING should have Mode B hop"
-    assert hops[0]["mapId"] == "eye_of_horus", hops[0]
-    assert hops[0]["targetZoneId"] == "EOH_NW_CRATER_CAMP", hops[0]
-    assert hops[0]["sessionMode"] == "reload_travel"
-    hop = wzg.validate_mode_b_hop(ws, "KOOM_SE_GREEN_SHELF", "TAB_NW_PLATEAU")
-    assert hop is not None, "Koom→Tabula strategic_link missing"
-    # same_map candidates must NOT include strategic targets
-    adj = wzg.load_map_adjacency(ws, "greenest_fields", kinds=("same_map",))
-    for nbrs in adj.values():
-        assert "EOH_NW_CRATER_CAMP" not in nbrs
-    # resolve + lua emit dry
-    r = resolve_travel(
-        ws, from_zone="GF_SE_STAGING", to_zone="EOH_NW_CRATER_CAMP", write=False
-    )
+
+    # Derive the probe hop from the graph rather than naming zone ids inline.
+    # The previous version asserted against GF_SE_STAGING / EOH_NW_CRATER_CAMP and
+    # friends, which the zone-id migration renamed out of existence -- so the test
+    # failed on its first assert and never reached the checks that would have
+    # caught the shipped va_strategic_links.lua still carrying those dead ids.
+    graph_zone_ids = {n["zoneId"] for n in wzg.load_world_zone_graph(ws)["nodes"]}
+    probe = edges[0]
+    from_zone, to_zone = probe["from"], probe["to"]
+    hops = wzg.mode_b_travel_candidates(ws, [from_zone])
+    assert hops, f"{from_zone} should have a Mode B hop"
+    assert hops[0]["sessionMode"] == "reload_travel", hops[0]
+    assert hops[0]["targetZoneId"] in graph_zone_ids, hops[0]
+    hop = wzg.validate_mode_b_hop(ws, from_zone, to_zone)
+    assert hop is not None, f"{from_zone} -> {to_zone} strategic_link missing"
+
+    # Every strategic link must cross maps and land on a zone that exists.
+    for e in edges:
+        assert e["from"] in graph_zone_ids, e
+        assert e["to"] in graph_zone_ids, e
+
+    # same_map candidates must never include a cross-map strategic target.
+    from_map = hops[0].get("fromMapId") or ""
+    for map_id in {e.get("fromMapId") for e in edges if e.get("fromMapId")}:
+        adj = wzg.load_map_adjacency(ws, map_id, kinds=("same_map",))
+        cross_targets = {e["to"] for e in edges if e.get("fromMapId") == map_id}
+        for nbrs in adj.values():
+            assert not (set(nbrs) & cross_targets), (map_id, nbrs)
+
+    r = resolve_travel(ws, from_zone=from_zone, to_zone=to_zone, write=False)
     assert r["action"] == "stamp_reload_travel", r
-    assert r["selectedHop"]["mapId"] == "eye_of_horus"
+
     lua_path = emit_lua_strategic_links(ws)
     assert lua_path.is_file()
     body = lua_path.read_text(encoding="utf-8")
-    assert "GF_SE_STAGING" in body and "EOH_NW_CRATER_CAMP" in body
+    # The shipped include must reference only zones the graph still has. This is
+    # the assertion that regenerating the file after a zone-id migration relies on.
+    for zid in re.findall(r'(?:from|to)ZoneId = "([^"]+)"', body):
+        assert zid in graph_zone_ids, f"va_strategic_links.lua references dead zone {zid}"
+    assert from_zone in body and to_zone in body
     cap = stamp_capability_from_evidence(ws)
     assert cap["reload"] is True
     print("ok mode_b_reload_travel self_test")

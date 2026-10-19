@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "verdance-voice/0.1",
+  "speaker": "yeva",
+  "name": "Whisper-of-Ash Yeva",
+  "register": "Fog and ghosts. She hedges, and her hedges are more accurate than other people's certainties. She owns what nobody has looked at. She says 'nobody's looked', 'a week ago I'd have known', 'from here those look the same', 'a picket, maybe a battalion'. She never says 'estimate', 'band' or 'confidence'. She almost smiles. She is the voice of the surprise at Drop start: what we briefed versus what we found.",
+  "argues": ["hunted"],
+  "resists": [],
+  "owns": ["ground_changed_hands_near_us", "clash_near_held", "unobserved_ground"],
+  "lines": [
+    { "id": "y.changed.1", "on": { "class": "ground_changed_hands_near_us" }, "text": "{label} is {toFaction}'s now. None of ours saw it happen. We were at {ourMap}." },
+    { "id": "y.changed.2", "on": { "class": "ground_changed_hands_near_us" }, "text": "{label} changed hands while we weren't watching. That's what happens to ground when nobody's watching it." },
+    { "id": "y.changed.3", "on": { "class": "ground_changed_hands_near_us" }, "text": "Somebody took {label}. I can tell you who's standing on it. I can't tell you how many. Yet." },
+
+    { "id": "y.clash.1", "on": { "class": "clash_near_held" }, "text": "Shelling near our ground on {map}. {count} times. Could be the Mercs. Could be anyone. Could be both." },
+    { "id": "y.clash.2", "on": { "class": "clash_near_held" }, "text": "{count} fights touched our ground while we were elsewhere. Nobody won them. That's worse." },
+    { "id": "y.clash.3", "on": { "class": "clash_near_held" }, "text": "The ghosts heard guns near {map}. I believe ghosts. They've no reason to lie." },
+
+    { "id": "y.unseen.1", "on": { "class": "unobserved_ground" }, "text": "{n} of {m} zones on our maps, nobody's looked at since we stood there. We're the last measurement, and we're stale." },
+    { "id": "y.unseen.2", "on": { "class": "unobserved_ground" }, "text": "A week ago I'd have known what was in those zones. Now I'd be guessing. I'd rather tell you I'm guessing." },
+    { "id": "y.unseen.3", "on": { "class": "unobserved_ground" }, "text": "The map's mostly pencil. The ink is wherever we last bled. Pick the next Drop knowing that." },
+
+    { "id": "y.open.ash_front", "on": { "attractor": "ash_front" }, "occasion": "briefing", "text": "What we briefed last time and what we found weren't the same. Tonight: a picket, maybe a battalion. I'll say which when we're there." },
+    { "id": "y.open.shelf", "on": { "attractor": "shelf" }, "occasion": "briefing", "text": "Nobody's looked at where you're going. That's not a warning. It's just true." },
+    { "id": "y.open.finale_spire", "on": { "attractor": "finale_spire" }, "occasion": "briefing", "text": "I've walked the road off. Twice. Unseen. That's how I know it's real." },
+
+    { "id": "y.shift.hunted", "on": { "dominantBecame": "hunted" }, "occasion": "camp", "once": true, "text": "Three marks on the map in pencil. None confirmed. All closer than last week. That isn't nothing. That's a shape." },
+    { "id": "y.shift.armada_falling", "on": { "dominantBecame": "armada_falling" }, "occasion": "camp", "once": true, "text": "The old flag's coming down. From here I can't tell if that means fewer of them or more desperate ones. Those look the same from a distance." },
+    { "id": "y.settled.hunted", "on": { "coherenceSettled": { "pair": ["hunted", "armada_falling"], "toward": "hunted" } }, "occasion": "camp", "once": true, "text": "It's coming toward us. I'm done hedging that one. Everything else I'll keep hedging." }
+  ],
+  "deathLine": "The ghosts walked this one first. I just caught up.",
+  "notes": "Yeva is active, not in the sealed company. Her strongest material (the surprise at Drop start: measured minus briefed) needs process_result to stamp the pre-Drop estimate and the observed presence into the bead; see dataGaps."
+}

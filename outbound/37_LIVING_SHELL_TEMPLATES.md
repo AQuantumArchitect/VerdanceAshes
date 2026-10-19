@@ -89,18 +89,29 @@ Cortex / Legion mirrors listed there.
 
 ### Eight start slots (normalized 0–1)
 
+North desert (`GF_NE_PLATEAU`) and NW muster (`GF_NW_MUSTER`) are **standard
+safe infil/exfil** — no living-shell eco. Former `gf_n_desert` / `gf_nw_green`
+pockets were removed so Drop never lands inside an Armada farm.
+
+Center gates carry **optional high-value fusion vaults** (fusion + beamer
+guards). Bonus secondary marks — wreck for merc standing, never required for
+raid victory.
+
 | # | Slot id | Approx (x,z) | Zone / intent |
 |---|---------|--------------|---------------|
-| 0 | `gf_se_works` | 0.80, 0.80 | `GF_SE_ENERGY_WORKS` primary |
-| 1 | `gf_n_desert` | 0.80, 0.17 | `GF_NORTH_DESERT_EDGE` |
-| 2 | `gf_s_desert` | 0.20, 0.81 | `GF_SOUTH_DESERT_EDGE` |
-| 3 | `gf_nw_green` | 0.15, 0.15 | `GF_NW_GREEN_START` |
-| 4 | `gf_central_n` | 0.40, 0.30 | central grassland north |
-| 5 | `gf_central_s` | 0.35, 0.50 | central grassland south |
-| 6 | `gf_east_mid` | 0.72, 0.45 | east mid energy bleed |
-| 7 | `gf_west_mid` | 0.25, 0.45 | west mid |
+| 0 | `gf_se_works` | 0.80, 0.80 | `GF_SE_PLATEAU` primary raid target |
+| 1 | `gf_s_desert` | 0.20, 0.81 | `GF_SW_BASTION` |
+| 2 | `gf_central_n` | 0.40, 0.30 | `GF_NW_BASTION` |
+| 3 | `gf_central_s` | 0.35, 0.50 | `GF_NW_BASTION` |
+| 4 | `gf_east_mid` | 0.72, 0.58 | `GF_SE_PLATEAU` (south of safe desert) |
+| 5 | `gf_west_mid` | 0.25, 0.45 | `GF_NW_BASTION` |
+| 6 | `gf_c_gate_fus` | 0.516, 0.474 | `GF_C_GATE` optional fusion vault |
+| 7 | `gf_c_inner_fus` | 0.526, 0.526 | `GF_C_INNER_GATE` optional fusion vault |
 
-**Clearance:** do not seed shell units inside player staging `GF_SE_STAGING` (approx 0.46–0.68 × 0.48–0.70). Bake recipe marks that rect as `player_clear`.
+**Clearance:** never seed shell units on the north desert rim
+(`GF_NE_PLATEAU`, approx 0.55–1.0 × 0.0–0.36) or NW muster
+(`GF_NW_MUSTER`, approx 0.04–0.30 × 0.0–0.26). Bake recipe marks those as
+`playerClear` / `playerClearExtra`.
 
 ### Play fantasy on Greenest
 

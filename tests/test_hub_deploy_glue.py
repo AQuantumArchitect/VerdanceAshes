@@ -20,14 +20,14 @@ def test_normalize_plan_marks():
         "deployAces": ["vane", "ketha"],
         "choiceId": "c1",
         "marks": {
-            "deployZoneId": "GF_SE_STAGING",
-            "extractZoneId": "GF_SE_STAGING",
-            "captureZoneIds": ["GF_SE_ENERGY_WORKS", "GF_NORTH_DESERT_EDGE"],
+            "deployZoneId": "GF_NW_MUSTER",
+            "extractZoneId": "GF_NW_MUSTER",
+            "captureZoneIds": ["GF_SE_PLATEAU", "GF_NE_PLATEAU"],
         },
     }
     p = normalize_plan(raw)
     assert p["mapId"] == "greenest_fields"
-    assert p["marks"]["captureZoneIds"][0] == "GF_SE_ENERGY_WORKS"
+    assert p["marks"]["captureZoneIds"][0] == "GF_SE_PLATEAU"
     assert len(p["marks"]["captureZoneIds"]) == 2
 
 
@@ -87,17 +87,20 @@ def test_stamp_writes_outbox(tmp_path: Path | None = None):
         "deployAces": ["vane", "ketha"],
         "sessionMode": "same_map",
         "marks": {
-            "deployZoneId": "GF_SE_STAGING",
-            "extractZoneId": "GF_SE_STAGING",
-            "captureZoneIds": ["GF_SE_ENERGY_WORKS"],
+            # Live campaign_state may paint NW muster as Armada; use an
+            # Ashwalker-held rim pad so the LZ rule is what we exercise.
+            "deployZoneId": "GF_S_PLATEAU",
+            "extractZoneId": "GF_S_PLATEAU",
+            "captureZoneIds": ["GF_SE_PLATEAU"],
         },
     }
     report = stamp(plan, ws)
-    assert report["ok"] is True
+    assert report["ok"] is True, report
     assert report["hubChoiceId"] == "c_test_pytest"
     order = json.loads((ws / "outbox" / "next_sortie_order.json").read_text(encoding="utf-8-sig"))
     assert order["hubChoiceId"] == "c_test_pytest"
-    assert order["targetZoneId"] == "GF_SE_ENERGY_WORKS"
+    assert order["targetZoneId"] == "GF_SE_PLATEAU"
+    assert order["deploymentZoneId"] == "GF_S_PLATEAU"
     assert order["source"] == "hub_deploy_plan"
     assert order["sessionMode"] == "same_map"
     home = json.loads((ws / "outbox" / "session_home.latest.json").read_text(encoding="utf-8-sig"))

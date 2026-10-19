@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "verdance-voice/0.1",
+  "speaker": "pavise",
+  "name": "Pavise",
+  "register": "The counterpart who kept the shield side honest when the commander wore a real Armada suit. One Centurion, no flock. Calm, plain, unshowy loyalty; the only one who refers to the commander's old flag without irony or bitterness. Pavise speaks to the commander as someone who knew them before, which nobody else in camp can do. Pavise is the anchor: alive, the player's past has a voice; dead, the first name on the roll and the reason the roll exists.",
+  "argues": [],
+  "resists": [],
+  "owns": [],
+  "lines": [
+    { "id": "p.held.1", "on": { "class": "drop_held" }, "text": "Held. I kept your left like I used to. Different suit. Same side." },
+    { "id": "p.held.2", "on": { "class": "drop_held" }, "text": "{map} held. You still turn into the shield when it's bad. You always did." },
+    { "id": "p.lost.1", "on": { "class": "drop_lost" }, "text": "We lost {map}. We've lost before, under a better flag. We came back then too." },
+    { "id": "p.unfinished.1", "on": { "class": "drop_unfinished" }, "text": "Half done. The old you would have stayed for the other half. I'm glad you're not the old you." },
+    { "id": "p.scrap.1", "on": { "class": "walker_still_scrap" }, "occasion": "camp", "text": "I remember you in a real suit. I remember what it cost. I'm not in a hurry to see you in one." },
+    { "id": "p.scrap.2", "on": { "class": "walker_still_scrap" }, "occasion": "camp", "text": "You don't need legs to be the one I'm walking beside. I've checked. It still works." },
+    { "id": "p.rebuilt.1", "on": { "class": "walker_rebuilt" }, "occasion": "camp", "once": true, "text": "There you are. I'd stopped looking for you on the left. Started looking for you at the table. Both now." },
+    { "id": "p.flip.armada.1", "on": { "class": "armada_flip_away" }, "text": "{label} went. Our old flag. I won't pretend it doesn't land. I won't pretend it changes tonight." },
+    { "id": "p.shift.armada_falling", "on": { "dominantBecame": "armada_falling" }, "occasion": "camp", "once": true, "text": "It's coming down, the flag we wore. I thought I'd feel more. I feel like holding your left. Same as always." },
+    { "id": "p.shift.sovereign", "on": { "dominantBecame": "sovereign" }, "occasion": "camp", "once": true, "text": "You've got your own flag now. You never wanted one. That's probably why it's any good." },
+    { "id": "p.shift.haunted", "on": { "dominantBecame": "haunted" }, "occasion": "camp", "once": true, "text": "Ketha's list is long. If I'm ever on it, read it to yourself, not out loud. You'll want to argue, and I won't be there to lose." }
+  ],
+  "deathLine": "Left side's open. Somebody take it.",
+  "posthumous": {
+    "notes": "When Pavise is dead the anchor inverts: these lines are spoken ABOUT Pavise by others, keyed as named_dead with heroId pavise (see ketha.json k.dead.pavise.*) and by the roll document itself. The commander's first entry on the roll is the one who knew them under the old flag.",
+    "rollEntry": "Pavise. First. Kept the commander's left under a real flag and under this one. The frame was not brought back."
+  }
+}

@@ -54,6 +54,10 @@ def make_handler(kernel: CampaignKernel, showoff: Path):
             parsed = urlparse(self.path)
             path = parsed.path
 
+            if path == "/api/narrative":
+                code, body, ct = _json_bytes(kernel.narrative_surface())
+                return self._send(code, body, ct)
+
             if path == "/api/status":
                 code, body, ct = _json_bytes(kernel.status())
                 return self._send(code, body, ct)
@@ -70,6 +74,15 @@ def make_handler(kernel: CampaignKernel, showoff: Path):
                 code, body, ct = _json_bytes(kernel.get_result())
                 return self._send(code, body, ct)
 
+            if path == "/api/continuity-audit":
+                qs = parse_qs(parsed.query or "")
+                marks = []
+                for key in ("mark", "marks"):
+                    for raw in qs.get(key, []):
+                        marks.extend([m.strip() for m in str(raw).split(",") if m.strip()])
+                code, body, ct = _json_bytes(kernel.continuity_audit(marks=marks or None))
+                return self._send(code, body, ct)
+
             if path == "/api/phases":
                 from verdance_kernel.phases import phase_status
 
@@ -84,6 +97,17 @@ def make_handler(kernel: CampaignKernel, showoff: Path):
 
             if path == "/api/surface":
                 code, body, ct = _json_bytes(kernel.write_campaign_surface())
+                return self._send(code, body, ct)
+
+            if path == "/api/field":
+                code, body, ct = _json_bytes(kernel.get_field())
+                return self._send(code, body, ct)
+
+            if path == "/api/saves":
+                if hasattr(kernel, "list_saves"):
+                    code, body, ct = _json_bytes(kernel.list_saves())
+                else:
+                    code, body, ct = _json_bytes({"ok": False, "error": "saves not available"}, 404)
                 return self._send(code, body, ct)
 
             rel = path.lstrip("/") or "index.html"
@@ -106,6 +130,14 @@ def make_handler(kernel: CampaignKernel, showoff: Path):
             parsed = urlparse(self.path)
             path = parsed.path
             qs = parse_qs(parsed.query or "")
+
+            if path == "/api/narrative-choice":
+                try:
+                    result = kernel.narrative_choice(_read_json_body(self))
+                except (ValueError, TypeError, AttributeError):
+                    result = {"ok": False, "error": "Invalid narrative choice request."}
+                code, body, ct = _json_bytes(result, 200 if result.get("ok") else 409)
+                return self._send(code, body, ct)
 
             if path == "/api/rebuild-hub":
                 code, body, ct = _json_bytes(kernel.rebuild_hub())
@@ -158,7 +190,41 @@ def make_handler(kernel: CampaignKernel, showoff: Path):
                 if isinstance(plan.get("launch"), bool):
                     launch = plan.pop("launch")
                 result = kernel.commit_deploy(plan, launch=launch)
-                code = 200 if result.get("ok") else 502
+                if result.get("accepted"):
+                    code = 202
+                else:
+                    code = 200 if result.get("ok") else 502
+                code, body, ct = _json_bytes(result, code)
+                return self._send(code, body, ct)
+
+            if path == "/api/deploy-roster":
+                try:
+                    raw = _read_json_body(self)
+                except Exception as e:  # noqa: BLE001
+                    code, body, ct = _json_bytes({"ok": False, "error": f"bad json: {e}"}, 400)
+                    return self._send(code, body, ct)
+                result = kernel.update_sortie_roster(raw)
+                code, body, ct = _json_bytes(result, 200)
+                return self._send(code, body, ct)
+
+            if path == "/api/continue":
+                try:
+                    body_in = _read_json_body(self)
+                except Exception as e:  # noqa: BLE001
+                    code, body, ct = _json_bytes({"ok": False, "error": f"bad json: {e}"}, 400)
+                    return self._send(code, body, ct)
+                result = kernel.continue_field(body_in)
+                code = 200 if result.get("ok") else 400
+                code, body, ct = _json_bytes(result, code)
+                return self._send(code, body, ct)
+
+            if path == "/api/extract-leave":
+                try:
+                    body_in = _read_json_body(self)
+                except Exception:
+                    body_in = {}
+                result = kernel.extract_leave_field(body_in)
+                code = 200 if result.get("ok") else 400
                 code, body, ct = _json_bytes(result, code)
                 return self._send(code, body, ct)
 
@@ -180,6 +246,108 @@ def make_handler(kernel: CampaignKernel, showoff: Path):
 
             if path == "/api/home-build":
                 result = kernel.home_build()
+                code = 200 if result.get("ok") else 400
+                code, body, ct = _json_bytes(result, code)
+                return self._send(code, body, ct)
+
+            if path == "/api/camp-talk":
+                try:
+                    body_in = _read_json_body(self)
+                except Exception as e:  # noqa: BLE001
+                    code, body, ct = _json_bytes({"ok": False, "error": f"bad json: {e}"}, 400)
+                    return self._send(code, body, ct)
+                if hasattr(kernel, "camp_talk"):
+                    result = kernel.camp_talk(
+                        talk_id=str(body_in.get("talkId") or body_in.get("id") or ""),
+                        hero_a=str(body_in.get("a") or body_in.get("heroA") or ""),
+                        hero_b=str(body_in.get("b") or body_in.get("heroB") or ""),
+                    )
+                else:
+                    result = {"ok": False, "error": "camp_talk not available"}
+                code = 200 if result.get("ok") else 400
+                code, body, ct = _json_bytes(result, code)
+                return self._send(code, body, ct)
+
+            if path == "/api/seal-company":
+                try:
+                    body_in = _read_json_body(self)
+                except Exception as e:  # noqa: BLE001
+                    code, body, ct = _json_bytes({"ok": False, "error": f"bad json: {e}"}, 400)
+                    return self._send(code, body, ct)
+                band = body_in.get("band") or body_in.get("crewBand") or body_in.get("picks") or []
+                if not isinstance(band, list):
+                    band = []
+                if hasattr(kernel, "seal_company"):
+                    result = kernel.seal_company(band=[str(x) for x in band])
+                else:
+                    result = {"ok": False, "error": "seal_company not available"}
+                code = 200 if result.get("ok") else 400
+                code, body, ct = _json_bytes(result, code)
+                return self._send(code, body, ct)
+
+            if path == "/api/bro-tzar":
+                if hasattr(kernel, "order_bro_tzar"):
+                    result = kernel.order_bro_tzar()
+                else:
+                    result = {"ok": False, "error": "order_bro_tzar not available"}
+                code = 200 if result.get("ok") else 400
+                code, body, ct = _json_bytes(result, code)
+                return self._send(code, body, ct)
+
+            if path == "/api/reset-campaign":
+                try:
+                    body_in = _read_json_body(self)
+                except Exception:
+                    body_in = {}
+                confirm = str(
+                    body_in.get("confirm")
+                    or (qs.get("confirm") or [""])[0]
+                    or ""
+                )
+                if hasattr(kernel, "reset_campaign"):
+                    result = kernel.reset_campaign(confirm=confirm)
+                else:
+                    result = {"ok": False, "error": "reset not available"}
+                code = 200 if result.get("ok") else 400
+                code, body, ct = _json_bytes(result, code)
+                return self._send(code, body, ct)
+
+            if path == "/api/save-campaign":
+                try:
+                    body_in = _read_json_body(self)
+                except Exception as e:  # noqa: BLE001
+                    code, body, ct = _json_bytes({"ok": False, "error": f"bad json: {e}"}, 400)
+                    return self._send(code, body, ct)
+                if hasattr(kernel, "save_campaign"):
+                    result = kernel.save_campaign(
+                        slot=str(body_in.get("slot") or body_in.get("name") or ""),
+                        label=str(body_in.get("label") or ""),
+                        note=str(body_in.get("note") or ""),
+                    )
+                else:
+                    result = {"ok": False, "error": "save not available"}
+                code = 200 if result.get("ok") else 400
+                code, body, ct = _json_bytes(result, code)
+                return self._send(code, body, ct)
+
+            if path == "/api/load-campaign":
+                try:
+                    body_in = _read_json_body(self)
+                except Exception as e:  # noqa: BLE001
+                    code, body, ct = _json_bytes({"ok": False, "error": f"bad json: {e}"}, 400)
+                    return self._send(code, body, ct)
+                confirm = str(
+                    body_in.get("confirm")
+                    or (qs.get("confirm") or [""])[0]
+                    or ""
+                )
+                if hasattr(kernel, "load_campaign"):
+                    result = kernel.load_campaign(
+                        slot=str(body_in.get("slot") or body_in.get("name") or ""),
+                        confirm=confirm,
+                    )
+                else:
+                    result = {"ok": False, "error": "load not available"}
                 code = 200 if result.get("ok") else 400
                 code, body, ct = _json_bytes(result, code)
                 return self._send(code, body, ct)

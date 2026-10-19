@@ -35,9 +35,14 @@ try:
 except Exception:  # noqa: BLE001
     wzg = None  # type: ignore
 
+try:
+    import landing_zones_v1 as lz  # noqa: E402
+except Exception:  # noqa: BLE001
+    lz = None  # type: ignore
+
 SORTIE_SCHEMA = "verdance-sortie-order/1.0"
 PLAN_SCHEMA = "verdance-deploy-plan/1.0"
-RIM_EDGE_THRESHOLD = 0.28
+RIM_EDGE_THRESHOLD = getattr(lz, "RIM_EDGE_THRESHOLD", 0.28) if lz else 0.28
 
 
 def load_json(path: Path) -> dict:
@@ -57,6 +62,8 @@ def _now() -> str:
 
 def edge_score(bounds: dict) -> float:
     """Distance from map rim in normalized coords (0 = on edge, 0.5 = dead center)."""
+    if lz is not None:
+        return lz.edge_score(bounds)
     xmin = float(bounds.get("xMin", 0) or 0)
     xmax = float(bounds.get("xMax", 1) or 1)
     zmin = float(bounds.get("zMin", 0) or 0)
@@ -67,15 +74,16 @@ def edge_score(bounds: dict) -> float:
 
 
 def is_rim_zone(bounds: dict, *, threshold: float = RIM_EDGE_THRESHOLD) -> bool:
+    if lz is not None:
+        return lz.is_rim_zone(bounds, threshold=threshold)
     return edge_score(bounds) <= threshold
 
 
-def zone_bounds_lookup(ws: Path, map_id: str) -> dict[str, dict]:
-    """zoneId → bounds from authored zone map."""
+def zone_meta_lookup(ws: Path, map_id: str) -> dict[str, dict]:
+    """zoneId → {bounds, tags, role} from authored zone map."""
     if not map_id:
         return {}
     authored = ws / "data" / "zone_maps" / "authored"
-    # greenest_fields.authored.zone_map.json etc.
     candidates = list(authored.glob(f"{map_id}*.json")) if authored.is_dir() else []
     if not candidates:
         return {}
@@ -86,9 +94,23 @@ def zone_bounds_lookup(ws: Path, map_id: str) -> dict[str, dict]:
     out: dict[str, dict] = {}
     for z in data.get("zones") or []:
         zid = z.get("zoneId")
-        if zid and isinstance(z.get("bounds"), dict):
-            out[str(zid)] = z["bounds"]
+        if not zid:
+            continue
+        out[str(zid)] = {
+            "bounds": z.get("bounds") if isinstance(z.get("bounds"), dict) else None,
+            "tags": list(z.get("tags") or []),
+            "role": str(z.get("role") or ""),
+        }
     return out
+
+
+def zone_bounds_lookup(ws: Path, map_id: str) -> dict[str, dict]:
+    """zoneId → bounds from authored zone map."""
+    return {
+        zid: meta["bounds"]
+        for zid, meta in zone_meta_lookup(ws, map_id).items()
+        if meta.get("bounds")
+    }
 
 
 def normalize_plan(raw: dict) -> dict:
@@ -97,14 +119,23 @@ def normalize_plan(raw: dict) -> dict:
     caps = list(marks.get("captureZoneIds") or raw.get("captureZoneIds") or [])
     deploy = marks.get("deployZoneId") or raw.get("deployZoneId") or raw.get("deploymentZoneId")
     extract = marks.get("extractZoneId") or raw.get("extractZoneId") or raw.get("extractionZoneId")
+    # A mouth card's doors win over a board mark that snapped inland.
+    infil = raw.get("infilZoneId") or (marks.get("infilZoneId") if isinstance(marks, dict) else None)
+    exfil = raw.get("exfilZoneId") or (marks.get("exfilZoneId") if isinstance(marks, dict) else None)
+    if infil:
+        deploy = infil
+    if exfil:
+        extract = exfil
     if not extract:
         extract = deploy
     map_id = raw.get("mapId") or raw.get("map")
+    wet = bool(raw.get("wetReach") or infil)
     return {
         "schemaVersion": raw.get("schemaVersion") or PLAN_SCHEMA,
         "mapId": map_id,
         "contractKind": raw.get("contractKind") or raw.get("objectiveArchetype") or "seize_lane",
         "deployAces": list(raw.get("deployAces") or []),
+        "crewBand": list(raw.get("crewBand") or raw.get("crew_band") or []),
         "choiceId": raw.get("choiceId") or raw.get("hubChoiceId"),
         "repDelta": raw.get("repDelta") or {},
         "arcId": raw.get("arcId"),
@@ -119,11 +150,75 @@ def normalize_plan(raw: dict) -> dict:
         "pathSignal": raw.get("pathSignal"),
         "sessionMode": raw.get("sessionMode") or "same_map",
         "occupationModel": raw.get("occupationModel") or "living_shell",
+        "wetReach": wet,
+        "infilZoneId": infil or deploy,
+        "exfilZoneId": exfil or extract,
+        "headingMapId": raw.get("headingMapId"),
+        "headingZoneId": raw.get("headingZoneId"),
+        "alongTheWay": list(raw.get("alongTheWay") or []),
     }
 
 
-def soft_validate(plan: dict, ws: Path) -> list[str]:
-    """Warnings + hard rim errors (RIM_* → stamp still writes but valid may fail)."""
+def choice_pads(ws: Path, choice_id: str | None, map_id: str | None = None) -> set[str]:
+    """Infil/exfil the active hub sortie already named.
+
+    Those pads are the route on the seal. The quiet-rim rule still applies to
+    a freehand mark; it does not veto the sortie the player just confirmed.
+    If the choice id has been refreshed out of the hub, pads named by the
+    current sorties on the same map still count.
+    """
+    hub = load_json(ws / "app" / "showoff" / "hub_state.json")
+    choices = ((hub.get("node") or {}).get("choices")) or []
+    keys = (
+        "preferredDeployZoneId",
+        "deploymentZoneId",
+        "preferredExtractionZoneId",
+        "extractionZoneId",
+        "infilZoneId",
+        "exfilZoneId",
+    )
+
+    def take(effect: dict) -> set[str]:
+        return {str(effect[k]) for k in keys if effect.get(k)}
+
+    matched: set[str] = set()
+    same_map: set[str] = set()
+    for ch in choices:
+        if not isinstance(ch, dict):
+            continue
+        effect = ch.get("effect") or {}
+        if choice_id and ch.get("id") == choice_id:
+            matched = take(effect)
+        if map_id and effect.get("mapId") == map_id and ch.get("kind") == "deploy":
+            same_map |= take(effect)
+    return matched or same_map
+
+
+def lz_zone_id(warning: str) -> str:
+    bits = str(warning).split()
+    if len(bits) < 2:
+        return ""
+    return bits[1].rstrip(":")
+
+
+def blocking_lz_warnings(warns: list[str], pads: set[str]) -> list[str]:
+    blocked: list[str] = []
+    for raw in warns:
+        warning = str(raw)
+        if not warning.startswith("LZ_"):
+            continue
+        if lz_zone_id(warning) in pads:
+            continue
+        blocked.append(warning)
+    return blocked
+
+
+def soft_validate(plan: dict, ws: Path, state: dict | None = None) -> list[str]:
+    """Warnings + hard LZ errors (LZ_* → stamp still writes but valid may fail).
+
+    Legal infil/exfil: quiet rim OR Ashwalker-majority established base.
+    Legacy RIM_* codes are no longer emitted; midfield is fine when owned.
+    """
     warns: list[str] = []
     map_id = plan.get("mapId")
     marks = plan.get("marks") or {}
@@ -135,26 +230,47 @@ def soft_validate(plan: dict, ws: Path) -> list[str]:
     if not marks.get("deployZoneId"):
         warns.append("NO_DEPLOY: deployZoneId missing (will fall back in materialize)")
 
-    # Hard rim rule: infil / exfil must sit on the map edge.
-    bounds_by_id = zone_bounds_lookup(ws, str(map_id or ""))
+    if state is None:
+        state = load_json(ws / "state" / "campaign_state.json")
+    meta_by_id = zone_meta_lookup(ws, str(map_id or ""))
     deploy = marks.get("deployZoneId")
     extract = marks.get("extractZoneId") or deploy
-    if deploy and bounds_by_id:
-        b = bounds_by_id.get(str(deploy))
-        if b is not None and not is_rim_zone(b):
-            warns.append(
-                f"RIM_DEPLOY: {deploy} is midfield (edgeScore={edge_score(b):.2f}); "
-                f"infil must be on the rim (≤{RIM_EDGE_THRESHOLD})"
-            )
-        elif b is None:
-            warns.append(f"UNKNOWN_DEPLOY_ZONE: {deploy}")
-    if extract and bounds_by_id and extract != deploy:
-        b = bounds_by_id.get(str(extract))
-        if b is not None and not is_rim_zone(b):
-            warns.append(
-                f"RIM_EXTRACT: {extract} is midfield (edgeScore={edge_score(b):.2f}); "
-                f"exfil must be on the rim (≤{RIM_EDGE_THRESHOLD})"
-            )
+
+    def _lz_warn(kind: str, zone_id: str) -> None:
+        meta = meta_by_id.get(str(zone_id)) or {}
+        bounds = meta.get("bounds")
+        if bounds is None and str(zone_id) not in meta_by_id:
+            warns.append(f"UNKNOWN_{kind}_ZONE: {zone_id}")
+            return
+        if lz is None:
+            # Fallback without landing_zones_v1: cannot see Ashwalker ownership,
+            # so only quiet-rim geometry is accepted (never a permanent hard lock).
+            if bounds is not None and not is_rim_zone(bounds):
+                warns.append(
+                    f"LZ_{kind}: {zone_id} is midfield (edgeScore={edge_score(bounds):.2f}); "
+                    f"need quiet rim or Ashwalker base (landing_zones_v1 missing)"
+                )
+            return
+        ok, reason = lz.legal_landing_reason(
+            state,
+            str(map_id or ""),
+            str(zone_id),
+            bounds,
+            tags=meta.get("tags"),
+            role=str(meta.get("role") or ""),
+        )
+        if ok:
+            return
+        score = edge_score(bounds) if bounds else 0.5
+        warns.append(
+            f"LZ_{kind}: {zone_id} illegal ({reason}, edgeScore={score:.2f}); "
+            f"infil/exfil need quiet rim or Ashwalker-majority base"
+        )
+
+    if deploy and (meta_by_id or lz is not None):
+        _lz_warn("DEPLOY", str(deploy))
+    if extract and extract != deploy and (meta_by_id or lz is not None):
+        _lz_warn("EXTRACT", str(extract))
 
     if wzg is None:
         return warns
@@ -196,16 +312,49 @@ def plan_to_sortie(plan: dict, state: dict | None = None) -> dict:
     path = plan.get("pathSignal") or (state or {}).get("pathSignal") or "B"
     q6 = float(graph.get("q6_contested", 0.85) or 0.85)
     q7 = float(graph.get("q7_resource_scarcity", 0.98) or 0.98)
+    map_id = plan.get("mapId")
+    home = str((state or {}).get("sessionHomeMap") or (state or {}).get("homeMapId") or "")
+    home = home.lower().replace(" ", "_") if home else ""
+    plan_mid = str(map_id or "").lower().replace(" ", "_")
+    # Leaving session home via the theater board is intentional travel, not Mode A.
+    if plan.get("sessionMode"):
+        session_mode = plan.get("sessionMode")
+    elif home and plan_mid and plan_mid != home:
+        session_mode = "reload_travel"
+    else:
+        session_mode = (state or {}).get("sessionMode") or "same_map"
+
+    # Full G snapshot for the measurement apparatus (hub prepares; BAR does not own G).
+    try:
+        from graph_collapse_v1 import snapshot_graph, pressure_brief
+
+        graph_snap = snapshot_graph(graph)
+        graph_pressure = pressure_brief(graph)
+    except Exception:
+        graph_snap = {
+            "q6_contested": round(q6, 4),
+            "q7_resource_scarcity": round(q7, 4),
+        }
+        graph_pressure = f"contested={q6:.2f} scarcity={q7:.2f}"
+    # Legacy compact keys kept for older gadget readers
+    graph_snap.setdefault("q6", round(q6, 3))
+    graph_snap.setdefault("q7", round(q7, 4))
 
     return {
         "schemaVersion": SORTIE_SCHEMA,
         "campaignId": (state or {}).get("campaignId") or "verdance_ashes",
-        "mapId": plan.get("mapId"),
+        "mapId": map_id,
         "targetZoneId": primary,
         "secondaryCaptureZoneIds": secondary,
         "captureZoneIds": caps,
         "deploymentZoneId": deploy,
         "extractionZoneId": extract,
+        "wetReach": bool(plan.get("wetReach")),
+        "infilZoneId": plan.get("infilZoneId") or deploy,
+        "exfilZoneId": plan.get("exfilZoneId") or extract,
+        "headingMapId": plan.get("headingMapId"),
+        "headingZoneId": plan.get("headingZoneId"),
+        "alongTheWay": list(plan.get("alongTheWay") or []),
         "patron": plan.get("patron") or "nullmercs",
         "patronBloc": "nullmercs",
         "against": plan.get("against") or "armada",
@@ -218,17 +367,21 @@ def plan_to_sortie(plan: dict, state: dict | None = None) -> dict:
         "namedDefender": None,
         "hubChoiceId": plan.get("choiceId"),
         "deployAces": list(plan.get("deployAces") or []),
+        "crewBand": list(plan.get("crewBand") or []),
+        "missionCallIns": list(plan.get("missionCallIns") or []),
         "repDelta": plan.get("repDelta") or {},
-        "sessionMode": plan.get("sessionMode") or (state or {}).get("sessionMode") or "same_map",
+        "sessionMode": session_mode,
         "occupationModel": plan.get("occupationModel")
         or (state or {}).get("occupationModel")
         or "living_shell",
-        "graphSnapshot": {"q6": round(q6, 3), "q7": round(q7, 4)},
+        "graphSnapshot": graph_snap,
+        "graphPressure": graph_pressure,
         "source": "hub_deploy_plan",
         "derived": {
             "source": "hub_deploy_plan",
             "arcId": plan.get("arcId"),
             "maxCaptureMarks": plan.get("maxCaptureMarks"),
+            "graphPressure": graph_pressure,
         },
         "valid": bool(primary and plan.get("mapId")),
         "stampedAt": _now(),
@@ -239,13 +392,35 @@ def stamp(plan_raw: dict, workspace: Path) -> dict:
     ws = workspace.resolve()
     plan = normalize_plan(plan_raw)
     state = load_json(ws / "state" / "campaign_state.json")
-    warns = soft_validate(plan, ws)
+    # Hub Dropping list wins. Core is added in sortie_roster. Missing list = everyone living.
+    try:
+        from company_v1 import ensure_company, sortie_roster  # type: ignore
+
+        ensure_company(state, ws)
+        if (state.get("company") or {}).get("sealed"):
+            requested = plan.get("crewBand")
+            if requested is None:
+                requested = plan.get("deployAces")
+            band, aces = sortie_roster(state, requested)
+            plan["crewBand"] = band
+            plan["deployAces"] = aces
+        # Prefer call-ins already on the plan (commit_deploy consumed them into plan).
+        if not plan.get("missionCallIns"):
+            from company_v1 import peek_mission_call_ins  # type: ignore
+
+            pending = peek_mission_call_ins(state)
+            if pending:
+                plan["missionCallIns"] = pending
+    except Exception:
+        pass
+    warns = soft_validate(plan, ws, state)
     sortie = plan_to_sortie(plan, state)
-    # Hard fail rim violations so the hub cannot drop a midfield landing.
-    rim_hard = [w for w in warns if w.startswith("RIM_")]
-    if rim_hard:
+    # Freehand midfield pads still fail the drop. The sortie's own infil does not.
+    pads = choice_pads(ws, plan.get("choiceId"), plan.get("mapId"))
+    lz_hard = blocking_lz_warnings(warns, pads)
+    if lz_hard:
         sortie["valid"] = False
-        sortie["errors"] = rim_hard
+        sortie["errors"] = lz_hard
 
     outbox = ws / "outbox"
     plan_path = outbox / "hub_deploy_plan.latest.json"
@@ -290,9 +465,11 @@ def stamp(plan_raw: dict, workspace: Path) -> dict:
         "extractionZoneId": sortie.get("extractionZoneId"),
         "hubChoiceId": sortie.get("hubChoiceId"),
         "deployAces": sortie.get("deployAces"),
+        "crewBand": sortie.get("crewBand"),
         "sessionMode": sortie.get("sessionMode"),
         "occupationModel": sortie.get("occupationModel"),
         "warnings": warns,
+        "error": lz_hard[0] if lz_hard else None,
         "next": [
             "python tools/verdance_story_engine_v1.py intent --workspace .",
             "powershell -File scripts/build_next_mission_v1.ps1",

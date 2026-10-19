@@ -183,7 +183,8 @@ Live campaign purchase remains `purchase_listing` on the engine / host path.
 {
   "schemaVersion": "verdance-hub-commerce/1.0",
   "tenebrium": 0,
-  "scrapCredits": 40,
+  "metalK": 0,
+  "metal": { "id": "campaign_metal", "label": "Metal", "shortLabel": "1km$", "unitMetal": 1000 },
   "resource": { "id": "tenebrium", "label": "Tenebrium", "shortLabel": "Tnb" },
   "shop": [
     {
@@ -191,19 +192,19 @@ Live campaign purchase remains `purchase_listing` on the engine / host path.
       "label": "Crash of Brutes",
       "kind": "purchase_package",
       "tenebriumCost": 0,
-      "creditCost": 180,
+      "metalCostK": 4,
       "available": false,
-      "blockedReason": "need 180 scrap credits",
+      "blockedReason": "need 4×1km$ metal",
       "owned": false,
       "tags": ["merc", "armor"]
     }
   ],
   "deployKit": [
-    { "listingId": "punch_of_thugs", "kind": "loan_package", "unitDef": "corthud", "count": 6, "loan": true }
+    { "listingId": "punch_of_thugs", "kind": "purchase_package", "unitDef": "corthud", "count": 7, "loan": false }
   ],
   "owned": {},
   "upgrades": {},
-  "notes": "Tenebrium is black-hole metal…"
+  "notes": "Tenebrium is black-hole metal… Campaign metal banks as floor(endMetal/1000)."
 }
 ```
 

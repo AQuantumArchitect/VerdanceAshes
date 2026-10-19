@@ -27,7 +27,18 @@ _TOOLS = Path(__file__).resolve().parent
 if str(_TOOLS) not in sys.path:
     sys.path.insert(0, str(_TOOLS))
 
-from build_hub_state_v1 import build_hub, load_json  # noqa: E402
+import importlib
+
+import build_hub_state_v1 as _hub_mod  # noqa: E402
+
+
+def _hub_api():
+    """Reload hub builder so long-lived kernel processes pick up edits."""
+    mod = importlib.reload(_hub_mod)
+    return mod.build_hub, mod.load_json
+
+
+build_hub, load_json = _hub_api()
 
 
 def _now() -> str:
@@ -151,28 +162,39 @@ def last_result_payload(state: dict, report: dict | None, plan: dict | None) -> 
         "resultKey": ar.get("resultKey") or (debrief or {}).get("resultKey"),
         "zoneFlipped": bool(ar.get("zoneFlipped")),
         "terminalReason": ar.get("terminalReason") or (debrief or {}).get("terminalReason"),
+        "reasonHint": (debrief or {}).get("reasonHint") or ar.get("reasonHint"),
+        "objectiveFailed": bool(
+            (debrief or {}).get("objectiveFailed")
+            or ar.get("objectiveFailed")
+            or ar.get("rescueContractFailed")
+        ),
+        "objectiveFailHero": ar.get("objectiveFailHero") or "",
         "headline": (debrief or {}).get("headline"),
         "changed": (debrief or {}).get("changed") or [],
         "nextAction": (debrief or {}).get("nextAction"),
         "duplicate": bool((debrief or {}).get("duplicate") or ar.get("reason") == "duplicate"),
         "debrief": debrief,
+        "collapse": (debrief or {}).get("collapse") or ar.get("collapse"),
+        "graphDelta": ar.get("graphDelta"),
+        "graphMeasured": ar.get("graphMeasured"),
         "tokens": tokens_from_state_and_report(state, report),
         "source": "apply_result_to_hub_v1",
     }
 
 
 def rebuild_hub(ws: Path, last_result: dict | None = None) -> dict:
+    build_hub_fn, load_json_fn = _hub_api()
     state_path = ws / "state" / "campaign_state.json"
     war_path = ws / "outbox" / "war_map.json"
     if not state_path.is_file():
         return {"ok": False, "reason": "missing campaign_state"}
-    state = load_json(state_path)
-    war = load_json(war_path) if war_path.is_file() else {
+    state = load_json_fn(state_path)
+    war = load_json_fn(war_path) if war_path.is_file() else {
         "campaignId": state.get("campaignId"),
         "missionNumber": state.get("missionNumber"),
         "regions": [],
     }
-    hub = build_hub(state, war)
+    hub = build_hub_fn(state, war)
     if last_result:
         hub["lastResult"] = last_result
         # Append a short history line for the shell
@@ -186,15 +208,28 @@ def rebuild_hub(ws: Path, last_result: dict | None = None) -> dict:
             ),
         })
         hub["history"] = hist[-40:]
-        # Node after real result
-        map_id = last_result.get("mapId") or "the field"
-        hub["node"] = dict(hub.get("node") or {})
-        hub["node"]["text"] = (
-            f"Back from {map_id}. "
-            f"{last_result.get('verdict', 'done').title()}. "
-            "Aces updated. Mark the next board when you're ready."
-        )
-        hub["node"]["speaker"] = "ketha"
+        # Only clobber Ketha's tactical open-node after a real BAR result.
+        # state_sync / skip-advance rebuilds keep build_hub's advice (grab Tnb,
+        # extract, haul home) so the companion stays useful mid-session.
+        verdict = str(last_result.get("verdict") or "").lower()
+        if verdict and verdict not in ("state_sync", "sync", "none"):
+            map_id = last_result.get("mapId") or "the field"
+            hub["node"] = dict(hub.get("node") or {})
+            reason = str(last_result.get("terminalReason") or "")
+            hint = str(last_result.get("reasonHint") or "").strip()
+            if last_result.get("objectiveFailed") or reason == "extracted_recruit_lost":
+                body = hint or "Rescue scrubbed — company came home as a hinge."
+                hub["node"]["text"] = (
+                    f"Back from {map_id}. {body} "
+                    "Mark the next board when you're ready."
+                )
+            else:
+                hub["node"]["text"] = (
+                    f"Back from {map_id}. "
+                    f"{last_result.get('verdict', 'done').title()}. "
+                    "Aces updated. Mark the next board when you're ready."
+                )
+            hub["node"]["speaker"] = "ketha"
     hub["flags"] = hub.get("flags") or {}
     hub["flags"]["deployStub"] = False
     hub["flags"]["source"] = "apply_result_to_hub_v1"
@@ -302,6 +337,15 @@ def apply(ws: Path, *, skip_advance: bool = False, result_path: Path | None = No
         last["headline"] = debrief.get("headline") or last.get("headline")
         last["verdict"] = debrief.get("verdict") or last.get("verdict")
 
+    # Wallets must ride the debrief patch: the webGUI mergeHubPatch path used to
+    # refresh aces/mission/rep while leaving commerce stuck on the pre-sortie bag.
+    commerce = hub.get("commerce") if isinstance(hub.get("commerce"), dict) else None
+    company = hub.get("company") if isinstance(hub.get("company"), dict) else None
+    collapse = (
+        (debrief.get("collapse") if isinstance(debrief, dict) else None)
+        or last.get("collapse")
+        or (ar.get("collapse") if isinstance(ar, dict) else None)
+    )
     patch = {
         "schemaVersion": "verdance-hub-result/1.0",
         "at": _now(),
@@ -309,6 +353,7 @@ def apply(ws: Path, *, skip_advance: bool = False, result_path: Path | None = No
         "advance": advance_info,
         "lastResult": last,
         "debrief": debrief,
+        "collapse": collapse,
         "verdict": debrief.get("verdict") or last.get("verdict"),
         "headline": debrief.get("headline"),
         "resultKey": debrief.get("resultKey") or last.get("resultKey"),
@@ -321,8 +366,16 @@ def apply(ws: Path, *, skip_advance: bool = False, result_path: Path | None = No
             for r in (hub.get("regions") or [])
         ],
         "graph": hub.get("graph"),
+        "graphPressure": hub.get("graphPressure"),
         "spectral": hub.get("spectral"),
         "node": hub.get("node"),
+        # Campaign bag SoT (post settle_commerce_after_sortie).
+        "tenebrium": hub.get("tenebrium"),
+        "commerce": commerce,
+        "factionBanks": hub.get("factionBanks"),
+        "company": company,
+        "homeEval": hub.get("homeEval"),
+        "homeCamp": hub.get("homeCamp"),
     }
     # Paint hub node from debrief when present
     if debrief.get("headline") and not advance_info.get("skipped"):
@@ -365,6 +418,11 @@ def apply(ws: Path, *, skip_advance: bool = False, result_path: Path | None = No
         "hubRebuild": {"ok": hub_info.get("ok"), "path": hub_info.get("hubPath")},
         "missionNumber": patch["missionNumber"],
         "sessionHomeMap": state.get("sessionHomeMap") or hub.get("sessionHomeMap"),
+        # Post-settle wallets for advance response + mergeHubPatch clients.
+        "tenebrium": patch.get("tenebrium"),
+        "commerce": patch.get("commerce"),
+        "company": patch.get("company"),
+        "factionBanks": patch.get("factionBanks"),
     }
 
 

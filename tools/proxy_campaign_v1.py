@@ -52,6 +52,22 @@ ENEMY_STYLES: Dict[str, Dict[str, Any]] = {
         "fortified_kinds": frozenset({"hold_plateau", "siege", "gate_control"}),
         "note": "Stock SimpleAI: moderate screen, slower counter",
     },
+    # BARb ships two profiles and install_playable_slice.ps1 exposes both as
+    # separate player-controller seats (barbarian_hard / barbarian_aggressive),
+    # but this table only ever modelled the aggressive one -- so the abstraction
+    # could not represent a matchup the real game can actually run. Values sit
+    # between simple and aggressive: "hard" is the same posture with more mass,
+    # which is why it shares simple's fortified_kinds and only the aggressive
+    # profile additionally contests seize_lane.
+    "barbarian_hard": {
+        "label": "BARb_hard",
+        "bar_controller": "barbarian_hard",
+        "enemy_scale_mul": 1.25,
+        "enemy_start_strength": 0.64,
+        "player_start_strength": 0.71,
+        "fortified_kinds": frozenset({"hold_plateau", "siege", "gate_control"}),
+        "note": "BARbarIAn hard: more mass than SimpleAI, same defensive posture",
+    },
     "barbarian": {
         "label": "BARb_aggressive",
         "bar_controller": "barbarian_aggressive",
@@ -617,19 +633,29 @@ def compare_enemy_styles(
             "divergence": ksim.divergence_report(subset),
         }
 
-    # Head-to-head delta when both styles present
-    h2h = None
-    if "simple" in by_style and "barbarian" in by_style:
+    # Head-to-head deltas across every pair of styles that actually ran. The old
+    # form hardcoded simple-vs-barbarian and silently produced nothing once a
+    # third seat existed.
+    h2h: Optional[Dict[str, Any]] = None
+    present = [s for s in ENEMY_STYLES if s in by_style]
+    if len(present) >= 2:
+        pairs: Dict[str, Any] = {}
+        for i, a in enumerate(present):
+            for b in present[i + 1 :]:
+                pairs[f"{b}_minus_{a}"] = {
+                    "winRateDelta": round(
+                        by_style[b]["meanWinRate"] - by_style[a]["meanWinRate"], 3
+                    ),
+                    "funDelta": round(by_style[b]["meanFun"] - by_style[a]["meanFun"], 3),
+                }
         h2h = {
-            "winRateDelta_barb_minus_simple": round(
-                by_style["barbarian"]["meanWinRate"] - by_style["simple"]["meanWinRate"], 3
-            ),
-            "funDelta_barb_minus_simple": round(
-                by_style["barbarian"]["meanFun"] - by_style["simple"]["meanFun"], 3
-            ),
+            "styles": present,
+            "pairs": pairs,
+            "ladder": sorted(present, key=lambda s: by_style[s]["meanWinRate"], reverse=True),
             "note": (
-                "Negative winRateDelta means barbarian is harder for the proxy "
-                "(expected). Fun should stay playable on both."
+                "A negative winRateDelta means the second-named style is harder "
+                "for the proxy. Expected order easiest-to-hardest: simple, "
+                "barbarian_hard, barbarian. Fun should stay playable on all."
             ),
         }
 
@@ -714,8 +740,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     ap.add_argument(
         "--enemy",
         default="both",
-        choices=["simple", "barbarian", "both"],
-        help="enemy AI style (both = A/B)",
+        choices=["simple", "barbarian_hard", "barbarian", "both", "all"],
+        help="enemy AI style (both = simple vs aggressive A/B; all = every seat)",
     )
     ap.add_argument("--difficulty", type=float, default=1.0)
     ap.add_argument("--ticks", type=int, default=48, help="fair-sim ticks per sortie")
@@ -740,6 +766,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     styles: List[str]
     if args.enemy == "both":
         styles = ["simple", "barbarian"]
+    elif args.enemy == "all":
+        styles = list(ENEMY_STYLES)
     else:
         styles = [args.enemy]
 

@@ -38,8 +38,11 @@ if %ERRORLEVEL%==0 (
   )
 )
 
-if exist "C:\Users\Luke Spooner\ws-win\umwelt\.venv\Scripts\python.exe" (
-  set "VERDANCE_PY=C:\Users\Luke Spooner\ws-win\umwelt\.venv\Scripts\python.exe"
+REM Dev-machine fallback. Written against %USERPROFILE% rather than a literal
+REM path: this file ships to every playtester, and an absolute path spelled out
+REM here puts the developer's account name in their copy for no benefit.
+if exist "%USERPROFILE%\ws-win\umwelt\.venv\Scripts\python.exe" (
+  set "VERDANCE_PY=%USERPROFILE%\ws-win\umwelt\.venv\Scripts\python.exe"
   goto :py_ok
 )
 
@@ -53,6 +56,7 @@ echo.
 exit /b 1
 
 :py_ok
-REM Optional research paths (forge only — never required for play)
-if exist "C:\Users\Luke Spooner\ws-win\umwelt\src" set "PYTHONPATH=%PYTHONPATH%;C:\Users\Luke Spooner\ws-win\umwelt\src"
-if exist "C:\Users\Luke Spooner\ws-win\yurt-sync\work\_wargen\coral" set "PYTHONPATH=%PYTHONPATH%;C:\Users\Luke Spooner\ws-win\yurt-sync\work\_wargen\coral"
+REM Optional research paths (forge only, never required for play). ASCII only:
+REM this is a .bat and an em dash here renders as mojibake on a cp437 console.
+if exist "%USERPROFILE%\ws-win\umwelt\src" set "PYTHONPATH=%PYTHONPATH%;%USERPROFILE%\ws-win\umwelt\src"
+if exist "%USERPROFILE%\ws-win\yurt-sync\work\_wargen\coral" set "PYTHONPATH=%PYTHONPATH%;%USERPROFILE%\ws-win\yurt-sync\work\_wargen\coral"

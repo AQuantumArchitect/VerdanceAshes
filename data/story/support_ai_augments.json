@@ -1,0 +1,118 @@
+{
+  "schemaVersion": "verdance-support-ai-augments/0.1",
+  "status": "wishlist",
+  "notes": "Relationship → soft AI / micro consequences. Not G0. Bond ranks from pairBonds (C<25, B<55, A≥55). Effects shadow IntentResolver / unit_behavior — never densify, never god-mode. Cultivated motifs (spot meets siege, supply meets hunger) are preferred triggers.",
+  "law": [
+    "Human seal before retuning combat feel",
+    "Soft bias only — kite/avoid cones, bark hints, mark preference",
+    "Requires co-deployed pair on the field + bond rank gate",
+    "Dark / missing pairBond → no augment (honest absence)",
+    "Do not replace BeliefField / kiln plod / player orders"
+  ],
+  "augments": [
+    {
+      "id": "friendly_arty_dodge",
+      "title": "Knock cadence",
+      "status": "wishlist",
+      "motif": "spot meets siege",
+      "pitch": "Scouts learn to dodge friendly Fatboy / Tzar splash as bond rises — timing from hearth talks becomes micro.",
+      "when": {
+        "bondRankMin": "B",
+        "pairBondMin": 25,
+        "roles": { "spotter": ["eyes", "skirmish"], "arty": ["siege"] },
+        "heroesHint": {
+          "spotter": ["volt", "yeva", "tick", "veil", "spoke", "noctua"],
+          "arty": ["fatboy", "bro"]
+        },
+        "coDeployed": true
+      },
+      "effect": {
+        "kind": "soft_avoid",
+        "target": "allied_siege_projectile_cone",
+        "delta": { "kiteBias": 0.15, "bailBias": 0.05 },
+        "note": "Spotter packs step out of Fatboy/Tzar knock cones a beat early; arty does not stop firing."
+      },
+      "hook": "va_intent_resolver.lua + game_verdance_unit_behavior.lua",
+      "talkSeeds": ["fatboy__volt:C", "fatboy__volt:B", "bro__yeva:C"],
+      "observeTag": "augment:friendly_arty_dodge"
+    },
+    {
+      "id": "spotter_marks_for_siege",
+      "title": "Eyes for the wall",
+      "status": "wishlist",
+      "motif": "spot meets siege",
+      "pitch": "High bond spotter→siege: scout marks / fog pushes bias the plod target toward what the eyes already painted.",
+      "when": {
+        "bondRankMin": "B",
+        "pairBondMin": 25,
+        "heroesHint": {
+          "spotter": ["volt", "yeva", "veil", "tick", "noctua", "spoke", "commando"],
+          "siege": ["anvil", "warder", "nox", "fatboy", "bro", "brakhov", "grath", "halq", "odessa", "rusk"]
+        },
+        "coDeployed": true
+      },
+      "effect": {
+        "kind": "mark_bias",
+        "delta": { "pushBias": 0.1 },
+        "note": "Siege preferDefenses / push soft-weights toward spotter-revealed statics and marked hinges."
+      },
+      "hook": "va_intent_resolver.lua · marks registry",
+      "talkSeeds": ["anvil__volt:C", "anvil__yeva:C", "commando__warder:B", "nox__veil:C"],
+      "observeTag": "augment:spotter_marks_for_siege"
+    },
+    {
+      "id": "pad_mine_ring",
+      "title": "Same circle, different tooth",
+      "status": "wishlist",
+      "motif": "spot meets siege",
+      "pitch": "Warder↔Commando: dirty tooth seeds approaches inside the beamer circle; exit lanes stay clean.",
+      "when": {
+        "bondRankMin": "B",
+        "pairBondMin": 25,
+        "heroesHint": { "pad": ["warder", "nox"], "dirty": ["commando"] },
+        "coDeployed": true
+      },
+      "effect": {
+        "kind": "placement_bias",
+        "note": "Trap/mine assist prefers annulus inside Warder/Nox pad radius; extract corridor unmarked."
+      },
+      "hook": "va_hero_doctrine / crew assist",
+      "talkSeeds": ["commando__warder:C", "commando__warder:B", "commando__nox:C"],
+      "observeTag": "augment:pad_mine_ring"
+    },
+    {
+      "id": "supply_feeds_hunger",
+      "title": "Feed the roast",
+      "status": "wishlist",
+      "motif": "supply meets hunger",
+      "pitch": "Hearth/Lumen/Solarium bond with Kiln/Bro/Fatboy: eco stall / energy deficit soft-holds siege push until surplus recovers.",
+      "when": {
+        "bondRankMin": "B",
+        "pairBondMin": 25,
+        "heroesHint": {
+          "supply": ["hearth", "lumen", "solarium"],
+          "hunger": ["brakhov", "bro", "fatboy"]
+        },
+        "coDeployed": true
+      },
+      "effect": {
+        "kind": "tempo_bias",
+        "note": "On energy drought, hunger plod pushBias dips briefly; supply craftBias rises — then release."
+      },
+      "hook": "va_intent_resolver kiln/siege_plod + eco read",
+      "talkSeeds": ["brakhov__hearth:C"],
+      "observeTag": "augment:supply_feeds_hunger"
+    },
+    {
+      "id": "hearth_bark_support",
+      "title": "In-Drop support bark",
+      "status": "wishlist",
+      "motif": "any cultivated couple",
+      "pitch": "Light HUD/bark when a high-η couple shares the field — keyed off cognifold/support couple, not a second AI.",
+      "when": { "bondRankMin": "C", "pairBondMin": 0, "coDeployed": true },
+      "effect": { "kind": "bark", "note": "One-liner from camp talk motif; no gameplay power." },
+      "hook": "widget / ash console",
+      "observeTag": "augment:hearth_bark_support"
+    }
+  ]
+}

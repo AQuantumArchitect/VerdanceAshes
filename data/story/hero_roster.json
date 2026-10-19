@@ -1,6 +1,6 @@
 {
   "schemaVersion": "verdance-hero-roster/1.0",
-  "notes": "Drop 3 Wave 2: the authored named-hero roster. Heroes ship locked; the engine's recruitment beats (apply_recruitment_beats) activate them when their moment lands. unitDef must be a verified Legion def — act-2 recruits ride the T2 chassis that ARE the player's tech. recruit.type: mission_victory | objective_kind | rep | act_reached.",
+  "notes": "Named-hero roster. Voice/fiction from hero_codex.json (apply). Core pavise+ketha always ship; Halbard band on corhal.",
   "heroes": [
     {
       "heroId": "rusk",
@@ -8,13 +8,19 @@
       "unitDef": "leggat",
       "missionCritical": false,
       "status": "locked",
-      "xp": 0.15,
+      "xp": 0.06,
       "timesWounded": 0,
       "campaignXp": 0.0,
       "trait": "shieldline",
-      "traits": ["shieldline", "gat_veteran"],
-      "fiction": "Held the Koom scrap-gate alone for six hours with a jammed gatling and a lie about reinforcements.",
-      "recruit": { "type": "mission_victory", "mission": 2 }
+      "traits": [
+        "shieldline",
+        "gat_veteran"
+      ],
+      "fiction": "Six hours at a scrap-gate with a jammed gatling and a fiction about reinforcements. Doors are Rusk's religion. He does not kite a threshold.",
+      "recruit": {
+        "type": "mission_victory",
+        "mission": 2
+      }
     },
     {
       "heroId": "verse",
@@ -22,41 +28,24 @@
       "unitDef": "legjav",
       "missionCritical": false,
       "status": "locked",
-      "xp": 0.15,
+      "xp": 0.0,
       "timesWounded": 0,
       "campaignXp": 0.0,
       "trait": "deadbolt",
-      "traits": ["deadbolt", "lancer"],
-      "fiction": "Counts her missiles out loud. Has never reached zero without something dying.",
-      "recruit": { "type": "mission_victory", "mission": 3 }
-    },
-    {
-      "heroId": "mirren",
-      "name": "Mirren Vex",
-      "unitDef": "legcen",
-      "missionCritical": false,
-      "status": "locked",
-      "xp": 0.15,
-      "timesWounded": 0,
-      "campaignXp": 0.0,
-      "trait": "lane_ghost",
-      "traits": ["lane_ghost", "pointwalker"],
-      "fiction": "Walks point on every lane the clans have ever taken, and two they officially haven't.",
-      "recruit": { "type": "objective_kind", "kinds": ["seize_lane", "gate_control"], "act": 1 }
-    },
-    {
-      "heroId": "kettle",
-      "name": "Saint Kettle",
-      "unitDef": "legrezbot",
-      "missionCritical": false,
-      "status": "locked",
-      "xp": 0.15,
-      "timesWounded": 0,
-      "campaignXp": 0.0,
-      "trait": "field_surgeon",
-      "traits": ["field_surgeon", "wreck_whisperer"],
-      "fiction": "The Ashwalkers call every rez bot a kettle. This one they call Saint. Nobody stays dead near her if the chassis is honest.",
-      "recruit": { "type": "rep", "faction": "ashwalkers", "min": 30 }
+      "traits": [
+        "deadbolt",
+        "lancer",
+        "stash_pilot"
+      ],
+      "fiction": "Each missile is a word. She counts them out loud and has never reached zero without something dying. Glass skirmish with a ledger tongue.",
+      "recruit": {
+        "type": "retrieve_stash",
+        "mapId": "the_rock_jungle",
+        "zoneId": "TRJ_SE_GATE",
+        "seedXp": 0.0,
+        "campaignXpUnlock": 0,
+        "blurb": "Retrieve the stashed Javelins — pilot joins green (no banked XP)"
+      }
     },
     {
       "heroId": "odessa",
@@ -64,13 +53,19 @@
       "unitDef": "legamph",
       "missionCritical": false,
       "status": "locked",
-      "xp": 0.2,
+      "xp": 0.035,
       "timesWounded": 0,
       "campaignXp": 0.0,
       "trait": "fordbreaker",
-      "traits": ["fordbreaker", "earned_t2"],
-      "fiction": "First of the earned tech: a salvaged amphibious heat-ray hull with a pilot who refuses to dry out.",
-      "recruit": { "type": "act_reached", "act": 2 }
+      "traits": [
+        "fordbreaker",
+        "earned_t2"
+      ],
+      "fiction": "Oddly line, not gimmick. Water is just another door. Odessa refuses to dry out and treats every ford like a hinge she owns.",
+      "recruit": {
+        "type": "act_reached",
+        "act": 2
+      }
     },
     {
       "heroId": "brakhov",
@@ -78,27 +73,41 @@
       "unitDef": "leginc",
       "missionCritical": false,
       "status": "locked",
-      "xp": 0.2,
+      "xp": 0.0,
       "timesWounded": 0,
       "campaignXp": 0.0,
       "trait": "kiln_doctrine",
-      "traits": ["kiln_doctrine", "earned_t2"],
-      "fiction": "Burned his own name off the hull so the enemy would learn it the slow way.",
-      "recruit": { "type": "mission_victory", "mission": 6 }
+      "traits": [
+        "kiln_doctrine",
+        "earned_t2"
+      ],
+      "fiction": "He burned his name off the hull so the enemy would learn it the slow way. The Kiln does not kite, does not retreat, does not argue with turrets — he walks into them and roasts. Personality is a heatray with legs.",
+      "recruit": {
+        "type": "mission_victory",
+        "mission": 6
+      }
     },
     {
       "heroId": "yeva",
       "name": "Whisper-of-Ash Yeva",
-      "unitDef": "legaspy",
+      "unitDef": "armsnipe",
       "missionCritical": false,
       "status": "locked",
-      "xp": 0.2,
+      "xp": 0.031,
       "timesWounded": 0,
       "campaignXp": 0.0,
       "trait": "unseen",
-      "traits": ["unseen", "infiltrator"],
-      "fiction": "The clans are not sure Yeva exists. Armada High Command is sure she doesn't. Both are wrong.",
-      "recruit": { "type": "mission_victory", "mission": 7 }
+      "traits": [
+        "unseen",
+        "infiltrator",
+        "sharpshooter"
+      ],
+      "fiction": "She does not take the lane — the ghosts already walked it. Whisper is a suggestion; the shot is a fact. Fog that ends careers.",
+      "recruit": {
+        "type": "wreck_rez",
+        "mapId": "eye_of_horus",
+        "zoneId": "EOH_E_LANE"
+      }
     },
     {
       "heroId": "cauter",
@@ -106,27 +115,40 @@
       "unitDef": "legshot",
       "missionCritical": false,
       "status": "locked",
-      "xp": 0.2,
+      "xp": 0.045,
       "timesWounded": 0,
       "campaignXp": 0.0,
       "trait": "riot_breaker",
-      "traits": ["riot_breaker", "earned_t2"],
-      "fiction": "Closes distance like an argument she has already won. The riot cannon is punctuation.",
-      "recruit": { "type": "mission_victory", "mission": 8 }
+      "traits": [
+        "riot_breaker",
+        "earned_t2"
+      ],
+      "fiction": "She has already won the argument. The riot cannon is the period. Line heat — close, boom, no poetry about kiting.",
+      "recruit": {
+        "type": "mission_victory",
+        "mission": 8
+      }
     },
     {
       "heroId": "grath",
-      "name": "Grath Unpaid",
+      "name": "Grath Arrears",
       "unitDef": "legkark",
       "missionCritical": false,
       "status": "locked",
-      "xp": 0.25,
+      "xp": 0.06,
       "timesWounded": 0,
       "campaignXp": 0.0,
       "trait": "merc_debt",
-      "traits": ["merc_debt", "kark_line"],
-      "fiction": "A Null Merc line-breaker who has not been paid in three wars. Signs on when the clans' credit finally reads better than the Mercs' ledgers.",
-      "recruit": { "type": "rep", "faction": "nullmercs", "min": 65 }
+      "traits": [
+        "merc_debt",
+        "kark_line"
+      ],
+      "fiction": "Not unpaid — arrears. Three wars on the ledger. He holds the middle because credit finally beat the Mercs, and debt makes a man hard to move.",
+      "recruit": {
+        "type": "rep",
+        "faction": "nullmercs",
+        "min": 65
+      }
     },
     {
       "heroId": "halq",
@@ -134,13 +156,19 @@
       "unitDef": "legbal",
       "missionCritical": false,
       "status": "locked",
-      "xp": 0.25,
+      "xp": 0.06,
       "timesWounded": 0,
       "campaignXp": 0.0,
       "trait": "long_arc",
-      "traits": ["long_arc", "ballistic_savant"],
-      "fiction": "Shoots at map coordinates, not targets. The targets keep being there anyway.",
-      "recruit": { "type": "mission_victory", "mission": 9 }
+      "traits": [
+        "long_arc",
+        "ballistic_savant"
+      ],
+      "fiction": "Halq does not see units — he sees grid refs. The rockets land where the map said they would. Line support that argues with math.",
+      "recruit": {
+        "type": "mission_victory",
+        "mission": 9
+      }
     },
     {
       "heroId": "auditor",
@@ -148,13 +176,609 @@
       "unitDef": "legeallterrainmech",
       "missionCritical": false,
       "status": "locked",
-      "xp": 0.3,
+      "xp": 0.0,
       "timesWounded": 0,
       "campaignXp": 0.0,
       "trait": "final_account",
-      "traits": ["final_account", "earned_t3"],
-      "fiction": "A T3 all-terrain mech that walked out of a dead Legion vault the day the finale was declared. It keeps its own ledger of what the war still owes.",
-      "recruit": { "type": "act_reached", "act": 3 }
+      "traits": [
+        "final_account",
+        "earned_t3"
+      ],
+      "fiction": "Walked out of a dead vault the day the finale was declared. Keeps its own books of what the war still owes — and collects in person. Count that can push.",
+      "recruit": {
+        "type": "act_reached",
+        "act": 3
+      }
+    },
+    {
+      "heroId": "twitch",
+      "name": "Twitcher",
+      "unitDef": "corfast",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.06,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "combat_engineer",
+      "traits": [
+        "combat_engineer",
+        "cortex_contract"
+      ],
+      "fiction": "Build power with bad intentions. Twitcher grins with a welder and leaves surprises in the dirt. Eco seat that bites.",
+      "recruit": {
+        "type": "rep",
+        "faction": "cortex",
+        "min": 40
+      }
+    },
+    {
+      "heroId": "consul",
+      "name": "Armada Consul",
+      "unitDef": "armconsul",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.06,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "field_office",
+      "traits": [
+        "field_office",
+        "armada_contract",
+        "builder_mission"
+      ],
+      "fiction": "Left Armada without leaving the toolkit. Fortifies like penance — every nano an unpaid debt to a flag he no longer salutes. Contract still binds; loyalty does not.",
+      "recruit": {
+        "type": "assist_fortify",
+        "mapId": "the_rock_jungle",
+        "zoneId": "TRJ_NW_GATE",
+        "optionalJoin": true,
+        "blurb": "Help fortify the Jungle camp — Consul may join after"
+      }
+    },
+    {
+      "heroId": "spoke",
+      "name": "Spoke",
+      "unitDef": "legscout",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.06,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "wheelie_mentor",
+      "traits": [
+        "wheelie_mentor",
+        "scout_tech",
+        "scout_pack"
+      ],
+      "fiction": "Spoke does not trust boots, bots, or promises — only wheels. The bay mints scouts like nervous habits. Live to see; die and the bank remembers.",
+      "recruit": {
+        "type": "wreck_rez",
+        "mapId": "greenest_fields",
+        "zoneId": "GF_C_INNER_GATE"
+      }
+    },
+    {
+      "heroId": "hearth",
+      "name": "Hearth",
+      "unitDef": "armfus",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.0,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "pad_heart",
+      "traits": [
+        "pad_heart",
+        "hero_fusion",
+        "eco_anchor"
+      ],
+      "fiction": "Hearth does not tour the map. The pad is a hearth; she is the coal. Keep her alive and the lights stay on. Wanderlust is for captains; she is furniture with a pulse.",
+      "recruit": {
+        "type": "rep",
+        "faction": "armada",
+        "min": 35
+      }
+    },
+    {
+      "heroId": "solarium",
+      "name": "Solarium",
+      "unitDef": "armnanotc",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.06,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "eco_lab",
+      "traits": [
+        "eco_lab",
+        "wind_farm",
+        "converter_nest"
+      ],
+      "fiction": "War is a budget with explosions. Solarium plants sun and converters like crops, then checks the ledger twice. The garden that feeds the guns.",
+      "recruit": {
+        "type": "rep",
+        "faction": "armada",
+        "min": 25
+      }
+    },
+    {
+      "heroId": "warder",
+      "name": "Warder",
+      "unitDef": "armbeamer",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.06,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "area_control",
+      "traits": [
+        "area_control",
+        "pad_tooth",
+        "radar_eye"
+      ],
+      "fiction": "The Warder does not chase. A circle of dirt is enough empire. Ferrets wait cloaked; beamers argue with trespassers. Pad tooth with patience.",
+      "recruit": {
+        "type": "objective_kind",
+        "kinds": [
+          "seize_lane",
+          "gate_control",
+          "fortify_zone"
+        ],
+        "act": 1
+      }
+    },
+    {
+      "heroId": "veil",
+      "name": "Veil & Compass",
+      "unitDef": "coreter",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.06,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "ew_pair",
+      "traits": [
+        "ew_pair",
+        "mixed_payroll"
+      ],
+      "fiction": "Cortex haze and Armada radar on one invoice. Nobody asks why. The fog works for you; the gremlins collect.",
+      "recruit": {
+        "type": "wreck_rez",
+        "mapId": "the_rock_jungle",
+        "zoneId": "TRJ_NW_GATE"
+      }
+    },
+    {
+      "heroId": "commando",
+      "name": "Cinder Hook",
+      "unitDef": "va_cormando",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.02,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "saboteur",
+      "traits": [
+        "saboteur",
+        "mine_pets",
+        "beefcake"
+      ],
+      "fiction": "Grew plate instead of patience. Cinder Hook inserts, mines, and leaves the debate for someone else. Mischief with an airlift.",
+      "recruit": {
+        "type": "wreck_rez",
+        "mapId": "the_rock_jungle",
+        "zoneId": "TRJ_SW_LANE"
+      }
+    },
+    {
+      "heroId": "tick",
+      "name": "Tick Stream",
+      "unitDef": "armflea",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.06,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "scout_pack",
+      "traits": [
+        "scout_pack",
+        "swarm"
+      ],
+      "fiction": "We are the eyes. Tick is a pronoun with a factory. Carpet the fog, die cheap, mint again. Singular is a failure mode.",
+      "recruit": {
+        "type": "wreck_rez",
+        "mapId": "greenest_fields",
+        "zoneId": "GF_C_GATE"
+      }
+    },
+    {
+      "heroId": "fatboy",
+      "name": "Fatboy Contract",
+      "unitDef": "armfboy",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.02,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "plasma_house",
+      "traits": [
+        "plasma_house",
+        "armada_heavy"
+      ],
+      "fiction": "A pad that got legs. The Fatboy Contract is real estate with a plasma greeting. It plods to the door and knocks until there is no door.",
+      "recruit": {
+        "type": "wreck_rez",
+        "mapId": "greenest_fields",
+        "zoneId": "GF_NE_PLATEAU"
+      }
+    },
+    {
+      "heroId": "bro",
+      "name": "Bro",
+      "unitDef": "corgol",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.01,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "tzar_merc",
+      "traits": [
+        "tzar_merc",
+        "cortex_favor"
+      ],
+      "fiction": "Bro is not angry. Bro is available. Cortex Tzar on a friendly contract: point at a wall, he arrives, the wall reconsidered. Plod with a shrug.",
+      "recruit": {
+        "type": "wreck_rez",
+        "mapId": "eye_of_horus",
+        "zoneId": "EOH_SE_BASTION"
+      }
+    },
+    {
+      "heroId": "stride",
+      "name": "Saloon Stride",
+      "unitDef": "va_mav_stride",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.035,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "gunfighter",
+      "traits": [
+        "gunfighter",
+        "saloon_vintage",
+        "armada_subhouse"
+      ],
+      "fiction": "They do not count shots; they count exits. Saloon vintage with manners that would get you thrown out of any bar that still had walls.",
+      "recruit": {
+        "type": "wreck_rez",
+        "mapId": "koom_valley",
+        "zoneId": "KV_W_LANE"
+      }
+    },
+    {
+      "heroId": "noctua",
+      "name": "Noctua Bay",
+      "unitDef": "legap",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.051,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "air_scout",
+      "traits": [
+        "air_scout",
+        "drone_bay",
+        "scout"
+      ],
+      "fiction": "The bay is the hero. It dreams in flight paths and wakes as a cloud of eyes. Ground captains argue lanes; Noctua argues altitude.",
+      "recruit": {
+        "type": "wreck_rez",
+        "mapId": "greenest_fields",
+        "zoneId": "GF_SE_PLATEAU"
+      }
+    },
+    {
+      "heroId": "mira",
+      "missionCritical": false,
+      "status": "locked",
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "name": "Mira Barrage",
+      "unitDef": "legbar",
+      "xp": 0.04,
+      "trait": "sparkle_battery",
+      "traits": [
+        "sparkle_battery",
+        "siege",
+        "tone_break"
+      ],
+      "fiction": "Hyper-optimistic artillery girl in an ash war. Impacts sparkle; she cheers. Napalm is confetti. She never walks into the argument — she *is* the fireworks from the back of the parade.",
+      "recruit": {
+        "type": "wreck_rez",
+        "mapId": "the_rock_jungle",
+        "zoneId": "TRJ_C_SPILLWAY"
+      }
+    },
+    {
+      "heroId": "kettle",
+      "missionCritical": false,
+      "status": "locked",
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "name": "Saint Kettle",
+      "unitDef": "armaak",
+      "xp": 0.03,
+      "trait": "sky_saint",
+      "traits": [
+        "sky_saint",
+        "mobile_aa",
+        "chainsaw_soul"
+      ],
+      "fiction": "Reborn from rez-saint to sky-saint. Keeps the air honest with Archangel hymns and a chainsaw temperament. No pawn blob — holiness is elite. Mira's fireworks need a clear ceiling.",
+      "recruit": {
+        "type": "wreck_rez",
+        "mapId": "greenest_fields",
+        "zoneId": "GF_C_GATE"
+      }
+    },
+    {
+      "heroId": "infestor",
+      "missionCritical": false,
+      "status": "locked",
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "name": "Infestor Hive",
+      "unitDef": "leginfestor",
+      "xp": 0.045,
+      "trait": "infestor",
+      "traits": [
+        "infestor",
+        "all_terrain",
+        "self_replicate"
+      ],
+      "fiction": "Quiet gardener of legs. The hive does not recruit — it germinates. All-terrain, stealthed, patient. The company grows itself whether you are watching or not.",
+      "recruit": {
+        "type": "wreck_rez",
+        "mapId": "eye_of_horus",
+        "zoneId": "EOH_E_LANE"
+      }
+    },
+    {
+      "heroId": "vane",
+      "name": "Ash-Captain Vane",
+      "unitDef": "legcen",
+      "missionCritical": false,
+      "status": "active",
+      "xp": 0.06,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "captain",
+      "traits": [
+        "captain",
+        "glass"
+      ],
+      "fiction": "She does not hold a line; she holds a rhythm. Phobos peel when the lasers paint, reform when the beat returns. Captain means the pack is one thought under fire.",
+      "recruit": {
+        "type": "core"
+      }
+    },
+    {
+      "heroId": "ketha",
+      "name": "Ketha",
+      "unitDef": "legrezbot",
+      "missionCritical": true,
+      "status": "active",
+      "xp": 0.06,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "saint",
+      "traits": [
+        "saint"
+      ],
+      "fiction": "Every wreck is an unfinished sentence. Ketha finishes them. She will walk into fire for a name in the mud; she will not chase a kill. The company's memory has one pair of hands.",
+      "recruit": {
+        "type": "core"
+      }
+    },
+    {
+      "heroId": "quill",
+      "name": "Ash-Marshal Quill",
+      "unitDef": "armbull",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.04,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "captain",
+      "traits": [
+        "captain",
+        "heat"
+      ],
+      "fiction": "Vane owns the flock. Quill owns the argument that walks. Two Bulls and a voice that does not ask twice. Captain heat — close the distance because the order already did.",
+      "recruit": {
+        "type": "band_unlock",
+        "blurb": "Orders walk on treads."
+      }
+    },
+    {
+      "heroId": "kit",
+      "name": "Kit Sparkler",
+      "unitDef": "legbart",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.04,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "gleeful",
+      "traits": [
+        "gleeful",
+        "mischief"
+      ],
+      "fiction": "Mira throws confetti from the parade. Kit brings the fireworks to handshake range and laughs when something catches. Gleeful mischief — burn, bail, burn again.",
+      "recruit": {
+        "type": "band_unlock",
+        "blurb": "Fireworks at walking distance."
+      }
+    },
+    {
+      "heroId": "vale",
+      "name": "Vale Soft",
+      "unitDef": "armmerl",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.035,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "fog",
+      "traits": [
+        "fog",
+        "contract"
+      ],
+      "fiction": "Kiln announces himself with heat. Vale invoices in fog. Two Ambassadors on a quiet contract: prefer the static, never the brawl, leave before the argument learns your name.",
+      "recruit": {
+        "type": "band_unlock",
+        "blurb": "The wall never saw the invoice."
+      }
+    },
+    {
+      "heroId": "nox",
+      "name": "Nox Tithe",
+      "unitDef": "armscab",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.03,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "debt",
+      "traits": [
+        "debt",
+        "pad"
+      ],
+      "fiction": "Grath owes wages. Nox owes weather. One mobile anti-nuke and a ledger that will not close until the sky stays honest. Debt that holds a circle.",
+      "recruit": {
+        "type": "band_unlock",
+        "blurb": "Still paying for the last sky."
+      }
+    },
+    {
+      "heroId": "ceil",
+      "name": "Ceil Rat",
+      "unitDef": "armbrawl",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.045,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "sky",
+      "traits": [
+        "sky",
+        "glass"
+      ],
+      "fiction": "Noctua dreams flight paths for eyes. Ceil Rat argues with roofs. Five Roughnecks that treat the ceiling like a suggestion and glass like a lifestyle.",
+      "recruit": {
+        "type": "band_unlock",
+        "blurb": "Altitude is an opinion."
+      }
+    },
+    {
+      "heroId": "lumen",
+      "name": "Sister Lumen",
+      "unitDef": "armageo",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.05,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "saint",
+      "traits": [
+        "saint",
+        "garden"
+      ],
+      "fiction": "Hearth is coal furniture. Lumen is faith with a geothermal throat. She does not tour. She tithes heat into the pad and calls the surplus holy. Eco saint — stay and feed.",
+      "recruit": {
+        "type": "band_unlock",
+        "blurb": "Tithe the grid."
+      }
+    },
+    {
+      "heroId": "anvil",
+      "name": "Anvil Mire",
+      "unitDef": "armcroc",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.04,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "plod",
+      "traits": [
+        "plod",
+        "pad"
+      ],
+      "fiction": "Kiln plods to roast. Anvil plods to occupy. Two Turtles that treat fords like floors and defenses like invitations. Line plod — weight first, poetry never.",
+      "recruit": {
+        "type": "band_unlock",
+        "blurb": "The river learns my weight."
+      }
+    },
+    {
+      "heroId": "volt",
+      "name": "Volt Lash",
+      "unitDef": "armlatnk",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.045,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "heat",
+      "traits": [
+        "heat",
+        "glass"
+      ],
+      "fiction": "Most eyes hide. Volt Lash paints. Five Jaguars that turn reconnaissance into a burn mark — heat glass, see by hurting, leave a scar on the map.",
+      "recruit": {
+        "type": "band_unlock",
+        "blurb": "Sight is a wound you give them."
+      }
+    },
+    {
+      "heroId": "pavise",
+      "name": "Pavise",
+      "unitDef": "armwar",
+      "missionCritical": false,
+      "status": "active",
+      "xp": 0.45,
+      "timesWounded": 0,
+      "campaignXp": 40.0,
+      "peakBarXp": 0.45,
+      "trait": "shield",
+      "traits": [
+        "shield",
+        "captain"
+      ],
+      "fiction": "Back when you wore a real Armada suit, this was the counterpart who kept the shield side honest. One Centurion. No flock. The aura still remembers every Warrior that stood in the same dirt.",
+      "recruit": {
+        "type": "core"
+      }
+    },
+    {
+      "heroId": "halbard",
+      "name": "Halbard",
+      "unitDef": "corhal",
+      "missionCritical": false,
+      "status": "active",
+      "xp": 0.08,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "peakBarXp": 0.08,
+      "trait": "heavy",
+      "traits": [
+        "heavy",
+        "sparkle"
+      ],
+      "fiction": "Not Pavise. Different spelling, different manners. The Halberd is a door that learned to hover.",
+      "recruit": {
+        "type": "band"
+      }
     }
   ]
 }

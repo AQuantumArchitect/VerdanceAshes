@@ -80,26 +80,31 @@ function Clamp01([double]$V) {
   return [Math]::Max(0.02, [Math]::Min(0.98, $V))
 }
 
-function InClear($x, $z, $clear) {
-  if (-not $clear -or -not $clear.bounds) { return $false }
-  $b = $clear.bounds
-  return ($x -ge [double]$b.xMin -and $x -le [double]$b.xMax -and $z -ge [double]$b.zMin -and $z -le [double]$b.zMax)
+function InClear($x, $z, $clears) {
+  foreach ($clear in @($clears)) {
+    if (-not $clear -or -not $clear.bounds) { continue }
+    $b = $clear.bounds
+    if ($x -ge [double]$b.xMin -and $x -le [double]$b.xMax -and $z -ge [double]$b.zMin -and $z -le [double]$b.zMax) {
+      return $true
+    }
+  }
+  return $false
 }
 
 function Scale-Count([double]$Base, [double]$Scale) {
   return [Math]::Max(0, [int][Math]::Round($Base * $Scale))
 }
 
-function Add-Units($list, [string]$Def, [int]$Count, [double]$Cx, [double]$Cz, [double]$Radius, [string]$ZoneId, [string]$PocketId, [string]$KeepClass, $clear, [string]$Faction) {
+function Add-Units($list, [string]$Def, [int]$Count, [double]$Cx, [double]$Cz, [double]$Radius, [string]$ZoneId, [string]$PocketId, [string]$KeepClass, $clears, [string]$Faction) {
   if ($Count -le 0 -or -not $Def) { return }
   for ($i = 0; $i -lt $Count; $i++) {
     $off = RandOffset $Radius
     $x = Clamp01 ($Cx + $off[0])
     $z = Clamp01 ($Cz + $off[1])
-    if (InClear $x $z $clear) {
+    if (InClear $x $z $clears) {
       $x = Clamp01 ($Cx + $off[0] * 1.6)
       $z = Clamp01 ($Cz + $off[1] * 1.6)
-      if (InClear $x $z $clear) { continue }
+      if (InClear $x $z $clears) { continue }
     }
     $list.Add([ordered]@{
       unitDefName = $Def
@@ -129,7 +134,11 @@ function Resolve-Faction($start) {
 $units = New-Object System.Collections.Generic.List[object]
 $pockets = @()
 $radius = if ($dens.scatterRadius) { [double]$dens.scatterRadius } else { 0.055 }
-$clear = $recipe.playerClear
+$clears = @()
+if ($recipe.playerClear) { $clears += $recipe.playerClear }
+if ($recipe.PSObject.Properties["playerClearExtra"] -and $recipe.playerClearExtra) {
+  foreach ($extra in @($recipe.playerClearExtra)) { $clears += $extra }
+}
 
 foreach ($start in @($recipe.starts)) {
   $cx = [double]$start.x
@@ -158,6 +167,7 @@ foreach ($start in @($recipe.starts)) {
     "citadel"  { $defMul = 1.6; $ecoMul = 0.9; $wallMul = 1.3; $hltMul = 1.4 }
     "fortress" { $defMul = 1.35; $ecoMul = 1.1; $wallMul = 1.2; $hltMul = 1.25 }
     "gate"     { $defMul = 1.4; $ecoMul = 0.7; $wallMul = 1.25; $hltMul = 1.2 }
+    "fusion_fort" { $defMul = 1.8; $ecoMul = 0.15; $wallMul = 1.4; $hltMul = 2.2 }
     "rim"      { $defMul = 1.15; $ecoMul = 0.65 }
     "lane"     { $defMul = 1.2; $ecoMul = 0.75; $mexMul = 1.1; $wallMul = 1.15 }
     "scrap"    { $defMul = 0.9; $ecoMul = 0.55; $mexMul = 0.7 }
@@ -172,10 +182,15 @@ foreach ($start in @($recipe.starts)) {
   $mexMul *= [double]$gmul.mex
   $hltMul *= [double]$gmul.hlt
 
+  # Tight center forts use a smaller scatter so teeth sit on the choke.
+  $pocketRadius = $radius
+  if ($kind -eq "fusion_fort") { $pocketRadius = [Math]::Min($radius, 0.028) }
+
   $solarN = Scale-Count ([double]$dens.solarPerPocket) ($scale * $ecoMul)
   $windN = Scale-Count ([double]$dens.windPerPocket) ($scale * $ecoMul)
   if ($kind -eq "wind") { $windN = Scale-Count $windN 1.35; $solarN = Scale-Count $solarN 0.65 }
   if ($kind -eq "solar") { $solarN = Scale-Count $solarN 1.35; $windN = Scale-Count $windN 0.65 }
+  if ($kind -eq "fusion_fort") { $solarN = 0; $windN = 0 }
   $convN = Scale-Count ([double]$(if ($null -ne $dens.converterPerPocket) { $dens.converterPerPocket } else { 0 })) ($scale * $ecoMul)
   $advN = Scale-Count ([double]$(if ($null -ne $dens.advSolarPerPocket) { $dens.advSolarPerPocket } else { 0 })) ($scale * $ecoMul)
   $estorN = Scale-Count ([double]$(if ($null -ne $dens.estorPerPocket) { $dens.estorPerPocket } else { 0 })) $scale
@@ -184,29 +199,43 @@ foreach ($start in @($recipe.starts)) {
   $hltN = Scale-Count ([double]$(if ($null -ne $dens.hltPerPocket) { $dens.hltPerPocket } else { 0 })) ($scale * $defMul * $hltMul)
   $wallN = Scale-Count ([double]$(if ($null -ne $dens.wallPerPocket) { $dens.wallPerPocket } else { 0 })) ($scale * $defMul * $wallMul)
   $radN = Scale-Count ([double]$(if ($null -ne $dens.radarPerPocket) { $dens.radarPerPocket } else { 0 })) $scale
-
-  Add-Units $units $kit.solar $solarN $cx $cz $radius $zid $pocketKey "energy" $clear $faction
-  Add-Units $units $kit.wind $windN $cx $cz $radius $zid $pocketKey "energy" $clear $faction
-  if ($convN -gt 0 -and $kit.conv -and $kit.conv -ne $kit.mex) {
-    Add-Units $units $kit.conv $convN $cx $cz ($radius * 0.7) $zid $pocketKey "converter" $clear $faction
+  if ($kind -eq "fusion_fort") {
+    # Beamer ring around one fusion — high value, optional, heavily defended.
+    $convN = 0; $advN = 0; $estorN = 0; $mexN = 0
+    $lltN = 2
+    $hltN = 6
+    $wallN = 10
+    $radN = 1
   }
-  Add-Units $units $kit.advsolar $advN $cx $cz ($radius * 0.5) $zid $pocketKey "energy" $clear $faction
-  Add-Units $units $kit.estor $estorN $cx $cz ($radius * 0.4) $zid $pocketKey "storage" $clear $faction
-  Add-Units $units $kit.mex $mexN $cx $cz ($radius * 0.85) $zid $pocketKey "mex" $clear $faction
-  Add-Units $units $kit.llt $lltN $cx $cz ($radius * 1.1) $zid $pocketKey "defense" $clear $faction
-  Add-Units $units $kit.hlt $hltN $cx $cz ($radius * 0.5) $zid $pocketKey "defense" $clear $faction
-  Add-Units $units $kit.wall $wallN $cx $cz ($radius * 1.15) $zid $pocketKey "wall" $clear $faction
-  Add-Units $units $kit.radar $radN $cx $cz ($radius * 0.3) $zid $pocketKey "intel" $clear $faction
+
+  Add-Units $units $kit.solar $solarN $cx $cz $pocketRadius $zid $pocketKey "energy" $clears $faction
+  Add-Units $units $kit.wind $windN $cx $cz $pocketRadius $zid $pocketKey "energy" $clears $faction
+  if ($convN -gt 0 -and $kit.conv -and $kit.conv -ne $kit.mex) {
+    Add-Units $units $kit.conv $convN $cx $cz ($pocketRadius * 0.7) $zid $pocketKey "converter" $clears $faction
+  }
+  Add-Units $units $kit.advsolar $advN $cx $cz ($pocketRadius * 0.5) $zid $pocketKey "energy" $clears $faction
+  Add-Units $units $kit.estor $estorN $cx $cz ($pocketRadius * 0.4) $zid $pocketKey "storage" $clears $faction
+  Add-Units $units $kit.mex $mexN $cx $cz ($pocketRadius * 0.85) $zid $pocketKey "mex" $clears $faction
+  Add-Units $units $kit.llt $lltN $cx $cz ($pocketRadius * 1.1) $zid $pocketKey "defense" $clears $faction
+  Add-Units $units $kit.hlt $hltN $cx $cz ($pocketRadius * 0.85) $zid $pocketKey "defense" $clears $faction
+  Add-Units $units $kit.wall $wallN $cx $cz ($pocketRadius * 1.15) $zid $pocketKey "wall" $clears $faction
+  Add-Units $units $kit.radar $radN $cx $cz ($pocketRadius * 0.3) $zid $pocketKey "intel" $clears $faction
   if ($kind -eq "citadel" -or $kind -eq "fortress") {
-    Add-Units $units $kit.fus 1 $cx $cz ($radius * 0.25) $zid $pocketKey "energy" $clear $faction
+    Add-Units $units $kit.fus 1 $cx $cz ($pocketRadius * 0.25) $zid $pocketKey "energy" $clears $faction
+  }
+  if ($kind -eq "fusion_fort") {
+    # Fusion is the optional high-value mark; beamers are teeth, not the mark.
+    Add-Units $units $kit.fus 1 $cx $cz ($pocketRadius * 0.12) $zid $pocketKey "high_value" $clears $faction
   }
   # Autonomous decoy commander nodes (occupation flavor). Sims still use real coms.
+  # Skip decoys on optional fusion forts — the fusion itself is the mark.
   $wantDecoy = $true
   if ($recipe.occupation -and $null -ne $recipe.occupation.decoyCommanders) {
     $wantDecoy = [bool]$recipe.occupation.decoyCommanders
   }
-  if ($wantDecoy -and $kind -ne "thin" -and $kit.decoy) {
-    Add-Units $units $kit.decoy 1 $cx $cz ($radius * 0.15) $zid $pocketKey "decoy_node" $clear $faction
+  if ($kind -eq "fusion_fort" -or $kind -eq "thin") { $wantDecoy = $false }
+  if ($wantDecoy -and $kit.decoy) {
+    Add-Units $units $kit.decoy 1 $cx $cz ($pocketRadius * 0.15) $zid $pocketKey "decoy_node" $clears $faction
   }
 
   $aiShort = "SimpleAI"
@@ -217,7 +246,7 @@ foreach ($start in @($recipe.starts)) {
     if ($gp.barbProfile) { $barbProf = [string]$gp.barbProfile }
   }
 
-  $pockets += [ordered]@{
+  $pocketMeta = [ordered]@{
     pocketId = $pocketKey
     zoneId = $zid
     label = [string]$start.label
@@ -231,6 +260,17 @@ foreach ($start in @($recipe.starts)) {
     primaryCandidate = [bool]$start.primaryCandidate
     densityScale = $scale
   }
+  if ($start.PSObject.Properties["optionalTarget"] -and $start.optionalTarget) {
+    $pocketMeta.optionalTarget = $true
+  }
+  if ($start.PSObject.Properties["highValue"] -and $start.highValue) {
+    $pocketMeta.highValue = $true
+  }
+  if ($kind -eq "fusion_fort") {
+    $pocketMeta.optionalTarget = $true
+    $pocketMeta.highValue = $true
+  }
+  $pockets += $pocketMeta
 }
 
 $factionName = if ($recipe.PSObject.Properties["faction"] -and $recipe.faction) { [string]$recipe.faction } else { "mixed" }

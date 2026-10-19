@@ -1,0 +1,93 @@
+Verdance's Ashes
+Copyright (c) 2026 Luke Spooner
+
+This project is deliberately split into two parts under two different terms.
+Read both before reusing anything.
+
+
+================================================================================
+1. GAME CONTENT AND ENGINE-SIDE CODE  --  GNU GPL v2 or later
+================================================================================
+
+Applies to:
+
+  mod/VerdanceAshes.sdd/**        all Lua gadgets, widgets and includes
+  data/**                         campaign, zone, story and scenario data
+  scripts/**                      launcher and build scripts
+  docs/**                         documentation
+
+These are licensed under the GNU General Public License, version 2, or (at your
+option) any later version. Every Lua file additionally declares this in its own
+GetInfo() block.
+
+This is not a preference. Verdance's Ashes runs on the Recoil engine, which is
+GPL-2.0-or-later and requires that game code it loads be GPL-compatible. The
+license follows from the platform.
+
+A copy of the GPL v2 is available at:
+  https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+
+
+================================================================================
+2. THE CAMPAIGN KERNEL  --  all rights reserved
+================================================================================
+
+Applies to:
+
+  tools/**                        campaign simulation, story engine, zone graph,
+                                  mission generation, analysis tooling
+  app/**                          hub, kernel launcher and surface
+
+Copyright (c) 2026 Luke Spooner. All rights reserved.
+
+No license is granted to copy, modify, redistribute or create derivative works
+of this portion. It is published here for reference and for use as part of
+Verdance's Ashes; it is not released as free software.
+
+This code is engine-agnostic and contains no Recoil or Beyond All Reason
+derivative work, so no copyleft obligation reaches it. It is separated
+deliberately so that its licensing stays an open question rather than a settled
+one.
+
+For permission to use it, contact the copyright holder.
+
+
+================================================================================
+3. WHAT THIS PROJECT DOES *NOT* COVER
+================================================================================
+
+Beyond All Reason
+  Verdance's Ashes is a mutator (modinfo.lua: modtype = 1) that declares a
+  dependency on Beyond All Reason and resolves it from the player's own
+  installation at load time. It contains no BAR models, textures, animations,
+  sounds, music or icons, and redistributes none of them.
+
+  BAR's own content is separately licensed -- code under GPL v2, and art,
+  animation, sound and music predominantly under CC-BY-NC-ND 4.0, which permits
+  neither commercial use nor derivative works. Those terms are BAR's and are not
+  affected, extended or reinterpreted by this file. See:
+  https://github.com/beyond-all-reason/Beyond-All-Reason/blob/master/LICENSE.md
+
+Maps
+  The seven campaign maps are not distributed with this project. They are
+  downloaded on demand from Beyond All Reason's own content service and remain
+  the property of their respective authors under their own terms.
+
+The Recoil engine
+  GPL-2.0-or-later, and not distributed here.
+  https://github.com/beyond-all-reason/RecoilEngine
+
+Third-party reference material
+  See NOTICE.
+
+
+================================================================================
+4. AI ASSISTANCE
+================================================================================
+
+Substantial portions of this project were written with AI assistance, reviewed
+and tested by the author. This is disclosed here because at least one downstream
+project this work touches -- Beyond All Reason -- requires disclosure of
+AI-assisted contributions, and because it should be stated plainly regardless.
+
+No AI-generated art, audio or video is distributed as part of the game.

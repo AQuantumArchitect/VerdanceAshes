@@ -48,8 +48,9 @@ GRID_ID = re.compile(r"_G(\d\d)_(\d\d)$")
 #   defence   <- defensiveValue
 #   traffic   <- armyValue           (mobile combat mass, not a movement count)
 #   loss      <- unavailable; the packets record no deaths by position
-CHANNEL_NOTE = ("presence=totalUnitValue, structure=defensiveValue+buildPower, "
-                "defence=defensiveValue, traffic=armyValue, loss=unmeasured")
+CHANNEL_NOTE = ("territory=defensiveValue (DV-only ownership), "
+                "structure=defensiveValue+buildPower, defence=defensiveValue, "
+                "traffic=armyValue, loss=unmeasured")
 
 
 def load_json(path: Path) -> Dict[str, Any]:

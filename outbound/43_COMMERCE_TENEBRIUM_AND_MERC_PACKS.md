@@ -12,11 +12,11 @@ Ashwalkers / Null Mercs are a **mercenary band**, not a full faction eco. They b
 | Piece | What |
 |-------|------|
 | **Punch of Thugs** | Starter **loan**: 6× `corthud`, spawn **smoking** (~32–52% HP). Return them in better shape (alive count ≥ loaned on a win) or the broker docks rep/credits. |
-| **Crash of Brutes** | Buy 4× `corraid` for scrap credits (no Tenebrium — they do not build). |
-| **Cortex Grunt Fab** | Buy a little `corlab` **locked** to print `corak` forever. Arc 1 chaff stream. Costs **1 Tenebrium**. |
-| **Grunt Fab Build Power** | Arc 2+: nanos + thicker metal/energy trickle. Costs **1 Tenebrium**. |
-| **Armada / Cortex constructors** | `armck` / `corck` at **rep ≥ 60** + **1 Tenebrium** each. |
-| **Scrap credits** | Broker scrip for pure combat packs. |
+| **Crash of Brutes** | Buy 4× `corraid` for **4×1km$** metal (no Tenebrium — they do not build). |
+| **Cortex Grunt Fab** | Buy a little `corlab` **locked** to print `corak` forever. Arc 1 chaff stream. Costs **1 Tenebrium** + **2×1km$**. |
+| **Grunt Fab Build Power** | Arc 2+: nanos + thicker metal/energy trickle. Costs **1 Tenebrium** + **1×1km$**. |
+| **Armada / Cortex constructors** | `armck` / `corck` at **rep ≥ 60** + **1 Tenebrium** + **2×1km$** each. |
+| **Campaign metal (1km$)** | Banked as `floor(endMetal/1000)` from each sortie. Replaces retired scrap credits. |
 
 ## Data / code
 
@@ -33,8 +33,8 @@ Ashwalkers / Null Mercs are a **mercenary band**, not a full faction eco. They b
 ```json
 "commerce": {
   "tenebrium": 0,
-  "credits": 40,
-  "owned": { "punch_of_thugs": { "loan": true, "loanCount": 6, ... } },
+  "metalK": 0,
+  "owned": { "punch_of_thugs": { "loan": false, "qty": 1, ... } },
   "upgrades": {},
   "ledger": []
 }
@@ -44,11 +44,11 @@ Intent exposes `commerce.shop` (shelf + availability) and `commerce.deploy` (com
 
 ## Sortie rewards (deterministic from resultKey)
 
-- Victory → chance of +0–1 Tenebrium, +scrap credits  
-- Zone flip → higher Tenebrium chance  
-- Clean extract → small extra chance  
-- Loan return OK → credit tip + Null Merc rep; small Tenebrium tip chance  
-- Loan breach → credit debt + rep hit  
+- End metal stockpile → `+floor(metalStored/1000)` ×1km$ (always banked)  
+- Victory → chance of +0–1 Tenebrium (when free mint allowed)  
+- Clean extract → small extra Tnb chance  
+- Loan return OK → +1×1km$ tip + Null Merc rep; small Tenebrium tip chance  
+- Loan breach → −1×1km$ + rep hit  
 
 ## Local sims (coward's-road deferred)
 
@@ -108,4 +108,4 @@ Infolog: `VA_TENEBRIUM_INIT` · `SPEND` · `REFUND` · `PENDING` · `SHARD` · `
 1. Fresh campaign: **Punch of Thugs** is free and already owned — expect damaged Thugs and busy rez bots.  
 2. You **cannot** buy the grunt fab until you scavenge **1 Tenebrium** (win/flip sorties).  
 3. Constructors stay locked until faction rep is high **and** you have Tenebrium.  
-4. Crash of Brutes is the expensive hammer when you have scrap but not build rights.
+4. Crash of Brutes is the expensive hammer when you have banked metal but not build rights.

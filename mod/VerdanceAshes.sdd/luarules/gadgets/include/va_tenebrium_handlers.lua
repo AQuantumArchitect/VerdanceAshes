@@ -19,10 +19,16 @@ return function(tenebLoot, api)
     Spring.SetGameRulesParam("va_tenebrium_spent", tenebLoot.spent or 0, { public = true })
     Spring.SetGameRulesParam("va_tenebrium_lost", tenebLoot.lost or 0, { public = true })
     Spring.SetGameRulesParam("va_tenebrium_storage", -1, { public = true }) -- infinite
+    Spring.SetGameRulesParam("va_tenebrium_wrecks_created", tenebLoot.wrecksCreated or 0, { public = true })
+    Spring.SetGameRulesParam("va_tenebrium_wrecks_claimed", tenebLoot.wrecksClaimed or 0, { public = true })
+    Spring.SetGameRulesParam("va_tenebrium_wrecks_lost", tenebLoot.wrecksLost or 0, { public = true })
+    Spring.SetGameRulesParam("va_tenebrium_wrecks_unclaimed", tenebLoot.unclaimedWrecks and tenebLoot.unclaimedWrecks() or 0, { public = true })
     Spring.SetGameRulesParam("va_armada_tenebrium_crisis", tenebLoot.armadaCrisis and 1 or 0, { public = true })
-    if tenebLoot.publishBpCap then
-      tenebLoot.publishBpCap()
-    end
+    -- Clear old access / BP-cap scaffolding so HUD does not show stale walls.
+    Spring.SetGameRulesParam("va_tenebrium_invested", 0, { public = true })
+    Spring.SetGameRulesParam("va_tenebrium_access", 0, { public = true })
+    Spring.SetGameRulesParam("va_tenebrium_bp_max", 0, { public = true })
+    Spring.SetGameRulesParam("va_tenebrium_bp_used", 0, { public = true })
   end
 
   tenebLoot.eventsJson = function()
@@ -40,65 +46,84 @@ return function(tenebLoot, api)
     return '[' .. table.concat(parts, ',') .. ']'
   end
 
-  tenebLoot.costOf = function(unitDefID)
-    local ud = unitDefID and UnitDefs[unitDefID]
-    if not ud then return 0 end
-    local bp = tonumber(ud.buildSpeed or 0) or 0
-    if bp <= 0 then return 0 end
-    -- Floor 1 for any build-power unit; scale gently with BP (cons/nano/fac/com).
-    return math.max(1, math.floor(bp / 150 + 0.999))
-  end
-
-  -- v0.8.4: concurrent BP ceiling = 150 * accessTnb (bank + living invested stakes).
-  tenebLoot.bpPerTnb = tenebLoot.bpPerTnb or 150
-
-  tenebLoot.unitBuildPower = function(unitDefID)
-    local ud = unitDefID and UnitDefs[unitDefID]
-    if not ud then return 0 end
-    return tonumber(ud.buildSpeed or 0) or 0
-  end
-
-  tenebLoot.investedTotal = function()
-    local sum = 0
-    for _, amt in pairs(tenebLoot.byUnit or {}) do
-      sum = sum + (math.floor(tonumber(amt) or 0))
-    end
-    return sum
-  end
-
-  tenebLoot.accessTnb = function()
-    return math.max(0, math.floor(tenebLoot.bank or 0) + tenebLoot.investedTotal())
-  end
-
-  tenebLoot.maxPlayerBuildPower = function()
-    return (tenebLoot.bpPerTnb or 150) * tenebLoot.accessTnb()
-  end
-
-  tenebLoot.playerBpUsed = function()
-    local team = api.playerTeamID()
-    if team == nil then return 0 end
-    local units = Spring.GetTeamUnits and Spring.GetTeamUnits(team) or {}
-    local sum = 0
-    for i = 1, #units do
-      local uid = units[i]
-      local udid = Spring.GetUnitDefID and Spring.GetUnitDefID(uid)
-      local bp = tenebLoot.unitBuildPower(udid)
-      if bp > 0 then
-        sum = sum + bp
+  tenebLoot.claimEventsJson = function()
+    local parts = {}
+    for i = 1, #(tenebLoot.claimEvents or {}) do
+      local e = tenebLoot.claimEvents[i]
+      if e then
+        parts[#parts + 1] = '{'
+          .. '"featureID":' .. jnum(e.featureID or -1)
+          .. ',"teamID":' .. jnum(e.teamID or -1)
+          .. ',"faction":' .. jstr(e.faction or "unknown")
+          .. ',"builderID":' .. jnum(e.builderID or -1)
+          .. ',"frame":' .. jnum(e.frame or 0)
+          .. ',"amount":' .. jnum(e.amount or 0)
+          .. '}'
       end
     end
-    return sum
+    return '[' .. table.concat(parts, ',') .. ']'
   end
 
-  tenebLoot.publishBpCap = function()
-    local maxBp = tenebLoot.maxPlayerBuildPower()
-    local used = tenebLoot.playerBpUsed()
-    if Spring.SetGameRulesParam then
-      Spring.SetGameRulesParam("va_tenebrium_bp_max", maxBp, { public = true })
-      Spring.SetGameRulesParam("va_tenebrium_bp_used", used, { public = true })
-      Spring.SetGameRulesParam("va_tenebrium_access", tenebLoot.accessTnb(), { public = true })
+  tenebLoot.teamBanksJson = function()
+    local parts = {}
+    local ids = {}
+    for teamID in pairs(tenebLoot.teamBanks or {}) do ids[#ids + 1] = teamID end
+    table.sort(ids)
+    for i = 1, #ids do
+      local teamID = ids[i]
+      parts[#parts + 1] = jstr(teamID) .. ':' .. jnum(tenebLoot.teamBanks[teamID] or 0)
     end
-    return maxBp, used
+    return '{' .. table.concat(parts, ',') .. '}'
+  end
+
+  tenebLoot.factionBanksJson = function()
+    local parts = {}
+    local factions = {}
+    for faction in pairs(tenebLoot.factionBank or {}) do factions[#factions + 1] = faction end
+    table.sort(factions)
+    for i = 1, #factions do
+      local faction = factions[i]
+      parts[#parts + 1] = jstr(faction) .. ':' .. jnum(tenebLoot.factionBank[faction] or 0)
+    end
+    return '{' .. table.concat(parts, ',') .. '}'
+  end
+
+  tenebLoot.unclaimedWrecks = function()
+    local n = 0
+    for _, rec in pairs(tenebLoot.byFeature or {}) do
+      if rec and not rec.claimedByTeam and (rec.amountRemaining or 0) > 0 then n = n + 1 end
+    end
+    return n
+  end
+
+  -- Shared formula (UI build cards Include the same file).
+  local TnbCost = nil
+  do
+    local ok, mod = pcall(VFS.Include, "luarules/gadgets/include/va_tnb_cost.lua")
+    if ok and type(mod) == "table" then TnbCost = mod end
+  end
+
+  tenebLoot.bpPerTnb = tenebLoot.bpPerTnb or ((TnbCost and TnbCost.BP_PER_TNB) or 150)
+
+  local function costOpts()
+    return {
+      amountPerDecoy = tenebLoot.amountPerDecoy or 1,
+      bpPerTnb = tenebLoot.bpPerTnb or 150,
+    }
+  end
+
+  tenebLoot.costOf = function(unitDefID)
+    if TnbCost and TnbCost.costOf then
+      return TnbCost.costOf(unitDefID, costOpts())
+    end
+    return 0
+  end
+
+  tenebLoot.dropOf = function(unitDefID)
+    if TnbCost and TnbCost.dropOf then
+      return TnbCost.dropOf(unitDefID, costOpts())
+    end
+    return tenebLoot.costOf(unitDefID)
   end
 
   tenebLoot.isDecoy = function(unitID, unitDefID)
@@ -118,6 +143,15 @@ return function(tenebLoot, api)
 
   tenebLoot.initFromMission = function()
     -- Idempotent: GameStart + startMission both call this; do not wipe unit stamps.
+    -- Always heal tables that tryLoot / publish require (older runs left them nil).
+    tenebLoot.claimEvents = tenebLoot.claimEvents or {}
+    tenebLoot.teamBanks = tenebLoot.teamBanks or {}
+    tenebLoot.events = tenebLoot.events or {}
+    tenebLoot.pending = tenebLoot.pending or {}
+    tenebLoot.byFeature = tenebLoot.byFeature or {}
+    tenebLoot.byUnit = tenebLoot.byUnit or {}
+    tenebLoot.heapTransfer = tenebLoot.heapTransfer or {}
+    tenebLoot.pendingLoss = tenebLoot.pendingLoss or {}
     if tenebLoot._inited then
       tenebLoot.publish()
       return
@@ -130,6 +164,11 @@ return function(tenebLoot, api)
     tenebLoot.pending = {}
     tenebLoot.byFeature = {}
     tenebLoot.byUnit = {}
+    tenebLoot.teamBanks = {}
+    tenebLoot.claimEvents = {}
+    tenebLoot.wrecksCreated = 0
+    tenebLoot.wrecksClaimed = 0
+    tenebLoot.wrecksLost = 0
     tenebLoot.heapTransfer = {}
     tenebLoot.pendingLoss = {}
     tenebLoot.events = {}
@@ -137,7 +176,20 @@ return function(tenebLoot, api)
     local tn = (mission and mission.tenebrium) or {}
     local com = (mission and mission.commerce) or {}
     local startBank = tonumber(tn.playerBank or tn.bank or com.tenebrium or 0) or 0
-    tenebLoot.bank = math.max(0, math.floor(startBank))
+    -- Mid-reload restore: prefer live published bank over reseeding to 0.
+    local frame = (Spring.GetGameFrame and Spring.GetGameFrame()) or 0
+    local published = tonumber((Spring.GetGameRulesParam and Spring.GetGameRulesParam("va_tenebrium_bank")))
+    if frame > 0 and published ~= nil then
+      tenebLoot.bank = math.max(0, math.floor(published))
+      tenebLoot.spent = math.max(0, math.floor(tonumber((Spring.GetGameRulesParam("va_tenebrium_spent"))) or 0))
+      tenebLoot.looted = math.max(0, math.floor(tonumber((Spring.GetGameRulesParam("va_tenebrium_looted"))) or 0))
+      tenebLoot.lost = math.max(0, math.floor(tonumber((Spring.GetGameRulesParam("va_tenebrium_lost"))) or 0))
+      Spring.Echo("VA_TENEBRIUM_RESTORE bank=" .. tostring(tenebLoot.bank)
+        .. " spent=" .. tostring(tenebLoot.spent)
+        .. " frame=" .. tostring(frame))
+    else
+      tenebLoot.bank = math.max(0, math.floor(startBank))
+    end
     local wc = (mission and mission.worldConflict) or {}
     if tn.armadaCrisis ~= nil then
       tenebLoot.armadaCrisis = tn.armadaCrisis == true
@@ -171,6 +223,26 @@ return function(tenebLoot, api)
     tenebLoot.publish()
   end
 
+  tenebLoot.addTeamBank = function(teamID, amount, source)
+    teamID = tonumber(teamID)
+    amount = math.floor(tonumber(amount) or 0)
+    if not teamID or amount <= 0 then return end
+    tenebLoot.teamBanks[teamID] = math.max(0, (tenebLoot.teamBanks[teamID] or 0) + amount)
+    local faction = tostring(teamFaction[teamID] or "unknown")
+    tenebLoot.factionBank[faction] = math.max(0, (tenebLoot.factionBank[faction] or 0) + amount)
+    if teamID == api.playerTeamID() then
+      tenebLoot.addBank(amount, source)
+    else
+      tenebLoot.events[#tenebLoot.events + 1] = {
+        amount = amount,
+        frame = Spring.GetGameFrame() or 0,
+        source = source or "team_reclaim",
+        teamID = teamID,
+      }
+      tenebLoot.publish()
+    end
+  end
+
   tenebLoot.stampUnit = function(unitID, amount)
     amount = math.floor(tonumber(amount) or 0)
     if amount <= 0 or not unitID then return end
@@ -181,7 +253,7 @@ return function(tenebLoot, api)
     end
   end
 
-  tenebLoot.tagFeature = function(featureID, amount, fromUnit)
+  tenebLoot.tagFeature = function(featureID, amount, fromUnit, sourceTeam, sourceDef)
     if not featureID then return end
     amount = math.floor(tonumber(amount) or 0)
     if amount <= 0 then return end
@@ -194,7 +266,14 @@ return function(tenebLoot, api)
       amountRemaining = amount,
       looted = false,
       fromUnit = fromUnit,
+      sourceTeam = sourceTeam,
+      sourceDef = sourceDef,
+      claimedByTeam = nil,
+      claimedByFaction = nil,
+      claimFrame = nil,
+      claimBuilderID = nil,
     }
+    tenebLoot.wrecksCreated = (tenebLoot.wrecksCreated or 0) + 1
     if Spring.SetFeatureRulesParam then
       Spring.SetFeatureRulesParam(featureID, "va_tenebrium_shard", 1, { public = true })
       Spring.SetFeatureRulesParam(featureID, "va_tenebrium_amount", amount, { public = true })
@@ -236,13 +315,20 @@ return function(tenebLoot, api)
     local invested = tenebLoot.byUnit[unitID]
     tenebLoot.byUnit[unitID] = nil
     local isDecoy = tenebLoot.isDecoy(unitID, unitDefID)
+    -- Drop can be 0 even when cost was > 0 (T2 fabs explode too hard to salvage).
+    local drop = tenebLoot.dropOf and tenebLoot.dropOf(unitDefID) or tenebLoot.costOf(unitDefID)
     local amount = invested
-    if not amount or amount <= 0 then
+    if drop <= 0 then
+      amount = 0
+    elseif not amount or amount <= 0 then
       if isDecoy then
         amount = tenebLoot.amountPerDecoy or 1
       else
-        amount = tenebLoot.costOf(unitDefID)
+        amount = drop
       end
+    else
+      -- Stamped invest may exceed dropOf (e.g. fab that costs but never drops).
+      amount = math.min(amount, drop)
     end
     if not amount or amount <= 0 then return end
     -- Incomplete nanoframe refund to player bank.
@@ -266,6 +352,8 @@ return function(tenebLoot, api)
       frame = Spring.GetGameFrame() or 0,
       amount = amount,
       decoy = isDecoy,
+      sourceTeam = unitTeam,
+      sourceDef = UnitDefs[unitDefID] and UnitDefs[unitDefID].name or tostring(unitDefID),
     }
     Spring.Echo("VA_TENEBRIUM_PENDING unit=" .. tostring(unitID)
       .. " amount=" .. tostring(amount)
@@ -278,7 +366,7 @@ return function(tenebLoot, api)
     if sourceID and tenebLoot.pending[sourceID] then
       local pend = tenebLoot.pending[sourceID]
       tenebLoot.pending[sourceID] = nil
-      tenebLoot.tagFeature(featureID, pend.amount, sourceID)
+      tenebLoot.tagFeature(featureID, pend.amount, sourceID, pend.sourceTeam, pend.sourceDef)
       return
     end
     -- Heap / debris successor: pick up transfer from wreck destroyed this frame.
@@ -347,6 +435,7 @@ return function(tenebLoot, api)
           if left and left > 0 then
             tenebLoot.heapTransfer[pl.key] = nil
             tenebLoot.lost = (tenebLoot.lost or 0) + left
+            tenebLoot.wrecksLost = (tenebLoot.wrecksLost or 0) + 1
             tenebLoot.events[#tenebLoot.events + 1] = {
               amount = -left, frame = frame, source = "wreck_gone",
             }
@@ -361,42 +450,89 @@ return function(tenebLoot, api)
     end
   end
 
-  tenebLoot.tryLoot = function(builderID, builderTeam, featureID, step)
-    -- Reclaim steps are negative. Pull Tnb proportional to reclaim progress; durable
-    -- until the feature is gone. First tick always moves at least 1 if any remains.
-    if not step or step >= 0 then return end
+  -- Claim a Tnb shard into the bank (reclaim / active rez soak — not a free vacuum).
+  tenebLoot.claimFeature = function(featureID, builderID, builderTeam, source)
     local rec = tenebLoot.byFeature[featureID]
-    if not rec then return end
+    if not rec or rec.claimedByTeam then return 0 end
     local rem = math.floor(tonumber(rec.amountRemaining or 0) or 0)
-    if rem <= 0 then return end
+    if rem <= 0 then return 0 end
     local allyOk = (builderTeam == api.playerTeamID())
     local playerAllyTeamID = api.playerAllyTeamID()
-    if not allyOk and Spring.GetUnitAllyTeam and playerAllyTeamID then
+    if not allyOk and builderID and Spring.GetUnitAllyTeam and playerAllyTeamID then
       allyOk = Spring.GetUnitAllyTeam(builderID) == playerAllyTeamID
     end
-    if not allyOk then return end
-    -- Fraction of this reclaim step: BAR step is ~negative reclaim-progress delta.
-    local frac = math.min(1, math.max(0.05, math.abs(step)))
-    local take = math.max(1, math.floor(rem * frac + 0.5))
-    if take > rem then take = rem end
-    rec.amountRemaining = rem - take
+    if not allyOk then return 0 end
+    local claimant = tonumber(builderTeam)
+    if not claimant then return 0 end
+    rec.amountRemaining = 0
+    rec.claimedByTeam = claimant
+    rec.claimedByFaction = tostring(teamFaction[claimant] or "unknown")
+    rec.claimFrame = Spring.GetGameFrame() or 0
+    rec.claimBuilderID = builderID
+    tenebLoot.wrecksClaimed = (tenebLoot.wrecksClaimed or 0) + 1
+    tenebLoot.claimEvents = tenebLoot.claimEvents or {}
+    tenebLoot.claimEvents[#tenebLoot.claimEvents + 1] = {
+      featureID = featureID,
+      teamID = claimant,
+      faction = rec.claimedByFaction,
+      builderID = builderID,
+      frame = rec.claimFrame,
+      amount = rem,
+      source = source or "reclaim",
+    }
     if Spring.SetFeatureRulesParam then
-      Spring.SetFeatureRulesParam(featureID, "va_tenebrium_amount", rec.amountRemaining, { public = true })
+      Spring.SetFeatureRulesParam(featureID, "va_tenebrium_amount", 0, { public = true })
     end
-    tenebLoot.addBank(take, rec.fromUnit and "builder_reclaim" or "decoy_reclaim")
-    if take > 0 and (tenebLoot.metalBonus or 0) > 0 and Spring.AddTeamResource then
-      pcall(Spring.AddTeamResource, builderTeam, "metal", math.min(tenebLoot.metalBonus, 15 * take))
+    tenebLoot.addTeamBank(claimant, rem, source or (rec.fromUnit and "builder_reclaim" or "decoy_reclaim"))
+    if rem > 0 and (tenebLoot.metalBonus or 0) > 0 and Spring.AddTeamResource then
+      pcall(Spring.AddTeamResource, builderTeam, "metal", math.min(tenebLoot.metalBonus, 15 * rem))
     end
-    Spring.Echo("VA_TENEBRIUM_LOOT amount=" .. tostring(take)
+    Spring.Echo("VA_TENEBRIUM_LOOT amount=" .. tostring(rem)
+      .. " source=" .. tostring(source or "reclaim")
       .. " bank=" .. tostring(tenebLoot.bank)
-      .. " remainOnWreck=" .. tostring(rec.amountRemaining)
       .. " feature=" .. tostring(featureID))
     if SendToUnsynced then
-      SendToUnsynced("VERDANCE_BEAT", "tenebrium_loot", take, tenebLoot.bank, featureID, 0)
+      SendToUnsynced("VERDANCE_BEAT", "tenebrium_loot", rem, tenebLoot.bank, featureID, claimant)
     end
-    if rec.amountRemaining <= 0 then
-      rec.looted = true
+    rec.looted = true
+    return rem
+  end
+
+  tenebLoot.tryLoot = function(builderID, builderTeam, featureID, step)
+    -- Reclaim steps are negative. First reclaim tick claims the whole stake.
+    if not step or step >= 0 then return end
+    tenebLoot.claimFeature(featureID, builderID, builderTeam, "reclaim")
+  end
+
+  -- Pull Tnb off the feature a rez bot is actively working (rez or reclaim).
+  local WorkerFeature = nil
+  do
+    local ok, mod = pcall(VFS.Include, "luarules/gadgets/include/va_worker_feature.lua")
+    if ok and type(mod) == "table" then WorkerFeature = mod end
+  end
+
+  tenebLoot.soakWorkerFeature = function(builderID, builderTeam)
+    if not builderID or not Spring.GetUnitWorkerTask or not CMD then return 0 end
+    local cmdID, targetID = Spring.GetUnitWorkerTask(builderID)
+    if not targetID then return 0 end
+    if cmdID ~= CMD.RESURRECT and cmdID ~= CMD.RECLAIM then return 0 end
+    local featureID = targetID
+    if cmdID == CMD.RESURRECT and WorkerFeature and WorkerFeature.normalizeFeatureID then
+      featureID = WorkerFeature.normalizeFeatureID(targetID) or targetID
+    elseif cmdID == CMD.RESURRECT
+        and not (Engine and Engine.FeatureSupport and Engine.FeatureSupport.noOffsetForFeatureID) then
+      featureID = featureID - Game.maxUnits
     end
+    local got = tenebLoot.claimFeature(featureID, builderID, builderTeam,
+      cmdID == CMD.RESURRECT and "rez_soak" or "reclaim_soak")
+    if got <= 0 and cmdID == CMD.RECLAIM and WorkerFeature and WorkerFeature.needsFeatureOffset
+        and WorkerFeature.needsFeatureOffset() then
+      got = tenebLoot.claimFeature(featureID - Game.maxUnits, builderID, builderTeam, "reclaim_soak")
+    elseif got <= 0 and cmdID == CMD.RECLAIM
+        and not (Engine and Engine.FeatureSupport and Engine.FeatureSupport.noOffsetForFeatureID) then
+      got = tenebLoot.claimFeature(featureID - Game.maxUnits, builderID, builderTeam, "reclaim_soak")
+    end
+    return got
   end
 
   tenebLoot.teamIsArmada = function(teamID)
@@ -405,34 +541,24 @@ return function(tenebLoot, api)
     return false
   end
 
-  tenebLoot.allowCreate = function(unitDefID, builderTeam)
+  -- Bank check only. Rez of a Tnb builder soaks the wreck first, then spends.
+  tenebLoot.allowCreate = function(unitDefID, builderTeam, builderID)
     if not tenebLoot.enabled then return true end
+    local resurrecting = false
+    if builderID and Spring.GetUnitWorkerTask and CMD and CMD.RESURRECT then
+      local cmdID = Spring.GetUnitWorkerTask(builderID)
+      if cmdID == CMD.RESURRECT then
+        resurrecting = true
+        tenebLoot.soakWorkerFeature(builderID, builderTeam)
+      end
+    end
     local cost = tenebLoot.costOf(unitDefID)
     if cost <= 0 then return true end
-    -- Armada crisis: no Tnb left — cannot complete new build-power units.
-    if tenebLoot.armadaCrisis and tenebLoot.teamIsArmada(builderTeam) then
-      Spring.Echo("VA_TENEBRIUM_BLOCKED armada_crisis cost=" .. tostring(cost))
+    if builderTeam == api.playerTeamID() and (tenebLoot.bank or 0) < cost then
+      Spring.Echo("VA_TENEBRIUM_BLOCKED need=" .. tostring(cost)
+        .. " have=" .. tostring(tenebLoot.bank or 0)
+        .. (resurrecting and " rez=1" or ""))
       return false
-    end
-    if builderTeam == api.playerTeamID() then
-      if (tenebLoot.bank or 0) < cost then
-        Spring.Echo("VA_TENEBRIUM_BLOCKED need=" .. tostring(cost) .. " have=" .. tostring(tenebLoot.bank or 0))
-        return false
-      end
-      -- Concurrent BP cap: maxBP = 150 * accessTnb (bank + living invested).
-      local bp = tenebLoot.unitBuildPower(unitDefID)
-      local maxBp = tenebLoot.maxPlayerBuildPower()
-      local used = tenebLoot.playerBpUsed()
-      -- After spend, access still includes this unit's cost once stamped; gate on
-      -- current access (pre-create). Bank 0 + no invested => maxBp 0 => block.
-      if maxBp <= 0 or (used + bp) > (maxBp + 0.01) then
-        Spring.Echo("VA_TENEBRIUM_BPCAP used=" .. tostring(used)
-          .. " need=" .. tostring(bp)
-          .. " max=" .. tostring(maxBp)
-          .. " access=" .. tostring(tenebLoot.accessTnb())
-          .. " bank=" .. tostring(tenebLoot.bank or 0))
-        return false
-      end
     end
     return true
   end
@@ -440,26 +566,18 @@ return function(tenebLoot, api)
   tenebLoot.onUnitCreated = function(unitID, unitDefID, unitTeam, builderID)
     local cost = tenebLoot.costOf(unitDefID)
     if cost <= 0 then return end
-    -- Pre-spawned mission kit: stamp reclaim stake, do not charge bank again.
+    -- Pre-spawned mission kit: stamp reclaim shard, do not charge bank again.
     local proxy = Spring.GetUnitRulesParam and Spring.GetUnitRulesParam(unitID, "va_playable_proxy")
     if proxy == 1 or proxy == true or not builderID then
       tenebLoot.stampUnit(unitID, cost)
-      if tenebLoot.publishBpCap then tenebLoot.publishBpCap() end
       return
     end
     if unitTeam == api.playerTeamID() then
-      if (tenebLoot.bank or 0) < cost then
-        -- Should have been blocked; hard fail.
-        if Spring.DestroyUnit then pcall(Spring.DestroyUnit, unitID, false, true) end
-        return
+      -- Rez may finish a frame after soak; soak again just in case.
+      if builderID then
+        tenebLoot.soakWorkerFeature(builderID, unitTeam)
       end
-      local bp = tenebLoot.unitBuildPower(unitDefID)
-      local maxBp = tenebLoot.maxPlayerBuildPower()
-      local used = tenebLoot.playerBpUsed()
-      -- Pre-create used does not include this unit yet.
-      if maxBp <= 0 or (used + bp) > (maxBp + 0.01) then
-        Spring.Echo("VA_TENEBRIUM_BPCAP destroy unit=" .. tostring(unitID)
-          .. " used=" .. tostring(used) .. " bp=" .. tostring(bp) .. " max=" .. tostring(maxBp))
+      if (tenebLoot.bank or 0) < cost then
         if Spring.DestroyUnit then pcall(Spring.DestroyUnit, unitID, false, true) end
         return
       end
@@ -469,11 +587,66 @@ return function(tenebLoot, api)
       tenebLoot.publish()
       Spring.Echo("VA_TENEBRIUM_SPEND amount=" .. tostring(cost)
         .. " bank=" .. tostring(tenebLoot.bank)
-        .. " unit=" .. tostring(UnitDefs[unitDefID] and UnitDefs[unitDefID].name or unitDefID)
-        .. " bpCap=" .. tostring(tenebLoot.maxPlayerBuildPower()))
+        .. " unit=" .. tostring(UnitDefs[unitDefID] and UnitDefs[unitDefID].name or unitDefID))
     else
-      -- Enemy / ally AI: stamp for reclaim value; Armada cannot afford new (blocked above).
       tenebLoot.stampUnit(unitID, cost)
     end
+  end
+
+  -- Sum Tnb still stamped on living player units/structures (build stakes).
+  tenebLoot.livingStakes = function(teamID)
+    teamID = tonumber(teamID)
+    local total = 0
+    local n = 0
+    if not teamID or not Spring.GetTeamUnits then
+      return 0, 0
+    end
+    local units = Spring.GetTeamUnits(teamID) or {}
+    for i = 1, #units do
+      local uid = units[i]
+      local amt = tonumber(tenebLoot.byUnit[uid]) or 0
+      if amt <= 0 and Spring.GetUnitRulesParam then
+        -- GetUnitRulesParam returns nothing when missing — wrap before tonumber().
+        amt = tonumber((Spring.GetUnitRulesParam(uid, "va_tenebrium_invested"))) or 0
+      end
+      if amt > 0 then
+        total = total + math.floor(amt)
+        n = n + 1
+      end
+    end
+    return total, n
+  end
+
+  -- Exfil: pull living build-stakes back into liquid bank so campaign bag
+  -- recovers Tnb spent on structures/units you leave behind when you extract.
+  -- Does not touch unclaimed wreck shards (those stay lost unless reclaimed).
+  tenebLoot.refundLivingStakesOnExfil = function(teamID)
+    teamID = tonumber(teamID) or api.playerTeamID()
+    local total, n = tenebLoot.livingStakes(teamID)
+    if total <= 0 then
+      return 0, 0
+    end
+    local units = Spring.GetTeamUnits(teamID) or {}
+    for i = 1, #units do
+      local uid = units[i]
+      if tenebLoot.byUnit[uid] then
+        tenebLoot.byUnit[uid] = nil
+      end
+      if Spring.SetUnitRulesParam then
+        pcall(Spring.SetUnitRulesParam, uid, "va_tenebrium_invested", 0, { public = true })
+      end
+    end
+    tenebLoot.bank = (tenebLoot.bank or 0) + total
+    tenebLoot.spent = math.max(0, (tenebLoot.spent or 0) - total)
+    tenebLoot.events[#tenebLoot.events + 1] = {
+      amount = total,
+      frame = Spring.GetGameFrame() or 0,
+      source = "exfil_stake_refund",
+    }
+    tenebLoot.publish()
+    Spring.Echo("VA_TENEBRIUM_EXFIL_REFUND amount=" .. tostring(total)
+      .. " units=" .. tostring(n)
+      .. " bank=" .. tostring(tenebLoot.bank))
+    return total, n
   end
 end

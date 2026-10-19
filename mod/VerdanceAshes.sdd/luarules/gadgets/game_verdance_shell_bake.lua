@@ -45,10 +45,13 @@ function gadget:Initialize()
   if bakeEnabled then
     Spring.Echo("VA_SHELL_BAKE_ARMED frames=" .. tostring(bakeFrames))
     -- Headless often stalls forever building IconsAtlas; push icons off.
+    -- useOverlay (the third arg) keeps these in memory only. Without it they are
+    -- written through to the player's springsettings.cfg and survive the process,
+    -- so one bake silently disables LuaUI for every later GUI session.
     if Spring.SetConfigInt then
-      Spring.SetConfigInt("UnitIconsAsUI", 0)
-      Spring.SetConfigInt("UnitIconDist", 99999)
-      Spring.SetConfigInt("LuaUI", 0)
+      Spring.SetConfigInt("UnitIconsAsUI", 0, true)
+      Spring.SetConfigInt("UnitIconDist", 99999, true)
+      Spring.SetConfigInt("LuaUI", 0, true)
     end
     -- Speed up headless grow (AI still builds; sim clock races).
     if Spring.SendCommands then

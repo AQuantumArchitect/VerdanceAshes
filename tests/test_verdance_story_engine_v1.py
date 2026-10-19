@@ -1,4 +1,5 @@
 import copy
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -43,10 +44,17 @@ def make_workspace() -> tempfile.TemporaryDirectory:
           "schemaVersion": "verdance-zone-map/0.2",
           "mapId": "greenest_fields",
           "zones": [
+            {"zoneId":"GF_NW_MUSTER","label":"Northwest Muster","role":"start","tags":["start","northwest","low"],"campEligible":true,"deployEligible":true,"extractEligible":true,"bounds":{"xMin":0.0,"xMax":0.25,"zMin":0.0,"zMax":0.25}},
+            {"zoneId":"GF_SW_MUSTER","label":"Southwest Muster","role":"start","tags":["start","southwest","low"],"campEligible":true,"deployEligible":true,"extractEligible":true,"bounds":{"xMin":0.0,"xMax":0.25,"zMin":0.75,"zMax":1.0}},
+            {"zoneId":"GF_NE_PLATEAU","label":"Northeast Plateau / North Desert","role":"plateau","tags":["high","start","northeast"],"campEligible":true,"deployEligible":true,"extractEligible":true,"bounds":{"xMin":0.55,"xMax":1.0,"zMin":0.0,"zMax":0.5}},
             {"zoneId":"GF_NW_GREEN_START","label":"Northwest Green Start","role":"legion_start","tags":["start"]},
             {"zoneId":"GF_SE_SYNTH_START","label":"Southeast Synth Start","role":"defender_start","tags":["start","economy"]},
             {"zoneId":"GF_NORTH_DESERT_EDGE","label":"North Desert Edge","role":"energy_edge","tags":["north","wind"]},
-            {"zoneId":"GF_SOUTH_DESERT_EDGE","label":"South Desert Edge","role":"energy_edge","tags":["south","wind"]}
+            {"zoneId":"GF_SOUTH_DESERT_EDGE","label":"South Desert Edge","role":"energy_edge","tags":["south","wind"]},
+            {"zoneId":"GF_N_PLATEAU","label":"North Plateau","role":"plateau","tags":["north","high"],"campEligible":true,"deployEligible":true,"extractEligible":true,"bounds":{"xMin":0.3,"xMax":0.7,"zMin":0.0,"zMax":0.22}},
+            {"zoneId":"GF_C_GATE","label":"Central Gate","role":"gate","campEligible":true,"deployEligible":false,"extractEligible":false,"bounds":{"xMin":0.4,"xMax":0.6,"zMin":0.4,"zMax":0.5}},
+            {"zoneId":"GF_C_INNER_GATE","label":"Central Inner Gate","role":"gate","campEligible":true,"deployEligible":false,"extractEligible":false,"bounds":{"xMin":0.4,"xMax":0.6,"zMin":0.5,"zMax":0.6}},
+            {"zoneId":"GF_SE_PLATEAU","label":"Southeast Plateau","role":"plateau","tags":["southeast","start"],"campEligible":true,"deployEligible":true,"extractEligible":true,"bounds":{"xMin":0.55,"xMax":1.0,"zMin":0.55,"zMax":1.0}}
           ]
         }""",
         encoding="utf-8",
@@ -140,6 +148,107 @@ def sample_telemetry():
 
 
 class StoryEngineV1Tests(unittest.TestCase):
+    def test_fresh_campaign_uses_greenest_fields_opening_over_stale_quest_order(self):
+        with make_workspace() as tmp:
+            root = Path(tmp)
+            outbox = root / "outbox"
+            outbox.mkdir(parents=True, exist_ok=True)
+            # Non-hub junk left in outbox — opening still owns a fresh campaign.
+            stale = {
+                "schemaVersion": "verdance-sortie-order/1.0",
+                "mapId": "the_rock_jungle",
+                "targetZoneId": "RJ_CENTRAL_LAGOON_MAZE",
+                "deploymentZoneId": "RJ_NW_JUNGLE_SHELF",
+                "patron": "nullmercs",
+                "against": "wild",
+                "objectiveArchetype": "gate_control",
+                "source": "quest_generator",
+            }
+            (outbox / "next_sortie_choice.json").write_text(
+                json.dumps(stale), encoding="utf-8"
+            )
+            (outbox / "next_sortie_order.json").write_text(
+                json.dumps(stale), encoding="utf-8"
+            )
+
+            intent = engine.materialize_next_intent(sample_state(), root)
+
+            self.assertEqual(intent["mapId"], "greenest_fields")
+            self.assertEqual(intent["objective"], "eco_raid")
+            self.assertEqual(intent["targetZoneId"], "GF_SE_PLATEAU")
+            self.assertEqual(intent["deploymentZoneId"], "GF_NE_PLATEAU")
+            self.assertEqual(intent["extractionZoneId"], "GF_NE_PLATEAU")
+            self.assertEqual(intent["fromZoneIds"], ["GF_NE_PLATEAU"])
+            self.assertTrue(intent["openingMission"])
+            self.assertEqual(intent["openingDoctrine"], "decoy_raid")
+            self.assertIn("Thugs", intent["storyReason"])
+            self.assertEqual(
+                json.loads((outbox / "next_sortie_order.json").read_text(encoding="utf-8"))["mapId"],
+                "greenest_fields",
+            )
+
+    def test_hub_stamp_beats_opening_on_fresh_campaign(self):
+        """Theater-board Drop must not be stomped by the authored opening."""
+        with make_workspace() as tmp:
+            root = Path(tmp)
+            outbox = root / "outbox"
+            outbox.mkdir(parents=True, exist_ok=True)
+            hub = {
+                "schemaVersion": "verdance-sortie-order/1.0",
+                "mapId": "greenest_fields",
+                "targetZoneId": "GF_N_PLATEAU",
+                "deploymentZoneId": "GF_NW_MUSTER",
+                "extractionZoneId": "GF_NW_MUSTER",
+                "fromZoneIds": ["GF_NW_MUSTER"],
+                "captureZoneIds": ["GF_N_PLATEAU"],
+                "patron": "nullmercs",
+                "against": "armada",
+                "objectiveArchetype": "seize_lane",
+                "hubChoiceId": "c_theater",
+                "source": "hub_deploy_plan",
+                "derived": {"source": "hub_deploy_plan"},
+            }
+            (outbox / "next_sortie_choice.json").write_text(
+                json.dumps(hub), encoding="utf-8"
+            )
+            (outbox / "next_sortie_order.json").write_text(
+                json.dumps(hub), encoding="utf-8"
+            )
+
+            intent = engine.materialize_next_intent(sample_state(), root)
+
+            self.assertEqual(intent["mapId"], "greenest_fields")
+            self.assertEqual(intent["targetZoneId"], "GF_N_PLATEAU")
+            self.assertEqual(intent["deploymentZoneId"], "GF_NW_MUSTER")
+            self.assertFalse(bool(intent.get("openingMission")))
+            order = json.loads(
+                (outbox / "next_sortie_order.json").read_text(encoding="utf-8")
+            )
+            self.assertEqual(order["targetZoneId"], "GF_N_PLATEAU")
+            self.assertEqual(order["source"], "hub_deploy_plan")
+
+    def test_opening_sortie_order_uses_quiet_rim_route(self):
+        opening = engine.opening_sortie_order(engine.default_v1_state())
+        self.assertEqual(opening["mapId"], "greenest_fields")
+        # Standard shell-free north desert infil/exfil.
+        self.assertEqual(opening["deploymentZoneId"], "GF_NE_PLATEAU")
+        self.assertEqual(opening["targetZoneId"], "GF_SE_PLATEAU")
+        self.assertEqual(opening["extractionZoneId"], "GF_NE_PLATEAU")
+        self.assertEqual(opening["fromZoneIds"], ["GF_NE_PLATEAU"])
+        self.assertEqual(opening["deployAces"], ["vane", "ketha"])
+        self.assertEqual(opening["openingForce"]["karkinos"], 2)
+        self.assertEqual(opening["openingForce"]["rezBots"], 6)
+
+    def test_opening_hub_choice_is_a_projection_of_the_story_order(self):
+        state = engine.default_v1_state()
+        order = engine.opening_sortie_order(state)
+        choice = engine.opening_hub_choice(state)
+        self.assertIsNotNone(choice)
+        self.assertEqual(choice["effect"]["deploymentZoneId"], order["deploymentZoneId"])
+        self.assertEqual(choice["effect"]["targetZoneId"], order["targetZoneId"])
+        self.assertEqual(choice["effect"]["extractionZoneId"], order["extractionZoneId"])
+        self.assertEqual(choice["effect"]["openingForce"], order["openingForce"])
+
     def test_measured_telemetry_updates_zone_memory_and_intent(self):
         with make_workspace() as tmp:
             root = Path(tmp)
@@ -360,7 +469,12 @@ class WarMapTests(unittest.TestCase):
             state = sample_state()
             engine.ensure_zone_memory(state, root)
             state["nextMapOverride"] = {"mapId": "the_rock_jungle", "deploymentZoneId": "RJ_NW_JUNGLE_SHELF"}
-            self.assertEqual(engine.choose_next_map_zone(state), ("the_rock_jungle", "RJ_NW_JUNGLE_SHELF"))
+            # Pass root: choose_next_map_zone now translates retired zone ids
+            # forward, and without a workspace it would resolve against the real
+            # repo's authored maps (where RJ_NW_JUNGLE_SHELF has migrated to
+            # TRJ_NW_MUSTER) rather than this fixture's, which still defines it.
+            self.assertEqual(engine.choose_next_map_zone(state, root),
+                             ("the_rock_jungle", "RJ_NW_JUNGLE_SHELF"))
             state, report, _intent, _events = engine.process_result(
                 state,
                 sample_result(mapId="the_rock_jungle", deploymentMapId="the_rock_jungle",
@@ -478,43 +592,97 @@ class RosterTests(unittest.TestCase):
 
 
 class CommerceTests(unittest.TestCase):
-    def test_starter_punch_of_thugs_and_zero_tenebrium(self):
+    def test_fresh_bag_has_starter_metal_and_tnb(self):
         with make_workspace() as tmp:
             root = Path(tmp)
-            # Catalog lives in real workspace; ensure_commerce falls back to tools parent.
             state = engine.default_v1_state()
             commerce = engine.ensure_commerce(state, root)
-            self.assertEqual(commerce["tenebrium"], 0)
-            self.assertIn("punch_of_thugs", commerce["owned"])
-            self.assertTrue(commerce["owned"]["punch_of_thugs"].get("loan"))
-            self.assertEqual(int(commerce["owned"]["punch_of_thugs"].get("loanCount") or 0), 6)
+            self.assertEqual(commerce["tenebrium"], 3)
+            self.assertEqual(commerce.get("metalK"), 7)
+            self.assertNotIn("credits", commerce)
+            # Buy-everything: fresh bag is wallets only — no free Punch.
+            self.assertNotIn("punch_of_thugs", commerce.get("owned") or {})
+            intent = engine.build_commerce_intent(state, root)
+            punch = next(
+                (d for d in intent.get("deploy") or [] if d.get("listingId") == "punch_of_thugs"),
+                None,
+            )
+            self.assertIsNone(punch)
+            bought = engine.purchase_listing(state, "punch_of_thugs", root)
+            self.assertTrue(bought.get("ok"), bought)
+            intent2 = engine.build_commerce_intent(state, root)
+            punch2 = next(
+                (d for d in intent2.get("deploy") or [] if d.get("listingId") == "punch_of_thugs"),
+                None,
+            )
+            self.assertIsNotNone(punch2)
+            self.assertEqual(int(punch2.get("count") or 0), 7)
 
     def test_build_items_require_tenebrium_floor(self):
         with make_workspace() as tmp:
             root = Path(tmp)
             state = engine.default_v1_state()
             engine.ensure_commerce(state, root)
+            state["commerce"]["tenebrium"] = 0
             blocked = engine.purchase_listing(state, "cortex_grunt_fab", root)
             self.assertFalse(blocked["ok"])
             state["commerce"]["tenebrium"] = 1
-            state["commerce"]["credits"] = 200
+            state["commerce"]["metalK"] = 20
             state["reputation"]["cortex"] = 30
             bought = engine.purchase_listing(state, "cortex_grunt_fab", root)
             self.assertTrue(bought["ok"], bought)
             self.assertEqual(bought["tenebriumCost"], 1)
+            self.assertEqual(bought.get("metalCostK"), 2)
             self.assertEqual(state["commerce"]["tenebrium"], 0)
+            self.assertEqual(state["commerce"]["metalK"], 18)
 
-    def test_intent_deploys_loan_package(self):
+    def test_settle_banks_end_metal_in_1k_steps(self):
+        with make_workspace() as tmp:
+            root = Path(tmp)
+            state = engine.default_v1_state()
+            engine.ensure_commerce(state, root)
+            # Fresh bag starts at 7km$; field end stockpile is authoritative.
+            self.assertEqual(state["commerce"]["metalK"], 7)
+            rich = engine.settle_commerce_after_sortie(
+                state,
+                {
+                    "resultKey": "metal-rich",
+                    "metalStored": 9500,
+                    "metalKExtracted": 9,
+                    "tenebriumBank": 0,
+                },
+                True,
+                False,
+                False,
+                root,
+            )
+            self.assertEqual(state["commerce"]["metalK"], 9)
+            self.assertEqual(rich.get("gainedMetalK"), 2)  # 9 - 7 starter
+            poor_state = engine.default_v1_state()
+            engine.ensure_commerce(poor_state, root)
+            poor = engine.settle_commerce_after_sortie(
+                poor_state,
+                {"resultKey": "metal-poor", "metalStored": 999, "tenebriumBank": 0},
+                True,
+                False,
+                False,
+                root,
+            )
+            # End stock < 1km$ → bag settles to 0 (spent the starter in the field).
+            self.assertEqual(poor_state["commerce"]["metalK"], 0)
+            self.assertEqual(poor.get("gainedMetalK"), -7)
+
+    def test_intent_exposes_metal_bag(self):
         with make_workspace() as tmp:
             root = Path(tmp)
             state = sample_state()
+            state.setdefault("commerce", {})["metalK"] = 3
             engine.ensure_zone_memory(state, root)
             intent = engine.materialize_next_intent(state, root)
             self.assertIn("commerce", intent)
-            self.assertEqual(intent["commerce"]["tenebrium"], 0)
-            packages = [d for d in intent["commerce"]["deploy"] if d.get("kind") == "package"]
-            self.assertTrue(any(d.get("unitDef") == "corthud" for d in packages))
-            self.assertTrue(any(d.get("loan") for d in packages))
+            self.assertEqual(intent["commerce"]["tenebrium"], intent["commerce"].get("tenebrium", 0))
+            self.assertIn("metalK", intent["commerce"])
+            self.assertGreaterEqual(int(intent["commerce"]["metalK"]), 0)
 
 
 def _zone(control, mil=0.0, base=0.0, eco=0.0, hazard=0.0, instab=0.5, fort=0.0):
@@ -941,6 +1109,38 @@ class HeroRosterTests(unittest.TestCase):
             self.assertIn(intent["roster"]["progression"]["mode"], ("cracked_farm", "standard"))
             self.assertTrue(intent["roster"]["progression"]["xpPersistOnDeath"])
 
+    def test_cadre_xp_banks_majority_between_rounds(self):
+        """Packs / escorts keep ~85% of field XP across drops via cadreXp."""
+        with make_workspace() as tmp:
+            root = Path(tmp)
+            state = sample_state()
+            engine.ensure_roster(state)
+            result = sample_result(
+                playerSurvivors={"legcen": 4, "legrezbot": 2},
+                playerSurvivorXp={
+                    "legcen": {
+                        "count": 4, "peakXp": 1.0, "avgXp": 0.8,
+                        "peakCraftXp": 0.0, "avgCraftXp": 0.0,
+                    },
+                    "legrezbot": {
+                        "count": 2, "peakXp": 0.4, "avgXp": 0.35,
+                        "peakCraftXp": 0.6, "avgCraftXp": 0.5,
+                    },
+                },
+            )
+            state, report, intent, _ = engine.process_result(state, result, None, root)
+            self.assertTrue(report["processed"])
+            bank = state["roster"]["cadreXp"]
+            self.assertIn("legcen", bank)
+            # Majority retain: seed xp should be well above half of avg.
+            self.assertGreaterEqual(bank["legcen"]["xp"], 0.8 * 0.85 * 0.9)
+            self.assertGreaterEqual(bank["legcen"]["peakXp"], 1.0)
+            self.assertGreaterEqual(bank["legrezbot"]["craftXp"], 0.5 * 0.85 * 0.9)
+            # Intent carries cadreXp for the next mission bake.
+            intent_bank = (intent.get("roster") or {}).get("cadreXp") or {}
+            self.assertIn("legcen", intent_bank)
+            self.assertGreater(float(intent_bank["legcen"]["xp"]), 0.0)
+
     def test_wounds_heal_between_missions(self):
         with make_workspace() as tmp:
             root = Path(tmp)
@@ -1038,21 +1238,19 @@ class ActStructureTests(unittest.TestCase):
         self.assertEqual(engine.act_for_mission(19), 3)
 
     def test_tech_policy_shapes(self):
-        act1 = engine.tech_policy_for_act(1)
-        self.assertEqual(act1["buildTech"], 1)
-        self.assertFalse(act1["buildStructures"])
-        act2 = engine.tech_policy_for_act(2)
-        self.assertEqual(act2["buildTech"], 1)
-        self.assertTrue(act2["buildStructures"])
-        act3 = engine.tech_policy_for_act(3)
-        self.assertEqual(act3["buildTech"], 3)
-        self.assertTrue(act3["buildStructures"])
+        # Emergent play: every act is full fab; Tnb/BP is the only gate.
+        for act in (1, 2, 3):
+            pol = engine.tech_policy_for_act(act)
+            self.assertEqual(pol["buildTech"], 3)
+            self.assertTrue(pol["buildStructures"])
+            self.assertFalse(pol.get("gateEnabled", True))
 
     def test_act1_intent_carries_ground_control_policy(self):
         intent = engine.materialize_next_intent(self._state(2), None)
         self.assertEqual(intent["act"]["act"], 1)
         self.assertEqual(intent["techPolicy"]["mode"], "ground_control")
-        self.assertFalse(intent["techPolicy"]["buildStructures"])
+        self.assertEqual(intent["techPolicy"]["buildTech"], 3)
+        self.assertTrue(intent["techPolicy"]["buildStructures"])
         self.assertIsNone(intent["finale"])
         self.assertIn("ground_control", intent["storyTags"])
 
@@ -1060,7 +1258,7 @@ class ActStructureTests(unittest.TestCase):
         intent = engine.materialize_next_intent(self._state(7), None)
         self.assertEqual(intent["act"]["act"], 2)
         self.assertEqual(intent["techPolicy"]["mode"], "constrained_rts")
-        self.assertEqual(intent["techPolicy"]["buildTech"], 1)
+        self.assertEqual(intent["techPolicy"]["buildTech"], 3)
         self.assertTrue(intent["techPolicy"]["buildStructures"])
         self.assertIsNone(intent["finale"])
 
@@ -1543,6 +1741,47 @@ class LivingWorldTests(unittest.TestCase):
         engine.hydrology_wind_pace(state, ROOT)
         engine.update_hydrology_bloom(state, "the_rock_jungle", ROOT)
         self.assertEqual(path.read_bytes(), before)
+
+
+class AuthoredZoneIdsAreLiveTests(unittest.TestCase):
+    """Authored zone-id constants must resolve against the REAL zone maps.
+
+    These run against ROOT, not a fixture, on purpose. The bug they exist to
+    catch is a zone re-cut retiring an id that a hardcoded constant still names:
+    ALPHA_SPINE and objective_for_map between them named twelve zones that no
+    longer existed, and nothing failed, because every test that touched them
+    used a synthetic workspace where the old ids were still valid.
+
+    A fixture cannot catch this. Only the shipping data can.
+    """
+
+    def test_alpha_spine_deploy_zones_all_exist(self):
+        valid = engine.valid_zone_ids(ROOT)
+        self.assertTrue(valid, "no authored zone ids loaded; the check would be vacuous")
+        for map_id, zone_id in engine.ALPHA_SPINE:
+            resolved = engine.canonical_zone_id(zone_id, ROOT)
+            self.assertIn(resolved, valid,
+                          f"ALPHA_SPINE deploy zone for {map_id} ({zone_id}) "
+                          f"resolves to {resolved}, which is not a live zone")
+
+    def test_choose_next_map_zone_is_live_for_every_mission(self):
+        valid = engine.valid_zone_ids(ROOT)
+        for mission in range(1, 13):
+            map_id, zone_id = engine.choose_next_map_zone({"missionNumber": mission}, ROOT)
+            self.assertIn(zone_id, valid,
+                          f"mission {mission} deploys to {zone_id} on {map_id}, "
+                          "which is not a live zone")
+
+    def test_objective_fallback_targets_all_exist(self):
+        valid = engine.valid_zone_ids(ROOT)
+        for map_id, _zone in engine.ALPHA_SPINE:
+            objective = engine.objective_for_map(map_id, {}, ROOT)
+            target = objective.get("targetZoneId")
+            if target is None:
+                continue  # the generic sortie fallback names no zone
+            self.assertIn(target, valid,
+                          f"objective_for_map({map_id}) targets {target}, "
+                          "which is not a live zone")
 
 
 if __name__ == "__main__":

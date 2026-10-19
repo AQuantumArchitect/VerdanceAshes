@@ -1,0 +1,174 @@
+{
+  "schemaVersion": "verdance-readings/0.1",
+  "notes": "Narrative density matrix basis. A reading is one interpretation of the company's situation. The diagonal of rho_N is how much the evidence supports each reading; off-diagonals are coherence: two readings nobody has yet been forced to choose between. Everything here is DERIVED from state/campaign_state.json by tools/readings_v1.py; nothing here is world truth and nothing here is written back. Probes are the only vocabulary a reading may use to touch state; add a probe to the tool before you add one here. Witness strings are for the hub readout and writers, never for character mouths.",
+  "spine": {
+    "missions": 12,
+    "note": "Working spine length for attractor pacing. Not a gate; nothing unlocks on mission number."
+  },
+  "player": {
+    "id": "commander",
+    "note": "The player is the suitless ex-Armada commander. roster.commander.unlocked=false means the player has no body and no name on the field. Pavise was the counterpart who knew them under the old flag."
+  },
+  "readings": [
+    {
+      "id": "auxiliary",
+      "title": "Hired Hands",
+      "gloss": "The company is a Null Merc instrument: paid, pointed, replaceable.",
+      "argues": "grath",
+      "resists": "vane",
+      "evidence": [
+        { "probe": "rep", "faction": "nullmercs", "weight": 1.0, "witness": "Merc standing at {pct}" },
+        { "probe": "tag_rate", "tag": "path-b", "window": 6, "weight": 0.9, "witness": "{count} of the last {window} Drops flown on Merc paper" },
+        { "probe": "commitment", "thread": "friends", "choice": "merc", "weight": 0.6, "witness": "the company took the Merc hand on 'Friends of Convenience'" },
+        { "probe": "holdings_ratio", "faction": "nullmercs", "against": "ashwalkers", "weight": 0.5, "witness": "Mercs hold {a} zones to our {b}" },
+        { "probe": "const", "value": 0.12, "weight": 1.0, "witness": null }
+      ]
+    },
+    {
+      "id": "sovereign",
+      "title": "Our Own Flag",
+      "gloss": "The company is becoming a thing in its own right, with ground that answers to no patron.",
+      "argues": "vane",
+      "resists": "grath",
+      "evidence": [
+        { "probe": "holdings_count", "faction": "ashwalkers", "scale": 8, "weight": 1.0, "witness": "{count} zones held under our own name" },
+        { "probe": "graph", "axis": "q6_independent", "weight": 0.7, "witness": "independent footing reads {value}" },
+        { "probe": "tag_rate", "tag": "ashwalker-gain", "window": 6, "weight": 0.7, "witness": "{count} of the last {window} Drops left us holding more than we arrived with" },
+        { "probe": "claimed_nodes", "scale": 2, "weight": 0.8, "witness": "{count} confirmed node claims" },
+        { "probe": "thread_resolved", "thread": "shelter", "weight": 0.5, "witness": "the shelter promise was kept" },
+        { "probe": "commitment", "thread": "friends", "choice": "independent", "weight": 0.5, "witness": "the company chose its own course on 'Friends of Convenience'" },
+        { "probe": "const", "value": 0.1, "weight": 1.0, "witness": null }
+      ]
+    },
+    {
+      "id": "indebted",
+      "title": "The Dealer's Ledger",
+      "gloss": "Someone else holds the paper. Every Drop pays interest before it pays the company.",
+      "argues": "auditor",
+      "resists": "ketha",
+      "evidence": [
+        { "probe": "flag", "path": "worldResponse.loanScrutiny", "weight": 0.7, "witness": "loan scrutiny is on the company" },
+        { "probe": "ledger_ops", "match": "loan", "scale": 2, "weight": 0.9, "witness": "{count} loan entries on the commerce ledger" },
+        { "probe": "tenebrium_low", "threshold": 6, "weight": 0.8, "witness": "Tenebrium bank at {value} of a {threshold} floor" },
+        { "probe": "commitment", "thread": "dealer", "choice": "dealer", "weight": 0.6, "witness": "the company took the dealer's terms" },
+        { "probe": "thread_stage", "thread": "dealer", "stages": ["Available", "Committed", "Changed"], "weight": 0.3, "witness": "the dealer's grudge is open" },
+        { "probe": "const", "value": 0.08, "weight": 1.0, "witness": null }
+      ]
+    },
+    {
+      "id": "bleeding",
+      "title": "Shorter Roster",
+      "gloss": "The company is losing people faster than it is gaining them.",
+      "argues": "ketha",
+      "resists": "brakhov",
+      "evidence": [
+        { "probe": "wounded_named", "scale": 3, "weight": 0.9, "witness": "{count} named on the wounded bench: {names}" },
+        { "probe": "dead_named", "scale": 2, "weight": 0.7, "witness": "{count} named dead: {names}" },
+        { "probe": "verdict_rate", "verdicts": ["defeat", "partial"], "window": 4, "weight": 0.7, "witness": "{count} of the last {window} returns were partial or worse" },
+        { "probe": "thread_distrust", "thread": "bring_back", "scale": 2, "weight": 0.6, "witness": "the 'bring them back' promise has been missed" },
+        { "probe": "const", "value": 0.08, "weight": 1.0, "witness": null }
+      ]
+    },
+    {
+      "id": "rooted",
+      "title": "A Place to Stand",
+      "gloss": "The camp is a home, not a staging area. People come back to it on purpose.",
+      "argues": "hearth",
+      "resists": "vane",
+      "evidence": [
+        { "probe": "home_level", "scale": 2, "weight": 1.0, "witness": "home camp at level {value}" },
+        { "probe": "flag", "path": "flags.homeCleared", "weight": 0.6, "witness": "the shelf is cleared" },
+        { "probe": "thread_resolved", "thread": "place", "weight": 0.7, "witness": "'A Place to Stand' was kept" },
+        { "probe": "thread_trust", "thread": "place", "scale": 2, "weight": 0.4, "witness": "trust on the home promise" },
+        { "probe": "tag_rate", "tag": "extract-clean", "window": 4, "weight": 0.6, "witness": "{count} of the last {window} returns came home clean" },
+        { "probe": "commitment", "thread": "shelter", "choice": "builders", "weight": 0.4, "witness": "the company chose to build somewhere worth defending" },
+        { "probe": "const", "value": 0.08, "weight": 1.0, "witness": null }
+      ]
+    },
+    {
+      "id": "armada_falling",
+      "title": "The Old Flag Comes Down",
+      "gloss": "Armada is losing Verdance. The world the commander came from is ending around them.",
+      "argues": "auditor",
+      "resists": "hearth",
+      "evidence": [
+        { "probe": "flag", "path": "worldFlags.armadaTenebriumCrisis", "weight": 0.8, "witness": "Armada's Tenebrium crisis is declared" },
+        { "probe": "graph", "axis": "q0_armada_cortex", "weight": 0.6, "witness": "the faction axis leans {value} toward Cortex" },
+        { "probe": "front_flips", "from": "armada", "scale": 2, "weight": 0.8, "witness": "{count} zones flipped away from Armada offscreen" },
+        { "probe": "holdings_share_inverse", "faction": "armada", "weight": 0.5, "witness": "Armada holds {pct} of claimed ground" },
+        { "probe": "rep_inverse", "faction": "armada", "weight": 0.4, "witness": "Armada standing at {pct}; the old flag does not answer" },
+        { "probe": "const", "value": 0.1, "weight": 1.0, "witness": null }
+      ]
+    },
+    {
+      "id": "haunted",
+      "title": "The Roll Is Longer Than the Roster",
+      "gloss": "The dead and the unnamed outnumber the living. The commander still has no name on the field.",
+      "argues": "ketha",
+      "resists": "rusk",
+      "evidence": [
+        { "probe": "dead_named", "scale": 2, "weight": 1.2, "witness": "{count} named dead on the roll: {names}" },
+        { "probe": "walker_locked", "weight": 0.6, "witness": "the command walker is still scrap; the commander has no body on the field" },
+        { "probe": "scars_total", "scale": 4, "weight": 0.4, "witness": "{count} scars across the company" },
+        { "probe": "const", "value": 0.08, "weight": 1.0, "witness": null }
+      ]
+    },
+    {
+      "id": "hunted",
+      "title": "Someone Is Looking for Us",
+      "gloss": "The pressure is coming toward the company, not away from it.",
+      "argues": "yeva",
+      "resists": "hearth",
+      "evidence": [
+        { "probe": "graph", "axis": "q6_contested", "weight": 0.8, "witness": "contested pressure reads {value}" },
+        { "probe": "clashes_near_held", "scale": 6, "weight": 0.9, "witness": "{count} offscreen clashes touched ground we hold" },
+        { "probe": "number", "path": "worldResponse.armadaGarrisonScale", "center": 1.0, "scale": 0.5, "weight": 0.6, "witness": "Armada garrisons scaled to {value}" },
+        { "probe": "flag", "path": "worldResponse.denseTeeth", "weight": 0.3, "witness": "the world is answering with denser teeth" },
+        { "probe": "unobserved_held_maps", "weight": 0.5, "witness": "{n} of {m} zones on maps we hold have not been seen since we last stood there" },
+        { "probe": "const", "value": 0.1, "weight": 1.0, "witness": null }
+      ]
+    }
+  ],
+  "coherencePairs": [
+    {
+      "pair": ["auxiliary", "sovereign"],
+      "question": "Whose war is this?",
+      "gloss": "Merc paper and our own ground have not yet been made incompatible.",
+      "initial": 1.0
+    },
+    {
+      "pair": ["rooted", "bleeding"],
+      "question": "Is the camp a home or a hospital?",
+      "gloss": "People come back to it; the question is in what condition.",
+      "initial": 1.0
+    },
+    {
+      "pair": ["indebted", "sovereign"],
+      "question": "Who holds the paper?",
+      "gloss": "You can own ground and still owe for it.",
+      "initial": 1.0
+    },
+    {
+      "pair": ["haunted", "rooted"],
+      "question": "Do we go back for them?",
+      "gloss": "A home can be the place the dead are counted or the place the living are kept.",
+      "initial": 1.0
+    },
+    {
+      "pair": ["hunted", "armada_falling"],
+      "question": "Is the pressure coming or going?",
+      "gloss": "A collapsing Armada can mean fewer enemies or desperate ones.",
+      "initial": 1.0
+    },
+    {
+      "pair": ["auxiliary", "indebted"],
+      "question": "Which creditor?",
+      "gloss": "The Mercs pay; the dealer lends. The company has not yet learned which one it belongs to.",
+      "initial": 1.0
+    }
+  ],
+  "dynamics": {
+    "note": "Coherence c in [0,1] per pair. A distinguishing event multiplies c by (1 - strength) and records which reading it pointed toward. A renewing event moves c toward 1 by strength. rho_ij = c_ij * sqrt(rho_ii * rho_jj).",
+    "floor": 0.02
+  }
+}

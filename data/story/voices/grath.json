@@ -1,0 +1,42 @@
+{
+  "schemaVersion": "verdance-voice/0.1",
+  "speaker": "grath",
+  "name": "Grath Arrears",
+  "register": "Three wars unpaid. Exact about money, bitter about everything else, and funny only by accident. He holds the middle because credit finally beat the Mercs and he knows precisely what that means. He reads the payment line first. He has been on the other side of a loan. He respects the Mercs the way you respect weather.",
+  "argues": ["auxiliary"],
+  "resists": ["sovereign"],
+  "owns": ["merc_paper", "scarcity_crossed_up", "scarcity_crossed_down", "loan_taken", "promise_kept:friends", "promise_broken:friends"],
+  "lines": [
+    { "id": "g.paper.1", "on": { "class": "merc_paper" }, "text": "{map}: Merc contract, Merc payment, nothing of it stayed ours. Clean, as these things go." },
+    { "id": "g.paper.2", "on": { "class": "merc_paper" }, "text": "Paid in full for {map}. Three wars and it still surprises me when the money arrives." },
+    { "id": "g.paper.3", "on": { "class": "merc_paper" }, "text": "Their name's on {map}. Ours is on the scrip. That's the trade and it's not a bad one." },
+    { "id": "g.paper.4", "on": { "class": "merc_paper" }, "reading": { "dominant": ["sovereign"] }, "text": "You took Merc paper for {map}. Fine. Just don't fly our flag over it. They notice flags." },
+    { "id": "g.paper.5", "on": { "class": "merc_paper" }, "reading": { "dominant": ["auxiliary"] }, "text": "Another contract, another payment. We're good at this. I keep waiting for the part where that's a problem." },
+
+    { "id": "g.scarce.up.1", "on": { "class": "scarcity_crossed_up" }, "text": "Scarcity bit after {map}. Everything costs more tomorrow. Spend tonight like you believe me." },
+    { "id": "g.scarce.up.2", "on": { "class": "scarcity_crossed_up" }, "text": "Tenebrium's thin. When it's thin, people lend. When people lend, they own you. Mind the order." },
+    { "id": "g.scarce.down.1", "on": { "class": "scarcity_crossed_down" }, "text": "Scarcity eased after {map}. Don't celebrate. Easing is what it does right before it doesn't." },
+    { "id": "g.scarce.down.2", "on": { "class": "scarcity_crossed_down" }, "text": "There's slack in the ledger for once. I've already spent it in my head. Twice." },
+
+    { "id": "g.loan.1", "on": { "class": "loan_taken" }, "text": "A loan. I've signed those. The first payment's easy. That's how they design it." },
+    { "id": "g.loan.2", "on": { "class": "loan_taken" }, "text": "Borrowed. Fine. Now every Drop has a line at the top before the objective. I'll write it in red." },
+    { "id": "g.loan.3", "on": { "class": "loan_taken" }, "reading": { "dominant": ["sovereign"] }, "text": "Our own flag, on somebody else's money. I've seen how that flag comes down. Slowly, then all at once." },
+
+    { "id": "g.kept.friends.1", "on": { "class": "promise_kept", "thread": "friends" }, "text": "You took the Merc hand and it held. They'll remember that. So will I. Different reasons." },
+    { "id": "g.kept.friends.2", "on": { "class": "promise_kept", "thread": "friends" }, "text": "Friends of convenience, paid on time. That's more than most friends manage." },
+    { "id": "g.broken.friends.1", "on": { "class": "promise_broken", "thread": "friends" }, "text": "The Merc arrangement lapsed. They don't get angry about that. They get accurate." },
+    { "id": "g.broken.friends.2", "on": { "class": "promise_broken", "thread": "friends" }, "text": "We let the contract slide. Somewhere a Merc clerk just wrote our name smaller." },
+
+    { "id": "g.open.shelf", "on": { "attractor": "shelf" }, "occasion": "briefing", "text": "Payment line first: {tenebrium} Tenebrium in the bank. Now the part where we earn more." },
+    { "id": "g.open.paid_work", "on": { "attractor": "paid_work" }, "occasion": "briefing", "text": "Contract's good. Payment's real. The zone has their name on it. I read it so you don't have to." },
+    { "id": "g.open.ledger", "on": { "attractor": "ledger" }, "occasion": "briefing", "text": "Before the objective: what tonight costs. After the objective: what it was worth. I'll have both numbers." },
+    { "id": "g.open.finale_overthrow", "on": { "attractor": "finale_overthrow" }, "occasion": "briefing", "text": "They're paying in territory for the Armada gate. Somebody else's house. That's how arrears get settled." },
+
+    { "id": "g.shift.auxiliary", "on": { "dominantBecame": "auxiliary" }, "occasion": "camp", "once": true, "text": "Nobody's paid me three times running in my life. They just did. I'd like to not think about why." },
+    { "id": "g.shift.indebted", "on": { "dominantBecame": "indebted" }, "occasion": "camp", "once": true, "text": "Somebody holds our paper now. It isn't the money they want. It's what the money lets them ask for." },
+    { "id": "g.shift.sovereign", "on": { "dominantBecame": "sovereign" }, "occasion": "camp", "once": true, "text": "Our own flag. I've served under four. I'll tell you how it goes if you want. You won't want." },
+    { "id": "g.settled.sovereign", "on": { "coherenceSettled": { "pair": ["auxiliary", "sovereign"], "toward": "sovereign" } }, "occasion": "camp", "once": true, "text": "So we're not hands anymore. All right. Somebody's going to have to explain that to the people who paid for the hands." }
+  ],
+  "deathLine": "Three wars. Put this one on the ledger. Somebody'll collect.",
+  "notes": "Grath is active in the live save but not in the sealed company. His lines fire when he's in camp; promise_kept:friends falls back to Ketha otherwise."
+}

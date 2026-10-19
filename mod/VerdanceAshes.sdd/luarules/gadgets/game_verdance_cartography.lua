@@ -400,10 +400,13 @@ function gadget:Initialize()
   ))
 
   -- Headless stalls on IconsAtlas; the shell-bake gadget learned this the hard way.
+  -- useOverlay (the third arg) keeps these in memory only. Without it they are
+  -- written through to the player's springsettings.cfg and survive the process,
+  -- so one survey batch silently disables LuaUI for every later GUI session.
   if Spring.SetConfigInt then
-    Spring.SetConfigInt("UnitIconsAsUI", 0)
-    Spring.SetConfigInt("UnitIconDist", 99999)
-    Spring.SetConfigInt("LuaUI", 0)
+    Spring.SetConfigInt("UnitIconsAsUI", 0, true)
+    Spring.SetConfigInt("UnitIconDist", 99999, true)
+    Spring.SetConfigInt("LuaUI", 0, true)
   end
   local speed = modInt("va_cart_speed", 20)
   if speed > 0 and Spring.SendCommands then

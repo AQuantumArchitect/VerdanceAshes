@@ -9,8 +9,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 AUTH = ROOT / "data" / "zone_maps" / "authored"
 OUT = ROOT / "app" / "showoff" / "boards.embed.js"
-
-
 def edge_score(bounds: dict) -> float:
     """Distance from map rim in normalized coords (0 = on edge, 0.5 = dead center)."""
     xmin = float(bounds.get("xMin", 0) or 0)
@@ -53,24 +51,35 @@ def is_preferred_objective(role: str, tags: list) -> bool:
 
 
 def is_edge_zone(bounds: dict, *, threshold: float = 0.28) -> bool:
-    """Enfil / exfil belong on the rim of the map, not the middle."""
+    """Quiet-rim geometry helper (edgeScore ≤ threshold). Not a hard LZ lock —
+    inland Ashwalker bases are also legal landings at stamp/hub time."""
     return edge_score(bounds) <= threshold
 
 
-def is_deploy_candidate(role: str, tags: list, bounds: dict) -> bool:
-    """Player landing candidates: start/staging only if also near the map edge."""
-    if not is_edge_zone(bounds):
-        return False
+def is_deploy_candidate(role: str, tags: list, bounds: dict | None = None) -> bool:
+    """Authored start/staging/muster pads — rim preferred for defaults, but
+    midfield starts are not stripped (owned inland FOBs land here later)."""
     t = set(tags or [])
     if role == "legion_start":
         return True
-    if "staging" in t or "start" in t:
+    if "staging" in t or "start" in t or "muster" in t:
         return True
     if "start" in t and ("legion" in t or "ashwalker" in t):
         return True
-    if role in ("reserve",) and "green" in t:
+    if role in ("start", "reserve") and ("green" in t or "muster" in str(role)):
+        return True
+    if role == "start":
         return True
     return False
+
+
+def is_inter_map_lane(zone_id: str, role: str, tags: list, bounds: dict) -> bool:
+    """Theater corridor endpoints (rim muster / lane / staging)."""
+    if not is_edge_zone(bounds):
+        return False
+    blob = f"{zone_id or ''} {role or ''} {' '.join(tags or [])}".lower()
+    keys = ("muster", "lane", "staging", "causeway", "shelf", "start", "camp", "approach")
+    return any(k in blob for k in keys)
 
 
 def build_boards() -> dict:
@@ -83,6 +92,7 @@ def build_boards() -> dict:
             b = z.get("bounds") or {}
             tags = list(z.get("tags") or [])
             role = z.get("role") or ""
+            zid = z.get("zoneId")
             bounds = {
                 "xMin": float(b.get("xMin", 0)),
                 "xMax": float(b.get("xMax", 1)),
@@ -90,41 +100,79 @@ def build_boards() -> dict:
                 "zMax": float(b.get("zMax", 1)),
             }
             es = round(edge_score(bounds), 4)
+            hydro = z.get("hydrology") or {}
+            try:
+                resting = float(hydro.get("restingSubmerged") or 0.0)
+                floods_at = float(hydro.get("floodsAt") or 2.0)
+            except (TypeError, ValueError):
+                resting, floods_at = 0.0, 2.0
+            anchor = z.get("anchor") or {}
+            try:
+                ax = float(anchor.get("x"))
+                az = float(anchor.get("z"))
+            except (TypeError, ValueError):
+                ax = (bounds["xMin"] + bounds["xMax"]) / 2.0
+                az = (bounds["zMin"] + bounds["zMax"]) / 2.0
+            dry = bool(z.get("campEligible", True)) and resting < 0.35 and floods_at > 0.0
             zones.append(
                 {
-                    "zoneId": z.get("zoneId"),
-                    "label": z.get("label") or z.get("zoneId"),
+                    "zoneId": zid,
+                    "label": z.get("label") or zid,
                     "role": role,
                     "tags": tags,
                     "bounds": bounds,
+                    "anchor": {"x": round(ax, 4), "z": round(az, 4)},
+                    "dry": dry,
                     "edgeScore": es,
+                    # Quiet-rim corridor hint — hub still unlocks Ashwalker inland pads.
+                    "interMapLane": is_inter_map_lane(str(zid or ""), role, tags, bounds),
                     "capturable": is_capturable(role, tags, bounds),
                     "preferredObjective": is_preferred_objective(role, tags),
-                    "deployDefault": False,  # set after edge ranking
+                    "deployDefault": False,  # set after ranking (rim preferred, not required)
                     "extractDefault": False,
                 }
             )
-        # Prefer true rim landings: lowest edgeScore among deploy candidates.
-        candidates = [z for z in zones if is_deploy_candidate(z["role"], z["tags"], z["bounds"])]
+        # Prefer quiet-rim / inter-map lanes for *defaults*; midfield starts stay eligible.
+        rim = [z for z in zones if is_edge_zone(z["bounds"])]
+        lane_rim = [z for z in rim if z.get("interMapLane")]
+        deployish = [
+            z for z in zones
+            if is_deploy_candidate(z["role"], z["tags"], z["bounds"]) or z.get("interMapLane")
+        ]
+        candidates = [
+            z for z in (lane_rim or rim or deployish)
+            if is_deploy_candidate(z["role"], z["tags"], z["bounds"]) or z.get("interMapLane")
+        ]
         if not candidates:
-            # Fallback: any non-capturable edge zone, else lowest edgeScore overall.
-            candidates = [z for z in zones if is_edge_zone(z["bounds"]) and not z["capturable"]]
+            candidates = [z for z in rim if not z["capturable"]]
         if not candidates:
-            candidates = sorted(zones, key=lambda z: z["edgeScore"])[:1]
+            candidates = deployish[:1] or sorted(
+                zones, key=lambda z: (0 if z.get("interMapLane") else 1, z["edgeScore"])
+            )[:1]
         if candidates:
-            best = min(candidates, key=lambda z: z["edgeScore"])
+            # Prefer true edge, then inter-map lanes — never hard-exclude midfield pads.
+            best = min(
+                candidates,
+                key=lambda z: (
+                    0 if is_edge_zone(z["bounds"]) else 1,
+                    z["edgeScore"],
+                    0 if z.get("interMapLane") else 1,
+                ),
+            )
             best["deployDefault"] = True
             best["extractDefault"] = True
             best["capturable"] = False  # never capture your own LZ
-            # Second-best edge zone as alternate extract if available
             alts = sorted(
                 [z for z in candidates if z is not best],
-                key=lambda z: z["edgeScore"],
+                key=lambda z: (
+                    0 if is_edge_zone(z["bounds"]) else 1,
+                    z["edgeScore"],
+                    0 if z.get("interMapLane") else 1,
+                ),
             )
             if alts:
                 alts[0]["extractDefault"] = True
             else:
-                # Mark other edge non-objectives as extract-friendly
                 for z in zones:
                     if z is not best and is_edge_zone(z["bounds"]) and not z["preferredObjective"]:
                         z["extractDefault"] = True

@@ -1,0 +1,9 @@
+{
+  "note": "The command walker starts as scrap. A beat in this list is what fields it. Mission number is not a beat. The examples key is documentation and is not loaded.",
+  "beats": [],
+  "examples": [
+    { "id": "suit_comes_home", "when": "hero_joined", "heroId": "someone" },
+    { "id": "rebuilt", "when": "story_tag", "tag": "commander_rebuilt" },
+    { "id": "shelf_flag", "when": "flag", "flag": "walkerRebuilt" }
+  ]
+}

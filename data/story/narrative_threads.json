@@ -1,0 +1,380 @@
+{
+  "schemaVersion": "verdance-narrative-content/1.0",
+  "threads": [
+    {
+      "id": "place",
+      "title": "A Place to Stand",
+      "maps": [
+        "the_rock_jungle",
+        "greenest_fields"
+      ],
+      "priority": 80,
+      "reason": "The company needs a home.",
+      "opening": "We have somewhere to land. We still need somewhere to belong.",
+      "escalation": "The shelf is waiting; decide what you can bring to it.",
+      "success": "The camp is established. A place to return to is now part of the war.",
+      "failure": "The company came back with unfinished work. The jungle is still there.",
+      "changed": "The situation has changed. Reassess the home route before committing again.",
+      "callback": "You built a place worth returning to.",
+      "perspectives": [
+        {
+          "speaker": "ketha",
+          "text": "I can mend a company. Give me somewhere to put it."
+        },
+        {
+          "speaker": "vane",
+          "text": "A camp is a promise we have to defend."
+        }
+      ],
+      "choices": [
+        {
+          "id": "raid",
+          "label": "Raid for the home",
+          "goal": "raid",
+          "obligation": "Complete a clean extraction from Greenest Fields. No deadline.",
+          "cost": 0,
+          "stance": "Building a future",
+          "response": "Ketha clears a corner of the supply table. \"All right. We start here. Try not to build the infirmary downhill from the ammunition.\""
+        },
+        {
+          "id": "home",
+          "label": "Establish the camp",
+          "goal": "home",
+          "obligation": "Raise the existing home camp, then complete a sortie. No deadline.",
+          "cost": 0,
+          "stance": "Building a future",
+          "response": "Ketha clears a corner of the supply table. \"All right. We start here. Try not to build the infirmary downhill from the ammunition.\""
+        },
+        {
+          "id": "people",
+          "label": "A home starts with who comes back.",
+          "goal": "recover",
+          "stance": "Care before ambition",
+          "obligation": "Complete a clean extraction with explicit survivor records showing no hero wounds or losses. No deadline.",
+          "response": "Ketha leaves a space at the table instead of drawing a bigger perimeter. \"Good. Start with people. Walls can learn to wait.\"",
+          "success": "You promised people before walls, and the field report supports that promise.",
+          "callback": "Ketha taps the empty chair. \"Still a chair. Not a memorial. That was the plan.\"",
+          "cost": 0
+        }
+      ]
+    },
+    {
+      "id": "shelter",
+      "title": "The Price of Shelter",
+      "maps": [
+        "the_rock_jungle",
+        "greenest_fields",
+        "koom_valley"
+      ],
+      "priority": 65,
+      "reason": "Owned ground opens routes, but holding it takes work.",
+      "opening": "Every foothold is a door that opens both ways.",
+      "escalation": "Our ground still needs attention.",
+      "success": "A confirmed claim gives the company ground to stand on.",
+      "failure": "The ground is not secured yet. Check the next operation's requirements.",
+      "changed": "The commitment has run its course or the foothold is gone. Choose a fresh route; no territory is awarded.",
+      "callback": "You made holding ground part of the company's story.",
+      "perspectives": [
+        {
+          "speaker": "warder",
+          "text": "A wall is a place to put your back."
+        },
+        {
+          "speaker": "vane",
+          "text": "And a place the enemy knows to find it."
+        }
+      ],
+      "choices": [
+        {
+          "id": "claim",
+          "label": "Commit to securing ground",
+          "goal": "claim",
+          "obligation": "Confirm a node claim within the next three completed sorties.",
+          "cost": 0,
+          "deadline": 3,
+          "stance": "Holding ground",
+          "response": "Vane marks the ground. \"Then it gets a name, a route, and someone watching the route.\""
+        },
+        {
+          "id": "mobile",
+          "label": "Our home travels with us. Keep a way out.",
+          "goal": "extract",
+          "stance": "Freedom of movement",
+          "obligation": "Complete a clean extraction within three completed sorties. This does not defend or surrender territory.",
+          "response": "Vane folds the perimeter sketch along the road. \"A door that only opens inward is a trap.\"",
+          "success": "You backed your preference for mobility with a clean return.",
+          "callback": "The old perimeter sketch now has an exit drawn on it. Nobody has erased it.",
+          "cost": 0,
+          "deadline": 3
+        },
+        {
+          "id": "builders",
+          "label": "Build somewhere worth defending.",
+          "goal": "home",
+          "stance": "Stewardship",
+          "obligation": "Raise the home camp, then complete a sortie within three completed sorties. An already established camp meets the building condition.",
+          "response": "Ketha studies the supply list. \"Beds first. If you call a gun emplacement a bed again, you sleep in it.\"",
+          "success": "Your established camp gives substance to the promise of shelter.",
+          "callback": "The company measures shelter in places to rest as well as places to fire.",
+          "cost": 0,
+          "deadline": 3
+        }
+      ]
+    },
+    {
+      "id": "bring_back",
+      "title": "What We Bring Back",
+      "maps": [
+        "greenest_fields",
+        "the_rock_jungle",
+        "all_that_simmers"
+      ],
+      "priority": 75,
+      "reason": "Extraction turns battlefield gains into a future.",
+      "opening": "There is always one more valuable thing beyond the line.",
+      "escalation": "There is still a way home. Decide what is worth carrying.",
+      "success": "The company completed a clean extraction. The result ledger records what survived.",
+      "failure": "The return was costly. Read the losses before choosing the next risk.",
+      "changed": "The extraction commitment has changed. Re-plan with the company you have.",
+      "callback": "You once chose a route home. The company remembers that.",
+      "perspectives": [
+        {
+          "speaker": "ketha",
+          "text": "Wrecks can wait. People are harder to rebuild."
+        },
+        {
+          "speaker": "brakhov",
+          "text": "There is still heat in that ridge."
+        }
+      ],
+      "choices": [
+        {
+          "id": "extract",
+          "label": "Make a clean return the priority",
+          "goal": "extract",
+          "obligation": "Complete a clean extraction within three completed sorties.",
+          "cost": 0,
+          "deadline": 3,
+          "stance": "Prudence",
+          "response": "Ketha draws a heavy line beneath extraction. \"This bit is part of the mission. I want that understood before we leave.\""
+        },
+        {
+          "id": "care",
+          "label": "Nobody is spare equipment.",
+          "goal": "recover",
+          "stance": "Care before profit",
+          "obligation": "Complete a clean extraction with explicit survivor records showing no hero wounds or losses within three completed sorties.",
+          "response": "Ketha closes the salvage tally. \"I will still count the metal. I will just count you first.\"",
+          "success": "The survivor report backs your promise to put people first.",
+          "callback": "Someone has written PEOPLE at the top of the salvage board. Ketha declines to identify the handwriting.",
+          "cost": 0,
+          "deadline": 3
+        },
+        {
+          "id": "provision",
+          "label": "Take the risk that buys us a future.",
+          "goal": "raid",
+          "stance": "Calculated ambition",
+          "obligation": "Complete a clean extraction from Greenest Fields within three completed sorties. No minimum loot or optional objective is promised.",
+          "response": "Brakhov leans toward the map. \"Then we go for a reason. Not because something over there is still standing.\"",
+          "success": "You made the raid and returned cleanly. The ledger, not the promise, decides its profit.",
+          "callback": "The raid is now an argument the company can refer to: ambition needs a route home.",
+          "cost": 0,
+          "deadline": 3
+        }
+      ]
+    },
+    {
+      "id": "friends",
+      "title": "Friends of Convenience",
+      "maps": [
+        "greenest_fields",
+        "koom_valley",
+        "tabula"
+      ],
+      "priority": 45,
+      "reason": "Null Merc standing affects who fights beside you.",
+      "opening": "A shared enemy is a beginning, not an oath.",
+      "escalation": "The mercs will judge the next field result.",
+      "success": "You completed the promised operation away from the dealer's ground. Existing faction rules determine the standing change.",
+      "failure": "Shared interests have not yet become a successful operation.",
+      "changed": "The promised window passed. The next conversation begins with unfinished business.",
+      "callback": "The mercs have a field result to remember.",
+      "perspectives": [
+        {
+          "speaker": "vane",
+          "text": "I trust a flank I can see."
+        },
+        {
+          "speaker": "vale",
+          "text": "I prefer the terms written down."
+        }
+      ],
+      "choices": [
+        {
+          "id": "merc",
+          "label": "Promise a successful field operation",
+          "goal": "merc",
+          "obligation": "Win an operation outside Eye of Horus within three completed sorties. Existing reputation rules still apply.",
+          "cost": 0,
+          "deadline": 3,
+          "stance": "Reciprocity",
+          "response": "Vane checks the map again. \"A promise with a destination. I can live with that.\""
+        },
+        {
+          "id": "independent",
+          "label": "Cooperate, but promise them nothing.",
+          "goal": "extract",
+          "stance": "Independence",
+          "obligation": "Complete a clean extraction within three completed sorties. This promise is to your company; it grants no faction standing.",
+          "response": "Vane nods. \"A shared road. Separate steering wheels.\"",
+          "success": "You kept the company moving without pretending a field result was an alliance.",
+          "callback": "When someone calls the mercs family, the company still asks which part of the contract says that.",
+          "cost": 0,
+          "deadline": 3
+        },
+        {
+          "id": "care",
+          "label": "Our people set the terms.",
+          "goal": "recover",
+          "stance": "Solidarity",
+          "obligation": "Complete a clean extraction with explicit survivor records showing no hero wounds or losses within three completed sorties. No alliance is created.",
+          "response": "Vale considers the wording. \"An actual term. Better than mutual benefit, which usually means their benefit twice.\"",
+          "success": "You backed your terms with a clean, unwounded return recorded by the result.",
+          "callback": "The phrase our people first has made it into the margins of the company agreements.",
+          "cost": 0,
+          "deadline": 3
+        }
+      ]
+    },
+    {
+      "id": "dealer",
+      "title": "The Dealer’s Grudge",
+      "maps": [
+        "eye_of_horus"
+      ],
+      "priority": 55,
+      "reason": "Cortex remembers destruction on its ground.",
+      "opening": "The dealer remembers what you broke, even when you call it business.",
+      "escalation": "A return to Horus carries the weight of the last visit.",
+      "success": "You returned from Horus. The existing battle result determines the dealer's actual response.",
+      "failure": "The account is still open. A failed operation does not erase a grudge.",
+      "changed": "The return was deferred. Review current dealer access before another commitment.",
+      "callback": "Horus is no longer just a point on the map.",
+      "perspectives": [
+        {
+          "speaker": "vale",
+          "text": "Read the price before you touch the shelf."
+        },
+        {
+          "speaker": "brakhov",
+          "text": "Everything has a melting point."
+        }
+      ],
+      "choices": [
+        {
+          "id": "dealer",
+          "label": "Commit to returning from Horus",
+          "goal": "dealer",
+          "obligation": "Complete a clean extraction from Eye of Horus within three completed sorties. This does not guarantee improved reputation.",
+          "cost": 0,
+          "deadline": 3,
+          "stance": "Defiance",
+          "response": "Brakhov smiles. Vale keeps reading. Neither finds the other reassuring."
+        },
+        {
+          "id": "distance",
+          "label": "We can earn our living elsewhere.",
+          "goal": "merc",
+          "stance": "Self-reliance",
+          "obligation": "Win an operation outside Eye of Horus within three completed sorties. This does not repair Cortex standing.",
+          "response": "Vale puts the invoice face down. \"A price is only compulsory if we insist on shopping here.\"",
+          "success": "You won elsewhere. The company has an answer to the claim that Horus is its only future.",
+          "callback": "The old invoice is still on the table. It no longer occupies the whole table.",
+          "cost": 0,
+          "deadline": 3
+        },
+        {
+          "id": "restrained",
+          "label": "Bring everyone home before settling accounts.",
+          "goal": "recover",
+          "stance": "Restraint",
+          "obligation": "Complete a clean extraction with explicit survivor records showing no hero wounds or losses within three completed sorties. No dealer access is restored.",
+          "response": "Brakhov looks disappointed. Ketha looks at Brakhov. The disappointment becomes private.",
+          "success": "You put a documented safe return ahead of the grudge.",
+          "callback": "The company remembers a debt you chose not to collect with its bodies.",
+          "cost": 0,
+          "deadline": 3
+        }
+      ]
+    },
+    {
+      "id": "company",
+      "title": "The Shape of the Company",
+      "maps": [
+        "the_rock_jungle",
+        "greenest_fields",
+        "koom_valley",
+        "tabula",
+        "all_that_simmers",
+        "eye_of_horus",
+        "ancient_bastion"
+      ],
+      "priority": 50,
+      "reason": "Shared deployments leave wounds and relationships.",
+      "opening": "The same company can want very different futures.",
+      "escalation": "A quieter return can give those disagreements room to breathe.",
+      "success": "A clean return kept this commitment alive in the company's memory.",
+      "failure": "The return did not settle the company's unfinished business.",
+      "changed": "The company needs a new commitment suited to its current condition.",
+      "callback": "The company remembers that coming home mattered.",
+      "perspectives": [
+        {
+          "speaker": "ketha",
+          "text": "We are more than the list of what still fires."
+        },
+        {
+          "speaker": "vane",
+          "text": "Then let's keep the list long."
+        }
+      ],
+      "choices": [
+        {
+          "id": "recover",
+          "label": "Commit to a careful return",
+          "goal": "recover",
+          "obligation": "Complete a clean extraction with explicit survivor records showing no hero wounds or losses within three completed sorties.",
+          "cost": 0,
+          "deadline": 3,
+          "stance": "Care",
+          "response": "Ketha nods once. \"Careful is work. It means planning for the person who cannot keep up.\""
+        },
+        {
+          "id": "bold",
+          "label": "We are the ones who make a foothold.",
+          "goal": "claim",
+          "stance": "Resolve",
+          "obligation": "Confirm a node claim within three completed sorties. Territory still follows the existing campaign rules.",
+          "response": "Vane studies the line. \"Then say where. Courage without a location is just noise.\"",
+          "success": "A confirmed claim gives your declaration a place on the map.",
+          "callback": "The company can point to ground when someone asks what your promise meant.",
+          "cost": 0,
+          "deadline": 3
+        },
+        {
+          "id": "practical",
+          "label": "We survive by making the next return possible.",
+          "goal": "extract",
+          "stance": "Pragmatism",
+          "obligation": "Complete a clean extraction within three completed sorties. Wounds and losses still count under the existing rules.",
+          "response": "Ketha takes a breath. \"I can work with an honest promise. Do not turn it into an excuse.\"",
+          "success": "You delivered the clean extraction you promised. The costs remain in the ledger.",
+          "callback": "When plans grow grand, someone asks the small question you taught them: and how do we get back?",
+          "cost": 0,
+          "deadline": 3
+        }
+      ]
+    }
+  ],
+  "scenes": []
+}

@@ -5,7 +5,7 @@ param(
   [int]$MaxMissions = 12,
   [switch]$SessionHost,
   [switch]$NoAutoRelaunch,
-  [ValidateSet("visible", "headless-fastwin")]
+  [ValidateSet("visible", "headless-fastwin", "headless-zip")]
   [string]$EngineMode = "visible",
   [string]$StatusPath = ""
 )

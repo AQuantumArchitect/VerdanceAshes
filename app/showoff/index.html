@@ -21,7 +21,7 @@ button { font-family:inherit; cursor:pointer; }
 button:disabled { opacity:.45; cursor:not-allowed; }
 
 .app {
-  display:grid; grid-template-columns: 15.5rem 1fr 17.5rem;
+  display:grid; grid-template-columns: 18rem 1fr 17.5rem;
   grid-template-rows: auto 1fr auto;
   height:100%; gap:0;
 }
@@ -56,6 +56,7 @@ button:disabled { opacity:.45; cursor:not-allowed; }
   border-right:1px solid rgba(61,143,85,.2);
   background:var(--panel);
 }
+#col-aces { position: relative; }
 .col.right { border-right:0; border-left:1px solid rgba(61,143,85,.2); }
 .main {
   overflow:auto; padding:1rem 1.15rem 1.4rem;
@@ -174,7 +175,9 @@ h3 { margin:.8rem 0 .35rem; font-size:.78rem; color:var(--gold); font-weight:600
   color:var(--steam); margin-bottom:.22rem;
 }
 .choice .label { font-size:.92rem; font-weight:600; color:var(--ink); }
-.choice .blurb { font-size:.74rem; color:var(--muted); margin-top:.28rem; line-height:1.35; }
+.choice .blurb { font-size:.74rem; color:var(--muted); margin-top:.28rem; line-height:1.35; white-space:pre-line; }
+.choice.lean { border-color:rgba(224,190,110,.72); }
+.choice.residual { opacity:.74; }
 .choice.deploy .kind { color:var(--good); }
 .choice.shop .kind { color:var(--tnb); }
 .choice.talk .kind { color:var(--gold); }
@@ -216,6 +219,16 @@ h3 { margin:.8rem 0 .35rem; font-size:.78rem; color:var(--gold); font-weight:600
   border-radius:8px; padding:.35rem .65rem; font-size:.72rem;
   border:1px solid rgba(61,143,85,.45); background:rgba(0,0,0,.4); color:var(--ink);
 }
+.btn-bro-tzar {
+  background:rgba(201,160,255,.14); color:var(--tnb);
+  border:1px solid rgba(201,160,255,.55);
+  font-weight:600; letter-spacing:.01em;
+}
+.btn-bro-tzar:hover:not(:disabled) { filter:brightness(1.12); border-color:var(--tnb); }
+.btn-bro-tzar.ordered {
+  background:rgba(125,255,138,.1); color:var(--good);
+  border-color:rgba(125,255,138,.45);
+}
 .btn-primary {
   background:linear-gradient(135deg, #2d6b42, #1a3f2a);
   border-color:var(--edge); color:var(--ink); padding:.55rem 1.1rem; font-size:.85rem;
@@ -236,6 +249,44 @@ h3 { margin:.8rem 0 .35rem; font-size:.78rem; color:var(--gold); font-weight:600
   padding:.7rem .85rem .85rem;
   box-shadow:0 12px 40px rgba(0,0,0,.28);
 }
+.map-picker {
+  display:flex; flex-wrap:wrap; gap:.4rem; margin:0 0 .55rem;
+  align-items:stretch;
+}
+.map-chip {
+  appearance:none; cursor:pointer;
+  border:1px solid rgba(61,143,85,.4);
+  background:rgba(8,18,12,.75);
+  color:var(--ink); border-radius:10px;
+  padding:.4rem .65rem .35rem; min-width:5.5rem;
+  text-align:left; line-height:1.2;
+  transition: border-color .12s, background .12s, box-shadow .12s;
+}
+.map-chip:hover { border-color:var(--gold); }
+.map-chip.active {
+  border-color:var(--gold);
+  background:rgba(61,143,85,.22);
+  box-shadow:0 0 0 1px rgba(224,186,96,.25), 0 0 14px rgba(61,143,85,.18);
+}
+.map-chip .mc-name {
+  display:block; font-size:.78rem; font-weight:600; color:var(--gold);
+  letter-spacing:.02em;
+}
+.map-chip .mc-meta {
+  display:flex; flex-wrap:wrap; gap:.25rem .4rem; margin-top:.2rem;
+  font-size:.58rem; color:var(--muted); text-transform:uppercase; letter-spacing:.04em;
+}
+.map-chip .mc-meta .tag-home { color:var(--steam); }
+.map-chip .mc-meta .tag-count { color:var(--warn); }
+.map-chip.locked { opacity:.45; cursor:not-allowed; }
+.choices-head {
+  display:flex; flex-wrap:wrap; justify-content:space-between; gap:.35rem;
+  align-items:baseline; margin: .85rem 0 .35rem;
+}
+.choices-head .ch-kicker {
+  font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted);
+}
+.choices-head .ch-map { font-size:.78rem; color:var(--gold); font-weight:600; }
 .theater-head {
   display:flex; flex-wrap:wrap; justify-content:space-between; gap:.5rem;
   align-items:flex-start; margin-bottom:.5rem;
@@ -273,6 +324,15 @@ h3 { margin:.8rem 0 .35rem; font-size:.78rem; color:var(--gold); font-weight:600
 .zone.ctrl-cortex { background:rgba(201,160,255,.14); }
 .zone.ctrl-wild { background:rgba(224,160,96,.12); }
 .zone.est { opacity:.88; }
+/* Outside operational footprint — still readable as planet, not mission ground */
+.zone.fog {
+  opacity:.28; filter:saturate(.35) brightness(.75);
+  border-color:rgba(126,200,255,.12);
+  background:rgba(10,18,14,.55);
+}
+.zone.fog .zone-label { color:rgba(200,220,210,.45); }
+.zone.fog .zone-chip { display:none; }
+.zone.fog:hover { opacity:.45; border-color:rgba(224,186,96,.35); }
 /* Ash Console marks: infil=good, target=warn, exfil=steam */
 .zone.deploy-mark {
   background:rgba(125,255,138,.22); border-color:var(--good);
@@ -286,8 +346,10 @@ h3 { margin:.8rem 0 .35rem; font-size:.78rem; color:var(--gold); font-weight:600
   background:rgba(224,160,96,.28); border-color:var(--warn);
   box-shadow:0 0 12px rgba(224,160,96,.3); z-index:5;
 }
-.zone.rim-eligible.mode-rim:hover { border-color:var(--steam); }
-.zone.midfield.mode-rim { cursor:not-allowed; opacity:.72; }
+.zone.rim-eligible.mode-lz:hover,
+.zone.lz-eligible.mode-lz:hover { border-color:var(--steam); }
+.zone.midfield.mode-lz:not(.lz-eligible) { cursor:not-allowed; opacity:.72; }
+.zone.midfield.lz-eligible.mode-lz { cursor:pointer; opacity:1; }
 .zone-label { pointer-events:none; line-height:1.15; }
 .zone-chip {
   display:inline-block; font-size:.5rem; letter-spacing:.05em; text-transform:uppercase;
@@ -304,6 +366,9 @@ h3 { margin:.8rem 0 .35rem; font-size:.78rem; color:var(--gold); font-weight:600
 .theater-actions {
   display:flex; flex-wrap:wrap; gap:.45rem; justify-content:space-between;
   align-items:center; margin-top:.35rem;
+  position: sticky; bottom: 0; z-index: 6;
+  padding: .55rem 0 .2rem;
+  background: linear-gradient(180deg, rgba(4,9,7,0), rgba(4,9,7,.96) 28%);
 }
 .marks-sum { font-size:.75rem; color:var(--muted); line-height:1.45; flex:1; min-width:12rem; }
 .marks-sum b { color:var(--ink); }
@@ -324,7 +389,7 @@ h3 { margin:.8rem 0 .35rem; font-size:.78rem; color:var(--gold); font-weight:600
 .overlay { display:none !important; }
 .status-toast {
   position:fixed; left:50%; bottom:1.2rem; transform:translateX(-50%);
-  z-index:50; max-width:min(32rem,92vw); padding:.55rem .9rem;
+  z-index:120; max-width:min(32rem,92vw); padding:.55rem .9rem;
   background:rgba(6,14,10,.92); border:1px solid rgba(126,200,255,.3);
   border-radius:10px; font-size:.8rem; display:none;
 }
@@ -367,6 +432,350 @@ h3 { margin:.8rem 0 .35rem; font-size:.78rem; color:var(--gold); font-weight:600
   border:1px solid rgba(61,143,85,.4); background:rgba(0,0,0,.35); color:var(--ink);
 }
 .foot-actions button.primary { border-color:rgba(212,196,154,.45); color:var(--gold); }
+.foot-actions button.danger {
+  border-color:rgba(180,70,70,.55);
+  color:#e8a0a0;
+}
+.foot-actions button.danger:hover {
+  border-color:rgba(220,90,90,.75);
+  background:rgba(120,30,30,.25);
+}
+
+/* THE COMPANY sidebar — formation + roster (merged from main muster) */
+#col-aces.company-preamble {
+  box-shadow: inset 0 0 0 2px rgba(212,196,154,.55), 0 0 24px rgba(212,196,154,.12);
+  position: relative;
+}
+#col-aces.company-preamble::before {
+  content: "Form your company";
+  display: block;
+  font-size: .62rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin: 0 0 .45rem;
+  padding: .35rem .55rem;
+  border-radius: 8px;
+  border: 1px solid rgba(212,196,154,.4);
+  background: linear-gradient(135deg, rgba(212,196,154,.14), transparent 70%);
+}
+.company-head {
+  display: flex; flex-wrap: wrap; gap: .35rem;
+  justify-content: space-between; align-items: flex-start;
+  margin-bottom: .35rem;
+}
+.company-head h2 { margin: 0; }
+.company-wallet {
+  font-size: .62rem; color: #c9a0ff; border: 1px solid rgba(201,160,255,.35);
+  border-radius: 999px; padding: .15rem .45rem; white-space: nowrap;
+}
+.company-sub {
+  font-size: .68rem; color: var(--muted); line-height: 1.35;
+  margin: 0 0 .35rem;
+}
+.company-cap {
+  margin: 0 0 .55rem;
+  padding: .45rem .55rem;
+  border-radius: 8px;
+  border: 1px solid rgba(212,196,154,.45);
+  background: rgba(212,196,154,.1);
+  color: var(--gold);
+  font-size: .78rem;
+  line-height: 1.4;
+}
+.company-cap b { color: var(--ink); font-weight: 600; }
+.company-tier {
+  font-size: .58rem; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--ash); margin: .55rem 0 .3rem;
+}
+.company-tier:first-child { margin-top: 0; }
+.company-list { display: flex; flex-direction: column; gap: .35rem; }
+.company-foot {
+  margin: .65rem 0 .85rem;
+  padding-top: .55rem;
+  border-top: 1px solid rgba(61,143,85,.25);
+  display: flex; flex-direction: column; gap: .4rem;
+}
+.company-preview {
+  font-size: .66rem; color: var(--muted); line-height: 1.35;
+}
+.company-recruit {
+  margin: 0 0 .55rem;
+  padding: .45rem;
+  border-radius: 12px;
+  border: 1px solid rgba(224,160,96,.5);
+  background:
+    linear-gradient(135deg, rgba(224,160,96,.12), transparent 55%),
+    rgba(0,0,0,.35);
+}
+.company-recruit .cr-kicker {
+  font-size: .58rem; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--warn); margin: 0 0 .35rem;
+}
+.company-recruit .hero-card {
+  margin: 0;
+  border-color: rgba(224,160,96,.45);
+  cursor: default;
+}
+.hero-card.tier-deployed.on,
+.hero-card.deployed {
+  border-color: rgba(212,196,154,.65);
+  background: rgba(40,55,30,.55);
+  box-shadow: 0 0 0 1px rgba(212,196,154,.2);
+}
+.hero-card.tier-base {
+  opacity: .92;
+  border-style: dashed;
+  border-color: rgba(126,200,255,.35);
+}
+.hero-card.tier-base.toggleable:hover {
+  border-color: var(--gold);
+  background: rgba(40,55,30,.4);
+}
+.hero-card.tier-deployed.toggleable:hover {
+  filter: brightness(1.08);
+}
+.hero-card.tier-dead {
+  opacity: .55;
+  border-color: rgba(255,125,125,.35);
+  filter: grayscale(.25);
+}
+.hero-card.tier-locked {
+  opacity: .72;
+  border-style: dashed;
+}
+.zone.has-recruit {
+  box-shadow: inset 0 0 0 1px rgba(224,160,96,.55), 0 0 10px rgba(224,160,96,.15);
+}
+.zone.has-recruit::after {
+  content: "rez";
+  position: absolute; right: 2px; bottom: 1px;
+  font-size: .48rem; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--warn); opacity: .9;
+}
+.zone.has-recruit-ambient {
+  box-shadow: inset 0 0 0 1px rgba(224,160,96,.25);
+}
+.zone.has-recruit-ambient::after {
+  content: "home";
+  position: absolute; right: 2px; bottom: 1px;
+  font-size: .48rem; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--muted); opacity: .75;
+}
+
+/* Shared hero card — company, drop confirm, future join picks */
+.hero-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-auto-rows: auto;
+  column-gap: .55rem;
+  row-gap: .12rem;
+  text-align: left;
+  border-radius: 10px;
+  padding: .55rem .65rem .6rem;
+  border: 1px solid rgba(61,143,85,.35);
+  background: rgba(0,0,0,.35);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+  min-width: 0;
+}
+.hero-card:disabled, .hero-card.locked { opacity: .45; cursor: not-allowed; }
+.hero-card.core {
+  cursor: default;
+  border-color: rgba(125,255,138,.35);
+}
+.hero-card.wild {
+  cursor: default;
+  opacity: .78;
+  border-style: dashed;
+}
+.hero-card.on {
+  border-color: rgba(212,196,154,.65);
+  background: rgba(40,55,30,.55);
+  box-shadow: 0 0 0 1px rgba(212,196,154,.25);
+}
+.hero-card.wounded { border-color: rgba(255,125,125,.4); }
+.hero-card .hc-name {
+  grid-column: 1;
+  grid-row: 1;
+  font-weight: 600;
+  font-size: .82rem;
+  color: var(--gold);
+  line-height: 1.25;
+  min-width: 0;
+  padding-right: .2rem;
+}
+.hero-card .hc-level {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: end;
+  align-self: start;
+  font-weight: 700;
+  font-size: .92rem;
+  letter-spacing: .02em;
+  color: var(--gold);
+  line-height: 1.1;
+  white-space: nowrap;
+}
+.hero-card .hc-peak {
+  grid-column: 2;
+  grid-row: 2;
+  justify-self: end;
+  align-self: start;
+  font-size: .58rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  line-height: 1.15;
+  white-space: nowrap;
+  padding: .08rem .35rem;
+  border-radius: 999px;
+  border: 1px solid rgba(125,255,138,.35);
+  color: var(--good, #7dff8a);
+  background: rgba(61,143,85,.18);
+}
+.hero-card .hc-peak.peak-blooded {
+  color: #9dffb0;
+  border-color: rgba(125,255,138,.5);
+}
+.hero-card .hc-peak.peak-hardened {
+  color: #9ecfff;
+  border-color: rgba(120,180,255,.55);
+  background: rgba(60,110,160,.22);
+}
+.hero-card .hc-peak.peak-cracked,
+.hero-card .hc-peak.peak-blooded.peak-cracked {
+  color: var(--gold);
+  border-color: rgba(212,196,154,.65);
+  background: rgba(120,100,50,.28);
+}
+.hero-card .hc-peak.peak-runner,
+.hero-card .hc-peak.peak-green,
+.hero-card .hc-peak.peak-unproven {
+  color: var(--muted);
+  border-color: rgba(140,150,140,.35);
+  background: rgba(0,0,0,.2);
+  font-weight: 600;
+}
+.hero-card .hc-tags {
+  grid-column: 1 / -1;
+  font-size: .58rem;
+  color: var(--steam);
+  letter-spacing: .02em;
+  line-height: 1.35;
+  opacity: .92;
+}
+.hero-card .hc-xp {
+  grid-column: 2;
+  grid-row: 3;
+  justify-self: end;
+  align-self: start;
+  font-size: .6rem;
+  color: var(--steam);
+  line-height: 1.2;
+  white-space: nowrap;
+  opacity: .9;
+}
+.hero-card .hc-meta {
+  grid-column: 1;
+  grid-row: 2 / span 2;
+  font-size: .66rem;
+  color: var(--muted);
+  line-height: 1.3;
+  min-width: 0;
+}
+.hero-card .hc-cost-row {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .28rem;
+  margin-top: .15rem;
+  min-height: 0;
+}
+.hero-card .hc-blurb {
+  grid-column: 1 / -1;
+  font-size: .64rem;
+  color: var(--ash);
+  margin-top: .15rem;
+  line-height: 1.4;
+  min-width: 0;
+}
+.hero-card .hc-cost {
+  display: inline-flex;
+  align-items: center;
+  font-size: .58rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  padding: .12rem .4rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  line-height: 1.2;
+}
+.hero-card .hc-cost.tnb {
+  color: var(--tnb);
+  border-color: rgba(201,160,255,.45);
+  background: rgba(201,160,255,.12);
+}
+.hero-card .hc-cost.km {
+  color: #9fd0ff;
+  border-color: rgba(126,200,255,.4);
+  background: rgba(126,200,255,.1);
+}
+.hero-card .hc-cost.free {
+  color: var(--steam);
+  border-color: rgba(140,150,140,.35);
+  background: rgba(0,0,0,.2);
+}
+.hero-card.compact {
+  padding: .45rem .55rem .5rem;
+  column-gap: .4rem;
+}
+.hero-card.compact .hc-name { font-size: .78rem; }
+.hero-card.compact .hc-level { font-size: .84rem; }
+.hero-card.compact .hc-blurb {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.hero-card.compact .hc-cost { font-size: .52rem; padding: .08rem .32rem; }
+.hero-card.panel {
+  cursor: default;
+  margin-bottom: .4rem;
+  width: 100%;
+}
+#aces .hero-card.panel { background: rgba(0,0,0,.28); }
+/* Soft lock: map stays browsable; Drop is gated. Hard greyscale felt "broken". */
+.theater.company-locked {
+  outline: 1px dashed rgba(212,196,154,.45);
+  outline-offset: 4px;
+}
+.theater-lock-banner {
+  display: none;
+  margin: 0 0 .55rem;
+  padding: .55rem .75rem;
+  border-radius: 10px;
+  border: 1px solid rgba(212,196,154,.45);
+  background: linear-gradient(135deg, rgba(212,196,154,.16), rgba(0,0,0,.35));
+  color: var(--gold);
+  font-size: .82rem;
+  line-height: 1.4;
+}
+.theater.company-locked .theater-lock-banner { display: block; }
+.theater-lock-banner b { color: var(--ink); }
+.theater-lock-banner button {
+  margin-left: .45rem;
+  border: 1px solid rgba(212,196,154,.5);
+  background: rgba(212,196,154,.12);
+  color: var(--gold);
+  border-radius: 999px;
+  padding: .2rem .65rem;
+  font-size: .72rem;
+  letter-spacing: .04em;
+}
+.theater-lock-banner button:hover { background: rgba(212,196,154,.22); }
 
 /* Standing orders + welcome */
 .next-step {
@@ -382,6 +791,169 @@ h3 { margin:.8rem 0 .35rem; font-size:.78rem; color:var(--gold); font-weight:600
 .next-step .ns-title { color: var(--gold); font-size: .98rem; font-weight: 600; margin: .18rem 0 .28rem; }
 .next-step .ns-body { color: var(--muted); font-size: .8rem; line-height: 1.45; }
 .next-step .ns-body b { color: var(--ink); }
+/* First-run company intro — blocks the hub until 3 packs are sealed */
+.company-intro {
+  position: fixed; inset: 0; z-index: 80; display: none;
+  background: rgba(2,5,4,.94); backdrop-filter: blur(10px);
+  align-items: center; justify-content: center; padding: 1rem;
+}
+.company-intro.show { display: flex; }
+.company-intro-card {
+  width: min(56rem, 96vw);
+  max-height: min(94vh, 52rem);
+  overflow: auto;
+  background:
+    radial-gradient(ellipse at 28% 0%, rgba(61,143,85,.22), transparent 55%),
+    #0a1410;
+  border: 1px solid rgba(212,196,154,.42);
+  border-radius: 18px;
+  padding: 1.35rem 1.4rem 1.2rem;
+  box-shadow: 0 28px 90px rgba(0,0,0,.7);
+}
+.company-intro-card .epigraph {
+  font-size: .62rem; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--ash); margin: 0 0 .45rem;
+}
+.company-intro-card h1 {
+  margin: 0; font-size: clamp(1.25rem, 2.6vw, 1.55rem);
+  color: var(--gold); font-weight: 600; line-height: 1.25;
+}
+.company-intro-card .lede {
+  margin: .55rem 0 0; font-size: .88rem; color: var(--ink); line-height: 1.45; max-width: 42rem;
+}
+.company-intro-card .lede b { color: var(--gold); font-weight: 600; }
+.company-intro-meta {
+  display: flex; flex-wrap: wrap; gap: .45rem; align-items: center;
+  margin: .85rem 0 .55rem; font-size: .72rem; color: var(--muted);
+}
+.company-intro-meta .chip {
+  border: 1px solid rgba(212,196,154,.35); border-radius: 999px;
+  padding: .18rem .55rem; color: var(--gold);
+}
+.company-intro-core {
+  display: flex; flex-wrap: wrap; gap: .4rem; margin: 0 0 .75rem;
+}
+.company-intro-core .hero-card { flex: 1 1 11rem; max-width: 16rem; }
+.company-intro-kicker {
+  font-size: .62rem; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--ash); margin: .35rem 0 .4rem;
+}
+.company-intro-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr));
+  gap: .45rem;
+}
+.company-intro-grid .hero-card.on {
+  border-color: rgba(61,143,85,.75);
+  box-shadow: 0 0 0 1px rgba(61,143,85,.35), 0 0 18px rgba(61,143,85,.12);
+}
+.company-intro-grid .hero-card.locked { opacity: .45; }
+.company-intro-actions {
+  display: flex; gap: .55rem; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; margin-top: 1rem; padding-top: .85rem;
+  border-top: 1px solid rgba(61,143,85,.22);
+}
+.company-intro-actions .count {
+  font-size: .82rem; color: var(--muted);
+}
+.company-intro-actions .count b { color: var(--gold); }
+
+/* Camp sheet — pinned over the left company column (not the mission main) */
+.camp-sheet {
+  position: fixed; z-index: 75; display: none;
+  background: rgba(2,5,4,.9); backdrop-filter: blur(6px);
+  align-items: stretch; justify-content: stretch;
+  padding: .55rem;
+  box-sizing: border-box;
+}
+.camp-sheet.show { display: flex; }
+.camp-sheet-card {
+  width: 100%;
+  max-height: 100%;
+  overflow: auto;
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(61,143,85,.2), transparent 55%),
+    #0a1410;
+  border: 1px solid rgba(212,196,154,.42);
+  border-radius: 14px;
+  padding: .9rem .95rem .85rem;
+  box-shadow: 0 16px 48px rgba(0,0,0,.55);
+}
+.camp-sheet-card .epigraph {
+  font-size: .6rem; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--ash); margin: 0 0 .35rem;
+}
+.camp-sheet-card h2 {
+  margin: 0; font-size: 1.05rem; color: var(--gold); font-weight: 600; line-height: 1.25;
+}
+.camp-sheet-card .lede {
+  margin: .45rem 0 0; font-size: .78rem; color: var(--muted); line-height: 1.4;
+}
+.camp-sheet-stats {
+  display: flex; flex-wrap: wrap; gap: .35rem; margin: .75rem 0 .55rem;
+}
+.camp-sheet-stats .chip {
+  border: 1px solid rgba(212,196,154,.35); border-radius: 999px;
+  padding: .15rem .5rem; font-size: .68rem; color: var(--gold);
+}
+.camp-sheet-actions {
+  display: flex; flex-direction: column; gap: .4rem; margin-top: .85rem;
+}
+.camp-sheet-actions .btn-primary,
+.camp-sheet-actions .btn-ghost { width: 100%; justify-content: center; }
+.hearth-block {
+  margin-top: .85rem; padding-top: .7rem;
+  border-top: 1px solid rgba(212,196,154,.22);
+}
+.hearth-block .hearth-label {
+  font-size: .6rem; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--ash); margin: 0 0 .4rem;
+}
+.hearth-list { display: flex; flex-direction: column; gap: .35rem; max-height: 11rem; overflow: auto; }
+.hearth-talk {
+  text-align: left; width: 100%;
+  border: 1px solid rgba(212,196,154,.28); border-radius: 10px;
+  background: rgba(6,18,12,.65); color: var(--ink);
+  padding: .45rem .55rem; cursor: pointer;
+}
+.hearth-talk:hover { border-color: rgba(212,196,154,.55); background: rgba(12,28,18,.8); }
+.hearth-talk .ht-title { font-size: .78rem; color: var(--gold); font-weight: 600; }
+.hearth-talk .ht-meta { font-size: .65rem; color: var(--muted); margin-top: .15rem; }
+.hearth-talk .ht-meta b { color: var(--ketha); font-weight: 500; }
+.hearth-empty { font-size: .72rem; color: var(--muted); line-height: 1.35; }
+.hearth-stage {
+  display: none; margin-top: .55rem; padding: .55rem .6rem;
+  border: 1px solid rgba(166,209,166,.35); border-radius: 10px;
+  background: rgba(4,14,10,.85);
+}
+.hearth-stage.show { display: block; }
+.hearth-stage .hs-title { font-size: .8rem; color: var(--gold); margin: 0 0 .35rem; }
+.hearth-stage .hs-beat {
+  font-size: .72rem; line-height: 1.4; margin: .28rem 0; color: var(--ink);
+}
+.hearth-stage .hs-beat .who {
+  color: var(--ketha); font-size: .6rem; letter-spacing: .08em;
+  text-transform: uppercase; display: block; margin-bottom: .05rem;
+}
+.hearth-stage .hs-beat.narrator .who { color: var(--ash); }
+.hearth-stage .hs-actions { display: flex; gap: .35rem; margin-top: .5rem; }
+.camp-chip {
+  display: flex; align-items: center; justify-content: space-between; gap: .4rem;
+  width: 100%; margin: 0 0 .55rem; padding: .4rem .55rem;
+  border-radius: 10px; border: 1px solid rgba(212,196,154,.35);
+  background: linear-gradient(135deg, rgba(61,143,85,.16), transparent 70%);
+  color: var(--ink); cursor: pointer; text-align: left;
+  font: inherit;
+}
+.camp-chip:hover { border-color: rgba(212,196,154,.55); background: rgba(61,143,85,.2); }
+.camp-chip .cc-label { font-size: .72rem; color: var(--gold); font-weight: 600; }
+.camp-chip .cc-meta { font-size: .62rem; color: var(--muted); }
+.shop-shelf {
+  font-size: .58rem; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--ash); margin: .7rem 0 .3rem;
+}
+.shop-shelf:first-child { margin-top: 0; }
+
 .coach {
   position: fixed; inset: 0; z-index: 60; display: none;
   background: rgba(2,5,4,.92); backdrop-filter: blur(8px);
@@ -417,6 +989,69 @@ h3 { margin:.8rem 0 .35rem; font-size:.78rem; color:var(--gold); font-weight:600
 }
 .coach-card .hint { font-size: .74rem; color: var(--muted); line-height: 1.45; margin: 0 0 .95rem; }
 .coach-actions { display: flex; gap: .45rem; justify-content: flex-end; flex-wrap: wrap; }
+
+/* Drop confirmation */
+.drop-confirm {
+  position: fixed; inset: 0; z-index: 90; display: none;
+  background: rgba(2,5,4,.88); backdrop-filter: blur(6px);
+  align-items: center; justify-content: center; padding: 1rem;
+}
+.drop-confirm.show { display: flex; }
+.drop-confirm-card {
+  width: min(52rem, 96vw);
+  max-height: min(92vh, 44rem);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(ellipse at 25% 0%, rgba(61,143,85,.2), transparent 55%),
+    #0a1410;
+  border: 1px solid rgba(212,196,154,.4);
+  border-radius: 16px;
+  padding: 1.25rem 1.3rem 1.15rem;
+  box-shadow: 0 24px 80px rgba(0,0,0,.65);
+}
+.drop-squad-kicker {
+  margin: .85rem 0 .35rem;
+  font-size: .62rem; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--ash);
+}
+.drop-squad {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr));
+  gap: .4rem;
+  margin: 0 0 .15rem;
+  overflow: auto;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+.drop-squad .hero-card {
+  background: rgba(0,0,0,.32);
+}
+.drop-squad .hero-card.core { border-color: rgba(212,196,154,.4); }
+.drop-confirm-card .epigraph {
+  font-size: .62rem; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--ash); margin: 0 0 .4rem;
+}
+.drop-confirm-card h2 {
+  margin: 0; font-size: 1.2rem; color: var(--gold); font-weight: 600; line-height: 1.25;
+}
+.drop-confirm-card .lede {
+  margin: .55rem 0 0; font-size: .88rem; color: var(--ink); line-height: 1.45;
+}
+.drop-confirm-card .lede b { color: var(--gold); font-weight: 600; }
+.drop-confirm-card .hint {
+  margin: .7rem 0 0; font-size: .74rem; color: var(--muted); line-height: 1.4;
+}
+.drop-confirm-actions {
+  display: flex; gap: .45rem; justify-content: flex-end; flex-wrap: wrap;
+  margin-top: 1rem; flex-shrink: 0;
+}
+.btn-primary.dropping {
+  opacity: .85; cursor: wait;
+  background: rgba(61,143,85,.35);
+}
+
 .choice .kind.battle { color: var(--good); }
 .rep-name { text-transform: capitalize; }
 details.advanced {
@@ -429,6 +1064,7 @@ details.advanced summary { cursor: pointer; color: var(--steam); }
   .col, .col.right { border:0; border-bottom:1px solid rgba(61,143,85,.2); max-height:28vh; }
 }
 </style>
+<link rel="stylesheet" href="console/console.css"/>
 </head>
 <body>
 <div class="app" id="app">
@@ -440,12 +1076,56 @@ details.advanced summary { cursor: pointer; color: var(--steam); }
   </header>
 
   <aside class="col" id="col-aces">
-    <h2>The company</h2>
-    <div id="aces"></div>
+    <div class="company-head">
+      <h2>The company</h2>
+      <div class="company-wallet" id="company-wallet">—</div>
+    </div>
+    <button type="button" class="camp-chip" id="camp-chip" title="Camp and home shelf">
+      <span class="cc-label" id="camp-chip-label">Camp</span>
+      <span class="cc-meta" id="camp-chip-meta">Open</span>
+    </button>
+    <p class="company-sub" id="company-sub">Core always ships. Pick packs here.</p>
+    <p class="company-cap" id="company-cap">You can bring 3 packs besides core.</p>
+    <div class="company-recruit" id="company-recruit" hidden>
+      <div class="cr-kicker" id="company-recruit-kicker">Sortie reward</div>
+      <div id="company-recruit-card"></div>
+    </div>
+    <div class="company-list" id="aces"></div>
+    <div class="company-foot" id="company-foot">
+      <span class="company-preview" id="company-preview-text">Pick packs to seal the company.</span>
+      <button type="button" class="btn-primary" id="btn-seal-company">Confirm company</button>
+      <button type="button" class="btn-bro-tzar" id="btn-bro-tzar" hidden>Bro, Pass me the Tzar</button>
+    </div>
     <h3>Standing</h3>
     <div id="rep"></div>
     <h3>The war</h3>
     <div id="kernel"></div>
+    <div class="camp-sheet" id="camp-sheet" role="dialog" aria-modal="true" aria-labelledby="camp-sheet-title">
+      <div class="camp-sheet-card">
+        <p class="epigraph">Home shelf</p>
+        <h2 id="camp-sheet-title">Jungle camp</h2>
+        <p class="lede" id="camp-sheet-lede">Raise the shelf here. Main screen stays on missions.</p>
+        <div class="camp-sheet-stats" id="camp-sheet-stats"></div>
+        <div class="hearth-block" id="hearth-block">
+          <p class="hearth-label">Hearth · support talks</p>
+          <div class="hearth-list" id="hearth-list"></div>
+          <div class="hearth-stage" id="hearth-stage" aria-live="polite">
+            <div class="hs-title" id="hearth-stage-title"></div>
+            <div id="hearth-stage-beats"></div>
+            <div class="hs-actions">
+              <button type="button" class="btn-primary" id="btn-hearth-confirm">Seal talk</button>
+              <button type="button" class="btn-ghost" id="btn-hearth-cancel">Back</button>
+            </div>
+          </div>
+        </div>
+        <div class="camp-sheet-actions">
+          <button type="button" class="btn-primary" id="btn-camp-raise">Raise camp</button>
+          <button type="button" class="btn-ghost" id="btn-camp-founding">Founding sortie</button>
+          <button type="button" class="btn-ghost" id="btn-camp-broker">Open broker</button>
+          <button type="button" class="btn-ghost" id="btn-camp-close">Close</button>
+        </div>
+      </div>
+    </div>
   </aside>
 
   <main class="main" id="main">
@@ -466,6 +1146,16 @@ details.advanced summary { cursor: pointer; color: var(--steam); }
         <button type="button" class="btn-ghost" id="hc-dismiss">Dismiss</button>
       </div>
     </div>
+    <div class="homecoming" id="field-open" aria-live="polite" style="display:none;border-color:rgba(120,220,255,.35)">
+      <div class="hc-kicker">Field open</div>
+      <div class="hc-banner" id="field-banner">BAR is paused on the map</div>
+      <div class="hc-headline" id="field-headline">Pick the next contract here — BAR only executes</div>
+      <p class="hc-hint" id="field-hint"></p>
+      <div class="hc-chips" id="field-chips"></div>
+      <div class="hc-actions" id="field-actions">
+        <button type="button" class="btn-ghost" id="field-leave">Return to hub</button>
+      </div>
+    </div>
     <div class="next-step" id="next-step" aria-live="polite">
       <div class="ns-kicker">Standing orders</div>
       <div class="ns-title" id="ns-title">Loading…</div>
@@ -473,23 +1163,28 @@ details.advanced summary { cursor: pointer; color: var(--steam); }
     </div>
 
     <section class="theater" id="theater" aria-label="Theater map">
+      <div class="theater-lock-banner" id="theater-lock-banner">
+        <b>Form the company first.</b> Pick 3 packs, then Confirm —
+        <button type="button" id="btn-open-company-intro">Open company picker</button>
+      </div>
+      <div class="map-picker" id="map-picker" role="tablist" aria-label="Operational maps"></div>
       <div class="theater-head">
         <div>
           <h2 id="theater-title">Theater</h2>
-          <p class="theater-sub" id="theater-sub">Click a wound (target). Infil and exfil stay on the rim. Arrows show the route.</p>
+          <p class="theater-sub" id="theater-sub">Click a wound (target). Infil/exfil: quiet rim, or an Ashwalker base you already hold. Arrows show the route.</p>
         </div>
         <div class="mode-bar" style="margin:0">
           <span class="label">Mark</span>
-          <button type="button" class="mode-btn active" data-mode="capture">Target</button>
-          <button type="button" class="mode-btn" data-mode="deploy">Infil</button>
-          <button type="button" class="mode-btn" data-mode="extract">Exfil</button>
+          <button type="button" class="mode-btn active" data-mode="capture">Objective</button>
+          <button type="button" class="mode-btn" data-mode="deploy">Landing</button>
+          <button type="button" class="mode-btn" data-mode="extract">Extraction</button>
         </div>
       </div>
       <div class="legend-row">
-        <span class="lg-infil">Infil (rim)</span>
-        <span class="lg-target">Target</span>
-        <span class="lg-exfil">Exfil (rim)</span>
-        <span class="lg-open">Open wound</span>
+        <span class="lg-infil">△ Landing</span>
+        <span class="lg-target">◎ Required target</span>
+        <span class="lg-exfil">◇ Extraction</span>
+        <span class="lg-open">Available objective</span>
       </div>
       <div class="board-wrap" id="board">
         <div id="board-zones"></div>
@@ -504,6 +1199,10 @@ details.advanced summary { cursor: pointer; color: var(--steam); }
       </div>
     </section>
 
+    <div class="choices-head" id="choices-head">
+      <span class="ch-kicker">Recommended sorties</span>
+      <span class="ch-map" id="choices-map-label">—</span>
+    </div>
     <div class="choices" id="choices"></div>
     <div class="log" id="log"></div>
   </main>
@@ -520,7 +1219,7 @@ details.advanced summary { cursor: pointer; color: var(--steam); }
       <p id="shop-note" style="font-size:.68rem;color:var(--muted);margin:0 0 .5rem;line-height:1.35"></p>
       <h3>In the bag</h3>
       <div id="deploy-kit"></div>
-      <h3>For hire</h3>
+      <h3>Shelves</h3>
       <div id="shop-list"></div>
     </div>
     <div id="panel-theaters" hidden>
@@ -551,10 +1250,49 @@ details.advanced summary { cursor: pointer; color: var(--steam); }
       <button type="button" class="primary" id="btn-pull-result" title="Bring the last sortie home (auto when the bridge is live)">After the fight — bring it home</button>
       <button type="button" id="btn-abandon" title="Leave the field with no zone flip or fake win — unlocks the next Drop">Abandon sortie</button>
       <button type="button" id="btn-sync-hub" title="Refresh the map from campaign progress">Refresh</button>
+      <button type="button" id="btn-save-campaign" title="Snapshot campaign_state into a named save slot under state/saves/">Save</button>
+      <button type="button" id="btn-load-campaign" title="Restore a named save slot (backs up live state first)">Load</button>
+      <button type="button" class="danger" id="btn-reset-campaign" title="Full wipe: backup save, archive results, clear Act-N lua, mission 1 + empty bag (same as RESET.bat).">Reset</button>
       <button type="button" id="btn-help" title="How this works">How this works</button>
       <a href="story_autoplay.html" title="Optional cinematic reel">Story reel</a>
     </div>
   </footer>
+</div>
+
+<div class="drop-confirm" id="drop-confirm" role="dialog" aria-modal="true" aria-labelledby="drop-confirm-title">
+  <div class="drop-confirm-card">
+    <p class="epigraph">Before the match</p>
+    <h2 id="drop-confirm-title">Drop into battle?</h2>
+    <p class="lede" id="drop-confirm-body">Confirm to seal this route and open Beyond All Reason.</p>
+    <div class="drop-squad-kicker" id="drop-squad-kicker">Who is dropping</div>
+    <div class="drop-squad" id="drop-squad" aria-label="Who is dropping"></div>
+    <p class="hint" id="drop-warm-status">Pick who ships, then press Confirm drop. The level does not load until the company is locked.</p>
+    <div class="drop-confirm-actions">
+      <button type="button" class="btn-ghost" id="drop-confirm-cancel">Cancel</button>
+      <button type="button" class="btn-primary" id="drop-confirm-go">Confirm drop</button>
+    </div>
+  </div>
+</div>
+
+<div class="company-intro" id="company-intro" role="dialog" aria-modal="true" aria-labelledby="company-intro-title">
+  <div class="company-intro-card">
+    <p class="epigraph">First run · company formation</p>
+    <h1 id="company-intro-title">Who ships with you?</h1>
+    <p class="lede">
+      Core always drops (gold cards) and does not use a seat. Pick <b>exactly 3</b> more packs.
+      Choose construction, recovery support, and fighting power that suit your first operation.
+      Everyone you leave behind waits in the field — recruit them later from wrecks and zone rewards.
+      Formation costs are shown on each card. These are separate from later broker purchases.
+    </p>
+    <div class="company-intro-meta" id="company-intro-meta"></div>
+    <div class="company-intro-core" id="company-intro-core" hidden aria-hidden="true"></div>
+    <div class="company-intro-kicker">Roster · eco → XP · core always ships · pick 3</div>
+    <div class="company-intro-grid" id="company-intro-grid" aria-label="Hero packs (eco first, then XP)"></div>
+    <div class="company-intro-actions"><button type="button" class="btn-ghost" id="recommend-company">Suggest a balanced company</button>
+      <span class="count" id="company-intro-count">Pick 3 packs</span>
+      <button type="button" class="btn-primary" id="btn-seal-company-intro">Confirm company</button>
+    </div>
+  </div>
 </div>
 
 <div class="coach" id="coach" role="dialog" aria-modal="true" aria-labelledby="coach-title">
@@ -562,15 +1300,17 @@ details.advanced summary { cursor: pointer; color: var(--steam); }
     <p class="epigraph">A campaign for Beyond All Reason</p>
     <h1 id="coach-title">The ashes remember commanders</h1>
     <p class="lede">
-      You are an <b>Ashwalker</b>. Home is the <b>Rock Jungle</b>.
-      Raid abroad for <b>Tenebrium</b> so you can scale build power — then clear your wilds.
-      Plan on this map. Fight in <b>Beyond All Reason</b>.
+      You are an <b>Ashwalker</b> founding a new base in the <b>Rock Jungle</b>.
+      <b>Greenest Fields</b> is the Tenebrium raid — crack Armada decoy farms so you can build at home.
+      Two journeys, both real: dig in at the jungle first, or jump the Fields on the way.
+      Plan here. Fight in <b>Beyond All Reason</b>.
     </p>
     <ol class="steps">
-      <li><span class="n">1</span><span><b>Click a wound</b> on the theater map (target). Open wounds glow amber.</span></li>
-      <li><span class="n">2</span><span><b>Infil</b> and <b>exfil</b> only on the <b>rim</b>. Arrows show the route. Then <b>Drop into battle</b>.</span></li>
+      <li><span class="n">1</span><span><b>Form the Company</b> on first open — core always ships; pick <b>3 unlocked packs</b>. Unpicked heroes stay off your board until a field recruit.</span></li>
+      <li><span class="n">2</span><span>Pick a <b>mission</b> on the main screen, mark <b>landing / objective / extraction</b>, then <b>Drop into battle</b>.</span></li>
       <li><span class="n">3</span><span>In BAR, take the objective. When the match ends, return here and <b>bring it home</b>.</span></li>
-      <li><span class="n">4</span><span>Raise the jungle camp, raid for Tnb, hire mercs. Cortex starts friendly — bomb their crater and they remember.</span></li>
+      <li><span class="n">4</span><span><b>Camp</b> (left bar) raises the jungle shelf. <b>Home → Broker</b> shows each available purchase and its exact cost.</span></li>
+      <li><span class="n">5</span><span><b>Save / Load / Reset</b> in the footer manage campaign state.</span></li>
     </ol>
     <p class="hint">Lost? Hit <b>How this works</b> in the bar below anytime.</p>
     <div class="coach-actions">
@@ -584,1362 +1324,10 @@ details.advanced summary { cursor: pointer; color: var(--steam); }
 
 <script src="hub_state.embed.js"></script>
 <script src="boards.embed.js"></script>
-<script>
-(function () {
-  const H = window.HUB_STATE || {};
-  const BOARDS = window.ZONE_BOARDS || {};
-  const state = {
-    hub: JSON.parse(JSON.stringify(H)),
-    focusMap: null,
-    hostLive: false,
-    hostBase: "", // "" = same-origin; else http://127.0.0.1:8770
-    hostInfo: null,
-    markMode: "capture",
-    plan: null,
-    log: [],
-    rhoSel: { i: 0, j: 0 },
-    lastResultAt: null,
-  };
+<script src="crew_packs.embed.js"></script>
+<script src="support_web.embed.js"></script>
+<script src="camp_talks.embed.js"></script>
+<script type="module" src="console/workspaces.js"></script>
 
-  function api(path) {
-    const base = state.hostBase || "";
-    return base + path;
-  }
-
-  const $ = (id) => document.getElementById(id);
-  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  })[c]);
-
-  /* Ash Console copy table — keep in sync with match_credit_v1 + va_ash_tokens */
-  const VERDICT_UI = {
-    victory: { banner: "SECURED", headline: "Secured." },
-    partial: { banner: "HINGE", headline: "Hinge. Not a win." },
-    defeat: { banner: "FIELD COSTS", headline: "Field costs." },
-    abandon: { banner: "LEFT THE FIELD", headline: "Left the field." },
-    incomplete: { banner: "RESULT NOT HOME", headline: "Result not home — Retry extract or Abandon." },
-  };
-
-  function showHomecoming(opts) {
-    const el = $("homecoming");
-    if (!el) return;
-    const verdict = String((opts && opts.verdict) || "incomplete").toLowerCase();
-    const ui = VERDICT_UI[verdict] || VERDICT_UI.incomplete;
-    const banner = $("hc-banner");
-    const headline = $("hc-headline");
-    const hint = $("hc-hint");
-    const chips = $("hc-chips");
-    if (banner) {
-      banner.textContent = (opts && opts.banner) || ui.banner;
-      banner.className = "hc-banner " + verdict;
-    }
-    if (headline) headline.textContent = (opts && opts.headline) || ui.headline;
-    if (hint) hint.textContent = (opts && (opts.reasonHint || opts.hint)) || "";
-    if (chips) {
-      chips.innerHTML = "";
-      const list = (opts && opts.chips) || [];
-      list.forEach((c) => {
-        if (!c) return;
-        const span = document.createElement("span");
-        const s = String(c);
-        span.className = "hc-chip";
-        if (/flip|claim|xp|secured/i.test(s)) span.classList.add("good");
-        else if (/hinge|partial|scar|no free/i.test(s)) span.classList.add("warn");
-        else if (/defeat|wiped|lost/i.test(s)) span.classList.add("bad");
-        span.textContent = s;
-        chips.appendChild(span);
-      });
-    }
-    el.classList.add("show");
-  }
-
-  function hideHomecoming() {
-    const el = $("homecoming");
-    if (el) el.classList.remove("show");
-  }
-
-  function toast(msg, kind) {
-    const el = $("toast");
-    el.textContent = msg;
-    el.className = "status-toast show" + (kind ? " " + kind : "");
-    clearTimeout(toast._t);
-    toast._t = setTimeout(() => el.classList.remove("show"), 4200);
-  }
-
-  function logLine(text) {
-    state.log.unshift(text);
-    state.log = state.log.slice(0, 12);
-    $("log").innerHTML = state.log.map(t => `<div>${esc(t)}</div>`).join("");
-  }
-
-  function commerce() {
-    return state.hub.commerce || { shop: [], deployKit: [], tenebrium: 0, scrapCredits: 0, owned: {}, upgrades: {} };
-  }
-
-  function arcMax() {
-    return (state.hub.arc && state.hub.arc.maxCaptureMarks) || 1;
-  }
-
-  function prettyMap(id) {
-    if (!id) return "—";
-    const r = (state.hub.regions || []).find(x => x.mapId === id);
-    if (r && r.displayName) return r.displayName;
-    return String(id).replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
-  }
-
-  function sessionLabel(mode) {
-    return (mode === "map_travel") ? "On the road" : "Holding this ground";
-  }
-
-  function occupationLabel(model) {
-    const m = String(model || "living_shell");
-    if (m.indexOf("living") >= 0) return "Clear, hold, fortify";
-    if (m.indexOf("raid") >= 0) return "Raid and leave scars";
-    return m.replace(/_/g, " ");
-  }
-
-  function kindLabel(kind) {
-    const k = String(kind || "choice").toLowerCase();
-    if (k === "deploy") return "sortie";
-    if (k === "home_build") return "camp";
-    if (k === "shop") return "broker";
-    if (k === "talk") return "hearth";
-    if (k === "rest") return "rest";
-    if (k === "bay") return "garage";
-    return k;
-  }
-
-  async function doHomeBuild() {
-    if (state.hostLive) {
-      try {
-        toast("Raising the jungle camp…");
-        const res = await fetch(api("/api/home-build"), { method: "POST" });
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok || data.ok === false) {
-          return toast((data && data.error) || "Camp build failed", "err");
-        }
-        if (data.homeCamp) state.hub.homeCamp = data.homeCamp;
-        if (data.flags) state.hub.flags = Object.assign(state.hub.flags || {}, data.flags);
-        if (data.tenebrium != null) {
-          state.hub.tenebrium = data.tenebrium;
-          if (state.hub.commerce) state.hub.commerce.tenebrium = data.tenebrium;
-        }
-        if (data.commerce) state.hub.commerce = data.commerce;
-        logLine(`Jungle camp raised to L${(data.homeCamp && data.homeCamp.level) || "?"}.`);
-        toast("Camp raised — scale at home", "ok");
-        await pullHubState();
-        refreshTheaterForFocus();
-        return;
-      } catch (e) {
-        return toast(String(e.message || e), "err");
-      }
-    }
-    const c = commerce();
-    const tnb = Number(c.tenebrium || 0);
-    const scrap = Number(c.scrapCredits != null ? c.scrapCredits : c.credits || 0);
-    if (tnb < 1) return toast("Need 1 Tenebrium — raid to print", "err");
-    if (scrap < 25) return toast("Need 25 scrap", "err");
-    c.tenebrium = tnb - 1;
-    if (c.scrapCredits != null) c.scrapCredits = scrap - 25;
-    else c.credits = scrap - 25;
-    state.hub.homeCamp = state.hub.homeCamp || { level: 0, mapId: "the_rock_jungle" };
-    state.hub.homeCamp.level = (state.hub.homeCamp.level || 0) + 1;
-    state.hub.flags = state.hub.flags || {};
-    if (state.hub.homeCamp.level >= 1 || c.tenebrium >= 3) state.hub.flags.homeClearReady = true;
-    state.hub.tenebrium = c.tenebrium;
-    logLine(`Demo camp → L${state.hub.homeCamp.level}`);
-    toast("Camp raised (demo bag)", "ok");
-    renderBadges();
-    renderNode();
-    renderBoard();
-  }
-
-  function repLabel(k) {
-    const map = {
-      armada: "Armada", cortex: "Cortex", nullmercs: "Null Mercs",
-      ashwalkers: "Ashwalkers", sev: "Sev",
-    };
-    return map[k] || String(k).replace(/_/g, " ");
-  }
-
-  function renderNextStep() {
-    const live = state.hostLive;
-    const home = state.hub.sessionHomeMap || (state.hub.node && state.hub.node.regionHint);
-    const m = state.hub.missionNumber || 1;
-    const title = $("ns-title");
-    const body = $("ns-body");
-    if (!title || !body) return;
-    if (!live) {
-      title.textContent = "Campfire map — the wire is dark";
-      body.innerHTML =
-        `You can study the war from here, but you cannot drop into a fight. ` +
-        `Run <b>PLAY_CAMPAIGN.bat</b> (leave it open), then choose a green <b>sortie</b> and <b>Drop into battle</b>.`;
-      return;
-    }
-    if (m <= 1) {
-      title.textContent = `First blood on ${prettyMap(home)}`;
-      body.innerHTML =
-        `Take a green <b>sortie</b> below. Confirm the objective on the briefing table, then <b>Drop into battle</b>. ` +
-        `When the match ends, come back and <b>bring it home</b> so the ashes keep score.`;
-      return;
-    }
-    title.textContent = `Mission ${m} — the front still moves`;
-    body.innerHTML =
-      `Home ground: <b>${esc(prettyMap(home))}</b> · ${esc(sessionLabel(state.hub.sessionMode))}. ` +
-      `Pick a sortie, fight in BAR, then bring the result home so your aces and the map remember.`;
-  }
-
-  function renderBadges() {
-    const h = state.hub;
-    const live = state.hostLive;
-    const arc = h.arc || {};
-    $("hud-title").textContent =
-      `${(arc.title) || "First Scar"} · sortie ${h.missionNumber || 1}`;
-    const home = h.sessionHomeMap || (h.node && h.node.regionHint);
-    const bits = [
-      `<span class="badge ${live ? "live" : "warn"}">${live ? "Wire open" : "Map only"}</span>`,
-      `<span class="badge steam">${esc(prettyMap(home))}</span>`,
-      `<span class="badge">${esc(sessionLabel(h.sessionMode))}</span>`,
-      `<span class="badge tnb">Tenebrium ${h.tenebrium ?? commerce().tenebrium ?? 0}</span>`,
-      `<span class="badge gold">Scrap ${commerce().scrapCredits ?? commerce().credits ?? 0}</span>`,
-    ];
-    $("hud-badges").innerHTML = bits.join("");
-    $("foot-left").textContent = live
-      ? `Wire open · sortie ${h.missionNumber || 1}`
-      : `Map only · run PLAY_CAMPAIGN.bat to fight`;
-    renderNextStep();
-  }
-
-  function renderAces() {
-    const aces = state.hub.aces || [];
-    $("aces").innerHTML = aces.map(a => {
-      const bonds = Object.entries(a.bonds || {}).map(([k,v]) => `${repLabel(k)} ${v}`).join(" · ") || "—";
-      const wound = a.wounds ? ` · wounded ×${a.wounds}` : "";
-      return `<div class="panel-card ace ${a.wounds ? "wounded" : ""}">
-        <div class="name">${esc(a.name || a.id)}</div>
-        <div class="meta">${esc(a.rank || "Runner")} · Level ${a.level || 1}${wound}</div>
-        <div class="row"><span>XP ${Math.round(Number(a.campaignXp||0))}</span><span>${esc(a.status || "active")}</span></div>
-        <div class="meta">Bonds · ${esc(bonds)}</div>
-      </div>`;
-    }).join("") || `<div class="panel-card meta">No aces yet — the first drop names the company.</div>`;
-
-    const rep = state.hub.reputation || {};
-    $("rep").innerHTML = Object.entries(rep).map(([k,v]) =>
-      `<div class="panel-card"><div class="row"><span class="rep-name">${esc(repLabel(k))}</span><strong>${esc(v)}</strong></div></div>`
-    ).join("");
-
-    const home = state.hub.sessionHomeMap || (state.hub.node && state.hub.node.regionHint);
-    const companion = state.hub.companion || {};
-    $("kernel").innerHTML = `
-      <div class="panel-card">
-        <div class="meta">Home ground</div>
-        <div class="name" style="font-size:.82rem">${esc(prettyMap(home))}</div>
-      </div>
-      <div class="panel-card">
-        <div class="meta">How we fight</div>
-        <div class="name" style="font-size:.82rem">${esc(sessionLabel(state.hub.sessionMode))} · ${esc(occupationLabel(state.hub.occupationModel))}</div>
-      </div>
-      <div class="panel-card">
-        <div class="meta">Ketha of Rhekk's Line</div>
-        <div class="meta">Morale ${esc(companion.morale ?? "—")} · Stress ${esc(companion.stress ?? "—")}</div>
-      </div>
-      <div class="panel-card">
-        <div class="meta">Null bay</div>
-        <div class="meta">${esc((state.hub.bay && state.hub.bay.hint) || "Still welding")}</div>
-      </div>`;
-  }
-
-  function renderRegions() {
-    const focus = state.focusMap || (state.hub.node && state.hub.node.regionHint);
-    $("regions").innerHTML = (state.hub.regions || []).map(r => {
-      const cls = r.mapId === focus ? "panel-card region focus" : "panel-card region";
-      return `<div class="${cls}" data-map="${esc(r.mapId)}">
-        <div class="name">${esc(r.displayName || r.mapId)}</div>
-        <div class="meta">${esc(r.descriptor || r.family)}</div>
-        <div class="row">
-          <span class="ctrl">${esc(r.control)}</span>
-          <span>${esc(r.threatBand)} · ${esc(r.dominantEnemy)}</span>
-        </div>
-      </div>`;
-    }).join("");
-    $("regions").querySelectorAll(".region").forEach(el => {
-      el.onclick = () => {
-        state.focusMap = el.dataset.map;
-        renderRegions();
-        renderQuantum();
-        refreshTheaterForFocus();
-        logLine(`Focus theater → ${state.focusMap}`);
-      };
-    });
-  }
-
-  function renderShop() {
-    const c = commerce();
-    $("shop-balances").innerHTML = `
-      <div class="bal tnb">Tenebrium<strong>${c.tenebrium ?? 0}</strong>∞ storage</div>
-      <div class="bal cred">Scrap credits<strong>${c.scrapCredits ?? c.credits ?? 0}</strong>broker scrip</div>`;
-    $("shop-note").textContent = c.notes ||
-      (state.hostLive
-        ? "Buy before you drop. Fabricators eat Tenebrium."
-        : "Campfire broker — purchases stick when the wire is open.");
-
-    const kit = c.deployKit || [];
-    $("deploy-kit").innerHTML = kit.length
-      ? kit.map(k => `<div class="kit-line"><b>${esc(k.label || k.listingId)}</b>
-          ${k.count ? " · ×" + esc(k.count) : ""}
-          ${k.loan ? " · loan" : ""}
-          ${k.factoryDef ? " · fabricator" : ""}</div>`).join("")
-      : `<div class="kit-line">Empty bag — loans show after the first real export.</div>`;
-
-    const shop = c.shop || [];
-    $("shop-list").innerHTML = shop.map(item => {
-      const locked = !item.available;
-      const owned = item.owned;
-      const costs = [];
-      if (item.tenebriumCost) costs.push(`${item.tenebriumCost} Tnb`);
-      if (item.creditCost) costs.push(`${item.creditCost} scrap`);
-      if (!costs.length) costs.push(item.starterOwned ? "starter loan" : "free");
-      return `<div class="listing ${owned ? "owned" : ""} ${locked ? "locked" : ""}" data-id="${esc(item.id)}">
-        <div class="title">
-          <strong>${esc(item.label)}</strong>
-          <span class="cost">${esc(costs.join(" · "))}</span>
-        </div>
-        <div class="blurb">${esc(item.blurb)}</div>
-        <div class="cost">${esc(item.kind)}${item.unitDef ? " · " + esc(item.unitDef) : ""}${item.count ? " ×" + esc(item.count) : ""}${item.builds ? " · builds" : ""}</div>
-        ${locked ? `<div class="block">${esc(item.blockedReason || "locked")}</div>` : ""}
-        ${owned ? `<div class="block" style="color:var(--good)">In bag / installed</div>` : ""}
-        <div class="tags">${(item.tags || []).map(t => `<span class="tag">${esc(t)}</span>`).join("")}</div>
-        ${!owned && !item.starterOwned ? `<button type="button" class="btn-buy" data-buy="${esc(item.id)}" ${locked ? "disabled" : ""}>${state.hostLive ? "Buy" : "Preview buy"}</button>` : ""}
-      </div>`;
-    }).join("") || `<div class="panel-card meta">Broker is empty — re-export the campaign pack.</div>`;
-
-    $("shop-list").querySelectorAll("[data-buy]").forEach(btn => {
-      btn.onclick = () => tryBuy(btn.dataset.buy);
-    });
-  }
-
-  function recomputeShopAvailability() {
-    const c = commerce();
-    const rep = state.hub.reputation || {};
-    const mission = state.hub.missionNumber || 1;
-    const arcN = mission <= 5 ? 1 : mission <= 10 ? 2 : 3;
-    const owned = c.owned || {};
-    const upgrades = c.upgrades || {};
-    (c.shop || []).forEach(item => {
-      let ok = true, reason = null;
-      const kind = item.kind || "";
-      if (kind === "printer_upgrade" && upgrades[item.id]) { ok = false; reason = "upgrade already installed"; }
-      if ((kind === "unit_printer" || kind === "loan_package") && owned[item.id]) { ok = false; reason = "already owned"; }
-      if (item.starterOwned && owned[item.id]) { ok = false; reason = "already owned (starter loan)"; }
-      if (item.requires && !owned[item.requires]) { ok = false; reason = "requires " + item.requires; }
-      if ((item.arcMin || 1) > arcN) { ok = false; reason = "arc " + item.arcMin + "+ only"; }
-      const repMin = item.repMin || {};
-      for (const f of Object.keys(repMin)) {
-        if (Number(rep[f] || 0) < Number(repMin[f])) {
-          ok = false; reason = `need ${f} rep ≥ ${repMin[f]}`;
-        }
-      }
-      const tcost = Number(item.tenebriumCost || 0);
-      const ccost = Number(item.creditCost || 0);
-      if (Number(c.tenebrium || 0) < tcost) { ok = false; reason = `need ${tcost} Tenebrium`; }
-      if (Number(c.scrapCredits || 0) < ccost) { ok = false; reason = `need ${ccost} scrap credits`; }
-      item.available = ok;
-      item.blockedReason = ok ? null : reason;
-      item.owned = !!(owned[item.id] || upgrades[item.id]);
-    });
-    // rebuild deploy kit labels lightly
-    const kit = [];
-    for (const [lid, rec] of Object.entries(owned)) {
-      if (!rec || typeof rec !== "object") continue;
-      const listing = (c.shop || []).find(s => s.id === lid) || {};
-      kit.push({
-        listingId: lid,
-        kind: rec.kind || listing.kind,
-        unitDef: rec.unitDef || listing.unitDef,
-        count: rec.loanCount || rec.count || listing.count,
-        loan: !!(rec.loan || listing.loan),
-        label: listing.label || lid,
-        factoryDef: rec.factoryDef,
-        product: rec.product,
-      });
-    }
-    for (const uid of Object.keys(upgrades)) {
-      const listing = (c.shop || []).find(s => s.id === uid) || {};
-      kit.push({ listingId: uid, kind: "printer_upgrade", label: listing.label || uid });
-    }
-    c.deployKit = kit;
-    state.hub.tenebrium = c.tenebrium;
-    if (state.hub.factionBanks) {
-      state.hub.factionBanks.nullmercs = c.tenebrium;
-      state.hub.factionBanks.ashwalkers = c.tenebrium;
-    }
-  }
-
-  async function tryBuy(listingId) {
-    const c = commerce();
-    const item = (c.shop || []).find(s => s.id === listingId);
-    if (!item) return toast("Unknown listing", "err");
-    recomputeShopAvailability();
-    if (!item.available) return toast(item.blockedReason || "Locked", "err");
-    const tcost = Number(item.tenebriumCost || 0);
-    const ccost = Number(item.creditCost || 0);
-
-    // Live path: mutate campaign_state via host → story engine purchase_listing
-    if (state.hostLive) {
-      try {
-        toast("Purchasing…");
-        const res = await fetch(api("/api/purchase"), {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ listingId }),
-        });
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok || data.ok === false) {
-          return toast((data && (data.error || data.reason)) || `Buy failed (${res.status})`, "err");
-        }
-        if (data.commerce) state.hub.commerce = data.commerce;
-        if (data.tenebrium != null) state.hub.tenebrium = data.tenebrium;
-        if (data.aces) state.hub.aces = data.aces;
-        recomputeShopAvailability();
-        renderShop();
-        renderBadges();
-        logLine(`Bought ${item.label} (−${tcost} Tnb, −${ccost} scrap) · campaign bag live`);
-        toast(`Bought ${item.label}`, "ok");
-        await pullHubState();
-        return;
-      } catch (e) {
-        return toast("Purchase error: " + e.message, "err");
-      }
-    }
-
-    // Offline demo bag (file://) — does not touch campaign_state
-    c.tenebrium = Number(c.tenebrium || 0) - tcost;
-    c.scrapCredits = Number(c.scrapCredits || 0) - ccost;
-    c.owned = c.owned || {};
-    c.upgrades = c.upgrades || {};
-    if (item.kind === "printer_upgrade") {
-      c.upgrades[listingId] = { installedAtMission: state.hub.missionNumber || 1, requires: item.requires };
-    } else {
-      c.owned[listingId] = {
-        qty: 1,
-        loan: !!item.loan,
-        unitDef: item.unitDef,
-        loanCount: item.count,
-        count: item.count,
-        kind: item.kind,
-        source: "hub_demo_buy",
-      };
-    }
-    c.ledger = c.ledger || [];
-    c.ledger.push({ op: "hub_demo_purchase", listingId, tcost, ccost, at: new Date().toISOString() });
-    recomputeShopAvailability();
-    renderShop();
-    renderBadges();
-    renderAces();
-    logLine(`Acquired ${item.label} (−${tcost} Tnb, −${ccost} scrap). Demo bag only until campaign settle.`);
-    toast(`Acquired ${item.label} (demo)`, "ok");
-    downloadJson(`hub_purchase_${listingId}.json`, {
-      schemaVersion: "verdance-hub-purchase-demo/1.0",
-      listingId,
-      label: item.label,
-      tenebriumCost: tcost,
-      creditCost: ccost,
-      bag: { tenebrium: c.tenebrium, scrapCredits: c.scrapCredits, owned: c.owned, upgrades: c.upgrades },
-      note: "Hub demo mutation. Live: HUB_HOST.bat → POST /api/purchase.",
-    });
-  }
-
-  function renderNode() {
-    const h = state.hub;
-    const node = h.node || {};
-    const home = h.sessionHomeMap || node.regionHint;
-    const arcTitle = (h.arc && h.arc.title) || "First Scar";
-    $("kicker").textContent =
-      `${arcTitle} · sortie ${h.missionNumber || 1} · ${prettyMap(home)}`;
-    $("title").textContent = h.tagline || "The green is dying. Ashwalkers hold the line.";
-    const nullRep = Number((h.reputation || {}).nullmercs || 0);
-    $("sub").textContent =
-      `${sessionLabel(h.sessionMode)} · ${occupationLabel(h.occupationModel)}` +
-      (nullRep ? ` · Null Mercs know you (${nullRep})` : "");
-    const speaker = (node.speaker || "ketha");
-    const speakerName = speaker === "ketha" ? "Ketha of Rhekk's Line" :
-      (speaker.charAt(0).toUpperCase() + speaker.slice(1));
-    if ($("voice-who")) $("voice-who").textContent = speakerName;
-    $("voice").textContent = node.text || "The line is quiet. That never lasts.";
-    const choices = node.choices || [];
-    $("choices").innerHTML = choices.map(ch => {
-      const kl = kindLabel(ch.kind);
-      const isSortie = ch.kind === "deploy";
-      const cls = isSortie ? "deploy battle" : (ch.kind || "");
-      const blurb = ch.blurb
-        || (isSortie ? "Mark the ground. Drop. Come home." : "");
-      return `<button type="button" class="choice ${esc(cls)}" data-choice="${esc(ch.id)}">
-        <div class="kind ${esc(kl)}">${esc(kl)}</div>
-        <div class="label">${esc(ch.label)}</div>
-        ${blurb ? `<div class="blurb">${esc(blurb)}</div>` : ""}
-      </button>`;
-    }).join("");
-    $("choices").querySelectorAll(".choice").forEach(btn => {
-      btn.onclick = () => onChoice(btn.dataset.choice);
-    });
-    renderNextStep();
-  }
-
-  function onChoice(id) {
-    const ch = ((state.hub.node || {}).choices || []).find(c => c.id === id);
-    if (!ch) return;
-    const kind = ch.kind || "";
-    if (kind === "deploy") {
-      openDeploy(ch);
-      return;
-    }
-    if (kind === "home_build") {
-      doHomeBuild();
-      return;
-    }
-    if (kind === "shop") {
-      document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === "shop"));
-      $("panel-shop").hidden = false;
-      $("panel-theaters").hidden = true;
-      if ($("panel-manifold")) $("panel-manifold").hidden = true;
-      logLine("The broker's tent is open.");
-      toast("Broker — hire before you drop", "ok");
-      return;
-    }
-    if (kind === "talk") {
-      const delta = (ch.effect && ch.effect.bondDelta) || {};
-      for (const ace of state.hub.aces || []) {
-        const d = delta[ace.id];
-        if (d) {
-          ace.bonds = ace.bonds || {};
-          for (const [k, v] of Object.entries(d)) ace.bonds[k] = (ace.bonds[k] || 0) + Number(v);
-        }
-      }
-      logLine("Ketha stays by the fire a little longer. Bonds warm.");
-      toast("The hearth holds", "ok");
-      renderAces();
-      return;
-    }
-    if (kind === "rest") {
-      for (const ace of state.hub.aces || []) {
-        if (ace.wounds > 0) ace.wounds = Math.max(0, ace.wounds - 1);
-      }
-      if (state.hub.companion && state.hub.companion.stress != null) {
-        state.hub.companion.stress = Math.max(0, Number(state.hub.companion.stress) - 5);
-      }
-      logLine("The company sleeps. Wounds ease. Stress bleeds off.");
-      toast("The company rests", "ok");
-      renderAces();
-      return;
-    }
-    if (kind === "bay") {
-      toast((ch.effect && ch.effect.note) || "Bay still locked", "err");
-      logLine("Null bay is still welding. Come back when the contract deepens.");
-      return;
-    }
-    logLine(`Choice ${id} (${kind})`);
-  }
-
-  const RIM_THRESHOLD = 0.28;
-
-  function edgeScore(z) {
-    if (z && z.edgeScore != null) return Number(z.edgeScore);
-    const b = (z && z.bounds) || {};
-    const cx = ((Number(b.xMin) || 0) + (Number(b.xMax) || 1)) / 2;
-    const cz = ((Number(b.zMin) || 0) + (Number(b.zMax) || 1)) / 2;
-    return Math.min(cx, 1 - cx, cz, 1 - cz);
-  }
-
-  function isRimZone(z) {
-    return edgeScore(z) <= RIM_THRESHOLD;
-  }
-
-  function zoneCenter(z) {
-    const b = (z && z.bounds) || {};
-    return {
-      x: (((Number(b.xMin) || 0) + (Number(b.xMax) || 1)) / 2) * 100,
-      y: (((Number(b.zMin) || 0) + (Number(b.zMax) || 1)) / 2) * 100,
-    };
-  }
-
-  function intelFor(mapId, zoneId) {
-    const theater = state.hub.theater || {};
-    if (theater.mapId === mapId && theater.intelByZone && theater.intelByZone[zoneId]) {
-      return theater.intelByZone[zoneId];
-    }
-    const zones = (theater.zones || []);
-    return zones.find(z => z.zoneId === zoneId) || null;
-  }
-
-  function defaultMarks(mapId) {
-    const board = BOARDS[mapId] || {};
-    const zones = board.zones || [];
-    // Infil / exfil must sit on the map rim (low edgeScore), never midfield.
-    const byEdge = zones.slice().sort((a, b) => edgeScore(a) - edgeScore(b));
-    const rim = byEdge.filter(z => isRimZone(z));
-    const deployPool = rim.length ? rim : byEdge;
-    const deploy =
-      deployPool.find(z => z.deployDefault) ||
-      deployPool.find(z => /start|staging|shelf|camp/i.test(String(z.role || "") + " " + (z.tags || []).join(" "))) ||
-      deployPool[0] ||
-      zones[0];
-    const extract =
-      deployPool.find(z => z.extractDefault && z !== deploy) ||
-      deployPool.find(z => z.extractDefault) ||
-      deploy ||
-      zones[0];
-    const theater = state.hub.theater || {};
-    const openId = ((theater.openTargets || [])[0] || {}).zoneId;
-    const caps = zones.filter(z => z.capturable || z.preferredObjective);
-    const pick =
-      (openId && zones.find(z => z.zoneId === openId)) ||
-      caps.find(z => z.preferredObjective && z.zoneId !== (deploy && deploy.zoneId)) ||
-      caps.find(z => z.preferredObjective) ||
-      caps[0] ||
-      zones[0];
-    return {
-      deployZoneId: deploy && deploy.zoneId,
-      extractZoneId: extract && extract.zoneId,
-      captureZoneIds: pick ? [pick.zoneId] : [],
-    };
-  }
-
-  function jobLabel(kind) {
-    return ({
-      eco_raid: "Raid their economy",
-      seize_lane: "Seize and hold the lane",
-      strike_relay: "Cut the relay",
-      destroy_key_structure: "Break the key structure",
-      hive_clear_or_bypass: "Clear or bypass the hive",
-      gate_control: "Hold the gate",
-      home_clear: "Clear the home wilds",
-    })[kind] || String(kind || "Sortie").replace(/_/g, " ");
-  }
-
-  function ensureTheaterPlan(choice) {
-    const effect = (choice && choice.effect) || {};
-    const mapId = effect.mapId
-      || state.focusMap
-      || state.hub.sessionHomeMap
-      || (state.hub.node && state.hub.node.regionHint)
-      || "the_rock_jungle";
-    const marks = defaultMarks(mapId);
-    if (effect.preferredCaptureZoneId) {
-      marks.captureZoneIds = [effect.preferredCaptureZoneId];
-    }
-    if (effect.preferredDeployZoneId) {
-      const board = BOARDS[mapId] || {};
-      const z = (board.zones || []).find(x => x.zoneId === effect.preferredDeployZoneId);
-      if (z && isRimZone(z)) {
-        marks.deployZoneId = effect.preferredDeployZoneId;
-        if (!marks.extractZoneId) marks.extractZoneId = effect.preferredDeployZoneId;
-      }
-    }
-    const against = effect.against
-      || (mapId === "eye_of_horus" ? "cortex" : mapId === "the_rock_jungle" ? "wild" : "armada");
-    state.plan = {
-      schemaVersion: "verdance-deploy-plan/1.0",
-      mapId,
-      contractKind: effect.contractKind || (mapId === "the_rock_jungle" ? "hive_clear_or_bypass" : "seize_lane"),
-      deployAces: effect.deployAces || (state.hub.aces || []).filter(a => a.deployable).map(a => a.id).slice(0, 2),
-      choiceId: (choice && choice.id) || "c_theater",
-      repDelta: effect.repDelta || {},
-      arcId: (state.hub.arc && state.hub.arc.id) || 1,
-      maxCaptureMarks: arcMax(),
-      marks,
-      pathSignal: state.hub.pathSignal,
-      sessionMode: effect.sessionMode || state.hub.sessionMode || "same_map",
-      occupationModel: state.hub.occupationModel || "living_shell",
-      commerceDeploy: {
-        tenebrium: commerce().tenebrium,
-        kit: commerce().deployKit || [],
-      },
-      patron: "nullmercs",
-      against,
-    };
-    state.markMode = state.markMode || "capture";
-    state.focusMap = mapId;
-    return state.plan;
-  }
-
-  function openDeploy(choice) {
-    ensureTheaterPlan(choice);
-    state.markMode = "capture";
-    document.querySelectorAll(".mode-btn").forEach(b => b.classList.toggle("active", b.dataset.mode === state.markMode));
-    const launchBtn = $("btn-deploy");
-    if (launchBtn) {
-      launchBtn.textContent = state.hostLive ? "Drop into battle" : "Save plan (map only)";
-    }
-    renderBoard();
-    const plan = state.plan;
-    logLine(`Route briefing — ${prettyMap(plan.mapId)} · ${jobLabel(plan.contractKind)}`);
-    toast(`Mark the target on ${prettyMap(plan.mapId)}`, "ok");
-    const th = $("theater");
-    if (th) th.scrollIntoView({ behavior: "smooth", block: "nearest" });
-  }
-
-  function refreshTheaterForFocus() {
-    const mapId = state.focusMap
-      || state.hub.sessionHomeMap
-      || (state.hub.node && state.hub.node.regionHint)
-      || "the_rock_jungle";
-    // Prefer a deploy choice matching this map if present
-    const choices = ((state.hub.node || {}).choices || []).filter(c => c.kind === "deploy");
-    const match = choices.find(c => (c.effect || {}).mapId === mapId) || choices[0] || null;
-    if (match) ensureTheaterPlan(match);
-    else ensureTheaterPlan({ id: "c_theater", effect: { mapId } });
-    renderBoard();
-  }
-
-  function drawRouteArrows(plan, zones) {
-    const svg = $("board-route");
-    if (!svg) return;
-    const m = (plan && plan.marks) || {};
-    const byId = Object.fromEntries((zones || []).map(z => [z.zoneId, z]));
-    const infil = byId[m.deployZoneId];
-    const targetId = (m.captureZoneIds || [])[0];
-    const target = byId[targetId];
-    const exfil = byId[m.extractZoneId];
-    const parts = [];
-    parts.push(`<defs>
-      <marker id="arr-warn" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto">
-        <path d="M0,0 L5,2.5 L0,5 Z" fill="#e0a060"/></marker>
-      <marker id="arr-steam" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto">
-        <path d="M0,0 L5,2.5 L0,5 Z" fill="#7ec8ff"/></marker>
-    </defs>`);
-    if (infil && target) {
-      const a = zoneCenter(infil), b = zoneCenter(target);
-      parts.push(`<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}"
-        stroke="#e0a060" stroke-width="0.9" stroke-opacity="0.9"
-        marker-end="url(#arr-warn)"/>`);
-    }
-    if (target && exfil) {
-      const a = zoneCenter(target), b = zoneCenter(exfil);
-      parts.push(`<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}"
-        stroke="#7ec8ff" stroke-width="0.85" stroke-opacity="0.85" stroke-dasharray="2 1.5"
-        marker-end="url(#arr-steam)"/>`);
-    }
-    svg.innerHTML = parts.join("");
-  }
-
-  function renderBoard() {
-    if (!state.plan) refreshTheaterForFocus();
-    const plan = state.plan;
-    if (!plan) return;
-    const board = BOARDS[plan.mapId] || { zones: [] };
-    const zones = board.zones || [];
-    const el = $("board-zones") || $("board");
-    const title = $("theater-title");
-    const sub = $("theater-sub");
-    if (title) title.textContent = prettyMap(plan.mapId);
-    if (sub) {
-      const camp = (state.hub.homeCamp && state.hub.homeCamp.level) || 0;
-      const flags = state.hub.flags || {};
-      const homeNote = plan.mapId === "the_rock_jungle"
-        ? (flags.homeCleared
-          ? " · home cleared"
-          : ` · camp L${camp}${flags.homeClearReady ? " · clear ready" : " · need Tnb to scale"}`)
-        : "";
-      sub.textContent =
-        `${jobLabel(plan.contractKind)} · ${(plan.deployAces || []).join(", ") || "your aces"}${homeNote}`;
-    }
-    const rimMode = state.markMode === "deploy" || state.markMode === "extract";
-    if (!zones.length) {
-      el.innerHTML = `<div style="padding:1rem;color:var(--muted);font-size:.85rem">
-        No zone board for <b>${esc(plan.mapId)}</b>. Run tools/build_zone_boards_v1.py.</div>`;
-      drawRouteArrows(plan, []);
-    } else {
-      el.innerHTML = zones.map(z => {
-        const b = z.bounds || { xMin:0, xMax:0.2, zMin:0, zMax:0.2 };
-        const left = (b.xMin || 0) * 100;
-        const top = (b.zMin || 0) * 100;
-        const w = Math.max(4, ((b.xMax || 0) - (b.xMin || 0)) * 100);
-        const h = Math.max(4, ((b.zMax || 0) - (b.zMin || 0)) * 100);
-        const m = plan.marks || {};
-        const intel = intelFor(plan.mapId, z.zoneId) || {};
-        const cls = ["zone"];
-        if (z.capturable) cls.push("capturable");
-        if (isRimZone(z)) cls.push("rim-eligible");
-        else cls.push("midfield");
-        if (rimMode) cls.push("mode-rim");
-        if (intel.openTarget || intel.preferred) cls.push("open-target");
-        if (intel.claimed) cls.push("claimed");
-        if (intel.control) cls.push("ctrl-" + String(intel.control).replace(/[^a-z]/g, ""));
-        if (intel.confidence === "estimated") cls.push("est");
-        if (m.deployZoneId === z.zoneId) cls.push("deploy-mark");
-        if (m.extractZoneId === z.zoneId) cls.push("extract-mark");
-        if ((m.captureZoneIds || []).includes(z.zoneId)) cls.push("capture-mark");
-        const chip = (intel.openTarget || intel.preferred)
-          ? `<div class="zone-chip">open</div>` : "";
-        return `<div class="${cls.join(" ")}" data-zone="${esc(z.zoneId)}"
-          style="left:${left}%;top:${top}%;width:${w}%;height:${h}%"
-          title="${esc(z.label || z.zoneId)}${intel.control ? " · " + intel.control : ""}">
-          <div class="zone-label">${esc(z.label || z.zoneId)}</div>${chip}
-        </div>`;
-      }).join("");
-      el.querySelectorAll(".zone").forEach(z => {
-        z.onclick = () => markZone(z.dataset.zone);
-      });
-      drawRouteArrows(plan, zones);
-    }
-    const m = plan.marks || {};
-    const zoneName = (id) => {
-      if (!id) return "—";
-      const z = zones.find(x => x.zoneId === id);
-      return (z && z.label) || id;
-    };
-    const modeLabel = ({ capture: "target", deploy: "infil", extract: "exfil" })[state.markMode] || state.markMode;
-    $("marks-sum").innerHTML =
-      `<b>Infil</b> ${esc(zoneName(m.deployZoneId))} · <b>Target</b> ${(m.captureZoneIds || []).map(z => esc(zoneName(z))).join(", ") || "—"} · <b>Exfil</b> ${esc(zoneName(m.extractZoneId))}<br>` +
-      `route arrows · marking <b>${esc(modeLabel)}</b> · rim only for infil/exfil`;
-    const launchBtn = $("btn-deploy");
-    if (launchBtn) {
-      launchBtn.textContent = state.hostLive ? "Drop into battle" : "Save plan (map only)";
-    }
-  }
-
-  function markZone(zoneId) {
-    const plan = state.plan;
-    if (!plan) return;
-    const board = BOARDS[plan.mapId] || {};
-    const z = (board.zones || []).find(x => x.zoneId === zoneId);
-    const m = plan.marks;
-    if (state.markMode === "deploy" || state.markMode === "extract") {
-      if (z && !isRimZone(z)) {
-        toast("Infil and exfil stay on the rim of the map", "err");
-        return;
-      }
-      if (state.markMode === "deploy") {
-        m.deployZoneId = zoneId;
-        if (!m.extractZoneId) m.extractZoneId = zoneId;
-      } else {
-        m.extractZoneId = zoneId;
-      }
-    } else {
-      // Target is a different mark type from landing
-      const caps = m.captureZoneIds || [];
-      const i = caps.indexOf(zoneId);
-      if (i >= 0) caps.splice(i, 1);
-      else {
-        if (caps.length >= (plan.maxCaptureMarks || 1)) caps.shift();
-        caps.push(zoneId);
-      }
-      m.captureZoneIds = caps;
-    }
-    renderBoard();
-  }
-
-  function downloadJson(filename, obj) {
-    const blob = new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = filename;
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(a.href), 1500);
-  }
-
-  async function commitDeploy(launch) {
-    const plan = state.plan;
-    if (!plan) return;
-    if (!(plan.marks && plan.marks.captureZoneIds && plan.marks.captureZoneIds.length)) {
-      return toast("Mark a target (wound) on the map first", "err");
-    }
-    if (!plan.marks.deployZoneId) {
-      return toast("Mark an infil zone on the rim", "err");
-    }
-    const board = BOARDS[plan.mapId] || {};
-    const zones = board.zones || [];
-    const dep = zones.find(z => z.zoneId === plan.marks.deployZoneId);
-    const ext = zones.find(z => z.zoneId === (plan.marks.extractZoneId || plan.marks.deployZoneId));
-    if (dep && !isRimZone(dep)) {
-      return toast("Infil must be on the rim — pick an edge zone", "err");
-    }
-    if (ext && !isRimZone(ext)) {
-      return toast("Exfil must be on the rim — pick an edge zone", "err");
-    }
-    plan.commerceDeploy = { tenebrium: commerce().tenebrium, kit: commerce().deployKit || [] };
-
-    if (state.hostLive) {
-      try {
-        toast(launch ? "Sealing the drop — opening Beyond All Reason…" : "Sealing the drop…");
-        const q = launch ? "?launch=1" : "";
-        const res = await fetch(api("/api/deploy" + q), {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(plan),
-        });
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok || data.ok === false) {
-          logLine("The drop did not go through — check the toast.");
-          toast((data && (data.error || data.reason)) || `Drop failed (${res.status})`, "err");
-          return;
-        }
-        const launched = !!(data.launch && data.launch.ok !== false && !data.launch.skipped);
-        logLine(launched
-          ? `Dropping on ${prettyMap(plan.mapId)}. Fight the match, then bring it home.`
-          : `Sortie ready on ${prettyMap(plan.mapId)}. Open BAR if it did not start.`);
-        toast(launched
-          ? "Beyond All Reason is opening — good hunting."
-          : "Sortie sealed. Open BAR if it did not launch.", "ok");
-        state.hub.flags = state.hub.flags || {};
-        state.hub.flags.deployStub = false;
-        state.hub.lastResult = { kind: "deploy_committed", at: new Date().toISOString(), seedHint: data.seedHint };
-        renderBadges();
-        const ns = $("ns-title");
-        const nb = $("ns-body");
-        if (ns && nb) {
-          ns.textContent = "The company is in the field";
-          nb.innerHTML = `When the match ends, the <b>bridge brings it home</b> automatically if it can. ` +
-            `If the map does not move, click <b>After the fight — bring it home</b>.`;
-        }
-      } catch (e) {
-        toast("Wire error: " + e.message, "err");
-      }
-      return;
-    }
-
-    // Offline map-only: download plan, guide player to PLAY_CAMPAIGN
-    downloadJson("hub_deploy_plan.json", plan);
-    logLine(`Map-only plan for ${prettyMap(plan.mapId)}. Run PLAY_CAMPAIGN.bat to fight.`);
-    toast("Map only — run PLAY_CAMPAIGN.bat to open the wire and drop for real.", "err");
-    $("deploy-overlay").classList.remove("show");
-    state.hub.lastResult = { kind: "deploy_stub", mapId: plan.mapId, contractKind: plan.contractKind };
-  }
-
-  async function probeHost() {
-    const candidates = [];
-    if (location.protocol === "http:" || location.protocol === "https:") {
-      candidates.push(""); // same origin first
-    }
-    candidates.push("http://127.0.0.1:8770");
-    state.hostLive = false;
-    state.hostBase = "";
-    for (const base of candidates) {
-      try {
-        const res = await fetch((base || "") + "/api/status", { cache: "no-store" });
-        if (!res.ok) continue;
-        const data = await res.json();
-        if (!(data.schemaVersion && String(data.schemaVersion).indexOf("hub-host") >= 0) &&
-            !(data.capabilities && data.capabilities.stamp)) continue;
-        state.hostLive = true;
-        state.hostBase = base;
-        state.hostInfo = data;
-        if (state.hub.flags) state.hub.flags.deployStub = false;
-        logLine(`Wire open (${base || location.origin})`);
-        break;
-      } catch (_) { /* try next */ }
-    }
-    if (!state.hostLive && state.hub.flags) state.hub.flags.deployStub = true;
-    if (!state.hostLive) {
-      logLine("Map only — run PLAY_CAMPAIGN.bat to fight in BAR.");
-    }
-    renderBadges();
-    if (state.hostLive) {
-      startResultPoll();
-      pullHubState().catch(() => {});
-    }
-  }
-
-  function heatColor(v) {
-    // v in [0,1] → dark green to gold
-    const t = Math.max(0, Math.min(1, v));
-    const r = Math.round(20 + t * 200);
-    const g = Math.round(40 + t * 160);
-    const b = Math.round(30 + t * 40);
-    return `rgb(${r},${g},${b})`;
-  }
-
-  function buildRho(mapId) {
-    const board = BOARDS[mapId];
-    const zones = (board && board.zones) || [];
-    if (!zones.length) return { labels: [], matrix: [], zones: [] };
-    const n = zones.length;
-    const centers = zones.map(z => {
-      const b = z.bounds || {};
-      return {
-        x: ((b.xMin || 0) + (b.xMax || 1)) / 2,
-        z: ((b.zMin || 0) + (b.zMax || 1)) / 2,
-        zone: z,
-      };
-    });
-    const matrix = Array.from({ length: n }, () => Array(n).fill(0));
-    const g = state.hub.graph || {};
-    const contest = Math.min(1.5, Number(g.q6_contested) || 0.85);
-    const voidS = Number(g.q2_void_structure) || 0.15;
-    for (let i = 0; i < n; i++) {
-      const ctrl = (zones[i].control || zones[i].defaultControl || "neutral");
-      const diag = 0.35 + 0.4 * contest * (ctrl === "contested" || ctrl === "armada" ? 1 : 0.6);
-      matrix[i][i] = Math.min(1, diag);
-      for (let j = i + 1; j < n; j++) {
-        const dx = centers[i].x - centers[j].x;
-        const dz = centers[i].z - centers[j].z;
-        const dist = Math.sqrt(dx * dx + dz * dz) || 0.01;
-        let coh = Math.exp(-dist * (2.2 + voidS * 2)) * contest * 0.85;
-        if (zones[i].capturable && zones[j].capturable) coh *= 1.15;
-        coh = Math.min(0.95, coh);
-        matrix[i][j] = coh;
-        matrix[j][i] = coh;
-      }
-    }
-    // Normalize row-ish for display
-    let mx = 0.001;
-    for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) mx = Math.max(mx, matrix[i][j]);
-    for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) matrix[i][j] = matrix[i][j] / mx;
-    return {
-      labels: zones.map(z => (z.label || z.zoneId || "?").slice(0, 10)),
-      matrix,
-      zones,
-      centers,
-    };
-  }
-
-  function renderQuantum() {
-    const mapId = state.focusMap
-      || state.hub.sessionHomeMap
-      || (state.hub.node && state.hub.node.regionHint)
-      || ((state.hub.regions || [])[0] && (state.hub.regions || [])[0].mapId);
-    const g = state.hub.graph || {};
-    const rhoCamp = state.hub.campaignRho || {};
-    const axes = rhoCamp.axes || {};
-    const keys = [
-      ["Armada↔Cortex", g.q0_armada_cortex],
-      ["Void scars", g.q2_void_structure],
-      ["Contested", g.q6_contested],
-      ["Independents", g.q6_independent],
-      ["Scarcity", g.q7_resource_scarcity],
-    ];
-    if (axes.arm_cor != null) {
-      keys.push(["Faction pull", axes.arm_cor], ["Path tilt", axes.phi], ["Tenebrium pressure", axes.tenebrium]);
-    }
-    $("graph-scalars").innerHTML = keys.map(([k, v]) =>
-      `<span class="scalar-pill">${k} <b>${Number(v || 0).toFixed(2)}</b></span>`
-    ).join("");
-    const sp = state.hub.spectral || {};
-    const energy = Number(sp.energy || keys.reduce((s, [, v]) => s + Math.abs(Number(v || 0)), 0));
-    const barPct = Math.min(100, Math.round((energy / 6) * 100));
-    $("spec-bar").innerHTML = `<i style="width:${barPct}%"></i>`;
-    const pur = rhoCamp.purity != null ? Number(rhoCamp.purity).toFixed(2) : "—";
-    const ent = rhoCamp.entropy != null ? Number(rhoCamp.entropy).toFixed(2) : "—";
-    $("spec-meta").textContent =
-      `Theater: ${prettyMap(mapId)} · war energy ${energy.toFixed(2)} · focus ${pur} · chaos ${ent}`;
-    const adv = $("rho-advanced");
-    if (adv) {
-      adv.textContent =
-        `q0=${Number(g.q0_armada_cortex||0).toFixed(3)} q2=${Number(g.q2_void_structure||0).toFixed(3)} ` +
-        `q6c=${Number(g.q6_contested||0).toFixed(3)} q7=${Number(g.q7_resource_scarcity||0).toFixed(3)} ` +
-        `λ=${Number(sp.dominantEigenvalue||0).toFixed(3)} path=${state.hub.pathSignal||"B"}`;
-    }
-
-    const rho = buildRho(mapId);
-    const n = rho.matrix.length;
-    if (!n) {
-      $("rho-table").innerHTML = "<tr><td style='color:var(--muted);padding:.4rem'>No zone board — run build_zone_boards_v1.py</td></tr>";
-      $("ent-svg").innerHTML = "";
-      $("rho-inspect").textContent = "";
-      return;
-    }
-    // Clamp selection
-    state.rhoSel.i = Math.min(state.rhoSel.i, n - 1);
-    state.rhoSel.j = Math.min(state.rhoSel.j, n - 1);
-
-    let head = "<tr><th></th>" + rho.labels.map(l => `<th title="${esc(l)}">${esc(l.slice(0, 4))}</th>`).join("") + "</tr>";
-    let body = "";
-    for (let i = 0; i < n; i++) {
-      body += `<tr><th title="${esc(rho.labels[i])}">${esc(rho.labels[i].slice(0, 4))}</th>`;
-      for (let j = 0; j < n; j++) {
-        const v = rho.matrix[i][j];
-        const sel = (state.rhoSel.i === i && state.rhoSel.j === j) ? " sel" : "";
-        body += `<td class="${sel}" data-i="${i}" data-j="${j}" style="background:${heatColor(v)}" title="${v.toFixed(3)}"></td>`;
-      }
-      body += "</tr>";
-    }
-    $("rho-table").innerHTML = head + body;
-    $("rho-table").querySelectorAll("td[data-i]").forEach(td => {
-      td.onclick = () => {
-        state.rhoSel = { i: +td.dataset.i, j: +td.dataset.j };
-        renderQuantum();
-      };
-    });
-    const si = state.rhoSel.i, sj = state.rhoSel.j;
-    $("rho-inspect").textContent =
-      `Link ${rho.matrix[si][sj].toFixed(2)} · ${rho.labels[si]} ↔ ${rho.labels[sj]}`;
-
-    // Entanglement SVG — edges for strong off-diagonals
-    const W = 280, H = 140, pad = 18;
-    const pts = (rho.centers || []).map((c, idx) => ({
-      x: pad + c.x * (W - 2 * pad),
-      y: pad + c.z * (H - 2 * pad),
-      i: idx,
-    }));
-    let edges = "";
-    for (let i = 0; i < n; i++) {
-      for (let j = i + 1; j < n; j++) {
-        const v = rho.matrix[i][j];
-        if (v < 0.35) continue;
-        edges += `<line x1="${pts[i].x}" y1="${pts[i].y}" x2="${pts[j].x}" y2="${pts[j].y}"
-          stroke="rgba(126,200,255,${0.15 + v * 0.7})" stroke-width="${0.6 + v * 2.2}"/>`;
-      }
-    }
-    const nodes = pts.map((p, i) => {
-      const hot = i === si || i === sj;
-      return `<circle cx="${p.x}" cy="${p.y}" r="${hot ? 5.5 : 3.5}"
-        fill="${hot ? "var(--gold)" : "var(--edge)"}" opacity="0.9"/>`;
-    }).join("");
-    $("ent-svg").innerHTML = edges + nodes;
-  }
-
-  function mergeHubPatch(patch) {
-    if (!patch) return;
-    if (patch.aces) state.hub.aces = patch.aces;
-    if (patch.missionNumber != null) {
-      state.hub.missionNumber = patch.missionNumber;
-      // arc rebuild light
-      const n = patch.missionNumber;
-      state.hub.arc = n <= 5
-        ? { id: 1, title: "First Scar", maxCaptureMarks: 1 }
-        : n <= 10
-          ? { id: 2, title: "Second Scar", maxCaptureMarks: 2 }
-          : { id: 3, title: "Third Scar", maxCaptureMarks: 3 };
-    }
-    if (patch.reputation) state.hub.reputation = patch.reputation;
-    if (patch.graph) state.hub.graph = patch.graph;
-    if (patch.spectral) state.hub.spectral = patch.spectral;
-    if (patch.node) state.hub.node = patch.node;
-    if (patch.lastResult) state.hub.lastResult = patch.lastResult;
-    if (patch.regions && Array.isArray(patch.regions)) {
-      const byId = Object.fromEntries(patch.regions.map(r => [r.mapId, r]));
-      (state.hub.regions || []).forEach(r => {
-        const u = byId[r.mapId];
-        if (u && u.control) r.control = u.control;
-      });
-    }
-    if (state.hub.flags) state.hub.flags.deployStub = false;
-    const debrief = patch.debrief || (patch.lastResult && patch.lastResult.debrief) || null;
-    const tokens = (patch.lastResult && patch.lastResult.tokens) || (debrief && debrief.changed) || [];
-    const auto = !!(patch.autoApplied || (patch.lastResult && patch.lastResult.autoApplied));
-    const headline = (debrief && debrief.headline)
-      || patch.headline
-      || (patch.lastResult && patch.lastResult.headline)
-      || null;
-    const verdict = (debrief && debrief.verdict) || patch.verdict || (patch.lastResult && patch.lastResult.verdict);
-    const reasonHint = (debrief && debrief.reasonHint)
-      || patch.reasonHint
-      || (patch.lastResult && patch.lastResult.reasonHint)
-      || "";
-    if (headline || tokens.length || auto || verdict) {
-      const prefix = auto ? "Bridge: " : (verdict === "incomplete" ? "Incomplete: " : "Brought home: ");
-      logLine(prefix + (headline || tokens.slice(0, 8).join(" · ") || "campaign advanced"));
-      showHomecoming({
-        verdict: verdict || "incomplete",
-        banner: (debrief && debrief.banner) || patch.banner,
-        headline: headline,
-        reasonHint: reasonHint,
-        chips: tokens.slice(0, 10),
-      });
-      if (verdict === "incomplete") {
-        toast(headline || "Result not home — retry bring-home or Abandon", "err");
-      } else if (verdict === "abandon") {
-        toast(headline || "Left the field — mark the next board", "warn");
-      } else if (debrief && debrief.duplicate) {
-        toast("Already applied — state unchanged", "ok");
-      } else {
-        toast(auto
-          ? (headline || "Bridge brought the sortie home")
-          : (headline || "The ashes keep score — company and map updated"), "ok");
-      }
-    }
-    renderBadges();
-    renderAces();
-    renderRegions();
-    renderShop();
-    renderNode();
-    renderQuantum();
-  }
-
-  async function pullHubState() {
-    if (!state.hostLive) return;
-    const res = await fetch(api("/api/hub-state"), { cache: "no-store" });
-    const j = await res.json();
-    if (j.ok && j.hub) {
-      const focus = state.focusMap;
-      state.hub = j.hub;
-      state.focusMap = focus || j.hub.sessionHomeMap || (j.hub.node && j.hub.node.regionHint);
-      if (state.hub.flags) state.hub.flags.deployStub = false;
-      renderBadges();
-      renderAces();
-      renderRegions();
-      renderShop();
-      renderNode();
-      renderQuantum();
-      refreshTheaterForFocus();
-      logLine("Map refreshed from the living campaign");
-    }
-  }
-
-  async function pullBarResult() {
-    if (!state.hostLive) {
-      return toast("Open the wire first — run PLAY.bat", "err");
-    }
-    toast("Listening for the last sortie…");
-    try {
-      const res = await fetch(api("/api/advance?extract=1"), { method: "POST" });
-      const j = await res.json().catch(() => ({}));
-      const rr = await fetch(api("/api/result"), { cache: "no-store" });
-      const rj = await rr.json().catch(() => ({}));
-      if (rj.present && rj.result) {
-        state.lastResultAt = rj.result.at;
-        mergeHubPatch({
-          ...rj.result,
-          debrief: j.debrief || rj.result.debrief,
-          headline: j.headline || rj.result.headline,
-          verdict: j.verdict || rj.result.verdict,
-        });
-      } else if (j.debrief || (j.apply && j.apply.lastResult) || j.incomplete) {
-        mergeHubPatch({
-          lastResult: (j.apply && j.apply.lastResult) || j.lastResult,
-          debrief: j.debrief,
-          headline: j.headline,
-          verdict: j.verdict,
-          missionNumber: j.apply && j.apply.missionNumber,
-        });
-        if (!j.incomplete) await pullHubState();
-      } else if (!j.ok) {
-        toast((j.error || (j.apply && j.apply.error) || "Nothing to bring home yet — finish a match or Abandon"), "err");
-      } else {
-        await pullHubState();
-        toast("Map refreshed — no new scars this pass", "ok");
-      }
-    } catch (e) {
-      toast("Could not bring it home: " + e.message, "err");
-    }
-  }
-
-  async function abandonSortie() {
-    if (!state.hostLive) {
-      return toast("Open the wire first — run PLAY.bat", "err");
-    }
-    if (!confirm("Abandon this sortie? No zone flip, no fake win. Next Drop unlocks.")) return;
-    try {
-      const res = await fetch(api("/api/abandon"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ reason: "player_abandon" }),
-      });
-      const j = await res.json().catch(() => ({}));
-      if (j.ok || j.abandon) {
-        mergeHubPatch({
-          debrief: j.debrief,
-          headline: j.headline || "Left the field.",
-          verdict: "abandon",
-          lastResult: { verdict: "abandon", debrief: j.debrief, at: j.at },
-        });
-        await pullHubState();
-      } else {
-        toast(j.error || "Abandon failed", "err");
-      }
-    } catch (e) {
-      toast("Abandon failed: " + e.message, "err");
-    }
-  }
-
-  function showCoach(force) {
-    try {
-      if (!force && localStorage.getItem("va_coach_seen_v2") === "1") return;
-    } catch (_) { /* private mode */ }
-    $("coach").classList.add("show");
-  }
-  function hideCoach(remember) {
-    $("coach").classList.remove("show");
-    if (remember) {
-      try { localStorage.setItem("va_coach_seen_v2", "1"); } catch (_) { /* */ }
-    }
-  }
-
-  function startResultPoll() {
-    if (startResultPoll._on) return;
-    startResultPoll._on = true;
-    setInterval(async () => {
-      if (!state.hostLive) return;
-      try {
-        const rr = await fetch(api("/api/result"), { cache: "no-store" });
-        const rj = await rr.json();
-        if (rj.present && rj.result && rj.result.at && rj.result.at !== state.lastResultAt) {
-          state.lastResultAt = rj.result.at;
-          // Phase 2: bridge may set autoApplied on hub_result
-          mergeHubPatch({
-            ...rj.result,
-            autoApplied: !!(rj.result.autoApplied),
-            lastResult: rj.result.lastResult || rj.result,
-          });
-        }
-      } catch (_) { /* host down */ }
-    }, 8000);
-  }
-
-  // Tabs
-  document.querySelectorAll(".tab").forEach(tab => {
-    tab.onclick = () => {
-      document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t === tab));
-      const name = tab.dataset.tab;
-      $("panel-shop").hidden = name !== "shop";
-      $("panel-theaters").hidden = name !== "theaters";
-      $("panel-manifold").hidden = name !== "manifold";
-      if (name === "manifold") renderQuantum();
-    };
-  });
-
-  document.querySelectorAll(".mode-btn").forEach(btn => {
-    btn.onclick = () => {
-      state.markMode = btn.dataset.mode;
-      document.querySelectorAll(".mode-btn").forEach(b => b.classList.toggle("active", b === btn));
-      renderBoard();
-    };
-  });
-
-  if ($("btn-clear-marks")) {
-    $("btn-clear-marks").onclick = () => {
-      if (!state.plan) return;
-      state.plan.marks = defaultMarks(state.plan.mapId);
-      renderBoard();
-      toast("Route reset", "ok");
-    };
-  }
-  $("btn-deploy").onclick = () => commitDeploy(true);
-  $("btn-pull-result").onclick = () => pullBarResult();
-  if ($("btn-abandon")) $("btn-abandon").onclick = () => abandonSortie();
-  if ($("hc-dismiss")) $("hc-dismiss").onclick = () => hideHomecoming();
-  $("btn-sync-hub").onclick = async () => {
-    if (!state.hostLive) return toast("Run PLAY.bat for a live map", "err");
-    try {
-      await fetch(api("/api/rebuild-hub"), { method: "POST" });
-      await pullHubState();
-      toast("Map refreshed", "ok");
-    } catch (e) {
-      toast("Refresh failed: " + e.message, "err");
-    }
-  };
-  $("btn-help").onclick = () => showCoach(true);
-  $("coach-go").onclick = () => hideCoach(true);
-  $("coach-skip").onclick = () => hideCoach(true);
-
-  // Boot
-  if (!window.HUB_STATE) {
-    $("title").textContent = "The map is blank";
-    $("voice").textContent = "Rebuild the hub (build_hub_state_v1.py), then open this again.";
-    return;
-  }
-  state.focusMap = H.sessionHomeMap || (H.node && H.node.regionHint) || (H.regions && H.regions[0] && H.regions[0].mapId) || "the_rock_jungle";
-  renderBadges();
-  renderAces();
-  renderRegions();
-  renderShop();
-  renderNode();
-  renderQuantum();
-  refreshTheaterForFocus();
-  logLine(`The map answers · home ${prettyMap(state.focusMap)} · ${(commerce().shop||[]).length} broker listings`);
-  probeHost();
-  showCoach(false);
-})();
-</script>
 </body>
 </html>

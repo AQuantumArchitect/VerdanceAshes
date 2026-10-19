@@ -1,0 +1,148 @@
+{
+  "schemaVersion": "verdance-voice/0.1",
+  "speaker": "rusk",
+  "name": "Rusk Halloway",
+  "register": "Literal, stubborn, loyal to thresholds. Six hours at a scrap-gate with a jammed gatling and a fiction about reinforcements; doors are his religion. He talks about people as doors he did or didn't hold. He is the one who argues for going back, every time, and he is wrong about half the time and never sorry. Short sentences. No metaphors except doors, which he doesn't think are metaphors.",
+  "argues": [
+    "rooted"
+  ],
+  "resists": [
+    "haunted"
+  ],
+  "owns": [
+    "frame_recovered"
+  ],
+  "lines": [
+    {
+      "id": "r.rec.1",
+      "on": {
+        "class": "frame_recovered"
+      },
+      "occasion": "roll",
+      "text": "{hero} came back on somebody's shoulders. Good. That's a door that held."
+    },
+    {
+      "id": "r.rec.2",
+      "on": {
+        "class": "frame_recovered"
+      },
+      "occasion": "roll",
+      "text": "{hero}. Carried. I'd have carried them myself if I'd been closer. I'll be closer."
+    },
+    {
+      "id": "r.rec.3",
+      "on": {
+        "class": "frame_recovered"
+      },
+      "occasion": "roll",
+      "text": "We went back for {hero}. Write that next to the names we didn't go back for. Keeps the page honest."
+    },
+    {
+      "id": "r.rec.4",
+      "on": {
+        "class": "frame_recovered"
+      },
+      "occasion": "roll",
+      "reading": {
+        "dominant": [
+          "haunted"
+        ]
+      },
+      "text": "{hero} is on the bench, not the roll. One door held. I'm counting the ones that held tonight."
+    },
+    {
+      "id": "r.rec.5",
+      "on": {
+        "class": "frame_recovered"
+      },
+      "occasion": "roll",
+      "reading": {
+        "dominant": [
+          "bleeding"
+        ]
+      },
+      "text": "{hero}, {wounds} times now. Some doors you hold more than once. That's what makes them yours."
+    },
+    {
+      "id": "r.dead.aside.1",
+      "on": {
+        "class": "named_dead"
+      },
+      "occasion": "roll",
+      "text": "{hero}. A door I didn't hold. I know I wasn't there. That's the part I'm saying."
+    },
+    {
+      "id": "r.dead.aside.2",
+      "on": {
+        "class": "named_dead"
+      },
+      "occasion": "roll",
+      "text": "Next time a frame goes down we hold the ground until it's carried. I'll need the gatling fixed."
+    },
+    {
+      "id": "r.open.hearthfire",
+      "on": {
+        "attractor": "hearthfire"
+      },
+      "occasion": "briefing",
+      "text": "Doors first. The camp's got a few now. I hung one of them. Here's which one we're going out through."
+    },
+    {
+      "id": "r.open.roll",
+      "on": {
+        "attractor": "roll"
+      },
+      "occasion": "briefing",
+      "text": "If somebody goes down out there, I'm standing on them until they're carried. Plan the rest around that."
+    },
+    {
+      "id": "r.shift.rooted",
+      "on": {
+        "dominantBecame": "rooted"
+      },
+      "occasion": "camp",
+      "once": true,
+      "text": "I put a door on the shelf. Actual door. It doesn't lock. It's for closing behind you."
+    },
+    {
+      "id": "r.shift.haunted",
+      "on": {
+        "dominantBecame": "haunted"
+      },
+      "occasion": "camp",
+      "once": true,
+      "text": "More names on her list than chairs at the table. I'm going to start holding doors that aren't there yet."
+    },
+    {
+      "id": "r.torn.goback",
+      "on": {
+        "coherenceTorn": {
+          "pair": [
+            "haunted",
+            "rooted"
+          ]
+        }
+      },
+      "occasion": "camp",
+      "once": true,
+      "text": "We went back for some. We didn't for others. I can tell you which. I can't tell you the rule."
+    },
+    {
+      "id": "r.settled.haunted",
+      "on": {
+        "coherenceSettled": {
+          "pair": [
+            "haunted",
+            "rooted"
+          ],
+          "toward": "haunted"
+        }
+      },
+      "occasion": "camp",
+      "once": true,
+      "text": "We've stopped going back. I noticed. I'm not going to stop. Plan around that too."
+    }
+  ],
+  "deathLine": "Door's held. Go through it.",
+  "notes": "Rusk is in the live company (player: true). His lines are live now."
+}

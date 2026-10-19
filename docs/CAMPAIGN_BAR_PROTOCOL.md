@@ -4,6 +4,10 @@
 
 After a fight, the kernel brings the result home. If not: **Pull result** or **Abandon**.
 
+**Collapse law:** one Drop / MatchResult is the **observation** that updates world graph `G` inside `process_result` (`apply_graph_deltas` + `measure_graph_from_world`). See [`GRAPH_COLLAPSE_SSOT.md`](GRAPH_COLLAPSE_SSOT.md).
+
+**Objective ledger law (one primary):** the stamped `objectiveArchetype` owns the board. On `eco_raid`, Tnb/eco is primary; wild field recruits seed as **optional** bonuses (`optionalJoin=true`) unless explicitly contracted. Destroying an optional recruit must not set `objectiveFailed`. Dedicated rescue contracts hard-link only when authored that way.
+
 See also: `docs/DEPLOY_TRUTH.md` (play path), `tools/contract_v2.py`, `tools/match_credit_v1.py`, `docs/UI_ASH_CONSOLE.md` (shared debrief language on BAR + hub).
 
 ---
@@ -11,9 +15,9 @@ See also: `docs/DEPLOY_TRUTH.md` (play path), `tools/contract_v2.py`, `tools/mat
 ## Mental model
 
 ```
-SORTIE  ──(Sortie v2)──►  BAR MATCH  ──(MatchResult v2)──►  CAMPAIGN
+SORTIE  ──(Sortie v2)──►  BAR MATCH  ──(MatchResult v2)──►  CAMPAIGN (+ collapse G)
   hub/stamp                 gadget terminal                  kernel.bring_home
-  one seed                  one terminal per chapter         one credit table
+  one seed                  one terminal per chapter         one credit table + M(G,result)
 ```
 
 | Direction | Contract | Writer | Consumer |

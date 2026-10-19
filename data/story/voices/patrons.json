@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "verdance-patrons/0.1",
+  "notes": "The other side's voices. The six named faction commanders in campaign_state.characters who are not in the codex: the Merc broker, three Armada officers, the Dealer-Prime, and a Cortex synthwright. They never speak in camp. Their lines arrive as dispatches: intercepted by the Auditor, relayed by a Merc liaison, or posted on the hub board. This is where the macro war gets a face and where the enemy's version of the roll, with no Ashwalker named, comes from. Keyed to event classes so the world answers the player's actions in someone's voice.",
+  "patrons": {
+    "anselm": {
+      "name": "Broker Anselm Rue",
+      "faction": "nullmercs",
+      "register": "Merc broker. Pleasant, exact, never threatens; states terms. Calls the company 'the Ashwalker contract'. Never uses a hero's name.",
+      "dispatches": [
+        { "on": { "class": "merc_paper" }, "text": "The Ashwalker contract performed at {map}. Payment released. Further work available on the same terms." },
+        { "on": { "class": "own_ground_on_merc_paper" }, "text": "A clarification is requested regarding {map}: the Null Merc Bloc holds the contract; the Bloc assumes it also holds the ground. Please confirm." },
+        { "on": { "class": "promise_kept", "thread": "friends" }, "text": "The Bloc notes the Ashwalker contract's reliability. Reliability is priced. Expect improved terms." },
+        { "on": { "class": "promise_broken", "thread": "friends" }, "text": "The Bloc notes a lapse. No penalty is assessed. The Bloc's memory is the penalty." },
+        { "on": { "attractor": "finale_overthrow" }, "text": "The Bloc offers the Armada gate. Entire. Compensation in territory, to be defined after. The Ashwalker contract is the Bloc's preferred instrument." },
+        { "on": { "coherenceSettled": { "pair": ["auxiliary", "sovereign"], "toward": "sovereign" } }, "text": "The Bloc observes that the Ashwalker contract now describes itself differently. The Bloc has no objection. The Bloc has updated the rates." }
+      ]
+    },
+    "brask": {
+      "name": "Line-Captain Odell Brask",
+      "faction": "armada",
+      "register": "Armada line officer, Greenest Fields. Tired, correct, holds what he's told to hold. Refers to the commander as 'the deserter' without heat.",
+      "dispatches": [
+        { "on": { "class": "drop_held", "map": "greenest_fields" }, "text": "Greenest Fields sector lost to irregulars under Merc contract. Deserter believed present. Request reinforcement. Request denied in advance, I assume." },
+        { "on": { "class": "armada_flip_away" }, "text": "{label} is gone. Not to the irregulars. To nobody in particular. That's the worst way to lose ground and we are getting good at it." },
+        { "on": { "class": "garrison_scaled_up" }, "text": "Garrison increased. Supply not increased. Tell Command the walls are thicker and the men behind them are the same men." }
+      ]
+    },
+    "solvang": {
+      "name": "Warden-Marshal Teir Solvang",
+      "faction": "armada",
+      "register": "Armada marshal, Ancient Bastion. Formal, bitter, believes the flag will outlast its people and says so. The one who writes the Armada's version of the roll.",
+      "dispatches": [
+        { "on": { "dominantBecame": "armada_falling" }, "text": "Verdance will be recorded as held until it is recorded as lost. The record is what we are defending now. Men are a means." },
+        { "on": { "class": "named_dead" }, "text": "Irregular casualties at {map}: unnamed, number uncertain. Armada casualties: see attached roll, by name and rank. The distinction is the point of us." },
+        { "on": { "attractor": "ash_front" }, "text": "The irregulars have made themselves a shape on the map. Shapes can be surrounded. Begin." }
+      ]
+    },
+    "voren": {
+      "name": "Bastion-Keeper Ilsa Voren",
+      "faction": "armada",
+      "register": "Armada keeper, Tabula. Practical, quietly disloyal to Command, the one Armada officer who might deal. Speaks of the commander as 'our former colleague'.",
+      "dispatches": [
+        { "on": { "class": "clean_return" }, "text": "Our former colleague brings their people home. Command calls that cowardice. I call it the first competent thing anyone has done on this world in a year." },
+        { "on": { "class": "scarcity_crossed_up" }, "text": "Tenebrium is short on both sides of the line. If the irregulars can be bought, now is when. If they cannot, now is when we find out." },
+        { "on": { "dominantBecame": "sovereign" }, "text": "The irregulars are flying their own flag at Tabula's edge. Command wants it burned. I want to know what it's called." }
+      ]
+    },
+    "ixt": {
+      "name": "Dealer-Prime Ixt",
+      "faction": "cortex",
+      "register": "The dealer. Cortex, Eye of Horus. Courteous, patient, speaks of debt as a relationship. Never says 'owe'; says 'between us'.",
+      "dispatches": [
+        { "on": { "class": "loan_taken" }, "text": "The terms are between us now. I find that people who say 'between us' keep their word longer than people who say 'owed'. I hope to find it again." },
+        { "on": { "class": "debt_cleared" }, "text": "Settled. I'm pleased, and a little sorry; there was something between us and now there isn't. Should you need there to be again, Horus is where it always was." },
+        { "on": { "class": "scarcity_crossed_up" }, "text": "I hear the fields are thin. I don't deal in fields. I deal in what people do when the fields are thin. Come and see me." },
+        { "on": { "class": "promise_broken", "thread": "dealer" }, "text": "A grudge is just a term that hasn't been written down yet. I've written it down. It's quite reasonable." },
+        { "on": { "attractor": "finale_spire" }, "text": "There is a way off this world and I hold a share of it. I mention it as a friend. Friends mention things." }
+      ]
+    },
+    "calder": {
+      "name": "Synthwright Calder Nyx",
+      "faction": "cortex",
+      "register": "Cortex synthwright, Greenest Fields. Clinical curiosity about the company as a specimen. Speaks of the commander's void-touched nature as a technical property.",
+      "dispatches": [
+        { "on": { "class": "hero_joined" }, "text": "The irregular formation has acquired another named unit. Named units degrade more slowly under loss than numbered ones. I am measuring by how much." },
+        { "on": { "class": "walker_still_scrap" }, "text": "The deserter commander operates without a frame. The formation does not degrade. This should not be possible and I have begun a file." },
+        { "on": { "class": "walker_rebuilt" }, "text": "The deserter commander has a frame again. I predict improved cohesion and a measurable increase in Armada attention. I predict the second more confidently." }
+      ]
+    }
+  }
+}

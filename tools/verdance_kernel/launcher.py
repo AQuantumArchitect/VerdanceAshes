@@ -6,6 +6,7 @@ Starts the kernel HTTP server and opens an embedded shell when possible
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 import threading
 import time
@@ -18,6 +19,88 @@ from verdance_kernel.api import CampaignKernel
 from verdance_kernel.bar_bridge import BarBridge
 from verdance_kernel.paths import showoff_dir
 from verdance_kernel.server import make_handler
+
+
+def reclaim_kernel_port(host: str = "127.0.0.1", port: int = 8770) -> list[int]:
+    """Stop stale verdance_kernel listeners on *port* so PLAY owns the hub.
+
+    After a reboot / RESET / abandoned PLAY window, an old kernel often keeps
+    :8770. A second PLAY then either fails to bind or (on Windows with reuse)
+    shares the port — and the browser keeps showing yesterday's campaign.
+    """
+    killed: list[int] = []
+    self_pid = os.getpid()
+    try:
+        import subprocess
+
+        # Prefer PowerShell on Windows — reliable Listen PID + command line.
+        if os.name == "nt":
+            ps = (
+                f"$conns = Get-NetTCPConnection -LocalPort {int(port)} "
+                f"-State Listen -ErrorAction SilentlyContinue; "
+                f"foreach ($c in @($conns)) {{ "
+                f"  $p = Get-CimInstance Win32_Process -Filter \"ProcessId=$($c.OwningProcess)\" "
+                f"-ErrorAction SilentlyContinue; "
+                f"  if ($p -and $p.CommandLine -match 'verdance_kernel') {{ "
+                f"    Write-Output $c.OwningProcess "
+                f"  }} "
+                f"}}"
+            )
+            r = subprocess.run(
+                [
+                    "powershell",
+                    "-NoProfile",
+                    "-ExecutionPolicy",
+                    "Bypass",
+                    "-Command",
+                    ps,
+                ],
+                capture_output=True,
+                text=True,
+                timeout=15,
+            )
+            pids: list[int] = []
+            for line in (r.stdout or "").splitlines():
+                line = line.strip()
+                if line.isdigit():
+                    pids.append(int(line))
+        else:
+            pids = []
+            try:
+                import socket
+
+                # Best-effort: if bind fails, we still raise below.
+                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                    s.bind((host, port))
+            except OSError:
+                pass
+    except Exception as e:  # noqa: BLE001
+        print(f"[launcher] port reclaim probe failed ({e})", file=sys.stderr)
+        return killed
+
+    for pid in sorted(set(pids)):
+        if pid <= 0 or pid == self_pid:
+            continue
+        try:
+            if os.name == "nt":
+                subprocess.run(
+                    ["taskkill", "/PID", str(pid), "/F"],
+                    capture_output=True,
+                    text=True,
+                    timeout=10,
+                )
+            else:
+                os.kill(pid, 15)
+            killed.append(pid)
+            print(f"[launcher] stopped stale kernel PID {pid} on :{port}")
+        except Exception as e:  # noqa: BLE001
+            print(f"[launcher] could not stop PID {pid}: {e}", file=sys.stderr)
+
+    if killed:
+        # Brief pause so the OS releases the listen socket.
+        time.sleep(0.4)
+    return killed
 
 
 def _try_webview(url: str, title: str = "Verdance's Ashes") -> bool:
@@ -40,6 +123,39 @@ def _try_webview(url: str, title: str = "Verdance's Ashes") -> bool:
         return False
 
 
+def _bar_mod_banner(workspace: Path) -> None:
+    """Print which tree BAR will load for VerdanceAshes.sdd (deployed vs workspace)."""
+    try:
+        local = Path(os.environ.get("LOCALAPPDATA", ""))
+        mod_dest = local / "Programs" / "Beyond-All-Reason" / "data" / "games" / "VerdanceAshes.sdd"
+        deployed = Path.home() / "Documents" / "My Games" / "VerdanceAshes" / "mod" / "VerdanceAshes.sdd"
+        workspace_mod = workspace / "mod" / "VerdanceAshes.sdd"
+        if not mod_dest.exists():
+            print(f"BAR mod: missing {mod_dest}", file=sys.stderr)
+            return
+        # Junction/symlink: resolve(); plain dir resolves to itself.
+        target = mod_dest.resolve()
+        deployed_r = deployed.resolve() if deployed.exists() else None
+        workspace_r = workspace_mod.resolve() if workspace_mod.exists() else None
+        mode = "CUSTOM"
+        if deployed_r and target == deployed_r:
+            mode = "DEPLOYED"
+        elif workspace_r and target == workspace_r:
+            mode = "WORKSPACE"
+        print(f"BAR mod mode: {mode}")
+        print(f"BAR mod loads: {target}")
+        if mode == "WORKSPACE":
+            print(
+                "NOTE: Drop is loading workspace Lua. Playtest truth is My Games — "
+                "run scripts\\player\\point_bar_mod.ps1 -Mode Deployed after SHIP.",
+                file=sys.stderr,
+            )
+        elif mode == "DEPLOYED":
+            print("Playtest truth: Drop Lua matches My Games install.")
+    except Exception as e:  # noqa: BLE001
+        print(f"BAR mod banner skipped ({e})", file=sys.stderr)
+
+
 def launch(
     workspace: str | Path | None = None,
     *,
@@ -48,6 +164,7 @@ def launch(
     no_ui: bool = False,
     prefer_browser: bool = False,
     enable_bridge: bool = True,
+    rebuild: bool = True,
 ) -> int:
     kernel = CampaignKernel(workspace)
     showoff = showoff_dir(kernel.ws)
@@ -55,20 +172,44 @@ def launch(
         print(f"ERROR: missing {showoff / 'index.html'}", file=sys.stderr)
         return 2
 
+    _bar_mod_banner(Path(kernel.ws))
+
+    # PLAY is the product entry point, so refresh the hub every time. Leaving
+    # hub_state.json untouched made a fresh launch show yesterday's first
+    # recommendation even though the campaign state and compiler had moved on.
+    # No stale-surface fallback: a broken rebuild must fail loud, not revive
+    # yesterday's Sortie N paint over a wiped campaign_state.
+    if rebuild:
+        print("Refreshing campaign hub…")
+    try:
+        if rebuild:
+            kernel.rebuild_hub()
+    except Exception as e:  # noqa: BLE001
+        print(
+            f"ERROR: hub refresh failed ({e}).\n"
+            f"  Refusing to open the last readable surface — that hid real bugs\n"
+            f"  and could paint an old sortie over a RESET campaign.\n"
+            f"  Fix the rebuild, then run PLAY.bat again.",
+            file=sys.stderr,
+        )
+        return 4
+
     if enable_bridge:
         BarBridge(kernel).start()
 
-    if not (showoff / "hub_state.json").is_file():
-        print("Rebuilding hub…")
-        kernel.rebuild_hub()
-    else:
-        try:
-            kernel.write_campaign_surface()
-        except Exception:  # noqa: BLE001
-            pass
+    reclaim_kernel_port(host, port)
 
     handler = make_handler(kernel, showoff)
-    server = ThreadingHTTPServer((host, port), handler)
+    try:
+        server = ThreadingHTTPServer((host, port), handler)
+    except OSError as e:
+        print(
+            f"ERROR: cannot bind {host}:{port} ({e}).\n"
+            f"  Another process still owns the hub port. Close the other PLAY window,\n"
+            f"  or run RESET.bat then PLAY.bat again.",
+            file=sys.stderr,
+        )
+        return 3
     url = f"http://{host}:{port}/"
 
     def _serve() -> None:
@@ -145,6 +286,11 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--no-ui", action="store_true", help="Kernel only, no browser/webview")
     ap.add_argument("--browser", action="store_true", help="Force system browser (skip webview)")
     ap.add_argument("--no-bridge", action="store_true", help="Disable BAR auto-apply bridge")
+    ap.add_argument(
+        "--no-rebuild",
+        action="store_true",
+        help="Skip hub rebuild on start (does not re-apply the last result)",
+    )
     args = ap.parse_args(argv)
     return launch(
         args.workspace,
@@ -153,6 +299,7 @@ def main(argv: list[str] | None = None) -> int:
         no_ui=args.no_ui,
         prefer_browser=args.browser,
         enable_bridge=not args.no_bridge,
+        rebuild=not args.no_rebuild,
     )
 
 

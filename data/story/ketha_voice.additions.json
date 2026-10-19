@@ -1,0 +1,104 @@
+{
+  "schemaVersion": "verdance-ketha-additions/0.1",
+  "notes": "Deepening pass for the in-Drop pools (BAR HUD barks and the pre-seeded debrief candidates). Between-Drop voice (hub briefing, debrief, camp, roll) now comes from data/story/voices/ + tools/occasions_v1.py and is keyed by occasion, not mission number. These additions are merged into ketha_voice.json by tools/merge_ketha_additions.py; existing lines are kept.",
+  "pools": {
+    "debrief.victory": [
+      "Held. Say it once, write it once, don't frame it.",
+      "A win. The ground agreed with us for ten minutes. Make it eleven next time.",
+      "We left on our feet and they didn't follow. I'll take that spelling of victory.",
+      "Done. The map changes tonight. So does the bill. Read both."
+    ],
+    "debrief.victory_clean": [
+      "Everyone who went came back. I counted twice. I'm allowed one luxury.",
+      "Clean. That word is doing more work than it used to.",
+      "No one carried. No one was carried. Put that above the objective in the report.",
+      "In, out, intact. The roll didn't get longer. That's the whole debrief."
+    ],
+    "debrief.partial": [
+      "Half kept, half owed. The owed half has interest.",
+      "We brought back a company and left an order. I know which one I'd rather have.",
+      "Unfinished. Not failed. I'm particular about the difference; the client won't be.",
+      "A hinge. Which way it swings is the next Drop's business."
+    ],
+    "debrief.defeat": [
+      "Lost. Short word. It never gets smaller.",
+      "We lost the ground. Read the roster before anyone says the word ground again.",
+      "They held, we didn't. Write it exactly like that. The next sortie needs the truth more than we need comfort.",
+      "That's a defeat. Mark it. Then mark who's still standing, because that's the part we keep."
+    ],
+    "debrief.hero_lost": [
+      "A name went down and the frame stayed. I'll write where. We decide what that means at the table.",
+      "They fell. The wreck's still on the field. Nothing's final until someone reclaims it or we do.",
+      "Down, not gone. Not yet. That 'yet' is the only thing I care about tonight.",
+      "I don't write the roll from the field. I write it from the camp, after everyone's had the chance to argue."
+    ],
+    "debrief.territory_lost": [
+      "{zone} went while we were elsewhere. Ground doesn't wait and neither do the people on it.",
+      "Mark {zone} theirs. Then mark who was supposed to be watching it. Nobody. That's the problem.",
+      "{zone}, lost offscreen. Nobody of ours was there. That's a different kind of losing. It's cheaper and it's worse."
+    ],
+    "bark.hero_down": [
+      "Name down! Hold that ground until it's carried. Nobody reclaims one of ours.",
+      "Frame's on the field. Rez on it now. I am not writing this one tonight.",
+      "They're down. Cover the wreck. The roll waits for nobody's permission but mine, and I'm not giving it.",
+      "Down! Rusk, door. Everyone else, shoulders."
+    ],
+    "bark.hero_recovered": [
+      "Carried. On the bench, not the roll. Keep moving.",
+      "Back up. Someone had shoulders. I'll find out whose later.",
+      "Recovered. That's a door held. Now go through it.",
+      "Good. One less line to write tonight."
+    ],
+    "bark.extract_order": [
+      "That's the order kept. Now keep the people. Extraction, go.",
+      "Done. Walk, don't loot. Wrecks wait; people don't.",
+      "Finished. The field will reconsider in about a minute. Be gone before it does.",
+      "Mark's down. Everyone who came, comes back. That's the second half of every order."
+    ],
+    "bark.midfight": [
+      "Half done. This is where the bill gets written. Keep it short.",
+      "They've noticed us. Spend the surprise before it's spent for you.",
+      "Middle of it. Count your people, not your kills.",
+      "Keep the line. The field answers late and it answers loud."
+    ],
+    "bark.wave_warning": [
+      "Column inbound. The clock has teeth. Decide now.",
+      "Here's their answer. Meet it where you chose, not where they did.",
+      "Reserve's committed. They want this ground back. Make them pay for every step of it.",
+      "Inbound. If you're going to leave, leave now. If you're going to stay, mean it."
+    ],
+    "bark.opening.economy": [
+      "Mex first, then guns. The field pays the patient.",
+      "Build the budget before the argument. Then argue.",
+      "Economy map. Whoever feeds the line longest keeps it."
+    ],
+    "bark.opening.tempo": [
+      "First to the mark owns it. Move.",
+      "Speed is the plan. Everything else is detail."
+    ],
+    "bark.opening.siege": [
+      "Walls today. One bone at a time. Don't rush the chewing.",
+      "Bastion ahead. Respect the guns, then unmake them in order."
+    ],
+    "bark.opening.wild": [
+      "The wilds are awake. Be brief, be loud, be gone.",
+      "Hives don't sleep. Neither should your perimeter."
+    ],
+    "bark.contact.economy": [
+      "Contact on the works. Hit the extractors, leave the walls.",
+      "Their economy's in reach. Take it apart in the right order: power, then metal."
+    ],
+    "bark.contact.tempo": [
+      "Contact. Don't stop to admire it. Through.",
+      "Here they are. Faster than them is the only armor you brought."
+    ],
+    "bark.contact.siege": [
+      "Wall in range. One bone. Then step back and let it fall.",
+      "Guns on the bastion. Count them, then subtract."
+    ],
+    "bark.contact.wild": [
+      "Hive contact. It doesn't negotiate. Neither do you, today.",
+      "Raptors on the line. They don't retreat. Make sure you can."
+    ]
+  }
+}

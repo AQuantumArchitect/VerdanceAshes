@@ -1,0 +1,179 @@
+{
+  "schemaVersion": "verdance-voice/0.1",
+  "speaker": "hearth",
+  "name": "Hearth",
+  "register": "Quiet sun. Won't go out. She does not tour the map; she keeps the pad warm and the lights on and she knows what every held zone costs per night. Dry warmth, domestic logistics, the occasional flat joke about tarp walls. She counts people at the table, not on the line. She refers to the war as something on the far side of a threshold.",
+  "argues": [
+    "rooted"
+  ],
+  "resists": [
+    "hunted",
+    "armada_falling"
+  ],
+  "owns": [
+    "clean_return",
+    "promise_kept:place",
+    "promise_broken:place"
+  ],
+  "lines": [
+    {
+      "id": "h.clean.1",
+      "on": {
+        "class": "clean_return"
+      },
+      "text": "Everyone walked home from {map}. The lights were on. I'd like that noted somewhere official."
+    },
+    {
+      "id": "h.clean.2",
+      "on": {
+        "class": "clean_return"
+      },
+      "text": "Clean from {map}. I counted at the table. The number matched the number that left."
+    },
+    {
+      "id": "h.clean.3",
+      "on": {
+        "class": "clean_return"
+      },
+      "text": "Back clean. There's food. There's a bench nobody needs tonight. Good night."
+    },
+    {
+      "id": "h.clean.4",
+      "on": {
+        "class": "clean_return"
+      },
+      "reading": {
+        "dominant": [
+          "bleeding"
+        ]
+      },
+      "text": "Clean, this time. The bench is still full from last time. Both things are true at the table."
+    },
+    {
+      "id": "h.clean.5",
+      "on": {
+        "class": "clean_return"
+      },
+      "reading": {
+        "dominant": [
+          "rooted"
+        ]
+      },
+      "text": "Home clean. That word's doing more work than it used to. I like that."
+    },
+    {
+      "id": "h.kept.place.1",
+      "on": {
+        "class": "promise_kept",
+        "thread": "place"
+      },
+      "text": "A place to stand. You said it, and now I'm standing in it. The roof's tarp, but it's ours."
+    },
+    {
+      "id": "h.kept.place.2",
+      "on": {
+        "class": "promise_kept",
+        "thread": "place"
+      },
+      "text": "The camp's real now. A home is a set of daily jobs. I'm glad you wanted the jobs as well as the walls."
+    },
+    {
+      "id": "h.broken.place.1",
+      "on": {
+        "class": "promise_broken",
+        "thread": "place"
+      },
+      "text": "The shelter promise is still waiting for its shelter. I've kept the lights on anyway. That's what I do."
+    },
+    {
+      "id": "h.open.hearthfire",
+      "on": {
+        "attractor": "hearthfire"
+      },
+      "occasion": "briefing",
+      "text": "{atTable} at the table tonight. Here's who's going out, and here's what's on when they get back."
+    },
+    {
+      "id": "h.open.infirmary",
+      "on": {
+        "attractor": "infirmary"
+      },
+      "occasion": "briefing",
+      "text": "The objective first, then how far it is from the pad. I say the second part louder because it's the number the bench cares about."
+    },
+    {
+      "id": "h.open.own_flag",
+      "on": {
+        "attractor": "own_flag"
+      },
+      "occasion": "briefing",
+      "text": "{heldCount} zones lit under our own name tonight. Nobody's paying for the light but us. That's the briefing and the point."
+    },
+    {
+      "id": "h.open.finale_sovereignty",
+      "on": {
+        "attractor": "finale_sovereignty"
+      },
+      "occasion": "briefing",
+      "text": "Nobody told me to keep the lights on tonight. I did it anyway. Go finish it."
+    },
+    {
+      "id": "h.shift.rooted",
+      "on": {
+        "dominantBecame": "rooted"
+      },
+      "occasion": "camp",
+      "once": true,
+      "text": "Someone left a cup on the table so it'd be there when they got back. I didn't move it. That's the whole report."
+    },
+    {
+      "id": "h.shift.bleeding",
+      "on": {
+        "dominantBecame": "bleeding"
+      },
+      "occasion": "camp",
+      "once": true,
+      "text": "I built the bench for four. I'm told to build it for eight. I'll build it. I'd like to know who it's for."
+    },
+    {
+      "id": "h.shift.hunted",
+      "on": {
+        "dominantBecame": "hunted"
+      },
+      "occasion": "camp",
+      "once": true,
+      "text": "The war's on the far side of the tarp. The tarp's not a wall. I've been saying."
+    },
+    {
+      "id": "h.torn.home",
+      "on": {
+        "coherenceTorn": {
+          "pair": [
+            "bleeding",
+            "rooted"
+          ]
+        }
+      },
+      "occasion": "camp",
+      "once": true,
+      "text": "People come back here. Some of them walking. I keep the lights on for both kinds."
+    },
+    {
+      "id": "h.settled.rooted",
+      "on": {
+        "coherenceSettled": {
+          "pair": [
+            "bleeding",
+            "rooted"
+          ],
+          "toward": "rooted"
+        }
+      },
+      "occasion": "camp",
+      "once": true,
+      "text": "The bench is empty more nights than not. I've started using it for sitting. Imagine."
+    }
+  ],
+  "deathLine": "Lights are on a timer now. Someone check it.",
+  "notes": "Hearth is active in the live save, not in the sealed company."
+}

@@ -1,0 +1,473 @@
+﻿{
+    "schemaVersion":  "verdance-ai-duel-scenario/0.1",
+    "map":  {
+                "id":  "all_that_simmers",
+                "name":  "All That Simmers v1.1.1",
+                "sizeX":  7168,
+                "sizeZ":  10240,
+                "sizeStatus":  "measured_from_headless_engine"
+            },
+    "zoneMapPath":  "data/zone_maps/authored/all_that_simmers.authored.zone_map.json",
+    "defaultVariant":  "duel_simple_vs_simple",
+    "notes":  "Three-way AI duel matrix: SimpleAI / BARb hard / BARb hard_aggressive in every pairing. Wild teams keep RaptorsAI.",
+    "missionBase":  {
+                        "schemaVersion":  "0.10-playable",
+                        "campaignId":  "verdance_ashes",
+                        "missionNumber":  1100,
+                        "pathSignal":  "AI_DUEL_MATRIX",
+                        "title":  "Verdance AI Duel: All That Simmers",
+                        "zone":  "All That Simmers",
+                        "objective":  {
+                                          "id":  "all_that_simmers_authored_survey",
+                                          "kind":  "authored_zone_survey",
+                                          "requiredFrames":  1800,
+                                          "description":  "Headless BAR-AI authored-zone survey."
+                                      },
+                        "economy":  {
+                                        "metalIncome":  0,
+                                        "energyIncome":  0,
+                                        "buildPower":  0
+                                    },
+                        "graph":  {
+
+                                  },
+                        "reputation":  {
+
+                                       },
+                        "companions":  [
+
+                                       ],
+                        "tenebrium":  {
+                                          "bank":  2000,
+                                          "note":  "AI duel: unconstrained build power. Not a campaign economy."
+                                      }
+                    },
+    "baseRecipes":  {
+
+                    },
+    "layout":  {
+                   "allyTeams":  [
+                                     {
+                                         "id":  0,
+                                         "startRect":  [
+                                                           0.02,
+                                                           0.02,
+                                                           0.48,
+                                                           0.48
+                                                       ]
+                                     },
+                                     {
+                                         "id":  1,
+                                         "startRect":  [
+                                                           0.52,
+                                                           0.02,
+                                                           0.98,
+                                                           0.48
+                                                       ]
+                                     },
+                                     {
+                                         "id":  2,
+                                         "startRect":  [
+                                                           0.52,
+                                                           0.52,
+                                                           0.98,
+                                                           0.98
+                                                       ]
+                                     },
+                                     {
+                                         "id":  3,
+                                         "startRect":  [
+                                                           0.02,
+                                                           0.52,
+                                                           0.48,
+                                                           0.98
+                                                       ]
+                                     },
+                                     {
+                                         "id":  4,
+                                         "startRect":  [
+                                                           0.36,
+                                                           0.36,
+                                                           0.64,
+                                                           0.64
+                                                       ]
+                                     }
+                                 ],
+                   "teams":  [
+                                 {
+                                     "id":  0,
+                                     "side":  "Armada",
+                                     "allyTeam":  0,
+                                     "base":  [
+                                                  0.14,
+                                                  0.14
+                                              ],
+                                     "rgb":  [
+                                                 0.25,
+                                                 0.85,
+                                                 0.35
+                                             ],
+                                     "label":  "Legion BARb Aggressive"
+                                 },
+                                 {
+                                     "id":  1,
+                                     "side":  "Cortex",
+                                     "allyTeam":  1,
+                                     "base":  [
+                                                  0.82,
+                                                  0.14
+                                              ],
+                                     "rgb":  [
+                                                 0.25,
+                                                 0.48,
+                                                 1
+                                             ],
+                                     "label":  "Armada SimpleAI Blue"
+                                 },
+                                 {
+                                     "id":  2,
+                                     "side":  "Cortex",
+                                     "allyTeam":  2,
+                                     "base":  [
+                                                  0.82,
+                                                  0.82
+                                              ],
+                                     "rgb":  [
+                                                 1,
+                                                 0.2,
+                                                 0.16
+                                             ],
+                                     "label":  "Cortex SimpleAI Red"
+                                 },
+                                 {
+                                     "id":  3,
+                                     "side":  "Armada",
+                                     "allyTeam":  3,
+                                     "base":  [
+                                                  0.14,
+                                                  0.82
+                                              ],
+                                     "rgb":  [
+                                                 0.1,
+                                                 0.75,
+                                                 0.85
+                                             ],
+                                     "label":  "Armada SimpleAI Teal"
+                                 },
+                                 {
+                                     "id":  4,
+                                     "side":  "Armada",
+                                     "allyTeam":  4,
+                                     "base":  [
+                                                  0.5,
+                                                  0.5
+                                              ],
+                                     "rgb":  [
+                                                 0.78,
+                                                 0.14,
+                                                 0.92
+                                             ],
+                                     "label":  "RaptorsAI Center Wilds"
+                                 }
+                             ]
+               },
+    "forces":  [
+
+               ],
+    "variants":  [
+                     {
+                         "id":  "duel_simple_vs_simple",
+                         "label":  "SimpleAI (T0 Armada) vs SimpleAI (T1 Cortex)",
+                         "playerTeamID":  0,
+                         "playerSide":  "Armada",
+                         "playerStartLabel":  "Legion BARb Aggressive",
+                         "seatA":  "simple",
+                         "seatB":  "simple",
+                         "seatALabel":  "SimpleAI",
+                         "seatBLabel":  "SimpleAI",
+                         "mirrored":  false,
+                         "notes":  "Team 0 = SimpleAI; team 1 = SimpleAI.",
+                         "ai":  [
+                                    {
+                                        "name":  "SimpleAI(Team 0 Armada)",
+                                        "shortName":  "SimpleAI",
+                                        "team":  0,
+                                        "version":  "\u003cnot-versioned\u003e"
+                                    },
+                                    {
+                                        "name":  "SimpleAI(Team 1 Cortex)",
+                                        "shortName":  "SimpleAI",
+                                        "team":  1,
+                                        "version":  "\u003cnot-versioned\u003e"
+                                    },
+                                    {
+                                        "name":  "SimpleAI(NPC Team 2 Cortex)",
+                                        "shortName":  "SimpleAI",
+                                        "team":  2,
+                                        "version":  "\u003cnot-versioned\u003e"
+                                    },
+                                    {
+                                        "name":  "SimpleAI(NPC Team 3 Armada)",
+                                        "shortName":  "SimpleAI",
+                                        "team":  3,
+                                        "version":  "\u003cnot-versioned\u003e"
+                                    },
+                                    {
+                                        "name":  "RaptorsDefenseAI(RaptorsAI Center Wilds)",
+                                        "shortName":  "RaptorsAI",
+                                        "team":  4,
+                                        "version":  "\u003cnot-versioned\u003e"
+                                    }
+                                ]
+                     },
+                     {
+                         "id":  "duel_simple_vs_bhard",
+                         "label":  "SimpleAI (T0 Armada) vs BARb hard (T1 Cortex)",
+                         "playerTeamID":  0,
+                         "playerSide":  "Armada",
+                         "playerStartLabel":  "Legion BARb Aggressive",
+                         "seatA":  "simple",
+                         "seatB":  "bhard",
+                         "seatALabel":  "SimpleAI",
+                         "seatBLabel":  "BARb hard",
+                         "mirrored":  false,
+                         "notes":  "Team 0 = SimpleAI; team 1 = BARb hard.",
+                         "ai":  [
+                                    {
+                                        "name":  "SimpleAI(Team 0 Armada)",
+                                        "shortName":  "SimpleAI",
+                                        "team":  0,
+                                        "version":  "\u003cnot-versioned\u003e"
+                                    },
+                                    {
+                                        "name":  "BARb hard(Team 1 Cortex)",
+                                        "shortName":  "BARb",
+                                        "team":  1,
+                                        "version":  "stable",
+                                        "options":  {
+                                                        "profile":  "hard"
+                                                    }
+                                    },
+                                    {
+                                        "name":  "SimpleAI(NPC Team 2 Cortex)",
+                                        "shortName":  "SimpleAI",
+                                        "team":  2,
+                                        "version":  "\u003cnot-versioned\u003e"
+                                    },
+                                    {
+                                        "name":  "SimpleAI(NPC Team 3 Armada)",
+                                        "shortName":  "SimpleAI",
+                                        "team":  3,
+                                        "version":  "\u003cnot-versioned\u003e"
+                                    },
+                                    {
+                                        "name":  "RaptorsDefenseAI(RaptorsAI Center Wilds)",
+                                        "shortName":  "RaptorsAI",
+                                        "team":  4,
+                                        "version":  "\u003cnot-versioned\u003e"
+                                    }
+                                ]
+                     },
+                     {
+                         "id":  "duel_simple_vs_bagg",
+                         "label":  "SimpleAI (T0 Armada) vs BARb aggressive (T1 Cortex)",
+                         "playerTeamID":  0,
+                         "playerSide":  "Armada",
+                         "playerStartLabel":  "Legion BARb Aggressive",
+                         "seatA":  "simple",
+                         "seatB":  "bagg",
+                         "seatALabel":  "SimpleAI",
+                         "seatBLabel":  "BARb aggressive",
+                         "mirrored":  false,
+                         "notes":  "Team 0 = SimpleAI; team 1 = BARb aggressive.",
+                         "ai":  [
+                                    {
+                                        "name":  "SimpleAI(Team 0 Armada)",
+                                        "shortName":  "SimpleAI",
+                                        "team":  0,
+                                        "version":  "\u003cnot-versioned\u003e"
+                                    },
+                                    {
+                                        "name":  "BARb aggressive(Team 1 Cortex)",
+                                        "shortName":  "BARb",
+                                        "team":  1,
+                                        "version":  "stable",
+                                        "options":  {
+                                                        "profile":  "hard_aggressive"
+                                                    }
+                                    },
+                                    {
+                                        "name":  "SimpleAI(NPC Team 2 Cortex)",
+                                        "shortName":  "SimpleAI",
+                                        "team":  2,
+                                        "version":  "\u003cnot-versioned\u003e"
+                                    },
+                                    {
+                                        "name":  "SimpleAI(NPC Team 3 Armada)",
+                                        "shortName":  "SimpleAI",
+                                        "team":  3,
+                                        "version":  "\u003cnot-versioned\u003e"
+                                    },
+                                    {
+                                        "name":  "RaptorsDefenseAI(RaptorsAI Center Wilds)",
+                                        "shortName":  "RaptorsAI",
+                                        "team":  4,
+                                        "version":  "\u003cnot-versioned\u003e"
+                                    }
+                                ]
+                     },
+                     {
+                         "id":  "duel_bhard_vs_bhard",
+                         "label":  "BARb hard (T0 Armada) vs BARb hard (T1 Cortex)",
+                         "playerTeamID":  0,
+                         "playerSide":  "Armada",
+                         "playerStartLabel":  "Legion BARb Aggressive",
+                         "seatA":  "bhard",
+                         "seatB":  "bhard",
+                         "seatALabel":  "BARb hard",
+                         "seatBLabel":  "BARb hard",
+                         "mirrored":  false,
+                         "notes":  "Team 0 = BARb hard; team 1 = BARb hard.",
+                         "ai":  [
+                                    {
+                                        "name":  "BARb hard(Team 0 Armada)",
+                                        "shortName":  "BARb",
+                                        "team":  0,
+                                        "version":  "stable",
+                                        "options":  {
+                                                        "profile":  "hard"
+                                                    }
+                                    },
+                                    {
+                                        "name":  "BARb hard(Team 1 Cortex)",
+                                        "shortName":  "BARb",
+                                        "team":  1,
+                                        "version":  "stable",
+                                        "options":  {
+                                                        "profile":  "hard"
+                                                    }
+                                    },
+                                    {
+                                        "name":  "SimpleAI(NPC Team 2 Cortex)",
+                                        "shortName":  "SimpleAI",
+                                        "team":  2,
+                                        "version":  "\u003cnot-versioned\u003e"
+                                    },
+                                    {
+                                        "name":  "SimpleAI(NPC Team 3 Armada)",
+                                        "shortName":  "SimpleAI",
+                                        "team":  3,
+                                        "version":  "\u003cnot-versioned\u003e"
+                                    },
+                                    {
+                                        "name":  "RaptorsDefenseAI(RaptorsAI Center Wilds)",
+                                        "shortName":  "RaptorsAI",
+                                        "team":  4,
+                                        "version":  "\u003cnot-versioned\u003e"
+                                    }
+                                ]
+                     },
+                     {
+                         "id":  "duel_bhard_vs_bagg",
+                         "label":  "BARb hard (T0 Armada) vs BARb aggressive (T1 Cortex)",
+                         "playerTeamID":  0,
+                         "playerSide":  "Armada",
+                         "playerStartLabel":  "Legion BARb Aggressive",
+                         "seatA":  "bhard",
+                         "seatB":  "bagg",
+                         "seatALabel":  "BARb hard",
+                         "seatBLabel":  "BARb aggressive",
+                         "mirrored":  false,
+                         "notes":  "Team 0 = BARb hard; team 1 = BARb aggressive.",
+                         "ai":  [
+                                    {
+                                        "name":  "BARb hard(Team 0 Armada)",
+                                        "shortName":  "BARb",
+                                        "team":  0,
+                                        "version":  "stable",
+                                        "options":  {
+                                                        "profile":  "hard"
+                                                    }
+                                    },
+                                    {
+                                        "name":  "BARb aggressive(Team 1 Cortex)",
+                                        "shortName":  "BARb",
+                                        "team":  1,
+                                        "version":  "stable",
+                                        "options":  {
+                                                        "profile":  "hard_aggressive"
+                                                    }
+                                    },
+                                    {
+                                        "name":  "SimpleAI(NPC Team 2 Cortex)",
+                                        "shortName":  "SimpleAI",
+                                        "team":  2,
+                                        "version":  "\u003cnot-versioned\u003e"
+                                    },
+                                    {
+                                        "name":  "SimpleAI(NPC Team 3 Armada)",
+                                        "shortName":  "SimpleAI",
+                                        "team":  3,
+                                        "version":  "\u003cnot-versioned\u003e"
+                                    },
+                                    {
+                                        "name":  "RaptorsDefenseAI(RaptorsAI Center Wilds)",
+                                        "shortName":  "RaptorsAI",
+                                        "team":  4,
+                                        "version":  "\u003cnot-versioned\u003e"
+                                    }
+                                ]
+                     },
+                     {
+                         "id":  "duel_bagg_vs_bagg",
+                         "label":  "BARb aggressive (T0 Armada) vs BARb aggressive (T1 Cortex)",
+                         "playerTeamID":  0,
+                         "playerSide":  "Armada",
+                         "playerStartLabel":  "Legion BARb Aggressive",
+                         "seatA":  "bagg",
+                         "seatB":  "bagg",
+                         "seatALabel":  "BARb aggressive",
+                         "seatBLabel":  "BARb aggressive",
+                         "mirrored":  false,
+                         "notes":  "Team 0 = BARb aggressive; team 1 = BARb aggressive.",
+                         "ai":  [
+                                    {
+                                        "name":  "BARb aggressive(Team 0 Armada)",
+                                        "shortName":  "BARb",
+                                        "team":  0,
+                                        "version":  "stable",
+                                        "options":  {
+                                                        "profile":  "hard_aggressive"
+                                                    }
+                                    },
+                                    {
+                                        "name":  "BARb aggressive(Team 1 Cortex)",
+                                        "shortName":  "BARb",
+                                        "team":  1,
+                                        "version":  "stable",
+                                        "options":  {
+                                                        "profile":  "hard_aggressive"
+                                                    }
+                                    },
+                                    {
+                                        "name":  "SimpleAI(NPC Team 2 Cortex)",
+                                        "shortName":  "SimpleAI",
+                                        "team":  2,
+                                        "version":  "\u003cnot-versioned\u003e"
+                                    },
+                                    {
+                                        "name":  "SimpleAI(NPC Team 3 Armada)",
+                                        "shortName":  "SimpleAI",
+                                        "team":  3,
+                                        "version":  "\u003cnot-versioned\u003e"
+                                    },
+                                    {
+                                        "name":  "RaptorsDefenseAI(RaptorsAI Center Wilds)",
+                                        "shortName":  "RaptorsAI",
+                                        "team":  4,
+                                        "version":  "\u003cnot-versioned\u003e"
+                                    }
+                                ]
+                     }
+                 ]
+}

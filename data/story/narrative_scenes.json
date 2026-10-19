@@ -1,0 +1,1047 @@
+[
+  {
+    "id": "vane__odessa:return_1",
+    "pair": [
+      "vane",
+      "odessa"
+    ],
+    "afterTurn": 1,
+    "minSharedDeployments": 1,
+    "title": "A line that moves",
+    "beats": [
+      {
+        "speaker": "vane",
+        "text": "You always choose somewhere to stop."
+      },
+      {
+        "speaker": "odessa",
+        "text": "Someone must keep a place for you to come back to."
+      },
+      {
+        "speaker": "vane",
+        "text": "Then keep it close. I dislike walking home alone."
+      }
+    ]
+  },
+  {
+    "id": "vane__odessa:return_2",
+    "pair": [
+      "vane",
+      "odessa"
+    ],
+    "afterTurn": 2,
+    "minSharedDeployments": 2,
+    "title": "The return route",
+    "beats": [
+      {
+        "speaker": "vane",
+        "text": "The route looked shorter on the board."
+      },
+      {
+        "speaker": "odessa",
+        "text": "It usually does when you leave out the wounded."
+      },
+      {
+        "speaker": "vane",
+        "text": "Next time, we draw the return first."
+      }
+    ]
+  },
+  {
+    "id": "vane__ketha:return_1",
+    "pair": [
+      "vane",
+      "ketha"
+    ],
+    "afterTurn": 1,
+    "minSharedDeployments": 1,
+    "title": "Inventory",
+    "beats": [
+      {
+        "speaker": "vane",
+        "text": "How many did we bring back?"
+      },
+      {
+        "speaker": "ketha",
+        "text": "Ask me their names first."
+      },
+      {
+        "speaker": "vane",
+        "text": "All right. Start with the quiet ones."
+      }
+    ]
+  },
+  {
+    "id": "vane__ketha:return_2",
+    "pair": [
+      "vane",
+      "ketha"
+    ],
+    "afterTurn": 2,
+    "minSharedDeployments": 2,
+    "title": "The unfinished sentence",
+    "beats": [
+      {
+        "speaker": "vane",
+        "text": "You were late coming off the ridge."
+      },
+      {
+        "speaker": "ketha",
+        "text": "I had a sentence to finish."
+      },
+      {
+        "speaker": "vane",
+        "text": "Next time use fewer explosions for punctuation."
+      }
+    ]
+  },
+  {
+    "id": "hearth__brakhov:return_1",
+    "pair": [
+      "hearth",
+      "brakhov"
+    ],
+    "afterTurn": 1,
+    "minSharedDeployments": 1,
+    "title": "A measured appetite",
+    "beats": [
+      {
+        "speaker": "hearth",
+        "text": "You ask for more power before the smoke clears."
+      },
+      {
+        "speaker": "brakhov",
+        "text": "Smoke is a sign of progress."
+      },
+      {
+        "speaker": "hearth",
+        "text": "So is a reserve that gets the others home."
+      }
+    ]
+  },
+  {
+    "id": "hearth__brakhov:return_2",
+    "pair": [
+      "hearth",
+      "brakhov"
+    ],
+    "afterTurn": 2,
+    "minSharedDeployments": 2,
+    "title": "Enough heat",
+    "beats": [
+      {
+        "speaker": "hearth",
+        "text": "There was power left when we returned."
+      },
+      {
+        "speaker": "brakhov",
+        "text": "A regrettable oversight."
+      },
+      {
+        "speaker": "hearth",
+        "text": "Keep making it. I could grow fond of you."
+      }
+    ]
+  },
+  {
+    "id": "brakhov__vale:return_1",
+    "pair": [
+      "brakhov",
+      "vale"
+    ],
+    "afterTurn": 1,
+    "minSharedDeployments": 1,
+    "title": "The receipt",
+    "beats": [
+      {
+        "speaker": "brakhov",
+        "text": "That wall was in the way."
+      },
+      {
+        "speaker": "vale",
+        "text": "It was also on the invoice."
+      },
+      {
+        "speaker": "brakhov",
+        "text": "Put a hole in the invoice."
+      }
+    ]
+  },
+  {
+    "id": "brakhov__vale:return_2",
+    "pair": [
+      "brakhov",
+      "vale"
+    ],
+    "afterTurn": 2,
+    "minSharedDeployments": 2,
+    "title": "An open account",
+    "beats": [
+      {
+        "speaker": "brakhov",
+        "text": "We returned. Close the account."
+      },
+      {
+        "speaker": "vale",
+        "text": "Returning closes the sortie. The account has witnesses."
+      },
+      {
+        "speaker": "brakhov",
+        "text": "Then let them witness the next one."
+      }
+    ]
+  },
+  {
+    "id": "anvil__volt:return_1",
+    "pair": [
+      "anvil",
+      "volt"
+    ],
+    "afterTurn": 1,
+    "minSharedDeployments": 1,
+    "title": "Eyes for the wall",
+    "beats": [
+      {
+        "speaker": "anvil",
+        "text": "I can hold this angle."
+      },
+      {
+        "speaker": "volt",
+        "text": "You cannot see the approach behind it."
+      },
+      {
+        "speaker": "anvil",
+        "text": "Then tell me where to look before you disappear."
+      }
+    ]
+  },
+  {
+    "id": "anvil__volt:return_2",
+    "pair": [
+      "anvil",
+      "volt"
+    ],
+    "afterTurn": 2,
+    "minSharedDeployments": 2,
+    "title": "Beyond the mark",
+    "beats": [
+      {
+        "speaker": "anvil",
+        "text": "You stopped at the edge of the map."
+      },
+      {
+        "speaker": "volt",
+        "text": "The edge of what we knew. Different thing."
+      },
+      {
+        "speaker": "anvil",
+        "text": "Good. Mark the difference for the rest of us."
+      }
+    ]
+  },
+  {
+    "id": "warder__commando:return_1",
+    "pair": [
+      "warder",
+      "commando"
+    ],
+    "afterTurn": 1,
+    "minSharedDeployments": 1,
+    "title": "A quiet door",
+    "beats": [
+      {
+        "speaker": "warder",
+        "text": "Leave the approach clear."
+      },
+      {
+        "speaker": "commando",
+        "text": "Clear for us, or clear for them?"
+      },
+      {
+        "speaker": "warder",
+        "text": "That is why I asked you."
+      }
+    ]
+  },
+  {
+    "id": "warder__commando:return_2",
+    "pair": [
+      "warder",
+      "commando"
+    ],
+    "afterTurn": 2,
+    "minSharedDeployments": 2,
+    "title": "Room to leave",
+    "beats": [
+      {
+        "speaker": "warder",
+        "text": "You left a gap in the ring."
+      },
+      {
+        "speaker": "commando",
+        "text": "An exit. We had people outside."
+      },
+      {
+        "speaker": "warder",
+        "text": "Keep it on the next plan. A wall should know its company."
+      }
+    ]
+  },
+  {
+    "id": "vane__ketha:leadership_0",
+    "pair": [
+      "vane",
+      "ketha"
+    ],
+    "afterTurn": 1,
+    "minSharedDeployments": 1,
+    "title": "A place on the manifest",
+    "setup": "Vane has crossed out three descriptions of the same person. Ketha has replaced them with a name.",
+    "beats": [
+      {
+        "speaker": "vane",
+        "text": "If I write recovery asset, the quartermaster knows what to load."
+      },
+      {
+        "speaker": "ketha",
+        "text": "If you write a name, you might remember why."
+      }
+    ],
+    "choices": [
+      {
+        "id": "first",
+        "label": "Names first. Capabilities underneath.",
+        "stance": "Care",
+        "response": "Then I can use both lists without pretending they are the same one."
+      },
+      {
+        "id": "second",
+        "label": "A manifest must tell us what people can do.",
+        "stance": "Pragmatism",
+        "response": "Ketha leaves the name in the margin. \"And this tells you who is doing it.\""
+      }
+    ]
+  },
+  {
+    "id": "hearth__brakhov:leadership_1",
+    "pair": [
+      "hearth",
+      "brakhov"
+    ],
+    "afterTurn": 1,
+    "minSharedDeployments": 1,
+    "title": "The unspent reserve",
+    "setup": "Brakhov has found a power allocation with nothing assigned to it. Hearth seems pleased.",
+    "beats": [
+      {
+        "speaker": "hearth",
+        "text": "You have budgeted for nothing."
+      },
+      {
+        "speaker": "brakhov",
+        "text": "I have budgeted for something we do not know about yet."
+      }
+    ],
+    "choices": [
+      {
+        "id": "first",
+        "label": "Keep the reserve. Surprises do not ask permission.",
+        "stance": "Prudence",
+        "response": "Hearth folds the page carefully. \"Good. It has a job, even if we hope it never does it.\""
+      },
+      {
+        "id": "second",
+        "label": "Commit it when there is a clear opening.",
+        "stance": "Calculated ambition",
+        "response": "Brakhov grins. \"A conditional appetite. I can work with that.\""
+      }
+    ]
+  },
+  {
+    "id": "brakhov__vale:leadership_2",
+    "pair": [
+      "brakhov",
+      "vale"
+    ],
+    "afterTurn": 1,
+    "minSharedDeployments": 1,
+    "title": "Damage, itemized",
+    "setup": "Vale presents a form. Brakhov examines it for structural weaknesses.",
+    "beats": [
+      {
+        "speaker": "brakhov",
+        "text": "Is necessary force a number?"
+      },
+      {
+        "speaker": "vale",
+        "text": "It becomes one when someone sends the bill."
+      }
+    ],
+    "choices": [
+      {
+        "id": "first",
+        "label": "We own the costs of what we choose to break.",
+        "stance": "Stewardship",
+        "response": "Vale adds a line for responsibility. Brakhov asks whether it has to be in ink."
+      },
+      {
+        "id": "second",
+        "label": "We judge the target first, the invoice second.",
+        "stance": "Resolve",
+        "response": "Vale nods. \"In that order, then. Not one instead of the other.\""
+      }
+    ]
+  },
+  {
+    "id": "vane__odessa:leadership_3",
+    "pair": [
+      "vane",
+      "odessa"
+    ],
+    "afterTurn": 1,
+    "minSharedDeployments": 1,
+    "title": "The empty chair",
+    "setup": "Odessa is setting a chair beside the map table. Vane asks whether they are expecting visitors.",
+    "beats": [
+      {
+        "speaker": "vane",
+        "text": "For whoever disagrees with us."
+      },
+      {
+        "speaker": "odessa",
+        "text": "An alarming amount of furniture, potentially."
+      }
+    ],
+    "choices": [
+      {
+        "id": "first",
+        "label": "Keep it. I want to hear the objection.",
+        "stance": "Solidarity",
+        "response": "Odessa leaves the chair. Vane puts it where it will not block the exit."
+      },
+      {
+        "id": "second",
+        "label": "Hear objections, then follow the decision together.",
+        "stance": "Resolve",
+        "response": "Vane nods. \"A discussion with an ending. We will need both parts.\""
+      }
+    ]
+  },
+  {
+    "id": "anvil__volt:leadership_4",
+    "pair": [
+      "anvil",
+      "volt"
+    ],
+    "afterTurn": 1,
+    "minSharedDeployments": 1,
+    "title": "The blank corner",
+    "setup": "Volt leaves a corner of the map unmarked. Anvil taps it twice.",
+    "beats": [
+      {
+        "speaker": "anvil",
+        "text": "Nothing there?"
+      },
+      {
+        "speaker": "volt",
+        "text": "Nothing we have seen. Those are different reports."
+      }
+    ],
+    "choices": [
+      {
+        "id": "first",
+        "label": "Keep the unknown visible.",
+        "stance": "Prudence",
+        "response": "Volt writes UNKNOWN in letters large enough to irritate everyone equally."
+      },
+      {
+        "id": "second",
+        "label": "Mark what we need to learn next.",
+        "stance": "Calculated ambition",
+        "response": "Volt draws a question mark. \"A task, then. Not an answer.\""
+      }
+    ]
+  },
+  {
+    "id": "warder__commando:leadership_5",
+    "pair": [
+      "warder",
+      "commando"
+    ],
+    "afterTurn": 1,
+    "minSharedDeployments": 1,
+    "title": "A door without a lock",
+    "setup": "Warder objects to an opening in a proposed perimeter. Commando objects to the word opening.",
+    "beats": [
+      {
+        "speaker": "warder",
+        "text": "You have drawn a weakness."
+      },
+      {
+        "speaker": "commando",
+        "text": "I have drawn a way for our people to return."
+      }
+    ],
+    "choices": [
+      {
+        "id": "first",
+        "label": "Every defense needs a way home.",
+        "stance": "Care",
+        "response": "Warder redraws the approach with room to cover it. \"Then we defend the door too.\""
+      },
+      {
+        "id": "second",
+        "label": "Keep it, but make someone responsible for it.",
+        "stance": "Stewardship",
+        "response": "Commando looks at Warder. Warder looks at the plan. The door remains."
+      }
+    ]
+  },
+  {
+    "id": "vane__ketha:leadership_6",
+    "pair": [
+      "vane",
+      "ketha"
+    ],
+    "afterTurn": 2,
+    "minSharedDeployments": 2,
+    "title": "The captain in the sentence",
+    "setup": "Ketha is reading the wording of a proposed order aloud, very slowly.",
+    "beats": [
+      {
+        "speaker": "vane",
+        "text": "Command has determined that losses are acceptable."
+      },
+      {
+        "speaker": "ketha",
+        "text": "You dislike the passive voice."
+      }
+    ],
+    "choices": [
+      {
+        "id": "first",
+        "label": "Then write: I am asking you to take this risk.",
+        "stance": "Resolve",
+        "response": "Ketha slides the page back. \"Now you are in the sentence with the rest of us.\""
+      },
+      {
+        "id": "second",
+        "label": "Then write the limit, and when we turn back.",
+        "stance": "Prudence",
+        "response": "Vane takes the pencil. \"A line I can recognize in the field. Better.\""
+      }
+    ]
+  },
+  {
+    "id": "hearth__brakhov:leadership_7",
+    "pair": [
+      "hearth",
+      "brakhov"
+    ],
+    "afterTurn": 2,
+    "minSharedDeployments": 2,
+    "title": "What stays lit",
+    "setup": "The conversation begins as an argument about power and becomes an argument about tomorrow.",
+    "beats": [
+      {
+        "speaker": "hearth",
+        "text": "You cannot save every spark."
+      },
+      {
+        "speaker": "brakhov",
+        "text": "No. But I can refuse to call every spark expendable."
+      }
+    ],
+    "choices": [
+      {
+        "id": "first",
+        "label": "Tomorrow gets a share of every plan.",
+        "stance": "Stewardship",
+        "response": "Hearth smiles without triumph. \"It is a quiet shareholder. I will speak for it.\""
+      },
+      {
+        "id": "second",
+        "label": "Sometimes we spend the reserve to reach tomorrow.",
+        "stance": "Calculated ambition",
+        "response": "Brakhov goes quiet. \"Then we should be certain it is tomorrow we are buying.\""
+      }
+    ]
+  },
+  {
+    "id": "brakhov__vale:leadership_8",
+    "pair": [
+      "brakhov",
+      "vale"
+    ],
+    "afterTurn": 2,
+    "minSharedDeployments": 2,
+    "title": "An honest account",
+    "setup": "Vale wants an explanation for the company record. Brakhov offers three adjectives.",
+    "beats": [
+      {
+        "speaker": "brakhov",
+        "text": "None of those are an explanation."
+      },
+      {
+        "speaker": "vale",
+        "text": "They are very good adjectives."
+      }
+    ],
+    "choices": [
+      {
+        "id": "first",
+        "label": "Record what happened, including our mistakes.",
+        "stance": "Pragmatism",
+        "response": "Vale takes a fresh sheet. \"Good. The flattering version was getting difficult to reconcile.\""
+      },
+      {
+        "id": "second",
+        "label": "Record what we tried to achieve as well.",
+        "stance": "Resolve",
+        "response": "Vale rules two columns. \"Intention. Result. They can coexist without being confused.\""
+      }
+    ]
+  },
+  {
+    "id": "vane__odessa:leadership_9",
+    "pair": [
+      "vane",
+      "odessa"
+    ],
+    "afterTurn": 2,
+    "minSharedDeployments": 2,
+    "title": "The right to leave",
+    "setup": "Vane has drawn a retreat route on a defense plan. Odessa studies it longer than he expected.",
+    "beats": [
+      {
+        "speaker": "vane",
+        "text": "Planning to leave already?"
+      },
+      {
+        "speaker": "odessa",
+        "text": "Planning to have a choice."
+      }
+    ],
+    "choices": [
+      {
+        "id": "first",
+        "label": "An exit is part of every commitment.",
+        "stance": "Freedom of movement",
+        "response": "Odessa traces the route. \"Then we should know what makes us use it.\""
+      },
+      {
+        "id": "second",
+        "label": "We name what is worth staying for.",
+        "stance": "Holding ground",
+        "response": "Vane puts down the pencil. \"Specific names, please. Glory is terrible at giving directions.\""
+      }
+    ]
+  },
+  {
+    "id": "anvil__volt:leadership_10",
+    "pair": [
+      "anvil",
+      "volt"
+    ],
+    "afterTurn": 2,
+    "minSharedDeployments": 2,
+    "title": "Who gets to be certain",
+    "setup": "Anvil asks for a definite answer. Volt offers a definite explanation of why there is not one.",
+    "beats": [
+      {
+        "speaker": "anvil",
+        "text": "I cannot aim at perhaps."
+      },
+      {
+        "speaker": "volt",
+        "text": "You aim at coordinates. Perhaps tells you how much faith to put in them."
+      }
+    ],
+    "choices": [
+      {
+        "id": "first",
+        "label": "Report uncertainty plainly. I will make the call.",
+        "stance": "Pragmatism",
+        "response": "Volt nods. \"Then I can stop spending half my report pretending to know more.\""
+      },
+      {
+        "id": "second",
+        "label": "Bring me a way to reduce the uncertainty.",
+        "stance": "Calculated ambition",
+        "response": "Anvil looks relieved. Volt looks busy. Neither calls the unknown a fact."
+      }
+    ]
+  },
+  {
+    "id": "warder__commando:leadership_11",
+    "pair": [
+      "warder",
+      "commando"
+    ],
+    "afterTurn": 2,
+    "minSharedDeployments": 2,
+    "title": "The quiet part of command",
+    "setup": "Commando has returned a plan with one sentence circled. Warder reads it aloud.",
+    "beats": [
+      {
+        "speaker": "warder",
+        "text": "No one acts alone."
+      },
+      {
+        "speaker": "commando",
+        "text": "Sometimes someone has to. The question is whether anyone knows."
+      }
+    ],
+    "choices": [
+      {
+        "id": "first",
+        "label": "Tell us your intent. Keep room to improvise.",
+        "stance": "Independence",
+        "response": "Commando uncaps a pen. \"That, I can report.\""
+      },
+      {
+        "id": "second",
+        "label": "Agree on the fallback before anyone moves.",
+        "stance": "Solidarity",
+        "response": "Warder adds a rendezvous. \"Freedom is easier to defend when it has an address.\""
+      }
+    ]
+  },
+  {
+    "id": "pavise__ketha:room",
+    "pair": [
+      "pavise",
+      "ketha"
+    ],
+    "afterTurn": 1,
+    "minSharedDeployments": 1,
+    "title": "Room behind the shield",
+    "setup": "Ketha has drawn a small rectangle behind Pavise on the planning board. Pavise asks what it represents.",
+    "beats": [
+      {
+        "speaker": "pavise",
+        "text": "You need a recovery position?"
+      },
+      {
+        "speaker": "ketha",
+        "text": "I need a place where being hurt does not make someone an obstruction."
+      }
+    ],
+    "choices": [
+      {
+        "id": "room",
+        "label": "Make recovery part of the plan from the start.",
+        "stance": "Care",
+        "response": "Pavise widens the rectangle. \"Then the line includes this.\""
+      },
+      {
+        "id": "mobile",
+        "label": "Plan a moving shelter. We cannot always hold still.",
+        "stance": "Freedom of movement",
+        "response": "Ketha draws an arrow through the rectangle. \"Then tell me before it moves.\""
+      }
+    ]
+  },
+  {
+    "id": "pavise__ketha:weight",
+    "pair": [
+      "pavise",
+      "ketha"
+    ],
+    "afterTurn": 2,
+    "minSharedDeployments": 2,
+    "title": "The weight of an order",
+    "setup": "Pavise is holding a page that has been rewritten twice. Ketha is waiting for him to put it down.",
+    "beats": [
+      {
+        "speaker": "pavise",
+        "text": "Hold until relieved. It is a clear order."
+      },
+      {
+        "speaker": "ketha",
+        "text": "It is half an order. The other half says who comes to relieve you."
+      }
+    ],
+    "choices": [
+      {
+        "id": "limits",
+        "label": "Every holding order needs a fallback.",
+        "stance": "Prudence",
+        "response": "Pavise reads the revised page. \"This one knows what happens if we are wrong.\""
+      },
+      {
+        "id": "responsibility",
+        "label": "I will name who is responsible for the relief.",
+        "stance": "Stewardship",
+        "response": "Ketha takes the pencil. \"A name is a good start. Put the route beside it.\""
+      }
+    ]
+  },
+  {
+    "id": "ketha__vane:unfinished_return",
+    "pair": [
+      "ketha",
+      "vane"
+    ],
+    "title": "The work we left",
+    "when": {
+      "verdicts": [
+        "partial"
+      ]
+    },
+    "setup": "After a return recorded as partial success, Ketha sets the unfinished orders beside the roster.",
+    "afterTurn": 1,
+    "minSharedDeployments": 1,
+    "beats": [
+      {
+        "speaker": "ketha",
+        "text": "We brought back a company. We did not finish the job. Both belong in the report."
+      },
+      {
+        "speaker": "vane",
+        "text": "Put the company first. Paper has never limped off a battlefield."
+      },
+      {
+        "speaker": "ketha",
+        "text": "And next time the people paying us will ask which part of the order we intend to keep."
+      }
+    ],
+    "choices": [
+      {
+        "id": "1",
+        "label": "An unfinished job is a price I will pay to bring people home.",
+        "stance": "Care",
+        "response": "Ketha folds the roster over the orders. \"Then we tell the client before we drop. Nobody gets sold a promise we will not keep.\""
+      },
+      {
+        "id": "2",
+        "label": "We should choose smaller objectives we can actually finish.",
+        "stance": "Prudence",
+        "response": "Vane taps the blank margin. \"Leave us room to surprise you. Just stop budgeting for miracles.\""
+      },
+      {
+        "id": "3",
+        "label": "We return for unfinished work when the company is ready.",
+        "stance": "Resolve",
+        "response": "Ketha keeps the orders. \"When ready. I will remember that part too.\""
+      }
+    ]
+  },
+  {
+    "id": "pavise__ketha:second_chapter",
+    "pair": [
+      "pavise",
+      "ketha"
+    ],
+    "title": "Staying is another order",
+    "when": {
+      "continued": true
+    },
+    "setup": "Their recorded return includes another contract on the same battlefield.",
+    "afterTurn": 1,
+    "minSharedDeployments": 1,
+    "beats": [
+      {
+        "speaker": "pavise",
+        "text": "We held our ground and made use of it. A position is a tool, not a monument."
+      },
+      {
+        "speaker": "ketha",
+        "text": "So is a company. Tools get checked between jobs. People should too."
+      },
+      {
+        "speaker": "pavise",
+        "text": "Then give me a readiness report before the next order. Not an apology after it."
+      }
+    ],
+    "choices": [
+      {
+        "id": "1",
+        "label": "Check the company before we choose another field contract.",
+        "stance": "Care",
+        "response": "Ketha nods. \"Names first, map second. That I can work with.\""
+      },
+      {
+        "id": "2",
+        "label": "Keep the pressure on, but give me a clear stopping condition.",
+        "stance": "Calculated ambition",
+        "response": "Pavise writes beneath the objective: \"And this is where we stop.\""
+      }
+    ]
+  },
+  {
+    "id": "hearth__brakhov:after_defeat",
+    "pair": [
+      "hearth",
+      "brakhov"
+    ],
+    "title": "What failure is for",
+    "when": {
+      "verdicts": [
+        "defeat"
+      ]
+    },
+    "setup": "The defeat is in the ledger. Neither of them is willing to leave it as a single word.",
+    "afterTurn": 1,
+    "minSharedDeployments": 1,
+    "beats": [
+      {
+        "speaker": "hearth",
+        "text": "I can mend a broken fitting. I cannot mend an order nobody will admit was wrong."
+      },
+      {
+        "speaker": "brakhov",
+        "text": "Admit it, then. But do not build a shrine to it. The enemy will not wait while we confess."
+      },
+      {
+        "speaker": "hearth",
+        "text": "I was thinking of a workbench. You can put useful things on one."
+      }
+    ],
+    "choices": [
+      {
+        "id": "1",
+        "label": "We change the plan before asking people to try again.",
+        "stance": "Prudence",
+        "response": "Hearth finds a clean sheet. \"Good. Start with the assumption that failed us.\""
+      },
+      {
+        "id": "2",
+        "label": "We learn enough to strike back with purpose.",
+        "stance": "Resolve",
+        "response": "Brakhov sets a weight on the old orders. \"Then purpose first. Anger can carry the bags.\""
+      }
+    ]
+  },
+  {
+    "id": "odessa__vane:held_and_home",
+    "pair": [
+      "odessa",
+      "vane"
+    ],
+    "title": "A place is not a person",
+    "when": {
+      "verdicts": [
+        "victory"
+      ]
+    },
+    "setup": "After a successful return, the argument turns to what success obliges them to do next.",
+    "afterTurn": 1,
+    "minSharedDeployments": 1,
+    "beats": [
+      {
+        "speaker": "odessa",
+        "text": "Ground taken, company home. I would like us to become boringly good at that."
+      },
+      {
+        "speaker": "vane",
+        "text": "A terrifying ambition. Will there be a badge?"
+      },
+      {
+        "speaker": "odessa",
+        "text": "Yes. It says everyone who left came back to be counted. We do the count before we award it."
+      }
+    ],
+    "choices": [
+      {
+        "id": "1",
+        "label": "Make the return route part of every plan.",
+        "stance": "Stewardship",
+        "response": "Vane sketches an arrow pointing back. \"There. A radical new direction.\""
+      },
+      {
+        "id": "2",
+        "label": "Keep enough freedom to leave by a different route.",
+        "stance": "Freedom of movement",
+        "response": "Odessa puts a second arrow beside his. \"A fallback is still a plan.\""
+      }
+    ]
+  },
+  {
+    "id": "vale__brakhov:incomplete_picture",
+    "pair": [
+      "vale",
+      "brakhov"
+    ],
+    "title": "An empty square",
+    "when": {
+      "verdicts": [
+        "partial",
+        "defeat"
+      ]
+    },
+    "setup": "Vale lays the last operation report beside a map with several unobserved sectors.",
+    "afterTurn": 1,
+    "minSharedDeployments": 1,
+    "beats": [
+      {
+        "speaker": "vale",
+        "text": "Unknown does not mean empty. It means nobody has earned the right to draw anything there."
+      },
+      {
+        "speaker": "brakhov",
+        "text": "And waiting will not draw it for us."
+      },
+      {
+        "speaker": "vale",
+        "text": "No. Looking might. There is a difference between moving first and pretending you already looked."
+      }
+    ],
+    "choices": [
+      {
+        "id": "1",
+        "label": "Tell me what we know and what we are guessing separately.",
+        "stance": "Prudence",
+        "response": "Vale puts the pencil down. \"Then I can give you an honest map.\""
+      },
+      {
+        "id": "2",
+        "label": "We can act on uncertainty if everyone understands the risk.",
+        "stance": "Calculated ambition",
+        "response": "Brakhov nods. \"A risk we name is an order we can argue with. Better than a surprise.\""
+      }
+    ]
+  },
+  {
+    "id": "odessa__hearth:wounded_return",
+    "pair": [
+      "odessa",
+      "hearth"
+    ],
+    "title": "Room in the schedule",
+    "when": {
+      "wounded": true
+    },
+    "setup": "The return ledger includes wounded company members. Odessa and Hearth review the next preparations.",
+    "afterTurn": 1,
+    "minSharedDeployments": 1,
+    "beats": [
+      {
+        "speaker": "odessa",
+        "text": "Recovery is on the roster. It needs to be on the schedule."
+      },
+      {
+        "speaker": "hearth",
+        "text": "The schedule currently says soon in three different places. I can build many things. Soon is not one of them."
+      },
+      {
+        "speaker": "odessa",
+        "text": "Give me a decision I can tell the wounded. Waiting is harder when nobody admits it is waiting."
+      }
+    ],
+    "choices": [
+      {
+        "id": "1",
+        "label": "Recovery comes before another ambitious sortie.",
+        "stance": "Care",
+        "response": "Hearth crosses out one soon. \"A rare material. An actual priority.\""
+      },
+      {
+        "id": "2",
+        "label": "Prepare a smaller operation around who is ready.",
+        "stance": "Pragmatism",
+        "response": "Odessa circles the available names. \"Then we plan for these people, not the people we wish were well.\""
+      }
+    ]
+  }
+]

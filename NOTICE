@@ -1,0 +1,87 @@
+Verdance's Ashes -- third-party notices
+=======================================
+
+This file records third-party material present in this repository, who wrote it
+and under what terms. See LICENSE for the project's own licensing.
+
+
+--------------------------------------------------------------------------------
+BAR UI 2.0 RML starter  --  reference only, not shipped
+--------------------------------------------------------------------------------
+
+  Location:  docs/references/bar-ui-2.0/rml_starter/
+  Files:     rml_starter.lua, rml_starter.rml, rml_starter.rcss,
+             generate-widget.sh
+  Author:    Mupersega
+  License:   GNU GPL, v2 or later
+  Upstream:  https://github.com/mupersega/Beyond-All-Reason/tree/bar-ui-2.0/
+             luaui/RmlWidgets/rml_starter
+
+Verbatim upstream code, retained as a working reference for Recoil's RmlUi
+widget API. It is not imported by any gadget or widget in mod/, and
+scripts/ship.ps1 does not stage it, so it forms no part of a released build.
+
+Because it is GPL v2, it must not be moved into any part of this project that is
+not GPL -- specifically not into tools/ or app/, which are all-rights-reserved.
+
+
+--------------------------------------------------------------------------------
+CPython  --  redistributed in shipped builds
+--------------------------------------------------------------------------------
+
+  Location:  runtime/python/ in a built distribution (export/dist/...)
+  Version:   3.12.x Windows embeddable distribution
+  License:   Python Software Foundation License (PSF)
+  Upstream:  https://www.python.org/
+
+Downloaded unmodified by scripts/ship.ps1 and bundled so players need not
+install Python. The PSF license text ships alongside it at
+runtime/python/LICENSE.txt.
+
+The bundle includes Microsoft Visual C++ runtime components (vcruntime140.dll
+and similar) as distributed by python.org, redistributable under Microsoft's
+own terms.
+
+
+--------------------------------------------------------------------------------
+Beyond All Reason  --  required at runtime, never redistributed
+--------------------------------------------------------------------------------
+
+  Upstream:  https://github.com/beyond-all-reason/Beyond-All-Reason
+  License:   code GPL v2; art, animation, sound and music predominantly
+             CC-BY-NC-ND 4.0 (some models CC-BY-SA 4.0); some content all
+             rights reserved
+
+Verdance's Ashes is a mutator and declares BAR as a dependency
+(mod/VerdanceAshes.sdd/modinfo.lua). BAR is resolved from the player's own
+installation. No BAR model, texture, animation, sound, icon or music file is
+contained in or distributed by this project.
+
+The mutator's Lua does reference BAR unit identifiers (armcom, legcom, armllt
+and similar). These are functional interface strings used to address units at
+runtime, not copies of BAR's creative content.
+
+
+--------------------------------------------------------------------------------
+Campaign maps  --  downloaded, never redistributed
+--------------------------------------------------------------------------------
+
+  All That Simmers v1.1.1      Koom Valley 3 3.1        Tabula_Remake 1.5
+  Ancient Bastion Remake 0.5   The Rock Jungle 2.1.1    Eye Of Horus 1.7
+  Greenest Fields 1.3
+
+Each map is the work of its own author under its own terms. This project
+distributes none of them. tools/map_provisioner_v1.py fetches them on demand
+from Beyond All Reason's content service (files-cdn.beyondallreason.dev), the
+same source the BAR client itself uses.
+
+
+--------------------------------------------------------------------------------
+Recoil engine  --  required at runtime, never redistributed
+--------------------------------------------------------------------------------
+
+  Upstream:  https://github.com/beyond-all-reason/RecoilEngine
+  License:   GNU GPL, v2 or later
+
+Supplied by the player's BAR installation. Its requirement that loaded game code
+be GPL-compatible is why this project's Lua and data are GPL-2.0-or-later.

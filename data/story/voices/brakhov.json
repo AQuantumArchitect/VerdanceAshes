@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "verdance-voice/0.1",
+  "speaker": "brakhov",
+  "name": "Brakhov the Kiln",
+  "register": "Formal, courtly menace played for comedy. He burned his name off the hull so the enemy would learn it slowly. Does not kite, does not retreat, expresses every emotion through the destruction of obstacles. He has no arc and needs none; he is the register that lets the camp breathe. Full sentences, slightly archaic, utterly literal about heat.",
+  "argues": [],
+  "resists": ["bleeding"],
+  "owns": [],
+  "lines": [
+    { "id": "b.held.1", "on": { "class": "drop_held" }, "text": "{map} is held. The obstacles have submitted their complaints in writing. I have burned the writing." },
+    { "id": "b.held.2", "on": { "class": "drop_held" }, "text": "A satisfactory temperature was achieved at {map}. I require no further praise. I will accept it." },
+    { "id": "b.unfinished.1", "on": { "class": "drop_unfinished" }, "text": "I dislike an unfinished wall. Point me at the part that is still standing." },
+    { "id": "b.lost.1", "on": { "class": "drop_lost" }, "text": "{map} was lost. I was present. I consider this a personal insult from geography." },
+    { "id": "b.joined.1", "on": { "class": "hero_joined" }, "text": "A new companion. I shall express my welcome through the destruction of something nearby." },
+    { "id": "b.clean.1", "on": { "class": "clean_return" }, "text": "Everyone returned. The obstacles did not. This is the correct ratio." },
+    { "id": "b.costly.1", "on": { "class": "costly_return" }, "text": "We came home paying. I shall be collecting the balance from the next wall, with interest, in heat." },
+    { "id": "b.scrap.1", "on": { "class": "walker_still_scrap" }, "occasion": "camp", "text": "Your walker remains on the shelf. When it stands, I should like to stand beside it. Slightly in front." },
+    { "id": "b.rebuilt.1", "on": { "class": "walker_rebuilt" }, "occasion": "camp", "text": "It walks. Finally, a future with a temperature." },
+    { "id": "b.dead.1", "on": { "class": "named_dead" }, "occasion": "roll", "text": "{hero}. I did not know them long. I know the wall that took them. The wall and I will speak." },
+    { "id": "b.rec.1", "on": { "class": "frame_recovered" }, "occasion": "roll", "text": "{hero} was carried home. Whoever carried them: I shall roast something in your honour." },
+    { "id": "b.shift.bleeding", "on": { "dominantBecame": "bleeding" }, "occasion": "camp", "once": true, "text": "Too many of us are sitting down. I am being asked to have a stopping point. I shall require a clearly marked one." },
+    { "id": "b.shift.hunted", "on": { "dominantBecame": "hunted" }, "occasion": "camp", "once": true, "text": "Something is looking for us. Excellent. I had begun to worry we were unmemorable." },
+    { "id": "b.shift.sovereign", "on": { "dominantBecame": "sovereign" }, "occasion": "camp", "once": true, "text": "Our own flag. I shall need it to be fire-resistant. This is not a metaphor." },
+    { "id": "b.open.any", "on": { "attractor": "*" }, "occasion": "briefing", "weight": 0.3, "text": "Whatever the objective, I intend to arrive at it slowly and leave it warmer." }
+  ],
+  "deathLine": "The name was already gone. Only the heat was left. Carry that.",
+  "notes": "Brakhov has no owned event classes on purpose; his lines are seasoning, selected at low weight when the owner's line has already been used recently."
+}

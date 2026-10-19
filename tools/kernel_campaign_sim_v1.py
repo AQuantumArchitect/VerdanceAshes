@@ -76,14 +76,16 @@ def _fresh_state(workspace: Path, home_map: str = "koom_valley") -> Dict[str, An
     state["occupationModel"] = "living_shell"
     # Seed a foothold so Mode A quests have from-zones
     zm = state.setdefault("zoneMemory", {}).setdefault(home_map, {})
+    # Zone IDs must match authored zone_memory (KV_*/GF_*/TRJ_*), not legacy aliases.
+    # Wrong IDs leave Mode A with no foothold → materialize falls through to GF opener.
     footholds = {
-        "koom_valley": "KOOM_NW_GREEN_SHELF",
-        "greenest_fields": "GF_NW_OPEN_FLANK",
+        "koom_valley": "KV_NW_MUSTER",
+        "greenest_fields": "GF_NW_MUSTER",
         "eye_of_horus": "EOH_NW_CRATER_CAMP",
         "all_that_simmers": "ATS_NW_RIM",
         "ancient_bastion": "AB_WEST_APPROACH",
-        "tabula": "TAB_NW_RAMP",
-        "the_rock_jungle": "RJ_WESTERN_CAUSEWAY",
+        "tabula": "T_NW_MUSTER",
+        "the_rock_jungle": "TRJ_NW_OUTER_MUSTER",
     }
     fz = footholds.get(home_map)
     if fz and fz in zm:

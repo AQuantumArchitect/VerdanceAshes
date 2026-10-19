@@ -32,7 +32,12 @@ def _read_version() -> str:
     try:
         ver_path = Path(__file__).resolve().parents[2] / "VERSION"
         if ver_path.is_file():
-            text = ver_path.read_text(encoding="utf-8").strip().splitlines()
+            # utf-8-sig, not utf-8: the VERSION file is BOM-prefixed (PowerShell's
+            # Set-Content wrote it), and a plain utf-8 read leaves ﻿ glued to the
+            # front of the string. That BOM then travels into every manifest, face and
+            # log line that stamps a version, and makes bare print() raise
+            # UnicodeEncodeError on a cp1252 console.
+            text = ver_path.read_text(encoding="utf-8-sig").strip().splitlines()
             if text and text[0].strip():
                 return text[0].strip()
     except Exception:  # noqa: BLE001

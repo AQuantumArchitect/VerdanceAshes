@@ -1,0 +1,228 @@
+{
+  "schemaVersion": "verdance-map-umwelt/0.1",
+  "notes": "L2 mapPressure SSOT — seven-map pool projected onto hero umwelt axes. ecoBridge rhymes with classical ROI manifold (spot/wind/eBuild/bp). mapPressure is what heroes · fit against. Zone overlays optional and sparse.",
+  "axes": [
+    "energy",
+    "offense",
+    "mobility",
+    "sight",
+    "pad",
+    "craft",
+    "heat",
+    "fog",
+    "sky",
+    "ledger"
+  ],
+  "projectionNotes": [
+    "high spot / reclaim → +pad +offense (+ledger soft)",
+    "wind-rich / eco → +energy +craft",
+    "fog / night / jungle choke → +fog +sight",
+    "heat / glass / ash → +heat +offense −energy",
+    "sky / hover / cliffs / plateau → +sky +mobility −pad",
+    "citadel / fortress → +pad −mobility +craft"
+  ],
+  "maps": [
+    {
+      "mapId": "greenest_fields",
+      "title": "Greenest Fields",
+      "biomeCue": "converter_utopia",
+      "descriptor": "No-metal synthesized utopia — energy→metal path dominates.",
+      "ecoBridge": {
+        "spotMult": 0.0,
+        "windMult": 1.1,
+        "eBuildPenalty": 0,
+        "bpMult": 1.0
+      },
+      "mapPressure": {
+        "energy": 1.0,
+        "offense": -0.2,
+        "mobility": 0.1,
+        "sight": 0.0,
+        "pad": 0.45,
+        "craft": 0.85,
+        "heat": 0.0,
+        "fog": -0.2,
+        "sky": 0.15,
+        "ledger": 0.25
+      },
+      "glyphs": "+ene·+cra·+pad"
+    },
+    {
+      "mapId": "the_rock_jungle",
+      "title": "The Rock Jungle",
+      "biomeCue": "limestone_labyrinth",
+      "descriptor": "Ashwalker home — choke labyrinth, low metal, foggy sightlines.",
+      "ecoBridge": {
+        "spotMult": 0.75,
+        "windMult": 0.8,
+        "eBuildPenalty": 0,
+        "bpMult": 0.95
+      },
+      "mapPressure": {
+        "energy": 0.15,
+        "offense": 0.25,
+        "mobility": 0.35,
+        "sight": 0.55,
+        "pad": 0.7,
+        "craft": 0.2,
+        "heat": 0.1,
+        "fog": 0.85,
+        "sky": -0.15,
+        "ledger": 0.2
+      },
+      "glyphs": "+fog·+pad·+sig"
+    },
+    {
+      "mapId": "all_that_simmers",
+      "title": "All That Simmers",
+      "biomeCue": "high_conflict_swamp",
+      "descriptor": "Default high-conflict swamp — raptors, wet fog, constant pressure.",
+      "ecoBridge": {
+        "spotMult": 0.9,
+        "windMult": 0.7,
+        "eBuildPenalty": 4,
+        "bpMult": 0.9
+      },
+      "mapPressure": {
+        "energy": -0.25,
+        "offense": 0.7,
+        "mobility": 0.45,
+        "sight": 0.35,
+        "pad": 0.2,
+        "craft": -0.1,
+        "heat": 0.4,
+        "fog": 0.9,
+        "sky": -0.2,
+        "ledger": 0.15
+      },
+      "glyphs": "+fog·+off·+hea"
+    },
+    {
+      "mapId": "koom_valley",
+      "title": "Koom Valley",
+      "biomeCue": "fluid_scar",
+      "descriptor": "Fluid scar — high wind, strong metal, open valley mobility.",
+      "ecoBridge": {
+        "spotMult": 1.2,
+        "windMult": 1.35,
+        "eBuildPenalty": 0,
+        "bpMult": 1.05
+      },
+      "mapPressure": {
+        "energy": 0.75,
+        "offense": 0.35,
+        "mobility": 0.8,
+        "sight": 0.25,
+        "pad": -0.15,
+        "craft": 0.2,
+        "heat": 0.1,
+        "fog": -0.1,
+        "sky": 0.45,
+        "ledger": 0.3
+      },
+      "glyphs": "+mob·+ene·+sky"
+    },
+    {
+      "mapId": "tabula",
+      "title": "Tabula",
+      "biomeCue": "tiered_plateau",
+      "descriptor": "Tiered plateau — very high wind, elevation / sky lanes.",
+      "ecoBridge": {
+        "spotMult": 1.0,
+        "windMult": 1.6,
+        "eBuildPenalty": 0,
+        "bpMult": 1.0
+      },
+      "mapPressure": {
+        "energy": 0.9,
+        "offense": 0.2,
+        "mobility": 0.55,
+        "sight": 0.4,
+        "pad": 0.35,
+        "craft": 0.25,
+        "heat": -0.1,
+        "fog": -0.25,
+        "sky": 0.85,
+        "ledger": 0.2
+      },
+      "glyphs": "+sky·+ene·+mob"
+    },
+    {
+      "mapId": "ancient_bastion",
+      "title": "Ancient Bastion",
+      "biomeCue": "citadel_siege",
+      "descriptor": "Taelith citadel — pad-heavy siege, high metal, low kite room.",
+      "ecoBridge": {
+        "spotMult": 1.35,
+        "windMult": 1.15,
+        "eBuildPenalty": 6,
+        "bpMult": 0.85
+      },
+      "mapPressure": {
+        "energy": 0.2,
+        "offense": 0.75,
+        "mobility": -0.55,
+        "sight": 0.15,
+        "pad": 1.0,
+        "craft": 0.55,
+        "heat": 0.2,
+        "fog": 0.1,
+        "sky": -0.2,
+        "ledger": 0.35
+      },
+      "glyphs": "+pad·+off·−mob"
+    },
+    {
+      "mapId": "eye_of_horus",
+      "title": "Eye of Horus",
+      "biomeCue": "mirv_glassed_core",
+      "descriptor": "Glassed core — heat, late-tech spike, scarce soft cover.",
+      "ecoBridge": {
+        "spotMult": 1.5,
+        "windMult": 1.25,
+        "eBuildPenalty": 10,
+        "bpMult": 0.8
+      },
+      "mapPressure": {
+        "energy": -0.55,
+        "offense": 0.85,
+        "mobility": 0.2,
+        "sight": 0.45,
+        "pad": 0.4,
+        "craft": 0.15,
+        "heat": 1.0,
+        "fog": -0.15,
+        "sky": 0.25,
+        "ledger": 0.5
+      },
+      "glyphs": "+hea·+off·−ene"
+    }
+  ],
+  "zones": {
+    "GF_NE_PLATEAU": {
+      "mapId": "greenest_fields",
+      "note": "Opening quiet-rim infil — clearer sight, less pad.",
+      "mapPressureDelta": { "sight": 0.2, "pad": -0.15, "mobility": 0.15 }
+    },
+    "GF_C_GATE": {
+      "mapId": "greenest_fields",
+      "note": "Optional fusion vault — pad + craft spike.",
+      "mapPressureDelta": { "pad": 0.35, "craft": 0.25, "offense": 0.2 }
+    },
+    "TRJ_C_SPILLWAY": {
+      "mapId": "the_rock_jungle",
+      "note": "Home spillway heart — pad + energy soft.",
+      "mapPressureDelta": { "pad": 0.25, "energy": 0.2, "fog": -0.1 }
+    },
+    "AB_NW_BASTION": {
+      "mapId": "ancient_bastion",
+      "note": "Siege face — max pad / offense.",
+      "mapPressureDelta": { "pad": 0.2, "offense": 0.15, "mobility": -0.1 }
+    },
+    "EOH_C_GATE": {
+      "mapId": "eye_of_horus",
+      "note": "Glassed gate — heat + sight.",
+      "mapPressureDelta": { "heat": 0.15, "sight": 0.2, "fog": -0.1 }
+    }
+  }
+}

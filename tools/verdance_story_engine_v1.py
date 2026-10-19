@@ -18,6 +18,15 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
+try:
+    from commerce_delivery_v1 import delivery_eta, make_pending_delivery, resolve_listing_delivery
+except ImportError:  # pragma: no cover
+    from tools.commerce_delivery_v1 import (  # type: ignore
+        delivery_eta,
+        make_pending_delivery,
+        resolve_listing_delivery,
+    )
+
 
 CAMPAIGN_ID = "verdance_ashes"
 STATE_SCHEMA = "verdance-campaign-state/1.0"
@@ -41,8 +50,10 @@ MAP_ALIASES = {
     "rock_jungle": "the_rock_jungle",
 }
 
+# Deploy pads are quiet rim (or migrate to quiet rim). Never midfield unowned ground.
+# Greenest: north desert (GF_NE_PLATEAU) is the standard shell-free infil/exfil.
 ALPHA_SPINE = [
-    ("greenest_fields", "GF_SE_STAGING"),
+    ("greenest_fields", "GF_NE_PLATEAU"),
     ("eye_of_horus", "EOH_NW_CRATER_CAMP"),
     ("koom_valley", "KOOM_NW_GREEN_SHELF"),
     ("tabula", "TAB_NW_PLATEAU"),
@@ -150,6 +161,15 @@ def load_json(path: Path) -> Any:
 
 def save_json(path: Path, obj: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
+    # Preserve the pre-narrative save on its first write. Projection alone does
+    # not migrate files or create backups.
+    if path.name == "campaign_state.json" and path.exists() and isinstance(obj, dict) and obj.get("narrative"):
+        previous = path.read_bytes()
+        if not json.loads(previous.decode("utf-8-sig")).get("narrative"):
+            backup = path.parent / "backups" / "pre_narrative"
+            backup.mkdir(parents=True, exist_ok=True)
+            import hashlib
+            (backup / (hashlib.sha256(previous).hexdigest()[:16] + ".json")).write_bytes(previous)
     path.write_text(json.dumps(obj, indent=2, sort_keys=False), encoding="utf-8")
 
 
@@ -295,10 +315,12 @@ def default_v1_state() -> Dict[str, Any]:
             "homeCleared": False,
         },
         "characters": {
-            "vane": { "id": "vane", "name": "Ash-Captain Vane", "faction": "ashwalkers", "unitDef": "legbal", "xp": 1480, "player": True, "home": None, "status": "active", "wounds": 0, "scars": [] },
-            "ketha": { "id": "ketha", "name": "Ketha", "faction": "ashwalkers", "unitDef": "legcen", "xp": 1120, "player": True, "home": None, "status": "active", "wounds": 0, "scars": [] },
+            # Sheet xp stays small so ensure_roster does not scale Pavise into L4 (Hardened = BAR ~0.45).
+            "pavise": { "id": "pavise", "name": "Pavise", "faction": "ashwalkers", "unitDef": "armwar", "xp": 40, "player": True, "home": None, "status": "active", "wounds": 0, "scars": [] },
+            "vane": { "id": "vane", "name": "Ash-Captain Vane", "faction": "ashwalkers", "unitDef": "legcen", "xp": 1480, "player": False, "home": None, "status": "locked", "wounds": 0, "scars": [] },
+            "ketha": { "id": "ketha", "name": "Ketha", "faction": "ashwalkers", "unitDef": "legrezbot", "xp": 1120, "player": True, "home": None, "status": "active", "wounds": 0, "scars": [] },
             "anselm": { "id": "anselm", "name": "Broker Anselm Rue", "faction": "nullmercs", "unitDef": "legcen", "xp": 1900, "player": False, "home": ["greenest_fields", "GF_CENTRAL_OPEN_GRASSLAND"], "status": "active", "wounds": 0, "scars": [] },
-            "grath": { "id": "grath", "name": "Grath Unpaid", "faction": "nullmercs", "unitDef": "legkark", "xp": 2400, "player": False, "home": ["koom_valley", "KOOM_WEST_RIDGE_POCKET"], "status": "active", "wounds": 0, "scars": [] },
+            "grath": { "id": "grath", "name": "Grath Arrears", "faction": "nullmercs", "unitDef": "legkark", "xp": 2400, "player": False, "home": ["koom_valley", "KOOM_WEST_RIDGE_POCKET"], "status": "active", "wounds": 0, "scars": [] },
             "halq": { "id": "halq", "name": "Sisu Halq", "faction": "nullmercs", "unitDef": "legbal", "xp": 1350, "player": False, "home": ["the_rock_jungle", "RJ_WESTERN_CAUSEWAY"], "status": "active", "wounds": 0, "scars": [] },
             "brask": { "id": "brask", "name": "Line-Captain Odell Brask", "faction": "armada", "unitDef": "armcom", "xp": 1600, "player": False, "home": ["greenest_fields", "GF_SE_ENERGY_WORKS"], "status": "active", "wounds": 0, "scars": [] },
             "solvang": { "id": "solvang", "name": "Warden-Marshal Teir Solvang", "faction": "armada", "unitDef": "armcom", "xp": 3100, "player": False, "home": ["ancient_bastion", "AB_EASTERN_BASTION_WALL"], "status": "active", "wounds": 0, "scars": [] },
@@ -323,34 +345,41 @@ def default_v1_state() -> Dict[str, Any]:
         # destroyed wreck is permadeath (mission restart if missionCritical).
         "roster": {
             "commander": {
-                "name": "Ash-Captain Vane",
+                "name": "Ashwalker Commander",
+                # The suit they used to wear. Scrap until a story beat sets unlocked.
+                # Mission number never fields it. Level and perks wait on the ledger.
                 "unitDef": "legcom",
                 "level": 1,
                 "xp": 0.0,
                 "perks": [],
                 "scars": [],
+                "unlocked": False,
             },
             "cadre": {},
             "cadreCap": 12,
             "heroes": [
                 {
-                    "heroId": "vane",
-                    "name": "Ash-Captain Vane",
-                    "unitDef": "legbal",
-                    # WO-008: missionCritical no longer aborts the match; kept as
-                    # a UI emphasis flag only (wreck rule decides fate).
+                    "heroId": "pavise",
+                    "name": "Pavise",
+                    # Solo Centurion left hand (armwar) — war buddy, Hardened BAR XP, HP aura.
+                    "unitDef": "armwar",
                     "missionCritical": False,
                     "status": "active",
-                    "xp": 0.25,
+                    "xp": 0.45,
+                    "campaignXp": 40.0,
+                    "peakBarXp": 0.45,
                     "timesWounded": 0,
                 },
                 {
                     "heroId": "ketha",
                     "name": "Ketha",
-                    "unitDef": "legcen",
+                    # Ketha is the named field medic / rez-bot hero.
+                    "unitDef": "legrezbot",
                     "missionCritical": False,
                     "status": "active",
                     "xp": 0.05,
+                    "campaignXp": 0.0,
+                    "peakBarXp": 0.05,
                     "timesWounded": 0,
                 },
             ],
@@ -360,6 +389,7 @@ def default_v1_state() -> Dict[str, Any]:
         "offscreenActors": {},
         "destroyedObjectives": {},
         "persistentBaseSnapshots": {},
+        "playerFootprints": {},
         "hazardState": {},
         "calibrationRefs": copy.deepcopy(TEST_WON_CALIBRATION_REFS),
         # Operator progression dial (cracked_farm = farm XP, heroes go super late).
@@ -370,15 +400,29 @@ def default_v1_state() -> Dict[str, Any]:
             "farmSortiesEnabled": True,
             "xpPersistOnDeath": True,
         },
-        # WO-043: broker commerce — Tenebrium (build floor), scrap credits,
-        # loan packs (Punch of Thugs), purchasable fab streams / constructors.
+        # WO-043/metal: broker commerce — Tenebrium (build floor), campaign
+        # metal in 1km$ units (floor(endMetal/1000)), purchasable packs / fabs.
+        # Fresh bag seeded from commerce_catalog (7km$ + 3 Tnb); hireTnb spends Tnb.
         "commerce": {
-            "tenebrium": 0,
-            "credits": 40,
+            "tenebrium": 3,
+            "metalK": 7,
             "owned": {},
             "upgrades": {},
             "ledger": [],
         },
+        # Fire Emblem company: sealed on hub preamble (pick 3 packs). Unpicked
+        # band heroes live in fieldPool until wreck/rez or sortie recruit.
+        "company": {
+            "sealed": False,
+            "core": ["pavise", "ketha"],
+            "band": [],
+            "joinedLater": [],
+            "sealedAt": None,
+            "seatCap": 3,
+        },
+        "fieldPool": {},
+        # Demo: "*" = full catalog on preamble. Later: explicit heroId list.
+        "unlockPool": ["*"],
     }
 
 
@@ -412,6 +456,9 @@ def migrate_state(raw: Dict[str, Any]) -> Dict[str, Any]:
         if key not in state:
             state[key] = copy.deepcopy(value)
     state["schemaVersion"] = STATE_SCHEMA
+    # Company ensure (incl. legacy auto-seal) is NOT done here — it mutates
+    # mid-run state. Callers that need a seal (hub rebuild, Drop gate, first
+    # apply of a result) invoke ensure_company explicitly.
     return state
 
 
@@ -624,10 +671,11 @@ def aggregate_zone(zone_id: str, zone: Dict[str, Any]) -> Dict[str, Any]:
         faction = faction_from_team(team, zone_id)
         if faction == "wild":
             has_wild = True
-        presence = metrics["armyValue"] + metrics["buildPower"] + metrics["defensiveValue"]
-        if presence <= 0:
-            presence = metrics["totalUnitValue"]
-        faction_presence[faction] = faction_presence.get(faction, 0.0) + presence
+        # Territory ownership = defensive value only. Army/build stay on
+        # metrics for pressure/economy abstracts; they do not buy the flag.
+        presence = metrics["defensiveValue"]
+        if presence > 0:
+            faction_presence[faction] = faction_presence.get(faction, 0.0) + presence
         for key in totals:
             totals[key] += metrics[key]
         team_snapshots.append({
@@ -641,9 +689,8 @@ def aggregate_zone(zone_id: str, zone: Dict[str, Any]) -> Dict[str, Any]:
     controlling = "neutral"
     if faction_presence:
         controlling = max(faction_presence.items(), key=lambda kv: kv[1])[0]
-    presence_total = totals["armyValue"] + totals["buildPower"] + totals["defensiveValue"]
-    if presence_total <= 0:
-        presence_total = totals["totalUnitValue"]
+    # Presence for fortification/hazard scaling still tracks DV stack total.
+    presence_total = totals["defensiveValue"]
     return {
         "metrics": totals,
         "presence": presence_total,
@@ -1413,7 +1460,7 @@ def get_character_rank(xp: float | int) -> str:
     elif val >= 1500:
         return "Captain"
     elif val >= 800:
-        return "Blooded"
+        return "Proven"
     return "Runner"
 
 
@@ -1515,12 +1562,18 @@ HOME_MAP_ID = "the_rock_jungle"
 HOME_CLEAR_TNB_MIN = 3
 HOME_CLEAR_CAMP_MIN = 1
 HOME_KEY_ZONES = (
+    "TRJ_C_SPILLWAY",
+    "TRJ_C_INNER_SPILLWAY",
+    "TRJ_NW_GATE",
+    "TRJ_SE_GATE",
+    # legacy aliases (pre-TRJ remap) — kept so old states still evaluate
     "RJ_CENTRAL_LAGOON_MAZE",
     "RJ_NW_JUNGLE_SHELF",
     "RJ_SE_JUNGLE_SHELF",
 )
 HOME_BUILD_TNB_COST = 1
-HOME_BUILD_SCRAP_COST = 25
+HOME_BUILD_METAL_K_COST = 1
+METAL_UNIT = 1000  # 1km$ = 1000 BAR metal
 
 
 def ensure_home_camp(state: Dict[str, Any]) -> Dict[str, Any]:
@@ -1661,7 +1714,9 @@ def evaluate_home_clear(state: Dict[str, Any], result: Dict[str, Any] | None = N
 
     playerish = {"ashwalkers", "nullmercs", "legion"}
     key_held = sum(1 for zid in HOME_KEY_ZONES if _zone_control(state, HOME_MAP_ID, zid) in playerish)
-    center = _zone_control(state, HOME_MAP_ID, "RJ_CENTRAL_LAGOON_MAZE")
+    center = _zone_control(state, HOME_MAP_ID, "TRJ_C_SPILLWAY")
+    if not center or center == "unknown":
+        center = _zone_control(state, HOME_MAP_ID, "RJ_CENTRAL_LAGOON_MAZE")
     map_id = str((result or {}).get("mapId") or "").lower().replace(" ", "_")
     verdict = str((result or {}).get("verdict") or (result or {}).get("status") or "")
     home_win = (
@@ -1684,25 +1739,23 @@ def evaluate_home_clear(state: Dict[str, Any], result: Dict[str, Any] | None = N
 
 
 def apply_home_build(state: Dict[str, Any], workspace: Path | None = None) -> Dict[str, Any]:
-    """Spend Tnb/scrap to raise the Rock Jungle camp (hub-only; scales next home drops)."""
+    """Spend Tnb + 1km$ metal to raise the Rock Jungle camp (hub-only)."""
     ensure_home_camp(state)
-    commerce = state.setdefault("commerce", {})
-    commerce.setdefault("tenebrium", 0)
-    commerce.setdefault("credits", 40)
+    commerce = ensure_commerce(state, workspace)
     tnb = int(commerce.get("tenebrium") or 0)
-    scrap = int(commerce.get("credits") or 0)
+    metal_k = int(commerce.get("metalK") or 0)
     if tnb < HOME_BUILD_TNB_COST:
         return {
             "ok": False,
             "error": f"need {HOME_BUILD_TNB_COST} Tenebrium (have {tnb}) — raid to print, then build home",
         }
-    if scrap < HOME_BUILD_SCRAP_COST:
+    if metal_k < HOME_BUILD_METAL_K_COST:
         return {
             "ok": False,
-            "error": f"need {HOME_BUILD_SCRAP_COST} scrap (have {scrap})",
+            "error": f"need {HOME_BUILD_METAL_K_COST}×1km$ metal (have {metal_k})",
         }
     commerce["tenebrium"] = tnb - HOME_BUILD_TNB_COST
-    commerce["credits"] = scrap - HOME_BUILD_SCRAP_COST
+    commerce["metalK"] = metal_k - HOME_BUILD_METAL_K_COST
     camp = state["homeCamp"]
     camp["level"] = int(camp.get("level") or 0) + 1
     camp["lastBuiltAt"] = utc_now()
@@ -1726,7 +1779,7 @@ def apply_home_build(state: Dict[str, Any], workspace: Path | None = None) -> Di
         "ok": True,
         "homeCamp": camp,
         "tenebrium": commerce["tenebrium"],
-        "credits": commerce["credits"],
+        "metalK": commerce["metalK"],
         "flags": dict(state.get("flags") or {}),
     }
 
@@ -1809,6 +1862,7 @@ def hero_hp_mult_from_level(level: int, critical: bool, wounded: bool) -> float:
 
 
 def hero_rank_label(level: int) -> str:
+    # L3–L4 used to say "Blooded" — read as wounded. "Proven" is the career rung.
     if level >= 11:
         return "Cracked"
     if level >= 9:
@@ -1818,8 +1872,21 @@ def hero_rank_label(level: int) -> str:
     if level >= 5:
         return "Captain"
     if level >= 3:
-        return "Blooded"
+        return "Proven"
     return "Runner"
+
+
+def normalize_hero_rank_label(rank: Any) -> str:
+    """Map legacy display ranks onto the current ladder."""
+    r = str(rank or "").strip()
+    if not r:
+        return "Runner"
+    low = r.lower()
+    if low in ("blooded", "bloodied"):
+        return "Proven"
+    if low == "green":
+        return "Runner"
+    return r
 
 
 def load_commerce_catalog(workspace: Optional[Path] = None) -> Dict[str, Any]:
@@ -1839,38 +1906,303 @@ def load_commerce_catalog(workspace: Optional[Path] = None) -> Dict[str, Any]:
                 continue
     return {
         "schemaVersion": "verdance-commerce-catalog/1.0",
-        "resource": {"id": "tenebrium", "startingBalance": {"ashwalkers": 0, "nullmercs": 0}, "buildFloor": 1},
-        "credits": {"startingBalance": 40},
+        "resource": {
+            "id": "tenebrium",
+            "startingBalance": {"ashwalkers": 3, "nullmercs": 3},
+            "buildFloor": 1,
+        },
+        "metal": {"startingBalanceK": 7, "unitMetal": 1000},
         "listings": {},
         "sortieRewards": {},
     }
 
 
+def listing_metal_cost_k(listing: Dict[str, Any]) -> int:
+    """Prefer metalCostK; fall back to retired creditCost for one-release compat."""
+    if listing.get("metalCostK") is not None:
+        return int(listing.get("metalCostK") or 0)
+    return int(listing.get("creditCost") or 0)
+
+
+def _catalog_starting_tenebrium(catalog: Optional[Dict[str, Any]] = None) -> int:
+    """Player starting Tnb from catalog (ashwalkers / nullmercs / startingBalancePlayer)."""
+    cat = catalog or {}
+    resource = cat.get("resource") or {}
+    starting = resource.get("startingBalance") or {}
+    if "startingBalancePlayer" in resource:
+        return max(0, int(resource.get("startingBalancePlayer") or 0))
+    for key in ("ashwalkers", "nullmercs", "player"):
+        if key in starting:
+            return max(0, int(starting.get(key) or 0))
+    return 0
+
+
+# Soft cap on extracted mobile army value carried into the next Drop (metal).
+ARMY_BUDGET_SOFT_CAP = 18000
+# Convert budget → deploy escorts (approx metal cost per chassis).
+ARMY_BUDGET_ESCORTS = (
+    ("legcen", 160, 20),   # Phobos swarm — cheap mobile mass
+    ("legkark", 520, 4),   # Karkinos — mid punch
+    ("legshot", 280, 6),   # Shotgun — close riot
+)
+
+
+def apply_army_budget_from_result(
+    state: Dict[str, Any],
+    result: Dict[str, Any],
+    *,
+    workspace: Optional[Path] = None,
+) -> Dict[str, Any]:
+    """Bank living mobile armyValue into commerce.armyBudget on extract/homecoming.
+
+    Structures stay on playerFootprints (map-local). This bag is the cross-map
+    "leave with a bigger army" carry — spent into deploy escorts on the next Drop.
+    """
+    commerce = ensure_commerce(state, workspace)
+    commerce.setdefault("armyBudget", 0)
+
+    def _army_from(obj: Any) -> float:
+        if not isinstance(obj, dict):
+            return 0.0
+        try:
+            return float((obj.get("metrics") or {}).get("armyValue") or obj.get("armyValue") or 0)
+        except (TypeError, ValueError):
+            return 0.0
+
+    army = _army_from(result)
+    # Prefer player team bucket from result / embedded telemetry.
+    candidates: List[Any] = []
+    for key in ("teams", "teamMetrics"):
+        raw = result.get(key)
+        if isinstance(raw, list):
+            candidates.extend(raw)
+        elif isinstance(raw, dict):
+            candidates.extend(raw.values())
+    tel = result.get("telemetry") if isinstance(result.get("telemetry"), dict) else {}
+    for key in ("teams", "teamMetrics"):
+        raw = tel.get(key)
+        if isinstance(raw, list):
+            candidates.extend(raw)
+        elif isinstance(raw, dict):
+            candidates.extend(raw.values())
+    player_tid = result.get("playerTeamId")
+    if player_tid is None:
+        player_tid = tel.get("playerTeamId")
+    for bucket in candidates:
+        if not isinstance(bucket, dict):
+            continue
+        tid = bucket.get("teamId")
+        fac = str(bucket.get("faction") or "").lower()
+        is_player = (
+            tid == player_tid
+            or tid in (0, "0")
+            or fac in ("ashwalkers", "player")
+        )
+        if is_player:
+            val = _army_from(bucket)
+            if val > 0:
+                army = val
+                break
+    if army <= 0:
+        return {"armyBudget": int(commerce.get("armyBudget") or 0), "gained": 0}
+    prev = int(commerce.get("armyBudget") or 0)
+    room = max(0, ARMY_BUDGET_SOFT_CAP - prev)
+    # Soft diminishing once past half the cap.
+    gained = int(round(army))
+    if prev >= ARMY_BUDGET_SOFT_CAP // 2:
+        gained = int(round(gained * 0.55))
+    gained = max(0, min(room, gained))
+    commerce["armyBudget"] = prev + gained
+    if gained:
+        commerce.setdefault("ledger", []).append({
+            "op": "army_budget_bank",
+            "gained": gained,
+            "armyValue": int(round(army)),
+            "armyBudget": commerce["armyBudget"],
+            "at": utc_now(),
+        })
+    return {
+        "armyBudget": int(commerce["armyBudget"]),
+        "gained": gained,
+        "armyValue": int(round(army)),
+    }
+
+
+def spend_army_budget_into_deploy(
+    commerce: Dict[str, Any],
+    deploy: List[Dict[str, Any]],
+) -> Dict[str, Any]:
+    """Convert armyBudget into t=0 combat escort packages; consume the bag."""
+    budget = int(commerce.get("armyBudget") or 0)
+    if budget <= 0:
+        return {"spent": 0, "units": 0, "remaining": 0}
+    spent = 0
+    units = 0
+    remaining = budget
+    for unit_def, cost, cap in ARMY_BUDGET_ESCORTS:
+        if remaining < cost or cap <= 0:
+            continue
+        count = min(cap, remaining // cost)
+        if count <= 0:
+            continue
+        deploy.append({
+            "listingId": f"army_bank_{unit_def}",
+            "kind": "package",
+            "unitDef": unit_def,
+            "count": int(count),
+            "healthFrac": 1.0,
+            "loan": False,
+            "packageTag": "army_budget",
+            "label": f"Exfil army · {unit_def}",
+        })
+        take = int(count * cost)
+        spent += take
+        units += int(count)
+        remaining -= take
+    # Leftover metal under cheapest chassis → field seed bump handled by caller.
+    commerce["armyBudget"] = int(remaining)
+    if spent:
+        commerce.setdefault("ledger", []).append({
+            "op": "army_budget_spend",
+            "spent": spent,
+            "units": units,
+            "remaining": int(remaining),
+            "at": utc_now(),
+        })
+    return {"spent": spent, "units": units, "remaining": int(remaining)}
+
+
 def default_commerce_state(catalog: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     cat = catalog or {}
-    credits0 = int((cat.get("credits") or {}).get("startingBalance", 40) or 40)
+    metal_meta = cat.get("metal") or {}
+    metal0 = int(metal_meta.get("startingBalanceK", 7) or 0)
+    tnb0 = _catalog_starting_tenebrium(cat)
     return {
-        "tenebrium": 0,
-        "credits": credits0,
+        "tenebrium": tnb0,
+        "metalK": metal0,
+        "armyBudget": 0,
         "owned": {},
         "upgrades": {},
         "ledger": [],
     }
 
 
+def commerce_dest_map_id(state: Dict[str, Any], workspace: Optional[Path] = None) -> str:
+    """Best-effort destination map for shop ETA / pending deliveries."""
+    def _ok(mid: Optional[str]) -> str:
+        if not mid:
+            return ""
+        # story-engine canonical_map_id(None) returns "unknown" — treat as empty.
+        raw = str(mid).strip()
+        if not raw or raw.lower() in ("unknown", "none", "null"):
+            return ""
+        out = canonical_map_id(raw)
+        if not out or out == "unknown":
+            return ""
+        return out
+
+    for key in ("plannedMapId", "activeMapId", "sessionHomeMap"):
+        mid = _ok(state.get(key))
+        if mid:
+            return mid
+    # Hub deploy stamp / plan if present beside workspace.
+    root = Path(workspace) if workspace is not None else Path(__file__).resolve().parent.parent
+    for rel in (
+        Path("outbox") / "hub_deploy_stamp.latest.json",
+        Path("outbox") / "hub_deploy_plan.latest.json",
+    ):
+        path = root / rel
+        if not path.exists():
+            continue
+        try:
+            data = load_json(path)
+            if isinstance(data, dict):
+                mid = _ok(
+                    data.get("mapId")
+                    or data.get("deploymentMapId")
+                    or (data.get("plan") or {}).get("mapId")
+                )
+                if mid:
+                    return mid
+        except Exception:
+            continue
+    return "greenest_fields"
+
+
 def ensure_commerce(state: Dict[str, Any], workspace: Optional[Path] = None) -> Dict[str, Any]:
-    """Ensure commerce bag + seed starter loan packs (Punch of Thugs)."""
+    """Ensure commerce bag; migrate scrap→metalK; retire loans.
+
+    Buy-everything rule: do not auto-grant combat packs. ``starterOwned`` is
+    retired (Punch must be purchased). Legacy loan Punch still converts to a
+    one-salvo owned package so old saves are not soft-locked.
+    """
     catalog = load_commerce_catalog(workspace)
     commerce = state.setdefault("commerce", default_commerce_state(catalog))
     if "tenebrium" not in commerce:
-        commerce["tenebrium"] = 0
-    if "credits" not in commerce:
-        commerce["credits"] = int((catalog.get("credits") or {}).get("startingBalance", 40) or 40)
+        commerce["tenebrium"] = _catalog_starting_tenebrium(catalog)
+    # Migrate retired scrap credits → campaign metal (1km$). scrap÷10 ≈ old pack scale.
+    # Live playtest make-good (+9km$ for ~9k end metal never exported) only on scrap migrate.
+    if "metalK" not in commerce:
+        old_scrap = int(commerce.get("credits") or 0)
+        metal_meta = catalog.get("metal") or {}
+        start_k = int(metal_meta.get("startingBalanceK", 7) or 0)
+        migrated_from_scrap = "credits" in commerce
+        commerce["metalK"] = max(start_k, old_scrap // 10) if old_scrap else start_k
+        ledger = commerce.setdefault("ledger", [])
+        ledger.append({
+            "op": "migrate_scrap_to_metal",
+            "oldCredits": old_scrap,
+            "metalK": commerce["metalK"],
+            "at": utc_now(),
+        })
+        if migrated_from_scrap:
+            commerce["metalK"] = int(commerce.get("metalK") or 0) + 9
+            ledger.append({
+                "op": "metal_playtest_credit",
+                "metalK": 9,
+                "note": "Make-good for ~9k end metal lost before metalStored export",
+                "at": utc_now(),
+            })
+            flags = state.setdefault("flags", {})
+            if isinstance(flags, dict):
+                flags["metalPlaytestCreditApplied"] = True
+    commerce.pop("credits", None)
     commerce.setdefault("owned", {})
     commerce.setdefault("upgrades", {})
     commerce.setdefault("ledger", [])
+    commerce.setdefault("pendingDeliveries", [])
+    commerce.setdefault("armyBudget", 0)
     owned = commerce["owned"]
-    for lid, listing in (catalog.get("listings") or {}).items():
+    listings = catalog.get("listings") or {}
+
+    # Retire Punch-of-Thugs loan: convert to one free non-loan purchase salvo.
+    punch = owned.get("punch_of_thugs")
+    punch_listing = listings.get("punch_of_thugs") if isinstance(listings.get("punch_of_thugs"), dict) else {}
+    if isinstance(punch, dict) and (
+        punch.get("loan") or str(punch.get("kind") or "") == "loan_package"
+    ):
+        owned["punch_of_thugs"] = {
+            "qty": max(1, int(punch.get("qty") or 1)),
+            "loan": False,
+            "unitDef": punch_listing.get("unitDef") or punch.get("unitDef") or "corthud",
+            "loanCount": None,
+            "loanHealthBaseline": None,
+            "spawnHealthFracMin": punch_listing.get("spawnHealthFracMin", 0.85),
+            "spawnHealthFracMax": punch_listing.get("spawnHealthFracMax", 1.0),
+            "acquiredAtMission": int(punch.get("acquiredAtMission") or state.get("missionNumber", 1) or 1),
+            "source": "loan_retire_grant",
+            "kind": "purchase_package",
+            "count": int(punch_listing.get("count") or 7),
+            "delivery": dict(punch_listing.get("delivery") or {}),
+        }
+        commerce.setdefault("ledger", []).append({
+            "op": "loan_retire",
+            "listingId": "punch_of_thugs",
+            "note": "Punch is now a pawn-launcher purchase (7 Thugs). Prior loan converted to one free salvo.",
+            "at": utc_now(),
+        })
+
+    for lid, listing in listings.items():
         if not isinstance(listing, dict):
             continue
         if not listing.get("starterOwned"):
@@ -1881,18 +2213,23 @@ def ensure_commerce(state: Dict[str, Any], workspace: Optional[Path] = None) -> 
             "qty": 1,
             "loan": bool(listing.get("loan")),
             "unitDef": listing.get("unitDef"),
-            "loanCount": int(listing.get("count") or 0),
-            "loanHealthBaseline": round(
-                (float(listing.get("spawnHealthFracMin") or 0.4)
-                 + float(listing.get("spawnHealthFracMax") or 0.5)) * 0.5,
-                3,
+            "loanCount": int(listing.get("count") or 0) if listing.get("loan") else None,
+            "loanHealthBaseline": (
+                round(
+                    (float(listing.get("spawnHealthFracMin") or 0.4)
+                     + float(listing.get("spawnHealthFracMax") or 0.5)) * 0.5,
+                    3,
+                )
+                if listing.get("loan")
+                else None
             ),
             "spawnHealthFracMin": listing.get("spawnHealthFracMin"),
             "spawnHealthFracMax": listing.get("spawnHealthFracMax"),
             "acquiredAtMission": int(state.get("missionNumber", 1) or 1),
             "source": "starter",
-            "kind": listing.get("kind") or "loan_package",
+            "kind": listing.get("kind") or "purchase_package",
             "count": listing.get("count"),
+            "delivery": dict(listing.get("delivery") or {}),
         }
         commerce.setdefault("ledger", []).append({
             "op": "starter_grant",
@@ -1934,7 +2271,7 @@ def listing_available(
                 return False, f"hero {hid} already on the company"
         if listing_id in owned:
             return False, "contract already signed"
-    if listing.get("starterOwned") and listing_id in owned:
+    if listing.get("starterOwned") and listing.get("loan") and listing_id in owned:
         return False, "already owned (starter loan)"
     req = listing.get("requires")
     if req and req not in owned:
@@ -1950,11 +2287,11 @@ def listing_available(
     tcost = int(listing.get("tenebriumCost") or 0)
     if listing.get("builds") and tcost < 1:
         tcost = 1
-    ccost = int(listing.get("creditCost") or 0)
+    mcost = listing_metal_cost_k(listing)
     if int(commerce.get("tenebrium") or 0) < tcost:
         return False, f"need {tcost} Tenebrium (have {commerce.get('tenebrium', 0)})"
-    if int(commerce.get("credits") or 0) < ccost:
-        return False, f"need {ccost} scrap credits (have {commerce.get('credits', 0)})"
+    if int(commerce.get("metalK") or 0) < mcost:
+        return False, f"need {mcost}×1km$ metal (have {commerce.get('metalK', 0)})"
     return True, "ok"
 
 
@@ -1975,9 +2312,9 @@ def purchase_listing(
     tcost = int(listing.get("tenebriumCost") or 0)
     if listing.get("builds") and tcost < 1:
         tcost = 1
-    ccost = int(listing.get("creditCost") or 0)
+    mcost = listing_metal_cost_k(listing)
     commerce["tenebrium"] = int(commerce.get("tenebrium") or 0) - tcost
-    commerce["credits"] = int(commerce.get("credits") or 0) - ccost
+    commerce["metalK"] = int(commerce.get("metalK") or 0) - mcost
     kind = str(listing.get("kind") or "purchase_package")
     if kind == "hero_contract":
         roster = ensure_roster(state)
@@ -2041,6 +2378,14 @@ def purchase_listing(
     else:
         prev = (commerce.get("owned") or {}).get(listing_id) or {}
         qty = int(prev.get("qty") or 0) + 1 if kind == "purchase_package" else 1
+        delivery = resolve_listing_delivery(listing, listing_id, workspace)
+        dest = commerce_dest_map_id(state, workspace)
+        eta = delivery_eta(
+            listing=listing,
+            listing_id=listing_id,
+            dest_map_id=dest,
+            workspace=workspace,
+        )
         commerce.setdefault("owned", {})[listing_id] = {
             "qty": qty,
             "loan": bool(listing.get("loan")),
@@ -2066,32 +2411,75 @@ def purchase_listing(
             "count": listing.get("count"),
             "spawnHealthFracMin": listing.get("spawnHealthFracMin"),
             "spawnHealthFracMax": listing.get("spawnHealthFracMax"),
+            "delivery": delivery,
+            "lastEta": {
+                "etaSeconds": eta.get("etaSeconds"),
+                "etaText": eta.get("etaText"),
+                "summary": eta.get("summary"),
+                "destMapId": eta.get("destMapId"),
+            },
         }
+        # Deferred combat packs become pending deliveries (arrive mid-sortie).
+        if kind == "purchase_package" and delivery.get("deferred"):
+            pending = make_pending_delivery(
+                listing_id=listing_id,
+                listing=listing,
+                dest_map_id=dest,
+                qty=1,
+                workspace=workspace,
+                mission_number=int(state.get("missionNumber", 1) or 1),
+            )
+            if pending:
+                # Unique id per purchase event.
+                pending["id"] = f"pd_{listing_id}_{int(state.get('missionNumber', 1) or 1)}_{qty}_{len(commerce.get('pendingDeliveries') or [])}"
+                commerce.setdefault("pendingDeliveries", []).append(pending)
     commerce.setdefault("ledger", []).append({
         "op": "purchase",
         "listingId": listing_id,
         "tenebriumCost": tcost,
-        "creditCost": ccost,
+        "metalCostK": mcost,
         "at": utc_now(),
         "missionNumber": int(state.get("missionNumber", 1) or 1),
     })
-    return {
+    receipt = {
         "ok": True,
         "listingId": listing_id,
         "tenebriumCost": tcost,
-        "creditCost": ccost,
+        "metalCostK": mcost,
         "tenebriumLeft": commerce["tenebrium"],
-        "creditsLeft": commerce["credits"],
+        "metalKLeft": commerce["metalK"],
     }
+    if kind == "purchase_package":
+        eta = delivery_eta(
+            listing=listing,
+            listing_id=listing_id,
+            dest_map_id=commerce_dest_map_id(state, workspace),
+            workspace=workspace,
+        )
+        receipt["delivery"] = {
+            "mode": eta.get("mode"),
+            "etaSeconds": eta.get("etaSeconds"),
+            "etaText": eta.get("etaText"),
+            "summary": eta.get("summary"),
+            "sourceLabel": eta.get("sourceLabel"),
+            "routeLabels": eta.get("routeLabels"),
+            "deferred": bool(eta.get("deferred")),
+        }
+    return receipt
 
 
 def build_commerce_intent(state: Dict[str, Any], workspace: Optional[Path] = None) -> Dict[str, Any]:
-    """Serialize commerce bag + shop shelf + deploy specs for the mission compiler."""
+    """Serialize commerce bag + shop shelf + deploy specs for the mission compiler.
+
+    map_web packs go to pendingDeliveries (mid-sortie arrival).
+    pawn_launcher / constructors / fabs go to deploy (t=0 kit).
+    """
     catalog = load_commerce_catalog(workspace)
     commerce = ensure_commerce(state, workspace)
     listings = catalog.get("listings") or {}
     owned = commerce.get("owned") or {}
     upgrades = commerce.get("upgrades") or {}
+    dest = commerce_dest_map_id(state, workspace)
     shop: List[Dict[str, Any]] = []
     for lid, listing in listings.items():
         if not isinstance(listing, dict):
@@ -2100,28 +2488,58 @@ def build_commerce_intent(state: Dict[str, Any], workspace: Optional[Path] = Non
         tcost = int(listing.get("tenebriumCost") or 0)
         if listing.get("builds") and tcost < 1:
             tcost = 1
+        eta = delivery_eta(
+            listing=listing,
+            listing_id=lid,
+            dest_map_id=dest,
+            workspace=workspace,
+        )
         shop.append({
             "id": lid,
             "label": listing.get("label") or lid,
             "blurb": listing.get("blurb") or "",
             "kind": listing.get("kind"),
             "tenebriumCost": tcost,
-            "creditCost": int(listing.get("creditCost") or 0),
+            "metalCostK": listing_metal_cost_k(listing),
             "builds": bool(listing.get("builds")),
             "available": ok,
             "blockedReason": None if ok else reason,
             "repMin": listing.get("repMin") or {},
             "arcMin": int(listing.get("arcMin") or 1),
             "tags": list(listing.get("tags") or []),
+            "count": listing.get("count") or listing.get("seedCount"),
+            "delivery": {
+                "mode": eta.get("mode"),
+                "deferred": bool(eta.get("deferred")),
+                "sourceLabel": eta.get("sourceLabel"),
+                "sourceBlurb": eta.get("sourceBlurb"),
+                "etaSeconds": eta.get("etaSeconds"),
+                "etaText": eta.get("etaText"),
+                "summary": eta.get("summary"),
+                "routeLabels": eta.get("routeLabels"),
+                "travelMinutes": eta.get("travelMinutes"),
+                "landNear": eta.get("landNear"),
+            },
         })
     deploy: List[Dict[str, Any]] = []
+    pending: List[Dict[str, Any]] = []
+    # Carry explicit pending queue first.
+    for item in commerce.get("pendingDeliveries") or []:
+        if isinstance(item, dict) and str(item.get("status") or "in_transit") == "in_transit":
+            pending.append(copy.deepcopy(item))
+
+    pending_listing_ids = {str(p.get("listingId")) for p in pending}
+
     for lid, rec in owned.items():
         if not isinstance(rec, dict):
             continue
         listing = listings.get(lid) or {}
         kind = str(rec.get("kind") or listing.get("kind") or "purchase_package")
+        delivery = resolve_listing_delivery(listing, lid, workspace)
+        deferred = bool(delivery.get("deferred")) and kind == "purchase_package"
+
         if kind in ("loan_package", "purchase_package") or (
-            listing.get("unitDef") and kind not in ("unit_printer", "constructor")
+            listing.get("unitDef") and kind not in ("unit_printer", "constructor", "hero_contract")
         ):
             unit_def = rec.get("unitDef") or listing.get("unitDef")
             count = int(rec.get("loanCount") or rec.get("count") or listing.get("count") or 0)
@@ -2132,18 +2550,42 @@ def build_commerce_intent(state: Dict[str, Any], workspace: Optional[Path] = Non
                 hmin = float(rec.get("spawnHealthFracMin") or listing.get("spawnHealthFracMin") or 1.0)
                 hmax = float(rec.get("spawnHealthFracMax") or listing.get("spawnHealthFracMax") or 1.0)
                 hfrac = round((hmin + hmax) * 0.5, 3)
-                deploy.append({
-                    "listingId": lid,
-                    "kind": "package",
-                    "unitDef": unit_def,
-                    "count": count,
-                    "healthFrac": hfrac,
-                    "healthFracMin": hmin,
-                    "healthFracMax": hmax,
-                    "loan": bool(rec.get("loan") or listing.get("loan")),
-                    "packageTag": lid,
-                    "label": listing.get("label") or lid,
-                })
+                if deferred:
+                    # Synthesize pending from owned if purchase did not queue yet
+                    # (e.g. migrated crash/punch from older saves).
+                    if lid not in pending_listing_ids:
+                        syn = make_pending_delivery(
+                            listing_id=lid,
+                            listing=listing or {
+                                "unitDef": unit_def,
+                                "count": int(listing.get("count") or count // max(1, qty)),
+                                "spawnHealthFracMin": hmin,
+                                "spawnHealthFracMax": hmax,
+                                "label": listing.get("label") or lid,
+                                "delivery": delivery,
+                            },
+                            dest_map_id=dest,
+                            qty=qty,
+                            workspace=workspace,
+                            mission_number=int(state.get("missionNumber", 1) or 1),
+                        )
+                        if syn:
+                            syn["count"] = count
+                            pending.append(syn)
+                            pending_listing_ids.add(lid)
+                else:
+                    deploy.append({
+                        "listingId": lid,
+                        "kind": "package",
+                        "unitDef": unit_def,
+                        "count": count,
+                        "healthFrac": hfrac,
+                        "healthFracMin": hmin,
+                        "healthFracMax": hmax,
+                        "loan": bool(rec.get("loan") or listing.get("loan")),
+                        "packageTag": lid,
+                        "label": listing.get("label") or lid,
+                    })
         if kind == "unit_printer" or listing.get("factoryDef"):
             metal = float(rec.get("metalIncome") or listing.get("metalIncome") or 8)
             energy = float(rec.get("energyIncome") or listing.get("energyIncome") or 40)
@@ -2191,23 +2633,76 @@ def build_commerce_intent(state: Dict[str, Any], workspace: Optional[Path] = Non
                     "label": listing.get("label") or lid,
                 })
     access = bp_access(state)
+    # Keep bag queue aligned with what the compiler will seed.
+    commerce["pendingDeliveries"] = copy.deepcopy(pending)
+    # Preview escorts from armyBudget without consuming — commit_deploy spends once.
+    army_budget = int(commerce.get("armyBudget") or 0)
+    army_preview: List[Dict[str, Any]] = []
+    if army_budget > 0:
+        preview_bag = {"armyBudget": army_budget, "ledger": []}
+        spend_army_budget_into_deploy(preview_bag, army_preview)
+        for row in army_preview:
+            deploy.append(copy.deepcopy(row))
+    metal_meta = catalog.get("metal") or {}
+    # Operating allotment only — campaign metalK stays home and export ADDs.
+    field_start_k = int(metal_meta.get("fieldStartMetalK") or 1)
+    if field_start_k < 0:
+        field_start_k = 0
+    leftover_preview = max(0, army_budget - sum(
+        int(r.get("count") or 0) * next(
+            (c for d, c, _cap in ARMY_BUDGET_ESCORTS if d == r.get("unitDef")),
+            0,
+        )
+        for r in army_preview
+    ))
+    unit_metal = int(metal_meta.get("unitMetal") or METAL_UNIT or 1000)
+    if leftover_preview >= unit_metal:
+        field_start_k += leftover_preview // unit_metal
+    field_start_e = int(metal_meta.get("fieldStartEnergy") or 3000)
+    if field_start_e < 0:
+        field_start_e = 0
     return {
         "tenebrium": int(commerce.get("tenebrium") or 0),
-        "credits": int(commerce.get("credits") or 0),
+        "metalK": int(commerce.get("metalK") or 0),
+        "armyBudget": army_budget,
+        "armyBudgetUnits": sum(int(r.get("count") or 0) for r in army_preview),
+        # Explicit: bag does not enter BAR; gadget reads these for field seed.
+        "metalKBrought": 0,
+        "fieldStartMetalK": field_start_k,
+        "metalKFieldStart": field_start_k,
+        "fieldStartEnergy": field_start_e,
         "resourceLabel": ((catalog.get("resource") or {}).get("label") or "Tenebrium"),
+        "metalLabel": metal_meta.get("label") or "Metal",
+        "metalShortLabel": metal_meta.get("shortLabel") or "1km$",
+        "metalUnit": int(metal_meta.get("unitMetal") or METAL_UNIT),
         "buildFloor": int((catalog.get("resource") or {}).get("buildFloor") or 1),
         "bpAccess": access,
         "owned": copy.deepcopy(owned),
         "upgrades": copy.deepcopy(upgrades),
         "shop": shop,
         "deploy": deploy,
+        "pendingDeliveries": pending,
+        "destMapId": dest,
         "arc": commerce_arc_number(state),
         "notes": (
             "Tenebrium is black-hole metal (scarce since the Generic Disaster). "
             "Anything that builds costs ≥1. Concurrent BP ceiling = 150 × access Tnb. "
-            "Ashwalkers/Null Mercs start at 0."
+            "Campaign metal bag stays home; sortie export floor(endMetal/1000) ADDS "
+            "to faction 1km$ (fieldStart netted out). Living Tnb build-stakes refund on exfil. "
+            "Combat packs ship via map-web / pawn launcher with field ETAs."
         ),
     }
+
+
+def _is_hv_unit_def(def_name: str, *, adjacent: bool = False) -> bool:
+    n = str(def_name or "").lower()
+    if not n:
+        return False
+    if any(tok in n for tok in ("fus", "fusion", "afus", "cafus")):
+        return True
+    if adjacent and any(tok in n for tok in ("beamer", "annihilator", "cordoom")):
+        return True
+    return False
 
 
 def apply_shell_scars(state: Dict[str, Any], result: Dict[str, Any], map_id: str) -> Dict[str, Any]:
@@ -2230,12 +2725,15 @@ def apply_shell_scars(state: Dict[str, Any], result: Dict[str, Any], map_id: str
     for item in incoming:
         if not isinstance(item, dict):
             continue
+        defn = item.get("unitDefName")
+        hv = bool(item.get("highValue")) or _is_hv_unit_def(str(defn or ""), adjacent=True)
         rec = {
             "zoneId": item.get("zoneId") or target,
             "pocketId": item.get("pocketId"),
-            "unitDefName": item.get("unitDefName"),
+            "unitDefName": defn,
             "destroyed": bool(item.get("destroyed", True)),
             "damageFrac": float(item.get("damageFrac") or 1.0),
+            "highValue": hv,
             "at": utc_now(),
             "resultKey": result.get("resultKey"),
         }
@@ -2257,6 +2755,310 @@ def apply_shell_scars(state: Dict[str, Any], result: Dict[str, Any], map_id: str
         bucket["units"] = bucket["units"][-300:]
     bucket["updatedAt"] = utc_now()
     return {"applied": applied, "mapId": mid}
+
+
+_CENTER_SNAP_OFFSETS = (0.007, 0.021)
+_CENTER_SNAP_TOL = 0.002
+
+
+def _authored_map_size(map_id: str) -> Optional[Tuple[float, float]]:
+    """Spring elmo size of an authored map, or None when the baseline is missing."""
+    path = (
+        Path(__file__).resolve().parents[1]
+        / "data"
+        / "scenarios"
+        / "authored"
+        / f"{map_id}.authored_baseline.json"
+    )
+    if not path.is_file():
+        return None
+    try:
+        data = json.loads(path.read_text(encoding="utf-8-sig"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    mp = data.get("map") if isinstance(data, dict) else None
+    if not isinstance(mp, dict):
+        return None
+    try:
+        sx = float(mp.get("sizeX") or 0)
+        sz = float(mp.get("sizeZ") or 0)
+    except (TypeError, ValueError):
+        return None
+    if sx < 512 or sz < 512:
+        return None
+    return sx, sz
+
+
+def _center_snap_hit(v: float, size: float) -> bool:
+    if size < 512 or v < 1.5:
+        return False
+    d = abs(v / size - 0.5)
+    return any(abs(d - off) < _CENTER_SNAP_TOL for off in _CENTER_SNAP_OFFSETS)
+
+
+def _is_center_snap_artifact(x: float, z: float, size: Optional[Tuple[float, float]]) -> bool:
+    """True when both axes sit on the old four-point map-center lattice.
+
+    shellCoord used to treat elmos as broken normalized coords and park every
+    pad on 0.5 ± 0.007 and ± 0.021. Those points are not where the player built.
+    """
+    if not size:
+        return False
+    return _center_snap_hit(x, size[0]) and _center_snap_hit(z, size[1])
+
+
+def apply_player_footprint(state: Dict[str, Any], result: Dict[str, Any], map_id: str) -> Dict[str, Any]:
+    """Persist player-built structures so the next Drop rehydrates them.
+
+    Living-shell occupation stays on the scar/heldInstall path. This is the
+    single concrete SoT for company-built pads (labs, solars, LLTs, factories).
+    Last extract wins per map — no merge with approximate baseSnapshot counts.
+
+    Absent key = keep prior bag (truncated/legacy results must not wipe pads).
+    Explicit [] = intentional clear.
+    Units parked on the old map-center lattice (0.5 ± 0.007 / ± 0.021 on both
+    axes) are a teleport artifact. A result that contains any of those points
+    keeps this map's real pads and drops the lattice, instead of last-extract
+    wins. A clean result still replaces the bag.
+    """
+    mid = canonical_map_id(map_id)
+    if not mid:
+        return {"kept": 0}
+    footprints = state.setdefault("playerFootprints", {})
+    has_key = ("playerFootprint" in result) or ("zoneFootprint" in result)
+    if not has_key:
+        prior = ((footprints.get(mid) or {}).get("units") or [])
+        return {"kept": len(prior) if isinstance(prior, list) else 0, "skipped": "absent", "mapId": mid}
+    incoming = result.get("playerFootprint")
+    if not isinstance(incoming, list):
+        incoming = result.get("zoneFootprint") if isinstance(result.get("zoneFootprint"), list) else []
+    units: List[Dict[str, Any]] = []
+    for item in incoming:
+        if not isinstance(item, dict):
+            continue
+        defn = str(item.get("unitDefName") or item.get("def") or "").strip()
+        if not defn:
+            continue
+        try:
+            x = float(item.get("x") or 0)
+            z = float(item.get("z") or 0)
+        except (TypeError, ValueError):
+            continue
+        try:
+            facing = int(item.get("facing") or 0)
+        except (TypeError, ValueError):
+            facing = 0
+        try:
+            hp = float(item.get("hpFrac") or 1.0)
+        except (TypeError, ValueError):
+            hp = 1.0
+        units.append({
+            "unitDefName": defn,
+            "x": x,
+            "z": z,
+            "facing": facing,
+            "hpFrac": max(0.05, min(1.0, hp)),
+            "zoneId": str(item.get("zoneId") or result.get("deploymentZoneId") or ""),
+            "owner": "player",
+            "role": str(item.get("role") or "player_footprint"),
+        })
+        if len(units) >= 64:
+            break
+    size = _authored_map_size(mid)
+    prior_bag = footprints.get(mid) if isinstance(footprints.get(mid), dict) else {}
+    prior_units = prior_bag.get("units") if isinstance(prior_bag.get("units"), list) else []
+
+    def _without_lattice(rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        kept_rows: List[Dict[str, Any]] = []
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+            try:
+                rx = float(row.get("x") or 0)
+                rz = float(row.get("z") or 0)
+            except (TypeError, ValueError):
+                continue
+            if _is_center_snap_artifact(rx, rz, size):
+                continue
+            kept_rows.append(row)
+        return kept_rows
+
+    lattice_hits = sum(
+        1
+        for row in units
+        if _is_center_snap_artifact(float(row["x"]), float(row["z"]), size)
+    )
+    # A center-snap extract is the teleported pile. Keep the pads that were
+    # actually built on this map, and do not let an all-lattice list wipe them.
+    # A clean extract (no lattice signature) still replaces the bag, so
+    # buildings the player destroyed stay gone.
+    if lattice_hits:
+        merged = _without_lattice(prior_units)
+        for row in _without_lattice(units):
+            defn = str(row.get("unitDefName") or "")
+            rx = float(row["x"])
+            rz = float(row["z"])
+            duplicate = False
+            for old in merged:
+                if str(old.get("unitDefName") or "") != defn:
+                    continue
+                try:
+                    ox = float(old.get("x") or 0)
+                    oz = float(old.get("z") or 0)
+                except (TypeError, ValueError):
+                    continue
+                if abs(ox - rx) <= 80 and abs(oz - rz) <= 80:
+                    duplicate = True
+                    break
+            if not duplicate:
+                merged.append(row)
+        if not merged and prior_units:
+            return {
+                "kept": len(prior_units),
+                "skipped": "center_snap_kept_prior",
+                "latticeHits": lattice_hits,
+                "mapId": mid,
+            }
+        units = merged[:64]
+    footprints[mid] = {
+        "mapId": mid,
+        "updatedAt": utc_now(),
+        "resultKey": result.get("resultKey"),
+        "deploymentZoneId": result.get("deploymentZoneId"),
+        "units": units,
+    }
+    report: Dict[str, Any] = {"kept": len(units), "mapId": mid}
+    if lattice_hits:
+        report["latticeHits"] = lattice_hits
+        report["merged"] = True
+    return report
+
+
+def apply_surviving_installs(state: Dict[str, Any], result: Dict[str, Any], map_id: str) -> Dict[str, Any]:
+    """Persist standing fusion vaults so they remain when the player returns.
+
+    Contested vaults stay enemy-owned. Player-owned / held vaults schedule a
+    defend threat — aggression that would wipe the pad becomes a defend sortie
+    instead of a silent offscreen delete.
+    """
+    mid = canonical_map_id(map_id)
+    if not mid:
+        return {"kept": 0}
+    incoming = result.get("survivingInstalls") or result.get("survivingInstallations") or []
+    if not isinstance(incoming, list):
+        incoming = []
+    held = state.setdefault("heldInstallations", {})
+    map_held = held.setdefault(mid, {})
+    if not isinstance(map_held, dict):
+        map_held = {}
+        held[mid] = map_held
+    kept = 0
+    threats = 0
+    standing_pockets = set()
+    for item in incoming:
+        if not isinstance(item, dict):
+            continue
+        pocket = str(item.get("pocketId") or "")
+        if not pocket:
+            continue
+        standing_pockets.add(pocket)
+        owner = str(item.get("owner") or "enemy")
+        zone = str(item.get("zoneId") or "")
+        # Zone flip this sortie upgrades contested prize → company held.
+        flipped = bool(result.get("zoneFlipped"))
+        target = str(result.get("targetZoneId") or "")
+        if flipped and zone and zone == target:
+            owner = "player"
+        rec = {
+            "pocketId": pocket,
+            "zoneId": zone,
+            "installationId": str(item.get("installationId") or f"{mid}::{pocket}"),
+            "owner": owner,
+            "status": "standing",
+            "highValue": True,
+            "units": item.get("units") if isinstance(item.get("units"), list) else [],
+            "updatedAt": utc_now(),
+            "resultKey": result.get("resultKey"),
+        }
+        if owner == "player":
+            # Justified aggression: next hub pass can offer defend_install.
+            pending = state.setdefault("pendingDefendThreats", {})
+            map_threats = pending.setdefault(mid, {})
+            if not isinstance(map_threats, dict):
+                map_threats = {}
+                pending[mid] = map_threats
+            map_threats[pocket] = {
+                "pocketId": pocket,
+                "zoneId": zone,
+                "installationId": rec["installationId"],
+                "reason": "territory_aggression",
+                "scheduledAt": utc_now(),
+                "severity": "defend_install",
+            }
+            threats += 1
+        map_held[pocket] = rec
+        kept += 1
+    # Mark held installs absent from this snapshot as destroyed if we fought
+    # their zone hard (scar ledger killed the vault).
+    scars = ((state.get("shellScars") or {}).get(mid) or {}).get("units") or []
+    dead_hv: set[str] = set()
+    adjacent_hits: Dict[str, int] = {}
+    for s in scars:
+        if not isinstance(s, dict) or not s.get("destroyed"):
+            continue
+        defn = str(s.get("unitDefName") or "")
+        pid = str(s.get("pocketId") or "")
+        if not pid:
+            continue
+        if _is_hv_unit_def(defn, adjacent=False) or s.get("highValue"):
+            if _is_hv_unit_def(defn, adjacent=False):
+                dead_hv.add(pid)
+            else:
+                adjacent_hits[pid] = adjacent_hits.get(pid, 0) + 1
+        elif _is_hv_unit_def(defn, adjacent=True):
+            adjacent_hits[pid] = adjacent_hits.get(pid, 0) + 1
+    for pid, hits in adjacent_hits.items():
+        if hits >= 3:
+            dead_hv.add(pid)
+    # Completed bonus_fus_* secondaries are hard vault-death witnesses.
+    secs = result.get("secondaryResults") or []
+    if isinstance(secs, list):
+        for sr in secs:
+            if not isinstance(sr, dict):
+                continue
+            sid = str(sr.get("id") or sr.get("objectiveId") or "")
+            if not sid.startswith("bonus_fus_"):
+                continue
+            done = bool(sr.get("completed")) or int(sr.get("destroyed") or sr.get("destroyedCount") or 0) > 0
+            if not done:
+                continue
+            pid = str(sr.get("pocketId") or sid.replace("bonus_fus_", "", 1))
+            if pid:
+                dead_hv.add(pid)
+    for pid in dead_hv:
+        rec = map_held.get(pid) if isinstance(map_held.get(pid), dict) else {
+            "pocketId": pid,
+            "zoneId": "",
+            "installationId": f"{mid}::{pid}",
+            "owner": "enemy",
+            "highValue": True,
+        }
+        rec["status"] = "destroyed"
+        rec["destroyedAt"] = utc_now()
+        rec["highValue"] = True
+        map_held[pid] = rec
+        pending = (state.get("pendingDefendThreats") or {}).get(mid) or {}
+        if isinstance(pending, dict):
+            pending.pop(pid, None)
+    for pid, rec in list(map_held.items()):
+        if not isinstance(rec, dict):
+            continue
+        if pid in dead_hv:
+            continue
+        if pid not in standing_pockets and str(rec.get("status") or "") == "standing":
+            # Still believed standing if we simply weren't on that pad this sortie.
+            pass
+    return {"kept": kept, "threats": threats, "mapId": mid, "destroyedHv": sorted(dead_hv)}
 
 
 def apply_abstract_regrow(state: Dict[str, Any], map_id: str, elapsed_minutes: float) -> Dict[str, Any]:
@@ -2688,7 +3490,7 @@ def settle_commerce_after_sortie(
     zone_flipped: bool,
     workspace: Optional[Path] = None,
 ) -> Dict[str, Any]:
-    """Award Tenebrium/credits; settle loan packages (return in better shape)."""
+    """Award Tenebrium + bank end-metal as 1km$; settle loan packages."""
     catalog = load_commerce_catalog(workspace)
     commerce = ensure_commerce(state, workspace)
     ensure_faction_banks(state)
@@ -2702,7 +3504,7 @@ def settle_commerce_after_sortie(
         return int(h[:8], 16) / float(0xFFFFFFFF)
 
     gained_t = 0
-    gained_c = 0
+    gained_k = 0
     notes: List[str] = []
 
     def _award_range(spec: Any, tag: str) -> int:
@@ -2737,7 +3539,6 @@ def settle_commerce_after_sortie(
     if success:
         if free_tnb:
             gained_t += _award_range(rewards.get("tenebriumOnVictory") or {}, "tv")
-        gained_c += _award_range(rewards.get("creditsOnVictory") or {"min": 15, "max": 40}, "cv")
     # Zone flip: catalog default chance=0; hard-block when free mint disallowed.
     if zone_flipped and free_tnb:
         flip_t = _award_range(rewards.get("tenebriumOnZoneFlip") or {"min": 0, "max": 0, "chance": 0}, "tz")
@@ -2749,7 +3550,36 @@ def settle_commerce_after_sortie(
     if not free_tnb:
         notes.append("node claim: no free Tnb mint (reclaim bank only)")
 
-    # WO-043c: end-of-sortie bank is authoritative liquid stock (reclaim − spend).
+    # Campaign metal export: floor(end stockpile / 1000). Prefer metalKExtracted.
+    # Bag stays HOME — export ADDS to faction totals (never replaces the bag).
+    metal_unit = int(((catalog.get("metal") or {}).get("unitMetal")) or METAL_UNIT)
+    try:
+        metal_stored = float(result.get("metalStored"))
+    except (TypeError, ValueError):
+        metal_stored = -1.0
+    try:
+        metal_k_field = int(float(result.get("metalKExtracted")))
+    except (TypeError, ValueError):
+        metal_k_field = -1
+    if metal_k_field >= 0:
+        raw_export_k = metal_k_field
+    elif metal_stored >= 0:
+        raw_export_k = int(math.floor(metal_stored / float(metal_unit)))
+    else:
+        raw_export_k = 0
+    try:
+        metal_k_brought = int(float(result.get("metalKBrought")))
+    except (TypeError, ValueError):
+        metal_k_brought = -1  # unknown / legacy result
+    try:
+        metal_k_field_start = int(float(result.get("metalKFieldStart") or 0))
+    except (TypeError, ValueError):
+        metal_k_field_start = 0
+    if metal_k_field_start < 0:
+        metal_k_field_start = 0
+
+    # WO-043c: end-of-sortie bank is authoritative liquid stock.
+    # Lua refunds living build-stakes into bank on exfil before writing this.
     try:
         loot_field = int(float(result.get("tenebriumLooted") or 0))
     except (TypeError, ValueError):
@@ -2766,9 +3596,13 @@ def settle_commerce_after_sortie(
         lost_field = int(float(result.get("tenebriumLost") or 0))
     except (TypeError, ValueError):
         lost_field = 0
+    try:
+        living_stakes = int(float(result.get("tenebriumLivingStakes") or result.get("tenebriumInvested") or 0))
+    except (TypeError, ValueError):
+        living_stakes = 0
 
     if bank_end >= 0:
-        # Live bank is authoritative for field stock; sortie awards stack on top.
+        # Live bank (incl. exfil stake refund) is authoritative; awards stack on top.
         prev = int(commerce.get("tenebrium") or 0)
         award_extra = gained_t  # victory / flip / extract rolls already in gained_t
         commerce["tenebrium"] = bank_end + award_extra
@@ -2778,8 +3612,10 @@ def settle_commerce_after_sortie(
             notes.append(f"+{award_extra} Tenebrium (sortie awards)")
         if loot_field:
             notes.append(f"reclaimed {loot_field} Tnb from wrecks/shards")
+        if living_stakes:
+            notes.append(f"exfil refunded {living_stakes} Tnb from living builds")
         if spent_field:
-            notes.append(f"spent {spent_field} Tnb on build-power units")
+            notes.append(f"spent {spent_field} Tnb on build-power units (net after exfil refund)")
         if lost_field:
             notes.append(f"lost {lost_field} Tnb (wrecks vaporized)")
         gained_t = award_extra + max(0, bank_end - prev)
@@ -2787,15 +3623,62 @@ def settle_commerce_after_sortie(
         if loot_field > 0:
             gained_t += loot_field
             notes.append(f"+{loot_field} Tenebrium (reclaim loot)")
+        if living_stakes > 0:
+            gained_t += living_stakes
+            notes.append(f"+{living_stakes} Tenebrium (exfil living-stake refund)")
         commerce["tenebrium"] = int(commerce.get("tenebrium") or 0) + gained_t
-        if gained_t and loot_field <= 0:
+        if gained_t and loot_field <= 0 and living_stakes <= 0:
             notes.append(f"+{gained_t} Tenebrium")
-        elif gained_t and loot_field > 0 and gained_t > loot_field:
-            notes.append(f"+{gained_t - loot_field} Tenebrium (sortie awards)")
+        elif gained_t and (loot_field > 0 or living_stakes > 0) and gained_t > (loot_field + living_stakes):
+            notes.append(f"+{gained_t - loot_field - living_stakes} Tenebrium (sortie awards)")
 
-    commerce["credits"] = int(commerce.get("credits") or 0) + gained_c
-    if gained_c:
-        notes.append(f"+{gained_c} scrap credits")
+    # Metal: ADD export to faction bag. Never replace.
+    # - New path (metalKBrought==0): bag stayed home; ADD max(0, export - fieldStart).
+    # - Legacy path (metalKBrought>0): bag was dumped onto map; ADD net delta
+    #   (export - brought) so spending bag metal still reduces the bag.
+    prev_metal_k = int(commerce.get("metalK") or 0)
+    if metal_k_field >= 0 or metal_stored >= 0 or raw_export_k:
+        if metal_k_brought > 0:
+            delta_k = int(raw_export_k) - metal_k_brought
+            commerce["metalK"] = max(0, prev_metal_k + delta_k)
+            mode = "legacy_delta"
+        else:
+            # Net out operating field seed so unused allotment does not inflate bag.
+            export_k = max(0, int(raw_export_k) - metal_k_field_start)
+            delta_k = export_k
+            commerce["metalK"] = prev_metal_k + export_k
+            mode = "add"
+        if delta_k != 0:
+            sign = "+" if delta_k > 0 else ""
+            notes.append(
+                f"{sign}{delta_k}×1km$ metal ({mode}; export={raw_export_k} "
+                f"fieldStart={metal_k_field_start} brought={metal_k_brought if metal_k_brought >= 0 else '?'}; "
+                f"bag {prev_metal_k}→{commerce['metalK']})"
+            )
+            commerce.setdefault("ledger", []).append({
+                "op": "metal_export_add" if mode == "add" else "metal_field_settle",
+                "metalK": commerce["metalK"],
+                "prevMetalK": prev_metal_k,
+                "metalKExtracted": int(raw_export_k),
+                "metalKFieldStart": metal_k_field_start,
+                "metalKBrought": metal_k_brought if metal_k_brought >= 0 else None,
+                "metalStored": int(metal_stored) if metal_stored >= 0 else None,
+                "deltaK": delta_k,
+                "mode": mode,
+                "at": utc_now(),
+            })
+        gained_k = delta_k
+    elif raw_export_k:
+        commerce["metalK"] = prev_metal_k + raw_export_k
+        notes.append(f"+{raw_export_k}×1km$ metal (end stock {int(metal_stored) if metal_stored >= 0 else '?'})")
+        commerce.setdefault("ledger", []).append({
+            "op": "metal_bank",
+            "metalK": raw_export_k,
+            "metalStored": metal_stored if metal_stored >= 0 else None,
+            "at": utc_now(),
+            "missionNumber": int(state.get("missionNumber", 1) or 1),
+        })
+        gained_k = raw_export_k
     # Persistent world flag: Armada Tenebrium crisis (spent on decoy farms).
     state.setdefault("worldFlags", {})["armadaTenebriumCrisis"] = True
     if result.get("armadaTenebriumCrisis") is False:
@@ -2830,9 +3713,13 @@ def settle_commerce_after_sortie(
         returned_well = success and count_ok and quality_ok
         if returned_well:
             bonus = rewards.get("loanReturnBonus") or {}
-            c_bonus = int(bonus.get("credits") or 0)
+            k_bonus = int(bonus.get("metalK") if bonus.get("metalK") is not None else bonus.get("credits") or 0)
+            # Legacy scrap tip (±25) → clamp to ±1 km$ if still using credits key.
+            if bonus.get("metalK") is None and abs(k_bonus) > 5:
+                k_bonus = 1 if k_bonus > 0 else -1
             r_bonus = float(bonus.get("nullmercRep") or 0)
-            commerce["credits"] = int(commerce.get("credits") or 0) + c_bonus
+            commerce["metalK"] = int(commerce.get("metalK") or 0) + k_bonus
+            gained_k += k_bonus
             if r_bonus:
                 rep["nullmercs"] = round(float(rep.get("nullmercs") or 0) + r_bonus, 2)
             if float(bonus.get("tenebriumChance") or 0) > 0 and _roll(f"loan:{lid}") < float(bonus["tenebriumChance"]):
@@ -2853,15 +3740,18 @@ def settle_commerce_after_sortie(
             pen = rewards.get("loanBreachPenalty") or {}
             # Soft quality miss: half penalty if count ok but still smoking.
             soft = success and count_ok and not quality_ok
-            c_pen = int(pen.get("credits") or 0)
+            k_pen = int(pen.get("metalK") if pen.get("metalK") is not None else pen.get("credits") or 0)
+            if pen.get("metalK") is None and abs(k_pen) > 5:
+                k_pen = -1 if k_pen < 0 else 1
             r_pen = float(pen.get("nullmercRep") or 0)
             if soft:
-                c_pen = int(math.floor(c_pen * 0.5))
+                k_pen = int(math.floor(k_pen * 0.5)) if k_pen else 0
                 r_pen = r_pen * 0.5
                 notes.append(f"loan {lid}: quality miss ({alive}/{loan_n}, avgHp={avg_hp})")
             else:
                 notes.append(f"loan {lid}: breach ({alive}/{loan_n} returned)")
-            commerce["credits"] = int(commerce.get("credits") or 0) + c_pen
+            commerce["metalK"] = max(0, int(commerce.get("metalK") or 0) + k_pen)
+            gained_k += k_pen
             if r_pen:
                 rep["nullmercs"] = round(float(rep.get("nullmercs") or 0) + r_pen, 2)
             commerce.setdefault("ledger", []).append({
@@ -2876,7 +3766,7 @@ def settle_commerce_after_sortie(
     commerce.setdefault("ledger", []).append({
         "op": "sortie_settle",
         "tenebriumGained": gained_t,
-        "creditsGained": gained_c,
+        "metalKGained": gained_k,
         "success": success,
         "zoneFlipped": zone_flipped,
         "at": utc_now(),
@@ -2884,15 +3774,25 @@ def settle_commerce_after_sortie(
     })
     if len(commerce.get("ledger") or []) > 80:
         commerce["ledger"] = commerce["ledger"][-60:]
+    # Cross-map army carry: bank living mobile armyValue into armyBudget.
+    army_bank = apply_army_budget_from_result(state, result, workspace=workspace)
+    if army_bank.get("gained"):
+        notes.append(
+            f"+{army_bank['gained']} army bank (field armyValue={army_bank.get('armyValue', 0)}; "
+            f"bag={army_bank.get('armyBudget', 0)})"
+        )
+
     # Keep faction bank mirror for null/ash in sync with commerce bag.
     banks = ensure_faction_banks(state)
     banks["nullmercs"] = int(commerce.get("tenebrium") or 0)
     banks["ashwalkers"] = int(commerce.get("tenebrium") or 0)
     return {
         "tenebrium": commerce["tenebrium"],
-        "credits": commerce["credits"],
+        "metalK": commerce["metalK"],
+        "armyBudget": int(commerce.get("armyBudget") or 0),
+        "armyBudgetGained": int(army_bank.get("gained") or 0),
         "gainedTenebrium": gained_t,
-        "gainedCredits": gained_c,
+        "gainedMetalK": gained_k,
         "notes": notes,
         "factionBanks": banks,
     }
@@ -2906,6 +3806,7 @@ def ensure_roster(state: Dict[str, Any]) -> Dict[str, Any]:
         commander.setdefault(key, copy.deepcopy(value))
     roster.setdefault("cadre", {})
     roster.setdefault("cadreCap", CADRE_CAP_BASE)
+    roster.setdefault("cadreXp", {})
     heroes = roster.setdefault("heroes", [])
     known = {str(h.get("heroId")) for h in heroes if isinstance(h, dict)}
     for hero in default["heroes"]:
@@ -2914,14 +3815,31 @@ def ensure_roster(state: Dict[str, Any]) -> Dict[str, Any]:
             known.add(str(hero["heroId"]))
     # Drop 3 Wave 2: authored roster heroes join locked; recruitment beats
     # (apply_recruitment_beats) unlock them when their moment lands.
-    for hero in load_hero_roster():
+    authored_rows = [h for h in load_hero_roster() if isinstance(h, dict) and h.get("heroId")]
+    authored = {str(h.get("heroId")): h for h in authored_rows}
+    for hero in authored_rows:
         hid = str(hero.get("heroId"))
         if hid and hid not in known:
             rec = copy.deepcopy(hero)
             rec.setdefault("status", "locked")
             heroes.append(rec)
             known.add(hid)
+    # Drop scrapped locked heroes that left the authored catalog (e.g. mirren).
+    # Keep anyone still active / wounded / dead on the company roll.
+    if authored:
+        kept = []
+        for hero in heroes:
+            if not isinstance(hero, dict):
+                continue
+            hid = str(hero.get("heroId") or "")
+            st = str(hero.get("status") or "").lower()
+            if hid in authored or st in ("active", "wounded", "dead", "lost"):
+                kept.append(hero)
+        heroes[:] = kept
+        known = {str(h.get("heroId")) for h in heroes if isinstance(h, dict)}
     # Seed campaignXp from any existing character sheet (legacy integer XP).
+    # Also refresh display names / chassis from the authored catalog so the
+    # webGUI never keeps leftovers like "Grath Unpaid".
     chars = state.get("characters") or {}
     for hero in heroes:
         if not isinstance(hero, dict):
@@ -2931,21 +3849,34 @@ def ensure_roster(state: Dict[str, Any]) -> Dict[str, Any]:
                            "peakBarXp": 0.0}.items():
             hero.setdefault(key, value)
         hid = str(hero.get("heroId") or "")
+        src = authored.get(hid)
+        if isinstance(src, dict):
+            if src.get("name"):
+                hero["name"] = src["name"]
+            if src.get("unitDef"):
+                hero["unitDef"] = src["unitDef"]
+            if src.get("fiction") and not hero.get("fiction"):
+                hero["fiction"] = src.get("fiction")
         c = chars.get(hid) if isinstance(chars, dict) else None
-        if isinstance(c, dict) and float(hero.get("campaignXp") or 0) <= 0:
-            # Character sheet used big integers (e.g. 1480); scale into ladder.
-            sheet = float(c.get("xp") or 0)
-            if sheet >= 50:
-                hero["campaignXp"] = round(sheet * 0.08, 2)  # 1480 → ~118 (L2)
-            elif sheet > 0:
-                hero["campaignXp"] = sheet
-        # Floor BAR xp from campaign ladder so new saves feel blooded, not empty.
+        if isinstance(c, dict):
+            if isinstance(src, dict) and src.get("name"):
+                c["name"] = src["name"]
+            if isinstance(src, dict) and src.get("unitDef"):
+                c["unitDef"] = src["unitDef"]
+            if float(hero.get("campaignXp") or 0) <= 0:
+                # Character sheet used big integers (e.g. 1480); scale into ladder.
+                sheet = float(c.get("xp") or 0)
+                if sheet >= 50:
+                    hero["campaignXp"] = round(sheet * 0.08, 2)  # 1480 → ~118 (L2)
+                elif sheet > 0:
+                    hero["campaignXp"] = sheet
+        # Floor BAR xp from campaign ladder so new saves feel proven, not empty.
         camp = float(hero.get("campaignXp") or 0.0)
         peak = max(float(hero.get("peakBarXp") or 0.0), float(hero.get("xp") or 0.0))
         hero["peakBarXp"] = peak
         hero["xp"] = bar_unit_xp_from_campaign(camp, peak)
         hero["level"] = hero_level_from_campaign_xp(camp)
-        hero["rank"] = hero_rank_label(int(hero["level"]))
+        hero["rank"] = normalize_hero_rank_label(hero_rank_label(int(hero["level"])))
     # Soft auto-unlock: high Null Merc rep can free Spoke without broker coins
     # (broker listing still works; this is the reputation path).
     maybe_unlock_wheelie_hero(state)
@@ -3012,14 +3943,16 @@ def update_roster(state: Dict[str, Any], result: Dict[str, Any], success: bool, 
     defeat = status in ("defeat", "failed", "failure")
     gains = _sortie_xp_gains(state, result, success, clean)
 
-    commander["xp"] = round(float(commander.get("xp", 0.0) or 0.0) + gains["commander"], 2)
-    new_level = roster_level_for_xp(commander["xp"])
-    if new_level > int(commander.get("level", 1)):
-        for lvl in range(int(commander.get("level", 1)) + 1, new_level + 1):
-            perk = PERK_LADDER.get(lvl)
-            if perk and perk not in commander.setdefault("perks", []):
-                commander["perks"].append(perk)
-        commander["level"] = new_level
+    # The command ledger grows only while the walker is on the field.
+    if commander.get("unlocked") is True:
+        commander["xp"] = round(float(commander.get("xp", 0.0) or 0.0) + gains["commander"], 2)
+        new_level = roster_level_for_xp(commander["xp"])
+        if new_level > int(commander.get("level", 1)):
+            for lvl in range(int(commander.get("level", 1)) + 1, new_level + 1):
+                perk = PERK_LADDER.get(lvl)
+                if perk and perk not in commander.setdefault("perks", []):
+                    commander["perks"].append(perk)
+            commander["level"] = new_level
     # Cap = perk base + act-2 grant bonus (earned specials never squeeze T1 vets).
     roster["cadreCap"] = commander_cadre_cap(commander) + grant_cap_bonus(roster)
 
@@ -3037,6 +3970,10 @@ def update_roster(state: Dict[str, Any], result: Dict[str, Any], success: bool, 
         # No survivor report but a defeat: rout the carried cadre by 40%.
         routed = {d: int(math.floor(c * 0.6)) for d, c in roster["cadre"].items()}
         roster["cadre"] = {d: c for d, c in routed.items() if c > 0}
+
+    # Veteran XP bank by unitDef — majority retain between drops.
+    # Named heroes already track peakBarXp; this covers packs / escorts / cadre.
+    _merge_cadre_xp(roster, result, defeat=defeat)
 
     # Scars: a lost commander limps into the next sortie (perks suppressed then).
     expire_scars(commander, int(state.get("missionNumber", 1)))
@@ -3110,11 +4047,66 @@ def update_roster(state: Dict[str, Any], result: Dict[str, Any], success: bool, 
         # Floor BAR combat XP from campaign ladder (cracked heroes by late game).
         hero["xp"] = bar_unit_xp_from_campaign(float(hero.get("campaignXp") or 0.0), peak)
         hero["level"] = hero_level_from_campaign_xp(float(hero.get("campaignXp") or 0.0))
-        hero["rank"] = hero_rank_label(int(hero["level"]))
+        hero["rank"] = normalize_hero_rank_label(hero_rank_label(int(hero["level"])))
         # Last sortie XP readout for debrief clarity.
         hero["lastSortieXpGain"] = round(camp_gain, 2)
 
+    # Legacy saves: "Blooded" read as wounded — coerce on every homecoming.
+    for hero in roster.get("heroes", []) or []:
+        if isinstance(hero, dict) and hero.get("rank") is not None:
+            hero["rank"] = normalize_hero_rank_label(hero.get("rank"))
+
     return roster
+
+
+# Majority retain: packs / escorts keep most of their field XP across drops.
+# Heroes already use peakBarXp (100%); cadre uses this keep fraction.
+CADRE_XP_KEEP_FRAC = 0.85
+CADRE_XP_DEFEAT_FRAC = 0.55
+
+
+def _merge_cadre_xp(roster: Dict[str, Any], result: Dict[str, Any], *, defeat: bool = False) -> None:
+    """Bank per-def combat + craft XP from the match into roster.cadreXp.
+
+    Shape: { unitDef: { xp, craftXp, peakXp, peakCraftXp } }
+    xp / craftXp are the *seed* values for the next drop (majority retain).
+    """
+    detail = result.get("playerSurvivorXp")
+    if not isinstance(detail, dict) or not detail:
+        return
+    keep = CADRE_XP_DEFEAT_FRAC if defeat else CADRE_XP_KEEP_FRAC
+    bank = roster.setdefault("cadreXp", {})
+    if not isinstance(bank, dict):
+        bank = {}
+        roster["cadreXp"] = bank
+    for unit_def, bag in detail.items():
+        if not isinstance(bag, dict):
+            continue
+        def_name = str(unit_def)
+        try:
+            peak = float(bag.get("peakXp") or 0.0)
+            avg = float(bag.get("avgXp") or 0.0)
+            peak_craft = float(bag.get("peakCraftXp") or 0.0)
+            avg_craft = float(bag.get("avgCraftXp") or 0.0)
+        except (TypeError, ValueError):
+            continue
+        # Seed from avg (majority of the company), never below prior bank,
+        # never above peak. Keep fraction applied to the new field reading.
+        field_seed = max(avg, peak * 0.75) * keep
+        field_craft = max(avg_craft, peak_craft * 0.75) * keep
+        prev = bank.get(def_name) if isinstance(bank.get(def_name), dict) else {}
+        prev_xp = float(prev.get("xp") or 0.0)
+        prev_craft = float(prev.get("craftXp") or 0.0)
+        prev_peak = float(prev.get("peakXp") or 0.0)
+        prev_peak_craft = float(prev.get("peakCraftXp") or 0.0)
+        bank[def_name] = {
+            "xp": round(max(prev_xp * 0.5, field_seed), 4),
+            "craftXp": round(max(prev_craft * 0.5, field_craft), 4),
+            "peakXp": round(max(prev_peak, peak), 4),
+            "peakCraftXp": round(max(prev_peak_craft, peak_craft), 4),
+            "avgXp": round(avg, 4),
+            "avgCraftXp": round(avg_craft, 4),
+        }
 
 
 def trim_cadre(cadre: Dict[str, int], cap: int) -> Dict[str, int]:
@@ -3213,7 +4205,29 @@ def story_tags_for_result(result: Dict[str, Any], graph_delta: Dict[str, float])
     return tags
 
 
-def objective_for_map(map_id: str, state: Dict[str, Any]) -> Dict[str, Any]:
+def objective_for_map(map_id: str, state: Dict[str, Any],
+                      workspace: Optional[Path] = None) -> Dict[str, Any]:
+    """Fallback objective for a map, with its target zone id translated forward.
+
+    Every targetZoneId below was authored against a pre-migration zone cut and
+    all seven are now retired -- AB_LRPC_EAST_WING, RJ_CENTRAL_LAGOON_MAZE,
+    ATS_CENTRAL_HIVE_FLATS, GF_SE_ENERGY_WORKS, EOH_SE_CORTEX_POCKET,
+    KOOM_CENTRAL_FLUID_SCAR, TAB_WESTERN_ROCK_GATES. Rather than hand-edit the
+    constants on every re-cut (which is what let them go stale in the first
+    place), they are translated at the point of use through the same migration
+    map canonical_zone_id already reads.
+
+    This path only fires when generate_mode_a_sortie finds no legal contract,
+    so it will not show up in an early mission and will show up in a late one.
+    """
+    raw = _objective_for_map_raw(map_id, state)
+    target = raw.get("targetZoneId")
+    if target:
+        raw["targetZoneId"] = canonical_zone_id(target, workspace)
+    return raw
+
+
+def _objective_for_map_raw(map_id: str, state: Dict[str, Any]) -> Dict[str, Any]:
     mid = canonical_map_id(map_id)
     destroyed = state.get("destroyedObjectives", {}).get(mid, {})
     if mid == "ancient_bastion":
@@ -3240,26 +4254,53 @@ def objective_for_map(map_id: str, state: Dict[str, Any]) -> Dict[str, Any]:
     return {"id": mid + "_objective", "kind": "sortie", "label": "Complete local objective", "targetZoneId": None}
 
 
-def choose_next_map_zone(state: Dict[str, Any]) -> Tuple[str, str]:
+def choose_next_map_zone(state: Dict[str, Any],
+                         workspace: Optional[Path] = None) -> Tuple[str, str]:
+    """Map and deployment zone for the next mission, zone id translated forward.
+
+    ALPHA_SPINE may still name legacy ids that migrate forward
+    (EOH_NW_CRATER_CAMP, KOOM_NW_GREEN_SHELF, …). It is the deployment-zone
+    source for every mission whose intent does not specify one.
+    nextMapOverride is authored too, so it goes through the same translation
+    rather than being trusted.
+    """
     requested = state.get("nextMapOverride")
     if requested:
-        return canonical_map_id(requested.get("mapId")), requested.get("deploymentZoneId", "unknown_zone")
-    number = int(state.get("missionNumber", 1))
-    return ALPHA_SPINE[(number - 1) % len(ALPHA_SPINE)]
+        return (canonical_map_id(requested.get("mapId")),
+                canonical_zone_id(requested.get("deploymentZoneId", "unknown_zone"), workspace))
+    # Mission number is the act clock. Geography is the collapse, then the
+    # landing a heading extract already wrote. ALPHA_SPINE is not a map picker.
+    try:
+        tools_dir = Path(__file__).resolve().parent
+        if str(tools_dir) not in sys.path:
+            sys.path.insert(0, str(tools_dir))
+        import wet_reach_v1 as _wet  # type: ignore
+
+        arrival = _wet._arrival(state)
+        if arrival and arrival.get("mapId") and arrival.get("zoneId"):
+            return (
+                canonical_map_id(arrival.get("mapId")),
+                canonical_zone_id(arrival.get("zoneId"), workspace),
+            )
+        if workspace is not None:
+            collapsed = _wet.collapse_sorties(state, Path(workspace))
+            cards = collapsed.get("cards") or []
+            if cards:
+                effect = cards[0].get("effect") or {}
+                return (
+                    canonical_map_id(effect.get("mapId")),
+                    canonical_zone_id(effect.get("infilZoneId") or "TRJ_NW_OUTER_MUSTER", workspace),
+                )
+    except Exception:
+        pass
+    return "the_rock_jungle", canonical_zone_id("TRJ_NW_OUTER_MUSTER", workspace)
 
 
 # ---------------------------------------------------------------------------
-# Drop 2 act structure (owner direction):
-#   Act 1 (missions 1-5)  — ground control: warband battles, no base building.
-#   Act 2 (missions 6-10) — constrained RTS: the player BUILDS T1 only; T2 (and
-#                           a touch of T3) arrive as earned special units
-#                           (heroes, veteran cadre, rewards), never buildable.
-#   Act 3 (missions 11+)  — the finale: one path-keyed closing mission played
-#                           as a full unconstrained game of BAR with massive
-#                           starting conditions.
-# Boundaries deliberately match commerce_arc_number so the broker shop and the
-# acts tell one story. The techPolicy is enforced in-mission by the campaign
-# gadget's AllowUnitCreation gate (seed grants and resurrection are exempt).
+# Act structure (story pacing only — NOT a build lock):
+#   Acts still label chapters / finales. Fabrication is unconstrained BAR;
+#   Tenebrium + concurrent BP ceiling is the only build-power gate.
+#   (Retired Drop-2 techPolicy scaffolding that blocked T2 / structures.)
 # ---------------------------------------------------------------------------
 
 ACT1_END_MISSION = 5
@@ -3267,8 +4308,8 @@ ACT2_END_MISSION = 10
 
 ACT_NAMES = {1: "ground_control", 2: "constrained_rts", 3: "unbound_finale"}
 ACT_LABELS = {
-    1: "Act I — Ground Control: warband battles, no base laying",
-    2: "Act II — Constrained Front: build T1; T2/T3 are earned units",
+    1: "Act I — Opening Front: full fab; Tnb gates constructors",
+    2: "Act II — Mid Front: full fab; Tnb gates constructors",
     3: "Act III — The Finale: full unconstrained war, massive starts",
 }
 
@@ -3344,34 +4385,26 @@ def act_profile_for_state(state: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def tech_policy_for_act(act: int) -> Dict[str, Any]:
-    """What the player may BUILD this act (gadget AllowUnitCreation gate).
+    """Fabrication policy for the mission seed (informational).
 
-    buildTech: highest customParams.techlevel constructible (3 = everything).
-    buildStructures: False forbids laying any new structure (Act 1 ground
-    control — granted factories still produce, rez bots still resurrect).
+    Emergent play: no Act tech gate. buildTech=3 / buildStructures=True always.
+    Live enforcement is Tenebrium only (allowCreate costOf + concurrent BP cap).
+    Act number still labels story chapter; it does not lock fabs.
     """
-    if act <= 1:
-        return {
-            "act": 1,
-            "mode": "ground_control",
-            "buildTech": 1,
-            "buildStructures": False,
-            "note": "Warband doctrine: no base laying; granted printers and rez bots still work.",
-        }
-    if act == 2:
-        return {
-            "act": 2,
-            "mode": "constrained_rts",
-            "buildTech": 1,
-            "buildStructures": True,
-            "note": "Build T1 only. T2/T3 are earned special units — your veterans ARE your tech.",
-        }
+    a = int(act or 1)
+    if a <= 1:
+        mode = "ground_control"
+    elif a == 2:
+        mode = "constrained_rts"
+    else:
+        mode = "unbound"
     return {
-        "act": 3,
-        "mode": "unbound",
+        "act": max(1, a),
+        "mode": mode,
         "buildTech": 3,
         "buildStructures": True,
-        "note": "Finale: full unconstrained BAR.",
+        "gateEnabled": False,
+        "note": "Unconstrained fab. Constructors / BP still cost Tnb (ceil(bp/150)).",
     }
 
 
@@ -3643,28 +4676,46 @@ def consequence_note(front: Dict[str, Any]) -> str:
     return "Pressure keeps building here while your attention is elsewhere."
 
 
-def enumerate_front_targets(state: Dict[str, Any], limit: int = 3) -> List[Dict[str, Any]]:
-    """2-4 candidate fronts the player can choose between. The ALPHA_SPINE map
-    for the current mission number is always offered (recommended); the rest are
-    the most salient alternatives (eroding clan ground first, then hottest)."""
-    number = int(state.get("missionNumber", 1))
-    spine_map, _ = ALPHA_SPINE[(number - 1) % len(ALPHA_SPINE)]
-    limit = max(2, min(limit, len(ALPHA_SPINE)))
+def enumerate_front_targets(state: Dict[str, Any], limit: int = 3,
+                            workspace: Optional[Path] = None) -> List[Dict[str, Any]]:
+    """The collapsed doors, lean first. Mission number does not pick a map."""
+    limit = max(1, min(int(limit or 3), 4))
+    cards: List[Dict[str, Any]] = []
+    try:
+        tools_dir = Path(__file__).resolve().parent
+        if str(tools_dir) not in sys.path:
+            sys.path.insert(0, str(tools_dir))
+        import wet_reach_v1 as _wet  # type: ignore
+
+        root = workspace or Path(__file__).resolve().parents[1]
+        cards = list((_wet.collapse_sorties(state, root).get("cards")) or [])
+    except Exception:
+        cards = []
+    seen: List[str] = []
     fronts = []
-    for map_id, deploy_zone in ALPHA_SPINE:
+    lean_map = None
+    for card in cards:
+        effect = card.get("effect") or {}
+        map_id = canonical_map_id(effect.get("mapId"))
+        if not map_id or map_id in seen:
+            continue
+        seen.append(map_id)
+        if card.get("recommended") and lean_map is None:
+            lean_map = map_id
         front = summarize_front(state, map_id)
-        objective = objective_for_map(map_id, state)
-        front["deploymentZoneId"] = deploy_zone
-        front["objective"] = {"kind": objective.get("kind"), "label": objective.get("label")}
-        front["recommended"] = (map_id == spine_map)
+        front["deploymentZoneId"] = effect.get("infilZoneId")
+        front["objective"] = {
+            "kind": effect.get("contractKind"),
+            "label": card.get("label"),
+        }
+        front["recommended"] = bool(card.get("recommended"))
         front["consequenceIfIgnored"] = consequence_note(front)
         fronts.append(front)
-    spine = [f for f in fronts if f["recommended"]]
-    others = [f for f in fronts if not f["recommended"]]
-    # Salience: eroding clan ground first, then hottest enemy presence. Stable
-    # tie-break on mapId keeps output deterministic for tests.
-    others.sort(key=lambda f: (f["atRisk"], f["threatCenter"], f["mapId"]), reverse=True)
-    return spine + others[: max(0, limit - len(spine))]
+        if len(fronts) >= limit:
+            break
+    if lean_map is None and fronts:
+        fronts[0]["recommended"] = True
+    return fronts
 
 
 def build_war_map(state: Dict[str, Any]) -> Dict[str, Any]:
@@ -3799,14 +4850,19 @@ def extraction_zone_for(map_id: str, deployment_zone: str,
                         workspace: Optional[Path] = None,
                         target_zone: Optional[str] = None,
                         mission_number: Optional[int] = None,
-                        adjacency_mode: Optional[str] = None) -> str:
+                        adjacency_mode: Optional[str] = None,
+                        state: Optional[Dict[str, Any]] = None) -> str:
     """Pick extraction LZ.
 
-    WO-039 Arc A/B (adjacency required/preferred): extract is a *neighbor* of the
-    target (or deploy), not a map-diagonal shelf marathon.
-
-    WO-010 later arcs: still prefer forward/away extract when adjacency is loose.
+    Legal pads only: quiet rim OR Ashwalker-majority base. Prefer the deploy
+    pad when it is already legal (open-area stack for exfil). WO-039 adjacency
+    modes still prefer neighbors of the target, filtered to legal pads.
     """
+    try:
+        import landing_zones_v1 as _lz
+    except ImportError:  # pragma: no cover
+        _lz = None  # type: ignore
+
     legacy = {
         "ancient_bastion": "AB_WESTERN_MUSTER_GROUNDS",
         "the_rock_jungle": "RJ_NW_JUNGLE_SHELF",
@@ -3820,50 +4876,100 @@ def extraction_zone_for(map_id: str, deployment_zone: str,
     adj = _load_map_adjacency(workspace, map_id)
     target_nbrs = list(adj.get(str(target_zone), []) or []) if target_zone else []
 
-    # Adjacent / preferred: stay local to the fight.
+    zones_by_id: Dict[str, Any] = {}
+    if workspace is not None:
+        zone_map_early = zone_maps_from_workspace(Path(workspace)).get(canonical_map_id(map_id))
+        if zone_map_early:
+            zones_by_id = {
+                str(z.get("zoneId")): z
+                for z in zone_map_early.get("zones", []) or []
+                if z.get("zoneId")
+            }
+
+    def _rim_score(zone: Dict[str, Any]) -> float:
+        if _lz is not None:
+            return _lz.edge_score(zone.get("bounds") or {})
+        b = zone.get("bounds") or {}
+        try:
+            xmin = float(b.get("xMin", 0) or 0)
+            xmax = float(b.get("xMax", 1) or 1)
+            zmin = float(b.get("zMin", 0) or 0)
+            zmax = float(b.get("zMax", 1) or 1)
+        except (TypeError, ValueError):
+            return 0.5
+        cx = (xmin + xmax) * 0.5
+        cz = (zmin + zmax) * 0.5
+        return min(cx, 1.0 - cx, cz, 1.0 - cz)
+
+    def _is_legal(zid: str) -> bool:
+        zone = zones_by_id.get(zid) or {}
+        bounds = zone.get("bounds") if isinstance(zone.get("bounds"), dict) else None
+        if _lz is None:
+            return bool(bounds) and _rim_score(zone) <= 0.28
+        return _lz.is_legal_landing(
+            state,
+            canonical_map_id(map_id),
+            zid,
+            bounds,
+            tags=list(zone.get("tags") or []),
+            role=str(zone.get("role") or ""),
+        )
+
+    # Prefer returning to the deploy pad when it is already a legal open LZ.
+    if deployment_zone and _is_legal(str(deployment_zone)):
+        if mode == "forward":
+            pass  # still allow a forward quiet rim below
+        else:
+            return str(deployment_zone)
+
+    # Adjacent / preferred: stay local, legal pads only.
     if mode in ("required", "preferred") and target_zone and target_nbrs:
         pool = [z for z in target_nbrs if z not in (deployment_zone, target_zone)]
-        if pool:
-            # Prefer neighbor that is not the deploy shelf.
-            return pool[0]
-        if deployment_zone and deployment_zone in target_nbrs:
-            return deployment_zone
-        return target_nbrs[0]
+        legal_pool = [z for z in pool if _is_legal(z)]
+        if legal_pool:
+            return legal_pool[0]
+        if deployment_zone and deployment_zone in target_nbrs and _is_legal(str(deployment_zone)):
+            return str(deployment_zone)
+        # No legal neighbor: fall back to deploy if legal, else legacy.
+        if deployment_zone and _is_legal(str(deployment_zone)):
+            return str(deployment_zone)
+        return legacy.get(canonical_map_id(map_id), deployment_zone)
 
-    if workspace is not None:
-        zone_map = zone_maps_from_workspace(Path(workspace)).get(canonical_map_id(map_id))
-        if zone_map:
-            zones = {str(z.get("zoneId")): z for z in zone_map.get("zones", []) or [] if z.get("zoneId")}
-            deploy = zones.get(deployment_zone)
-            target = zones.get(target_zone) if target_zone else None
-            if deploy:
-                dx, dz = zone_center_norm(deploy)
-                tx, tz = zone_center_norm(target) if target else (dx + 0.35, dz + 0.35)
-                ax, az = tx - dx, tz - dz
-                alen = (ax * ax + az * az) ** 0.5 or 1.0
-                ax, az = ax / alen, az / alen
-                min_dist = 0.14
-                candidates = []
-                for zid in sorted(zones):
-                    if zid in (deployment_zone, target_zone):
-                        continue
-                    zone = zones[zid]
-                    tags = set(str(t).lower() for t in zone.get("tags", []) or [])
-                    role = str(zone.get("role", "")).lower()
-                    if "hive" in role or "raptor" in role or "raptors" in tags or "wilds" in tags:
-                        continue
-                    cx, cz = zone_center_norm(zone)
-                    dist = ((cx - dx) ** 2 + (cz - dz) ** 2) ** 0.5
-                    forward = (cx - dx) * ax + (cz - dz) * az
-                    candidates.append((zid, dist, forward))
-                if candidates:
-                    far = [c for c in candidates if c[1] >= min_dist]
-                    pool = far or candidates
-                    pool.sort(key=lambda c: (c[2] + 0.5 * c[1]), reverse=True)
-                    best = pool[0][0]
-                    if best != deployment_zone:
-                        return best
-    return legacy.get(map_id, deployment_zone)
+    if workspace is not None and zones_by_id:
+        deploy = zones_by_id.get(deployment_zone)
+        target = zones_by_id.get(target_zone) if target_zone else None
+        if deploy:
+            dx, dz = zone_center_norm(deploy)
+            tx, tz = zone_center_norm(target) if target else (dx + 0.35, dz + 0.35)
+            ax, az = tx - dx, tz - dz
+            alen = (ax * ax + az * az) ** 0.5 or 1.0
+            ax, az = ax / alen, az / alen
+            min_dist = 0.14
+            candidates = []
+            for zid in sorted(zones_by_id):
+                if zid in (deployment_zone, target_zone):
+                    continue
+                if not _is_legal(zid):
+                    continue
+                zone = zones_by_id[zid]
+                tags = set(str(t).lower() for t in zone.get("tags", []) or [])
+                role = str(zone.get("role", "")).lower()
+                if "hive" in role or "raptor" in role or "raptors" in tags or "wilds" in tags:
+                    continue
+                cx, cz = zone_center_norm(zone)
+                dist = ((cx - dx) ** 2 + (cz - dz) ** 2) ** 0.5
+                forward = (cx - dx) * ax + (cz - dz) * az
+                candidates.append((zid, dist, forward, _rim_score(zone)))
+            if candidates:
+                far = [c for c in candidates if c[1] >= min_dist]
+                pool = far or candidates
+                pool.sort(key=lambda c: (c[2] + 0.5 * c[1], -c[3]), reverse=True)
+                best = pool[0][0]
+                if best != deployment_zone:
+                    return best
+    if deployment_zone and _is_legal(str(deployment_zone)):
+        return str(deployment_zone)
+    return legacy.get(canonical_map_id(map_id), deployment_zone)
 
 
 # ---------------------------------------------------------------------------
@@ -3938,6 +5044,37 @@ def result_streak(state: Dict[str, Any]) -> Tuple[str, int]:
     return streak_kind, streak
 
 
+def workspace_hint(voice: Dict[str, Any]) -> Optional[Path]:
+    """The voice cache is keyed by workspace; recover it so briefing can find outbox."""
+    for key, cached in _VOICE_CACHE.items():
+        if cached is voice:
+            return Path(key)
+    return None
+
+
+def _occasions_briefing_lines(state: Dict[str, Any], workspace: Optional[Path]) -> List[Dict[str, str]]:
+    """Briefing lines from outbox/occasions.latest.json when it matches this mission."""
+    if workspace is None:
+        return []
+    path = Path(workspace) / "outbox" / "occasions.latest.json"
+    if not path.exists():
+        return []
+    try:
+        occ = json.loads(path.read_text(encoding="utf-8-sig"))
+    except Exception:
+        return []
+    if int(occ.get("missionNumber") or -1) != int(state.get("missionNumber", 1) or 1):
+        return []
+    out: List[Dict[str, str]] = []
+    for row in occ.get("briefing") or []:
+        text = str(row.get("text") or "").strip()
+        if not text:
+            continue
+        out.append({"speaker": str(row.get("speaker") or "ketha"), "text": text,
+                    "tag": "readings:" + str(row.get("eventClass") or row.get("kind") or "line")})
+    return out[:5]
+
+
 def generate_briefing(state: Dict[str, Any], voice: Dict[str, Any], map_id: str, family: str,
                       objective: Dict[str, Any], pressure: Dict[str, Any],
                       esc_plan: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
@@ -3956,6 +5093,13 @@ def generate_briefing(state: Dict[str, Any], voice: Dict[str, Any], map_id: str,
     # constrained front / finale) — one line, right after the situation.
     mission_num = int(state.get("missionNumber", 1) or 1)
     add("briefing.act." + ACT_NAMES[act_for_mission(mission_num)], "act")
+    # Hot raid doctrine: camp not raised yet → Ketha pushes Tnb + extract + home.
+    camp = state.get("homeCamp") or {}
+    tnb_bank = int((state.get("commerce") or {}).get("tenebrium") or 0)
+    if int(camp.get("level") or 0) <= 0 and map_id != str(camp.get("mapId") or "the_rock_jungle"):
+        add("briefing.extract_priority", "extract")
+    elif tnb_bank < 3 and map_id in ("greenest_fields", "all_that_simmers", "tabula"):
+        add("briefing.extract_priority", "extract")
     # Drop 3: finales speak in their path's voice; a fresh recruit gets a nod.
     if act_for_mission(mission_num) >= 3:
         plan = finale_plan_for_state(state)
@@ -3992,6 +5136,18 @@ def generate_briefing(state: Dict[str, Any], voice: Dict[str, Any], map_id: str,
         add("briefing.world.cortex_ascendant", "world")
     elif q0 <= 0.38:
         add("briefing.world.armada_ascendant", "world")
+
+    # Readings layer: if the occasions face for this mission exists, the cast's
+    # briefing lines (attractor opener + fired event classes) replace the
+    # level-triggered pressure line below, which otherwise repeats while an axis
+    # stays pinned. Crossings are event classes now, not levels.
+    occ_lines = _occasions_briefing_lines(state, workspace_hint(voice))
+    if occ_lines:
+        # The cast now covers the standing-war read and the new-recruit nod.
+        lines[:] = [l for l in lines if l.get("tag") not in ("war", "warband")]
+        lines.extend(occ_lines)
+        add("briefing.path." + str(state.get("pathSignal", "B")), "path")
+        return {"lines": lines}
 
     # One conditional line: highest-priority campaign pressure wins.
     conditions = [
@@ -4258,7 +5414,7 @@ def hero_intent_entries(roster: Dict[str, Any]) -> List[Dict[str, Any]]:
             "missionCritical": critical,
             "wounded": wounded,
             "level": level,
-            "rank": str(hero.get("rank") or hero_rank_label(level)),
+            "rank": normalize_hero_rank_label(hero.get("rank") or hero_rank_label(level)),
             "campaignXp": round(camp, 2),
             "hpMult": hero_hp_mult_from_level(level, critical, wounded),
             "xp": bar_xp,
@@ -4266,6 +5422,118 @@ def hero_intent_entries(roster: Dict[str, Any]) -> List[Dict[str, Any]]:
             "traits": traits,
         })
     return entries
+
+
+def commander_is_unlocked(state: Dict[str, Any]) -> bool:
+    """The walker fields only when a story beat has set this. Level does not count."""
+    roster = state.get("roster") if isinstance(state, dict) else None
+    commander = roster.get("commander") if isinstance(roster, dict) else None
+    return isinstance(commander, dict) and commander.get("unlocked") is True
+
+
+def grant_commander(state: Dict[str, Any], reason: str) -> bool:
+    """Story grant. Idempotent. Mission number is not a reason."""
+    commander = ensure_roster(state)["commander"]
+    if commander.get("unlocked") is True:
+        return False
+    commander["unlocked"] = True
+    commander["unlockedBy"] = str(reason or "story")[:80]
+    commander["unlockedAt"] = utc_now()
+    return True
+
+
+def scrap_commander(state: Dict[str, Any], reason: str) -> bool:
+    """The walker is scrap again. Level and perks stay on the ledger."""
+    commander = ensure_roster(state)["commander"]
+    if commander.get("unlocked") is not True:
+        return False
+    commander["unlocked"] = False
+    commander["scrappedBy"] = str(reason or "lost")[:80]
+    commander["scrappedAt"] = utc_now()
+    return True
+
+
+def load_commander_beats(workspace: Optional[Path] = None) -> List[Dict[str, Any]]:
+    """data/story/commander_unlock.json beats. The examples key is not loaded."""
+    paths: List[Path] = []
+    if workspace is not None:
+        paths.append(Path(workspace) / "data" / "story" / "commander_unlock.json")
+    paths.append(Path(__file__).resolve().parent.parent / "data" / "story" / "commander_unlock.json")
+    for path in paths:
+        if not path.exists():
+            continue
+        try:
+            data = load_json(path)
+        except Exception:
+            continue
+        beats = data.get("beats") if isinstance(data, dict) else None
+        if isinstance(beats, list):
+            return [b for b in beats if isinstance(b, dict) and b.get("when")]
+    return []
+
+
+def _commander_beat_met(beat: Dict[str, Any], state: Dict[str, Any], result: Dict[str, Any], joined_ids: set) -> bool:
+    kind = str(beat.get("when") or "")
+    if kind == "hero_joined":
+        return str(beat.get("heroId") or "") in joined_ids
+    if kind == "story_tag":
+        want = str(beat.get("tag") or "")
+        tags = [str(t) for t in (result.get("storyTags") or [])]
+        sortie = result.get("sortie") if isinstance(result.get("sortie"), dict) else {}
+        tags.extend(str(t) for t in (sortie.get("storyTags") or []))
+        return bool(want) and want in tags
+    if kind == "flag":
+        flags = state.get("flags") if isinstance(state.get("flags"), dict) else {}
+        return bool(flags.get(str(beat.get("flag") or "")))
+    return False
+
+
+def apply_commander_story(
+    state: Dict[str, Any],
+    result: Dict[str, Any],
+    joined: Optional[List[Any]] = None,
+    workspace: Optional[Path] = None,
+) -> Dict[str, Any]:
+    """Field or scrap the command walker from the story, never from the sortie clock.
+
+    A loss scraps it and does not also grant on that same result. While it is
+    scrap, a result tag, a hero with grantsCommander, or a beat in
+    data/story/commander_unlock.json can rebuild it.
+    """
+    result = result if isinstance(result, dict) else {}
+    reason = str(result.get("terminalReason") or "")
+    if reason == "commander_lost":
+        if scrap_commander(state, "commander_lost"):
+            return {"event": "scrapped", "reason": "commander_lost"}
+        return {"event": "scrap", "reason": "commander_lost"}
+    if commander_is_unlocked(state):
+        return {"event": "fielded"}
+    tags = [str(t) for t in (result.get("storyTags") or [])]
+    sortie = result.get("sortie") if isinstance(result.get("sortie"), dict) else {}
+    tags.extend(str(t) for t in (sortie.get("storyTags") or []))
+    if result.get("unlockCommander") is True or "commander_unlocked" in tags:
+        grant_commander(state, "result")
+        return {"event": "unlocked", "reason": "result"}
+    joined_ids: set = set()
+    for item in joined or []:
+        if isinstance(item, dict) and item.get("heroId"):
+            joined_ids.add(str(item["heroId"]))
+        elif isinstance(item, str) and item:
+            joined_ids.add(item)
+    roster = ensure_roster(state)
+    for hero in roster.get("heroes") or []:
+        if not isinstance(hero, dict):
+            continue
+        hid = str(hero.get("heroId") or "")
+        if hid in joined_ids and hero.get("grantsCommander") is True:
+            grant_commander(state, "hero:" + hid)
+            return {"event": "unlocked", "reason": "hero:" + hid}
+    for beat in load_commander_beats(workspace):
+        if _commander_beat_met(beat, state, result, joined_ids):
+            why = str(beat.get("id") or beat.get("when") or "beat")
+            grant_commander(state, why)
+            return {"event": "unlocked", "reason": why}
+    return {"event": "scrap"}
 
 
 def build_roster_intent(state: Dict[str, Any]) -> Dict[str, Any]:
@@ -4281,9 +5549,26 @@ def build_roster_intent(state: Dict[str, Any]) -> Dict[str, Any]:
             "perks": list(commander.get("perks", []) or []),
             "activePerks": commander_active_perks(commander),
             "scarred": bool(commander.get("scars")),
+            "unlocked": commander.get("unlocked") is True,
         },
         "cadre": {str(d): int(c) for d, c in (roster.get("cadre") or {}).items() if c},
         "cadreCap": int(roster.get("cadreCap", CADRE_CAP_BASE)),
+        "cadreXp": {
+            str(d): {
+                "xp": round(float((bag or {}).get("xp") or 0.0), 4),
+                "craftXp": round(float((bag or {}).get("craftXp") or 0.0), 4),
+                "peakXp": round(float((bag or {}).get("peakXp") or 0.0), 4),
+                "peakCraftXp": round(float((bag or {}).get("peakCraftXp") or 0.0), 4),
+                "avgXp": round(float((bag or {}).get("avgXp") or 0.0), 4),
+                "avgCraftXp": round(float((bag or {}).get("avgCraftXp") or 0.0), 4),
+            }
+            for d, bag in (roster.get("cadreXp") or {}).items()
+            if isinstance(bag, dict) and (
+                float(bag.get("xp") or 0) > 0
+                or float(bag.get("craftXp") or 0) > 0
+                or float(bag.get("peakXp") or 0) > 0
+            )
+        },
         "heroes": hero_intent_entries(roster),
         "availableAllies": available_allies(state),
         "progression": {
@@ -4332,6 +5617,18 @@ def load_sortie_order(workspace: Optional[Path]) -> Optional[Dict[str, Any]]:
             continue
         if not isinstance(order, dict):
             continue
+        # Provenance must survive contract v2 normalize — hub stamps and opening
+        # flags are how materialize decides who wins the drop.
+        provenance = {
+            "source": order.get("source"),
+            "derived": order.get("derived"),
+            "openingMission": order.get("openingMission"),
+            "openingDoctrine": order.get("openingDoctrine"),
+            "openingForce": order.get("openingForce"),
+            "fromDebrief": order.get("fromDebrief"),
+            "debriefPick": order.get("debriefPick"),
+            "hubChoiceId": order.get("hubChoiceId") or order.get("choiceId"),
+        }
         # Normalize via contract v2 when available.
         try:
             if str(_tools_dir := Path(__file__).resolve().parent) not in sys.path:
@@ -4342,6 +5639,9 @@ def load_sortie_order(workspace: Optional[Path]) -> Optional[Dict[str, Any]]:
         except Exception:
             if order.get("targetZoneId") and not order.get("mapId") and order.get("map"):
                 order["mapId"] = order["map"]
+        for key, val in provenance.items():
+            if val is not None and (order.get(key) is None or key in ("source", "derived", "openingMission")):
+                order[key] = val
         if not order.get("mapId") or not order.get("targetZoneId"):
             continue
         if not order.get("patron"):
@@ -4352,6 +5652,186 @@ def load_sortie_order(workspace: Optional[Path]) -> Optional[Dict[str, Any]]:
         order.setdefault("occupationModel", "living_shell")
         return order
     return None
+
+
+def apply_sealed_company_to_packet(
+    packet: Dict[str, Any],
+    state: Dict[str, Any],
+    workspace: Optional[Path] = None,
+) -> Dict[str, Any]:
+    """Keep the hub dropping list as the only spawn list.
+
+    A non-empty ``crewBand`` is the packs on this drop. An empty list on a hub
+    stamp (``source=hub_deploy_plan``) means core only. Opening orders and
+    stamps that never named a list still receive the full living company.
+    """
+    if not isinstance(packet, dict) or not isinstance(state, dict):
+        return packet
+    try:
+        from company_v1 import (  # type: ignore
+            company_deploy_aces,
+            company_deploy_band,
+            ensure_company,
+            sortie_roster,
+        )
+    except Exception:
+        try:
+            from tools.company_v1 import (  # type: ignore
+                company_deploy_aces,
+                company_deploy_band,
+                ensure_company,
+                sortie_roster,
+            )
+        except Exception:
+            return packet
+    try:
+        ensure_company(state, workspace)
+    except Exception:
+        pass
+    company = state.get("company") or {}
+    if not company.get("sealed"):
+        return packet
+    explicit = packet.get("crewBand")
+    source = str(packet.get("source") or "")
+    sheet = isinstance(explicit, list) and (
+        len(explicit) > 0 or source == "hub_deploy_plan"
+    )
+    if sheet:
+        # sortie_roster: core always, requested packs only, unknown ids dropped.
+        band, aces = sortie_roster(state, [str(x) for x in explicit if x])
+        packet["crewBand"] = list(band)
+        packet["deployAces"] = list(aces)
+    else:
+        band = company_deploy_band(state)
+        aces = company_deploy_aces(state)
+        if band:
+            packet["crewBand"] = list(band)
+        if aces:
+            packet["deployAces"] = list(aces)
+    # Prefer call-ins already stamped on the packet (commit_deploy); else peek state.
+    if not packet.get("missionCallIns"):
+        try:
+            from company_v1 import peek_mission_call_ins  # type: ignore
+
+            calls = peek_mission_call_ins(state)
+            if calls:
+                packet["missionCallIns"] = list(calls)
+        except Exception:
+            pass
+    return packet
+
+
+def opening_sortie_order(state: Dict[str, Any], workspace: Optional[Path] = None) -> Optional[Dict[str, Any]]:
+    """Return the authored alpha opening for a genuinely fresh campaign.
+
+    The C&C board can leave a stamped contract in the outbox between sessions.
+    That is useful after mission one, but it must not be allowed to replace the
+    story's deliberate opening raid. An explicit non-Jungle session home or a
+    non-empty history means the player has already chosen a different flow.
+
+    Fresh campaigns own no ground, so the opening enters from the standard
+    shell-free north desert rim (`GF_NE_PLATEAU`), hits the southeast decoy
+    plateau, and extracts back to that same open pad — a stack left there
+    becomes the first Ashwalker sortie origin for later raids. NW muster is
+    the alternate quiet rim (also kept clear of living-shell eco).
+    """
+    if int(state.get("missionNumber", 1) or 1) != 1:
+        return None
+    if state.get("history"):
+        return None
+    home = canonical_map_id(state.get("sessionHomeMap") or state.get("homeMapId") or "")
+    if home and home != "the_rock_jungle":
+        return None
+    # Mission one locks map/objective. Sealed company band still drops via
+    # apply_sealed_company_to_packet so hub muster matches BAR.
+    deploy_aces = ["pavise", "ketha"]
+    # Standard safe GF infil/exfil: north desert (shell-free). NW muster backup.
+    rim_pad = "GF_NE_PLATEAU"
+    if workspace is not None:
+        try:
+            import landing_zones_v1 as _lz
+
+            zmap = zone_maps_from_workspace(Path(workspace)).get("greenest_fields") or {}
+            zones = list(zmap.get("zones") or [])
+            adj = _load_map_adjacency(workspace, "greenest_fields")
+            picked = _lz.pick_quiet_rim_pad(
+                "greenest_fields",
+                state=state,
+                zones=zones,
+                adjacency=adj,
+                preferred=["GF_NE_PLATEAU", "GF_NW_MUSTER", "GF_SW_MUSTER"],
+            )
+            if picked:
+                rim_pad = picked
+        except Exception:
+            pass
+    order = {
+        "schemaVersion": "verdance-sortie-order/1.0",
+        "campaignId": state.get("campaignId", CAMPAIGN_ID),
+        "mapId": "greenest_fields",
+        "targetZoneId": "GF_SE_PLATEAU",
+        "deploymentZoneId": rim_pad,
+        "extractionZoneId": rim_pad,
+        "fromZoneIds": [rim_pad],
+        "captureZoneIds": ["GF_SE_PLATEAU"],
+        "secondaryCaptureZoneIds": [],
+        "hubChoiceId": "c_raid_tnb_greenest_fields",
+        "deployAces": deploy_aces,
+        "crewBand": [],
+        "patron": "nullmercs",
+        "against": "armada",
+        "objectiveArchetype": "eco_raid",
+        "difficulty": 1,
+        "targetDuration": "8min",
+        "contractXp": 180,
+        "pathSignal": state.get("pathSignal", "B"),
+        "sessionMode": "reload_travel",
+        "occupationModel": "living_shell",
+        "source": "opening_mission",
+        "openingMission": True,
+        "openingDoctrine": "decoy_raid",
+        "openingForce": {
+            "mercenaryPackage": "punch_of_thugs",
+            "mercenaryLabel": "Mercenary Punch of Thugs",
+            "thugs": 6,
+            "karkinos": 2,
+            "rezBots": 6,
+        },
+        "label": "Raid Greenest Fields for Tenebrium",
+        "hubBlurb": (
+            "Jump the Fields first: land the quiet north desert rim, break Armada decoy farms "
+            "on the southeast plateau for Tenebrium, then extract back to that open pad. "
+            "A stack left on exfil becomes your first Fields foothold."
+        ),
+        "notes": (
+            "Opening Tnb raid from shell-free north desert (standard safe infil/exfil). "
+            "Hit Armada decoy commanders with Thugs and Legion Karkinos. "
+            "Home is the Rock Jungle — this sortie funds that base."
+        ),
+    }
+    apply_sealed_company_to_packet(order, state, workspace)
+    return order
+
+
+def opening_hub_choice(state: Dict[str, Any], workspace: Optional[Path] = None) -> Optional[Dict[str, Any]]:
+    """Project the canonical opening order as the hub's single deploy choice."""
+    order = opening_sortie_order(state, workspace)
+    if not order:
+        return None
+    effect = copy.deepcopy(order)
+    effect["contractKind"] = effect.get("objectiveArchetype") or "eco_raid"
+    effect["preferredDeployZoneId"] = order["deploymentZoneId"]
+    effect["preferredCaptureZoneId"] = order["targetZoneId"]
+    effect["preferredExtractionZoneId"] = order["extractionZoneId"]
+    return {
+        "id": order["hubChoiceId"],
+        "label": order.get("label") or "Raid Greenest Fields for Tenebrium",
+        "blurb": order.get("hubBlurb") or order.get("notes") or "Hit the marked objective, then extract.",
+        "kind": "deploy",
+        "recommended": True,
+        "effect": effect,
+        "journey": "tnb_raid",
+    }
 
 
 def _session_home_map(state: Dict[str, Any], workspace: Optional[Path] = None) -> Optional[str]:
@@ -4383,23 +5863,35 @@ def _session_home_map(state: Dict[str, Any], workspace: Optional[Path] = None) -
 
 
 def _is_hub_stamped_sortie(order: Dict[str, Any]) -> bool:
-    """True when the order was written by stamp_deploy_plan / hub C&C board."""
+    """True when the order was written by stamp_deploy_plan / hub C&C board.
+
+    Authored opening_mission also carries hubChoiceId — that must NOT count as
+    a player theater seal, or the opening would lock out real hub stamps.
+    """
     if not isinstance(order, dict):
         return False
     source = str(order.get("source") or "")
+    if source in ("opening_mission", "opening", "authored_opening"):
+        return False
+    if order.get("openingMission"):
+        return False
     derived = order.get("derived") if isinstance(order.get("derived"), dict) else {}
     derived_src = str(derived.get("source") or "")
     if source in ("hub_deploy_plan", "hub_stamp", "stamp_deploy_plan_v1"):
         return True
     if derived_src in ("hub_deploy_plan", "hub_stamp"):
         return True
-    # Explicit hub board fields without a debrief/player source → treat as hub.
+    # Explicit hub board fields without a debrief/player/opening source → hub.
     if order.get("hubChoiceId") and source not in (
         "debrief",
         "va_next_sortie_choice",
         "player_pick",
         "mode_a_quest",
         "quest_generator",
+        "opening_mission",
+        "opening",
+        "authored_opening",
+        "",
     ):
         return True
     return False
@@ -4531,10 +6023,10 @@ def objective_from_sortie(order: Dict[str, Any], state: Dict[str, Any]) -> Dict[
     map_id = order["mapId"]
     archetype = order.get("objectiveArchetype") or "gate_control"
     against = order.get("against") or "neutral"
-    label = f"Contract: {archetype} on {zone_id}"
+    label = str(order.get("label") or f"Contract: {archetype} on {zone_id}")
     zones = (state.get("zoneMemory") or {}).get(map_id, {}) or {}
     zm = zones.get(zone_id) or {}
-    if zm.get("label"):
+    if zm.get("label") and not order.get("label"):
         label = f"{archetype}: {zm.get('label')}"
     obj = {
         "id": zone_id,
@@ -4627,11 +6119,43 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
     # overrides contracts, Mode A walks, and the spine outright.
     act_info = act_profile_for_state(state)
     finale_plan = finale_plan_for_state(state)
-    sortie = None if finale_plan else load_sortie_order(workspace)
+    # Preference: hub C&C stamp / debrief pick beat the authored opening.
+    # Opening only fills a fresh campaign when the player has not sealed a
+    # theater-board drop (otherwise center raids get stomped by SE plateau).
+    standing = None if finale_plan else load_sortie_order(workspace)
+    hub_sealed = bool(standing and _is_hub_stamped_sortie(standing))
+    debrief_sealed = bool(standing and _is_player_debrief_sortie(standing))
+    opening = None
+    if not finale_plan and not hub_sealed and not debrief_sealed:
+        opening = opening_sortie_order(state, workspace)
+    sortie = opening if opening else (None if finale_plan else standing)
+    if opening and workspace is not None:
+        # Keep the compiler-facing order files in lockstep with the intent. Do
+        # not overwrite a hub stamp or in-engine debrief pick.
+        outbox = Path(workspace) / "outbox"
+        for name in ("next_sortie_choice.json", "next_sortie_order.json"):
+            path = outbox / name
+            try:
+                existing = load_json(path) if path.exists() else None
+                if existing and (
+                    _is_player_debrief_sortie(existing) or _is_hub_stamped_sortie(existing)
+                ):
+                    continue
+                outbox.mkdir(parents=True, exist_ok=True)
+                save_json(path, opening)
+            except Exception:
+                pass
     # Drop 4 bug fix: a standing order aimed at ground the patron already
     # holds is spent (stale from a previous mission) — discard it and let
     # Mode A walk the quest board fresh instead of re-issuing it forever.
-    if sortie and sortie.get("mapId") and sortie.get("targetZoneId"):
+    # Hub C&C stamps are exempt: the player just clicked that wound on purpose
+    # (home probe / own-base contracts are valid).
+    if (
+        sortie
+        and sortie.get("mapId")
+        and sortie.get("targetZoneId")
+        and not _is_hub_stamped_sortie(sortie)
+    ):
         _s_map = canonical_map_id(sortie["mapId"])
         _zm = ((state.get("zoneMemory") or {}).get(_s_map) or {}).get(str(sortie["targetZoneId"])) or {}
         _ctrl = _zm.get("controllingFaction") or (_zm.get("abstract") or {}).get("control") or "neutral"
@@ -4661,8 +6185,15 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
     elif sortie and sortie.get("mapId") and sortie.get("targetZoneId"):
         map_id = canonical_map_id(sortie["mapId"])
         # Mode A: refuse accidental map hops when a session home map is set.
+        # Explicit hub theater stamps are intentional travel — never rewrite them
+        # back onto sessionHomeMap (that is what swapped Rock Jungle → Greenest).
         home = _session_home_map(state, workspace)
-        if home and map_id != home and (sortie.get("sessionMode") or "same_map") == "same_map":
+        if (
+            home
+            and map_id != home
+            and (sortie.get("sessionMode") or "same_map") == "same_map"
+            and not _is_hub_stamped_sortie(sortie)
+        ):
             # Re-roll quests locked to home map.
             alt = generate_mode_a_sortie(
                 {**state, "history": (state.get("history") or []) + [{"mapId": home}]},
@@ -4693,7 +6224,7 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
             zones_on_map = (state.get("zoneMemory") or {}).get(map_id, {}) or {}
             deploy_zone = next(iter(zones_on_map.keys()), None)
             if not deploy_zone:
-                _, deploy_zone = choose_next_map_zone(state)
+                _, deploy_zone = choose_next_map_zone(state, workspace)
                 map_id = canonical_map_id(sortie["mapId"])
         objective = objective_from_sortie(sortie, state)
         # Multi-capture from hub board (arc 2+): primary stays targetZoneId.
@@ -4709,8 +6240,8 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
             )
         contract_active = True
     else:
-        map_id, deploy_zone = choose_next_map_zone(state)
-        objective = objective_for_map(map_id, state)
+        map_id, deploy_zone = choose_next_map_zone(state, workspace)
+        objective = objective_for_map(map_id, state, workspace)
         contract_active = False
         sortie = {}
 
@@ -4728,7 +6259,9 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
     family = map_family(map_id)
     voice = load_ketha_voice(workspace)
     title = pick_title(voice, map_id, state.get("campaignId", CAMPAIGN_ID), state.get("missionNumber", 1))
-    if contract_active:
+    if (sortie or {}).get("openingMission"):
+        title = "Opening Raid - Greenest Fields Decoy Farms" if title else None
+    elif contract_active:
         title = f"Contract — {objective.get('label') or objective.get('targetZoneId')}"
     if finale_plan:
         title = finale_plan["title"]
@@ -4747,12 +6280,20 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
     else:
         extraction_zone = extraction_zone_for(
             map_id, deploy_zone, workspace, objective.get("targetZoneId"),
-            mission_number=mission_num, adjacency_mode=adj_mode,
+            mission_number=mission_num, adjacency_mode=adj_mode, state=state,
         )
     # Carry sandbox flavor from debrief pick into intent.
     flavor = (sortie or {}).get("flavor")
     against = (sortie or {}).get("against") or objective.get("enemyFaction") or "armada"
     patron = (sortie or {}).get("patron") or objective.get("patron") or "nullmercs"
+    quantum_state = None
+    if workspace is not None:
+        try:
+            from quantum_campaign_state_v1 import bootstrap as _bootstrap_quantum
+
+            quantum_state = _bootstrap_quantum(state, Path(workspace))
+        except Exception:
+            quantum_state = None
     intent = {
         "schemaVersion": INTENT_SCHEMA,
         "campaignId": state.get("campaignId", CAMPAIGN_ID),
@@ -4772,6 +6313,9 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
         "contractXp": objective.get("contractXp") or (sortie or {}).get("contractXp"),
         "contractDifficulty": objective.get("difficulty") or (sortie or {}).get("difficulty"),
         "namedDefender": objective.get("namedDefender") or (sortie or {}).get("namedDefender"),
+        "openingMission": bool((sortie or {}).get("openingMission")),
+        "openingDoctrine": (sortie or {}).get("openingDoctrine"),
+        "openingForce": copy.deepcopy((sortie or {}).get("openingForce")),
         "sessionMode": (sortie or {}).get("sessionMode") or "same_map",
         "occupationModel": (sortie or {}).get("occupationModel") or "living_shell",
         "captureMode": (
@@ -4798,8 +6342,12 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
         "roster": build_roster_intent(state),
         "commerce": build_commerce_intent(state, workspace),
         "worldConflict": {
-            "primaryEnemy": against if against not in ("neutral", "wild") else "armada",
-            "accentFaction": "cortex" if against != "cortex" else "armada",
+            # Keep wild as wild — Rock Jungle founding must not rewrite to Armada.
+            "primaryEnemy": against if against else "armada",
+            "accentFaction": (
+                None if against in ("wild", "neutral")
+                else ("cortex" if against != "cortex" else "armada")
+            ),
             "patron": patron,
             "armadaTenebriumCrisis": bool(
                 (state.get("worldFlags") or {}).get("armadaTenebriumCrisis", True)
@@ -4833,6 +6381,7 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
             + (["finale", "finale-" + str(finale_plan.get("kind"))] if finale_plan else [])
             + (["epilogue"] if state.get("campaignComplete") else []),
         "campaignComplete": bool(state.get("campaignComplete")),
+        "campaignQuantumState": quantum_state,
         "environment": {
             "mapFamily": family,
             "campaignClockMinutes": round(float(state.get("campaignClockMinutes", 0.0)), 2),
@@ -4843,14 +6392,22 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
         "storyReason": (
             f"Path {finale_plan['pathKey']} finale ({finale_plan['kind']}): the campaign's closing battle on {map_id}."
             if finale_plan
-            else f"Contract for {patron} against {against} on {map_id}/{objective.get('targetZoneId')}"
+            else (
+                "Opening raid: hit Armada decoy farms in Greenest Fields with Thugs and Legion Karkinos, then extract."
+                if (sortie or {}).get("openingMission")
+                else f"Contract for {patron} against {against} on {map_id}/{objective.get('targetZoneId')}"
+            )
             if contract_active
             else story_reason_for_intent(map_id, family, pressure)
         ),
         "contractActive": contract_active,
-        # Hub C&C board stamp (deploy_plan.v1 → next_sortie_order)
+        # Hub dropping list (stamp sortie_roster). apply_sealed keeps that
+        # list. It fills the whole company only when no list was named.
+        "source": (sortie or {}).get("source"),
         "hubChoiceId": (sortie or {}).get("hubChoiceId"),
         "deployAces": list((sortie or {}).get("deployAces") or []),
+        "crewBand": list((sortie or {}).get("crewBand") or []),
+        "missionCallIns": list((sortie or {}).get("missionCallIns") or []),
         "captureZoneIds": list(
             objective.get("captureZoneIds")
             or (sortie or {}).get("captureZoneIds")
@@ -4862,10 +6419,42 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
             or []
         ),
     }
+    # Mouth cards name their own doors. Carry them so the snap can see them
+    # and the result's extract zone is the heading, not a near shore.
+    infil_named = (sortie or {}).get("infilZoneId") or (sortie or {}).get("deploymentZoneId")
+    exfil_named = (sortie or {}).get("exfilZoneId") or (sortie or {}).get("extractionZoneId")
+    if (sortie or {}).get("wetReach") or (sortie or {}).get("headingZoneId"):
+        if infil_named:
+            intent["deploymentZoneId"] = infil_named
+            intent["infilZoneId"] = infil_named
+        if exfil_named:
+            intent["extractionZoneId"] = exfil_named
+            intent["exfilZoneId"] = exfil_named
+        intent["wetReach"] = True
+        intent["headingMapId"] = (sortie or {}).get("headingMapId")
+        intent["headingZoneId"] = (sortie or {}).get("headingZoneId")
+        intent["alongTheWay"] = list((sortie or {}).get("alongTheWay") or [])
+    apply_sealed_company_to_packet(intent, state, workspace)
     # Authored content still names zones that a re-cut retired; translate the
     # whole intent forward in one place rather than trusting every source.
     intent = canonicalize_zone_ids(intent, workspace)
     separate_intent_zones(intent, workspace)
+    from narrative_v1 import operation_summary, project as narrative_project
+    intent["operationSummary"] = operation_summary({
+        "id": intent.get("hubChoiceId") or intent.get("missionId"),
+        "label": intent.get("title") or "Company operation",
+        "blurb": intent.get("storyReason") or "Secure the marked objective and bring the company home.",
+        "effect": {"mapId": map_id, "contractKind": intent.get("objective")},
+    })
+    narrative_view = narrative_project(state, workspace=workspace)
+    active_thread = next((t for t in narrative_view.get("threads", []) if t["stage"] == "Committed" and map_id in t["maps"]), None)
+    if active_thread:
+        intent["narrativeContext"] = {"threadId": active_thread["id"], "purpose": active_thread["reason"],
+                                      "perspectives": active_thread["perspectives"]}
+        intent["briefing"]["lines"].append({"speaker": "ketha", "text": active_thread["reason"], "tag": "commitment"})
+        for perspective in active_thread["perspectives"]:
+            if perspective["speaker"] != "ketha":
+                intent["briefing"]["lines"].append({"speaker": perspective["speaker"], "text": perspective["text"], "tag": "company"})
     return intent
 
 
@@ -4907,51 +6496,161 @@ def zone_is_landable(zone: Dict[str, Any], level: float) -> bool:
     return floods_at > float(level)
 
 
+# A zone rect wider than this is a region, not a pad. Its centre often sits
+# in the river even when the anchor is on a shelf (Rock Jungle gates).
+PAD_SPAN_MAX = 0.50
+# Farther than the nearest dry pad by this much is a cross-map haul.
+NEAR_PAD_SLACK = 0.12
+# Absolute cap: a corner muster on the other shore is not a walk.
+NEAR_PAD_CAP = 0.40
+
+
+def _pad_span_ok(zone: Dict[str, Any], limit: float = PAD_SPAN_MAX) -> bool:
+    bounds = zone.get("bounds") or {}
+    try:
+        sx = abs(float(bounds.get("xMax", 1.0)) - float(bounds.get("xMin", 0.0)))
+        sz = abs(float(bounds.get("zMax", 1.0)) - float(bounds.get("zMin", 0.0)))
+    except (TypeError, ValueError):
+        return False
+    return 0.02 <= sx <= limit and 0.02 <= sz <= limit
+
+
+def _anchor_dist(a: Dict[str, Any], b: Dict[str, Any]) -> float:
+    ax, az = zone_center_norm(a)
+    bx, bz = zone_center_norm(b)
+    return ((ax - bx) ** 2 + (az - bz) ** 2) ** 0.5
+
+
+def ground_pads_by_distance(
+    map_id: str,
+    target_zone_id: str,
+    workspace: Optional[Path] = None,
+    level: float = 0.0,
+    zones: Optional[Dict[str, Any]] = None,
+) -> List[Tuple[float, str]]:
+    """Dry, pad-sized zones nearest the objective anchor. Ground exfil only.
+
+    Skips flooded basins and map-wide rects. The nearest hit is the shore a
+    kbot can walk to; a far dry corner across the river is left off the front.
+    """
+    if zones is None:
+        zones = {
+            str(z.get("zoneId")): z
+            for z in (load_zone_map(map_id, workspace).get("zones") or [])
+            if z.get("zoneId")
+        }
+    target = zones.get(str(target_zone_id)) or {}
+    if not target:
+        return []
+    ranked: List[Tuple[float, str]] = []
+    for zid, zone in zones.items():
+        if zid == str(target_zone_id):
+            continue
+        if not zone_is_landable(zone, level):
+            continue
+        if not _pad_span_ok(zone):
+            continue
+        ranked.append((_anchor_dist(target, zone), zid))
+    ranked.sort()
+    return ranked
+
+
+def ground_pad_is_near(
+    zone_id: str,
+    map_id: str,
+    target_zone_id: str,
+    workspace: Optional[Path] = None,
+    level: float = 0.0,
+    zones: Optional[Dict[str, Any]] = None,
+    ranked: Optional[List[Tuple[float, str]]] = None,
+) -> bool:
+    """True when this pad is dry, pad-sized, and on the objective's shore."""
+    if zones is None:
+        zones = {
+            str(z.get("zoneId")): z
+            for z in (load_zone_map(map_id, workspace).get("zones") or [])
+            if z.get("zoneId")
+        }
+    zone = zones.get(str(zone_id)) or {}
+    target = zones.get(str(target_zone_id)) or {}
+    if not zone or not target:
+        return False
+    if str(zone_id) == str(target_zone_id):
+        return False
+    if not zone_is_landable(zone, level) or not _pad_span_ok(zone):
+        return False
+    if ranked is None:
+        ranked = ground_pads_by_distance(
+            map_id, target_zone_id, workspace, level, zones
+        )
+    if not ranked:
+        return False
+    dist = _anchor_dist(target, zone)
+    best = ranked[0][0]
+    return dist <= best + NEAR_PAD_SLACK and dist <= max(NEAR_PAD_CAP, best + 0.02)
+
+
 def separate_intent_zones(intent: Dict[str, Any],
                           workspace: Optional[Path] = None) -> Dict[str, Any]:
-    """Deploy, objective and extraction must be three different DRY places.
+    """Infil and exfil are dry pads the company can walk to from the objective.
 
-    Two things go wrong otherwise. Translating retired ids forward can fold them
-    together -- two old rectangles that inherited the same new zone leave a
-    sortie that says "land on the objective and extract from the objective".
-    And the water cycle moves: a landing zone chosen from static properties can
-    be half underwater by the time the campaign gets there. The objective is
-    allowed to be flooded -- taking a drowned basin is a fine mission -- but
-    landing in one is not."""
+    The objective may sit in a flooded basin. A dry corner on the far shore is
+    not an exit: at Rock Jungle's river level that crossing needs air
+    transport, and far is a bad walk even when the graph draws an edge.
+    Landing and leaving on the same near pad is intentional.
+    """
     target = intent.get("targetZoneId")
     if not isinstance(target, str) or not target:
         return intent
     map_id = str(intent.get("mapId") or "")
-    adjacency = _load_map_adjacency(workspace, map_id)
-    zones = {str(z.get("zoneId")): z for z in (load_zone_map(map_id, workspace).get("zones") or [])}
+    zones = {
+        str(z.get("zoneId")): z
+        for z in (load_zone_map(map_id, workspace).get("zones") or [])
+        if z.get("zoneId")
+    }
+    if not zones or target not in zones:
+        return intent
     level = float(((intent.get("hydrology") or {}).get("level")) or 0.0)
+    ranked = ground_pads_by_distance(map_id, target, workspace, level, zones)
 
-    def candidates(exclude: set) -> List[str]:
-        near = [z for z in (adjacency.get(target) or []) if isinstance(z, str)]
-        wider = [z for z in zones if z not in near]
-        dry = [z for z in near + wider
-               if z not in exclude and zone_is_landable(zones.get(z, {}), level)]
-        return dry
+    def _near(zid: Optional[str]) -> bool:
+        return bool(zid) and ground_pad_is_near(
+            str(zid), map_id, target, workspace, level, zones, ranked
+        )
 
-    taken = {target}
-    for key in ("deploymentZoneId", "extractionZoneId"):
-        value = intent.get(key)
-        if not isinstance(value, str) or not value:
-            continue
-        wet = bool(zones) and not zone_is_landable(zones.get(value, {}), level)
-        if value not in taken and not wet:
-            taken.add(value)
-            continue
-        replacement = next(iter(candidates(taken)), None)
-        if replacement is None:
-            # Nothing dry anywhere: keep what we had rather than invent a zone.
-            taken.add(value)
-            continue
-        intent[key] = replacement
-        taken.add(replacement)
-        objective = intent.get("objectiveTarget")
-        if isinstance(objective, dict) and key == "extractionZoneId":
-            objective["extractionZoneId"] = replacement
+    def _write(key: str, zid: str) -> None:
+        intent[key] = zid
+        if key == "extractionZoneId":
+            objective = intent.get("objectiveTarget")
+            if isinstance(objective, dict):
+                objective["extractionZoneId"] = zid
+
+    nearest = ranked[0][1] if ranked else None
+    # A mouth is the door off this map. The nearest dry shore of an inland
+    # hero must not move it. Non-mouth pads still snap.
+    try:
+        tools_dir = Path(__file__).resolve().parent
+        if str(tools_dir) not in sys.path:
+            sys.path.insert(0, str(tools_dir))
+        import wet_reach_v1 as _wet  # type: ignore
+
+        def _mouth(zid: Any) -> bool:
+            return bool(zid) and _wet.is_mouth(zid, workspace, map_id)
+    except Exception:
+        def _mouth(zid: Any) -> bool:
+            return False
+
+    deploy = intent.get("deploymentZoneId")
+    if not _mouth(deploy) and not _near(deploy if isinstance(deploy, str) else None):
+        if nearest:
+            _write("deploymentZoneId", nearest)
+    deploy = intent.get("deploymentZoneId")
+    extract = intent.get("extractionZoneId")
+    if not _mouth(extract) and not _near(extract if isinstance(extract, str) else None):
+        if _mouth(deploy) or _near(deploy if isinstance(deploy, str) else None):
+            _write("extractionZoneId", str(deploy))
+        elif nearest:
+            _write("extractionZoneId", nearest)
     return intent
 
 
@@ -5135,8 +6834,13 @@ def generate_story_events(state: Dict[str, Any], result: Dict[str, Any], bead: O
 
 
 def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Optional[Dict[str, Any]], workspace: Path, translation: Optional[Dict[str, Any]] = None) -> Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any], Dict[str, Any]]:
+    from narrative_v1 import world_snapshot
+    narrative_before = world_snapshot(state)
+    narrative_evidence = {k: copy.deepcopy(result[k]) for k in ("observedZoneIds", "deployAces", "deployedHeroes", "sortieHeroes") if k in result}
     state = migrate_state(state)
     ensure_zone_memory(state, workspace)
+    raw_quantum_state = copy.deepcopy(result.get("finalQuantumState"))
+    raw_quantum_journal = copy.deepcopy(result.get("quantumTransitionJournal") or [])
     # Normalize is law: MatchResult v2 fields only (no raw override soup).
     credit: Dict[str, Any] = {}
     try:
@@ -5148,6 +6852,9 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
 
         normalized = normalize_result(result)
         result = result_v2_to_v1_fields(normalized)
+        if raw_quantum_state:
+            result["finalQuantumState"] = raw_quantum_state
+            result["quantumTransitionJournal"] = raw_quantum_journal
         # Preserve telemetry-adjacent extras from raw when normalize omitted them
         for k in ("graph", "reputation", "zoneMap", "economy", "map", "primaryCompanion"):
             if k in (result if False else {}) or k not in result:
@@ -5263,8 +6970,10 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
 
     processed = key not in state.setdefault("processedResults", {})
     if not processed:
-        intent = materialize_next_intent(state, workspace)
-        events = generate_story_events(state, result, None, False, workspace)
+        # Intent/events for the response only — never mutate live state on a
+        # duplicate (company seal / roster ensure would otherwise stick).
+        intent = materialize_next_intent(copy.deepcopy(state), workspace)
+        events = generate_story_events(copy.deepcopy(state), result, None, False, workspace)
         try:
             from match_credit_v1 import presentable_debrief as _pd
 
@@ -5279,18 +6988,63 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
             "credit": credit,
         }, intent, events
 
-    old_clock = float(state.get("campaignClockMinutes", 0.0) or 0.0)
-    state["campaignClockMinutes"] = round(old_clock + elapsed, 4)
-    measured_zones = update_measured_zone_memory(state, result, telemetry, workspace)
-    graph_delta = apply_graph_deltas(state, result, elapsed)
-    apply_reputation_companion(state, result, elapsed)
     try:
-        evaluate_home_clear(state, result)
+        from company_v1 import ensure_company  # type: ignore
+
+        ensure_company(state, workspace)
     except Exception:
         pass
+
+    quantum_authoritative = False
+    if raw_quantum_state:
+        try:
+            from quantum_campaign_state_v1 import persist_exported as _persist_quantum
+
+            quantum_authoritative = _persist_quantum(state, result)
+        except Exception:
+            quantum_authoritative = False
+    old_clock = float(state.get("campaignClockMinutes", 0.0) or 0.0)
+    if not quantum_authoritative:
+        state["campaignClockMinutes"] = round(old_clock + elapsed, 4)
+    measured_zones = update_measured_zone_memory(state, result, telemetry, workspace)
+    graph_delta = {} if quantum_authoritative else apply_graph_deltas(state, result, elapsed)
+    apply_reputation_companion(state, result, elapsed)
+    if not quantum_authoritative:
+        try:
+            evaluate_home_clear(state, result)
+        except Exception:
+            pass
     clean_extract = bool((credit.get("credits") or {}).get("cleanExtract")) or (
         result.get("extractionStatus", "") in ("clean", "success") or bool(result.get("cleanExtract"))
     )
+    # Clean extract with a holding stack seeds the exfil pad as an Ashwalker
+    # sortie origin (belief-majority base) for later inland / return raids.
+    if clean_extract:
+        extract_pad = (
+            result.get("extractionZoneId")
+            or (result.get("objectiveTarget") or {}).get("extractionZoneId")
+            or result.get("deploymentZoneId")
+        )
+        if extract_pad:
+            try:
+                import landing_zones_v1 as _lz_seed
+
+                stack = result.get("extractStackWeight")
+                if stack is None:
+                    # Presence left on the pad: prefer explicit unit count, else 1.0.
+                    stack = float(
+                        result.get("extractUnitCount")
+                        or result.get("unitsExtracted")
+                        or 1.0
+                    )
+                _lz_seed.seed_ashwalker_pad(
+                    state,
+                    canonical_map_id(map_id),
+                    canonical_zone_id(str(extract_pad), workspace),
+                    stack_weight=max(1.0, float(stack)),
+                )
+            except Exception:
+                pass
     # Credit table law: fullSuccess for win tables; anyPositive for partial paths.
     success = bool(credit.get("fullSuccess"))
     any_positive = bool(credit.get("anyPositive"))
@@ -5313,6 +7067,8 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
     # Abstract regrow first: heal *prior* scars over campaign time, then stamp new scars.
     regrow_report = apply_abstract_regrow(state, map_id, elapsed)
     apply_shell_scars(state, result, map_id)
+    apply_surviving_installs(state, result, map_id)
+    apply_player_footprint(state, result, map_id)
 
     # WO-006 / WO-005: Character Wreck Rule & Roster update.
     chars = state.setdefault("characters", default_v1_state()["characters"])
@@ -5428,17 +7184,25 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
         _wt.power_response(state)
     except Exception:
         attachment_delta = None
-    spectral = spectral_summary(translation, state) if translation else None
+    spectral = None if quantum_authoritative else (spectral_summary(translation, state) if translation else None)
     if spectral:
         state["lastSpectral"] = spectral
-    graph_measured = measure_graph_from_world(state, result, spectral)
+    graph_measured = (copy.deepcopy(state.get("graph") or {}) if quantum_authoritative
+                      else measure_graph_from_world(state, result, spectral))
     update_destroyed_objectives(state, result)
-    reset_live_raptors_but_escalate(state, result, elapsed, workspace)
-    offscreen_tick = tick_offscreen_zones(state, map_id, measured_zones, elapsed, workspace)
-    front_flips = apply_front_decay(state, map_id, measured_zones, elapsed)
-    regression_flips = apply_player_regression(state, map_id, measured_zones, elapsed, workspace)
+    if not quantum_authoritative:
+        reset_live_raptors_but_escalate(state, result, elapsed, workspace)
+    offscreen_tick = ({
+        "source": "lua_quantum_kernel",
+        "elapsedMinutes": elapsed,
+        "transitionCount": len(raw_quantum_journal),
+    } if quantum_authoritative else tick_offscreen_zones(state, map_id, measured_zones, elapsed, workspace))
+    front_flips = [] if quantum_authoritative else apply_front_decay(state, map_id, measured_zones, elapsed)
+    regression_flips = [] if quantum_authoritative else apply_player_regression(state, map_id, measured_zones, elapsed, workspace)
     clash_report: Optional[Dict[str, Any]] = None
     try:
+        if quantum_authoritative:
+            raise RuntimeError("Lua quantum kernel already evolved offscreen state")
         tools_dir = Path(__file__).resolve().parent
         if str(tools_dir) not in sys.path:
             sys.path.insert(0, str(tools_dir))
@@ -5464,6 +7228,7 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
         bead.setdefault("storyTags", []).append("offscreen-clash")
     bead["verdict"] = credit.get("verdict")
     bead["terminalReason"] = credit.get("terminalReason")
+    bead["resultKey"] = key
     bead["offscreenTick"] = offscreen_tick
     if clash_report:
         bead["offscreenClash"] = {
@@ -5483,15 +7248,114 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
         # The planet's water moves between missions, not during them: a basin
         # fills over a few sorties and drains over a few more.
         advance_planet_hydrology(state, workspace)
-    state.pop("nextMapOverride", None)
+    # Consume a one-shot travel stamp from debrief/hub; lastSortie keeps Mode A
+    # chains without stealing Ashwalker home onto a raid theater.
+    travel = result.get("nextMapOverride") or result.get("travelIntent")
+    if isinstance(travel, dict) and travel.get("mapId"):
+        state["nextMapOverride"] = {
+            "mapId": canonical_map_id(travel.get("mapId")),
+            "deploymentZoneId": canonical_zone_id(
+                travel.get("deploymentZoneId") or travel.get("targetZoneId") or "unknown_zone",
+                workspace,
+            ),
+        }
+    else:
+        state.pop("nextMapOverride", None)
     if map_id:
-        state["sessionHomeMap"] = map_id
+        state["lastSortieMapId"] = canonical_map_id(map_id)
+        if result.get("mapSpent") or result.get("theaterExhausted"):
+            spent = state.setdefault("spentTheaters", {})
+            if isinstance(spent, dict):
+                spent[canonical_map_id(map_id)] = {
+                    "at": utc_now(),
+                    "missionNumber": int(result.get("missionNumber") or state.get("missionNumber") or 0),
+                }
+        # Ashwalker home is homeCamp / Rock Jungle. Raid theaters (Greenest, Eye, …)
+        # must not rewrite sessionHomeMap — that trapped players on an emptied GF.
+        camp_home = canonical_map_id(
+            ((state.get("homeCamp") or {}).get("mapId"))
+            or state.get("homeMapId")
+            or "the_rock_jungle"
+        )
+        mid = canonical_map_id(map_id)
+        journey = str(
+            result.get("journey")
+            or (result.get("sortie") or {}).get("journey")
+            or ""
+        ).lower()
+        home_intent = bool(
+            result.get("homeClearAttempt")
+            or journey in ("home_founding", "home_clear", "home_hold")
+            or mid == camp_home
+        )
+        if home_intent:
+            state["sessionHomeMap"] = mid
+        else:
+            state["sessionHomeMap"] = camp_home or state.get("sessionHomeMap") or mid
         state.setdefault("sessionMode", result.get("sessionMode") or state.get("sessionMode") or "same_map")
-        state.setdefault("occupationModel", result.get("occupationModel") or state.get("occupationModel") or "living_shell")
+        state.setdefault(
+            "occupationModel",
+            result.get("occupationModel") or state.get("occupationModel") or "living_shell",
+        )
+        # Holding the heading mouth opens the far map. A quit off that pad does not.
+        try:
+            tools_dir = Path(__file__).resolve().parent
+            if str(tools_dir) not in sys.path:
+                sys.path.insert(0, str(tools_dir))
+            import wet_reach_v1 as _wet  # type: ignore
+
+            headed = _wet.apply_heading(state, result, workspace)
+            if headed:
+                bead.setdefault("storyTags", []).append("wet-reach")
+                bead["wetReach"] = headed
+        except Exception as wet_exc:
+            try:
+                print(f"VA_WET_REACH_STAMP_FAIL {wet_exc}")
+            except Exception:
+                pass
     # Drop 3: the campaign answers the result — recruits sign on, act-2
     # victories mint earned specials, and a finale victory closes the book.
     completed_mission = int(result.get("missionNumber", state.get("missionNumber", 1)) or 1)
     hero_joins = apply_recruitment_beats(state, result, success, completed_mission)
+    # Field wreck/rez recruits from BAR (company preamble leftovers).
+    # Joins + losses (blasted rescue wreck → fieldPool status=lost).
+    field_losses: list = []
+    try:
+        from company_v1 import (  # type: ignore
+            apply_field_recruit_losses_from_result,
+            apply_field_recruits_from_result,
+        )
+
+        field_losses = apply_field_recruit_losses_from_result(
+            state, result, workspace=workspace
+        ) or []
+        field_joins = apply_field_recruits_from_result(
+            state, result, workspace=workspace, full_success=bool(success)
+        )
+        if field_joins:
+            hero_joins = list(hero_joins or []) + list(field_joins)
+    except Exception as field_exc:
+        # Never silently drop rescues — muster ownership depends on this path.
+        try:
+            print(f"VA_FIELD_RECRUIT_APPLY_FAIL {field_exc}")
+        except Exception:
+            pass
+        field_joins = []
+    walker = {"event": "scrap"}
+    try:
+        walker = apply_commander_story(state, result, hero_joins, workspace)
+    except Exception as com_exc:
+        try:
+            print(f"VA_COMMANDER_STORY_FAIL {com_exc}")
+        except Exception:
+            pass
+    else:
+        if walker.get("event") == "unlocked":
+            bead.setdefault("storyTags", []).append("commander-unlocked")
+            bead["commander"] = walker
+        elif walker.get("event") == "scrapped":
+            bead.setdefault("storyTags", []).append("commander-scrapped")
+            bead["commander"] = walker
     act_grant = apply_act_rewards(state, completed_mission, success)
     campaign_completed = False
     if success and act_for_mission(completed_mission) >= 3 and not state.get("campaignComplete"):
@@ -5504,6 +7368,26 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
         }
     if hero_joins:
         bead.setdefault("storyTags", []).append("hero-joined")
+        # Readings layer: the bead must carry WHO joined, not just that someone did.
+        bead["joined"] = [
+            {"heroId": str(j.get("heroId") or j.get("id") or ""), "name": str(j.get("name") or "")}
+            for j in hero_joins if isinstance(j, dict)
+        ]
+    # Readings layer: stamp named hero outcomes so the roll can be rebuilt from history.
+    try:
+        _outcomes = []
+        for _o in (result.get("namedOutcomes") or []):
+            if isinstance(_o, dict) and _o.get("charId"):
+                _outcomes.append({"charId": str(_o["charId"]), "outcome": str(_o.get("outcome") or "")})
+        _hr = result.get("heroResults") if isinstance(result.get("heroResults"), dict) else {}
+        _seen = {o["charId"] for o in _outcomes}
+        for _hid, _h in _hr.items():
+            if isinstance(_h, dict) and _h.get("status") and str(_hid) not in _seen:
+                _outcomes.append({"charId": str(_hid), "outcome": str(_h.get("status"))})
+        if _outcomes:
+            bead["namedOutcomes"] = _outcomes
+    except Exception:
+        pass
     if act_grant:
         bead.setdefault("storyTags", []).append("earned-specials")
     if campaign_completed:
@@ -5521,7 +7405,45 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
         bead.setdefault("storyTags", []).append("secondary-cleared")
     else:
         bonus_secondaries = []
+    from narrative_v1 import accept_result as accept_narrative_result
+    narrative_event = accept_narrative_result(state, {**result, **narrative_evidence, "resultKey": key, "mapId": map_id}, credit, workspace, narrative_before)
     sortie_consume = consume_played_hub_sorties(workspace, result, map_id)
+    # Readings layer (DERIVE faces; never world truth): rho_N over readings, attractor,
+    # and the occasions the cast has to speak to. Written once per homecoming so
+    # once-lines and recency carry forward. Failure here must never block homecoming.
+    if workspace is not None:
+        try:
+            import readings_v1 as _readings
+            import occasions_v1 as _occasions
+            _ws = Path(workspace)
+            _out = _ws / "outbox"
+            _out.mkdir(parents=True, exist_ok=True)
+            _prev_face = None
+            _face_path = _out / "readings.latest.json"
+            if _face_path.exists():
+                try:
+                    _prev_face = json.loads(_face_path.read_text(encoding="utf-8-sig"))
+                    if _prev_face.get("generatedFrom", {}).get("campaignId") != state.get("campaignId"):
+                        _prev_face = None
+                except Exception:
+                    _prev_face = None
+            _face = _readings.project(json.loads(json.dumps(state)), _ws, _prev_face)
+            _prev_occ = None
+            _occ_path = _out / "occasions.latest.json"
+            if _occ_path.exists():
+                try:
+                    _prev_occ = json.loads(_occ_path.read_text(encoding="utf-8-sig"))
+                except Exception:
+                    _prev_occ = None
+            _occ = _occasions.build(_face, state, _ws, _prev_occ)
+            _face_path.write_text(json.dumps(_face, indent=2, ensure_ascii=False), encoding="utf-8")
+            _occ_path.write_text(json.dumps(_occ, indent=2, ensure_ascii=False), encoding="utf-8")
+            (_out / "occasions.latest.md").write_text(_occasions.markdown(_occ), encoding="utf-8")
+        except Exception as _rx:
+            try:
+                print(f"VA_READINGS_FAIL {_rx}")
+            except Exception:
+                pass
     intent = materialize_next_intent(state, workspace)
     events = generate_story_events(state, result, bead, True, workspace)
     extra_changed = []
@@ -5531,12 +7453,32 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
         extra_changed.append("node claimed")
     for j in hero_joins:
         extra_changed.append("{} joined the company".format(j["name"]))
+    for lost in field_losses:
+        if isinstance(lost, dict):
+            extra_changed.append(
+                "{} rescue lost — scrubbed from the wild".format(lost.get("name") or lost.get("heroId") or "recruit")
+            )
     if act_grant:
         extra_changed.append("earned: {}".format(act_grant["label"]))
     for s in bonus_secondaries:
         extra_changed.append("bonus mark cleared: {} (+merc standing)".format(s.get("id") or "secondary"))
     if campaign_completed:
         extra_changed.append("CAMPAIGN COMPLETE — the ashes hold")
+    # Drop-as-collapse: surface G axis moves on the debrief (GRAPH_COLLAPSE_SSOT).
+    collapse = None
+    try:
+        from graph_collapse_v1 import collapse_chips, collapse_payload, character_collapse_chips
+
+        extra_changed.extend(collapse_chips(graph_delta, graph_measured, max_chips=6))
+        extra_changed.extend(character_collapse_chips(state, {"heroJoins": hero_joins}))
+        collapse = collapse_payload(
+            graph_after=state.get("graph"),
+            graph_delta=graph_delta,
+            graph_measured=graph_measured,
+            quantum_authoritative=bool(quantum_authoritative),
+        )
+    except Exception:
+        collapse = None
     try:
         from match_credit_v1 import presentable_debrief as _pd
 
@@ -5548,6 +7490,10 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
             "resultKey": key,
             "changed": extra_changed,
         }
+    if isinstance(debrief, dict) and collapse:
+        debrief["collapse"] = collapse
+    if isinstance(debrief, dict) and narrative_event:
+        debrief["narrativeEvent"] = narrative_event
     if campaign_completed and isinstance(debrief, dict):
         voice = load_ketha_voice(workspace)
         epilogue = pick_line(
@@ -5564,6 +7510,7 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
         "measuredZones": measured_zones,
         "graphDelta": graph_delta,
         "graphMeasured": graph_measured,
+        "collapse": collapse,
         "spectral": spectral,
         "zoneFlipped": zone_flipped,
         "nodeClaimed": node_claimed,
@@ -5592,6 +7539,7 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
         "bpAccess": bp_access(state),
         "heroJoins": hero_joins,
         "actGrant": act_grant,
+        "narrativeEvent": narrative_event,
         "bonusSecondaries": len(bonus_secondaries),
         "campaignComplete": bool(state.get("campaignComplete")),
     }

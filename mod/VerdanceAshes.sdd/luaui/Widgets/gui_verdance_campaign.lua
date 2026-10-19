@@ -24,11 +24,12 @@ local function help()
   say("Verdance Campaign commands:")
   say("/vastart starts auto-progress; /vastatus short state; /varesult logs full JSON to infolog.txt")
   say("/vaprogress adds 10s; /vaprogressbig completes; /vawin /vafail /vapartial force outcome")
-  say("/vaspawn spawns companion; /vareset resets local debug mission state")
+  say("/vaspawn spawns companion; /vareset resets local debug latch only (hub RESET.bat wipes campaign)")
   say("/vazones prints loaded zone map; /vaexport aliases /varesult")
   say("/vacontinue N  continue on this map into debrief pick N (1-3)")
   say("/vanext N      pick next mission candidate (same as debrief 1/2/3)")
   say("/vasurface     Phase 4: echo campaign_surface (kernel / mission card)")
+  say("/vapack status|on|off|drag on|drag off  — A/B pack glue (line-spread test)")
 end
 
 -- Phase 4: try known VFS / write paths for campaign_surface.latest.json
@@ -98,6 +99,10 @@ function widget:TextCommand(command)
   end
   if cmd == "vanext" then
     send(command)
+    return true
+  end
+  if cmd == "vapack" then
+    send(command) -- full "vapack …" for mid-Drop pack A/B
     return true
   end
   if cmd == "vastart" or cmd == "vastatus" or cmd == "varesult" or cmd == "vaprogress" or cmd == "vaprogressbig" or cmd == "vawin" or cmd == "vafail" or cmd == "vapartial" or cmd == "vaspawn" or cmd == "vareset" or cmd == "vazones" or cmd == "vaexport" then

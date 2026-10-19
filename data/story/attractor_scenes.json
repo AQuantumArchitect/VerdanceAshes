@@ -1,0 +1,386 @@
+{
+  "schemaVersion": "verdance-attractor-scenes/0.1",
+  "notes": "Transition scenes: the moment the company notices it has become something. One per attractor entry (plus variants), triggered when outbox/readings.latest.json reports attractor.transition.scene. Same shape as narrative_scenes.json (pair, setup, beats, choices with stance) so the hub can present them with the existing scene code. Stances use the leadership_voices vocabulary (care, ambition, independence, pragmatism, stewardship) so leadership reactions keep working. 'pair' must be in the company; 'fallback' names an alternate scene when it is not. No system vocabulary in anyone's mouth.",
+  "scenes": [
+    {
+      "id": "enter:paid_work",
+      "when": { "enterAttractor": "paid_work" },
+      "pair": ["ketha", "grath"],
+      "fallback": "enter:paid_work:ketha_only",
+      "title": "Good at being hired",
+      "setup": "Grath has laid the Merc scrip on the table in three stacks. He is not counting it. He has already counted it.",
+      "beats": [
+        { "speaker": "grath", "text": "Three contracts. Three payments. Nobody has paid me three times running in my life." },
+        { "speaker": "ketha", "text": "Say that again slower. I want to see if you smile." },
+        { "speaker": "grath", "text": "I don't. It's arrears. They're buying down what the last war owed me and they don't know it." },
+        { "speaker": "ketha", "text": "They know what they're buying. They're buying us not asking what the zone is called afterwards." }
+      ],
+      "choices": [
+        { "id": "count", "label": "Paid is paid. We take the work and keep our own count.", "stance": "pragmatism", "response": "Grath squares the stacks. \"Our own count. I'll keep two ledgers. I've had practice.\"" },
+        { "id": "name", "label": "Next contract, the zone keeps our name or we don't take it.", "stance": "independence", "response": "Ketha nods once. \"Then say it before the Drop, not after. After is where people get expensive.\"" },
+        { "id": "until", "label": "Let them pay us until we can afford not to be paid.", "stance": "ambition", "response": "Grath does not look up. \"I've said that sentence. I was younger, and it didn't end.\"" }
+      ]
+    },
+    {
+      "id": "enter:paid_work:ketha_only",
+      "when": { "enterAttractor": "paid_work" },
+      "pair": ["ketha"],
+      "title": "Good at being hired",
+      "setup": "Ketha has the Merc scrip in one hand and the roster in the other. She is weighing them, and not as a joke.",
+      "beats": [
+        { "speaker": "ketha", "text": "Three contracts, three payments, nobody dead this month. On paper we're a success." },
+        { "speaker": "ketha", "text": "The paper has their name at the top. I keep looking for ours and finding it in the margin, where the salvage goes." }
+      ],
+      "choices": [
+        { "id": "count", "label": "Paid is paid. We keep our own count.", "stance": "pragmatism", "response": "\"Then I'll keep it. Two ledgers. One for them, one for who came back.\"" },
+        { "id": "name", "label": "Next contract, the zone keeps our name or we don't take it.", "stance": "independence", "response": "\"Say it before the Drop. After is where people get expensive.\"" }
+      ]
+    },
+    {
+      "id": "enter:hinge",
+      "when": { "enterAttractor": "hinge" },
+      "pair": ["ketha", "auditor"],
+      "fallback": "enter:hinge:ketha_vane",
+      "title": "Someone asks",
+      "setup": "A Merc liaison's message sits unopened on the board. The Auditor has read it anyway.",
+      "beats": [
+        { "speaker": "auditor", "text": "They ask whose name is on the gate." },
+        { "speaker": "ketha", "text": "It's a gate. It doesn't have a name." },
+        { "speaker": "auditor", "text": "It has three. Theirs on the contract. Ours on the salvage. Nobody's on the flag. I have been asked to resolve the discrepancy." },
+        { "speaker": "ketha", "text": "You haven't been asked anything. You read other people's mail." },
+        { "speaker": "auditor", "text": "I was built to. The question stands whether or not it is addressed." }
+      ],
+      "choices": [
+        { "id": "ours", "label": "Write back: the gate is ours. Hold it.", "stance": "independence", "response": "The Auditor writes. \"Recorded. They will want to know with what.\"" },
+        { "id": "theirs", "label": "Write back: it's theirs on paper. We'll keep walking through it.", "stance": "pragmatism", "response": "Ketha takes the pen before the Auditor can. \"Then I'll write it. I want my handwriting on the part we'll regret.\"" },
+        { "id": "later", "label": "Don't answer yet. Ask who's standing on it tonight and whether they're fed.", "stance": "care", "response": "Ketha folds the message in half. \"That one I can do.\" The Auditor says nothing, which is how it objects." }
+      ]
+    },
+    {
+      "id": "enter:hinge:ketha_vane",
+      "when": { "enterAttractor": "hinge" },
+      "pair": ["ketha", "vane"],
+      "title": "Someone asks",
+      "setup": "A Merc liaison's message is pinned to the board. Vane has read it twice and drawn a door on it.",
+      "beats": [
+        { "speaker": "vane", "text": "They want to know whose gate it is." },
+        { "speaker": "ketha", "text": "It's a gate." },
+        { "speaker": "vane", "text": "It's the gate we walk home through. That's a kind of name." },
+        { "speaker": "ketha", "text": "Then tell them that and watch what they charge for it." }
+      ],
+      "choices": [
+        { "id": "ours", "label": "Write back: the gate is ours. Hold it.", "stance": "independence", "response": "Vane adds a second door to the drawing. \"Good. Now it needs a way out.\"" },
+        { "id": "theirs", "label": "Write back: it's theirs on paper. We'll keep walking through it.", "stance": "pragmatism", "response": "Ketha writes it herself. \"My handwriting. On the part we'll regret.\"" },
+        { "id": "later", "label": "Don't answer yet. Ask who's standing on it tonight.", "stance": "care", "response": "Vane shrugs. \"Rusk. He'd stand on it unpaid. Don't tell them that.\"" }
+      ]
+    },
+    {
+      "id": "enter:own_flag",
+      "when": { "enterAttractor": "own_flag" },
+      "pair": ["vane", "ketha"],
+      "fallback": "enter:own_flag:hearth",
+      "title": "A name on the ground",
+      "setup": "Vane has traced the held zones onto one clean sheet. There is no patron's mark anywhere on it.",
+      "beats": [
+        { "speaker": "vane", "text": "Look at it without the contract lines." },
+        { "speaker": "ketha", "text": "It looks like a place." },
+        { "speaker": "vane", "text": "It looks like a place with doors. Every one of these needs someone on the road." },
+        { "speaker": "ketha", "text": "Every one of these needs a name on it that isn't ours, in case the road wins." },
+        { "speaker": "vane", "text": "That's what the exits are for." }
+      ],
+      "choices": [
+        { "id": "garrison", "label": "Garrison what we hold. Fewer Drops, more watching.", "stance": "stewardship", "response": "Vane marks the roads. \"Then I'll need people who don't mind being bored. Rusk. Hearth. Not me.\"" },
+        { "id": "moving", "label": "Keep moving. Ground that needs us standing on it isn't ours yet.", "stance": "independence", "response": "Vane folds the sheet along the main road. \"A flag that travels. I can route that.\"" },
+        { "id": "next", "label": "Take the next one. A flag that doesn't grow gets folded.", "stance": "ambition", "response": "Ketha looks at the empty chair at the end of the table. \"Then say who's carrying it.\"" }
+      ]
+    },
+    {
+      "id": "enter:own_flag:hearth",
+      "when": { "enterAttractor": "own_flag" },
+      "pair": ["hearth", "ketha"],
+      "title": "A name on the ground",
+      "setup": "Hearth has worked out what each held zone costs to keep lit. The number is on the board. Nobody has argued with it.",
+      "beats": [
+        { "speaker": "hearth", "text": "That's what ours costs. Per night. Nobody's paying it but us." },
+        { "speaker": "ketha", "text": "That's what ours means." },
+        { "speaker": "hearth", "text": "I know what it means. I'm telling you what it costs. Those are both my job now." }
+      ],
+      "choices": [
+        { "id": "garrison", "label": "Garrison what we hold. Fewer Drops, more watching.", "stance": "stewardship", "response": "Hearth nods. \"Then the number goes down. Slowly. I'll show you.\"" },
+        { "id": "next", "label": "Take the next one. A flag that doesn't grow gets folded.", "stance": "ambition", "response": "Hearth writes a second number under the first. \"That's the next one. Per night.\"" }
+      ]
+    },
+    {
+      "id": "enter:ledger",
+      "when": { "enterAttractor": "ledger" },
+      "pair": ["grath", "auditor"],
+      "fallback": "enter:ledger:ketha_grath",
+      "title": "Interest",
+      "setup": "Two ledgers on the table. One is in Grath's hand. The other walked in on its own.",
+      "beats": [
+        { "speaker": "auditor", "text": "Your entry for the loan is wrong." },
+        { "speaker": "grath", "text": "It's what the dealer wrote." },
+        { "speaker": "auditor", "text": "The dealer wrote what we owe. You have not written what it costs. Those are different numbers and only one of them is on your page." },
+        { "speaker": "grath", "text": "Three wars. Nobody has once told me my arithmetic was optimistic." },
+        { "speaker": "auditor", "text": "Then this is a new war." }
+      ],
+      "choices": [
+        { "id": "paydown", "label": "Pay it down first. Nothing else until the paper's gone.", "stance": "pragmatism", "response": "Grath turns to a clean page. \"Then every Drop has a line at the top before the objective. I'll write it in red so nobody pretends.\"" },
+        { "id": "borrow", "label": "Borrow against the next zone. Debt is cheaper than losing.", "stance": "ambition", "response": "The Auditor's pen moves. \"I will record that you said cheaper.\"" },
+        { "id": "want", "label": "Find out what the dealer actually wants. It isn't the money.", "stance": "independence", "response": "Grath almost laughs. \"It's never the money. It's what the money lets them ask for.\"" }
+      ]
+    },
+    {
+      "id": "enter:ledger:ketha_grath",
+      "when": { "enterAttractor": "ledger" },
+      "pair": ["ketha", "grath"],
+      "title": "Interest",
+      "setup": "Grath has written the loan at the top of the roster, above the first name. Ketha has noticed.",
+      "beats": [
+        { "speaker": "ketha", "text": "Move it." },
+        { "speaker": "grath", "text": "It's where it goes. It gets paid before they do." },
+        { "speaker": "ketha", "text": "Nothing gets paid before they do. Write it at the bottom. In red if you want." }
+      ],
+      "choices": [
+        { "id": "paydown", "label": "Pay it down first. Nothing else until the paper's gone.", "stance": "pragmatism", "response": "Grath moves it to the bottom and underlines it. \"Bottom. Red. Still first.\"" },
+        { "id": "want", "label": "Find out what the dealer actually wants. It isn't the money.", "stance": "independence", "response": "Grath nods slowly. \"It's what the money lets them ask for. I've been on the other side of that.\"" }
+      ]
+    },
+    {
+      "id": "enter:infirmary",
+      "when": { "enterAttractor": "infirmary" },
+      "pair": ["ketha", "hearth"],
+      "fallback": "enter:infirmary:ketha_only",
+      "title": "The schedule says soon",
+      "setup": "The bench by the pad has more people on it than the line does.",
+      "beats": [
+        { "speaker": "hearth", "text": "I built the bench for four. I'm told to build it for eight." },
+        { "speaker": "ketha", "text": "Build it for eight. Then build a second one and don't tell me who it's for." },
+        { "speaker": "hearth", "text": "I keep the lights on. I'd like to know who I'm keeping them on for." },
+        { "speaker": "ketha", "text": "Everyone on that bench came back. That's the ledger I read. Read the other one if you want to." }
+      ],
+      "choices": [
+        { "id": "wait", "label": "Nobody drops until the bench is empty.", "stance": "care", "response": "Hearth puts the second bench plan away. \"Then I'll build beds. Beds are slower and better.\"" },
+        { "id": "small", "label": "Smaller Drops, around who can stand.", "stance": "pragmatism", "response": "Ketha counts on one hand and stops early. \"Those. Plan for those. Not for who we wish was well.\"" },
+        { "id": "now", "label": "We go now, and we go so the bench stops filling.", "stance": "ambition", "response": "Ketha looks past Hearth at the pad. \"Say that to the bench. Then I'll believe you believe it.\"" }
+      ]
+    },
+    {
+      "id": "enter:infirmary:ketha_only",
+      "when": { "enterAttractor": "infirmary" },
+      "pair": ["ketha"],
+      "title": "The schedule says soon",
+      "setup": "Ketha has moved the roster next to the bench so she can read both without turning her head.",
+      "beats": [
+        { "speaker": "ketha", "text": "More people sitting than standing. I've run camps like this. They're called hospitals." },
+        { "speaker": "ketha", "text": "Everyone on that bench came back. I want that said out loud before anyone says anything else." }
+      ],
+      "choices": [
+        { "id": "wait", "label": "Nobody drops until the bench is empty.", "stance": "care", "response": "\"Good. I'll hold you to the word empty.\"" },
+        { "id": "small", "label": "Smaller Drops, around who can stand.", "stance": "pragmatism", "response": "\"Then plan for who's standing. Not for who we wish was.\"" }
+      ]
+    },
+    {
+      "id": "enter:hearthfire",
+      "when": { "enterAttractor": "hearthfire" },
+      "pair": ["hearth", "rusk"],
+      "fallback": "enter:hearthfire:hearth_ketha",
+      "title": "A place that expects you",
+      "setup": "Rusk has put a door on the shelf. An actual door, hung on actual hinges, in a wall that is mostly tarp.",
+      "beats": [
+        { "speaker": "rusk", "text": "It doesn't lock." },
+        { "speaker": "hearth", "text": "What's it for, then." },
+        { "speaker": "rusk", "text": "Closing behind you. You'd be surprised how few places let you do that." },
+        { "speaker": "hearth", "text": "I've kept this pad warm for people who never closed anything. They left, they came back." },
+        { "speaker": "rusk", "text": "Now they'll leave and come back and the door will be where they put it. That's the difference." }
+      ],
+      "choices": [
+        { "id": "around", "label": "Make the camp something the war has to go around.", "stance": "stewardship", "response": "Hearth looks at the door for a while. \"Then it needs a wall. I'll stop pretending the tarp is one.\"" },
+        { "id": "people", "label": "A home is the people in it. Bring more of them in.", "stance": "care", "response": "Rusk nods at the door. \"It's wide enough for two. I measured.\"" },
+        { "id": "second", "label": "A home with one door is a trap. Cut a second one.", "stance": "independence", "response": "Rusk considers the wall. \"Two doors. I've held worse.\"" }
+      ]
+    },
+    {
+      "id": "enter:hearthfire:hearth_ketha",
+      "when": { "enterAttractor": "hearthfire" },
+      "pair": ["hearth", "ketha"],
+      "title": "A place that expects you",
+      "setup": "Someone has left a cup on the table by the pad. Not forgotten. Left, so it would be there.",
+      "beats": [
+        { "speaker": "hearth", "text": "Nobody told me to keep the lights on tonight. I did it anyway. That's new." },
+        { "speaker": "ketha", "text": "That's the whole thing. Nobody tells you. You just know which lights." },
+        { "speaker": "hearth", "text": "I know which lights. I've known for a while. I was waiting for someone to notice." }
+      ],
+      "choices": [
+        { "id": "around", "label": "Make the camp something the war has to go around.", "stance": "stewardship", "response": "Hearth nods. \"Then it needs a wall. I'll stop pretending the tarp is one.\"" },
+        { "id": "people", "label": "A home is the people in it. Bring more of them in.", "stance": "care", "response": "Ketha moves the cup an inch. \"Then we'll need more cups. I'll put it on the list under beds.\"" }
+      ]
+    },
+    {
+      "id": "enter:roll",
+      "when": { "enterAttractor": "roll", "dead": ["pavise"] },
+      "pair": ["ketha", "rusk"],
+      "fallback": "enter:roll:no_pavise",
+      "title": "The first name",
+      "setup": "Ketha has a list. Rusk has seen it and would rather not have. The first name on it is the one who knew the commander before any of this.",
+      "beats": [
+        { "speaker": "ketha", "text": "Pavise is at the top because Pavise was first. That's all the order means." },
+        { "speaker": "rusk", "text": "A door I didn't hold." },
+        { "speaker": "ketha", "text": "You weren't there. Nobody was there. That's what the roll is for: the ones nobody was there for." },
+        { "speaker": "rusk", "text": "Then I'll be there next time. Write that under the name." },
+        { "speaker": "ketha", "text": "I don't write promises on this page. I write what happened." }
+      ],
+      "choices": [
+        { "id": "hold", "label": "Next time a frame goes down, we hold the ground until it's carried.", "stance": "ambition", "response": "Rusk straightens. \"Good. I'll need the gatling fixed.\" Ketha writes nothing, which is how she agrees." },
+        { "id": "carry", "label": "We don't lose the living fetching the dead. Carry who can be carried.", "stance": "pragmatism", "response": "Ketha nods slowly. \"Then say it before we Drop. Everyone should know which they are.\"" },
+        { "id": "read", "label": "Read me the roll. All of it. Every time.", "stance": "care", "response": "Ketha looks at the page. \"It's short. It won't stay short. I'll read it anyway.\"" }
+      ]
+    },
+    {
+      "id": "enter:roll:no_pavise",
+      "when": { "enterAttractor": "roll" },
+      "pair": ["ketha", "rusk"],
+      "title": "The roll",
+      "setup": "Ketha has a list. It has more names on it than the roster has chairs.",
+      "beats": [
+        { "speaker": "ketha", "text": "I read it in the order they went. Not by rank. Not by who I liked." },
+        { "speaker": "rusk", "text": "Doors I didn't hold." },
+        { "speaker": "ketha", "text": "Nobody held them. That's what the roll is for. The ones nobody was there for." },
+        { "speaker": "rusk", "text": "Then I'll be there next time." },
+        { "speaker": "ketha", "text": "I don't write promises on this page." }
+      ],
+      "choices": [
+        { "id": "hold", "label": "Next time a frame goes down, we hold the ground until it's carried.", "stance": "ambition", "response": "Rusk nods once. \"I'll need the gatling fixed.\"" },
+        { "id": "carry", "label": "We don't lose the living fetching the dead. Carry who can be carried.", "stance": "pragmatism", "response": "Ketha nods. \"Then say it before we Drop. Everyone should know which they are.\"" },
+        { "id": "read", "label": "Read me the roll. All of it. Every time.", "stance": "care", "response": "\"It won't stay short. I'll read it anyway.\"" }
+      ]
+    },
+    {
+      "id": "enter:ash_front",
+      "when": { "enterAttractor": "ash_front" },
+      "pair": ["yeva", "vane"],
+      "fallback": "enter:ash_front:yeva_ketha",
+      "title": "They've found the road",
+      "setup": "Yeva has marked three places on the map in pencil. None of them is confirmed. All of them are closer than they were last week.",
+      "beats": [
+        { "speaker": "yeva", "text": "I don't know what's at any of these." },
+        { "speaker": "vane", "text": "Then why are they on my map." },
+        { "speaker": "yeva", "text": "Because a week ago I would have known. Nobody's looked. That isn't nothing. That's a shape." },
+        { "speaker": "vane", "text": "A shape walking toward us." },
+        { "speaker": "yeva", "text": "Or standing still while we walk toward it. From here those look the same." }
+      ],
+      "choices": [
+        { "id": "pull", "label": "Pull the line in. Hold what we can see.", "stance": "independence", "response": "Vane redraws the perimeter smaller and adds a door. \"Smaller is fine. Smaller with an exit is better.\"" },
+        { "id": "look", "label": "Go look. Measured ground is the only ground.", "stance": "ambition", "response": "Yeva taps the nearest mark. \"Then this one. If I'm wrong about it, I'd rather be wrong close to home.\"" },
+        { "id": "eyes", "label": "Spend a Drop on eyes, not ground. I want the pencil in ink.", "stance": "pragmatism", "response": "Yeva almost smiles. \"Ink. Yes. The ghosts don't mind being checked.\"" }
+      ]
+    },
+    {
+      "id": "enter:ash_front:yeva_ketha",
+      "when": { "enterAttractor": "ash_front" },
+      "pair": ["yeva", "ketha"],
+      "title": "They've found the road",
+      "setup": "Yeva has put three pencil marks on the map near the camp. Ketha has asked what they are. Yeva has said she doesn't know, which Ketha has learned is the alarming answer.",
+      "beats": [
+        { "speaker": "yeva", "text": "A week ago I'd have known what was there. Nobody's looked since. That isn't nothing." },
+        { "speaker": "ketha", "text": "It's a lot of nothing in a row, pointed at us." },
+        { "speaker": "yeva", "text": "Pointed. Or standing still while we walk toward it. From here those look the same." }
+      ],
+      "choices": [
+        { "id": "pull", "label": "Pull the line in. Hold what we can see.", "stance": "independence", "response": "Ketha nods. \"Smaller. I can keep smaller fed.\"" },
+        { "id": "eyes", "label": "Spend a Drop on eyes, not ground. I want the pencil in ink.", "stance": "pragmatism", "response": "Yeva almost smiles. \"Ink. The ghosts don't mind being checked.\"" }
+      ]
+    },
+    {
+      "id": "enter:finale_overthrow",
+      "when": { "enterAttractor": "finale_overthrow" },
+      "pair": ["grath", "ketha"],
+      "title": "Their flag, our hands",
+      "setup": "The Mercs have sent the last contract. It isn't for a zone.",
+      "beats": [
+        { "speaker": "grath", "text": "They want the Armada gate. All of it. They're paying in territory." },
+        { "speaker": "ketha", "text": "Territory they don't have." },
+        { "speaker": "grath", "text": "Territory we'd take. That's how arrears get paid. Somebody else's house." },
+        { "speaker": "ketha", "text": "And the names on the roll afterwards. Whose house do they go in?" },
+        { "speaker": "grath", "text": "Ours. That part was never on anyone's paper but yours." }
+      ],
+      "choices": [
+        { "id": "names", "label": "Take the contract. Negotiate the names.", "stance": "pragmatism", "response": "Grath picks up the pen. \"Names in the terms. I've never seen it done. I'd like to.\"" },
+        { "id": "keep", "label": "Take the gate. Keep it.", "stance": "independence", "response": "Grath sets the pen down. \"Then it isn't a contract. It's a war with a sponsor. Those end differently.\"" },
+        { "id": "carry", "label": "Take only what we can carry home. All of them.", "stance": "care", "response": "Ketha writes a number on the corner of the contract. \"That's how many. That's the whole negotiation.\"" }
+      ]
+    },
+    {
+      "id": "enter:finale_sovereignty",
+      "when": { "enterAttractor": "finale_sovereignty" },
+      "pair": ["vane", "hearth"],
+      "fallback": "enter:finale_sovereignty:hearth_ketha",
+      "title": "Nobody's paper",
+      "setup": "The last patron message has gone unanswered for three Drops. Nobody noticed, which is the point.",
+      "beats": [
+        { "speaker": "vane", "text": "No one's asked us for anything in three weeks." },
+        { "speaker": "hearth", "text": "I noticed. The lights didn't." },
+        { "speaker": "vane", "text": "That's what it looks like from outside. A place that keeps its own lights." },
+        { "speaker": "hearth", "text": "From inside it looks like a lot of people who need feeding and a commander with no legs." },
+        { "speaker": "vane", "text": "Both. That's what a country is." }
+      ],
+      "choices": [
+        { "id": "hold", "label": "Hold what we have. Let the war end around us.", "stance": "stewardship", "response": "Hearth nods. \"Then I'll need a wall. A real one. I've been saying.\"" },
+        { "id": "gate", "label": "Take the Armada gate ourselves. Finish it under our name.", "stance": "ambition", "response": "Vane draws the route without looking at the map. \"I've had this one drawn for a while.\"" },
+        { "id": "walker", "label": "First, the walker. The commander walks before anyone else does.", "stance": "care", "response": "Hearth and Vane look at each other. Hearth: \"Ketha's been keeping the parts. She'll pretend she hasn't.\"" }
+      ]
+    },
+    {
+      "id": "enter:finale_sovereignty:hearth_ketha",
+      "when": { "enterAttractor": "finale_sovereignty" },
+      "pair": ["hearth", "ketha"],
+      "title": "Nobody's paper",
+      "setup": "The last patron message has gone unanswered for three Drops. Ketha found it under the roster.",
+      "beats": [
+        { "speaker": "ketha", "text": "Nobody's asked us for anything in three weeks." },
+        { "speaker": "hearth", "text": "I noticed. The lights didn't." },
+        { "speaker": "ketha", "text": "A place that keeps its own lights and buries its own dead. I've heard that called a country." }
+      ],
+      "choices": [
+        { "id": "hold", "label": "Hold what we have. Let the war end around us.", "stance": "stewardship", "response": "Hearth nods. \"Then I'll need a wall. A real one.\"" },
+        { "id": "walker", "label": "First, the walker. The commander walks before anyone else does.", "stance": "care", "response": "Ketha doesn't answer right away. \"I've been keeping the parts. Don't tell anyone I said so.\"" }
+      ]
+    },
+    {
+      "id": "enter:finale_spire",
+      "when": { "enterAttractor": "finale_spire" },
+      "pair": ["auditor", "ketha"],
+      "fallback": "enter:finale_spire:ketha_yeva",
+      "title": "The way off",
+      "setup": "The Auditor has done the sum. The company can leave Verdance. It cannot stay and remain itself.",
+      "beats": [
+        { "speaker": "auditor", "text": "I have totaled the world. It does not balance in our favor." },
+        { "speaker": "ketha", "text": "Worlds don't." },
+        { "speaker": "auditor", "text": "This one has a door. The spire. Passage for the living. The roll travels light." },
+        { "speaker": "ketha", "text": "The roll doesn't travel. That's the point of it. It stays where they stayed." },
+        { "speaker": "auditor", "text": "Then someone must stay to read it. I am noting that this is not a cost I know how to enter." }
+      ],
+      "choices": [
+        { "id": "all", "label": "Everyone who's standing goes. The roll stays, and so does a marker.", "stance": "pragmatism", "response": "Ketha nods. \"A marker. Names cut, not painted. Paint goes.\"" },
+        { "id": "stay", "label": "Some of us stay. Someone has to keep reading it.", "stance": "care", "response": "The Auditor's pen stops. \"I will stay. I was built for keeping books that nobody reads.\"" },
+        { "id": "fight", "label": "No door. We hold until there's nothing to hold with.", "stance": "ambition", "response": "Ketha looks at the Auditor, then the roster. \"Then I need the roll to be longer than I can carry. Say it, so I know you mean that.\"" }
+      ]
+    },
+    {
+      "id": "enter:finale_spire:ketha_yeva",
+      "when": { "enterAttractor": "finale_spire" },
+      "pair": ["ketha", "yeva"],
+      "title": "The way off",
+      "setup": "Yeva has found the spire road. She has walked it twice without being seen, which is how she knows it's real.",
+      "beats": [
+        { "speaker": "yeva", "text": "There's a way off. I've walked it. The ghosts go that way already." },
+        { "speaker": "ketha", "text": "And the roll?" },
+        { "speaker": "yeva", "text": "The roll stays. It's a list of where people are. They're here." }
+      ],
+      "choices": [
+        { "id": "all", "label": "Everyone who's standing goes. The roll stays, and so does a marker.", "stance": "pragmatism", "response": "Ketha nods. \"Names cut, not painted. Paint goes.\"" },
+        { "id": "fight", "label": "No door. We hold until there's nothing to hold with.", "stance": "ambition", "response": "Yeva looks at the road she drew. \"Then I'll walk it one more time. To be sure nobody follows us back.\"" }
+      ]
+    }
+  ]
+}

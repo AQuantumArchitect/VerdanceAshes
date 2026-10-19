@@ -1,0 +1,195 @@
+{
+  "schemaVersion": "verdance-attractors/0.1",
+  "notes": "The checkpoint graph. An attractor is a region of reading-space a writer can stand in: a signature over readings (what the company looks like from here), requirements on coherence (which questions must still be open, or must already have been forced), the voices that lead while the company is here, and edges to the places it tends to go next. The projector picks the nearest attractor by Bhattacharyya fidelity between the live diagonal and each signature, filtered by requirements, with stickiness so the company does not flicker between neighbours. Nothing unlocks on mission number. Finale basins open when enough questions have been forced (settledPairsMin), i.e. when the campaign has decided what it is. Edges are authoring guidance and scene triggers, not gates: a trajectory may skip or revisit.",
+  "stickiness": 0.06,
+  "sharpen": 2.0,
+  "attractors": [
+    {
+      "id": "shelf",
+      "title": "The Shelf",
+      "gloss": "Everything is provisional. Names are being learned. The camp is a ledge the company happens to be standing on.",
+      "signature": { "auxiliary": 0.2, "haunted": 0.18, "hunted": 0.14, "rooted": 0.1, "sovereign": 0.1, "bleeding": 0.1, "armada_falling": 0.1, "indebted": 0.05 },
+      "tolerance": 0.9,
+      "requires": [ { "pair": ["auxiliary", "sovereign"], "minCoherence": 0.6 } ],
+      "leads": ["ketha", "grath"],
+      "framing": "Briefings are practical and short. Nobody speaks about what the company is; they speak about what it needs tonight.",
+      "favorThreads": ["place", "bring_back"],
+      "edges": [
+        { "to": "paid_work", "when": "Merc paper accumulates and nothing of it stays ours", "scene": "enter:paid_work" },
+        { "to": "hinge", "when": "Merc paper and our own ground keep arriving together", "scene": "enter:hinge" },
+        { "to": "infirmary", "when": "the bench outgrows the line", "scene": "enter:infirmary" },
+        { "to": "roll", "when": "a second name goes on the roll before the camp has a door", "scene": "enter:roll" }
+      ]
+    },
+    {
+      "id": "paid_work",
+      "title": "Paid Work",
+      "gloss": "The company is good at being hired. It is not asked what it is, and it has stopped asking.",
+      "signature": { "auxiliary": 0.42, "hunted": 0.14, "armada_falling": 0.1, "haunted": 0.1, "bleeding": 0.08, "rooted": 0.06, "sovereign": 0.05, "indebted": 0.05 },
+      "tolerance": 0.78,
+      "requires": [ { "pair": ["auxiliary", "sovereign"], "maxCoherence": 0.66, "leaning": ["auxiliary"] } ],
+      "leads": ["grath", "vane"],
+      "framing": "Briefings arrive as contracts. Grath reads the payment line first. Vane reads the exit. Nobody reads the name of the zone.",
+      "favorThreads": ["friends", "bring_back"],
+      "edges": [
+        { "to": "hinge", "when": "a patron finally asks whose name is on the gate", "scene": "enter:hinge" },
+        { "to": "ledger", "when": "scarcity bites and the first loan is signed", "scene": "enter:ledger" },
+        { "to": "ash_front", "when": "the contracts start arriving from closer and closer", "scene": "enter:ash_front" },
+        { "to": "finale_overthrow", "when": "the last contract is for the world, not a zone", "scene": "enter:finale_overthrow" }
+      ]
+    },
+    {
+      "id": "hinge",
+      "title": "The Hinge",
+      "gloss": "Merc paper and our own flag have been true at once for too long. Someone is about to ask which one it is.",
+      "signature": { "auxiliary": 0.3, "sovereign": 0.3, "hunted": 0.1, "haunted": 0.1, "rooted": 0.08, "bleeding": 0.05, "armada_falling": 0.05, "indebted": 0.02 },
+      "tolerance": 0.8,
+      "requires": [ { "pair": ["auxiliary", "sovereign"], "minCoherence": 0.5 } ],
+      "leads": ["auditor", "ketha"],
+      "framing": "Dramatic irony is the register. The Auditor says what nobody has asked. Briefings carry two names for the same ground and the text does not resolve them; the player's next choices do.",
+      "favorThreads": ["friends", "shelter"],
+      "edges": [
+        { "to": "paid_work", "when": "the company answers 'theirs' and keeps walking through the gate", "scene": null },
+        { "to": "own_flag", "when": "the company answers 'ours' and holds it", "scene": "enter:own_flag" },
+        { "to": "ledger", "when": "the company answers with borrowed money", "scene": "enter:ledger" }
+      ]
+    },
+    {
+      "id": "own_flag",
+      "title": "Our Own Flag",
+      "gloss": "Held ground with no patron's mark on it. Every zone is a door someone has to watch.",
+      "signature": { "sovereign": 0.42, "rooted": 0.14, "hunted": 0.12, "haunted": 0.08, "auxiliary": 0.08, "armada_falling": 0.08, "bleeding": 0.05, "indebted": 0.03 },
+      "tolerance": 0.78,
+      "requires": [ { "pair": ["auxiliary", "sovereign"], "maxCoherence": 0.66, "leaning": ["sovereign"] } ],
+      "leads": ["vane", "hearth"],
+      "framing": "Briefings are maps, not contracts. Vane names roads. Hearth names what each held zone costs to keep lit. The Mercs are referred to in the past tense.",
+      "favorThreads": ["shelter", "company"],
+      "edges": [
+        { "to": "hearthfire", "when": "the held ground acquires a door people close behind them", "scene": "enter:hearthfire" },
+        { "to": "ledger", "when": "sovereignty is being paid for with someone else's money", "scene": "enter:ledger" },
+        { "to": "ash_front", "when": "the war notices the flag", "scene": "enter:ash_front" },
+        { "to": "finale_sovereignty", "when": "no patron has asked for anything in a long time and nobody noticed", "scene": "enter:finale_sovereignty" }
+      ]
+    },
+    {
+      "id": "ledger",
+      "title": "The Ledger",
+      "gloss": "The company owns ground and owes for it. Every Drop pays interest before it pays anyone in the camp.",
+      "signature": { "indebted": 0.38, "auxiliary": 0.14, "sovereign": 0.14, "hunted": 0.1, "haunted": 0.08, "bleeding": 0.06, "rooted": 0.05, "armada_falling": 0.05 },
+      "tolerance": 0.78,
+      "requires": [],
+      "leads": ["auditor", "grath"],
+      "framing": "Two ledgers on the table and they disagree. Briefings state the cost of the Drop before its objective. The dealer is never seen and always present.",
+      "favorThreads": ["dealer", "friends"],
+      "edges": [
+        { "to": "own_flag", "when": "the paper is burned", "scene": "enter:own_flag" },
+        { "to": "paid_work", "when": "the debt is rolled into a Merc retainer", "scene": "enter:paid_work" },
+        { "to": "finale_spire", "when": "the sum does not balance and there is a door off-world", "scene": "enter:finale_spire" }
+      ]
+    },
+    {
+      "id": "infirmary",
+      "title": "The Infirmary",
+      "gloss": "The bench by the pad has more people on it than the line does. The camp is a hospital with a flag.",
+      "signature": { "bleeding": 0.38, "haunted": 0.16, "rooted": 0.12, "hunted": 0.1, "auxiliary": 0.08, "sovereign": 0.06, "armada_falling": 0.05, "indebted": 0.05 },
+      "tolerance": 0.78,
+      "requires": [ { "pair": ["bleeding", "rooted"], "maxCoherence": 0.8, "leaning": ["bleeding", null] } ],
+      "leads": ["ketha", "hearth"],
+      "framing": "Ketha leads every briefing and every one of them starts with who is not on it. Objectives are described by how far they are from the pad.",
+      "favorThreads": ["bring_back", "place"],
+      "edges": [
+        { "to": "hearthfire", "when": "the bench empties and people start coming back whole", "scene": "enter:hearthfire" },
+        { "to": "roll", "when": "the bench empties the other way", "scene": "enter:roll" },
+        { "to": "paid_work", "when": "the company takes easy paper to stop the bleeding", "scene": "enter:paid_work" }
+      ]
+    },
+    {
+      "id": "hearthfire",
+      "title": "Hearthfire",
+      "gloss": "A place that expects you. The lights stay on because someone decided they would.",
+      "signature": { "rooted": 0.4, "sovereign": 0.16, "haunted": 0.08, "hunted": 0.1, "auxiliary": 0.08, "bleeding": 0.06, "armada_falling": 0.07, "indebted": 0.05 },
+      "tolerance": 0.78,
+      "requires": [ { "pair": ["bleeding", "rooted"], "maxCoherence": 0.66, "leaning": ["rooted"] } ],
+      "leads": ["hearth", "rusk"],
+      "framing": "Briefings start at the camp and walk outward. Rusk names the doors. Hearth names who is at the table tonight. The war is something that happens on the far side of a threshold.",
+      "favorThreads": ["place", "shelter", "company"],
+      "edges": [
+        { "to": "ash_front", "when": "the war finds the road to the camp", "scene": "enter:ash_front" },
+        { "to": "infirmary", "when": "a bad return fills the bench again", "scene": "enter:infirmary" },
+        { "to": "finale_sovereignty", "when": "the camp has outlived every patron that paid for it", "scene": "enter:finale_sovereignty" }
+      ]
+    },
+    {
+      "id": "roll",
+      "title": "The Roll",
+      "gloss": "The dead and the unnamed outnumber the living who are counted. The commander still has no name on the field.",
+      "signature": { "haunted": 0.4, "bleeding": 0.18, "hunted": 0.1, "auxiliary": 0.08, "sovereign": 0.06, "rooted": 0.06, "armada_falling": 0.07, "indebted": 0.05 },
+      "tolerance": 0.78,
+      "requires": [ { "pair": ["haunted", "rooted"], "maxCoherence": 0.66, "leaning": ["haunted", null] } ],
+      "leads": ["ketha", "rusk"],
+      "framing": "Ketha reads from the roll at the start of every briefing, by name, with where the frame was left. Rusk argues for going back. The walker on the shelf is mentioned by someone every time.",
+      "favorThreads": ["bring_back", "company"],
+      "edges": [
+        { "to": "hearthfire", "when": "frames start coming home and the walker is rebuilt", "scene": "enter:hearthfire" },
+        { "to": "infirmary", "when": "the company keeps going back and keeps paying for it", "scene": "enter:infirmary" },
+        { "to": "finale_spire", "when": "the roll is the only thing that would stay on Verdance", "scene": "enter:finale_spire" }
+      ]
+    },
+    {
+      "id": "ash_front",
+      "title": "Ash Front",
+      "gloss": "The pressure is coming toward the company. Pencil marks on the map are closer than they were last week.",
+      "signature": { "hunted": 0.34, "armada_falling": 0.18, "sovereign": 0.1, "auxiliary": 0.1, "haunted": 0.1, "bleeding": 0.08, "rooted": 0.06, "indebted": 0.04 },
+      "tolerance": 0.78,
+      "requires": [ { "pair": ["hunted", "armada_falling"], "maxCoherence": 0.8, "leaning": ["hunted"] } ],
+      "leads": ["yeva", "vane", "auditor"],
+      "framing": "Yeva leads with what nobody has seen. Briefings give estimate bands as plain speech ('a picket, maybe a battalion') and the Drop's surprise is named afterwards. Vane draws exits before objectives.",
+      "favorThreads": ["shelter", "friends"],
+      "edges": [
+        { "to": "own_flag", "when": "the front is held and the ground stays ours", "scene": "enter:own_flag" },
+        { "to": "infirmary", "when": "the front is held and the bench fills", "scene": "enter:infirmary" },
+        { "to": "finale_overthrow", "when": "the Mercs offer the Armada gate itself", "scene": "enter:finale_overthrow" },
+        { "to": "finale_spire", "when": "there is no holding it and there is a way off", "scene": "enter:finale_spire" }
+      ]
+    },
+    {
+      "id": "finale_overthrow",
+      "title": "Their Flag, Our Hands",
+      "gloss": "The old flag comes down and the company is the hand that pulls it, on someone else's paper.",
+      "signature": { "armada_falling": 0.32, "auxiliary": 0.28, "hunted": 0.12, "haunted": 0.1, "indebted": 0.06, "bleeding": 0.05, "sovereign": 0.04, "rooted": 0.03 },
+      "tolerance": 0.75,
+      "requires": [ { "settledPairsMin": 3 }, { "pair": ["auxiliary", "sovereign"], "leaning": ["auxiliary"] } ],
+      "leads": ["grath", "ketha", "auditor"],
+      "framing": "Finale register. Ketha's finale pool: overthrow. The Auditor reads the enemy's version of the roll, in which no Ashwalker is named.",
+      "favorThreads": ["friends"],
+      "terminal": true,
+      "edges": []
+    },
+    {
+      "id": "finale_sovereignty",
+      "title": "Nobody's Paper",
+      "gloss": "The company has outlived every patron. What it is, is now the only thing left standing on Verdance.",
+      "signature": { "sovereign": 0.32, "rooted": 0.22, "armada_falling": 0.16, "hunted": 0.1, "haunted": 0.08, "auxiliary": 0.05, "bleeding": 0.04, "indebted": 0.03 },
+      "tolerance": 0.75,
+      "requires": [ { "settledPairsMin": 3 }, { "pair": ["auxiliary", "sovereign"], "leaning": ["sovereign"] } ],
+      "leads": ["vane", "hearth", "ketha"],
+      "framing": "Finale register. Ketha's finale pool: sovereignty. The roll is read in full, at home, by name.",
+      "favorThreads": ["company", "shelter"],
+      "terminal": true,
+      "edges": []
+    },
+    {
+      "id": "finale_spire",
+      "title": "The Way Off",
+      "gloss": "The world does not balance. There is a door, and the roll does not travel.",
+      "signature": { "haunted": 0.24, "indebted": 0.18, "hunted": 0.18, "armada_falling": 0.16, "bleeding": 0.1, "auxiliary": 0.06, "sovereign": 0.05, "rooted": 0.03 },
+      "tolerance": 0.75,
+      "requires": [ { "settledPairsMin": 3 } ],
+      "leads": ["auditor", "ketha", "yeva"],
+      "framing": "Finale register. Ketha's finale pool: spire_jump. The last briefing is about what stays.",
+      "favorThreads": ["dealer", "bring_back"],
+      "terminal": true,
+      "edges": []
+    }
+  ]
+}

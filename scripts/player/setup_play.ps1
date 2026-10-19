@@ -44,13 +44,8 @@ Write-Host "Rebuilding hub surface..."
 $prev = Get-Location
 Set-Location $Workspace
 try {
-  $code = @"
-from verdance_kernel.api import CampaignKernel
-k = CampaignKernel(r'''$Workspace''')
-r = k.rebuild_hub()
-print('ok' if r.get('ok') else r)
-"@
-  $result = & $py -c $code
+  # Avoid PowerShell @"..."@ here-strings (broken on LF-only .ps1 in PS 5.1).
+  $result = & $py -m verdance_kernel rebuild --workspace $Workspace
   Write-Host "Hub: $result"
   if ($LASTEXITCODE -ne 0) { throw "hub rebuild failed (exit $LASTEXITCODE)" }
 } finally {
