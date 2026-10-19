@@ -3,160 +3,9 @@
   "narrative": {
     "enabled": true,
     "schemaVersion": "verdance-narrative/1.0",
-    "revision": "345dd4d9034d96caedbe0ef1",
-    "turn": 4,
+    "revision": "3e9a607452ca90328be2afa3",
+    "turn": 0,
     "threads": [
-      {
-        "id": "shelter",
-        "title": "The Price of Shelter",
-        "maps": [
-          "the_rock_jungle",
-          "greenest_fields",
-          "koom_valley"
-        ],
-        "priority": 181,
-        "reason": "Our ground still needs attention.",
-        "opening": "Every foothold is a door that opens both ways.",
-        "escalation": "Our ground still needs attention.",
-        "success": "A confirmed claim gives the company ground to stand on.",
-        "failure": "The ground is not secured yet. Check the next operation's requirements.",
-        "changed": "The commitment has run its course or the foothold is gone. Choose a fresh route; no territory is awarded.",
-        "callback": "You made holding ground part of the company's story.",
-        "perspectives": [],
-        "choices": [],
-        "stage": "Committed",
-        "openedTurn": 0,
-        "history": [
-          {
-            "eventId": "53d68621-e880-46b4-b1f3-d4039e08d392",
-            "turn": 2,
-            "kind": "commitment",
-            "text": "Commit to securing ground"
-          },
-          {
-            "eventId": "verdance_ashes|va_003|3|ch1|partial|extracted_side_raid_damage|f13502",
-            "turn": 3,
-            "stage": "Committed",
-            "text": "The ground is not secured yet. Check the next operation's requirements."
-          },
-          {
-            "eventId": "verdance_ashes|va_004|4|ch2|victory|extracted|f15242",
-            "turn": 4,
-            "stage": "Committed",
-            "text": "Our ground still needs attention."
-          }
-        ],
-        "supportingEvents": [
-          "verdance_ashes|va_003|3|ch1|partial|extracted_side_raid_damage|f13502",
-          "verdance_ashes|va_004|4|ch2|victory|extracted|f15242"
-        ],
-        "presentations": 4,
-        "stance": "Holding ground",
-        "response": "Vane marks the ground. \"Then it gets a name, a route, and someone watching the route.\"",
-        "promise": "Commit to securing ground",
-        "commitment": "shelter:claim",
-        "goal": "claim",
-        "committedTurn": 2,
-        "explanation": "Our ground still needs attention.",
-        "deadline": 5,
-        "remaining": 1,
-        "trust": 0,
-        "operations": [
-          "wr_GF_NW_MUSTER__GF_C_INNER_GATE",
-          "wr_GF_C_INNER_GATE__GF_NW_MUSTER"
-        ],
-        "operationLabels": {
-          "wr_GF_NW_MUSTER__GF_C_INNER_GATE": "Walk the Eye through Central Inner Gate",
-          "wr_GF_C_INNER_GATE__GF_NW_MUSTER": "Walk the Rock Jungle through Northwest Muster"
-        },
-        "reactions": []
-      },
-      {
-        "id": "company",
-        "title": "The Shape of the Company",
-        "maps": [
-          "the_rock_jungle",
-          "greenest_fields",
-          "koom_valley",
-          "tabula",
-          "all_that_simmers",
-          "eye_of_horus",
-          "ancient_bastion"
-        ],
-        "priority": 166,
-        "reason": "A quieter return can give those disagreements room to breathe.",
-        "opening": "The same company can want very different futures.",
-        "escalation": "A quieter return can give those disagreements room to breathe.",
-        "success": "A clean return kept this commitment alive in the company's memory.",
-        "failure": "The return did not settle the company's unfinished business.",
-        "changed": "The company needs a new commitment suited to its current condition.",
-        "callback": "The company remembers that coming home mattered.",
-        "perspectives": [
-          {
-            "speaker": "ketha",
-            "text": "We are more than the list of what still fires."
-          }
-        ],
-        "choices": [],
-        "stage": "Committed",
-        "openedTurn": 0,
-        "history": [
-          {
-            "eventId": "f01394a6-5452-4e62-8b42-95db1f7668dd",
-            "turn": 2,
-            "kind": "commitment",
-            "text": "Commit to a careful return"
-          },
-          {
-            "eventId": "verdance_ashes|va_003|3|ch1|partial|extracted_side_raid_damage|f13502",
-            "turn": 3,
-            "stage": "Committed",
-            "text": "The return did not settle the company's unfinished business."
-          },
-          {
-            "eventId": "verdance_ashes|va_004|4|ch2|victory|extracted|f15242",
-            "turn": 4,
-            "stage": "Committed",
-            "text": "A quieter return can give those disagreements room to breathe."
-          }
-        ],
-        "supportingEvents": [
-          "verdance_ashes|va_003|3|ch1|partial|extracted_side_raid_damage|f13502",
-          "verdance_ashes|va_004|4|ch2|victory|extracted|f15242"
-        ],
-        "presentations": 4,
-        "stance": "Care",
-        "response": "Ketha nods once. \"Careful is work. It means planning for the person who cannot keep up.\"",
-        "promise": "Commit to a careful return",
-        "commitment": "company:recover",
-        "goal": "recover",
-        "committedTurn": 2,
-        "explanation": "A quieter return can give those disagreements room to breathe.",
-        "deadline": 5,
-        "remaining": 1,
-        "trust": 0,
-        "operations": [
-          "wr_EOH_NW_BASTION__EOH_SE_BASTION",
-          "wr_GF_NW_MUSTER__GF_C_INNER_GATE",
-          "wr_GF_C_INNER_GATE__GF_NW_MUSTER"
-        ],
-        "operationLabels": {
-          "wr_EOH_NW_BASTION__EOH_SE_BASTION": "Lean \u00b7 Open Koom Valley through Southeast Bastion",
-          "wr_GF_NW_MUSTER__GF_C_INNER_GATE": "Walk the Eye through Central Inner Gate",
-          "wr_GF_C_INNER_GATE__GF_NW_MUSTER": "Walk the Rock Jungle through Northwest Muster"
-        },
-        "reactions": [
-          {
-            "speaker": "ketha",
-            "style": "care",
-            "basis": "words",
-            "text": "You put people first. Good. I will ask you to mean it when the salvage is close.",
-            "memory": "Commit to a careful return",
-            "sourceEventId": "f01394a6-5452-4e62-8b42-95db1f7668dd",
-            "turn": 2
-          }
-        ]
-      },
       {
         "id": "place",
         "title": "A Place to Stand",
@@ -164,8 +13,8 @@
           "the_rock_jungle",
           "greenest_fields"
         ],
-        "priority": 81,
-        "reason": "The camp is established. A place to return to is now part of the war.",
+        "priority": 80,
+        "reason": "The company needs a home.",
         "opening": "We have somewhere to land. We still need somewhere to belong.",
         "escalation": "The shelf is waiting; decide what you can bring to it.",
         "success": "The camp is established. A place to return to is now part of the war.",
@@ -178,57 +27,53 @@
             "text": "I can mend a company. Give me somewhere to put it."
           }
         ],
-        "choices": [],
-        "stage": "Resolved",
-        "openedTurn": 0,
-        "history": [
+        "choices": [
           {
-            "eventId": "1221a5d2-a365-4165-b5d3-a3d632e05eda",
-            "turn": 0,
-            "kind": "commitment",
-            "text": "Raid for the home"
+            "id": "place:raid",
+            "label": "Raid for the home",
+            "goal": "raid",
+            "obligation": "Complete a clean extraction from Greenest Fields. No deadline.",
+            "cost": 0,
+            "stance": "Building a future",
+            "response": "Ketha clears a corner of the supply table. \"All right. We start here. Try not to build the infirmary downhill from the ammunition.\""
           },
           {
-            "eventId": "verdance_ashes|va_001|1|ch1|victory|extracted|f1562",
-            "turn": 1,
-            "stage": "Resolved",
-            "text": "The camp is established. A place to return to is now part of the war."
+            "id": "place:home",
+            "label": "Establish the camp",
+            "goal": "home",
+            "obligation": "Raise the existing home camp, then complete a sortie. No deadline.",
+            "cost": 0,
+            "stance": "Building a future",
+            "response": "Ketha clears a corner of the supply table. \"All right. We start here. Try not to build the infirmary downhill from the ammunition.\""
+          },
+          {
+            "id": "place:people",
+            "label": "A home starts with who comes back.",
+            "goal": "recover",
+            "stance": "Care before ambition",
+            "obligation": "Complete a clean extraction with explicit survivor records showing no hero wounds or losses. No deadline.",
+            "response": "Ketha leaves a space at the table instead of drawing a bigger perimeter. \"Good. Start with people. Walls can learn to wait.\"",
+            "success": "You promised people before walls, and the field report supports that promise.",
+            "callback": "Ketha taps the empty chair. \"Still a chair. Not a memorial. That was the plan.\"",
+            "cost": 0
           }
         ],
-        "supportingEvents": [
-          "verdance_ashes|va_001|1|ch1|victory|extracted|f1562"
-        ],
+        "stage": "Available",
+        "openedTurn": 0,
+        "history": [],
+        "supportingEvents": [],
         "presentations": 0,
-        "stance": "Building a future",
-        "response": "Ketha clears a corner of the supply table. \"All right. We start here. Try not to build the infirmary downhill from the ammunition.\"",
-        "promise": "Raid for the home",
-        "commitment": "place:raid",
-        "goal": "raid",
-        "committedTurn": 0,
-        "explanation": "The camp is established. A place to return to is now part of the war.",
-        "remembered": "You built a place worth returning to.",
-        "resolvedTurn": 1,
         "remaining": null,
-        "trust": 1,
+        "trust": 0,
         "operations": [
-          "wr_GF_NW_MUSTER__GF_C_INNER_GATE",
-          "wr_GF_C_INNER_GATE__GF_NW_MUSTER"
+          "c_raid_tnb_greenest_fields",
+          "c_home_probe"
         ],
         "operationLabels": {
-          "wr_GF_NW_MUSTER__GF_C_INNER_GATE": "Walk the Eye through Central Inner Gate",
-          "wr_GF_C_INNER_GATE__GF_NW_MUSTER": "Walk the Rock Jungle through Northwest Muster"
+          "c_raid_tnb_greenest_fields": "Raid Greenest Fields for Tenebrium",
+          "c_home_probe": "Found the Rock Jungle camp"
         },
-        "reactions": [
-          {
-            "speaker": "ketha",
-            "style": "care",
-            "basis": "words",
-            "text": "You put people first. Good. I will ask you to mean it when the salvage is close.",
-            "memory": "Commit to a careful return",
-            "sourceEventId": "f01394a6-5452-4e62-8b42-95db1f7668dd",
-            "turn": 2
-          }
-        ]
+        "reactions": []
       },
       {
         "id": "bring_back",
@@ -238,8 +83,8 @@
           "the_rock_jungle",
           "all_that_simmers"
         ],
-        "priority": 70,
-        "reason": "The extraction commitment has changed. Re-plan with the company you have.",
+        "priority": 75,
+        "reason": "Extraction turns battlefield gains into a future.",
         "opening": "There is always one more valuable thing beyond the line.",
         "escalation": "There is still a way home. Decide what is worth carrying.",
         "success": "The company completed a clean extraction. The result ledger records what survived.",
@@ -288,123 +133,6 @@
             "deadline": 3
           }
         ],
-        "stage": "Changed",
-        "openedTurn": 0,
-        "history": [
-          {
-            "eventId": "96f2e6c0-4d60-4fe1-9af4-a9abd8ade108",
-            "turn": 0,
-            "kind": "commitment",
-            "text": "Nobody is spare equipment."
-          },
-          {
-            "eventId": "verdance_ashes|va_001|1|ch1|victory|extracted|f1562",
-            "turn": 1,
-            "stage": "Committed",
-            "text": "There is still a way home. Decide what is worth carrying."
-          },
-          {
-            "eventId": "verdance_ashes|va_002|2|ch2|partial|extracted_side_field_recruit|f3032",
-            "turn": 2,
-            "stage": "Committed",
-            "text": "The return was costly. Read the losses before choosing the next risk."
-          },
-          {
-            "eventId": "verdance_ashes|va_003|3|ch1|partial|extracted_side_raid_damage|f13502",
-            "turn": 3,
-            "stage": "Changed",
-            "text": "The extraction commitment has changed. Re-plan with the company you have."
-          }
-        ],
-        "supportingEvents": [
-          "verdance_ashes|va_001|1|ch1|victory|extracted|f1562",
-          "verdance_ashes|va_002|2|ch2|partial|extracted_side_field_recruit|f3032",
-          "verdance_ashes|va_003|3|ch1|partial|extracted_side_raid_damage|f13502"
-        ],
-        "presentations": 4,
-        "stance": "Care before profit",
-        "response": "Ketha closes the salvage tally. \"I will still count the metal. I will just count you first.\"",
-        "promise": "Nobody is spare equipment.",
-        "commitment": "bring_back:care",
-        "goal": "recover",
-        "committedTurn": 0,
-        "explanation": "The extraction commitment has changed. Re-plan with the company you have.",
-        "deadline": 3,
-        "remaining": 0,
-        "trust": -1,
-        "operations": [
-          "wr_GF_NW_MUSTER__GF_C_INNER_GATE",
-          "wr_GF_C_INNER_GATE__GF_NW_MUSTER"
-        ],
-        "operationLabels": {
-          "wr_GF_NW_MUSTER__GF_C_INNER_GATE": "Walk the Eye through Central Inner Gate",
-          "wr_GF_C_INNER_GATE__GF_NW_MUSTER": "Walk the Rock Jungle through Northwest Muster"
-        },
-        "reactions": [
-          {
-            "speaker": "ketha",
-            "style": "care",
-            "basis": "words",
-            "text": "You put people first. Good. I will ask you to mean it when the salvage is close.",
-            "memory": "Commit to a careful return",
-            "sourceEventId": "f01394a6-5452-4e62-8b42-95db1f7668dd",
-            "turn": 2
-          }
-        ]
-      },
-      {
-        "id": "friends",
-        "title": "Friends of Convenience",
-        "maps": [
-          "greenest_fields",
-          "koom_valley",
-          "tabula"
-        ],
-        "priority": 45,
-        "reason": "Null Merc standing affects who fights beside you.",
-        "opening": "A shared enemy is a beginning, not an oath.",
-        "escalation": "The mercs will judge the next field result.",
-        "success": "You completed the promised operation away from the dealer's ground. Existing faction rules determine the standing change.",
-        "failure": "Shared interests have not yet become a successful operation.",
-        "changed": "The promised window passed. The next conversation begins with unfinished business.",
-        "callback": "The mercs have a field result to remember.",
-        "perspectives": [],
-        "choices": [
-          {
-            "id": "friends:merc",
-            "label": "Promise a successful field operation",
-            "goal": "merc",
-            "obligation": "Win an operation outside Eye of Horus within three completed sorties. Existing reputation rules still apply.",
-            "cost": 0,
-            "deadline": 3,
-            "stance": "Reciprocity",
-            "response": "Vane checks the map again. \"A promise with a destination. I can live with that.\""
-          },
-          {
-            "id": "friends:independent",
-            "label": "Cooperate, but promise them nothing.",
-            "goal": "extract",
-            "stance": "Independence",
-            "obligation": "Complete a clean extraction within three completed sorties. This promise is to your company; it grants no faction standing.",
-            "response": "Vane nods. \"A shared road. Separate steering wheels.\"",
-            "success": "You kept the company moving without pretending a field result was an alliance.",
-            "callback": "When someone calls the mercs family, the company still asks which part of the contract says that.",
-            "cost": 0,
-            "deadline": 3
-          },
-          {
-            "id": "friends:care",
-            "label": "Our people set the terms.",
-            "goal": "recover",
-            "stance": "Solidarity",
-            "obligation": "Complete a clean extraction with explicit survivor records showing no hero wounds or losses within three completed sorties. No alliance is created.",
-            "response": "Vale considers the wording. \"An actual term. Better than mutual benefit, which usually means their benefit twice.\"",
-            "success": "You backed your terms with a clean, unwounded return recorded by the result.",
-            "callback": "The phrase our people first has made it into the margins of the company agreements.",
-            "cost": 0,
-            "deadline": 3
-          }
-        ],
         "stage": "Available",
         "openedTurn": 0,
         "history": [],
@@ -413,358 +141,72 @@
         "remaining": null,
         "trust": 0,
         "operations": [
-          "wr_GF_NW_MUSTER__GF_C_INNER_GATE",
-          "wr_GF_C_INNER_GATE__GF_NW_MUSTER"
+          "c_raid_tnb_greenest_fields",
+          "c_home_probe"
         ],
         "operationLabels": {
-          "wr_GF_NW_MUSTER__GF_C_INNER_GATE": "Walk the Eye through Central Inner Gate",
-          "wr_GF_C_INNER_GATE__GF_NW_MUSTER": "Walk the Rock Jungle through Northwest Muster"
+          "c_raid_tnb_greenest_fields": "Raid Greenest Fields for Tenebrium",
+          "c_home_probe": "Found the Rock Jungle camp"
         },
         "reactions": []
       }
     ],
     "recommended": [
-      "shelter",
-      "company",
+      "place",
       "bring_back"
     ],
     "operations": [
       {
-        "id": "wr_EOH_NW_BASTION__EOH_SE_BASTION",
-        "title": "Lean \u00b7 Open Koom Valley through Southeast Bastion",
+        "id": "c_home_probe",
+        "title": "Found the Rock Jungle camp",
+        "mapId": "the_rock_jungle",
+        "purpose": "Start the new Ashwalker base: plant eco, dig in against raptor pests, and maybe mint a small exfil force. Spend leftover Tnb on constructors at the broker if you did not seat expensive heroes.",
+        "required": "Complete the required marks shown in the battle briefing; optional marks do not replace them.",
+        "bringHome": "Choose Home or Stay in field, then confirm extraction in the battle sidebar. The marked sector must show friendly control and be clear of hostiles. Hold the pad for 10 seconds; interruption resets the hold. The campaign saves the result before returning home or offering the next field mission. Timeout is a separate outcome, not extraction.",
+        "risks": "Enemy strength beyond observed ground is unknown. Optional targets add exposure.",
+        "consequences": "Territory changes require objective credit or a confirmed node claim. Capturing ground does not create Tenebrium.",
+        "disabled": false,
+        "priority": 0,
+        "recommendation": "Available on this theater. Review the requirements and route."
+      },
+      {
+        "id": "c_raid_crater",
+        "title": "Strike the Horus crater",
         "mapId": "eye_of_horus",
-        "purpose": "You are at Northwest Bastion, the Eye. You came in from Greenest Fields.\nHeading Southeast Bastion. That road opens Koom Valley.\nAlong the way: Bro, Infestor Hive, Twitcher, Whisper-of-Ash Yeva.\nThe world leans this way.",
-        "required": "Clear and hold the marked zone until the objective confirms completion.",
-        "bringHome": "Rally at extraction and complete its hold. The debrief confirms what was retained or lost.",
+        "purpose": "Cortex still smiles at customers \u2014 until you glass their gear.",
+        "required": "Destroy the marked key structures.",
+        "bringHome": "Choose Home or Stay in field, then confirm extraction in the battle sidebar. The marked sector must show friendly control and be clear of hostiles. Hold the pad for 10 seconds; interruption resets the hold. The campaign saves the result before returning home or offering the next field mission. Timeout is a separate outcome, not extraction.",
         "risks": "Enemy strength beyond observed ground is unknown. Optional targets add exposure.",
         "consequences": "Territory changes require objective credit or a confirmed node claim. Capturing ground does not create Tenebrium.",
         "disabled": false,
-        "priority": 100,
-        "recommendation": "Supports your commitment: The Shape of the Company"
+        "priority": 0,
+        "recommendation": "Available on this theater. Review the requirements and route."
       },
       {
-        "id": "wr_GF_C_INNER_GATE__GF_NW_MUSTER",
-        "title": "Walk the Rock Jungle through Northwest Muster",
+        "id": "c_raid_tnb_greenest_fields",
+        "title": "Raid Greenest Fields for Tenebrium",
         "mapId": "greenest_fields",
-        "purpose": "You are at Central Inner Gate, Greenest Fields. You came in from a road already open.\nHeading Northwest Muster. That road returns to the Rock Jungle.\nAlong the way: Halbard, Saint Kettle, Odessa Krail, Spoke +5.\nStill open.",
-        "required": "Clear and hold the marked zone until the objective confirms completion.",
-        "bringHome": "Rally at extraction and complete its hold. The debrief confirms what was retained or lost.",
+        "purpose": "Jump the Fields first: land the quiet north desert rim, break Armada decoy farms on the southeast plateau for Tenebrium, then extract back to that open pad. A stack left on exfil becomes your first Fields foothold.",
+        "required": "Destroy the required raid targets. Recover salvage before leaving.",
+        "bringHome": "Choose Home or Stay in field, then confirm extraction in the battle sidebar. The marked sector must show friendly control and be clear of hostiles. Hold the pad for 10 seconds; interruption resets the hold. The campaign saves the result before returning home or offering the next field mission. Timeout is a separate outcome, not extraction.",
         "risks": "Enemy strength beyond observed ground is unknown. Optional targets add exposure.",
         "consequences": "Territory changes require objective credit or a confirmed node claim. Capturing ground does not create Tenebrium.",
         "disabled": false,
-        "priority": 100,
-        "recommendation": "Supports your commitment: The Price of Shelter"
-      },
-      {
-        "id": "wr_GF_NW_MUSTER__GF_C_INNER_GATE",
-        "title": "Walk the Eye through Central Inner Gate",
-        "mapId": "greenest_fields",
-        "purpose": "You are at Northwest Muster, Greenest Fields. You came in from a road already open.\nHeading Central Inner Gate. That road returns to the Eye.\nAlong the way: Halbard, Saint Kettle, Odessa Krail, Spoke +5.\nStill open.",
-        "required": "Clear and hold the marked zone until the objective confirms completion.",
-        "bringHome": "Rally at extraction and complete its hold. The debrief confirms what was retained or lost.",
-        "risks": "Enemy strength beyond observed ground is unknown. Optional targets add exposure.",
-        "consequences": "Territory changes require objective credit or a confirmed node claim. Capturing ground does not create Tenebrium.",
-        "disabled": false,
-        "priority": 100,
-        "recommendation": "Supports your commitment: The Price of Shelter"
+        "priority": 0,
+        "recommendation": "Available on this theater. Review the requirements and route."
       }
     ],
-    "chronicle": [
-      {
-        "id": "verdance_ashes|va_004|4|ch2|victory|extracted|f15242",
-        "turn": 4,
-        "mapId": "greenest_fields",
-        "verdict": "victory",
-        "title": "Success",
-        "participants": [
-          "cauter",
-          "ceil",
-          "fatboy",
-          "ketha",
-          "noctua",
-          "pavise",
-          "verse"
-        ],
-        "consequences": [
-          {
-            "sourceEventId": "verdance_ashes|va_004|4|ch2|victory|extracted|f15242",
-            "origin": "campaign_update",
-            "text": "Nullmercs standing rose from 59 to 68."
-          },
-          {
-            "sourceEventId": "verdance_ashes|va_004|4|ch2|victory|extracted|f15242",
-            "origin": "campaign_update",
-            "text": "Conflict pressure eased."
-          },
-          {
-            "sourceEventId": "verdance_ashes|va_004|4|ch2|victory|extracted|f15242",
-            "origin": "campaign_update",
-            "text": "Resource pressure eased."
-          },
-          {
-            "sourceEventId": "verdance_ashes|va_004|4|ch2|victory|extracted|f15242",
-            "origin": "campaign_update",
-            "text": "Independent influence grew."
-          },
-          {
-            "sourceEventId": "verdance_ashes|va_004|4|ch2|victory|extracted|f15242",
-            "threadId": "shelter",
-            "origin": "your_action",
-            "text": "Our ground still needs attention."
-          },
-          {
-            "sourceEventId": "verdance_ashes|va_004|4|ch2|victory|extracted|f15242",
-            "threadId": "company",
-            "origin": "your_action",
-            "text": "A quieter return can give those disagreements room to breathe."
-          }
-        ],
-        "credits": {
-          "objectiveComplete": true,
-          "nodeClaimed": false,
-          "pocketCleared": false,
-          "zoneFlipEligible": true,
-          "cleanExtract": true,
-          "raidCredit": true,
-          "isCapturePath": false
-        },
-        "resources": {
-          "tenebriumBank": 10,
-          "tenebriumLooted": 6,
-          "tenebriumSpent": 0,
-          "tenebriumLost": 11
-        },
-        "wounded": [
-          "fatboy",
-          "cauter"
-        ]
-      },
-      {
-        "id": "verdance_ashes|va_003|3|ch1|partial|extracted_side_raid_damage|f13502",
-        "turn": 3,
-        "mapId": "greenest_fields",
-        "verdict": "partial",
-        "title": "Partial success",
-        "participants": [
-          "cauter",
-          "ceil",
-          "fatboy",
-          "ketha",
-          "noctua",
-          "pavise",
-          "verse"
-        ],
-        "consequences": [
-          {
-            "sourceEventId": "verdance_ashes|va_003|3|ch1|partial|extracted_side_raid_damage|f13502",
-            "origin": "campaign_update",
-            "text": "Nullmercs standing rose from 53.5 to 59."
-          },
-          {
-            "sourceEventId": "verdance_ashes|va_003|3|ch1|partial|extracted_side_raid_damage|f13502",
-            "origin": "campaign_update",
-            "text": "Resource pressure eased."
-          },
-          {
-            "sourceEventId": "verdance_ashes|va_003|3|ch1|partial|extracted_side_raid_damage|f13502",
-            "origin": "campaign_update",
-            "text": "Independent influence grew."
-          },
-          {
-            "sourceEventId": "verdance_ashes|va_003|3|ch1|partial|extracted_side_raid_damage|f13502",
-            "threadId": "shelter",
-            "origin": "your_action",
-            "text": "The ground is not secured yet. Check the next operation's requirements."
-          },
-          {
-            "sourceEventId": "verdance_ashes|va_003|3|ch1|partial|extracted_side_raid_damage|f13502",
-            "threadId": "bring_back",
-            "origin": "your_action",
-            "text": "The extraction commitment has changed. Re-plan with the company you have."
-          },
-          {
-            "sourceEventId": "verdance_ashes|va_003|3|ch1|partial|extracted_side_raid_damage|f13502",
-            "threadId": "company",
-            "origin": "your_action",
-            "text": "The return did not settle the company's unfinished business."
-          }
-        ],
-        "credits": {
-          "objectiveComplete": false,
-          "nodeClaimed": false,
-          "pocketCleared": true,
-          "zoneFlipEligible": false,
-          "cleanExtract": false,
-          "raidCredit": false,
-          "isCapturePath": true
-        },
-        "resources": {
-          "tenebriumBank": 6,
-          "tenebriumLooted": 2,
-          "tenebriumSpent": 0,
-          "tenebriumLost": 11
-        },
-        "wounded": [
-          "fatboy",
-          "cauter"
-        ]
-      },
-      {
-        "id": "verdance_ashes|va_002|2|ch2|partial|extracted_side_field_recruit|f3032",
-        "turn": 2,
-        "mapId": "greenest_fields",
-        "verdict": "partial",
-        "title": "Partial success",
-        "participants": [
-          "anvil",
-          "ceil",
-          "ketha",
-          "lumen",
-          "noctua",
-          "pavise",
-          "verse"
-        ],
-        "consequences": [
-          {
-            "sourceEventId": "verdance_ashes|va_002|2|ch2|partial|extracted_side_field_recruit|f3032",
-            "origin": "campaign_update",
-            "text": "Nullmercs standing rose from 51 to 53.5."
-          },
-          {
-            "sourceEventId": "verdance_ashes|va_002|2|ch2|partial|extracted_side_field_recruit|f3032",
-            "origin": "campaign_update",
-            "text": "Resource pressure eased."
-          },
-          {
-            "sourceEventId": "verdance_ashes|va_002|2|ch2|partial|extracted_side_field_recruit|f3032",
-            "origin": "campaign_update",
-            "text": "Independent influence grew."
-          },
-          {
-            "sourceEventId": "verdance_ashes|va_001|1|ch1|victory|extracted|f1562",
-            "threadId": "place",
-            "origin": "memory",
-            "text": "You built a place worth returning to."
-          },
-          {
-            "sourceEventId": "verdance_ashes|va_002|2|ch2|partial|extracted_side_field_recruit|f3032",
-            "threadId": "bring_back",
-            "origin": "your_action",
-            "text": "The return was costly. Read the losses before choosing the next risk."
-          }
-        ],
-        "credits": {
-          "objectiveComplete": false,
-          "nodeClaimed": false,
-          "pocketCleared": false,
-          "zoneFlipEligible": false,
-          "cleanExtract": false,
-          "raidCredit": false,
-          "isCapturePath": false
-        },
-        "resources": {
-          "tenebriumBank": 4,
-          "tenebriumLooted": 1,
-          "tenebriumSpent": 1,
-          "tenebriumLost": 7
-        },
-        "wounded": []
-      },
-      {
-        "id": "verdance_ashes|va_001|1|ch1|victory|extracted|f1562",
-        "turn": 1,
-        "mapId": "greenest_fields",
-        "verdict": "victory",
-        "title": "Success",
-        "participants": [
-          "anvil",
-          "ceil",
-          "ketha",
-          "lumen",
-          "noctua",
-          "pavise",
-          "verse"
-        ],
-        "consequences": [
-          {
-            "sourceEventId": "verdance_ashes|va_001|1|ch1|victory|extracted|f1562",
-            "origin": "campaign_update",
-            "text": "Nullmercs standing rose from 48 to 51."
-          },
-          {
-            "sourceEventId": "verdance_ashes|va_001|1|ch1|victory|extracted|f1562",
-            "threadId": "place",
-            "origin": "your_action",
-            "text": "The camp is established. A place to return to is now part of the war."
-          },
-          {
-            "sourceEventId": "verdance_ashes|va_001|1|ch1|victory|extracted|f1562",
-            "threadId": "bring_back",
-            "origin": "your_action",
-            "text": "There is still a way home. Decide what is worth carrying."
-          }
-        ],
-        "credits": {
-          "objectiveComplete": true,
-          "nodeClaimed": false,
-          "pocketCleared": false,
-          "zoneFlipEligible": true,
-          "cleanExtract": true,
-          "raidCredit": true,
-          "isCapturePath": false
-        },
-        "resources": {
-          "tenebriumBank": 4,
-          "tenebriumLooted": 0,
-          "tenebriumSpent": 0,
-          "tenebriumLost": 6
-        },
-        "wounded": []
+    "chronicle": [],
+    "intelligence": {
+      "greenest_fields:GF_SE_PLATEAU": {
+        "status": "Reported",
+        "source": "Operation briefing: Raid Greenest Fields for Tenebrium",
+        "lastObservedTurn": null
       }
-    ],
-    "intelligence": {},
+    },
     "scenes": [],
-    "leadership": [
-      {
-        "choiceId": "place:raid",
-        "stance": "Building a future",
-        "words": "Raid for the home",
-        "turn": 0,
-        "eventId": "1221a5d2-a365-4165-b5d3-a3d632e05eda"
-      },
-      {
-        "choiceId": "bring_back:care",
-        "stance": "Care before profit",
-        "words": "Nobody is spare equipment.",
-        "turn": 0,
-        "eventId": "96f2e6c0-4d60-4fe1-9af4-a9abd8ade108"
-      },
-      {
-        "choiceId": "shelter:claim",
-        "stance": "Holding ground",
-        "words": "Commit to securing ground",
-        "turn": 2,
-        "eventId": "53d68621-e880-46b4-b1f3-d4039e08d392"
-      },
-      {
-        "choiceId": "company:recover",
-        "stance": "Care",
-        "words": "Commit to a careful return",
-        "turn": 2,
-        "eventId": "f01394a6-5452-4e62-8b42-95db1f7668dd"
-      }
-    ],
-    "reactions": [
-      {
-        "speaker": "ketha",
-        "style": "care",
-        "basis": "words",
-        "text": "You put people first. Good. I will ask you to mean it when the salvage is close.",
-        "memory": "Commit to a careful return",
-        "sourceEventId": "f01394a6-5452-4e62-8b42-95db1f7668dd",
-        "turn": 2
-      }
-    ],
+    "leadership": [],
+    "reactions": [],
     "home": {
       "level": 0,
       "cleared": false
@@ -774,7 +216,7 @@
     "commandConsole": true
   },
   "campaignId": "verdance_ashes",
-  "missionNumber": 5,
+  "missionNumber": 1,
   "arc": {
     "id": 1,
     "title": "First Scar",
@@ -783,26 +225,16 @@
   },
   "pathSignal": "B",
   "seed": 28,
-  "generatedAt": "2026-10-16T01:24:14Z",
-  "tagline": "Home is the Rock Jungle. Raid the Fields for Tenebrium. Clear the wilds when you can scale.",
+  "generatedAt": "2026-10-19T18:42:24Z",
+  "tagline": "Found the Rock Jungle camp \u2014 or raid Greenest Fields for Tenebrium to fund it.",
   "sessionMode": "same_map",
   "sessionHomeMap": "the_rock_jungle",
   "theater": {
-    "mapId": "eye_of_horus",
+    "mapId": "greenest_fields",
     "zones": [
       {
-        "zoneId": "EOH_NW_BASTION",
+        "zoneId": "GF_NW_BASTION",
         "label": "Northwest Bastion",
-        "control": "nullmercs",
-        "confidence": "estimated",
-        "openTarget": false,
-        "claimed": false,
-        "preferred": false,
-        "hazard": 0.0
-      },
-      {
-        "zoneId": "EOH_SE_BASTION",
-        "label": "Southeast Bastion",
         "control": "neutral",
         "confidence": "estimated",
         "openTarget": false,
@@ -811,7 +243,17 @@
         "hazard": 0.0
       },
       {
-        "zoneId": "EOH_NW_MUSTER",
+        "zoneId": "GF_SW_BASTION",
+        "label": "Southwest Bastion",
+        "control": "neutral",
+        "confidence": "estimated",
+        "openTarget": false,
+        "claimed": false,
+        "preferred": false,
+        "hazard": 0.0
+      },
+      {
+        "zoneId": "GF_NW_MUSTER",
         "label": "Northwest Muster",
         "control": "neutral",
         "confidence": "estimated",
@@ -821,8 +263,8 @@
         "hazard": 0.0
       },
       {
-        "zoneId": "EOH_SE_MUSTER",
-        "label": "Southeast Muster",
+        "zoneId": "GF_SW_MUSTER",
+        "label": "Southwest Muster",
         "control": "neutral",
         "confidence": "estimated",
         "openTarget": false,
@@ -831,7 +273,47 @@
         "hazard": 0.0
       },
       {
-        "zoneId": "EOH_C_GATE",
+        "zoneId": "GF_NW_CITADEL",
+        "label": "Northwest Citadel",
+        "control": "neutral",
+        "confidence": "estimated",
+        "openTarget": false,
+        "claimed": false,
+        "preferred": false,
+        "hazard": 0.0
+      },
+      {
+        "zoneId": "GF_SW_CITADEL",
+        "label": "Southwest Citadel",
+        "control": "neutral",
+        "confidence": "estimated",
+        "openTarget": false,
+        "claimed": false,
+        "preferred": false,
+        "hazard": 0.0
+      },
+      {
+        "zoneId": "GF_N_PLATEAU",
+        "label": "North Plateau",
+        "control": "neutral",
+        "confidence": "estimated",
+        "openTarget": false,
+        "claimed": false,
+        "preferred": false,
+        "hazard": 0.0
+      },
+      {
+        "zoneId": "GF_S_PLATEAU",
+        "label": "South Plateau",
+        "control": "neutral",
+        "confidence": "estimated",
+        "openTarget": false,
+        "claimed": false,
+        "preferred": false,
+        "hazard": 0.0
+      },
+      {
+        "zoneId": "GF_C_GATE",
         "label": "Central Gate",
         "control": "neutral",
         "confidence": "estimated",
@@ -841,7 +323,7 @@
         "hazard": 0.0
       },
       {
-        "zoneId": "EOH_C_INNER_GATE",
+        "zoneId": "GF_C_INNER_GATE",
         "label": "Central Inner Gate",
         "control": "neutral",
         "confidence": "estimated",
@@ -851,28 +333,8 @@
         "hazard": 0.0
       },
       {
-        "zoneId": "EOH_NE_CAUSEWAY",
-        "label": "Northeast Causeway",
-        "control": "nullmercs",
-        "confidence": "estimated",
-        "openTarget": false,
-        "claimed": false,
-        "preferred": false,
-        "hazard": 0.0
-      },
-      {
-        "zoneId": "EOH_SW_CAUSEWAY",
-        "label": "Southwest Causeway",
-        "control": "nullmercs",
-        "confidence": "estimated",
-        "openTarget": false,
-        "claimed": false,
-        "preferred": false,
-        "hazard": 0.0
-      },
-      {
-        "zoneId": "EOH_C_LANE",
-        "label": "Central Lane",
+        "zoneId": "GF_NE_PLATEAU",
+        "label": "Northeast Plateau",
         "control": "neutral",
         "confidence": "estimated",
         "openTarget": false,
@@ -881,28 +343,8 @@
         "hazard": 0.0
       },
       {
-        "zoneId": "EOH_C_INNER_LANE",
-        "label": "Central Inner Lane",
-        "control": "neutral",
-        "confidence": "estimated",
-        "openTarget": false,
-        "claimed": false,
-        "preferred": false,
-        "hazard": 0.0
-      },
-      {
-        "zoneId": "EOH_W_LANE",
-        "label": "West Lane",
-        "control": "neutral",
-        "confidence": "estimated",
-        "openTarget": false,
-        "claimed": false,
-        "preferred": false,
-        "hazard": 0.0
-      },
-      {
-        "zoneId": "EOH_E_LANE",
-        "label": "East Lane",
+        "zoneId": "GF_SE_PLATEAU",
+        "label": "Southeast Plateau",
         "control": "neutral",
         "confidence": "estimated",
         "openTarget": false,
@@ -913,19 +355,9 @@
     ],
     "openTargets": [],
     "intelByZone": {
-      "EOH_NW_BASTION": {
-        "zoneId": "EOH_NW_BASTION",
+      "GF_NW_BASTION": {
+        "zoneId": "GF_NW_BASTION",
         "label": "Northwest Bastion",
-        "control": "nullmercs",
-        "confidence": "estimated",
-        "openTarget": false,
-        "claimed": false,
-        "preferred": false,
-        "hazard": 0.0
-      },
-      "EOH_SE_BASTION": {
-        "zoneId": "EOH_SE_BASTION",
-        "label": "Southeast Bastion",
         "control": "neutral",
         "confidence": "estimated",
         "openTarget": false,
@@ -933,8 +365,18 @@
         "preferred": false,
         "hazard": 0.0
       },
-      "EOH_NW_MUSTER": {
-        "zoneId": "EOH_NW_MUSTER",
+      "GF_SW_BASTION": {
+        "zoneId": "GF_SW_BASTION",
+        "label": "Southwest Bastion",
+        "control": "neutral",
+        "confidence": "estimated",
+        "openTarget": false,
+        "claimed": false,
+        "preferred": false,
+        "hazard": 0.0
+      },
+      "GF_NW_MUSTER": {
+        "zoneId": "GF_NW_MUSTER",
         "label": "Northwest Muster",
         "control": "neutral",
         "confidence": "estimated",
@@ -943,9 +385,9 @@
         "preferred": false,
         "hazard": 0.0
       },
-      "EOH_SE_MUSTER": {
-        "zoneId": "EOH_SE_MUSTER",
-        "label": "Southeast Muster",
+      "GF_SW_MUSTER": {
+        "zoneId": "GF_SW_MUSTER",
+        "label": "Southwest Muster",
         "control": "neutral",
         "confidence": "estimated",
         "openTarget": false,
@@ -953,8 +395,48 @@
         "preferred": false,
         "hazard": 0.0
       },
-      "EOH_C_GATE": {
-        "zoneId": "EOH_C_GATE",
+      "GF_NW_CITADEL": {
+        "zoneId": "GF_NW_CITADEL",
+        "label": "Northwest Citadel",
+        "control": "neutral",
+        "confidence": "estimated",
+        "openTarget": false,
+        "claimed": false,
+        "preferred": false,
+        "hazard": 0.0
+      },
+      "GF_SW_CITADEL": {
+        "zoneId": "GF_SW_CITADEL",
+        "label": "Southwest Citadel",
+        "control": "neutral",
+        "confidence": "estimated",
+        "openTarget": false,
+        "claimed": false,
+        "preferred": false,
+        "hazard": 0.0
+      },
+      "GF_N_PLATEAU": {
+        "zoneId": "GF_N_PLATEAU",
+        "label": "North Plateau",
+        "control": "neutral",
+        "confidence": "estimated",
+        "openTarget": false,
+        "claimed": false,
+        "preferred": false,
+        "hazard": 0.0
+      },
+      "GF_S_PLATEAU": {
+        "zoneId": "GF_S_PLATEAU",
+        "label": "South Plateau",
+        "control": "neutral",
+        "confidence": "estimated",
+        "openTarget": false,
+        "claimed": false,
+        "preferred": false,
+        "hazard": 0.0
+      },
+      "GF_C_GATE": {
+        "zoneId": "GF_C_GATE",
         "label": "Central Gate",
         "control": "neutral",
         "confidence": "estimated",
@@ -963,8 +445,8 @@
         "preferred": false,
         "hazard": 0.0
       },
-      "EOH_C_INNER_GATE": {
-        "zoneId": "EOH_C_INNER_GATE",
+      "GF_C_INNER_GATE": {
+        "zoneId": "GF_C_INNER_GATE",
         "label": "Central Inner Gate",
         "control": "neutral",
         "confidence": "estimated",
@@ -973,29 +455,9 @@
         "preferred": false,
         "hazard": 0.0
       },
-      "EOH_NE_CAUSEWAY": {
-        "zoneId": "EOH_NE_CAUSEWAY",
-        "label": "Northeast Causeway",
-        "control": "nullmercs",
-        "confidence": "estimated",
-        "openTarget": false,
-        "claimed": false,
-        "preferred": false,
-        "hazard": 0.0
-      },
-      "EOH_SW_CAUSEWAY": {
-        "zoneId": "EOH_SW_CAUSEWAY",
-        "label": "Southwest Causeway",
-        "control": "nullmercs",
-        "confidence": "estimated",
-        "openTarget": false,
-        "claimed": false,
-        "preferred": false,
-        "hazard": 0.0
-      },
-      "EOH_C_LANE": {
-        "zoneId": "EOH_C_LANE",
-        "label": "Central Lane",
+      "GF_NE_PLATEAU": {
+        "zoneId": "GF_NE_PLATEAU",
+        "label": "Northeast Plateau",
         "control": "neutral",
         "confidence": "estimated",
         "openTarget": false,
@@ -1003,29 +465,9 @@
         "preferred": false,
         "hazard": 0.0
       },
-      "EOH_C_INNER_LANE": {
-        "zoneId": "EOH_C_INNER_LANE",
-        "label": "Central Inner Lane",
-        "control": "neutral",
-        "confidence": "estimated",
-        "openTarget": false,
-        "claimed": false,
-        "preferred": false,
-        "hazard": 0.0
-      },
-      "EOH_W_LANE": {
-        "zoneId": "EOH_W_LANE",
-        "label": "West Lane",
-        "control": "neutral",
-        "confidence": "estimated",
-        "openTarget": false,
-        "claimed": false,
-        "preferred": false,
-        "hazard": 0.0
-      },
-      "EOH_E_LANE": {
-        "zoneId": "EOH_E_LANE",
-        "label": "East Lane",
+      "GF_SE_PLATEAU": {
+        "zoneId": "GF_SE_PLATEAU",
+        "label": "Southeast Plateau",
         "control": "neutral",
         "confidence": "estimated",
         "openTarget": false,
@@ -1049,9 +491,9 @@
   },
   "flags": {
     "mode": "hub",
-    "deployStub": false,
+    "deployStub": true,
     "hubHostHint": "app/bin/HUB_HOST.bat \u2192 http://127.0.0.1:8770/",
-    "source": "apply_result_to_hub_v1",
+    "source": "build_hub_state_v1",
     "shopSurface": true,
     "deployCompileLaunch": true,
     "resultPull": true,
@@ -1062,7 +504,7 @@
     "noFreeTnbMint": true,
     "livePurchase": true,
     "companyPreamble": true,
-    "companySealed": true,
+    "companySealed": false,
     "homeClearReady": true,
     "homeCleared": false
   },
@@ -1071,7 +513,7 @@
     "homeCleared": false,
     "keyHeld": 0,
     "centerControl": "neutral",
-    "tenebrium": 10,
+    "tenebrium": 3,
     "campLevel": 0
   },
   "occupationModel": "living_shell",
@@ -1080,66 +522,147 @@
   "captureContracts": [
     {
       "schemaVersion": "verdance-hub-capture-contract/1.0",
-      "contractId": "capture:greenest_fields:GF_C_GATE",
-      "mapId": "greenest_fields",
-      "targetZoneId": "GF_C_GATE",
+      "contractId": "capture:ancient_bastion:AB_NE_RESERVE",
+      "mapId": "ancient_bastion",
+      "targetZoneId": "AB_NE_RESERVE",
       "fromZoneIds": [
-        "GF_C_INNER_GATE",
-        "GF_NE_PLATEAU"
+        "AB_E_BASTION",
+        "AB_NE_CITADEL"
       ],
-      "label": "Central Gate",
-      "objectiveArchetype": "gate_control",
-      "captureMode": "clear_hold_shell",
+      "label": "Northeast Reserve",
+      "objectiveArchetype": "eco_raid",
+      "captureMode": "raid_scar",
       "occupationModel": "living_shell",
       "sessionMode": "same_map",
       "freeTnbMint": false,
       "clearFraction": 0.6,
       "holdUnderRegrow": true,
       "emptyGrassClaim": false,
-      "score": 1.834,
+      "score": 2.894,
       "against": "armada",
       "patron": "nullmercs",
       "sortie": {
         "schemaVersion": "verdance-sortie-order/1.0",
-        "mapId": "greenest_fields",
-        "targetZoneId": "GF_C_GATE",
+        "mapId": "ancient_bastion",
+        "targetZoneId": "AB_NE_RESERVE",
         "fromZoneIds": [
-          "GF_C_INNER_GATE",
-          "GF_NE_PLATEAU"
+          "AB_E_BASTION",
+          "AB_NE_CITADEL"
         ],
         "patron": "nullmercs",
         "against": "armada",
-        "objectiveArchetype": "gate_control",
-        "captureMode": "clear_hold_shell",
+        "objectiveArchetype": "eco_raid",
+        "captureMode": null,
         "freeTnbMint": false,
         "occupationModel": "living_shell",
         "sessionMode": "same_map",
-        "label": "Central Gate",
-        "score": 1.834,
+        "label": "Northeast Reserve",
+        "score": 2.894,
         "source": "quest_generator_v1",
         "graphEdgeKind": "same_map",
         "captureZoneIds": [
-          "GF_C_GATE"
-        ],
-        "captureRules": {
-          "model": "clear_hold_shell",
-          "clearFraction": 0.6,
-          "holdUnderRegrow": true,
-          "emptyGrassClaim": false,
-          "freeTnbMint": false
-        }
+          "AB_NE_RESERVE"
+        ]
       },
       "source": "capture_node_claims+quest_gen"
     },
     {
       "schemaVersion": "verdance-hub-capture-contract/1.0",
-      "contractId": "capture:greenest_fields:GF_N_PLATEAU",
-      "mapId": "greenest_fields",
-      "targetZoneId": "GF_N_PLATEAU",
+      "contractId": "capture:ancient_bastion:AB_SE_RESERVE",
+      "mapId": "ancient_bastion",
+      "targetZoneId": "AB_SE_RESERVE",
       "fromZoneIds": [
-        "GF_NE_PLATEAU"
+        "AB_E_OUTER_BASTION"
       ],
-      "label": "North Plateau",
+      "label": "Southeast Reserve",
+      "objectiveArchetype": "eco_raid",
+      "captureMode": "raid_scar",
+      "occupationModel": "living_shell",
+      "sessionMode": "same_map",
+      "freeTnbMint": false,
+      "clearFraction": 0.6,
+      "holdUnderRegrow": true,
+      "emptyGrassClaim": false,
+      "score": 2.894,
+      "against": "armada",
+      "patron": "nullmercs",
+      "sortie": {
+        "schemaVersion": "verdance-sortie-order/1.0",
+        "mapId": "ancient_bastion",
+        "targetZoneId": "AB_SE_RESERVE",
+        "fromZoneIds": [
+          "AB_E_OUTER_BASTION"
+        ],
+        "patron": "nullmercs",
+        "against": "armada",
+        "objectiveArchetype": "eco_raid",
+        "captureMode": null,
+        "freeTnbMint": false,
+        "occupationModel": "living_shell",
+        "sessionMode": "same_map",
+        "label": "Southeast Reserve",
+        "score": 2.894,
+        "source": "quest_generator_v1",
+        "graphEdgeKind": "same_map",
+        "captureZoneIds": [
+          "AB_SE_RESERVE"
+        ]
+      },
+      "source": "capture_node_claims+quest_gen"
+    },
+    {
+      "schemaVersion": "verdance-hub-capture-contract/1.0",
+      "contractId": "capture:tabula:T_NW_RESERVE",
+      "mapId": "tabula",
+      "targetZoneId": "T_NW_RESERVE",
+      "fromZoneIds": [
+        "T_NE_CAUSEWAY"
+      ],
+      "label": "Northwest Reserve",
+      "objectiveArchetype": "eco_raid",
+      "captureMode": "raid_scar",
+      "occupationModel": "living_shell",
+      "sessionMode": "same_map",
+      "freeTnbMint": false,
+      "clearFraction": 0.6,
+      "holdUnderRegrow": true,
+      "emptyGrassClaim": false,
+      "score": 2.894,
+      "against": "armada",
+      "patron": "nullmercs",
+      "sortie": {
+        "schemaVersion": "verdance-sortie-order/1.0",
+        "mapId": "tabula",
+        "targetZoneId": "T_NW_RESERVE",
+        "fromZoneIds": [
+          "T_NE_CAUSEWAY"
+        ],
+        "patron": "nullmercs",
+        "against": "armada",
+        "objectiveArchetype": "eco_raid",
+        "captureMode": null,
+        "freeTnbMint": false,
+        "occupationModel": "living_shell",
+        "sessionMode": "same_map",
+        "label": "Northwest Reserve",
+        "score": 2.894,
+        "source": "quest_generator_v1",
+        "graphEdgeKind": "same_map",
+        "captureZoneIds": [
+          "T_NW_RESERVE"
+        ]
+      },
+      "source": "capture_node_claims+quest_gen"
+    },
+    {
+      "schemaVersion": "verdance-hub-capture-contract/1.0",
+      "contractId": "capture:all_that_simmers:ATS_NE_OUTER_PLATEAU",
+      "mapId": "all_that_simmers",
+      "targetZoneId": "ATS_NE_OUTER_PLATEAU",
+      "fromZoneIds": [
+        "ATS_NE_GATE"
+      ],
+      "label": "Northeast Outer Plateau",
       "objectiveArchetype": "hold_plateau",
       "captureMode": "clear_hold_shell",
       "occupationModel": "living_shell",
@@ -1148,15 +671,15 @@
       "clearFraction": 0.6,
       "holdUnderRegrow": true,
       "emptyGrassClaim": false,
-      "score": 1.834,
+      "score": 1.94,
       "against": "armada",
       "patron": "nullmercs",
       "sortie": {
         "schemaVersion": "verdance-sortie-order/1.0",
-        "mapId": "greenest_fields",
-        "targetZoneId": "GF_N_PLATEAU",
+        "mapId": "all_that_simmers",
+        "targetZoneId": "ATS_NE_OUTER_PLATEAU",
         "fromZoneIds": [
-          "GF_NE_PLATEAU"
+          "ATS_NE_GATE"
         ],
         "patron": "nullmercs",
         "against": "armada",
@@ -1165,12 +688,12 @@
         "freeTnbMint": false,
         "occupationModel": "living_shell",
         "sessionMode": "same_map",
-        "label": "North Plateau",
-        "score": 1.834,
+        "label": "Northeast Outer Plateau",
+        "score": 1.94,
         "source": "quest_generator_v1",
         "graphEdgeKind": "same_map",
         "captureZoneIds": [
-          "GF_N_PLATEAU"
+          "ATS_NE_OUTER_PLATEAU"
         ],
         "captureRules": {
           "model": "clear_hold_shell",
@@ -1184,14 +707,14 @@
     },
     {
       "schemaVersion": "verdance-hub-capture-contract/1.0",
-      "contractId": "capture:greenest_fields:GF_NW_MUSTER",
-      "mapId": "greenest_fields",
-      "targetZoneId": "GF_NW_MUSTER",
+      "contractId": "capture:all_that_simmers:ATS_NE_PLATEAU",
+      "mapId": "all_that_simmers",
+      "targetZoneId": "ATS_NE_PLATEAU",
       "fromZoneIds": [
-        "GF_NW_BASTION"
+        "ATS_NE_GATE"
       ],
-      "label": "Northwest Muster",
-      "objectiveArchetype": "siege",
+      "label": "Northeast Plateau",
+      "objectiveArchetype": "hold_plateau",
       "captureMode": "clear_hold_shell",
       "occupationModel": "living_shell",
       "sessionMode": "same_map",
@@ -1199,44 +722,51 @@
       "clearFraction": 0.6,
       "holdUnderRegrow": true,
       "emptyGrassClaim": false,
-      "score": 1.3,
+      "score": 1.94,
       "against": "armada",
       "patron": "nullmercs",
       "sortie": {
         "schemaVersion": "verdance-sortie-order/1.0",
-        "mapId": "greenest_fields",
-        "targetZoneId": "GF_NW_MUSTER",
+        "mapId": "all_that_simmers",
+        "targetZoneId": "ATS_NE_PLATEAU",
         "fromZoneIds": [
-          "GF_NW_BASTION"
+          "ATS_NE_GATE"
         ],
         "patron": "nullmercs",
         "against": "armada",
-        "objectiveArchetype": "siege",
-        "captureMode": null,
+        "objectiveArchetype": "hold_plateau",
+        "captureMode": "clear_hold_shell",
         "freeTnbMint": false,
         "occupationModel": "living_shell",
         "sessionMode": "same_map",
-        "label": "Northwest Muster",
-        "score": 1.3,
+        "label": "Northeast Plateau",
+        "score": 1.94,
         "source": "quest_generator_v1",
         "graphEdgeKind": "same_map",
         "captureZoneIds": [
-          "GF_NW_MUSTER"
-        ]
+          "ATS_NE_PLATEAU"
+        ],
+        "captureRules": {
+          "model": "clear_hold_shell",
+          "clearFraction": 0.6,
+          "holdUnderRegrow": true,
+          "emptyGrassClaim": false,
+          "freeTnbMint": false
+        }
       },
       "source": "capture_node_claims+quest_gen"
     },
     {
       "schemaVersion": "verdance-hub-capture-contract/1.0",
-      "contractId": "capture:greenest_fields:GF_NW_CITADEL",
-      "mapId": "greenest_fields",
-      "targetZoneId": "GF_NW_CITADEL",
+      "contractId": "capture:all_that_simmers:ATS_NW_SPILLWAY",
+      "mapId": "all_that_simmers",
+      "targetZoneId": "ATS_NW_SPILLWAY",
       "fromZoneIds": [
-        "GF_NE_PLATEAU",
-        "GF_NW_BASTION"
+        "ATS_C_BASTION",
+        "ATS_NE_GATE"
       ],
-      "label": "Northwest Citadel",
-      "objectiveArchetype": "siege",
+      "label": "Northwest Spillway",
+      "objectiveArchetype": "gate_control",
       "captureMode": "clear_hold_shell",
       "occupationModel": "living_shell",
       "sessionMode": "same_map",
@@ -1244,123 +774,38 @@
       "clearFraction": 0.6,
       "holdUnderRegrow": true,
       "emptyGrassClaim": false,
-      "score": 1.2,
+      "score": 1.94,
       "against": "armada",
       "patron": "nullmercs",
       "sortie": {
         "schemaVersion": "verdance-sortie-order/1.0",
-        "mapId": "greenest_fields",
-        "targetZoneId": "GF_NW_CITADEL",
+        "mapId": "all_that_simmers",
+        "targetZoneId": "ATS_NW_SPILLWAY",
         "fromZoneIds": [
-          "GF_NE_PLATEAU",
-          "GF_NW_BASTION"
+          "ATS_C_BASTION",
+          "ATS_NE_GATE"
         ],
         "patron": "nullmercs",
         "against": "armada",
-        "objectiveArchetype": "siege",
-        "captureMode": null,
+        "objectiveArchetype": "gate_control",
+        "captureMode": "clear_hold_shell",
         "freeTnbMint": false,
         "occupationModel": "living_shell",
         "sessionMode": "same_map",
-        "label": "Northwest Citadel",
-        "score": 1.2,
+        "label": "Northwest Spillway",
+        "score": 1.94,
         "source": "quest_generator_v1",
         "graphEdgeKind": "same_map",
         "captureZoneIds": [
-          "GF_NW_CITADEL"
-        ]
-      },
-      "source": "capture_node_claims+quest_gen"
-    },
-    {
-      "schemaVersion": "verdance-hub-capture-contract/1.0",
-      "contractId": "capture:greenest_fields:GF_SW_BASTION",
-      "mapId": "greenest_fields",
-      "targetZoneId": "GF_SW_BASTION",
-      "fromZoneIds": [
-        "GF_NW_BASTION"
-      ],
-      "label": "Southwest Bastion",
-      "objectiveArchetype": "siege",
-      "captureMode": "clear_hold_shell",
-      "occupationModel": "living_shell",
-      "sessionMode": "same_map",
-      "freeTnbMint": false,
-      "clearFraction": 0.6,
-      "holdUnderRegrow": true,
-      "emptyGrassClaim": false,
-      "score": 1.2,
-      "against": "armada",
-      "patron": "nullmercs",
-      "sortie": {
-        "schemaVersion": "verdance-sortie-order/1.0",
-        "mapId": "greenest_fields",
-        "targetZoneId": "GF_SW_BASTION",
-        "fromZoneIds": [
-          "GF_NW_BASTION"
+          "ATS_NW_SPILLWAY"
         ],
-        "patron": "nullmercs",
-        "against": "armada",
-        "objectiveArchetype": "siege",
-        "captureMode": null,
-        "freeTnbMint": false,
-        "occupationModel": "living_shell",
-        "sessionMode": "same_map",
-        "label": "Southwest Bastion",
-        "score": 1.2,
-        "source": "quest_generator_v1",
-        "graphEdgeKind": "same_map",
-        "captureZoneIds": [
-          "GF_SW_BASTION"
-        ]
-      },
-      "source": "capture_node_claims+quest_gen"
-    },
-    {
-      "schemaVersion": "verdance-hub-capture-contract/1.0",
-      "contractId": "capture:greenest_fields:GF_SW_CITADEL",
-      "mapId": "greenest_fields",
-      "targetZoneId": "GF_SW_CITADEL",
-      "fromZoneIds": [
-        "GF_C_INNER_GATE",
-        "GF_SE_PLATEAU",
-        "GF_S_PLATEAU"
-      ],
-      "label": "Southwest Citadel",
-      "objectiveArchetype": "siege",
-      "captureMode": "clear_hold_shell",
-      "occupationModel": "living_shell",
-      "sessionMode": "same_map",
-      "freeTnbMint": false,
-      "clearFraction": 0.6,
-      "holdUnderRegrow": true,
-      "emptyGrassClaim": false,
-      "score": 1.2,
-      "against": "armada",
-      "patron": "nullmercs",
-      "sortie": {
-        "schemaVersion": "verdance-sortie-order/1.0",
-        "mapId": "greenest_fields",
-        "targetZoneId": "GF_SW_CITADEL",
-        "fromZoneIds": [
-          "GF_C_INNER_GATE",
-          "GF_SE_PLATEAU",
-          "GF_S_PLATEAU"
-        ],
-        "patron": "nullmercs",
-        "against": "armada",
-        "objectiveArchetype": "siege",
-        "captureMode": null,
-        "freeTnbMint": false,
-        "occupationModel": "living_shell",
-        "sessionMode": "same_map",
-        "label": "Southwest Citadel",
-        "score": 1.2,
-        "source": "quest_generator_v1",
-        "graphEdgeKind": "same_map",
-        "captureZoneIds": [
-          "GF_SW_CITADEL"
-        ]
+        "captureRules": {
+          "model": "clear_hold_shell",
+          "clearFraction": 0.6,
+          "holdUnderRegrow": true,
+          "emptyGrassClaim": false,
+          "freeTnbMint": false
+        }
       },
       "source": "capture_node_claims+quest_gen"
     }
@@ -1377,78 +822,77 @@
   "factionBanks": {
     "armada": 0,
     "cortex": 2,
-    "nullmercs": 10,
-    "ashwalkers": 10
+    "nullmercs": 3,
+    "ashwalkers": 3
   },
-  "tenebrium": 10,
+  "tenebrium": 3,
   "graph": {
-    "q0_armada_cortex": 0.5857,
-    "q2_void_structure": 0.2185,
-    "q6_contested": 0.835,
-    "q6_independent": 0.395,
-    "q7_resource_scarcity": 0.8444,
+    "q0_armada_cortex": 0.77,
+    "q2_void_structure": 0.15,
+    "q6_contested": 0.85,
+    "q6_independent": 0.24,
+    "q7_resource_scarcity": 0.98,
     "pathSignalA": 0.0,
-    "pathSignalB": 1.0,
+    "pathSignalB": 0.1,
     "pathSignalC": 0.0
   },
-  "graphPressure": "high contest \u00b7 Tnb scarce",
+  "graphPressure": "high contest \u00b7 Tnb scarce \u00b7 Cortex lean",
   "spectral": {
-    "dominantEigenvalue": 0.668,
-    "energy": 3.946,
-    "participation": 0.0,
-    "spread": 0.2202,
+    "dominantEigenvalue": 1.255,
+    "energy": 2.99,
+    "participation": 0.622,
+    "spread": 0.51,
     "factionWeights": {
-      "ashwalkers": 0.0,
-      "armada": 0.0,
-      "neutral": 0.0,
-      "nullmercs": 1.0
-    },
-    "zones": 12
+      "ashwalkers": 0.2,
+      "armada": 0.35,
+      "nullmercs": 0.2,
+      "neutral": 0.25
+    }
   },
   "campaignRho": {
     "schemaVersion": "verdance-campaign-rho/1.0",
     "source": "graph_qubits",
     "axes": {
-      "arm_cor": 0.1714,
-      "schism": -0.21,
-      "void_struct": -0.563,
-      "zone_control": 0.67,
-      "tenebrium": -0.6888,
-      "phi": 0.2857,
+      "arm_cor": 0.54,
+      "schism": -0.52,
+      "void_struct": -0.7,
+      "zone_control": 0.7,
+      "tenebrium": -0.96,
+      "phi": 0.0,
       "path_a": 0.33,
-      "path_b": 1.0,
+      "path_b": 0.1,
       "path_c": 0.33
     },
     "packedDiag": [
-      0.4143,
-      0.5857,
-      0.605,
-      0.395,
-      0.7815,
-      0.2185,
-      0.165,
-      0.835,
-      0.8444,
-      0.1556
+      0.23,
+      0.77,
+      0.76,
+      0.24,
+      0.85,
+      0.15,
+      0.15,
+      0.85,
+      0.98,
+      0.02
     ],
-    "purity": 0.675,
-    "entropy": 0.8612,
-    "width": 0.6593,
+    "purity": 0.68,
+    "entropy": 0.855,
+    "width": 0.6675,
     "sessionHomeMap": "the_rock_jungle",
-    "missionNumber": 5
+    "missionNumber": 1
   },
   "reputation": {
     "armada": 18,
     "cortex": 70,
-    "nullmercs": 68.0,
+    "nullmercs": 48.0,
     "sev": 50
   },
   "companion": {
     "id": "ketha",
     "name": "Ketha",
-    "morale": 80.0,
+    "morale": 70,
     "loyalty": 75,
-    "stress": 4.0
+    "stress": 12
   },
   "bay": {
     "unlocked": true,
@@ -1471,8 +915,8 @@
       "shortLabel": "1km$",
       "unitMetal": 1000
     },
-    "tenebrium": 10,
-    "metalK": 8,
+    "tenebrium": 3,
+    "metalK": 7,
     "armyBudget": 0,
     "owned": {},
     "upgrades": {},
@@ -1543,13 +987,12 @@
           "mode": "map_web",
           "deferred": true,
           "sourceLabel": "All That Simmers",
-          "etaSeconds": 360,
-          "etaText": "~6:00 via All That Simmers",
-          "summary": "Via All That Simmers \u2192 The Rock Jungle \u2192 Greenest Fields \u00b7 field ETA 6:00",
+          "etaSeconds": 200,
+          "etaText": "~3:20 via All That Simmers",
+          "summary": "Via All That Simmers \u2192 The Rock Jungle \u00b7 field ETA 3:20",
           "routeLabels": [
             "All That Simmers",
-            "The Rock Jungle",
-            "Greenest Fields"
+            "The Rock Jungle"
           ]
         }
       },
@@ -1583,12 +1026,13 @@
           "mode": "map_web",
           "deferred": true,
           "sourceLabel": "Eye of Horus",
-          "etaSeconds": 140,
-          "etaText": "~2:20 via Eye of Horus",
-          "summary": "Via Eye of Horus \u2192 Greenest Fields \u00b7 field ETA 2:20",
+          "etaSeconds": 300,
+          "etaText": "~5:00 via Eye of Horus",
+          "summary": "Via Eye of Horus \u2192 Greenest Fields \u2192 The Rock Jungle \u00b7 field ETA 5:00",
           "routeLabels": [
             "Eye of Horus",
-            "Greenest Fields"
+            "Greenest Fields",
+            "The Rock Jungle"
           ]
         }
       },
@@ -1703,57 +1147,8 @@
     "deployKit": [],
     "inbound": [],
     "pendingDeliveries": [],
-    "destMapId": "greenest_fields",
-    "ledger": [
-      {
-        "op": "sortie_settle",
-        "tenebriumGained": 1,
-        "metalKGained": 0,
-        "success": true,
-        "zoneFlipped": true,
-        "at": "2026-10-15T19:22:37Z",
-        "missionNumber": 1
-      },
-      {
-        "op": "sortie_settle",
-        "tenebriumGained": 0,
-        "metalKGained": 0,
-        "success": true,
-        "zoneFlipped": false,
-        "at": "2026-10-15T19:24:43Z",
-        "missionNumber": 2
-      },
-      {
-        "op": "sortie_settle",
-        "tenebriumGained": 2,
-        "metalKGained": 0,
-        "success": true,
-        "zoneFlipped": false,
-        "at": "2026-10-16T01:19:41Z",
-        "missionNumber": 3
-      },
-      {
-        "op": "metal_export_add",
-        "metalK": 8,
-        "prevMetalK": 7,
-        "metalKExtracted": 1,
-        "metalKFieldStart": 0,
-        "metalKBrought": null,
-        "metalStored": 1000,
-        "deltaK": 1,
-        "mode": "add",
-        "at": "2026-10-16T01:22:07Z"
-      },
-      {
-        "op": "sortie_settle",
-        "tenebriumGained": 4,
-        "metalKGained": 1,
-        "success": true,
-        "zoneFlipped": true,
-        "at": "2026-10-16T01:22:07Z",
-        "missionNumber": 4
-      }
-    ],
+    "destMapId": "the_rock_jungle",
+    "ledger": [],
     "notes": "Tenebrium is black-hole metal (scarce since the Generic Disaster). Campaign metal banks as floor(endMetal/1000) 1km$ units. Combat packs ship via Eye of Horus / All That Simmers / pawn launcher with field ETAs.",
     "catalogSchema": "verdance-commerce-catalog/1.4",
     "armadaCrisis": true,
@@ -1770,21 +1165,14 @@
       "name": "Pavise",
       "faction": "ashwalkers",
       "unitDef": "armwar",
-      "level": 3,
-      "rank": "Proven",
-      "campaignXp": 290.8,
+      "level": 1,
+      "rank": "Runner",
+      "campaignXp": 40.0,
       "wounds": 0,
-      "status": "dead",
+      "status": "active",
       "scars": [],
-      "deployable": false,
-      "bonds": {
-        "ketha": 20,
-        "verse": 20,
-        "ceil": 20,
-        "noctua": 20,
-        "cauter": 6,
-        "fatboy": 6
-      },
+      "deployable": true,
+      "bonds": {},
       "loadout": {
         "modules": [],
         "bayTier": 0
@@ -1795,20 +1183,14 @@
       "name": "Ketha",
       "faction": "ashwalkers",
       "unitDef": "legrezbot",
-      "level": 4,
-      "rank": "Proven",
-      "campaignXp": 393.6,
+      "level": 1,
+      "rank": "Runner",
+      "campaignXp": 89.6,
       "wounds": 0,
       "status": "active",
       "scars": [],
       "deployable": true,
       "bonds": {
-        "pavise": 20,
-        "verse": 20,
-        "ceil": 20,
-        "noctua": 20,
-        "cauter": 6,
-        "fatboy": 6,
         "vane": 10
       },
       "loadout": {
@@ -1825,9 +1207,9 @@
       "rank": "Runner",
       "campaignXp": 0.0,
       "wounds": 0,
-      "status": "active",
+      "status": "locked",
       "scars": [],
-      "deployable": true,
+      "deployable": false,
       "bonds": {},
       "loadout": {
         "modules": [],
@@ -1839,21 +1221,14 @@
       "name": "Verse Adder",
       "faction": "ashwalkers",
       "unitDef": "legjav",
-      "level": 4,
-      "rank": "Proven",
-      "campaignXp": 304.0,
+      "level": 1,
+      "rank": "Runner",
+      "campaignXp": 0.0,
       "wounds": 0,
-      "status": "active",
+      "status": "locked",
       "scars": [],
-      "deployable": true,
-      "bonds": {
-        "pavise": 20,
-        "ketha": 20,
-        "ceil": 20,
-        "noctua": 20,
-        "cauter": 6,
-        "fatboy": 6
-      },
+      "deployable": false,
+      "bonds": {},
       "loadout": {
         "modules": [],
         "bayTier": 0
@@ -1918,24 +1293,14 @@
       "name": "Cauter Bel-Ansa",
       "faction": "ashwalkers",
       "unitDef": "legshot",
-      "level": 2,
+      "level": 1,
       "rank": "Runner",
-      "campaignXp": 136.8,
-      "wounds": 2,
-      "status": "active",
-      "scars": [
-        "wound_1",
-        "wound_2"
-      ],
-      "deployable": true,
-      "bonds": {
-        "pavise": 6,
-        "ketha": 6,
-        "verse": 6,
-        "ceil": 6,
-        "noctua": 6,
-        "fatboy": 6
-      },
+      "campaignXp": 0.0,
+      "wounds": 0,
+      "status": "locked",
+      "scars": [],
+      "deployable": false,
+      "bonds": {},
       "loadout": {
         "modules": [],
         "bayTier": 0
@@ -2004,9 +1369,9 @@
       "rank": "Runner",
       "campaignXp": 0.0,
       "wounds": 0,
-      "status": "active",
+      "status": "locked",
       "scars": [],
-      "deployable": true,
+      "deployable": false,
       "bonds": {},
       "loadout": {
         "modules": [],
@@ -2040,9 +1405,9 @@
       "rank": "Runner",
       "campaignXp": 0.0,
       "wounds": 0,
-      "status": "active",
+      "status": "locked",
       "scars": [],
-      "deployable": true,
+      "deployable": false,
       "bonds": {},
       "loadout": {
         "modules": [],
@@ -2162,24 +1527,14 @@
       "name": "Fatboy Contract",
       "faction": "ashwalkers",
       "unitDef": "armfboy",
-      "level": 2,
+      "level": 1,
       "rank": "Runner",
-      "campaignXp": 136.8,
-      "wounds": 2,
-      "status": "active",
-      "scars": [
-        "wound_1",
-        "wound_2"
-      ],
-      "deployable": true,
-      "bonds": {
-        "pavise": 6,
-        "ketha": 6,
-        "verse": 6,
-        "ceil": 6,
-        "noctua": 6,
-        "cauter": 6
-      },
+      "campaignXp": 0.0,
+      "wounds": 0,
+      "status": "locked",
+      "scars": [],
+      "deployable": false,
+      "bonds": {},
       "loadout": {
         "modules": [],
         "bayTier": 0
@@ -2226,21 +1581,14 @@
       "name": "Noctua Bay",
       "faction": "ashwalkers",
       "unitDef": "legap",
-      "level": 4,
-      "rank": "Proven",
-      "campaignXp": 304.0,
+      "level": 1,
+      "rank": "Runner",
+      "campaignXp": 0.0,
       "wounds": 0,
-      "status": "active",
+      "status": "locked",
       "scars": [],
-      "deployable": true,
-      "bonds": {
-        "pavise": 20,
-        "ketha": 20,
-        "verse": 20,
-        "ceil": 20,
-        "cauter": 6,
-        "fatboy": 6
-      },
+      "deployable": false,
+      "bonds": {},
       "loadout": {
         "modules": [],
         "bayTier": 0
@@ -2309,9 +1657,9 @@
       "rank": "Runner",
       "campaignXp": 118.4,
       "wounds": 0,
-      "status": "locked",
+      "status": "active",
       "scars": [],
-      "deployable": false,
+      "deployable": true,
       "bonds": {
         "ketha": 10
       },
@@ -2397,21 +1745,14 @@
       "name": "Ceil Rat",
       "faction": "ashwalkers",
       "unitDef": "armbrawl",
-      "level": 4,
-      "rank": "Proven",
-      "campaignXp": 304.0,
+      "level": 1,
+      "rank": "Runner",
+      "campaignXp": 0.0,
       "wounds": 0,
-      "status": "active",
+      "status": "locked",
       "scars": [],
-      "deployable": true,
-      "bonds": {
-        "pavise": 20,
-        "ketha": 20,
-        "verse": 20,
-        "noctua": 20,
-        "cauter": 6,
-        "fatboy": 6
-      },
+      "deployable": false,
+      "bonds": {},
       "loadout": {
         "modules": [],
         "bayTier": 0
@@ -2422,15 +1763,13 @@
       "name": "Sister Lumen",
       "faction": "ashwalkers",
       "unitDef": "armageo",
-      "level": 2,
+      "level": 1,
       "rank": "Runner",
-      "campaignXp": 116.3,
-      "wounds": 1,
-      "status": "active",
-      "scars": [
-        "wound_1"
-      ],
-      "deployable": true,
+      "campaignXp": 0.0,
+      "wounds": 0,
+      "status": "locked",
+      "scars": [],
+      "deployable": false,
       "bonds": {},
       "loadout": {
         "modules": [],
@@ -2444,9 +1783,9 @@
       "unitDef": "armcroc",
       "level": 1,
       "rank": "Runner",
-      "campaignXp": 98.8,
+      "campaignXp": 0.0,
       "wounds": 0,
-      "status": "dead",
+      "status": "locked",
       "scars": [],
       "deployable": false,
       "bonds": {},
@@ -2482,9 +1821,9 @@
       "rank": "Runner",
       "campaignXp": 0.0,
       "wounds": 0,
-      "status": "locked",
+      "status": "active",
       "scars": [],
-      "deployable": false,
+      "deployable": true,
       "bonds": {},
       "loadout": {
         "modules": [],
@@ -2499,15 +1838,114 @@
     "talkCount": 138,
     "topPairs": [
       {
-        "id": "cauter__ceil",
-        "a": "cauter",
-        "b": "ceil",
-        "aName": "Cauter Bel-Ansa",
-        "bName": "Ceil Rat",
+        "id": "anvil__brakhov",
+        "a": "brakhov",
+        "b": "anvil",
+        "aName": "Brakhov the Kiln",
+        "bName": "Anvil Mire",
+        "score": 1.0,
+        "polarity": "mirror",
+        "motif": "roast plod and wet plod",
+        "authored": true
+      },
+      {
+        "id": "brakhov__vale",
+        "a": "brakhov",
+        "b": "vale",
+        "aName": "Brakhov the Kiln",
+        "bName": "Vale Soft",
+        "score": 1.0,
+        "polarity": "rivalry",
+        "motif": "roast vs soft invoice",
+        "authored": true
+      },
+      {
+        "id": "hearth__lumen",
+        "a": "hearth",
+        "b": "lumen",
+        "aName": "Hearth",
+        "bName": "Sister Lumen",
+        "score": 1.0,
+        "polarity": "bond",
+        "motif": "coal furniture and grid saint",
+        "authored": true
+      },
+      {
+        "id": "kettle__mira",
+        "a": "mira",
+        "b": "kettle",
+        "aName": "Mira Barrage",
+        "bName": "Saint Kettle",
+        "score": 1.0,
+        "polarity": "bond",
+        "motif": "fireworks need a clear sky",
+        "authored": true
+      },
+      {
+        "id": "kit__mira",
+        "a": "mira",
+        "b": "kit",
+        "aName": "Mira Barrage",
+        "bName": "Kit Sparkler",
+        "score": 1.0,
+        "polarity": "mirror",
+        "motif": "parade and walking fireworks",
+        "authored": true
+      },
+      {
+        "id": "quill__vane",
+        "a": "vane",
+        "b": "quill",
+        "aName": "Ash-Captain Vane",
+        "bName": "Ash-Marshal Quill",
         "score": 1.0,
         "polarity": "tension",
-        "motif": "kite vs hold",
-        "authored": false
+        "motif": "flock captain vs tread marshal",
+        "authored": true
+      },
+      {
+        "id": "ketha__vane",
+        "a": "vane",
+        "b": "ketha",
+        "aName": "Ash-Captain Vane",
+        "bName": "Ketha",
+        "score": 0.95,
+        "polarity": "bond",
+        "motif": "captain and unfinished sentences",
+        "authored": true
+      },
+      {
+        "id": "veil__volt",
+        "a": "veil",
+        "b": "volt",
+        "aName": "Veil & Compass",
+        "bName": "Volt Lash",
+        "score": 0.897,
+        "polarity": "friction",
+        "motif": "fog payroll vs lightning wound",
+        "authored": true
+      },
+      {
+        "id": "grath__nox",
+        "a": "grath",
+        "b": "nox",
+        "aName": "Grath Arrears",
+        "bName": "Nox Tithe",
+        "score": 0.8,
+        "polarity": "mirror",
+        "motif": "wages and weather arrears",
+        "authored": true
+      },
+      {
+        "id": "spoke__tick",
+        "a": "spoke",
+        "b": "tick",
+        "aName": "Spoke",
+        "bName": "Tick Stream",
+        "score": 0.77,
+        "polarity": "sibling",
+        "motif": "wheels and plurals",
+        "authored": true
       },
       {
         "id": "ceil__noctua",
@@ -2519,96 +1957,25 @@
         "polarity": "tension",
         "motif": "flight paths vs gunship manners",
         "authored": true
-      }
-    ],
-    "eligibleTalks": [
-      {
-        "id": "ceil__noctua:C",
-        "pairId": "ceil__noctua",
-        "title": "Altitude arguments",
-        "polarity": "tension",
-        "motif": "flight paths vs gunship manners",
-        "rank": "C",
-        "a": "ceil",
-        "b": "noctua",
-        "authored": true,
-        "beats": [
-          {
-            "speaker": "narrator",
-            "line": "A bay that dreams. A rat that argues with roofs."
-          },
-          {
-            "speaker": "noctua",
-            "line": "Dreams in flight paths. You scratch them."
-          },
-          {
-            "speaker": "ceil",
-            "line": "Altitude is an opinion. Yours is a spreadsheet with wings."
-          },
-          {
-            "speaker": "noctua",
-            "line": "Eyes first."
-          },
-          {
-            "speaker": "ceil",
-            "line": "Teeth first. Then eyes, if anything's left to see."
-          },
-          {
-            "speaker": "narrator",
-            "line": "Sky is big. Their disagreement is not."
-          }
-        ],
-        "unlock": {
-          "coDeploy": 1,
-          "campLevelMin": 0,
-          "bondMin": 0
-        }
       },
       {
-        "id": "cauter__ceil:C",
-        "pairId": "cauter__ceil",
-        "title": "kite vs hold",
-        "polarity": "tension",
-        "motif": "kite vs hold",
-        "rank": "C",
-        "a": "cauter",
-        "b": "ceil",
-        "authored": false,
-        "beats": [
-          {
-            "speaker": "narrator",
-            "line": "Kite vs hold. The room gets smaller when both of you stand in it."
-          },
-          {
-            "speaker": "cauter",
-            "line": "Riot as punctuation."
-          },
-          {
-            "speaker": "ceil",
-            "line": "Altitude is an opinion."
-          },
-          {
-            "speaker": "narrator",
-            "line": "line seat beside skirmish. Not enemies. Not easy."
-          }
-        ],
-        "unlock": {
-          "coDeploy": 1,
-          "campLevelMin": 0,
-          "bondMin": 0
-        }
+        "id": "odessa__rusk",
+        "a": "rusk",
+        "b": "odessa",
+        "aName": "Rusk Halloway",
+        "bName": "Odessa Krail",
+        "score": 0.72,
+        "polarity": "sibling",
+        "motif": "gate door and ford door",
+        "authored": true
       }
     ],
+    "eligibleTalks": [],
     "note": "Parametric relationship web \u2014 hearth talks wire next.",
-    "circleEdgeCount": 2,
+    "circleEdgeCount": 0,
     "circle": [
-      "cauter",
-      "ceil",
-      "fatboy",
       "ketha",
-      "noctua",
-      "pavise",
-      "verse"
+      "pavise"
     ],
     "highlights": [
       {
@@ -2744,123 +2111,12 @@
         "authored": true
       }
     ],
-    "pairBonds": {
-      "ketha__vane": {
-        "points": 10.0,
-        "rank": "C",
-        "talksDone": []
-      },
-      "ketha__pavise": {
-        "points": 20.0,
-        "rank": "C",
-        "talksDone": []
-      },
-      "pavise__verse": {
-        "points": 20.0,
-        "rank": "C",
-        "talksDone": []
-      },
-      "ceil__pavise": {
-        "points": 20.0,
-        "rank": "C",
-        "talksDone": []
-      },
-      "noctua__pavise": {
-        "points": 20.0,
-        "rank": "C",
-        "talksDone": []
-      },
-      "ketha__verse": {
-        "points": 20.0,
-        "rank": "C",
-        "talksDone": []
-      },
-      "ceil__ketha": {
-        "points": 20.0,
-        "rank": "C",
-        "talksDone": []
-      },
-      "ketha__noctua": {
-        "points": 20.0,
-        "rank": "C",
-        "talksDone": []
-      },
-      "ceil__verse": {
-        "points": 20.0,
-        "rank": "C",
-        "talksDone": []
-      },
-      "noctua__verse": {
-        "points": 20.0,
-        "rank": "C",
-        "talksDone": []
-      },
-      "ceil__noctua": {
-        "points": 20.0,
-        "rank": "C",
-        "talksDone": []
-      },
-      "cauter__pavise": {
-        "points": 6.0,
-        "rank": "C",
-        "talksDone": []
-      },
-      "fatboy__pavise": {
-        "points": 6.0,
-        "rank": "C",
-        "talksDone": []
-      },
-      "cauter__ketha": {
-        "points": 6.0,
-        "rank": "C",
-        "talksDone": []
-      },
-      "fatboy__ketha": {
-        "points": 6.0,
-        "rank": "C",
-        "talksDone": []
-      },
-      "cauter__verse": {
-        "points": 6.0,
-        "rank": "C",
-        "talksDone": []
-      },
-      "fatboy__verse": {
-        "points": 6.0,
-        "rank": "C",
-        "talksDone": []
-      },
-      "cauter__ceil": {
-        "points": 6.0,
-        "rank": "C",
-        "talksDone": []
-      },
-      "ceil__fatboy": {
-        "points": 6.0,
-        "rank": "C",
-        "talksDone": []
-      },
-      "cauter__noctua": {
-        "points": 6.0,
-        "rank": "C",
-        "talksDone": []
-      },
-      "fatboy__noctua": {
-        "points": 6.0,
-        "rank": "C",
-        "talksDone": []
-      },
-      "cauter__fatboy": {
-        "points": 6.0,
-        "rank": "C",
-        "talksDone": []
-      }
-    },
+    "pairBonds": {},
     "authoredTalkCount": 28
   },
   "company": {
-    "sealed": true,
-    "preambleNeeded": false,
+    "sealed": false,
+    "preambleNeeded": true,
     "core": [
       {
         "id": "pavise",
@@ -2889,18 +2145,11 @@
         "escorts": []
       }
     ],
-    "band": [
-      "verse",
-      "ceil",
-      "noctua"
-    ],
-    "joinedLater": [
-      "cauter",
-      "fatboy"
-    ],
+    "band": [],
+    "joinedLater": [],
     "seatCap": 3,
-    "formationWalletTnb": 10,
-    "formationWalletKm": 8,
+    "formationWalletTnb": 3,
+    "formationWalletKm": 7,
     "unlockedIds": [
       "vane",
       "brakhov",
@@ -3521,418 +2770,12 @@
         "escorts": []
       }
     ],
-    "wild": [
-      {
-        "id": "vane",
-        "name": "Ash-Captain Vane",
-        "unitDef": "legcen",
-        "mapId": "greenest_fields",
-        "zoneId": "GF_C_GATE",
-        "recruit": {
-          "type": "wreck_rez",
-          "mapId": "greenest_fields",
-          "zoneId": "GF_C_GATE"
-        }
-      },
-      {
-        "id": "brakhov",
-        "name": "Brakhov the Kiln",
-        "unitDef": "leginc",
-        "mapId": "ancient_bastion",
-        "zoneId": "AB_E_BASTION",
-        "recruit": {
-          "type": "sortie",
-          "legacy": {
-            "type": "mission_victory",
-            "mission": 6
-          },
-          "requiresVictory": true,
-          "mapId": "ancient_bastion",
-          "zoneId": "AB_E_BASTION"
-        }
-      },
-      {
-        "id": "odessa",
-        "name": "Odessa Krail",
-        "unitDef": "legamph",
-        "mapId": "greenest_fields",
-        "zoneId": "GF_C_GATE",
-        "recruit": {
-          "type": "wreck_rez",
-          "legacy": {
-            "type": "act_reached",
-            "act": 2
-          },
-          "mapId": "greenest_fields",
-          "zoneId": "GF_C_GATE"
-        }
-      },
-      {
-        "id": "rusk",
-        "name": "Rusk Halloway",
-        "unitDef": "leggat",
-        "mapId": "koom_valley",
-        "zoneId": "KV_W_LANE",
-        "recruit": {
-          "type": "wreck_rez",
-          "legacy": {
-            "type": "mission_victory",
-            "mission": 2
-          },
-          "mapId": "koom_valley",
-          "zoneId": "KV_W_LANE"
-        }
-      },
-      {
-        "id": "grath",
-        "name": "Grath Arrears",
-        "unitDef": "legkark",
-        "mapId": "koom_valley",
-        "zoneId": "KV_E_LANE",
-        "recruit": {
-          "type": "wreck_rez",
-          "legacy": {
-            "type": "rep",
-            "faction": "nullmercs",
-            "min": 65
-          },
-          "mapId": "koom_valley",
-          "zoneId": "KV_E_LANE"
-        }
-      },
-      {
-        "id": "halq",
-        "name": "Sisu Halq",
-        "unitDef": "legbal",
-        "mapId": "the_rock_jungle",
-        "zoneId": "TRJ_SE_GATE",
-        "recruit": {
-          "type": "wreck_rez",
-          "legacy": {
-            "type": "mission_victory",
-            "mission": 9
-          },
-          "mapId": "the_rock_jungle",
-          "zoneId": "TRJ_SE_GATE"
-        }
-      },
-      {
-        "id": "yeva",
-        "name": "Whisper-of-Ash Yeva",
-        "unitDef": "armsnipe",
-        "mapId": "eye_of_horus",
-        "zoneId": "EOH_E_LANE",
-        "recruit": {
-          "type": "wreck_rez",
-          "mapId": "eye_of_horus",
-          "zoneId": "EOH_E_LANE"
-        }
-      },
-      {
-        "id": "spoke",
-        "name": "Spoke",
-        "unitDef": "legscout",
-        "mapId": "greenest_fields",
-        "zoneId": "GF_C_INNER_GATE",
-        "recruit": {
-          "type": "wreck_rez",
-          "mapId": "greenest_fields",
-          "zoneId": "GF_C_INNER_GATE",
-          "factory": "wheelie_bay"
-        }
-      },
-      {
-        "id": "auditor",
-        "name": "The Last Auditor",
-        "unitDef": "legeallterrainmech",
-        "mapId": "ancient_bastion",
-        "zoneId": "AB_NE_CITADEL",
-        "recruit": {
-          "type": "sortie",
-          "legacy": {
-            "type": "act_reached",
-            "act": 3
-          },
-          "requiresVictory": true,
-          "mapId": "ancient_bastion",
-          "zoneId": "AB_NE_CITADEL"
-        }
-      },
-      {
-        "id": "twitch",
-        "name": "Twitcher",
-        "unitDef": "corfast",
-        "mapId": "eye_of_horus",
-        "zoneId": "EOH_SE_BASTION",
-        "recruit": {
-          "type": "wreck_rez",
-          "legacy": {
-            "type": "rep",
-            "faction": "cortex",
-            "min": 40
-          },
-          "factory": "twitch_kit",
-          "mapId": "eye_of_horus",
-          "zoneId": "EOH_SE_BASTION"
-        }
-      },
-      {
-        "id": "consul",
-        "name": "Armada Consul",
-        "unitDef": "armconsul",
-        "mapId": "the_rock_jungle",
-        "zoneId": "TRJ_NW_GATE",
-        "recruit": {
-          "type": "wreck_rez",
-          "legacy": {
-            "type": "assist_fortify",
-            "mapId": "the_rock_jungle",
-            "zoneId": "TRJ_NW_GATE",
-            "optionalJoin": true,
-            "blurb": "Help fortify the Jungle camp \u2014 Consul may join after"
-          },
-          "factory": "consul_works",
-          "mapId": "the_rock_jungle",
-          "zoneId": "TRJ_NW_GATE"
-        }
-      },
-      {
-        "id": "veil",
-        "name": "Veil & Compass",
-        "unitDef": "coreter",
-        "mapId": "the_rock_jungle",
-        "zoneId": "TRJ_NW_GATE",
-        "recruit": {
-          "type": "wreck_rez",
-          "mapId": "the_rock_jungle",
-          "zoneId": "TRJ_NW_GATE"
-        }
-      },
-      {
-        "id": "commando",
-        "name": "Cinder Hook",
-        "unitDef": "va_cormando",
-        "mapId": "the_rock_jungle",
-        "zoneId": "TRJ_SW_LANE",
-        "recruit": {
-          "type": "wreck_rez",
-          "mapId": "the_rock_jungle",
-          "zoneId": "TRJ_SW_LANE"
-        }
-      },
-      {
-        "id": "tick",
-        "name": "Tick Stream",
-        "unitDef": "armflea",
-        "mapId": "greenest_fields",
-        "zoneId": "GF_SW_MUSTER",
-        "recruit": {
-          "type": "wreck_rez",
-          "mapId": "greenest_fields",
-          "zoneId": "GF_C_GATE",
-          "factory": "tick_stream_bay"
-        }
-      },
-      {
-        "id": "bro",
-        "name": "Bro",
-        "unitDef": "corgol",
-        "mapId": "eye_of_horus",
-        "zoneId": "EOH_SE_BASTION",
-        "recruit": {
-          "type": "wreck_rez",
-          "mapId": "eye_of_horus",
-          "zoneId": "EOH_SE_BASTION"
-        }
-      },
-      {
-        "id": "stride",
-        "name": "Saloon Stride",
-        "unitDef": "va_mav_stride",
-        "mapId": "koom_valley",
-        "zoneId": "KV_W_LANE",
-        "recruit": {
-          "type": "wreck_rez",
-          "mapId": "koom_valley",
-          "zoneId": "KV_W_LANE"
-        }
-      },
-      {
-        "id": "hearth",
-        "name": "Hearth",
-        "unitDef": "armfus",
-        "mapId": "greenest_fields",
-        "zoneId": "GF_NW_CITADEL",
-        "recruit": {
-          "type": "wreck_rez",
-          "legacy": {
-            "type": "rep",
-            "faction": "armada",
-            "min": 35
-          },
-          "mapId": "greenest_fields",
-          "zoneId": "GF_NW_CITADEL"
-        }
-      },
-      {
-        "id": "solarium",
-        "name": "Solarium",
-        "unitDef": "armnanotc",
-        "mapId": "greenest_fields",
-        "zoneId": "GF_SW_CITADEL",
-        "recruit": {
-          "type": "wreck_rez",
-          "legacy": {
-            "type": "rep",
-            "faction": "armada",
-            "min": 25
-          },
-          "mapId": "greenest_fields",
-          "zoneId": "GF_SW_CITADEL"
-        }
-      },
-      {
-        "id": "warder",
-        "name": "Warder",
-        "unitDef": "armbeamer",
-        "mapId": "the_rock_jungle",
-        "zoneId": "TRJ_NW_MUSTER",
-        "recruit": {
-          "type": "objective_kind",
-          "kinds": [
-            "seize_lane",
-            "gate_control",
-            "fortify_zone"
-          ],
-          "act": 1,
-          "mapId": "the_rock_jungle",
-          "zoneId": "TRJ_NW_MUSTER"
-        }
-      },
-      {
-        "id": "mira",
-        "name": "Mira Barrage",
-        "unitDef": "legbar",
-        "mapId": "the_rock_jungle",
-        "zoneId": "TRJ_C_SPILLWAY",
-        "recruit": {
-          "type": "wreck_rez",
-          "mapId": "the_rock_jungle",
-          "zoneId": "TRJ_C_SPILLWAY"
-        }
-      },
-      {
-        "id": "kettle",
-        "name": "Saint Kettle",
-        "unitDef": "armaak",
-        "mapId": "greenest_fields",
-        "zoneId": "GF_SW_BASTION",
-        "recruit": {
-          "type": "wreck_rez",
-          "mapId": "greenest_fields",
-          "zoneId": "GF_C_GATE"
-        }
-      },
-      {
-        "id": "infestor",
-        "name": "Infestor Hive",
-        "unitDef": "leginfestor",
-        "mapId": "eye_of_horus",
-        "zoneId": "EOH_E_LANE",
-        "recruit": {
-          "type": "wreck_rez",
-          "mapId": "eye_of_horus",
-          "zoneId": "EOH_E_LANE"
-        }
-      },
-      {
-        "id": "quill",
-        "name": "Ash-Marshal Quill",
-        "unitDef": "armbull",
-        "mapId": "koom_valley",
-        "zoneId": "KV_E_LANE",
-        "recruit": {
-          "type": "wreck_rez",
-          "mapId": "koom_valley",
-          "zoneId": "KV_E_LANE"
-        }
-      },
-      {
-        "id": "kit",
-        "name": "Kit Sparkler",
-        "unitDef": "legbart",
-        "mapId": "the_rock_jungle",
-        "zoneId": "TRJ_C_SPILLWAY",
-        "recruit": {
-          "type": "wreck_rez",
-          "mapId": "the_rock_jungle",
-          "zoneId": "TRJ_C_SPILLWAY"
-        }
-      },
-      {
-        "id": "vale",
-        "name": "Vale Soft",
-        "unitDef": "armmerl",
-        "mapId": "ancient_bastion",
-        "zoneId": "AB_E_BASTION",
-        "recruit": {
-          "type": "wreck_rez",
-          "mapId": "ancient_bastion",
-          "zoneId": "AB_E_BASTION"
-        }
-      },
-      {
-        "id": "nox",
-        "name": "Nox Tithe",
-        "unitDef": "armscab",
-        "mapId": "greenest_fields",
-        "zoneId": "GF_N_PLATEAU",
-        "recruit": {
-          "type": "wreck_rez",
-          "mapId": "greenest_fields",
-          "zoneId": "GF_N_PLATEAU"
-        }
-      },
-      {
-        "id": "volt",
-        "name": "Volt Lash",
-        "unitDef": "armlatnk",
-        "mapId": "koom_valley",
-        "zoneId": "KV_W_LANE",
-        "recruit": {
-          "type": "wreck_rez",
-          "mapId": "koom_valley",
-          "zoneId": "KV_W_LANE"
-        }
-      },
-      {
-        "id": "halbard",
-        "name": "Halbard",
-        "unitDef": "corhal",
-        "mapId": "greenest_fields",
-        "zoneId": "GF_C_GATE",
-        "recruit": {
-          "type": "wreck_rez",
-          "mapId": "greenest_fields",
-          "zoneId": "GF_C_GATE"
-        }
-      }
-    ],
+    "wild": [],
     "deployAces": [
-      "ketha",
-      "verse",
-      "ceil",
-      "noctua",
-      "cauter",
-      "fatboy"
+      "pavise",
+      "ketha"
     ],
-    "deployBand": [
-      "verse",
-      "ceil",
-      "noctua",
-      "cauter",
-      "fatboy"
-    ],
+    "deployBand": [],
     "missionCallIns": [],
     "broTzar": {
       "available": false,
@@ -3953,15 +2796,11 @@
       "displayName": "Greenest Fields",
       "descriptor": "The Synthesized Utopia",
       "family": "economy",
-      "control": "contested",
+      "control": "neutral",
       "dominantEnemy": "armada",
-      "threatBand": "heavy",
+      "threatBand": "light",
       "controlCounts": {
-        "ashwalkers": 6,
-        "armada": 6,
-        "neutral": 4,
-        "cortex": 1,
-        "nullmercs": 1
+        "neutral": 12
       },
       "selectable": true
     },
@@ -3974,8 +2813,8 @@
       "dominantEnemy": "nullmercs",
       "threatBand": "light",
       "controlCounts": {
-        "nullmercs": 3,
-        "neutral": 9
+        "neutral": 11,
+        "nullmercs": 1
       },
       "selectable": true
     },
@@ -4048,273 +2887,110 @@
     }
   ],
   "node": {
-    "id": "hub_open_m5",
+    "id": "hub_open_m1",
     "kind": "choice",
     "speaker": "ketha",
-    "text": "Already applied. (extracted). duplicate resultKey \u2014 state unchanged",
-    "regionHint": "eye_of_horus",
-    "sortieMapId": "eye_of_horus",
+    "text": "Two roads from the ash: found our new base in the Rock Jungle (eco, raptor defence, leftover Tnb on constructors), or jump Greenest Fields first \u2014 raid decoy farms for Tenebrium, optionally plant a presence, then haul it home to build.",
+    "regionHint": "greenest_fields",
+    "sortieMapId": "greenest_fields",
     "sessionHomeMap": "the_rock_jungle",
-    "graphPressure": "high contest \u00b7 Tnb scarce",
+    "graphPressure": "high contest \u00b7 Tnb scarce \u00b7 Cortex lean",
     "choices": [
       {
-        "id": "wr_EOH_NW_BASTION__EOH_SE_BASTION",
-        "label": "Lean \u00b7 Open Koom Valley through Southeast Bastion",
-        "blurb": "You are at Northwest Bastion, the Eye. You came in from Greenest Fields.\nHeading Southeast Bastion. That road opens Koom Valley.\nAlong the way: Bro, Infestor Hive, Twitcher, Whisper-of-Ash Yeva.\nThe world leans this way.",
+        "id": "c_raid_tnb_greenest_fields",
+        "label": "Raid Greenest Fields for Tenebrium",
+        "blurb": "Jump the Fields first: land the quiet north desert rim, break Armada decoy farms on the southeast plateau for Tenebrium, then extract back to that open pad. A stack left on exfil becomes your first Fields foothold.",
         "kind": "deploy",
         "recommended": true,
         "effect": {
-          "mapId": "eye_of_horus",
-          "contractKind": "seize_lane",
-          "preferredCaptureZoneId": "EOH_SE_BASTION",
-          "preferredDeployZoneId": "EOH_NW_BASTION",
-          "preferredExtractionZoneId": "EOH_SE_BASTION",
-          "infilZoneId": "EOH_NW_BASTION",
-          "exfilZoneId": "EOH_SE_BASTION",
-          "headingMapId": "koom_valley",
-          "headingZoneId": "KV_NW_MUSTER",
-          "alongTheWay": [
-            "bro",
-            "infestor",
-            "twitch",
-            "yeva"
-          ],
-          "wetReach": true,
-          "sessionMode": "map_travel",
-          "against": "cortex",
-          "journey": "wet_reach",
-          "deployAces": [
-            "ketha",
-            "rusk"
-          ]
-        }
-      },
-      {
-        "id": "wr_GF_NW_MUSTER__GF_C_INNER_GATE",
-        "label": "Walk the Eye through Central Inner Gate",
-        "blurb": "You are at Northwest Muster, Greenest Fields. You came in from a road already open.\nHeading Central Inner Gate. That road returns to the Eye.\nAlong the way: Halbard, Saint Kettle, Odessa Krail, Spoke +5.\nStill open.",
-        "kind": "deploy",
-        "recommended": false,
-        "effect": {
+          "schemaVersion": "verdance-sortie-order/1.0",
+          "campaignId": "verdance_ashes",
           "mapId": "greenest_fields",
-          "contractKind": "seize_lane",
-          "preferredCaptureZoneId": "GF_C_GATE",
-          "preferredDeployZoneId": "GF_NW_MUSTER",
-          "preferredExtractionZoneId": "GF_C_INNER_GATE",
-          "infilZoneId": "GF_NW_MUSTER",
-          "exfilZoneId": "GF_C_INNER_GATE",
-          "headingMapId": "eye_of_horus",
-          "headingZoneId": "EOH_NW_BASTION",
-          "alongTheWay": [
-            "halbard",
-            "kettle",
-            "odessa",
-            "spoke",
-            "tick",
-            "vane",
-            "hearth",
-            "nox",
-            "solarium"
+          "targetZoneId": "GF_SE_PLATEAU",
+          "deploymentZoneId": "GF_NE_PLATEAU",
+          "extractionZoneId": "GF_NE_PLATEAU",
+          "fromZoneIds": [
+            "GF_NE_PLATEAU"
           ],
-          "wetReach": true,
-          "sessionMode": "map_travel",
-          "against": "cortex",
-          "journey": "wet_reach",
+          "captureZoneIds": [
+            "GF_SE_PLATEAU"
+          ],
+          "secondaryCaptureZoneIds": [],
+          "hubChoiceId": "c_raid_tnb_greenest_fields",
           "deployAces": [
-            "ketha",
-            "rusk"
-          ]
-        }
-      },
-      {
-        "id": "wr_GF_C_INNER_GATE__GF_NW_MUSTER",
-        "label": "Walk the Rock Jungle through Northwest Muster",
-        "blurb": "You are at Central Inner Gate, Greenest Fields. You came in from a road already open.\nHeading Northwest Muster. That road returns to the Rock Jungle.\nAlong the way: Halbard, Saint Kettle, Odessa Krail, Spoke +5.\nStill open.",
-        "kind": "deploy",
-        "recommended": false,
-        "effect": {
-          "mapId": "greenest_fields",
-          "contractKind": "seize_lane",
-          "preferredCaptureZoneId": "GF_C_GATE",
-          "preferredDeployZoneId": "GF_C_INNER_GATE",
-          "preferredExtractionZoneId": "GF_NW_MUSTER",
-          "infilZoneId": "GF_C_INNER_GATE",
-          "exfilZoneId": "GF_NW_MUSTER",
-          "headingMapId": "the_rock_jungle",
-          "headingZoneId": "TRJ_NW_OUTER_MUSTER",
-          "alongTheWay": [
-            "halbard",
-            "kettle",
-            "odessa",
-            "spoke",
-            "tick",
-            "vane",
-            "hearth",
-            "nox",
-            "solarium"
+            "pavise",
+            "ketha"
           ],
-          "wetReach": true,
-          "sessionMode": "map_travel",
+          "crewBand": [],
+          "patron": "nullmercs",
           "against": "armada",
-          "journey": "wet_reach",
+          "objectiveArchetype": "eco_raid",
+          "difficulty": 1,
+          "targetDuration": "8min",
+          "contractXp": 180,
+          "pathSignal": "B",
+          "sessionMode": "reload_travel",
+          "occupationModel": "living_shell",
+          "source": "opening_mission",
+          "openingMission": true,
+          "openingDoctrine": "decoy_raid",
+          "openingForce": {
+            "mercenaryPackage": "punch_of_thugs",
+            "mercenaryLabel": "Mercenary Punch of Thugs",
+            "thugs": 6,
+            "karkinos": 2,
+            "rezBots": 6
+          },
+          "label": "Raid Greenest Fields for Tenebrium",
+          "hubBlurb": "Jump the Fields first: land the quiet north desert rim, break Armada decoy farms on the southeast plateau for Tenebrium, then extract back to that open pad. A stack left on exfil becomes your first Fields foothold.",
+          "notes": "Opening Tnb raid from shell-free north desert (standard safe infil/exfil). Hit Armada decoy commanders with Thugs and Legion Karkinos. Home is the Rock Jungle \u2014 this sortie funds that base.",
+          "contractKind": "eco_raid",
+          "preferredDeployZoneId": "GF_NE_PLATEAU",
+          "preferredCaptureZoneId": "GF_SE_PLATEAU",
+          "preferredExtractionZoneId": "GF_NE_PLATEAU"
+        },
+        "journey": "tnb_raid"
+      },
+      {
+        "id": "c_home_probe",
+        "label": "Found the Rock Jungle camp",
+        "blurb": "Start the new Ashwalker base: plant eco, dig in against raptor pests, and maybe mint a small exfil force. Spend leftover Tnb on constructors at the broker if you did not seat expensive heroes.",
+        "kind": "deploy",
+        "effect": {
+          "mapId": "the_rock_jungle",
+          "contractKind": "fortify_zone",
+          "preferredCaptureZoneId": "TRJ_NW_GATE",
+          "preferredDeployZoneId": "TRJ_NW_OUTER_MUSTER",
+          "preferredExtractionZoneId": "TRJ_NW_OUTER_MUSTER",
           "deployAces": [
-            "ketha",
-            "rusk"
-          ]
+            "pavise",
+            "ketha"
+          ],
+          "sessionMode": "same_map",
+          "against": "wild",
+          "homeClearAttempt": false,
+          "journey": "home_founding"
+        }
+      },
+      {
+        "id": "c_raid_crater",
+        "label": "Strike the Horus crater",
+        "blurb": "Cortex still smiles at customers \u2014 until you glass their gear.",
+        "kind": "deploy",
+        "effect": {
+          "mapId": "eye_of_horus",
+          "contractKind": "destroy_key_structure",
+          "deployAces": [
+            "pavise",
+            "ketha"
+          ],
+          "sessionMode": "map_travel",
+          "against": "cortex",
+          "journey": "spine_outflow"
         }
       }
     ]
   },
-  "lastResult": {
-    "at": "2026-10-16T01:24:14Z",
-    "choiceId": "wr_GF_NW_MUSTER__GF_C_INNER_GATE",
-    "mapId": "greenest_fields",
-    "contractKind": "seize_lane",
-    "deployAces": [
-      "pavise",
-      "ketha",
-      "verse",
-      "ceil",
-      "noctua"
-    ],
-    "deployPlan": {
-      "schemaVersion": "verdance-deploy-plan/1.0",
-      "mapId": "greenest_fields",
-      "contractKind": "seize_lane",
-      "deployAces": [
-        "pavise",
-        "ketha",
-        "verse",
-        "ceil",
-        "noctua"
-      ],
-      "crewBand": [
-        "verse",
-        "ceil",
-        "noctua"
-      ],
-      "choiceId": "wr_GF_NW_MUSTER__GF_C_INNER_GATE",
-      "repDelta": {},
-      "arcId": 1,
-      "maxCaptureMarks": 1,
-      "marks": {
-        "deployZoneId": "GF_NW_MUSTER",
-        "extractZoneId": "GF_C_INNER_GATE",
-        "captureZoneIds": [
-          "GF_NW_BASTION"
-        ]
-      },
-      "patron": "nullmercs",
-      "against": "cortex",
-      "pathSignal": "B",
-      "sessionMode": "map_travel",
-      "occupationModel": "living_shell",
-      "wetReach": true,
-      "infilZoneId": "GF_NW_MUSTER",
-      "exfilZoneId": "GF_C_INNER_GATE",
-      "headingMapId": "eye_of_horus",
-      "headingZoneId": "EOH_NW_BASTION",
-      "alongTheWay": [
-        "cauter",
-        "fatboy",
-        "halbard",
-        "hearth",
-        "kettle",
-        "nox",
-        "odessa",
-        "solarium",
-        "spoke",
-        "tick",
-        "vane"
-      ],
-      "stampedAt": "2026-10-16T01:06:15Z"
-    },
-    "verdict": "victory",
-    "resultKey": "verdance_ashes|va_004|4|ch2|victory|extracted|f15242",
-    "zoneFlipped": false,
-    "terminalReason": "extracted",
-    "reasonHint": null,
-    "objectiveFailed": false,
-    "objectiveFailHero": "",
-    "headline": "Already applied.",
-    "changed": [
-      "duplicate resultKey \u2014 state unchanged"
-    ],
-    "nextAction": "mark_board",
-    "duplicate": true,
-    "debrief": {
-      "ok": true,
-      "verdict": "victory",
-      "banner": "SUCCESS",
-      "headline": "Already applied.",
-      "terminalReason": "extracted",
-      "changed": [
-        "duplicate resultKey \u2014 state unchanged"
-      ],
-      "nextAction": "mark_board",
-      "resultKey": "verdance_ashes|va_004|4|ch2|victory|extracted|f15242",
-      "duplicate": true
-    },
-    "collapse": null,
-    "graphDelta": null,
-    "graphMeasured": null,
-    "tokens": [
-      "resultKey=verdance_ashes|va_004|4|ch2|victory|extracted|f15242",
-      "xp pavise+53.3",
-      "dead pavise",
-      "rank pavise=Proven",
-      "xp ketha+82.0",
-      "rank ketha=Proven",
-      "rank rusk=Runner",
-      "xp verse+82.0",
-      "rank verse=Proven",
-      "rank odessa=Runner",
-      "rank brakhov=Runner",
-      "rank yeva=Runner",
-      "xp cauter+73.8",
-      "rank cauter=Runner",
-      "rank grath=Runner",
-      "rank halq=Runner",
-      "rank auditor=Runner",
-      "rank twitch=Runner",
-      "rank consul=Runner",
-      "rank spoke=Runner",
-      "rank hearth=Runner",
-      "rank solarium=Runner",
-      "rank warder=Runner",
-      "rank veil=Runner",
-      "rank commando=Runner",
-      "rank tick=Runner",
-      "xp fatboy+73.8",
-      "rank fatboy=Runner",
-      "rank bro=Runner",
-      "rank stride=Runner",
-      "xp noctua+82.0",
-      "rank noctua=Proven",
-      "rank mira=Runner",
-      "rank kettle=Runner",
-      "rank infestor=Runner",
-      "rank vane=Runner",
-      "rank quill=Runner",
-      "rank kit=Runner",
-      "rank vale=Runner",
-      "rank nox=Runner",
-      "xp ceil+82.0",
-      "rank ceil=Proven",
-      "rank lumen=Runner",
-      "dead anvil",
-      "rank anvil=Runner",
-      "rank volt=Runner",
-      "rank halbard=Runner",
-      "rep.nullmercs=68.0",
-      "modeA=the_rock_jungle:6"
-    ],
-    "source": "apply_result_to_hub_v1"
-  },
-  "history": [
-    {
-      "at": "2026-10-16T01:24:14Z",
-      "msg": "BAR result victory \u00b7 greenest_fields \u00b7 resultKey=verdance_ashes|va_004|4|ch2|victory|extracted|f15242, xp pavise+53.3, dead pavise, rank pavise=Proven, xp ketha+82.0, rank ketha=Proven"
-    }
-  ]
+  "lastResult": null,
+  "history": []
 }

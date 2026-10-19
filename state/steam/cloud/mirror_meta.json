@@ -1,8 +1,8 @@
 {
   "schemaVersion": "verdance-steam-cloud-mirror/1.0",
-  "at": "2026-10-16T01:24:14Z",
-  "source": "C:\\Users\\Luke Spooner\\Documents\\BAR_Verdance_Workspace\\state\\campaign_state.json",
-  "dest": "C:\\Users\\Luke Spooner\\Documents\\BAR_Verdance_Workspace\\state\\steam\\cloud\\campaign_state.json",
+  "at": "2026-10-19T18:42:25Z",
+  "source": "/sessions/rcw-01uc3fcvmzen12go1drhoau8/mnt/BAR_Verdance_Workspace/state/campaign_state.json",
+  "dest": "/sessions/rcw-01uc3fcvmzen12go1drhoau8/mnt/BAR_Verdance_Workspace/state/steam/cloud/campaign_state.json",
   "steamworks": false,
   "note": "Mirror only \u2014 wire FileWriteAsync when AppID is live."
 }
