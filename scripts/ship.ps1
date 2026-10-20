@@ -1,4 +1,4 @@
-# Consolidated product ship -> export\dist\VerdanceAshes_vX.Y.Z (+ zip)
+﻿# Consolidated product ship -> export\dist\VerdanceAshes_vX.Y.Z (+ zip)
 # Self-contained: SETUP + PLAY + kernel + mod + data. No design forge required.
 param(
   [string]$Workspace = "",
