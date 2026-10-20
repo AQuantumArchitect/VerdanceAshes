@@ -2,7 +2,7 @@
 
 **One product, two skins:** BAR in-theater HUD + HTML war-room hub.
 
-Version: **0.8.3** (theater map + home jungle) · **pass six 2026-10-20**: the board paints belief, one pad, exposure, manifest debrief. Protocol credit laws stay in `docs/CAMPAIGN_BAR_PROTOCOL.md` and `tools/match_credit_v1.py`. Theater/home rules: `docs/THEATER_MAP_AND_HOME.md`.
+Version: **0.9** · **pass seven 2026-10-20**: three surfaces (minimap board · sidebar · infil/exfil cards), one encoding, no pings. Protocol credit laws stay in `docs/CAMPAIGN_BAR_PROTOCOL.md` and `tools/match_credit_v1.py`. Theater/home rules: `docs/THEATER_MAP_AND_HOME.md`.
 
 ---
 
@@ -63,10 +63,28 @@ Secondary: `reasonHint` from credit table; never invent a third dialect.
 
 ---
 
-## Surfaces
+## Surfaces (pass seven)
 
 | Surface | File | Role |
 |---|---|---|
+| Hub | `app/showoff/index.html` | Company, Drop board, homecoming card, Abandon |
+| Belief board (model + painter) | `luaui/Include/va_board.lua` | ONE encoding for every in-game map surface: faction fill = who we believe holds it, alpha = confidence, LOS fades belief, bad hatch = how much of us they see, △ pad, ◆ objective, ◆/◇/✓/✗ marks, ◉ loudest exposure, ✗/○ contradictions, ●○✚⚑ people. Zone outlines, never cell grids. |
+| Minimap | `gui_verdance_minimap.lua` | The minimap IS the board (owns `WG.vaBoard`, `WG.vaContradicted`); pad ring on the ground; Yeva on contradictions |
+| Sidebar | `gui_verdance_sidebar.lua` | Phase chip + clock meter · mission + progress meter + mark squares · the company (a card per hero: strip, hp bar, state glyph; click selects, double-click focuses) · the pad (dots, exposure, EXTRACT, "left if you lift"). Paints the route stage on the battlefield with MarkerAddLine — no marker text, no ground arrows, no pings. |
+| Infil card | `gui_verdance_infil.lua` | Paused landing card: who you brought · the board with pad + job · the job, marks, clock, Yeva's read. Enter begins. `/vabrief` reopens. |
+| Exfil manifest | `gui_verdance_exfil.lua` | EXTRACT → pause → going / left-if-you-lift / the board with ●○■ / briefed→seen swatches → confirm. Closing card = the board frozen. |
+| Voice | `gui_verdance_voice.lua` | One stack: Ketha, Yeva, rank-ups, inbound. `WG.vaVoice.say`. `/valog`. |
+| Tnb bar | `gui_verdance_tnb_bar.lua` | Top-centre: bank · looted · field, pips, rise/fall flash |
+| Hero tags | `gui_verdance_hero_tags.lua` | Name only over heroes and wrecks |
+| Proxy story | `gui_verdance_proxy_story.lua` | Optional archive (`/vastoryshow`) |
+
+Retired in pass seven (history keeps them): `gui_verdance_objectives.lua` (2,793 lines: rail, narrative cam, F9 overlay, marker spam), `gui_verdance_zone_minimap.lua`, `gui_verdance_belief_overlay.lua`, `gui_verdance_playfeel.lua` (centre-screen nags, debug chip, retreat rays).
+
+**Gadget truth for the HUD** (`game_verdance_exfil.lua` hudScan, every 30 frames): `va_hud_heroes_json` [{id,name,unit,hp,x,z,onPad,zone,crit,level,rank,vet,state,dist} + down wrecks], `va_pad_people/units/off_units/off_structures/enemy_live`. Widgets never rescan units.
+
+**Harness**: `tools/hud_harness/harness.py` runs the widgets under a stubbed Spring in liblua (Linux); `render.py` draws the recorded gl calls to PNG so a screen can be looked at before BAR runs it.
+
+---|---|---|
 | Hub | `app/showoff/index.html` | Company, Drop board, homecoming card, Abandon |
 | BAR command deck | `gui_verdance_objectives.lua` | Briefing, phase chip, pad ring + headcount, EXTRACT states + "left if you lift", SEEN row, barks (one voice queue with Yeva) |
 | Exfil manifest | `gui_verdance_exfil.lua` | EXTRACT → pause → going / staying / learned → confirm |
@@ -94,7 +112,7 @@ Secondary: `reasonHint` from credit table; never invent a third dialect.
 
 Operator live smoke after SETUP:
 
-- [ ] Briefing dismissible (Space), reopenable (`/vabrief`)
+- [ ] Infil card: Enter begins; `/vabrief` reopens (paused)
 - [ ] Phase + clock readable under BAR resource bar
 - [ ] Debrief contracts selectable by click, number key, arrows + Enter
 - [ ] Partial debrief ≠ green victory (HINGE / Hinge. Not a win.)

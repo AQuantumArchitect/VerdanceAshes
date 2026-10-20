@@ -312,7 +312,7 @@ def intel_for_intent(state: Dict[str, Any], workspace: Path, map_id: Optional[st
                 if r.get("mapId") != map_id or not r.get("role"):
                     continue
                 z = out["zones"].setdefault(str(r["node"]), {"label": r.get("label")})
-                z[str(r["role"])] = {"value": r.get("value"), "confidence": r.get("confidence"), "state": r.get("state"), "age_min": r.get("age_min"), "source": r.get("source")}
+                z[str(r["role"])] = {"value": r.get("value"), "confidence": r.get("confidence"), "state": r.get("state"), "age_min": r.get("age_min"), "source": r.get("source"), "faction": r.get("faction")}
             out["questions"] = [{"id": q["id"], "icon": q.get("icon"), "status": q.get("status"), "lean": q.get("lean")} for q in frame.get("questions") or []]
         except Exception:
             pass

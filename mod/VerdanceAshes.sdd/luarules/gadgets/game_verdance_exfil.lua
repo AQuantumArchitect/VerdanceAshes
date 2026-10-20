@@ -280,6 +280,73 @@ local function manifest()
   return m
 end
 
+-- ---------------------------------------------------------------- HUD truth (pass seven)
+-- The one scan the HUD reads instead of guessing from its own unit loops, every 30 frames:
+--   va_hud_heroes_json  [{id,name,unit,hp,x,z,onPad,zone,crit,level,rank,vet,state}] + down wrecks
+--   va_pad_people / va_pad_units      what is inside the ring right now (would lift)
+--   va_pad_off_units / va_pad_off_structures   what would stay
+--   va_pad_enemy_live                 who else stands on our pad (visible to us)
+local function hudScan()
+  if not pad then return end
+  if next(teamAlly) == nil then resolvePlayerTeam() end
+  local heroes = {}
+  local onPeople, onUnits, offUnits, offStructures = 0, 0, 0, 0
+  local r2 = pad.r * pad.r
+  for _, uid in ipairs(Spring.GetTeamUnits(playerTeamID) or {}) do
+    if Spring.ValidUnitID(uid) and not Spring.GetUnitIsDead(uid) then
+      local x, _, z = Spring.GetUnitPosition(uid)
+      local dID = Spring.GetUnitDefID(uid)
+      local ud = dID and UnitDefs[dID]
+      local structure = ud and (ud.isBuilding or ud.isFactory or ((ud.speed or 1) == 0))
+      local hid = Spring.GetUnitRulesParam(uid, "va_hero_id")
+      local isHero = hid ~= nil and tostring(hid) ~= "" and tostring(hid) ~= "0"
+      local dx, dz = (x or 0) - pad.x, (z or 0) - pad.z
+      local onPad = (dx * dx + dz * dz) <= r2
+      if structure then
+        offStructures = offStructures + 1
+      elseif onPad then
+        if isHero then onPeople = onPeople + 1 else onUnits = onUnits + 1 end
+      elseif not isHero then
+        offUnits = offUnits + 1
+      end
+      if isHero then
+        local hp, maxHp = Spring.GetUnitHealth(uid)
+        heroes[#heroes + 1] = {
+          id = tostring(hid), name = tostring(Spring.GetUnitRulesParam(uid, "va_hero_name") or hid), unit = uid,
+          hp = (hp and maxHp and maxHp > 0) and (hp / maxHp) or 1, x = math.floor(x or 0), z = math.floor(z or 0),
+          onPad = onPad, zone = zoneOf(x, z) or "", crit = (tonumber(Spring.GetUnitRulesParam(uid, "va_hero_critical")) or 0) == 1,
+          level = tonumber(Spring.GetUnitRulesParam(uid, "va_hero_level")) or 1, rank = tostring(Spring.GetUnitRulesParam(uid, "va_hero_rank") or ""),
+          vet = tostring(Spring.GetUnitRulesParam(uid, "va_vet_rank") or ""), state = "alive",
+          dist = math.floor(math.sqrt(dx * dx + dz * dz)),
+        }
+      end
+    end
+  end
+  for _, fid in ipairs(Spring.GetAllFeatures() or {}) do
+    local name = Spring.GetFeatureRulesParam(fid, "va_hero_wreck_name")
+    if type(name) == "string" and name ~= "" then
+      local fx, _, fz = Spring.GetFeaturePosition(fid)
+      local hid = Spring.GetFeatureRulesParam(fid, "va_hero_wreck")
+      heroes[#heroes + 1] = { id = tostring(hid or name), name = name, x = math.floor(fx or 0), z = math.floor(fz or 0), zone = zoneOf(fx, fz) or "", state = "down", feature = fid }
+    end
+  end
+  local enemy = 0
+  for _, uid in ipairs(Spring.GetUnitsInCylinder(pad.x, pad.z, pad.r) or {}) do
+    local team = Spring.GetUnitTeam(uid)
+    if team ~= nil and team ~= gaiaTeamID and not Spring.AreTeamsAllied(playerTeamID, team) then enemy = enemy + 1 end
+  end
+  Spring.SetGameRulesParam("va_hud_heroes_json", toJson(heroes), { public = true })
+  Spring.SetGameRulesParam("va_pad_people", onPeople, { public = true })
+  Spring.SetGameRulesParam("va_pad_units", onUnits, { public = true })
+  Spring.SetGameRulesParam("va_pad_off_units", offUnits, { public = true })
+  Spring.SetGameRulesParam("va_pad_off_structures", offStructures, { public = true })
+  Spring.SetGameRulesParam("va_pad_enemy_live", enemy, { public = true })
+end
+
+function gadget:GameFrame(f)
+  if ready and f % 30 == 7 then hudScan() end
+end
+
 function GG.VA_Manifest()
   if not ready then return nil end
   return manifest()

@@ -132,7 +132,7 @@ end
 
 local function issueObjectiveOrders(frame)
   local tx, tz = positionForRule("va_objective_x", "va_objective_z")
-  local ex, ez = positionForRule("va_extract_x", "va_extract_z")
+  local ex, ez = positionForRule("va_pad_x", "va_pad_z")
   local objectiveDone = tonumber((Spring.GetGameRulesParam("va_objective_complete"))) == 1
   local terminal = tonumber((Spring.GetGameRulesParam("va_terminal"))) == 1
   if terminal then return end
@@ -288,7 +288,7 @@ local function zipTick(frame)
   local nextPhase
   if objectiveDone then
     nextPhase = "extract"
-    tx, tz = positionForRule("va_extract_x", "va_extract_z")
+    tx, tz = positionForRule("va_pad_x", "va_pad_z")
     if not tx then tx, tz = positionForRule("va_objective_x", "va_objective_z") end
   else
     nextPhase = "objective"

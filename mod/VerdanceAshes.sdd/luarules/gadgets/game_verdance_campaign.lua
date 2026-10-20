@@ -50,11 +50,6 @@ if not gadgetHandler:IsSyncedCode() then
   local pauseAssertEchoed = false
 
   function gadget:Initialize()
-    gadgetHandler:AddSyncAction("VERDANCE_TELEMETRY", function(_, jsonStr)
-      if Script.LuaUI and Script.LuaUI.VerdanceTelemetry then
-        Script.LuaUI.VerdanceTelemetry(jsonStr)
-      end
-    end)
     -- Tracked-playtest channel. The synced half already writes every one of these
     -- packets to the infolog; this hands the same strings to LuaUI so a widget can
     -- write the session record itself. That is what lets a played campaign record
@@ -109,7 +104,6 @@ if not gadgetHandler:IsSyncedCode() then
   end
 
   function gadget:Shutdown()
-    gadgetHandler:RemoveSyncAction("VERDANCE_TELEMETRY")
     gadgetHandler:RemoveSyncAction("VERDANCE_MISSION_EVENT")
     gadgetHandler:RemoveSyncAction("VERDANCE_HERO_EVENT")
     gadgetHandler:RemoveSyncAction("VERDANCE_BEAT")
@@ -3967,9 +3961,6 @@ function vaStepWaterline()
     if testHooks and testHooks.hydroDone and not testHooks.hydroProbe then
       testHooks.hydroProbe = Spring.GetGameFrame() + 90
     end
-    if SendToUnsynced then
-      SendToUnsynced("VERDANCE_HYDRO", "settled", vaWaterLevel)
-    end
     vaWaterTarget = nil
     vaWaterStep = 0
     return
@@ -4031,9 +4022,6 @@ function vaBeginWaterline(target, seconds)
   vaWaterStep = (to - vaWaterLevel) / span
   Spring.Echo(string.format("VA_HYDRO_BEGIN from=%.3f to=%.3f seconds=%s",
     vaWaterLevel, to, tostring(seconds)))
-  if SendToUnsynced then
-    SendToUnsynced("VERDANCE_HYDRO", (to > vaWaterLevel) and "rising" or "falling", to)
-  end
 end
 
 -- Sum metrics across all teams in a zone bucket (total military presence)
@@ -4266,10 +4254,6 @@ function logAndBroadcastTranslation()
   Spring.Echo("VA_TRANSLATION_PACKET_COMPACT " .. json)
   logJsonChunked("VA_TRANSLATION_PACKET", json)
 
-  -- Broadcast to LuaUI Overmind Widget (no-op in headless, active in playable)
-  if SendToUnsynced then
-    SendToUnsynced("VERDANCE_TELEMETRY", json)
-  end
 
   Spring.Echo(string.format(
     "VA_TRANSLATION_OK frame=%d zones=%d entanglements=%d factoids=%d water=%.3f",
@@ -4340,8 +4324,19 @@ extractLoop.applyPad = function(zoneId)
   end
   local r = extractLoop.padRadius
   extractionZoneRect = { cx - r, cz - r, cx + r, cz + r }
-  Spring.SetGameRulesParam("va_extract_x", math.floor(cx), { public = true })
-  Spring.SetGameRulesParam("va_extract_z", math.floor(cz), { public = true })
+  -- va_pad_x/z/r are published by game_verdance_exfil.lua (the pad authority); this is the
+  -- same anchor, so readers use padPoint() below.
+end
+
+-- The pad point as the HUD sees it; falls back to our own rect while the exfil gadget boots.
+function VA_padPoint()
+  local px = tonumber((Spring.GetGameRulesParam("va_pad_x"))) or -1
+  local pz = tonumber((Spring.GetGameRulesParam("va_pad_z"))) or -1
+  if px >= 0 and pz >= 0 then return px, pz end
+  if extractionZoneRect then
+    return (extractionZoneRect[1] + extractionZoneRect[3]) * 0.5, (extractionZoneRect[2] + extractionZoneRect[4]) * 0.5
+  end
+  return nil, nil
 end
 
 -- Cylinder so a transport hovering on the marker counts. Rectangle queries
@@ -6025,7 +6020,6 @@ function checkDefendInstall(frame)
   end
   VA_DEFEND.holdFrames = VA_DEFEND.holdFrames + CHECK_PERIOD
   Spring.SetGameRulesParam("va_defend_hold", VA_DEFEND.holdFrames, { public = true })
-  Spring.SetGameRulesParam("va_phase", "DEFEND", { public = true })
   if VA_DEFEND.holdFrames >= VA_DEFEND.needFrames then
     VA_DEFEND.armed = false
     Spring.SetGameRulesParam("va_defend_armed", 0, { public = true })
@@ -6196,15 +6190,7 @@ function checkFortifyObjective(frame)
   local defOk = defNow >= needDef
   Spring.SetGameRulesParam("va_fortify_def", defNow, { public = true })
   Spring.SetGameRulesParam("va_fortify_need_def", needDef, { public = true })
-  -- Legacy multi-bar params: publish zeros so old HUD branches stay quiet.
-  Spring.SetGameRulesParam("va_fortify_bp", 0, { public = true })
-  Spring.SetGameRulesParam("va_fortify_army", 0, { public = true })
-  Spring.SetGameRulesParam("va_fortify_storage", 0, { public = true })
-  Spring.SetGameRulesParam("va_fortify_need_bp", 0, { public = true })
-  Spring.SetGameRulesParam("va_fortify_need_army", 0, { public = true })
-  Spring.SetGameRulesParam("va_fortify_need_storage", 0, { public = true })
   Spring.SetGameRulesParam("va_fortify_score", defOk and 1 or 0, { public = true })
-  Spring.SetGameRulesParam("va_phase", "FORTIFY", { public = true })
   if defOk then
     onObjectiveComplete("zone_fortified")
   end
@@ -6273,8 +6259,6 @@ function checkPresenceObjective(frame)
       end
       Spring.SetGameRulesParam("va_zone_hold", zoneHoldFrames, { public = true })
       Spring.SetGameRulesParam("va_zone_hold_contested", (playerPresent and enemyCombat) and 1 or 0, { public = true })
-      Spring.SetGameRulesParam("va_phase",
-        (playerPresent and enemyCombat) and "HOLD_CONTESTED" or "HOLD", { public = true })
       local required = tonumber(mission.objective and mission.objective.requiredHoldFrames) or PRESENCE_HOLD_DEFAULT
       Spring.SetGameRulesParam("va_zone_hold_need", required, { public = true })
       if targetZoneRect then
@@ -6292,7 +6276,6 @@ function checkPresenceObjective(frame)
         capture.phase = "claimed"
         Spring.SetGameRulesParam("va_node_claimed", 1, { public = true })
         Spring.SetGameRulesParam("va_capture_phase", "claimed", { public = true })
-        Spring.SetGameRulesParam("va_phase", "CLAIMED", { public = true })
         Spring.Echo("VA_NODE_CLAIMED zone=" .. tostring(mission.objective and mission.objective.targetZoneId or "")
           .. " freeTnbMint=false")
         onObjectiveComplete("node_claimed")
@@ -6346,7 +6329,6 @@ openExtractLoop = function(reason)
   -- Availability alone does not start a phase, timer, or departure screen.
   extractLoop.opened = true
   Spring.SetGameRulesParam("va_extract_open", 1, { public = true })
-  Spring.SetGameRulesParam("va_extract_must_leave", 0, { public = true })
 end
 
 
@@ -6509,8 +6491,8 @@ function runTestHarness(frame)
     -- echo the gate's verdict for a def matrix (policy check), then issue a
     -- real build order so the engine's AllowUnitCreation path produces a
     -- genuine VA_TECH_GATE_DENY when the gate is armed.
-    local dx = tonumber((Spring.GetGameRulesParam("va_deploy_x"))) or 512
-    local dz = tonumber((Spring.GetGameRulesParam("va_deploy_z"))) or 512
+    local dx, dz = VA_padPoint()
+    dx, dz = dx or 512, dz or 512
     local dy = Spring.GetGroundHeight(dx, dz) or 0
     local builder = Spring.CreateUnit("legck", dx, dy, dz, 0, playerTeamID)
     for _, defName in ipairs({ "legalab", "leglab", "legsolar", "legcen", "legshot" }) do
@@ -6665,8 +6647,8 @@ function gadget:Initialize()
     local actLabel = (type(actInfo) == "table" and actInfo.label) and tostring(actInfo.label) or ""
     Spring.SetGameRulesParam("va_act", doctrine.actNumber, { public = true })
     Spring.SetGameRulesParam("va_act_label", actLabel, { public = true })
-    Spring.SetGameRulesParam("va_tech_cap", 3, { public = true })
-    Spring.SetGameRulesParam("va_tech_structures", 1, { public = true })
+    Spring.SetGameRulesParam("va_tech_cap", tonumber(doctrine.techMaxLevel) or 3, { public = true })
+    Spring.SetGameRulesParam("va_tech_structures", doctrine.techBuildStructures and 1 or 0, { public = true })
     Spring.SetGameRulesParam("va_tech_gate", doctrine.techGateEnabled and 1 or 0, { public = true })
     if doctrine.techGateEnabled then
       Spring.Echo("VA_TECH_GATE forced act=" .. tostring(doctrine.actNumber)
@@ -6808,21 +6790,6 @@ function gadget:Initialize()
   -- One pad (pass five): the company lands and lifts from the same point — the deployment
   -- zone's anchor. Deploy beacon, bought kit (infilAnchor) and extraction all read it.
   extractLoop.applyPad(mission.deploymentZoneId or mission.extractionZoneId or obj.extractionZoneId)
-  do
-    local px = tonumber((Spring.GetGameRulesParam("va_extract_x"))) or -1
-    local pz = tonumber((Spring.GetGameRulesParam("va_extract_z"))) or -1
-    if px < 0 then
-      local depRect = zoneRectFor(mission.deploymentZoneId)
-      if depRect then
-        px = (depRect[1] + depRect[3]) * 0.5
-        pz = (depRect[2] + depRect[4]) * 0.5
-      end
-    end
-    if px >= 0 then
-      Spring.SetGameRulesParam("va_deploy_x", math.floor(px), { public = true })
-      Spring.SetGameRulesParam("va_deploy_z", math.floor(pz), { public = true })
-    end
-  end
 
   -- In-mission beats ride the same profiling gate as escalation waves;
   -- va_beats forces them either way.
@@ -7454,9 +7421,8 @@ end
 VA_LOGISTICS = { pending = {} }
 
 function VA_LOGISTICS.infilAnchor()
-  local dx = tonumber((Spring.GetGameRulesParam("va_deploy_x"))) or -1
-  local dz = tonumber((Spring.GetGameRulesParam("va_deploy_z"))) or -1
-  if dx >= 0 and dz >= 0 then return dx, dz end
+  local dx, dz = VA_padPoint()
+  if dx and dz then return dx, dz end
   local px, pz = teamUnitCentroid(playerTeamID)
   if px then return px, pz end
   return (Game.mapSizeX or 0) * 0.5, (Game.mapSizeZ or 0) * 0.5

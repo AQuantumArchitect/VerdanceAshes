@@ -3,7 +3,7 @@ local widget = widget
 function widget:GetInfo()
   return {
     name = "Verdance Hero Tags",
-    desc = "Floating name tags over named heroes and their recoverable wrecks",
+    desc = "Floating name over named heroes and their recoverable wrecks (name only; detail lives on the sidebar)",
     author = "Claude / Luke Spooner",
     date = "2026-07-12",
     license = "GPL v2 or later",
@@ -95,12 +95,8 @@ function widget:DrawScreenEffects()
       if x then
         local sx, sy, sz = Spring.WorldToScreenCoords(x, y + rec.height, z)
         if sz and sz <= 1 then
-          -- Clarity: "Vane L5 Captain · hardened" so farmed power is visible mid-fight.
-          local label = string.format("%s  L%d %s", rec.name, rec.level or 1, rec.rank or "")
-          if rec.vetRank then
-            label = label .. " · " .. tostring(rec.vetRank)
-          end
-          drawTag(sx, sy, label, rec.critical and CRIT_COL or HERO_COL)
+          -- The name only; level, rank and vet live on the sidebar card (pass seven).
+          drawTag(sx, sy, rec.name, rec.critical and CRIT_COL or HERO_COL)
         end
       end
     end

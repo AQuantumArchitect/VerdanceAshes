@@ -633,16 +633,11 @@ local function retreatTarget(teamID, fromX, fromZ)
   local fx, fz, fkind = nearestHealthyFriend(teamID, fromX, fromZ)
   if fx then return fx, fz, fkind end
 
-  local dx = tonumber((Spring.GetGameRulesParam("va_deploy_x")))
-  local dz = tonumber((Spring.GetGameRulesParam("va_deploy_z")))
-  if dx and dz and dx > 0 and dz > 0 then
-    return dx, dz, "deploy"
-  end
-
-  local ex = tonumber((Spring.GetGameRulesParam("va_extract_x")))
-  local ez = tonumber((Spring.GetGameRulesParam("va_extract_z")))
-  if ex and ez and ex > 0 and ez > 0 then
-    return ex, ez, "extract"
+  -- the pad: one point, the company lands and lifts from it (va_pad_x/z, exfil gadget)
+  local px = tonumber((Spring.GetGameRulesParam("va_pad_x")))
+  local pz = tonumber((Spring.GetGameRulesParam("va_pad_z")))
+  if px and pz and px > 0 and pz > 0 then
+    return px, pz, "pad"
   end
   return nil, nil, nil
 end

@@ -433,6 +433,29 @@ The HUD paints the **company belief** — never the truth, never the enemy minds
 **Still open** — the builder composes a player kit the gadget discards (next cut: `crew[]` from Python); heroes left in the field are not yet spawned as units on return; nested zone geometry overlaps on the Greenest Fields board.
 
 
+## Pass seven: three surfaces, one encoding (2026-10-20)
+
+The in-game layer was one 2,800-line widget wearing fourteen hats, three maps that were not the map, marker spam the player had to erase, and a playfeel layer that nagged. Replaced by five small widgets on one shared board.
+
+**The board** — `luaui/Include/va_board.lua` is the model and the painter for every in-game map surface. Encoding is the hub's: faction colour fill = who the company believes holds the zone (`Ash.FACTION`, the hub's `--f-*`), alpha = confidence, fill fades as our own line of sight replaces belief (`va_obs_<zone>`), `bad` hatch = how much of us they see (`va_seen_<zone>`), zone *outlines* (edges without a same-zone neighbour — never cell grids), △ pad ring, ◆ objective, ◆/◇/✓/✗ marks, ◉ loudest exposure, ✗/○ where the brief was contradicted, ●○✚⚑ people. `intel_lua_v1` now carries `held.faction` so Lua can paint what the hub paints. Belief, not truth: nothing reads an enemy mind.
+
+**Minimap** (`gui_verdance_minimap.lua`) is the board, live. Owns `WG.vaBoard` and the contradiction record; Yeva speaks once per zone when the ground disagrees. The pad ring on the ground is the only world drawing besides painted route lines.
+
+**Sidebar** (`gui_verdance_sidebar.lua`) reads top to bottom as a sentence: phase chip + clock + clock meter · mission title, objective, one progress meter (targets / clear / hold / fortify all the same bar), a square per mark with only the current one named · the company — a card per hero from `va_hud_heroes_json` (strip gold if critical, hp bar, ● on pad / ○ distance / ✚ down / ✗ lost; click selects, double-click focuses) · the pad — dots per person, exposure swatch, enemy on pad, EXTRACT in three coded states, "left if you lift" only when something would stay. The route stage is painted on the battlefield with `MarkerAddLine` once per stage (pad→objective, objective→next required mark, last→pad); the player's clear-marks button erases it. No marker text, no ground arrows, no pings.
+
+**Infil** (`gui_verdance_infil.lua`) replaces the 45-second card and the pause hammer: the game waits paused on a full card — who you brought, the board with the pad and the job, the job / marks / clock, Yeva's plain-speech read of the pad zone, the objective zone, the marks and the most threatening belief, who is posted or was left here. Enter begins. `/vabrief` reopens it paused.
+
+**Exfil** (`gui_verdance_exfil.lua`) keeps the pass-five flow and gains the board: ● going fanned at the pad, ○ staying where they stand, ■ structures becoming holdings; "what we learned" is briefed-swatch → seen-swatch per zone; destinations are chips. The closing card is the board frozen under the headline.
+
+**Voice** (`gui_verdance_voice.lua`): Ketha, Yeva, rank-ups and inbound warnings in one framed stack under the Tnb bar. Nothing centre-screen.
+
+**Gadget truth** — `game_verdance_exfil.lua` publishes `va_hud_heroes_json` and `va_pad_people/units/off_units/off_structures/enemy_live` every 30 frames from one scan; widgets stopped rescanning units.
+
+**Cut** — narrative cam / PiP steering, F9 strategic overlay, `MarkerAddPoint` everywhere (objective, pad, marks, rank-ups, route text), ground chevron arrows and cross pins, hero-wreck X, selected-unit debug chip, centre-screen flashes, retreat rays, the `debug.setupvalue` team-list hack. Retired files live in history (removed from the tree; `git log -- luaui/Widgets/gui_verdance_objectives.lua`).
+
+**Verified** — real Lua parse (liblua 5.4 via ctypes), a stubbed-Spring harness that drives infil → field → click → EXTRACT → manifest → confirm → over and the event globals, and PNG renders of the four screens (`tools/hud_harness/`). Not yet run in BAR.
+
+
 ---
 
 ## Commands
@@ -449,4 +472,6 @@ python tools/perspectives_v1.py --worker . # drain the perspectives job queue
 python tools/camp_clock_v1.py            # camp surface
 python tools/intel_lua_v1.py             # rewrite generated/va_intel_current.lua from the intent
 python tools/luachk_v1.py <files.lua>    # structural Lua check
+python tools/hud_harness/harness.py      # widgets under a stubbed Spring (Linux, liblua5.4)
+python tools/hud_harness/render.py       # PNG renders of infil / field / exfil / over
 ```

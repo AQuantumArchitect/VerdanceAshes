@@ -4,7 +4,7 @@
     singleplayer/verdance_ashes/generated/va_intel_current.lua   (+ outbox/va_intel_current.lua)
 
 Source is `intent.intel` (verdance-intent-intel/0.1, perspective company) — belief, never truth.
-The overlay widget (gui_verdance_belief_overlay.lua) tints each zone by what the company believes
+The board (luaui/Include/va_board.lua, drawn by gui_verdance_minimap.lua) tints each zone by what the company believes
 until line of sight replaces the belief with the ground. Written beside next_mission_intent.json
 every time the intent is materialised; mirrored into the customer pack with va_current.lua.
 """
@@ -61,6 +61,8 @@ def intel_to_lua(intel: Dict[str, Any]) -> str:
                 "age": None if r.get("age_min") is None else round(float(r["age_min"]), 1),
                 "src": r.get("source"),
             }
+            if role == "held" and r.get("faction"):
+                row[role]["faction"] = str(r["faction"])   # who we last SAW holding it (hub faction palette)
         zones[zid] = row
     out = {
         "schema": intel.get("schema") or "verdance-intent-intel/0.1",
