@@ -360,7 +360,7 @@ def _cloud_locus_status(ws: Path) -> dict[str, Any]:
         "fallback_locus": "local_headless",
         "config_ready": cfg_path.is_file(),
         "reason": "Local IconsAtlas stall; BARb/SimpleAI grow bakes run on cloud VM.",
-        "doc": "outbound/40_CLOUD_BAR_COMPUTE.md",
+        "doc": "scripts/forge/cloud/README.md",
     }
     if harvest_path.is_file():
         try:

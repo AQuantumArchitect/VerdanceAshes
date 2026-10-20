@@ -394,7 +394,7 @@ The hub chips may keep short system labels. The characters may not.
 
 ## Engine patch (2026-10-19)
 
-Three additive edits to `tools/verdance_story_engine_v1.py`, each guarded so homecoming can never fail because of them. Pre-patch copy: `_attic/verdance_story_engine_v1.pre_readings_2026-10-19.py`. Test suite failure set identical before and after (45 pre-existing; most are `datetime.UTC` on Python < 3.11).
+Three additive edits to `tools/verdance_story_engine_v1.py`, each guarded so homecoming can never fail because of them. Pre-patch copy lived under `_attic/` (git history; see `docs/ARCHIVE.md`). Test suite failure set identical before and after (45 pre-existing; most are `datetime.UTC` on Python < 3.11).
 
 1. `process_result`: `bead["joined"]`, `bead["namedOutcomes"]` — closes the roll data gap.
 2. `process_result`: derive both faces once per homecoming, carrying forward once-lines and recency.
@@ -428,7 +428,7 @@ The HUD paints the **company belief** — never the truth, never the enemy minds
 
 **In BAR** — `gui_verdance_objectives.lua`: pad ring (r = 560, `Ash.MARK.pad`) with a live headcount chip; EXTRACT is three-state (empty pad / someone off the pad: "LEFT IF YOU LIFT" ledger / all aboard); SEEN row and exposure hatch from `va_pad_enemy` and the observe gadget; contradiction glyphs where the briefing was wrong; phase chips ▸ APPROACH ✦ FIGHT ◆ MARKS ⌂ EXTRACT ∞ OVERTIME (the clock never ends a sortie, overtime only wakes the map). `gui_verdance_tnb_bar.lua` is the first-class Tenebrium bar top-centre (bank · looted · field, pips, rise/fall flash) fed by `publishTenebriumRules()`; the broken donuts are gone. `gui_verdance_exfil.lua` is reskinned on the Ash tokens and fences input with `WG.vaExfilModal`.
 
-**Cut** — the old `controllingFaction` colouring, Tnb donuts, verdict tables in `va_ash_tokens.lua`, hold-timer copy (`narrative_v1.bringHome` now describes the manifest). Pre-sweep copies in `_attic/sweep_tmp/`.
+**Cut** — the old `controllingFaction` colouring, Tnb donuts, verdict tables in `va_ash_tokens.lua`, hold-timer copy (`narrative_v1.bringHome` now describes the manifest). Pre-sweep copies were under `_attic/sweep_tmp/` (git history).
 
 **Still open** — the builder composes a player kit the gadget discards (next cut: `crew[]` from Python); heroes left in the field are not yet spawned as units on return; nested zone geometry overlaps on the Greenest Fields board.
 

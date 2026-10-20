@@ -2,13 +2,12 @@
 
 Sim locus for living-shell grow → strip dumps.
 
-- Architecture: `outbound/40_CLOUD_BAR_COMPUTE.md`
-- **AWS step-by-step (recommended):** `outbound/41_AWS_CLOUD_SETUP.md`
+- Architecture and AWS step-by-step lived in `outbound/40` and `outbound/41` (git history; `docs/ARCHIVE.md`)
 - Yurt peer stub: `ws-win/yurt-sync/board/aws.toml` (Roc substitute)
 
 ## Quick path (AWS)
 
-1. Create AWS account + MFA + billing alarms (see outbound 41).
+1. Create AWS account + MFA + billing alarms.
 2. Local key + config:
 
 ```powershell

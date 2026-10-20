@@ -12,7 +12,6 @@ PLAY_SESSION = ROOT / "scripts" / "play_session_v1.ps1"
 CONTINUITY = ROOT / "tools" / "continuity_audit_v1.py"
 CREW_WIDGET = ROOT / "mod" / "VerdanceAshes.sdd" / "luaui" / "Widgets" / "gui_verdance_crew_select.lua"
 OVERMIND = ROOT / "mod" / "VerdanceAshes.sdd" / "luaui" / "Widgets" / "campaign_overmind_widget.lua"
-ATTIC = ROOT / "_attic" / "disabled_widgets"
 
 
 class PlayLoopDeslopTests(unittest.TestCase):
@@ -71,11 +70,8 @@ class PlayLoopDeslopTests(unittest.TestCase):
         self.assertIn("promoteOccupationOnContinue = $true", self.compiler)
 
     def test_dead_widgets_quarantined(self):
-        self.assertFalse(CREW_WIDGET.exists(), "crew select should be attic'd")
-        self.assertFalse(OVERMIND.exists(), "overmind should be attic'd")
-        self.assertTrue((ATTIC / "gui_verdance_crew_select.lua").exists())
-        self.assertTrue((ATTIC / "campaign_overmind_widget.lua").exists())
-        self.assertTrue((ATTIC / "README.md").exists())
+        self.assertFalse(CREW_WIDGET.exists(), "crew select must stay out of Widgets/")
+        self.assertFalse(OVERMIND.exists(), "overmind must stay out of Widgets/")
 
 
 class ScarSuppressUnitTests(unittest.TestCase):

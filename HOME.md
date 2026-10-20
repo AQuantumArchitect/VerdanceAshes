@@ -27,7 +27,9 @@ Combat lens (optional): molecule soft policy — not world truth; rollback `va_m
 
 ## Player (when you want to play the game)
 
-**Play path you use:** My Games `VerdanceAshes` → **`PLAY.bat`** / **`RESET.bat`** (after `SHIP.bat` / install from this repo).
+**Play path you use (this workspace):** `SETUP.bat` once, then **`PLAY.bat`** every session (leave it open). `RESET.bat` wipes the campaign (confirms).
+
+**Other machines:** `SHIP.bat` → `export\dist\VerdanceAshes_vX.Y.Z` (+ zip). Recipients run SETUP then PLAY from the unzipped folder. Optional: `python -m verdance_kernel ship --my-games`.
 
 Also here: Desktop **`Verdance Playtest.bat`** / **`Verdance End Playtest.bat`**, or `START_PLAYTEST.bat` / `END_PLAYTEST.bat`.
 
@@ -68,7 +70,7 @@ Doc shelf (bots only): [`docs/PROXY_CAMPAIGN.md`](docs/PROXY_CAMPAIGN.md) · [`d
 
 ## Version
 
-Root `VERSION` (kernel reads it). Consolidation line starts at **0.8.0**. Current line: **0.12.3** (extract auto-evac + rawget GameFrame fix).
+Root `VERSION` (kernel reads it). Consolidation line starts at **0.8.0**. Current line: **0.12.7** (pass five boundary + pass six HUD).
 
 ## Forge tools
 
@@ -93,6 +95,6 @@ python -m verdance_kernel ship
 
 Space briefing · 1/2/3 continue · `/vazones` · `/vastory`
 
-## Attic
+## Archive
 
-`_attic\` holds pre-consolidation bats and old brochure exports. Safe to delete after you trust `export\dist`.
+Pre-pass snapshots and numbered LLM handoffs were removed from the tree. Git history still has `_attic/` and `outbound/` — see [`docs/ARCHIVE.md`](docs/ARCHIVE.md).

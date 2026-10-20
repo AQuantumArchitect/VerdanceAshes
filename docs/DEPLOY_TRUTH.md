@@ -23,7 +23,6 @@ scripts\ship.ps1                        ← only ship pipeline
 tools\verdance_kernel\                  ← product API
 mod\VerdanceAshes.sdd\                  ← mutator source; sync on every Drop
 export\dist\                            ← only ship output
-_attic\                                 ← old bats + brochure exports
 ```
 
 ## Rules
@@ -42,4 +41,4 @@ _attic\                                 ← old bats + brochure exports
 | WP2 launcher collapse | done |
 | WP3 ship.ps1 | done |
 | WP4 kernel mod sync + player script resolve | done |
-| WP5 attic | done |
+| WP5 attic | done (folder removed from tree; see `docs/ARCHIVE.md`) |

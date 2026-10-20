@@ -2,12 +2,9 @@
 
 Frozen base shells for Verdance occupation maps.
 
-- Design substrate: `outbound/37_LIVING_SHELL_TEMPLATES.md`
-- Seven-map characters: `outbound/38_SEVEN_MAP_SHELL_CHARACTERS.md`
-- Grow rates + membrane: `outbound/39_SEVEN_MAP_GROW_RATES.md`
-- **Cloud sim locus:** `outbound/40_CLOUD_BAR_COMPUTE.md` + `scripts/cloud/`
 - Rate catalog: `grow_profiles.json` (SimpleAI sprawl vs BARb easy/medium/hard/hard_aggressive)
-- **Decoy swarm + T2 battle farm:** `outbound/42_DECOY_COM_SWARM_AND_T2_BATTLE_FARM.md`
+- Cloud bake notes: `scripts/forge/cloud/README.md`
+- Design briefs for shells / grow rates / decoy farm: git history under `outbound/` (see `docs/ARCHIVE.md`)
 - Sims use **normal commanders**; occupation plants **decoy coms** (`armdecom` / `cordecom` / `legdecom`) after strip
 
 ## Layout

@@ -41,7 +41,7 @@ outbox/hive_bar_residual.latest.json
 outbox/hive_gym_arena.latest.json
 app/brain/bar_brain_weights.json
 app/brain/bar_brain_ul_state.json
-outbound/48_HIVE_BAR_RESIDUAL_BRIDGE.md
+docs/HIVE_BAR_RESIDUAL_BRIDGE.md
 ```
 
 Also hive: `commons/vitals/bar_proxy_residual.latest.json`

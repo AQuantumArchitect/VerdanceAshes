@@ -45,8 +45,8 @@ The agent may only use:
 | umwelt beliefs (HUD→walls only) | omniscient advantage floats |
 | tools: read_*/think/commit_action | writing high-η truth without referee |
 
-First arc champion: **5/5 missions × 3 seeds @ difficulty 1.0** — see `outbound/20_FAIR_FIRST_ARC_CLEARED.md`.  
-Full campaign champion: **15/15 @ difficulty 1.0** (seeds 11, 28) — see `outbound/23_THREE_ARC_CAMPAIGN_AND_BAR_BRAIN.md`.
+First arc champion: **5/5 missions × 3 seeds @ difficulty 1.0**.  
+Full campaign champion: **15/15 @ difficulty 1.0** (seeds 11, 28). Scorecards lived in `outbound/` (git history; `docs/ARCHIVE.md`).
 
 ## Quick start
 
@@ -89,7 +89,7 @@ Remove-Item Env:GROK_API_KEY -ErrorAction SilentlyContinue
 
 # Novel quantum mechanisms: PathKet, CampaignDensity, ProxyBelief, LaneDensity,
 # PredicateInterference, DecoyPOVM, InterferenceTuner, EnemyLineAI
-# See outbound/29_DUAL_MANIFOLDS_LANE_AI.md and outbound/30_OVERNIGHT_QUANTUM_CRAFT.md
+# Dual-manifold / overnight craft notes: git history under outbound/ (docs/ARCHIVE.md)
 
 
 # or bat
@@ -97,7 +97,7 @@ Remove-Item Env:GROK_API_KEY -ErrorAction SilentlyContinue
 .\RUN_CAMPAIGN_ANT.bat
 ```
 
-**Do not** use metered `GROK_API_KEY` / xAI console for ant brains. See `outbound/21_ANT_SUBSCRIPTION_BRAIN.md`.
+**Do not** use metered `GROK_API_KEY` / xAI console for ant brains.
 
 Outputs:
 - campaign: `headless_runs/quantum_bar_ai_campaign_*/`, `outbox/quantum_bar_ai_campaign.latest.json`

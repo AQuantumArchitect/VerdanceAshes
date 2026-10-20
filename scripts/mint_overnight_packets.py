@@ -62,10 +62,8 @@ def main() -> int:
                 "export/**",
             ],
             "context_paths": [
-                "outbound/43_COMMERCE_TENEBRIUM_AND_MERC_PACKS.md",
-                "outbound/44_KERNEL_GRAPH_AND_OCCUPATION_LOCK.md",
-                "outbound/45_OVERNIGHT_KERNEL_PHASES.md",
                 "data/commerce/commerce_catalog.json",
+                "docs/SHIP_ARCHITECTURE.md",
             ],
             "referee_cmd": (
                 r'"C:\Python313\python.exe" -c "from pathlib import Path; '
@@ -83,14 +81,14 @@ def main() -> int:
                 "Only after VA_CAPABILITY reload=true. Wire strategic_link edges from "
                 "world_zone_graph into session host Reload path. Mode A is kernel default."
             ),
-            "allow_paths": ["scripts/play_session_v1.ps1", "mod/**", "tools/**", "outbound/**"],
+            "allow_paths": ["scripts/play_session_v1.ps1", "mod/**", "tools/**", "docs/**"],
             "context_paths": [
-                "outbound/18_IN_CLIENT_LOOP_AND_SHIP.md",
+                "docs/CAMPAIGN_BAR_PROTOCOL.md",
                 "data/zone_maps/world_zone_graph.v1.json",
             ],
             "referee_cmd": (
                 r'"C:\Python313\python.exe" -c "from pathlib import Path; '
-                r"p=Path(r'C:\Users\Luke Spooner\Documents\BAR_Verdance_Workspace\outbound\18_IN_CLIENT_LOOP_AND_SHIP.md'); "
+                r"p=Path(r'C:\Users\Luke Spooner\Documents\BAR_Verdance_Workspace\docs\CAMPAIGN_BAR_PROTOCOL.md'); "
                 r"assert p.is_file(); print('ok')\""
             ),
         },
@@ -127,13 +125,11 @@ def main() -> int:
             "allow_paths": [
                 "scripts/**",
                 "data/base_templates/**",
-                "outbound/40_CLOUD_BAR_COMPUTE.md",
-                "outbound/41_AWS_CLOUD_SETUP.md",
             ],
-            "context_paths": ["outbound/42_DECOY_COM_SWARM_AND_T2_BATTLE_FARM.md"],
+            "context_paths": ["scripts/forge/cloud/README.md"],
             "referee_cmd": (
                 r'"C:\Python313\python.exe" -c "from pathlib import Path; '
-                r"p=Path(r'C:\Users\Luke Spooner\Documents\BAR_Verdance_Workspace\outbound\40_CLOUD_BAR_COMPUTE.md'); "
+                r"p=Path(r'C:\Users\Luke Spooner\Documents\BAR_Verdance_Workspace\scripts\forge\cloud\README.md'); "
                 r"assert p.is_file(); print('ok')\""
             ),
         },
@@ -146,14 +142,14 @@ def main() -> int:
             "do_now": (
                 "After seven shells solid: hold cleared node = claim; hub contracts; no free Tnb mint."
             ),
-            "allow_paths": ["tools/**", "mod/**", "data/**", "outbound/**"],
+            "allow_paths": ["tools/**", "mod/**", "data/**", "docs/**"],
             "context_paths": [
-                "outbound/36_OCCUPIED_MAP_RAID.md",
-                "outbound/37_LIVING_SHELL_TEMPLATES.md",
+                "data/base_templates/README.md",
+                "docs/GRAPH_COLLAPSE_SSOT.md",
             ],
             "referee_cmd": (
                 r'"C:\Python313\python.exe" -c "from pathlib import Path; '
-                r"p=Path(r'C:\Users\Luke Spooner\Documents\BAR_Verdance_Workspace\outbound\37_LIVING_SHELL_TEMPLATES.md'); "
+                r"p=Path(r'C:\Users\Luke Spooner\Documents\BAR_Verdance_Workspace\data\base_templates\README.md'); "
                 r"assert p.is_file(); print('ok')\""
             ),
         },
@@ -167,8 +163,8 @@ def main() -> int:
                 "Horus core, Bastion citadel, Jungle scrap, Simmers multipaint — recipes + placeholders "
                 "exist; real dumps when bake path works."
             ),
-            "allow_paths": ["data/base_templates/**", "outbound/38_SEVEN_MAP_SHELL_CHARACTERS.md", "scripts/**"],
-            "context_paths": ["outbound/38_SEVEN_MAP_SHELL_CHARACTERS.md", "outbound/39_SEVEN_MAP_GROW_RATES.md"],
+            "allow_paths": ["data/base_templates/**", "scripts/**"],
+            "context_paths": ["data/base_templates/README.md"],
             "referee_cmd": (
                 r'"C:\Python313\python.exe" -c "from pathlib import Path; '
                 r"p=Path(r'C:\Users\Luke Spooner\Documents\BAR_Verdance_Workspace\data\base_templates'); "

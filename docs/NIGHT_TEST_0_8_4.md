@@ -62,5 +62,4 @@ Writes `outbox/night_preflight.latest.json` and (via kernel sim) `outbox/night_w
 ## Related
 
 - Theater / home: [`THEATER_MAP_AND_HOME.md`](THEATER_MAP_AND_HOME.md)
-- Tenebrium commerce: `outbound/43_COMMERCE_TENEBRIUM_AND_MERC_PACKS.md`
-- Grow rates: `outbound/39_SEVEN_MAP_GROW_RATES.md`
+- Tenebrium / grow-rate briefs: git history under `outbound/` (`docs/ARCHIVE.md`)

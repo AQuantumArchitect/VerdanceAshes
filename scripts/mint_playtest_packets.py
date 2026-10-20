@@ -46,7 +46,7 @@ def main() -> int:
         (
             "pkt-bar-afternoon-playtest-pack",
             "Afternoon human playtest pack",
-            "Shipped: snapshot, restore script, scorecard md, outbound/47. Operator runs P0-P5.",
+            "Shipped: snapshot, restore script, scorecard md. Operator runs P0-P5.",
             "cleared",
         ),
     ]:
