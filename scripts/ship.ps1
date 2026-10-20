@@ -149,6 +149,7 @@ $toolPy = @(
   "chronicle_v1.py",
   "intel_lua_v1.py",
   "validate_story_v1.py",
+  "wet_reach_v1.py",
   # Ship so a player build can self-check; also what the gates below run.
   "ship_parity_check_v1.py",
   "validate_map_names_v1.py"

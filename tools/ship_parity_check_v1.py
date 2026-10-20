@@ -37,7 +37,10 @@ _EXTRA_STDLIB = {"__future__", "typing_extensions"}
 # Declared in requirements-ship.txt and genuinely optional -- the kernel falls
 # back to the system browser when it is absent, which is a real feature flag
 # rather than a packaging accident.
-_ALLOWED_THIRD_PARTY = {"webview"}
+# numpy/scipy: the Umwelt belief field (requirements-ship.txt). umwelt: vendored into tools\_vendor by
+# scripts\ship.ps1 (a snapshot of a dependency, not a local module -- its own tree is not analysed).
+_ALLOWED_THIRD_PARTY = {"webview", "numpy", "scipy", "umwelt"}
+_SKIP_DIRS = {"_vendor", "__pycache__"}
 
 
 def stdlib_names() -> Set[str]:
@@ -134,7 +137,7 @@ def analyse(tools_dir: Path) -> Tuple[Dict[str, Set[str]], Set[str]]:
     unknown: Set[str] = set()
     py_files = sorted(tools_dir.rglob("*.py"))
     for f in py_files:
-        if "__pycache__" in f.parts:
+        if any(part in _SKIP_DIRS for part in f.parts):
             continue
         owner = f.stem if f.parent == tools_dir else f.parent.name
         for name in top_level_imports(f):
@@ -213,7 +216,7 @@ def main() -> int:
         problems.append(f"unresolved import '{name}' (not stdlib, not staged, not allowed)")
 
     # Data directories referenced by staged code must be staged too.
-    py_files = [p for p in tools.rglob("*.py") if "__pycache__" not in p.parts]
+    py_files = [p for p in tools.rglob("*.py") if not any(part in _SKIP_DIRS for part in p.parts)]
     ps_files = list((root / "scripts").rglob("*.ps1")) if (root / "scripts").is_dir() else []
     for d in sorted(data_dirs_referenced(py_files + ps_files)):
         if not (root / "data" / d).exists():
