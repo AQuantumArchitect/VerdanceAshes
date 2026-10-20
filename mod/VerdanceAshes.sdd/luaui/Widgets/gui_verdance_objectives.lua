@@ -3,7 +3,7 @@ local widget = widget
 function widget:GetInfo()
   return {
     name = "Verdance Objectives HUD",
-    desc = "Mission briefing, objectives, narrative sidebar cam, beats, heroes, and debrief for Verdance's Ashes",
+    desc = "Mission briefing, objectives, narrative sidebar cam, beats, heroes, and the EXTRACT button for Verdance's Ashes",
     author = "Claude / Luke Spooner",
     date = "2026-07-12",
     license = "GPL v2 or later",
@@ -15,34 +15,6 @@ end
 local mission
 local briefingLines = {}
 local missionCard = nil   -- WO-031 plain-English card
-local nextMissionCandidates = {}  -- WO-042 debrief picks
-local nextPickIndex = nil
-local debriefFocusIndex = 1       -- keyboard focus for the debrief choices
-local debriefHoverIndex = nil     -- current mouse target, if any
-local debriefPickRects = {}       -- rebuilt with the rendered rows each frame
-local debriefVisible = true
-local debriefPending = nil        -- { requestId, startedAt, index }
-local debriefRequestSerial = 0
-local continueArmed = false       -- WO-050 soft terminal: same-map continue available
-local continueChapter = 1
-local continueMessage = nil       -- brief status after pick / map-change
-local handoffStage = nil           -- extracted -> updating -> updated
-local handoffUpdateReceived = false
-local handoffMinimumUntil = 0
-local quitDialogRequested = false
--- Wall-clock quit after Extract: soft-terminal pauses GameFrame, and the
--- gadget leave path can lag. UI owns a backup quitforce so Extract always closes.
--- 2.5s gives Esc room to cancel; Enter / chip click still quit immediately.
-local departureClock = 0
-local reviewFieldAfterExtract = false
-local returnAfterReport = false
-local departureIsTravel = false
-local savePollAt = 0
-local resultReady = false
-local terminalReturnRect = nil
-local debriefPage, debriefPages, debriefPageRect = 1, 1, nil
-local extractionDestinationRect = nil
-local debriefCandidates = {}
 local missionTitle = "Verdance's Ashes"
 local storyReason = nil
 local difficultyLabel = nil
@@ -55,17 +27,6 @@ local playerBeganSortie = false
 local sawStartPaused = false
 local holdStartPause = true
 local lastPauseAssertAt = 0
-local fieldPacketWritten = false
-local lastLiveCommandId = nil
-local lastLiveCommandPollAt = 0
-local lastPollClock = 0
--- Stale hub live-commands (prior EXIT) must not auto-quit on the next soft terminal.
-local staleLiveCommandIds = {}
-local softTerminalOpenedAt = nil
-local softTerminalArmed = false
--- Forward decls: Update / hub poll run before the bodies below are assigned.
-local syncCandidatesFromRules
-local requestExtractLeave
 local followCamEnabled = false
 local followUnitID = nil
 local followCamRect = nil   -- {x1,y1,x2,y2} click target for watch toggle
@@ -84,47 +45,12 @@ local narrUserSteering = false -- player panned/zoomed; hold until next beat
 local narrPanDrag = nil        -- { lastX, lastY } while dragging the crop
 local narrPipSteeredAt = 0
 local leftRailRectCache = nil
-local exfilButtonRect = nil  -- mid-mission Exfil click target
+local extractButtonRect = nil  -- mid-mission EXTRACT click target (sends VA_CMD:manifest)
 local vsx, vsy = Spring.GetViewGeometry()
--- Forward decls: Update runs before these bodies are assigned (Lua local scope).
-local injectModeBTravelCandidates
+-- Forward decl: Update runs before the body below is assigned (Lua local scope).
 local poll
-local publishFieldPacket
-local pollLiveCommand
 
 local BRIEFING_SECONDS = 45
-local function extractionHoldNeed()
-  -- Prefer live SoT (gadget writes both on every extract tick); bail_need is the twin.
-  local n = tonumber(Spring.GetGameRulesParam and Spring.GetGameRulesParam("va_extraction_hold_need"))
-  if n and n > 0 then return n end
-  n = tonumber(Spring.GetGameRulesParam and Spring.GetGameRulesParam("va_bail_need"))
-  if n and n > 0 then return n end
-  return 300
-end
-
-local function clearLiveCommandFiles(reason)
-  -- Wipe stale hub commands so a previous EXIT does not fire on the next soft terminal.
-  local paths = {
-    "singleplayer/verdance_ashes/generated/va_live_command.json",
-  }
-  local cleared = 0
-  if io and io.open then
-    for _, p in ipairs(paths) do
-      local f = io.open(p, "w")
-      if f then
-        f:write('{"schemaVersion":"verdance-live-command/1.0","action":"none","requestId":"","cleared":"'
-          .. tostring(reason or "clear") .. '"}\n')
-        f:close()
-        cleared = cleared + 1
-      end
-    end
-  end
-  lastLiveCommandId = nil
-  if cleared > 0 then
-    Spring.Echo("VA_UI_LIVE_COMMAND_CLEARED reason=" .. tostring(reason or "clear")
-      .. " files=" .. tostring(cleared))
-  end
-end
 local PRESENCE_HOLD_DEFAULT = 900
 local NARRATIVE_LERP = 0.12
 local NARRATIVE_DISCOVER_PERIOD = 20  -- frames between LOS discovery sweeps
@@ -135,11 +61,8 @@ local state = {
   objectiveDestroyed = 0,
   objectiveComplete = false,
   terminal = false,
-  resultCode = 0,
+  sortieOver = false,   -- set by VERDANCE_MISSION_EVENT "sortie_over"; exfil widget owns the closing card
   zoneHold = 0,
-  extractionHold = 0,
-  extractionClean = true,
-  terminalReason = "",
   requiredFrames = 19800,
   holdFrames = 0,
   wavesSpawned = 0,
@@ -621,21 +544,9 @@ function widget:Initialize()
     elseif type(intent.missionCard) == "table" then
       missionCard = intent.missionCard
     end
-    -- Gadget owns Mode B / EXIT at soft terminal (publishContinueCandidateParams).
-    -- Do not dual-inject travel rows here — hub PLAY has no session host and
-    -- seed inject historically drifted EXIT past the 8-slot sync window.
-    if type(mission.nextMissionCandidates) == "table" then
-      nextMissionCandidates = mission.nextMissionCandidates
-    else
-      nextMissionCandidates = {}
-    end
-    mission.nextMissionCandidates = nextMissionCandidates
     -- Ketha flavor lines stay for optional reopen; not the main intro.
     if type(intent.briefing) == "table" and type(intent.briefing.lines) == "table" then
       briefingLines = intent.briefing.lines
-    end
-    if type(intent.debriefCandidates) == "table" then
-      debriefCandidates = intent.debriefCandidates
     end
     storyReason = intent.storyReason
     if mission.objective and mission.objective.requiredFrames then
@@ -661,7 +572,7 @@ function widget:Initialize()
     if type(arc) == "table" and arc.id then
       difficultyLabel = (difficultyLabel or "") .. "  |  Arc: " .. tostring(arc.id)
     end
-    -- Hero manifest: names the HUD and debrief track through hero events.
+    -- Hero manifest: names the HUD tracks through hero events.
     if type(mission.heroes) == "table" then
       for _, h in ipairs(mission.heroes) do
         if h.id then
@@ -804,72 +715,9 @@ end
 -- Start paused and stay paused until the player hits BAR's pause key.
 -- Space only closes the ephemeral briefing card — it must not begin the fight.
 function widget:Update(dt)
-  departureClock = departureClock + math.max(0, tonumber(dt) or 0)
   collapseEnemyTeams()
-  if returnAfterReport and not quitDialogRequested then
-    returnAfterReport = false
-    quitDialogRequested = true
-    Spring.Echo(departureIsTravel and "VA_TRAVEL_DEPARTURE" or "VA_RETURN_TO_HUB")
-    pcall(Spring.SendCommands, "quitforce")
-    return
-  end
-  if resultReady and state.terminal and departureClock >= savePollAt then
-    savePollAt = departureClock + 1
-    local key = Spring.GetGameRulesParam("va_result_key")
-    local saved = numParam("va_campaign_saved", 0) == 1
-    if key and not saved and io and io.open then
-      local f = io.open("LuaUI/Config/va_campaign_receipts.json", "r")
-      if f then
-        local blob = f:read("*a"); f:close()
-        if blob and blob:find('"' .. tostring(key) .. '"', 1, true) then
-          Spring.SendLuaRulesMsg("VA_CMD:varesultack:" .. tostring(key))
-        end
-      end
-    end
-    if saved then
-      handoffStage = nil
-      continueMessage = "Campaign saved. Choose a field mission or return home."
-      if not reviewFieldAfterExtract and numParam("va_exfil_requested", 0) == 1
-          and tostring(state.terminalReason or ""):match("^extracted") then
-        returnAfterReport = true
-      end
-    else
-      continueMessage = "Saving campaign result... If this stalls, use Retry save."
-    end
-  end
-  -- The synced kernel can finish in the same frame that it announces the
-  -- handoff. Hold the explanatory state on screen briefly so the player can
-  -- actually see why the game is paused before the debrief becomes actionable.
-  if handoffStage == "updating" and handoffUpdateReceived
-      and departureClock >= handoffMinimumUntil then
-    handoffStage = "updated"
-    continueMessage = "Field state updated; campaign report queued. Choose another mission or return to hub."
-  end
-  -- Do NOT wall-clock-fail debriefPending. The old 2s timer was slop: paused
-  -- soft-terminal + LuaRulesMsg lag looked like "timeout" even when continue
-  -- was still in flight. Wait for continue_start / continue_rejected / cancel.
-
-  -- Soft-terminal often pauses the sim — GameFrame poll stops. Refresh rules
-  -- params on wall clock so continueArmed / field packet still work.
-  -- pcall: never let hub/field glue remove the whole Objectives HUD.
-  pcall(function()
-    if gameIsPaused() and (state.terminal or continueArmed) then
-      local now = os.clock()
-      if (now - (lastPollClock or 0)) >= 0.5 then
-        lastPollClock = now
-        if poll then poll() end
-      end
-    end
-    if state.terminal then
-      -- Soft-terminal pauses GameFrame; keep candidate list aligned with gadget
-      -- authority so EXIT never points at a spent raid index.
-      if syncCandidatesFromRules then syncCandidatesFromRules() end
-    end
-    if state.terminal and continueArmed then
-      if publishFieldPacket then publishFieldPacket() end
-      if pollLiveCommand then pollLiveCommand() end
-    end
-  end)
+  -- End-of-sortie flow (manifest confirm, closing card, quit) is owned by
+  -- gui_verdance_exfil.lua. This widget only sends VA_CMD:manifest on EXTRACT.
 
   -- Normal BAR feel: sortie must load PAUSED. Hammer pause until it sticks,
   -- then stop so the player can begin with the pause key. Do not treat the
@@ -996,12 +844,9 @@ local function placeMarkers()
   local ez = numParam("va_extract_z", -1)
   if ex >= 0 and ez >= 0 then
     beaconExtraction = { x = ex, z = ez }
-    local extractOpen = numParam("va_extract_open", 0) == 1
-      or state.allObjectivesDone
-      or state.objectiveFailed
     if not extractionMarkerPlaced then
       extractionMarkerPlaced = true
-      local label = markCopy("extract", "EXTRACTION PAD - confirm in sidebar; hold 10s")
+      local label = markCopy("extract", "EXTRACTION PAD - load it, then press EXTRACT")
       pcall(Spring.MarkerAddPoint, ex, groundY(ex, ez), ez, label, true)
       rememberMarker(ex, ez)
     end
@@ -1039,12 +884,9 @@ refreshRouteStage = function()
   local requiredLeft = state.secondaryRequiredLeft or 0
   -- Same boardResolved as gadget: victory list done OR rescue contract failed.
   local boardResolved = state.allObjectivesDone or state.objectiveFailed
-  local extractOpen = numParam("va_extract_open", 0) == 1
-  local exfilReq = numParam("va_exfil_requested", 0) == 1
-  local bailArmed = numParam("va_bail_armed", 0) == 1
 
-  -- Voluntary EXFIL / side bail / any open LZ: route to extract even if board unfinished.
-  if ext and (boardResolved or extractOpen or exfilReq or bailArmed) then
+  -- Board resolved (all marks done or rescue failed): route to the pad.
+  if ext and boardResolved then
     routeStage = "extract"
     local from = dep and { x = dep.x, z = dep.z, label = "COMPANY" } or nil
     if obj then from = { x = obj.x, z = obj.z, label = "OBJECTIVE" } end
@@ -1061,8 +903,6 @@ refreshRouteStage = function()
     local label = "EXFIL"
     if state.objectiveFailed then
       label = "EXFIL (FAIL)"
-    elseif exfilReq and not boardResolved then
-      label = "EXFIL (PARTIAL)"
     end
     routeTo = { x = ext.x, z = ext.z, label = label }
   elseif not state.objectiveComplete then
@@ -1194,8 +1034,9 @@ poll = function()
   state.objectiveTotal = numParam("va_objective_total", 0)
   state.objectiveDestroyed = numParam("va_objective_destroyed", 0)
   state.objectiveComplete = numParam("va_objective_complete", 0) == 1
-  state.terminal = numParam("va_terminal", 0) == 1
-  state.resultCode = numParam("va_result_code", 0)
+  -- sortie_over latches terminal locally so route/cam gating holds even if
+  -- the new synced flow never publishes va_terminal.
+  state.terminal = state.sortieOver or numParam("va_terminal", 0) == 1
   state.zoneHold = numParam("va_zone_hold", 0)
   state.fortifyDef = numParam("va_fortify_def", 0)
   state.fortifyBp = numParam("va_fortify_bp", 0)
@@ -1206,8 +1047,6 @@ poll = function()
   state.fortifyNeedArmy = numParam("va_fortify_need_army", 0)
   state.fortifyNeedStorage = numParam("va_fortify_need_storage", 0)
   state.fortifyScore = numParam("va_fortify_score", 0)
-  state.extractionHold = numParam("va_extraction_hold", 0)
-  state.extractionClean = numParam("va_extraction_clean", 1) == 1
   state.wavesSpawned = numParam("va_waves_spawned", 0)
   state.captureMode = numParam("va_capture_mode", 0) == 1
   state.pocketCleared = numParam("va_pocket_cleared", 0) == 1
@@ -1264,29 +1103,8 @@ poll = function()
   state.armadaTenebriumCrisis = numParam("va_armada_tenebrium_crisis", 1) == 1
   state.requiredFrames = numParam("va_required_frames", state.requiredFrames or 19800)
   state.holdFrames = numParam("va_hold_frames", 0)
-  continueArmed = numParam("va_soft_continue", 0) == 1
-  continueChapter = numParam("va_continue_chapter", 1)
-  if continueArmed and state.terminal and not softTerminalArmed then
-    softTerminalArmed = true
-    softTerminalOpenedAt = os.clock()
-    -- Snapshot + clear any leftover hub command so it cannot fire as a choice.
-    local preexisting = nil
-    if VFS and VFS.LoadFile then
-      preexisting = VFS.LoadFile("singleplayer/verdance_ashes/generated/va_live_command.json")
-    end
-    if type(preexisting) == "string" then
-      local rid = preexisting:match('"requestId"%s*:%s*"([^"]*)"')
-      if rid and rid ~= "" then staleLiveCommandIds[rid] = true end
-    end
-    clearLiveCommandFiles("soft_terminal_arm")
-    Spring.Echo("VA_UI_SOFT_TERMINAL_ARMED")
-  elseif not continueArmed then
-    softTerminalArmed = false
-  end
   local st = sp("va_status")
   if type(st) == "string" and st ~= "" then state.status = st end
-  local reason = sp("va_terminal_reason")
-  if type(reason) == "string" then state.terminalReason = reason end
   placeMarkers()
   refreshRouteStage()
   if refreshHeroDownBanner then refreshHeroDownBanner() end
@@ -1306,468 +1124,13 @@ function widget:GameFrame(frame)
   end
 end
 
-local function currentMissionMapId()
-  if mission and mission.deploymentMapId then return tostring(mission.deploymentMapId) end
-  return ""
-end
-
-local function candidateIsSameMap(cand)
-  if type(cand) ~= "table" then return false end
-  local mapId = currentMissionMapId()
-  if mapId == "" then return true end -- optimistic if seed omits map id
-  return tostring(cand.mapId or "") == mapId
-end
-
--- Hub command deck: publish soft-terminal candidates; poll hub continue commands.
-publishFieldPacket = function()
-  if fieldPacketWritten then return end
-  if not state.terminal or not continueArmed then return end
-  local mapId = currentMissionMapId()
-  local cands = {}
-  for i, c in ipairs(nextMissionCandidates) do
-    cands[#cands + 1] = {
-      index = i,
-      id = c.id,
-      title = c.title,
-      plain = c.plain,
-      mapId = c.mapId,
-      targetZoneId = c.targetZoneId,
-      objectiveArchetype = c.objectiveArchetype or c.kind,
-      sessionMode = c.sessionMode,
-      sameMap = candidateIsSameMap(c),
-      extractOnly = c.extractOnly == true or c.objectiveArchetype == "extract_leave",
-    }
-  end
-  local bits = {
-    '"schemaVersion":"verdance-field/1.0"',
-    '"softContinue":true',
-    '"terminal":true',
-    '"mapId":"' .. tostring(mapId) .. '"',
-    '"chapter":' .. tostring(continueChapter or 1),
-    '"status":"' .. tostring(state.status or "") .. '"',
-    '"terminalReason":"' .. tostring(state.terminalReason or ""):gsub('"', "") .. '"',
-    '"candidateCount":' .. tostring(#cands),
-  }
-  Spring.Echo("VA_FIELD_JSON {" .. table.concat(bits, ",") .. "}")
-  if io and io.open then
-    local paths = {
-      "outbox/va_field.latest.json",
-      "LuaUI/Config/va_field.latest.json",
-      "singleplayer/verdance_ashes/generated/va_field.latest.json",
-    }
-    for _, p in ipairs(paths) do
-      local f = io.open(p, "w")
-      if f then
-        f:write("{\n")
-        f:write('  "schemaVersion": "verdance-field/1.0",\n')
-        f:write('  "softContinue": true,\n')
-        f:write('  "terminal": true,\n')
-        f:write('  "mapId": "' .. tostring(mapId) .. '",\n')
-        f:write('  "chapter": ' .. tostring(continueChapter or 1) .. ",\n")
-        f:write('  "status": "' .. tostring(state.status or "") .. '",\n')
-        f:write('  "terminalReason": "' .. tostring(state.terminalReason or ""):gsub('"', "") .. '",\n')
-        f:write('  "candidates": [\n')
-        for i, c in ipairs(cands) do
-          f:write("    {\n")
-          f:write('      "index": ' .. tostring(c.index) .. ",\n")
-          f:write('      "id": "' .. tostring(c.id or "") .. '",\n')
-          f:write('      "title": "' .. tostring(c.title or ""):gsub('"', "") .. '",\n')
-          f:write('      "targetZoneId": "' .. tostring(c.targetZoneId or "") .. '",\n')
-          f:write('      "objectiveArchetype": "' .. tostring(c.objectiveArchetype or "") .. '",\n')
-          f:write('      "sameMap": ' .. (c.sameMap and "true" or "false") .. ",\n")
-          f:write('      "extractOnly": ' .. (c.extractOnly and "true" or "false") .. "\n")
-          f:write("    }" .. (i < #cands and ",\n" or "\n"))
-        end
-        f:write("  ]\n")
-        f:write("}\n")
-        f:close()
-        Spring.Echo("VA_FIELD_WROTE " .. p)
-        break
-      end
-    end
-  end
-  fieldPacketWritten = true
-end
-
-local function jsonStringField(blob, key)
-  if type(blob) ~= "string" then return nil end
-  local v = blob:match('"' .. key .. '"%s*:%s*"([^"]*)"')
-  return v
-end
-
-local function jsonNumberField(blob, key)
-  if type(blob) ~= "string" then return nil end
-  local v = blob:match('"' .. key .. '"%s*:%s*(%-?%d+)')
-  return tonumber(v)
-end
-
-pollLiveCommand = function()
-  if not state.terminal or not continueArmed or debriefPending or numParam("va_campaign_saved",0) ~= 1 then return end
-  -- Let the debrief paint before any hub automation runs.
-  if softTerminalOpenedAt and (os.clock() - softTerminalOpenedAt) < 3.0 then return end
-  local now = os.clock()
-  if (now - (lastLiveCommandPollAt or 0)) < 0.75 then return end
-  lastLiveCommandPollAt = now
-  local blob = nil
-  if VFS and VFS.LoadFile then
-    blob = VFS.LoadFile("singleplayer/verdance_ashes/generated/va_live_command.json")
-    if not blob then
-      blob = VFS.LoadFile("LuaUI/Config/va_live_command.json")
-    end
-  end
-  if (not blob) and io and io.open then
-    for _, p in ipairs({
-      "singleplayer/verdance_ashes/generated/va_live_command.json",
-      "outbox/va_live_command.latest.json",
-      "LuaUI/Config/va_live_command.json",
-    }) do
-      local f = io.open(p, "r")
-      if f then
-        blob = f:read("*a")
-        f:close()
-        if blob and blob ~= "" then break end
-      end
-    end
-  end
-  if type(blob) ~= "string" or blob == "" then return end
-  local requestId = jsonStringField(blob, "requestId") or ""
-  local action = jsonStringField(blob, "action") or "continue"
-  if requestId == "" or action == "" or action == "none" then return end
-  if requestId == lastLiveCommandId then return end
-  if staleLiveCommandIds[requestId] then
-    Spring.Echo("VA_UI_HUB_COMMAND_STALE ignored requestId=" .. requestId
-      .. " action=" .. tostring(action))
-    lastLiveCommandId = requestId
-    return
-  end
-  lastLiveCommandId = requestId
-  if action == "extract_leave" then
-    -- Hub return uses the same saved-result gate as the field screen.
-    Spring.Echo("VA_UI_HUB_COMMAND extract_leave requestId=" .. requestId)
-    requestExtractLeave(requestId, { waitConfirm = true })
-    return
-  end
-  local idx = jsonNumberField(blob, "index")
-  local target = jsonStringField(blob, "targetZoneId")
-  if (not idx) and target then
-    for i, c in ipairs(nextMissionCandidates) do
-      if tostring(c.targetZoneId or "") == tostring(target) then
-        idx = i
-        break
-      end
-    end
-  end
-  if idx and nextMissionCandidates[idx] then
-    Spring.Echo("VA_UI_HUB_COMMAND continue index=" .. tostring(idx)
-      .. " requestId=" .. requestId .. " target=" .. tostring(target or ""))
-    selectNextMission(idx)
-  else
-    Spring.Echo("VA_UI_HUB_COMMAND_FAIL no_match requestId=" .. requestId
-      .. " index=" .. tostring(idx) .. " target=" .. tostring(target or ""))
-  end
-end
-
--- Mode B: strategic_link table from world_zone_graph (session host Reload path).
-local strategicLinks = nil
-local function loadStrategicLinks()
-  if strategicLinks ~= nil then return strategicLinks end
-  strategicLinks = {}
-  for _, p in ipairs({
-    "luaui/Include/va_strategic_links.lua",
-    "LuaUI/Include/va_strategic_links.lua",
-    "luarules/gadgets/include/va_strategic_links.lua",
-  }) do
-    local ok, data = pcall(VFS.Include, p)
-    if ok and type(data) == "table" then
-      strategicLinks = data
-      break
-    end
-  end
-  return strategicLinks
-end
-
-local function missionAnchorZones()
-  local zones = {}
-  local function push(z)
-    z = tostring(z or "")
-    if z == "" then return end
-    for i = 1, #zones do if zones[i] == z then return end end
-    zones[#zones + 1] = z
-  end
-  if mission then
-    if mission.objective then push(mission.objective.targetZoneId) end
-    push(mission.extractionZoneId)
-    push(mission.deploymentZoneId)
-  end
-  return zones
-end
-
--- Deprecated dual-writer. Gadget rebuildContinueCandidates is the sole Mode B
--- publisher (and only when va_session_host=1). Kept as pass-through so any
--- leftover call site cannot reintroduce EXIT index drift.
-injectModeBTravelCandidates = function(cands)
-  return cands or {}
-end
-
-local function writeNextSortieChoice(cand, pickIndex)
-  if cand and (cand.extractOnly or cand.objectiveArchetype == "extract_leave") then
-    return requestExtractLeave()
-  end
-  if numParam("va_campaign_saved", 0) ~= 1 then return false end
-  if type(cand) ~= "table" then return end
-  local isModeB = (cand.travelMode == "mode_b")
-    or (cand.sessionMode == "reload_travel")
-    or (cand.edgeKind == "strategic_link")
-    or (not candidateIsSameMap(cand))
-  local sessionMode = cand.sessionMode
-  if not sessionMode then
-    sessionMode = isModeB and "reload_travel" or "same_map"
-  end
-  local payload = {
-    schemaVersion = "verdance-sortie-order/1.0",
-    mapId = cand.mapId,
-    targetZoneId = cand.targetZoneId,
-    fromZoneIds = cand.fromZoneIds or {},
-    objectiveArchetype = cand.objectiveArchetype or cand.kind or "seize_lane",
-    patron = cand.patron or "nullmercs",
-    against = cand.against or "armada",
-    flavor = cand.flavor,
-    source = "debrief_pick",
-    candidateId = cand.id,
-    title = cand.title,
-    sessionMode = sessionMode,
-    travelMode = isModeB and "mode_b" or nil,
-    edgeKind = isModeB and (cand.edgeKind or "strategic_link") or nil,
-  }
-  -- Echo machine line for extract/advance scripts + Mode B session host.
-  local bits = {
-    '"mapId":"' .. tostring(payload.mapId or "") .. '"',
-    '"targetZoneId":"' .. tostring(payload.targetZoneId or "") .. '"',
-    '"objectiveArchetype":"' .. tostring(payload.objectiveArchetype or "") .. '"',
-    '"patron":"' .. tostring(payload.patron or "") .. '"',
-    '"against":"' .. tostring(payload.against or "") .. '"',
-    '"sessionMode":"' .. tostring(sessionMode) .. '"',
-  }
-  if payload.travelMode then
-    bits[#bits + 1] = '"travelMode":"' .. tostring(payload.travelMode) .. '"'
-  end
-  if payload.edgeKind then
-    bits[#bits + 1] = '"edgeKind":"' .. tostring(payload.edgeKind) .. '"'
-  end
-  if payload.flavor then
-    bits[#bits + 1] = '"flavor":"' .. tostring(payload.flavor) .. '"'
-  end
-  if type(payload.fromZoneIds) == "table" and payload.fromZoneIds[1] then
-    bits[#bits + 1] = '"fromZoneIds":["' .. tostring(payload.fromZoneIds[1]) .. '"]'
-  end
-  Spring.Echo("VA_NEXT_SORTIE_CHOICE {" .. table.concat(bits, ",") .. "}")
-  if isModeB then
-    Spring.Echo("VA_MODE_B_TRAVEL map=" .. tostring(payload.mapId)
-      .. " target=" .. tostring(payload.targetZoneId)
-      .. " sessionMode=reload_travel edge=strategic_link")
-  end
-  -- Best-effort write into BAR write-dir outbox (WO-043 probe path).
-  local ok = false
-  if io and io.open then
-    local paths = {
-      "outbox/next_sortie_choice.json",
-      "LuaUI/Config/verdance_next_sortie_choice.json",
-    }
-    for _, p in ipairs(paths) do
-      local f = io.open(p, "w")
-      if f then
-        f:write("{\n")
-        f:write('  "schemaVersion": "verdance-sortie-order/1.0",\n')
-        f:write('  "mapId": "' .. tostring(payload.mapId or "") .. '",\n')
-        f:write('  "targetZoneId": "' .. tostring(payload.targetZoneId or "") .. '",\n')
-        f:write('  "objectiveArchetype": "' .. tostring(payload.objectiveArchetype or "") .. '",\n')
-        f:write('  "patron": "' .. tostring(payload.patron or "") .. '",\n')
-        f:write('  "against": "' .. tostring(payload.against or "") .. '",\n')
-        f:write('  "sessionMode": "' .. tostring(sessionMode) .. '",\n')
-        if payload.travelMode then
-          f:write('  "travelMode": "' .. tostring(payload.travelMode) .. '",\n')
-        end
-        if payload.edgeKind then
-          f:write('  "edgeKind": "' .. tostring(payload.edgeKind) .. '",\n')
-        end
-        if type(payload.fromZoneIds) == "table" and payload.fromZoneIds[1] then
-          f:write('  "fromZoneIds": ["' .. tostring(payload.fromZoneIds[1]) .. '"],\n')
-        end
-        if payload.flavor then
-          f:write('  "flavor": "' .. tostring(payload.flavor) .. '",\n')
-        end
-        f:write('  "source": "debrief_pick"\n')
-        f:write("}\n")
-        f:close()
-        ok = true
-        Spring.Echo("VA_NEXT_SORTIE_WROTE " .. p)
-        break
-      end
-    end
-  end
-  if not ok then
-    Spring.Echo("VA_NEXT_SORTIE_WRITE_FAILED use infolog VA_NEXT_SORTIE_CHOICE")
-  end
-  nextPickIndex = cand
-  debriefRequestSerial = debriefRequestSerial + 1
-  local requestId = "ui_" .. tostring(Spring.GetGameFrame() or 0) .. "_" .. tostring(debriefRequestSerial)
-  debriefPending = { requestId = requestId, startedAt = os.clock(), index = tonumber(pickIndex) }
-  debriefVisible = false
-  debriefPickRects = {}
-  handoffStage = nil
-
-  -- Every choice is acknowledged by synced campaign authority. Same-map
-  -- choices resume in-engine; cross-map choices enter the departure state.
-  local idx = tonumber(pickIndex)
-  if idx and (continueArmed or state.terminal) then
-    local isExit = cand.extractOnly == true or cand.objectiveArchetype == "extract_leave"
-    if not isExit then
-      local candId = tostring(cand.id or "")
-      if candId ~= "" then
-        Spring.SendLuaRulesMsg("VA_CMD:vacontinue:id:" .. candId .. ":" .. requestId)
-      else
-        Spring.SendLuaRulesMsg("VA_CMD:vacontinue:" .. tostring(idx) .. ":" .. requestId)
-      end
-      continueMessage = candidateIsSameMap(cand)
-        and "Waiting for field ack — stay on this map..."
-        or "Waiting for field ack — preparing departure..."
-      Spring.Echo("VA_UI_REQUEST_CONTINUE index=" .. tostring(idx)
-        .. " id=" .. candId
-        .. " requestId=" .. tostring(requestId)
-        .. " target=" .. tostring(cand.targetZoneId))
-    end
-  end
-end
-
-requestExtractLeave = function(requestId, opts)
-  if not state.terminal or debriefPending then return false end
-  if numParam("va_campaign_saved", 0) ~= 1 then
-    Spring.Echo("VA_RETRY_RESULT")
-    continueMessage = "Retrying campaign save. The recorded result remains available for recovery."
-    return false
-  end
-  departureIsTravel = false
-  returnAfterReport = true
-  return true
-end
-
-local function selectNextMission(index)
-  if debriefPending or numParam("va_campaign_saved",0) ~= 1 then return false end
-  index = tonumber(index)
-  if not index or not nextMissionCandidates[index] then return false end
-  debriefFocusIndex = index
-  writeNextSortieChoice(nextMissionCandidates[index], index)
-  return true
-end
-
-syncCandidatesFromRules = function()
-  local n = math.floor(numParam("va_cand_count", 0))
-  if n <= 0 then return false end
-  local refreshed = {}
-  for i = 1, math.min(n, 8) do
-    local id = Spring.GetGameRulesParam("va_cand_" .. i .. "_id")
-    local title = Spring.GetGameRulesParam("va_cand_" .. i .. "_title")
-    local zone = Spring.GetGameRulesParam("va_cand_" .. i .. "_zone")
-    local kind = Spring.GetGameRulesParam("va_cand_" .. i .. "_kind")
-    local pocket = Spring.GetGameRulesParam("va_cand_" .. i .. "_pocket")
-    local plain = Spring.GetGameRulesParam("va_cand_" .. i .. "_plain")
-    local mapId = Spring.GetGameRulesParam("va_cand_" .. i .. "_map")
-    local session = Spring.GetGameRulesParam("va_cand_" .. i .. "_session")
-    local edge = Spring.GetGameRulesParam("va_cand_" .. i .. "_edge")
-    local isExit = numParam("va_cand_" .. i .. "_exit", 0) == 1
-    local isTravel = numParam("va_cand_" .. i .. "_travel", 0) == 1
-    local sessionMode = (type(session) == "string" and session ~= "" and session)
-      or (isTravel and "reload_travel" or "same_map")
-    refreshed[#refreshed + 1] = {
-      id = (type(id) == "string" and id ~= "" and id) or ("cand_" .. i),
-      title = (isExit or kind == "extract_leave") and "RETURN TO HUB"
-        or (type(title) == "string" and title ~= "" and title) or ("Contract " .. i),
-      plain = (type(plain) == "string" and plain) or "",
-      mapId = (type(mapId) == "string" and mapId) or currentMissionMapId(),
-      targetZoneId = (type(zone) == "string" and zone) or "",
-      objectiveArchetype = (type(kind) == "string" and kind) or "eco_raid",
-      pocketId = (type(pocket) == "string" and pocket) or nil,
-      highValue = (type(kind) == "string" and (kind == "defend_install" or kind == "seize_lane")),
-      defendInstall = (kind == "defend_install"),
-      extractOnly = isExit or kind == "extract_leave",
-      preplaced = not isTravel,
-      patron = "nullmercs",
-      against = "armada",
-      sessionMode = sessionMode,
-      travelMode = isTravel and "mode_b" or nil,
-      edgeKind = (type(edge) == "string" and edge ~= "" and edge)
-        or (isTravel and "strategic_link" or nil),
-    }
-  end
-  local changed = #refreshed ~= #nextMissionCandidates
-  if not changed then
-    for i = 1, #refreshed do
-      local a, b = refreshed[i], nextMissionCandidates[i]
-      if not b or tostring(a.id) ~= tostring(b.id)
-          or tostring(a.targetZoneId) ~= tostring(b.targetZoneId)
-          or tostring(a.objectiveArchetype) ~= tostring(b.objectiveArchetype) then
-        changed = true
-        break
-      end
-    end
-  end
-  if not changed then return false end
-  nextMissionCandidates = refreshed
-  if mission then mission.nextMissionCandidates = refreshed end
-  debriefFocusIndex = 1
-  nextPickIndex = nil
-  Spring.Echo("VA_UI_CANDIDATES_SYNC count=" .. tostring(#refreshed))
-  return true
-end
-
-local function debriefIndexForKey(key)
-  if key >= 49 and key <= 56 then return key - 48 end
-  -- BAR passes SDL-style keysyms. Keep the number-key path compatible with
-  -- the original implementation and support keypad digits as well.
-  if key == 49 or key == 257 then return 1 end
-  if key == 50 or key == 258 then return 2 end
-  if key == 51 or key == 259 then return 3 end
-  if key == 52 or key == 260 then return 4 end
-  return nil
-end
-
 local function pointInRect(x, y, r)
   return r and x >= r.x1 and x <= r.x2 and y >= r.y1 and y <= r.y2
 end
 
 function widget:KeyPress(key)
-  -- Eat input while the exfil loading cover owns the screen.
-  if handoffStage == "updating" then return true end
-  if state.terminal and (key == 104 or key == 72) then return requestExtractLeave() end
-  if state.terminal and (key == 114 or key == 82) and numParam("va_campaign_saved", 0) ~= 1 then
-    Spring.Echo("VA_RETRY_RESULT")
-    return true
-  end
-  -- WO-042/051: number keys 1-3 pick next mission on debrief (Mode A continues in-seat).
-  if state.terminal and #nextMissionCandidates > 0 and not debriefPending then
-    local idx = debriefIndexForKey(key)
-    if idx and selectNextMission(idx) then return true end
-
-    -- A player who prefers the keyboard can focus a row and confirm it.
-    -- SDL's legacy arrow keysyms are used by Spring/BAR on Windows.
-    if key == 273 or key == 274 then -- up / down
-      local step = key == 273 and -1 or 1
-      debriefFocusIndex = math.max(1, math.min(#nextMissionCandidates,
-        (debriefFocusIndex or 1) + step))
-      debriefHoverIndex = nil
-      local position = 0
-      for i,c in ipairs(nextMissionCandidates) do
-        if not (c.extractOnly or c.objectiveArchetype == "extract_leave") then
-          position = position + 1
-          if i == debriefFocusIndex then debriefPage = math.ceil(position / 3) end
-        end
-      end
-      return true
-    end
-    if key == 13 or key == 271 or key == 32 then -- return / keypad enter / space
-      if selectNextMission(debriefFocusIndex or 1) then return true end
-    end
-  end
+  -- After sortie_over the exfil widget owns input; this HUD stays out of the way.
+  if state.sortieOver then return false end
   -- Space / Esc dismiss the briefing card only. Do not touch pause.
   if not briefingDismissed and (key == 32 or key == 27) and not state.terminal then
     briefingDismissed = true
@@ -1806,23 +1169,11 @@ function widget:MouseMove(x, y)
     steerBuiltInPip(followViewCenter.x, followViewCenter.z, followViewRadius)
     return true
   end
-  if not state.terminal or #nextMissionCandidates == 0 then
-    debriefHoverIndex = nil
-    return false
-  end
-  debriefHoverIndex = nil
-  for i, rect in ipairs(debriefPickRects) do
-    if pointInRect(x, y, rect) then
-      debriefHoverIndex = i
-      debriefFocusIndex = i
-      break
-    end
-  end
   return false
 end
 
 function widget:MousePress(x, y, button)
-  if handoffStage == "updating" then return true end
+  if state.sortieOver then return false end
   -- Drag inside the narrative minimap crop to steer (does not toggle LIVE).
   if button == 1 and followViewRect and pointInRect(x, y, followViewRect) then
     followCamEnabled = true
@@ -1842,29 +1193,12 @@ function widget:MousePress(x, y, button)
     end
     return true
   end
-  if button == 1 and state.terminal and debriefPageRect
-      and pointInRect(x, y, debriefPageRect) then
-    debriefPage = debriefPage % debriefPages + 1
+  -- EXTRACT: ask synced for the manifest. gui_verdance_exfil.lua receives
+  -- VerdanceManifest and owns pause / confirm / closing card from there.
+  if button == 1 and extractButtonRect and pointInRect(x, y, extractButtonRect) and not state.terminal then
+    Spring.SendLuaRulesMsg("VA_CMD:manifest")
+    Spring.Echo("VA_UI_EXTRACT_PRESSED frame=" .. tostring(Spring.GetGameFrame() or 0))
     return true
-  end
-  if button == 1 and state.terminal and terminalReturnRect
-      and pointInRect(x, y, terminalReturnRect) then
-    requestExtractLeave()
-    return true
-  end
-  if button == 1 and not state.terminal and extractionDestinationRect then
-    if pointInRect(x, y, extractionDestinationRect.home) then reviewFieldAfterExtract = false; return true end
-    if pointInRect(x, y, extractionDestinationRect.stay) then reviewFieldAfterExtract = true; return true end
-  end
-  if button == 1 and exfilButtonRect and pointInRect(x, y, exfilButtonRect) and not state.terminal then
-    Spring.SendLuaRulesMsg(numParam("va_exfil_requested",0)==1 and "VA_CMD:vacancelexfil" or "VA_CMD:vaexfil")
-    return true
-  end
-  if button ~= 1 or not state.terminal or debriefPending then return false end
-  for i, rect in ipairs(debriefPickRects) do
-    if pointInRect(x, y, rect) then
-      return selectNextMission(i)
-    end
   end
   return false
 end
@@ -1952,19 +1286,10 @@ function widget:TextCommand(command)
       return true
     end
   end
-  if command:sub(1, 8) == "vanext " then
-    local n = tonumber(command:sub(9))
-    if n and nextMissionCandidates[n] then
-      writeNextSortieChoice(nextMissionCandidates[n], n)
-      return true
-    end
-  end
-  if command:sub(1, 11) == "vacontinue " then
-    local n = tonumber(command:sub(12))
-    if n and nextMissionCandidates[n] then
-      writeNextSortieChoice(nextMissionCandidates[n], n)
-      return true
-    end
+  if command == "vaextract" then
+    -- Same as the sidebar EXTRACT button.
+    Spring.SendLuaRulesMsg("VA_CMD:manifest")
+    return true
   end
   return false
 end
@@ -1992,59 +1317,6 @@ local function panel(x1, y1, x2, y2, accent)
     gl.Color(accent[1], accent[2], accent[3], accent[4] or 0.85)
     gl.Rect(x1, y1, x1 + 3, y2)
   end
-end
-
-local function pickDebriefLine()
-  if state.resultCode == 1 then
-    if state.extractionClean and debriefCandidates.victoryClean then return debriefCandidates.victoryClean end
-    if debriefCandidates.objectiveDestroyed and state.objectiveTotal > 0 then return debriefCandidates.objectiveDestroyed end
-    return debriefCandidates.victory
-  elseif state.resultCode == 2 then
-    if state.terminalReason == "commander_lost" and debriefCandidates.defeatCommander then return debriefCandidates.defeatCommander end
-    if state.terminalReason:find("^hero_lost_") and debriefCandidates.defeatHero then return debriefCandidates.defeatHero end
-    return debriefCandidates.defeat
-  end
-  return debriefCandidates.partial
-end
-
-local function currentDisplayVerdict()
-  if Ash and Ash.displayVerdict then
-    return Ash.displayVerdict(state.status, state.resultCode, state.terminalReason)
-  end
-  if state.resultCode == 1 or state.status == "victory" then return "victory" end
-  if state.resultCode == 2 or state.status == "defeat" then return "defeat" end
-  return "partial"
-end
-
-local function verdictPaint(verdict)
-  if Ash and Ash.verdictInfo then
-    local info = Ash.verdictInfo(verdict)
-    local col = Ash.color(info.color)
-    return info.banner, info.headline, col
-  end
-  if verdict == "victory" then return "SUCCESS", "Success.", COL.good end
-  if verdict == "defeat" then return "DEFEAT", "Defeat.", COL.bad end
-  return "PARTIAL SUCCESS", "Partial success.", COL.warn
-end
-
--- Credit honesty line (UI only; real credits live in match_credit_v1).
-local function creditHonestyLine(verdict)
-  if verdict == "victory" then
-    if state.nodeClaimed then
-      return "Territory credit eligible · salvage earns Tenebrium"
-    end
-    return "Full credit on bring-home"
-  end
-  if verdict == "partial" then
-    if state.nodeClaimed then
-      return "Node claimed · partial success"
-    end
-    return "Partial credit · unfinished objective or extraction"
-  end
-  if verdict == "defeat" then
-    return "No zone flip · scars may land"
-  end
-  return "No campaign advance until bring-home"
 end
 
 local function zoneLabel(zoneId)
@@ -2124,9 +1396,7 @@ local function currentPhaseClock()
   if type(phase) ~= "string" or phase == "" then
     if state.terminal then
       phase = "DONE"
-    elseif numParam("va_extract_open", 0) == 1
-        or numParam("va_exfil_requested", 0) == 1
-        or numParam("va_bail_armed", 0) == 1 then
+    elseif state.allObjectivesDone or state.objectiveFailed then
       phase = "EXTRACT"
     elseif state.objectiveComplete then
       phase = "MARKS"
@@ -2283,7 +1553,7 @@ local function drawDonut(cx, cy, outerR, innerR, rgb, alpha)
 end
 
 -- Purple Tnb donuts sit on the left objectives panel.
--- Stay visible through soft-terminal /vawin debrief — blanking looked like a Tnb UI break.
+-- Stays visible for the whole sortie — blanking looked like a Tnb UI break.
 local function drawTenebriumDonuts()
   local railLeft, _, railRight, railTop = resolveRightRail()
   local bank = math.floor(tonumber(state.tenebriumBank) or 0)
@@ -2691,42 +1961,18 @@ local function drawRightMissionRail()
     y = y - 12
   end
 
-  exfilButtonRect = nil
-  extractionDestinationRect = nil
+  -- EXTRACT: always available once the sortie is underway. One click sends
+  -- VA_CMD:manifest; gui_verdance_exfil.lua takes it from there.
+  extractButtonRect = nil
   if not state.terminal and playerBeganSortie then
-    y = math.max(y, 220) -- Keep the sole extraction controls on-screen at 720p.
-    panel(x-6,y-190,right-6,y+6,COL.edge)
-    local requested = numParam("va_exfil_requested",0)==1
-    local ready = numParam("va_extract_ready",0)==1
-    local blocker = Spring.GetGameRulesParam("va_extract_blocker")
-    local hints = {hostiles_in_zone="Blocked: hostile presence in the marked sector",
-      zone_not_owned="Blocked: the map does not show friendly control",
-      rally_company="Ready: bring a company unit onto the extraction pad",
-      unknown_zone="Extraction sector unavailable", operation_complete="Objective complete. Confirm to record the operation.", objectives_open="Complete the required objectives"}
-    for _,line in ipairs(wrapBriefing(hints[blocker] or "Friendly sector secured. Extraction ready.",40,2)) do
-      text(line,x,y-8,10,COL.dim,"l")
-      y=y-13
-    end
-    y=y-17
-    local mid=(x+right-12)/2
-    extractionDestinationRect={home={x1=x,y1=y-30,x2=mid-3,y2=y},stay={x1=mid+3,y1=y-30,x2=right-12,y2=y}}
-    for key,r in pairs(extractionDestinationRect) do
-      local chosen=(key=="stay")==reviewFieldAfterExtract
-      panel(r.x1,r.y1,r.x2,r.y2,chosen and COL.gold or COL.edge)
-      text((chosen and "[x] " or "[ ] ") .. (key=="home" and "HOME" or "STAY IN FIELD"),r.x1+8,y-19,11,COL.title,"l")
-    end
-    y=y-45
-    if requested or ready then exfilButtonRect={x1=x,y1=y-30,x2=right-12,y2=y} end
-    panel(x,y-30,right-12,y,ready and COL.good or COL.edge)
-    text(requested and "CANCEL EXTRACTION" or (blocker=="operation_complete" and "COMPLETE OPERATION" or "CONFIRM EXTRACTION"),x+10,y-19,12,COL.title,"l")
-    y=y-46
-    if requested then
-      text(ready and string.format("Extracting: %ds remaining",math.ceil(math.max(0,300-state.extractionHold)/30))
-        or "Hold reset. Secure the sector and rally to resume.",x,y,11,COL.warn,"l")
-    else
-      text("10 seconds on pad. Interrupted holds restart.",x,y,10,COL.dim,"l")
-    end
-    y=y-20
+    y = math.max(y, 120) -- Keep the button on-screen at 720p.
+    local boardResolved = state.allObjectivesDone or state.objectiveFailed
+    extractButtonRect = { x1 = x, y1 = y - 30, x2 = right - 12, y2 = y }
+    panel(x, y - 30, right - 12, y, boardResolved and COL.good or (COL.steam or COL.edge))
+    text("EXTRACT", x + 10, y - 19, 12, COL.title, "l")
+    y = y - 36
+    text("Get what you want to keep onto the pad first.", x, y, 9, COL.dim, "l")
+    y = y - 16
   end
 
   if not playerBeganSortie and not state.terminal then
@@ -2811,250 +2057,6 @@ local function drawBark()
   end
   text(label, cx, y, 15, color)
 end
-
-local function heroStatusBits()
-  -- Level leads; status is the detail. Matches FE hero-card emphasis.
-  local bits = {}
-  for _, rec in pairs(heroRoster) do
-    local lvl = tonumber(rec.level) or 1
-    local status
-    if rec.state == "lost" then
-      status = "lost"
-    elseif rec.state == "down" then
-      status = rec.missionCritical and "dragged home wounded" or "left in the wreckage"
-    elseif rec.everDown then
-      status = "recovered, wounded"
-    else
-      status = "standing"
-    end
-    bits[#bits + 1] = string.format("L%d  %s — %s", lvl, tostring(rec.name or "?"), status)
-  end
-  table.sort(bits)
-  return bits
-end
-
-local function warShiftLine(verdict)
-  if verdict == "victory" then
-    return "The front eases here — contested space recedes."
-  elseif verdict == "defeat" then
-    return "Contested space spreads — standing frays on this front."
-  end
-  return "The line holds, barely. The world stays contested."
-end
-
-local function drawDebriefScreen()
-  local heroBits = heroStatusBits()
-  local stayCands, exitCands = {}, {}
-  for i, c in ipairs(nextMissionCandidates) do
-    local isExit = c.extractOnly == true or c.objectiveArchetype == "extract_leave"
-    if isExit then
-      exitCands[#exitCands + 1] = { i = i, c = c }
-    else
-      stayCands[#stayCands + 1] = { i = i, c = c }
-    end
-  end
-  debriefPages = math.max(1, math.ceil(#stayCands / 3))
-  debriefPage = math.min(debriefPage, debriefPages)
-  debriefPageRect = nil
-  if debriefPages > 1 then
-    local pageRows = {}
-    for i = (debriefPage - 1) * 3 + 1, math.min(#stayCands, debriefPage * 3) do
-      pageRows[#pageRows + 1] = stayCands[i]
-    end
-    stayCands = pageRows
-    debriefPageRect = {x1=vsx-250,y1=vsy-110,x2=vsx-18,y2=vsy-70}
-    panel(debriefPageRect.x1,debriefPageRect.y1,debriefPageRect.x2,debriefPageRect.y2,COL.gold)
-    text("MORE MISSIONS  " .. debriefPage .. "/" .. debriefPages,vsx-134,vsy-95,12,COL.title)
-  end
-  terminalReturnRect = { x1 = vsx - 250, y1 = vsy - 58, x2 = vsx - 18, y2 = vsy - 18 }
-  panel(terminalReturnRect.x1, terminalReturnRect.y1, terminalReturnRect.x2, terminalReturnRect.y2, COL.gold)
-  text(numParam("va_campaign_saved",0)==1 and "RETURN HOME  [H]" or "RETRY SAVE  [R]", vsx - 134, vsy - 43, 13, COL.title)
-  local candCount = #nextMissionCandidates
-  local choiceRowHeight = 44
-  local w = math.min(680, vsx * 0.62)
-  local cx = vsx * 0.5
-  local top = vsy - 32
-  local extra = (#stayCands > 0 and (28 + #stayCands * choiceRowHeight) or 0)
-  if nextPickIndex then extra = extra + 18 end
-  local bottom = top - 250 - (#heroBits > 0 and (#heroBits * 15 + 8) or 0) - extra
-  local verdict = currentDisplayVerdict()
-  local banner, headline, bannerCol = verdictPaint(verdict)
-  panel(cx - w / 2, bottom, cx + w / 2, top, bannerCol)
-
-  local y = top - 22
-  text(tostring(state.terminalReason or ""):match("^soft_clock") and "MISSION TIMEOUT - NOT EXTRACTED" or "CHAPTER RESULT", cx, y, 10, COL.ash or COL.dim); y = y - 16
-  text(banner, cx, y, 24, bannerCol); y = y - 20
-  text(headline, cx, y, 13, COL.title); y = y - 16
-
-  -- Compact playfeel card: objective / secondaries / scars / extract.
-  do
-    local objBit = numParam("va_debrief_obj", state.objectiveComplete and 1 or 0) == 1 and "Primary claimed" or "Primary open"
-    local secBit = Spring.GetGameRulesParam("va_debrief_sec") or string.format("%d/%d sec", state.secondaryDone or 0, state.secondaryTotal or 0)
-    local heroBit = Spring.GetGameRulesParam("va_debrief_heroes")
-    local extBit = Spring.GetGameRulesParam("va_debrief_extract") or (state.extractionClean and "extract clean" or "extract contested")
-    text(objBit .. "  ·  " .. tostring(secBit), cx, y, 11, COL.steam or COL.blue); y = y - 14
-    if type(heroBit) == "string" and heroBit ~= "" then
-      text(tostring(heroBit), cx, y, 11, COL.warn or COL.gold); y = y - 14
-    end
-    text(tostring(extBit), cx, y, 10, COL.dim); y = y - 16
-  end
-
-  local debrief = pickDebriefLine()
-  if debrief then
-    if Ash and Ash.voiceBlock then
-      Ash.voiceBlock(cx, y - 6, w - 40, "Ketha", tostring(debrief), 1)
-      y = y - 44
-    else
-      text('Ketha: "' .. tostring(debrief) .. '"', cx, y, 12, COL.ketha)
-      y = y - 18
-    end
-  end
-
-  local bits = {}
-  if state.objectiveTotal > 0 then
-    bits[#bits + 1] = string.format("targets %d/%d", state.objectiveDestroyed, state.objectiveTotal)
-  end
-  if verdict == "victory" then
-    bits[#bits + 1] = state.extractionClean and "clean extract" or "contested extract"
-  elseif tostring(state.terminalReason or ""):find("recruit_lost", 1, true)
-      or state.objectiveFailed then
-    bits[#bits + 1] = "rescue failed"
-  elseif tostring(state.terminalReason or ""):find("bail", 1, true)
-      or tostring(state.terminalReason or ""):find("side_", 1, true) then
-    bits[#bits + 1] = "bailed forward"
-  end
-  if state.terminalReason ~= "" then
-    bits[#bits + 1] = state.terminalReason:gsub("_", " ")
-  end
-  if #bits > 0 then
-    text(table.concat(bits, "  ·  "), cx, y, 11, COL.dim); y = y - 14
-  end
-
-  text(creditHonestyLine(verdict), cx, y, 11, COL.steam or COL.blue); y = y - 14
-
-  if #heroBits > 0 then
-    text("THE COMPANY", cx, y, 10, COL.ash or COL.dim); y = y - 12
-    for _, line in ipairs(heroBits) do
-      text(line, cx, y, 11, COL.text); y = y - 13
-    end
-    y = y - 2
-  end
-
-  text(warShiftLine(verdict), cx, y, 11, COL.dim); y = y - 16
-
-  debriefPickRects = {}
-  if candCount > 0 then
-    if debriefPending or numParam("va_campaign_saved",0) ~= 1 then
-      text("PROCESSING", cx, y, 12, COL.steam or COL.blue); y = y - 14
-      text("Waiting for campaign acknowledgement", cx, y, 10, COL.dim); y = y - 14
-    else
-      if #stayCands > 0 then
-        text(continueArmed and "STAY ON THIS MAP" or "NEXT CONTRACT", cx, y, 11, COL.gold or COL.title)
-        y = y - 14
-        text("Click a row or press 1–" .. tostring(math.min(9, candCount)) .. "  ·  Enter confirms", cx, y, 10, COL.dim)
-        y = y - 14
-      end
-      if debriefFocusIndex < 1 or debriefFocusIndex > candCount then debriefFocusIndex = 1 end
-      for _, row in ipairs(stayCands) do
-        local i, c = row.i, row.c
-        local same = candidateIsSameMap(c)
-        local tag = same and "STAY" or "TRAVEL"
-        local rowTop = y + 8
-        local rowBottom = rowTop - (choiceRowHeight - 6)
-        local x1 = cx - w / 2 + 16
-        local x2 = cx + w / 2 - 16
-        local selected = nextPickIndex and nextPickIndex.id == c.id
-        local focused = debriefFocusIndex == i or debriefHoverIndex == i
-        debriefPickRects[i] = { x1 = x1, y1 = rowBottom, x2 = x2, y2 = rowTop }
-
-        gl.Color(COL.panel[1], COL.panel[2], COL.panel[3], focused and 0.42 or 0.22)
-        gl.Rect(x1, rowBottom, x2, rowTop)
-        local focusCol = selected and COL.good or (focused and COL.gold or COL.edge)
-        gl.Color(focusCol[1], focusCol[2], focusCol[3], focused and 0.95 or 0.45)
-        gl.Rect(x1, rowBottom, x1 + 3, rowTop)
-
-        local mark = selected and "OK  " or string.format("%d  ", i)
-        text(mark .. tostring(c.title or c.id), x1 + 14, y, 12,
-          selected and COL.good or (focused and COL.title or COL.text), "l")
-        text(tag, x2 - 14, y, 10, same and COL.good or COL.warn, "r")
-        y = y - 14
-        if c.plain then
-          text(tostring(c.plain), x1 + 14, y, 10, COL.dim, "l")
-        end
-        y = rowBottom - 6
-      end
-
-
-    end
-  end
-
-  if continueMessage then
-    text(continueMessage, cx, bottom + 14, 11, debriefPending and (COL.steam or COL.blue) or COL.good)
-  elseif nextPickIndex and continueArmed and candidateIsSameMap(nextPickIndex)
-      and not (nextPickIndex.extractOnly or nextPickIndex.objectiveArchetype == "extract_leave") then
-    text("Stay — company carries forward on this map.", cx, bottom + 14, 11, COL.good)
-  elseif nextPickIndex and (nextPickIndex.extractOnly or nextPickIndex.objectiveArchetype == "extract_leave") then
-    text("Returning home with the saved result.", cx, bottom + 14, 11, COL.warn)
-  elseif nextPickIndex then
-    text("Travel locked. Exit BAR — session host reloads the new map.", cx, bottom + 14, 11, COL.steam or COL.blue)
-  else
-    text("Choose another field mission, or return home.", cx, bottom + 14, 11, COL.dim)
-  end
-end
-
--- Full-screen cover while the synced kernel crunches the exfil transition.
--- Shown for at least two sim frames before VAQ.transition runs, so the hitch
--- lands on this screen instead of a frozen battlefield.
-local function drawExfilLoadingScreen()
-  local cx = vsx * 0.5
-  local cy = vsy * 0.52
-  if Ash and Ash.scrim then
-    Ash.scrim(0, 0, vsx, vsy, 0.88)
-  else
-    local bg = COL.bg or { 0.016, 0.035, 0.027, 1 }
-    gl.Color(bg[1], bg[2], bg[3], 0.94)
-    gl.Rect(0, 0, vsx, vsy)
-  end
-
-  local w = math.min(560, vsx * 0.72)
-  local top = cy + 120
-  local bottom = cy - 120
-  panel(cx - w / 2, bottom, cx + w / 2, top, COL.steam or COL.edge)
-
-  local tick = math.floor((os.clock() * 2.4) % 4)
-  local dots = string.rep(".", tick)
-  local steam = COL.steam or COL.blue or COL.title
-  local ash = COL.ash or COL.dim
-  local gold = COL.gold or COL.title
-
-  text("RECORDING OUTCOME", cx, top - 32, 11, ash)
-  if Ash and Ash.rule then
-    Ash.rule(cx - 70, top - 40, cx + 70, steam, 0.55)
-  end
-  text("UPDATING THE WAR", cx, top - 72, 24, gold)
-  text("Updating campaign state" .. dots, cx, top - 112, 14, steam)
-  text("Veteran XP · scars · hub bank", cx, top - 138, 12, COL.dim or ash)
-  text("Field locked — debrief opens when the handoff finishes.", cx, bottom + 36, 11, COL.dim or ash)
-
-  local barW = w - 80
-  local barX1 = cx - barW / 2
-  local barX2 = cx + barW / 2
-  local barY1 = bottom + 58
-  local barY2 = barY1 + 9
-  if Ash and Ash.progressSweep then
-    Ash.progressSweep(barX1, barY1, barX2, barY2, steam, os.clock() * 0.55)
-  else
-    gl.Color(steam[1], steam[2], steam[3], 0.18)
-    gl.Rect(barX1, barY1, barX2, barY2)
-    local pulse = (os.clock() * 0.55) % 1
-    local sweep = barW * 0.28
-    local sx1 = barX1 + pulse * (barW - sweep)
-    gl.Color(steam[1], steam[2], steam[3], 0.85)
-    gl.Rect(sx1, barY1, sx1 + sweep, barY2)
-  end
-  gl.Color(1, 1, 1, 1)
-end
-
 
 local function loadStratZones()
   if stratZones then return stratZones end
@@ -3213,17 +2215,8 @@ function widget:DrawScreen()
     gl.Color(1, 1, 1, 1)
   end)
 
-  -- Exfil loading covers everything while the deferred kernel crunch runs.
-  if handoffStage == "updating" then
-    guardDraw("exfil_loading", drawExfilLoadingScreen)
-    return
-  end
-
-  if state.terminal and debriefVisible then
-    guardDraw("debrief", drawDebriefScreen)
-    drawObjectiveBar()
-    return
-  end
+  -- Sortie over: gui_verdance_exfil.lua draws the closing card. Hide our panels.
+  if state.sortieOver then return end
 
   local frame = Spring.GetGameFrame() or 0
   local showCard = missionCard ~= nil or #briefingLines > 0
@@ -3319,7 +2312,7 @@ missionEventHandlers["objective_complete"] = function(reason)
   if reqLeft > 0 then
     queueBark("Ketha", "Primary's yours — finish the required marks, then bring them home.")
   else
-    queueBark("Ketha", "Mark claimed. Your call when we leave. Confirm extraction in the sidebar.")
+    queueBark("Ketha", "Mark claimed. Your call when we leave. Load the pad, then press EXTRACT.")
   end
   Spring.Echo("Verdance: objective complete (" .. tostring(reason) .. ") - return to extraction.")
 
@@ -3339,7 +2332,7 @@ missionEventHandlers["objective_failed"] = function(reason)
     x = ex and ex.x or nil,
     z = ex and ex.z or nil,
     title = "RESCUE FAILED",
-    body = "The wreck is gone. Secure extraction, choose Home or Stay, and confirm in the sidebar.",
+    body = "The wreck is gone. Get the company onto the pad and press EXTRACT.",
     radius = 900,
     seconds = 7.5,
     highlightObjective = true,
@@ -3347,7 +2340,7 @@ missionEventHandlers["objective_failed"] = function(reason)
 end
 
 missionEventHandlers["all_objectives_complete"] = function(reason)
-  queueBark("Ketha", "Required objectives complete. Choose Home or Stay, then confirm extraction when ready.")
+  queueBark("Ketha", "Required objectives complete. Load the pad with what you're keeping, then press EXTRACT.")
   poll()
   refreshRouteStage()
 end
@@ -3355,8 +2348,8 @@ end
 missionEventHandlers["extract_armed"] = function(reason)
   playUi("beep4", 0.9)
   queueBark("Ketha", reason == "on_pad"
-    and "On the extract pad — hold."
-    or "Extract armed — return to the pad and hold.")
+    and "On the extract pad. Press EXTRACT when you're loaded."
+    or "Pad is live — get the company onto it, then press EXTRACT.")
   routeStageDrawn = nil
   refreshRouteStage()
 end
@@ -3373,201 +2366,29 @@ missionEventHandlers["secondary_changed"] = function(reason)
   playUi("warning2", 0.7)
 end
 
-missionEventHandlers["stalemate_warning"] = function(reason)
-  playUi("warning1", 0.9)
-  queueBark("", "Force spent: no combat units and no way to build more. The sortie is failing.")
-end
-
 missionEventHandlers["debug_pause"] = function(reason)
-  -- /vawin /vafail /vapartial: freeze the field before debrief paints.
+  -- Dev commands: synced asks the field to freeze.
   pcall(Spring.SendCommands, "pause 1")
   holdStartPause = false
   Spring.Echo("VA_UI_DEBUG_PAUSE " .. tostring(reason or ""))
 end
 
-missionEventHandlers["victory"] = function(reason)
-  debriefVisible = true
-  -- Do not cancel an in-flight extract_leave (hub/UI race at soft terminal).
-  if not (debriefPending and debriefPending.extractLeave) then
-    debriefPending = nil
-  end
-  pcall(Spring.SendCommands, "pause 1")
-  playUi("commanderspawn", 0.8)
-end
-
-missionEventHandlers["defeat"] = function(reason)
-  debriefVisible = true
-  debriefPending = nil
-  pcall(Spring.SendCommands, "pause 1")
-  playUi("warning1", 1.0)
-end
-
-missionEventHandlers["partial"] = function(reason)
-  debriefVisible = true
-  if not (debriefPending and debriefPending.extractLeave) then
-    debriefPending = nil
-  end
-  pcall(Spring.SendCommands, "pause 1")
-end
-
-missionEventHandlers["result_processing"] = function(reason)
-  resultReady = false
-  handoffStage = "updating"
-  debriefVisible = false
-  debriefPending = nil
-  continueMessage = tostring(reason or ""):match("^soft_clock")
-    and "Mission timed out. Recording outcome; extraction was not completed."
-    or "Recording the chapter outcome..."
-end
-
-missionEventHandlers["result_ready"] = function(reason)
-  resultReady = true
-  handoffStage = "saving"
-  debriefVisible = true
-  debriefPending = nil
-  continueMessage = "World updated. Waiting for campaign save acknowledgement..."
-  pcall(Spring.SendCommands,"pause 1")
-end
-
-missionEventHandlers["extraction_rejected"] = function(reason)
-  queueBark("Ketha", "Extraction is blocked. Check the sector status in the sidebar.")
-end
-
-missionEventHandlers["extract_leave"] = function(reason)
-  requestExtractLeave()
-end
-
-local function continueResetFieldHud()
-  resultReady = false
-  debriefPage = 1
-  debriefPageRect = nil
-  reviewFieldAfterExtract = false
-  departureIsTravel = false
-  returnAfterReport = false
-  extractionDestinationRect = nil
-  -- Persistent battlefield: leave debrief and point the HUD at an installation
-  -- that was already on the map.
-  state.terminal = false
-  state.objectiveComplete = false
-  state.resultCode = 0
-  state.terminalReason = ""
-  nextPickIndex = nil
-  debriefFocusIndex = 1
-  debriefHoverIndex = nil
-  debriefPickRects = {}
-  debriefVisible = false
-  debriefPending = nil
-  handoffStage = nil
-  handoffUpdateReceived = false
-  handoffMinimumUntil = 0
-  quitDialogRequested = false
-  continueMessage = nil
-  objectiveMarkerPlaced = false
-  extractionMarkerPlaced = false
-  deployMarkerPlaced = false
-  secondaryMarkerDone = {}
-  beaconObjective = nil
-  beaconExtraction = nil
-  beaconDeploy = nil
+missionEventHandlers["sortie_over"] = function(reason)
+  -- reason: "extracted" | "wiped". gui_verdance_exfil.lua owns the closing
+  -- card and the quit; this HUD just steps aside (DrawScreen returns early).
+  state.sortieOver = true
+  state.terminal = true
+  extractButtonRect = nil
+  followCamRect = nil
+  followViewRect = nil
   heroBanner = nil
   heroWreckBeacon = nil
-  briefingDismissed = false
-  briefingReopenUntil = (Spring.GetGameFrame() or 0) + BRIEFING_SECONDS * 30
-  playerBeganSortie = false
-  sawStartPaused = false
-  holdStartPause = true
-  lastPauseAssertAt = 0
-  fieldPacketWritten = false
-  lastLiveCommandId = nil
-  followCamEnabled = false
   narrativeActive = nil
   narrativeQueue = {}
-  narrativeHighlightUntil = 0
-  narrativeDiscovered = {}
-  narrativeObjShown = false
-  routeStage = nil
-  routeStageDrawn = nil
-  routeFrom = nil
-  routeTo = nil
-  stratOverlay = false
-  stratZones = nil
-  ourMapMarkers = {}
+  routeStage, routeFrom, routeTo = nil, nil, nil
+  if WG then WG.vaRoute = nil end
+  Spring.Echo("VA_UI_SORTIE_OVER reason=" .. tostring(reason or ""))
 end
-
-local function continueApplyChapterCard(reason)
-  local kind, zone = tostring(reason or ""):match("([^|]+)|?(.*)")
-  zone = zone or ""
-  missionCard = {
-    situation = "Chapter " .. tostring(continueChapter) .. " - same map. Warband carries forward.",
-    objective = "Next contract: " .. tostring(kind or "push") .. (zone ~= "" and (" at " .. zone) or ""),
-    howToWin = "Complete the objective, then confirm extraction in the sidebar. Your secured extraction sector is retained.",
-    howItEnds = "Soft clock about 10 minutes. Watch the HUD countdown.",
-    threats = "Existing defenders remain in place. Routed reinforcements may arrive from another sector.",
-    allies = "Your force is still in the field.",
-    plainObjective = tostring(reason or "continue"),
-  }
-  if mission then
-    mission.title = missionCard.objective
-    mission.deploymentMapId = mission.deploymentMapId or currentMissionMapId()
-    if mission.objective then
-      mission.objective.description = missionCard.plainObjective
-      mission.objective.kind = kind or mission.objective.kind
-      mission.objective.targetZoneId = (zone ~= "" and zone) or mission.objective.targetZoneId
-    end
-    -- Candidate truth remains the compiler's battlefield manifest. The synced
-    -- kernel rejects installations that were destroyed opportunistically.
-  end
-  playUi("beep4", 1.0)
-  pcall(Spring.SendCommands, "pause 1")
-  queueBark("", "Next contract live. Space closes card — Pause key begins.")
-  Spring.Echo("VA_UI_CONTINUE_START " .. tostring(reason))
-end
-
-missionEventHandlers["continue_start"] = function(reason)
-  continueResetFieldHud()
-  continueApplyChapterCard(reason)
-end
-
-missionEventHandlers["candidates_refresh"] = function(reason)
-  -- Synced kernel rebuilt stay/EXIT rows. Prefer rules-param sync (also polled
-  -- on Update while paused) so leave never keeps a stale EXIT index.
-  if syncCandidatesFromRules and syncCandidatesFromRules() then
-    Spring.Echo("VA_UI_CANDIDATES_REFRESH count=" .. tostring(#nextMissionCandidates))
-  else
-    Spring.Echo("VA_UI_CANDIDATES_REFRESH pending count=" .. tostring(reason or "?"))
-  end
-end
-
-missionEventHandlers["continue_rejected"] = function(reason)
-  debriefPending = nil
-  debriefVisible = true
-  local why = tostring(reason or "")
-  if why:find("spent_target", 1, true) then
-    continueMessage = "That installation is already spent. Choose another stay contract, or return home."
-    -- Re-sync so EXIT is still available after a bad stay pick.
-    if syncCandidatesFromRules then syncCandidatesFromRules() end
-  elseif why:find("bad_index", 1, true) or why:find("bad_id", 1, true) then
-    continueMessage = "That pick is not on the field list. Choose again, or return home."
-    if syncCandidatesFromRules then syncCandidatesFromRules() end
-  elseif why:find("extraction_zone_unavailable", 1, true) then
-    continueMessage = "The extraction sector is no longer secure. Return home with your recorded result."
-  elseif why:find("result_not_saved", 1, true) then
-    continueMessage = "Waiting for the campaign to save this result. Retry save if needed."
-  elseif why:find("not_terminal", 1, true) then
-    continueMessage = "The next contract is not ready yet. Your previous result remains recorded."
-  else
-    continueMessage = "Contract rejected (" .. (why ~= "" and why or "unknown") .. "). Choose again, or return home."
-  end
-  nextPickIndex = nil
-  playUi("warning1", 0.7)
-end
-
-missionEventHandlers["map_change_required"] = function(reason)
-  debriefPending = nil
-  departureIsTravel = true
-  returnAfterReport = true
-end
-
 
 function widget:VerdanceMissionEvent(eventStatus, reason)
   poll()

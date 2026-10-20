@@ -47,10 +47,7 @@ if not gadgetHandler:IsSyncedCode() then
   -- so the player can unpause with the normal pause key.
   local holdStartPause = true
   local sawStartPaused = false
-  local endPaused = false
   local pauseAssertEchoed = false
-  -- Soft-terminal pauses GameFrame; wall-clock quit so EXIT actually closes BAR.
-  local leaveQuitAt = nil
 
   function gadget:Initialize()
     gadgetHandler:AddSyncAction("VERDANCE_TELEMETRY", function(_, jsonStr)
@@ -69,29 +66,7 @@ if not gadgetHandler:IsSyncedCode() then
       end
     end)
     gadgetHandler:AddSyncAction("VERDANCE_MISSION_EVENT", function(_, eventStatus, reason)
-      -- Exfil loading (extraction_complete / campaign_update_begin) must NOT
-      -- pause: synced GameFrame has to keep ticking so the deferred crunch runs
-      -- after the loading screen has painted. Pause only once the crunch is done.
-      if eventStatus == "victory" or eventStatus == "defeat" or eventStatus == "partial"
-          or eventStatus == "result_ready" then
-        if not endPaused then
-          endPaused = true
-          holdStartPause = false
-          requestPause("sortie_end:" .. tostring(eventStatus) .. ":" .. tostring(reason or ""))
-        end
-      elseif eventStatus == "continue_start" then
-        -- Mode A: hold pause for the next briefing card. Player unpauses.
-        endPaused = false
-        holdStartPause = true
-        sawStartPaused = false
-        leaveQuitAt = nil
-        requestPause("continue_briefing:" .. tostring(reason or ""))
-      elseif eventStatus == "extract_leave" then
-        -- Banked. UI widget owns the wall-clock quitforce (click / Enter / ~2.5s).
-        -- Keep unsynced leaveQuitAt cold so we do not double-quit.
-        leaveQuitAt = nil
-        Spring.Echo("VA_LEAVE_BANKED ui_owns_quit")
-      end
+      -- The end of the sortie is owned by game_verdance_exfil.lua (manifest, pause, quit).
       if Script.LuaUI and Script.LuaUI.VerdanceMissionEvent then
         Script.LuaUI.VerdanceMissionEvent(eventStatus, reason)
       end
@@ -115,12 +90,6 @@ if not gadgetHandler:IsSyncedCode() then
   end
 
   function gadget:Update()
-    if leaveQuitAt and os.clock() >= leaveQuitAt then
-      leaveQuitAt = nil
-      Spring.Echo("VA_LEAVE_QUITFORCE")
-      pcall(Spring.SendCommands, "quitforce")
-      return
-    end
     if isHeadless() or not holdStartPause then return end
     if gameIsPaused() then
       if not sawStartPaused then
@@ -430,20 +399,9 @@ local capture = {
 }
 local terminal = false
 local terminalReason = ""
--- Exfil path: paint a loading screen for a couple of frames, THEN crunch.
--- Packed table (Lua 5.1 local budget). pending=true means GameFrame owns the
--- VAQ.transition / result / GameOver work so the UI can draw first.
-local terminalJob = {
-  pending = false,
-  status = nil,
-  reason = nil,
-  dueFrame = 0,
-  extracted = false,
-  beginSent = false,
-}
+local lastResultJson = nil     -- the one result this sortie wrote (dev telemetry re-sends it)
 -- Mode A chapter tracking (declared early so resultJson can close over them)
 local sortieChapter = 1
-local softContinueArmed = false
 -- Soft-terminal glue: defer UI candidate refresh one frame (rules-param race),
 -- and auto-quitforce after a confirmed extract_leave so BAR actually closes.
 local leaveJob = {
@@ -595,8 +553,7 @@ end
 local function readMission()
   local ok, data = pcall(VFS.Include, "singleplayer/verdance_ashes/generated/va_current.lua")
   if ok and type(data) == "table" then return data end
-  ok, data = pcall(VFS.Include, "singleplayer/verdance_ashes/generated/va_001.lua")
-  if ok and type(data) == "table" then return data end
+  Spring.Echo("VA_SEED_MISSING generated/va_current.lua did not load; the kernel did not build this sortie")
   return {
     schemaVersion = "0.6",
     campaignId = "verdance_ashes",
@@ -1258,6 +1215,8 @@ local function resultJson()
     '"pathSignal":' .. jstr(mission.pathSignal or "B"),
     '"status":' .. jstr(status),
     '"verdict":' .. jstr(status),
+    -- pass five: the manifest is the ending; Python reads the verdict off it
+    '"manifest":' .. ((GG and GG.VA_ManifestJson) and GG.VA_ManifestJson() or 'null'),
     '"resultKey":' .. jstr(rkey),
     '"sortieId":' .. jstr(tostring(sortieId)),
     '"holdFrames":' .. jnum(holdFrames),
@@ -1314,7 +1273,6 @@ local function resultJson()
     '"occupationModel":' .. jstr(mission.occupationModel or "living_shell"),
     '"mapSpent":' .. tostring((Spring.GetGameRulesParam("va_map_spent") == 1) or (Spring.GetGameRulesParam("va_map_spent") == true)),
     '"theaterExhausted":' .. tostring((Spring.GetGameRulesParam("va_map_spent") == 1) or (Spring.GetGameRulesParam("va_map_spent") == true)),
-    '"softContinueArmed":' .. tostring(softContinueArmed == true),
     '"credits":{'
       .. '"objectiveComplete":' .. tostring(objectiveComplete == true)
       .. ',"nodeClaimed":' .. tostring(nodeClaimed == true)
@@ -1397,7 +1355,7 @@ local function logResult()
       .. '"freeTnbMint":false'
       .. "}"
   end
-  Spring.Echo("VA_RESULT_JSON_COMPACT " .. json)
+  lastResultJson = json
   logJsonChunked("VA_RESULT_JSON", json)
   echoStatus()
 end
@@ -1407,7 +1365,6 @@ local function finishHeadlessResult(outcome)
   status = outcome or "victory"
   holdFrames = req
   debugAutoProgress = 0
-  Spring.SetGameRulesParam("va_campaign_saved", 0, { public = true })
   terminal = true
   terminalReason = "headless_fastwin"
   Spring.SetGameRulesParam("va_hold_frames", holdFrames, { public = true })
@@ -1432,31 +1389,7 @@ local function startMission()
   echoStatus()
 end
 
-local function progress(frames)
-  if status == "inactive" then status = "active" end
-  holdFrames = holdFrames + (frames or 300)
-  local req = mission.objective and mission.objective.requiredFrames or 600
-  if holdFrames >= req and status == "active" then status = "victory" end
-  echoStatus()
-end
 
-function spawnCompanions()
-  if not mission.companions then return end
-  local teamID = 0
-  local x, y, z = 1000, 100, 1000
-  for i, comp in ipairs(mission.companions) do
-    local defName = comp.unitDefName or "armwar"
-    local unitID = Spring.CreateUnit(defName, x + i * 80, y, z + i * 80, 0, teamID)
-    comp._unitID = unitID
-    if unitID then
-      Spring.SetUnitRulesParam(unitID, "va_companion", 1, { public = true })
-      Spring.SetUnitRulesParam(unitID, "va_companion_xp", comp.xp or 0, { public = true })
-      Spring.SetUnitRulesParam(unitID, "va_companion_morale", comp.morale or 0, { public = true })
-      if Spring.SetUnitExperience then Spring.SetUnitExperience(unitID, comp.xp or 0) end
-    end
-  end
-  Spring.Echo("VA_SPAWN companions=" .. tostring(#mission.companions))
-end
 
 local function unitDefName(defID)
   local ud = UnitDefs[defID]
@@ -2369,40 +2302,6 @@ function VA_refreshPlayerStorageCaps(reason)
   return true
 end
 
--- Always plant metal + energy storage on the drop pad so dig-in / converters
--- have a buffer. Prefer Legion (Ashwalker), fall back to Armada / Cortex defs.
-function VA_CREW_spawnPadStorage(baseX, baseZ)
-  if not baseX or not baseZ then return 0 end
-  local function pick(...)
-    for i = 1, select("#", ...) do
-      local n = select(i, ...)
-      if UnitDefNames and UnitDefNames[n] then return n end
-    end
-    return nil
-  end
-  local mDef = pick("legmstor", "armmstor", "cormstor")
-  local eDef = pick("legestor", "armestor", "corestor")
-  local spawned = 0
-  if mDef then
-    spawned = spawned + spawnUnitSpec({
-      unitDefName = mDef, count = 1, dx = -110, dz = -90, spacing = 80,
-      packageTag = "pad_metal_storage",
-    }, playerTeamID, baseX, baseZ, 0, 0, {}, { role = "player_crew" })
-  else
-    Spring.Echo("VA_PAD_STORAGE_SKIP metal_def_missing")
-  end
-  if eDef then
-    spawned = spawned + spawnUnitSpec({
-      unitDefName = eDef, count = 1, dx = -40, dz = -130, spacing = 80,
-      packageTag = "pad_energy_storage",
-    }, playerTeamID, baseX, baseZ, 0, 0, {}, { role = "player_crew" })
-  else
-    Spring.Echo("VA_PAD_STORAGE_SKIP energy_def_missing")
-  end
-  Spring.Echo("VA_PAD_STORAGE spawned=" .. tostring(spawned)
-    .. " metal=" .. tostring(mDef) .. " energy=" .. tostring(eDef))
-  return spawned
-end
 
 function VA_CREW_publish()
   local cs = VA_CREW_SELECT
@@ -3187,11 +3086,6 @@ function VA_CREW_confirm(selectedIds)
   return true
 end
 
-function VA_CREW_autoConfirm()
-  local roster = VA_CREW_loadRoster()
-  local picks = (roster.defaultAutoPick and roster.defaultAutoPick()) or { "odessa", "cauter", "grath" }
-  return VA_CREW_confirm(picks)
-end
 
 local function spawnPlayableSetup()
   vaDryClaims = {}
@@ -3311,8 +3205,8 @@ local function spawnPlayableSetup()
       Spring.Echo("VA_CREW_PACKET_CORE_ONLY")
       VA_CREW_confirm({})
     else
-      Spring.Echo("VA_CREW_PACKET_EMPTY falling_back_to_autoConfirm")
-      VA_CREW_autoConfirm()
+      Spring.Echo("VA_CREW_PACKET_EMPTY core_only (no invented band)")
+      VA_CREW_confirm({})
     end
     Spring.Echo("VA_CREW_FROM_PACKET picks=" .. table.concat(VA_CREW_SELECT.selected or picks, ",")
       .. " chapter=" .. tostring(sortieChapter)
@@ -3340,11 +3234,9 @@ local function spawnPlayableSetup()
         or (mission and type(mission.deployAces) == "table")
       if #picks > 0 then
         VA_CREW_confirm(picks)
-      elseif sheetPresent then
+      else
         Spring.Echo("VA_CREW_PACKET_CORE_ONLY")
         VA_CREW_confirm({})
-      else
-        VA_CREW_autoConfirm()
       end
     end
   end
@@ -4611,6 +4503,21 @@ function VAQ.responseDefs(teamID)
   return defs
 end
 
+-- Where the enemy sends its answer: the zone it BELIEVES we are in (what it has seen of us,
+-- recency faded — game_verdance_belief_observe.lua), not our true centroid. If it has seen
+-- nothing, it goes to where we were last known: the pad.
+function enemyResponseTarget()
+  if GG and GG.VA_EnemyBelievedZone then
+    local zid, ax, az = GG.VA_EnemyBelievedZone()
+    if zid and ax and az then return ax, az, zid end
+  end
+  local px = tonumber((Spring.GetGameRulesParam("va_pad_x"))) or -1
+  local pz = tonumber((Spring.GetGameRulesParam("va_pad_z"))) or -1
+  if px >= 0 and pz >= 0 then return px, pz, "pad" end
+  local cx, cz = teamUnitCentroid(playerTeamID)
+  return cx, cz, "centroid"
+end
+
 local function spawnWave(fromTeamID, count, targetX, targetZ, label)
   if not fromTeamID or count < 1 then return 0 end
   -- Every pressure producer shares one response budget per credited chapter.
@@ -5525,7 +5432,7 @@ function runBeatActions(b)
       SendToUnsynced("VERDANCE_BEAT", "sound", tostring(action.file or "beep4"), tonumber(action.volume) or 1.0)
     elseif kind == "wave" then
       if objectiveTeamID then
-        local px, pz = teamUnitCentroid(playerTeamID)
+        local px, pz = enemyResponseTarget()
         spawnWave(objectiveTeamID, tonumber(action.count) or waves.baseSize, px, pz, "beat_" .. b.id)
       end
     elseif kind == "spawn" then
@@ -5625,7 +5532,7 @@ function onObjectiveComplete(how)
   -- Hot extraction: one counter-pack on objective complete (Arc A still gets
   -- this even when timed escalation is off). Full escalation also uses it.
   if (waves.enabled or doctrine.hotExtractOnly) and objectiveTeamID then
-    local px, pz = teamUnitCentroid(playerTeamID)
+    local px, pz = enemyResponseTarget()
     spawnWave(objectiveTeamID, waves.baseSize + 2, px, pz, "hot_extraction")
   end
 end
@@ -5633,7 +5540,6 @@ end
 -- ============================================================
 -- MODE A: same-map seamless continue (WO-050..053)
 -- Soft terminal skips Spring.GameOver; debrief pick reseeds in-place.
--- (sortieChapter / softContinueArmed declared with other file-scope locals)
 -- ============================================================
 
 function currentMapId()
@@ -6049,348 +5955,10 @@ function promoteOccupationInZone(zoneId, kindHint, pocketId)
   return tagged
 end
 
-function spawnContinueCamp(zoneId, kind)
-  -- Rock Jungle / wild dig-ins stay empty of empire camps. Raptors already own the shelf.
-  local against = tostring(
-    (mission and mission.worldConflict and mission.worldConflict.primaryEnemy)
-    or (mission and mission.against)
-    or ""
-  ):lower()
-  local mapId = tostring((mission and (mission.deploymentMapId or mission.mapId)) or "")
-  if against == "wild" or mapId == "the_rock_jungle" then
-    Spring.Echo("VA_CONTINUE_WILD_SKIP zone=" .. tostring(zoneId)
-      .. " kind=" .. tostring(kind) .. " against=" .. against .. " map=" .. mapId)
-    return 0
-  end
-  local teamID = findEnemyCampTeam()
-  if not teamID then
-    Spring.Echo("VA_CONTINUE_NO_ENEMY_TEAM")
-    return 0
-  end
-  objectiveTeamID = teamID
-  local rect = zoneRectFor(zoneId)
-  if not rect then
-    Spring.Echo("VA_CONTINUE_NO_ZONE " .. tostring(zoneId))
-    return 0
-  end
-  local cx = (rect[1] + rect[3]) * 0.5
-  local cz = (rect[2] + rect[4]) * 0.5
-  local works, guard = continueCampBlueprint(kind)
-  local forceId = "continue_" .. tostring(kind) .. "_" .. tostring(zoneId)
-  local garrisonForce = { id = forceId .. "_guard", role = "garrison", faction = "armada" }
-  local objectiveForce = { id = forceId .. "_works", role = "objective_target", faction = "armada" }
 
-  -- Reset objective target bookkeeping for the new camp only.
-  objectiveTargets = {}
-  objectiveTargetCount = 0
-  objectiveTargetsDestroyed = 0
-  targetForceStructures = {}
-  local spawned = 0
-  local claimed = {}
 
-  local function placeList(list, force)
-    for _, spec in ipairs(list) do
-      local unitSpec = {
-        unitDefName = spec.def,
-        count = spec.count or 1,
-        dx = spec.dx or 0,
-        dz = spec.dz or 0,
-        spacing = spec.spacing or 70,
-      }
-      spawned = spawned + spawnUnitSpec(unitSpec, teamID, cx, cz, 0, 0, claimed, force)
-    end
-  end
 
-  if #works > 0 then
-    placeList(works, objectiveForce)
-  end
-  placeList(guard, garrisonForce)
 
-  if spawned <= 0 then
-    Spring.Echo("VA_CONTINUE_CAMP_EMPTY zone=" .. tostring(zoneId) .. " kind=" .. tostring(kind))
-  end
-  Spring.SetGameRulesParam("va_objective_total", objectiveTargetCount, { public = true })
-  Spring.SetGameRulesParam("va_objective_destroyed", 0, { public = true })
-  Spring.Echo("VA_CONTINUE_CAMP zone=" .. tostring(zoneId) .. " kind=" .. tostring(kind)
-    .. " units=" .. tostring(spawned) .. " targets=" .. tostring(objectiveTargetCount)
-    .. " team=" .. tostring(teamID))
-  return spawned
-end
-
-function scanStandingHighValueInstalls()
-  local found = {}
-  local units = Spring.GetAllUnits() or {}
-  for i = 1, #units do
-    local uid = units[i]
-    if Spring.ValidUnitID(uid) and not Spring.GetUnitIsDead(uid) then
-      local hv = Spring.GetUnitRulesParam(uid, "va_high_value")
-      local held = Spring.GetUnitRulesParam(uid, "va_held_install")
-      local role = tostring(Spring.GetUnitRulesParam(uid, "va_force_role") or "")
-      if hv == 1 or held == 1 or role == "held_install" or role == "objective_secondary" then
-        local pocket = tostring(Spring.GetUnitRulesParam(uid, "va_shell_pocket") or "")
-        local zone = tostring(Spring.GetUnitRulesParam(uid, "va_shell_zone") or "")
-        if pocket ~= "" and not found[pocket] then
-          local team = Spring.GetUnitTeam(uid)
-          local owned = (held == 1) or (team == playerTeamID)
-            or (Spring.AreTeamsAllied and Spring.AreTeamsAllied(team, playerTeamID))
-          found[pocket] = {
-            pocketId = pocket,
-            zoneId = zone,
-            owned = owned == true,
-            label = owned and ("Defend " .. zone) or ("Secure fusion at " .. zone),
-          }
-        end
-      end
-    end
-  end
-  return found
-end
-
-function rebuildContinueCandidates(fromZoneId)
-  local cands = {}
-  if not zoneMap or type(zoneMap.zones) ~= "table" then
-    mission.nextMissionCandidates = cands
-    return
-  end
-  local sx = Game.mapSizeX or 1
-  local sz = Game.mapSizeZ or 1
-  local fromRect = zoneRectFor(fromZoneId)
-  local fx, fz = 0.5 * sx, 0.5 * sz
-  if fromRect then
-    fx = (fromRect[1] + fromRect[3]) * 0.5
-    fz = (fromRect[2] + fromRect[4]) * 0.5
-  end
-  local mapId = currentMapId()
-  local against = tostring(
-    (mission and mission.worldConflict and mission.worldConflict.primaryEnemy)
-    or (mission and mission.against)
-    or ""
-  ):lower()
-  -- Rock Jungle has no fusion vaults. hvN==0 is the normal shelf, not an
-  -- empty Greenest Fields theater.
-  local wildShelf = (mapId == "the_rock_jungle") or (against == "wild")
-  -- Territory prizes still on the field generate sorties: defend if you hold
-  -- them, seize if they're still contested. Aggression fiction: a justified
-  -- wave that would wipe a held vault becomes a defend contract instead.
-  local hv = scanStandingHighValueInstalls()
-  local hvN = 0
-  for pocket, info in pairs(hv) do
-    hvN = hvN + 1
-    local kind = info.owned and "defend_install" or "seize_lane"
-    local title = info.owned
-      and ("Defend fusion vault — " .. tostring(info.zoneId or pocket))
-      or ("Claim fusion vault — " .. tostring(info.zoneId or pocket))
-    local plain = info.owned
-      and "A response wave is coming for this vault. Hold the beamer ring — if it falls, the pad is gone."
-      or "The fusion vault is still standing. Clear and claim it before the field takes it back."
-    cands[#cands + 1] = {
-      id = "cand_hv_" .. tostring(pocket),
-      title = title,
-      plain = plain,
-      mapId = mapId,
-      targetZoneId = tostring(info.zoneId or fromZoneId),
-      fromZoneIds = { fromZoneId },
-      objectiveArchetype = kind,
-      pocketId = tostring(pocket),
-      highValue = true,
-      defendInstall = info.owned == true,
-      patron = "nullmercs",
-      against = "armada",
-      preplaced = true,
-    }
-    if hvN >= 2 then break end
-  end
-  -- Blank / spent theater (no vaults left): do not fabricate empty same-map
-  -- raids that keep the player trapped. EXIT → hub opens travel doors.
-  -- A wild shelf is not spent just because it never had vaults.
-  local mapSpent = (hvN == 0) and not wildShelf
-  if mapSpent then
-    Spring.SetGameRulesParam("va_map_spent", 1, { public = true })
-    Spring.Echo("VA_MAP_SPENT map=" .. tostring(mapId)
-      .. " — no high-value installs; skip empty same-map stays")
-  else
-    Spring.SetGameRulesParam("va_map_spent", 0, { public = true })
-    local scored = {}
-    for _, z in ipairs(zoneMap.zones) do
-      local zid = z.zoneId
-      if zid and zid ~= fromZoneId then
-        local r = zoneRectFor(zid)
-        if r then
-          local cx = (r[1] + r[3]) * 0.5
-          local cz = (r[2] + r[4]) * 0.5
-          local dx, dz = cx - fx, cz - fz
-          local dist = math.sqrt(dx * dx + dz * dz)
-          scored[#scored + 1] = { id = zid, label = z.label or zid, dist = dist }
-        end
-      end
-    end
-    table.sort(scored, function(a, b) return a.dist < b.dist end)
-    local kinds = { "seize_lane", "eco_raid", "strike_relay" }
-    local added = 0
-    for i = 1, #scored do
-      if added >= 3 then break end
-      local s = scored[i]
-      local kind = kinds[(added % #kinds) + 1]
-      local needsTargets = DESTRUCTION_KINDS[kind] or kind == "eco_raid"
-        or kind == "economy_disrupt" or kind == "strike_relay"
-      -- Spent pads: do not offer destruction stays that promoteOccupation would reject.
-      if needsTargets and not zoneHasPromotableOccupation(s.id, kind, nil) then
-        kind = "seize_lane"
-      end
-      added = added + 1
-      cands[#cands + 1] = {
-        id = "cand_" .. added .. "_" .. s.id,
-        title = kind .. " - " .. tostring(s.label),
-        plain = "Next: " .. kind .. " on " .. tostring(s.label) .. " (adjacent). Deploy from current ground.",
-        mapId = mapId,
-        targetZoneId = s.id,
-        fromZoneIds = { fromZoneId },
-        objectiveArchetype = kind,
-        patron = "nullmercs",
-        against = "armada",
-        sessionMode = "same_map",
-        preplaced = true,
-      }
-    end
-  end
-  -- Mode B Reload still needs session host. Without it, blank maps push EXIT
-  -- so the hub can open Eye / Rock Jungle doors (PLAY.bat path).
-  local hostArmed = false
-  do
-    local mo = Spring.GetModOptions and Spring.GetModOptions() or {}
-    local v = mo.va_session_host or mo.vasessionhost
-    hostArmed = (v == "1" or v == 1 or v == true or tostring(v) == "true")
-  end
-  if hostArmed then
-    local okL, links = pcall(VFS.Include, "luarules/gadgets/include/va_strategic_links.lua")
-    if okL and type(links) == "table" then
-      local have = {}
-      for _, c in ipairs(cands) do
-        if c.targetZoneId then have[tostring(c.targetZoneId)] = true end
-      end
-      for _, link in ipairs(links) do
-        local a, b = tostring(link.fromZoneId or ""), tostring(link.toZoneId or "")
-        local fromZ, toZ, toMap, fromMap, label
-        if a == tostring(fromZoneId) then
-          fromZ, toZ, toMap, fromMap = a, b, link.toMapId, link.fromMapId
-          label = link.toLabel or b
-        elseif b == tostring(fromZoneId) then
-          fromZ, toZ, toMap, fromMap = b, a, link.fromMapId, link.toMapId
-          label = a
-        end
-        if fromZ and toZ and tostring(toMap or "") ~= tostring(mapId) and not have[toZ] then
-          have[toZ] = true
-          cands[#cands + 1] = {
-            id = "mode_b_" .. fromZ .. "_" .. toZ,
-            title = "Travel — " .. tostring(label),
-            plain = "Mode B map travel via strategic_link → " .. tostring(toMap)
-              .. ". Session host Reload path.",
-            mapId = tostring(toMap or ""),
-            targetZoneId = toZ,
-            fromZoneIds = { fromZ },
-            objectiveArchetype = "seize_lane",
-            patron = "nullmercs",
-            against = "armada",
-            sessionMode = "reload_travel",
-            travelMode = "mode_b",
-            edgeKind = "strategic_link",
-            cost = link.cost or 2,
-            notes = link.notes or "",
-            fromMapId = tostring(fromMap or mapId),
-          }
-        end
-      end
-    end
-  elseif mapSpent then
-    Spring.Echo("VA_MAP_SPENT_EXIT_HUB map=" .. tostring(mapId)
-      .. " — EXIT to hub for Eye of Horus / Rock Jungle travel")
-  else
-    Spring.Echo("VA_MODE_B_SKIP no_session_host")
-  end
-  ensureExitCandidate(cands, fromZoneId)
-  -- On a spent map, retitle EXIT so the outflow is obvious.
-  if mapSpent then
-    for _, c in ipairs(cands) do
-      if c and (c.extractOnly == true or c.objectiveArchetype == "extract_leave") then
-        c.title = "EXIT — theater spent, open the war map"
-        c.plain = "This map is empty. Bank the sortie and pick Eye of Horus or Rock Jungle on the hub."
-        c.mapSpent = true
-      end
-    end
-  end
-  mission.nextMissionCandidates = cands
-end
-
--- Always keep one EXIT row. Rebuild used to drop extract_leave, then the UI
--- kept a stale index for EXIT while the gadget served a spent eco_raid — leave
--- failed with spent_target and the player had to hard-quit BAR.
-function ensureExitCandidate(cands, fromZoneId)
-  if type(cands) ~= "table" then return cands end
-  for _, c in ipairs(cands) do
-    if c and (c.extractOnly == true or c.objectiveArchetype == "extract_leave") then
-      return cands
-    end
-  end
-  local mapId = currentMapId()
-  local zone = tostring(fromZoneId
-    or (mission and mission.extractionZoneId)
-    or (mission and mission.deploymentZoneId)
-    or "")
-  cands[#cands + 1] = {
-    id = "cand_exit_leave",
-    title = "EXIT — bank and close",
-    plain = "Save the sortie and close BAR. Hub reopens with the bank.",
-    mapId = mapId,
-    targetZoneId = zone ~= "" and zone or "LZ_EXTRACT",
-    fromZoneIds = zone ~= "" and { zone } or {},
-    objectiveArchetype = "extract_leave",
-    extractOnly = true,
-    patron = "nullmercs",
-    against = "armada",
-    sessionMode = "same_map",
-  }
-  return cands
-end
-
-function publishContinueCandidateParams(merged)
-  merged = merged or (mission and mission.nextMissionCandidates) or {}
-  -- Cap at 8 published slots with EXIT forced into the last published slot so
-  -- leave never falls past the UI sync window when Mode B / stays overrun.
-  local exits, stays = {}, {}
-  for _, c in ipairs(merged) do
-    if c and (c.extractOnly == true or c.objectiveArchetype == "extract_leave") then
-      exits[#exits + 1] = c
-    elseif c then
-      stays[#stays + 1] = c
-    end
-  end
-  local published = {}
-  local maxStay = (#exits > 0) and 7 or 8
-  for i = 1, math.min(maxStay, #stays) do
-    published[#published + 1] = stays[i]
-  end
-  if #exits > 0 then
-    published[#published + 1] = exits[1]
-  end
-  Spring.SetGameRulesParam("va_cand_count", #published, { public = true })
-  for i = 1, #published do
-    local c = published[i]
-    local isExit = (c.extractOnly == true or c.objectiveArchetype == "extract_leave")
-    local isTravel = (c.travelMode == "mode_b") or (c.sessionMode == "reload_travel")
-      or (c.edgeKind == "strategic_link")
-    Spring.SetGameRulesParam("va_cand_" .. i .. "_id", tostring(c.id or ""), { public = true })
-    Spring.SetGameRulesParam("va_cand_" .. i .. "_title", tostring(c.title or ""), { public = true })
-    Spring.SetGameRulesParam("va_cand_" .. i .. "_zone", tostring(c.targetZoneId or ""), { public = true })
-    Spring.SetGameRulesParam("va_cand_" .. i .. "_kind", tostring(c.objectiveArchetype or ""), { public = true })
-    Spring.SetGameRulesParam("va_cand_" .. i .. "_pocket", tostring(c.pocketId or ""), { public = true })
-    Spring.SetGameRulesParam("va_cand_" .. i .. "_plain", tostring(c.plain or ""), { public = true })
-    Spring.SetGameRulesParam("va_cand_" .. i .. "_map", tostring(c.mapId or ""), { public = true })
-    Spring.SetGameRulesParam("va_cand_" .. i .. "_exit", isExit and 1 or 0, { public = true })
-    Spring.SetGameRulesParam("va_cand_" .. i .. "_travel", isTravel and 1 or 0, { public = true })
-    Spring.SetGameRulesParam("va_cand_" .. i .. "_session", tostring(c.sessionMode or (isTravel and "reload_travel" or "same_map")), { public = true })
-    Spring.SetGameRulesParam("va_cand_" .. i .. "_edge", tostring(c.edgeKind or ""), { public = true })
-  end
-end
 
 -- Defend-install chapter state (one table — local budget).
 VA_DEFEND = {
@@ -6465,43 +6033,7 @@ function checkDefendInstall(frame)
   end
 end
 
-function publishContinueBriefing(cand, kind, targetZone, extractZone)
-  local objLine = "Hit the Armada installation at " .. tostring(targetZone) .. ", then extract."
-  if kind == "eco_raid" or kind == "economy_disrupt" then
-    objLine = "Wreck the existing energy works at " .. tostring(targetZone) .. " (~60%), then extract."
-  elseif kind == "defend_install" then
-    objLine = "Hold the fusion vault at " .. tostring(targetZone)
-      .. ". A justified response wave is incoming — if the vault dies, the pad is gone."
-  elseif kind == "seize_lane" or kind == "gate_control" or kind == "hold_plateau" then
-    objLine = "Clear the living-shell pocket at " .. tostring(targetZone)
-      .. " (~60%), then hold under regrow pressure to claim the node. No free Tnb."
-  elseif kind == "strike_relay" then
-    objLine = "Destroy the relay at " .. tostring(targetZone) .. ", then extract."
-  end
-  local card = {
-    situation = "Same battlefield. Warband carries. Intelligence retasks you toward " .. tostring(targetZone) .. ".",
-    objective = objLine,
-    howToWin = "No commanders. Phobos + rez + heroes. Blow or hold the new mark -- do not expand.",
-    howItEnds = "Fresh soft clock armed for this chapter. When it hits zero the sortie ends.",
-    threats = "Pre-existing installation: static guns, energy works, and a mobile screen.",
-    allies = "Surviving Wheelies, Phobos, and rez bots stay in the field.",
-    plainObjective = tostring(kind) .. ": " .. tostring(targetZone),
-  }
-  mission.missionCard = card
-  Spring.SetGameRulesParam("va_continue_chapter", sortieChapter, { public = true })
-  -- Chapter is live again — soft-continue stays cold until the next terminal.
-  Spring.SetGameRulesParam("va_soft_continue", 0, { public = true })
-  Spring.Echo("VA_CONTINUE_CARD objective=" .. tostring(card.objective))
-end
 
-function notifyContinueFail(requestId, why)
-  why = tostring(why or "fail")
-  Spring.Echo("VA_CONTINUE_FAIL " .. why .. " requestId=" .. tostring(requestId or ""))
-  if SendToUnsynced then
-    SendToUnsynced("VERDANCE_MISSION_EVENT", "continue_rejected",
-      tostring(requestId or "") .. "|" .. why)
-  end
-end
 
 -- Eco starter chassis that must never open a stay-contract sitting on the
 -- new enemy mark (Solarium nano, Hearth fusion, etc.).
@@ -6513,723 +6045,61 @@ local CONTINUE_ECO_HERO_IDS = {
   solarium = true, hearth = true, consul = true, twitch = true, lumen = true,
 }
 
--- Same-map continue: pull starter eco / Solarium pack off the new target and
--- back onto the deploy/enfil pad. Captured living-shell pads near citadel look
--- like a second Solarium nest sitting on enemy guns.
-function reanchorCrewStartersForContinue(deployZoneId, targetZoneId)
-  local depRect = zoneRectFor(deployZoneId) or extractionZoneRect
-  local tgtRect = zoneRectFor(targetZoneId) or targetZoneRect
-  if not depRect or not Spring.SetUnitPosition then
-    return 0
-  end
-  local dx = (depRect[1] + depRect[3]) * 0.5
-  local dz = (depRect[2] + depRect[4]) * 0.5
-  local tx = tgtRect and ((tgtRect[1] + tgtRect[3]) * 0.5) or nil
-  local tz = tgtRect and ((tgtRect[2] + tgtRect[4]) * 0.5) or nil
-  -- Danger bubble around the new mark — anything starter-shaped inside moves home.
-  local dangerR2 = 1100 * 1100
-  local safeR2 = 520 * 520
-  local function inRect(x, z, rect)
-    return rect and x >= rect[1] and x <= rect[3] and z >= rect[2] and z <= rect[4]
-  end
-  local function nearTarget(x, z)
-    if inRect(x, z, tgtRect) then return true end
-    if tx and tz then
-      local ox, oz = x - tx, z - tz
-      return (ox * ox + oz * oz) <= dangerR2
-    end
-    return false
-  end
-  local function nearDeploy(x, z)
-    local ox, oz = x - dx, z - dz
-    return (ox * ox + oz * oz) <= safeR2
-  end
-  local movers = {}
-  local units = Spring.GetTeamUnits(playerTeamID) or {}
-  for i = 1, #units do
-    local uid = units[i]
-    if Spring.ValidUnitID(uid) and not Spring.GetUnitIsDead(uid) then
-      local x, _, z = Spring.GetUnitPosition(uid)
-      if x and z and nearTarget(x, z) and not nearDeploy(x, z) then
-        local dID = Spring.GetUnitDefID(uid)
-        local ud = dID and UnitDefs[dID]
-        local defName = ud and tostring(ud.name or "") or ""
-        local hid = Spring.GetUnitRulesParam and Spring.GetUnitRulesParam(uid, "va_hero_id")
-        hid = hid and tostring(hid) or ""
-        local packLead = Spring.GetUnitRulesParam and Spring.GetUnitRulesParam(uid, "va_pack_leader")
-        packLead = packLead and tostring(packLead) or ""
-        local isShell = Spring.GetUnitRulesParam and (
-          Spring.GetUnitRulesParam(uid, "va_living_shell") == 1
-          or Spring.GetUnitRulesParam(uid, "va_living_shell") == true
-          or Spring.GetUnitRulesParam(uid, "va_living_shell") == "1")
-        local ecoHero = CONTINUE_ECO_HERO_IDS[hid] or CONTINUE_ECO_HERO_IDS[packLead]
-        local ecoDef = CONTINUE_ECO_STARTER_DEFS[defName]
-        local structure = ud and (ud.isBuilding or ud.isFactory or ((ud.speed or 1) == 0))
-        -- Move: named eco heroes, their pack, starter chassis, and captured
-        -- shell pads that would otherwise become the new "home next to guns".
-        if ecoHero or (ecoDef and structure) or (isShell and structure) then
-          movers[#movers + 1] = uid
-        end
-      end
-    end
-  end
-  local moved = 0
-  for i = 1, #movers do
-    local col = (i - 1) % 4
-    local row = math.floor((i - 1) / 4)
-    local ox = dx + ((col - 1.5) * 110)
-    local oz = dz + (row * 110) + 40
-    if pcall(Spring.SetUnitPosition, movers[i], ox, oz) then
-      moved = moved + 1
-      if Spring.GiveOrderToUnit and CMD and CMD.STOP then
-        pcall(Spring.GiveOrderToUnit, movers[i], CMD.STOP, {}, {})
-      end
-    end
-  end
-  if moved > 0 then
-    Spring.Echo("VA_CONTINUE_REANCHOR moved=" .. tostring(moved)
-      .. " deploy=" .. tostring(deployZoneId)
-      .. " awayFrom=" .. tostring(targetZoneId)
-      .. " pad=" .. tostring(math.floor(dx)) .. "," .. tostring(math.floor(dz)))
-  end
-  return moved
-end
 
-function applyContinueCandidate(cand, requestId)
-  if type(cand) ~= "table" then
-    notifyContinueFail(requestId, "bad_candidate")
-    return false
-  end
-  if not terminal or Spring.GetGameRulesParam("va_campaign_saved") ~= 1 then
-    notifyContinueFail(requestId, "result_not_saved")
-    return false
-  end
-  if not candidateIsSameMap(cand) then
-    -- Mode B: strategic_link / cross-map hop. Session host Reload path builds + relaunches.
-    -- Do not call Spring.Reload here — capability GO for presence, write/startscript still external.
-    Spring.Echo("VA_CONTINUE_FAIL map_change_use_mode_b map=" .. tostring(cand.mapId)
-      .. " target=" .. tostring(cand.targetZoneId or "")
-      .. " sessionMode=reload_travel")
-    Spring.Echo("VA_MODE_B_TRAVEL map=" .. tostring(cand.mapId)
-      .. " target=" .. tostring(cand.targetZoneId or "")
-      .. " edge=strategic_link")
-    Spring.SetGameRulesParam("va_continue_mode", "map_change", { public = true })
-    Spring.SetGameRulesParam("va_session_mode", "reload_travel", { public = true })
-    Spring.SetGameRulesParam("va_mode_b", 1, { public = true })
-    if SendToUnsynced then SendToUnsynced("VERDANCE_MISSION_EVENT", "map_change_required", tostring(cand.mapId or "")) end
-    return false
-  end
-  if not terminal then
-    notifyContinueFail(requestId, "not_terminal")
-    return false
-  end
 
-  local kind = tostring(cand.objectiveArchetype or cand.kind or "seize_lane")
-  local targetZone = tostring(cand.targetZoneId or "")
-  if targetZone == "" then
-    notifyContinueFail(requestId, "no_target")
-    return false
-  end
 
-  -- Explicit extract / leave the field: end session soft-continue chain.
-  if kind == "extract_leave" or cand.extractOnly == true then
-    Spring.Echo("VA_CONTINUE_EXTRACT_LEAVE zone=" .. targetZone
-      .. " requestId=" .. tostring(requestId or ""))
-    softContinueArmed = false
-    Spring.SetGameRulesParam("va_soft_continue", 0, { public = true })
-    Spring.SetGameRulesParam("va_continue_mode", "extract_leave", { public = true })
-    if SendToUnsynced then
-      -- Unsynced owns the wall-clock quitforce — soft-terminal pauses GameFrame.
-      SendToUnsynced("VERDANCE_MISSION_EVENT", "extract_leave", targetZone)
-    end
-    Spring.Echo("VA_LEAVE_QUIT_ARMED via_unsynced")
-    return true
-  end
 
-  local prevTarget = mission.objective and mission.objective.targetZoneId
-  local extractZone = mission.extractionZoneId
-  local safe = extractLoop.security(extractZone)
-  if not safe then
-    notifyContinueFail(requestId, "extraction_zone_unavailable")
-    return false
-  end
-
-  local preplaced = (cand.preplaced == true) or (cand.preplaced == 1)
-  local rules = mission.continueRules or {}
-  local promotePrefer = true
-  -- Selection is state-neutral. Promote only structures that already exist;
-  -- spent installations are rejected and credited opportunistically elsewhere.
-  local campUnits = 0
-  if kind == "defend_install" then
-    -- Defend uses the standing vault as the asset — no enemy eco promote.
-    campUnits = 1
-    Spring.Echo("VA_CONTINUE_DEFEND zone=" .. targetZone
-      .. " pocket=" .. tostring(cand.pocketId or ""))
-  else
-    campUnits = promoteOccupationInZone(targetZone, kind, cand.pocketId)
-  end
-  local requiresTargets = DESTRUCTION_KINDS[kind] or kind == "eco_raid"
-    or kind == "economy_disrupt" or kind == "strike_relay"
-  if requiresTargets and campUnits <= 0 then
-    Spring.Echo("VA_CONTINUE_REJECT spent_target zone=" .. targetZone .. " kind=" .. kind)
-    -- Strip the spent stay from the published board so EXIT stays reachable.
-    do
-      local cands = mission and mission.nextMissionCandidates
-      if type(cands) == "table" then
-        local filtered = {}
-        for _, c in ipairs(cands) do
-          if c then
-            local isExit = (c.extractOnly == true or c.objectiveArchetype == "extract_leave")
-            local sameSpent = (not isExit)
-              and tostring(c.targetZoneId or "") == targetZone
-              and tostring(c.objectiveArchetype or c.kind or "") == kind
-            if not sameSpent then
-              filtered[#filtered + 1] = c
-            end
-          end
-        end
-        ensureExitCandidate(filtered, targetZone)
-        mission.nextMissionCandidates = filtered
-        publishContinueCandidateParams(filtered)
-        if SendToUnsynced then
-          SendToUnsynced("VERDANCE_MISSION_EVENT", "candidates_refresh", tostring(#filtered))
-        end
-      end
-    end
-    if SendToUnsynced then
-      SendToUnsynced("VERDANCE_MISSION_EVENT", "continue_rejected",
-        tostring(requestId or "") .. "|spent_target|" .. targetZone)
-    end
-    return false
-  end
-  Spring.Echo("VA_CONTINUE_PERSISTENT zone=" .. targetZone
-    .. " promoted=" .. tostring(campUnits) .. " staticMutation=0 kind=" .. kind)
-
-  -- Soft-reset objective automation state (heroes / player units stay).
-  Spring.SetGameRulesParam("va_campaign_saved", 0, { public = true })
-  terminal = false
-  softContinueArmed = false
-  terminalReason = ""
-  terminalJob.pending = false
-  terminalJob.beginSent = false
-  Spring.SetGameRulesParam("va_campaign_updating", 0, { public = true })
-  status = "active"
-  objectiveComplete = false
-  objectiveCompleteHow = ""
-  objectiveBypassed = false
-  rescueContractFailed = false
-  rescueContractFailReason = ""
-  rescueContractFailHero = ""
-  -- Drop 4: re-arm the all-objectives latch for the next pocket. The
-  -- secondary ledger itself persists — marks already wrecked stay credited,
-  -- marks still standing stay killable on the same field.
-  extraObj.announced = false
-  Spring.SetGameRulesParam("va_all_objectives_done", 0, { public = true })
-  Spring.SetGameRulesParam("va_objective_failed", 0, { public = true })
-  Spring.SetGameRulesParam("va_objective_fail_reason", "", { public = true })
-  Spring.SetGameRulesParam("va_objective_fail_hero", "", { public = true })
-  zoneHoldFrames = 0
-  extractionHoldFrames = 0
-  extractionClean = true
-  playerLeftExtraction = false
-  extractLoop.opened = false
-  extractLoop.mustLeave = false
-  extractLoop.armed = false
-  extractLoop.completed = false
-  extractLoop.playerRequest = false
-  extractLoop.openedFrame = nil
-  extractLoop.armedFrame = nil
-  Spring.SetGameRulesParam("va_extract_open", 0, { public = true })
-  Spring.SetGameRulesParam("va_extract_must_leave", 0, { public = true })
-  Spring.SetGameRulesParam("va_extract_armed", 0, { public = true })
-  Spring.SetGameRulesParam("va_exfil_requested", 0, { public = true })
-  stalemate.frames = 0
-  stalemate.warned = false
-  holdFrames = 0
-  mercWaveUsed = false
-  -- Reset capture claim machine for the next pocket on the same shell.
-  capture.mode = false
-  capture.phase = "idle"
-  capture.pocketCleared = false
-  capture.nodeClaimed = false
-  capture.regrowWaves = 0
-  capture.regrowNextFrame = 0
-  shellObjectivesClaimed = false
-  Spring.SetGameRulesParam("va_capture_mode", 0, { public = true })
-  Spring.SetGameRulesParam("va_capture_phase", "idle", { public = true })
-  Spring.SetGameRulesParam("va_pocket_cleared", 0, { public = true })
-  Spring.SetGameRulesParam("va_node_claimed", 0, { public = true })
-  Spring.SetGameRulesParam("va_regrow_waves", 0, { public = true })
-  Spring.SetGameRulesParam("va_zone_hold", 0, { public = true })
-
-  sortieChapter = sortieChapter + 1
-  local mn = (tonumber(mission.missionNumber) or 0) + 1
-  mission.missionNumber = mn
-  mission.missionId = string.format("va_%03d", mn)
-  mission.deploymentZoneId = extractZone
-  mission.extractionZoneId = extractZone
-  mission.objective = mission.objective or {}
-  mission.objective.id = targetZone
-  mission.objective.kind = kind
-  mission.objective.targetZoneId = targetZone
-  mission.objective.extractionZoneId = extractZone
-  mission.objective.description = kind .. ": " .. targetZone
-  -- Soft clock is absolute game frame. Must re-arm from NOW.
-  local now = Spring.GetGameFrame() or 0
-  local budget = 12000
-  if kind == "eco_raid" or kind == "economy_disrupt" then budget = 13500 end
-  if kind == "seize_lane" or kind == "gate_control" or kind == "hold_plateau" then budget = 11000 end
-  mission.objective.requiredFrames = now + budget
-  if CAPTURE_KINDS[kind] then
-    mission.objective.captureMode = "clear_hold_shell"
-    mission.objective.description = "Clear pocket + hold under regrow to claim " .. targetZone
-  end
-  mission.title = "Contract - " .. kind .. " - " .. targetZone
-  mission.targetZoneId = targetZone
-
-  targetZoneRect = zoneRectFor(targetZone)
-  extractLoop.applyPad(extractZone)
-  -- Landing (enfil) beacon follows the new chapter deploy pad — never the attack mark.
-  do
-    local depRect = zoneRectFor(extractZone) or extractionZoneRect
-    if depRect then
-      local dcx = (depRect[1] + depRect[3]) * 0.5
-      local dcz = (depRect[2] + depRect[4]) * 0.5
-      Spring.SetGameRulesParam("va_deploy_x", math.floor(dcx), { public = true })
-      Spring.SetGameRulesParam("va_deploy_z", math.floor(dcz), { public = true })
-      VA_CREW_SELECT.anchorX = dcx
-      VA_CREW_SELECT.anchorZ = dcz
-    end
-  end
-  -- Pull Solarium / starter eco off the new enemy mark before the chapter opens.
-  reanchorCrewStartersForContinue(extractZone, targetZone)
-
-  -- No camp creation here. The battlefield manifest was fully materialized at
-  -- frame zero; this contract merely points at surviving units.
-  VA_DEFEND.armed = false
-  Spring.SetGameRulesParam("va_defend_armed", 0, { public = true })
-  if kind == "defend_install" then
-    armDefendInstall(cand, targetZone)
-  end
-  publishContinueBriefing(cand, kind, targetZone, extractZone)
-  Spring.Echo("VA_CONTINUE_CLOCK now=" .. tostring(now)
-    .. " requiredFrames=" .. tostring(mission.objective.requiredFrames)
-    .. " budget=" .. tostring(budget)
-    .. " campUnits=" .. tostring(campUnits)
-    .. " preplaced=" .. tostring(preplaced))
-  -- Publish objective marker (inline; avoid upvalue on later local).
-  do
-    local ox, oz, n = 0, 0, 0
-    for unitID in pairs(objectiveTargets) do
-      local x, _, z = Spring.GetUnitPosition(unitID)
-      if x then ox, oz, n = ox + x, oz + z, n + 1 end
-    end
-    if n > 0 then
-      ox, oz = ox / n, oz / n
-    elseif targetZoneRect then
-      ox = (targetZoneRect[1] + targetZoneRect[3]) * 0.5
-      oz = (targetZoneRect[2] + targetZoneRect[4]) * 0.5
-    end
-    if n > 0 or targetZoneRect then
-      Spring.SetGameRulesParam("va_objective_x", math.floor(ox), { public = true })
-      Spring.SetGameRulesParam("va_objective_z", math.floor(oz), { public = true })
-    end
-  end
-
-  Spring.SetGameRulesParam("va_terminal", 0, { public = true })
-  Spring.SetGameRulesParam("va_result_code", 0, { public = true })
-  Spring.SetGameRulesParam("va_status", "active", { public = true })
-  Spring.SetGameRulesParam("va_terminal_reason", "", { public = true })
-  Spring.SetGameRulesParam("va_objective_complete", 0, { public = true })
-  Spring.SetGameRulesParam("va_objective_failed", 0, { public = true })
-  Spring.SetGameRulesParam("va_objective_fail_reason", "", { public = true })
-  Spring.SetGameRulesParam("va_objective_fail_hero", "", { public = true })
-  Spring.SetGameRulesParam("va_zone_hold", 0, { public = true })
-  Spring.SetGameRulesParam("va_extraction_hold", 0, { public = true })
-  Spring.SetGameRulesParam("va_extraction_hold_need", EXTRACTION_HOLD_FRAMES, { public = true })
-  extractLoop.opened = false
-  extractLoop.mustLeave = false
-  extractLoop.armed = false
-  extractLoop.completed = false
-  extractLoop.playerRequest = false
-  extractLoop.openedFrame = nil
-  extractLoop.armedFrame = nil
-  Spring.SetGameRulesParam("va_extract_open", 0, { public = true })
-  Spring.SetGameRulesParam("va_extract_must_leave", 0, { public = true })
-  Spring.SetGameRulesParam("va_extract_armed", 0, { public = true })
-  Spring.SetGameRulesParam("va_exfil_requested", 0, { public = true })
-  Spring.SetGameRulesParam("va_mission_number", mn, { public = true })
-  Spring.SetGameRulesParam("va_hold_frames", 0, { public = true })
-  Spring.SetGameRulesParam("va_required_frames", mission.objective.requiredFrames or 19800, { public = true })
-  Spring.SetGameRulesParam("va_waves_spawned", waves.spawned or 0, { public = true })
-  Spring.SetGameRulesParam("va_continue_mode", "same_map", { public = true })
-  Spring.SetGameRulesParam("va_soft_continue", 0, { public = true })
-
-  Spring.Echo("VA_CONTINUE chapter=" .. tostring(sortieChapter)
-    .. " mission=" .. tostring(mission.missionId)
-    .. " kind=" .. kind
-    .. " target=" .. targetZone
-    .. " extract=" .. tostring(extractZone))
-  -- Buggy extract / wipe can leave the field empty on same-map continue.
-  -- Re-drop the hub crew kit at the new deployment pad so the player is not stuck.
-  do
-    local alive = 0
-    if Spring.GetTeamUnits then
-      local units = Spring.GetTeamUnits(playerTeamID) or {}
-      for i = 1, #units do
-        local u = units[i]
-        if Spring.ValidUnitID(u) and not Spring.GetUnitIsDead(u) then
-          alive = alive + 1
-        end
-      end
-    end
-    if alive == 0 then
-      Spring.Echo("VA_CONTINUE_EMPTY_FIELD recovering_hub_kit")
-      -- Always reseed on the deploy/enfil pad — never the attack target center.
-      local baseX = tonumber(VA_CREW_SELECT.anchorX)
-      local baseZ = tonumber(VA_CREW_SELECT.anchorZ)
-      local depX = tonumber((Spring.GetGameRulesParam("va_deploy_x")))
-      local depZ = tonumber((Spring.GetGameRulesParam("va_deploy_z")))
-      if depX and depZ and depX > 0 and depZ > 0 then
-        baseX, baseZ = depX, depZ
-      elseif extractionZoneRect then
-        baseX = (extractionZoneRect[1] + extractionZoneRect[3]) * 0.5
-        baseZ = (extractionZoneRect[2] + extractionZoneRect[4]) * 0.5
-      end
-      if not baseX or not baseZ then
-        baseX = (Game.mapSizeX or 0) * 0.23
-        baseZ = (Game.mapSizeZ or 0) * 0.24
-      end
-      VA_CREW_SELECT.anchorX = baseX
-      VA_CREW_SELECT.anchorZ = baseZ
-      Spring.Echo("VA_CONTINUE_EMPTY_FIELD_PAD x=" .. tostring(math.floor(baseX))
-        .. " z=" .. tostring(math.floor(baseZ)))
-      VA_CREW_SELECT.confirmed = false
-      local picks = {}
-      local band = mission and (mission.crewBand or (mission.crew and mission.crew.band))
-      if type(band) == "table" then
-        for _, id in ipairs(band) do
-          if id and tostring(id) ~= "" then picks[#picks + 1] = tostring(id) end
-        end
-      end
-      if #picks == 0 then
-        local aces = mission and mission.deployAces
-        if type(aces) == "table" then
-          local roster = VA_CREW_loadRoster()
-          for _, id in ipairs(aces) do
-            id = tostring(id or "")
-            if id ~= "" and not (roster.isCore and roster.isCore(id)) then
-              picks[#picks + 1] = id
-            end
-          end
-        end
-      end
-      if #picks > 0 then
-        VA_CREW_confirm(picks)
-      else
-        VA_CREW_autoConfirm()
-      end
-    end
-  end
-  if SendToUnsynced then
-    SendToUnsynced("VERDANCE_MISSION_EVENT", "continue_start", kind .. "|" .. targetZone)
-  end
-  return true
-end
-
-function tryContinueByIndex(idx, requestId)
-  idx = tonumber(idx)
-  local cands = mission and mission.nextMissionCandidates
-  if not idx or type(cands) ~= "table" or not cands[idx] then
-    notifyContinueFail(requestId, "bad_index=" .. tostring(idx))
-    return false
-  end
-  return applyContinueCandidate(cands[idx], requestId)
-end
-
-function tryContinueExtractLeave(requestId)
-  local cands = mission and mission.nextMissionCandidates
-  if type(cands) == "table" then
-    for _, c in ipairs(cands) do
-      if c and (c.extractOnly == true or c.objectiveArchetype == "extract_leave") then
-        return applyContinueCandidate(c, requestId)
-      end
-    end
-  end
-  -- Synthesize EXIT if the list lost it (stale prior / bad merge).
-  local zone = tostring((mission and mission.extractionZoneId)
-    or (mission and mission.deploymentZoneId)
-    or (mission and mission.objective and mission.objective.targetZoneId)
-    or "LZ_EXTRACT")
-  return applyContinueCandidate({
-    id = "cand_exit_leave",
-    title = "EXIT — bank and close",
-    mapId = currentMapId(),
-    targetZoneId = zone,
-    objectiveArchetype = "extract_leave",
-    extractOnly = true,
-    sessionMode = "same_map",
-  }, requestId)
-end
-
-function tryContinueById(candId, requestId)
-  candId = tostring(candId or "")
-  if candId == "" then
-    notifyContinueFail(requestId, "bad_id")
-    return false
-  end
-  if candId == "extract_leave" or candId == "exit" or candId == "cand_exit_leave" then
-    return tryContinueExtractLeave(requestId)
-  end
-  local cands = mission and mission.nextMissionCandidates
-  if type(cands) ~= "table" then
-    notifyContinueFail(requestId, "bad_id=" .. candId)
-    return false
-  end
-  for _, c in ipairs(cands) do
-    if c and tostring(c.id or "") == candId then
-      return applyContinueCandidate(c, requestId)
-    end
-  end
-  notifyContinueFail(requestId, "bad_id=" .. candId)
-  return false
-end
 
 -- Heavy terminal work (quantum transition, result JSON, telemetry, GameOver).
 -- Extracted from setTerminal so the exfil path can paint a loading screen first.
+-- Pass five: the sortie ends once, with facts. No verdict here (Python reads the manifest),
+-- no deferred crunch, no soft-continue, no engine GameOver. The exfil gadget owns the manifest
+-- and the quit; this is the one place the result is written.
 function runTerminalCrunch(opts)
   opts = opts or {}
-  local newStatus = opts.status or status
-  local reason = opts.reason or terminalReason
-  local extracted = opts.extracted == true
-  if extracted and SendToUnsynced and not opts.beginAlreadySent then
-    SendToUnsynced("VERDANCE_MISSION_EVENT", "result_processing", reason)
-  end
-  Spring.Echo("VA_TERMINAL_CRUNCH status=" .. tostring(newStatus)
-    .. " reason=" .. tostring(reason)
-    .. " frame=" .. tostring(Spring.GetGameFrame() or 0))
-  -- Every completed contract is a campaign measurement, including a same-map
-  -- stay chapter. The resulting snapshot is embedded in the result below.
-  VAQ.transition(reason)
+  local kind = opts.reason or terminalReason
+  Spring.Echo("VA_TERMINAL_CRUNCH kind=" .. tostring(kind) .. " frame=" .. tostring(Spring.GetGameFrame() or 0))
+  VAQ.transition(kind)
   logResult()
-  -- Standing fusion vaults become next-contract options (defend if held, claim if not).
-  do
-    local fromZ = tostring((mission and mission.objective and mission.objective.targetZoneId)
-      or (mission and mission.deploymentZoneId) or "")
-    if fromZ ~= "" then
-      local prior = mission.nextMissionCandidates or {}
-      rebuildContinueCandidates(fromZ)
-      -- Keep authored occupation EXIT / stay rows; prepend HV options in front.
-      local rebuilt = mission.nextMissionCandidates or {}
-      local hvOnly = {}
-      for _, c in ipairs(rebuilt) do
-        if c and (c.highValue or c.defendInstall or c.objectiveArchetype == "defend_install") then
-          hvOnly[#hvOnly + 1] = c
-        end
-      end
-      local merged = {}
-      for _, c in ipairs(hvOnly) do merged[#merged + 1] = c end
-      -- Prefer freshly rebuilt adjacent raids over stale prior stay rows, but
-      -- keep authored prior stay rows that are not HV duplicates. EXIT is
-      -- forced on afterwards so leave never depends on a stale index.
-      local rebuiltStay = {}
-      for _, c in ipairs(rebuilt) do
-        if c and not (c.highValue or c.defendInstall or c.objectiveArchetype == "defend_install"
-            or c.extractOnly or c.objectiveArchetype == "extract_leave") then
-          rebuiltStay[#rebuiltStay + 1] = c
-        end
-      end
-      -- Wild shelf: the seed already named the stay contracts. Do not replace
-      -- them with a spent-theater EXIT just because there is no fusion vault.
-      local mapNow = currentMapId()
-      local wildShelf = (mapNow == "the_rock_jungle")
-      if wildShelf then
-        local authored = {}
-        for _, c in ipairs(prior) do
-          if c and not (c.extractOnly or c.objectiveArchetype == "extract_leave"
-              or c.highValue or c.defendInstall or c.objectiveArchetype == "defend_install") then
-            authored[#authored + 1] = c
-          end
-        end
-        if #authored > 0 then
-          rebuiltStay = authored
-        end
-        Spring.SetGameRulesParam("va_map_spent", 0, { public = true })
-      end
-      for _, c in ipairs(rebuiltStay) do merged[#merged + 1] = c end
-      for _, c in ipairs(prior) do
-        if not c then
-          -- skip
-        elseif c.extractOnly or c.objectiveArchetype == "extract_leave" then
-          -- EXIT re-added by ensureExitCandidate
-        elseif c.highValue or c.defendInstall or c.objectiveArchetype == "defend_install" then
-          local skip = false
-          for _, h in ipairs(hvOnly) do
-            if h.pocketId and c.pocketId and tostring(h.pocketId) == tostring(c.pocketId) then
-              skip = true
-              break
-            end
-          end
-          if not skip then merged[#merged + 1] = c end
-        end
-      end
-      ensureExitCandidate(merged, fromZ)
-      -- rebuildContinueCandidates retitles EXIT when the theater is blank;
-      -- ensureExitCandidate / merge can re-add a stock EXIT — restore the cue.
-      if Spring.GetGameRulesParam("va_map_spent") == 1
-          or Spring.GetGameRulesParam("va_map_spent") == true then
-        for _, c in ipairs(merged) do
-          if c and (c.extractOnly == true or c.objectiveArchetype == "extract_leave") then
-            c.title = "EXIT — theater spent, open the war map"
-            c.plain = "This map is empty. Bank the sortie and pick Eye of Horus or Rock Jungle on the hub."
-            c.mapSpent = true
-          end
-        end
-      end
-      mission.nextMissionCandidates = merged
-      publishContinueCandidateParams(merged)
-      Spring.Echo("VA_CONTINUE_CANDS refreshed count=" .. tostring(#merged)
-        .. " hv=" .. tostring(#hvOnly)
-        .. " mapSpent=" .. tostring(Spring.GetGameRulesParam("va_map_spent") or 0))
-      -- Emit now; UI also re-syncs from rules params on Update while paused.
-      if SendToUnsynced then
-        SendToUnsynced("VERDANCE_MISSION_EVENT", "candidates_refresh", tostring(#merged))
-      end
-    end
+  if devTel.enabled and SendToUnsynced then
+    SendToUnsynced("VERDANCE_TRACK", "result", lastResultJson or "")
   end
-  if SendToUnsynced then SendToUnsynced("VERDANCE_MISSION_EVENT", "result_ready", reason) end
-  Spring.SetGameRulesParam("va_campaign_updating", 0, { public = true })
-  -- Level 2: emit the Hermitian battlefield observable at terminal so the
-  -- campaign engine can eigen-decompose it and collapse it onto the graph.
-  logAndBroadcastTranslation()
-  -- A tracked human session has no export frame and no fib milestone, so this is the
-  -- only place it ever writes the two packets the AI-duel analyser reads. Emitting
-  -- them here is what makes a played mission and a headless duel the same shape.
-  if devTel.enabled then
-    if vaSampleZoneFlow then vaSampleZoneFlow() end
-    logTelemetry()
-    if vaZoneFlowJson then
-      local flowJson = vaZoneFlowJson()
-      Spring.Echo("VA_ZONE_FLOW_JSON " .. flowJson)
-      if SendToUnsynced then SendToUnsynced("VERDANCE_TRACK", "zoneflow", flowJson) end
-    end
-    -- The recorder widget commits its file on this, so it must be sent after the
-    -- final zoneflow rather than before it.
-    if SendToUnsynced then
-      SendToUnsynced("VERDANCE_TRACK", "result", resultJson())
-    end
-    Spring.Echo("VA_PLAY_TRACK_FINAL status=" .. tostring(status)
-      .. " frame=" .. tostring(Spring.GetGameFrame() or 0))
-  end
-  if SendToUnsynced then SendToUnsynced("VERDANCE_MISSION_EVENT", newStatus, reason) end
+  if SendToUnsynced then SendToUnsynced("VERDANCE_SORTIE_OVER", kind) end
   local profilingRun = headless.autoStart or balance.exportFrame or (#fib.milestones > 0)
-  if profilingRun then
-    if headless.quit then
-      headless.quitFrame = Spring.GetGameFrame() + 60
-    end
-    return
+  if profilingRun and headless.quit then
+    headless.quitFrame = Spring.GetGameFrame() + 60
   end
-
-  -- The campaign owns the return screen even when the last field contract is
-  -- spent. Engine GameOver adds a second competing completion/quit dialog.
-  local softOk = true -- All human results use the campaign receipt; no competing GameOver screen.
-  softContinueArmed = softOk
-  Spring.SetGameRulesParam("va_soft_continue", softOk and 1 or 0, { public = true })
-  if softOk then
-    Spring.Echo("VA_SOFT_TERMINAL same_map_continue=1 chapter=" .. tostring(sortieChapter))
-    return
-  end
-
-  local winners = {}
-  if newStatus == "defeat" then
-    for _, at in ipairs(Spring.GetAllyTeamList()) do
-      if at ~= playerAllyTeamID and at ~= gaiaAllyTeamID then winners[#winners + 1] = at end
-    end
-  else
-    winners = { playerAllyTeamID }
-  end
-  Spring.GameOver(winners)
 end
 
-function tickTerminalJob(frame)
-  if not terminalJob.pending then return end
-  if frame < (terminalJob.dueFrame or 0) then return end
-  terminalJob.pending = false
-  runTerminalCrunch({
-    status = terminalJob.status,
-    reason = terminalJob.reason,
-    extracted = terminalJob.extracted == true,
-    beginAlreadySent = terminalJob.beginSent == true,
-  })
-end
 
-function tickLeaveJob(frame)
-  -- Reserved: soft-terminal pauses GameFrame, so leave quit lives in unsynced Update.
-end
 
-function setTerminal(newStatus, reason)
+-- kind: "extracted" (manifest confirmed) | "wiped" (nobody left) | "closed" (engine ended it).
+function setTerminal(kind, reason)
   if terminal then return end
-  Spring.SetGameRulesParam("va_campaign_saved", 0, { public = true })
   terminal = true
-  terminalReason = tostring(reason or "")
-  status = newStatus
+  terminalReason = tostring(reason or kind or "")
+  status = tostring(kind or "closed")
   debugAutoProgress = 0
   finalizeHeroStates()
   publishHeroRules()
   Spring.SetGameRulesParam("va_terminal", 1, { public = true })
-  Spring.SetGameRulesParam("va_result_code", (newStatus == "victory" and 1) or (newStatus == "defeat" and 2) or 3, { public = true })
-  Spring.SetGameRulesParam("va_status", newStatus, { public = true })
+  Spring.SetGameRulesParam("va_status", status, { public = true })
   Spring.SetGameRulesParam("va_terminal_reason", terminalReason, { public = true })
-  Spring.SetGameRulesParam("va_extraction_clean", extractionClean and 1 or 0, { public = true })
-  -- Compact debrief card (UI reads these; keep short).
-  do
-    local wounded, lost, recovered = 0, 0, 0
-    for _, rec in pairs(heroes) do
-      local out = rec.result or (rec.everDown and "wounded" or "survived")
-      if rec.state == "lost" or out == "dead" then
-        lost = lost + 1
-      elseif out == "recovered" then
-        recovered = recovered + 1
-      elseif out == "wounded" or rec.everDown then
-        wounded = wounded + 1
-      end
-    end
-    local secDone = tonumber((Spring.GetGameRulesParam("va_secondary_done"))) or 0
-    local secTotal = tonumber((Spring.GetGameRulesParam("va_secondary_total"))) or 0
-    Spring.SetGameRulesParam("va_debrief_obj", objectiveComplete and 1 or 0, { public = true })
-    Spring.SetGameRulesParam("va_debrief_sec", string.format("%d/%d", secDone, secTotal), { public = true })
-    Spring.SetGameRulesParam("va_debrief_heroes",
-      string.format("scar %d · rez %d · lost %d", wounded, recovered, lost), { public = true })
-    Spring.SetGameRulesParam("va_debrief_extract", extractionStatusString(), { public = true })
-  end
-  Spring.Echo("VA_TERMINAL status=" .. status .. " reason=" .. terminalReason)
-  local extracted = extractLoop.completed == true
-  local profilingRun = headless.autoStart or balance.exportFrame or (#fib.milestones > 0)
+  Spring.Echo("VA_TERMINAL kind=" .. status .. " reason=" .. terminalReason)
+  runTerminalCrunch({ reason = status })
+end
 
-  -- Played exfil: announce loading, wait two frames so DrawScreen can paint,
-  -- THEN crunch. Pause is requested only after campaign_update_complete so
-  -- GameFrame keeps ticking through the deferred job.
-  if not profilingRun then
-    Spring.SetGameRulesParam("va_campaign_updating", 1, { public = true })
-    if SendToUnsynced then
-      SendToUnsynced("VERDANCE_MISSION_EVENT", "result_processing", terminalReason)
-    end
-    terminalJob.pending = true
-    terminalJob.status = newStatus
-    terminalJob.reason = terminalReason
-    terminalJob.extracted = extracted
-    terminalJob.beginSent = true
-    terminalJob.dueFrame = (Spring.GetGameFrame() or 0) + 2
-    Spring.Echo("VA_TERMINAL_DEFER crunch_at_frame=" .. tostring(terminalJob.dueFrame))
-    return
+-- The exfil gadget calls this when the player confirms the manifest.
+function GG.VA_EndSortie(kind)
+  if kind == "extracted" then
+    extractLoop.completed = true
+    extractionClean = (tonumber(Spring.GetGameRulesParam("va_pad_enemy")) or 0) == 0
   end
+  setTerminal(kind, kind)
+end
 
-  runTerminalCrunch({
-    status = newStatus,
-    reason = terminalReason,
-    extracted = extracted,
-    beginAlreadySent = false,
-  })
+function GG.VA_TenebriumBank()
+  return tonumber(tenebLoot and tenebLoot.bank) or 0
 end
 
 function pocketClearProgress()
@@ -7437,84 +6307,9 @@ function vaSideWorkCredit()
   return false, ""
 end
 
--- Mid-mission Exfil button: open LZ + arm bail/partial hold (never victory).
--- Packed into extractLoop to stay under main-chunk local budget.
--- Extraction is one explicit state transition, independent of objective credit.
-function extractLoop.security(zoneId)
-  zoneId = zoneId or mission.extractionZoneId or (mission.objective or {}).extractionZoneId
-  if not zoneId or not zoneRectFor(zoneId) then return false, "unknown_zone", "unknown" end
-  local owner = "neutral"
-  for _, sample in ipairs(VAQ.zoneSamples()) do
-    if sample.zoneId == zoneId then owner = tostring(sample.control or "neutral"):lower(); break end
-  end
-  -- Same cell assignment as campaign ownership and the minimap; never the AABB.
-  for _, uid in ipairs(Spring.GetAllUnits() or {}) do
-    local team = Spring.GetUnitTeam(uid)
-    if team and team ~= gaiaTeamID and not Spring.AreTeamsAllied(playerTeamID, team)
-        and Spring.ValidUnitID(uid) and not Spring.GetUnitIsDead(uid) then
-      local x, _, z = Spring.GetUnitPosition(uid)
-      local zone = x and zoneForPosition(x, z)
-      if zone and zone.zoneId == zoneId then return false, "hostiles_in_zone", owner end
-    end
-  end
-  for team, faction in pairs(teamFaction) do
-    if tostring(faction):lower() == owner
-        and (team == playerTeamID or Spring.AreTeamsAllied(playerTeamID, team)) then
-      return true, "secured", owner
-    end
-  end
-  return false, "zone_not_owned", owner
-end
 
-function extractLoop.publish()
-  if not extractionZoneRect then
-    local ready = vaAllObjectivesDone()
-    Spring.SetGameRulesParam("va_extract_ready", ready and 1 or 0, { public = true })
-    Spring.SetGameRulesParam("va_extract_blocker", ready and "operation_complete" or "objectives_open", { public = true })
-    return ready, ready and "operation_complete" or "objectives_open"
-  end
-  local secured, blocker, owner = extractLoop.security()
-  local present = extractLoop.scan()
-  if secured and not present then blocker = "rally_company" end
-  Spring.SetGameRulesParam("va_extract_zone", tostring(mission.extractionZoneId or (mission.objective or {}).extractionZoneId or ""), { public = true })
-  Spring.SetGameRulesParam("va_target_zone", tostring((mission.objective or {}).targetZoneId or ""), { public = true })
-  Spring.SetGameRulesParam("va_extract_owner", owner, { public = true })
-  Spring.SetGameRulesParam("va_extract_secured", secured and 1 or 0, { public = true })
-  Spring.SetGameRulesParam("va_extract_ready", secured and present and 1 or 0, { public = true })
-  Spring.SetGameRulesParam("va_extract_blocker", blocker, { public = true })
-  return secured and present, blocker
-end
 
-function requestPlayerExfil()
-  if terminal or status ~= "active" then return false end
-  if extractLoop.playerRequest then return true end
-  local ready, blocker = extractLoop.publish()
-  if not ready then
-    if SendToUnsynced then SendToUnsynced("VERDANCE_MISSION_EVENT", "extraction_rejected", blocker) end
-    return false
-  end
-  if not extractionZoneRect then
-    setTerminal("victory", "operation_complete_no_extraction")
-    return true
-  end
-  extractLoop.playerRequest = true
-  extractLoop.completed = false
-  extractionHoldFrames = 0
-  Spring.SetGameRulesParam("va_exfil_requested", 1, { public = true })
-  Spring.SetGameRulesParam("va_extract_armed", 1, { public = true })
-  return true
-end
 
-function cancelPlayerExfil()
-  if terminal then return false end
-  extractLoop.completed = false
-  extractLoop.playerRequest = false
-  extractionHoldFrames = 0
-  Spring.SetGameRulesParam("va_exfil_requested", 0, { public = true })
-  Spring.SetGameRulesParam("va_extract_armed", 0, { public = true })
-  Spring.SetGameRulesParam("va_extraction_hold", 0, { public = true })
-  return true
-end
 
 openExtractLoop = function(reason)
   -- Availability alone does not start a phase, timer, or departure screen.
@@ -7523,123 +6318,37 @@ openExtractLoop = function(reason)
   Spring.SetGameRulesParam("va_extract_must_leave", 0, { public = true })
 end
 
-function checkExtraction(frame)
-  if terminal or status ~= "active" then return end
-  local ready = extractLoop.publish()
-  if not extractionZoneRect then
-    if ready and headless.autoStart then setTerminal("victory", "operation_complete_no_extraction") end
-    return
-  end
-  local requested = extractLoop.playerRequest or headless.autoStart
-  Spring.SetGameRulesParam("va_extraction_hold_need", EXTRACTION_HOLD_FRAMES, { public = true })
-  Spring.SetGameRulesParam("va_extract_hold_rate", 1000, { public = true })
-  Spring.SetGameRulesParam("va_bail_armed", 0, { public = true })
-  if not requested then
-    extractionHoldFrames = 0
-  elseif ready then
-    extractionHoldFrames = extractionHoldFrames + CHECK_PERIOD
-  else
-    extractionHoldFrames = 0
-  end
-  Spring.SetGameRulesParam("va_extraction_hold", extractionHoldFrames, { public = true })
-  Spring.SetGameRulesParam("va_extract_armed", requested and 1 or 0, { public = true })
-  if requested then Spring.SetGameRulesParam("va_phase", ready and "EXTRACTING" or "EXTRACT_BLOCKED", { public = true }) end
-  if ready and requested and extractionHoldFrames >= EXTRACTION_HOLD_FRAMES then
-    extractLoop.completed = true
-    extractionClean = true
-    local done = vaAllObjectivesDone()
-    if not done then objectiveBypassed = true end
-    setTerminal(done and "victory" or "partial",
-      done and "extracted" or (rescueContractFailed and "extracted_recruit_lost" or "extracted_voluntary"))
-  end
-end
 
 function checkPlayerWipe(frame)
   if frame < WIPE_GRACE_FRAMES then return end
   local count = Spring.GetTeamUnitCount(playerTeamID) or 0
   if count <= 0 then
-    setTerminal("defeat", "player_wiped")
+    -- nobody left to confirm a manifest: the exfil gadget stamps an empty one and we end
+    if GG and GG.VA_WipedManifest then GG.VA_WipedManifest() else setTerminal("wiped", "player_wiped") end
   end
 end
 
--- No-fail stalemate guard: a player left with neither mobile combat power nor
--- any way to build it (no builders, no factories) can neither win nor lose -
--- warn once, then end the mission as force-spent instead of hanging forever.
-function checkStalemate(frame)
-  if frame < WIPE_GRACE_FRAMES then return end
-  local units = Spring.GetTeamUnits(playerTeamID) or {}
-  local capable = false
-  for i = 1, #units do
-    local dID = Spring.GetUnitDefID(units[i])
-    local ud = dID and UnitDefs[dID]
-    if ud then
-      if ud.isFactory or isBuilder(dID) then capable = true; break end
-      if canFight(dID) and not isStructure(dID) then capable = true; break end
-    end
-  end
-  if capable then
-    stalemate.frames = 0
-    return
-  end
-  stalemate.frames = stalemate.frames + CHECK_PERIOD
-  if not stalemate.warned and stalemate.frames >= CHECK_PERIOD then
-    stalemate.warned = true
-    Spring.Echo("VA_STALEMATE_WARNING no mobile combat units and no production")
-    if SendToUnsynced then SendToUnsynced("VERDANCE_MISSION_EVENT", "stalemate_warning", "force_spent") end
-  end
-  if stalemate.frames >= stalemate.limit then
-    setTerminal("defeat", "force_spent")
-  end
-end
 
 -- Soft clock: requiredFrames is a real mission end, not just a HUD countdown.
 -- Without this, time hits 0 and the player sits in PHASE FIGHT forever.
+-- The clock is a fact on the HUD, not an ending. The sortie ends when the player extracts,
+-- when nobody is left, or when the player closes the game.
 function checkSoftClock(frame)
   if terminal or status ~= "active" then return end
   local req = mission and mission.objective and tonumber(mission.objective.requiredFrames)
   if not req or req <= 0 then return end
   local left = req - frame
   Spring.SetGameRulesParam("va_clock_left", math.max(0, left), { public = true })
-  -- checkExtraction owns EXTRACT / EXTRACTING / BAIL / RTB. Soft clock must
-  -- not stomp those once the board is resolved (allDone OR rescue fail).
-  local allDone = vaAllObjectivesDone()
-  local boardResolved = allDone or rescueContractFailed
-  if not extractLoop.playerRequest and not boardResolved and not (playerLeftExtraction and not objectiveComplete) then
-    local phase = "FIGHT"
-    if objectiveComplete then
-      phase = "MARKS"
-    elseif frame < 90 * 30 then
-      phase = "APPROACH"
-    end
-    if left <= 0 then phase = "TIMEOUT" end
-    Spring.SetGameRulesParam("va_phase", phase, { public = true })
-  elseif left <= 0 and not boardResolved then
-    Spring.SetGameRulesParam("va_phase", "TIMEOUT", { public = true })
+  local phase = "FIGHT"
+  if vaAllObjectivesDone() then
+    phase = "EXTRACT"
+  elseif objectiveComplete then
+    phase = "MARKS"
+  elseif frame < 90 * 30 then
+    phase = "APPROACH"
   end
-  if left > 0 then return end
-  if allDone then
-    setTerminal("partial", "soft_clock_no_extract")
-    return
-  end
-  if rescueContractFailed then
-    -- Rescue already scrubbed; clock out as the same partial RTB outcome.
-    setTerminal("partial", "soft_clock_rescue_failed")
-    return
-  end
-  if objectiveComplete then
-    -- Primary done but required marks / extract still open — partial credit.
-    setTerminal("partial", "soft_clock_marks_open")
-    return
-  end
-  local dmg = 0
-  if objectiveTargetCount > 0 then
-    dmg = objectiveTargetsDestroyed / objectiveTargetCount
-  end
-  if dmg >= (RAID_CREDIT_FRACTION * 0.5) or zoneHoldFrames >= (PRESENCE_HOLD_DEFAULT * 0.5) then
-    setTerminal("partial", "soft_clock_timeout")
-  else
-    setTerminal("defeat", "soft_clock_timeout")
-  end
+  if left <= 0 then phase = "OVERTIME" end
+  Spring.SetGameRulesParam("va_phase", phase, { public = true })
 end
 
 function isCommanderUnitDef(ud)
@@ -8065,15 +6774,22 @@ function gadget:Initialize()
   if VAQ.kernel then waves.enabled = false end
   local obj = mission.objective or {}
   targetZoneRect = zoneRectFor(obj.targetZoneId)
-  extractLoop.applyPad(mission.extractionZoneId or obj.extractionZoneId)
-  -- Landing (enfil) beacon — always marked, distinct from extract.
+  -- One pad (pass five): the company lands and lifts from the same point — the deployment
+  -- zone's anchor. Deploy beacon, bought kit (infilAnchor) and extraction all read it.
+  extractLoop.applyPad(mission.deploymentZoneId or mission.extractionZoneId or obj.extractionZoneId)
   do
-    local depRect = zoneRectFor(mission.deploymentZoneId)
-    if depRect then
-      local dcx = (depRect[1] + depRect[3]) * 0.5
-      local dcz = (depRect[2] + depRect[4]) * 0.5
-      Spring.SetGameRulesParam("va_deploy_x", math.floor(dcx), { public = true })
-      Spring.SetGameRulesParam("va_deploy_z", math.floor(dcz), { public = true })
+    local px = tonumber((Spring.GetGameRulesParam("va_extract_x"))) or -1
+    local pz = tonumber((Spring.GetGameRulesParam("va_extract_z"))) or -1
+    if px < 0 then
+      local depRect = zoneRectFor(mission.deploymentZoneId)
+      if depRect then
+        px = (depRect[1] + depRect[3]) * 0.5
+        pz = (depRect[2] + depRect[4]) * 0.5
+      end
+    end
+    if px >= 0 then
+      Spring.SetGameRulesParam("va_deploy_x", math.floor(px), { public = true })
+      Spring.SetGameRulesParam("va_deploy_z", math.floor(pz), { public = true })
     end
   end
 
@@ -8099,12 +6815,7 @@ function gadget:Initialize()
   Spring.SetGameRulesParam("va_terminal", 0, { public = true })
   Spring.SetGameRulesParam("va_arc_id", tostring(arc.id or ""), { public = true })
   Spring.SetGameRulesParam("va_player_commanders", doctrine.playerComsAllowed, { public = true })
-  -- Soft-continue is armed only at soft terminal. Arming it at load lets the
-  -- hub race an extract_leave the instant terminal flips, before candidates refresh.
-  Spring.SetGameRulesParam("va_soft_continue", 0, { public = true })
   Spring.SetGameRulesParam("va_continue_chapter", sortieChapter, { public = true })
-  Spring.SetGameRulesParam("va_continue_mode", "none", { public = true })
-  Spring.SetGameRulesParam("va_campaign_updating", 0, { public = true })
   -- Mid-reload / soft-continue: restore sticky field joins so /vawin and later
   -- chapter results still export recruitedHeroIds.
   if (Spring.GetGameFrame and Spring.GetGameFrame() or 0) > 0 then
@@ -8296,8 +7007,6 @@ end
 
 function gadget:GameFrame(frame)
   -- Deferred exfil crunch (loading screen paints first). One call = one upvalue.
-  tickTerminalJob(frame)
-  tickLeaveJob(frame)
   -- Field-recruit wreck seeds: kill the live unit so BAR leaves a normal rez corpse.
   tickFieldRecruitPendingDeath(frame)
   -- Re-apply M/E storage caps after BAR Team Resourcing's GameStart wipe.
@@ -8447,10 +7156,8 @@ function gadget:GameFrame(frame)
     checkPresenceObjective(frame)
     checkDefendInstall(frame)
     vaCheckPurge(frame)
-    checkExtraction(frame)
     checkPlayerWipe(frame)
     checkHeroWreckTimeouts(frame)
-    checkStalemate(frame)
     checkSoftClock(frame)
     if beatsEnabled then checkBeats(frame) end
     pollMentorSubordinateXp(frame)
@@ -8465,7 +7172,7 @@ function gadget:GameFrame(frame)
         local dmg = (objectiveTargetCount > 0) and (objectiveTargetsDestroyed / objectiveTargetCount) or 0
         local threshold = raidWaveThresholds[waves.spawned + 1] or 1.1
         if dmg >= threshold then
-          local px, pz = teamUnitCentroid(playerTeamID)
+          local px, pz = enemyResponseTarget()
           spawnWave(objectiveTeamID, waves.baseSize, px, pz, "armada_qrf")
           waves.spawned = waves.spawned + 1
           waves.nextFrame = frame + waves.interval
@@ -8473,7 +7180,7 @@ function gadget:GameFrame(frame)
         end
       end
     elseif frame >= waves.nextFrame and waves.spawned < waves.max then
-      local px, pz = teamUnitCentroid(playerTeamID)
+      local px, pz = enemyResponseTarget()
       spawnWave(objectiveTeamID, waves.baseSize, px, pz, "escalation")
       waves.spawned = waves.spawned + 1
       waves.nextFrame = frame + waves.interval
@@ -8488,7 +7195,7 @@ function gadget:GameFrame(frame)
     local req = mission.objective and mission.objective.requiredFrames or 600
     if holdFrames >= req then
       Spring.Echo("VA_OBJECTIVE_COMPLETE mission=" .. tostring(mission.missionId))
-      setTerminal("victory", "debug_autoprogress")
+      setTerminal("extracted", "debug_autoprogress")
     end
   end
 
@@ -8694,34 +7401,15 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
   if playerCommanders[unitID] then
     playerCommanders[unitID] = nil
     if doctrine.sawPlayerCom and next(playerCommanders) == nil and status == "active" and not terminal then
-      setTerminal("defeat", "commander_lost")
+      Spring.Echo("VA_COMMANDER_LOST")  -- a fact for the result; the sortie goes on
     end
   end
 end
 
 function gadget:GameOver(winningAllyTeams)
   if terminal then return end
-  -- Safety net: the game ended without our own terminal path (resign, quit,
-  -- external gameover). Derive a status and guarantee a result marker.
-  local won = false
-  for _, at in ipairs(winningAllyTeams or {}) do
-    if at == playerAllyTeamID then won = true end
-  end
-  terminal = true
-  terminalReason = "gameover_external"
-  if won then
-    status = objectiveComplete and "victory" or "partial"
-  else
-    status = "defeat"
-  end
-  debugAutoProgress = 0
-  finalizeHeroStates()
-  publishHeroRules()
-  Spring.SetGameRulesParam("va_terminal", 1, { public = true })
-  Spring.SetGameRulesParam("va_status", status, { public = true })
-  Spring.Echo("VA_TERMINAL status=" .. status .. " reason=" .. terminalReason)
-  VAQ.transition(terminalReason)
-  logResult()
+  -- The engine ended the game without a manifest (resign / external). Record the facts.
+  setTerminal("closed", "gameover_external")
 end
 
 -- Living logistics: deferred combat packs arrive mid-sortie from map-web / launcher.
@@ -9031,45 +7719,7 @@ spawnCommerceDeployKit = function(...) return VA_LOGISTICS.spawnCommerceDeployKi
 
 function runVerdanceCommand(cmd)
   if type(cmd) ~= "string" then return false end
-  if cmd == "vacancelexfil" then return cancelPlayerExfil() end
-  local receipt = cmd:match("^varesultack:(.+)$")
-  if receipt then
-    if terminal and receipt == Spring.GetGameRulesParam("va_result_key") then
-      Spring.SetGameRulesParam("va_campaign_saved", 1, { public = true })
-      return true
-    end
-    return false
-  end
-  -- Mid-mission Exfil: open LZ + bank partial on hold (never victory).
-  if cmd == "vaexfil" or cmd == "vaexfilnow" or cmd:match("^vaexfil[%s:]") then
-    requestPlayerExfil()
-    return true
-  end
-  -- WO-051: vacontinue:1 / vacontinue extract_leave / vacontinue id:<candId>
-  -- Index alone is fragile after HV prepend + UI rules-param race; EXIT always
-  -- resolves by archetype so leave cannot land on a spent eco_raid.
-  -- IMPORTANT: Lua patterns do NOT support | alternation. A prior
-  -- (extract_leave|exit) group matched the literal pipe string and made every
-  -- Extract click echo VA_UNKNOWN_CMD — soft terminal saved, BAR never closed.
-  local leaveReq = cmd:match("^vacontinue[:%s]+extract_leave[:%s]*([%w_%-]*)")
-  if leaveReq == nil then
-    leaveReq = cmd:match("^vacontinue[:%s]+exit[:%s]*([%w_%-]*)")
-  end
-  if leaveReq ~= nil then
-    tryContinueExtractLeave(leaveReq)
-    return true
-  end
-  local idTok, idReq = cmd:match("^vacontinue[:%s]+id:([%w_%-]+)[:%s]*([%w_%-]*)")
-  if idTok then
-    tryContinueById(idTok, idReq)
-    return true
-  end
-  local contIdx, requestId = cmd:match("^vacontinue[:%s]+(%d+)[:%s]*([%w_%-]*)")
-  if not contIdx then contIdx = cmd:match("^vacontinue(%d+)") end
-  if contIdx then
-    tryContinueByIndex(contIdx, requestId)
-    return true
-  end
+  -- Exfil (manifest / extract:<dest>) is owned by game_verdance_exfil.lua.
   -- Operator / playtest: grant liquid Tenebrium so BP constructors unlock.
   local tnbAmt = cmd:match("^vatnb[%s:]+(%-?%d+)")
   if cmd == "vatnb" or tnbAmt or cmd:match("^vatnb[%s:]") then
@@ -9090,24 +7740,6 @@ function runVerdanceCommand(cmd)
   end
   if cmd == "vastart" then startMission()
   elseif cmd == "vastatus" then echoStatus()
-  elseif cmd == "vaprogress" then progress(300)
-  elseif cmd == "vaprogressbig" then progress(99999)
-  elseif cmd == "vawin" then
-    -- Pause first so the player can read the debrief / Tnb stack before crunch.
-    if SendToUnsynced then
-      SendToUnsynced("VERDANCE_MISSION_EVENT", "debug_pause", "vawin")
-    end
-    setTerminal("victory", "debug_command")
-  elseif cmd == "vafail" then
-    if SendToUnsynced then
-      SendToUnsynced("VERDANCE_MISSION_EVENT", "debug_pause", "vafail")
-    end
-    setTerminal("defeat", "debug_command")
-  elseif cmd == "vapartial" then
-    if SendToUnsynced then
-      SendToUnsynced("VERDANCE_MISSION_EVENT", "debug_pause", "vapartial")
-    end
-    setTerminal("partial", "debug_command")
   elseif cmd == "vatest_killobjective" then
     if Spring.IsCheatingEnabled() then
       local ids = {}
@@ -9117,12 +7749,12 @@ function runVerdanceCommand(cmd)
     else
       Spring.Echo("VA_TEST_DENIED cheats required for vatest_killobjective")
     end
-  elseif cmd == "vaspawn" then spawnCompanions()
   elseif cmd == "vaspawnlayout" then spawnPlayableSetup()
   elseif cmd == "vazones" then echoZones()
   elseif cmd == "vatelemetry" or cmd == "vabalance" then logTelemetry()
   elseif cmd == "vatranslation" then logAndBroadcastTranslation()
-  elseif cmd == "varesult" or cmd == "vaexport" then logResult()
+  elseif cmd == "varesult" or cmd == "vaexport" then
+    if Spring.IsCheatingEnabled() then logResult() else Spring.Echo("VA_TEST_DENIED cheats required for varesult") end
   elseif cmd == "vaheadless" then startMission(); finishHeadlessResult("victory")
   elseif cmd == "vacallmercs" then
     -- Pillar B / C payoff: at high standing the Null Mercs answer one call.
@@ -9146,8 +7778,6 @@ function runVerdanceCommand(cmd)
     debugAutoProgress = 0
     Spring.Echo("VA_RESET local_debug_only (hub RESET.bat wipes campaign)")
     echoStatus()
-  elseif cmd == "vacrewauto" then
-    VA_CREW_autoConfirm()
   elseif cmd:match("^vapack") then
     -- Mid-Drop A/B for pack glue / line-spread (handled by pack_overlay GG).
     if GG and GG.VA_PackSet then

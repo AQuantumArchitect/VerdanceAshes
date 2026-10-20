@@ -27,15 +27,11 @@ from verdance_kernel import steam as steam_mod
 from verdance_kernel import surface as surface_mod
 from verdance_kernel.paths import (
     backups_dir,
-    field_state_path,
     hub_result_path,
     hub_state_path,
     latest_result_path,
-    live_command_mod_path,
-    live_command_path,
     resolve_workspace,
     saves_dir,
-    session_status_path,
     showoff_dir,
     state_path,
 )
@@ -46,8 +42,6 @@ KERNEL_SCHEMA = "verdance-campaign-kernel/1.0"
 # Preferred player-path scripts first, then legacy scripts/ names.
 _PS1_ALIASES: dict[str, tuple[str, ...]] = {
     "build": ("scripts/player/build_mission.ps1", "scripts/build_next_mission_v1.ps1"),
-    "session": ("scripts/player/play_session.ps1", "scripts/play_session_v1.ps1"),
-    "extract": ("scripts/player/extract_result.ps1", "scripts/extract_latest_result.ps1"),
     "install_mod": ("scripts/player/install_mod.ps1", "scripts/install_mod_archive.ps1"),
 }
 
@@ -329,14 +323,15 @@ class CampaignKernel:
             return {"ok": False, "error": str(e)}
 
     def session_status(self) -> dict[str, Any]:
-        p = session_status_path(self.ws)
-        if not p.is_file():
+        """The sortie watch is the session: launching → in-game → bringing-home → home | closed-without-result."""
+        w = getattr(self._bridge, "status", lambda: None)() if self._bridge is not None else None
+        if not w or w.get("phase") in (None, "idle"):
             return {"present": False}
-        try:
-            data = json.loads(p.read_text(encoding="utf-8-sig"))
-            return {"present": True, "status": data}
-        except Exception as e:  # noqa: BLE001
-            return {"present": True, "error": str(e)}
+        # same keys the hub already reads: phase / springPid / updatedAt
+        last = w.get("last") or {}
+        return {"present": True, "status": {"phase": w.get("phase"), "springPid": w.get("pid"), "pid": w.get("pid"),
+                                             "updatedAt": last.get("at") or w.get("startedAt"), "startedAt": w.get("startedAt"),
+                                             "applied": w.get("applied"), "last": last}}
 
     # ── ops ──────────────────────────────────────────────────
 
@@ -790,8 +785,10 @@ class CampaignKernel:
             self._last_mod_sync = report
             return report
         extra: list[str] = []
-        # install_mod.ps1 defaults to Copy; legacy install_mod_archive needs -Copy
-        if copy and script.name == "install_mod_archive.ps1":
+        # One spine (pass five): every Drop copies the WORKSPACE mod into BAR's data\games. The
+        # workspace is the truth; the My Games install is only what SHIP produces for other people.
+        # (install_mod.ps1 without -Copy would junction data\games to My Games instead.)
+        if copy:
             extra.append("-Copy")
         report = run_ps1(script, self.ws, extra_args=extra or None, timeout=120)
         report = dict(report)
@@ -832,34 +829,6 @@ class CampaignKernel:
                 break
         return out
 
-    def _sync_customer_seed(self) -> dict[str, Any]:
-        """Mirror va_current.lua into Documents/My Games customer pack (dual-spine)."""
-        import shutil
-
-        src_candidates = [
-            self.ws / "mod" / "VerdanceAshes.sdd" / "singleplayer" / "verdance_ashes" / "generated" / "va_current.lua",
-            self.ws / "outbox" / "va_current.lua",
-        ]
-        src = next((p for p in src_candidates if p.is_file()), None)
-        if src is None:
-            return {"ok": False, "reason": "va_current.lua missing after build"}
-        home = Path.home() / "Documents" / "My Games" / "VerdanceAshes" / "VerdanceAshes.sdd"
-        dest = home / "singleplayer" / "verdance_ashes" / "generated" / "va_current.lua"
-        if not home.is_dir():
-            return {"ok": False, "reason": f"customer pack missing: {home}", "skipped": True}
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(src, dest)
-        # Keep zone map companion in sync when present.
-        zsrc = src.parent / "zone_map_current.lua"
-        if zsrc.is_file():
-            shutil.copy2(zsrc, dest.parent / "zone_map_current.lua")
-        # the company's belief about the planned map (pass three/four overlay), same lifecycle as the seed
-        for name in ("va_intel_current.lua",):
-            isrc = self.ws / "mod" / "VerdanceAshes.sdd" / "singleplayer" / "verdance_ashes" / "generated" / name
-            if isrc.is_file():
-                shutil.copy2(isrc, dest.parent / name)
-        return {"ok": True, "src": str(src), "dest": str(dest)}
-
     def build_mission(self) -> dict[str, Any]:
         script = self._resolve_ps1("build")
         if script is None:
@@ -867,56 +836,23 @@ class CampaignKernel:
         return run_ps1(script, self.ws, timeout=240)
 
     def launch_bar(self, *, max_missions: int = 1, auto_relaunch: bool = False) -> dict[str, Any]:
-        already = _spring_already_open()
-        if already:
-            return {
-                "ok": False,
-                "skipped": True,
-                "reason": "Beyond All Reason is already open. Finish or close that match, then drop again.",
-            }
-        script = self._resolve_ps1("session")
-        if script is None:
-            return {"ok": False, "reason": "play_session script missing"}
-        args = [
-            "powershell",
-            "-NoProfile",
-            "-ExecutionPolicy",
-            "Bypass",
-            "-File",
-            str(script),
-            "-Workspace",
-            str(self.ws),
-            "-MaxMissions",
-            str(max_missions),
-        ]
-        if not auto_relaunch:
-            args.append("-NoAutoRelaunch")
-        # Sandbox campaign zip only. A normal hub drop never sets this.
-        if os.environ.get("VERDANCE_ZIP") == "1":
-            args.extend(["-EngineMode", "headless-zip"])
-        try:
-            proc = subprocess.Popen(
-                args,
-                cwd=str(self.ws),
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-            )
-            report = {
-                "ok": True,
-                "pid": proc.pid,
-                "script": str(script),
-                "note": f"play_session started (MaxMissions={max_missions}, auto_relaunch={auto_relaunch})",
-                "at": _now(),
-            }
+        """Start spring.exe on the startscript the build wrote, and watch the infolog for the result.
+        The kernel is the only launcher and the only ingest (pass five): no play_session host."""
+        del max_missions, auto_relaunch
+        from verdance_kernel import sortie as _sortie
+
+        if _sortie.spring_running():
+            return {"ok": False, "skipped": True,
+                    "reason": "Beyond All Reason is already open. Finish or close that match, then drop again."}
+        report = _sortie.launch(self.ws)
+        if report.get("ok"):
             self._last_launch = report
             if self._bridge is not None:
                 try:
                     self._bridge.watch_after_launch(report)
-                except Exception:  # noqa: BLE001
-                    pass
-            return report
-        except Exception as e:  # noqa: BLE001
-            return {"ok": False, "reason": f"{type(e).__name__}: {e}"}
+                except Exception as e:  # noqa: BLE001
+                    report["watch"] = {"ok": False, "error": str(e)}
+        return report
 
     def update_sortie_roster(self, raw: dict[str, Any] | None) -> dict[str, Any]:
         """Confirm drop locks the roster. The level is compiled from that list."""
@@ -1087,8 +1023,14 @@ class CampaignKernel:
                     self._error = err
                     return refused
                 intent_report = self.materialize_intent()
+                # Order (pass five): sync the mod FIRST, then build. The installer writes the seed into
+                # BAR's data\games copy; building before the copy left a seedless archive, which the
+                # retired play_session host used to paper over with a second build.
+                mod_report: dict[str, Any] = {"skipped": True}
+                if intent_report.get("ok"):
+                    mod_report = self.sync_mod(copy=True)
                 build_report = (
-                    self.build_mission() if intent_report.get("ok") else {"ok": False, "skipped": True}
+                    self.build_mission() if intent_report.get("ok") and mod_report.get("ok") is not False else {"ok": False, "skipped": True, "reason": "mod sync failed" if mod_report.get("ok") is False else "intent failed"}
                 )
                 # Consume armyBudget once the Drop is actually built — escorts already
                 # stamped into the kit from commerce intent preview.
@@ -1120,17 +1062,9 @@ class CampaignKernel:
                                 army_budget_spent = prev_army
                     except Exception as e:  # noqa: BLE001
                         army_budget_spent = {"error": str(e)}
-                mod_report: dict[str, Any] = {"skipped": True}
-                if build_report.get("ok"):
-                    mod_report = self.sync_mod(copy=True)
-                    try:
-                        mod_report["customerPack"] = self._sync_customer_seed()
-                    except Exception as e:  # noqa: BLE001
-                        mod_report["customerPack"] = {"ok": False, "reason": str(e)}
                 launch_report: dict[str, Any] = {"skipped": True}
                 if launch and build_report.get("ok"):
-                    # Roster was stamped with this plan before the build. play_session
-                    # recompiles that same intent, then starts the map.
+                    # The build already installed the seed and wrote the startscript; the kernel starts the engine.
                     with self._lock:
                         self._deploy_phase = "launching"
                     launch_report = self.launch_bar()
@@ -1188,12 +1122,6 @@ class CampaignKernel:
             finally:
                 pass
 
-    def extract_result(self) -> dict[str, Any]:
-        script = self._resolve_ps1("extract")
-        if script is None:
-            return {"ok": False, "reason": "extract script missing"}
-        return run_ps1(script, self.ws, timeout=60)
-
     def bring_home(
         self,
         *,
@@ -1211,22 +1139,10 @@ class CampaignKernel:
             self._busy = True
             self._error = None
             try:
-                extract_info: dict[str, Any] = {"skipped": True}
-                if extract and not skip_advance:
-                    extract_info = self.extract_result()
-                    if not extract_info.get("ok", True) and extract_info.get("returncode", 0) not in (
-                        0,
-                        None,
-                    ):
-                        # Extract failed — present incomplete debrief, do not fake advance
-                        incomplete = self._incomplete_home(
-                            reason="extract_failed",
-                            extract_info=extract_info,
-                            mode=mode,
-                        )
-                        self._last_advance = incomplete
-                        self._error = "extract failed — incomplete"
-                        return incomplete
+                # The watcher (verdance_kernel.sortie) already wrote inbox/latest_va_result.json from the
+                # infolog; `extract` is kept for callers but there is no second extractor any more.
+                extract_info: dict[str, Any] = {"skipped": True, "source": "sortie_watch_inbox"}
+                del extract
 
                 has_inbox = latest_result_path(self.ws).is_file()
                 if not has_inbox and not skip_advance:
@@ -1293,87 +1209,6 @@ class CampaignKernel:
         """Alias for bring_home (backward compatible)."""
         return self.bring_home(extract=extract, skip_advance=skip_advance, mode="manual")
 
-    def get_field(self) -> dict[str, Any]:
-        """Live soft-terminal / in-field snapshot for the hub command deck."""
-        candidates = [
-            field_state_path(self.ws),
-            live_command_mod_path(self.ws).with_name("va_field.latest.json"),
-        ]
-        p = next((c for c in candidates if c.is_file()), None)
-        if p is None:
-            return {
-                "ok": True,
-                "softContinue": False,
-                "idle": True,
-                "note": "No live field packet yet — BAR writes va_field at soft terminal.",
-            }
-        try:
-            data = json.loads(p.read_text(encoding="utf-8-sig"))
-        except Exception as e:  # noqa: BLE001
-            return {"ok": False, "error": str(e)}
-        data = dict(data) if isinstance(data, dict) else {"raw": data}
-        data.setdefault("ok", True)
-        data["path"] = str(p)
-        return data
-
-    def continue_field(self, body: dict[str, Any] | None = None) -> dict[str, Any]:
-        """Queue a same-map continue command for the paused BAR mutator."""
-        body = dict(body or {})
-        idx = body.get("index") or body.get("candidateIndex")
-        target = body.get("targetZoneId") or body.get("target")
-        kind = body.get("objectiveArchetype") or body.get("kind") or "seize_lane"
-        if idx is None and not target:
-            return {"ok": False, "error": "need candidate index or targetZoneId"}
-        cmd = {
-            "schemaVersion": "verdance-live-command/1.0",
-            "at": _now(),
-            "action": "continue",
-            "index": int(idx) if idx is not None else None,
-            "targetZoneId": target,
-            "objectiveArchetype": kind,
-            "mapId": body.get("mapId"),
-            "requestId": body.get("requestId")
-            or f"hub_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}",
-            "source": "hub",
-        }
-        return self._write_live_command(cmd)
-
-    def extract_leave_field(self, body: dict[str, Any] | None = None) -> dict[str, Any]:
-        """Queue extract_leave so BAR ends the soft-continue chain."""
-        body = dict(body or {})
-        cmd = {
-            "schemaVersion": "verdance-live-command/1.0",
-            "at": _now(),
-            "action": "extract_leave",
-            "requestId": body.get("requestId")
-            or f"hub_leave_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}",
-            "source": "hub",
-        }
-        return self._write_live_command(cmd)
-
-    def _write_live_command(self, cmd: dict[str, Any]) -> dict[str, Any]:
-        """Write command to outbox + mutator generated path (VFS-visible to BAR)."""
-        paths = [live_command_path(self.ws), live_command_mod_path(self.ws)]
-        written: list[str] = []
-        errors: list[str] = []
-        payload = json.dumps(cmd, indent=2) + "\n"
-        for p in paths:
-            try:
-                p.parent.mkdir(parents=True, exist_ok=True)
-                p.write_text(payload, encoding="utf-8")
-                written.append(str(p))
-            except Exception as e:  # noqa: BLE001
-                errors.append(f"{p}: {e}")
-        ok = bool(written)
-        return {
-            "ok": ok,
-            "at": _now(),
-            "command": cmd,
-            "written": written,
-            "errors": errors,
-            "note": "BAR widget polls generated/va_live_command.json while soft-terminal.",
-        }
-
     def _incomplete_home(
         self,
         *,
@@ -1434,6 +1269,10 @@ class CampaignKernel:
 
     def abandon_sortie(self, *, reason: str = "player_abandon") -> dict[str, Any]:
         """Record abandon bead without zone flip or mission bump; unlock next Drop."""
+        from verdance_kernel import sortie as _sortie
+
+        if _sortie.spring_running():
+            return {"ok": False, "error": "Beyond All Reason is still open. Extract or close it first; abandon is for a sortie that never came home."}
         with self._lock:
             if self._busy:
                 return {"ok": False, "error": "kernel busy"}

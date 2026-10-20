@@ -121,10 +121,6 @@ def make_handler(kernel: CampaignKernel, showoff: Path):
                 code, body, ct = _json_bytes(kernel.write_campaign_surface())
                 return self._send(code, body, ct)
 
-            if path == "/api/field":
-                code, body, ct = _json_bytes(kernel.get_field())
-                return self._send(code, body, ct)
-
             if path == "/api/saves":
                 if hasattr(kernel, "list_saves"):
                     code, body, ct = _json_bytes(kernel.list_saves())
@@ -235,27 +231,6 @@ def make_handler(kernel: CampaignKernel, showoff: Path):
                     return self._send(code, body, ct)
                 result = kernel.update_sortie_roster(raw)
                 code, body, ct = _json_bytes(result, 200)
-                return self._send(code, body, ct)
-
-            if path == "/api/continue":
-                try:
-                    body_in = _read_json_body(self)
-                except Exception as e:  # noqa: BLE001
-                    code, body, ct = _json_bytes({"ok": False, "error": f"bad json: {e}"}, 400)
-                    return self._send(code, body, ct)
-                result = kernel.continue_field(body_in)
-                code = 200 if result.get("ok") else 400
-                code, body, ct = _json_bytes(result, code)
-                return self._send(code, body, ct)
-
-            if path == "/api/extract-leave":
-                try:
-                    body_in = _read_json_body(self)
-                except Exception:
-                    body_in = {}
-                result = kernel.extract_leave_field(body_in)
-                code = 200 if result.get("ok") else 400
-                code, body, ct = _json_bytes(result, code)
                 return self._send(code, body, ct)
 
             if path == "/api/purchase":

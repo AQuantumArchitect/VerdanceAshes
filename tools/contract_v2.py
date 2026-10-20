@@ -193,6 +193,20 @@ def normalize_result(raw: Dict[str, Any], *, campaign_id: str = "verdance_ashes"
     """
     if not isinstance(raw, dict):
         raw = {}
+    # Pass five: a result that carries a manifest has no verdict of its own; Python reads one off it.
+    try:
+        import manifest_v1 as _mf
+        _v = _mf.verdict_from(raw)
+        if _v:
+            raw = dict(raw)
+            raw["status"] = _v
+            raw["verdict"] = _v
+            _es = _mf.extraction_status_from(raw)
+            if _es is not None:
+                raw["extractionStatus"] = _es
+                raw["cleanExtract"] = (_es == "clean")
+    except Exception:  # noqa: BLE001
+        pass
     status = raw.get("status") or raw.get("verdict") or raw.get("result")
     # Map extraction cleanliness early for credit table
     ext = _s(raw.get("extractionStatus")).lower()
@@ -353,6 +367,7 @@ def normalize_result(raw: Dict[str, Any], *, campaign_id: str = "verdance_ashes"
         #   beliefExport  {zoneId: {ours, held, strength, threat}} — what the HUD showed at exit, at its own eta.
         # Absent → the fold falls back to a footprint proxy; never invented here.
         "observedZones": (raw.get("observedZones") if isinstance(raw.get("observedZones"), dict) else None),
+        "manifest": (raw.get("manifest") if isinstance(raw.get("manifest"), dict) else None),
         "beliefExport": (raw.get("beliefExport") if isinstance(raw.get("beliefExport"), dict) else None),
         "destroyedObjectives": raw.get("destroyedObjectives") or raw.get("destroyedObjectiveIds") or [],
         "destroyedObjectiveIds": raw.get("destroyedObjectiveIds") or raw.get("destroyedObjectives") or [],
@@ -441,6 +456,7 @@ def result_v2_to_v1_fields(r: Dict[str, Any]) -> Dict[str, Any]:
         "destroyedObjectives": r.get("destroyedObjectives"),
         "destroyedObjectiveIds": r.get("destroyedObjectiveIds") or r.get("destroyedObjectives"),
         **({"observedZones": r.get("observedZones")} if isinstance(r.get("observedZones"), dict) else {}),
+        **({"manifest": r.get("manifest")} if isinstance(r.get("manifest"), dict) else {}),
         **({"beliefExport": r.get("beliefExport")} if isinstance(r.get("beliefExport"), dict) else {}),
         "objectiveResults": r.get("objectiveResults") or [],
         "secondaryResults": r.get("secondaryResults") or [],

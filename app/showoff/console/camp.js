@@ -86,7 +86,7 @@ function render() {
   const shown = rows.filter(z => !S.mapFilter || z.mapId === S.mapFilter).sort((a, b) => String(a.label).localeCompare(String(b.label)));
   const heroes = (Array.isArray(camp.people) ? camp.people : Object.entries(camp.people || {}).map(([heroId, rec]) => ({ heroId, ...(rec || {}) }))).map(h => ({ ...h, hid: h.heroId || h.hid }));
   const atCamp = heroes.filter(h => (h.where || "camp") === "camp" && h.status !== "dead" && h.inCompany !== false);
-  const away = heroes.filter(h => h.where === "posted" || h.where === "transit");
+  const away = heroes.filter(h => h.where === "posted" || h.where === "transit" || (h.where === "field" && h.status !== "dead"));
   const div = S.divergence && S.divergence.face;
   const pend = S.divergence && S.divergence.pending;
   const crossed = div && div.crossed && div.crossed.armada && div.crossed.armada.aboutCompany;
@@ -128,7 +128,7 @@ function render() {
     ${away.length ? `<h3>Away from camp</h3><div class="camp-people">${away.map(h => `
       <div class="camp-person">
         <span>${esc(h.name || h.hid)}</span>
-        <span class="muted">${esc(h.where === "transit" ? ("on the road → " + (h.then === "camp" ? "camp" : (h.label || h.zoneId || "?")) + " · back " + clock(h.eta)) : ("posted on " + (h.label || h.zoneId || "?")))}${h.wounded ? " · wounded" : ""}</span>
+        <span class="muted">${esc(h.where === "transit" ? ("on the road → " + (h.then === "camp" ? "camp" : (h.label || h.zoneId || "?")) + " · back " + clock(h.eta)) : (h.where === "field" ? ("left in the field at " + (h.label || h.zoneId || "?")) : ("posted on " + (h.label || h.zoneId || "?"))))}${h.wounded ? " · wounded" : ""}</span>
         <button type="button" class="btn-ghost tiny" data-act="recall" data-hero="${esc(h.hid)}" ${S.busy || h.where === "transit" ? "disabled" : ""}>Recall</button>
       </div>`).join("")}</div>` : ""}
 

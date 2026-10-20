@@ -29,7 +29,7 @@ _attic\                                 ← old bats + brochure exports
 ## Rules
 
 1. Kernel is the only player control plane.
-2. `commit_deploy` always `sync_mod` (copy SDD → BAR games) before build/launch.
+2. `commit_deploy` always `sync_mod -Copy` (workspace SDD → BAR `data\games`) **before** the build, then launches `spring.exe` itself and tails the infolog (pass five). SHIP is for other people's machines; your own Drop always runs the workspace Lua.
 3. My Games is **not** a second product unless you run `ship -InstallToMyGames` (full dist).
 4. Do not add `export\customer\VerdanceAshes_v0.*` trees.
 

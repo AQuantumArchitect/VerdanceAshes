@@ -49,6 +49,12 @@ local ready = false
 local tick = 0
 
 local obs = {}        -- zoneId -> { eta, lastShare, enemyRecent, enemyPeak, friendNow, enemyStructPeak, friendStructPeak, seenAny }
+-- The other direction: what the enemy can see of US. Symmetric policy — a zone where an enemy
+-- ally team has our units in its line of sight is a zone they believe we are in, with the same
+-- recency fade. The campaign gadget sends its response there, not to our true centroid.
+local seenBy = {}     -- zoneId -> decayed share of our units in that zone that some enemy ally team sees
+local enemyAllyTeams = {}
+local zoneAnchor = {} -- zoneId -> {x, z}
 
 local function clamp01(v)
   if v ~= v then return 0 end
@@ -117,6 +123,15 @@ local function build()
   for _, z in ipairs(zm.zones) do
     local id = tostring(z.zoneId or "")
     if id ~= "" then
+      do
+        local a = z.anchor
+        if type(a) == "table" and tonumber(a.x) then
+          local ax, az = tonumber(a.x), tonumber(a.z)
+          if ax <= 1 then ax = ax * mapX end
+          if az <= 1 then az = az * mapZ end
+          zoneAnchor[id] = { ax, az }
+        end
+      end
       local idx = expandRuns(z)
       local rec = { id = id, label = tostring(z.label or id), points = {}, n = #idx }
       for _, ci in ipairs(idx) do
@@ -156,6 +171,14 @@ local function resolvePlayerTeam()
     playerTeamID = fallback or 0
   end
   playerAllyTeamID = teamAlly[playerTeamID] or 0
+  enemyAllyTeams = {}
+  local seenAlly = {}
+  for tid, at in pairs(teamAlly) do
+    if tid ~= gaiaTeamID and at ~= playerAllyTeamID and not seenAlly[at] then
+      seenAlly[at] = true
+      enemyAllyTeams[#enemyAllyTeams + 1] = at
+    end
+  end
 end
 
 local function zoneOfPos(x, z)
@@ -186,9 +209,10 @@ local function sample(frame)
     o.enemyNow = 0
     if share > 0 then o.seenAny = true end
   end
-  -- 2. what is standing in the zones we can see
+  -- 2. what is standing in the zones we can see (and what of ours the enemy can see)
   local units = Spring.GetAllUnits() or {}
   local friendStruct, enemyStruct = {}, {}
+  local oursIn, oursSeen = {}, {}
   for i = 1, #units do
     local uid = units[i]
     local team = Spring.GetUnitTeam(uid)
@@ -206,6 +230,15 @@ local function sample(frame)
           if friendly then
             o.friendNow = o.friendNow + 1
             if structure then friendStruct[id] = (friendStruct[id] or 0) + 1 end
+            if team == playerTeamID then
+              oursIn[id] = (oursIn[id] or 0) + 1
+              for k = 1, #enemyAllyTeams do
+                if Spring.IsUnitInLos(uid, enemyAllyTeams[k]) then
+                  oursSeen[id] = (oursSeen[id] or 0) + 1
+                  break
+                end
+              end
+            end
           else
             o.enemyNow = o.enemyNow + 1
             if structure then enemyStruct[id] = (enemyStruct[id] or 0) + 1 end
@@ -215,6 +248,11 @@ local function sample(frame)
     end
   end
   for _, id in ipairs(zoneOrder) do
+    local share = (oursIn[id] and oursIn[id] > 0) and ((oursSeen[id] or 0) / oursIn[id]) or 0
+    -- weight by how much of us is there: one scout seen is a rumour, a column seen is a fact
+    local weight = math.min(1, (oursSeen[id] or 0) / 6)
+    seenBy[id] = math.max((seenBy[id] or 0) * decay, share * weight)
+    Spring.SetGameRulesParam("va_seen_" .. id, math.floor(seenBy[id] * 1000 + 0.5) / 1000, { public = true })
     local o = obs[id]
     o.enemyRecent = math.max(o.enemyRecent, o.enemyNow)
     if o.enemyNow > o.enemyPeak then o.enemyPeak = o.enemyNow end
@@ -250,6 +288,29 @@ local function belief(o)
   strength = clamp01(o.enemyStructPeak / 8 + o.enemyPeak / 16)
   threat = clamp01(o.enemyRecent / 10)
   return ours, held, strength, threat
+end
+
+-- The zone the enemy most believes we are in right now (their line of sight, recency faded).
+-- nil when they have seen nothing. The campaign gadget aims its response here.
+function GG.VA_EnemyBelievedZone()
+  if not ready then return nil end
+  local best, bestV = nil, 0.05
+  for _, id in ipairs(zoneOrder) do
+    local v = seenBy[id] or 0
+    if v > bestV then best, bestV = id, v end
+  end
+  if not best then return nil end
+  local a = zoneAnchor[best]
+  return best, a and a[1], a and a[2], bestV
+end
+
+function GG.VA_ObservedZonesTable()
+  if not ready then return {} end
+  local t = {}
+  for _, id in ipairs(zoneOrder) do
+    if obs[id].eta > 0.005 then t[id] = math.floor(obs[id].eta * 1000 + 0.5) / 1000 end
+  end
+  return t
 end
 
 function GG.VA_ObservedZonesJson()
@@ -299,4 +360,6 @@ end
 function gadget:Shutdown()
   GG.VA_ObservedZonesJson = nil
   GG.VA_BeliefExportJson = nil
+  GG.VA_ObservedZonesTable = nil
+  GG.VA_EnemyBelievedZone = nil
 end

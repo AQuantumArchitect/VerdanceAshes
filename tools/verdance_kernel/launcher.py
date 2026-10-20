@@ -144,14 +144,12 @@ def _bar_mod_banner(workspace: Path) -> None:
             mode = "WORKSPACE"
         print(f"BAR mod mode: {mode}")
         print(f"BAR mod loads: {target}")
-        if mode == "WORKSPACE":
-            print(
-                "NOTE: Drop is loading workspace Lua. Playtest truth is My Games — "
-                "run scripts\\player\\point_bar_mod.ps1 -Mode Deployed after SHIP.",
-                file=sys.stderr,
-            )
-        elif mode == "DEPLOYED":
-            print("Playtest truth: Drop Lua matches My Games install.")
+        # Pass five: every Drop re-copies the workspace mod into data\games (CUSTOM = that copy).
+        # Whatever is there now is replaced on the next Drop; the workspace is the truth.
+        if mode == "DEPLOYED":
+            print("NOTE: data\\games currently points at the My Games install; the next Drop replaces it with a copy of the workspace mod.")
+        else:
+            print("Drop Lua: copied from the workspace on every Drop.")
     except Exception as e:  # noqa: BLE001
         print(f"BAR mod banner skipped ({e})", file=sys.stderr)
 

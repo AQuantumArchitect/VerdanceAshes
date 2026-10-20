@@ -3466,88 +3466,9 @@
     }, 8000);
   }
 
-  function renderFieldOpen(field) {
-    const el = $("field-open");
-    if (!el) return;
-    const open = !!(field && field.softContinue && !field.idle);
-    el.style.display = open ? "" : "none";
-    if (!open) return;
-    const mapId = field.mapId || state.focusMap || "";
-    $("field-banner").textContent = "Paused on " + prettyMap(mapId);
-    $("field-headline").textContent = "Chapter " + (field.chapter || "?") + " — pick next wound or leave";
-    $("field-hint").textContent = field.terminalReason
-      ? ("Last: " + String(field.terminalReason).replace(/_/g, " "))
-      : "BAR waits for a hub command.";
-    const chips = $("field-chips");
-    const actions = $("field-actions");
-    chips.innerHTML = "";
-    const cands = Array.isArray(field.candidates) ? field.candidates : [];
-    cands.forEach((c) => {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "btn-sm";
-      const tag = c.extractOnly ? "EXIT" : (c.sameMap === false ? "TRAVEL" : "STAY");
-      btn.textContent = tag + " · " + (c.title || c.targetZoneId || c.id || ("#" + c.index));
-      btn.onclick = async () => {
-        try {
-          toast("Sending contract to the field…");
-          const res = await fetch(api("/api/continue"), {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              index: c.index,
-              targetZoneId: c.targetZoneId,
-              objectiveArchetype: c.objectiveArchetype,
-              mapId: c.mapId || mapId,
-            }),
-          });
-          const j = await res.json().catch(() => ({}));
-          if (!res.ok || j.ok === false) {
-            return toast((j && j.error) || "Continue failed", "err");
-          }
-          logLine("Hub → field continue " + (c.targetZoneId || c.index));
-          toast("Contract queued — BAR should reseed", "ok");
-        } catch (e) {
-          toast("Continue failed: " + e.message, "err");
-        }
-      };
-      chips.appendChild(btn);
-    });
-    if ($("field-leave")) {
-      $("field-leave").onclick = async () => {
-        try {
-          const res = await fetch(api("/api/extract-leave"), {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({}),
-          });
-          const j = await res.json().catch(() => ({}));
-          if (!res.ok || j.ok === false) {
-            return toast((j && j.error) || "Leave failed", "err");
-          }
-          toast("Return ordered — finish in BAR / quit", "ok");
-        } catch (e) {
-          toast("Leave failed: " + e.message, "err");
-        }
-      };
-    }
-    if (actions && !$("field-leave")) {
-      /* leave button is static in markup */
-    }
-  }
-
-  function startFieldPoll() {
-    if (startFieldPoll._on) return;
-    startFieldPoll._on = true;
-    setInterval(async () => {
-      if (!state.hostLive) return;
-      try {
-        const res = await fetch(api("/api/field"), { cache: "no-store" });
-        const field = await res.json();
-        renderFieldOpen(field);
-      } catch (_) { /* host down */ }
-    }, 4000);
-  }
+  // Pass five: there is no "BAR paused on the map" state any more. The sortie ends on the
+  // manifest in BAR; the kernel brings the result home; the debrief arrives through /api/result.
+  function startFieldPoll() { /* retired */ }
 
   // Tabs
   document.querySelectorAll(".tab").forEach(tab => {

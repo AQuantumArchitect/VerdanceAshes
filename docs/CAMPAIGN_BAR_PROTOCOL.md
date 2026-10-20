@@ -2,6 +2,13 @@
 
 **One outbound contract. One inbound contract. One ingest owner. One credit table.**
 
+> **Pass five (2026-10-20).** The sortie ends on the player's **manifest** (what goes, what stays, where
+> to); the gadget writes facts only and `tools/manifest_v1.py` reads the verdict off them. The kernel
+> launches Spring itself and tails the infolog (`tools/verdance_kernel/sortie.py`); there is no
+> play_session host, no extract script, no receipts file and no live-command channel on the player path.
+> Sections below that mention those describe the operator/headless tooling or history.
+> See `docs/NARRATIVE_READINGS_SSOT.md` → "Pass five".
+
 After a fight, the kernel brings the result home. If not: **Pull result** or **Abandon**.
 
 **Collapse law:** one Drop / MatchResult is the **observation** that updates world graph `G` inside `process_result` (`apply_graph_deltas` + `measure_graph_from_world`). See [`GRAPH_COLLAPSE_SSOT.md`](GRAPH_COLLAPSE_SSOT.md).

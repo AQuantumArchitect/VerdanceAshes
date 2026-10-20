@@ -148,6 +148,7 @@ $toolPy = @(
   "story_dance_v1.py",
   "chronicle_v1.py",
   "intel_lua_v1.py",
+  "manifest_v1.py",
   "validate_story_v1.py",
   "wet_reach_v1.py",
   # Ship so a player build can self-check; also what the gates below run.
@@ -222,13 +223,12 @@ $scriptList = @(
   "_common.ps1",
   "setup_tester.ps1",
   "install_mod_archive.ps1",
-  "play_session_v1.ps1",
+  # pass five: the kernel launches spring and reads the infolog itself; play_session_v1 /
+  # extract_latest_result / run_full_cycle are operator (headless) tools, not the player path.
   "build_next_mission_v1.ps1",
   "install_playable_slice.ps1",
-  "extract_latest_result.ps1",
   "extract_latest_telemetry.ps1",
   "advance_campaign_v1.ps1",
-  "run_full_cycle_v1.ps1",
   "migrate_state_v1.ps1",
   "ship.ps1"
 )

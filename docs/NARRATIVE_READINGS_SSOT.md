@@ -288,6 +288,62 @@ inference); posted heroes do not yet appear as units in a Drop on their own zone
 yet draw belief on the theater board itself (the table is the first form); `va_obs_*` is not yet
 read by the objectives widget for "unconfirmed" markers.
 
+## Pass five: the boundary — in quiet, out by manifest
+
+**Principle.** Lua reports facts; Python interprets. The Drop is a window onto one zone-cluster of the
+world graph for a while. Nothing inside it needs a verdict, a timer, or a mechanic the graph does not
+already have. The gadget knows nothing about victory.
+
+**One pad.** The company lands and lifts from the same ground, like raiders: `extractionZoneId ==
+deploymentZoneId` (engine), the deploy beacon, the bought kit and the exfil pad all read the zone anchor
+(`generated/va_pad_current.lua`, written with the intent). A manifest destination that is a zone makes
+the next sortie on that map land there (`camp.nextPadZoneId`); traversal is a travel sortie, not a
+different pad.
+
+**The way out.** `EXTRACT` (objectives widget) → `VA_CMD:manifest` → `game_verdance_exfil.lua` counts
+the pad (radius 560): heroes and units on it are **going**; heroes, units and structures off it are
+**staying**, by zone; `enemyOnPad`; `seen` = η per zone from the observe gadget; destinations = camp +
+same-map holdings of ours + the graph's map links out. `gui_verdance_exfil.lua` pauses the game and shows
+it with the **company's** belief beside what was looked at (the other minds are never shown). Enter →
+`VA_CMD:extract:<dest>` → the manifest is stamped on the one result (`result.manifest`) and the
+campaign gadget ends the sortie: no hold timer, no zone-ownership gate, no soft clock, no stalemate,
+no Mode A continue, no debug terminals, no receipts, no live commands, no two-frame "UPDATING THE WAR".
+Esc → back to the field. Nobody left → `GG.VA_WipedManifest()` stamps an empty one. The engine ending
+the game without a manifest → `closed`.
+
+**Python reads the manifest** (`tools/manifest_v1.py`): verdict — wiped → defeat, closed → abandon,
+extracted → victory if the objective was done and nobody was left, else partial; `extractionStatus`
+contested when enemies stood on the pad; people left stand where they stood (`camp.people[hid] =
+{where: "field", zoneId}`), do not board the next Drop until recalled, and the dance tape owes "bring
+<name> back from <zone>"; structures left are the footprint and the zone's holding — a holding is a
+holding whoever's it is.
+
+**They respond to what they see.** The observe gadget runs symmetrically: `va_seen_<zone>` is the
+recency-faded share of our units some enemy ally team has in line of sight (weighted by how many).
+`enemyResponseTarget()` sends QRF, escalation, beat and hot-extraction packs to the zone the enemy
+*believes* we are in, falling back to the pad, never to our true centroid. No heat meter, no comms.
+
+**The bridge, kernel-owned** (`tools/verdance_kernel/sortie.py`): Drop = gate → stamp → intent →
+`sync_mod -Copy` (the workspace mod is copied into `data\games` every Drop; the workspace is the
+truth) → **one** build (installer writes the seed and startscript) → the kernel starts `spring.exe
+--write-dir <barDataRoot> --only-local <startscript>` itself and remembers the spring pid and the infolog
+size. One watcher tails the infolog from there every 2 s, reassembles each `VA_RESULT_JSON_BEGIN..END`
+block in Python (chunk `i/n` checked; COMPACT retired), writes `inbox/archive/<resultKey>.json` +
+`latest_va_result.json`, and calls `bring_home` once per unprocessed key. Spring exits with no key →
+`incomplete`; a duplicate key still counts as home. `/api/session` reports the watch
+(`launching → in-game → bringing-home → home | closed-without-result`). Retired: `play_session_v1`,
+`run_full_cycle_v1`, `extract_latest_result.ps1` on the player path (operator/headless tools keep them),
+`_sync_customer_seed`, `/api/field`, `/api/continue`, `/api/extract-leave`, the receipts file, the live
+command file, the field packet, `next_sortie_choice.json` from Lua, the second build, `abandon` while
+Spring runs.
+
+**Numbers.** campaign gadget 9,216 → ~7,870 lines; objectives widget 3,728 → 2,549; new: exfil gadget
+~330, exfil widget ~330, sortie.py ~330, manifest_v1 ~100. Result verdict strings in Lua: 12 → 3 kinds.
+
+**Open.** The builder still composes a player kit the gadget discards (one `crew[]` from Python is the
+next cut); the seed is still produced by PowerShell; a hero left in the field is not yet spawned as a unit
+on return; the hub debrief does not yet draw the manifest.
+
 ## Pipeline
 
 ```

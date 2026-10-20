@@ -5392,7 +5392,7 @@ def _away_from_camp(state: Dict[str, Any]) -> set:
     out = set()
     people = ((state.get("camp") or {}).get("people") or {})
     for hid, rec in people.items():
-        if isinstance(rec, dict) and rec.get("where") in ("posted", "transit"):
+        if isinstance(rec, dict) and rec.get("where") in ("posted", "transit", "field"):
             out.add(str(hid))
     return out
 
@@ -6283,17 +6283,16 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
     esc_plan = build_escalation_plan(state, map_id, objective, finale_plan, workspace)
     adj_mode = "required" if mission_num <= 3 else ("preferred" if mission_num <= 6 else "forward")
     # Hub extract mark wins when stamped on the sortie order.
-    if finale_plan:
-        # Finales have no extraction: the closing battle is won on the field
-        # (gadget: objective complete with no extraction rect => victory).
-        extraction_zone = None
-    elif (sortie or {}).get("extractionZoneId"):
-        extraction_zone = sortie.get("extractionZoneId")
-    else:
-        extraction_zone = extraction_zone_for(
-            map_id, deploy_zone, workspace, objective.get("targetZoneId"),
-            mission_number=mission_num, adjacency_mode=adj_mode, state=state,
-        )
+    # Pass five: the company lands where it chose to extract to last time (manifest destination)
+    # when that zone is on this map; otherwise where the sortie says.
+    _camp = state.get("camp") or {}
+    if _camp.get("nextPadZoneId") and (_camp.get("nextPadMapId") in (None, map_id)):
+        _zm_map = (state.get("zoneMemory") or {}).get(map_id) or {}
+        if str(_camp["nextPadZoneId"]) in _zm_map:
+            deploy_zone = str(_camp["nextPadZoneId"])
+    # Raiders: in and out from the same ground. The pad IS the deployment zone; traversal to
+    # another map is a travel sortie, not a different extraction pad.
+    extraction_zone = None if finale_plan else deploy_zone
     # Carry sandbox flavor from debrief pick into intent.
     flavor = (sortie or {}).get("flavor")
     against = (sortie or {}).get("against") or objective.get("enemyFaction") or "armada"
@@ -6476,6 +6475,7 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
             # and the same belief as a Lua table the mod can VFS.Include (generated/va_intel_current.lua)
             import intel_lua_v1 as _il
             _il.write_intel_lua(intent, Path(workspace))
+            _il.write_pad_lua(intent, state, Path(workspace))
     except Exception as e:  # noqa: BLE001
         print(f"VA_INTENT_INTEL_SKIP {e}")
     return intent
@@ -7431,6 +7431,14 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
     from narrative_v1 import accept_result as accept_narrative_result
     narrative_event = accept_narrative_result(state, {**result, **narrative_evidence, "resultKey": key, "mapId": map_id}, credit, workspace, narrative_before)
     sortie_consume = consume_played_hub_sorties(workspace, result, map_id)
+    # The manifest (pass five): people left stand where they stood; the destination moves the pad.
+    try:
+        import manifest_v1 as _mf
+        _mfr = _mf.fold_manifest(state, result, bead, workspace)
+        if not _mfr.get("skipped"):
+            print(f"VA_MANIFEST left={_mfr.get('left')} dest={_mfr.get('destination')} verdict={_mfr.get('verdict')}")
+    except Exception as _mx:  # noqa: BLE001
+        print(f"VA_MANIFEST_FAIL {_mx}")
     # Belief world (Umwelt): fold this homecoming into the company's comprehension,
     # stamp the surprise (briefed vs found) on the bead, split truth from intel.
     # Skips cleanly when Umwelt is not importable; never blocks homecoming.
