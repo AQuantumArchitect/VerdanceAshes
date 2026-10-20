@@ -13,6 +13,17 @@
   --panel:rgba(8,16,12,.90);
   --warn:#e0a060; --good:#7dff8a; --bad:#ff7d7d; --tnb:#c9a0ff;
   --ash:#9a8b72;
+  /* Faction palette — ONE source. On the board a faction colour means
+     "we believe this faction holds it" (belief, never truth). */
+  --f-armada-rgb:90,165,255;   --f-armada:rgb(var(--f-armada-rgb));
+  --f-cortex-rgb:255,98,107;   --f-cortex:rgb(var(--f-cortex-rgb));
+  --f-nullmercs-rgb:80,237,140;--f-nullmercs:rgb(var(--f-nullmercs-rgb));
+  --f-wild-rgb:245,212,71;     --f-wild:rgb(var(--f-wild-rgb));
+  --f-raptors-rgb:245,212,71;  --f-raptors:rgb(var(--f-raptors-rgb));
+  --f-scavengers-rgb:193,134,255;--f-scavengers:rgb(var(--f-scavengers-rgb));
+  --f-legion-rgb:80,237,140;   --f-legion:rgb(var(--f-legion-rgb));
+  --edge-rgb:61,143,85; --good-rgb:125,255,138; --warn-rgb:224,160,96; --bad-rgb:255,125,125;
+  --muted-rgb:125,149,132; --ash-rgb:154,139,114;
 }
 * { box-sizing:border-box; }
 html,body { margin:0; height:100%; background:var(--bg); color:var(--ink);
@@ -145,6 +156,24 @@ h3 { margin:.8rem 0 .35rem; font-size:.78rem; color:var(--gold); font-weight:600
 .homecoming .hc-chip.warn { color:var(--warn); border-color:rgba(224,160,96,.4); }
 .homecoming .hc-chip.good { color:var(--good); border-color:rgba(125,255,138,.35); }
 .homecoming .hc-chip.bad { color:var(--bad); border-color:rgba(255,125,125,.4); }
+.homecoming .hc-manifest { margin:.5rem 0 .1rem; }
+.homecoming .hc-manifest[hidden] { display:none; }
+.homecoming .hm-kicker { font-size:.58rem; letter-spacing:.14em; text-transform:uppercase; color:var(--ash); margin-bottom:.3rem; }
+.homecoming .hm-grid { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:.5rem; }
+.homecoming .hm-col { background:rgba(0,0,0,.28); border:1px solid rgba(61,143,85,.25); border-radius:8px; padding:.4rem .5rem; min-width:0; }
+.homecoming .hm-h { font-size:.58rem; letter-spacing:.12em; text-transform:uppercase; color:var(--steam); margin-bottom:.2rem; }
+.homecoming .hm-col ul { margin:0; padding:0; list-style:none; font-size:.74rem; line-height:1.4; color:var(--ink); }
+.homecoming .hm-col li.hm-units { color:var(--muted); }
+.homecoming .hm-col li.hm-none { color:var(--muted); font-style:italic; }
+@media (max-width:640px) { .homecoming .hm-grid { grid-template-columns:1fr; } }
+.region .belief-counts { gap:.5rem; justify-content:flex-start; flex-wrap:wrap; }
+.region .bc-known { color:var(--good); }
+.region .bc-stale { color:var(--warn); }
+.region .bc-dark { color:var(--muted); }
+.hero-card.away { opacity:.55; filter:grayscale(.6); border-style:dashed; cursor:not-allowed; }
+.cc-field-people { font-size:.76rem; color:var(--muted); line-height:1.45; margin:.2rem 0 .6rem; border-left:2px solid var(--warn); padding-left:.5rem; }
+.cc-field-people b { color:var(--good); font-weight:600; }
+.cc-field-people b.bad { color:var(--bad); }
 .homecoming .hc-actions {
   display:flex; flex-wrap:wrap; gap:.35rem; margin-top:.55rem; justify-content:flex-end;
 }
@@ -319,38 +348,78 @@ h3 { margin:.8rem 0 .35rem; font-size:.78rem; color:var(--gold); font-weight:600
 .zone.capturable { border-color:rgba(61,143,85,.55); }
 .zone.open-target { box-shadow:inset 0 0 0 1px rgba(224,160,96,.45); }
 .zone.claimed { background:rgba(125,255,138,.12); }
-.zone.ctrl-ashwalkers, .zone.ctrl-nullmercs { background:rgba(61,143,85,.28); }
-.zone.ctrl-armada { background:rgba(126,200,255,.12); }
-.zone.ctrl-cortex { background:rgba(201,160,255,.14); }
-.zone.ctrl-wild { background:rgba(224,160,96,.12); }
-.zone.est { opacity:.88; }
-/* Outside operational footprint — still readable as planet, not mission ground */
+/* Outside operational footprint — still readable as planet, not mission ground.
+   Lighter than before so the dark hatch underneath stays legible. */
 .zone.fog {
-  opacity:.28; filter:saturate(.35) brightness(.75);
+  opacity:.55; filter:saturate(.45) brightness(.8);
   border-color:rgba(126,200,255,.12);
-  background:rgba(10,18,14,.55);
 }
-.zone.fog .zone-label { color:rgba(200,220,210,.45); }
+.zone.fog .zone-label { color:rgba(200,220,210,.5); }
 .zone.fog .zone-chip { display:none; }
-.zone.fog:hover { opacity:.45; border-color:rgba(224,186,96,.35); }
-/* Ash Console marks: infil=good, target=warn, exfil=steam */
+.zone.fog:hover { opacity:.75; border-color:rgba(224,186,96,.35); }
+
+/* ---- Belief paint (colour + shape + border; alpha = confidence) ----------
+   --conf is set inline per zone by renderBoard. Fill alpha floors at .1 so a
+   low-confidence belief still reads as a belief, not as empty. */
+.zone { --conf:0; --fill-a:calc(.08 + var(--conf) * .42); }
+.zone.bel-ours { background:rgba(var(--edge-rgb), var(--fill-a)); border:1px solid rgba(var(--good-rgb), calc(.35 + var(--conf) * .6)); }
+.zone.bel-held { background:rgba(var(--warn-rgb), var(--fill-a)); border:1px solid var(--warn); }
+.zone.bel-held.fac-armada { background:rgba(var(--f-armada-rgb), var(--fill-a)); border-color:rgba(var(--f-armada-rgb), calc(.4 + var(--conf) * .6)); }
+.zone.bel-held.fac-cortex { background:rgba(var(--f-cortex-rgb), var(--fill-a)); border-color:rgba(var(--f-cortex-rgb), calc(.4 + var(--conf) * .6)); }
+.zone.bel-held.fac-nullmercs, .zone.bel-held.fac-legion { background:rgba(var(--f-nullmercs-rgb), var(--fill-a)); border-color:rgba(var(--f-nullmercs-rgb), calc(.4 + var(--conf) * .6)); }
+.zone.bel-held.fac-wild, .zone.bel-held.fac-raptors, .zone.bel-held.fac-raptor { background:rgba(var(--f-wild-rgb), var(--fill-a)); border-color:rgba(var(--f-wild-rgb), calc(.4 + var(--conf) * .6)); }
+.zone.bel-held.fac-scavengers { background:rgba(var(--f-scavengers-rgb), var(--fill-a)); border-color:rgba(var(--f-scavengers-rgb), calc(.4 + var(--conf) * .6)); }
+.zone.bel-empty { background:transparent; border:1px solid rgba(238,246,238, calc(.25 + var(--conf) * .4)); }
+.zone.bel-unsure { background:rgba(var(--muted-rgb), calc(.1 + var(--conf) * .3)); border:1px solid rgba(var(--muted-rgb),.5); }
+.zone.bel-dark {
+  background:repeating-linear-gradient(135deg, rgba(var(--ash-rgb),.16) 0 3px, transparent 3px 9px);
+  border:1px dashed rgba(var(--ash-rgb),.45);
+}
+.zone .z-q {
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  font-size:1.3rem; color:rgba(var(--ash-rgb),.5); pointer-events:none; font-weight:600;
+}
+/* stale → dotted ash inner outline */
+.zone .z-stale { position:absolute; inset:2px; border:1px dotted var(--ash); border-radius:4px; pointer-events:none; }
+/* threat → thin red top-edge bar, width = believed threat */
+.zone .z-threat { position:absolute; left:0; top:0; height:3px; background:var(--bad); opacity:.85; pointer-events:none; }
+/* surprise / exposure corner badges */
+.zone .z-corner { position:absolute; right:14px; top:1px; display:flex; gap:2px; font-size:.62rem; line-height:1; pointer-events:auto; }
+.zone .z-surprise { color:var(--warn); font-weight:700; }
+.zone .z-surprise.bad { color:var(--warn); }
+.zone .z-surprise.muted { color:var(--muted); }
+.zone .z-eyes { color:var(--bad); }
+/* people ⚑ / holdings ■ */
+.zone .z-foot { position:absolute; right:3px; bottom:2px; display:flex; gap:.3rem; font-size:.58rem; line-height:1; background:rgba(7,17,13,.75); padding:1px 3px; border-radius:3px; }
+.zone .z-foot:empty { display:none; }
+.zone .z-people.good { color:var(--good); }
+.zone .z-people.bad { color:var(--bad); }
+.zone .z-hold { color:var(--gold); }
+/* exposure: their eyes on OUR holdings */
+.zone.exp-known { box-shadow:0 0 0 2px rgba(var(--bad-rgb),.45); outline:1px dashed rgba(var(--bad-rgb),.6); outline-offset:3px; }
+.zone.exp-suspected { outline:1px dotted rgba(var(--warn-rgb),.7); outline-offset:3px; }
+/* legal pads carry a STANDING mark: dashed edge inner ring + △ (even outside Pad mode) */
+.zone.pad-legal::before, .zone.pad-illegal::before {
+  content:"△"; position:absolute; right:3px; top:1px; font-size:.62rem; line-height:1;
+  color:var(--edge); pointer-events:none;
+}
+.zone.pad-legal::after { content:""; position:absolute; inset:3px; border:1px dashed rgba(var(--edge-rgb),.75); border-radius:4px; pointer-events:none; }
+.zone.pad-legal.mode-lz { cursor:pointer; }
+.zone.pad-legal.mode-lz:hover { border-color:var(--good); }
+.zone.pad-illegal { filter:grayscale(1) brightness(.8); cursor:not-allowed; }
+.zone.pad-illegal::before { color:var(--muted); text-decoration:line-through; }
+/* Ash Console marks: pad=good, wound=warn */
 .zone.deploy-mark {
-  background:rgba(125,255,138,.22); border-color:var(--good);
-  box-shadow:0 0 0 1px var(--edge), 0 0 12px rgba(125,255,138,.2); z-index:5;
+  background:rgba(var(--good-rgb),.22); border-color:var(--good);
+  box-shadow:0 0 0 1px var(--edge), 0 0 12px rgba(var(--good-rgb),.2); z-index:5;
 }
-.zone.extract-mark {
-  outline:1px dashed var(--steam); border-color:var(--steam);
-  box-shadow:0 0 0 1px rgba(126,200,255,.35); z-index:5;
-}
+.zone.deploy-mark::before { color:var(--good); }
 .zone.capture-mark {
-  background:rgba(224,160,96,.28); border-color:var(--warn);
-  box-shadow:0 0 12px rgba(224,160,96,.3); z-index:5;
+  background:rgba(var(--warn-rgb),.28); border-color:var(--warn);
+  box-shadow:0 0 12px rgba(var(--warn-rgb),.3); z-index:5;
 }
-.zone.rim-eligible.mode-lz:hover,
-.zone.lz-eligible.mode-lz:hover { border-color:var(--steam); }
-.zone.midfield.mode-lz:not(.lz-eligible) { cursor:not-allowed; opacity:.72; }
-.zone.midfield.lz-eligible.mode-lz { cursor:pointer; opacity:1; }
-.zone-label { pointer-events:none; line-height:1.15; }
+.zone.exp-known.deploy-mark { box-shadow:0 0 0 1px var(--edge), 0 0 0 3px rgba(var(--bad-rgb),.5); }
+.zone-label { pointer-events:none; line-height:1.15; position:relative; z-index:1; padding-right:1rem; }
 .zone-chip {
   display:inline-block; font-size:.5rem; letter-spacing:.05em; text-transform:uppercase;
   padding:0 .25rem; border-radius:4px; margin-top:.1rem;
@@ -382,7 +451,11 @@ h3 { margin:.8rem 0 .35rem; font-size:.78rem; color:var(--gold); font-weight:600
 }
 .legend-row .lg-infil::before { background:var(--good); }
 .legend-row .lg-target::before { background:var(--warn); }
-.legend-row .lg-exfil::before { background:var(--steam); }
+.legend-row .lg-pad::before { background:transparent; border:1px dashed var(--edge); }
+.legend-row .lg-stale::before { background:transparent; border:1px dotted var(--ash); }
+.legend-row .lg-dark::before { background:repeating-linear-gradient(135deg, rgba(154,139,114,.5) 0 1px, transparent 1px 3px); border:1px dashed var(--ash); }
+.legend-row .lg-threat::before { background:var(--bad); height:.2rem; }
+.legend-row .lg-eyes::before { background:transparent; border:1px dashed var(--bad); border-radius:50%; }
 .legend-row .lg-open::before { background:transparent; border:1px solid var(--warn); }
 
 /* Legacy modal kept hidden — theater is main view */
@@ -549,7 +622,7 @@ h3 { margin:.8rem 0 .35rem; font-size:.78rem; color:var(--gold); font-weight:600
 }
 .zone.has-recruit::after {
   content: "rez";
-  position: absolute; right: 2px; bottom: 1px;
+  position: absolute; right: 2px; bottom: 14px;
   font-size: .48rem; letter-spacing: .06em; text-transform: uppercase;
   color: var(--warn); opacity: .9;
 }
@@ -558,7 +631,7 @@ h3 { margin:.8rem 0 .35rem; font-size:.78rem; color:var(--gold); font-weight:600
 }
 .zone.has-recruit-ambient::after {
   content: "home";
-  position: absolute; right: 2px; bottom: 1px;
+  position: absolute; right: 2px; bottom: 14px;
   font-size: .48rem; letter-spacing: .06em; text-transform: uppercase;
   color: var(--muted); opacity: .75;
 }
@@ -1161,27 +1234,30 @@ details.advanced summary { cursor: pointer; color: var(--steam); }
       <div class="theater-head">
         <div>
           <h2 id="theater-title">Theater</h2>
-          <p class="theater-sub" id="theater-sub">Click a wound (target). Infil/exfil: quiet rim, or an Ashwalker base you already hold. Arrows show the route.</p>
+          <p class="theater-sub" id="theater-sub">Click a wound (target). The pad is one zone — you land there and you lift from there: a zone we believe is ours, a quiet rim, or the camp's next pad (△). The board shows what the company believes, not the ground.</p>
         </div>
         <div class="mode-bar" style="margin:0">
           <span class="label">Mark</span>
-          <button type="button" class="mode-btn active" data-mode="capture">Objective</button>
-          <button type="button" class="mode-btn" data-mode="deploy">Landing</button>
-          <button type="button" class="mode-btn" data-mode="extract">Extraction</button>
+          <button type="button" class="mode-btn active" data-mode="capture">Wound</button>
+          <button type="button" class="mode-btn" data-mode="pad">Pad</button>
         </div>
       </div>
       <div class="legend-row">
-        <span class="lg-infil">△ Landing</span>
-        <span class="lg-target">◎ Required target</span>
-        <span class="lg-exfil">◇ Extraction</span>
+        <span class="lg-infil">△ Pad · in and out</span>
+        <span class="lg-target">◎ Wound</span>
+        <span class="lg-pad">△ Legal pad</span>
         <span class="lg-open">Available objective</span>
+        <span class="lg-stale">Stale belief</span>
+        <span class="lg-dark">? Nobody looked</span>
+        <span class="lg-threat">Threat</span>
+        <span class="lg-eyes">◉ Their eyes on ours</span>
       </div>
       <div class="board-wrap" id="board">
         <div id="board-zones"></div>
         <svg class="board-route" id="board-route" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg>
       </div>
       <div class="theater-actions">
-        <div class="marks-sum" id="marks-sum">Pick a target on the map.</div>
+        <div class="marks-sum" id="marks-sum">Pick a wound on the map.</div>
         <div style="display:flex;gap:.4rem;flex-wrap:wrap">
           <button type="button" class="btn-ghost" id="btn-clear-marks" title="Reset marks to defaults">Reset route</button>
           <button type="button" class="btn-primary" id="btn-deploy">Drop into battle</button>
@@ -1297,7 +1373,7 @@ details.advanced summary { cursor: pointer; color: var(--steam); }
     </p>
     <ol class="steps">
       <li><span class="n">1</span><span><b>Form the Company</b> on first open — core always ships; pick <b>3 unlocked packs</b>. Unpicked heroes stay off your board until a field recruit.</span></li>
-      <li><span class="n">2</span><span>Pick a <b>mission</b> on the main screen, mark <b>landing / objective / extraction</b>, then <b>Drop into battle</b>.</span></li>
+      <li><span class="n">2</span><span>Pick a <b>mission</b> on the main screen, mark the <b>wound</b> and the <b>pad</b> (you lift from where you landed), then <b>Drop into battle</b>.</span></li>
       <li><span class="n">3</span><span>In BAR, take the objective. When the match ends, return here and <b>bring it home</b>.</span></li>
       <li><span class="n">4</span><span><b>Camp</b> (left bar) raises the jungle shelf. <b>Home → Broker</b> shows each available purchase and its exact cost.</span></li>
       <li><span class="n">5</span><span><b>Save / Load / Reset</b> in the footer manage campaign state.</span></li>

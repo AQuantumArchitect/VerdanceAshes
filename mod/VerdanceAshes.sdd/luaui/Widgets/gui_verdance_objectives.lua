@@ -84,17 +84,31 @@ local heroBanner = nil        -- { text, critical } while a hero wreck is rescua
 local heroWreckBeacon = nil   -- { x, z, name } for the DrawWorld ground ring
 local refreshHeroDownBanner   -- forward: open recover/recruit secondaries → banner
 
--- World beacons + one-shot minimap markers for objective/extraction/landing.
+-- World beacons + one-shot minimap markers for objective / the pad.
 local objectiveMarkerPlaced = false
-local extractionMarkerPlaced = false
-local deployMarkerPlaced = false
+local padMarkerPlaced = false
 local secondaryMarkerDone = {}  -- index -> true (supports mid-mission hero-down marks)
 local presentSecondary  -- defined after COL
 local beaconObjective = nil   -- { x, z }
-local beaconExtraction = nil  -- { x, z }
-local beaconDeploy = nil      -- { x, z } enfil / landing
+local beaconExtraction = nil  -- { x, z } the pad (lift point) — same point as beaconDeploy
+local beaconDeploy = nil      -- { x, z } the pad (landing point)
+-- The pad: one ring, the company lands and lifts from it (va_pad_x/z/r, fallback va_extract_x/z).
+-- Headcount is widget-side only (nothing published): what is inside the ring right now.
+local padState = {
+  x = -1, z = -1, r = 560,
+  onPeople = 0, onUnits = 0,
+  offPeople = {},        -- { name, dist, zoneId }
+  offUnits = 0, offStructures = 0,
+  enemyOnPad = 0,
+}
+local lastHeadcountFrame = -999
+local drawExtractBlock    -- forward: EXTRACT button + "LEFT IF YOU LIFT" ledger
+local drawPhaseRow        -- forward: phase chip + clock
+local drawSeenRow         -- forward: exposure row
+local scanHeadcount       -- forward: pad headcount (every 30 frames)
+local zoneIdAt            -- forward: world point -> zoneId (zone_map_current.lua bounds)
 -- Stage-gated route (hub theater arrows, one stage at a time).
--- push: enfil→obj | marks: obj→next required | extract: last→exfil
+-- push: pad→obj | marks: obj→next required | extract: last→pad
 local routeStage = nil          -- "push" | "marks" | "extract" | nil
 local routeStageDrawn = nil     -- last stage we stamped as a persistent map line
 local routeFrom = nil           -- { x, z, label }
@@ -358,8 +372,8 @@ local function updateNarrativeCam()
       steerBuiltInPip(followViewCenter.x, followViewCenter.z, followViewRadius)
     end
   elseif not followViewCenter then
-    local dx = tonumber((Spring.GetGameRulesParam("va_deploy_x"))) or -1
-    local dz = tonumber((Spring.GetGameRulesParam("va_deploy_z"))) or -1
+    local dx = tonumber((Spring.GetGameRulesParam("va_pad_x"))) or tonumber((Spring.GetGameRulesParam("va_deploy_x"))) or -1
+    local dz = tonumber((Spring.GetGameRulesParam("va_pad_z"))) or tonumber((Spring.GetGameRulesParam("va_deploy_z"))) or -1
     if dx >= 0 and dz >= 0 then
       followViewCenter = { x = dx, z = dz }
     elseif routeTo then
@@ -608,6 +622,9 @@ function widget:Initialize()
     Spring.SendCommands("bind Any+f9 va_strat_overlay")
   end)
   Spring.Echo("VA_UI_STRAT_OVERLAY bound to F9 · /vaoverlay · /vaclear")
+  -- One voice stack: Ketha barks (ours) + Yeva toasts (belief overlay, WG.vaYevaToasts)
+  -- stack upward from vsy-150. Claiming it tells the overlay not to draw its own.
+  if WG then WG.vaVoiceOwner = "objectives" end
 end
 
 local function gameIsPaused()
@@ -741,7 +758,7 @@ function widget:Update(dt)
     Spring.Echo("VA_UI_SORTIE_BEGAN frame=" .. tostring(Spring.GetGameFrame() or 0))
   end
 
-  -- Never let cam/poll glue remove the Objectives + Tnb HUD.
+  -- Never let cam/poll glue remove the Objectives HUD.
   pcall(updateFollowCam)
 end
 
@@ -755,6 +772,7 @@ function widget:Shutdown()
     Spring.SendCommands("unbind Any+f9 va_strat_overlay")
     widgetHandler:RemoveAction(widget, "va_strat_overlay", "t")
   end)
+  if WG and WG.vaVoiceOwner == "objectives" then WG.vaVoiceOwner = nil end
 end
 
 function widget:ViewResize(x, y)
@@ -798,15 +816,32 @@ local function markCopy(key, fallback)
   return (Ash and Ash.MARK and Ash.MARK[key]) or fallback
 end
 
+-- The pad point: va_pad_x/z/r (exfil gadget), falling back to va_extract_x/z, radius 560.
+local function readPad()
+  local px = numParam("va_pad_x", -1)
+  local pz = numParam("va_pad_z", -1)
+  local pr = numParam("va_pad_r", 0)
+  if px < 0 or pz < 0 then
+    px = numParam("va_extract_x", -1)
+    pz = numParam("va_extract_z", -1)
+  end
+  if pr <= 0 then pr = 560 end
+  padState.x, padState.z, padState.r = px, pz, pr
+  return px, pz, pr
+end
+
 local function placeMarkers()
-  if not deployMarkerPlaced then
-    local dx = numParam("va_deploy_x", -1)
-    local dz = numParam("va_deploy_z", -1)
-    if dx >= 0 and dz >= 0 then
-      deployMarkerPlaced = true
-      beaconDeploy = { x = dx, z = dz }
-      pcall(Spring.MarkerAddPoint, dx, groundY(dx, dz), dz, markCopy("landing", ">>> LANDING (enfil) <<<"), true)
-      rememberMarker(dx, dz)
+  -- ONE pad marker: the deploy pin and the extract pin are the same point.
+  do
+    local px, pz = readPad()
+    if px >= 0 and pz >= 0 then
+      beaconDeploy = { x = px, z = pz }
+      beaconExtraction = { x = px, z = pz }
+      if not padMarkerPlaced then
+        padMarkerPlaced = true
+        pcall(Spring.MarkerAddPoint, px, groundY(px, pz), pz, markCopy("pad", "PAD — land here, lift here"), true)
+        rememberMarker(px, pz)
+      end
     end
   end
   if not objectiveMarkerPlaced then
@@ -836,19 +871,6 @@ local function placeMarkers()
           secondaryMarkerDone[i] = doneKey
         end
       end
-    end
-  end
-  -- Extract LZ — single owner of Ash.MARK.extract.
-  -- boardResolved = all marks done OR rescue contract failed (same as gadget).
-  local ex = numParam("va_extract_x", -1)
-  local ez = numParam("va_extract_z", -1)
-  if ex >= 0 and ez >= 0 then
-    beaconExtraction = { x = ex, z = ez }
-    if not extractionMarkerPlaced then
-      extractionMarkerPlaced = true
-      local label = markCopy("extract", "EXTRACTION PAD - load it, then press EXTRACT")
-      pcall(Spring.MarkerAddPoint, ex, groundY(ex, ez), ez, label, true)
-      rememberMarker(ex, ez)
     end
   end
 end
@@ -888,7 +910,7 @@ refreshRouteStage = function()
   -- Board resolved (all marks done or rescue failed): route to the pad.
   if ext and boardResolved then
     routeStage = "extract"
-    local from = dep and { x = dep.x, z = dep.z, label = "COMPANY" } or nil
+    local from = dep and { x = dep.x, z = dep.z, label = "PAD" } or nil
     if obj then from = { x = obj.x, z = obj.z, label = "OBJECTIVE" } end
     if state.secondaries then
       for i = (state.secondaryTotal or 0), 1, -1 do
@@ -900,16 +922,12 @@ refreshRouteStage = function()
       end
     end
     routeFrom = from
-    local label = "EXFIL"
-    if state.objectiveFailed then
-      label = "EXFIL (FAIL)"
-    end
-    routeTo = { x = ext.x, z = ext.z, label = label }
+    routeTo = { x = ext.x, z = ext.z, label = "PAD" }
   elseif not state.objectiveComplete then
-    -- PUSH: enfil → primary objective
+    -- PUSH: pad → primary objective
     if dep and obj then
       routeStage = "push"
-      routeFrom = { x = dep.x, z = dep.z, label = "ENFIL" }
+      routeFrom = { x = dep.x, z = dep.z, label = "PAD" }
       routeTo = { x = obj.x, z = obj.z, label = "OBJECTIVE" }
     elseif obj then
       routeStage = "push"
@@ -922,7 +940,7 @@ refreshRouteStage = function()
     routeFrom = obj and { x = obj.x, z = obj.z, label = "OBJECTIVE" } or nil
     routeTo = { x = nextSec.x, z = nextSec.z, label = tostring(nextSec.label):upper() }
   elseif ext then
-    -- EXTRACT: last mark → exfil
+    -- EXTRACT: last mark → the pad
     routeStage = "extract"
     local from = nextSec -- shouldn't exist if requiredLeft==0
     if obj then from = { x = obj.x, z = obj.z, label = "OBJECTIVE" } end
@@ -936,7 +954,7 @@ refreshRouteStage = function()
       end
     end
     routeFrom = from
-    routeTo = { x = ext.x, z = ext.z, label = "EXFIL" }
+    routeTo = { x = ext.x, z = ext.z, label = "PAD" }
   end
 
   -- Stamp a persistent map line once per stage so the drawing stays until
@@ -1092,15 +1110,7 @@ poll = function()
     }
   end
   state.mercsAvailable = numParam("va_mercs_available", 0) == 1
-  state.tenebriumLooted = numParam("va_tenebrium_looted", 0)
-  state.tenebriumBank = numParam("va_tenebrium_bank", 0)
-  state.tenebriumSpent = numParam("va_tenebrium_spent", 0)
-  state.tenebriumLost = numParam("va_tenebrium_lost", 0)
-  state.tenebriumWrecksCreated = numParam("va_tenebrium_wrecks_created", 0)
-  state.tenebriumWrecksClaimed = numParam("va_tenebrium_wrecks_claimed", 0)
-  state.tenebriumWrecksLost = numParam("va_tenebrium_wrecks_lost", 0)
-  state.tenebriumWrecksUnclaimed = numParam("va_tenebrium_wrecks_unclaimed", 0)
-  state.armadaTenebriumCrisis = numParam("va_armada_tenebrium_crisis", 1) == 1
+  -- Tenebrium is read by gui_verdance_tnb_bar.lua only (one place on the HUD).
   state.requiredFrames = numParam("va_required_frames", state.requiredFrames or 19800)
   state.holdFrames = numParam("va_hold_frames", 0)
   local st = sp("va_status")
@@ -1122,6 +1132,10 @@ function widget:GameFrame(frame)
     lastPoll = frame
     poll()
   end
+  if frame - lastHeadcountFrame >= 30 and scanHeadcount then
+    lastHeadcountFrame = frame
+    pcall(scanHeadcount)
+  end
 end
 
 local function pointInRect(x, y, r)
@@ -1131,6 +1145,8 @@ end
 function widget:KeyPress(key)
   -- After sortie_over the exfil widget owns input; this HUD stays out of the way.
   if state.sortieOver then return false end
+  -- Manifest / extracting modal: Esc must cancel the manifest, not dismiss the briefing.
+  if WG and WG.vaExfilModal then return false end
   -- Space / Esc dismiss the briefing card only. Do not touch pause.
   if not briefingDismissed and (key == 32 or key == 27) and not state.terminal then
     briefingDismissed = true
@@ -1174,6 +1190,8 @@ end
 
 function widget:MousePress(x, y, button)
   if state.sortieOver then return false end
+  -- Modal fence: a click on EXTRACT while the manifest is up must not re-send VA_CMD:manifest.
+  if WG and WG.vaExfilModal then return false end
   -- Drag inside the narrative minimap crop to steer (does not toggle LIVE).
   if button == 1 and followViewRect and pointInRect(x, y, followViewRect) then
     followCamEnabled = true
@@ -1212,6 +1230,7 @@ function widget:MouseRelease(x, y, button)
 end
 
 function widget:MouseWheel(up, value)
+  if WG and WG.vaExfilModal then return false end
   local mx, my = Spring.GetMouseState()
   if not followViewRect or not pointInRect(mx, my, followViewRect) then
     return false
@@ -1258,8 +1277,8 @@ function widget:TextCommand(command)
     local ox = beaconObjective and beaconObjective.x
     local oz = beaconObjective and beaconObjective.z
     if not ox then
-      ox = tonumber((Spring.GetGameRulesParam("va_deploy_x"))) or 0
-      oz = tonumber((Spring.GetGameRulesParam("va_deploy_z"))) or 0
+      ox = (padState.x >= 0) and padState.x or (tonumber((Spring.GetGameRulesParam("va_deploy_x"))) or 0)
+      oz = (padState.z >= 0) and padState.z or (tonumber((Spring.GetGameRulesParam("va_deploy_z"))) or 0)
     end
     local body = command:match("^vanarrative%s+(.+)$")
       or "Test beat — sidebar zoom only. Main camera stays put."
@@ -1288,6 +1307,7 @@ function widget:TextCommand(command)
   end
   if command == "vaextract" then
     -- Same as the sidebar EXTRACT button.
+    if WG and WG.vaExfilModal then return true end
     Spring.SendLuaRulesMsg("VA_CMD:manifest")
     return true
   end
@@ -1388,30 +1408,69 @@ local function wrapBriefing(s, maxLen, maxLines)
   return lines
 end
 
+-- Phase + clock. The clock never ends the game: past zero the phase is OVERTIME and the
+-- clock counts up. Phases: APPROACH · FIGHT · MARKS · EXTRACT (board resolved) · OVERTIME.
+-- Returns phase, secondsLeft (>= 0), secondsOver (>= 0).
 local function currentPhaseClock()
   local frame = Spring.GetGameFrame() or 0
   local req = state.requiredFrames or 19800
   local left = math.max(0, (req - frame) / 30)
+  local over = math.max(0, (frame - req) / 30)
   local phase = Spring.GetGameRulesParam("va_phase")
   if type(phase) ~= "string" or phase == "" then
-    if state.terminal then
-      phase = "DONE"
-    elseif state.allObjectivesDone or state.objectiveFailed then
+    if state.allObjectivesDone or state.objectiveFailed then
       phase = "EXTRACT"
     elseif state.objectiveComplete then
       phase = "MARKS"
-    elseif state.captureMode and state.capturePhase == "hold" then
-      phase = (numParam("va_zone_hold_contested", 0) == 1) and "HOLD_CONTESTED" or "HOLD"
-    elseif state.captureMode and (state.capturePhase == "clear" or state.capturePhase == "idle") then
-      phase = "CLEAR"
     elseif frame < 90 * 30 then
       phase = "APPROACH"
     else
       phase = "FIGHT"
     end
+    if left <= 0 then phase = "OVERTIME" end
   end
   phase = string.upper(tostring(phase))
-  return phase, left
+  -- Legacy synced names (DEFEND / FORTIFY / CLAIMED / HOLD…) fold into the five chips.
+  local known = { APPROACH = true, FIGHT = true, MARKS = true, EXTRACT = true, OVERTIME = true }
+  if not known[phase] then
+    if left <= 0 then phase = "OVERTIME"
+    elseif state.allObjectivesDone or state.objectiveFailed then phase = "EXTRACT"
+    elseif state.objectiveComplete then phase = "MARKS"
+    else phase = "FIGHT" end
+  end
+  return phase, left, over
+end
+
+-- Phase chip (glyph + colour + border, via Ash.chipLabel) and the clock.
+-- Clock: ink while counting down; "+m:ss" in ash once it has run out. Never bad.
+local PHASE_FALLBACK = {
+  APPROACH = { glyph = "▸", color = "edge" },
+  FIGHT    = { glyph = "✦", color = "warn" },
+  MARKS    = { glyph = "◆", color = "gold" },
+  EXTRACT  = { glyph = "⌂", color = "steam" },
+  OVERTIME = { glyph = "∞", color = "ash", sub = "clock out — the map is awake" },
+}
+drawPhaseRow = function(x, y, right)
+  local phase, clockLeft, clockOver = currentPhaseClock()
+  local spec = (Ash and Ash.PHASE and Ash.PHASE[phase]) or PHASE_FALLBACK[phase] or PHASE_FALLBACK.FIGHT
+  local col = COL[spec.color] or COL.edge
+  local label = tostring(spec.glyph or "") .. " " .. phase
+  if Ash and Ash.chipLabel then
+    Ash.chipLabel(label, x, y, 10, col, "l")
+  else
+    text(label, x, y, 10, col, "l")
+  end
+  if clockLeft > 0 then
+    text(formatClock(clockLeft), right - 12, y, 12, COL.ink or COL.text, "r")
+  else
+    text("+" .. formatClock(clockOver), right - 12, y, 12, COL.ash or COL.dim, "r")
+  end
+  y = y - 16
+  if spec.sub then
+    text(tostring(spec.sub), x, y, 9, COL.ash or COL.dim, "l")
+    y = y - 12
+  end
+  return y
 end
 
 -- Slim boot card: title + one-line objective. Permanent detail lives on the left rail.
@@ -1446,7 +1505,7 @@ end
 
 local function resolveRightRail()
   -- Mid-right column. Width matches the team list. Height matches it when that
-  -- list is a real column; a folded stub must not crush the clock or exfil line.
+  -- list is a real column; a folded stub must not crush the clock or the EXTRACT block.
   local rememberedW = leftRailRectCache and leftRailRectCache.teamW
   local rememberedH = leftRailRectCache and leftRailRectCache.teamH
   local width = rememberedW or 232
@@ -1517,75 +1576,6 @@ local function resolveRightRail()
     teamW = rememberedW, teamH = rememberedH,
   }
   return left, bottom, right, top
-end
-
-local function drawDonut(cx, cy, outerR, innerR, rgb, alpha)
-  local r, g, b = rgb[1], rgb[2], rgb[3]
-  local a = alpha or 0.95
-  -- Outer plate (screen-space 2D vertices)
-  gl.Color(r, g, b, a)
-  gl.BeginEnd(GL.TRIANGLE_FAN, function()
-    gl.Vertex(cx, cy)
-    for i = 0, 24 do
-      local ang = (i / 24) * math.pi * 2
-      gl.Vertex(cx + math.cos(ang) * outerR, cy + math.sin(ang) * outerR)
-    end
-  end)
-  -- Dark hole (infinite-power well)
-  gl.Color(0.04, 0.02, 0.08, 0.92)
-  gl.BeginEnd(GL.TRIANGLE_FAN, function()
-    gl.Vertex(cx, cy)
-    for i = 0, 20 do
-      local ang = (i / 20) * math.pi * 2
-      gl.Vertex(cx + math.cos(ang) * innerR, cy + math.sin(ang) * innerR)
-    end
-  end)
-  -- Fusion-bright inner rim
-  gl.Color(math.min(1, r + 0.25), math.min(1, g + 0.15), 1, a * 0.85)
-  gl.LineWidth(1.5)
-  gl.BeginEnd(GL.LINE_LOOP, function()
-    for i = 0, 20 do
-      local ang = (i / 20) * math.pi * 2
-      gl.Vertex(cx + math.cos(ang) * (innerR + 1.2), cy + math.sin(ang) * (innerR + 1.2))
-    end
-  end)
-  gl.LineWidth(1)
-end
-
--- Purple Tnb donuts sit on the left objectives panel.
--- Stays visible for the whole sortie — blanking looked like a Tnb UI break.
-local function drawTenebriumDonuts()
-  local railLeft, _, railRight, railTop = resolveRightRail()
-  local bank = math.floor(tonumber(state.tenebriumBank) or 0)
-  -- Sit on the objectives panel, not in the metal bar. The resource bar
-  -- draws over anything parked on the top edge.
-  local cy = railTop - 36
-  local plates = math.min(14, math.max(1, bank > 0 and math.ceil(bank / 3) or 1))
-  if bank <= 0 then plates = 1 end
-  local grow = (plates - 1) * 6.5
-  local baseX = math.max((railLeft or 0) + 48, (railLeft or 0) + 168)
-  local roomRight = (railRight or (baseX + 40)) - 18
-  if baseX > roomRight then baseX = roomRight end
-  local minX = (railLeft or 0) + 52
-  if baseX - grow < minX then baseX = minX + grow end
-  local tnb = COL.tnb or { 0.788, 0.627, 1.0 }
-  local dark = { 0.35, 0.12, 0.55 }
-  for i = plates, 1, -1 do
-    -- Stack back into the panel. The left edge is the screen edge.
-    local ox = -(i - 1) * 6.5
-    local oy = (i - 1) * 4.5
-    local ceiling = (railTop or cy) - 16
-    if cy + oy > ceiling then oy = ceiling - cy end
-    local glow = 0.55 + 0.45 * (i / plates)
-    local rgb = (i == plates) and tnb or dark
-    drawDonut(baseX + ox, cy + oy, 11 + (i == plates and 1 or 0), 4.5, rgb, glow)
-  end
-  local labelX = math.max((railLeft or 0) + 28, baseX - (plates * 6.5) - 18)
-  text(tostring(bank), labelX, cy - 1, 13, tnb, "r")
-  text("Tnb", labelX, cy + 12, 9, COL.ash or COL.dim, "r")
-  if (state.tenebriumWrecksUnclaimed or 0) > 0 then
-    text(string.format("+%d field", state.tenebriumWrecksUnclaimed), labelX, cy - 14, 9, COL.warn or COL.dim, "r")
-  end
 end
 
 local function watchUnitLabel(uid)
@@ -1677,8 +1667,7 @@ local function drawWatchViewport(vx1, vy1, vx2, vy2)
     for _, z in ipairs(roleZones) do
       if z.kind and z.kind ~= "default" and z.cells then
         local col = z.kind == "objective" and COL.warn
-          or (z.kind == "extract" and (COL.steam or COL.blue)
-          or (z.kind == "deploy" and COL.good or (COL.gold or COL.title)))
+          or (z.kind == "pad" and (COL.steam or COL.blue) or (COL.gold or COL.title))
         gl.Color(col[1], col[2], col[3], 0.28)
         for _, c in ipairs(z.cells) do
           if c[3] >= x0 and c[1] <= x1 and c[4] >= z0 and c[2] <= z1 then
@@ -1802,37 +1791,17 @@ local function drawRightMissionRail()
   if routeStage and not state.terminal then
     local stageCol = routeStage == "extract" and (COL.steam or COL.blue)
       or (routeStage == "marks" and (COL.gold or COL.title) or COL.warn)
-    local stageBit = routeStage == "push" and "ROUTE  enfil → obj"
-      or (routeStage == "marks" and "ROUTE  obj → mark" or "ROUTE  → exfil")
+    local stageBit = routeStage == "push" and "ROUTE  pad → obj"
+      or (routeStage == "marks" and "ROUTE  obj → mark" or "ROUTE  → pad")
     text(stageBit, x, y, 10, stageCol, "l")
     text("F9", right - 12, y, 9, COL.dim, "r")
     y = y - 14
   end
 
   if not state.terminal then
-    local phase, clockLeft = currentPhaseClock()
-    local clockCol = COL.good
-    if clockLeft < 120 then clockCol = COL.warn end
-    if clockLeft < 45 then clockCol = COL.bad end
-    local phaseCol = COL.edge
-    if phase == "EXTRACT" then phaseCol = COL.steam or COL.blue end
-    if phase == "TIMEOUT" then phaseCol = COL.bad end
-    text(phase, x, y, 12, phaseCol, "l")
-    text(formatClock(clockLeft), right - 12, y, 12, clockCol, "r")
-    y = y - 16
-  end
-
-  -- Pin Tnb near the top so content below cannot push it off the rail.
-  do
-    local bank = math.floor(tonumber(state.tenebriumBank) or 0)
-    local field = math.floor(tonumber(state.tenebriumWrecksUnclaimed) or 0)
-    local tnb = COL.tnb or { 0.788, 0.627, 1.0 }
-    local line = string.format("Tnb carried %d", bank)
-    if field > 0 then
-      line = line .. string.format("  ·  +%d field", field)
-    end
-    text(line:sub(1, 34), x, y, 11, tnb, "l")
-    y = y - 14
+    y = drawPhaseRow(x, y, right)
+    -- Exposure: how much of us the enemy currently sees, and where (va_seen_<zone>).
+    if drawSeenRow then y = drawSeenRow(x, y, right) end
   end
 
   if obj.description then
@@ -1886,7 +1855,7 @@ local function drawRightMissionRail()
       gl.Color(1, 1, 1, 1)
       y = y - 12
     end
-    text(contested and "Contested — clock paused" or "Clear hostiles to keep ticking",
+    text(contested and "Contested" or "Clear hostiles to keep ticking",
       x, y, 10, contested and COL.warn or COL.dim, "l")
     y = y - 13
   elseif not state.objectiveComplete and state.zoneHold > 0 and not state.captureMode then
@@ -1957,22 +1926,14 @@ local function drawRightMissionRail()
       and not state.objectiveFailed and not state.terminal then
     text("Primary claimed — finish REQUIRED marks", x, y, 10, COL.warn, "l")
     y = y - 13
-    text("Extract early for partial credit, or finish required marks", x, y, 9, COL.dim, "l")
-    y = y - 12
   end
 
   -- EXTRACT: always available once the sortie is underway. One click sends
   -- VA_CMD:manifest; gui_verdance_exfil.lua takes it from there.
   extractButtonRect = nil
   if not state.terminal and playerBeganSortie then
-    y = math.max(y, 120) -- Keep the button on-screen at 720p.
-    local boardResolved = state.allObjectivesDone or state.objectiveFailed
-    extractButtonRect = { x1 = x, y1 = y - 30, x2 = right - 12, y2 = y }
-    panel(x, y - 30, right - 12, y, boardResolved and COL.good or (COL.steam or COL.edge))
-    text("EXTRACT", x + 10, y - 19, 12, COL.title, "l")
-    y = y - 36
-    text("Get what you want to keep onto the pad first.", x, y, 9, COL.dim, "l")
-    y = y - 16
+    y = math.max(y, 150) -- Keep the button + ledger on-screen at 720p.
+    y = drawExtractBlock(x, y, right)
   end
 
   if not playerBeganSortie and not state.terminal then
@@ -2008,6 +1969,218 @@ local function drawRightMissionRail()
   y = drawFollowCamCard(left, bottom, right, y - 4)
 end
 
+-- ---------------------------------------------------------------- the pad (widget-side)
+local function fmtDist(d)
+  d = tonumber(d) or 0
+  if d >= 1000 then return string.format("%.1f km", d / 1000) end
+  return string.format("%d m", math.floor(d + 0.5))
+end
+
+-- Headcount: what is inside the ring right now. Structures never lift (they become
+-- holdings); a unit with va_hero_id is a person; enemies inside the ring are counted too.
+-- Nothing is published — the synced manifest is the record, this is the live read.
+scanHeadcount = function()
+  local px, pz, pr = readPad()
+  padState.onPeople, padState.onUnits = 0, 0
+  padState.offPeople = {}
+  padState.offUnits, padState.offStructures, padState.enemyOnPad = 0, 0, 0
+  if px < 0 or pz < 0 then return end
+  local myTeam = Spring.GetLocalTeamID and Spring.GetLocalTeamID() or Spring.GetMyTeamID()
+  if myTeam == nil then return end
+  local r2 = pr * pr
+  for _, uid in ipairs(Spring.GetTeamUnits(myTeam) or {}) do
+    if Spring.ValidUnitID(uid) and not Spring.GetUnitIsDead(uid) then
+      local defID = Spring.GetUnitDefID(uid)
+      local ud = defID and UnitDefs[defID]
+      local structure = ud and (ud.isBuilding or ud.isFactory or ((ud.speed or 1) == 0))
+      local ux, _, uz = Spring.GetUnitPosition(uid)
+      if structure then
+        padState.offStructures = padState.offStructures + 1
+      elseif ux then
+        local dx, dz = ux - px, uz - pz
+        local d2 = dx * dx + dz * dz
+        local hero = Spring.GetUnitRulesParam(uid, "va_hero_id")
+        local isHero = hero ~= nil and tostring(hero) ~= "" and tostring(hero) ~= "0"
+        if d2 <= r2 then
+          if isHero then padState.onPeople = padState.onPeople + 1
+          else padState.onUnits = padState.onUnits + 1 end
+        elseif isHero then
+          local hname = Spring.GetUnitRulesParam(uid, "va_hero_name")
+          local rec = heroRoster[tostring(hero)]
+          local name = (type(hname) == "string" and hname ~= "" and hname) or (rec and rec.name) or tostring(hero)
+          padState.offPeople[#padState.offPeople + 1] = {
+            name = tostring(name),
+            dist = math.sqrt(d2),
+            zoneId = zoneIdAt and zoneIdAt(ux, uz) or nil,
+          }
+        else
+          padState.offUnits = padState.offUnits + 1
+        end
+      end
+    end
+  end
+  -- Farthest person first: that is the one the player has to go get.
+  table.sort(padState.offPeople, function(a, b) return a.dist > b.dist end)
+  -- Who else is standing on our pad (visible to us; not allied, not gaia).
+  local gaia = Spring.GetGaiaTeamID and Spring.GetGaiaTeamID() or -1
+  for _, uid in ipairs(Spring.GetUnitsInCylinder(px, pz, pr) or {}) do
+    local team = Spring.GetUnitTeam(uid)
+    if team ~= nil and team ~= gaia and not Spring.AreTeamsAllied(myTeam, team) then
+      padState.enemyOnPad = padState.enemyOnPad + 1
+    end
+  end
+end
+
+-- EXTRACT button (three redundant-coded states) + the "LEFT IF YOU LIFT" ledger.
+--   steam  "EXTRACT · 2 ppl / 14 u"                              — clean
+--   warn   "[!] EXTRACT · …" + "Vane is off the pad — 1.2 km"     — a hero is off
+--   bad    "[✗] EXTRACT" + "nobody on the pad"                   — empty
+-- No verdict hint: the button never goes good. Returns the next y.
+drawExtractBlock = function(x, y, right)
+  local ps = padState
+  local people, units = ps.onPeople, ps.onUnits
+  local heroOff = #ps.offPeople
+  local empty = (people + units) == 0
+  local fill, labelCol, label, sub
+  if empty then
+    fill, labelCol = COL.bad, COL.bad
+    label = "[✗] EXTRACT"
+    sub = "nobody on the pad"
+  elseif heroOff > 0 then
+    fill, labelCol = COL.warn, COL.warn
+    label = string.format("[!] EXTRACT · %d ppl / %d u", people, units)
+    local h = ps.offPeople[1]
+    if heroOff > 1 then
+      sub = string.format("%s +%d off the pad — %s", h.name, heroOff - 1, fmtDist(h.dist))
+    else
+      sub = string.format("%s is off the pad — %s", h.name, fmtDist(h.dist))
+    end
+  else
+    fill, labelCol = (COL.steam or COL.blue), COL.title
+    label = string.format("EXTRACT · %d ppl / %d u", people, units)
+  end
+  local h = sub and 44 or 30
+  extractButtonRect = { x1 = x, y1 = y - h, x2 = right - 12, y2 = y }
+  if Ash and Ash.actionRow then
+    Ash.actionRow(x, y - h, right - 12, y, { fill = fill, focused = not empty })
+  else
+    panel(x, y - h, right - 12, y, fill)
+  end
+  text(label:sub(1, 30), x + 12, y - 19, 12, labelCol, "l")
+  if sub then
+    text(sub:sub(1, 36), x + 12, y - 35, 9, labelCol, "l")
+  end
+  y = y - h - 8
+
+  -- Ledger: what stays on Verdance if you lift now (up to 3 rows).
+  text("LEFT IF YOU LIFT", x, y, 9, COL.ash or COL.dim, "l")
+  y = y - 13
+  local rows = {}
+  if heroOff > 0 then
+    local h = ps.offPeople[1]
+    rows[#rows + 1] = { string.format("✗ %s — %s", h.name, fmtDist(h.dist)), COL.bad }
+  end
+  if ps.offUnits > 0 then
+    rows[#rows + 1] = { string.format("! %d unit%s off the pad", ps.offUnits, ps.offUnits == 1 and "" or "s"), COL.warn }
+  end
+  if ps.offStructures > 0 then
+    rows[#rows + 1] = { string.format("⌂ %d structure%s → holdings", ps.offStructures, ps.offStructures == 1 and "" or "s"), COL.gold or COL.title }
+  end
+  if heroOff > 1 and #rows < 3 then
+    rows[#rows + 1] = { string.format("✗ +%d more people off the pad", heroOff - 1), COL.bad }
+  end
+  if #rows == 0 then
+    rows[1] = { "nothing left behind", COL.dim }
+  end
+  for i = 1, math.min(3, #rows) do
+    text(rows[i][1]:sub(1, 32), x, y, 10, rows[i][2], "l")
+    y = y - 13
+  end
+  return y - 4
+end
+
+-- Headcount chip billboarded at the pad centre (DrawScreen, WorldToScreenCoords).
+local function drawPadChip()
+  if padState.x < 0 or padState.z < 0 then return end
+  if not Spring.WorldToScreenCoords then return end
+  local wy = groundY(padState.x, padState.z) + 24
+  local sx, sy, sz = Spring.WorldToScreenCoords(padState.x, wy, padState.z)
+  if not sx or not sy then return end
+  if sz and sz > 1 then return end -- behind the camera
+  if sx < -240 or sx > vsx + 240 or sy < -40 or sy > vsy + 40 then return end
+  local main = string.format("ON PAD  %d people · %d units", padState.onPeople, padState.onUnits)
+  local suffix = nil
+  local heroOff = #padState.offPeople
+  if heroOff > 0 then
+    suffix = string.format(" · %d hero%s OFF", heroOff, heroOff == 1 and "" or "es")
+  end
+  if padState.enemyOnPad > 0 then
+    suffix = (suffix or "") .. string.format(" · %d enemy", padState.enemyOnPad)
+  end
+  local size = 11
+  local wMain = gl.GetTextWidth(main) * size
+  local wSuf = suffix and (gl.GetTextWidth(suffix) * size) or 0
+  local w = wMain + wSuf + 20
+  local x1 = sx - w * 0.5
+  local y1 = sy + 6
+  local steam = COL.steam or COL.blue
+  panel(x1, y1, x1 + w, y1 + 20, steam)
+  text(main, x1 + 10, y1 + 6, size, steam, "l")
+  if suffix then
+    text(suffix, x1 + 10 + wMain, y1 + 6, size, COL.bad, "l")
+  end
+end
+
+-- The pad ring (DrawWorld): steam LINE_LOOP, 48 segments, pulsing; four ticks N/E/S/W;
+-- an inner dashed ring at r-40 that turns warn while enemies stand inside.
+local function drawPadRing()
+  local px, pz, pr = padState.x, padState.z, padState.r
+  if px < 0 or pz < 0 or pr <= 0 then return end
+  local steam = COL.steam or COL.blue
+  local segs = 48
+  local twoPi = math.pi * 2
+  local pulse = 0.35 + 0.35 * math.abs(math.sin(os.clock() * 1.6))
+  gl.Color(steam[1], steam[2], steam[3], pulse)
+  gl.LineWidth(3)
+  gl.BeginEnd(GL.LINE_LOOP, function()
+    for i = 0, segs - 1 do
+      local a = (i / segs) * twoPi
+      local x, z = px + math.cos(a) * pr, pz + math.sin(a) * pr
+      gl.Vertex(x, groundY(x, z) + 10, z)
+    end
+  end)
+  -- Four short radial ticks (N/E/S/W).
+  gl.BeginEnd(GL.LINES, function()
+    for k = 0, 3 do
+      local a = k * math.pi * 0.5
+      local cx, cz = math.cos(a), math.sin(a)
+      local x1, z1 = px + cx * (pr - 30), pz + cz * (pr - 30)
+      local x2, z2 = px + cx * (pr + 50), pz + cz * (pr + 50)
+      gl.Vertex(x1, groundY(x1, z1) + 10, z1)
+      gl.Vertex(x2, groundY(x2, z2) + 10, z2)
+    end
+  end)
+  -- Inner dashed ring: warn (and faster pulse) while enemies are inside.
+  local inner = math.max(60, pr - 40)
+  local hostile = (padState.enemyOnPad or 0) > 0
+  local ic = hostile and COL.warn or steam
+  local ia = hostile and (0.55 + 0.4 * math.abs(math.sin(os.clock() * 4))) or 0.3
+  gl.Color(ic[1], ic[2], ic[3], ia)
+  gl.LineWidth(2)
+  gl.BeginEnd(GL.LINES, function()
+    for i = 0, segs - 1, 2 do
+      local a1 = (i / segs) * twoPi
+      local a2 = ((i + 1) / segs) * twoPi
+      local x1, z1 = px + math.cos(a1) * inner, pz + math.sin(a1) * inner
+      local x2, z2 = px + math.cos(a2) * inner, pz + math.sin(a2) * inner
+      gl.Vertex(x1, groundY(x1, z1) + 10, z1)
+      gl.Vertex(x2, groundY(x2, z2) + 10, z2)
+    end
+  end)
+  gl.LineWidth(1)
+  gl.Color(1, 1, 1, 1)
+end
+
 local drawFaultLogged = {}
 
 local function guardDraw(name, fn)
@@ -2020,42 +2193,65 @@ local function guardDraw(name, fn)
 end
 
 local function drawObjectiveBar()
-  -- Permanent objectives live on the left panel; Tnb sits on that same panel.
+  -- Permanent objectives live on the right rail. Tnb lives in gui_verdance_tnb_bar.lua.
   guardDraw("rail", drawRightMissionRail)
-  guardDraw("tnb", drawTenebriumDonuts)
 end
 
--- One bark at a time — framed voice block (matches hub .voice).
+-- The voice stack: one chrome for everyone (Ash.voiceBlock). Our Ketha bark (one at a
+-- time) sits at vsy-150; Yeva's toasts from the belief overlay (WG.vaYevaToasts) stack
+-- upward from there, 46px apart, at most two above the bark — so nothing overlaps and the
+-- stack stays under the Tnb bar (vsy-84).
+local VOICE_BASE_Y = 150
+local VOICE_STEP = 46
 local function drawBark()
-  local bark = barkQueue[1]
-  if not bark then return end
-  local frame = Spring.GetGameFrame() or 0
-  if not bark.untilFrame then
-    bark.untilFrame = frame + bark.seconds * 30
-    if bark.speaker ~= "" then playUi("beep4", 0.45) end
-  end
-  if frame >= bark.untilFrame then
-    table.remove(barkQueue, 1)
-    return
-  end
-  local remaining = (bark.untilFrame - frame) / 30
-  local alpha = math.min(1, remaining / 0.75)
   local cx = vsx * 0.5
-  local y = vsy - 188
-  if Ash and Ash.voiceBlock then
-    Ash.voiceBlock(cx, y, math.min(560, vsx * 0.55), bark.speaker, bark.text, alpha)
-    return
+  local y = vsy - VOICE_BASE_Y
+  local w = math.min(560, vsx * 0.55)
+  local slots = 3
+  local bark = barkQueue[1]
+  if bark then
+    local frame = Spring.GetGameFrame() or 0
+    if not bark.untilFrame then
+      bark.untilFrame = frame + bark.seconds * 30
+      if bark.speaker ~= "" then playUi("beep4", 0.45) end
+    end
+    if frame >= bark.untilFrame then
+      table.remove(barkQueue, 1)
+      bark = nil
+    end
   end
-  local label
-  local color
-  if bark.speaker ~= "" then
-    label = bark.speaker .. ': "' .. bark.text .. '"'
-    color = { COL.ketha[1], COL.ketha[2], COL.ketha[3], alpha }
-  else
-    label = bark.text
-    color = { COL.warn[1], COL.warn[2], COL.warn[3], alpha }
+  if bark then
+    local remaining = (bark.untilFrame - (Spring.GetGameFrame() or 0)) / 30
+    local alpha = math.min(1, remaining / 0.75)
+    if Ash and Ash.voiceBlock then
+      Ash.voiceBlock(cx, y, w, bark.speaker, bark.text, alpha)
+    else
+      local label = bark.speaker ~= "" and (bark.speaker .. ': "' .. bark.text .. '"') or bark.text
+      local base = bark.speaker ~= "" and COL.ketha or COL.warn
+      text(label, cx, y, 15, { base[1], base[2], base[3], alpha })
+    end
+    y = y + VOICE_STEP
+    slots = slots - 1
   end
-  text(label, cx, y, 15, color)
+  -- Yeva (belief overlay) — same chrome, stacked above.
+  local toasts = WG and WG.vaYevaToasts
+  if type(toasts) == "table" and #toasts > 0 then
+    local now = Spring.GetGameSeconds()
+    for i = 1, #toasts do
+      if slots <= 0 then break end
+      local t = toasts[i]
+      if t and (tonumber(t.until_) or 0) > now then
+        local a = math.min(1, (t.until_ - now) / 2)
+        if Ash and Ash.voiceBlock then
+          Ash.voiceBlock(cx, y, w, t.speaker or "Yeva", t.text, a)
+        else
+          text((t.speaker or "Yeva") .. ': "' .. tostring(t.text) .. '"', cx, y, 15, { COL.ketha[1], COL.ketha[2], COL.ketha[3], a })
+        end
+        y = y + VOICE_STEP
+        slots = slots - 1
+      end
+    end
+  end
 end
 
 local function loadStratZones()
@@ -2084,6 +2280,51 @@ local function loadStratZones()
   return stratZones
 end
 
+-- World point -> zoneId by zone_map_current.lua bounds (AABB; good enough for a ledger).
+zoneIdAt = function(x, z)
+  if not x or not z then return nil end
+  for _, zr in ipairs(loadStratZones()) do
+    if x >= zr.x1 and x <= zr.x2 and z >= zr.z1 and z <= zr.z2 then
+      return zr.zoneId
+    end
+  end
+  return nil
+end
+
+-- Exposure row: "SEEN · quiet|noticed|loud|pinned · at <zone>" from max va_seen_<zone>
+-- (how much of us the enemy currently sees), with a tiny bad hatch swatch — the same
+-- encoding the minimap uses for exposure, never the belief fill.
+drawSeenRow = function(x, y, right)
+  local best, bestLabel = 0, nil
+  for _, zr in ipairs(loadStratZones()) do
+    local v = numParam("va_seen_" .. tostring(zr.zoneId), 0)
+    if v > best then best, bestLabel = v, zr.label end
+  end
+  local level, col
+  if best < 0.05 then level, col = "quiet", COL.dim
+  elseif best < 0.25 then level, col = "noticed", COL.ink or COL.text
+  elseif best < 0.6 then level, col = "loud", COL.warn
+  else level, col = "pinned", COL.bad end
+  local sw = 10
+  local sx1, sy1 = x, y - 1
+  gl.Color(0.12, 0.14, 0.13, 0.85)
+  gl.Rect(sx1, sy1, sx1 + sw, sy1 + sw)
+  local bad = COL.bad
+  if Ash and Ash.hatchRect then
+    Ash.hatchRect(sx1, sy1, sx1 + sw, sy1 + sw, { bad[1], bad[2], bad[3], 0.3 + 0.7 * math.min(1, best) }, 3)
+  end
+  gl.Color(bad[1], bad[2], bad[3], 0.6)
+  gl.LineWidth(1)
+  gl.BeginEnd(GL.LINE_LOOP, function()
+    gl.Vertex(sx1, sy1); gl.Vertex(sx1 + sw, sy1); gl.Vertex(sx1 + sw, sy1 + sw); gl.Vertex(sx1, sy1 + sw)
+  end)
+  local line = "SEEN · " .. level
+  if bestLabel and best >= 0.05 then line = line .. " · at " .. tostring(bestLabel) end
+  text(line:sub(1, 34), x + sw + 6, y, 10, col, "l")
+  gl.Color(1, 1, 1, 1)
+  return y - 14
+end
+
 toggleStratOverlay = function()
   stratOverlay = not stratOverlay
   if stratOverlay then loadStratZones() end
@@ -2105,9 +2346,9 @@ local function drawStratOverlay()
   local x2 = x1 + panelW
   panel(x1, y1, x2, y2, COL.edge)
 
-  local stageName = (routeStage == "push" and "PUSH  enfil → objective")
+  local stageName = (routeStage == "push" and "PUSH  pad → objective")
     or (routeStage == "marks" and "MARKS  objective → next")
-    or (routeStage == "extract" and "EXTRACT  → exfil")
+    or (routeStage == "extract" and "EXTRACT  → pad")
     or "ROUTE idle"
   text("STRATEGIC OVERLAY", x1 + 14, y2 - 14, 10, COL.ash or COL.dim, "l")
   text("F9 close · /vaclear marks", x2 - 14, y2 - 14, 9, COL.dim, "r")
@@ -2145,8 +2386,7 @@ local function drawStratOverlay()
     local col = COL.dim
     local a = 0.12
     if z.kind == "objective" then col, a = COL.warn, 0.40
-    elseif z.kind == "deploy" then col, a = COL.good, 0.35
-    elseif z.kind == "extract" then col, a = (COL.steam or COL.blue), 0.35
+    elseif z.kind == "pad" then col, a = (COL.steam or COL.blue), 0.35
     elseif z.kind == "secondary" then col, a = (COL.gold or COL.title), 0.30
     else
       -- skip default clutter on the overlay
@@ -2217,6 +2457,13 @@ function widget:DrawScreen()
 
   -- Sortie over: gui_verdance_exfil.lua draws the closing card. Hide our panels.
   if state.sortieOver then return end
+  -- Manifest modal (WG.vaExfilModal): the exfil widget owns the screen; drop click targets.
+  if WG and WG.vaExfilModal then
+    extractButtonRect = nil
+    followCamRect = nil
+    followViewRect = nil
+    return
+  end
 
   local frame = Spring.GetGameFrame() or 0
   local showCard = missionCard ~= nil or #briefingLines > 0
@@ -2224,8 +2471,9 @@ function widget:DrawScreen()
       and not state.objectiveComplete and showCard then
     guardDraw("briefing", drawBriefingCard)
   end
-  -- Objectives + Tnb are the load-bearing HUD — always attempt them.
+  -- Objectives rail is the load-bearing HUD — always attempt it.
   drawObjectiveBar()
+  guardDraw("padchip", drawPadChip)
   guardDraw("bark", drawBark)
   guardDraw("strat", drawStratOverlay)
 end
@@ -2251,6 +2499,11 @@ function widget:DrawWorld()
       gl.Vertex(hx, hy, hz - 70); gl.Vertex(hx, hy, hz + 70)
     end)
     gl.LineWidth(1)
+  end
+
+  -- The pad ring: steam circle, four ticks, inner dashed ring (warn when enemies stand in it).
+  if not state.terminal then
+    guardDraw("padring", drawPadRing)
   end
 
   -- Presence / hold zone outline while the clock matters.
@@ -2342,15 +2595,6 @@ end
 missionEventHandlers["all_objectives_complete"] = function(reason)
   queueBark("Ketha", "Required objectives complete. Load the pad with what you're keeping, then press EXTRACT.")
   poll()
-  refreshRouteStage()
-end
-
-missionEventHandlers["extract_armed"] = function(reason)
-  playUi("beep4", 0.9)
-  queueBark("Ketha", reason == "on_pad"
-    and "On the extract pad. Press EXTRACT when you're loaded."
-    or "Pad is live — get the company onto it, then press EXTRACT.")
-  routeStageDrawn = nil
   refreshRouteStage()
 end
 

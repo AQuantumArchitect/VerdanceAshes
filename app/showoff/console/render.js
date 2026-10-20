@@ -9,6 +9,15 @@ export function operation(op) {
     field('Known risks',op.risks)+field('Consequences',op.consequences);
 }
 
+// One line for the operations rail: people of ours who are not at camp.
+// rows: [{name, where: posted|transit|field, label, wounded}]
+export function fieldLine(rows) {
+  const list=(rows || []).filter(Boolean);
+  if(!list.length) return '';
+  const word=r=>r.where==='transit' ? 'on the road' : (r.label || 'somewhere');
+  return `<p class="cc-field-people" role="status">Left in the field: ${list.map(r=>`<b class="${r.wounded?'bad':''}">${escape(r.name)}</b> (${escape(word(r))}${r.wounded?' · wounded':''})`).join(', ')}</p>`;
+}
+
 export function thread(t, live) {
   return `<p class="cc-eyebrow">Company matter / ${escape(t.stage)}</p><h2>${escape(t.title)}</h2>
     <p>${escape(t.opening)}</p>${field('Why now',t.reason)}

@@ -124,10 +124,10 @@ def normalize_plan(raw: dict) -> dict:
     exfil = raw.get("exfilZoneId") or (marks.get("exfilZoneId") if isinstance(marks, dict) else None)
     if infil:
         deploy = infil
-    if exfil:
-        extract = exfil
-    if not extract:
-        extract = deploy
+    # Pass six: raiders land and lift from the same pad. The exfil/extract mark is accepted for
+    # schema compatibility but always equals the pad.
+    exfil = None
+    extract = deploy
     map_id = raw.get("mapId") or raw.get("map")
     wet = bool(raw.get("wetReach") or infil)
     return {
@@ -250,6 +250,32 @@ def soft_validate(plan: dict, ws: Path, state: dict | None = None) -> list[str]:
                     f"LZ_{kind}: {zone_id} is midfield (edgeScore={edge_score(bounds):.2f}); "
                     f"need quiet rim or Ashwalker base (landing_zones_v1 missing)"
                 )
+            return
+        # Pass six: legality is judged on what the COMPANY BELIEVES, never on the truth.
+        # legal = believed ours · a rim we believe empty / nobody has looked at, with low believed
+        # threat · the pad the last manifest said we would land on.
+        bel = None
+        try:
+            import hub_belief_v1  # type: ignore
+            bel = (hub_belief_v1.belief_surface(ws, state, str(map_id or "")).get("zones") or {}).get(str(zone_id))
+        except Exception:  # noqa: BLE001
+            bel = None
+        if bel is not None:
+            camp = state.get("camp") or {}
+            if str(camp.get("nextPadZoneId") or "") == str(zone_id):
+                return
+            if bel.get("believed") == "ours":
+                return
+            rim = bounds is not None and is_rim_zone(bounds)
+            threat = float(bel.get("threat") or 0.0)
+            if bel.get("believed") in ("empty", "dark", "unsure") and rim and threat <= 0.4:
+                return
+            why = {"held": f"believed held by {bel.get('faction') or 'someone'} ({int(float(bel.get('confidence') or 0) * 100)}%)",
+                   "empty": "believed empty but not a rim", "dark": "nobody has looked and it is not a rim",
+                   "unsure": "not a rim", "ours": "ours"}.get(bel.get("believed") or "dark", "not a legal pad")
+            if threat > 0.4 and bel.get("believed") in ("empty", "dark", "unsure"):
+                why = f"believed threat too high ({threat:.2f})"
+            warns.append(f"LZ_{kind}: {zone_id} illegal ({why}); a pad is ground we believe is ours, or a quiet rim")
             return
         ok, reason = lz.legal_landing_reason(
             state,

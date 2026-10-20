@@ -61,7 +61,8 @@ def _drop_obs(z: Dict[str, Any]) -> Dict[str, float]:
     ctrl = str(z.get("controllingFaction") or ab.get("control") or "neutral")
     strength = max(float(ab.get("baseStrength") or 0), float(ab.get("militaryPressure") or 0), float(ab.get("fortification") or 0))
     return {"ours": 1.0 if ctrl == "ashwalkers" else 0.0, "held": 0.0 if ctrl == "neutral" else 1.0,
-            "strength": _clamp(strength / 0.25), "threat": _clamp(float(ab.get("instability") or 0.0))}
+            "strength": _clamp(strength / 0.25), "threat": _clamp(float(ab.get("instability") or 0.0)),
+            "faction": ctrl}
 
 
 def _open_world(state: Dict[str, Any], workspace: Path):
@@ -217,7 +218,7 @@ def fold_homecoming(state: Dict[str, Any], result: Dict[str, Any], bead: Dict[st
             zid = f.get("zoneId")
             if zid in truth and zid in world.host.engine.field.clusters:
                 eta = 0.35 if on_held else 0.15
-                world.observe_zone(str(zid), source="rumour:flip", eta=eta, minute=now_minute, held=1.0,
+                world.observe_zone(str(zid), source="rumour:flip", eta=eta, minute=now_minute, held=1.0, faction=str(f.get("toFaction") or "") or None,
                                    ours=1.0 if f.get("toFaction") == "ashwalkers" else 0.0, threat=0.6)
                 if eta >= 0.3:
                     intel.append({"kind": "rumour", "about": "flip", "mapId": f.get("mapId"), "zoneId": zid, "label": f.get("label"),

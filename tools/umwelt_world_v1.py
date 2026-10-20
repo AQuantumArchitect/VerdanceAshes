@@ -52,8 +52,7 @@ def _umwelt():
     src = os.environ.get("UMWELT_SRC")
     if src and src not in sys.path:
         sys.path.insert(0, src)
-    for cand in (ROOT.parent / "umwelt" / "src", Path.home() / "ws-win" / "umwelt" / "src", Path.home() / "umwelt" / "src",
-                 ROOT / "tools" / "_vendor"):  # shipped snapshot, last resort (scripts/ship.ps1)
+    for cand in (ROOT.parent / "umwelt" / "src", Path.home() / "ws-win" / "umwelt" / "src", Path.home() / "umwelt" / "src"):
         if cand.is_dir() and str(cand) not in sys.path:
             sys.path.insert(0, str(cand))
     try:
@@ -169,6 +168,9 @@ class VerdanceWorld:
         self.pushes: Dict[str, Dict[str, float]] = {q: {"pole_0": 0.0, "pole_1": 0.0, "renew": 0.0} for q in QUESTIONS}
         self.host = api.GameHost().register_world(self.spec, population=False, start=minute_to_time(start_minute))
         self.last_seen: Dict[str, Dict[str, Any]] = {}     # "node.role" -> {minute, source, eta}
+        # who we last SAW holding a zone (a label, not a quantity): the board's faction colour is
+        # this, at the held row's confidence. Nobody-looked zones have no entry.
+        self.seen_faction: Dict[str, Dict[str, Any]] = {}  # zoneId -> {faction, minute, eta, source}
         self._batch: Optional[Dict[str, Any]] = None
         self.zone_meta = {str(z["zoneId"]): z for z in world_graph(self.workspace).get("nodes") or [] if z.get("zoneId")}
         for z in self.extra_zones:
@@ -257,7 +259,14 @@ class VerdanceWorld:
 
     def observe_zone(self, zone_id: str, *, source: str, eta: float, minute: Optional[float] = None,
                      ours: Optional[float] = None, held: Optional[float] = None,
-                     strength: Optional[float] = None, threat: Optional[float] = None) -> None:
+                     strength: Optional[float] = None, threat: Optional[float] = None,
+                     faction: Optional[str] = None) -> None:
+        if faction is not None and held is not None:
+            prev = self.seen_faction.get(zone_id)
+            m = float(minute if minute is not None else self.minute)
+            # a louder look overrides a quieter rumour; a newer look overrides an older one of the same weight
+            if prev is None or float(eta) >= 0.5 * float(prev.get("eta") or 0) or m - float(prev.get("minute") or 0) > 720:
+                self.seen_faction[zone_id] = {"faction": str(faction), "minute": round(m, 3), "eta": round(float(eta), 3), "source": source}
         readings = {}
         for r, v in (("ours", ours), ("held", held), ("strength", strength), ("threat", threat)):
             if v is not None:
@@ -332,6 +341,11 @@ class VerdanceWorld:
             if node in self.zone_meta:
                 row["label"] = self.zone_meta[node].get("label")
                 row["mapId"] = self.zone_meta[node].get("mapId")
+                if role == "held" and state != "dark":
+                    sf = self.seen_faction.get(node)
+                    if sf:
+                        row["faction"] = sf.get("faction")
+                        row["factionSeenMinute"] = sf.get("minute")
             nodes.append(row)
         questions = []
         for q, spec in QUESTIONS.items():
@@ -357,7 +371,7 @@ class VerdanceWorld:
 
     def save(self, path: Path) -> None:
         self.host.save(str(path))
-        Path(str(path) + ".seen.json").write_text(json.dumps({"minute": self.minute, "last_seen": self.last_seen, "pushes": self.pushes}, indent=1), encoding="utf-8")
+        Path(str(path) + ".seen.json").write_text(json.dumps({"minute": self.minute, "last_seen": self.last_seen, "pushes": self.pushes, "seen_faction": self.seen_faction}, indent=1), encoding="utf-8")
 
     def load(self, path: Path) -> None:
         self.host.load(str(path))
@@ -365,6 +379,7 @@ class VerdanceWorld:
         if meta.exists():
             d = json.loads(meta.read_text(encoding="utf-8"))
             self.last_seen = d.get("last_seen") or {}
+            self.seen_faction = d.get("seen_faction") or {}
             self.pushes = d.get("pushes") or self.pushes
             # The engine pickle restores the field; the host's clock is ours to restore,
             # or every reload would start the fog again from minute zero.

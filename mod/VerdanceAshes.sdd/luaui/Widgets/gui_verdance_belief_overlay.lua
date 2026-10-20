@@ -27,44 +27,62 @@ local zoneOrder = {}
 local enabled = true
 local showPanel = false
 local lastTick = -1
-local surprised = {}    -- zoneId -> true once spoken
-local toasts = {}       -- { text, until }
+local surprised = {}    -- zoneId -> true once checked to a conclusion
+local contradicted = {} -- zoneId -> kind ("ours_found_enemy" | "dark_found_enemy" | "theirs_found_empty"); never fades
+local toasts = {}       -- { text, until_ } — Yeva lines; drawn in the shared voice stack
 local mapMatches = false
 
+-- Every colour from Ash.COL (empty → muted). Belief fill, exposure hatch, glyphs.
 local COL = {
-  ours   = { 0.49, 1.00, 0.54 },
-  theirs = { 1.00, 0.42, 0.36 },
-  empty  = { 0.72, 0.72, 0.66 },
-  dark   = { 0.35, 0.38, 0.36 },
-  ink    = { 0.93, 0.96, 0.93 },
+  ours   = { 0.490, 1.000, 0.541 },
+  theirs = { 0.878, 0.627, 0.376 },
+  empty  = { 0.490, 0.584, 0.518 },
+  dark   = { 0.490, 0.584, 0.518 },
+  ink    = { 0.933, 0.965, 0.933 },
+  warn   = { 0.878, 0.627, 0.376 },
+  muted  = { 0.490, 0.584, 0.518 },
+  bad    = { 1.000, 0.490, 0.490 },
 }
+local Ash
 do
-  local ok, Ash = pcall(VFS.Include, "luaui/Include/va_ash_tokens.lua")
-  if not ok or type(Ash) ~= "table" then
-    ok, Ash = pcall(VFS.Include, "LuaUI/Include/va_ash_tokens.lua")
+  local ok, mod = pcall(VFS.Include, "luaui/Include/va_ash_tokens.lua")
+  if not ok or type(mod) ~= "table" then
+    ok, mod = pcall(VFS.Include, "LuaUI/Include/va_ash_tokens.lua")
   end
-  if ok and type(Ash) == "table" and Ash.COL then
-    if Ash.COL.good then COL.ours = { Ash.COL.good[1], Ash.COL.good[2], Ash.COL.good[3] } end
-    if Ash.COL.warn then COL.theirs = { Ash.COL.warn[1], Ash.COL.warn[2], Ash.COL.warn[3] } end
-    if Ash.COL.muted then COL.dark = { Ash.COL.muted[1], Ash.COL.muted[2], Ash.COL.muted[3] } end
-    if Ash.COL.ink then COL.ink = { Ash.COL.ink[1], Ash.COL.ink[2], Ash.COL.ink[3] } end
+  Ash = (ok and type(mod) == "table") and mod or nil
+  if Ash and Ash.COL then
+    local A = Ash.COL
+    COL.ours = A.good; COL.theirs = A.warn; COL.empty = A.muted; COL.dark = A.muted
+    COL.ink = A.ink; COL.warn = A.warn; COL.muted = A.muted; COL.bad = A.bad
   end
 end
+
+-- Voice stack (one chrome for everyone). gui_verdance_objectives.lua owns the stack when it is
+-- loaded: it draws its Ketha bark at vsy-150 and our Yeva toasts above it (WG.vaYevaToasts),
+-- 46px apart, so the two never overlap. If no owner has claimed the stack we draw it here.
+local VOICE_BASE_Y = 150
+local VOICE_STEP = 46
 
 -- Yeva (the company's quartermaster of bad news). Plain speech; the numbers stay in the log.
 local LINES = {
   ours_found_enemy = {
-    "Yeva: %s was supposed to be ours. It is not.",
-    "Yeva: We briefed %s as held. Somebody else is holding it.",
+    "%s was supposed to be ours. It is not.",
+    "We briefed %s as held. Somebody else is holding it.",
   },
   dark_found_enemy = {
-    "Yeva: Nobody had looked at %s. There is a column in it.",
-    "Yeva: %s was a blank on the map. It is not blank.",
+    "Nobody had looked at %s. There is a column in it.",
+    "%s was a blank on the map. It is not blank.",
   },
   theirs_found_empty = {
-    "Yeva: %s was briefed as theirs. There is nobody there.",
-    "Yeva: We came expecting a fight at %s. The ground is empty.",
+    "%s was briefed as theirs. There is nobody there.",
+    "We came expecting a fight at %s. The ground is empty.",
   },
+}
+-- Persistent minimap glyph per contradiction kind (never fades once drawn).
+local GLYPH = {
+  ours_found_enemy   = { "✗", "warn" },
+  dark_found_enemy   = { "✗", "warn" },
+  theirs_found_empty = { "○", "muted" },
 }
 
 local function readLua(path)
@@ -166,13 +184,24 @@ local function enemySeen(id)
   return tonumber(Spring.GetGameRulesParam("va_obs_enemy_" .. id)) or 0
 end
 
+-- how much of us the enemy currently sees in this zone (observe gadget, 0..1)
+local function exposure(id)
+  return tonumber(Spring.GetGameRulesParam("va_seen_" .. id)) or 0
+end
+
+local function publishToasts()
+  if WG then WG.vaYevaToasts = toasts end
+end
+
 local function say(kind, label, id)
   local pool = LINES[kind]
   if not pool then return end
   local n = 0
   for c in tostring(id):gmatch(".") do n = n + c:byte() end
   local text = string.format(pool[(n % #pool) + 1], label)
-  toasts[#toasts + 1] = { text = text, until_ = Spring.GetGameSeconds() + 14 }
+  toasts[#toasts + 1] = { speaker = "Yeva", text = text, until_ = Spring.GetGameSeconds() + 14 }
+  publishToasts()
+  contradicted[id] = kind
   Spring.Echo("VA_SURPRISE_LIVE zone=" .. id .. " kind=" .. kind)
 end
 
@@ -201,6 +230,11 @@ end
 
 function widget:Initialize()
   rebuild()
+  publishToasts()
+end
+
+function widget:Shutdown()
+  if WG then WG.vaYevaToasts = nil end
 end
 
 function widget:Update()
@@ -229,9 +263,31 @@ function widget:TextCommand(cmd)
   return false
 end
 
+-- Minimap pass order: belief shape (fill / fill+border / border / "?") → exposure hatch
+-- (bad diagonal lines, alpha = va_seen_) → "◉" at the loudest zone → contradiction glyphs.
+-- Fill and hatch never share an encoding: fill = what we believed, hatch = what they see.
 function widget:DrawInMiniMap(sx, sy)
   if not enabled or not mapMatches or #zoneOrder == 0 then return end
   local mapX, mapZ = Game.mapSizeX or 1, Game.mapSizeZ or 1
+  local function cellRect(c)
+    local x1 = (c[1] / mapX) * sx
+    local y1 = sy - (c[2] / mapZ) * sy
+    local x2 = (c[3] / mapX) * sx
+    local y2 = sy - (c[4] / mapZ) * sy
+    return math.min(x1, x2), math.min(y1, y2), math.max(x1, x2), math.max(y1, y2)
+  end
+  local function outlineCells(rec, col, a)
+    gl.Color(col[1], col[2], col[3], a)
+    gl.LineWidth(1)
+    for i = 1, #rec.cells do
+      local x1, y1, x2, y2 = cellRect(rec.cells[i])
+      gl.BeginEnd(GL.LINE_LOOP, function()
+        gl.Vertex(x1, y1); gl.Vertex(x2, y1); gl.Vertex(x2, y2); gl.Vertex(x1, y2)
+      end)
+    end
+  end
+
+  -- 1. belief tint, shape by state
   for _, id in ipairs(zoneOrder) do
     local rec = cellsByZone[id]
     local state, conf = believed(id)
@@ -242,14 +298,17 @@ function widget:DrawInMiniMap(sx, sy)
     if state == "dark" then alpha = 0.06 * fade end
     if alpha > 0.01 then
       local col = COL[state] or COL.dark
-      gl.Color(col[1], col[2], col[3], alpha)
-      for i = 1, #rec.cells do
-        local c = rec.cells[i]
-        local x1 = (c[1] / mapX) * sx
-        local y1 = sy - (c[2] / mapZ) * sy
-        local x2 = (c[3] / mapX) * sx
-        local y2 = sy - (c[4] / mapZ) * sy
-        gl.Rect(math.min(x1, x2), math.min(y1, y2), math.max(x1, x2), math.max(y1, y2))
+      if state == "ours" or state == "theirs" or state == "dark" then
+        gl.Color(col[1], col[2], col[3], alpha)
+        for i = 1, #rec.cells do
+          local x1, y1, x2, y2 = cellRect(rec.cells[i])
+          gl.Rect(x1, y1, x2, y2)
+        end
+      end
+      if state == "theirs" then
+        outlineCells(rec, COL.warn, math.min(0.9, alpha * 2.2))
+      elseif state == "empty" then
+        outlineCells(rec, COL.empty, math.min(0.8, alpha * 2.0))
       end
       if state == "dark" and fade > 0.5 then
         -- a question mark where nobody has looked
@@ -258,30 +317,88 @@ function widget:DrawInMiniMap(sx, sy)
       end
     end
   end
+
+  -- 2. exposure hatch: how much of us the enemy sees here (bad, lines only)
+  local loudId, loud = nil, 0
+  for _, id in ipairs(zoneOrder) do
+    local rec = cellsByZone[id]
+    local seen = exposure(id)
+    if seen > loud then loud, loudId = seen, id end
+    if seen > 0.02 then
+      local hcol = { COL.bad[1], COL.bad[2], COL.bad[3], math.min(0.9, seen) }
+      for i = 1, #rec.cells do
+        local x1, y1, x2, y2 = cellRect(rec.cells[i])
+        if Ash and Ash.hatchRect then
+          Ash.hatchRect(x1, y1, x2, y2, hcol, 4)
+        else
+          gl.Color(hcol[1], hcol[2], hcol[3], hcol[4])
+          gl.BeginEnd(GL.LINES, function()
+            gl.Vertex(x1, y1); gl.Vertex(x2, y2)
+          end)
+        end
+      end
+    end
+  end
+  if loudId and loud >= 0.05 then
+    local rec = cellsByZone[loudId]
+    gl.Color(COL.bad[1], COL.bad[2], COL.bad[3], 0.95)
+    gl.Text("◉", (rec.cx / mapX) * sx, sy - (rec.cz / mapZ) * sy - 5, 11, "co")
+  end
+
+  -- 3. contradiction glyphs: once the ground disagreed with the brief, the mark stays
+  for id, kind in pairs(contradicted) do
+    local rec = cellsByZone[id]
+    local g = GLYPH[kind]
+    if rec and g then
+      local col = COL[g[2]] or COL.warn
+      gl.Color(col[1], col[2], col[3], 0.95)
+      gl.Text(g[1], (rec.cx / mapX) * sx, sy - (rec.cz / mapZ) * sy - 5, 11, "co")
+    end
+  end
   gl.Color(1, 1, 1, 1)
+  gl.LineWidth(1)
+end
+
+-- Draw the voice stack ourselves only when no owner (objectives HUD) has claimed it.
+local function drawToastsFallback(vsx, vsy, now)
+  local y = vsy - VOICE_BASE_Y
+  local shown = 0
+  for i = 1, #toasts do
+    local t = toasts[i]
+    if shown >= 3 then break end
+    local a = math.min(1, (t.until_ - now) / 2)
+    if Ash and Ash.voiceBlock then
+      Ash.voiceBlock(vsx * 0.5, y, math.min(560, vsx * 0.55), t.speaker or "Yeva", t.text, a)
+    else
+      gl.Color(0, 0, 0, 0.55 * a)
+      local w = gl.GetTextWidth(t.text) * 15 + 24
+      gl.Rect(vsx * 0.5 - w * 0.5, y - 8, vsx * 0.5 + w * 0.5, y + 20)
+      gl.Color(COL.ink[1], COL.ink[2], COL.ink[3], a)
+      gl.Text("Yeva: " .. t.text, vsx * 0.5, y, 15, "co")
+    end
+    y = y + VOICE_STEP
+    shown = shown + 1
+  end
 end
 
 function widget:DrawScreen()
   if not mapMatches then return end
   local vsx, vsy = Spring.GetViewGeometry()
   local now = Spring.GetGameSeconds()
-  -- toasts: Yeva, top centre, below whatever the objectives widget owns
-  local y = vsy - 150
-  local keep = {}
-  for i = 1, #toasts do
+  -- expire toasts; keep the shared table identity so the owner sees the same list
+  local n = #toasts
+  local w = 0
+  for i = 1, n do
     local t = toasts[i]
+    toasts[i] = nil
     if t.until_ > now then
-      keep[#keep + 1] = t
-      local a = math.min(1, (t.until_ - now) / 2)
-      gl.Color(0, 0, 0, 0.55 * a)
-      local w = gl.GetTextWidth(t.text) * 15 + 24
-      gl.Rect(vsx * 0.5 - w * 0.5, y - 8, vsx * 0.5 + w * 0.5, y + 20)
-      gl.Color(COL.ink[1], COL.ink[2], COL.ink[3], a)
-      gl.Text(t.text, vsx * 0.5, y, 15, "co")
-      y = y - 30
+      w = w + 1
+      toasts[w] = t
     end
   end
-  toasts = keep
+  if w > 0 and not (WG and WG.vaVoiceOwner) then
+    drawToastsFallback(vsx, vsy, now)
+  end
   if not showPanel or #zoneOrder == 0 then
     gl.Color(1, 1, 1, 1)
     return
@@ -289,9 +406,9 @@ function widget:DrawScreen()
   -- panel: belief vs what we have seen, per zone (/vabeliefpanel)
   local px, py = 20, vsy * 0.5 + 10 * #zoneOrder
   gl.Color(0, 0, 0, 0.5)
-  gl.Rect(px - 8, py - 16 * (#zoneOrder + 1) - 6, px + 330, py + 18)
+  gl.Rect(px - 8, py - 16 * (#zoneOrder + 1) - 6, px + 360, py + 18)
   gl.Color(COL.ink[1], COL.ink[2], COL.ink[3], 1)
-  gl.Text("BELIEF  (before landing  ->  seen)", px, py, 12, "o")
+  gl.Text("BELIEF  (before landing  ->  seen  ->  they see us)", px, py, 12, "o")
   for _, id in ipairs(zoneOrder) do
     py = py - 16
     local state, conf = believed(id)
@@ -299,8 +416,9 @@ function widget:DrawScreen()
     local col = COL[state] or COL.dark
     gl.Color(col[1], col[2], col[3], 1)
     local seen = (eta >= 0.6) and "seen" or ((eta > 0.05) and string.format("glimpsed %d%%", math.floor(eta * 100 + 0.5)) or "unseen")
-    gl.Text(string.format("%-22s %-7s %3d%%  %s%s", cellsByZone[id].label:sub(1, 22), state, math.floor(conf * 100 + 0.5), seen,
-      (enemySeen(id) > 0) and ("  enemy " .. enemySeen(id)) or ""), px, py, 11, "o")
+    gl.Text(string.format("%-22s %-7s %3d%%  %s%s  exp %d%%%s", cellsByZone[id].label:sub(1, 22), state, math.floor(conf * 100 + 0.5), seen,
+      (enemySeen(id) > 0) and ("  enemy " .. enemySeen(id)) or "", math.floor(exposure(id) * 100 + 0.5),
+      contradicted[id] and ("  " .. (GLYPH[contradicted[id]] or { "?" })[1]) or ""), px, py, 11, "o")
   end
   gl.Color(1, 1, 1, 1)
 end

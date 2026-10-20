@@ -298,6 +298,9 @@ local function endWith(kind, dest)
   Spring.Echo("VA_MANIFEST " .. kind .. " dest=" .. tostring(m.destination)
     .. " going=" .. tostring(#m.going.heroes) .. "h/" .. tostring(m.going.unitCount)
     .. " staying=" .. tostring(#m.staying.heroes) .. "h/" .. tostring(m.staying.unitCount) .. "u/" .. tostring(m.staying.structureCount) .. "s")
+  -- The campaign gadget reads va_pad_enemy inside VA_EndSortie (extractionClean), so it
+  -- must be on the board before the call, not after.
+  Spring.SetGameRulesParam("va_pad_enemy", tonumber(m.enemyOnPad) or 0, { public = true })
   if GG and GG.VA_EndSortie then
     GG.VA_EndSortie(kind)
   else

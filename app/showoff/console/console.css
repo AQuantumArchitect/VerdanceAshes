@@ -88,14 +88,21 @@
 .cc-choice .cc-stance { color:#d0b7eb;font-size:.75rem; }
 #workspace-home .camp-chip { max-width:400px; }
 
-.command-console .zone.ctrl-ashwalkers,.command-console .zone.ctrl-nullmercs { background:#155d36!important;border:2px solid #50ed8c!important;--owner:#70ffa7; }
-.command-console .zone.ctrl-armada { background:#153f80!important;border:2px solid #5aa5ff!important;--owner:#98c6ff; }
-.command-console .zone.ctrl-cortex { background:#802b31!important;border:2px solid #ff626b!important;--owner:#ffa3a9; }
-.command-console .zone.ctrl-raptors,.command-console .zone.ctrl-raptor,.command-console .zone.ctrl-wild { background:#665411!important;border:2px solid #f5d447!important;--owner:#ffe57a; }
-.command-console .zone.ctrl-scavengers { background:#542b77!important;border:2px solid #c186ff!important;--owner:#ddb6ff; }
+/* Belief paint lives in index.html (.zone.bel-* / .fac-*) and reads the ONE faction palette
+   (--f-* tokens on :root). The owner chip colour follows the believed faction. */
+.command-console .zone { --owner:var(--muted); }
+.command-console .zone.bel-ours { --owner:var(--good); }
+.command-console .zone.bel-held { --owner:var(--warn); }
+.command-console .zone.bel-held.fac-armada { --owner:var(--f-armada); }
+.command-console .zone.bel-held.fac-cortex { --owner:var(--f-cortex); }
+.command-console .zone.bel-held.fac-nullmercs,.command-console .zone.bel-held.fac-legion { --owner:var(--f-nullmercs); }
+.command-console .zone.bel-held.fac-wild,.command-console .zone.bel-held.fac-raptors,.command-console .zone.bel-held.fac-raptor { --owner:var(--f-wild); }
+.command-console .zone.bel-held.fac-scavengers { --owner:var(--f-scavengers); }
+.command-console .zone.bel-empty { --owner:var(--ink); }
+.command-console .zone.bel-dark { --owner:var(--ash); }
 .cc-faction-key { display:flex;flex-wrap:wrap;gap:.6rem;font-size:.72rem;padding:.3rem .4rem; }
-.cc-faction-key .ally { color:#70ffa7; }.cc-faction-key .armada { color:#98c6ff; }.cc-faction-key .cortex { color:#ffa3a9; }.cc-faction-key .raptors { color:#ffe57a; }.cc-faction-key .scavengers { color:#ddb6ff; }
-.cc-owner { position:absolute;left:5px;top:26px;font-size:.68rem;font-weight:bold;color:var(--owner);background:#080d13db;padding:2px 4px; }
+.cc-faction-key .ally { color:var(--good); }.cc-faction-key .held { color:var(--warn); }.cc-faction-key .armada { color:var(--f-armada); }.cc-faction-key .cortex { color:var(--f-cortex); }.cc-faction-key .nullmercs { color:var(--f-nullmercs); }.cc-faction-key .raptors { color:var(--f-wild); }.cc-faction-key .scavengers { color:var(--f-scavengers); }.cc-faction-key .empty { color:var(--ink); }.cc-faction-key .dark { color:var(--ash); }
+.cc-owner { position:absolute;left:5px;top:26px;font-size:.68rem;font-weight:bold;color:var(--owner);background:#080d13db;padding:2px 4px;z-index:1; }
 .command-console .hide-ownership .zone { background:#152019!important;border-color:#456253!important; }
 .hide-ownership .cc-owner,.hide-ownership .cc-faction-key { display:none; }
 #cc-camp-upgrades { border:1px solid #577750;background:#14271b;padding:1.2rem;border-radius:8px;margin:1rem 0; }

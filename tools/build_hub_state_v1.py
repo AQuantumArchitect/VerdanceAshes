@@ -24,6 +24,10 @@ OUT_EMBED = ROOT / "app" / "showoff" / "hub_state.embed.js"
 # Mission selection is owned by the story engine. This module only projects
 # the canonical order into the C&C board; it must not invent a second route.
 from verdance_story_engine_v1 import opening_hub_choice
+try:
+    import hub_belief_v1  # pass six: the board paints belief, never truth
+except Exception:  # noqa: BLE001
+    hub_belief_v1 = None
 
 try:
     from commerce_delivery_v1 import delivery_eta
@@ -55,6 +59,7 @@ def rank_from_level(level: int) -> str:
 
 
 def build_aces(state: dict) -> list[dict]:
+    _away = hub_belief_v1.away_from_camp(state) if hub_belief_v1 else set()
     characters = state.get("characters") or {}
     roster = (state.get("roster") or {}).get("heroes") or []
     by_id = {h.get("heroId"): h for h in roster if h.get("heroId")}
@@ -80,7 +85,8 @@ def build_aces(state: dict) -> list[dict]:
             "wounds": int(ch.get("wounds") or rh.get("timesWounded") or 0),
             "status": rh.get("status") or ch.get("status") or "active",
             "scars": list(ch.get("scars") or rh.get("scars") or []),
-            "deployable": (rh.get("status") or ch.get("status") or "active") == "active",
+            "deployable": ((rh.get("status") or ch.get("status") or "active") == "active") and (hid not in _away),
+            "where": ((state.get("camp") or {}).get("people") or {}).get(hid, {}).get("where") or "camp",
             "bonds": dict(ch.get("bonds") or {}),
             "loadout": ch.get("loadout") or {"modules": [], "bayTier": 0},
         }
@@ -455,13 +461,30 @@ def build_theater(state: dict, map_id: str, capture_contracts: list | None = Non
             }
         )
     zones_out: list[dict] = []
+    # Pass six law: the board shows what the COMPANY believes. zoneMemory (truth) only names the
+    # zones; colour, confidence, state and threat come from the belief frame.
+    belief = {}
+    if hub_belief_v1 is not None:
+        try:
+            belief = hub_belief_v1.belief_surface(ROOT, state, map_id).get("zones") or {}
+        except Exception:  # noqa: BLE001
+            belief = {}
     for zid, z in zm.items():
         if not isinstance(z, dict):
             continue
         abstract = z.get("abstract") or {}
-        control = str(
-            z.get("controllingFaction") or abstract.get("control") or "unknown"
-        ).lower()
+        b = belief.get(str(zid)) or {"believed": "dark", "confidence": 0.0, "state": "dark", "faction": None}
+        believed = b.get("believed") or "dark"
+        # `control` keeps its old name for the renderer: a faction we believe holds it, "ashwalkers"
+        # for ours, "empty"/"unknown" otherwise. Never the truth.
+        if believed == "ours":
+            control = "ashwalkers"
+        elif believed == "held":
+            control = str(b.get("faction") or "held").lower()
+        elif believed == "empty":
+            control = "empty"
+        else:
+            control = "unknown"
         claim_key = f"capture:{map_id}:{zid}"
         claimed = bool(
             claims.get(claim_key)
@@ -473,13 +496,19 @@ def build_theater(state: dict, map_id: str, capture_contracts: list | None = Non
                 "zoneId": zid,
                 "label": z.get("label") or zid,
                 "control": control,
-                "confidence": z.get("confidence") or "estimated",
+                "believed": believed,
+                "confidence": float(b.get("confidence") or 0.0),
+                "state": b.get("state") or "dark",
+                "ageMin": b.get("age_min"),
+                "source": b.get("source"),
+                "threat": b.get("threat"),
+                "surprise": b.get("surprise"),
+                "people": b.get("people") or [],
+                "holding": int(b.get("holding") or 0),
                 "openTarget": zid in open_ids,
                 "claimed": claimed,
                 "preferred": zid in open_ids or bool(abstract.get("preferredObjective")),
-                "hazard": float(
-                    z.get("hazardPressure") or abstract.get("hazardPressure") or 0
-                ),
+                "hazard": 0.0,
             }
         )
     # Prefer open targets even if zoneMemory empty for that id
@@ -1453,6 +1482,10 @@ def build_hub(state: dict, war: dict) -> dict:
         "sessionMode": session_mode,
         "sessionHomeMap": session_home,
         "theater": theater,
+        # pass six: the interstitial faces the board and debrief draw from
+        "belief": (hub_belief_v1.belief_surface(ROOT, state, None) if hub_belief_v1 else {}),
+        "camp": (hub_belief_v1.camp_surface(state) if hub_belief_v1 else {}),
+        "exposure": (hub_belief_v1.exposure_surface(ROOT) if hub_belief_v1 else {}),
         "homeCamp": home_camp,
         "flags": flags,
         "homeEval": home_eval if isinstance(home_eval, dict) else {},
@@ -1492,7 +1525,7 @@ def build_hub(state: dict, war: dict) -> dict:
         "company": company_surface,
         "regions": regions,
         "node": node,
-        "lastResult": _load_last_hub_result(),
+        "lastResult": _with_manifest(_load_last_hub_result(), state),
         "history": [],
         "flags": {
             "mode": "hub",
@@ -1515,6 +1548,19 @@ def build_hub(state: dict, war: dict) -> dict:
             "homeCleared": flags.get("homeCleared"),
         },
     }
+
+
+def _with_manifest(payload, state):
+    """The last bead's manifest rides on the debrief (pass five): going / staying / destination."""
+    try:
+        m = hub_belief_v1.last_manifest(state) if hub_belief_v1 else None
+    except Exception:  # noqa: BLE001
+        m = None
+    if not m:
+        return payload
+    out = dict(payload or {})
+    out["manifest"] = m
+    return out
 
 
 def _load_last_hub_result():

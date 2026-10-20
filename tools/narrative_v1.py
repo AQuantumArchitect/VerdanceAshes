@@ -125,7 +125,7 @@ def operation_summary(choice):
     return {"id": choice.get("id"), "title": choice.get("label", "Operation"),
             "mapId": effect.get("mapId"), "purpose": choice.get("blurb") or "Secure an opportunity for the company.",
             "required": required,
-            "bringHome": "Choose Home or Stay in field, then confirm extraction in the battle sidebar. The marked sector must show friendly control and be clear of hostiles. Hold the pad for 10 seconds; interruption resets the hold. The campaign saves the result before returning home or offering the next field mission. Timeout is a separate outcome, not extraction.",
+            "bringHome": "Get what you want to keep onto the pad and press EXTRACT. The game pauses and shows the manifest: who goes, what stays, where to. What is off the pad stays on Verdance; what stays becomes a holding. The clock never ends the sortie — overtime only wakes the map.",
             "risks": "Enemy strength beyond observed ground is unknown. Optional targets add exposure.",
             "consequences": "Territory changes require objective credit or a confirmed node claim. Capturing ground does not create Tenebrium.",
             "disabled": bool(choice.get("disabled"))}

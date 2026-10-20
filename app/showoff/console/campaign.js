@@ -17,6 +17,7 @@
     dropping: false, // true while /api/deploy is in flight
     warm: { phase: "idle", locked: false, timer: null, poll: null, startedAt: 0 },
     selectedZoneId: null, // last marked / clicked theater zone (recruit tease)
+    padNote: null, // {mapId,text} — why the last Pad click was refused (shown in #marks-sum)
     sortieSynced: false, // after seal, keep local Dropping↔Base picks across hub pulls
     knownCompanyIds: null, // sealed members already sorted Dropping↔Base (absorb new joins)
   };
@@ -259,7 +260,30 @@
     const st = String((ace && ace.status) || "active").toLowerCase();
     if (st === "dead" || st === "lost") return false;
     if (ace && ace.deployable === false) return false;
+    // People posted on a zone, on the road, or left in the field are not at camp:
+    // they cannot board the Drop until they come home.
+    if (heroAway(id)) return false;
     return true;
+  }
+  function heroAwayRec(id) {
+    const camp = (state.hub && state.hub.camp) || {};
+    const people = Array.isArray(camp.people) ? camp.people : [];
+    return people.find(p => p && (p.heroId === id || p.hid === id)) || null;
+  }
+  function heroAway(id) {
+    const ace = aceById(id);
+    const rec = heroAwayRec(id);
+    const where = String((rec && rec.where) || (ace && ace.where) || "camp").toLowerCase();
+    return where === "posted" || where === "transit" || where === "field";
+  }
+  function heroWhereLabel(id) {
+    // "posted · Northwest Bastion" / "in the field · Central Gate" / "on the road"
+    const ace = aceById(id);
+    const rec = heroAwayRec(id);
+    const where = String((rec && rec.where) || (ace && ace.where) || "camp").toLowerCase();
+    const place = rec && (rec.label || rec.zoneId);
+    const word = ({ posted: "posted", transit: "on the road", field: "in the field" })[where] || where;
+    return place ? `${word} · ${place}` : word;
   }
   function syncCrewFromHub() {
     const c = companySurface();
@@ -328,6 +352,9 @@
         if (state.plan) state.plan.deployAces = sealedDeployAces();
         renderCompany();
         renderBoard();
+        if (heroAway(id)) {
+          return toast(`${crewHeroName(id)} is ${heroWhereLabel(id)} — not at camp, so not boarding`, "warn");
+        }
         return toast(`${crewHeroName(id)} is fallen — that's why they're not here`, "warn");
       }
       if (i >= 0) {
@@ -531,9 +558,9 @@
   }
 
   function companyStatusRank(entry) {
-    // Sort: deployed → base → dead → locked
+    // Sort: deployed → base → away → dead → locked
     const t = entry.tier || "locked";
-    return ({ deployed: 0, base: 1, dead: 2, locked: 3 })[t] ?? 9;
+    return ({ deployed: 0, base: 1, away: 2, dead: 3, locked: 4 })[t] ?? 9;
   }
 
   function buildCompanyEntries() {
@@ -589,11 +616,20 @@
           push(id, "dead", { pickable: false });
           return;
         }
+        if (heroAway(id)) {
+          // Posted / field / transit: greyed, shows where, cannot be put in the Drop squad.
+          push(id, "away", { tag: heroWhereLabel(id), pickable: false, on: false });
+          return;
+        }
         push(id, "base", {
           tag: laterIds.has(id) ? "field join" : "at base",
           pickable: true,
           on: false,
         });
+      });
+      // Core away from camp (posted / left in the field) is shown, greyed, not boarding.
+      coreIds.forEach(id => {
+        if (!seen.has(id) && heroAway(id)) push(id, "away", { tag: "core · " + heroWhereLabel(id), pickable: false, on: false });
       });
       // Fallen company / roster heroes only (still no locked dump).
       aces.forEach(a => {
@@ -836,6 +872,7 @@
     const tierLabels = {
       deployed: sealed ? `Dropping · ${dropping.length} packs + ${coreN} core · click a pack to leave it at base` : "Selected",
       base: sealed ? "At base · click to bring on sortie" : "Available · pick for formation",
+      away: "Away from camp · not boarding until they come home",
       dead: "Fallen",
       locked: "Locked",
     };
@@ -877,6 +914,7 @@
           e.tier === "deployed" ? "deployed" : "",
           crewCoreIds().includes(e.id) ? "core" : "",
           e.tier === "locked" ? "wild" : "",
+          e.tier === "away" ? "away" : "",
           lockedPick ? "locked" : "",
           e.ace && e.ace.wounds ? "wounded" : "",
           canToggle ? "toggleable" : "",
@@ -1078,10 +1116,15 @@
           type: "button",
         });
       });
-      const fallenHome = companyOwnedBand()
+      const notBoarding = companyOwnedBand()
         .concat(coreIds)
         .filter((id, i, arr) => arr.indexOf(id) === i && !heroIsDeployable(id));
+      const away = notBoarding.filter(heroAway);
+      const fallenHome = notBoarding.filter(id => !heroAway(id));
       let html = cards.join("") || `<div class="theater-sub">Nobody living is marked to drop.</div>`;
+      if (away.length) {
+        html += `<div class="theater-sub" style="margin-top:.55rem;color:var(--muted)">Away from camp · ${away.map(id => `${esc(crewHeroName(id))} (${esc(heroWhereLabel(id))})`).join(" · ")}</div>`;
+      }
       if (fallenHome.length) {
         html += `<div class="theater-sub" style="margin-top:.55rem;color:var(--muted)">Fallen stay home · ${fallenHome.map(crewHeroName).map(esc).join(" · ")}</div>`;
       }
@@ -1209,18 +1252,17 @@
       return (z && z.label) || id;
     };
     const m = plan.marks || {};
+    // One pad: the stamp carries deploy = extract = the same zone.
+    m.extractZoneId = m.deployZoneId;
     const targets = (m.captureZoneIds || []).map(zoneName).join(", ") || "—";
-    const exfilId = m.extractZoneId || m.deployZoneId;
-    const crossMap = exfilId && m.deployZoneId && exfilId !== m.deployZoneId;
     const body = $("drop-confirm-body");
     if (body) {
+      const eyes = padExposed(m.deployZoneId);
       body.innerHTML =
         `Drop on <b>${esc(prettyMap(plan.mapId))}</b> · <b>${esc(jobLabel(plan.contractKind))}</b><br>` +
-        `Landing <b>${esc(zoneName(m.deployZoneId))}</b> → objective <b>${esc(targets)}</b> → extraction <b>${esc(zoneName(exfilId))}</b>` +
-        (crossMap
-          ? `<br><span style="color:var(--warn)">Exfil is a different pad — you'll cross the map to leave. Mark exfil on your infil if you want a round trip.</span>`
-          : `.`);
-      body.innerHTML += `<p><b>Bring them home:</b> Choose Home or Stay in field, then confirm extraction in the battle sidebar. The marked sector must show friendly control and be clear of hostiles. Hold the pad for 10 seconds. Interrupted holds restart; the campaign saves before you leave or continue.</p><p>Engine launch starts after you confirm this deployment.</p>`;
+        `Pad <b>${esc(zoneName(m.deployZoneId))}</b> → wound <b>${esc(targets)}</b> → back to <b>${esc(zoneName(m.deployZoneId))}</b>.` +
+        (eyes === "known" ? `<br><span style="color:var(--bad)">Armada has eyes on this pad.</span>` : "");
+      body.innerHTML += `<p>Get what you want onto the pad and press EXTRACT. What is off the pad stays. What stays becomes a holding.</p><p>Engine launch starts after you confirm this deployment.</p>`;
       body.setAttribute("data-route", body.innerHTML);
     }
     const el = $("drop-confirm");
@@ -1325,12 +1367,75 @@
 
   /* Ash Console copy table — keep in sync with match_credit_v1 + va_ash_tokens */
   const VERDICT_UI = {
-    victory: { banner: "SUCCESS", headline: "Success." },
-    partial: { banner: "PARTIAL SUCCESS", headline: "Partial success." },
-    defeat: { banner: "DEFEAT", headline: "Defeat." },
-    abandon: { banner: "WITHDRAWN", headline: "Withdrawn." },
-    incomplete: { banner: "RESULT PENDING", headline: "Result not home — Retry extract or Abandon." },
+    victory: { banner: "SECURED", headline: "Secured." },
+    partial: { banner: "HINGE", headline: "Hinge — it could still go either way." },
+    defeat: { banner: "FIELD COSTS", headline: "Field costs." },
+    abandon: { banner: "LEFT THE FIELD", headline: "Left the field." },
+    incomplete: { banner: "RESULT NOT HOME", headline: "Result not home — Retry extract or Abandon." },
   };
+
+  // Zone label from the theater board, the belief frame, or the zone boards. Never invents.
+  function zoneLabelAny(zoneId, mapId) {
+    if (!zoneId) return "";
+    const th = state.hub.theater || {};
+    const hit = (th.zones || []).find(z => z && z.zoneId === zoneId);
+    if (hit && hit.label) return hit.label;
+    const bz = (state.hub.belief && state.hub.belief.zones) || {};
+    if (bz[zoneId] && bz[zoneId].label) return bz[zoneId].label;
+    for (const mid of [mapId, th.mapId, state.focusMap].filter(Boolean)) {
+      const z = ((BOARDS[mid] || {}).zones || []).find(x => x.zoneId === zoneId);
+      if (z && z.label) return z.label;
+    }
+    return String(zoneId);
+  }
+  function heroNameAny(id) {
+    const ace = aceById(id);
+    return (ace && ace.name) || crewHeroName(id) || String(id);
+  }
+
+  // Debrief from the extraction manifest: who went, who stayed, where the company is now.
+  function renderManifest(man) {
+    const el = $("homecoming");
+    if (!el) return;
+    let box = $("hc-manifest");
+    if (!box) {
+      box = document.createElement("div");
+      box.id = "hc-manifest";
+      box.className = "hc-manifest";
+      const chips = $("hc-chips");
+      if (chips && chips.parentNode === el) chips.after(box); else el.append(box);
+    }
+    if (!man || typeof man !== "object") { box.innerHTML = ""; box.hidden = true; return; }
+    const mapId = man.mapId || null;
+    const going = man.going || {};
+    const staying = man.staying || {};
+    const goingNames = (going.heroes || []).map(heroNameAny);
+    const stayRows = (staying.heroes || []).map(h => {
+      const id = typeof h === "string" ? h : (h && h.heroId);
+      const zid = h && typeof h === "object" ? h.zoneId : null;
+      return `${heroNameAny(id)}${zid ? ` · ${zoneLabelAny(zid, mapId)}` : ""}`;
+    });
+    const dest = String(man.destination || "").toLowerCase();
+    const destLabel = !dest || dest === "camp" ? "Camp" : zoneLabelAny(man.destination, mapId);
+    const unitsLine = (n, word) => (Number(n) > 0 ? `<li class="hm-units">${esc(n)} ${word}</li>` : "");
+    const col = (title, items, extra) =>
+      `<div class="hm-col"><div class="hm-h">${esc(title)}</div><ul>` +
+      (items.map(s => `<li>${esc(s)}</li>`).join("") || `<li class="hm-none">nobody</li>`) +
+      (extra || "") + `</ul></div>`;
+    const kind = String(man.kind || "").toLowerCase();
+    box.hidden = false;
+    box.innerHTML =
+      `<div class="hm-kicker">${man.pad ? `Lifted from ${esc(zoneLabelAny(man.pad, mapId))}` : "Manifest"}` +
+      (kind === "wiped" ? " · nobody lifted" : kind === "closed" ? " · the field was closed" : "") +
+      `</div>` +
+      `<div class="hm-grid">` +
+      col("Going", goingNames, unitsLine(going.units, "units")) +
+      col("Staying", stayRows,
+        unitsLine(staying.units, "units") +
+        (Number(staying.structures) > 0 ? `<li class="hm-units">${esc(staying.structures)} structures → holdings</li>` : "")) +
+      `<div class="hm-col"><div class="hm-h">Destination</div><ul><li>${esc(destLabel)}</li></ul></div>` +
+      `</div>`;
+  }
 
   function showHomecoming(opts) {
     const el = $("homecoming");
@@ -1345,11 +1450,15 @@
       banner.textContent = (opts && opts.banner) || ui.banner;
       banner.className = "hc-banner " + verdict;
     }
-    if (headline) headline.textContent = (opts && opts.headline) || ui.headline;
+    const man = (opts && opts.manifest) || null;
+    const manKind = String((man && man.kind) || "").toLowerCase();
+    const manHeadline = manKind === "wiped" ? "Nobody came back." : manKind === "closed" ? "Left the field." : null;
+    if (headline) headline.textContent = manHeadline || (opts && opts.headline) || ui.headline;
     if (hint) hint.textContent = (opts && (opts.reasonHint || opts.hint)) || "";
     if (chips) {
       chips.innerHTML = "";
       const list = ((opts && opts.chips) || []).filter(c => !/^(collapse |freeTnbMint|H:)/.test(String(c)));
+      if (man && Number(man.enemyOnPad) > 0) list.push("contested — enemies on the pad");
       list.forEach((c) => {
         if (!c) return;
         const span = document.createElement("span");
@@ -1362,6 +1471,7 @@
         chips.appendChild(span);
       });
     }
+    renderManifest(man);
     el.classList.add("show");
   }
 
@@ -1556,12 +1666,15 @@
         locked ? "locked" : "",
       ].filter(Boolean).join(" ");
       const n = deployChoicesForMap(r.mapId).length;
+      const bc = beliefCountsForMap(r.mapId);
       return `<div class="${cls}" data-map="${esc(r.mapId)}" data-locked="${locked ? "1" : "0"}">
         <div class="name">${esc(r.displayName || r.mapId)}</div>
         <div class="meta">${esc(r.descriptor || r.family)}${n ? ` · ${n} sortie${n === 1 ? "" : "s"}` : ""}</div>
-        <div class="row">
-          <span class="ctrl">${esc(r.control)}</span>
-          <span>${locked ? "locked" : esc(r.threatBand) + " · " + esc(r.dominantEnemy)}</span>
+        <div class="row belief-counts" title="What the company believes about this ground: looked at recently / looked at once / nobody has looked">
+          <span class="bc-known">● ${bc.current} known</span>
+          <span class="bc-stale">◐ ${bc.stale} stale</span>
+          <span class="bc-dark">? ${bc.dark} dark</span>
+          ${locked ? `<span class="ctrl">locked</span>` : ""}
         </div>
       </div>`;
     }).join("");
@@ -2210,7 +2323,9 @@
   }
 
   const RIM_THRESHOLD = 0.28;
-  const ENEMY_CTRL = new Set(["armada", "cortex", "wild"]);
+  // Faction names the board may colour. Colour means "we believe this faction holds it".
+  const FACTION_KEYS = new Set(["armada", "cortex", "nullmercs", "wild", "raptors", "raptor", "scavengers", "legion"]);
+  const PAD_THREAT_MAX = 0.4;
 
   function edgeScore(z) {
     if (z && z.edgeScore != null) return Number(z.edgeScore);
@@ -2286,52 +2401,148 @@
     }
     return out;
   }
+  // ---- Belief frame -------------------------------------------------------
+  // LAW: the board paints what the COMPANY believes, never the truth. Every
+  // colour, glyph and gate below reads from theater.zones[] (belief rows) or
+  // hub.belief.zones; nothing reads an authoritative control string.
+  function beliefRow(mapId, zoneId) {
+    const theater = state.hub.theater || {};
+    if (theater.mapId === mapId) {
+      const hit = (theater.zones || []).find(z => z && z.zoneId === zoneId);
+      if (hit && (hit.believed || hit.state)) return hit;
+    }
+    const bz = (state.hub.belief && state.hub.belief.zones) || {};
+    const row = bz[zoneId];
+    if (row && (!row.mapId || row.mapId === mapId)) return row;
+    return null;
+  }
+  function clamp01(v) {
+    const n = Number(v);
+    return Number.isFinite(n) ? Math.max(0, Math.min(1, n)) : 0;
+  }
+  function beliefOf(mapId, zoneId) {
+    const row = beliefRow(mapId, zoneId);
+    const out = {
+      believed: "dark", control: "unknown", confidence: 0, state: "dark", ageMin: null,
+      source: null, threat: null, surprise: null, people: [], holding: 0, known: false,
+    };
+    if (!row) {
+      // Old hub states (no belief frame): our own claim ledger is company knowledge, not truth.
+      const claim = claimRecordFor(mapId, zoneId);
+      if (claim) Object.assign(out, { believed: "ours", control: "ashwalkers", confidence: 0.5, state: "stale", source: "claim", known: true });
+      return out;
+    }
+    const control = String(row.control || "unknown").toLowerCase();
+    let believed = String(row.believed || "").toLowerCase();
+    if (!["ours", "held", "empty", "dark", "unsure"].includes(believed)) {
+      believed = control === "ashwalkers" ? "ours"
+        : control === "empty" ? "empty"
+        : control === "unknown" ? "dark"
+        : (control === "held" || FACTION_KEYS.has(control)) ? "held"
+        : "unsure";
+    }
+    const st = String(row.state || "").toLowerCase();
+    out.believed = believed;
+    out.control = control;
+    out.confidence = clamp01(row.confidence);
+    out.state = ["current", "stale", "dark"].includes(st) ? st : (believed === "dark" ? "dark" : "current");
+    out.ageMin = row.ageMin == null ? null : Number(row.ageMin);
+    out.source = row.source || null;
+    out.threat = row.threat == null ? null : clamp01(row.threat);
+    out.surprise = row.surprise && typeof row.surprise === "object" ? row.surprise : null;
+    out.people = Array.isArray(row.people) ? row.people : [];
+    out.holding = Math.max(0, Number(row.holding) || 0);
+    out.known = true;
+    return out;
+  }
+  function believedFaction(b) {
+    return b && b.believed === "held" && FACTION_KEYS.has(b.control) ? b.control : null;
+  }
+  function factionWord(f) {
+    return ({ armada: "Armada", cortex: "Cortex", nullmercs: "Null Mercs", wild: "the wild", raptors: "Raptors", raptor: "Raptors", scavengers: "Scavengers", legion: "the Legion" })[f] || f;
+  }
+  function believedWord(b) {
+    const f = believedFaction(b);
+    return b.believed === "ours" ? "ours"
+      : b.believed === "held" ? (f ? `held by ${factionWord(f)}` : "held — by whom, unseen")
+      : b.believed === "empty" ? "empty"
+      : b.believed === "dark" ? "dark — nobody has looked"
+      : "unsure";
+  }
+  function ageWord(min) {
+    if (min == null || !Number.isFinite(Number(min))) return "never looked";
+    const m = Math.max(0, Math.round(Number(min)));
+    if (m < 60) return `looked ${m} min ago`;
+    if (m < 48 * 60) return `looked ${Math.round(m / 60)} h ago`;
+    return `looked ${Math.round(m / 1440)} d ago`;
+  }
+  function beliefCountsForMap(mapId) {
+    const boardN = (((BOARDS[mapId] || {}).zones) || []).length;
+    const rows = [];
+    const seen = new Set();
+    const th = state.hub.theater || {};
+    if (th.mapId === mapId) (th.zones || []).forEach(r => { if (r && r.zoneId && (r.believed || r.state)) { rows.push(r); seen.add(r.zoneId); } });
+    Object.values((state.hub.belief && state.hub.belief.zones) || {}).forEach(r => {
+      if (r && r.mapId === mapId && !seen.has(r.zoneId)) { rows.push(r); seen.add(r.zoneId); }
+    });
+    let current = 0, stale = 0, dark = 0;
+    rows.forEach(r => {
+      const st = String(r.state || "dark").toLowerCase();
+      if (st === "current") current += 1; else if (st === "stale") stale += 1; else dark += 1;
+    });
+    if (boardN > rows.length) dark += boardN - rows.length;
+    return { current, stale, dark };
+  }
+  // Exposure (their eyes on OUR holdings — our side of the mirror only).
+  function padExposed(zoneId) {
+    const arm = (((state.hub.exposure || {}).factions) || {}).armada || {};
+    if ((arm.known || []).includes(zoneId)) return "known";
+    if ((arm.suspected || []).includes(zoneId)) return "suspected";
+    return null;
+  }
+
   function zoneInOps(mapId, z) {
     if (!z) return false;
     const intel = intelFor(mapId, z.zoneId) || {};
     if (intel.claimed || intel.openTarget || intel.preferred) return true;
-    const ctrl = String(intel.control || "").toLowerCase();
-    if (ctrl === "ashwalkers" || ctrl === "legion") return true;
+    const b = beliefOf(mapId, z.zoneId);
+    // Anything the company has looked at is mission ground.
+    if (b.known && b.state !== "dark") return true;
+    if (b.people.length || b.holding > 0) return true;
     if (isLegalLanding(mapId, z)) return true;
-    // Preferred capture / infil from the active plan always stay in footprint.
+    // Preferred capture / pad from the active plan always stay in footprint.
     const m = (state.plan && state.plan.marks) || {};
     if (m.deployZoneId === z.zoneId || m.extractZoneId === z.zoneId) return true;
     if ((m.captureZoneIds || []).includes(z.zoneId)) return true;
     return false;
   }
 
-  function zoneControl(mapId, zoneId, z) {
-    const intel = intelFor(mapId, zoneId) || {};
-    return String(intel.control || (z && z.control) || "unknown").toLowerCase();
+  function isBelievedOurs(mapId, zoneId) {
+    return beliefOf(mapId, zoneId).believed === "ours";
   }
 
-  function isContestedApproach(mapId, z) {
-    if (!z) return true;
-    const ctrl = zoneControl(mapId, z.zoneId, z);
-    if (ENEMY_CTRL.has(ctrl)) return true;
-    const tags = (z.tags || []).map(t => String(t).toLowerCase());
-    const role = String(z.role || "").toLowerCase();
-    if (tags.includes("contested") || role.includes("contested")) return true;
-    if ((tags.includes("fortress") || tags.includes("bastion") || /fortress|bastion|citadel/.test(role))
-        && ctrl !== "ashwalkers" && ctrl !== "nullmercs") {
-      return true;
+  // Pad legality from belief: ours, OR a rim zone believed empty/dark with low
+  // believed threat, OR the camp's own next pad. Returns the reason either way
+  // so an illegal click can say WHY.
+  function padLegality(mapId, z) {
+    if (!z) return { ok: false, why: "no such zone" };
+    const camp = state.hub.camp || {};
+    if (camp.nextPadZoneId && camp.nextPadZoneId === z.zoneId
+        && (!camp.nextPadMapId || camp.nextPadMapId === mapId)) {
+      return { ok: true, why: "the camp's next pad" };
     }
-    return false;
-  }
-
-  function isAshwalkerBase(mapId, zoneId) {
-    const intel = intelFor(mapId, zoneId) || {};
-    const ctrl = String(intel.control || "").toLowerCase();
-    // Claimed scars / FOBs count even if control string is briefly stale.
-    if (intel.claimed) return true;
-    return ctrl === "ashwalkers" || ctrl === "legion";
+    const b = beliefOf(mapId, z.zoneId);
+    const pct = `${Math.round(b.confidence * 100)}%`;
+    if (b.believed === "ours") return { ok: true, why: `believed ours · ${pct}` };
+    if (b.believed === "held") return { ok: false, why: `believed held · ${pct}` };
+    if (b.believed === "unsure") return { ok: false, why: `unsure what is there · ${pct}` };
+    if (!isRimZone(z)) return { ok: false, why: "not a rim" };
+    if ((b.threat ?? 0) > PAD_THREAT_MAX) return { ok: false, why: `threat too high · ${Math.round((b.threat || 0) * 100)}%` };
+    return { ok: true, why: b.believed === "dark" ? "rim · nobody has looked" : `rim · believed empty · ${pct}` };
   }
 
   function isLegalLanding(mapId, z) {
-    if (!z) return false;
-    // Hard rim-only lock is gone: inland pads are fine when we hold them.
-    if (isAshwalkerBase(mapId, z.zoneId)) return true;
-    return isRimZone(z) && !isContestedApproach(mapId, z);
+    return padLegality(mapId, z).ok;
   }
 
   function zoneCenter(z) {
@@ -2398,50 +2609,58 @@
   }
 
   // Far dry corners stay on the board as pads the player can mark, but a
-  // sortie's default exfil is the near shore. Rock Jungle's river is not a walk.
+  // sortie default pad snaps to the near shore (one pad: you lift where you
+  // landed). The camp's own pad is never snapped away from.
   function snapGroundRoute(mapId, marks) {
     const targetId = (marks.captureZoneIds || [])[0];
     if (!targetId) return;
-    const near = nearestDryPad(mapId, targetId);
-    if (!near) return;
-    if (!padIsNear(mapId, marks.deployZoneId, targetId)) marks.deployZoneId = near.zoneId;
-    if (!padIsNear(mapId, marks.extractZoneId, targetId)) {
-      marks.extractZoneId = padIsNear(mapId, marks.deployZoneId, targetId)
-        ? marks.deployZoneId
-        : near.zoneId;
+    const camp = state.hub.camp || {};
+    const onCampPad = !!(camp.nextPadZoneId && marks.deployZoneId === camp.nextPadZoneId
+      && (!camp.nextPadMapId || camp.nextPadMapId === mapId));
+    // The camp's own pad is where the company is: never snap away from it.
+    if (!onCampPad) {
+      const near = nearestDryPad(mapId, targetId);
+      if (near && !padIsNear(mapId, marks.deployZoneId, targetId)) {
+        const zones = ((BOARDS[mapId] || {}).zones) || [];
+        const nearZ = zones.find(z => z.zoneId === near.zoneId);
+        // Snap only onto a pad belief says is legal; otherwise keep the current pick.
+        if (nearZ && isLegalLanding(mapId, nearZ)) marks.deployZoneId = near.zoneId;
+      }
     }
+    // One pad: in and out are the same zone.
+    marks.extractZoneId = marks.deployZoneId;
   }
 
   function defaultMarks(mapId) {
     const board = BOARDS[mapId] || {};
     const zones = board.zones || [];
-    // Infil / exfil: quiet rim or Ashwalker bases; prefer inter-map lanes.
+    // Pad: the camp's next pad when it is on this map; else a legal pad from
+    // belief (believed ours first, then quiet rim lanes).
+    const camp = state.hub.camp || {};
+    const campPad = camp.nextPadZoneId && (!camp.nextPadMapId || camp.nextPadMapId === mapId)
+      ? zones.find(z => z.zoneId === camp.nextPadZoneId)
+      : null;
     const legal = zones.filter(z => isLegalLanding(mapId, z));
     const byEdge = legal.slice().sort((a, b) => {
-      const owned = (z) => (isAshwalkerBase(mapId, z.zoneId) ? 0 : 1);
+      const owned = (z) => (isBelievedOurs(mapId, z.zoneId) ? 0 : 1);
       const lane = (z) => (z && z.interMapLane) ? 0 : 1;
       return (owned(a) - owned(b)) || (lane(a) - lane(b)) || (edgeScore(a) - edgeScore(b));
     });
     const rim = byEdge.filter(z => isRimZone(z));
     const lanes = rim.filter(z => z.interMapLane);
-    const owned = byEdge.filter(z => isAshwalkerBase(mapId, z.zoneId));
+    const owned = byEdge.filter(z => isBelievedOurs(mapId, z.zoneId));
     const deployPool = owned.length
       ? owned
       : (lanes.length ? lanes : (rim.length ? rim : byEdge));
     const deploy =
+      campPad ||
       deployPool.find(z => z.deployDefault) ||
       deployPool.find(z => z.interMapLane) ||
       deployPool.find(z => /start|staging|shelf|camp|muster/i.test(String(z.role || "") + " " + (z.tags || []).join(" "))) ||
       deployPool[0] ||
       zones[0];
-    // Default exfil = same pad as infil (round-trip raid). Opposite-side
-    // interMapLane used to auto-pick SE when you landed NW — that forced a
-    // full-map crossing just to leave. Player can still mark a far exfil.
-    const extract =
-      deployPool.find(z => z.extractDefault && z === deploy) ||
-      deploy ||
-      deployPool.find(z => z.extractDefault) ||
-      zones[0];
+    // One pad: you leave from where you landed. The stamp keeps both fields.
+    const extract = deploy;
     const theater = state.hub.theater || {};
     const openId = ((theater.openTargets || [])[0] || {}).zoneId;
     const caps = zones.filter(z => z.capturable || z.preferredObjective);
@@ -2488,26 +2707,23 @@
         marks.captureZoneIds = effect.captureZoneIds.slice();
       }
       const preferredDeploy = effect.preferredDeployZoneId || effect.deploymentZoneId;
-      if (preferredDeploy) {
-        const board = BOARDS[mapId] || {};
-        const z = (board.zones || []).find(x => x.zoneId === preferredDeploy);
+      const camp = state.hub.camp || {};
+      const campPadHere = !!(camp.nextPadZoneId && (!camp.nextPadMapId || camp.nextPadMapId === mapId)
+        && ((BOARDS[mapId] || {}).zones || []).some(z => z.zoneId === camp.nextPadZoneId));
+      // The camp's own next pad (where the company actually is) outranks an authored pad.
+      if (preferredDeploy && !campPadHere) {
         // Honor story/engine pads even when midfield — LZ legality is stamp-side.
-        if (z || preferredDeploy) {
-          marks.deployZoneId = preferredDeploy;
-          if (!marks.extractZoneId) marks.extractZoneId = preferredDeploy;
-        }
+        marks.deployZoneId = preferredDeploy;
       }
-      const preferredExtract = effect.preferredExtractionZoneId || effect.extractionZoneId;
-      if (preferredExtract) {
-        marks.extractZoneId = preferredExtract;
-      }
+      // ONE PAD: authored preferredExtractionZoneId / extractionZoneId / exfilZoneId are
+      // ignored. You leave from where you landed.
       const mouthIn = effect.infilZoneId;
       const mouthOut = effect.exfilZoneId;
       const mouthCard = !!(effect.wetReach && mouthIn && mouthOut);
-      if (mouthCard) {
+      if (mouthCard && !campPadHere) {
         marks.deployZoneId = mouthIn;
-        marks.extractZoneId = mouthOut;
       }
+      marks.extractZoneId = marks.deployZoneId;
     const against = effect.against
       || (mapId === "eye_of_horus" ? "cortex" : mapId === "the_rock_jungle" ? "wild" : "armada");
     state.plan = {
@@ -2580,28 +2796,27 @@
     if (!svg) return;
     const m = (plan && plan.marks) || {};
     const byId = Object.fromEntries((zones || []).map(z => [z.zoneId, z]));
-    const infil = byId[m.deployZoneId];
+    const pad = byId[m.deployZoneId];
     const targetId = (m.captureZoneIds || [])[0];
     const target = byId[targetId];
-    const exfil = byId[m.extractZoneId];
     const parts = [];
+    // One pad: pad → wound → back to the pad. Drawn as a double-headed line in
+    // the warn token (out) with a good-token return head, colours from CSS vars.
     parts.push(`<defs>
-      <marker id="arr-warn" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto">
-        <path d="M0,0 L5,2.5 L0,5 Z" fill="#e0a060"/></marker>
-      <marker id="arr-steam" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto">
-        <path d="M0,0 L5,2.5 L0,5 Z" fill="#7ec8ff"/></marker>
+      <marker id="arr-out" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto">
+        <path d="M0,0 L5,2.5 L0,5 Z" style="fill:var(--warn)"/></marker>
+      <marker id="arr-back" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto-start-reverse">
+        <path d="M0,0 L5,2.5 L0,5 Z" style="fill:var(--good)"/></marker>
     </defs>`);
-    if (infil && target) {
-      const a = zoneCenter(infil), b = zoneCenter(target);
+    if (pad && target) {
+      const a = zoneCenter(pad), b = zoneCenter(target);
       parts.push(`<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}"
-        stroke="#e0a060" stroke-width="0.9" stroke-opacity="0.9"
-        marker-end="url(#arr-warn)"/>`);
-    }
-    if (target && exfil) {
-      const a = zoneCenter(target), b = zoneCenter(exfil);
-      parts.push(`<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}"
-        stroke="#7ec8ff" stroke-width="0.85" stroke-opacity="0.85" stroke-dasharray="2 1.5"
-        marker-end="url(#arr-steam)"/>`);
+        style="stroke:var(--warn)" stroke-width="0.9" stroke-opacity="0.9"
+        marker-start="url(#arr-back)" marker-end="url(#arr-out)"/>`);
+      // Return glyph at the pad end.
+      const mx = a.x + (b.x - a.x) * 0.18, my = a.y + (b.y - a.y) * 0.18;
+      parts.push(`<text x="${mx}" y="${my}" dy="-1.2" text-anchor="middle" font-size="3.2"
+        style="fill:var(--good)" stroke="rgba(0,0,0,.6)" stroke-width="0.3" paint-order="stroke">↩</text>`);
     }
     svg.innerHTML = parts.join("");
   }
@@ -2627,7 +2842,7 @@
       sub.textContent =
         `${jobLabel(plan.contractKind)} · ${(plan.deployAces || []).join(", ") || "your aces"}${homeNote}`;
     }
-    const lzMode = state.markMode === "deploy" || state.markMode === "extract";
+    const lzMode = state.markMode === "pad";
     if (!zones.length) {
       el.innerHTML = `<div style="padding:1rem;color:var(--muted);font-size:.85rem">
         No zone board for <b>${esc(plan.mapId)}</b>. Run tools/build_zone_boards_v1.py.</div>`;
@@ -2641,18 +2856,25 @@
         const h = Math.max(4, ((b.zMax || 0) - (b.zMin || 0)) * 100);
         const m = plan.marks || {};
         const intel = intelFor(plan.mapId, z.zoneId) || {};
+        const bel = beliefOf(plan.mapId, z.zoneId);
+        const legal = padLegality(plan.mapId, z);
         const cls = ["zone"];
         if (z.capturable) cls.push("capturable");
         if (isRimZone(z)) cls.push("rim-eligible");
         else cls.push("midfield");
-        if (isLegalLanding(plan.mapId, z)) cls.push("lz-eligible");
+        if (legal.ok) cls.push("lz-eligible", "pad-legal");
+        else if (lzMode) cls.push("pad-illegal");
         if (lzMode) cls.push("mode-lz");
         if (intel.openTarget || intel.preferred) cls.push("open-target");
         if (intel.claimed) cls.push("claimed");
-        if (intel.control) cls.push("ctrl-" + String(intel.control).replace(/[^a-z]/g, ""));
-        if (intel.confidence === "estimated") cls.push("est");
+        // Belief paint: state + (believed faction) + freshness. No truth classes.
+        cls.push("bel-" + bel.believed);
+        const fac = believedFaction(bel);
+        if (fac) cls.push("fac-" + fac.replace(/[^a-z]/g, ""));
+        if (bel.state === "stale") cls.push("st-stale");
+        const eyes = padExposed(z.zoneId);
+        if (eyes) cls.push("exp-" + eyes);
         if (m.deployZoneId === z.zoneId) cls.push("deploy-mark");
-        if (m.extractZoneId === z.zoneId) cls.push("extract-mark");
         if ((m.captureZoneIds || []).includes(z.zoneId)) cls.push("capture-mark");
         const inOps = zoneInOps(plan.mapId, z);
         if (!inOps) cls.push("fog");
@@ -2669,10 +2891,50 @@
             ? ` · home pad ${ambientHere.name || ambientHere.id} (mark target/infil to seed)`
             : "");
         const fogNote = inOps ? "" : " · outside ops";
+        // Glyph row: surprise (✗ / ○), exposure (◉), threat bar, people ⚑, holdings ■, dark ?
+        const sp = bel.surprise;
+        const spEmpty = sp && String(sp.believed).toLowerCase() === "held" && String(sp.found).toLowerCase() === "empty";
+        const spBadge = sp
+          ? `<span class="z-surprise ${spEmpty ? "muted" : "bad"}" title="believed ${esc(sp.believed)}, found ${esc(sp.found)}">${spEmpty ? "○" : "✗"}</span>`
+          : "";
+        const eyeBadge = eyes === "known"
+          ? `<span class="z-eyes" title="Armada has eyes on this holding">◉</span>`
+          : "";
+        const threatBar = (bel.threat != null && bel.threat > 0 && bel.confidence > 0.2)
+          ? `<i class="z-threat" style="width:${Math.round(bel.threat * 100)}%" title="believed threat ${Math.round(bel.threat * 100)}%"></i>`
+          : "";
+        const anyWounded = bel.people.some(p => p && p.wounded);
+        const peopleNames = bel.people.map(p => (p && (p.name || p.heroId)) || "").filter(Boolean);
+        const peopleGlyph = bel.people.length
+          ? `<span class="z-people ${anyWounded ? "bad" : "good"}" title="${esc(peopleNames.join(", "))}">⚑ ${bel.people.length}</span>`
+          : "";
+        const holdGlyph = bel.holding > 0
+          ? `<span class="z-hold" title="${bel.holding} of our structures left here">■ ${bel.holding}</span>`
+          : "";
+        const darkGlyph = bel.believed === "dark" ? `<span class="z-q" aria-hidden="true">?</span>` : "";
+        const stale = bel.state === "stale" ? `<i class="z-stale" aria-hidden="true"></i>` : "";
+        const tipBits = [
+          z.label || z.zoneId,
+          `believed ${believedWord(bel)}`,
+          bel.known ? `${Math.round(bel.confidence * 100)}%` : null,
+          bel.state,
+          ageWord(bel.ageMin),
+          (bel.threat != null && bel.confidence > 0.2) ? `threat ${Math.round(bel.threat * 100)}%` : null,
+          peopleNames.length ? `ours here: ${peopleNames.join(", ")}` : null,
+          bel.holding > 0 ? `holdings ${bel.holding}` : null,
+          sp ? `✗ believed ${sp.believed}, found ${sp.found}` : null,
+          eyes === "known" ? "Armada has eyes on it" : eyes === "suspected" ? "Armada may suspect it" : null,
+          legal.ok ? `pad: ${legal.why}` : (lzMode ? `no pad: ${legal.why}` : null),
+        ].filter(Boolean);
         return `<div role="button" tabindex="0" class="${cls.join(" ")}" data-zone="${esc(z.zoneId)}"
-          style="left:${left}%;top:${top}%;width:${w}%;height:${h}%"
-          title="${esc(z.label || z.zoneId)}${intel.control ? " · " + intel.control : ""}${esc(recruitTitle)}${fogNote}">
+          data-believed="${esc(bel.believed)}" data-control="${esc(bel.control)}" data-conf="${bel.confidence.toFixed(2)}" data-state="${esc(bel.state)}"
+          style="left:${left}%;top:${top}%;width:${w}%;height:${h}%;--conf:${bel.confidence.toFixed(2)}"
+          title="${esc(tipBits.join(" · "))}${esc(recruitTitle)}${fogNote}">
+          ${threatBar}${stale}
           <div class="zone-label">${esc(z.label || z.zoneId)}</div>${chip}
+          <span class="z-corner">${spBadge}${eyeBadge}</span>
+          ${darkGlyph}
+          <span class="z-foot">${peopleGlyph}${holdGlyph}</span>
         </div>`;
       }).join("");
       el.querySelectorAll(".zone").forEach(z => {
@@ -2687,11 +2949,18 @@
       const z = zones.find(x => x.zoneId === id);
       return (z && z.label) || id;
     };
-    const modeLabel = ({ capture: "objective", deploy: "landing", extract: "extraction" })[state.markMode] || state.markMode;
+    const modeLabel = ({ capture: "wound", pad: "pad" })[state.markMode] || state.markMode;
     const opsLit = zones.filter(z => zoneInOps(plan.mapId, z)).length;
+    const legalN = zones.filter(z => isLegalLanding(plan.mapId, z)).length;
+    const padEyes = padExposed(m.deployZoneId);
+    const padNote = state.padNote && state.padNote.mapId === plan.mapId
+      ? `<br><span style="color:var(--warn)">${esc(state.padNote.text)}</span>`
+      : "";
     $("marks-sum").innerHTML =
-      `<b>Landing</b> ${esc(zoneName(m.deployZoneId))} · <b>Target</b> ${(m.captureZoneIds || []).map(z => esc(zoneName(z))).join(", ") || "—"} · <b>Extraction</b> ${esc(zoneName(m.extractZoneId))}<br>` +
-      `route arrows · marking <b>${esc(modeLabel)}</b> · ops ${opsLit}/${zones.length || 0} zones · quiet rim or Ashwalker base`;
+      `<b>Pad</b> ${esc(zoneName(m.deployZoneId))} → <b>wound</b> ${(m.captureZoneIds || []).map(z => esc(zoneName(z))).join(", ") || "—"} → back to <b>${esc(zoneName(m.deployZoneId))}</b><br>` +
+      `marking <b>${esc(modeLabel)}</b> · ${legalN} legal pad${legalN === 1 ? "" : "s"} (△) · ops ${opsLit}/${zones.length || 0} zones · believed ours, or a quiet rim` +
+      (padEyes === "known" ? `<br><span style="color:var(--bad)">◉ Armada has eyes on this pad.</span>` : "") +
+      padNote;
     updateDeployGate();
   }
 
@@ -2701,21 +2970,19 @@
     const board = BOARDS[plan.mapId] || {};
     const z = (board.zones || []).find(x => x.zoneId === zoneId);
     const m = plan.marks;
-    if (state.markMode === "deploy" || state.markMode === "extract") {
-      if (plan.wetReach) {
-        toast("These doors are the sortie. Pick another card to head a different way.", "err");
+    if (state.markMode === "pad") {
+      const legal = padLegality(plan.mapId, z);
+      if (!legal.ok) {
+        const why = `${(z && z.label) || zoneId}: no pad — ${legal.why}`;
+        state.padNote = { mapId: plan.mapId, text: why };
+        toast(why, "err");
+        renderBoard();
         return;
       }
-      if (!z || !isLegalLanding(plan.mapId, z)) {
-        toast("Establish an Ashwalker foothold here to use this landing area, or choose a legal quiet perimeter.", "err");
-        return;
-      }
-      if (state.markMode === "deploy") {
-        m.deployZoneId = zoneId;
-        if (!m.extractZoneId) m.extractZoneId = zoneId;
-      } else {
-        m.extractZoneId = zoneId;
-      }
+      state.padNote = null;
+      // ONE pad: in and out share the zone; the stamp schema is unchanged.
+      m.deployZoneId = zoneId;
+      m.extractZoneId = zoneId;
     } else {
       // Target is a different mark type from landing
       const caps = m.captureZoneIds || [];
@@ -2754,10 +3021,9 @@
   function authoredPads(plan) {
     const ch = ((state.hub.node || {}).choices || []).find(c => c && c.id === (plan && plan.choiceId));
     const e = (ch && ch.effect) || {};
+    // One pad: only authored landing pads count. Authored exfil fields are ignored.
     return new Set([
-      e.preferredDeployZoneId, e.deploymentZoneId,
-      e.preferredExtractionZoneId, e.extractionZoneId,
-      e.infilZoneId, e.exfilZoneId,
+      e.preferredDeployZoneId, e.deploymentZoneId, e.infilZoneId,
     ].filter(Boolean).map(String));
   }
   function canLaunchFrom(plan, z) {
@@ -2792,17 +3058,16 @@
       return blockDrop("Mark a target (wound) on the map first");
     }
     if (!plan.marks.deployZoneId) {
-      return blockDrop("Mark an infil pad first");
+      return blockDrop("Mark a pad first");
     }
+    // ONE pad: the stamp carries deploy = extract = the same zone.
+    plan.marks.extractZoneId = plan.marks.deployZoneId;
     const board = BOARDS[plan.mapId] || {};
     const zones = board.zones || [];
     const dep = zones.find(z => z.zoneId === plan.marks.deployZoneId);
-    const ext = zones.find(z => z.zoneId === (plan.marks.extractZoneId || plan.marks.deployZoneId));
     if (!dep || !canLaunchFrom(plan, dep)) {
-      return blockDrop("Infil must be a quiet rim, an Ashwalker base, or this sortie's pad");
-    }
-    if (ext && !canLaunchFrom(plan, ext)) {
-      return blockDrop("Exfil must be a quiet rim, an Ashwalker base, or this sortie's pad");
+      const why = dep ? padLegality(plan.mapId, dep).why : "no such zone";
+      return blockDrop(`The pad must be believed ours, a quiet rim, or the camp's next pad — ${why}`);
     }
     plan.commerceDeploy = { tenebrium: commerce().tenebrium, kit: commerce().deployKit || [] };
 
@@ -3090,6 +3355,11 @@
     if (patch.spectral) state.hub.spectral = patch.spectral;
     if (patch.node) state.hub.node = patch.node;
     if (patch.lastResult) state.hub.lastResult = patch.lastResult;
+    // Belief frame / camp / exposure / theater rows ride along with a homecoming.
+    if (patch.belief && typeof patch.belief === "object") state.hub.belief = patch.belief;
+    if (patch.camp && typeof patch.camp === "object") state.hub.camp = patch.camp;
+    if (patch.exposure && typeof patch.exposure === "object") state.hub.exposure = patch.exposure;
+    if (patch.theater && typeof patch.theater === "object" && Array.isArray(patch.theater.zones)) state.hub.theater = patch.theater;
     // Post-sortie wallets — must update even when poll skips full pullHubState.
     if (patch.commerce && typeof patch.commerce === "object") {
       state.hub.commerce = Object.assign({}, state.hub.commerce || {}, patch.commerce);
@@ -3153,6 +3423,7 @@
         headline: headline,
         reasonHint: reasonHint || "Review the return ledger for confirmed changes.",
         chips: chips.slice(0, 12),
+        manifest: (patch.lastResult && patch.lastResult.manifest) || patch.manifest || null,
       });
       if (verdict === "incomplete") {
         toast(headline || "Result not home — retry bring-home or Abandon", "err");
@@ -3261,7 +3532,7 @@
       if (j.ok || j.abandon) {
         mergeHubPatch({
           debrief: j.debrief,
-          headline: j.headline || "Withdrawn.",
+          headline: j.headline || "Left the field.",
           verdict: "abandon",
           lastResult: { verdict: "abandon", debrief: j.debrief, at: j.at },
         });
@@ -3569,6 +3840,14 @@
     notify: toast,
     showCamp: showCampSheet,
     renderCamp: renderCampSheet,
+    homecoming: showHomecoming, // debrief card (verdict, chips, manifest)
+    fieldPeople: () => {
+      // People of ours not at camp, with where they are: for the operations rail.
+      const camp = (state.hub && state.hub.camp) || {};
+      return (Array.isArray(camp.people) ? camp.people : [])
+        .filter(p => p && ["posted", "transit", "field"].includes(String(p.where || "").toLowerCase()))
+        .map(p => ({ heroId: p.heroId, name: p.name || heroNameAny(p.heroId), where: p.where, label: p.label || zoneLabelAny(p.zoneId, p.mapId), wounded: !!p.wounded }));
+    },
     recommendCompany: () => {
       if (companySealed()) return;
       const pool=crewBandOrder().filter(id => !crewCoreIds().includes(id) && !['dead','lost'].includes(String(aceById(id)?.status || 'active')));

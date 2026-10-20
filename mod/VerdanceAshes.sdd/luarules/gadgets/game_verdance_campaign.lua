@@ -6102,6 +6102,37 @@ function GG.VA_TenebriumBank()
   return tonumber(tenebLoot and tenebLoot.bank) or 0
 end
 
+-- Tnb top bar feed (gui_verdance_tnb_bar.lua). GLOBAL on purpose: the main chunk is
+-- at Lua 5.1's 200-local ceiling. Every field is guarded; tenebLoot may be bare early
+-- (handlers pack attaches after the chunk) so each read is pcall-safe.
+function publishTenebriumRules()
+  local function readField(name)
+    local ok, v = pcall(function() return tenebLoot and tenebLoot[name] end)
+    if not ok then return nil end
+    return v
+  end
+  local function asCount(v)
+    if type(v) == "function" then
+      local ok, r = pcall(v)
+      v = ok and r or 0
+    end
+    if type(v) == "table" then
+      local n = 0
+      for _ in pairs(v) do n = n + 1 end
+      return n
+    end
+    return tonumber(v) or 0
+  end
+  local bank = tonumber(readField("bank")) or 0
+  local looted = tonumber(readField("looted")) or tonumber(readField("total")) or 0
+  local spent = tonumber(readField("spent")) or 0
+  local field = asCount(readField("unclaimedWrecks"))
+  pcall(Spring.SetGameRulesParam, "va_tenebrium_bank", bank, { public = true })
+  pcall(Spring.SetGameRulesParam, "va_tenebrium_looted", looted, { public = true })
+  pcall(Spring.SetGameRulesParam, "va_tenebrium_spent", spent, { public = true })
+  pcall(Spring.SetGameRulesParam, "va_tenebrium_wrecks_unclaimed", field, { public = true })
+end
+
 function pocketClearProgress()
   if objectiveTargetCount <= 0 then return 1.0, 0, 0 end
   local need = math.max(1, math.ceil(objectiveTargetCount * CLEAR_FRACTION))
@@ -7003,6 +7034,7 @@ function gadget:GameStart()
     VA_LOGISTICS.spawnCommerceDeployKit()
   end
   armPendingDeliveries()
+  publishTenebriumRules()
 end
 
 function gadget:GameFrame(frame)
@@ -7086,6 +7118,10 @@ function gadget:GameFrame(frame)
   -- WO-043c: shard spawn + wreck-gone loss timeout.
   if frame % 5 == 0 then
     tenebLoot.tickPending(frame)
+  end
+  -- Tnb top bar feed (va_tenebrium_bank/looted/spent/wrecks_unclaimed).
+  if frame % 30 == 0 then
+    publishTenebriumRules()
   end
 
   -- WO-033 unit printer metal/energy trickle (per-frame).

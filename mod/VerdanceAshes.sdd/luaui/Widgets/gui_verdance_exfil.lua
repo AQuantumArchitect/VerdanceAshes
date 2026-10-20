@@ -27,7 +27,28 @@ local intel = nil           -- company belief about this map (va_intel_current.l
 local zoneLabel = {}
 local buttons = {}          -- {x1,y1,x2,y2,action}
 
-local COL = { ink = { 0.93, 0.96, 0.93 }, gold = { 0.83, 0.77, 0.60 }, good = { 0.49, 1.0, 0.54 }, warn = { 0.88, 0.63, 0.38 }, muted = { 0.49, 0.58, 0.52 }, bad = { 1.0, 0.42, 0.36 } }
+local COL = { ink = { 0.93, 0.96, 0.93 }, gold = { 0.83, 0.77, 0.60 }, good = { 0.49, 1.0, 0.54 }, warn = { 0.88, 0.63, 0.38 }, muted = { 0.49, 0.58, 0.52 }, bad = { 1.0, 0.49, 0.49 }, steam = { 0.494, 0.784, 1.0 }, ash = { 0.604, 0.545, 0.447 }, edge = { 0.239, 0.561, 0.333 }, panel = { 0.031, 0.063, 0.047, 0.90 }, bg = { 0.016, 0.035, 0.027 } }
+
+-- Ash Console tokens (docs/UI_ASH_CONSOLE.md): one chrome for every Verdance screen.
+local Ash
+do
+  local ok, mod = pcall(VFS.Include, "luaui/Include/va_ash_tokens.lua")
+  if not ok or type(mod) ~= "table" then
+    ok, mod = pcall(VFS.Include, "LuaUI/Include/va_ash_tokens.lua")
+  end
+  Ash = (ok and type(mod) == "table") and mod or nil
+  if Ash and Ash.COL then
+    for k in pairs(COL) do
+      if Ash.COL[k] then COL[k] = Ash.COL[k] end
+    end
+  end
+end
+
+-- Input/draw fence: while the manifest owns the screen the objectives HUD steps back
+-- (no EXTRACT re-click, no briefing dismiss on Esc). Read by gui_verdance_objectives.lua.
+local function setModal(on)
+  if WG then WG.vaExfilModal = on and true or false end
+end
 
 -- ---------------------------------------------------------------- tiny json
 local function decode(str)
@@ -135,6 +156,7 @@ function widget:VerdanceManifest(json)
   manifest = m
   destIdx = 1
   phase = "manifest"
+  setModal(true)
   setPaused(true)
   Spring.Echo("VA_EXFIL_UI manifest open going=" .. tostring(#(m.going and m.going.heroes or {})) .. "h staying=" .. tostring(#(m.staying and m.staying.heroes or {})) .. "h")
 end
@@ -152,6 +174,7 @@ local function cancel()
   if phase ~= "manifest" then return end
   phase = "field"
   manifest = nil
+  setModal(false)
   setPaused(false)
   Spring.Echo("VA_EXFIL_UI back to the field")
 end
@@ -159,6 +182,7 @@ end
 function widget:VerdanceMissionEvent(eventStatus, reason)
   if eventStatus == "sortie_over" then
     phase = "over"
+    setModal(true)
     overKind = tostring(reason or "extracted")
     overAt = Spring.GetGameSeconds()
     if not manifest then
@@ -170,16 +194,17 @@ end
 
 function widget:Initialize()
   widgetHandler:RegisterGlobal(widget, "VerdanceManifest", function(json) widget:VerdanceManifest(json) end)
-  -- the objectives widget also registers VerdanceMissionEvent; the unsynced exfil gadget calls
-  -- whichever is registered last, so we chain: keep a reference to a previous global if any.
-  local prev = Script and Script.LuaUI and Script.LuaUI.VerdanceMissionEvent or nil
+  -- the objectives widget owns VerdanceMissionEvent; the unsynced exfil gadget calls this
+  -- second global for us, so both widgets hear sortie_over.
   widgetHandler:RegisterGlobal(widget, "VerdanceMissionEventExfil", function(e, r) widget:VerdanceMissionEvent(e, r) end)
   loadContext()
+  setModal(false)
 end
 
 function widget:Shutdown()
   widgetHandler:DeregisterGlobal(widget, "VerdanceManifest")
   widgetHandler:DeregisterGlobal(widget, "VerdanceMissionEventExfil")
+  setModal(false)
 end
 
 function widget:Update()
@@ -223,17 +248,44 @@ end
 -- ---------------------------------------------------------------- draw
 local function text(s, x, y, size, opts, col)
   col = col or COL.ink
-  gl.Color(col[1], col[2], col[3], 1)
+  gl.Color(col[1], col[2], col[3], col[4] or 1)
   gl.Text(tostring(s), x, y, size or 13, opts or "o")
 end
 
-local function button(x1, y1, x2, y2, caption, action, primary)
-  if primary then gl.Color(0.20, 0.45, 0.26, 0.9) else gl.Color(0.12, 0.16, 0.13, 0.9) end
+local function scrim(x1, y1, x2, y2, a)
+  if Ash and Ash.scrim then Ash.scrim(x1, y1, x2, y2, a); return end
+  gl.Color(COL.bg[1], COL.bg[2], COL.bg[3], a or 0.72)
   gl.Rect(x1, y1, x2, y2)
-  gl.Color(COL.gold[1], COL.gold[2], COL.gold[3], 0.6)
-  gl.LineWidth(1)
-  gl.Shape(GL.LINE_LOOP, { { v = { x1, y1 } }, { v = { x2, y1 } }, { v = { x2, y2 } }, { v = { x1, y2 } } })
-  text(caption, (x1 + x2) * 0.5, y1 + (y2 - y1) * 0.5 - 6, 14, "co", COL.ink)
+end
+
+local function panel(x1, y1, x2, y2, accent)
+  if Ash and Ash.panel then Ash.panel(x1, y1, x2, y2, { accent = accent }); return end
+  gl.Color(COL.panel[1], COL.panel[2], COL.panel[3], COL.panel[4] or 0.9)
+  gl.Rect(x1, y1, x2, y2)
+  if accent then
+    gl.Color(accent[1], accent[2], accent[3], 0.85)
+    gl.Rect(x1, y1, x1 + 3, y2)
+  end
+end
+
+-- Action row (CONFIRM = steam focused; BACK = muted). Redundant coding: fill + rail + caption.
+local function actionButton(x1, y1, x2, y2, caption, action, fillCol, focused)
+  if Ash and Ash.actionRow then
+    Ash.actionRow(x1, y1, x2, y2, { fill = fillCol, focused = focused })
+  else
+    gl.Color(fillCol[1], fillCol[2], fillCol[3], focused and 0.32 or 0.16)
+    gl.Rect(x1, y1, x2, y2)
+    gl.Color(fillCol[1], fillCol[2], fillCol[3], focused and 0.95 or 0.7)
+    gl.Rect(x1, y1, x1 + 4, y2)
+  end
+  text(caption, (x1 + x2) * 0.5, y1 + (y2 - y1) * 0.5 - 6, 14, "co", focused and COL.ink or COL.muted)
+  buttons[#buttons + 1] = { x1, y1, x2, y2, action }
+end
+
+-- Small square step button (destination < >).
+local function stepButton(x1, y1, x2, y2, caption, action)
+  panel(x1, y1, x2, y2, nil)
+  text(caption, (x1 + x2) * 0.5, y1 + (y2 - y1) * 0.5 - 6, 13, "co", COL.steam)
   buttons[#buttons + 1] = { x1, y1, x2, y2, action }
 end
 
@@ -244,60 +296,93 @@ local function sortedKeys(t)
   return ks
 end
 
+-- One manifest column: Ash.panel, ash kicker, rows { label, col, flag }.
+-- flag "bad"  → "[!] " prefix + bad text + bad left border
+-- flag "note" → warn left border (the ✗ / ! learned-notes)
+local function column(x1, y1, x2, y2, kicker, accent, lines)
+  panel(x1, y1, x2, y2, accent)
+  local ix = x1 + 12
+  local ly = y2 - 18
+  text(kicker, ix, ly, 10, "o", COL.ash)
+  if Ash and Ash.rule then Ash.rule(ix, ly - 5, x2 - 12, accent, 0.45) end
+  ly = ly - 24
+  local maxRows = math.max(1, math.floor((ly - y1 - 8) / 17))
+  local shown = math.min(#lines, maxRows)
+  for i = 1, shown do
+    local row = lines[i]
+    local label, col, flag = row[1], row[2] or COL.ink, row[3]
+    if flag == "bad" then
+      label = "[!] " .. label
+      col = COL.bad
+      gl.Color(COL.bad[1], COL.bad[2], COL.bad[3], 0.85)
+      gl.Rect(x1 + 5, ly - 4, x1 + 7, ly + 12)
+    elseif flag == "note" then
+      gl.Color(COL.warn[1], COL.warn[2], COL.warn[3], 0.85)
+      gl.Rect(x1 + 5, ly - 4, x1 + 7, ly + 12)
+    end
+    text(label, ix, ly, 12, "o", col)
+    ly = ly - 17
+  end
+  if #lines > shown then text("… and " .. (#lines - shown) .. " more", ix, ly, 11, "o", COL.muted) end
+end
+
 local function drawManifest()
   buttons = {}
   local vsx, vsy = Spring.GetViewGeometry()
   local m = manifest
-  gl.Color(0.02, 0.05, 0.03, 0.88)
-  gl.Rect(0, 0, vsx, vsy)
+  scrim(0, 0, vsx, vsy, 0.78)
   local W = math.min(1180, vsx - 60)
   local x0 = (vsx - W) * 0.5
   local top = vsy - 70
   local padLabel = (m.pad and m.pad.label) or "the pad"
-  text("EXTRACT  —  " .. padLabel, x0, top, 24, "o", COL.gold)
+  text("EXTRACT", x0, top, 10, "o", COL.ash)
+  text("The company lifts from " .. padLabel, x0, top - 26, 22, "o", COL.gold)
+
   -- destination
   local dests = m.destinations or { { id = "home", label = "Back to camp" } }
   if destIdx > #dests then destIdx = #dests end
   local d = dests[destIdx] or dests[1]
-  local y = top - 40
-  text("to:", x0, y, 15, "o", COL.muted)
-  button(x0 + 40, y - 6, x0 + 70, y + 18, "<", "prev")
-  text((d and d.label or "Back to camp") .. ((d and d.mapId) and ("  ·  " .. tostring(d.mapId):gsub("_", " ")) or ""), x0 + 82, y, 17, "o", COL.ink)
-  local w = gl.GetTextWidth((d and d.label or "") .. "        ") * 17 + 110
-  button(x0 + w + 2, y - 6, x0 + w + 32, y + 18, ">", "next")
-  text(string.format("%d of %d", destIdx, #dests), x0 + w + 44, y, 12, "o", COL.muted)
+  local y = top - 58
+  text("TO", x0, y, 10, "o", COL.ash)
+  stepButton(x0 + 28, y - 7, x0 + 54, y + 17, "<", "prev")
+  local destLabel = (d and d.label or "Back to camp") .. ((d and d.mapId) and ("  ·  " .. tostring(d.mapId):gsub("_", " ")) or "")
+  text(destLabel, x0 + 66, y, 16, "o", COL.ink)
+  local w = gl.GetTextWidth(destLabel) * 16 + 80
+  stepButton(x0 + w + 2, y - 7, x0 + w + 28, y + 17, ">", "next")
+  text(string.format("%d of %d", destIdx, #dests), x0 + w + 40, y, 11, "o", COL.muted)
 
-  -- columns
-  local colW = (W - 40) / 3
-  local cy = y - 44
-  local function column(cx, title, col, lines)
-    text(title, cx, cy, 15, "o", col)
-    local ly = cy - 22
-    for i = 1, math.min(#lines, 18) do
-      text(lines[i][1], cx, ly, 12, "o", lines[i][2] or COL.ink)
-      ly = ly - 17
-    end
-    if #lines > 18 then text("… and " .. (#lines - 18) .. " more", cx, ly, 11, "o", COL.muted) end
-  end
-  -- going
+  -- the three columns: going (steam) · staying (warn) · learned (gold)
+  local gap = 16
+  local colW = (W - 2 * gap) / 3
+  local colTop = y - 26
+  local colBot = vsy * 0.14 + 56
+  if colBot > colTop - 120 then colBot = math.max(40, colTop - 120) end
+
   local g = m.going or {}
   local goingLines = {}
-  for _, h in ipairs(g.heroes or {}) do goingLines[#goingLines + 1] = { h.name or h.heroId, COL.good } end
+  for _, h in ipairs(g.heroes or {}) do goingLines[#goingLines + 1] = { h.name or h.heroId, COL.steam } end
   for _, k in ipairs(sortedKeys(g.units)) do goingLines[#goingLines + 1] = { string.format("%d × %s", g.units[k], k), COL.ink } end
-  if (g.unitCount or 0) == 0 and #(g.heroes or {}) == 0 then goingLines[1] = { "nobody is on the pad", COL.bad } end
+  local padEmpty = (g.unitCount or 0) == 0 and #(g.heroes or {}) == 0
+  if padEmpty then goingLines[1] = { "nobody is on the pad", COL.bad, "bad" } end
   if m.tenebrium then goingLines[#goingLines + 1] = { string.format("%s Tenebrium", tostring(m.tenebrium)), COL.gold } end
-  column(x0, string.format("GOING  (%d people, %d units)", #(g.heroes or {}), g.unitCount or 0), COL.good, goingLines)
-  -- staying
+  if (m.enemyOnPad or 0) > 0 then
+    goingLines[#goingLines + 1] = { string.format("%d enemy on the pad — contested lift", m.enemyOnPad), COL.bad, "bad" }
+  end
+  column(x0, colBot, x0 + colW, colTop,
+    string.format("GOING  ·  %d people  ·  %d units", #(g.heroes or {}), g.unitCount or 0), COL.steam, goingLines)
+
   local s = m.staying or {}
   local stayLines = {}
-  for _, h in ipairs(s.heroes or {}) do stayLines[#stayLines + 1] = { (h.name or h.heroId) .. "  — at " .. label(h.zoneId or "?"), COL.bad } end
+  for _, h in ipairs(s.heroes or {}) do stayLines[#stayLines + 1] = { (h.name or h.heroId) .. "  — at " .. label(h.zoneId or "?"), COL.bad, "bad" } end
   for _, zid in ipairs(sortedKeys(s.units)) do stayLines[#stayLines + 1] = { string.format("%d units at %s", s.units[zid], label(zid)), COL.warn } end
   for _, zid in ipairs(sortedKeys(s.structures)) do
     local r = s.structures[zid]
-    stayLines[#stayLines + 1] = { string.format("%d structures at %s  → our holding there", r.count or 0, label(zid)), COL.gold }
+    stayLines[#stayLines + 1] = { string.format("%d structures at %s  → holding", r.count or 0, label(zid)), COL.gold }
   end
   if #stayLines == 0 then stayLines[1] = { "nothing left behind", COL.muted } end
-  column(x0 + colW + 20, string.format("STAYING  (%d people, %d units, %d structures)", #(s.heroes or {}), s.unitCount or 0, s.structureCount or 0), COL.warn, stayLines)
+  column(x0 + colW + gap, colBot, x0 + 2 * colW + gap, colTop,
+    string.format("LEFT IF YOU LIFT  ·  %d people  ·  %d units  ·  %d structures", #(s.heroes or {}), s.unitCount or 0, s.structureCount or 0), COL.warn, stayLines)
+
   -- what we learned (company belief vs what we looked at)
   local seenLines = {}
   local seen = m.seen or {}
@@ -310,25 +395,27 @@ local function drawManifest()
       local enemies = tonumber(Spring.GetGameRulesParam("va_obs_enemy_" .. zid)) or 0
       local note = ""
       if bel == "ours" and enemies >= 3 then note = "  ✗ not ours" elseif bel == "held" and eta >= 0.75 and enemies == 0 then note = "  ✗ nobody there" elseif bel == "nobody looked" and enemies >= 5 then note = "  ! a column" end
-      seenLines[#seenLines + 1] = { string.format("%-18s briefed %s%s · looked %d%%%s", label(zid):sub(1, 18), bel, (conf > 0) and string.format(" %d%%", math.floor(conf * 100 + 0.5)) or "", math.floor(eta * 100 + 0.5), note), note ~= "" and COL.warn or COL.ink }
+      seenLines[#seenLines + 1] = {
+        string.format("%-16s briefed %s%s · looked %d%%%s", label(zid):sub(1, 16), bel,
+          (conf > 0) and string.format(" %d%%", math.floor(conf * 100 + 0.5)) or "", math.floor(eta * 100 + 0.5), note),
+        note ~= "" and COL.warn or COL.ink,
+        note ~= "" and "note" or nil,
+      }
     end
   end
   if #seenLines == 0 then seenLines[1] = { "we looked at nothing", COL.muted } end
-  column(x0 + 2 * (colW + 20), "WHAT WE LEARNED", COL.gold, seenLines)
-  -- enemy on the pad
-  if (m.enemyOnPad or 0) > 0 then
-    text(string.format("%d enemy units are on the pad — this will be a contested extraction", m.enemyOnPad), x0, 118, 13, "o", COL.bad)
-  end
-  -- buttons
-  button(x0, 50, x0 + 300, 92, "CONFIRM EXTRACTION   [Enter]", "confirm", true)
-  button(x0 + 320, 50, x0 + 560, 92, "BACK TO THE FIELD   [Esc]", "cancel", false)
-  text("Left/right picks where the company goes. Whatever is not on the pad stays on Verdance.", x0, 28, 11, "o", COL.muted)
+  column(x0 + 2 * (colW + gap), colBot, x0 + W, colTop, "WHAT WE LEARNED", COL.gold, seenLines)
+
+  -- buttons: out of BAR's build band (bottom-left), at vsy*0.14
+  local by = vsy * 0.14
+  actionButton(x0, by, x0 + 300, by + 42, "CONFIRM EXTRACTION   [Enter]", "confirm", COL.steam, true)
+  actionButton(x0 + 316, by, x0 + 556, by + 42, "BACK TO THE FIELD   [Esc]", "cancel", COL.muted, false)
+  text("Left/right picks where the company goes. Whatever is not on the pad stays on Verdance.", x0, by - 18, 11, "o", COL.muted)
 end
 
 local function drawOver()
   local vsx, vsy = Spring.GetViewGeometry()
-  gl.Color(0.02, 0.05, 0.03, 0.92)
-  gl.Rect(0, 0, vsx, vsy)
+  scrim(0, 0, vsx, vsy, 0.92)
   local m = manifest or {}
   local g, s = m.going or {}, m.staying or {}
   local y = vsy * 0.55
@@ -347,9 +434,11 @@ function widget:DrawScreen()
     drawManifest()
   elseif phase == "extracting" then
     local vsx, vsy = Spring.GetViewGeometry()
-    gl.Color(0.02, 0.05, 0.03, 0.6)
-    gl.Rect(0, 0, vsx, vsy)
+    scrim(0, 0, vsx, vsy, 0.6)
     text("Extracting…", vsx * 0.5, vsy * 0.5, 24, "co", COL.gold)
+    if Ash and Ash.progressSweep then
+      Ash.progressSweep(vsx * 0.5 - 140, vsy * 0.5 - 22, vsx * 0.5 + 140, vsy * 0.5 - 16, COL.steam, os.clock() * 0.6)
+    end
   elseif phase == "over" then
     drawOver()
   end

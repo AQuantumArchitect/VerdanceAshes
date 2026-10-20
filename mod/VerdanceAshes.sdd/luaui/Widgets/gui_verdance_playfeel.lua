@@ -203,10 +203,17 @@ function widget:DrawWorld()
   if Spring.IsGUIHidden and Spring.IsGUIHidden() then return end
   -- Deploy↔extract corridor + extract markers live in objectives (WG.vaRoute).
   -- Playfeel only draws hurt-retreat rays to the unit's chosen safe point.
+  -- Safe point fallback: the pad (one point — land and lift), then legacy deploy/extract.
+  local px = numParam("va_pad_x", -1)
+  local pz = numParam("va_pad_z", -1)
   local dx = numParam("va_deploy_x", -1)
   local dz = numParam("va_deploy_z", -1)
   local ex = numParam("va_extract_x", -1)
   local ez = numParam("va_extract_z", -1)
+  if px >= 0 and pz >= 0 then
+    dx, dz = px, pz
+    ex, ez = px, pz
+  end
 
   local myTeam = Spring.GetMyTeamID and Spring.GetMyTeamID()
   if myTeam ~= nil then
@@ -344,8 +351,9 @@ local function maybeBringHome(frame)
   end
 
   if (allDone or (rescueFailed and extractOpen)) and frame - lastBringHome > 45 * 30 then
+    -- Board resolved: no directive, no verdict. The player decides when to lift.
     lastBringHome = frame
-    flashLabel = rescueFailed and "RTB — extract (rescue failed)" or "Extract open — rally the pad"
+    flashLabel = "Board resolved — your call"
     flashUntil = os.clock() + 2.2
     flashColor = COL_STEAM
     playUi("beep4", 0.55)

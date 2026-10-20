@@ -418,6 +418,21 @@ Three additive edits to `tools/verdance_story_engine_v1.py`, each guarded so hom
 
 Unstructured events (beads, offscreen clashes, promises kept and broken, deaths) → a small vocabulary of probes → a weighted mixture over competing **readings** with explicit, computable **ambiguity** between them → authored **attractors** chosen by fidelity → content keyed to the interpretation, never to the raw signal. The pipeline is rebuildable from the log, deterministic, and linted. Replace "Drops" with support tickets or field reports and nothing in the architecture changes; only the readings and the voices do.
 
+## Pass six: the board rhymes with the field (2026-10-20)
+
+The HUD paints the **company belief** — never the truth, never the enemy minds — the same way in the hub and in BAR, with colour, shape and border each carrying the same fact.
+
+**Belief on the board** — `tools/hub_belief_v1.py` reads `outbox/intel.latest.json` (the pass-three frame) into one row per zone: `believed ours|held|empty|dark|unsure`, `confidence` (alpha), `state current|stale|dark` (ring), `faction` = who we last **saw** holding it (`umwelt_world_v1.seen_faction`, kept in `.seen.json`; rumours flip it, nothing else does), `threat`, `surprise`, `people[]`, `holding`. `build_hub_state_v1` no longer reads `zoneMemory.controllingFaction` for colour; theater `control` comes from belief. A faction colour on the board means "we believe they hold it", at that confidence. Hub keys: `belief`, `camp`, `exposure` (our side of the mirror only: which of our holdings Armada has eyes on), `lastResult.manifest`.
+
+**One pad, constrained choice** — raiders land and lift at the same point. The hub shows one Pad mark; `stamp_deploy_plan_v1` sets `extract = deploy` and judges legality from belief: ours, or a rim believed empty/dark/unsure with threat ≤ 0.4, or `camp.nextPadZoneId`. Illegal zones are rendered with a struck ring and refuse the click; the reason is the belief sentence ("believed held by armada (88%)"). Heroes left in the field (`camp.people[hid].where = field`) are not deployable and show where they are.
+
+**In BAR** — `gui_verdance_objectives.lua`: pad ring (r = 560, `Ash.MARK.pad`) with a live headcount chip; EXTRACT is three-state (empty pad / someone off the pad: "LEFT IF YOU LIFT" ledger / all aboard); SEEN row and exposure hatch from `va_pad_enemy` and the observe gadget; contradiction glyphs where the briefing was wrong; phase chips ▸ APPROACH ✦ FIGHT ◆ MARKS ⌂ EXTRACT ∞ OVERTIME (the clock never ends a sortie, overtime only wakes the map). `gui_verdance_tnb_bar.lua` is the first-class Tenebrium bar top-centre (bank · looted · field, pips, rise/fall flash) fed by `publishTenebriumRules()`; the broken donuts are gone. `gui_verdance_exfil.lua` is reskinned on the Ash tokens and fences input with `WG.vaExfilModal`.
+
+**Cut** — the old `controllingFaction` colouring, Tnb donuts, verdict tables in `va_ash_tokens.lua`, hold-timer copy (`narrative_v1.bringHome` now describes the manifest). Pre-sweep copies in `_attic/sweep_tmp/`.
+
+**Still open** — the builder composes a player kit the gadget discards (next cut: `crew[]` from Python); heroes left in the field are not yet spawned as units on return; nested zone geometry overlaps on the Greenest Fields board.
+
+
 ---
 
 ## Commands

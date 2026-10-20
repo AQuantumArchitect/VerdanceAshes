@@ -2,7 +2,7 @@ import './campaign.js';
 
 import {session, readNarrative, commitChoice} from './state.js';
 
-import {escape, pretty, field, operation, thread, chronicle, reactions, scene} from './render.js';
+import {escape, pretty, field, operation, thread, chronicle, reactions, scene, fieldLine} from './render.js';
 
 import {installOverlays, updateIntelligence, zoneInspector} from './map.js';
 
@@ -177,7 +177,7 @@ if(params.get('console')==='0' || adapter?.snapshot().hub.features?.commandConso
 
     choices.sort((a,b)=>ranking.findIndex(o=>o.id===a.id)-ranking.findIndex(o=>o.id===b.id));
 
-    const signature=JSON.stringify([n,snap.live,snap.focusMap,snap.plan?.choiceId,snap.hub.homeCamp,snap.hub.aces,snap.hub.lastResult,session.allThreads,session.selectedThread,session.error]);
+    const signature=JSON.stringify([n,snap.live,snap.focusMap,snap.plan?.choiceId,snap.hub.homeCamp,snap.hub.aces,snap.hub.lastResult,snap.hub.camp,session.allThreads,session.selectedThread,session.error]);
 
     updateIntelligence(n,snap.focusMap);
 
@@ -189,7 +189,7 @@ if(params.get('console')==='0' || adapter?.snapshot().hub.features?.commandConso
 
     const shown=session.allThreads?actionable:actionable.filter(t=>n.recommended.includes(t.id));
 
-    rail.innerHTML='<p class="cc-eyebrow">Company operations</p><h2>Where do we go next?</h2>'+choices.slice(0,3).map(c=>`<button class="cc-operation" type="button" data-operation="${escape(c.id)}" ${c.disabled?'disabled':''} aria-pressed="${c.id===snap.plan?.choiceId}"><strong>${escape(c.label)}</strong><span>${escape(ranking.find(o=>o.id===c.id)?.recommendation || 'Plan the route and inspect the requirements.')}</span></button>`).join('')+
+    rail.innerHTML='<p class="cc-eyebrow">Company operations</p><h2>Where do we go next?</h2>'+fieldLine(adapter.fieldPeople ? adapter.fieldPeople() : [])+choices.slice(0,3).map(c=>`<button class="cc-operation" type="button" data-operation="${escape(c.id)}" ${c.disabled?'disabled':''} aria-pressed="${c.id===snap.plan?.choiceId}"><strong>${escape(c.label)}</strong><span>${escape(ranking.find(o=>o.id===c.id)?.recommendation || 'Plan the route and inspect the requirements.')}</span></button>`).join('')+
 
       (choices.length>3?`<details><summary>All ${choices.length} operations</summary>${choices.slice(3).map(c=>`<button type="button" data-operation="${escape(c.id)}" ${c.disabled?'disabled':''}>${escape(c.label)}</button>`).join('')}</details>`:'')+
 

@@ -1,6 +1,6 @@
 -- Ash Console tokens + draw helpers for Verdance BAR widgets.
 -- Keep in sync with docs/UI_ASH_CONSOLE.md and app/showoff/index.html :root.
--- Also keep verdict copy in sync with tools/match_credit_v1.py _HEADLINES.
+-- No verdict copy lives here: Lua reports facts, Python interprets.
 
 local Ash = {}
 
@@ -19,47 +19,26 @@ Ash.COL = {
   warn   = { 0.878, 0.627, 0.376, 1.0 },
   bad    = { 1.000, 0.490, 0.490, 1.0 },
   tnb    = { 0.788, 0.627, 1.000, 1.0 },
-  -- map markers
-  deploy = { 0.490, 1.000, 0.541, 0.75 },
+  -- map markers (the pad is one point: the company lands and lifts from it)
+  pad = { 0.494, 0.784, 1.000, 0.75 },
   objective = { 0.878, 0.627, 0.376, 0.75 },
-  extract = { 0.494, 0.784, 1.000, 0.75 },
 }
 
 -- World map marker copy — objectives owns MarkerAddPoint; playfeel does not.
+-- One pad: deploy pin and extract pin are the same point.
 Ash.MARK = {
-  landing = ">>> LANDING (enfil) <<<",
+  pad = "PAD — land here, lift here",
   objective = "!!! OBJECTIVE: ",
-  extract = "^^^ EXTRACT HERE — hold ^^^",
   rezPrefix = "REZ: ",
 }
 
--- Display copy — sync with match_credit_v1._HEADLINES
-Ash.VERDICT = {
-  victory = {
-    banner = "SUCCESS",
-    headline = "Success.",
-    color = "good",
-  },
-  partial = {
-    banner = "PARTIAL SUCCESS",
-    headline = "Partial success.",
-    color = "warn",
-  },
-  defeat = {
-    banner = "DEFEAT",
-    headline = "Defeat.",
-    color = "bad",
-  },
-  abandon = {
-    banner = "WITHDRAWN",
-    headline = "Withdrawn.",
-    color = "muted",
-  },
-  incomplete = {
-    banner = "RESULT PENDING",
-    headline = "Result pending — retry recovery or withdraw.",
-    color = "steam",
-  },
+-- Phase chips (objectives rail + clock). Never bad: the clock never ends the game.
+Ash.PHASE = {
+  APPROACH = { glyph = "▸", color = "edge" },
+  FIGHT    = { glyph = "✦", color = "warn" },
+  MARKS    = { glyph = "◆", color = "gold" },
+  EXTRACT  = { glyph = "⌂", color = "steam" },
+  OVERTIME = { glyph = "∞", color = "ash", sub = "clock out — the map is awake" },
 }
 
 function Ash.color(name, alpha)
@@ -68,35 +47,6 @@ function Ash.color(name, alpha)
     return { c[1], c[2], c[3], alpha }
   end
   return c
-end
-
-function Ash.verdictInfo(verdict)
-  local key = tostring(verdict or "incomplete"):lower()
-  return Ash.VERDICT[key] or Ash.VERDICT.incomplete
-end
-
---- Map gadget status / resultCode to protocol verdict for display only.
-function Ash.displayVerdict(status, resultCode, terminalReason)
-  local st = tostring(status or ""):lower()
-  local reason = tostring(terminalReason or ""):lower()
-  if st == "victory" or st == "victoryclean" or resultCode == 1 then
-    return "victory"
-  end
-  if st == "defeat" or st == "failed" or st == "failure" or resultCode == 2 then
-    return "defeat"
-  end
-  if st == "abandon" or st == "abandoned" or reason == "abandon" then
-    return "abandon"
-  end
-  if st == "incomplete" or st == "unknown" or st == "active" or st == "inactive" then
-    return "incomplete"
-  end
-  if st == "partial" or st == "extracted" or resultCode == 3 then
-    return "partial"
-  end
-  if resultCode == 1 then return "victory" end
-  if resultCode == 2 then return "defeat" end
-  return "partial"
 end
 
 function Ash.setColor(col)
@@ -172,9 +122,55 @@ function Ash.voiceBlock(cx, y, maxW, speaker, line, alpha)
   return h
 end
 
---- Small label chip: dark fill, colored text.
-function Ash.chipLabel(str, x, y, size, col)
-  Ash.text(str, x, y, size or 11, col or Ash.COL.muted, "c")
+--- Small label chip: dark fill, colored text, 1px border in the same colour.
+-- align "l" anchors the chip's left edge at x; "c" centres it; "r" anchors the right edge.
+-- Returns the chip width.
+function Ash.chipLabel(str, x, y, size, col, align)
+  size = size or 11
+  col = col or Ash.COL.muted
+  str = tostring(str or "")
+  local w = (gl.GetTextWidth(str) * size) + 12
+  local h = size + 6
+  local x1
+  if align == "l" then x1 = x
+  elseif align == "r" then x1 = x - w
+  else x1 = x - w / 2 end
+  local y1 = y - 3
+  Ash.setColor({ Ash.COL.bg[1], Ash.COL.bg[2], Ash.COL.bg[3], 0.78 })
+  gl.Rect(x1, y1, x1 + w, y1 + h)
+  Ash.setColor({ col[1], col[2], col[3], 0.55 })
+  gl.LineWidth(1)
+  gl.BeginEnd(GL.LINE_LOOP, function()
+    gl.Vertex(x1, y1)
+    gl.Vertex(x1 + w, y1)
+    gl.Vertex(x1 + w, y1 + h)
+    gl.Vertex(x1, y1 + h)
+  end)
+  Ash.text(str, x1 + 6, y, size, col, "l")
+  return w
+end
+
+--- Diagonal hatch (lines, not fill) inside a screen rect. Used for exposure so it
+-- never shares an encoding with belief fill. step in px; col with alpha.
+function Ash.hatchRect(x1, y1, x2, y2, col, step)
+  if x2 <= x1 or y2 <= y1 then return end
+  step = step or 4
+  Ash.setColor(col or Ash.COL.bad)
+  gl.LineWidth(1)
+  local w, h = x2 - x1, y2 - y1
+  gl.BeginEnd(GL.LINES, function()
+    local d = step
+    while d < w + h do
+      -- line from (x1 + d, y1) to (x1, y1 + d), clipped to the rect
+      local ax, ay = x1 + d, y1
+      if ax > x2 then ax = x2; ay = y1 + (d - w) end
+      local bx, by = x1, y1 + d
+      if by > y2 then by = y2; bx = x1 + (d - h) end
+      gl.Vertex(ax, ay)
+      gl.Vertex(bx, by)
+      d = d + step
+    end
+  end)
 end
 
 --- Soft vignette fill behind a modal card (deep ash bg).

@@ -246,7 +246,7 @@ class Clock:
                     zid = f.get("zoneId")
                     eta = 0.35 if on_held else 0.15
                     if zid and zid in self.world.host.engine.field.clusters:
-                        self.world.observe_zone(str(zid), source="rumour:flip", eta=eta, minute=self.minute, held=1.0,
+                        self.world.observe_zone(str(zid), source="rumour:flip", eta=eta, minute=self.minute, held=1.0, faction=str(f.get("toFaction") or "") or None,
                                                 ours=1.0 if f.get("toFaction") == "ashwalkers" else 0.0, threat=0.6)
                     if on_held:
                         row = {"kind": "rumour", "about": "flip", "mapId": f.get("mapId"), "zoneId": zid, "label": f.get("label"), "toFaction": f.get("toFaction"), "fromFaction": f.get("fromFaction"), "eta": eta, "source": "word from the road", "minute": round(self.minute, 1), "missionNumber": int(st.get("missionNumber") or 0), "camp": True}

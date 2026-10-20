@@ -2,7 +2,7 @@
 
 **One product, two skins:** BAR in-theater HUD + HTML war-room hub.
 
-Version: **0.8.3** (theater map + home jungle). Protocol credit laws stay in `docs/CAMPAIGN_BAR_PROTOCOL.md` and `tools/match_credit_v1.py`. Theater/home rules: `docs/THEATER_MAP_AND_HOME.md`.
+Version: **0.8.3** (theater map + home jungle) · **pass six 2026-10-20**: the board paints belief, one pad, exposure, manifest debrief. Protocol credit laws stay in `docs/CAMPAIGN_BAR_PROTOCOL.md` and `tools/match_credit_v1.py`. Theater/home rules: `docs/THEATER_MAP_AND_HOME.md`.
 
 ---
 
@@ -36,9 +36,11 @@ Not a second brand. Not a debug strip. Not “partial looks like victory.”
 
 | Role | Color |
 |---|---|
-| Deploy / landing | `good` / `edge` |
-| Objective | `warn` |
-| Extract | `steam` |
+| Pad (land and lift, one point) | `steam` ring r=560, △ glyph |
+| Objective / wound | `warn` |
+| Belief fill | ours `edge`/`good` · held-by-faction = that faction's colour · held-unseen `warn` · empty border only · nobody looked = hatch + `?` · alpha = confidence · stale = dotted `ash` ring |
+| Exposure | `bad` diagonal hatch (α = how much of us they see) + ◉ at the zone they believe we are in |
+| History | ✗ `warn` / ○ `muted` where the briefing was contradicted · ⚑ people left · ■ `gold` holdings |
 
 **Implementations**
 
@@ -66,7 +68,10 @@ Secondary: `reasonHint` from credit table; never invent a third dialect.
 | Surface | File | Role |
 |---|---|---|
 | Hub | `app/showoff/index.html` | Company, Drop board, homecoming card, Abandon |
-| BAR command deck | `gui_verdance_objectives.lua` | Briefing, phase strip, barks, debrief + clickable picks / 1-4 |
+| BAR command deck | `gui_verdance_objectives.lua` | Briefing, phase chip, pad ring + headcount, EXTRACT states + "left if you lift", SEEN row, barks (one voice queue with Yeva) |
+| Exfil manifest | `gui_verdance_exfil.lua` | EXTRACT → pause → going / staying / learned → confirm |
+| Belief overlay | `gui_verdance_belief_overlay.lua` | Minimap belief fill, exposure hatch, contradiction glyphs, Yeva |
+| Tnb bar | `gui_verdance_tnb_bar.lua` | Top-centre: bank · looted · field, pips, rise/fall flash |
 | Hero tags | `gui_verdance_hero_tags.lua` | World labels |
 | Zone minimap | `gui_verdance_zone_minimap.lua` | Enfil / obj / extract |
 | Proxy story | `gui_verdance_proxy_story.lua` | Optional archive (`/vastoryshow`) |
@@ -80,7 +85,7 @@ Secondary: `reasonHint` from credit table; never invent a third dialect.
 - **Title:** `gold`
 - **Voice:** left edge bar `edge` + speaker kicker + italic-ish line
 - **Panel:** dark fill + thin `edge` border + left accent strip
-- **Phase chip:** APPROACH / FIGHT / EXTRACT / TIMEOUT
+- **Phase chip:** ▸ APPROACH `edge` · ✦ FIGHT `warn` · ◆ MARKS `gold` · ⌂ EXTRACT `steam` (board resolved — your call) · ∞ OVERTIME `ash` (the map is awake). The clock never ends a sortie and is never red.
 - **Verdict colors:** victory=`good`, partial=`warn`, defeat=`bad`, abandon=`muted`, incomplete=`steam`
 
 ---

@@ -21,12 +21,12 @@ local showLabels = true
 local showAllFaint = false  -- /vazonesall — faint cell traces for every zone
 
 -- Ash Console map markers (docs/UI_ASH_CONSOLE.md) — match hub deploy board.
+-- Kinds: objective (warn) · secondary (gold) · pad (steam — the company lands AND lifts here).
 local COL = {
   default = { 0.490, 0.584, 0.518, 0.14 },
   objective = { 0.878, 0.627, 0.376, 0.55 },
   secondary = { 0.831, 0.769, 0.604, 0.40 },
-  extract = { 0.494, 0.784, 1.000, 0.55 },
-  deploy = { 0.490, 1.000, 0.541, 0.55 },
+  pad = { 0.494, 0.784, 1.000, 0.55 },
   edge = { 0.933, 0.965, 0.933, 0.85 },
 }
 do
@@ -37,8 +37,7 @@ do
   if ok and type(Ash) == "table" and Ash.COL then
     COL.objective = { Ash.COL.warn[1], Ash.COL.warn[2], Ash.COL.warn[3], 0.55 }
     COL.secondary = { Ash.COL.gold[1], Ash.COL.gold[2], Ash.COL.gold[3], 0.40 }
-    COL.extract = { Ash.COL.steam[1], Ash.COL.steam[2], Ash.COL.steam[3], 0.55 }
-    COL.deploy = { Ash.COL.good[1], Ash.COL.good[2], Ash.COL.good[3], 0.55 }
+    COL.pad = { Ash.COL.steam[1], Ash.COL.steam[2], Ash.COL.steam[3], 0.55 }
     COL.edge = { Ash.COL.ink[1], Ash.COL.ink[2], Ash.COL.ink[3], 0.85 }
     COL.default = { Ash.COL.muted[1], Ash.COL.muted[2], Ash.COL.muted[3], 0.14 }
   end
@@ -123,8 +122,11 @@ local function rebuild()
   local sz = Game.mapSizeZ or 1
   local obj = mission and mission.objective or {}
   local objId = Spring.GetGameRulesParam("va_target_zone") or obj.targetZoneId
-  local extId = Spring.GetGameRulesParam("va_extract_zone") or (mission and (mission.extractionZoneId or obj.extractionZoneId))
-  local depId = mission and mission.deploymentZoneId
+  -- The pad: one zone (va_pad_zone from the exfil gadget); deployment zone until it is published.
+  local padId = Spring.GetGameRulesParam("va_pad_zone")
+  if type(padId) ~= "string" or padId == "" then
+    padId = mission and (mission.pad and mission.pad.zoneId or mission.deploymentZoneId)
+  end
   local secondarySet = {}
   local secList = obj.secondaryCaptureZoneIds or mission.secondaryCaptureZoneIds or {}
   if type(secList) == "table" then
@@ -143,11 +145,7 @@ local function rebuild()
     local kind = "default"
     if zoneId == tostring(objId or "") then kind = "objective"
     elseif secondarySet[zoneId] then kind = "secondary"
-    elseif zoneId == tostring(depId or "") then kind = "deploy"
-    elseif zoneId == tostring(extId or "") then kind = "extract"
-    end
-    if zoneId == tostring(depId or "") and zoneId == tostring(extId or "") then
-      kind = "deploy"
+    elseif zoneId == tostring(padId or "") then kind = "pad"
     end
     -- Lean: only role zones by default (AABB spam was the green-box mess).
     if kind == "default" and not showAllFaint then
@@ -162,7 +160,6 @@ local function rebuild()
         cells = cells,
         cx = cx,
         cz = cz,
-        alsoExtract = (zoneId == tostring(depId or "") and zoneId == tostring(extId or "")),
       }
       zones[#zones + 1] = rec
     end
@@ -207,7 +204,7 @@ end
 
 local lastRouteKey = ""
 function widget:Update()
-  local key = tostring(Spring.GetGameRulesParam("va_target_zone")) .. ":" .. tostring(Spring.GetGameRulesParam("va_extract_zone"))
+  local key = tostring(Spring.GetGameRulesParam("va_target_zone")) .. ":" .. tostring(Spring.GetGameRulesParam("va_pad_zone"))
   if key ~= lastRouteKey then lastRouteKey = key; rebuild() end
 end
 
@@ -244,7 +241,7 @@ local function drawRouteOnMinimap(sx, sy, mapX, mapZ)
   local bx = (route.to.x / mapX) * sx
   local by = sy - (route.to.z / mapZ) * sy
   local col = COL.objective
-  if route.stage == "extract" then col = COL.extract
+  if route.stage == "extract" then col = COL.pad
   elseif route.stage == "marks" then col = COL.secondary
   end
   gl.Color(col[1], col[2], col[3], 0.95)
@@ -267,12 +264,6 @@ end
 
 local function drawZoneCells(z, sx, sy, mapX, mapZ)
   local col = COL[z.kind] or COL.default
-  if z.kind == "extract" or z.alsoExtract then
-    local owner = Spring.GetGameRulesParam("va_extract_owner")
-    local factionColors = {ashwalkers={0.2,1,0.3,0.5}, nullmercs={0.2,1,0.3,0.5},
-      armada={0.2,0.5,1,0.5}, cortex={1,0.2,0.2,0.5}, raptors={1,0.85,0.1,0.5}, scavengers={0.75,0.25,1,0.5}}
-    col = factionColors[owner] or COL.default
-  end
   local cells = z.cells or {}
   -- Trace real cells — not the legacy AABB square.
   gl.Color(col[1], col[2], col[3], col[4])
@@ -297,18 +288,14 @@ function widget:DrawInMiniMap(sx, sy)
     drawZoneCells(z, sx, sy, mapX, mapZ)
     local cx = (z.cx / mapX) * sx
     local cy = sy - (z.cz / mapZ) * sy
-    if z.kind == "deploy" then
-      drawArrow(cx, cy, 11, false, 0.35, 1.0, 0.5, 1.0)
+    if z.kind == "pad" then
+      -- Down-arrow (land) and up-arrow (lift) share the point: one pad, steam.
+      local p = COL.pad
+      drawArrow(cx - 6, cy, 9, false, p[1], p[2], p[3], 1.0)
+      drawArrow(cx + 6, cy, 9, true, p[1], p[2], p[3], 1.0)
       if showLabels then
-        gl.Color(0.6, 1.0, 0.7, 1)
-        gl.Text(z.alsoExtract and "LAND / EXTRACT" or "LAND", cx, cy + 12, 9, "co")
-      end
-    elseif z.kind == "extract" then
-      drawArrow(cx, cy, 11, true, 0.4, 0.85, 1.0, 1.0)
-      if showLabels then
-        gl.Color(0.5, 0.9, 1.0, 1)
-        local secured = Spring.GetGameRulesParam("va_extract_secured") == 1
-        gl.Text(secured and "EXTRACT: SECURE" or "EXTRACT: BLOCKED", cx, cy + 12, 9, "co")
+        gl.Color(p[1], p[2], p[3], 1)
+        gl.Text("PAD", cx, cy + 12, 9, "co")
       end
     elseif z.kind == "objective" then
       gl.Color(1.0, 0.7, 0.25, 1)
