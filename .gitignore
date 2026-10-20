@@ -36,3 +36,5 @@ _attic/
 outbound/
 _attic/umwelt_src_snapshot_*.zip
 tools/_vendor/
+tools/hud_harness/fx/
+tools/hud_harness/out/
