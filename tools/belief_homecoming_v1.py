@@ -80,6 +80,53 @@ def _open_world(state: Dict[str, Any], workspace: Path):
     return world, True
 
 
+def observed_etas(state: Dict[str, Any], result: Dict[str, Any], bead: Dict[str, Any], truth: Dict[str, Dict[str, Any]],
+                  map_id: str, workspace: Path) -> Dict[str, float]:
+    """eta per zone for this Drop.
+
+    Preferred: result.observedZones {zoneId: eta} from the gadget (line-of-sight share per zone,
+    recency-weighted; pass 4). Fallback: a footprint proxy — zones where the player had units, deployed,
+    extracted or struck the objective are 1.0; zones adjacent to those 0.5; the rest of the map 0.15
+    (minimap-level awareness). Zones never seen stay dark even on a fought map."""
+    on_map = {zid for zid, z in truth.items() if z.get("mapId") == map_id}
+    given = result.get("observedZones")
+    if isinstance(given, dict) and given:
+        return {str(z): _clamp(e) for z, e in given.items() if str(z) in on_map and _clamp(e) > 0}
+    strong = set()
+    for key in ("deploymentZoneId", "extractionZoneId", "targetZoneId"):
+        v = result.get(key) or bead.get(key)
+        if v in on_map:
+            strong.add(str(v))
+    for fp in result.get("playerFootprint") or []:
+        if isinstance(fp, dict) and fp.get("zoneId") in on_map:
+            strong.add(str(fp["zoneId"]))
+    for o in result.get("objectiveResults") or []:
+        if isinstance(o, dict) and o.get("zoneId") in on_map:
+            strong.add(str(o["zoneId"]))
+    for ev in result.get("tenebriumClaimEvents") or []:
+        if isinstance(ev, dict) and ev.get("zoneId") in on_map:
+            strong.add(str(ev["zoneId"]))
+    if not strong:
+        # legacy result: everything measured on the map at 0.6 (we were there, we did not look everywhere)
+        return {zid: 0.6 for zid in on_map if truth[zid].get("confidence") == "measured"}
+    adj: Dict[str, List[str]] = {}
+    try:
+        g = _load(workspace / "data" / "zone_maps" / "world_zone_graph.v1.json")
+        for e in g.get("edges") or []:
+            a, b = str(e.get("from")), str(e.get("to"))
+            adj.setdefault(a, []).append(b); adj.setdefault(b, []).append(a)
+    except Exception:
+        pass
+    out = {z: 1.0 for z in strong}
+    for z in strong:
+        for nz in adj.get(z, []):
+            if nz in on_map and nz not in out:
+                out[nz] = 0.5
+    for zid in on_map:
+        out.setdefault(zid, 0.15)
+    return out
+
+
 def _rest_minutes(state: Dict[str, Any]) -> float:
     camp = state.get("camp") or {}
     try:
@@ -113,19 +160,10 @@ def fold_homecoming(state: Dict[str, Any], result: Dict[str, Any], bead: Dict[st
     if gap > 0:
         world.advance(gap, step_minutes=max(60.0, gap / 12.0))
 
-    # which zones this Drop measured
-    match_id = result.get("matchId")
-    measured = []
-    for zid, z in truth.items():
-        if z.get("mapId") != map_id or z.get("confidence") != "measured":
-            continue
-        raw = z.get("lastMeasuredRaw") or {}
-        if match_id and raw.get("matchId") and raw.get("matchId") != match_id:
-            continue
-        measured.append(zid)
-    observed_ids = [str(x) for x in (result.get("observedZoneIds") or []) if str(x) in truth]
-    if observed_ids:
-        measured = sorted(set(measured) | set(observed_ids))
+    # which zones this Drop measured, and how well (eta per zone)
+    eta_by_zone = observed_etas(state, result, bead, truth, map_id, workspace)
+    measured = sorted(eta_by_zone)
+    bead["observedZones"] = {z: round(e, 3) for z, e in sorted(eta_by_zone.items())}
 
     # 3. SURPRISE: what we believed before we looked
     per_zone = []
@@ -135,25 +173,32 @@ def fold_homecoming(state: Dict[str, Any], result: Dict[str, Any], bead: Dict[st
             continue
         want = _drop_obs(truth[zid])
         b = world.zone_summary(zid)
+        eta = float(eta_by_zone.get(zid, 1.0))
         gap_ours = b["ours"]["conf"] * abs(want["ours"] - b["ours"]["value"])
         gap_held = b["held"]["conf"] * abs(want["held"] - b["held"]["value"])
         gap_strength = 0.5 * b["strength"]["conf"] * abs(want["strength"] - b["strength"]["value"])
-        s = gap_ours + gap_held + gap_strength
+        # you can only be surprised by what you actually saw
+        s = eta * (gap_ours + gap_held + gap_strength)
         total += s
         believed = ("ours" if b["ours"]["value"] > 0.5 else ("held by someone" if b["held"]["value"] > 0.5 else "empty")) if max(b["ours"]["conf"], b["held"]["conf"]) >= 0.15 else "nobody had looked"
         found = str(truth[zid].get("controllingFaction") or "neutral")
         found = "empty" if found == "neutral" else found
-        per_zone.append({"zoneId": zid, "label": truth[zid].get("label") or zid, "surprise": round(s, 4),
+        per_zone.append({"zoneId": zid, "label": truth[zid].get("label") or zid, "surprise": round(s, 4), "eta": round(eta, 3),
                          "believed": believed, "found": found,
                          "belief": {k: v for k, v in b.items() if k in ("ours", "held", "strength")}})
     per_zone.sort(key=lambda r: -r["surprise"])
     bead["surprise"] = {"total": round(total, 4), "zones": len(measured), "top": per_zone[:3]}
 
-    # 4a. Drop telemetry (one ingest for the whole homecoming)
+    # 4a. Drop telemetry at each zone's own eta (one ingest for the whole homecoming)
     world.begin_batch()
     for zid in measured:
         if zid in world.host.engine.field.clusters:
-            world.observe_zone(zid, source=f"drop:m{mission}", eta=1.0, minute=now_minute, **_drop_obs(truth[zid]))
+            world.observe_zone(zid, source=f"drop:m{mission}", eta=float(eta_by_zone[zid]), minute=now_minute, **_drop_obs(truth[zid]))
+    # 4a'. an in-match belief export (pass 4: the Lua belief field) lands directly at its own eta
+    for zid, row in (result.get("beliefExport") or {}).items() if isinstance(result.get("beliefExport"), dict) else []:
+        if zid in world.host.engine.field.clusters and isinstance(row, dict):
+            world.observe_zone(str(zid), source=f"match:m{mission}", eta=_clamp(row.get("eta", 0.8)), minute=now_minute,
+                               ours=row.get("ours"), held=row.get("held"), strength=row.get("strength"), threat=row.get("threat"))
     # 4b. what reached camp from elsewhere: rumours, with provenance, into state["intel"]
     intel = state.setdefault("intel", [])
     new_fronts = [f for f in (state.get("frontEvents") or [])[before_front_count:] if isinstance(f, dict)]
@@ -223,6 +268,17 @@ def fold_homecoming(state: Dict[str, Any], result: Dict[str, Any], bead: Dict[st
             world.observe({f"obs_hero_{hid}_fit": 0.9}, 0.6, source=f"drop:m{mission}", minute=now_minute)
 
     world.flush()
+    # 4e. the other minds: truth frame (hidden), faction beliefs by policy, divergence
+    try:
+        import perspectives_v1 as P
+        P.write_truth(state, workspace)
+        fought = {"mapId": map_id, "zones": [z for z, e in eta_by_zone.items() if e >= 0.5], "against": str(result.get("against") or result.get("enemyFaction") or "")}
+        P.enqueue(state, workspace, new_fronts=new_fronts, fought=fought, minute=now_minute)
+    except Exception as exc:  # perspectives are optional; never block the company's fold
+        try:
+            print(f"VA_PERSPECTIVES_FAIL {exc}")
+        except Exception:
+            pass
     # 5. persist + face
     world.save(pkl)
     frame = world.frame()
@@ -232,8 +288,45 @@ def fold_homecoming(state: Dict[str, Any], result: Dict[str, Any], bead: Dict[st
     out = workspace / "outbox" / "intel.latest.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(frame, indent=2, ensure_ascii=False), encoding="utf-8")
+    try:
+        import perspectives_v1 as P
+        P.divergence(state, workspace)
+    except Exception:
+        pass
     return {"skipped": False, "measured": len(measured), "surprise": bead["surprise"]["total"], "rumours": len(new_fronts),
             "fresh": fresh, "fieldHash": frame["producer"]["field_hash"]}
+
+
+def intel_for_intent(state: Dict[str, Any], workspace: Path, map_id: Optional[str]) -> Dict[str, Any]:
+    """What the sortie stamp carries INTO the Drop: the company's belief about the planned map (not
+    truth), who is posted where, and which frames lie where. The HUD shows belief until line of
+    sight confirms (pass 4); the surprise then happens live."""
+    out: Dict[str, Any] = {"schema": "verdance-intent-intel/0.1", "perspective": "company", "mapId": map_id, "zones": {}, "posted": [], "frames": [], "asOfMinute": None}
+    frame_path = Path(workspace) / "outbox" / "intel.latest.json"
+    if frame_path.exists():
+        try:
+            frame = _load(frame_path)
+            out["asOfMinute"] = frame.get("as_of_minute")
+            for r in frame.get("nodes") or []:
+                if r.get("mapId") != map_id or not r.get("role"):
+                    continue
+                z = out["zones"].setdefault(str(r["node"]), {"label": r.get("label")})
+                z[str(r["role"])] = {"value": r.get("value"), "confidence": r.get("confidence"), "state": r.get("state"), "age_min": r.get("age_min"), "source": r.get("source")}
+            out["questions"] = [{"id": q["id"], "icon": q.get("icon"), "status": q.get("status"), "lean": q.get("lean")} for q in frame.get("questions") or []]
+        except Exception:
+            pass
+    camp = state.get("camp") or {}
+    names = {hid: (ch.get("name") or hid) for hid, ch in (state.get("characters") or {}).items() if isinstance(ch, dict)}
+    for hid, rec in (camp.get("people") or {}).items():
+        if rec.get("where") in ("posted", "transit") and rec.get("zoneId"):
+            out["posted"].append({"heroId": hid, "name": names.get(hid, hid), "zoneId": rec.get("zoneId"), "where": rec.get("where"), "eta": rec.get("eta")})
+    for e in ((state.get("dance") or {}).get("events") or []):
+        if e.get("verb") == "null" and e.get("kind") == "hero" and e.get("obligations"):
+            heads = (state.get("dance") or {}).get("heads") or {}
+            if heads.get(f"hero:{e.get('object')}") == e.get("id"):
+                pl = e.get("payload") or {}
+                out["frames"].append({"heroId": e.get("object"), "name": names.get(e.get("object"), e.get("object")), "mapId": pl.get("mapId"), "zoneId": pl.get("zoneId"), "since": e.get("missionNumber")})
+    return out
 
 
 if __name__ == "__main__":

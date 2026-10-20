@@ -278,6 +278,42 @@ class CampaignKernel:
                 save_json(p, state)
             return out
 
+    # ── pass three faces: belief frames, truth (dev), divergence, chronicle ─────
+    def _outbox_face(self, name: str, hidden: bool = False) -> dict[str, Any]:
+        p = self.ws / "outbox" / name
+        if not p.is_file():
+            return {"ok": False, "error": f"{name} not written yet (no fold has run)."}
+        try:
+            face = json.loads(p.read_text(encoding="utf-8-sig"))
+        except Exception as e:  # noqa: BLE001
+            return {"ok": False, "error": str(e)}
+        out = {"ok": True, "face": face}
+        if hidden:
+            out["hidden"] = True  # dev-only: never show the player truth in the hub
+        return out
+
+    def intel_surface(self, perspective: str = "company") -> dict[str, Any]:
+        """A belief frame (verdance-intel/1). company = the player's own; armada/nullmercs/cortex
+        are simulated minds, dev/debug faces until pass 4 decides what leaks through patrons."""
+        name = "intel.latest.json" if perspective in ("", "company") else f"intel.{perspective}.latest.json"
+        return self._outbox_face(name, hidden=(perspective not in ("", "company")))
+
+    def truth_surface(self) -> dict[str, Any]:
+        return self._outbox_face("truth.latest.json", hidden=True)
+
+    def divergence_surface(self) -> dict[str, Any]:
+        out = self._outbox_face("divergence.latest.json", hidden=True)
+        # faction minds fold in a detached worker; say whether the face is still catching up
+        try:
+            import perspectives_v1 as P
+            out["pending"] = P.pending(self.ws)
+        except Exception:  # noqa: BLE001
+            pass
+        return out
+
+    def chronicle_surface(self) -> dict[str, Any]:
+        return self._outbox_face("chronicle.latest.json")
+
     def continuity_audit(self, marks: list[str] | None = None) -> dict[str, Any]:
         """Phase 0 continuity membrane inspector (witness vs belief vs reinduce)."""
         try:

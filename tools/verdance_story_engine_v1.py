@@ -6455,6 +6455,14 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
         for perspective in active_thread["perspectives"]:
             if perspective["speaker"] != "ketha":
                 intent["briefing"]["lines"].append({"speaker": perspective["speaker"], "text": perspective["text"], "tag": "company"})
+    # Pass three: the sortie carries the company's BELIEF about the planned map into the Drop
+    # (not truth). Pass 4 will draw it on the HUD until line of sight confirms or surprises.
+    try:
+        if workspace is not None:
+            import belief_homecoming_v1 as _bh
+            intent["intel"] = _bh.intel_for_intent(state, Path(workspace), map_id)
+    except Exception as e:  # noqa: BLE001
+        print(f"VA_INTENT_INTEL_SKIP {e}")
     return intent
 
 

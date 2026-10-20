@@ -197,6 +197,21 @@ def build(face: Dict[str, Any], state: Dict[str, Any], workspace: Path, previous
         "mapId": (latest or {}).get("mapId"),
     }
 
+    # what the other side believes about us (divergence face), so a dispatch is written from its author's mind
+    div_path = workspace / "outbox" / "divergence.latest.json"
+    if div_path.exists():
+        try:
+            div = _load(div_path)
+            crossed = (div.get("crossed") or {})
+            persp = (div.get("perspectives") or {})
+            for fac, c in crossed.items():
+                a = c.get("aboutCompany") or {}
+                common[f"{fac}Knows"] = len(a.get("known") or [])
+                common[f"{fac}Blind"] = len(a.get("blind") or [])
+                common[f"{fac}OfOurs"] = a.get("ofOurs")
+                common[f"{fac}Ghost"] = len((persp.get(fac) or {}).get("ghostHoldings") or [])
+        except Exception:
+            pass
     out: Dict[str, Any] = {"schemaVersion": SCHEMA, "missionNumber": face.get("generatedFrom", {}).get("missionNumber"),
                            "attractor": sel.attractor, "dominant": sel.dominant,
                            "briefing": [], "debrief": [], "camp": [], "roll": {}, "dispatches": [], "blades": [], "transition": None}
@@ -323,6 +338,17 @@ def build(face: Dict[str, Any], state: Dict[str, Any], workspace: Path, previous
                 ok = True
             elif "dominantBecame" in on and prev_face.get("dominant") and prev_face.get("dominant") != sel.dominant and on["dominantBecame"] == sel.dominant:
                 ok = True
+            elif "belief" in on:
+                # the author's OWN mind about us (divergence face): blind = our holdings it has never seen,
+                # ghost = holdings it still believes are its own. Only patrons of that faction may use it.
+                fac = p.get("faction")
+                want = on["belief"]
+                if want.get("blindGte") is not None and (common.get(f"{fac}Blind") or 0) >= want["blindGte"]:
+                    ok = True
+                if want.get("ghostGte") is not None and (common.get(f"{fac}Ghost") or 0) >= want["ghostGte"]:
+                    ok = True
+                if want.get("knowsAll") and (common.get(f"{fac}Blind") == 0) and (common.get(f"{fac}Knows") or 0) > 0:
+                    ok = True
             elif "coherenceSettled" in on:
                 want = on["coherenceSettled"]
                 for c in face.get("coherence") or []:
@@ -335,7 +361,15 @@ def build(face: Dict[str, Any], state: Dict[str, Any], workspace: Path, previous
             if text:
                 cands.append({"from": pid, "name": p.get("name"), "faction": p.get("faction"), "text": text, "on": on})
     cands.sort(key=lambda c: (stable(c["from"], c["text"], sel.key)))
-    out["dispatches"] = cands[:2]
+    # at most two dispatches a bead, and never two from the same desk
+    picked: List[Dict[str, Any]] = []
+    for c in cands:
+        if any(p["from"] == c["from"] for p in picked):
+            continue
+        picked.append(c)
+        if len(picked) == 2:
+            break
+    out["dispatches"] = picked
 
     # --- blades: participants in the latest bead
     if latest:

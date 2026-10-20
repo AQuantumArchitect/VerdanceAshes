@@ -62,6 +62,24 @@ def make_handler(kernel: CampaignKernel, showoff: Path):
                 code, body, ct = _json_bytes(kernel.camp_surface())
                 return self._send(code, body, ct)
 
+            if path == "/api/intel":
+                q = parse_qs(parsed.query or "")
+                persp = (q.get("perspective") or ["company"])[0]
+                code, body, ct = _json_bytes(kernel.intel_surface(persp))
+                return self._send(code, body, ct)
+
+            if path == "/api/truth":
+                code, body, ct = _json_bytes(kernel.truth_surface())
+                return self._send(code, body, ct)
+
+            if path == "/api/divergence":
+                code, body, ct = _json_bytes(kernel.divergence_surface())
+                return self._send(code, body, ct)
+
+            if path == "/api/chronicle":
+                code, body, ct = _json_bytes(kernel.chronicle_surface())
+                return self._send(code, body, ct)
+
             if path == "/api/status":
                 code, body, ct = _json_bytes(kernel.status())
                 return self._send(code, body, ct)

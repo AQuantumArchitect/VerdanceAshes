@@ -155,6 +155,7 @@ class Clock:
     def __init__(self, state: Dict[str, Any], workspace: Path):
         self.state = state
         self.ws = Path(workspace)
+        self._fronts_at_open = len(state.get("frontEvents") or [])
         self.graph = ZoneGraph(self.ws, state)
         self.camp = camp_state(state)
         self.world = None
@@ -389,6 +390,14 @@ class Clock:
         if self.world is not None:
             pkl, _ = self._B._world_paths(self.ws)
             self.world.save(pkl)
+            # the other minds see the same hours pass, by their own policy
+            try:
+                import perspectives_v1 as P
+                new_fronts = [f for f in (self.state.get("frontEvents") or [])[self._fronts_at_open:] if isinstance(f, dict)]
+                P.write_truth(self.state, self.ws)
+                P.enqueue(self.state, self.ws, new_fronts=new_fronts, minute=self.minute)
+            except Exception:
+                pass
             frame = self.world.frame()
             frame["intel"] = (self.state.get("intel") or [])[-40:]
             (self.ws / "outbox").mkdir(parents=True, exist_ok=True)
@@ -399,6 +408,11 @@ class Clock:
             face["dark"] = sum(1 for r in frame["nodes"] if r["role"] == "ours" and r["state"] == "dark")
         else:
             face["belief"] = "unavailable: " + getattr(self, "world_error", "Umwelt not importable")
+        try:
+            import perspectives_v1 as P
+            face["divergence"] = {k: {"right": v["right"], "ghost": len(v["ghostHoldings"]), "dark": v["dark"]} for k, v in P.divergence(self.state, self.ws).get("perspectives", {}).items()}
+        except Exception:
+            pass
         (self.ws / "outbox" / "camp.latest.json").write_text(json.dumps(face, indent=2, ensure_ascii=False), encoding="utf-8")
         return face
 

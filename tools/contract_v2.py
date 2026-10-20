@@ -348,6 +348,12 @@ def normalize_result(raw: Dict[str, Any], *, campaign_id: str = "verdance_ashes"
             isinstance(raw.get("playerFootprint"), list)
             or isinstance(raw.get("zoneFootprint"), list)
         ),
+        # Pass three belief contract (pass 4 fills these from the gadget):
+        #   observedZones {zoneId: eta 0..1} — line-of-sight share per zone, recency weighted.
+        #   beliefExport  {zoneId: {ours, held, strength, threat}} — what the HUD showed at exit, at its own eta.
+        # Absent → the fold falls back to a footprint proxy; never invented here.
+        "observedZones": (raw.get("observedZones") if isinstance(raw.get("observedZones"), dict) else None),
+        "beliefExport": (raw.get("beliefExport") if isinstance(raw.get("beliefExport"), dict) else None),
         "destroyedObjectives": raw.get("destroyedObjectives") or raw.get("destroyedObjectiveIds") or [],
         "destroyedObjectiveIds": raw.get("destroyedObjectiveIds") or raw.get("destroyedObjectives") or [],
         "objectiveResults": raw.get("objectiveResults") or [],
@@ -434,6 +440,8 @@ def result_v2_to_v1_fields(r: Dict[str, Any]) -> Dict[str, Any]:
         ),
         "destroyedObjectives": r.get("destroyedObjectives"),
         "destroyedObjectiveIds": r.get("destroyedObjectiveIds") or r.get("destroyedObjectives"),
+        **({"observedZones": r.get("observedZones")} if isinstance(r.get("observedZones"), dict) else {}),
+        **({"beliefExport": r.get("beliefExport")} if isinstance(r.get("beliefExport"), dict) else {}),
         "objectiveResults": r.get("objectiveResults") or [],
         "secondaryResults": r.get("secondaryResults") or [],
         "elapsedFrames": r.get("elapsedFrames"),

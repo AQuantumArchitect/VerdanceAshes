@@ -180,6 +180,60 @@ push has answered. Referee: fewer rows than events, every kept icon survives, `l
 Icons are now on every reading, coherence pair, event class and attractor; the validator warns on a
 missing one. One glyph vocabulary across the hub chips, the briefing, the roll and the chronicle.
 
+## Pass three: into and out of BAR — truth, belief, and the other minds
+
+**One shape for every perspective.** Truth is projected into the same `verdance-intel/1` node shape as
+belief (`outbox/truth.latest.json`, confidence 1, `perspective: truth`, **hidden**; `/api/truth` is dev-only).
+Every belief is a lossy reading of that one truth, and every mind is DERIVE: none writes world state.
+
+**Perspectives** (`tools/perspectives_v1.py`). Besides the company's mind
+(`state/belief/verdance.engine.pkl`) there is one Umwelt world per faction
+(`state/belief/{armada,nullmercs,cortex}.engine.pkl`), fed by an **observation policy** instead of a player:
+zones they control η 0.9 · adjacent η 0.4 · clashes touching their ground η 0.8 · flips from/to them η 1.0 ·
+a Drop fought on their ground η 0.8 (they learn the irregulars were there). The roles are per-mind — Armada's
+`ours` means Armada's — so perspectives are compared only through truth. Faces: `outbox/intel.<faction>.latest.json`.
+
+**Divergence** (`outbox/divergence.latest.json`, `/api/divergence`) is the surprise map stated as objects:
+per perspective, belief vs truth — `right`, `ghostHoldings` (believes it holds what it lost), `unknownHoldings`
+(holds what it does not believe it holds), `wrongHeld`, `dark`, `gap` (Σ conf·|truth−belief|); and
+**crossed**: what each faction knows of the company's ground (`known` / `suspected` / `blind`).
+The patrons speak from it: a dispatch may carry `{"on": {"belief": {"blindGte": n | "ghostGte": n | "knowsAll": true}}}`
+and is written from what its author's faction **believes**, never from truth ("Command's map shows two
+sectors more than the ground does"). Fields `armadaKnows / armadaBlind / armadaGhost / armadaOfOurs` (and
+per faction) are common occasion fields. At most two dispatches a bead, never two from one desk.
+
+**Out of BAR — the result contract** (`contract_v2.normalize_result` carries both through):
+- `observedZones {zoneId: η}` — line-of-sight share per zone, recency weighted (the gadget, pass 4). Until
+  it exists the fold uses a **footprint proxy**: deploy/extract/target/footprint/objective/claim zones 1.0,
+  their neighbours 0.5, the rest of the fought map 0.15 (minimap awareness); legacy results 0.6.
+  The bead stamps `observedZones`; the Drop's telemetry is observed at exactly that η per zone.
+- `beliefExport {zoneId: {ours, held, strength, threat}}` — what the HUD believed at exit, ingested at its own η.
+- **Surprise is η-weighted**: `Σ η·conf·|truth−belief|`; `bead.surprise.top[].eta` says how hard we looked.
+  (A ghost holding seen at 0.15 is a rumour; at 1.0 it is Yeva's line.)
+
+**Into BAR — the sortie stamp.** `intent.intel` (`verdance-intent-intel/0.1`, perspective **company**):
+for the planned map, every zone's `ours/held/strength/threat` as `{value, confidence, state, age_min, source}`
+— belief, not truth; the six questions; who is `posted`/in `transit` and where; which `frames` lie where
+(open ∅ obligations). Pass 4 draws belief on the HUD until line of sight confirms or surprises it live.
+
+**Cost law.** Each mind is a full Umwelt world and Umwelt's save/load walks the continuation surface, so the
+three faction minds cost ~10× the company's fold. They are **off the critical path**: homecoming and every
+camp action `enqueue()` a job (a frozen truth slice + fronts + the fought map) and spawn a detached,
+low-priority, single-thread worker (`perspectives_v1.py --worker <ws>`); jobs queued back to back coalesce;
+divergence is rewritten when the worker lands. `/api/divergence.pending` says `{queued, workerAlive}`.
+Truth and the company's own fold stay synchronous. `VA_PERSPECTIVES_SYNC=1` folds inline (tests);
+`VA_PERSPECTIVES_NOSPAWN=1` queues without spawning (gates).
+
+**Routes.** `/api/intel?perspective=company|armada|nullmercs|cortex` · `/api/truth` (hidden) ·
+`/api/divergence` (hidden) · `/api/chronicle` · `/api/camp`, `/api/camp-act` (pass two).
+
+**Gate.** `tools/umwelt_replay_v1.py` still passes 5/5 on a pass-three save (measured track truth 36/36,
+unmeasured dark 90/90, rumour fades, questions agree with face 6/6, save/load hash).
+
+**Pass 4 (BAR / LuaUI) inherits:** export `observedZones` and `beliefExport` from the gadget; draw
+`intent.intel` as the pre-LOS overlay; posted heroes out of the Drop roster; casualties on scout/post;
+regenerate `world_zone_graph` for the 6 unbridged zones; vendor the Umwelt snapshot in SHIP.bat.
+
 ## Pipeline
 
 ```
@@ -264,4 +318,8 @@ python tools/readings_v1.py              # readout + outbox/readings.latest.json
 python tools/readings_v1.py --fresh      # ignore previous face (no stickiness/transition)
 python tools/occasions_v1.py             # who says what; writes occasions.latest.json/.md
 python tools/merge_ketha_additions.py    # idempotent pool deepening
+python tools/umwelt_replay_v1.py         # belief gate: replay the save, 5 checks
+python tools/perspectives_v1.py          # fold the faction minds once, print divergence
+python tools/perspectives_v1.py --worker . # drain the perspectives job queue
+python tools/camp_clock_v1.py            # camp surface
 ```

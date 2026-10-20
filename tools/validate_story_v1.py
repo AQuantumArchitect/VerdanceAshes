@@ -36,7 +36,8 @@ BEAD_FIELDS = {"map", "mapId", "ourMap", "verdict", "extraction", "extractionTex
                "count", "label", "toFaction", "fromFaction", "level", "hero", "heroId", "wounds", "outcome", "names", "joinedIds",
                "surprise", "believed", "found", "zonesMeasured", "eta", "source"}
 SNAPSHOT_FIELDS = {"hero", "heroId", "wounds", "value", "n", "m"}
-COMMON_FIELDS = {"wounded", "dead", "heldCount", "tenebrium", "atTable", "map", "mapId"}
+COMMON_FIELDS = {"wounded", "dead", "heldCount", "tenebrium", "atTable", "map", "mapId",
+                 "armadaKnows", "armadaBlind", "armadaGhost", "armadaOfOurs", "nullmercsKnows", "nullmercsBlind", "nullmercsGhost", "nullmercsOfOurs", "cortexKnows", "cortexBlind", "cortexGhost", "cortexOfOurs"}
 STANCES = {"care", "ambition", "independence", "pragmatism", "stewardship"}
 
 
