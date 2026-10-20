@@ -234,6 +234,60 @@ unmeasured dark 90/90, rumour fades, questions agree with face 6/6, save/load ha
 `intent.intel` as the pre-LOS overlay; posted heroes out of the Drop roster; casualties on scout/post;
 regenerate `world_zone_graph` for the 6 unbridged zones; vendor the Umwelt snapshot in SHIP.bat.
 
+## Pass four: BAR / LuaUI — the belief goes in, the looking comes out
+
+**Out: `game_verdance_belief_observe.lua`** (synced, its own chunk — the campaign gadget sits at the
+Lua local limit). Every 2 s it samples up to 36 cell centres per zone against the player's line of
+sight: `eta = max(eta·decay, share)` with an eight-minute half-life, so a zone driven through reads
+≈1.0 at exit and a zone glanced at an hour ago has faded to a rumour. It also counts what stood in
+the seen cells by side (units, structures, peaks, "enemy seen recently"). Published as
+`GG.VA_ObservedZonesJson()` / `GG.VA_BeliefExportJson()`, spliced into `resultJson()` as
+`observedZones` / `beliefExport` (two lines, no new locals), and live as GameRulesParams
+`va_obs_<zone>`, `va_obs_enemy_<zone>`, `va_obs_tick`. The Python fold observes the Drop's truth
+at exactly that η per zone; the footprint proxy is now only the legacy fallback.
+
+**In: `generated/va_intel_current.lua`** (`tools/intel_lua_v1.py`, written whenever the intent is
+materialised, mirrored into the customer pack with `va_current.lua`): `intent.intel` as a Lua
+table — per zone `ours/held/strength/threat = {v, c, state, age, src}`, the questions, posted people,
+open frames. Belief, not truth; a fresh campaign ships an empty table (nobody has looked).
+
+**The overlay: `gui_verdance_belief_overlay.lua`.** Minimap tint per zone by what we believed
+(ours / held by someone / empty / "?" where nobody looked), alpha by confidence, fading to nothing
+by η 0.6 — line of sight replaces belief and the real map shows through. When a well-seen zone
+contradicts the briefing (believed ours, found a column; believed theirs, found empty; a blank
+with a column in it) Yeva says so once (`VA_SURPRISE_LIVE` in the log), and the same contradiction
+comes home on the result as surprise. `/vabelief` toggles the tint, `/vabeliefpanel` a per-zone
+table (belief → seen), `/vabeliefrebuild` reloads the files.
+
+**Bodies are where they are.** `roster.heroes` on the intent excludes anyone the camp clock has
+posted or in transit (`roster.awayFromCamp` lists them); recall first. Looking costs: a posted
+hero on hostile ground risks a wound every hour (`0.015/h`, plus `0.010·instability`), comes home
+in transit, and the pause is a `casualty` (🩸 on the dance tape); a patrol into hostile ground has a
+one-in-five chance of not all coming back — a cadre unit is spent and its report lands at η 0.35
+instead of 0.55. All rolls are hashes of who/where/when, so a replay lands the same wounds. Only
+company members take a post; the wounded rest first.
+
+**The hub.** `app/showoff/console/camp.js` mounts into the console's **Home** workspace: the clock,
+known/stale/dark, run-the-clock actions (rest, wait, scout, post, recall → `POST /api/camp-act`),
+who is away, what the clock said, last homecoming's surprise, the six questions, the belief table
+per map (from `/api/intel`, never truth), and what Armada knows of us (from `/api/divergence`,
+with "still catching up" while the worker runs). The folded record (`/api/chronicle`) renders under
+**Chronicle**. Legacy tab layout gets a fourth "Camp" tab instead.
+
+**Ship.** `scripts/ship.ps1` stages the pass one–four tools and vendors a snapshot of Umwelt's
+`src/umwelt` package into `tools/_vendor` (from `UMWELT_SRC`, a sibling clone, or `~/ws-win`);
+`umwelt_world_v1._umwelt()` tries that path last, after a live clone. `requirements-ship.txt`
+gains numpy. FREEZE law stands: the snapshot is distribution, not a fork — nothing in it is edited.
+
+**Checks.** `tools/luachk_v1.py` is a structural Lua check (no interpreter on the build hosts):
+brackets and block balance; all 40 mod files pass. The 6 "unbridged" zones were legacy ids in an
+old save; a fresh campaign's 102 zones all sit on the graph, so no graph regeneration was needed.
+
+**Open after pass four.** The gadget's belief export is coarse (sides and counts, not control
+inference); posted heroes do not yet appear as units in a Drop on their own zone; the hub does not
+yet draw belief on the theater board itself (the table is the first form); `va_obs_*` is not yet
+read by the objectives widget for "unconfirmed" markers.
+
 ## Pipeline
 
 ```
@@ -322,4 +376,6 @@ python tools/umwelt_replay_v1.py         # belief gate: replay the save, 5 check
 python tools/perspectives_v1.py          # fold the faction minds once, print divergence
 python tools/perspectives_v1.py --worker . # drain the perspectives job queue
 python tools/camp_clock_v1.py            # camp surface
+python tools/intel_lua_v1.py             # rewrite generated/va_intel_current.lua from the intent
+python tools/luachk_v1.py <files.lua>    # structural Lua check
 ```

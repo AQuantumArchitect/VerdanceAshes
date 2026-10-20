@@ -52,7 +52,8 @@ def _umwelt():
     src = os.environ.get("UMWELT_SRC")
     if src and src not in sys.path:
         sys.path.insert(0, src)
-    for cand in (ROOT.parent / "umwelt" / "src", Path.home() / "ws-win" / "umwelt" / "src", Path.home() / "umwelt" / "src"):
+    for cand in (ROOT.parent / "umwelt" / "src", Path.home() / "ws-win" / "umwelt" / "src", Path.home() / "umwelt" / "src",
+                 ROOT / "tools" / "_vendor"):  # shipped snapshot, last resort (scripts/ship.ps1)
         if cand.is_dir() and str(cand) not in sys.path:
             sys.path.insert(0, str(cand))
     try:

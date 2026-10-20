@@ -10,6 +10,8 @@ and the cast speaks to it through the same occasions machinery as a homecoming.
 
 Actions (all advance campaignClockMinutes):
   rest    {hours}                 the fog grows; a wounded hero stands up after 12h
+                                  (posted heroes on hostile ground risk a wound every hour; a patrol into
+                                   hostile ground may not all come back — pass four)
   scout   {zoneId}                a patrol: 4h + travel; eta 0.55 on the zone, 0.2 on neighbours
   post    {heroId, zoneId}        send someone to stand on ground; they measure it every hour (eta 0.7)
   recall  {heroId}                bring them home (travel time)
@@ -45,6 +47,13 @@ HEAL_AFTER_REST_MINUTES = 720.0
 POST_ETA = 0.7
 SCOUT_ETA = 0.55
 NEIGHBOUR_ETA = 0.2
+# Looking costs. A posted hero on hostile ground is at risk every hour; a patrol into hostile
+# ground may not all come back (its report arrives thinner). Deterministic: the roll is a hash
+# of who/where/when, so a replay of the log lands the same wounds.
+POST_RISK_HOSTILE_PER_HOUR = 0.015
+POST_RISK_UNREST_PER_HOUR = 0.010      # x zone instability
+SCOUT_LOSS_HOSTILE = 0.20
+SCOUT_LOSS_ETA = 0.35
 
 
 def _load(path: Path) -> Any:
@@ -265,8 +274,41 @@ class Clock:
                         rec.pop("zoneId", None)
                     found.append({"pause": "arrival", "heroId": hid, "zoneId": rec.get("zoneId"),
                                   "witness": f"{(self.state.get('characters') or {}).get(hid, {}).get('name', hid)} {'is on' if rec['where'] == 'posted' else 'is back from'} {self.graph.label.get(str(rec.get('zoneId') or rec.get('fromZoneId')), rec.get('zoneId') or 'the road')}"})
+            self._hazard_posted(found)
             self.world.flush()
         return found
+
+    @staticmethod
+    def _roll(*parts: Any) -> float:
+        import hashlib
+        h = hashlib.sha1("|".join(str(p) for p in parts).encode("utf-8")).hexdigest()
+        return int(h[:8], 16) / 0xFFFFFFFF
+
+    def _hazard_posted(self, found: List[Dict[str, Any]]) -> None:
+        """Hourly: a posted hero on hostile or unstable ground may be wounded and start home."""
+        chars = self.state.get("characters") or {}
+        for hid, rec in list(self.camp["people"].items()):
+            if rec.get("where") != "posted" or not rec.get("zoneId"):
+                continue
+            truth = self._truth(str(rec["zoneId"])) or {}
+            ctrl = str(truth.get("controllingFaction") or "neutral")
+            unrest = float((truth.get("abstract") or {}).get("instability") or 0.0)
+            p = (POST_RISK_HOSTILE_PER_HOUR if ctrl not in ("ashwalkers", "neutral") else 0.0) + POST_RISK_UNREST_PER_HOUR * unrest
+            if p <= 0:
+                continue
+            if self._roll("post", hid, rec["zoneId"], int(self.minute // STEP_MINUTES)) < p * (STEP_MINUTES / 60.0):
+                ch = chars.get(hid)
+                if isinstance(ch, dict) and ch.get("status") not in ("dead", "locked"):
+                    ch["status"] = "wounded"
+                    ch["timesWounded"] = int(ch.get("timesWounded") or 0) + 1
+                travel = self.graph.travel_minutes(rec["zoneId"], self.camp.get("homeZoneId"), home_map=self.camp.get("homeMapId"))
+                self.camp["people"][hid] = {"where": "transit", "fromZoneId": rec["zoneId"], "eta": round(self.minute + travel, 1), "then": "camp", "since": round(self.minute, 1), "wounded": True}
+                if self.world and f"hero:{hid}" in self.world.host.engine.field.clusters:
+                    self.world.observe({f"obs_hero_{hid}_fit": 0.3}, 1.0, source=f"post:{hid}", minute=self.minute)
+                name = (chars.get(hid) or {}).get("name", hid)
+                found.append({"pause": "casualty", "heroId": hid, "zoneId": rec["zoneId"],
+                              "witness": f"{name} was hit on {self.graph.label.get(str(rec['zoneId']), rec['zoneId'])} ({ctrl}'s ground); coming home wounded"})
+                self.state.setdefault("intel", []).append({"kind": "casualty", "about": "post", "zoneId": rec["zoneId"], "heroId": hid, "label": self.graph.label.get(str(rec["zoneId"]), rec["zoneId"]), "toFaction": ctrl, "eta": POST_ETA, "source": f"post:{hid}", "minute": round(self.minute, 1), "missionNumber": int(self.state.get("missionNumber") or 0), "camp": True})
 
     def _all_zones(self) -> List[Dict[str, Any]]:
         out = []
@@ -333,11 +375,25 @@ class Clock:
             return {"ok": False, "error": f"unknown zone {zone_id}"}
         travel = self.graph.travel_minutes(self.camp.get("homeZoneId"), zone_id, home_map=self.camp.get("homeMapId"))
         out = self.run(travel + SCOUT_MINUTES, active_map=self.graph.map_of.get(zone_id), until_pause=False, reason=f"scout:{zone_id}")
+        ctrl_now = str(truth.get("controllingFaction") or "neutral")
+        lost = ctrl_now not in ("ashwalkers", "neutral") and self._roll("scout", zone_id, int(self.minute // STEP_MINUTES)) < SCOUT_LOSS_HOSTILE
+        scout_eta = SCOUT_LOSS_ETA if lost else SCOUT_ETA
+        if lost:
+            # the patrol that did not all come back: a field unit is spent, the report is thinner
+            roster = self.state.get("roster") or {}
+            cadre = roster.get("cadre") or {}
+            spent = next((d for d, c in sorted(cadre.items()) if int(c or 0) > 0), None)
+            if spent:
+                cadre[spent] = int(cadre[spent]) - 1
+            out["patrolLoss"] = {"zoneId": zone_id, "spent": spent}
+            out["pauses"].append({"pause": "casualty", "minute": round(self.minute, 1), "during": f"scout:{zone_id}", "zoneId": zone_id,
+                                  "witness": f"the patrol to {self.graph.label.get(zone_id, zone_id)} ran into {ctrl_now}; not all of it came back" + (f" (lost a {spent})" if spent else "")})
+            self.camp["pauses"].append(out["pauses"][-1])
         if self.world is not None and zone_id in self.world.host.engine.field.clusters:
             before = self.world.zone_summary(zone_id)
             obs = self._B._drop_obs(truth)
             self.world.begin_batch()
-            self.world.observe_zone(zone_id, source="scout", eta=SCOUT_ETA, minute=self.minute, **obs)
+            self.world.observe_zone(zone_id, source="scout", eta=scout_eta, minute=self.minute, **obs)
             for nz in self.graph.adj.get(zone_id, []):
                 nt = self._truth(nz)
                 if nt and nz in self.world.host.engine.field.clusters:
@@ -350,7 +406,7 @@ class Clock:
             out["scouted"] = {"zoneId": zone_id, "label": self.graph.label.get(zone_id, zone_id), "found": str(truth.get("controllingFaction") or "neutral"),
                               "believed": ("ours" if before["ours"]["value"] > 0.5 else ("held" if before["held"]["value"] > 0.5 else "empty")) if max(before["ours"]["conf"], before["held"]["conf"]) >= 0.15 else "nobody had looked",
                               "surprise": round(s, 3), "before": before, "after": after}
-            self.state.setdefault("intel", []).append({"kind": "scout", "about": "scout", "zoneId": zone_id, "label": self.graph.label.get(zone_id, zone_id), "found": out["scouted"]["found"], "believed": out["scouted"]["believed"], "surprise": out["scouted"]["surprise"], "eta": SCOUT_ETA, "source": "patrol", "minute": round(self.minute, 1), "missionNumber": int(self.state.get("missionNumber") or 0), "camp": True})
+            self.state.setdefault("intel", []).append({"kind": "scout", "about": "scout", "zoneId": zone_id, "label": self.graph.label.get(zone_id, zone_id), "found": out["scouted"]["found"], "believed": out["scouted"]["believed"], "surprise": out["scouted"]["surprise"], "eta": scout_eta, "source": "patrol", "minute": round(self.minute, 1), "missionNumber": int(self.state.get("missionNumber") or 0), "camp": True})
             out["pauses"].append({"pause": "arrival", "minute": round(self.minute, 1), "during": f"scout:{zone_id}", "zoneId": zone_id,
                                   "witness": f"patrol back from {self.graph.label.get(zone_id, zone_id)}: {out['scouted']['found']}" + (f" (we believed {out['scouted']['believed']})" if s > 0.3 else "")})
             self.camp["pauses"].append(out["pauses"][-1])
@@ -361,6 +417,10 @@ class Clock:
         ch = (self.state.get("characters") or {}).get(hero_id)
         if not isinstance(ch, dict) or ch.get("status") in ("dead", "locked"):
             return {"ok": False, "error": f"{hero_id} cannot be posted"}
+        if not ch.get("player"):
+            return {"ok": False, "error": f"{ch.get('name') or hero_id} is not in the company; only company members take a post"}
+        if ch.get("status") == "wounded":
+            return {"ok": False, "error": f"{ch.get('name') or hero_id} is wounded; rest first"}
         if self._truth(zone_id) is None:
             return {"ok": False, "error": f"unknown zone {zone_id}"}
         rec = self.camp["people"].get(hero_id) or {"where": "camp"}

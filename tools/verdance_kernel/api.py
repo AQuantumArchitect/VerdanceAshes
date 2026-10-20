@@ -853,6 +853,11 @@ class CampaignKernel:
         zsrc = src.parent / "zone_map_current.lua"
         if zsrc.is_file():
             shutil.copy2(zsrc, dest.parent / "zone_map_current.lua")
+        # the company's belief about the planned map (pass three/four overlay), same lifecycle as the seed
+        for name in ("va_intel_current.lua",):
+            isrc = self.ws / "mod" / "VerdanceAshes.sdd" / "singleplayer" / "verdance_ashes" / "generated" / name
+            if isrc.is_file():
+                shutil.copy2(isrc, dest.parent / name)
         return {"ok": True, "src": str(src), "dest": str(dest)}
 
     def build_mission(self) -> dict[str, Any]:

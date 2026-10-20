@@ -5386,6 +5386,17 @@ def maybe_unlock_wheelie_hero(state: Dict[str, Any]) -> bool:
     return True
 
 
+def _away_from_camp(state: Dict[str, Any]) -> set:
+    """Heroes the camp clock has posted to a zone or who are in transit do not board the Drop
+    (pass two: physical locations are real). Recall them first (camp action) to field them."""
+    out = set()
+    people = ((state.get("camp") or {}).get("people") or {})
+    for hid, rec in people.items():
+        if isinstance(rec, dict) and rec.get("where") in ("posted", "transit"):
+            out.add(str(hid))
+    return out
+
+
 def hero_intent_entries(roster: Dict[str, Any]) -> List[Dict[str, Any]]:
     """The named heroes who deploy this mission: everyone not dead. Wounded
     heroes field at reduced toughness so last sortie's cost is felt.
@@ -5569,7 +5580,8 @@ def build_roster_intent(state: Dict[str, Any]) -> Dict[str, Any]:
                 or float(bag.get("peakXp") or 0) > 0
             )
         },
-        "heroes": hero_intent_entries(roster),
+        "heroes": [h for h in hero_intent_entries(roster) if h.get("heroId") not in _away_from_camp(state)],
+        "awayFromCamp": sorted(_away_from_camp(state)),
         "availableAllies": available_allies(state),
         "progression": {
             "mode": prog.get("mode"),
@@ -6461,6 +6473,9 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
         if workspace is not None:
             import belief_homecoming_v1 as _bh
             intent["intel"] = _bh.intel_for_intent(state, Path(workspace), map_id)
+            # and the same belief as a Lua table the mod can VFS.Include (generated/va_intel_current.lua)
+            import intel_lua_v1 as _il
+            _il.write_intel_lua(intent, Path(workspace))
     except Exception as e:  # noqa: BLE001
         print(f"VA_INTENT_INTEL_SKIP {e}")
     return intent

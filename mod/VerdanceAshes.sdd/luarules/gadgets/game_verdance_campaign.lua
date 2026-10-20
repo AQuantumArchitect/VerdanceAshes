@@ -1301,6 +1301,9 @@ local function resultJson()
     '"secondaryResults":' .. secondaryResultsJson(),
     '"survivingInstalls":' .. survivingInstallsJson(),
     '"playerFootprint":' .. playerFootprintJson(),
+    -- pass three belief contract, produced by game_verdance_belief_observe.lua (GG, no new locals here)
+    '"observedZones":' .. ((GG and GG.VA_ObservedZonesJson) and GG.VA_ObservedZonesJson() or 'null'),
+    '"beliefExport":' .. ((GG and GG.VA_BeliefExportJson) and GG.VA_BeliefExportJson() or 'null'),
     '"purge":{"armed":' .. tostring(extraObj.purge == true)
       .. ',"done":' .. tostring(extraObj.purgeDone == true) .. '}',
     '"companionsAlive":' .. jnum(alive),

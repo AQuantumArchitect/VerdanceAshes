@@ -135,6 +135,20 @@ $toolPy = @(
   "hero_graph_analyze_v1.py",
   "support_web_v1.py",
   "hero_codex_v1.py",
+  # Narrative readings / belief world / perspectives / camp clock (passes one..four, 2026-10-19).
+  # The engine imports these inside try/except, so a missing one ships a silent campaign with no
+  # readings face, no belief fold, no camp clock and no intel overlay.
+  "readings_v1.py",
+  "occasions_v1.py",
+  "belief_homecoming_v1.py",
+  "umwelt_world_v1.py",
+  "umwelt_replay_v1.py",
+  "perspectives_v1.py",
+  "camp_clock_v1.py",
+  "story_dance_v1.py",
+  "chronicle_v1.py",
+  "intel_lua_v1.py",
+  "validate_story_v1.py",
   # Ship so a player build can self-check; also what the gates below run.
   "ship_parity_check_v1.py",
   "validate_map_names_v1.py"
@@ -174,6 +188,29 @@ foreach ($noise in @(
 )) {
   $npath = Join-Path $staging $noise
   if (Test-Path $npath) { Remove-Item -Recurse -Force $npath }
+}
+
+# ---- Umwelt (belief-field engine; FREEZE law: depend, don't copy) ----
+# The campaign imports the umwelt package at run time (tools\umwelt_world_v1.py). A player
+# build has no clone of the Umwelt repo, so vendor a snapshot of its src\umwelt package into
+# tools\_vendor, which umwelt_world_v1 adds to sys.path last (UMWELT_SRC and a sibling clone win).
+$umweltCandidates = @()
+if ($env:UMWELT_SRC) { $umweltCandidates += $env:UMWELT_SRC }
+$umweltCandidates += (Join-Path (Split-Path -Parent $Workspace) "umwelt\src")
+$umweltCandidates += (Join-Path $env:USERPROFILE "ws-win\umwelt\src")
+$umweltCandidates += (Join-Path $env:USERPROFILE "umwelt\src")
+$umweltSrc = $umweltCandidates | Where-Object { Test-Path (Join-Path $_ "umwelt\__init__.py") } | Select-Object -First 1
+if ($umweltSrc) {
+  $vendor = Join-Path $staging "tools\_vendor"
+  New-Item -ItemType Directory -Force -Path $vendor | Out-Null
+  Copy-Into (Join-Path $umweltSrc "umwelt") (Join-Path $vendor "umwelt")
+  Get-ChildItem $vendor -Recurse -Directory -Filter "__pycache__" -ErrorAction SilentlyContinue |
+    Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+  $umweltHash = (git -C (Split-Path -Parent $umweltSrc) rev-parse --short HEAD 2>$null)
+  Set-Content -Path (Join-Path $vendor "UMWELT_SNAPSHOT.txt") -Value ("umwelt snapshot from " + $umweltSrc + " at " + (Get-Date).ToString("s") + " commit " + $umweltHash)
+  Write-Host "Umwelt vendored from $umweltSrc ($umweltHash)"
+} else {
+  Write-Warning "Umwelt source not found (UMWELT_SRC / ..\umwelt\src / ~\ws-win\umwelt\src); shipped build will run without the belief world."
 }
 
 Copy-File (Join-Path $Workspace "verdance_config.template.json") (Join-Path $staging "verdance_config.template.json")

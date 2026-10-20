@@ -182,9 +182,9 @@ def fold_camp(state: Dict[str, Any], pauses: List[Dict[str, Any]]) -> int:
     n = 0
     for p in pauses or []:
         kind = p.get("pause")
-        if kind in ("rumour", "arrival", "contact"):
-            obj = "people" if kind in ("arrival", "contact") else "intel"
-            append(state, "push", obj, p.get("heroId") or p.get("zoneId") or "camp", text=str(p.get("witness") or kind), icon={"rumour": "🌫", "arrival": "🚶", "contact": "⚠"}[kind],
+        if kind in ("rumour", "arrival", "contact", "casualty"):
+            obj = "people" if kind in ("arrival", "contact", "casualty") else "intel"
+            append(state, "push", obj, p.get("heroId") or p.get("zoneId") or "camp", text=str(p.get("witness") or kind), icon={"rumour": "🌫", "arrival": "🚶", "contact": "⚠", "casualty": "🩸"}[kind],
                    minute=p.get("minute"), mission=state.get("missionNumber"), payload={k: v for k, v in p.items() if k not in ("witness",)})
             n += 1
         elif kind == "question":
