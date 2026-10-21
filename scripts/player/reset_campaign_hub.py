@@ -70,10 +70,7 @@ def seed_opener_intent(ws: Path, state: dict | None = None) -> Path:
         tools = ws / "tools"
         if str(tools) not in sys.path:
             sys.path.insert(0, str(tools))
-        from verdance_story_engine_v1 import (  # type: ignore
-            load_json,
-            opening_sortie_order,
-        )
+        from verdance.campaign import load_json, opening_sortie_order
 
         st = state if isinstance(state, dict) else {}
         if not st:
@@ -209,15 +206,9 @@ def main() -> int:
     if str(tools) not in sys.path:
         sys.path.insert(0, str(tools))
 
-    from company_v1 import ensure_company
+    from verdance.company.company import ensure_company
     from verdance_kernel.api import CampaignKernel
-    from verdance_story_engine_v1 import (
-        build_war_map,
-        ensure_commerce,
-        ensure_roster,
-        load_json,
-        save_json,
-    )
+    from verdance.campaign import build_war_map, ensure_commerce, ensure_roster, load_json, save_json
 
     sp = ws / "state" / "campaign_state.json"
     outbox = ws / "outbox"

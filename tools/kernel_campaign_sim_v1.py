@@ -21,13 +21,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
-TOOLS = Path(__file__).resolve().parent
-if str(TOOLS) not in sys.path:
-    sys.path.insert(0, str(TOOLS))
 
-import attachments_v1 as att_mod  # noqa: E402
-import world_tick_v1 as wt  # noqa: E402
-import verdance_story_engine_v1 as engine  # noqa: E402
+from verdance.company import attachments as att_mod
+from verdance.world import world_tick as wt
+from verdance import campaign as engine
 
 PROFILES = (
     "clean_win",

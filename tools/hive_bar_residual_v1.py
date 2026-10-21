@@ -17,9 +17,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence
 
-TOOLS = Path(__file__).resolve().parent
-if str(TOOLS) not in sys.path:
-    sys.path.insert(0, str(TOOLS))
 
 SCHEMA = "hive-bar-residual/1.1"
 SCHEMA_LEGACY = "hive-bar-residual/1.0"

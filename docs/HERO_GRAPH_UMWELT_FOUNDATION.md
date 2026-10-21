@@ -3,7 +3,7 @@
 **Status:** living foundation (not G0 ship work).  
 **SSOT molecules:** `data/story/hero_umwelt.json`  
 **SSOT edges:** `data/story/support_web.json`  
-**Analyzer:** `python tools/hero_graph_analyze_v1.py [--write]`  
+**Analyzer:** retired in pass 10 (hero_graph_analyze); the live lane is `tools/verdance/company/hero_observe.py`  
 **Classical rhyme:** [bar-eco-manifold](https://bar-eco-manifold-five.vercel.app/) · campaign design § eco → quantum  
 **World vs cast:** this file is **character graph H**. World graph G + Drop-as-collapse: [`GRAPH_COLLAPSE_SSOT.md`](GRAPH_COLLAPSE_SSOT.md). Molecules color combat temperament; they are **not** zone ownership.
 
@@ -232,9 +232,9 @@ Same law as cultivation: **don’t force Hearth↔Kiln; let evidence keep it.**
 Policy temperament SSOT + shadow stack + **opt-in soft blend**:
 
 - Doc: `docs/MOLECULE_POLICY_BRAIN.md` · seal: `docs/MOLECULE_POLICY_SCORECARD.md` (vibe PASS)
-- Stage 1 `D(u)`: `python tools/molecule_doctrine_v1.py apply --shadow` (JSON + `va_molecule_doctrine.lua`)
-- Stage 2 φ: `data/story/phi_features.json` · `python tools/phi_projector_v1.py smoke|fit|face`
-- Stage 3 shadow resolver: `python tools/shadow_intent_v1.py run|smoke`
+- Stage 1 `D(u)`: molecule_doctrine (tool retired in pass 10; `va_molecule_doctrine.lua` is the kept output)
+- Stage 2 φ: `data/story/phi_features.json` (phi_projector tool retired in pass 10)
+- Stage 3 shadow resolver: shadow_intent (retired in pass 10)
 - Stage 4: `va_molecule_policy=soft|shadow|off` (default **soft**; deployed to My Games)
 - Faces: `outbox/molecule_doctrine_shadow.json` · `phi_shadow.latest.json` · `shadow_intent.latest.json`
 
@@ -249,7 +249,7 @@ Hand doctrine stays cache/override. Soft is character color, not a second brain.
 3. ~~Freeze molecule policy face + D(u) shadow~~ → **done**
 4. ~~φ projector + shadow IntentResolver~~ → **done** (Stages 2–3)
 5. ~~Soft live merge opt-in~~ → **done** (Stage 4; default off; vibe seal)
-6. **Keep running** `tools/hero_graph_analyze_v1.py --write` after molecule/web regen
+6. (Retired) the analyzer pass after molecule/web regen
 7. **Play** — generate real tape rows; glance `hero_observe.latest.json`
 8. **Next unlock:** Stage 5a Knock cadence when you want bond micro
 9. **Do not** start full cognifold wishlist / L4 tensor until observe volume exists

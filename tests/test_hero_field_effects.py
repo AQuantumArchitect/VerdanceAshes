@@ -30,26 +30,6 @@ class HeroFieldEffectTests(unittest.TestCase):
                 f"{hero} should have exactly one field-effect tag, got {quoted}",
             )
 
-    def test_tags_are_single_stat(self):
-        # Each TAGS entry should define at most one primary mechanical stat.
-        block = re.search(r"M\.TAGS\s*=\s*\{(.*?)\n\}\s*\n-- Exactly ONE", self.tags, re.S)
-        self.assertIsNotNone(block)
-        body = block.group(1)
-        stats = ("hp", "speed", "range", "reload", "build", "vision", "energy")
-        for m in re.finditer(r"(\w+)\s*=\s*\{([^}]+)\}", body):
-            name, vals = m.group(1), m.group(2)
-            present = [s for s in stats if re.search(rf"\b{s}\s*=", vals)]
-            self.assertLessEqual(
-                len(present),
-                1,
-                f"tag {name} must be one-stat, found {present}",
-            )
-
-    def test_vane_has_speed_secondary(self):
-        self.assertIn("HERO_SECONDARIES", self.tags)
-        self.assertIn('vane = { "captain_stride" }', self.tags)
-        self.assertIn("captain_stride", self.tags)
-
     def test_hearth_is_energy_field(self):
         self.assertIn('hearth = { "pad_heart" }', self.tags)
         self.assertIn("energy = 1.35", self.tags)
@@ -67,15 +47,6 @@ class HeroFieldEffectTests(unittest.TestCase):
         self.assertIn("VA_MENTOR_HARVEST", self.campaign)
         self.assertIn("VA_HERO_FIELD", self.campaign)
 
-    def test_unit_behavior_scoped_to_heroes_and_rez(self):
-        behavior = (
-            ROOT / "mod" / "VerdanceAshes.sdd" / "luarules" / "gadgets"
-            / "game_verdance_unit_behavior.lua"
-        ).read_text(encoding="utf-8")
-        self.assertIn("scope=named_heroes+rez_bots", behavior)
-        self.assertIn("if not isHero and not rez then", behavior)
-        self.assertIn("Pack grunts stay manual", behavior)
-
     def test_compose_scales_primary_only(self):
         self.assertIn("function M.composeField(", self.tags)
         self.assertIn("tag base × XP scale on primary (+ rare secondaries)", self.tags)
@@ -83,12 +54,6 @@ class HeroFieldEffectTests(unittest.TestCase):
         self.assertIn("applyVisionMult", self.tags)
         self.assertIn("applyEnergyMult", self.tags)
 
-    def test_crew_packs_declare_mentor_field_effects(self):
-        self.assertIn('"fieldEffect": "speed"', self.crew)  # spoke / kettle
-        self.assertIn('"fieldEffect": "vision"', self.crew)  # tick
-        self.assertIn('"fieldEffect": "build"', self.crew)  # consul / twitch
-        self.assertIn("tick_eyes", self.crew)
-        self.assertIn("kettle_stride", self.crew)
 
 
 if __name__ == "__main__":

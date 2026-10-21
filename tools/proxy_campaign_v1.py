@@ -29,14 +29,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
-TOOLS = Path(__file__).resolve().parent
-if str(TOOLS) not in sys.path:
-    sys.path.insert(0, str(TOOLS))
 
-import attachments_v1 as att_mod  # noqa: E402
+from verdance.company import attachments as att_mod
 import kernel_campaign_sim_v1 as ksim  # noqa: E402
-import verdance_story_engine_v1 as engine  # noqa: E402
-import world_tick_v1 as wt  # noqa: E402
+from verdance import campaign as engine
+from verdance.world import world_tick as wt
 
 # ---------------------------------------------------------------------------
 # Enemy styles (BAR seat mapping)
@@ -110,7 +107,7 @@ def _ensure_umwelt() -> None:
     candidates = [
         Path(r"C:\Users\Luke Spooner\ws-win\umwelt\src"),
         Path.home() / "ws-win" / "umwelt" / "src",
-        TOOLS.parent.parent / "ws-win" / "umwelt" / "src",
+        Path(__file__).resolve().parents[2] / "ws-win" / "umwelt" / "src",
     ]
     for c in candidates:
         if c.is_dir() and str(c) not in sys.path:

@@ -66,12 +66,9 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
-TOOLS = Path(__file__).resolve().parent
-if str(TOOLS) not in sys.path:
-    sys.path.insert(0, str(TOOLS))
 
-import escalation_ladder_v1 as ladder  # noqa: E402
-import verdance_story_engine_v1 as engine  # noqa: E402
+from verdance.world import escalation_ladder as ladder
+from verdance import campaign as engine
 
 SCHEMA = "verdance-campaign-flow/2.1"
 

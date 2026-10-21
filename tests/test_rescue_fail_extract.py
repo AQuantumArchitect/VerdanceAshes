@@ -4,8 +4,9 @@ We cannot run the Spring gadget in pytest; these tests lock the Lua contracts
 by reading the shipped sources so a regression cannot silently drop the path.
 
 Canonical path:
-  blast wreck → short grace → heroLost → failRescueContract (latch)
-  → openExtractLoop → hold → setTerminal(partial, extracted_recruit_lost)
+  blast wreck → short grace → heroLost → failRescueContract (latch) → the extract loop opens;
+  the verdict word is the campaign's to derive (pass nine: the gadget reports facts).
+(The gadget-terminal and HUD-prompt string checks went with the debrief widget in pass seven.)
 """
 
 from __future__ import annotations
@@ -15,8 +16,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 MARKS = ROOT / "mod" / "VerdanceAshes.sdd" / "luarules" / "gadgets" / "include" / "va_marks_registry.lua"
 CAMPAIGN = ROOT / "mod" / "VerdanceAshes.sdd" / "luarules" / "gadgets" / "game_verdance_campaign.lua"
-OBJECTIVES = ROOT / "mod" / "VerdanceAshes.sdd" / "luaui" / "Widgets" / "gui_verdance_objectives.lua"
-PLAYFEEL = ROOT / "mod" / "VerdanceAshes.sdd" / "luaui" / "Widgets" / "gui_verdance_playfeel.lua"
 
 
 def _live_lines(src: str, needle: str) -> list[str]:
@@ -35,90 +34,11 @@ def test_marks_fail_does_not_credit_required_left(marks_src: str | None = None):
     assert "va_sec" in marks_src and "_failed" in marks_src
 
 
-def test_campaign_one_fail_path(campaign_src: str | None = None):
-    campaign_src = campaign_src or CAMPAIGN.read_text(encoding="utf-8")
-    assert "failRescueContract" in campaign_src
-    assert "rescueContractFailed" in campaign_src
-    assert "VA_OBJECTIVE_FAILED" in campaign_src
-    # Single extract opener (victory + rescue-fail share it).
-    assert "openExtractLoop" in campaign_src
-    assert "openExtractForRescueFail" not in campaign_src
-    assert 'setTerminal("partial", "extracted_recruit_lost")' in campaign_src
-    assert "fieldRecruitIsSortieLinked" in campaign_src
-    assert "boardResolved = allDone or rescueContractFailed" in campaign_src
-    # SoT rules params — no dual va_rescue_failed latch.
-    assert 'SetGameRulesParam("va_objective_failed"' in campaign_src
-    assert 'SetGameRulesParam("va_objective_fail_hero"' in campaign_src
-    assert 'SetGameRulesParam("va_rescue_failed"' not in campaign_src
-    # Fail must not pretend to be a hive bypass.
-    for ln in _live_lines(campaign_src, "objectiveBypassed = true"):
-        # Allowed only on real bypass / bail terminals, not inside failRescueContract.
-        assert "failRescueContract" not in ln
-    # WO-008: no live hard-defeat on named loss.
-    assert "Intentionally no setTerminal" in campaign_src
-    assert _live_lines(campaign_src, 'setTerminal("defeat", "hero_lost') == []
-
-
-def test_soft_clock_respects_rescue_fail(campaign_src: str | None = None):
-    campaign_src = campaign_src or CAMPAIGN.read_text(encoding="utf-8")
-    # Soft clock must treat rescue fail as board-resolved (not stomp EXTRACT,
-    # not fall through to soft_clock_timeout defeat).
-    assert "local boardResolved = allDone or rescueContractFailed" in campaign_src
-    soft = campaign_src.split("function checkSoftClock", 1)[1].split("\nfunction ", 1)[0]
-    assert "rescueContractFailed" in soft
-    assert 'setTerminal("partial", "extracted_recruit_lost")' in soft
-
-
 def test_blast_uses_short_rez_grace(campaign_src: str | None = None):
     campaign_src = campaign_src or CAMPAIGN.read_text(encoding="utf-8")
     assert "rezBuilderWorkingFeature" in campaign_src
     assert "wreck_gone" in campaign_src
     assert "math.min(HERO_REZ_GRACE, 15)" in campaign_src
-
-
-def test_hud_fail_and_extract_prompts():
-    obj = OBJECTIVES.read_text(encoding="utf-8")
-    feel = PLAYFEEL.read_text(encoding="utf-8")
-    assert 'rail = "FAIL "' in obj
-    assert 'eventStatus == "objective_failed"' in obj
-    assert "RESCUE FAILED" in obj
-    assert "RESCUE FAILED — EXTRACT" in feel
-    assert "va_objective_failed" in feel
-    # Single SoT — playfeel must not OR a second rescue flag.
-    assert "va_rescue_failed" not in feel
-    assert 'numParam("va_rescue_failed"' not in obj
-    # Connected HUD: extract rail / route / marker treat fail as boardResolved.
-    assert "state.allObjectivesDone or state.objectiveFailed" in obj
-    assert "RESCUE FAILED — leave the pad" in obj
-    assert 'label = "EXFIL (FAIL)"' in obj or "EXFIL (FAIL)" in obj
-    # Mid-mission EXFIL NOW + board-open status (not a leave-first bypass).
-    assert "EXFIL NOW" in obj
-    assert "EXTRACT OPEN" in obj
-    assert "VA_UI_REQUEST_EXFIL" in obj
-    assert "VA_UI_EXFIL_IGNORE board_extract_open" in obj
-    # Route follows voluntary / open extract, not only boardResolved.
-    assert "extractOpen or exfilReq" in obj or "va_exfil_requested" in obj
-
-
-def test_voluntary_exfil_and_bail_gates(campaign_src: str | None = None):
-    """EXFIL NOW opens partial; board open ignores leave-first cancel; bail needs credit."""
-    campaign_src = campaign_src or CAMPAIGN.read_text(encoding="utf-8")
-    assert "function requestPlayerExfil()" in campaign_src
-    assert "playerRequest" in campaign_src
-    assert 'setTerminal("partial", "extracted_voluntary")' in campaign_src
-    assert "VA_EXFIL_ACK already_open" in campaign_src
-    # Natural bail requires EXFIL NOW or side-work credit (no silent spawn→LZ bank).
-    assert "extractLoop.playerRequest or (playerLeftExtraction and sideReady)" in campaign_src
-    # All-done announce opens LZ immediately (same snappy path as rescue-fail).
-    announce = campaign_src.split("function vaMaybeAnnounceAllDone()", 1)[1].split("\nfunction ", 1)[0]
-    assert 'openExtractLoop("rally")' in announce or "openExtractLoop(" in announce
-    assert 'SendLuaRulesMsg("VA_CMD:vaexfil")' not in campaign_src  # UI owns the click
-
-
-def test_result_json_includes_objective_failed(campaign_src: str | None = None):
-    campaign_src = campaign_src or CAMPAIGN.read_text(encoding="utf-8")
-    assert "objectiveFailed" in campaign_src
-    assert "extracted_recruit_lost" in campaign_src
 
 
 def test_sortie_link_is_optional_only(campaign_src: str | None = None):
@@ -135,7 +55,7 @@ def test_eco_raid_field_recruits_default_optional():
     import sys
 
     sys.path.insert(0, str(ROOT / "tools"))
-    from company_v1 import WRECK_SEED_PROXY, field_recruits_for_map
+    from verdance.company.company import WRECK_SEED_PROXY, field_recruits_for_map
 
     assert WRECK_SEED_PROXY.get("legap") != "legcen"
     state = {
@@ -183,8 +103,8 @@ def test_credit_and_contract_know_recruit_lost():
     import sys
 
     sys.path.insert(0, str(ROOT / "tools"))
-    import match_credit_v1 as mc
-    from contract_v2 import normalize_result
+    from verdance.belief import match_credit as mc
+    from verdance.hub.contract import normalize_result
 
     assert "extracted_recruit_lost" in mc._REASON_HINTS
     raw = {
@@ -218,7 +138,7 @@ def test_credit_and_contract_know_recruit_lost():
 
 
 def test_company_seeds_sortie_linked():
-    src = (ROOT / "tools" / "company_v1.py").read_text(encoding="utf-8")
+    src = (ROOT / "tools" / "verdance" / "company" / "company.py").read_text(encoding="utf-8")
     assert "sortieLinked" in src
     assert "not optional" in src
 
@@ -227,7 +147,7 @@ def test_field_pool_marks_lost_recruit():
     import sys
 
     sys.path.insert(0, str(ROOT / "tools"))
-    from company_v1 import apply_field_recruit_losses_from_result
+    from verdance.company.company import apply_field_recruit_losses_from_result
 
     state = {
         "company": {

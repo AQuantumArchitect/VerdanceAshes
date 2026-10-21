@@ -12,9 +12,9 @@ TOOLS = WS / "tools"
 if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
 
-import offscreen_clash_v1 as clash  # noqa: E402
-import verdance_story_engine_v1 as engine  # noqa: E402
-import world_tick_v1 as wt  # noqa: E402
+from verdance.world import offscreen_clash as clash
+from verdance import campaign as engine
+from verdance.world import world_tick as wt
 
 
 def _zone(fac: str, mil: float = 0.3, fort: float = 0.2) -> dict:

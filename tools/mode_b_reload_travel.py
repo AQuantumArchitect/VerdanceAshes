@@ -26,7 +26,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-import world_zone_graph as wzg
+from verdance.world import zone_graph as wzg
 
 OUT_CHOICE = Path("outbox/next_sortie_choice.json")
 OUT_MODE_B = Path("outbox/mode_b_travel.latest.json")

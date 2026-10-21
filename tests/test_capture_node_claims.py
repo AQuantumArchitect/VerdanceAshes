@@ -12,10 +12,10 @@ TOOLS = WS / "tools"
 if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
 
-import capture_node_claims as cnc  # noqa: E402
-import contract_v2 as c2  # noqa: E402
-import quest_generator_v1 as qg  # noqa: E402
-import verdance_story_engine_v1 as engine  # noqa: E402
+from verdance.company import capture_node_claims as cnc
+from verdance.hub import contract as c2
+from verdance.company import quest_generator as qg
+from verdance import campaign as engine
 
 
 class CaptureNodeClaimsTests(unittest.TestCase):
@@ -114,10 +114,8 @@ class CaptureNodeClaimsTests(unittest.TestCase):
 
     def test_quest_generator_stamps_capture_mode(self):
         state = engine.load_json(WS / "state" / "campaign_state.json")
-        state.setdefault("zoneMemory", {}).setdefault("koom_valley", {}).setdefault(
-            "KOOM_NW_GREEN_SHELF", {}
-        )["controllingFaction"] = "nullmercs"
-        cands = qg.generate_quests(WS, state, map_id="koom_valley", limit=5)
+        # The company stands at the northwest muster (a claim, not a zoneMemory truth read).
+        cands = qg.generate_quests(WS, state, map_id="koom_valley", from_zone_ids=["KV_NW_MUSTER"], limit=5)
         self.assertTrue(cands)
         seize = [c for c in cands if c.get("objectiveArchetype") in cnc.CAPTURE_KINDS]
         if seize:
@@ -283,7 +281,7 @@ class PlayerImpactClaimSeedingTests(unittest.TestCase):
         self.assertLess(during_seed, after_seed)
 
     def test_player_impact_import_matches_offscreen_clash(self):
-        import offscreen_clash_v1 as oc
+        from verdance.world import offscreen_clash as oc
         self.assertEqual(cnc._player_impact(), oc.PLAYER_IMPACT)
 
 

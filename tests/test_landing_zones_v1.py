@@ -9,8 +9,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 
-import landing_zones_v1 as lz  # noqa: E402
-import verdance_story_engine_v1 as engine  # noqa: E402
+from verdance.world import landing_zones as lz
+from verdance import campaign as engine
 
 
 class TestLandingZones(unittest.TestCase):

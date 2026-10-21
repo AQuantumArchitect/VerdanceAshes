@@ -91,12 +91,9 @@ def quest_generator_roles() -> set:
     """Roles the quest generator can actually read. A zone whose role is missing
     here silently falls through to the seize_lane default, which is how every
     board ended up the same kind before Drop 4."""
-    try:
-        sys.path.insert(0, str(Path(__file__).resolve().parent))
-        import quest_generator_v1 as qg  # noqa: E402
-        return set(qg.ROLE_ARCHETYPE)
-    except Exception:
-        return set()
+    from verdance.company import quest_generator as qg
+
+    return set(qg.ROLE_ARCHETYPE)
 
 
 def load_json(path: Path) -> Any:

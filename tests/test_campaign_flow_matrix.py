@@ -30,11 +30,18 @@ WS = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(WS / "tools"))
 
 import campaign_flow_matrix_v1 as flow  # noqa: E402
-import verdance_story_engine_v1 as engine  # noqa: E402
+from verdance import campaign as engine
 
 
 def load_state():
     return json.loads((WS / "state" / "campaign_state.json").read_text(encoding="utf-8-sig"))
+
+
+def needs_played_world(test, state):
+    """Some checks only mean something once powers stand on the ground: they read the live save
+    in state/ and skip on a fresh campaign (missionNumber 1, no history)."""
+    if not (state.get("history") or []):
+        test.skipTest("needs a played save in state/ (fresh campaign: nobody stands anywhere yet)")
 
 
 class LatticeTests(unittest.TestCase):
@@ -173,6 +180,7 @@ class DensityMatrixTests(unittest.TestCase):
     def test_coupling_needs_a_power_standing_in_both_places(self):
         """Every non-zero off-diagonal traces to some power with amplitude at
         both ends -- by reach along the lattice, or by holding both at once."""
+        needs_played_world(self, self.state)
         checked = 0
         for i in range(0, self.lattice.n, 3):
             for j in range(i + 1, self.lattice.n, 7):
@@ -185,6 +193,7 @@ class DensityMatrixTests(unittest.TestCase):
         self.assertGreater(checked, 50, "expected plenty of couplings to check")
 
     def test_neighbouring_zones_do_couple(self):
+        needs_played_world(self, self.state)
         found = 0
         for zone_id, neighbours in self.lattice.same_map_neighbours.items():
             i = self.lattice.index[zone_id]
@@ -325,6 +334,7 @@ class ArcTests(unittest.TestCase):
         is which power it concentrates around -- and that turns out to be a
         binary, not a slider: the player either leads the dominant mode or
         never touches it."""
+        needs_played_world(self, self.state)
         leads = {}
         for profile in ("sweeping", "clean", "grinding", "losing"):
             arc = flow.run_arc(self.lattice, self.state, WS, 11, profile)
@@ -414,6 +424,7 @@ class DynamicsTests(unittest.TestCase):
         self.assertLess(series[-1], 0.15 * series[2])
 
     def test_the_bloom_lives_on_the_wild_maps(self):
+        needs_played_world(self, self.state)
         occ = flow.seed_occupation(self.lattice, self.state)
         wild_maps = sorted({self.lattice.map_of[z]
                             for z, held in (occ.get("wild") or {}).items()
@@ -435,6 +446,7 @@ class DynamicsTests(unittest.TestCase):
     def test_cortex_is_the_constant(self):
         """Bunker and scout: the cortex never attacks anyone, and its share of
         the planet barely moves across the whole arc."""
+        needs_played_world(self, self.state)
         arc = flow.run_arc(self.lattice, self.state, WS, 11, "clean",
                            opening="cold_war")
         shares = []
@@ -584,6 +596,7 @@ class WeatherSystemsTests(unittest.TestCase):
         """Owner direction: more water dynamics to drive raptor presence.
         The deepened karst response turns the jungle's standing water into
         living water, and the bloom actually fires there."""
+        needs_played_world(self, self.state)
         self.assertGreater(self.lattice.flood_swing("the_rock_jungle"), 0.2)
         dyn = flow.Dynamics(self.lattice, self.state, WS, 11)
         self.assertGreater(max(dyn.bloom_at("the_rock_jungle", n)
@@ -592,6 +605,7 @@ class WeatherSystemsTests(unittest.TestCase):
     def test_the_tide_feeds_the_bloom_on_the_way_up(self):
         """Rising water arrives as intermittent floods, and every pulse that
         recedes feeds the raptors the same mission -- no beat of lag."""
+        needs_played_world(self, self.state)
         quiet = flow.Dynamics(self.lattice, self.state, WS, 11,
                               tide={"bloomFeed": 0.0})
         loud = flow.Dynamics(self.lattice, self.state, WS, 11)

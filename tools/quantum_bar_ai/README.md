@@ -80,10 +80,8 @@ Remove-Item Env:GROK_API_KEY -ErrorAction SilentlyContinue
 & $py -m quantum_bar_ai.train_bar_brain --show
 
 # Dual umwelt manifolds + co-evolution gym (proxy belief ⊥ campaign density)
-& $py -m unittest quantum_bar_ai.test_quantum_membrane quantum_bar_ai.test_manifolds_lane -v
 & $py -m quantum_bar_ai.manifold_gym --gens 12 --seeds 2
 & $py -m quantum_bar_ai.manifold_gym --gens 80 --seeds 2 --hours 6   # overnight
-& $py -m quantum_bar_ai.lane_stress --lanes 4 --ticks 50 --seeds 8   # Koom line war
 & $py -m quantum_bar_ai.craft_apply --show
 & $py -m quantum_bar_ai.craft_apply --pin   # pin widths into campaign curve
 

@@ -9,8 +9,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 
-from commerce_delivery_v1 import delivery_eta, shortest_map_route  # noqa: E402
-from verdance_story_engine_v1 import (  # noqa: E402
+from verdance.company.commerce_delivery import delivery_eta, shortest_map_route
+from verdance.campaign import (
     build_commerce_intent,
     ensure_commerce,
     listing_available,
@@ -28,7 +28,9 @@ def test_eye_to_greenest_is_short_corridor():
 
 def test_eye_to_simmers_is_long_haul():
     route, minutes = shortest_map_route("eye_of_horus", "all_that_simmers", ROOT)
-    assert "tabula" in route or "koom_valley" in route
+    # a long haul: at least two maps between the ends, whichever corridor the graph authors
+    assert route[0] == "eye_of_horus" and route[-1] == "all_that_simmers"
+    assert len(route) >= 4, route
     assert minutes >= 50.0
 
 

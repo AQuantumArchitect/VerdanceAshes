@@ -91,11 +91,15 @@ Copy-Into (Join-Path $Workspace "tools\verdance_kernel") (Join-Path $staging "to
 Get-ChildItem (Join-Path $staging "tools") -Recurse -Directory -Filter "__pycache__" -ErrorAction SilentlyContinue |
   Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
 
-# This list is verified, not maintained by hand: the parity gate below runs
-# tools\ship_parity_check_v1.py over the staged tree and fails the ship if any
-# staged module imports something that is not here. Regenerate with:
-#   python tools\ship_parity_check_v1.py --staging . --closure --entry "<this list>"
+# The campaign package ships whole: tools\verdance (belief / readings / world / company / hub /
+# campaign) is one tree, so there is no per-module list to forget. The thin compat shims at the
+# old flat paths (tools\<name>_v1.py) ship too while build_next_mission_v1.ps1 and the other
+# PowerShell still call them by path; remove them after the first public playtest.
+# The parity gate below still runs tools\ship_parity_check_v1.py over the staged tree and fails
+# the ship if anything staged imports something that is not here.
+Copy-Into (Join-Path $Workspace "tools\verdance") (Join-Path $staging "tools\verdance")
 $toolPy = @(
+  # compat shims (python tools\<name>.py / import <name>) -> verdance.*
   "apply_result_to_hub_v1.py",
   "stamp_deploy_plan_v1.py",
   "build_hub_state_v1.py",
@@ -107,41 +111,23 @@ $toolPy = @(
   "attachments_v1.py",
   "quest_generator_v1.py",
   "capture_node_claims.py",
-  # --- absent from v0.10.0, and absent SILENTLY: every import site is a bare
-  # try/except. Without escalation_ladder_v1 the story engine's
-  # build_escalation_plan returns None, intent.escalationPlan never appears, and
-  # build_next_mission_v1.ps1 pins objectiveStrength to "surgical" for the whole
-  # campaign -- shipping the exact flat difficulty curve Drop 4 removed, with no
-  # symptom to trace. The other two lose mission credit/debrief and the
-  # between-mission offscreen war respectively.
   "escalation_ladder_v1.py",
   "match_credit_v1.py",
   "graph_collapse_v1.py",
   "narrative_v1.py",
   "offscreen_clash_v1.py",
-  # Fetches campaign maps from BAR's own content service at play time.
   "map_provisioner_v1.py",
-  # Continuity / company / commerce / LZ / quantum state -- imported by engine +
-  # kernel; missing these silently disables footprint audit, field-pool loss,
-  # delivery packs, and landing-zone resolve on shipped builds.
   "commerce_delivery_v1.py",
   "company_v1.py",
   "continuity_audit_v1.py",
   "landing_zones_v1.py",
   "quantum_campaign_state_v1.py",
-  # Hero observe / map umwelt. (molecule_doctrine, phi_projector, shadow_intent,
-  # hero_graph_analyze, support_web, hero_codex were dead on the player path and
-  # are no longer staged; the parity gate confirms nothing staged imports them.)
   "hero_observe_v1.py",
   "map_umwelt_v1.py",
-  # Narrative readings / belief world / perspectives / camp clock (passes one..four, 2026-10-19).
-  # The engine imports these inside try/except, so a missing one ships a silent campaign with no
-  # readings face, no belief fold, no camp clock and no intel overlay.
   "readings_v1.py",
   "occasions_v1.py",
   "belief_homecoming_v1.py",
   "umwelt_world_v1.py",
-  # The hub's belief face (minimap paint); imported by build_hub_state_v1 + stamp_deploy_plan_v1.
   "hub_belief_v1.py",
   "perspectives_v1.py",
   "camp_clock_v1.py",
@@ -157,6 +143,9 @@ $toolPy = @(
 foreach ($t in $toolPy) {
   Copy-File (Join-Path $Workspace "tools\$t") (Join-Path $staging "tools\$t")
 }
+# drop pycache again (the package copy may carry some)
+Get-ChildItem (Join-Path $staging "tools") -Recurse -Directory -Filter "__pycache__" -ErrorAction SilentlyContinue |
+  Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
 
 # ---- data ----
 $dataParts = @(
@@ -192,9 +181,9 @@ foreach ($noise in @(
 }
 
 # ---- Umwelt (belief-field engine; FREEZE law: depend, don't copy) ----
-# The campaign imports the umwelt package at run time (tools\umwelt_world_v1.py). A player
+# The campaign imports the umwelt package at run time (tools\verdance\belief\world.py). A player
 # build has no clone of the Umwelt repo, so vendor a snapshot of its src\umwelt package into
-# tools\_vendor, which umwelt_world_v1 adds to sys.path last (UMWELT_SRC and a sibling clone win).
+# tools\_vendor, which verdance.belief.world adds to sys.path last (UMWELT_SRC and a sibling clone win).
 # Discovery only, never an assumption: UMWELT_SRC, then a sibling clone, then the two
 # conventional home-folder clones. No match = a WARNING and a build without belief.
 $umweltCandidates = @()
@@ -350,7 +339,7 @@ if (-not $SkipPython) {
 
     # ---- numpy + scipy into the embedded runtime (the belief world's substrate) ----
     # Best effort: any failure here prints a WARNING and the build ships with belief off
-    # (umwelt_world_v1 returns None and the campaign logs VA_BELIEF_SKIP). -SkipScience opts out.
+    # (verdance.belief.world returns None and the campaign logs VA_BELIEF_SKIP). -SkipScience opts out.
     if ($SkipScience) {
       Write-Host "Skipping numpy/scipy (-SkipScience); shipped build runs with the belief world OFF."
     } else {

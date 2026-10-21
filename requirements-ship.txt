@@ -2,5 +2,5 @@
 # Core kernel runs on stdlib only (Python 3.10+).
 
 pywebview>=5.0  # embedded window instead of system browser
-numpy>=1.24  # Umwelt belief field (tools\umwelt_world_v1.py); without it the campaign runs with no belief world
+numpy>=1.24  # Umwelt belief field (tools\verdance\belief\world.py); without it the campaign runs with no belief world
 scipy>=1.10  # Umwelt uses scipy.linalg.expm on some substrate paths

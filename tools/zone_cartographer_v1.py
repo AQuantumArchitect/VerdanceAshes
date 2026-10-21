@@ -35,7 +35,6 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
 
 WS_DEFAULT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import map_symmetry_v1  # noqa: E402
 

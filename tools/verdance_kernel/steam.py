@@ -14,11 +14,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from verdance.common import utc_now
+
 from verdance_kernel.paths import state_path, steam_dir
-
-
-def _now() -> str:
-    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 # Catalog of achievement IDs the kernel may fire (Steam AppID TBD).
@@ -63,7 +61,7 @@ def cloud_mirror(ws: Path) -> dict[str, Any]:
     shutil.copy2(src, dest)
     meta = {
         "schemaVersion": "verdance-steam-cloud-mirror/1.0",
-        "at": _now(),
+        "at": utc_now(),
         "source": str(src),
         "dest": str(dest),
         "steamworks": False,
@@ -79,7 +77,7 @@ def unlock_achievement(ws: Path, achievement_id: str, *, detail: str | None = No
     root = ensure_layout(ws)
     cat = ACHIEVEMENT_CATALOG.get(achievement_id, {})
     rec = {
-        "at": _now(),
+        "at": utc_now(),
         "id": achievement_id,
         "display": cat.get("display") or achievement_id,
         "detail": detail,

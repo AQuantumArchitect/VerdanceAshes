@@ -9,8 +9,8 @@ ROOT = Path(__file__).resolve().parents[1]
 TOOLS = ROOT / "tools"
 sys.path.insert(0, str(TOOLS))
 
-from contract_v2 import normalize_sortie, sortie_v2_to_v1_order  # noqa: E402
-from stamp_deploy_plan_v1 import normalize_plan, plan_to_sortie, stamp  # noqa: E402
+from verdance.hub.contract import normalize_sortie, sortie_v2_to_v1_order
+from verdance.hub.stamp_deploy_plan import normalize_plan, plan_to_sortie, stamp
 
 
 def test_normalize_plan_marks():
@@ -47,7 +47,8 @@ def test_plan_to_sortie_secondary():
     assert s["targetZoneId"] == "A"
     assert s["secondaryCaptureZoneIds"] == ["B"]
     assert s["deploymentZoneId"] == "D"
-    assert s["extractionZoneId"] == "E"
+    # pass six: raiders land and lift from the same pad; the extract mark is accepted, not honoured
+    assert s["extractionZoneId"] == "D"
     assert s["hubChoiceId"] == "c_multi"
     assert s["deployAces"] == ["vane"]
     assert s["valid"] is True
@@ -108,7 +109,7 @@ def test_stamp_writes_outbox(tmp_path: Path | None = None):
 
 
 def test_consume_played_hub_sorties():
-    from verdance_story_engine_v1 import consume_played_hub_sorties, save_json  # noqa: E402
+    from verdance.campaign import consume_played_hub_sorties, save_json
 
     import tempfile
     import shutil
@@ -145,7 +146,7 @@ def test_consume_played_hub_sorties():
 
 
 def test_campaign_rho_projection():
-    from build_hub_state_v1 import project_campaign_rho  # noqa: E402
+    from verdance.hub.build_hub_state import project_campaign_rho
 
     state = {
         "graph": {

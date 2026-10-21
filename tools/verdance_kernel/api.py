@@ -15,13 +15,32 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-# tools/ on path for stamp / apply / story engine
-_TOOLS = Path(__file__).resolve().parent.parent
-if str(_TOOLS) not in sys.path:
-    sys.path.insert(0, str(_TOOLS))
-
-from apply_result_to_hub_v1 import apply as apply_result_to_hub  # noqa: E402
-from stamp_deploy_plan_v1 import stamp as stamp_plan  # noqa: E402
+from verdance.common import load_json, save_json, utc_now
+from verdance.belief import camp_clock as camp, hub_belief, perspectives as P, world as W
+from verdance.belief.match_credit import credit_from_result, presentable_debrief
+from verdance.campaign import (
+    apply_home_build,
+    build_war_map,
+    ensure_commerce,
+    migrate_state,
+    opening_sortie_order,
+    process_result,
+    purchase_listing,
+)
+from verdance.company import continuity_audit as audit
+from verdance.company.company import (
+    company_deploy_aces,
+    company_deploy_band,
+    consume_mission_call_ins,
+    ensure_company,
+    hub_company_surface,
+    peek_mission_call_ins,
+    seal_company as _seal,
+    sortie_roster,
+)
+from verdance.hub.apply_result_to_hub import apply as apply_result_to_hub
+from verdance.hub.stamp_deploy_plan import stamp as stamp_plan
+from verdance.readings.narrative import choose, project
 
 from verdance_kernel import steam as steam_mod
 from verdance_kernel import surface as surface_mod
@@ -35,7 +54,7 @@ from verdance_kernel.paths import (
     showoff_dir,
     state_path,
 )
-from verdance_kernel.runtime import run_cmd, run_ps1
+from verdance_kernel.runtime import run_cmd, run_module, run_ps1
 
 KERNEL_SCHEMA = "verdance-campaign-kernel/1.0"
 
@@ -44,10 +63,6 @@ _PS1_ALIASES: dict[str, tuple[str, ...]] = {
     "build": ("scripts/player/build_mission.ps1", "scripts/build_next_mission_v1.ps1"),
     "install_mod": ("scripts/player/install_mod.ps1", "scripts/install_mod_archive.ps1"),
 }
-
-
-def _now() -> str:
-    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def _first_error_line(*reports: dict[str, Any]) -> str:
@@ -144,7 +159,7 @@ class CampaignKernel:
         self._last_mod_sync: dict[str, Any] | None = None
         self._error: str | None = None
         self._bridge = None  # set by bar_bridge if attached
-        self.started_at = _now()
+        self.started_at = utc_now()
 
     def _resolve_ps1(self, key: str) -> Path | None:
         for rel in _PS1_ALIASES.get(key, ()):
@@ -217,7 +232,6 @@ class CampaignKernel:
             return {"present": True, "error": str(e)}
 
     def narrative_surface(self) -> dict[str, Any]:
-        from narrative_v1 import project
         p = state_path(self.ws)
         if not p.is_file():
             return {"ok": False, "error": "Campaign save is missing."}
@@ -227,8 +241,6 @@ class CampaignKernel:
             return {"ok": True, "narrative": project(state, (hub.get("node") or {}).get("choices") or [], self.ws)}
 
     def narrative_choice(self, body: dict[str, Any]) -> dict[str, Any]:
-        from narrative_v1 import choose
-        from verdance_story_engine_v1 import save_json
         with self._lock:
             if self._busy:
                 return {"ok": False, "error": "A campaign operation is in progress. Try again after it completes."}
@@ -246,10 +258,6 @@ class CampaignKernel:
     def camp_surface(self) -> dict[str, Any]:
         """What the company knows and where its people are. Reads state; writes only
         outbox/camp.latest.json and outbox/intel.latest.json (DERIVE faces)."""
-        try:
-            import camp_clock_v1 as camp
-        except Exception as e:  # noqa: BLE001
-            return {"ok": False, "error": f"camp_clock import failed: {e}"}
         p = state_path(self.ws)
         if not p.is_file():
             return {"ok": False, "error": "Campaign save is missing."}
@@ -264,11 +272,6 @@ class CampaignKernel:
         """Run the clock: rest / wait / scout / post / recall. Mutates the campaign
         save (clock, camp, intel, zone truth via the engine's own offscreen tick) and
         the persisted belief world; time stops at the first pause."""
-        try:
-            import camp_clock_v1 as camp
-        except Exception as e:  # noqa: BLE001
-            return {"ok": False, "error": f"camp_clock import failed: {e}"}
-        from verdance_story_engine_v1 import save_json
         action = str((body or {}).get("action") or "")
         if action not in ("rest", "wait", "scout", "post", "recall"):
             return {"ok": False, "error": "Unknown camp action."}
@@ -327,7 +330,6 @@ class CampaignKernel:
         out = self._outbox_face("divergence.latest.json", hidden=True)
         # faction minds fold in a detached worker; say whether the face is still catching up
         try:
-            import perspectives_v1 as P
             out["pending"] = P.pending(self.ws)
         except Exception:  # noqa: BLE001
             pass
@@ -337,11 +339,7 @@ class CampaignKernel:
         """Player-safe projection of divergence: our side of the mirror only. Per faction, which of
         the zones WE BELIEVE are ours they have eyes on (known / suspected / blind). No `actually`,
         no other faction's picture of the world, nothing about ground we do not know we hold."""
-        try:
-            import hub_belief_v1
-        except Exception as e:  # noqa: BLE001
-            return {"ok": False, "error": f"hub_belief import failed: {e}"}
-        exp = hub_belief_v1.exposure_surface(self.ws)
+        exp = hub_belief.exposure_surface(self.ws)
         if not exp.get("present"):
             return {"ok": True, "present": False, "factions": {}}
         ours: set[str] | None = None
@@ -349,7 +347,7 @@ class CampaignKernel:
         if p.is_file():
             try:
                 state = json.loads(p.read_text(encoding="utf-8-sig"))
-                ours = set(hub_belief_v1.believed_ours(self.ws, state))
+                ours = set(hub_belief.believed_ours(self.ws, state))
             except Exception:  # noqa: BLE001
                 ours = None
         factions: dict[str, Any] = {}
@@ -362,7 +360,6 @@ class CampaignKernel:
                              "ofOurs": (len(ours) if ours is not None else a.get("ofOurs"))}
         out: dict[str, Any] = {"ok": True, "present": True, "asOfMinute": exp.get("asOfMinute"), "factions": factions}
         try:
-            import perspectives_v1 as P
             out["pending"] = P.pending(self.ws)
         except Exception:  # noqa: BLE001
             pass
@@ -373,10 +370,6 @@ class CampaignKernel:
 
     def continuity_audit(self, marks: list[str] | None = None) -> dict[str, Any]:
         """Phase 0 continuity membrane inspector (witness vs belief vs reinduce)."""
-        try:
-            import continuity_audit_v1 as audit
-        except Exception as e:  # noqa: BLE001
-            return {"ok": False, "error": f"continuity_audit import failed: {e}"}
         try:
             report = audit.run_audit(self.ws, marked=marks or [])
             audit.write_outbox(self.ws, report)
@@ -395,7 +388,7 @@ class CampaignKernel:
 
         out: dict[str, Any] = {
             "ok": True,
-            "at": _now(),
+            "at": utc_now(),
             "python": platform.python_version(),
             "pythonOk": sys.version_info >= (3, 10),
             "numpy": importlib.util.find_spec("numpy") is not None,
@@ -412,7 +405,6 @@ class CampaignKernel:
         }
         # Belief engine. _umwelt() may raise SystemExit (old) or return None (new); both mean "not found".
         try:
-            import umwelt_world_v1 as W
             out["umwelt"] = W._umwelt() is not None
         except BaseException:  # noqa: BLE001  (SystemExit included)
             out["umwelt"] = False
@@ -536,8 +528,8 @@ class CampaignKernel:
                 except Exception as e:  # noqa: BLE001
                     skipped.append(f"infolog ({type(e).__name__})")
         except Exception as e:  # noqa: BLE001
-            return {"ok": False, "error": f"{type(e).__name__}: {e}", "at": _now()}
-        return {"ok": True, "at": _now(), "path": str(zpath), "included": included, "skipped": skipped}
+            return {"ok": False, "error": f"{type(e).__name__}: {e}", "at": utc_now()}
+        return {"ok": True, "at": utc_now(), "path": str(zpath), "included": included, "skipped": skipped}
 
     def session_status(self) -> dict[str, Any]:
         """The sortie watch is the session: launching → in-game → bringing-home → home | closed-without-result."""
@@ -559,7 +551,6 @@ class CampaignKernel:
         state_file = self.ws / "state" / "campaign_state.json"
         if state_file.is_file():
             try:
-                from verdance_story_engine_v1 import build_war_map, load_json, save_json
 
                 save_json(war_path, build_war_map(load_json(state_file)))
                 out["war_map"] = {"ok": True, "path": str(war_path)}
@@ -567,18 +558,15 @@ class CampaignKernel:
                 raise RuntimeError(f"war_map regenerate failed: {e}") from e
         elif not war_path.is_file():
             raise RuntimeError("missing campaign_state.json and outbox/war_map.json")
-        py = sys.executable
-        for name in ("build_hub_state_v1.py", "build_zone_boards_v1.py"):
-            script = self.ws / "tools" / name
-            if script.is_file():
-                out[name] = run_cmd([py, str(script)], self.ws, timeout=60)
-        hub_build = out.get("build_hub_state_v1.py") or {}
+        for name in ("build_hub_state", "build_zone_boards"):
+            out[name] = run_module(self.ws, f"verdance.hub.{name}", [], workspace_flag=False, timeout=60)
+        hub_build = out.get("build_hub_state") or {}
         if hub_build and not hub_build.get("ok"):
             detail = (
                 hub_build.get("stderr_tail")
                 or hub_build.get("stdout_tail")
                 or hub_build.get("reason")
-                or "build_hub_state_v1 failed"
+                or "build_hub_state failed"
             )
             raise RuntimeError(f"hub rebuild failed: {str(detail).strip()[:400]}")
         # Campaign reset / wipe must NOT re-ingest results. Calling
@@ -623,7 +611,7 @@ class CampaignKernel:
             "apply": apply_info,
             "surface": {"path": surface.get("path")},
             "missionNumber": (hub.get("hub") or {}).get("missionNumber"),
-            "at": _now(),
+            "at": utc_now(),
         }
 
     @_campaign_lock
@@ -633,16 +621,16 @@ class CampaignKernel:
             return {
                 "ok": False,
                 "error": "type YES to confirm full campaign reset",
-                "at": _now(),
+                "at": utc_now(),
             }
         script = self.ws / "scripts" / "player" / "reset_campaign.ps1"
         if not script.is_file():
-            return {"ok": False, "error": "reset_campaign.ps1 missing", "at": _now()}
+            return {"ok": False, "error": "reset_campaign.ps1 missing", "at": utc_now()}
         report = run_ps1(script, self.ws, timeout=180)
         hub = self.get_hub_surface()
         return {
             "ok": bool(report.get("ok", report.get("exitCode", 1) == 0)),
-            "at": _now(),
+            "at": utc_now(),
             "reset": report,
             "hub": hub.get("hub") if hub.get("ok") else None,
             "missionNumber": (hub.get("hub") or {}).get("missionNumber"),
@@ -697,33 +685,26 @@ class CampaignKernel:
                     "note": meta.get("note"),
                 }
             )
-        return {"ok": True, "at": _now(), "saves": slots, "dir": str(root)}
+        return {"ok": True, "at": utc_now(), "saves": slots, "dir": str(root)}
 
     @_campaign_lock
     def seal_company(self, *, band: list[str] | None = None) -> dict[str, Any]:
         """Hub preamble: lock core + exactly seatCap band packs for this run."""
-        from company_v1 import (  # type: ignore
-            company_deploy_aces,
-            company_deploy_band,
-            hub_company_surface,
-            seal_company as _seal,
-        )
-        from verdance_story_engine_v1 import load_json, migrate_state, save_json  # type: ignore
 
         sp = state_path(self.ws)
         if not sp.is_file():
-            return {"ok": False, "error": "campaign_state.json missing", "at": _now()}
+            return {"ok": False, "error": "campaign_state.json missing", "at": utc_now()}
         try:
             state = migrate_state(load_json(sp))
         except Exception as e:  # noqa: BLE001
-            return {"ok": False, "error": f"load state failed: {e}", "at": _now()}
+            return {"ok": False, "error": f"load state failed: {e}", "at": utc_now()}
         ok, err, company = _seal(state, list(band or []), workspace=self.ws)
         if not ok:
-            return {"ok": False, "error": err, "company": company, "at": _now()}
+            return {"ok": False, "error": err, "company": company, "at": utc_now()}
         try:
             save_json(sp, state)
         except Exception as e:  # noqa: BLE001
-            return {"ok": False, "error": f"save state failed: {e}", "at": _now()}
+            return {"ok": False, "error": f"save state failed: {e}", "at": utc_now()}
         hub_report = self.rebuild_hub()
         surface = hub_company_surface(state, self.ws)
 
@@ -732,10 +713,7 @@ class CampaignKernel:
         # that can pick Mode A / extract ghosts and desync the hub theater.
         seed_report: dict[str, Any] = {"skipped": True}
         try:
-            from verdance_story_engine_v1 import (  # type: ignore
-                opening_sortie_order,
-                save_json as _save_json,
-            )
+            _save_json = save_json
 
             mission_n = int(state.get("missionNumber") or 1)
             order = opening_sortie_order(state, self.ws) if mission_n == 1 else None
@@ -783,7 +761,7 @@ class CampaignKernel:
                     "against": order.get("against") or "armada",
                     "sessionMode": order.get("sessionMode") or "reload_travel",
                     "occupationModel": order.get("occupationModel") or "living_shell",
-                    "seededAt": _now(),
+                    "seededAt": utc_now(),
                     "seedReason": "company_seal_opening_bake",
                 }
                 _save_json(outbox / "next_mission_intent.json", intent)
@@ -820,7 +798,7 @@ class CampaignKernel:
                             "schemaVersion": "verdance-seed-status/1.0",
                             "stale": not bool(build_report.get("ok")),
                             "reason": "company_sealed_opening",
-                            "at": _now(),
+                            "at": utc_now(),
                             "deployAces": company_deploy_aces(state),
                             "crewBand": company_deploy_band(state),
                             "deploymentZoneId": rim,
@@ -844,7 +822,7 @@ class CampaignKernel:
                             "schemaVersion": "verdance-seed-status/1.0",
                             "stale": True,
                             "reason": "await_drop_bake",
-                            "at": _now(),
+                            "at": utc_now(),
                         },
                         indent=2,
                     )
@@ -856,7 +834,7 @@ class CampaignKernel:
 
         return {
             "ok": True,
-            "at": _now(),
+            "at": utc_now(),
             "company": company,
             "surface": surface,
             "deployAces": company_deploy_aces(state),
@@ -877,7 +855,7 @@ class CampaignKernel:
             name = f"slot_{stamp}"
         src = state_path(self.ws)
         if not src.is_file():
-            return {"ok": False, "error": "campaign_state.json missing", "at": _now()}
+            return {"ok": False, "error": "campaign_state.json missing", "at": utc_now()}
         dest_dir = saves_dir(self.ws) / name
         dest_dir.mkdir(parents=True, exist_ok=True)
         dest = dest_dir / "campaign_state.json"
@@ -893,7 +871,7 @@ class CampaignKernel:
             "id": name,
             "label": str(label or name).strip() or name,
             "note": str(note or "").strip() or None,
-            "savedAt": _now(),
+            "savedAt": utc_now(),
             "missionNumber": mission,
         }
         (dest_dir / "meta.json").write_text(
@@ -906,7 +884,7 @@ class CampaignKernel:
             pass
         return {
             "ok": True,
-            "at": _now(),
+            "at": utc_now(),
             "slot": name,
             "path": str(dest),
             "meta": meta,
@@ -922,14 +900,14 @@ class CampaignKernel:
             return {
                 "ok": False,
                 "error": "type YES to confirm load (overwrites live campaign_state)",
-                "at": _now(),
+                "at": utc_now(),
             }
         name = self._sanitize_slot(slot)
         if not name:
-            return {"ok": False, "error": "slot name required", "at": _now()}
+            return {"ok": False, "error": "slot name required", "at": utc_now()}
         src = saves_dir(self.ws) / name / "campaign_state.json"
         if not src.is_file():
-            return {"ok": False, "error": f"save slot not found: {name}", "at": _now()}
+            return {"ok": False, "error": f"save slot not found: {name}", "at": utc_now()}
         live = state_path(self.ws)
         backups_dir(self.ws).mkdir(parents=True, exist_ok=True)
         stamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
@@ -946,7 +924,7 @@ class CampaignKernel:
         hub = self.get_hub_surface()
         return {
             "ok": bool(hub_report.get("ok", True)),
-            "at": _now(),
+            "at": utc_now(),
             "slot": name,
             "backup": str(backup) if live.is_file() else None,
             "hubRebuild": hub_report,
@@ -955,18 +933,13 @@ class CampaignKernel:
         }
 
     def materialize_intent(self) -> dict[str, Any]:
-        engine = self.ws / "tools" / "verdance_story_engine_v1.py"
-        return run_cmd(
-            [sys.executable, str(engine), "intent", "--workspace", str(self.ws)],
-            self.ws,
-            timeout=120,
-        )
+        return run_module(self.ws, "verdance.campaign.engine", ["intent"], timeout=120)
 
     def sync_mod(self, *, copy: bool = True) -> dict[str, Any]:
         """Copy (or junction) workspace mutator into BAR data/games before play."""
         script = self._resolve_ps1("install_mod")
         if script is None:
-            report = {"ok": False, "reason": "install_mod script missing", "at": _now()}
+            report = {"ok": False, "reason": "install_mod script missing", "at": utc_now()}
             self._last_mod_sync = report
             return report
         extra: list[str] = []
@@ -977,7 +950,7 @@ class CampaignKernel:
             extra.append("-Copy")
         report = run_ps1(script, self.ws, extra_args=extra or None, timeout=120)
         report = dict(report)
-        report["at"] = _now()
+        report["at"] = utc_now()
         report["script"] = str(script)
         self._last_mod_sync = report
         return report
@@ -1058,7 +1031,7 @@ class CampaignKernel:
                     "accepted": False,
                     "phase": "failed",
                     "error": self._error,
-                    "at": _now(),
+                    "at": utc_now(),
                 }
         finally:
             with self._lock:
@@ -1078,7 +1051,7 @@ class CampaignKernel:
                     refused = {
                         "ok": False,
                         "error": err,
-                        "at": _now(),
+                        "at": utc_now(),
                         "launch": {"ok": False, "skipped": True, "reason": err},
                     }
                     self._last_deploy = refused
@@ -1098,7 +1071,7 @@ class CampaignKernel:
                 name="va-deploy",
                 daemon=True,
             ).start()
-            return {"ok": True, "accepted": True, "phase": "building", "at": _now()}
+            return {"ok": True, "accepted": True, "phase": "building", "at": utc_now()}
 
         with self._lock:
             if self._busy:
@@ -1121,7 +1094,7 @@ class CampaignKernel:
                     refused = {
                         "ok": False,
                         "error": err,
-                        "at": _now(),
+                        "at": utc_now(),
                         "launch": {"ok": False, "skipped": True, "reason": err},
                     }
                     self._last_deploy = refused
@@ -1130,13 +1103,6 @@ class CampaignKernel:
 
                 # Company preamble gate — drop only after hub seals the run company.
                 try:
-                    from company_v1 import (  # type: ignore
-                        consume_mission_call_ins,
-                        ensure_company,
-                        peek_mission_call_ins,
-                        sortie_roster,
-                    )
-                    from verdance_story_engine_v1 import load_json, migrate_state, save_json  # type: ignore
 
                     sp = state_path(self.ws)
                     if sp.is_file():
@@ -1147,7 +1113,7 @@ class CampaignKernel:
                             return {
                                 "ok": False,
                                 "error": "Form the company first — pick 3 packs on the hub preamble",
-                                "at": _now(),
+                                "at": utc_now(),
                                 "companyPreambleNeeded": True,
                             }
                         # Core always ships. The hub Dropping list is who else comes.
@@ -1176,7 +1142,7 @@ class CampaignKernel:
                     return {
                         "ok": False,
                         "error": f"company gate failed: {e}",
-                        "at": _now(),
+                        "at": utc_now(),
                     }
 
                 # Stamp → intent → build FIRST, then sync the built seed into BAR.
@@ -1188,7 +1154,7 @@ class CampaignKernel:
                     refused = {
                         "ok": False,
                         "error": err,
-                        "at": _now(),
+                        "at": utc_now(),
                         "stamp": stamp_report,
                         "launch": {"ok": False, "skipped": True, "reason": err},
                     }
@@ -1210,13 +1176,6 @@ class CampaignKernel:
                 army_budget_spent = None
                 if build_report.get("ok"):
                     try:
-                        from verdance_story_engine_v1 import (  # type: ignore
-                            ensure_commerce,
-                            load_json,
-                            migrate_state,
-                            save_json,
-                            utc_now,
-                        )
 
                         sp = state_path(self.ws)
                         if sp.is_file():
@@ -1262,7 +1221,7 @@ class CampaignKernel:
                     )
                 result = {
                     "ok": drop_ok,
-                    "at": _now(),
+                    "at": utc_now(),
                     "modSync": mod_report,
                     "stamp": stamp_report,
                     "intent": intent_report,
@@ -1351,7 +1310,7 @@ class CampaignKernel:
                 ).get("debrief")
                 result = {
                     "ok": bool(hub_apply.get("ok")),
-                    "at": _now(),
+                    "at": utc_now(),
                     "mode": mode,
                     "extract": extract_info,
                     "apply": hub_apply,
@@ -1399,7 +1358,6 @@ class CampaignKernel:
     ) -> dict[str, Any]:
         """Write presentable incomplete debrief without mutating campaign credit."""
         try:
-            from match_credit_v1 import presentable_debrief, credit_from_result
 
             credit = credit_from_result({"status": "incomplete", "terminalReason": reason})
             debrief = presentable_debrief(credit)
@@ -1416,13 +1374,13 @@ class CampaignKernel:
             }
         patch = {
             "schemaVersion": "verdance-hub-result/1.0",
-            "at": _now(),
+            "at": utc_now(),
             "ok": False,
             "incomplete": True,
             "reason": reason,
             "debrief": debrief,
             "lastResult": {
-                "at": _now(),
+                "at": utc_now(),
                 "verdict": "incomplete",
                 "debrief": debrief,
                 "source": "bring_home_incomplete",
@@ -1436,7 +1394,7 @@ class CampaignKernel:
             pass
         return {
             "ok": False,
-            "at": _now(),
+            "at": utc_now(),
             "mode": mode,
             "incomplete": True,
             "reason": reason,
@@ -1463,12 +1421,6 @@ class CampaignKernel:
                 tools = Path(__file__).resolve().parent.parent
                 if str(tools) not in sys.path:
                     sys.path.insert(0, str(tools))
-                from verdance_story_engine_v1 import (  # noqa: E402
-                    load_json,
-                    migrate_state,
-                    process_result,
-                    save_json,
-                )
 
                 sp = state_path(self.ws)
                 if not sp.is_file():
@@ -1508,13 +1460,13 @@ class CampaignKernel:
                         data = json.loads(hr.read_text(encoding="utf-8-sig"))
                     data["debrief"] = debrief
                     data["lastResult"] = {
-                        "at": _now(),
+                        "at": utc_now(),
                         "verdict": "abandon",
                         "debrief": debrief,
                         "source": "abandon_sortie",
                     }
                     data["ok"] = True
-                    data["at"] = _now()
+                    data["at"] = utc_now()
                     hr.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
                 except Exception:  # noqa: BLE001
                     pass
@@ -1524,7 +1476,7 @@ class CampaignKernel:
                 )
                 result = {
                     "ok": bool(report.get("processed") or report.get("reason") == "duplicate"),
-                    "at": _now(),
+                    "at": utc_now(),
                     "abandon": True,
                     "report": {
                         k: v
@@ -1555,12 +1507,6 @@ class CampaignKernel:
                 return {"ok": False, "error": "kernel busy — try the buy again in a moment"}
             self._busy = True
             try:
-                from verdance_story_engine_v1 import (  # noqa: E402
-                    load_json,
-                    migrate_state,
-                    purchase_listing,
-                    save_json,
-                )
 
                 raw = load_json(state_path(self.ws))
                 state = migrate_state(raw)
@@ -1576,7 +1522,7 @@ class CampaignKernel:
                 surface_mod.write_surface(self.ws, hub)
                 return {
                     "ok": True,
-                    "at": _now(),
+                    "at": utc_now(),
                     "receipt": receipt,
                     "missionNumber": hub.get("missionNumber") or hub_info.get("missionNumber"),
                     "tenebrium": hub.get("tenebrium"),
@@ -1595,12 +1541,6 @@ class CampaignKernel:
         if not state_path(self.ws).is_file():
             return {"ok": False, "error": "missing campaign_state.json"}
         try:
-            from verdance_story_engine_v1 import (  # noqa: E402
-                apply_home_build,
-                load_json,
-                migrate_state,
-                save_json,
-            )
 
             raw = load_json(state_path(self.ws))
             state = migrate_state(raw)
@@ -1614,7 +1554,7 @@ class CampaignKernel:
             surface_mod.write_surface(self.ws, hub)
             return {
                 "ok": True,
-                "at": _now(),
+                "at": utc_now(),
                 "receipt": receipt,
                 "homeCamp": hub.get("homeCamp") or receipt.get("homeCamp"),
                 "flags": hub.get("flags") or receipt.get("flags"),

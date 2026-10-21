@@ -7,7 +7,15 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
-import narrative_v1 as narrative
+from verdance.readings import narrative as narrative
+
+
+# A workspace with the story data but no belief frame in outbox/: the company has looked at
+# nothing yet, so "do we hold ground" falls back to its own claim ledger (claimedNodes).
+WS = Path(tempfile.mkdtemp(prefix="va_narrative_"))
+(WS / "data").mkdir()
+import shutil as _shutil
+_shutil.copytree(ROOT / "data" / "story", WS / "data" / "story")
 
 
 def fresh():
@@ -17,11 +25,11 @@ def fresh():
             "homeCamp": {"level": 0}, "commerce": {"tenebrium": 3}, "reputation": {"nullmercs": 48, "cortex": 70}}
 
 
-def result(state, key="r1", verdict="victory", **extra):
+def result(state, key="r1", verdict="victory", workspace=None, **extra):
     r = {"resultKey": key, "mapId": "greenest_fields", **extra}
     c = {"verdict": verdict, "advanceMission": verdict in ("victory", "partial", "defeat"),
          "credits": {"cleanExtract": verdict == "victory", "nodeClaimed": verdict == "victory"}}
-    return narrative.accept_result(state, r, c)
+    return narrative.accept_result(state, r, c, workspace=workspace)
 
 
 class NarrativeTests(unittest.TestCase):
@@ -115,10 +123,12 @@ class NarrativeTests(unittest.TestCase):
         self.assertEqual(narrative.project(s)["scenes"],[])
 
     def test_lost_foothold_changes_opportunity(self):
-        s=fresh(); s["zoneMemory"]={"greenest_fields":{"pad":{"controllingFaction":"ashwalkers"}}}
-        narrative.choose(s,"shelter:claim",narrative.revision(s),"request")
-        s["zoneMemory"]["greenest_fields"]["pad"]["controllingFaction"]="armada"
-        t=next(t for t in narrative.project(s)["threads"] if t["id"]=="shelter")
+        # belief, not truth: the company's own claim ledger says it holds the pad ...
+        s=fresh(); s["claimedNodes"]={"greenest_fields":{"pad":{}}}
+        narrative.choose(s,"shelter:claim",narrative.revision(s),"request",workspace=WS)
+        # ... and losing that claim is what changes the opportunity.
+        s["claimedNodes"]={}
+        t=next(t for t in narrative.project(s,workspace=WS)["threads"] if t["id"]=="shelter")
         self.assertEqual(t["stage"],"Changed"); self.assertTrue(t["choices"])
 
     def test_quantum_authority_does_not_change_world_twice(self):
@@ -138,7 +148,7 @@ class NarrativeTests(unittest.TestCase):
         self.assertEqual(s["custom"],{"future":42})
 
     def test_backup_on_first_migration_write(self):
-        from verdance_story_engine_v1 import save_json
+        from verdance.campaign import save_json
         with tempfile.TemporaryDirectory() as d:
             p=Path(d)/"campaign_state.json"; s=fresh(); save_json(p,s); old=p.read_bytes()
             result(s); save_json(p,s)
@@ -181,7 +191,7 @@ class NarrativeTests(unittest.TestCase):
 
     def test_full_engine_result_integration_and_duplicate(self):
         import shutil
-        import verdance_story_engine_v1 as engine
+        from verdance import campaign as engine
         with tempfile.TemporaryDirectory() as d:
             root=Path(d);shutil.copytree(ROOT/'data',root/'data')
             state=engine.default_v1_state()
@@ -234,10 +244,10 @@ class NarrativeTests(unittest.TestCase):
     def test_all_families_have_success_and_deadline_or_fallback_paths(self):
         for spec in narrative.catalog()['threads']:
             s=fresh();s['history']=[{'mapId':'eye_of_horus'}]
-            s['zoneMemory']={'greenest_fields':{'pad':{'controllingFaction':'ashwalkers'}}}
+            s['claimedNodes']={'greenest_fields':{'pad':{}}}
             choice=spec['choices'][0]
-            self.assertTrue(narrative.choose(s,spec['id']+':'+choice['id'],narrative.revision(s),'choose')['ok'])
-            result(s,mapId='eye_of_horus' if spec['id']=='dealer' else 'greenest_fields',heroResults={'ketha':{'status':'survived'}})
+            self.assertTrue(narrative.choose(s,spec['id']+':'+choice['id'],narrative.revision(s),'choose',workspace=WS)['ok'])
+            result(s,mapId='eye_of_horus' if spec['id']=='dealer' else 'greenest_fields',heroResults={'ketha':{'status':'survived'}},workspace=WS)
             self.assertEqual(s['narrative']['threads'][spec['id']]['stage'],'Resolved',spec['id'])
 
 

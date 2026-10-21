@@ -4,7 +4,7 @@
 Why this exists
 ---------------
 Every optional subsystem in the story engine is imported inside a bare
-``try/except Exception`` -- see verdance_story_engine_v1.py:4574 and :5008.
+``try/except Exception`` (see the lazy imports in tools/verdance/campaign/engine.py).
 That is a reasonable pattern for a genuinely optional feature and a disastrous
 one for a packaging mistake, because the two are indistinguishable at runtime:
 a module left out of the ship list produces no error, no log line, and no
@@ -61,12 +61,10 @@ def top_level_imports(path: Path) -> Set[str]:
     that actually broke the v0.10.0 build were all inside functions, several
     levels into a try block.
 
-    `tools` is unwrapped rather than reported. Several modules use the pattern
-    `try: import attachments_v1 / except ImportError: from tools import
-    attachments_v1` -- the same module by either name, depending on whether the
-    tools directory is on sys.path directly or as a package. Reporting the
-    package spelling as a missing dependency is a false positive; what matters
-    is whether `attachments_v1` itself is staged.
+    `tools` is unwrapped rather than reported: `from tools import X` and
+    `import X` name the same staged module. A package import such as
+    `verdance.belief.world` reports its top-level package (`verdance`), which
+    ships whole.
     """
     try:
         tree = ast.parse(path.read_text(encoding="utf-8-sig"))
@@ -139,7 +137,8 @@ def analyse(tools_dir: Path) -> Tuple[Dict[str, Set[str]], Set[str]]:
     for f in py_files:
         if any(part in _SKIP_DIRS for part in f.parts):
             continue
-        owner = f.stem if f.parent == tools_dir else f.parent.name
+        rel = f.relative_to(tools_dir)
+        owner = f.stem if len(rel.parts) == 1 else rel.parts[0]
         for name in top_level_imports(f):
             if name in std or name in _ALLOWED_THIRD_PARTY:
                 continue

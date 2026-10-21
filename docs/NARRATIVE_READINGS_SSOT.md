@@ -33,7 +33,6 @@ data/story/voices/<speaker>.json  7 leads + brakhov + pavise; blades.json (28); 
 tools/readings_v1.py              projector  -> outbox/readings.latest.json
 tools/occasions_v1.py             selector   -> outbox/occasions.latest.json / .md (includes the roll)
 tools/validate_story_v1.py        linter: every reference must resolve; projector determinism
-tools/merge_ketha_additions.py    deepens the in-Drop pools in ketha_voice.json (idempotent)
 ```
 
 ### Readings (the basis)
@@ -109,7 +108,6 @@ and the war (`AQuantumArchitect/umwelt`; set `UMWELT_SRC=<umwelt>/src`, or keep 
 
 ```
 tools/umwelt_world_v1.py        DomainSpec from the zone graph + codex + the six questions; VerdanceWorld host
-tools/umwelt_replay_v1.py       the gate: replay a save, check comprehension (5 checks)
 tools/belief_homecoming_v1.py   fold a homecoming: fog grows, SURPRISE stamped, observe, intel split, save world
 tools/camp_clock_v1.py          interstitial time: rest/wait/scout/post/recall, truth ticks, pauses
 state/belief/verdance.engine.pkl   the company's mind (a legitimate second truth: about the company, never the world)
@@ -131,7 +129,7 @@ confidence × |truth − belief|. Zero on a first visit. The `surprise_at_drop` 
 at ≥ 0.6 with the top zone's "believed / found".
 
 **The questions as Bloch vectors:** z is the lean, the radius is how committed, and *torn* is a short
-vector after being pushed both ways (tallied per question). `umwelt_replay_v1` checks the Umwelt
+vector after being pushed both ways (tallied per question). the belief gate (now `tests/e2e_campaign.py`) checks the Umwelt
 estimator never leans opposite to the readings face on the same evidence.
 
 **The camp clock** (`/api/camp`, `/api/camp-act`): time runs in hourly steps; truth evolves only through
@@ -227,7 +225,7 @@ Truth and the company's own fold stay synchronous. `VA_PERSPECTIVES_SYNC=1` fold
 **Routes.** `/api/intel?perspective=company|armada|nullmercs|cortex` · `/api/truth` (hidden) ·
 `/api/divergence` (hidden) · `/api/chronicle` · `/api/camp`, `/api/camp-act` (pass two).
 
-**Gate.** `tools/umwelt_replay_v1.py` still passes 5/5 on a pass-three save (measured track truth 36/36,
+**Gate.** The replay gate (retired in pass 10 in favour of `tests/e2e_campaign.py`) passed 5/5 on a pass-three save (measured track truth 36/36,
 unmeasured dark 90/90, rumour fades, questions agree with face 6/6, save/load hash).
 
 **Pass 4 (BAR / LuaUI) inherits:** export `observedZones` and `beliefExport` from the gadget; draw
@@ -279,8 +277,8 @@ with "still catching up" while the worker runs). The folded record (`/api/chroni
 `umwelt_world_v1._umwelt()` tries that path last, after a live clone. `requirements-ship.txt`
 gains numpy. FREEZE law stands: the snapshot is distribution, not a fork — nothing in it is edited.
 
-**Checks.** `tools/luachk_v1.py` is a structural Lua check (no interpreter on the build hosts):
-brackets and block balance; all 40 mod files pass. The 6 "unbridged" zones were legacy ids in an
+**Checks.** A structural Lua check (brackets and block balance; superseded by `tools/hud_harness/luasyn.py`)
+passed all 40 mod files. The 6 "unbridged" zones were legacy ids in an
 old save; a fresh campaign's 102 zones all sit on the graph, so no graph regeneration was needed.
 
 **Open after pass four.** The gadget's belief export is coarse (sides and counts, not control
@@ -465,13 +463,12 @@ python tools/validate_story_v1.py        # lint content, check projector determi
 python tools/readings_v1.py              # readout + outbox/readings.latest.json
 python tools/readings_v1.py --fresh      # ignore previous face (no stickiness/transition)
 python tools/occasions_v1.py             # who says what; writes occasions.latest.json/.md
-python tools/merge_ketha_additions.py    # idempotent pool deepening
-python tools/umwelt_replay_v1.py         # belief gate: replay the save, 5 checks
+UMWELT_SRC=... python tests/e2e_campaign.py   # belief gate: fresh campaign, drop, homecoming
 python tools/perspectives_v1.py          # fold the faction minds once, print divergence
 python tools/perspectives_v1.py --worker . # drain the perspectives job queue
 python tools/camp_clock_v1.py            # camp surface
 python tools/intel_lua_v1.py             # rewrite generated/va_intel_current.lua from the intent
-python tools/luachk_v1.py <files.lua>    # structural Lua check
+python tools/hud_harness/luasyn.py <files.lua>  # structural Lua check
 python tools/hud_harness/harness.py      # widgets under a stubbed Spring (Linux, liblua5.4)
 python tools/hud_harness/render.py       # PNG renders of infil / field / exfil / over
 ```

@@ -16,7 +16,7 @@ sys.path.insert(0, str(WS / "tools"))
 
 import hydrology_v1 as hydro  # noqa: E402
 import map_symmetry_v1 as symmetry  # noqa: E402
-import verdance_story_engine_v1 as engine  # noqa: E402
+from verdance import campaign as engine
 import zone_cartographer_v1 as carto  # noqa: E402
 
 RES = 32

@@ -1,6 +1,11 @@
-"""Playtest infra: attachments, world tick, kernel sim, power response."""
+"""Playtest infra: attachments, world tick, kernel sim, power response.
+
+The kernel-sim and strategic-seat classes run whole proxy campaigns through the belief field
+(minutes each); they are skipped unless VA_SLOW=1 is set.
+"""
 from __future__ import annotations
 
+import os
 import sys
 import unittest
 from pathlib import Path
@@ -10,10 +15,10 @@ TOOLS = WS / "tools"
 if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
 
-import attachments_v1 as att  # noqa: E402
-import world_tick_v1 as wt  # noqa: E402
+from verdance.company import attachments as att
+from verdance.world import world_tick as wt
 import kernel_campaign_sim_v1 as ksim  # noqa: E402
-import verdance_story_engine_v1 as engine  # noqa: E402
+from verdance import campaign as engine
 
 
 class AttachmentTests(unittest.TestCase):
@@ -84,6 +89,10 @@ class WorldTickTests(unittest.TestCase):
         self.assertGreater(r["strengthComposite"], 0.3)
 
 
+SLOW = unittest.skipUnless(os.environ.get("VA_SLOW"), "slow: full kernel campaign sims (set VA_SLOW=1)")
+
+
+@SLOW
 class KernelSimTests(unittest.TestCase):
     def test_one_sortie_settles(self):
         run = ksim.run_campaign(WS, sorties=2, seed=7, home_map="koom_valley")
@@ -114,6 +123,7 @@ class KernelSimTests(unittest.TestCase):
         )
 
 
+@SLOW
 class StrategicSeatImportTests(unittest.TestCase):
     def test_seat_one_seed(self):
         # Load file directly — quantum_bar_ai package __init__ needs umwelt.

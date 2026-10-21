@@ -45,7 +45,7 @@ Not a second brand. Not a debug strip. Not “partial looks like victory.”
 **Implementations**
 
 - Lua: `mod/VerdanceAshes.sdd/luaui/Widgets/include/va_ash_tokens.lua`
-- HTML: `app/showoff/index.html` `:root` CSS variables (keep names locked)
+- HTML: `app/showoff/console/console.css` `:root` CSS variables — the only stylesheet (pass eleven); keep names locked
 
 ---
 

@@ -125,9 +125,8 @@ def main() -> int:
     print(f"map names OK ({checked} references across {len(valid)} maps{note})")
 
     if args.online:
-        sys.path.insert(0, str(root / "tools"))
         try:
-            import map_provisioner_v1 as mp
+            from verdance.world import map_provisioner as mp
         except ImportError:
             print("WARN map_provisioner_v1 not importable; skipping the online check.")
             return 0

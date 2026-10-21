@@ -9,8 +9,8 @@ ROOT = Path(__file__).resolve().parents[1]
 TOOLS = ROOT / "tools"
 sys.path.insert(0, str(TOOLS))
 
-import verdance_story_engine_v1 as engine  # noqa: E402
-from contract_v2 import normalize_result, result_v2_to_v1_fields  # noqa: E402
+from verdance import campaign as engine
+from verdance.hub.contract import normalize_result, result_v2_to_v1_fields
 
 
 class TestPlayerFootprint(unittest.TestCase):

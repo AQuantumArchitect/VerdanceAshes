@@ -1,6 +1,6 @@
 """HTTP face for the campaign kernel (Phase 1 shell transport).
 
-Same endpoints as hub_host_v1 so the HTML map keeps working.
+Serves the hub (app/showoff) and the /api/* endpoints the HTML map calls.
 """
 from __future__ import annotations
 
@@ -110,7 +110,7 @@ def make_handler(kernel: CampaignKernel, showoff: Path):
                 return self._send(code, body, ct)
 
             # /api/continuity-audit, /api/phases, /api/steam, /api/surface were removed in pass 8B:
-            # nothing in app/ or tools/ called them (campaign_zip_v1 is dead code).
+            # nothing in app/ or tools/ called them (campaign_zip went with them in pass 10).
 
             if path == "/api/saves":
                 if hasattr(kernel, "list_saves"):

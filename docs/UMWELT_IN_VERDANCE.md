@@ -43,14 +43,14 @@ The engine that holds these pictures is **Umwelt** ([AQuantumArchitect/umwelt](h
                  │ result (facts)
                  ▼
             ┌──────────────────────────────────────────────────────────────┐
-            │ belief lane (tools/)                                           │
-            │ umwelt_world_v1 ── adapter over Umwelt (observe, decay, frame) │
-            │ belief_homecoming_v1 ── fold a sortie's facts into belief      │
-            │ perspectives_v1 ── the other minds, by observation policy      │
-            │ camp_clock_v1 ── camp time: scouts, patrols, rumours           │
-            │ hub_belief_v1 / intel_lua_v1 ── belief surfaces for hub / HUD  │
-            │ manifest_v1 / match_credit_v1 ── verdicts from the manifest    │
-            │ readings_v1 / occasions_v1 ── what the story thinks happened   │
+            │ belief lane (tools/verdance/belief, tools/verdance/readings)   │
+            │ belief.world ── adapter over Umwelt (observe, decay, frame)    │
+            │ belief.homecoming ── fold a sortie's facts into belief         │
+            │ belief.perspectives ── the other minds, by observation policy  │
+            │ belief.camp_clock ── camp time: scouts, patrols, rumours       │
+            │ belief.hub_belief / intel_lua ── belief surfaces for hub / HUD │
+            │ belief.manifest / match_credit ── verdicts from the manifest   │
+            │ readings.readings / occasions ── what the story thinks happened│
             └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -72,7 +72,8 @@ The engine that holds these pictures is **Umwelt** ([AQuantumArchitect/umwelt](h
 
 ## Where to read next
 
-- `tools/umwelt_world_v1.py` — the whole adapter; start here.
-- `tools/belief_homecoming_v1.py` — one sortie folded into belief.
+- `tools/verdance/belief/world.py` — the whole adapter; start here.
+- `tools/verdance/belief/homecoming.py` — one sortie folded into belief.
+- `tests/test_belief_lane.py` — the lane's contracts as unit tests; `tests/e2e_campaign.py` — a whole sortie without BAR.
 - `luaui/Include/va_board.lua` — the one painter for belief in BAR.
 - `docs/NARRATIVE_READINGS_SSOT.md` — readings, and the pass-by-pass log of how the game got here.

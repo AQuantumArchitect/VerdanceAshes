@@ -12,6 +12,8 @@ import json
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any, Callable
 
+from verdance.common import utc_now
+
 from verdance_kernel.paths import hub_result_path
 from verdance_kernel.sortie import SortieWatch
 
@@ -19,16 +21,12 @@ if TYPE_CHECKING:
     from verdance_kernel.api import CampaignKernel
 
 
-def _now() -> str:
-    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-
-
 class BarBridge:
     def __init__(self, kernel: "CampaignKernel", *, poll_seconds: float = 2.0,
                  on_auto_apply: Callable[[dict[str, Any]], None] | None = None) -> None:
         self.kernel = kernel
         self.on_auto_apply = on_auto_apply
-        self._started_at = _now()
+        self._started_at = utc_now()
         self.watch = SortieWatch(kernel.ws, kernel.bring_home, kernel._incomplete_home, poll_seconds=poll_seconds, on_event=self._on_event)
         kernel.attach_bridge(self)
 
@@ -52,7 +50,7 @@ class BarBridge:
         try:
             out = self.kernel.ws / "outbox" / "bridge.latest.json"
             out.parent.mkdir(parents=True, exist_ok=True)
-            out.write_text(json.dumps(dict(ev, writtenAt=_now()), indent=2) + "\n", encoding="utf-8")
+            out.write_text(json.dumps(dict(ev, writtenAt=utc_now()), indent=2) + "\n", encoding="utf-8")
         except Exception:  # noqa: BLE001
             pass
         if ev.get("event") in ("applied", "incomplete"):
@@ -62,7 +60,7 @@ class BarBridge:
                     data = json.loads(hr.read_text(encoding="utf-8-sig"))
                     data["autoApplied"] = True
                     data["autoReason"] = ev.get("event")
-                    data["autoAt"] = _now()
+                    data["autoAt"] = utc_now()
                     hr.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
                 except Exception:  # noqa: BLE001
                     pass

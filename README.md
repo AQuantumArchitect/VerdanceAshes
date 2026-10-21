@@ -46,7 +46,7 @@ Steam, GitHub Releases, and a Steam AppID are not wired yet. The dist zip is the
 | `mod/VerdanceAshes.sdd` | BAR mutator |
 | `state/campaign_state.json` | World graph *G* between Drops (runtime; not tracked) |
 
-One BAR Drop is one observation that collapses the world graph. Law: [`docs/GRAPH_COLLAPSE_SSOT.md`](docs/GRAPH_COLLAPSE_SSOT.md). Protocol: [`docs/CAMPAIGN_BAR_PROTOCOL.md`](docs/CAMPAIGN_BAR_PROTOCOL.md). Architecture: [`docs/SHIP_ARCHITECTURE.md`](docs/SHIP_ARCHITECTURE.md). Deploy truth: [`docs/DEPLOY_TRUTH.md`](docs/DEPLOY_TRUTH.md).
+One BAR Drop is one **observation**: the company's belief about the map goes in, line of sight and the manifest come out, and the belief is folded forward. The rules: [`docs/THE_GAME.md`](docs/THE_GAME.md). The engine: [`docs/UMWELT_IN_VERDANCE.md`](docs/UMWELT_IN_VERDANCE.md). Protocol: [`docs/CAMPAIGN_BAR_PROTOCOL.md`](docs/CAMPAIGN_BAR_PROTOCOL.md). Architecture: [`docs/SHIP_ARCHITECTURE.md`](docs/SHIP_ARCHITECTURE.md). Deploy truth: [`docs/DEPLOY_TRUTH.md`](docs/DEPLOY_TRUTH.md).
 
 ```
 python -m verdance_kernel launch
@@ -55,6 +55,29 @@ python -m verdance_kernel ship
 ```
 
 Operator notes live in [`HOME.md`](HOME.md); forge launchers (overnight, proxy, tracked play) live under `app/bin/forge/`.
+
+## Code map
+
+The Python side is one package, `tools/verdance`, split by lane (the lanes are explained in
+[`docs/UMWELT_IN_VERDANCE.md`](docs/UMWELT_IN_VERDANCE.md)), plus the kernel that drives it.
+
+| Path | What lives there |
+|---|---|
+| `tools/verdance/common.py` | the one `load_json` / `save_json` / `clamp` / `utc_now` / `canonical_map_id` |
+| `tools/verdance/belief/` | what the company **believes**: the Umwelt world, homecoming folds, faction perspectives, the camp clock, the hub's belief face, the intel the Drop carries, the manifest and mission credit |
+| `tools/verdance/readings/` | the narrative face: readings, occasions, narrative threads, the chronicle, the story dance |
+| `tools/verdance/world/` | the world under the campaign: zone graph, landing zones, wet reach, map umwelt, escalation ladder, the offscreen war, world tick, graph collapse, quantum state, map provisioning |
+| `tools/verdance/company/` | the company: roster and seats, attachments, hero observation, commerce delivery, capture claims, quest generation, continuity audit |
+| `tools/verdance/hub/` | the hub surfaces: hub state, zone boards, result application, the deploy stamp, the sortie contract |
+| `tools/verdance/campaign/` | the story engine, split by seam (`engine.py` = `process_result` / `materialize_next_intent` / CLI; schema, measure, commerce, roster, hydrology, objectives, sorties, intent, voice, acts, home, zones, progression, living_shell) |
+| `tools/verdance_kernel/` | the product entry point: `python -m verdance_kernel` launches the hub, stamps a plan, watches the sortie, brings it home |
+| `tools/*_v1.py` | compat shims at the old flat paths — remove after the first public playtest |
+| `tools/<dev tools>.py`, `tools/quantum_bar_ai/`, `tools/hud_harness/` | forge-only: cartography, flow matrices, proxy campaigns, the Lua HUD harness |
+
+```
+UMWELT_SRC=/path/to/umwelt/src python3 tests/e2e_campaign.py   # the gate: a campaign without BAR
+python3 tests/run_tests.py                                     # the suite (no pytest needed)
+```
 
 ## License
 

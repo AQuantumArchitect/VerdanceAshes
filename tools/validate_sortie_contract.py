@@ -20,11 +20,8 @@ import sys
 from pathlib import Path
 
 # Allow `python tools/validate_sortie_contract.py` from workspace root.
-_TOOLS = Path(__file__).resolve().parent
-if str(_TOOLS) not in sys.path:
-    sys.path.insert(0, str(_TOOLS))
 
-import world_zone_graph as wzg  # noqa: E402
+from verdance.world import zone_graph as wzg
 
 SORTIE_SCHEMA = "verdance-sortie-order/1.0"
 STATE_PATH = Path("state/campaign_state.json")

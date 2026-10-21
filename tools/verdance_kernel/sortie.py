@@ -23,11 +23,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Optional
 
+from verdance.common import tools_env, utc_now
+
 _CHUNK = re.compile(r"VA_RESULT_JSON_CHUNK (\d+)/(\d+) (.*)$")
-
-
-def _now() -> str:
-    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 # ----------------------------------------------------------------------------- where BAR lives
@@ -240,7 +238,7 @@ def _write_provision_status(ws: Path, **fields: Any) -> None:
     rec = {"schemaVersion": "verdance-provision/1.0", "map": "", "bytes": 0, "total": 0, "percent": 0,
            "state": "downloading", "error": None}
     rec.update(fields)
-    rec["at"] = _now()
+    rec["at"] = utc_now()
     try:
         out = provision_status_path(ws)
         out.parent.mkdir(parents=True, exist_ok=True)
@@ -266,17 +264,17 @@ def provision_status(ws: Path) -> Optional[dict[str, Any]]:
 def provision_map(ws: Path, cfg: dict[str, Any], map_name: str) -> dict[str, Any]:
     """A map the player does not own is a fatal content_error before the mutator loads.
 
-    Runs tools/map_provisioner_v1.py synchronously (the launch waits for the map) while the
+    Runs verdance.world.map_provisioner synchronously (the launch waits for the map) while the
     provisioner streams progress into outbox/provision.latest.json for the hub to poll."""
-    prov = ws / "tools" / "map_provisioner_v1.py"
-    if not prov.is_file() or not map_name:
+    if not (ws / "tools" / "verdance" / "world" / "map_provisioner.py").is_file() or not map_name:
         return {"skipped": True}
     status_file = provision_status_path(ws)
     _write_provision_status(ws, map=map_name, state="downloading")
     try:
-        r = subprocess.run([sys.executable, str(prov), "--workspace", str(ws), "--bar-data-root", cfg["barDataRoot"], "--map", map_name,
+        r = subprocess.run([sys.executable, "-m", "verdance.world.map_provisioner", "--workspace", str(ws),
+                            "--bar-data-root", cfg["barDataRoot"], "--map", map_name,
                             "--quiet", "--progress-json", str(status_file)],
-                           cwd=str(ws), capture_output=True, text=True, timeout=PROVISION_TIMEOUT_S)
+                           cwd=str(ws), capture_output=True, text=True, timeout=PROVISION_TIMEOUT_S, env=tools_env(ws))
         tail = (r.stdout or r.stderr or "")[-600:]
         cur = provision_status(ws) or {}
         if r.returncode == 0:
@@ -351,7 +349,7 @@ def _launch(ws: Path) -> dict[str, Any]:
     except Exception as e:  # noqa: BLE001
         return {"ok": False, "reason": f"{type(e).__name__}: {e}", "engine": str(exe)}
     report = {"ok": True, "pid": proc.pid, "engine": str(exe), "startScriptPath": str(script), "infologPath": str(infolog),
-              "infologBaseline": baseline, "mapName": map_name, "provision": prov, "at": _now(), "schemaVersion": "verdance-launch/2.0"}
+              "infologBaseline": baseline, "mapName": map_name, "provision": prov, "at": utc_now(), "schemaVersion": "verdance-launch/2.0"}
     try:
         out = ws / "playable_runs" / "latest_launch.json"
         out.parent.mkdir(parents=True, exist_ok=True)
@@ -484,7 +482,7 @@ class SortieWatch:
         self.applied = []
         self.seen = []
         self.phase = "launching"
-        self.started_at = _now()
+        self.started_at = utc_now()
         self._stop.clear()
         self._thread = threading.Thread(target=self._loop, name="va-sortie-watch", daemon=True)
         self._thread.start()
@@ -496,7 +494,7 @@ class SortieWatch:
             t.join(timeout=1.0)
 
     def _emit(self, ev: dict[str, Any]) -> None:
-        self.last = dict(ev, at=_now())
+        self.last = dict(ev, at=utc_now())
         if self.on_event:
             try:
                 self.on_event(self.last)

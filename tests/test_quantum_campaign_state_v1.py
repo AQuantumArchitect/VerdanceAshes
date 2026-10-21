@@ -8,7 +8,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 
-import quantum_campaign_state_v1 as quantum
+from verdance.world import quantum_campaign_state as quantum
 
 
 class QuantumCampaignStateTests(unittest.TestCase):
@@ -25,7 +25,7 @@ class QuantumCampaignStateTests(unittest.TestCase):
         self.assertEqual(quantum.SCHEMA, first["schemaVersion"])
         self.assertGreaterEqual(len(first["zones"]), 100)
         strategic = [edge for edge in first["edges"] if edge["kind"] == "strategic_link"]
-        self.assertEqual(7, len(strategic))
+        self.assertEqual(8, len(strategic))  # the authored world graph carries eight corridors
         self.assertTrue(all(edge["travelMinutes"] >= 14 for edge in strategic))
         self.assertAlmostEqual(1.0, sum(first["narrative"][key] for key in ("pathA", "pathB", "pathC")))
 

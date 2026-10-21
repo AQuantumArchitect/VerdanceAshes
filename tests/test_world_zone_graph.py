@@ -10,7 +10,7 @@ TOOLS = WS / "tools"
 if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
 
-import world_zone_graph as wzg  # noqa: E402
+from verdance.world import zone_graph as wzg
 
 
 class WorldZoneGraphKernelTests(unittest.TestCase):

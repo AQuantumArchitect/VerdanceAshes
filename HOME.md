@@ -4,7 +4,7 @@
 
 ## Recalibration (read this first)
 
-**One Drop = one collapse of the world graph.** Hub holds superposition between fights; BAR measures; `bring_home` records.  
+**One Drop = one observation.** The hub holds the company's belief between fights; BAR is where it looks; `bring_home` folds what it saw back into belief (`docs/UMWELT_IN_VERDANCE.md`).  
 Law + inventory: [`docs/archive/GRAPH_COLLAPSE_SSOT.md`](docs/archive/GRAPH_COLLAPSE_SSOT.md)
 
 World SSOT: `state/campaign_state.json` → `graph`  
@@ -13,7 +13,7 @@ Combat lens (optional): molecule soft policy — not world truth; rollback `va_m
 
 ## Docs
 
-- **Graph SSOT / Drop-as-collapse:** [`docs/archive/GRAPH_COLLAPSE_SSOT.md`](docs/archive/GRAPH_COLLAPSE_SSOT.md)
+- **The rules / the engine:** [`docs/THE_GAME.md`](docs/THE_GAME.md) · [`docs/UMWELT_IN_VERDANCE.md`](docs/UMWELT_IN_VERDANCE.md) (older graph-collapse framing: `docs/archive/GRAPH_COLLAPSE_SSOT.md`)
 - **Narrative readings (ρ_N over readings, attractors, voices, the roll):** [`docs/NARRATIVE_READINGS_SSOT.md`](docs/NARRATIVE_READINGS_SSOT.md) — faces: `outbox/readings.latest.json`, `outbox/occasions.latest.md`
 - Deploy truth: [`docs/DEPLOY_TRUTH.md`](docs/DEPLOY_TRUTH.md)
 - Ship architecture: [`docs/SHIP_ARCHITECTURE.md`](docs/SHIP_ARCHITECTURE.md)
@@ -31,21 +31,16 @@ Combat lens (optional): molecule soft policy — not world truth; rollback `va_m
 
 **Other machines:** `SHIP.bat` → `export\dist\VerdanceAshes_vX.Y.Z` (+ zip). Recipients run SETUP then PLAY from the unzipped folder. Optional: `python -m verdance_kernel ship --my-games`.
 
-Also here: Desktop **`Verdance Playtest.bat`** / **`Verdance End Playtest.bat`**, or `START_PLAYTEST.bat` / `END_PLAYTEST.bat`.
-
-Player brief + hitlist: [`docs/archive/LUKE_PLAYTEST_TODAY.md`](docs/archive/LUKE_PLAYTEST_TODAY.md)  
-Scorecard: [`docs/HUMAN_PLAY_SCORECARD.md`](docs/HUMAN_PLAY_SCORECARD.md)
+Feedback after a session: hub → System → **Export feedback bundle** (writes `export\feedback_<stamp>.zip`). Tracked sessions: `app\bin\forge\PLAY_TRACKED.bat` (`docs/TRACKED_PLAYTEST.md`).
 
 ```
 SETUP.bat          # once: BAR + mutator + hub
-START_PLAYTEST.bat  # brief + PLAY.bat
 PLAY.bat           # every session: kernel + war map + bridge
-END_PLAYTEST.bat    # harvest human_playthrough faces + open scorecard
 RESET.bat          # optional: wipe campaign (confirms)
 SHIP.bat           # build export\dist\VerdanceAshes_vX.Y.Z (+ zip)
 ```
 
-Leave `PLAY.bat` open → green sortie → **Drop into battle** → homecoming collapses `graph`.
+Leave `PLAY.bat` open → green sortie → **Drop into battle** → homecoming folds the sortie into belief.
 
 ### Faces worth your eyes (player)
 
@@ -54,7 +49,7 @@ Leave `PLAY.bat` open → green sortie → **Drop into battle** → homecoming c
 - `outbox/war_map.json` / `campaign_surface.latest.json`
 - `outbox/human_playthrough.latest.json` (and yurt-sync vitals copies, if present)
 
-Everything else in `outbox/` is derive or bot — see [`GRAPH_COLLAPSE_SSOT.md`](docs/archive/GRAPH_COLLAPSE_SSOT.md).
+Everything else in `outbox/` is derived or bot output — see `docs/hub_state_v1.md` (files beside it).
 
 ---
 

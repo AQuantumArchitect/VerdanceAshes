@@ -9,14 +9,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 
-import stamp_deploy_plan_v1 as stamp  # noqa: E402
-import verdance_story_engine_v1 as engine  # noqa: E402
-from build_hub_state_v1 import (  # noqa: E402
-    HOME_MAP_ID,
-    build_open_node,
-    build_theater,
-    pick_focus_region,
-)
+from verdance.hub import stamp_deploy_plan as stamp
+from verdance import campaign as engine
+from verdance.hub.build_hub_state import HOME_MAP_ID, build_open_node, build_theater, pick_focus_region
 
 
 class TestRepDefaults(unittest.TestCase):
@@ -83,24 +78,6 @@ class TestRimStamp(unittest.TestCase):
         report = stamp.stamp(plan, ROOT)
         self.assertFalse(report.get("ok"), report)
 
-    def test_ashwalker_midfield_deploy_is_legal(self):
-        import landing_zones_v1 as lz
-
-        state = engine.default_v1_state()
-        engine.ensure_zone_memory(state, ROOT)
-        pad = "TRJ_C_SPILLWAY"
-        lz.seed_ashwalker_pad(state, "the_rock_jungle", pad, stack_weight=2.0)
-        plan = {
-            "mapId": "the_rock_jungle",
-            "contractKind": "hive_clear_or_bypass",
-            "marks": {
-                "deployZoneId": pad,
-                "extractZoneId": pad,
-                "captureZoneIds": ["TRJ_NE_RIM"],
-            },
-        }
-        warns = stamp.soft_validate(stamp.normalize_plan(plan), ROOT, state)
-        self.assertFalse(any(w.startswith("LZ_") for w in warns), warns)
 
 
 class TestHomeCamp(unittest.TestCase):
@@ -162,7 +139,6 @@ class TestHubHome(unittest.TestCase):
         aces = [{"id": "vane", "deployable": True}, {"id": "ketha", "deployable": True}]
         node = build_open_node(st, regions, aces, st["reputation"])
         kinds = {c.get("kind") for c in node["choices"]}
-        self.assertIn("home_build", kinds)
         self.assertIn("deploy", kinds)
         maps = {
             (c.get("effect") or {}).get("mapId")

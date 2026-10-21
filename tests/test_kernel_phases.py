@@ -12,25 +12,22 @@ TOOLS = WS / "tools"
 if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
 
-import contract_v2 as c2  # noqa: E402
-import quest_generator_v1 as qg  # noqa: E402
-import world_zone_graph as wzg  # noqa: E402
-import verdance_story_engine_v1 as engine  # noqa: E402
+from verdance.hub import contract as c2
+from verdance.company import quest_generator as qg
+from verdance.world import zone_graph as wzg
+from verdance import campaign as engine
 
 
 class KernelPhaseTests(unittest.TestCase):
     def test_quest_generator_same_map(self):
         state = engine.load_json(WS / "state" / "campaign_state.json")
-        # Seed holdings so candidates exist
-        state.setdefault("zoneMemory", {}).setdefault("koom_valley", {}).setdefault(
-            "KOOM_NW_GREEN_SHELF", {}
-        )["controllingFaction"] = "nullmercs"
-        cands = qg.generate_quests(WS, state, map_id="koom_valley", limit=5)
+        # The company stands at the northwest muster (a claim, not a zoneMemory truth read).
+        cands = qg.generate_quests(WS, state, map_id="koom_valley", from_zone_ids=["KV_NW_MUSTER"], limit=5)
         self.assertTrue(cands, "expected at least one koom quest")
         for c in cands:
             self.assertEqual(c["mapId"], "koom_valley")
             self.assertEqual(c.get("graphEdgeKind"), "same_map")
-            self.assertNotEqual(c["targetZoneId"], "KOOM_NW_GREEN_SHELF")
+            self.assertNotEqual(c["targetZoneId"], "KV_NW_MUSTER")
 
     def test_contract_v2_roundtrip(self):
         raw = {

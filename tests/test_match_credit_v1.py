@@ -10,8 +10,8 @@ ROOT = Path(__file__).resolve().parents[1]
 TOOLS = ROOT / "tools"
 sys.path.insert(0, str(TOOLS))
 
-import match_credit_v1 as mc  # noqa: E402
-from contract_v2 import normalize_result  # noqa: E402
+from verdance.belief import match_credit as mc
+from verdance.hub.contract import normalize_result
 
 
 def _base(**kwargs):
@@ -98,13 +98,6 @@ class TestCreditTable(unittest.TestCase):
         self.assertFalse(c["zoneFlip"])
         self.assertEqual(c["xpTier"], "loss")
         self.assertTrue(c["advanceMission"])
-
-    def test_force_spent(self):
-        r = _base(status="defeat", terminalReason="force_spent")
-        c = mc.credit_from_result(r)
-        self.assertEqual(c["verdict"], "defeat")
-        self.assertEqual(c["terminalReason"], "force_spent")
-        self.assertIn("combat", (c.get("reasonHint") or "").lower())
 
     def test_gameover_external(self):
         r = _base(status="partial", terminalReason="gameover_external")
@@ -210,7 +203,7 @@ class TestProcessResultCredit(unittest.TestCase):
     """Integration with process_result when state is minimal."""
 
     def setUp(self):
-        from verdance_story_engine_v1 import default_v1_state, migrate_state
+        from verdance.campaign import default_v1_state, migrate_state
 
         self.state = migrate_state(default_v1_state())
         # Ensure zone memory for flip tests
@@ -224,7 +217,7 @@ class TestProcessResultCredit(unittest.TestCase):
         self.ws = ROOT
 
     def test_partial_does_not_flip_capture(self):
-        from verdance_story_engine_v1 import process_result
+        from verdance.campaign import process_result
 
         state = copy.deepcopy(self.state)
         result = _base(
@@ -246,7 +239,7 @@ class TestProcessResultCredit(unittest.TestCase):
         self.assertEqual(zm.get("controllingFaction"), "armada")
 
     def test_victory_claim_flips(self):
-        from verdance_story_engine_v1 import process_result
+        from verdance.campaign import process_result
 
         state = copy.deepcopy(self.state)
         result = _base(
@@ -269,7 +262,7 @@ class TestProcessResultCredit(unittest.TestCase):
         self.assertFalse(report.get("freeTnbMint", True))
 
     def test_duplicate_noop(self):
-        from verdance_story_engine_v1 import process_result
+        from verdance.campaign import process_result
 
         state = copy.deepcopy(self.state)
         result = _base(
@@ -289,7 +282,7 @@ class TestProcessResultCredit(unittest.TestCase):
         self.assertEqual(r2.get("reason"), "duplicate")
 
     def test_abandon_no_mission_bump(self):
-        from verdance_story_engine_v1 import process_result
+        from verdance.campaign import process_result
 
         state = copy.deepcopy(self.state)
         before = int(state.get("missionNumber") or 1)

@@ -11,7 +11,7 @@ TOOLS = WS / "tools"
 if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
 
-import continuity_audit_v1 as audit  # noqa: E402
+from verdance.company import continuity_audit as audit
 
 
 def _fatboy_state() -> dict:

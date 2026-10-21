@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import unittest
 
-from tools import verdance_story_engine_v1 as engine
+from verdance import campaign as engine
 
 
 class TerritoryDvControlTests(unittest.TestCase):

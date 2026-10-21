@@ -21,7 +21,7 @@ import derive_zone_adjacency as adjacency  # noqa: E402
 import migrate_zone_ids_v1 as migrate  # noqa: E402
 import parse_cartography_log_v1 as parser  # noqa: E402
 import plan_cartography_runs_v1 as planner  # noqa: E402
-import quest_generator_v1 as qg  # noqa: E402
+from verdance.company import quest_generator as qg
 import zone_cartographer_v1 as carto  # noqa: E402
 import zone_scorecard_v1 as scorecard  # noqa: E402
 

@@ -28,7 +28,6 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 WS_DEFAULT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from zone_cartographer_v1 import CH, COMPASS_CODE  # noqa: E402
 

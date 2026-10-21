@@ -9,11 +9,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from verdance.common import utc_now
+
 from verdance_kernel.paths import campaign_surface_path, hub_state_path, state_path
-
-
-def _now() -> str:
-    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def build_surface(ws: Path, hub: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -31,7 +29,7 @@ def build_surface(ws: Path, hub: dict[str, Any] | None = None) -> dict[str, Any]
     aces = (hub or {}).get("aces") or []
     return {
         "schemaVersion": "verdance-campaign-surface/1.0",
-        "at": _now(),
+        "at": utc_now(),
         "missionNumber": (hub or {}).get("missionNumber"),
         "arc": (hub or {}).get("arc"),
         "tagline": (hub or {}).get("tagline"),

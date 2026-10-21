@@ -27,11 +27,8 @@ import tempfile
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-_TOOLS = Path(__file__).resolve().parent
-if str(_TOOLS) not in sys.path:
-    sys.path.insert(0, str(_TOOLS))
 
-import verdance_story_engine_v1 as engine  # noqa: E402
+from verdance import campaign as engine
 
 WS_DEFAULT = Path(__file__).resolve().parents[1]
 

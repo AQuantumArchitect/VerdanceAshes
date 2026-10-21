@@ -5,1117 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <meta name="theme-color" content="#070e0b"/>
 <title>Verdance's Ashes</title>
-<style>
-/* Ash Console tokens — lock to docs/UI_ASH_CONSOLE.md + va_ash_tokens.lua */
-:root {
-  --bg:#040907; --ink:#eef6ee; --muted:#7d9584; --edge:#3d8f55;
-  --gold:#d4c49a; --ketha:#a6d1a6; --steam:#7ec8ff;
-  --panel:rgba(8,16,12,.90);
-  --warn:#e0a060; --good:#7dff8a; --bad:#ff7d7d; --tnb:#c9a0ff;
-  --ash:#9a8b72;
-  /* Faction palette — ONE source. On the board a faction colour means
-     "we believe this faction holds it" (belief, never truth). */
-  --f-armada-rgb:90,165,255;   --f-armada:rgb(var(--f-armada-rgb));
-  --f-cortex-rgb:255,98,107;   --f-cortex:rgb(var(--f-cortex-rgb));
-  --f-nullmercs-rgb:80,237,140;--f-nullmercs:rgb(var(--f-nullmercs-rgb));
-  --f-wild-rgb:245,212,71;     --f-wild:rgb(var(--f-wild-rgb));
-  --f-raptors-rgb:245,212,71;  --f-raptors:rgb(var(--f-raptors-rgb));
-  --f-scavengers-rgb:193,134,255;--f-scavengers:rgb(var(--f-scavengers-rgb));
-  --f-legion-rgb:80,237,140;   --f-legion:rgb(var(--f-legion-rgb));
-  --edge-rgb:61,143,85; --good-rgb:125,255,138; --warn-rgb:224,160,96; --bad-rgb:255,125,125;
-  --muted-rgb:125,149,132; --ash-rgb:154,139,114;
-}
-* { box-sizing:border-box; }
-html,body { margin:0; height:100%; background:var(--bg); color:var(--ink);
-  font-family:"Segoe UI",system-ui,sans-serif; overflow:hidden; }
-button { font-family:inherit; cursor:pointer; }
-button:disabled { opacity:.45; cursor:not-allowed; }
-
-.app {
-  display:grid; grid-template-columns: 18rem 1fr 17.5rem;
-  grid-template-rows: auto 1fr auto;
-  height:100%; gap:0;
-}
-.top {
-  grid-column:1 / -1;
-  display:flex; justify-content:space-between; align-items:center;
-  padding:.7rem 1.1rem; border-bottom:1px solid rgba(61,143,85,.3);
-  background:
-    linear-gradient(90deg, rgba(212,196,154,.06), transparent 40%),
-    linear-gradient(180deg, rgba(14,32,22,.98), rgba(6,14,10,.94));
-  gap:.75rem; flex-wrap:wrap;
-}
-.brand { font-size:.62rem; letter-spacing:.2em; text-transform:uppercase; color:var(--ash); }
-.brand strong { display:block; font-size:1.05rem; letter-spacing:.04em; color:var(--gold);
-  text-transform:none; margin-top:.14rem; font-weight:600; }
-.badges { display:flex; flex-wrap:wrap; gap:.3rem; justify-content:flex-end; }
-.badge {
-  font-size:.62rem; letter-spacing:.07em; text-transform:uppercase;
-  padding:.2rem .5rem; border-radius:999px;
-  border:1px solid rgba(61,143,85,.4); color:var(--edge);
-  background:rgba(0,0,0,.35);
-}
-.badge.gold { color:var(--gold); border-color:rgba(212,196,154,.35); }
-.badge.steam { color:var(--steam); border-color:rgba(126,200,255,.35); }
-.badge.good { color:var(--good); border-color:rgba(125,255,138,.35); }
-.badge.warn { color:var(--warn); border-color:rgba(224,160,96,.4); }
-.badge.tnb { color:var(--tnb); border-color:rgba(201,160,255,.4); }
-.badge.live { color:#9ff; border-color:rgba(120,220,255,.5); box-shadow:0 0 8px rgba(120,220,255,.2); }
-
-.col {
-  overflow:auto; padding:.7rem .75rem;
-  border-right:1px solid rgba(61,143,85,.2);
-  background:var(--panel);
-}
-#col-aces { position: relative; }
-.col.right { border-right:0; border-left:1px solid rgba(61,143,85,.2); }
-.main {
-  overflow:auto; padding:1rem 1.15rem 1.4rem;
-  background:
-    radial-gradient(ellipse at 20% 0%, rgba(212,196,154,.07), transparent 42%),
-    radial-gradient(ellipse at 80% 10%, rgba(61,143,85,.14), transparent 45%),
-    linear-gradient(180deg, #0a1611 0%, #040907 70%);
-}
-.foot {
-  grid-column:1 / -1;
-  padding:.45rem 1rem; border-top:1px solid rgba(61,143,85,.3);
-  display:flex; justify-content:space-between; align-items:center; gap:.75rem;
-  font-size:.72rem; color:var(--muted); background:rgba(0,0,0,.35);
-  flex-wrap:wrap;
-}
-.foot a { color:var(--steam); }
-
-h2 {
-  margin:0 0 .45rem; font-size:.72rem; letter-spacing:.12em;
-  text-transform:uppercase; color:var(--steam); font-weight:600;
-}
-h3 { margin:.8rem 0 .35rem; font-size:.78rem; color:var(--gold); font-weight:600; }
-.panel-card {
-  background:rgba(0,0,0,.28); border:1px solid rgba(61,143,85,.28);
-  border-radius:10px; padding:.55rem .65rem; margin-bottom:.45rem;
-}
-.panel-card .name { color:var(--gold); font-size:.88rem; font-weight:600; }
-.panel-card .meta { color:var(--muted); font-size:.72rem; margin-top:.15rem; }
-.panel-card .row { display:flex; justify-content:space-between; gap:.4rem; font-size:.72rem; margin-top:.2rem; }
-.ace.wounded { border-color:rgba(255,125,125,.4); }
-.region { cursor:pointer; transition: border-color .15s; }
-.region:hover, .region.focus { border-color:var(--gold); }
-.region .ctrl { text-transform:uppercase; letter-spacing:.06em; font-size:.62rem; }
-
-.kicker { color:var(--ash); letter-spacing:.16em; text-transform:uppercase; font-size:.68rem; }
-.voice {
-  margin:.85rem 0 0; max-width:40rem;
-  border-left:3px solid var(--edge); padding:.7rem .95rem .75rem;
-  background:linear-gradient(90deg, rgba(61,143,85,.12), rgba(0,0,0,.22));
-  border-radius:0 12px 12px 0;
-}
-.voice .who {
-  font-size:.62rem; letter-spacing:.14em; text-transform:uppercase;
-  color:var(--edge); margin:0 0 .35rem; font-style:normal; font-weight:600;
-}
-.voice .line {
-  font-style:italic; color:var(--gold); font-size:.95rem; line-height:1.45; margin:0;
-}
-
-/* Homecoming card — hub twin of BAR debrief (Ash Console) */
-.homecoming {
-  display:none; margin:1rem 0 0; max-width:40rem;
-  border:1px solid rgba(61,143,85,.35); border-radius:12px;
-  background:linear-gradient(135deg, rgba(8,16,12,.95), rgba(4,9,7,.92));
-  border-left:3px solid var(--edge);
-  padding:.75rem .95rem .85rem;
-  box-shadow:0 12px 40px rgba(0,0,0,.35);
-}
-.homecoming.show { display:block; }
-.homecoming .hc-kicker {
-  font-size:.58rem; letter-spacing:.16em; text-transform:uppercase; color:var(--ash);
-}
-.homecoming .hc-banner {
-  font-size:1.15rem; font-weight:600; letter-spacing:.06em; margin:.2rem 0 .15rem;
-}
-.homecoming .hc-banner.victory { color:var(--good); }
-.homecoming .hc-banner.partial { color:var(--warn); }
-.homecoming .hc-banner.defeat { color:var(--bad); }
-.homecoming .hc-banner.abandon { color:var(--muted); }
-.homecoming .hc-banner.incomplete { color:var(--steam); }
-.homecoming .hc-headline {
-  color:var(--gold); font-size:.95rem; margin:0 0 .35rem; font-weight:600;
-}
-.homecoming .hc-hint {
-  font-size:.78rem; color:var(--muted); line-height:1.4; margin:0 0 .4rem;
-}
-.homecoming .hc-chips {
-  display:flex; flex-wrap:wrap; gap:.25rem; margin:.35rem 0 .15rem;
-}
-.homecoming .hc-chip {
-  font-size:.58rem; letter-spacing:.06em; text-transform:uppercase;
-  padding:.15rem .4rem; border-radius:999px;
-  border:1px solid rgba(61,143,85,.35); color:var(--steam);
-  background:rgba(0,0,0,.3);
-}
-.homecoming .hc-chip.warn { color:var(--warn); border-color:rgba(224,160,96,.4); }
-.homecoming .hc-chip.good { color:var(--good); border-color:rgba(125,255,138,.35); }
-.homecoming .hc-chip.bad { color:var(--bad); border-color:rgba(255,125,125,.4); }
-.homecoming .hc-manifest { margin:.5rem 0 .1rem; }
-.homecoming .hc-manifest[hidden] { display:none; }
-.homecoming .hm-kicker { font-size:.58rem; letter-spacing:.14em; text-transform:uppercase; color:var(--ash); margin-bottom:.3rem; }
-.homecoming .hm-grid { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:.5rem; }
-.homecoming .hm-col { background:rgba(0,0,0,.28); border:1px solid rgba(61,143,85,.25); border-radius:8px; padding:.4rem .5rem; min-width:0; }
-.homecoming .hm-h { font-size:.58rem; letter-spacing:.12em; text-transform:uppercase; color:var(--steam); margin-bottom:.2rem; }
-.homecoming .hm-col ul { margin:0; padding:0; list-style:none; font-size:.74rem; line-height:1.4; color:var(--ink); }
-.homecoming .hm-col li.hm-units { color:var(--muted); }
-.homecoming .hm-col li.hm-none { color:var(--muted); font-style:italic; }
-@media (max-width:640px) { .homecoming .hm-grid { grid-template-columns:1fr; } }
-.region .belief-counts { gap:.5rem; justify-content:flex-start; flex-wrap:wrap; }
-.region .bc-known { color:var(--good); }
-.region .bc-stale { color:var(--warn); }
-.region .bc-dark { color:var(--muted); }
-.hero-card.away { opacity:.55; filter:grayscale(.6); border-style:dashed; cursor:not-allowed; }
-.cc-field-people { font-size:.76rem; color:var(--muted); line-height:1.45; margin:.2rem 0 .6rem; border-left:2px solid var(--warn); padding-left:.5rem; }
-.cc-field-people b { color:var(--good); font-weight:600; }
-.cc-field-people b.bad { color:var(--bad); }
-.homecoming .hc-actions {
-  display:flex; flex-wrap:wrap; gap:.35rem; margin-top:.55rem; justify-content:flex-end;
-}
-.badge.abandon { color:var(--muted); border-color:rgba(125,149,132,.4); }
-.badge.incomplete { color:var(--steam); border-color:rgba(126,200,255,.4); }
-.badge.partial { color:var(--warn); border-color:rgba(224,160,96,.4); }
-.badge.defeat { color:var(--bad); border-color:rgba(255,125,125,.4); }
-.badge.victory { color:var(--good); border-color:rgba(125,255,138,.35); }
-.choices { display:flex; flex-direction:column; gap:.45rem; margin-top:1.1rem; max-width:36rem; }
-.choice {
-  text-align:left; background:rgba(0,0,0,.42); border:1px solid rgba(61,143,85,.38);
-  color:var(--ink); border-radius:12px; padding:.7rem .9rem;
-  transition: border-color .15s, background .15s, transform .12s;
-}
-.choice:hover:not(:disabled) {
-  border-color:var(--gold); background:rgba(61,143,85,.14);
-  transform: translateX(2px);
-}
-.choice.deploy.battle {
-  border-color:rgba(125,255,138,.28);
-  background:linear-gradient(135deg, rgba(30,70,45,.35), rgba(0,0,0,.4));
-}
-.choice.deploy.battle:hover:not(:disabled) {
-  border-color:var(--good); box-shadow:0 0 18px rgba(61,143,85,.18);
-}
-.choice .kind {
-  display:inline-block; font-size:.58rem; letter-spacing:.12em; text-transform:uppercase;
-  color:var(--steam); margin-bottom:.22rem;
-}
-.choice .label { font-size:.92rem; font-weight:600; color:var(--ink); }
-.choice .blurb { font-size:.74rem; color:var(--muted); margin-top:.28rem; line-height:1.35; white-space:pre-line; }
-.choice.lean { border-color:rgba(224,190,110,.72); }
-.choice.residual { opacity:.74; }
-.choice.deploy .kind { color:var(--good); }
-.choice.shop .kind { color:var(--tnb); }
-.choice.talk .kind { color:var(--gold); }
-.log {
-  margin-top:1rem; max-width:40rem; font-size:.78rem; color:var(--muted);
-  border-top:1px solid rgba(61,143,85,.25); padding-top:.55rem;
-}
-.log div { margin:.2rem 0; padding-left:.4rem; border-left:2px solid rgba(61,143,85,.3); }
-
-.shop-balances {
-  display:grid; grid-template-columns:1fr 1fr; gap:.35rem; margin-bottom:.55rem;
-}
-.bal {
-  background:rgba(0,0,0,.35); border:1px solid rgba(61,143,85,.3);
-  border-radius:8px; padding:.4rem .5rem; font-size:.7rem; color:var(--muted);
-}
-.bal strong { display:block; font-size:1.05rem; margin-top:.1rem; }
-.bal.tnb strong { color:var(--tnb); }
-.bal.cred strong { color:var(--gold); }
-
-.listing {
-  background:rgba(0,0,0,.28); border:1px solid rgba(61,143,85,.28);
-  border-radius:10px; padding:.5rem .55rem; margin-bottom:.4rem;
-}
-.listing.owned { border-color:rgba(125,255,138,.3); }
-.listing.locked { opacity:.72; }
-.listing .title { display:flex; justify-content:space-between; gap:.35rem; align-items:flex-start; }
-.listing .title strong { color:var(--gold); font-size:.82rem; }
-.listing .blurb { font-size:.7rem; color:var(--muted); margin:.25rem 0; line-height:1.35; }
-.listing .cost { font-size:.68rem; color:var(--steam); }
-.listing .block { font-size:.66rem; color:var(--warn); margin-top:.2rem; }
-.listing .tags { display:flex; flex-wrap:wrap; gap:.2rem; margin-top:.3rem; }
-.listing .tag {
-  font-size:.55rem; letter-spacing:.06em; text-transform:uppercase;
-  padding:.1rem .35rem; border-radius:999px; border:1px solid rgba(126,200,255,.25);
-  color:var(--steam);
-}
-.btn-buy, .btn-primary, .btn-ghost {
-  border-radius:8px; padding:.35rem .65rem; font-size:.72rem;
-  border:1px solid rgba(61,143,85,.45); background:rgba(0,0,0,.4); color:var(--ink);
-}
-.btn-primary {
-  background:linear-gradient(135deg, #2d6b42, #1a3f2a);
-  border-color:var(--edge); color:var(--ink); padding:.55rem 1.1rem; font-size:.85rem;
-}
-.btn-primary:hover:not(:disabled) { filter:brightness(1.12); }
-.btn-buy { color:var(--tnb); border-color:rgba(201,160,255,.4); margin-top:.3rem; }
-.btn-buy:hover:not(:disabled) { background:rgba(201,160,255,.1); }
-.btn-ghost:hover:not(:disabled) { border-color:var(--gold); color:var(--gold); }
-
-.kit-line { font-size:.7rem; color:var(--muted); margin:.15rem 0; }
-.kit-line b { color:var(--ink); }
-
-/* Theater board (main view) — Ash Console map-first sortie */
-.theater {
-  margin:1rem 0 0; max-width:48rem;
-  border:1px solid rgba(61,143,85,.35); border-radius:14px;
-  background:linear-gradient(135deg, rgba(8,16,12,.94), rgba(4,9,7,.9));
-  padding:.7rem .85rem .85rem;
-  box-shadow:0 12px 40px rgba(0,0,0,.28);
-}
-.map-picker {
-  display:flex; flex-wrap:wrap; gap:.4rem; margin:0 0 .55rem;
-  align-items:stretch;
-}
-.map-chip {
-  appearance:none; cursor:pointer;
-  border:1px solid rgba(61,143,85,.4);
-  background:rgba(8,18,12,.75);
-  color:var(--ink); border-radius:10px;
-  padding:.4rem .65rem .35rem; min-width:5.5rem;
-  text-align:left; line-height:1.2;
-  transition: border-color .12s, background .12s, box-shadow .12s;
-}
-.map-chip:hover { border-color:var(--gold); }
-.map-chip.active {
-  border-color:var(--gold);
-  background:rgba(61,143,85,.22);
-  box-shadow:0 0 0 1px rgba(224,186,96,.25), 0 0 14px rgba(61,143,85,.18);
-}
-.map-chip .mc-name {
-  display:block; font-size:.78rem; font-weight:600; color:var(--gold);
-  letter-spacing:.02em;
-}
-.map-chip .mc-meta {
-  display:flex; flex-wrap:wrap; gap:.25rem .4rem; margin-top:.2rem;
-  font-size:.58rem; color:var(--muted); text-transform:uppercase; letter-spacing:.04em;
-}
-.map-chip .mc-meta .tag-home { color:var(--steam); }
-.map-chip .mc-meta .tag-count { color:var(--warn); }
-.map-chip.locked { opacity:.45; cursor:not-allowed; }
-.choices-head {
-  display:flex; flex-wrap:wrap; justify-content:space-between; gap:.35rem;
-  align-items:baseline; margin: .85rem 0 .35rem;
-}
-.choices-head .ch-kicker {
-  font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted);
-}
-.choices-head .ch-map { font-size:.78rem; color:var(--gold); font-weight:600; }
-.theater-head {
-  display:flex; flex-wrap:wrap; justify-content:space-between; gap:.5rem;
-  align-items:flex-start; margin-bottom:.5rem;
-}
-.theater-head h2 { margin:0; color:var(--gold); font-size:.95rem; letter-spacing:.04em; text-transform:none; }
-.theater-sub { color:var(--muted); font-size:.75rem; margin:.15rem 0 0; line-height:1.35; max-width:28rem; }
-.board-wrap {
-  position:relative; width:100%; aspect-ratio:1.35;
-  background:
-    linear-gradient(rgba(61,143,85,.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(61,143,85,.08) 1px, transparent 1px),
-    #0c1a14;
-  background-size: 8% 8%, 8% 8%, auto;
-  border:1px solid rgba(61,143,85,.35); border-radius:12px;
-  overflow:hidden; margin-bottom:.55rem;
-}
-#board-zones { position:absolute; inset:0; z-index:1; }
-.board-route {
-  position:absolute; inset:0; width:100%; height:100%;
-  pointer-events:none; z-index:3;
-}
-.zone {
-  position:absolute; border:1px solid rgba(126,200,255,.28);
-  background:rgba(20,40,30,.45); border-radius:6px; font-size:.58rem;
-  color:var(--ink); padding:.15rem .25rem; overflow:hidden; cursor:pointer;
-  transition: background .12s, border-color .12s, box-shadow .12s;
-  z-index:1;
-}
-.zone:hover { border-color:var(--gold); z-index:4; }
-.zone.capturable { border-color:rgba(61,143,85,.55); }
-.zone.open-target { box-shadow:inset 0 0 0 1px rgba(224,160,96,.45); }
-.zone.claimed { background:rgba(125,255,138,.12); }
-/* Outside operational footprint — still readable as planet, not mission ground.
-   Lighter than before so the dark hatch underneath stays legible. */
-.zone.fog {
-  opacity:.55; filter:saturate(.45) brightness(.8);
-  border-color:rgba(126,200,255,.12);
-}
-.zone.fog .zone-label { color:rgba(200,220,210,.5); }
-.zone.fog .zone-chip { display:none; }
-.zone.fog:hover { opacity:.75; border-color:rgba(224,186,96,.35); }
-
-/* ---- Belief paint (colour + shape + border; alpha = confidence) ----------
-   --conf is set inline per zone by renderBoard. Fill alpha floors at .1 so a
-   low-confidence belief still reads as a belief, not as empty. */
-.zone { --conf:0; --fill-a:calc(.08 + var(--conf) * .42); }
-.zone.bel-ours { background:rgba(var(--edge-rgb), var(--fill-a)); border:1px solid rgba(var(--good-rgb), calc(.35 + var(--conf) * .6)); }
-.zone.bel-held { background:rgba(var(--warn-rgb), var(--fill-a)); border:1px solid var(--warn); }
-.zone.bel-held.fac-armada { background:rgba(var(--f-armada-rgb), var(--fill-a)); border-color:rgba(var(--f-armada-rgb), calc(.4 + var(--conf) * .6)); }
-.zone.bel-held.fac-cortex { background:rgba(var(--f-cortex-rgb), var(--fill-a)); border-color:rgba(var(--f-cortex-rgb), calc(.4 + var(--conf) * .6)); }
-.zone.bel-held.fac-nullmercs, .zone.bel-held.fac-legion { background:rgba(var(--f-nullmercs-rgb), var(--fill-a)); border-color:rgba(var(--f-nullmercs-rgb), calc(.4 + var(--conf) * .6)); }
-.zone.bel-held.fac-wild, .zone.bel-held.fac-raptors, .zone.bel-held.fac-raptor { background:rgba(var(--f-wild-rgb), var(--fill-a)); border-color:rgba(var(--f-wild-rgb), calc(.4 + var(--conf) * .6)); }
-.zone.bel-held.fac-scavengers { background:rgba(var(--f-scavengers-rgb), var(--fill-a)); border-color:rgba(var(--f-scavengers-rgb), calc(.4 + var(--conf) * .6)); }
-.zone.bel-empty { background:transparent; border:1px solid rgba(238,246,238, calc(.25 + var(--conf) * .4)); }
-.zone.bel-unsure { background:rgba(var(--muted-rgb), calc(.1 + var(--conf) * .3)); border:1px solid rgba(var(--muted-rgb),.5); }
-.zone.bel-dark {
-  background:repeating-linear-gradient(135deg, rgba(var(--ash-rgb),.16) 0 3px, transparent 3px 9px);
-  border:1px dashed rgba(var(--ash-rgb),.45);
-}
-.zone .z-q {
-  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-  font-size:1.3rem; color:rgba(var(--ash-rgb),.5); pointer-events:none; font-weight:600;
-}
-/* stale → dotted ash inner outline */
-.zone .z-stale { position:absolute; inset:2px; border:1px dotted var(--ash); border-radius:4px; pointer-events:none; }
-/* threat → thin red top-edge bar, width = believed threat */
-.zone .z-threat { position:absolute; left:0; top:0; height:3px; background:var(--bad); opacity:.85; pointer-events:none; }
-/* surprise / exposure corner badges */
-.zone .z-corner { position:absolute; right:14px; top:1px; display:flex; gap:2px; font-size:.62rem; line-height:1; pointer-events:auto; }
-.zone .z-surprise { color:var(--warn); font-weight:700; }
-.zone .z-surprise.bad { color:var(--warn); }
-.zone .z-surprise.muted { color:var(--muted); }
-.zone .z-eyes { color:var(--bad); }
-/* people ⚑ / holdings ■ */
-.zone .z-foot { position:absolute; right:3px; bottom:2px; display:flex; gap:.3rem; font-size:.58rem; line-height:1; background:rgba(7,17,13,.75); padding:1px 3px; border-radius:3px; }
-.zone .z-foot:empty { display:none; }
-.zone .z-people.good { color:var(--good); }
-.zone .z-people.bad { color:var(--bad); }
-.zone .z-hold { color:var(--gold); }
-/* exposure: their eyes on OUR holdings */
-.zone.exp-known { box-shadow:0 0 0 2px rgba(var(--bad-rgb),.45); outline:1px dashed rgba(var(--bad-rgb),.6); outline-offset:3px; }
-.zone.exp-suspected { outline:1px dotted rgba(var(--warn-rgb),.7); outline-offset:3px; }
-/* legal pads carry a STANDING mark: dashed edge inner ring + △ (even outside Pad mode) */
-.zone.pad-legal::before, .zone.pad-illegal::before {
-  content:"△"; position:absolute; right:3px; top:1px; font-size:.62rem; line-height:1;
-  color:var(--edge); pointer-events:none;
-}
-.zone.pad-legal::after { content:""; position:absolute; inset:3px; border:1px dashed rgba(var(--edge-rgb),.75); border-radius:4px; pointer-events:none; }
-.zone.pad-legal.mode-lz { cursor:pointer; }
-.zone.pad-legal.mode-lz:hover { border-color:var(--good); }
-.zone.pad-illegal { filter:grayscale(1) brightness(.8); cursor:not-allowed; }
-.zone.pad-illegal::before { color:var(--muted); text-decoration:line-through; }
-/* Ash Console marks: pad=good, wound=warn */
-.zone.deploy-mark {
-  background:rgba(var(--good-rgb),.22); border-color:var(--good);
-  box-shadow:0 0 0 1px var(--edge), 0 0 12px rgba(var(--good-rgb),.2); z-index:5;
-}
-.zone.deploy-mark::before { color:var(--good); }
-.zone.capture-mark {
-  background:rgba(var(--warn-rgb),.28); border-color:var(--warn);
-  box-shadow:0 0 12px rgba(var(--warn-rgb),.3); z-index:5;
-}
-.zone.exp-known.deploy-mark { box-shadow:0 0 0 1px var(--edge), 0 0 0 3px rgba(var(--bad-rgb),.5); }
-.zone-label { pointer-events:none; line-height:1.15; position:relative; z-index:1; padding-right:1rem; }
-.zone-chip {
-  display:inline-block; font-size:.5rem; letter-spacing:.05em; text-transform:uppercase;
-  padding:0 .25rem; border-radius:4px; margin-top:.1rem;
-  border:1px solid rgba(224,160,96,.4); color:var(--warn);
-}
-.mode-bar { display:flex; flex-wrap:wrap; gap:.35rem; margin-bottom:.45rem; align-items:center; }
-.mode-bar .label { font-size:.7rem; color:var(--muted); margin-right:.25rem; }
-.mode-btn {
-  font-size:.68rem; padding:.3rem .55rem; border-radius:999px;
-  border:1px solid rgba(61,143,85,.4); background:rgba(0,0,0,.35); color:var(--ink);
-}
-.mode-btn.active { border-color:var(--gold); color:var(--gold); background:rgba(212,196,154,.1); }
-.theater-actions {
-  display:flex; flex-wrap:wrap; gap:.45rem; justify-content:space-between;
-  align-items:center; margin-top:.35rem;
-  position: sticky; bottom: 0; z-index: 6;
-  padding: .55rem 0 .2rem;
-  background: linear-gradient(180deg, rgba(4,9,7,0), rgba(4,9,7,.96) 28%);
-}
-.marks-sum { font-size:.75rem; color:var(--muted); line-height:1.45; flex:1; min-width:12rem; }
-.marks-sum b { color:var(--ink); }
-.legend-row {
-  display:flex; flex-wrap:wrap; gap:.45rem; font-size:.58rem; color:var(--muted);
-  margin:.2rem 0 .45rem; letter-spacing:.04em; text-transform:uppercase;
-}
-.legend-row span::before {
-  content:""; display:inline-block; width:.45rem; height:.45rem; border-radius:2px;
-  margin-right:.25rem; vertical-align:middle;
-}
-.legend-row .lg-infil::before { background:var(--good); }
-.legend-row .lg-target::before { background:var(--warn); }
-.legend-row .lg-stale::before { background:transparent; border:1px dotted var(--ash); }
-.legend-row .lg-dark::before { background:repeating-linear-gradient(135deg, rgba(154,139,114,.5) 0 1px, transparent 1px 3px); border:1px dashed var(--ash); }
-.legend-row .lg-threat::before { background:var(--bad); height:.2rem; }
-.legend-row .lg-eyes::before { background:transparent; border:1px dashed var(--bad); border-radius:50%; }
-.legend-row .lg-open::before { background:transparent; border:1px solid var(--warn); }
-
-.status-toast {
-  position:fixed; left:50%; bottom:1.2rem; transform:translateX(-50%);
-  z-index:120; max-width:min(32rem,92vw); padding:.55rem .9rem;
-  background:rgba(6,14,10,.92); border:1px solid rgba(126,200,255,.3);
-  border-radius:10px; font-size:.8rem; display:none;
-}
-.status-toast.show { display:block; }
-.status-toast.err { border-color:rgba(255,125,125,.45); color:var(--bad); }
-.status-toast.ok { border-color:rgba(125,255,138,.4); color:var(--good); }
-
-/* Density matrix (war-map ρ room) */
-.rho-wrap { overflow:auto; max-height:14rem; }
-.rho-table { border-collapse:collapse; font-size:.55rem; font-family:ui-monospace,Consolas,monospace; }
-.rho-table th, .rho-table td {
-  width:1.35rem; height:1.35rem; text-align:center; border:1px solid rgba(0,0,0,.35);
-  cursor:pointer; padding:0;
-}
-.rho-table th { color:var(--muted); font-weight:500; background:rgba(0,0,0,.25); max-width:2.2rem;
-  overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding:0 .1rem; }
-.rho-table td.sel { outline:1px solid var(--gold); }
-.ent-svg { width:100%; height:9rem; background:rgba(0,0,0,.25); border-radius:8px; margin:.4rem 0; }
-.scalar-row { display:flex; flex-wrap:wrap; gap:.3rem; margin:.35rem 0; }
-.scalar-pill {
-  font-size:.62rem; padding:.2rem .4rem; border-radius:6px;
-  background:rgba(0,0,0,.35); border:1px solid rgba(61,143,85,.3); color:var(--steam);
-}
-.scalar-pill b { color:var(--gold); font-weight:600; }
-.spec-bar {
-  height:.45rem; border-radius:4px; background:rgba(0,0,0,.4); overflow:hidden; margin:.25rem 0 .5rem;
-}
-.spec-bar > i { display:block; height:100%; background:linear-gradient(90deg,var(--edge),var(--steam)); }
-.foot-actions { display:flex; flex-wrap:wrap; gap:.35rem; align-items:center; }
-.foot-actions button {
-  font-size:.68rem; padding:.28rem .55rem; border-radius:8px;
-  border:1px solid rgba(61,143,85,.4); background:rgba(0,0,0,.35); color:var(--ink);
-}
-.foot-actions button.primary { border-color:rgba(212,196,154,.45); color:var(--gold); }
-.foot-actions button.danger {
-  border-color:rgba(180,70,70,.55);
-  color:#e8a0a0;
-}
-.foot-actions button.danger:hover {
-  border-color:rgba(220,90,90,.75);
-  background:rgba(120,30,30,.25);
-}
-
-/* THE COMPANY sidebar — formation + roster (merged from main muster) */
-#col-aces.company-preamble {
-  box-shadow: inset 0 0 0 2px rgba(212,196,154,.55), 0 0 24px rgba(212,196,154,.12);
-  position: relative;
-}
-#col-aces.company-preamble::before {
-  content: "Form your company";
-  display: block;
-  font-size: .62rem;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: var(--gold);
-  margin: 0 0 .45rem;
-  padding: .35rem .55rem;
-  border-radius: 8px;
-  border: 1px solid rgba(212,196,154,.4);
-  background: linear-gradient(135deg, rgba(212,196,154,.14), transparent 70%);
-}
-.company-head {
-  display: flex; flex-wrap: wrap; gap: .35rem;
-  justify-content: space-between; align-items: flex-start;
-  margin-bottom: .35rem;
-}
-.company-head h2 { margin: 0; }
-.company-wallet {
-  font-size: .62rem; color: #c9a0ff; border: 1px solid rgba(201,160,255,.35);
-  border-radius: 999px; padding: .15rem .45rem; white-space: nowrap;
-}
-.company-sub {
-  font-size: .68rem; color: var(--muted); line-height: 1.35;
-  margin: 0 0 .35rem;
-}
-.company-cap {
-  margin: 0 0 .55rem;
-  padding: .45rem .55rem;
-  border-radius: 8px;
-  border: 1px solid rgba(212,196,154,.45);
-  background: rgba(212,196,154,.1);
-  color: var(--gold);
-  font-size: .78rem;
-  line-height: 1.4;
-}
-.company-cap b { color: var(--ink); font-weight: 600; }
-.company-tier {
-  font-size: .58rem; letter-spacing: .1em; text-transform: uppercase;
-  color: var(--ash); margin: .55rem 0 .3rem;
-}
-.company-tier:first-child { margin-top: 0; }
-.company-list { display: flex; flex-direction: column; gap: .35rem; }
-.company-foot {
-  margin: .65rem 0 .85rem;
-  padding-top: .55rem;
-  border-top: 1px solid rgba(61,143,85,.25);
-  display: flex; flex-direction: column; gap: .4rem;
-}
-.company-preview {
-  font-size: .66rem; color: var(--muted); line-height: 1.35;
-}
-.company-recruit {
-  margin: 0 0 .55rem;
-  padding: .45rem;
-  border-radius: 12px;
-  border: 1px solid rgba(224,160,96,.5);
-  background:
-    linear-gradient(135deg, rgba(224,160,96,.12), transparent 55%),
-    rgba(0,0,0,.35);
-}
-.company-recruit .cr-kicker {
-  font-size: .58rem; letter-spacing: .12em; text-transform: uppercase;
-  color: var(--warn); margin: 0 0 .35rem;
-}
-.company-recruit .hero-card {
-  margin: 0;
-  border-color: rgba(224,160,96,.45);
-  cursor: default;
-}
-.hero-card.tier-deployed.on,
-.hero-card.deployed {
-  border-color: rgba(212,196,154,.65);
-  background: rgba(40,55,30,.55);
-  box-shadow: 0 0 0 1px rgba(212,196,154,.2);
-}
-.hero-card.tier-base {
-  opacity: .92;
-  border-style: dashed;
-  border-color: rgba(126,200,255,.35);
-}
-.hero-card.tier-base.toggleable:hover {
-  border-color: var(--gold);
-  background: rgba(40,55,30,.4);
-}
-.hero-card.tier-deployed.toggleable:hover {
-  filter: brightness(1.08);
-}
-.hero-card.tier-dead {
-  opacity: .55;
-  border-color: rgba(255,125,125,.35);
-  filter: grayscale(.25);
-}
-.hero-card.tier-locked {
-  opacity: .72;
-  border-style: dashed;
-}
-.zone.has-recruit {
-  box-shadow: inset 0 0 0 1px rgba(224,160,96,.55), 0 0 10px rgba(224,160,96,.15);
-}
-.zone.has-recruit::after {
-  content: "rez";
-  position: absolute; right: 2px; bottom: 14px;
-  font-size: .48rem; letter-spacing: .06em; text-transform: uppercase;
-  color: var(--warn); opacity: .9;
-}
-.zone.has-recruit-ambient {
-  box-shadow: inset 0 0 0 1px rgba(224,160,96,.25);
-}
-.zone.has-recruit-ambient::after {
-  content: "home";
-  position: absolute; right: 2px; bottom: 14px;
-  font-size: .48rem; letter-spacing: .06em; text-transform: uppercase;
-  color: var(--muted); opacity: .75;
-}
-
-/* Shared hero card — company, drop confirm, future join picks */
-.hero-card {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-auto-rows: auto;
-  column-gap: .55rem;
-  row-gap: .12rem;
-  text-align: left;
-  border-radius: 10px;
-  padding: .55rem .65rem .6rem;
-  border: 1px solid rgba(61,143,85,.35);
-  background: rgba(0,0,0,.35);
-  color: var(--ink);
-  font: inherit;
-  cursor: pointer;
-  min-width: 0;
-}
-.hero-card:disabled, .hero-card.locked { opacity: .45; cursor: not-allowed; }
-.hero-card.core {
-  cursor: default;
-  border-color: rgba(125,255,138,.35);
-}
-.hero-card.wild {
-  cursor: default;
-  opacity: .78;
-  border-style: dashed;
-}
-.hero-card.on {
-  border-color: rgba(212,196,154,.65);
-  background: rgba(40,55,30,.55);
-  box-shadow: 0 0 0 1px rgba(212,196,154,.25);
-}
-.hero-card.wounded { border-color: rgba(255,125,125,.4); }
-.hero-card .hc-name {
-  grid-column: 1;
-  grid-row: 1;
-  font-weight: 600;
-  font-size: .82rem;
-  color: var(--gold);
-  line-height: 1.25;
-  min-width: 0;
-  padding-right: .2rem;
-}
-.hero-card .hc-level {
-  grid-column: 2;
-  grid-row: 1;
-  justify-self: end;
-  align-self: start;
-  font-weight: 700;
-  font-size: .92rem;
-  letter-spacing: .02em;
-  color: var(--gold);
-  line-height: 1.1;
-  white-space: nowrap;
-}
-.hero-card .hc-peak {
-  grid-column: 2;
-  grid-row: 2;
-  justify-self: end;
-  align-self: start;
-  font-size: .58rem;
-  font-weight: 700;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  line-height: 1.15;
-  white-space: nowrap;
-  padding: .08rem .35rem;
-  border-radius: 999px;
-  border: 1px solid rgba(125,255,138,.35);
-  color: var(--good, #7dff8a);
-  background: rgba(61,143,85,.18);
-}
-.hero-card .hc-peak.peak-blooded {
-  color: #9dffb0;
-  border-color: rgba(125,255,138,.5);
-}
-.hero-card .hc-peak.peak-hardened {
-  color: #9ecfff;
-  border-color: rgba(120,180,255,.55);
-  background: rgba(60,110,160,.22);
-}
-.hero-card .hc-peak.peak-cracked,
-.hero-card .hc-peak.peak-blooded.peak-cracked {
-  color: var(--gold);
-  border-color: rgba(212,196,154,.65);
-  background: rgba(120,100,50,.28);
-}
-.hero-card .hc-peak.peak-runner,
-.hero-card .hc-peak.peak-green,
-.hero-card .hc-peak.peak-unproven {
-  color: var(--muted);
-  border-color: rgba(140,150,140,.35);
-  background: rgba(0,0,0,.2);
-  font-weight: 600;
-}
-.hero-card .hc-tags {
-  grid-column: 1 / -1;
-  font-size: .58rem;
-  color: var(--steam);
-  letter-spacing: .02em;
-  line-height: 1.35;
-  opacity: .92;
-}
-.hero-card .hc-xp {
-  grid-column: 2;
-  grid-row: 3;
-  justify-self: end;
-  align-self: start;
-  font-size: .6rem;
-  color: var(--steam);
-  line-height: 1.2;
-  white-space: nowrap;
-  opacity: .9;
-}
-.hero-card .hc-meta {
-  grid-column: 1;
-  grid-row: 2 / span 2;
-  font-size: .66rem;
-  color: var(--muted);
-  line-height: 1.3;
-  min-width: 0;
-}
-.hero-card .hc-cost-row {
-  grid-column: 1 / -1;
-  display: flex;
-  flex-wrap: wrap;
-  gap: .28rem;
-  margin-top: .15rem;
-  min-height: 0;
-}
-.hero-card .hc-blurb {
-  grid-column: 1 / -1;
-  font-size: .64rem;
-  color: var(--ash);
-  margin-top: .15rem;
-  line-height: 1.4;
-  min-width: 0;
-}
-.hero-card .hc-cost {
-  display: inline-flex;
-  align-items: center;
-  font-size: .58rem;
-  font-weight: 700;
-  letter-spacing: .04em;
-  text-transform: uppercase;
-  padding: .12rem .4rem;
-  border-radius: 999px;
-  border: 1px solid transparent;
-  line-height: 1.2;
-}
-.hero-card .hc-cost.tnb {
-  color: var(--tnb);
-  border-color: rgba(201,160,255,.45);
-  background: rgba(201,160,255,.12);
-}
-.hero-card .hc-cost.km {
-  color: #9fd0ff;
-  border-color: rgba(126,200,255,.4);
-  background: rgba(126,200,255,.1);
-}
-.hero-card .hc-cost.free {
-  color: var(--steam);
-  border-color: rgba(140,150,140,.35);
-  background: rgba(0,0,0,.2);
-}
-.hero-card.compact {
-  padding: .45rem .55rem .5rem;
-  column-gap: .4rem;
-}
-.hero-card.compact .hc-name { font-size: .78rem; }
-.hero-card.compact .hc-level { font-size: .84rem; }
-.hero-card.compact .hc-blurb {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-.hero-card.compact .hc-cost { font-size: .52rem; padding: .08rem .32rem; }
-.hero-card.panel {
-  cursor: default;
-  margin-bottom: .4rem;
-  width: 100%;
-}
-#aces .hero-card.panel { background: rgba(0,0,0,.28); }
-/* Soft lock: map stays browsable; Drop is gated. Hard greyscale felt "broken". */
-.theater.company-locked {
-  outline: 1px dashed rgba(212,196,154,.45);
-  outline-offset: 4px;
-}
-.theater-lock-banner {
-  display: none;
-  margin: 0 0 .55rem;
-  padding: .55rem .75rem;
-  border-radius: 10px;
-  border: 1px solid rgba(212,196,154,.45);
-  background: linear-gradient(135deg, rgba(212,196,154,.16), rgba(0,0,0,.35));
-  color: var(--gold);
-  font-size: .82rem;
-  line-height: 1.4;
-}
-.theater.company-locked .theater-lock-banner { display: block; }
-.theater-lock-banner b { color: var(--ink); }
-.theater-lock-banner button {
-  margin-left: .45rem;
-  border: 1px solid rgba(212,196,154,.5);
-  background: rgba(212,196,154,.12);
-  color: var(--gold);
-  border-radius: 999px;
-  padding: .2rem .65rem;
-  font-size: .72rem;
-  letter-spacing: .04em;
-}
-.theater-lock-banner button:hover { background: rgba(212,196,154,.22); }
-
-/* Standing orders + welcome */
-.next-step {
-  margin: .95rem 0 0; max-width: 40rem;
-  border: 1px solid rgba(212,196,154,.22); border-radius: 12px;
-  background: linear-gradient(135deg, rgba(28,40,28,.5), rgba(6,12,10,.75));
-  padding: .75rem .9rem;
-  border-left: 3px solid var(--gold);
-}
-.next-step .ns-kicker {
-  font-size: .6rem; letter-spacing: .14em; text-transform: uppercase; color: var(--ash);
-}
-.next-step .ns-title { color: var(--gold); font-size: .98rem; font-weight: 600; margin: .18rem 0 .28rem; }
-.next-step .ns-body { color: var(--muted); font-size: .8rem; line-height: 1.45; }
-.next-step .ns-body b { color: var(--ink); }
-/* First-run company intro — blocks the hub until 3 packs are sealed */
-.company-intro {
-  position: fixed; inset: 0; z-index: 80; display: none;
-  background: rgba(2,5,4,.94); backdrop-filter: blur(10px);
-  align-items: center; justify-content: center; padding: 1rem;
-}
-.company-intro.show { display: flex; }
-.company-intro-card {
-  width: min(56rem, 96vw);
-  max-height: min(94vh, 52rem);
-  overflow: auto;
-  background:
-    radial-gradient(ellipse at 28% 0%, rgba(61,143,85,.22), transparent 55%),
-    #0a1410;
-  border: 1px solid rgba(212,196,154,.42);
-  border-radius: 18px;
-  padding: 1.35rem 1.4rem 1.2rem;
-  box-shadow: 0 28px 90px rgba(0,0,0,.7);
-}
-.company-intro-card .epigraph {
-  font-size: .62rem; letter-spacing: .18em; text-transform: uppercase;
-  color: var(--ash); margin: 0 0 .45rem;
-}
-.company-intro-card h1 {
-  margin: 0; font-size: clamp(1.25rem, 2.6vw, 1.55rem);
-  color: var(--gold); font-weight: 600; line-height: 1.25;
-}
-.company-intro-card .lede {
-  margin: .55rem 0 0; font-size: .88rem; color: var(--ink); line-height: 1.45; max-width: 42rem;
-}
-.company-intro-card .lede b { color: var(--gold); font-weight: 600; }
-.company-intro-meta {
-  display: flex; flex-wrap: wrap; gap: .45rem; align-items: center;
-  margin: .85rem 0 .55rem; font-size: .72rem; color: var(--muted);
-}
-.company-intro-meta .chip {
-  border: 1px solid rgba(212,196,154,.35); border-radius: 999px;
-  padding: .18rem .55rem; color: var(--gold);
-}
-.company-intro-core {
-  display: flex; flex-wrap: wrap; gap: .4rem; margin: 0 0 .75rem;
-}
-.company-intro-core .hero-card { flex: 1 1 11rem; max-width: 16rem; }
-.company-intro-kicker {
-  font-size: .62rem; letter-spacing: .14em; text-transform: uppercase;
-  color: var(--ash); margin: .35rem 0 .4rem;
-}
-.company-intro-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr));
-  gap: .45rem;
-}
-.company-intro-grid .hero-card.on {
-  border-color: rgba(61,143,85,.75);
-  box-shadow: 0 0 0 1px rgba(61,143,85,.35), 0 0 18px rgba(61,143,85,.12);
-}
-.company-intro-grid .hero-card.locked { opacity: .45; }
-.company-intro-actions {
-  display: flex; gap: .55rem; justify-content: space-between; align-items: center;
-  flex-wrap: wrap; margin-top: 1rem; padding-top: .85rem;
-  border-top: 1px solid rgba(61,143,85,.22);
-}
-.company-intro-actions .count {
-  font-size: .82rem; color: var(--muted);
-}
-.company-intro-actions .count b { color: var(--gold); }
-
-/* Camp sheet — pinned over the left company column (not the mission main) */
-.camp-sheet {
-  position: fixed; z-index: 75; display: none;
-  background: rgba(2,5,4,.9); backdrop-filter: blur(6px);
-  align-items: stretch; justify-content: stretch;
-  padding: .55rem;
-  box-sizing: border-box;
-}
-.camp-sheet.show { display: flex; }
-.camp-sheet-card {
-  width: 100%;
-  max-height: 100%;
-  overflow: auto;
-  background:
-    radial-gradient(ellipse at 20% 0%, rgba(61,143,85,.2), transparent 55%),
-    #0a1410;
-  border: 1px solid rgba(212,196,154,.42);
-  border-radius: 14px;
-  padding: .9rem .95rem .85rem;
-  box-shadow: 0 16px 48px rgba(0,0,0,.55);
-}
-.camp-sheet-card .epigraph {
-  font-size: .6rem; letter-spacing: .16em; text-transform: uppercase;
-  color: var(--ash); margin: 0 0 .35rem;
-}
-.camp-sheet-card h2 {
-  margin: 0; font-size: 1.05rem; color: var(--gold); font-weight: 600; line-height: 1.25;
-}
-.camp-sheet-card .lede {
-  margin: .45rem 0 0; font-size: .78rem; color: var(--muted); line-height: 1.4;
-}
-.camp-sheet-stats {
-  display: flex; flex-wrap: wrap; gap: .35rem; margin: .75rem 0 .55rem;
-}
-.camp-sheet-stats .chip {
-  border: 1px solid rgba(212,196,154,.35); border-radius: 999px;
-  padding: .15rem .5rem; font-size: .68rem; color: var(--gold);
-}
-.camp-sheet-actions {
-  display: flex; flex-direction: column; gap: .4rem; margin-top: .85rem;
-}
-.camp-sheet-actions .btn-primary,
-.camp-sheet-actions .btn-ghost { width: 100%; justify-content: center; }
-.hearth-block {
-  margin-top: .85rem; padding-top: .7rem;
-  border-top: 1px solid rgba(212,196,154,.22);
-}
-.hearth-block .hearth-label {
-  font-size: .6rem; letter-spacing: .14em; text-transform: uppercase;
-  color: var(--ash); margin: 0 0 .4rem;
-}
-.hearth-list { display: flex; flex-direction: column; gap: .35rem; max-height: 11rem; overflow: auto; }
-.hearth-talk {
-  text-align: left; width: 100%;
-  border: 1px solid rgba(212,196,154,.28); border-radius: 10px;
-  background: rgba(6,18,12,.65); color: var(--ink);
-  padding: .45rem .55rem; cursor: pointer;
-}
-.hearth-talk:hover { border-color: rgba(212,196,154,.55); background: rgba(12,28,18,.8); }
-.hearth-talk .ht-title { font-size: .78rem; color: var(--gold); font-weight: 600; }
-.hearth-talk .ht-meta { font-size: .65rem; color: var(--muted); margin-top: .15rem; }
-.hearth-talk .ht-meta b { color: var(--ketha); font-weight: 500; }
-.hearth-empty { font-size: .72rem; color: var(--muted); line-height: 1.35; }
-.hearth-stage {
-  display: none; margin-top: .55rem; padding: .55rem .6rem;
-  border: 1px solid rgba(166,209,166,.35); border-radius: 10px;
-  background: rgba(4,14,10,.85);
-}
-.hearth-stage.show { display: block; }
-.hearth-stage .hs-title { font-size: .8rem; color: var(--gold); margin: 0 0 .35rem; }
-.hearth-stage .hs-beat {
-  font-size: .72rem; line-height: 1.4; margin: .28rem 0; color: var(--ink);
-}
-.hearth-stage .hs-beat .who {
-  color: var(--ketha); font-size: .6rem; letter-spacing: .08em;
-  text-transform: uppercase; display: block; margin-bottom: .05rem;
-}
-.hearth-stage .hs-beat.narrator .who { color: var(--ash); }
-.hearth-stage .hs-actions { display: flex; gap: .35rem; margin-top: .5rem; }
-.camp-chip {
-  display: flex; align-items: center; justify-content: space-between; gap: .4rem;
-  width: 100%; margin: 0 0 .55rem; padding: .4rem .55rem;
-  border-radius: 10px; border: 1px solid rgba(212,196,154,.35);
-  background: linear-gradient(135deg, rgba(61,143,85,.16), transparent 70%);
-  color: var(--ink); cursor: pointer; text-align: left;
-  font: inherit;
-}
-.camp-chip:hover { border-color: rgba(212,196,154,.55); background: rgba(61,143,85,.2); }
-.camp-chip .cc-label { font-size: .72rem; color: var(--gold); font-weight: 600; }
-.camp-chip .cc-meta { font-size: .62rem; color: var(--muted); }
-.shop-shelf {
-  font-size: .58rem; letter-spacing: .1em; text-transform: uppercase;
-  color: var(--ash); margin: .7rem 0 .3rem;
-}
-.shop-shelf:first-child { margin-top: 0; }
-
-.coach {
-  position: fixed; inset: 0; z-index: 60; display: none;
-  background: rgba(2,5,4,.92); backdrop-filter: blur(8px);
-  align-items: center; justify-content: center; padding: 1rem;
-}
-.coach.show { display: flex; }
-.coach-card {
-  width: min(30rem, 94vw); background:
-    radial-gradient(ellipse at 30% 0%, rgba(61,143,85,.18), transparent 55%),
-    #0a1410;
-  border: 1px solid rgba(212,196,154,.35); border-radius: 18px;
-  padding: 1.4rem 1.45rem 1.25rem; box-shadow: 0 28px 90px rgba(0,0,0,.65);
-}
-.coach-card .epigraph {
-  font-size: .62rem; letter-spacing: .18em; text-transform: uppercase;
-  color: var(--ash); margin: 0 0 .55rem;
-}
-.coach-card h1 { margin: 0; font-size: 1.4rem; color: var(--gold); font-weight: 600; line-height: 1.25; }
-.coach-card .lede {
-  margin: .65rem 0 0; font-size: .9rem; color: var(--ink); line-height: 1.5;
-}
-.coach-card .lede b { color: var(--gold); font-weight: 600; }
-.coach-card .steps { margin: 1rem 0 .85rem; padding: 0; list-style: none; }
-.coach-card .steps li {
-  display: flex; gap: .7rem; align-items: flex-start;
-  margin: .5rem 0; font-size: .86rem; color: var(--ink); line-height: 1.4;
-}
-.coach-card .steps .n {
-  flex: 0 0 1.55rem; height: 1.55rem; border-radius: 999px;
-  background: rgba(61,143,85,.22); border: 1px solid rgba(212,196,154,.4);
-  color: var(--gold); display: flex; align-items: center; justify-content: center;
-  font-size: .72rem; font-weight: 600;
-}
-.coach-card .hint { font-size: .74rem; color: var(--muted); line-height: 1.45; margin: 0 0 .95rem; }
-.coach-actions { display: flex; gap: .45rem; justify-content: flex-end; flex-wrap: wrap; }
-
-/* Drop confirmation */
-.drop-confirm {
-  position: fixed; inset: 0; z-index: 90; display: none;
-  background: rgba(2,5,4,.88); backdrop-filter: blur(6px);
-  align-items: center; justify-content: center; padding: 1rem;
-}
-.drop-confirm.show { display: flex; }
-.drop-confirm-card {
-  width: min(52rem, 96vw);
-  max-height: min(92vh, 44rem);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  background:
-    radial-gradient(ellipse at 25% 0%, rgba(61,143,85,.2), transparent 55%),
-    #0a1410;
-  border: 1px solid rgba(212,196,154,.4);
-  border-radius: 16px;
-  padding: 1.25rem 1.3rem 1.15rem;
-  box-shadow: 0 24px 80px rgba(0,0,0,.65);
-}
-.drop-squad-kicker {
-  margin: .85rem 0 .35rem;
-  font-size: .62rem; letter-spacing: .14em; text-transform: uppercase;
-  color: var(--ash);
-}
-.drop-squad {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr));
-  gap: .4rem;
-  margin: 0 0 .15rem;
-  overflow: auto;
-  min-height: 0;
-  flex: 1 1 auto;
-}
-.drop-squad .hero-card {
-  background: rgba(0,0,0,.32);
-}
-.drop-squad .hero-card.core { border-color: rgba(212,196,154,.4); }
-.drop-confirm-card .epigraph {
-  font-size: .62rem; letter-spacing: .16em; text-transform: uppercase;
-  color: var(--ash); margin: 0 0 .4rem;
-}
-.drop-confirm-card h2 {
-  margin: 0; font-size: 1.2rem; color: var(--gold); font-weight: 600; line-height: 1.25;
-}
-.drop-confirm-card .lede {
-  margin: .55rem 0 0; font-size: .88rem; color: var(--ink); line-height: 1.45;
-}
-.drop-confirm-card .lede b { color: var(--gold); font-weight: 600; }
-.drop-confirm-card .hint {
-  margin: .7rem 0 0; font-size: .74rem; color: var(--muted); line-height: 1.4;
-}
-.drop-confirm-actions {
-  display: flex; gap: .45rem; justify-content: flex-end; flex-wrap: wrap;
-  margin-top: 1rem; flex-shrink: 0;
-}
-.btn-primary.dropping {
-  opacity: .85; cursor: wait;
-  background: rgba(61,143,85,.35);
-}
-
-.choice .kind.battle { color: var(--good); }
-.rep-name { text-transform: capitalize; }
-details.advanced {
-  margin-top: .55rem; font-size: .7rem; color: var(--muted);
-}
-details.advanced summary { cursor: pointer; color: var(--steam); }
-
-@media (max-width: 980px) {
-  .app { grid-template-columns: 1fr; grid-template-rows: auto auto 1fr auto auto; }
-  .col, .col.right { border:0; border-bottom:1px solid rgba(61,143,85,.2); max-height:28vh; }
-}
-</style>
 <link rel="stylesheet" href="console/console.css"/>
 </head>
 <body>
@@ -1125,195 +14,224 @@ details.advanced summary { cursor: pointer; color: var(--steam); }
       <strong id="hud-title">Loading…</strong>
     </div>
     <div class="badges" id="hud-badges"></div>
+    <nav class="cc-nav" aria-label="Campaign workspaces">
+      <button type="button" data-workspace="operations" aria-pressed="true">Operations</button>
+      <button type="button" data-workspace="company" aria-pressed="false">Company</button>
+      <button type="button" data-workspace="home" aria-pressed="false">Home</button>
+      <button type="button" data-workspace="chronicle" aria-pressed="false">Chronicle</button>
+    </nav>
+    <details id="cc-system">
+      <summary>System</summary>
+      <div class="cc-system-body">
+        <h2>Campaign controls</h2>
+        <div id="cc-system-actions">
+          <button type="button" id="btn-save-campaign" title="Save the campaign to a named slot">Save</button>
+          <button type="button" id="btn-load-campaign" title="Load a named save (the current campaign is backed up first)">Load</button>
+          <button type="button" id="btn-reset-campaign" title="Start the campaign over: a backup is kept, then mission 1 with an empty bag">Reset</button>
+          <button type="button" id="btn-sync-hub" title="Refresh the map from campaign progress">Refresh</button>
+          <button type="button" id="btn-abandon" title="Leave the field with no zone flip or fake win — unlocks the next Drop">Abandon sortie</button>
+        </div>
+        <section id="cc-ready" aria-label="Ready to drop">
+          <h2>Ready to drop</h2>
+          <ul id="cc-ready-list" class="cc-ready-list"><li class="cc-ready-row"><span class="cc-dot"></span><span>Checking…</span></li></ul>
+          <p id="cc-ready-progress" class="cc-ready-progress" hidden></p>
+        </section>
+        <section id="cc-feedback" aria-label="Feedback">
+          <h2>Feedback</h2>
+          <p class="cc-feedback-note">Zips the campaign save, the kernel faces, the hub state and the newest BAR log for a bug report. Never the truth frame or another faction's mind.</p>
+          <textarea id="cc-feedback-notes" rows="2" placeholder="What happened? (optional)"></textarea>
+          <button type="button" id="cc-feedback-export">Export feedback bundle</button>
+          <p id="cc-feedback-result" class="cc-feedback-result" hidden></p>
+        </section>
+        <h3>Diagnostics</h3>
+        <div id="panel-manifold">
+          <h2>Front sense</h2>
+          <p class="sys-note">
+            How the planet feels under your feet — pressure, scarcity, the tug of contested ground.
+            Every sortie leaves a bruise here.
+          </p>
+          <div class="scalar-row" id="graph-scalars"></div>
+          <div class="spec-bar" id="spec-bar" title="war energy"><i></i></div>
+          <div id="spec-meta" class="sys-note"></div>
+          <svg class="ent-svg" id="ent-svg" viewBox="0 0 280 140" preserveAspectRatio="xMidYMid meet"></svg>
+          <div class="rho-wrap"><table class="rho-table" id="rho-table"></table></div>
+          <div id="rho-inspect" class="rho-inspect"></div>
+          <details class="advanced"><summary>Engine readouts</summary>
+            <div id="rho-advanced" class="rho-advanced"></div>
+          </details>
+        </div>
+        <div id="panel-theaters">
+          <h2>Theaters</h2>
+          <div id="regions"></div>
+        </div>
+      </div>
+    </details>
   </header>
 
-  <aside class="col" id="col-aces">
-    <div class="company-head">
-      <h2>The company</h2>
-      <div class="company-wallet" id="company-wallet">—</div>
-    </div>
-    <button type="button" class="camp-chip" id="camp-chip" title="Camp and home shelf">
-      <span class="cc-label" id="camp-chip-label">Camp</span>
-      <span class="cc-meta" id="camp-chip-meta">Open</span>
-    </button>
-    <p class="company-sub" id="company-sub">Core always ships. Pick packs here.</p>
-    <p class="company-cap" id="company-cap">You can bring 3 packs besides core.</p>
-    <div class="company-recruit" id="company-recruit" hidden>
-      <div class="cr-kicker" id="company-recruit-kicker">Sortie reward</div>
-      <div id="company-recruit-card"></div>
-    </div>
-    <div class="company-list" id="aces"></div>
-    <div class="company-foot" id="company-foot">
-      <span class="company-preview" id="company-preview-text">Pick packs to seal the company.</span>
-      <button type="button" class="btn-primary" id="btn-seal-company">Confirm company</button>
-    </div>
-    <h3>Standing</h3>
-    <div id="rep"></div>
-    <h3>The war</h3>
-    <div id="kernel"></div>
-    <div class="camp-sheet" id="camp-sheet" role="dialog" aria-modal="true" aria-labelledby="camp-sheet-title">
-      <div class="camp-sheet-card">
-        <p class="epigraph">Home shelf</p>
-        <h2 id="camp-sheet-title">Jungle camp</h2>
-        <p class="lede" id="camp-sheet-lede">Raise the shelf here. Main screen stays on missions.</p>
-        <div class="camp-sheet-stats" id="camp-sheet-stats"></div>
-        <div class="hearth-block" id="hearth-block">
-          <p class="hearth-label">Hearth · support talks</p>
-          <div class="hearth-list" id="hearth-list"></div>
-          <div class="hearth-stage" id="hearth-stage" aria-live="polite">
-            <div class="hs-title" id="hearth-stage-title"></div>
-            <div id="hearth-stage-beats"></div>
-            <div class="hs-actions">
-              <button type="button" class="btn-primary" id="btn-hearth-confirm">Seal talk</button>
-              <button type="button" class="btn-ghost" id="btn-hearth-cancel">Back</button>
-            </div>
-          </div>
-        </div>
-        <div class="camp-sheet-actions">
-          <button type="button" class="btn-primary" id="btn-camp-raise">Raise camp</button>
-          <button type="button" class="btn-ghost" id="btn-camp-founding">Founding sortie</button>
-          <button type="button" class="btn-ghost" id="btn-camp-broker">Open broker</button>
-          <button type="button" class="btn-ghost" id="btn-camp-close">Close</button>
-        </div>
-      </div>
-    </div>
-  </aside>
+  <aside class="col cc-rail" id="operations-rail" aria-label="Company operations"></aside>
 
   <main class="main" id="main">
-    <div class="kicker" id="kicker">Ashwalker command</div>
-    <h1 id="title" style="margin:.3rem 0 0;font-size:clamp(1.35rem,2.9vw,2rem);color:var(--gold);font-weight:600;line-height:1.2">…</h1>
-    <p id="sub" style="color:var(--muted);margin:.45rem 0 0;max-width:40rem;font-size:.9rem;line-height:1.45"></p>
-    <div class="voice" id="voice-wrap">
-      <div class="who" id="voice-who">Ketha</div>
-      <p class="line" id="voice">…</p>
-    </div>
-    <div class="homecoming" id="homecoming" aria-live="polite">
-      <div class="hc-kicker">Sortie home</div>
-      <div class="hc-banner" id="hc-banner">—</div>
-      <div class="hc-headline" id="hc-headline"></div>
-      <p class="hc-hint" id="hc-hint"></p>
-      <div class="hc-chips" id="hc-chips"></div>
-      <div class="hc-actions">
-        <button type="button" class="btn-ghost" id="hc-dismiss">Dismiss</button>
+    <section id="workspace-operations" class="cc-workspace">
+      <section id="cc-pending" class="cc-error" role="status" hidden>
+        <h2>Result pending</h2>
+        <p>Bring the previous battle result home before deploying again. No narrative deadline advances while synchronization is incomplete.</p>
+        <button id="cc-recover-result" type="button">Recover battle result</button>
+      </section>
+      <div class="kicker" id="kicker">Ashwalker command</div>
+      <h1 id="title">…</h1>
+      <div class="homecoming" id="homecoming" aria-live="polite">
+        <div class="hc-kicker">Sortie home</div>
+        <div class="hc-banner" id="hc-banner">—</div>
+        <div class="hc-headline" id="hc-headline"></div>
+        <p class="hc-hint" id="hc-hint"></p>
+        <div class="hc-chips" id="hc-chips"></div>
+        <div class="hc-manifest" id="hc-manifest" hidden></div>
+        <div class="hc-actions">
+          <button type="button" class="btn-ghost" id="hc-dismiss">Dismiss</button>
+        </div>
       </div>
-    </div>
-    <div class="next-step" id="next-step" aria-live="polite">
-      <div class="ns-kicker">Standing orders</div>
-      <div class="ns-title" id="ns-title">Loading…</div>
-      <div class="ns-body" id="ns-body"></div>
-    </div>
+      <details id="cc-return" hidden></details>
 
-    <section class="theater" id="theater" aria-label="Theater map">
-      <div class="theater-lock-banner" id="theater-lock-banner">
-        <b>Form the company first.</b> Pick 3 packs, then Confirm —
-        <button type="button" id="btn-open-company-intro">Open company picker</button>
-      </div>
-      <div class="map-picker" id="map-picker" role="tablist" aria-label="Operational maps"></div>
-      <div class="theater-head">
-        <div>
-          <h2 id="theater-title">Theater</h2>
-          <p class="theater-sub" id="theater-sub">Click a wound (target). The pad is one zone — you land there and you lift from there: a zone we believe is ours, a quiet rim, or the camp's next pad (△). The board shows what the company believes, not the ground.</p>
+      <section class="theater" id="theater" aria-label="Theater map">
+        <div class="theater-lock-banner" id="theater-lock-banner">
+          <b>Form the company first.</b> Pick 3 packs, then Confirm —
+          <button type="button" id="btn-open-company-intro">Open company picker</button>
         </div>
-        <div class="mode-bar" style="margin:0">
-          <span class="label">Mark</span>
-          <button type="button" class="mode-btn active" data-mode="capture">Wound</button>
-          <button type="button" class="mode-btn" data-mode="pad">Pad</button>
+        <div class="map-picker" id="map-picker" role="tablist" aria-label="Operational maps"></div>
+        <div class="theater-head">
+          <div>
+            <h2 id="theater-title">Theater</h2>
+            <p class="theater-sub" id="theater-sub">Click a wound (target). The pad is one zone — you land there and you lift from there: a zone we believe is ours, a quiet rim, or the camp's next pad (△). The board shows what the company believes, not the ground.</p>
+          </div>
+          <div class="mode-bar">
+            <span class="label">Mark</span>
+            <button type="button" class="mode-btn active" data-mode="capture">Wound</button>
+            <button type="button" class="mode-btn" data-mode="pad">Pad</button>
+          </div>
         </div>
+        <div class="legend-row">
+          <span class="lg-infil">△ Pad — land and lift</span>
+          <span class="lg-target">◎ Wound</span>
+          <span class="lg-open">Available objective</span>
+          <span class="lg-stale">Stale belief</span>
+          <span class="lg-dark">? Nobody looked</span>
+          <span class="lg-threat">Threat</span>
+          <span class="lg-eyes">◉ Their eyes on ours</span>
+        </div>
+        <fieldset class="cc-overlays" id="cc-overlays">
+          <legend>Map layers</legend>
+          <label><input type="checkbox" data-overlay="ownership" checked> Ownership</label>
+          <label><input type="checkbox" data-overlay="intelligence" checked> Intelligence</label>
+          <label><input type="checkbox" data-overlay="route" checked> Route</label>
+        </fieldset>
+        <!-- Belief key: what the COMPANY believes holds each zone. Faction colour = "we believe they hold it". -->
+        <div class="cc-faction-key" aria-label="Belief legend">
+          <span class="ally">● Ours</span><span class="held">◆ Held · unseen</span><span class="armada">◆ Armada</span><span class="cortex">◆ Cortex</span><span class="nullmercs">◆ Null Mercs</span><span class="raptors">◆ Wild</span><span class="scavengers">◆ Scavengers</span><span class="empty">○ Empty</span><span class="dark">? Dark · nobody looked</span>
+        </div>
+        <div class="board-wrap" id="board">
+          <div id="board-zones"></div>
+          <svg class="board-route" id="board-route" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg>
+        </div>
+      </section>
+      <details id="cc-map-details" hidden></details>
+    </section>
+
+    <section id="col-aces" class="cc-workspace" hidden>
+      <div class="company-head">
+        <h2>The company</h2>
+        <div class="company-wallet" id="company-wallet">—</div>
       </div>
-      <div class="legend-row">
-        <span class="lg-infil">△ Pad — land and lift</span>
-        <span class="lg-target">◎ Wound</span>
-        <span class="lg-open">Available objective</span>
-        <span class="lg-stale">Stale belief</span>
-        <span class="lg-dark">? Nobody looked</span>
-        <span class="lg-threat">Threat</span>
-        <span class="lg-eyes">◉ Their eyes on ours</span>
+      <div class="company-recruit" id="company-recruit" hidden>
+        <div class="cr-kicker" id="company-recruit-kicker">Sortie reward</div>
+        <div id="company-recruit-card"></div>
       </div>
-      <div class="board-wrap" id="board">
-        <div id="board-zones"></div>
-        <svg class="board-route" id="board-route" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg>
+      <section id="cc-company-members"></section>
+      <h3>Standing</h3>
+      <div id="rep"></div>
+      <section id="cc-company-scenes"></section>
+      <div id="panel-shop">
+        <h2>Reinforcements and equipment</h2>
+        <div class="shop-balances" id="shop-balances"></div>
+        <p id="shop-note" class="shop-note"></p>
+        <h3>In the bag</h3>
+        <div id="deploy-kit"></div>
+        <h3>Shelves</h3>
+        <div id="shop-list"></div>
       </div>
-      <div class="theater-actions">
-        <div class="marks-sum" id="marks-sum">Pick a wound on the map.</div>
-        <div style="display:flex;gap:.4rem;flex-wrap:wrap">
-          <button type="button" class="btn-ghost" id="btn-clear-marks" title="Reset marks to defaults">Reset route</button>
-          <button type="button" class="btn-primary" id="btn-deploy">Drop into battle</button>
+      <div class="hearth-block" id="hearth-block">
+        <p class="hearth-label">Hearth · support talks</p>
+        <div class="hearth-list" id="hearth-list"></div>
+        <div class="hearth-stage" id="hearth-stage" aria-live="polite">
+          <div class="hs-title" id="hearth-stage-title"></div>
+          <div id="hearth-stage-beats"></div>
+          <div class="hs-actions">
+            <button type="button" class="btn-primary" id="btn-hearth-confirm">Seal talk</button>
+            <button type="button" class="btn-ghost" id="btn-hearth-cancel">Back</button>
+          </div>
         </div>
       </div>
     </section>
 
-    <div class="choices-head" id="choices-head">
-      <span class="ch-kicker">Recommended sorties</span>
-      <span class="ch-map" id="choices-map-label">—</span>
-    </div>
-    <div class="choices" id="choices"></div>
-    <div class="log" id="log"></div>
+    <section id="workspace-home" class="cc-workspace" hidden>
+      <p class="cc-eyebrow">The Rock Jungle</p>
+      <h1>Something worth returning to</h1>
+      <div id="cc-home-status"></div>
+      <section id="cc-camp-upgrades">
+        <h2>Camp improvements</h2>
+        <p>Invest in the place the company comes back to.</p>
+        <div class="camp-sheet-stats" id="camp-sheet-stats"></div>
+        <button type="button" class="btn-primary" id="btn-camp-raise">Raise camp</button>
+        <button type="button" class="btn-ghost" id="btn-camp-founding">Founding sortie</button>
+      </section>
+      <div id="panel-camp" class="camp-panel"></div>
+    </section>
+
+    <section id="workspace-chronicle" class="cc-workspace" hidden>
+      <p class="cc-eyebrow">Actions become history</p>
+      <h1>Company chronicle</h1>
+      <div id="cc-chronicle"></div>
+      <div id="panel-camp-chronicle" class="camp-panel"></div>
+    </section>
   </main>
 
   <aside class="col right" id="col-right">
-    <div id="panel-shop">
-      <h2>Broker</h2>
-      <div class="shop-balances" id="shop-balances"></div>
-      <p id="shop-note" style="font-size:.68rem;color:var(--muted);margin:0 0 .5rem;line-height:1.35"></p>
-      <h3>In the bag</h3>
-      <div id="deploy-kit"></div>
-      <h3>Shelves</h3>
-      <div id="shop-list"></div>
-    </div>
-    <div id="panel-theaters" hidden>
-      <h2>Theaters</h2>
-      <div id="regions"></div>
-    </div>
-    <div id="panel-manifold" hidden>
-      <h2>Front sense</h2>
-      <p style="font-size:.68rem;color:var(--muted);margin:0 0 .45rem;line-height:1.35">
-        How the planet feels under your feet — pressure, scarcity, the tug of contested ground.
-        Every sortie leaves a bruise here.
-      </p>
-      <div class="scalar-row" id="graph-scalars"></div>
-      <div class="spec-bar" id="spec-bar" title="war energy"><i style="width:40%"></i></div>
-      <div id="spec-meta" class="meta" style="font-size:.68rem;color:var(--muted);margin-bottom:.4rem"></div>
-      <svg class="ent-svg" id="ent-svg" viewBox="0 0 280 140" preserveAspectRatio="xMidYMid meet"></svg>
-      <div class="rho-wrap"><table class="rho-table" id="rho-table"></table></div>
-      <div id="rho-inspect" style="font-size:.68rem;color:var(--steam);margin-top:.35rem"></div>
-      <details class="advanced"><summary>Engine readouts</summary>
-        <div id="rho-advanced" style="margin-top:.35rem;font-family:ui-monospace,Consolas,monospace;font-size:.62rem;line-height:1.4"></div>
-      </details>
-    </div>
+    <section id="cc-matters" aria-label="Company matters"></section>
+    <div id="cc-inspector" aria-label="Company matter details"></div>
   </aside>
 
   <footer class="foot">
+    <div class="theater-actions" id="theater-actions">
+      <div class="marks-sum" id="marks-sum">Pick a wound on the map.</div>
+      <div class="actions">
+        <button type="button" class="btn-ghost" id="btn-clear-marks" title="Reset marks to defaults">Reset route</button>
+        <button type="button" class="btn-primary" id="btn-deploy">Drop into battle</button>
+      </div>
+    </div>
     <span id="foot-left">Verdance's Ashes</span>
     <div class="foot-actions">
       <button type="button" class="primary" id="btn-pull-result" title="Bring the last sortie home (auto when the bridge is live)">After the fight — bring it home</button>
-      <button type="button" id="btn-abandon" title="Leave the field with no zone flip or fake win — unlocks the next Drop">Abandon sortie</button>
-      <button type="button" id="btn-sync-hub" title="Refresh the map from campaign progress">Refresh</button>
-      <button type="button" id="btn-save-campaign" title="Save the campaign to a named slot">Save</button>
-      <button type="button" id="btn-load-campaign" title="Load a named save (the current campaign is backed up first)">Load</button>
-      <button type="button" class="danger" id="btn-reset-campaign" title="Start the campaign over: a backup is kept, then mission 1 with an empty bag">Reset</button>
       <button type="button" id="btn-help" title="How this works">How this works</button>
-      <a href="story_autoplay.html" title="Optional cinematic reel">Story reel</a>
     </div>
   </footer>
 </div>
 
-<div class="drop-confirm" id="drop-confirm" role="dialog" aria-modal="true" aria-labelledby="drop-confirm-title">
-  <div class="drop-confirm-card">
+<div class="scrim drop-confirm" id="drop-confirm" role="dialog" aria-modal="true" aria-labelledby="drop-confirm-title">
+  <div class="sheet-card drop-confirm-card">
     <p class="epigraph">Before the match</p>
     <h2 id="drop-confirm-title">Drop into battle?</h2>
     <p class="lede" id="drop-confirm-body">Confirm to seal this route and open Beyond All Reason.</p>
     <div class="drop-squad-kicker" id="drop-squad-kicker">Who is dropping</div>
     <div class="drop-squad" id="drop-squad" aria-label="Who is dropping"></div>
     <p class="hint" id="drop-warm-status">Pick who ships, then press Confirm drop. The level does not load until the company is locked.</p>
-    <div class="drop-confirm-actions">
+    <div class="sheet-actions">
       <button type="button" class="btn-ghost" id="drop-confirm-cancel">Cancel</button>
       <button type="button" class="btn-primary" id="drop-confirm-go">Confirm drop</button>
     </div>
   </div>
 </div>
 
-<div class="company-intro" id="company-intro" role="dialog" aria-modal="true" aria-labelledby="company-intro-title">
-  <div class="company-intro-card">
+<div class="scrim company-intro" id="company-intro" role="dialog" aria-modal="true" aria-labelledby="company-intro-title">
+  <div class="sheet-card company-intro-card">
     <p class="epigraph">First run · company formation</p>
     <h1 id="company-intro-title">Who ships with you?</h1>
     <p class="lede">
@@ -1326,15 +244,16 @@ details.advanced summary { cursor: pointer; color: var(--steam); }
     <div class="company-intro-core" id="company-intro-core" hidden aria-hidden="true"></div>
     <div class="company-intro-kicker">Roster · eco → XP · core always ships · pick 3</div>
     <div class="company-intro-grid" id="company-intro-grid" aria-label="Hero packs (eco first, then XP)"></div>
-    <div class="company-intro-actions"><button type="button" class="btn-ghost" id="recommend-company">Suggest a balanced company</button>
+    <div class="sheet-actions company-intro-actions">
+      <button type="button" class="btn-ghost" id="recommend-company">Suggest a balanced company</button>
       <span class="count" id="company-intro-count">Pick 3 packs</span>
       <button type="button" class="btn-primary" id="btn-seal-company-intro">Confirm company</button>
     </div>
   </div>
 </div>
 
-<div class="coach" id="coach" role="dialog" aria-modal="true" aria-labelledby="coach-title">
-  <div class="coach-card">
+<div class="scrim coach" id="coach" role="dialog" aria-modal="true" aria-labelledby="coach-title">
+  <div class="sheet-card coach-card">
     <p class="epigraph">A campaign for Beyond All Reason</p>
     <h1 id="coach-title">The ashes remember commanders</h1>
     <p class="lede">
@@ -1348,10 +267,10 @@ details.advanced summary { cursor: pointer; color: var(--steam); }
       <li><span class="n">2</span><span>Pick a <b>mission</b> on the main screen, mark the <b>wound</b> and the <b>pad</b> (you lift from where you landed), then <b>Drop into battle</b>.</span></li>
       <li><span class="n">3</span><span>In BAR, take the objective, get what you want to keep onto the pad and press <b>EXTRACT</b> (the fight also ends if the company is wiped). The clock never ends a sortie — overtime only wakes the map. The kernel brings the result home to this screen.</span></li>
       <li><span class="n">4</span><span><b>Home</b> is the camp — raise the jungle shelf there. The <b>Broker</b> is in <b>Company</b> and shows each available purchase and its exact cost.</span></li>
-      <li><span class="n">5</span><span><b>Save / Load / Reset</b> in the footer manage campaign state.</span></li>
+      <li><span class="n">5</span><span><b>Save / Load / Reset</b> live under <b>System</b> in the top bar.</span></li>
     </ol>
     <p class="hint">Lost? Hit <b>How this works</b> in the bar below anytime.</p>
-    <div class="coach-actions">
+    <div class="sheet-actions">
       <button type="button" class="btn-ghost" id="coach-skip">I've been here</button>
       <button type="button" class="btn-primary" id="coach-go">Open the map</button>
     </div>
@@ -1363,10 +282,7 @@ details.advanced summary { cursor: pointer; color: var(--steam); }
 <script src="hub_state.embed.js"></script>
 <script src="boards.embed.js"></script>
 <script src="crew_packs.embed.js"></script>
-<script src="support_web.embed.js"></script>
 <script src="camp_talks.embed.js"></script>
-<script type="module" src="console/workspaces.js"></script>
-<script type="module" src="console/camp.js"></script>
-
+<script type="module" src="console/main.js"></script>
 </body>
 </html>

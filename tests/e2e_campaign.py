@@ -57,7 +57,9 @@ def main() -> int:
     t0 = time.time()
 
     # 1. fresh state
-    r = subprocess.run([sys.executable, str(ws / "tools" / "verdance_story_engine_v1.py"), "init-state", "--workspace", str(ws), "--write-state"], capture_output=True, text=True, timeout=300)
+    env = dict(os.environ, PYTHONPATH=os.pathsep.join([str(ws / "tools"), os.environ.get("PYTHONPATH", "")]).rstrip(os.pathsep))
+    r = subprocess.run([sys.executable, "-m", "verdance.campaign.engine", "init-state", "--workspace", str(ws), "--write-state"],
+                       capture_output=True, text=True, timeout=300, cwd=str(ws), env=env)
     state_path = ws / "state" / "campaign_state.json"
     check("init-state writes mission 1", state_path.is_file() and json.loads(state_path.read_text(encoding="utf-8-sig")).get("missionNumber") in (1, None), (r.stderr or r.stdout)[-300:] if r.returncode else "")
     state = json.loads(state_path.read_text(encoding="utf-8-sig"))

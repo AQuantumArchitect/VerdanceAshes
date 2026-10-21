@@ -1,0 +1,113 @@
+{
+  "schema": "hive-bar-residual/1.1",
+  "at": "2026-10-21T16:40:51.980682+00:00",
+  "source": "test",
+  "kind": "player_proxy",
+  "ran_on": "wargen",
+  "muscleNode": "wargen",
+  "workspaceVersion": "0.12.7",
+  "proxyMeta": {
+    "sorties": 2,
+    "seeds": 1,
+    "difficulty": 1.4,
+    "durationTicks": null,
+    "homeMap": null,
+    "generatedAt": null,
+    "playerProxy": true
+  },
+  "byStyle": {
+    "simple": {
+      "meanWinRate": 1.0,
+      "meanFun": 0.37,
+      "meanTnb": 0.0,
+      "meanClashEvents": 20.0,
+      "n": 1,
+      "barEnemy": null,
+      "playerControllerHist": {}
+    },
+    "barbarian": {
+      "meanWinRate": 0.5,
+      "meanFun": 0.5,
+      "meanTnb": 1.0,
+      "meanClashEvents": 22.0,
+      "n": 1,
+      "barEnemy": null,
+      "playerControllerHist": {}
+    }
+  },
+  "headToHead": {
+    "winRateDelta_barb_minus_simple": -0.5
+  },
+  "brain": {
+    "samples": 192661,
+    "wins": 2794,
+    "losses": 1858,
+    "ulFamily": "width_action+eco_action",
+    "ulUpdateCount": 5103,
+    "ulMeanSigma": 1.4168,
+    "ulMissions": 2463,
+    "ulWidthUpdates": 3036,
+    "ulEcoUpdates": 2067,
+    "ulFamilies": [
+      "width_action",
+      "eco_action"
+    ]
+  },
+  "missionCountThisUnit": 2,
+  "doctrineHints": {
+    "patrolVsPush": "rest",
+    "note": "soft prior only — never command fair agent",
+    "source": null
+  },
+  "honesty": {
+    "barDensifyBanned": true,
+    "fairRoomOnly": true,
+    "nObsWall": 15,
+    "godBrainMerge": false,
+    "humanSealBotClearForbidden": true,
+    "umweltd_dark": true
+  },
+  "umweltPost": {
+    "umweltd_dark": true,
+    "attempted": 0,
+    "appended": 0,
+    "posts_planned": [
+      {
+        "project": "bar",
+        "kind": "referee",
+        "polarity": 1.0,
+        "note": "residual unit ok ran_on=wargen ul=5103",
+        "eta_hint": 0.92,
+        "binding_hint": "bar_referee"
+      },
+      {
+        "project": "bar",
+        "kind": "wall",
+        "polarity": -1.0,
+        "note": "simple saturated soft fun simpleWin=1.0 fun=0.37",
+        "eta_hint": 0.4,
+        "binding_hint": "bar_wall"
+      },
+      {
+        "project": "bar",
+        "kind": "claim",
+        "polarity": 1.0,
+        "note": "barb harder than simple (expected proxy pressure)",
+        "eta_hint": 0.25,
+        "binding_hint": "bar_momentum"
+      },
+      {
+        "project": "bar",
+        "kind": "claim",
+        "polarity": 1.0,
+        "note": "UL updates present count=5103",
+        "eta_hint": 0.25,
+        "binding_hint": "bar_momentum"
+      }
+    ],
+    "errors": [
+      "umweltd_unreachable"
+    ],
+    "note": "file residual remains authority; field post deferred"
+  }
+}
