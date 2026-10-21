@@ -8,17 +8,115 @@ function Get-VerdanceWorkspaceRoot {
   return Split-Path -Parent $PSScriptRoot
 }
 
+function Get-BAREngineDirs {
+  # Every engine\<version>\ folder under a BAR data root that holds spring.exe (newest name last).
+  param([string]$BarDataRoot)
+  if (-not $BarDataRoot) { return @() }
+  $engineRoot = Join-Path $BarDataRoot "engine"
+  if (!(Test-Path $engineRoot)) { return @() }
+  return @(Get-ChildItem $engineRoot -Directory -ErrorAction SilentlyContinue |
+    Where-Object { Test-Path (Join-Path $_.FullName "spring.exe") } |
+    Sort-Object Name)
+}
+
+function Test-BARDataRoot {
+  # A usable BAR data root: the folder exists and at least one engine\*\spring.exe is installed.
+  param([string]$BarDataRoot)
+  if (-not $BarDataRoot -or !(Test-Path $BarDataRoot)) { return $false }
+  return ((Get-BAREngineDirs -BarDataRoot $BarDataRoot).Count -gt 0)
+}
+
+function Get-SteamLibraryRoots {
+  # Steam install dir (registry, then the usual folders) plus every library in libraryfolders.vdf.
+  $steamRoots = @()
+  foreach ($key in @("HKCU:\Software\Valve\Steam", "HKLM:\SOFTWARE\WOW6432Node\Valve\Steam", "HKLM:\SOFTWARE\Valve\Steam")) {
+    try {
+      $props = Get-ItemProperty -Path $key -ErrorAction Stop
+      foreach ($name in @("SteamPath", "InstallPath")) {
+        if ($props.PSObject.Properties[$name] -and $props.$name) { $steamRoots += [string]$props.$name }
+      }
+    } catch {}
+  }
+  if (${env:ProgramFiles(x86)}) { $steamRoots += (Join-Path ${env:ProgramFiles(x86)} "Steam") }
+  if ($env:ProgramFiles) { $steamRoots += (Join-Path $env:ProgramFiles "Steam") }
+  $libs = @()
+  foreach ($root in $steamRoots) {
+    if (-not $root) { continue }
+    $root = $root -replace "/", "\"
+    if (!(Test-Path $root)) { continue }
+    $libs += $root
+    $vdf = Join-Path $root "steamapps\libraryfolders.vdf"
+    if (Test-Path $vdf) {
+      try {
+        $text = Get-Content -Raw $vdf
+        foreach ($m in [regex]::Matches($text, '"path"\s+"([^"]+)"')) {
+          $libs += ($m.Groups[1].Value -replace "\\\\", "\")
+        }
+      } catch {}
+    }
+  }
+  return @($libs | Where-Object { $_ } | Select-Object -Unique)
+}
+
+function Get-BARDataRootCandidates {
+  # Detection order: the standard installer, Program Files, then Steam libraries (both folder spellings).
+  $c = @()
+  if ($env:LOCALAPPDATA) { $c += (Join-Path $env:LOCALAPPDATA "Programs\Beyond-All-Reason\data") }
+  if ($env:ProgramFiles) { $c += (Join-Path $env:ProgramFiles "Beyond-All-Reason\data") }
+  if (${env:ProgramFiles(x86)}) { $c += (Join-Path ${env:ProgramFiles(x86)} "Beyond-All-Reason\data") }
+  foreach ($lib in (Get-SteamLibraryRoots)) {
+    foreach ($name in @("Beyond All Reason", "Beyond-All-Reason")) {
+      $c += (Join-Path $lib "steamapps\common\$name\data")
+    }
+  }
+  return @($c | Where-Object { $_ } | Select-Object -Unique)
+}
+
+function Get-ConfiguredBARDataRoot {
+  # verdance_config.json barDataRoot is authoritative when it names a folder that exists.
+  param([string]$Workspace)
+  if (-not $Workspace) { return $null }
+  $configPath = Join-Path $Workspace "verdance_config.json"
+  if (!(Test-Path $configPath)) { return $null }
+  try {
+    $cfg = Get-Content $configPath -Raw | ConvertFrom-Json
+    if ($cfg.PSObject.Properties["barDataRoot"] -and $cfg.barDataRoot -and (Test-Path $cfg.barDataRoot)) {
+      return [string]$cfg.barDataRoot
+    }
+  } catch {}
+  return $null
+}
+
 function Find-BARDataRoot {
+  # Order: verdance_config.json -> BAR_DATA_ROOT env -> detected roots that have an engine
+  # -> detected roots that merely exist (BAR installed but never launched; the caller
+  # tells the player to launch BAR once so it installs an engine). $null when nothing.
+  param([string]$Workspace)
+  $configured = Get-ConfiguredBARDataRoot -Workspace $Workspace
+  if ($configured) { return $configured }
   if ($env:BAR_DATA_ROOT -and (Test-Path $env:BAR_DATA_ROOT)) { return $env:BAR_DATA_ROOT }
-  $candidates = @(
-    (Join-Path $env:LOCALAPPDATA "Programs\Beyond-All-Reason\data"),
-    "C:\Program Files\Beyond-All-Reason\data",
-    (Join-Path ${env:ProgramFiles(x86)} "Steam\steamapps\common\Beyond All Reason\data")
-  )
+  $candidates = Get-BARDataRootCandidates
   foreach ($candidate in $candidates) {
-    if ($candidate -and (Test-Path (Join-Path $candidate "engine"))) { return $candidate }
+    if (Test-BARDataRoot -BarDataRoot $candidate) { return $candidate }
+  }
+  foreach ($candidate in $candidates) {
+    if (Test-Path (Join-Path $candidate "games")) { return $candidate }
   }
   return $null
+}
+
+function Assert-BARDataRoot {
+  # Throws a player-readable message when $BarDataRoot is not a usable BAR data root.
+  param([string]$BarDataRoot)
+  if (-not $BarDataRoot -or !(Test-Path $BarDataRoot)) {
+    throw "No Beyond All Reason data directory found. Install BAR first (https://www.beyondallreason.info), then run SETUP.bat and enter the path to its 'data' folder when asked."
+  }
+  if (!(Test-Path (Join-Path $BarDataRoot "games"))) {
+    throw "'$BarDataRoot' does not look like a BAR data directory (no games\ folder). It is usually ...\Beyond-All-Reason\data."
+  }
+  if (-not (Test-BARDataRoot -BarDataRoot $BarDataRoot)) {
+    throw "No engine with spring.exe found under $BarDataRoot\engine. Launch BAR once so it installs an engine, then run SETUP.bat again."
+  }
 }
 
 function Get-VerdanceConfig {
@@ -40,8 +138,8 @@ function Get-VerdanceConfig {
 
   Set-DefaultProp $config "workspace" $Workspace
   if (-not ($config.PSObject.Properties["barDataRoot"] -and $config.barDataRoot -and (Test-Path $config.barDataRoot))) {
-    $detected = Find-BARDataRoot
-    if (-not $detected) { throw "Could not locate a Beyond All Reason data directory. Set barDataRoot in verdance_config.json or the BAR_DATA_ROOT environment variable." }
+    $detected = Find-BARDataRoot -Workspace $Workspace
+    if (-not $detected) { throw "Could not locate a Beyond All Reason data directory. Run SETUP.bat (it asks for the path when it cannot detect BAR), or set barDataRoot in verdance_config.json / the BAR_DATA_ROOT environment variable." }
     Set-DefaultProp $config "barDataRoot" $detected
     if ($config.PSObject.Properties["barDataRoot"]) { $config.barDataRoot = $detected }
   }
@@ -76,31 +174,45 @@ function Get-BAREngineDir {
   return $dirs[0].FullName
 }
 
+function Test-VerdancePythonExe {
+  # True when $Path exists, is not the Microsoft Store stub (WindowsApps), and runs as Python 3.10+.
+  param([string]$Path)
+  if (-not $Path) { return $false }
+  $Path = $Path.Trim()
+  if (!(Test-Path -LiteralPath $Path)) { return $false }
+  if ($Path -match 'WindowsApps') { return $false }
+  try {
+    & $Path -c "import sys; sys.exit(0 if sys.version_info >= (3, 10) else 1)" 2>$null | Out-Null
+    return ($LASTEXITCODE -eq 0)
+  } catch { return $false }
+}
+
 function Get-VerdancePython {
   param([string]$Workspace)
-  # Prefer explicit env (PLAY/_env.bat sets VERDANCE_PY)
-  foreach ($envName in @("VERDANCE_PY", "VERDANCE_PYTHON")) {
-    $v = [Environment]::GetEnvironmentVariable($envName)
-    if ($v -and (Test-Path $v)) { return $v }
-  }
+  # Same order as app\bin\_env.bat, so PLAY/SETUP/SHIP agree on one interpreter:
+  #   runtime\python (ship embed) -> VERDANCE_PY / VERDANCE_PYTHON -> py -3 -> python / python3 on PATH.
+  # Every candidate is run before it is accepted; the WindowsApps Store stub never qualifies.
+  if (-not $Workspace) { $Workspace = Get-VerdanceWorkspaceRoot }
   if ($Workspace) {
     $embedded = Join-Path $Workspace "runtime\python\python.exe"
-    if (Test-Path $embedded) { return $embedded }
+    if (Test-VerdancePythonExe $embedded) { return $embedded }
   }
-  # Prefer full python.exe over WindowsApps stub when possible
-  $cmd = Get-Command python -ErrorAction SilentlyContinue
-  if ($cmd -and $cmd.Source -and ($cmd.Source -notmatch 'WindowsApps')) {
-    return $cmd.Source
+  foreach ($envName in @("VERDANCE_PY", "VERDANCE_PYTHON")) {
+    $v = [Environment]::GetEnvironmentVariable($envName)
+    if (Test-VerdancePythonExe $v) { return $v.Trim() }
   }
-  $pyLauncher = Get-Command py -ErrorAction SilentlyContinue
-  if ($pyLauncher) {
+  if (Get-Command py -ErrorAction SilentlyContinue) {
     try {
       $exe = & py -3 -c "import sys; print(sys.executable)" 2>$null
-      if ($exe -and (Test-Path $exe.Trim())) { return $exe.Trim() }
+      if ($exe -and (Test-VerdancePythonExe ([string]$exe))) { return ([string]$exe).Trim() }
     } catch {}
   }
-  if ($cmd) { return $cmd.Source }
-  throw "No Python interpreter found. Install Python 3 or place an embeddable Python at runtime\python\."
+  foreach ($name in @("python", "python3")) {
+    foreach ($cmd in @(Get-Command $name -All -ErrorAction SilentlyContinue)) {
+      if ($cmd.Source -and (Test-VerdancePythonExe $cmd.Source)) { return $cmd.Source }
+    }
+  }
+  throw "No working Python 3.10+ found. Install Python 3.10 or newer from https://www.python.org/downloads/ (tick 'Add python.exe to PATH'), or use the SHIP zip, which embeds Python under runtime\python\."
 }
 
 function Get-BARInfolog {

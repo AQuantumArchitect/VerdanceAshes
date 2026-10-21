@@ -30,7 +30,7 @@ echo  ============================================================
 echo.
 set /p CONFIRM=Type YES to reset: 
 if /I not "%CONFIRM%"=="YES" (
-  echo Cancelled — campaign was NOT wiped.
+  echo Cancelled - campaign was NOT wiped.
   pause
   exit /b 0
 )
@@ -41,7 +41,7 @@ echo.
 if %ERR% neq 0 (
   echo RESET failed with code %ERR%.
   echo If you still see Python syntax errors inside PowerShell, the
-  echo reset script needs a refresh — tell the wire.
+  echo reset script needs a refresh - report it on the GitHub issues page.
 ) else (
   echo Reset complete.
   echo Hard-refresh the hub ^(Ctrl+F5^), then run PLAY.bat when ready.

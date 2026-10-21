@@ -14,7 +14,7 @@
   "user": "Administrator",
   "auth": {
     "method": "key",
-    "privateKeyPath": "C:\\Users\\Luke Spooner\\.ssh\\verdance_bar_aws",
+    "privateKeyPath": "%USERPROFILE%\\.ssh\\verdance_bar_aws",
     "passwordEnv": "VERDANCE_CLOUD_SSH_PASSWORD"
   },
   "remoteOs": "windows",

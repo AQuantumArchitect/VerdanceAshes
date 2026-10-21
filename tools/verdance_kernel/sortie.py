@@ -32,6 +32,114 @@ def _now() -> str:
 
 # ----------------------------------------------------------------------------- where BAR lives
 
+def engine_dirs(root: Path, name: str = "spring.exe") -> list[Path]:
+    """engine/<version>/ folders under a BAR data root that hold spring.exe, newest name first."""
+    eng = Path(root) / "engine"
+    if not eng.is_dir():
+        return []
+    try:
+        return sorted((d for d in eng.iterdir() if d.is_dir() and (d / name).is_file()), key=lambda d: d.name, reverse=True)
+    except OSError:
+        return []
+
+
+def has_engine(root: Optional[str | Path]) -> bool:
+    return bool(root) and Path(root).is_dir() and bool(engine_dirs(Path(root)))
+
+
+def _steam_library_roots() -> list[Path]:
+    """Steam install dir (registry, then the usual folders) plus every library in libraryfolders.vdf."""
+    roots: list[Path] = []
+    if sys.platform == "win32":
+        try:
+            import winreg  # type: ignore
+
+            for hive, key in ((winreg.HKEY_CURRENT_USER, r"Software\Valve\Steam"),
+                              (winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\WOW6432Node\Valve\Steam"),
+                              (winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Valve\Steam")):
+                try:
+                    with winreg.OpenKey(hive, key) as k:
+                        for val in ("SteamPath", "InstallPath"):
+                            try:
+                                v, _ = winreg.QueryValueEx(k, val)
+                                if v:
+                                    roots.append(Path(str(v).replace("/", "\\")))
+                            except OSError:
+                                pass
+                except OSError:
+                    pass
+        except Exception:  # noqa: BLE001
+            pass
+    for env in ("ProgramFiles(x86)", "ProgramFiles"):
+        v = os.environ.get(env)
+        if v:
+            roots.append(Path(v) / "Steam")
+    libs: list[Path] = []
+    for r in roots:
+        if not r.is_dir():
+            continue
+        libs.append(r)
+        vdf = r / "steamapps" / "libraryfolders.vdf"
+        if vdf.is_file():
+            try:
+                for m in re.finditer(r'"path"\s+"([^"]+)"', vdf.read_text(encoding="utf-8", errors="replace")):
+                    libs.append(Path(m.group(1).replace("\\\\", "\\")))
+            except OSError:
+                pass
+    out: list[Path] = []
+    for p in libs:
+        if p not in out:
+            out.append(p)
+    return out
+
+
+def bar_data_root_candidates() -> list[Path]:
+    """Detection order (mirrors scripts/_common.ps1 Get-BARDataRootCandidates):
+    LOCALAPPDATA installer, Program Files, then Steam libraries with both folder spellings."""
+    cands: list[Path] = []
+    la = os.environ.get("LOCALAPPDATA")
+    if la:
+        cands.append(Path(la) / "Programs" / "Beyond-All-Reason" / "data")
+    cands.append(Path.home() / "AppData" / "Local" / "Programs" / "Beyond-All-Reason" / "data")
+    for env in ("ProgramFiles", "ProgramFiles(x86)"):
+        v = os.environ.get(env)
+        if v:
+            cands.append(Path(v) / "Beyond-All-Reason" / "data")
+    for lib in _steam_library_roots():
+        for name in ("Beyond All Reason", "Beyond-All-Reason"):
+            cands.append(lib / "steamapps" / "common" / name / "data")
+    out: list[Path] = []
+    for c in cands:
+        if c not in out:
+            out.append(c)
+    return out
+
+
+def find_bar_data_root(ws: Optional[Path] = None) -> Optional[str]:
+    """verdance_config.json barDataRoot is authoritative; then BAR_DATA_ROOT; then detected roots
+    with an engine; then detected roots that merely exist (BAR installed, never launched)."""
+    if ws is not None:
+        p = Path(ws) / "verdance_config.json"
+        if p.is_file():
+            try:
+                root = (json.loads(p.read_text(encoding="utf-8-sig")) or {}).get("barDataRoot")
+                if root and Path(root).is_dir():
+                    return str(root)
+            except Exception:  # noqa: BLE001
+                pass
+    env_root = os.environ.get("BAR_DATA_ROOT")
+    if env_root and Path(env_root).is_dir():
+        return env_root
+    cands = bar_data_root_candidates()
+    for c in cands:
+        if has_engine(c):
+            return str(c)
+    for c in cands:
+        if (c / "games").is_dir():
+            return str(c)
+    return None
+
+
 def bar_config(ws: Path) -> dict[str, Any]:
     """Mirror of scripts/_common.ps1 Get-VerdanceConfig, the parts the kernel needs."""
     cfg: dict[str, Any] = {}
@@ -41,16 +149,12 @@ def bar_config(ws: Path) -> dict[str, Any]:
             cfg = json.loads(p.read_text(encoding="utf-8-sig")) or {}
         except Exception:  # noqa: BLE001
             cfg = {}
-    root = cfg.get("barDataRoot") or os.environ.get("BAR_DATA_ROOT")
+    root = cfg.get("barDataRoot")
     if not root or not Path(root).is_dir():
-        cands = []
-        la = os.environ.get("LOCALAPPDATA")
-        if la:
-            cands.append(Path(la) / "Programs" / "Beyond-All-Reason" / "data")
-        cands.append(Path.home() / "AppData" / "Local" / "Programs" / "Beyond-All-Reason" / "data")
-        root = next((str(c) for c in cands if c.is_dir()), None)
+        root = find_bar_data_root(ws)
     if not root:
-        raise RuntimeError("Could not locate a Beyond All Reason data directory. Set barDataRoot in verdance_config.json or BAR_DATA_ROOT.")
+        raise RuntimeError("Could not locate a Beyond All Reason data directory. Run SETUP.bat (it asks for the path when it cannot detect BAR), "
+                           "or set barDataRoot in verdance_config.json / BAR_DATA_ROOT.")
     rootp = Path(root)
     cfg["barDataRoot"] = str(rootp)
     cfg.setdefault("infolog", str(rootp / "infolog.txt"))
@@ -63,12 +167,9 @@ def engine_exe(cfg: dict[str, Any], name: str = "spring.exe") -> Path:
     ed = cfg.get("engineDir")
     if ed and (Path(ed) / name).is_file():
         return Path(ed) / name
-    root = Path(cfg["barDataRoot"]) / "engine"
-    if not root.is_dir():
-        raise RuntimeError(f"No engine directory under {cfg['barDataRoot']}")
-    dirs = sorted((d for d in root.iterdir() if (d / name).is_file()), key=lambda d: d.name, reverse=True)
+    dirs = engine_dirs(Path(cfg["barDataRoot"]), name)
     if not dirs:
-        raise RuntimeError(f"No engine folder containing {name} under {root}")
+        raise RuntimeError(f"No engine with {name} under {cfg['barDataRoot']}\\engine. Launch BAR once so it installs an engine, then try again.")
     return dirs[0] / name
 
 
@@ -124,17 +225,81 @@ def spring_running() -> bool:
 
 # ----------------------------------------------------------------------------- launch
 
+PROVISION_TIMEOUT_S = 1800   # a ~100 MB map on a slow line; the hub polls progress meanwhile
+PROVISION_STATUS = Path("outbox") / "provision.latest.json"
+
+
+def provision_status_path(ws: Path) -> Path:
+    return Path(ws) / PROVISION_STATUS
+
+
+def _write_provision_status(ws: Path, **fields: Any) -> None:
+    """outbox/provision.latest.json: {map, bytes, total, percent, state: downloading|done|failed, error, at}.
+    The provisioner subprocess rewrites it at least every 2 s while a download runs; the kernel
+    writes the opening and closing records so the file is never missing or stale-but-open."""
+    rec = {"schemaVersion": "verdance-provision/1.0", "map": "", "bytes": 0, "total": 0, "percent": 0,
+           "state": "downloading", "error": None}
+    rec.update(fields)
+    rec["at"] = _now()
+    try:
+        out = provision_status_path(ws)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        tmp = out.with_suffix(".json.tmp")
+        tmp.write_text(json.dumps(rec), encoding="utf-8")
+        os.replace(tmp, out)
+    except Exception:  # noqa: BLE001
+        pass
+
+
+def provision_status(ws: Path) -> Optional[dict[str, Any]]:
+    """The parsed outbox/provision.latest.json, or None when no provisioning has been recorded."""
+    p = provision_status_path(ws)
+    if not p.is_file():
+        return None
+    try:
+        d = json.loads(p.read_text(encoding="utf-8-sig"))
+        return d if isinstance(d, dict) else None
+    except Exception:  # noqa: BLE001
+        return None
+
+
 def provision_map(ws: Path, cfg: dict[str, Any], map_name: str) -> dict[str, Any]:
-    """A map the player does not own is a fatal content_error before the mutator loads."""
+    """A map the player does not own is a fatal content_error before the mutator loads.
+
+    Runs tools/map_provisioner_v1.py synchronously (the launch waits for the map) while the
+    provisioner streams progress into outbox/provision.latest.json for the hub to poll."""
     prov = ws / "tools" / "map_provisioner_v1.py"
     if not prov.is_file() or not map_name:
         return {"skipped": True}
+    status_file = provision_status_path(ws)
+    _write_provision_status(ws, map=map_name, state="downloading")
     try:
-        r = subprocess.run([sys.executable, str(prov), "--workspace", str(ws), "--bar-data-root", cfg["barDataRoot"], "--map", map_name, "--quiet"],
-                           cwd=str(ws), capture_output=True, text=True, timeout=600)
-        return {"ok": r.returncode == 0, "returncode": r.returncode, "tail": (r.stdout or r.stderr or "")[-600:]}
+        r = subprocess.run([sys.executable, str(prov), "--workspace", str(ws), "--bar-data-root", cfg["barDataRoot"], "--map", map_name,
+                            "--quiet", "--progress-json", str(status_file)],
+                           cwd=str(ws), capture_output=True, text=True, timeout=PROVISION_TIMEOUT_S)
+        tail = (r.stdout or r.stderr or "")[-600:]
+        cur = provision_status(ws) or {}
+        if r.returncode == 0:
+            if cur.get("state") != "done":
+                _write_provision_status(ws, map=map_name, state="done", bytes=cur.get("bytes") or 0, total=cur.get("total") or 0, percent=100)
+        else:
+            err = cur.get("error") if cur.get("state") == "failed" else None
+            if not err:
+                lines = tail.strip().splitlines()
+                err = lines[-1] if lines else "map provisioner failed"
+            _write_provision_status(ws, map=map_name, state="failed", bytes=cur.get("bytes") or 0, total=cur.get("total") or 0,
+                                    percent=cur.get("percent") or 0, error=err)
+        return {"ok": r.returncode == 0, "returncode": r.returncode, "tail": tail}
+    except subprocess.TimeoutExpired:
+        cur = provision_status(ws) or {}
+        err = f"map download did not finish within {PROVISION_TIMEOUT_S // 60} minutes"
+        _write_provision_status(ws, map=map_name, state="failed", bytes=cur.get("bytes") or 0, total=cur.get("total") or 0,
+                                percent=cur.get("percent") or 0, error=err)
+        return {"ok": False, "error": err}
     except Exception as e:  # noqa: BLE001
-        return {"ok": False, "error": f"{type(e).__name__}: {e}"}
+        err = f"{type(e).__name__}: {e}"
+        _write_provision_status(ws, map=map_name, state="failed", error=err)
+        return {"ok": False, "error": err}
 
 
 def launch(ws: Path) -> dict[str, Any]:

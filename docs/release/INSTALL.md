@@ -12,7 +12,10 @@
   service. The first mission needs about 100 MB; the rest arrive as you go.
 - An internet connection the first time each new map comes up
 
-Python is **not** required — a portable Python runtime is bundled in `runtime\`.
+Python: the zip build embeds a portable Python runtime in `runtime\`, so nothing
+needs installing. If you cloned the git repository instead, install Python 3.10+
+from python.org (tick "Add python.exe to PATH"); `SETUP.bat` tells you if it
+cannot find a working one.
 The maps are not bundled: they belong to their authors and your BAR client
 downloads them from the same place it always does.
 
@@ -20,12 +23,19 @@ downloads them from the same place it always does.
 
 1. Unzip the package anywhere you like (e.g. `Documents\VerdanceAshes`).
    Avoid folders that need admin rights (like `Program Files`).
-2. Double-click `SETUP.bat`.
-   - It auto-detects your BAR install (default: `%LOCALAPPDATA%\Programs\Beyond-All-Reason\data`).
-     If it can't find it, it will ask you for the path.
+2. Double-click `SETUP.bat` (once).
+   - It auto-detects your BAR install: the standard installer
+     (`%LOCALAPPDATA%\Programs\Beyond-All-Reason\data`), Program Files, then
+     Steam libraries. If it cannot find one it **asks you for the path** to the
+     `data` folder (the one containing `engine\` and `games\`) and remembers it
+     in `verdance_config.json`.
+   - It needs an engine: if BAR has never been launched there is no
+     `engine\*\spring.exe` yet. Launch BAR once, then run SETUP again.
    - It copies `VerdanceAshes.sdd` into BAR's `data\games\` folder.
-   - It creates a fresh campaign state.
-3. Double-click `PLAY.bat` to play.
+   - It writes a fresh campaign state (mission 1).
+3. Double-click `PLAY.bat` to play. Leave the window open.
+4. `RESET.bat` starts the campaign over whenever you want (old save kept in
+   `state\backups\`).
 
 ## The play loop
 
@@ -48,20 +58,37 @@ field units carry forward; a new enemy camp reseeds at the new target.
 
 ## Troubleshooting
 
-- **"Could not locate a Beyond All Reason data directory"** -- pass the path manually:
-  re-run SETUP.bat and enter the `data` folder that contains `engine\` and `games\`.
+- **"Could not locate a Beyond All Reason data directory"** -- re-run SETUP.bat and
+  enter the `data` folder that contains `engine\` and `games\` when it asks. You can
+  also edit `barDataRoot` in `verdance_config.json` by hand; it is authoritative.
+- **"No engine with spring.exe found"** -- BAR is installed but has never run.
+  Launch BAR once so it installs an engine, then run SETUP.bat again.
+- **"No working Python 3.10+ was found"** (git clone only) -- install Python from
+  python.org with "Add python.exe to PATH", or use the zip build, which embeds it.
+  The Microsoft Store `python` stub does not count; SETUP skips it on purpose.
 - **BAR launches vanilla skirmish instead of the mission** -- the mutator isn't installed;
   re-run SETUP.bat and check that `data\games\VerdanceAshes.sdd\modinfo.lua` exists.
 - **BAR closes instantly, or `Dependent archive "<map name>" not found`** -- the
   mission's map isn't installed and couldn't be downloaded. This is fatal inside
-  BAR itself, before the campaign loads, so it looks like a crash. Check your
-  connection and try again; to fetch every map up front, run:
+  BAR itself, before the campaign loads, so it looks like a crash. The Drop
+  downloads the map first (up to 30 minutes on a slow line; the hub shows the
+  progress from `outbox\provision.latest.json`). Check your connection and try
+  again; to fetch every map up front, run:
   `runtime\python\python.exe tools\map_provisioner_v1.py --check-all`
+  (git clone: `python tools\map_provisioner_v1.py --check-all`)
   As a last resort, join any BAR lobby on that map once and let the client pull it.
 - **Mission ends but nothing advances** -- check the kernel's status page
   (`http://127.0.0.1:8770/api/status`) and BAR's `data\infolog.txt` for
-  `VA_RESULT_JSON` lines. Include both in a bug report.
+  `VA_RESULT_JSON` lines. Then export a feedback bundle (below).
 - **Reset everything** -- run `RESET.bat` (campaign restarts at mission 1;
   your BAR install is untouched).
 - **Uninstall** -- delete `data\games\VerdanceAshes.sdd` from your BAR install and delete
   the unzipped package folder.
+
+## Sending feedback
+
+In the hub: **System menu → Export feedback bundle**. It writes
+`export\feedback_<stamp>.zip` with your campaign state and the logs the kernel
+needs to reproduce the problem. Attach it to an issue at
+<https://github.com/AQuantumArchitect/verdanceashes/issues> and say what you
+did, what you expected, and what happened.

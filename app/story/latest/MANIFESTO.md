@@ -20,7 +20,7 @@ Cleared: `11, 28, 45`
 
 - Samples trained: **1688**
 - Win rate (tape missions): **1.0**
-- Weights: `C:\Users\Luke Spooner\Documents\BAR_Verdance_Workspace\app\brain\bar_brain_weights.json`
+- Weights: `app\brain\bar_brain_weights.json` (workspace-relative)
 - Eco seat hint: `pressure` / controller `barbarian_aggressive`
 - Siege seat hint: `pressure`
 

@@ -81,7 +81,7 @@ Shell-capable kinds: eco_raid, eco_expand, seize_lane, strike_relay, siege, mult
 ## Membrane
 
 ```powershell
-$env:PYTHONPATH = "$ws\tools;C:\Users\Luke Spooner\ws-win\umwelt\src"
-& "...\umwelt\.venv\Scripts\python.exe" -m quantum_bar_ai.shell_character_membrane $ws
+$env:PYTHONPATH = "$ws\tools;$env:UMWELT_SRC"   # UMWELT_SRC = <umwelt clone>\src
+& python -m quantum_bar_ai.shell_character_membrane $ws
 # -> outbox/shell_character_membrane.latest.json
 ```

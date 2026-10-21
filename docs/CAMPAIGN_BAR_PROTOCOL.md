@@ -60,14 +60,56 @@ SORTIE  ──(Sortie v2)──►  BAR MATCH  ──(MatchResult v2)──►  
 
 ---
 
-## MatchResult essentials
+## MatchResult: the gadget writes facts, Python interprets
+
+The gadget (`game_verdance_campaign.lua` `resultJson`, one blob per sortie as `VA_RESULT_JSON_*`
+in the infolog) carries **no verdict, no credits, no zone flip and no extraction judgement**.
+Its `status` is the terminal **kind** only. Everything a reader needs to judge the sortie is a
+fact in the blob; `tools/manifest_v1.py` turns the manifest into the verdict and
+`tools/match_credit_v1.py` turns the facts into credits. `tools/contract_v2.normalize_result`
+is the only door: it strips any judgement field an older result still carries
+(`verdict`, `credits`, `zoneFlipped`, `zoneFlipEligible`, `cleanExtract`, `freeTnbMint`,
+`mapSpent`, `theaterExhausted`) before the credit table sees it.
+
+**How a sortie ends** (and only these ways):
+
+| `status` (terminal kind) | What happened | Python verdict |
+|---|---|---|
+| `extracted` | the player confirmed the manifest (`VA_CMD:extract:<dest>`) | `victory` if `manifest.objectiveComplete` and `manifest.staying.heroes` is empty, else `partial` |
+| `wiped` | nobody left to confirm one; the exfil gadget stamps an empty manifest | `defeat` |
+| `closed` | the engine ended the game without a manifest (resign / external GameOver) | `abandon` |
+
+The clock never ends a sortie: when `requiredFrames` runs out the HUD phase becomes `OVERTIME`
+and play continues until the player lifts. `extractionStatus` is Python's reading of
+`manifest.enemyOnPad` (`clean` when 0, else `contested`); it is not written by Lua.
+
+**Fields** (all facts; `*` = new in pass nine):
+
+| Group | Fields |
+|---|---|
+| identity | `schemaVersion` `campaignId` `missionId` `missionNumber` `chapterIndex` `resultKey` `sortieId` `playerTeamId` `pathSignal` `patron` |
+| ending | `status` (kind) `terminalReason` `manifest` (`verdance-manifest/1`: `kind` `destination` `pad` `going` `staying` `enemyOnPad` `objectiveComplete` `seen` `tenebrium`) `frame` `elapsedMinutes` `holdFrames` `requiredFrames` |
+| where | `deploymentMapId` `mapId` `deploymentZoneId` `targetZoneId` `extractionZoneId` `map` `zoneMap` |
+| primary objective | `objectiveComplete` `objectiveCompleteHow`* `objectiveCompleteFrame`* `objectiveKind`* `objectiveMode`* (capture · presence · fortify · targets_choice · targets_raid · targets_all) `objectiveTargetsTotal`* `objectiveTargetsDestroyed`* `objectiveBypassed` `chosenTargetForceId` `destroyedObjectiveIds` `objectiveResults[]` (`objectiveId` `kind` `mode`* `status`: incomplete · destroyed · complete · claimed, `how`* `targetsTotal`* `targetsDestroyed`* `damage`) |
+| capture state machine | `captureMode` `capturePhase` (idle · clear · hold · claimed) `pocketCleared` `nodeClaimed` `nodeClaimedFrame`* `zoneHoldFrames`* `regrowWaves` |
+| marks | `secondaryResults[]` `requiredMarksLeft`* `allObjectivesDone`* (primary + every required mark + purge: the HUD's EXTRACT phase) `purge{armed,done}` |
+| rescue contract | `objectiveFailed` `objectiveFailReason` `objectiveFailHero` `rescueContractFailed` |
+| company | `heroResults{}` `namedOutcomes[]` `recruitedHeroIds[]` `playerSurvivors{}` `playerSurvivorXp{}` `loanUnitHp{}` `armyValue` / `metrics.armyValue` (metal of living mobile combat units, a measurement) `companionsAlive` `companionsTotal` `primaryCompanion` |
+| field | `playerFootprint[]` `survivingInstalls[]` `shellScars[]` `observedZones{}` `beliefExport{}` |
+| economy | `metalStored` `metalStorage` `metalKExtracted` `metalKBrought` `metalKFieldStart` `metalExportMode` `economy` `tenebrium*` (`Bank` `Looted` `Spent` `Lost` `Invested` `LivingStakes` `LivingStakeUnits` `LootEvents` `WrecksCreated` `WrecksClaimed` `WrecksLost` `UnclaimedOnExtraction` `ClaimEvents` `TeamBanks` `FactionBanks`) `armadaTenebriumCrisis` |
+| world | `graph` `reputation` `quantumTransitionJournal` `finalQuantumState` `sessionMode` `occupationModel` `farmSortie` `debugAutoProgress` |
+
+After normalize, MatchResult v2 adds what Python decided: `verdict`/`status` (verdict enum),
+`terminalKind`, `extractionStatus`, `cleanExtract`, `zoneFlipped`, `credits{}`, `success`,
+`freeTnbMint:false`.
 
 ```json
 {
   "schemaVersion": "verdance-match-result/2.0",
-  "resultKey": "campaign|missionId|missionNumber|chN|verdict|reason|fFRAME",
+  "resultKey": "campaign|missionId|missionNumber|chN|<kind>|<reason>|fFRAME",
   "verdict": "victory|partial|defeat|abandon|incomplete",
-  "terminalReason": "extracted|soft_clock_no_extract|player_wiped|…",
+  "terminalKind": "extracted|wiped|closed",
+  "terminalReason": "extracted|wiped|closed|gameover_external|…",
   "credits": {
     "objectiveComplete": true,
     "nodeClaimed": true,
@@ -80,8 +122,6 @@ SORTIE  ──(Sortie v2)──►  BAR MATCH  ──(MatchResult v2)──►  
   "freeTnbMint": false
 }
 ```
-
-Gadget still emits a flat JSON blob; `contract_v2.normalize_result` fills v2 + credits.
 
 ---
 
@@ -100,7 +140,8 @@ Gadget still emits a flat JSON blob; `contract_v2.normalize_result` fills v2 + c
 - `partial ≠ victory` for full XP and empty-grass flips.
 - Capture path never flips without `nodeClaimed`.
 - Duplicates (`resultKey` already in `processedResults`) → no-op, hub shows “already applied”.
-- Mode A chapters are full MatchResults each; soft-continue does not skip credit.
+- One sortie, one result: there is no same-map continue and no second chapter (`chapterIndex` is always 1).
+- The gadget never decides any row of this table; it only reports the facts the table reads.
 
 ---
 
@@ -108,11 +149,11 @@ Gadget still emits a flat JSON blob; `contract_v2.normalize_result` fills v2 + c
 
 | Event | Action |
 |---|---|
-| Mode A soft continue | Process each new `resultKey`; keep watching until BAR exits |
-| Travel / extract_leave | Process last result; relaunch is host concern |
+| Clock runs out | nothing ends: HUD phase `OVERTIME`; the player still lifts via the manifest |
 | BAR exit, 0 results | `incomplete` debrief; Retry extract or Abandon |
 | Extract parse fail | `incomplete` + `outbox/result_harvest_fail.latest.json` |
-| External GameOver | Gadget safety net logs; normalize as victory/partial/defeat + `gameover_external` |
+| External GameOver (resign / crash-to-lobby) | gadget writes the facts with `status: closed`, `terminalReason: gameover_external`, no manifest → `abandon` (bead only, mission number held) |
+| Company wiped | exfil gadget stamps an empty manifest (`kind: wiped`) → `defeat` |
 | Re-Pull same result | duplicate no-op |
 | Stale inbox | refuse if already processed; ask re-extract or new Drop |
 

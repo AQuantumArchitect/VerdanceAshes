@@ -13,7 +13,7 @@
   "growMinutes": 7,
   "teams": 2,
   "seed": 66,
-  "rawDumpPath": "C:\\Users\\Luke Spooner\\Documents\\BAR_Verdance_Workspace\\headless_runs\\shell_bake_the_rock_jungle_20260728_201311\\shell_raw_units.json",
+  "rawDumpPath": "headless_runs\\shell_bake_the_rock_jungle_20260728_201311\\shell_raw_units.json",
   "stripped": 41,
   "kept": 20,
   "simCommanders": "normal",

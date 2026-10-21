@@ -47,7 +47,7 @@ if (Test-Path $shipKeep) {
   Write-Host "Scrubbed nested va_ship_state_keep (ship ghost saves)"
 }
 
-# Steam cloud is a local mirror, not a restore source — but wipe it anyway so
+# Steam cloud is a local mirror, not a restore source - but wipe it anyway so
 # a later tool cannot copy Sortie 2 back over the fresh opener.
 $cloudState = Join-Path $Workspace "state\steam\cloud\campaign_state.json"
 if (Test-Path $cloudState) {
@@ -105,10 +105,18 @@ if (Test-Path $ghostResult) {
 }
 
 # Stale Act-N mission lua must not be what BAR loads after a wipe.
+# The BAR copy lives under the configured data root (verdance_config.json is
+# authoritative; Find-BARDataRoot falls back to the usual install folders).
 $generatedDirs = @(
-  (Join-Path $Workspace "mod\VerdanceAshes.sdd\singleplayer\verdance_ashes\generated"),
-  (Join-Path $env:LOCALAPPDATA "Programs\Beyond-All-Reason\data\games\VerdanceAshes.sdd\singleplayer\verdance_ashes\generated")
+  (Join-Path $Workspace "mod\VerdanceAshes.sdd\singleplayer\verdance_ashes\generated")
 )
+$barRoot = $null
+try { $barRoot = Find-BARDataRoot -Workspace $Workspace } catch { $barRoot = $null }
+if ($barRoot) {
+  $generatedDirs += (Join-Path $barRoot "games\VerdanceAshes.sdd\singleplayer\verdance_ashes\generated")
+} else {
+  Write-Host "Note: no BAR data root found; only the workspace mod was scrubbed (run SETUP.bat)."
+}
 foreach ($generated in $generatedDirs) {
   if (-not (Test-Path $generated)) { continue }
   foreach ($name in @("va_current.lua", "proxy_story_current.lua", "zone_map_current.lua")) {
@@ -151,9 +159,9 @@ try {
 
 Write-Host ""
 Write-Host "Reset done."
-Write-Host '  - Fresh mission 1 opener (GF eco_raid — fusion vaults are OPTIONAL bonuses)'
+Write-Host '  - Fresh mission 1 opener (GF eco_raid - fusion vaults are OPTIONAL bonuses)'
 Write-Host '  - Stale intents / playable / BAR va_current scrubbed (no ghost sorties)'
-Write-Host '  - Bag starts empty — buy Punch / streams at the Broker (nothing free)'
+Write-Host '  - Bag starts empty - buy Punch / streams at the Broker (nothing free)'
 Write-Host '  - Metal bank starts at catalog fresh wallet (earn more by extracting end metal)'
 Write-Host '  - Blow a fusion vault and it stays dead next sortie (continuity scar)'
 Write-Host '  - Mark GF_NE_PLATEAU before Drop if you want the Fatboy wreck'

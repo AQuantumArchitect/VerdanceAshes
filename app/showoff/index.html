@@ -244,19 +244,9 @@ h3 { margin:.8rem 0 .35rem; font-size:.78rem; color:var(--gold); font-weight:600
   padding:.1rem .35rem; border-radius:999px; border:1px solid rgba(126,200,255,.25);
   color:var(--steam);
 }
-.btn-buy, .btn-sm, .btn-primary, .btn-ghost {
+.btn-buy, .btn-primary, .btn-ghost {
   border-radius:8px; padding:.35rem .65rem; font-size:.72rem;
   border:1px solid rgba(61,143,85,.45); background:rgba(0,0,0,.4); color:var(--ink);
-}
-.btn-bro-tzar {
-  background:rgba(201,160,255,.14); color:var(--tnb);
-  border:1px solid rgba(201,160,255,.55);
-  font-weight:600; letter-spacing:.01em;
-}
-.btn-bro-tzar:hover:not(:disabled) { filter:brightness(1.12); border-color:var(--tnb); }
-.btn-bro-tzar.ordered {
-  background:rgba(125,255,138,.1); color:var(--good);
-  border-color:rgba(125,255,138,.45);
 }
 .btn-primary {
   background:linear-gradient(135deg, #2d6b42, #1a3f2a);
@@ -451,15 +441,12 @@ h3 { margin:.8rem 0 .35rem; font-size:.78rem; color:var(--gold); font-weight:600
 }
 .legend-row .lg-infil::before { background:var(--good); }
 .legend-row .lg-target::before { background:var(--warn); }
-.legend-row .lg-pad::before { background:transparent; border:1px dashed var(--edge); }
 .legend-row .lg-stale::before { background:transparent; border:1px dotted var(--ash); }
 .legend-row .lg-dark::before { background:repeating-linear-gradient(135deg, rgba(154,139,114,.5) 0 1px, transparent 1px 3px); border:1px dashed var(--ash); }
 .legend-row .lg-threat::before { background:var(--bad); height:.2rem; }
 .legend-row .lg-eyes::before { background:transparent; border:1px dashed var(--bad); border-radius:50%; }
 .legend-row .lg-open::before { background:transparent; border:1px solid var(--warn); }
 
-/* Legacy modal kept hidden — theater is main view */
-.overlay { display:none !important; }
 .status-toast {
   position:fixed; left:50%; bottom:1.2rem; transform:translateX(-50%);
   z-index:120; max-width:min(32rem,92vw); padding:.55rem .9rem;
@@ -469,14 +456,6 @@ h3 { margin:.8rem 0 .35rem; font-size:.78rem; color:var(--gold); font-weight:600
 .status-toast.show { display:block; }
 .status-toast.err { border-color:rgba(255,125,125,.45); color:var(--bad); }
 .status-toast.ok { border-color:rgba(125,255,138,.4); color:var(--good); }
-
-.tabs { display:flex; gap:.3rem; margin-bottom:.5rem; }
-.tab {
-  flex:1; font-size:.68rem; letter-spacing:.06em; text-transform:uppercase;
-  padding:.35rem; border-radius:8px; border:1px solid rgba(61,143,85,.3);
-  background:transparent; color:var(--muted);
-}
-.tab.active { color:var(--gold); border-color:rgba(212,196,154,.4); background:rgba(0,0,0,.3); }
 
 /* Density matrix (war-map ρ room) */
 .rho-wrap { overflow:auto; max-height:14rem; }
@@ -1167,7 +1146,6 @@ details.advanced summary { cursor: pointer; color: var(--steam); }
     <div class="company-foot" id="company-foot">
       <span class="company-preview" id="company-preview-text">Pick packs to seal the company.</span>
       <button type="button" class="btn-primary" id="btn-seal-company">Confirm company</button>
-      <button type="button" class="btn-bro-tzar" id="btn-bro-tzar" hidden>Bro, Pass me the Tzar</button>
     </div>
     <h3>Standing</h3>
     <div id="rep"></div>
@@ -1243,9 +1221,8 @@ details.advanced summary { cursor: pointer; color: var(--steam); }
         </div>
       </div>
       <div class="legend-row">
-        <span class="lg-infil">△ Pad · in and out</span>
+        <span class="lg-infil">△ Pad — land and lift</span>
         <span class="lg-target">◎ Wound</span>
-        <span class="lg-pad">△ Legal pad</span>
         <span class="lg-open">Available objective</span>
         <span class="lg-stale">Stale belief</span>
         <span class="lg-dark">? Nobody looked</span>
@@ -1274,11 +1251,6 @@ details.advanced summary { cursor: pointer; color: var(--steam); }
   </main>
 
   <aside class="col right" id="col-right">
-    <div class="tabs">
-      <button type="button" class="tab active" data-tab="shop" id="tab-shop">Broker</button>
-      <button type="button" class="tab" data-tab="theaters" id="tab-theaters">Theaters</button>
-      <button type="button" class="tab" data-tab="manifold" id="tab-manifold">Front sense</button>
-    </div>
     <div id="panel-shop">
       <h2>Broker</h2>
       <div class="shop-balances" id="shop-balances"></div>
@@ -1316,9 +1288,9 @@ details.advanced summary { cursor: pointer; color: var(--steam); }
       <button type="button" class="primary" id="btn-pull-result" title="Bring the last sortie home (auto when the bridge is live)">After the fight — bring it home</button>
       <button type="button" id="btn-abandon" title="Leave the field with no zone flip or fake win — unlocks the next Drop">Abandon sortie</button>
       <button type="button" id="btn-sync-hub" title="Refresh the map from campaign progress">Refresh</button>
-      <button type="button" id="btn-save-campaign" title="Snapshot campaign_state into a named save slot under state/saves/">Save</button>
-      <button type="button" id="btn-load-campaign" title="Restore a named save slot (backs up live state first)">Load</button>
-      <button type="button" class="danger" id="btn-reset-campaign" title="Full wipe: backup save, archive results, clear Act-N lua, mission 1 + empty bag (same as RESET.bat).">Reset</button>
+      <button type="button" id="btn-save-campaign" title="Save the campaign to a named slot">Save</button>
+      <button type="button" id="btn-load-campaign" title="Load a named save (the current campaign is backed up first)">Load</button>
+      <button type="button" class="danger" id="btn-reset-campaign" title="Start the campaign over: a backup is kept, then mission 1 with an empty bag">Reset</button>
       <button type="button" id="btn-help" title="How this works">How this works</button>
       <a href="story_autoplay.html" title="Optional cinematic reel">Story reel</a>
     </div>
@@ -1374,8 +1346,8 @@ details.advanced summary { cursor: pointer; color: var(--steam); }
     <ol class="steps">
       <li><span class="n">1</span><span><b>Form the Company</b> on first open — core always ships; pick <b>3 unlocked packs</b>. Unpicked heroes stay off your board until a field recruit.</span></li>
       <li><span class="n">2</span><span>Pick a <b>mission</b> on the main screen, mark the <b>wound</b> and the <b>pad</b> (you lift from where you landed), then <b>Drop into battle</b>.</span></li>
-      <li><span class="n">3</span><span>In BAR, take the objective. When the match ends, return here and <b>bring it home</b>.</span></li>
-      <li><span class="n">4</span><span><b>Camp</b> (left bar) raises the jungle shelf. <b>Home → Broker</b> shows each available purchase and its exact cost.</span></li>
+      <li><span class="n">3</span><span>In BAR, take the objective, get what you want to keep onto the pad and press <b>EXTRACT</b> (the fight also ends if the company is wiped). The clock never ends a sortie — overtime only wakes the map. The kernel brings the result home to this screen.</span></li>
+      <li><span class="n">4</span><span><b>Home</b> is the camp — raise the jungle shelf there. The <b>Broker</b> is in <b>Company</b> and shows each available purchase and its exact cost.</span></li>
       <li><span class="n">5</span><span><b>Save / Load / Reset</b> in the footer manage campaign state.</span></li>
     </ol>
     <p class="hint">Lost? Hit <b>How this works</b> in the bar below anytime.</p>

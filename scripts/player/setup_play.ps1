@@ -1,7 +1,11 @@
 # First-run / re-arm: BAR detect, install mutator, config, hub rebuild.
 param(
   [string]$Workspace = "",
-  [switch]$Junction
+  [string]$BarDataRoot = "",
+  [switch]$Junction,
+  # SETUP.bat runs in a console, so setup_tester may ASK for the BAR path when it
+  # cannot detect one. Pass -NonInteractive from automation (no prompt; fail instead).
+  [switch]$NonInteractive
 )
 
 $ErrorActionPreference = "Stop"
@@ -24,9 +28,10 @@ $setupTester = Join-Path $ScriptsDir "setup_tester.ps1"
 if (!(Test-Path $setupTester)) { throw "scripts\setup_tester.ps1 missing" }
 
 $setupArgs = @{
-  Workspace     = $Workspace
-  NonInteractive = $true
+  Workspace = $Workspace
 }
+if ($BarDataRoot) { $setupArgs["BarDataRoot"] = $BarDataRoot }
+if ($NonInteractive) { $setupArgs["NonInteractive"] = $true }
 if ($Junction) { $setupArgs["Junction"] = $true }
 & $setupTester @setupArgs
 
@@ -54,5 +59,6 @@ try {
 
 Write-Host ""
 Write-Host "=== SETUP complete (v$version) ==="
-Write-Host "Run PLAY.bat from the workspace root:"
+Write-Host "Run PLAY.bat from the workspace root (leave it open while you play):"
 Write-Host "  $Workspace\PLAY.bat"
+Write-Host "RESET.bat starts the campaign over."

@@ -62,18 +62,31 @@ def make_handler(kernel: CampaignKernel, showoff: Path):
                 code, body, ct = _json_bytes(kernel.camp_surface())
                 return self._send(code, body, ct)
 
+            # THE LAW: the player side shows the company's belief only. Truth, another faction's
+            # mind and belief-vs-truth are dev faces: 403 unless devMode / VA_DEV=1.
             if path == "/api/intel":
                 q = parse_qs(parsed.query or "")
                 persp = (q.get("perspective") or ["company"])[0]
-                code, body, ct = _json_bytes(kernel.intel_surface(persp))
+                result = kernel.intel_surface(persp)
+                code, body, ct = _json_bytes(result, 403 if result.get("error") == "dev only" else 200)
                 return self._send(code, body, ct)
 
             if path == "/api/truth":
-                code, body, ct = _json_bytes(kernel.truth_surface())
+                result = kernel.truth_surface()
+                code, body, ct = _json_bytes(result, 403 if result.get("error") == "dev only" else 200)
                 return self._send(code, body, ct)
 
             if path == "/api/divergence":
-                code, body, ct = _json_bytes(kernel.divergence_surface())
+                result = kernel.divergence_surface()
+                code, body, ct = _json_bytes(result, 403 if result.get("error") == "dev only" else 200)
+                return self._send(code, body, ct)
+
+            if path == "/api/exposure":
+                code, body, ct = _json_bytes(kernel.exposure_surface())
+                return self._send(code, body, ct)
+
+            if path == "/api/health":
+                code, body, ct = _json_bytes(kernel.health())
                 return self._send(code, body, ct)
 
             if path == "/api/chronicle":
@@ -96,30 +109,8 @@ def make_handler(kernel: CampaignKernel, showoff: Path):
                 code, body, ct = _json_bytes(kernel.get_result())
                 return self._send(code, body, ct)
 
-            if path == "/api/continuity-audit":
-                qs = parse_qs(parsed.query or "")
-                marks = []
-                for key in ("mark", "marks"):
-                    for raw in qs.get(key, []):
-                        marks.extend([m.strip() for m in str(raw).split(",") if m.strip()])
-                code, body, ct = _json_bytes(kernel.continuity_audit(marks=marks or None))
-                return self._send(code, body, ct)
-
-            if path == "/api/phases":
-                from verdance_kernel.phases import phase_status
-
-                code, body, ct = _json_bytes(phase_status())
-                return self._send(code, body, ct)
-
-            if path == "/api/steam":
-                from verdance_kernel import steam as steam_mod
-
-                code, body, ct = _json_bytes(steam_mod.status(kernel.ws))
-                return self._send(code, body, ct)
-
-            if path == "/api/surface":
-                code, body, ct = _json_bytes(kernel.write_campaign_surface())
-                return self._send(code, body, ct)
+            # /api/continuity-audit, /api/phases, /api/steam, /api/surface were removed in pass 8B:
+            # nothing in app/ or tools/ called them (campaign_zip_v1 is dead code).
 
             if path == "/api/saves":
                 if hasattr(kernel, "list_saves"):
@@ -223,16 +214,6 @@ def make_handler(kernel: CampaignKernel, showoff: Path):
                 code, body, ct = _json_bytes(result, code)
                 return self._send(code, body, ct)
 
-            if path == "/api/deploy-roster":
-                try:
-                    raw = _read_json_body(self)
-                except Exception as e:  # noqa: BLE001
-                    code, body, ct = _json_bytes({"ok": False, "error": f"bad json: {e}"}, 400)
-                    return self._send(code, body, ct)
-                result = kernel.update_sortie_roster(raw)
-                code, body, ct = _json_bytes(result, 200)
-                return self._send(code, body, ct)
-
             if path == "/api/purchase":
                 try:
                     body_in = _read_json_body(self)
@@ -290,13 +271,13 @@ def make_handler(kernel: CampaignKernel, showoff: Path):
                 code, body, ct = _json_bytes(result, code)
                 return self._send(code, body, ct)
 
-            if path == "/api/bro-tzar":
-                if hasattr(kernel, "order_bro_tzar"):
-                    result = kernel.order_bro_tzar()
-                else:
-                    result = {"ok": False, "error": "order_bro_tzar not available"}
-                code = 200 if result.get("ok") else 400
-                code, body, ct = _json_bytes(result, code)
+            if path == "/api/feedback-bundle":
+                try:
+                    body_in = _read_json_body(self)
+                except Exception:  # noqa: BLE001
+                    body_in = {}
+                result = kernel.feedback_bundle(body_in if isinstance(body_in, dict) else {})
+                code, body, ct = _json_bytes(result, 200 if result.get("ok") else 500)
                 return self._send(code, body, ct)
 
             if path == "/api/reset-campaign":

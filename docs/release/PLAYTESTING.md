@@ -6,22 +6,24 @@ and tell us where the loop broke or felt wrong.
 ## The player path (use this)
 
 ```
-app\bin\PLAY.bat
-→ war map (kernel on http://127.0.0.1:8770/)
+SETUP.bat   once
+PLAY.bat    every session → war map (kernel on http://127.0.0.1:8770/)
+RESET.bat   start over
 ```
 
 1. **First light** — read the welcome card (**How this works** reopens it anytime).
 2. **Choose a sortie** — green cards in the center. Stay on home ground first.
 3. **Briefing table** — green = objective, blue = landing. Defaults are usually fine.
-4. **Drop into battle** — Beyond All Reason should open into the mission.
+   The minimap paints what the company **believes** about each zone, not the truth.
+4. **Drop into battle** — Beyond All Reason should open into the mission. The first
+   Drop on a new map downloads it first; the hub shows the progress.
 5. **Play** — briefing (Space to dismiss), clear the objective, extract if prompted.
    After a win, **1 / 2 / 3** can take the next pocket on the same map.
 6. **Bring it home** — bridge usually auto-applies. Fallback: **After the fight — bring it home**.
 7. Hire mercs, talk to Ketha, rest, or take the next drop.
 
-Optional seat-only path (no war map): run `scripts\play_session_v1.ps1`.
-(An older note here pointed at `app\bin\PLAY_AS_PLAYER.bat`; that file lives
-under `app\bin\forge\`, which is a workspace-only tool and is never shipped.)
+There is no other player path. Everything under `app\bin\forge\` is workspace
+tooling and is not shipped.
 
 ## What we're testing
 
@@ -33,12 +35,21 @@ under `app\bin\forge\`, which is a workspace-only tool and is never shipped.)
 6. **Campaign feel** — does the world react across a few missions?
 7. **Vibe** — does it feel like a game, or a tool?
 
-## Feedback template
+## Sending feedback
+
+1. In the hub: **System menu → Export feedback bundle**. It writes
+   `export\feedback_<stamp>.zip` (your campaign state plus the logs the kernel
+   needs to reproduce the problem).
+2. Open an issue at <https://github.com/AQuantumArchitect/verdanceashes/issues>,
+   attach the zip, and paste the template below.
 
 ```
-Build / date:
+Build / date:            (VERSION file, or the zip name)
 Missions played:
 Same-map continues? (Y/N, how many):
+What I did:
+What I expected:
+What happened:
 What felt good:
 What was confusing:
 Where the vibe broke:

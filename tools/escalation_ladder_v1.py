@@ -2,7 +2,7 @@
 """Escalation ladder v1 — the authored complexity/difficulty curve.
 
 One authority for "how hard and how complex is mission N", answering the
-Drop 4 baseline findings (see docs/plans/drop4_escalation.md):
+Drop 4 baseline findings (see docs/archive/plans/drop4_escalation.md):
 
 - Difficulty: a per-mission **scale window** [lo, hi]. The compiler still
   computes enemyScale from campaign state (zone presence, dial, craft knobs,

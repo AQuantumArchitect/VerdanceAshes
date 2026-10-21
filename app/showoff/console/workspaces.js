@@ -12,13 +12,7 @@ const adapter=window.Verdance;
 
 const $=id=>document.getElementById(id);
 
-const params=new URLSearchParams(location.search);
-
-if(params.get('console')==='0' || adapter?.snapshot().hub.features?.commandConsole===false) {
-
-  location.replace('legacy.html'+location.search);
-
-} else if(adapter) {
+if(adapter) {
 
   document.body.classList.add('command-console');
 
@@ -61,7 +55,10 @@ if(params.get('console')==='0' || adapter?.snapshot().hub.features?.commandConso
 
   const system=document.createElement('details');system.id='cc-system';
 
-  system.innerHTML='<summary>System</summary><div class="cc-system-body"><h2>Campaign controls</h2><div id="cc-system-actions"></div><a href="legacy.html">Legacy presentation</a><h3>Diagnostics</h3></div>';
+  system.innerHTML='<summary>System</summary><div class="cc-system-body"><h2>Campaign controls</h2><div id="cc-system-actions"></div>'+
+    '<section id="cc-ready" aria-label="Ready to drop"><h2>Ready to drop</h2><ul id="cc-ready-list" class="cc-ready-list"><li class="cc-ready-row"><span class="cc-dot"></span><span>Checking…</span></li></ul><p id="cc-ready-progress" class="cc-ready-progress" hidden></p></section>'+
+    '<section id="cc-feedback" aria-label="Feedback"><h2>Feedback</h2><p class="cc-feedback-note">Zips the campaign save, the kernel faces, the hub state and the newest BAR log for a bug report. Never the truth frame or another faction\'s mind.</p><textarea id="cc-feedback-notes" rows="2" placeholder="What happened? (optional)"></textarea><button type="button" id="cc-feedback-export">Export feedback bundle</button><p id="cc-feedback-result" class="cc-feedback-result" hidden></p></section>'+
+    '<h3>Diagnostics</h3></div>';
 
   $('app').querySelector('.top').append(system);
 
@@ -70,8 +67,6 @@ if(params.get('console')==='0' || adapter?.snapshot().hub.features?.commandConso
   sysbody.append($('panel-manifold'));$('panel-manifold').hidden=false;
 
   sysbody.append($('panel-theaters'));$('panel-theaters').hidden=false;
-
-  $('col-right').querySelector('.tabs').remove();
 
   $('col-right').innerHTML='<section id="cc-matters" aria-label="Company matters"></section><div id="cc-inspector" aria-label="Company matter details"></div>';const mapDetails=document.createElement('details');mapDetails.id='cc-map-details';operations.append(mapDetails);
 
@@ -279,6 +274,59 @@ if(params.get('console')==='0' || adapter?.snapshot().hub.features?.commandConso
   }
 
   showWorkspace('operations');refresh();setInterval(refresh,3000);
+
+  // READY TO DROP: one honest checklist from /api/health, polled every 5 s while the drawer is open.
+  const FIXES={
+    python:'Install Python 3.10+ from python.org',
+    numpy:'Run SETUP.bat again (numpy is missing)',
+    scipy:'Run SETUP.bat again (scipy is missing)',
+    umwelt:'Belief engine not found — the map will show no belief; see INSTALL.md',
+    bar:'Install Beyond All Reason and launch it once',
+    engine:'Launch Beyond All Reason once so it installs an engine',
+    mod:'Press Drop once — the kernel installs the campaign into BAR',
+    map:'The next map downloads on Drop (keep the window open)',
+    kernel:'Start PLAY.bat and keep its window open',
+  };
+  function readyRows(h){
+    if(!h) return [{ok:false,label:'Campaign kernel',fix:FIXES.kernel}];
+    const rows=[
+      {ok:!!h.pythonOk,label:'Python '+(h.python||'?'),fix:FIXES.python},
+      {ok:!!h.numpy,label:'numpy',fix:FIXES.numpy},
+      {ok:!!h.scipy,label:'scipy',fix:FIXES.scipy},
+      {ok:!!h.umwelt,label:'Belief engine',fix:FIXES.umwelt},
+      {ok:!!h.barDataRoot,label:'Beyond All Reason found',fix:FIXES.bar},
+      {ok:!!h.engine,label:'BAR engine',fix:FIXES.engine},
+      {ok:!!h.modInstalled,label:'Campaign installed in BAR',fix:FIXES.mod},
+    ];
+    if(h.nextMap) rows.push({ok:h.mapCached===true,label:'Map for the next drop · '+pretty(h.nextMap),fix:FIXES.map,soft:h.mapCached==null});
+    rows.push({ok:h.stateMission!=null,label:h.stateMission!=null?('Campaign save · mission '+h.stateMission):'Campaign save',fix:'Press Reset to start a campaign'});
+    return rows;
+  }
+  function paintReady(h){
+    const list=$('cc-ready-list');if(!list)return;
+    list.innerHTML=readyRows(h).map(r=>`<li class="cc-ready-row ${r.ok?'ok':(r.soft?'soft':'bad')}"><span class="cc-dot" aria-hidden="true"></span><span>${escape(r.label)}${r.ok?'':`<small>${escape(r.fix)}</small>`}</span></li>`).join('');
+    const prog=$('cc-ready-progress');const p=h&&h.provision;
+    if(prog){const dl=p&&p.state==='downloading';prog.hidden=!dl;if(dl){const pct=Math.max(0,Math.min(100,Number(p.percent)||0));const mb=x=>(Number(x||0)/1048576).toFixed(0);prog.textContent=`Downloading ${p.map||'map'} · ${pct}% (${mb(p.bytes)}/${mb(p.total)} MB)`;}}
+  }
+  let readyTimer=null;
+  async function pollReady(){
+    if(!system.open){return;}
+    try{const r=await fetch(adapter.api('/api/health'),{cache:'no-store'});paintReady(r.ok?await r.json():null);}
+    catch(_){paintReady(null);}
+  }
+  system.addEventListener('toggle',()=>{if(system.open){pollReady();readyTimer=setInterval(pollReady,5000);}else if(readyTimer){clearInterval(readyTimer);readyTimer=null;}});
+
+  $('cc-feedback-export').onclick=async()=>{
+    const btn=$('cc-feedback-export');const out=$('cc-feedback-result');btn.disabled=true;out.hidden=false;out.textContent='Packing…';
+    try{
+      const r=await fetch(adapter.api('/api/feedback-bundle'),{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({notes:$('cc-feedback-notes').value||''})});
+      const j=await r.json();
+      if(!j.ok) throw new Error(j.error||'bundle failed');
+      out.textContent='Saved: '+j.path+(j.skipped&&j.skipped.length?' · left out: '+j.skipped.join(', '):'');
+      adapter.notify('Feedback bundle saved — '+j.path,'ok');
+    }catch(err){out.textContent='Could not export: '+err.message;adapter.notify('Feedback bundle: '+err.message,'err');}
+    finally{btn.disabled=false;}
+  };
 
   // Render selection changes without rebuilding the underlying map or losing its position.
 

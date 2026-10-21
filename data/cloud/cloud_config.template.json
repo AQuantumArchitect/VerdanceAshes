@@ -7,7 +7,7 @@
   "user": "Administrator",
   "auth": {
     "method": "key",
-    "privateKeyPath": "C:\\Users\\Luke Spooner\\.ssh\\id_rsa",
+    "privateKeyPath": "%USERPROFILE%\\.ssh\\id_rsa",
     "passwordEnv": "VERDANCE_CLOUD_SSH_PASSWORD"
   },
   "remoteOs": "windows",

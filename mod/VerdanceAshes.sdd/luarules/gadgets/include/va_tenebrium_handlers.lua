@@ -3,7 +3,7 @@
 -- Loaded via VFS.Include from game_verdance_campaign.lua; returns an attach
 -- function so parent locals stay live through api getters:
 --   api.jnum / api.jstr / api.teamFaction / api.SendToUnsynced
---   api.playerTeamID() / api.playerAllyTeamID() / api.mission()
+--   api.playerTeamID() / api.playerAllyTeamID() / api.mission() / api.publishRules()
 -- Do not require() this file standalone.
 
 return function(tenebLoot, api)
@@ -13,22 +13,12 @@ return function(tenebLoot, api)
   local SendToUnsynced = api.SendToUnsynced
 
   -- WO-043c handlers on tenebLoot table only (Lua 5.1 200-local ceiling).
+  -- One writer for the Tnb rules params: publishTenebriumRules in the campaign
+  -- gadget (va_tenebrium_bank / looted / spent / wrecks_unclaimed — the four the
+  -- HUD reads). Handlers call it on every bank change; the gadget also calls it
+  -- every 30 frames. Nothing else writes va_tenebrium_* params.
   tenebLoot.publish = function()
-    Spring.SetGameRulesParam("va_tenebrium_bank", tenebLoot.bank or 0, { public = true })
-    Spring.SetGameRulesParam("va_tenebrium_looted", tenebLoot.looted or 0, { public = true })
-    Spring.SetGameRulesParam("va_tenebrium_spent", tenebLoot.spent or 0, { public = true })
-    Spring.SetGameRulesParam("va_tenebrium_lost", tenebLoot.lost or 0, { public = true })
-    Spring.SetGameRulesParam("va_tenebrium_storage", -1, { public = true }) -- infinite
-    Spring.SetGameRulesParam("va_tenebrium_wrecks_created", tenebLoot.wrecksCreated or 0, { public = true })
-    Spring.SetGameRulesParam("va_tenebrium_wrecks_claimed", tenebLoot.wrecksClaimed or 0, { public = true })
-    Spring.SetGameRulesParam("va_tenebrium_wrecks_lost", tenebLoot.wrecksLost or 0, { public = true })
-    Spring.SetGameRulesParam("va_tenebrium_wrecks_unclaimed", tenebLoot.unclaimedWrecks and tenebLoot.unclaimedWrecks() or 0, { public = true })
-    Spring.SetGameRulesParam("va_armada_tenebrium_crisis", tenebLoot.armadaCrisis and 1 or 0, { public = true })
-    -- Clear old access / BP-cap scaffolding so HUD does not show stale walls.
-    Spring.SetGameRulesParam("va_tenebrium_invested", 0, { public = true })
-    Spring.SetGameRulesParam("va_tenebrium_access", 0, { public = true })
-    Spring.SetGameRulesParam("va_tenebrium_bp_max", 0, { public = true })
-    Spring.SetGameRulesParam("va_tenebrium_bp_used", 0, { public = true })
+    if api.publishRules then api.publishRules() end
   end
 
   tenebLoot.eventsJson = function()

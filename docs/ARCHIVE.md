@@ -1,6 +1,8 @@
-# Archive (removed from the tree)
+# Archive
 
-On 2026-10-20 the working tree dropped two history dumps. Git still has every file.
+`docs/archive/` holds dev logs, scorecards and superseded designs (two-pad theater, graph-collapse framing, proxy/swarm pipelines, the June/July briefs). They are history, not law: where they disagree with `THE_GAME.md`, the game is right.
+
+On 2026-10-20 the working tree also dropped two history dumps. Git still has every file.
 
 | Path | What it was |
 |------|-------------|

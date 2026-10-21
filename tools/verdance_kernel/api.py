@@ -101,6 +101,23 @@ def _spring_already_open() -> str | None:
     return None
 
 
+def dev_mode(ws: Path) -> bool:
+    """Truth faces are dev-only. On when verdance_config.json has "devMode": true or VA_DEV=1."""
+    if str(os.environ.get("VA_DEV") or "").strip().lower() in ("1", "true", "yes", "on"):
+        return True
+    p = Path(ws) / "verdance_config.json"
+    if p.is_file():
+        try:
+            cfg = json.loads(p.read_text(encoding="utf-8-sig")) or {}
+            return bool(cfg.get("devMode"))
+        except Exception:  # noqa: BLE001
+            return False
+    return False
+
+
+DEV_ONLY = {"ok": False, "error": "dev only"}
+
+
 def _campaign_lock(method):
     @wraps(method)
     def locked(self, *args, **kwargs):
@@ -286,18 +303,64 @@ class CampaignKernel:
             out["hidden"] = True  # dev-only: never show the player truth in the hub
         return out
 
+    def dev_mode(self) -> bool:
+        return dev_mode(self.ws)
+
     def intel_surface(self, perspective: str = "company") -> dict[str, Any]:
-        """A belief frame (verdance-intel/1). company = the player's own; armada/nullmercs/cortex
-        are simulated minds, dev/debug faces until pass 4 decides what leaks through patrons."""
-        name = "intel.latest.json" if perspective in ("", "company") else f"intel.{perspective}.latest.json"
-        return self._outbox_face(name, hidden=(perspective not in ("", "company")))
+        """A belief frame (verdance-intel/1). company = the player's own. armada/nullmercs/cortex are
+        other minds: THE LAW says the player side never sees them, so they are dev-only (403)."""
+        if perspective not in ("", "company"):
+            if not self.dev_mode():
+                return dict(DEV_ONLY)
+            return self._outbox_face(f"intel.{perspective}.latest.json", hidden=True)
+        return self._outbox_face("intel.latest.json")
 
     def truth_surface(self) -> dict[str, Any]:
+        if not self.dev_mode():
+            return dict(DEV_ONLY)
         return self._outbox_face("truth.latest.json", hidden=True)
 
     def divergence_surface(self) -> dict[str, Any]:
+        """Belief vs truth (`actually` fields) — dev-only. Players get /api/exposure."""
+        if not self.dev_mode():
+            return dict(DEV_ONLY)
         out = self._outbox_face("divergence.latest.json", hidden=True)
         # faction minds fold in a detached worker; say whether the face is still catching up
+        try:
+            import perspectives_v1 as P
+            out["pending"] = P.pending(self.ws)
+        except Exception:  # noqa: BLE001
+            pass
+        return out
+
+    def exposure_surface(self) -> dict[str, Any]:
+        """Player-safe projection of divergence: our side of the mirror only. Per faction, which of
+        the zones WE BELIEVE are ours they have eyes on (known / suspected / blind). No `actually`,
+        no other faction's picture of the world, nothing about ground we do not know we hold."""
+        try:
+            import hub_belief_v1
+        except Exception as e:  # noqa: BLE001
+            return {"ok": False, "error": f"hub_belief import failed: {e}"}
+        exp = hub_belief_v1.exposure_surface(self.ws)
+        if not exp.get("present"):
+            return {"ok": True, "present": False, "factions": {}}
+        ours: set[str] | None = None
+        p = state_path(self.ws)
+        if p.is_file():
+            try:
+                state = json.loads(p.read_text(encoding="utf-8-sig"))
+                ours = set(hub_belief_v1.believed_ours(self.ws, state))
+            except Exception:  # noqa: BLE001
+                ours = None
+        factions: dict[str, Any] = {}
+        for fac, a in (exp.get("factions") or {}).items():
+            def keep(xs: Any) -> list[str]:
+                xs = [str(x) for x in (xs or [])]
+                return [x for x in xs if ours is None or x in ours]
+            known, susp, blind = keep(a.get("known")), keep(a.get("suspected")), keep(a.get("blind"))
+            factions[fac] = {"known": known, "suspected": susp, "blind": blind,
+                             "ofOurs": (len(ours) if ours is not None else a.get("ofOurs"))}
+        out: dict[str, Any] = {"ok": True, "present": True, "asOfMinute": exp.get("asOfMinute"), "factions": factions}
         try:
             import perspectives_v1 as P
             out["pending"] = P.pending(self.ws)
@@ -321,6 +384,160 @@ class CampaignKernel:
             return report
         except Exception as e:  # noqa: BLE001
             return {"ok": False, "error": str(e)}
+
+    # ── ready to drop (pass 8B): one honest checklist for the System drawer ───────
+    def health(self) -> dict[str, Any]:
+        """Each check is a bool or a path|None; the hub paints a dot and a one-line fix per red."""
+        import importlib.util
+        import platform
+
+        from verdance_kernel import sortie as _sortie
+
+        out: dict[str, Any] = {
+            "ok": True,
+            "at": _now(),
+            "python": platform.python_version(),
+            "pythonOk": sys.version_info >= (3, 10),
+            "numpy": importlib.util.find_spec("numpy") is not None,
+            "scipy": importlib.util.find_spec("scipy") is not None,
+            "umwelt": False,
+            "barDataRoot": None,
+            "engine": None,
+            "modInstalled": False,
+            "mapCached": None,
+            "nextMap": None,
+            "provision": None,
+            "stateMission": None,
+            "devMode": self.dev_mode(),
+        }
+        # Belief engine. _umwelt() may raise SystemExit (old) or return None (new); both mean "not found".
+        try:
+            import umwelt_world_v1 as W
+            out["umwelt"] = W._umwelt() is not None
+        except BaseException:  # noqa: BLE001  (SystemExit included)
+            out["umwelt"] = False
+        # Where BAR lives. bar_config raises when it cannot find a data directory.
+        cfg: dict[str, Any] | None = None
+        try:
+            cfg = _sortie.bar_config(self.ws)
+            out["barDataRoot"] = cfg.get("barDataRoot")
+        except Exception:  # noqa: BLE001
+            cfg = None
+        if cfg:
+            try:
+                out["engine"] = str(_sortie.engine_exe(cfg))
+            except Exception:  # noqa: BLE001
+                out["engine"] = None
+            try:
+                out["modInstalled"] = (Path(cfg["barDataRoot"]) / "games" / "VerdanceAshes.sdd").is_dir()
+            except Exception:  # noqa: BLE001
+                out["modInstalled"] = False
+        # Next mission + its map, from the campaign save and the hub face (no network).
+        try:
+            sp = state_path(self.ws)
+            if sp.is_file():
+                st = json.loads(sp.read_text(encoding="utf-8-sig"))
+                out["stateMission"] = int(st.get("missionNumber") or 1)
+        except Exception:  # noqa: BLE001
+            pass
+        next_map = None
+        try:
+            hub = (self.get_hub_surface().get("hub") or {})
+            node = hub.get("node") or {}
+            next_map = node.get("sortieMapId") or node.get("regionHint") or hub.get("sessionHomeMap")
+        except Exception:  # noqa: BLE001
+            next_map = None
+        out["nextMap"] = next_map
+        if next_map and cfg:
+            try:
+                pool = json.loads((self.ws / "data" / "map_pool" / "seven_maps.json").read_text(encoding="utf-8-sig"))
+                arch = next((str(m.get("archivePattern") or "") for m in pool.get("maps") or [] if str(m.get("id")) == str(next_map)), "")
+                if arch:
+                    out["mapCached"] = (Path(cfg["barDataRoot"]) / "maps" / arch).is_file()
+            except Exception:  # noqa: BLE001
+                out["mapCached"] = None
+        prov_fn = getattr(_sortie, "provision_status", None)
+        if callable(prov_fn):
+            try:
+                out["provision"] = prov_fn(self.ws)
+            except Exception:  # noqa: BLE001
+                out["provision"] = None
+        return out
+
+    # ── feedback bundle (pass 8B): what a tester sends back, nothing the player may not see ──
+    def feedback_bundle(self, body: dict[str, Any] | None) -> dict[str, Any]:
+        import zipfile
+
+        body = body or {}
+        notes = str(body.get("notes") or "").strip()
+        stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        out_dir = self.ws / "export"
+        out_dir.mkdir(parents=True, exist_ok=True)
+        zpath = out_dir / f"feedback_{stamp}.zip"
+        included: list[str] = []
+        skipped: list[str] = []
+
+        def _banned(name: str) -> bool:
+            n = name.lower()
+            # THE LAW: truth and other minds never leave the kernel, not even in a bug report.
+            if n.startswith("truth") or n.startswith("divergence"):
+                return True
+            # intel.<faction>.latest.json is another mind; the company's own intel.latest.json is fine
+            return n.startswith("intel.") and n != "intel.latest.json"
+
+        def _redact_config(raw: str) -> str:
+            try:
+                cfg = json.loads(raw)
+            except Exception:  # noqa: BLE001
+                return "{}"
+            def red(v: Any) -> Any:
+                if isinstance(v, str):
+                    # any absolute path (C:\..., /home/..., \\server\...) names the tester's machine
+                    looks_path = (len(v) > 2 and v[1] == ":" and v[2] in "\\/") or v.startswith("/") or v.startswith("\\\\")
+                    return "<redacted path>" if looks_path else v
+                if isinstance(v, dict):
+                    return {k: red(x) for k, x in v.items()}
+                if isinstance(v, list):
+                    return [red(x) for x in v]
+                return v
+            return json.dumps(red(cfg), indent=2)
+
+        try:
+            with zipfile.ZipFile(zpath, "w", compression=zipfile.ZIP_DEFLATED) as z:
+                z.writestr("notes.txt", (notes or "(no notes)") + "\n")
+                for rel in ("state/campaign_state.json", "app/showoff/hub_state.json", "VERSION"):
+                    p = self.ws / rel
+                    if p.is_file():
+                        z.write(p, rel)
+                        included.append(rel)
+                cfgp = self.ws / "verdance_config.json"
+                if cfgp.is_file():
+                    z.writestr("verdance_config.json", _redact_config(cfgp.read_text(encoding="utf-8-sig")))
+                    included.append("verdance_config.json (paths redacted)")
+                ob = self.ws / "outbox"
+                if ob.is_dir():
+                    for p in sorted(ob.glob("*.latest.json")):
+                        if _banned(p.name):
+                            skipped.append(p.name)
+                            continue
+                        z.write(p, f"outbox/{p.name}")
+                        included.append(f"outbox/{p.name}")
+                # newest BAR infolog (the engine keeps infolog.txt at the data root; older ones roll to infolog_*.txt)
+                try:
+                    from verdance_kernel import sortie as _sortie
+                    cfg = _sortie.bar_config(self.ws)
+                    root = Path(cfg["barDataRoot"])
+                    cands = [Path(cfg.get("infolog") or (root / "infolog.txt"))] + sorted(root.glob("infolog*.txt"))
+                    cands = [c for c in cands if c.is_file()]
+                    if cands:
+                        newest = max(cands, key=lambda c: c.stat().st_mtime)
+                        z.write(newest, f"bar/{newest.name}")
+                        included.append(f"bar/{newest.name}")
+                except Exception as e:  # noqa: BLE001
+                    skipped.append(f"infolog ({type(e).__name__})")
+        except Exception as e:  # noqa: BLE001
+            return {"ok": False, "error": f"{type(e).__name__}: {e}", "at": _now()}
+        return {"ok": True, "at": _now(), "path": str(zpath), "included": included, "skipped": skipped}
 
     def session_status(self) -> dict[str, Any]:
         """The sortie watch is the session: launching → in-game → bringing-home → home | closed-without-result."""
@@ -481,38 +698,6 @@ class CampaignKernel:
                 }
             )
         return {"ok": True, "at": _now(), "saves": slots, "dir": str(root)}
-
-    def order_bro_tzar(self) -> dict[str, Any]:
-        """Hub: Bro, Pass me the Tzar — spend Tnb, queue mission-only call-in."""
-        from company_v1 import hub_company_surface, order_bro_tzar as _order  # type: ignore
-        from verdance_story_engine_v1 import load_json, migrate_state, save_json  # type: ignore
-
-        sp = state_path(self.ws)
-        if not sp.is_file():
-            return {"ok": False, "error": "campaign_state.json missing", "at": _now()}
-        try:
-            state = migrate_state(load_json(sp))
-        except Exception as e:  # noqa: BLE001
-            return {"ok": False, "error": f"load state failed: {e}", "at": _now()}
-        ok, err, payload = _order(state, workspace=self.ws)
-        if not ok:
-            return {"ok": False, "error": err, "at": _now(), **(payload or {})}
-        try:
-            save_json(sp, state)
-        except Exception as e:  # noqa: BLE001
-            return {"ok": False, "error": f"save state failed: {e}", "at": _now()}
-        hub_report = self.rebuild_hub()
-        surface = hub_company_surface(state, self.ws)
-        return {
-            "ok": True,
-            "at": _now(),
-            "toast": payload.get("toast"),
-            "callIn": payload.get("callIn"),
-            "tenebrium": payload.get("tenebrium"),
-            "surface": surface,
-            "hub": hub_report.get("hub") if hub_report.get("ok") else None,
-            "rebuild": hub_report,
-        }
 
     @_campaign_lock
     def seal_company(self, *, band: list[str] | None = None) -> dict[str, Any]:
@@ -854,18 +1039,6 @@ class CampaignKernel:
                     report["watch"] = {"ok": False, "error": str(e)}
         return report
 
-    def update_sortie_roster(self, raw: dict[str, Any] | None) -> dict[str, Any]:
-        """Confirm drop locks the roster. The level is compiled from that list."""
-        del raw
-        with self._lock:
-            phase = self._deploy_phase
-        return {
-            "ok": False,
-            "sealed": True,
-            "phase": phase,
-            "error": "The company locks when you confirm the drop, before the level loads.",
-        }
-
     def _deploy_async(self, plan: dict[str, Any]) -> None:
         try:
             result = self._deploy_body(plan, launch=True)
@@ -1161,6 +1334,14 @@ class CampaignKernel:
                 )
                 steam_bits = steam_mod.maybe_achievements_from_result(self.ws, hub_apply)
                 cloud = steam_mod.cloud_mirror(self.ws)
+                # apply_result_to_hub builds the hub from the state it loaded before the advance
+                # ran; rebuild once more so the homecoming card carries the bead's manifest and
+                # the board paints the belief the fold just wrote.
+                if hub_apply.get("ok"):
+                    try:
+                        self.rebuild_hub(skip_apply=True)
+                    except Exception as exc:  # noqa: BLE001
+                        hub_apply["postRebuildError"] = str(exc)
                 hub = self.get_hub_surface()
                 surface = surface_mod.write_surface(
                     self.ws, hub.get("hub") if hub.get("ok") else None

@@ -126,12 +126,19 @@ def _try_webview(url: str, title: str = "Verdance's Ashes") -> bool:
 def _bar_mod_banner(workspace: Path) -> None:
     """Print which tree BAR will load for VerdanceAshes.sdd (deployed vs workspace)."""
     try:
-        local = Path(os.environ.get("LOCALAPPDATA", ""))
-        mod_dest = local / "Programs" / "Beyond-All-Reason" / "data" / "games" / "VerdanceAshes.sdd"
+        from verdance_kernel.sortie import find_bar_data_root
+
+        # The configured root (verdance_config.json) is the truth; detection only when unset.
+        root = find_bar_data_root(workspace)
+        if not root:
+            print("BAR data root: not found. Run SETUP.bat (it asks for the path when it cannot detect BAR).", file=sys.stderr)
+            return
+        print(f"BAR data root: {root}")
+        mod_dest = Path(root) / "games" / "VerdanceAshes.sdd"
         deployed = Path.home() / "Documents" / "My Games" / "VerdanceAshes" / "mod" / "VerdanceAshes.sdd"
         workspace_mod = workspace / "mod" / "VerdanceAshes.sdd"
         if not mod_dest.exists():
-            print(f"BAR mod: missing {mod_dest}", file=sys.stderr)
+            print(f"BAR mod: not installed yet at {mod_dest} (SETUP.bat installs it; every Drop re-copies it)", file=sys.stderr)
             return
         # Junction/symlink: resolve(); plain dir resolves to itself.
         target = mod_dest.resolve()
@@ -171,6 +178,18 @@ def launch(
         return 2
 
     _bar_mod_banner(Path(kernel.ws))
+
+    # A fresh clone / unzip has no campaign yet; the rebuild below would fail with a
+    # message about war_map.json. Say the one true thing instead.
+    state_file = Path(kernel.ws) / "state" / "campaign_state.json"
+    if rebuild and not state_file.is_file() and not (Path(kernel.ws) / "outbox" / "war_map.json").is_file():
+        print(
+            f"ERROR: no campaign yet ({state_file} missing).\n"
+            f"  Run SETUP.bat once: it finds BAR, installs the mutator and writes mission 1.\n"
+            f"  Then run PLAY.bat again.",
+            file=sys.stderr,
+        )
+        return 5
 
     # PLAY is the product entry point, so refresh the hub every time. Leaving
     # hub_state.json untouched made a fresh launch show yesterday's first

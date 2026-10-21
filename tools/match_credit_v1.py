@@ -15,8 +15,10 @@ _CAPTURE_KINDS = frozenset({"seize_lane", "gate_control", "hold_plateau"})
 
 _VICTORY_STATUSES = frozenset({"victory", "victoryClean"})
 _PARTIAL_STATUSES = frozenset({"partial", "extracted"})
-_DEFEAT_STATUSES = frozenset({"defeat", "failed", "failure"})
-_ABANDON_STATUSES = frozenset({"abandon", "abandoned", "quit"})
+# Terminal KINDS the gadget reports (pass five/nine): extracted | wiped | closed.
+# manifest_v1 normally turns them into a verdict first; these keep a direct caller sane.
+_DEFEAT_STATUSES = frozenset({"defeat", "failed", "failure", "wiped"})
+_ABANDON_STATUSES = frozenset({"abandon", "abandoned", "quit", "closed"})
 _INCOMPLETE_STATUSES = frozenset({"incomplete", "unknown", "active", "inactive", ""})
 
 # Human headlines for hub debrief — keep in sync with docs/UI_ASH_CONSOLE.md
@@ -38,22 +40,20 @@ _BANNERS = {
     "incomplete": "RESULT PENDING",
 }
 
+# terminalReason as the gadget writes it today: the terminal kind (extracted | wiped |
+# closed) or one of the explicit paths below. The clock never ends a sortie (overtime
+# is a HUD phase), so there are no soft_clock_* reasons any more; older archive results
+# that still carry one fall through to the raw reason string.
 _REASON_HINTS = {
-    "extracted": "Clean pull-out after the objective.",
-    "extracted_bypass": "Bypassed the hard target and extracted.",
-    "extracted_bail": "Left early and held extract — partial success.",
-    "extracted_voluntary": "Exfil button — left on purpose; partial success.",
+    "extracted": "The company lifted on its manifest.",
+    "wiped": "Nobody left to lift — the company was wiped.",
+    "closed": "The game closed without a manifest.",
     "extracted_recruit_lost": "Rescue wreck destroyed; company extracted with partial success.",
-    "objective_complete_no_extraction_zone": "Objective done (no extract zone on seed).",
-    "soft_clock_rescue_failed": "Mission timed out after the rescue failed. Extraction was not completed.",
-    "operation_complete_no_extraction": "Operation completed; this mission has no extraction phase.",
-    "soft_clock_no_extract": "Objective done; clock hit before extract.",
-    "soft_clock_marks_open": "Primary done; clock hit with marks still open.",
-    "soft_clock_timeout": "Soft clock expired mid-fight.",
     "player_wiped": "Force wiped.",
-    "force_spent": "No combat power and no production left.",
-    "gameover_external": "Engine game-over (resign / external).",
+    "gameover_external": "Engine game-over (resign / external) — no manifest.",
     "node_claimed": "Node claimed under regrow pressure.",
+    "debug_autoprogress": "Debug auto-progress terminal.",
+    "headless_fastwin": "Headless profiling fast-win.",
     "debug_command": "Debug terminal.",
 }
 
@@ -164,6 +164,10 @@ def build_result_key(result: Dict[str, Any]) -> str:
 
 
 def _credits_block(result: Dict[str, Any], verdict: str) -> Dict[str, bool]:
+    """Credits are derived here from facts (objectiveComplete / destroyedObjectiveIds /
+    objectiveResults / capturePhase / nodeClaimed / extractionStatus). A ``credits`` block
+    on the input is only ever this function's own earlier output (contract_v2 strips the
+    gadget's result of any such block before it gets here)."""
     raw = result.get("credits") if isinstance(result.get("credits"), dict) else {}
     objective_complete = _b(
         raw.get("objectiveComplete")

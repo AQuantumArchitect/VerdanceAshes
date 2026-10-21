@@ -262,6 +262,9 @@ def _support_web_surface(
 
 
 def build_regions(war: dict) -> list[dict]:
+    """Theater chips: name and family only. war_map's control / dominantEnemy / threatBand /
+    controlCounts are the engine's truth (summarize_front) and never reach the hub; the chip's
+    known/stale/dark counts come from hub.belief at render time."""
     regions = []
     for r in war.get("regions") or []:
         regions.append(
@@ -270,10 +273,6 @@ def build_regions(war: dict) -> list[dict]:
                 "displayName": r.get("displayName") or r.get("mapId"),
                 "descriptor": r.get("descriptor") or "",
                 "family": r.get("family") or "tempo",
-                "control": r.get("control") or "contested",
-                "dominantEnemy": r.get("dominantEnemy") or "armada",
-                "threatBand": r.get("threatBand") or "light",
-                "controlCounts": r.get("controlCounts") or {},
                 "selectable": True,
             }
         )
@@ -1274,29 +1273,16 @@ def build_commerce_surface(state: dict, mission_n: int) -> dict:
         ),
         "catalogSchema": catalog.get("schemaVersion"),
         "armadaCrisis": (resource.get("armadaCrisis") or {}).get("active", True),
-        "startingBalanceHint": starting,
+        # authored lore, our side only — another faction's purse is its own business
+        "startingBalanceHint": {k: v for k, v in dict(starting).items() if k in ("ashwalkers", "nullmercs")},
     }
 
 
 def build_faction_banks(state: dict, commerce: dict) -> dict:
-    """Kernel paint: faction Tenebrium banks (Armada crisis → 0)."""
-    banks = dict(state.get("factionBanks") or {})
+    """The company's own purse only. Another faction's Tenebrium bank is that faction's mind;
+    the hub never carries it (pass 8B)."""
     tnb = int(commerce.get("tenebrium") or 0)
-    banks.setdefault("armada", 0)
-    banks.setdefault("cortex", int((commerce.get("startingBalanceHint") or {}).get("cortex") or 2))
-    banks.setdefault("nullmercs", tnb)
-    banks.setdefault("ashwalkers", tnb)
-    # Live bag always wins for player-side factions
-    banks["nullmercs"] = tnb
-    banks["ashwalkers"] = tnb
-    if commerce.get("armadaCrisis", True):
-        banks["armada"] = 0
-    return {
-        "armada": int(banks.get("armada") or 0),
-        "cortex": int(banks.get("cortex") or 0),
-        "nullmercs": int(banks.get("nullmercs") or 0),
-        "ashwalkers": int(banks.get("ashwalkers") or 0),
-    }
+    return {"nullmercs": tnb, "ashwalkers": tnb}
 
 
 def build_hub(state: dict, war: dict) -> dict:
@@ -1467,7 +1453,6 @@ def build_hub(state: dict, war: dict) -> dict:
     return {
         "schemaVersion": "verdance-hub-state/1.0",
         "narrative": narrative_project(state, node.get("choices") or [], ROOT),
-        "features": {"commandConsole": (state.get("features") or {}).get("commandConsole", True)},
         "campaignId": state.get("campaignId") or war.get("campaignId") or "verdance_ashes",
         "missionNumber": mission_n,
         "arc": arc,
@@ -1531,7 +1516,7 @@ def build_hub(state: dict, war: dict) -> dict:
             "mode": "hub",
             # True until HTML is opened via hub_host (runtime clears this).
             "deployStub": True,
-            "hubHostHint": "app/bin/HUB_HOST.bat → http://127.0.0.1:8770/",
+            "hubHostHint": "PLAY.bat",
             "source": "build_hub_state_v1",
             "shopSurface": True,
             "deployCompileLaunch": True,

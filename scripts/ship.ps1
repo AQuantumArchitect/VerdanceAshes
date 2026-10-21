@@ -5,6 +5,8 @@ param(
   [string]$Version = "",
   [string]$OutDir = "",
   [switch]$SkipPython,
+  # Skip pip + numpy/scipy in the embedded runtime (belief world off in the zip).
+  [switch]$SkipScience,
   [switch]$SkipZip,
   [switch]$InstallToMyGames,
   [string]$PythonEmbedZip = "",
@@ -75,10 +77,12 @@ foreach ($f in @("va_current.lua", "zone_map_current.lua")) {
   Remove-Item -Force -ErrorAction SilentlyContinue (Join-Path $gen $f)
 }
 
-# ---- UI + brain ----
+# ---- UI ----
+# app\brain (quantum-BAR-AI dev tapes / weights) is forge-only and is not staged.
 Copy-Into (Join-Path $Workspace "app\showoff") (Join-Path $staging "app\showoff")
-if (Test-Path (Join-Path $Workspace "app\brain")) {
-  Copy-Into (Join-Path $Workspace "app\brain") (Join-Path $staging "app\brain")
+foreach ($noise in @("legacy.html", "hub_state.json", "hub_state.embed.js")) {
+  # legacy.html is retired; hub_state.* is runtime output that SETUP/PLAY regenerate.
+  Remove-Item -Force -ErrorAction SilentlyContinue (Join-Path $staging "app\showoff\$noise")
 }
 
 # ---- kernel + tools (player surface only) ----
@@ -117,7 +121,7 @@ $toolPy = @(
   "offscreen_clash_v1.py",
   # Fetches campaign maps from BAR's own content service at play time.
   "map_provisioner_v1.py",
-  # Continuity / company / commerce / LZ / quantum state — imported by engine +
+  # Continuity / company / commerce / LZ / quantum state -- imported by engine +
   # kernel; missing these silently disables footprint audit, field-pool loss,
   # delivery packs, and landing-zone resolve on shipped builds.
   "commerce_delivery_v1.py",
@@ -125,16 +129,11 @@ $toolPy = @(
   "continuity_audit_v1.py",
   "landing_zones_v1.py",
   "quantum_campaign_state_v1.py",
-  # Hero observe / umwelt / molecule policy (attachments + support web + Stage 1–3 tools).
-  # Missing these silently drops observe stamps and blocks molecule D(u) regen on ship.
+  # Hero observe / map umwelt. (molecule_doctrine, phi_projector, shadow_intent,
+  # hero_graph_analyze, support_web, hero_codex were dead on the player path and
+  # are no longer staged; the parity gate confirms nothing staged imports them.)
   "hero_observe_v1.py",
   "map_umwelt_v1.py",
-  "molecule_doctrine_v1.py",
-  "phi_projector_v1.py",
-  "shadow_intent_v1.py",
-  "hero_graph_analyze_v1.py",
-  "support_web_v1.py",
-  "hero_codex_v1.py",
   # Narrative readings / belief world / perspectives / camp clock (passes one..four, 2026-10-19).
   # The engine imports these inside try/except, so a missing one ships a silent campaign with no
   # readings face, no belief fold, no camp clock and no intel overlay.
@@ -142,14 +141,14 @@ $toolPy = @(
   "occasions_v1.py",
   "belief_homecoming_v1.py",
   "umwelt_world_v1.py",
-  "umwelt_replay_v1.py",
+  # The hub's belief face (minimap paint); imported by build_hub_state_v1 + stamp_deploy_plan_v1.
+  "hub_belief_v1.py",
   "perspectives_v1.py",
   "camp_clock_v1.py",
   "story_dance_v1.py",
   "chronicle_v1.py",
   "intel_lua_v1.py",
   "manifest_v1.py",
-  "validate_story_v1.py",
   "wet_reach_v1.py",
   # Ship so a player build can self-check; also what the gates below run.
   "ship_parity_check_v1.py",
@@ -196,12 +195,16 @@ foreach ($noise in @(
 # The campaign imports the umwelt package at run time (tools\umwelt_world_v1.py). A player
 # build has no clone of the Umwelt repo, so vendor a snapshot of its src\umwelt package into
 # tools\_vendor, which umwelt_world_v1 adds to sys.path last (UMWELT_SRC and a sibling clone win).
+# Discovery only, never an assumption: UMWELT_SRC, then a sibling clone, then the two
+# conventional home-folder clones. No match = a WARNING and a build without belief.
 $umweltCandidates = @()
 if ($env:UMWELT_SRC) { $umweltCandidates += $env:UMWELT_SRC }
 $umweltCandidates += (Join-Path (Split-Path -Parent $Workspace) "umwelt\src")
-$umweltCandidates += (Join-Path $env:USERPROFILE "ws-win\umwelt\src")
-$umweltCandidates += (Join-Path $env:USERPROFILE "umwelt\src")
-$umweltSrc = $umweltCandidates | Where-Object { Test-Path (Join-Path $_ "umwelt\__init__.py") } | Select-Object -First 1
+if ($env:USERPROFILE) {
+  $umweltCandidates += (Join-Path $env:USERPROFILE "umwelt\src")
+  $umweltCandidates += (Join-Path $env:USERPROFILE "ws-win\umwelt\src")
+}
+$umweltSrc = $umweltCandidates | Where-Object { $_ -and (Test-Path (Join-Path $_ "umwelt\__init__.py")) } | Select-Object -First 1
 if ($umweltSrc) {
   $vendor = Join-Path $staging "tools\_vendor"
   New-Item -ItemType Directory -Force -Path $vendor | Out-Null
@@ -212,7 +215,7 @@ if ($umweltSrc) {
   Set-Content -Path (Join-Path $vendor "UMWELT_SNAPSHOT.txt") -Value ("umwelt snapshot from " + $umweltSrc + " at " + (Get-Date).ToString("s") + " commit " + $umweltHash)
   Write-Host "Umwelt vendored from $umweltSrc ($umweltHash)"
 } else {
-  Write-Warning "Umwelt source not found (UMWELT_SRC / ..\umwelt\src / ~\ws-win\umwelt\src); shipped build will run without the belief world."
+  Write-Warning "Umwelt source not found (UMWELT_SRC / ..\umwelt\src / ~\umwelt\src / ~\ws-win\umwelt\src); the shipped build will run with the belief world OFF."
 }
 
 Copy-File (Join-Path $Workspace "verdance_config.template.json") (Join-Path $staging "verdance_config.template.json")
@@ -235,9 +238,18 @@ $scriptList = @(
 foreach ($s in $scriptList) {
   Copy-File (Join-Path $Workspace "scripts\$s") (Join-Path $staging "scripts\$s")
 }
-# player helpers
-if (Test-Path (Join-Path $Workspace "scripts\player")) {
-  Copy-Into (Join-Path $Workspace "scripts\player") (Join-Path $staging "scripts\player")
+# player helpers: only the live player path. overnight_hive_bar / proxy_campaign /
+# night_preflight / smoke_play_path are forge tools and stay home.
+$playerScripts = @(
+  "setup_play.ps1",
+  "reset_campaign.ps1",
+  "reset_campaign_hub.py",
+  "build_mission.ps1",
+  "install_mod.ps1",
+  "point_bar_mod.ps1"
+)
+foreach ($s in $playerScripts) {
+  Copy-File (Join-Path $Workspace "scripts\player\$s") (Join-Path $staging "scripts\player\$s")
 }
 
 # ---- empty runtime dirs ----
@@ -318,18 +330,64 @@ if (-not $SkipPython) {
     $pyDir = Join-Path $staging "runtime\python"
     New-Item -ItemType Directory -Force -Path $pyDir | Out-Null
     Expand-Archive -Path $PythonEmbedZip -DestinationPath $pyDir -Force
-    # Allow site imports for tools path (embed _pth)
+    # The embeddable ._pth is the whole sys.path. It needs: site enabled (so pip-installed
+    # packages resolve), Lib\site-packages (where pip puts numpy/scipy), the campaign tools,
+    # and the vendored umwelt snapshot. Each line is relative to the ._pth file.
     $pth = Get-ChildItem $pyDir -Filter "python*._pth" | Select-Object -First 1
     if ($pth) {
       $pthText = Get-Content -Raw $pth.FullName
-      if ($pthText -notmatch "import site") {
-        Add-Content -Path $pth.FullName -Value "import site"
+      $pthLines = @($pthText -split "[\r\n]+" | Where-Object { $_ -ne "" })
+      # "#import site" is shipped commented out; uncomment rather than duplicate.
+      $pthLines = @($pthLines | ForEach-Object { if ($_ -match '^\s*#\s*import site\s*$') { "import site" } else { $_ } })
+      foreach ($need in @("Lib\site-packages", "..\..\tools", "..\..\tools\_vendor", "import site")) {
+        if (-not ($pthLines -contains $need)) { $pthLines += $need }
       }
-      if ($pthText -notmatch "\.\.\\..\\tools") {
-        Add-Content -Path $pth.FullName -Value "..\..\tools"
-      }
+      # "import site" must be the last line; keep paths above it.
+      $pthLines = @($pthLines | Where-Object { $_ -ne "import site" }) + @("import site")
+      Set-Content -Path $pth.FullName -Value ($pthLines -join "`r`n") -Encoding ASCII
     }
     Write-Host "Bundled embeddable Python"
+
+    # ---- numpy + scipy into the embedded runtime (the belief world's substrate) ----
+    # Best effort: any failure here prints a WARNING and the build ships with belief off
+    # (umwelt_world_v1 returns None and the campaign logs VA_BELIEF_SKIP). -SkipScience opts out.
+    if ($SkipScience) {
+      Write-Host "Skipping numpy/scipy (-SkipScience); shipped build runs with the belief world OFF."
+    } else {
+      $embedExe = Join-Path $pyDir "python.exe"
+      $getPip = Join-Path $cacheDir "get-pip.py"
+      $scienceOk = $false
+      # pip chatters on stderr; under ErrorActionPreference=Stop PS 5.1 can turn that into a
+      # terminating NativeCommandError. Relax it for the native calls only.
+      $savedEap = $ErrorActionPreference
+      $ErrorActionPreference = "Continue"
+      try {
+        if (!(Test-Path $getPip)) {
+          Write-Host "Downloading get-pip.py..."
+          Invoke-WebRequest -Uri "https://bootstrap.pypa.io/get-pip.py" -OutFile $getPip
+        }
+        Write-Host "Bootstrapping pip in the embedded runtime..."
+        & $embedExe $getPip --no-warn-script-location | Out-Host
+        if ($LASTEXITCODE -ne 0) { throw "get-pip exit $LASTEXITCODE" }
+        Write-Host "Installing numpy + scipy (wheels only)..."
+        & $embedExe -m pip install --no-warn-script-location --only-binary=:all: numpy scipy | Out-Host
+        if ($LASTEXITCODE -ne 0) { throw "pip install exit $LASTEXITCODE" }
+        & $embedExe -c "import numpy, scipy; print('numpy', numpy.__version__, 'scipy', scipy.__version__)" | Out-Host
+        if ($LASTEXITCODE -ne 0) { throw "numpy/scipy import check failed" }
+        $scienceOk = $true
+      } catch {
+        Write-Warning ("numpy/scipy could not be installed into the embedded runtime: " + $_.Exception.Message)
+        Write-Warning "The shipped build will run with the belief world OFF (VA_BELIEF_SKIP). Re-run SHIP with network, or pass -SkipScience to silence this."
+      } finally {
+        $ErrorActionPreference = $savedEap
+      }
+      if ($scienceOk) {
+        # pip itself is not needed at play time; drop the caches it leaves behind.
+        Get-ChildItem $pyDir -Recurse -Directory -Filter "__pycache__" -ErrorAction SilentlyContinue |
+          Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+        Write-Host "Embedded runtime: numpy + scipy installed (belief world ON when umwelt is vendored)."
+      }
+    }
   }
 } else {
   Write-Host "Skipping embedded Python"
@@ -395,6 +453,8 @@ $manifest = [ordered]@{
   includesKernel  = $true
   includesMod     = $true
   includesPython  = (Test-Path (Join-Path $staging "runtime\python\python.exe"))
+  includesScience = (Test-Path (Join-Path $staging "runtime\python\Lib\site-packages\numpy"))
+  includesUmwelt  = (Test-Path (Join-Path $staging "tools\_vendor\umwelt\__init__.py"))
 }
 $manifest | ConvertTo-Json -Depth 6 | Set-Content -Encoding UTF8 (Join-Path $staging "release_manifest.json")
 
@@ -440,7 +500,7 @@ if ($InstallToMyGames) {
     }
   }
   Write-Host "My Games install complete (full kernel dist)."
-  # Playtests must load deployed Lua — not the workspace junction.
+  # Playtests must load deployed Lua - not the workspace junction.
   $pointBar = Join-Path $Workspace "scripts\player\point_bar_mod.ps1"
   if (Test-Path $pointBar) {
     Write-Host "Pointing BAR VerdanceAshes.sdd -> My Games mod (deployed play truth)"
@@ -449,7 +509,7 @@ if ($InstallToMyGames) {
       throw "point_bar_mod Deployed failed (exit $LASTEXITCODE)"
     }
   } else {
-    Write-Host "WARN: point_bar_mod.ps1 missing — BAR may still junction to workspace."
+    Write-Host "WARN: point_bar_mod.ps1 missing - BAR may still junction to workspace."
   }
 }
 
@@ -457,5 +517,5 @@ Write-Host ""
 Write-Host "=== Ship complete ==="
 Write-Host "Folder: $staging"
 Write-Host "Files:  $($files.Count)"
-Write-Host "Play:   Documents\My Games\VerdanceAshes\PLAY.bat (deployed truth)"
-Write-Host "Dev:    point_bar_mod.ps1 -Mode Workspace  then workspace PLAY if needed"
+Write-Host "Send the zip. Recipients unzip anywhere, run SETUP.bat once, then PLAY.bat."
+if ($InstallToMyGames) { Write-Host "Play:   Documents\My Games\VerdanceAshes\PLAY.bat (deployed copy)" }

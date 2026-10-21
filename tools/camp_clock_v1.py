@@ -12,7 +12,8 @@ Actions (all advance campaignClockMinutes):
   rest    {hours}                 the fog grows; a wounded hero stands up after 12h
                                   (posted heroes on hostile ground risk a wound every hour; a patrol into
                                    hostile ground may not all come back — pass four)
-  scout   {zoneId}                a patrol: 4h + travel; eta 0.55 on the zone, 0.2 on neighbours
+  scout   {zoneId}                a patrol: 4h + travel; eta 0.35–0.6 on the zone (quieter ground, surer
+                                  report), 0.2 on neighbours; the hub hears the belief after the fold
   post    {heroId, zoneId}        send someone to stand on ground; they measure it every hour (eta 0.7)
   recall  {heroId}                bring them home (travel time)
   wait    {hours}                 like rest, but nobody heals; the explicit "let it run"
@@ -45,7 +46,6 @@ TRAVEL_MINUTES_CROSS_MAP = 240.0
 SCOUT_MINUTES = 240.0
 HEAL_AFTER_REST_MINUTES = 720.0
 POST_ETA = 0.7
-SCOUT_ETA = 0.55
 NEIGHBOUR_ETA = 0.2
 # Looking costs. A posted hero on hostile ground is at risk every hour; a patrol into hostile
 # ground may not all come back (its report arrives thinner). Deterministic: the roll is a hash
@@ -54,6 +54,10 @@ POST_RISK_HOSTILE_PER_HOUR = 0.015
 POST_RISK_UNREST_PER_HOUR = 0.010      # x zone instability
 SCOUT_LOSS_HOSTILE = 0.20
 SCOUT_LOSS_ETA = 0.35
+# A patrol is an observation, not an oracle: its eta runs 0.6 on quiet ground down to 0.35 on
+# unstable ground (pass 8B). What the hub hears is the company's belief AFTER the fold.
+SCOUT_ETA_MAX = 0.60
+SCOUT_ETA_MIN = 0.35
 
 
 def _load(path: Path) -> Any:
@@ -201,6 +205,20 @@ class Clock:
                 return dict(zones[zid], mapId=map_id)
         return None
 
+    def _believed_word(self, zid: str, summary: Dict[str, Any], *, before: bool = False) -> str:
+        """The company's word for a zone from its belief world: ours / <faction>'s / held / empty /
+        nobody had looked (before) | unclear (after). Reads the fold, never zoneMemory."""
+        o, h = summary.get("ours") or {}, summary.get("held") or {}
+        if max(float(o.get("conf") or 0), float(h.get("conf") or 0)) < 0.15:
+            return "nobody had looked" if before else "unclear"
+        if float(o.get("value") or 0) > 0.5:
+            return "ours"
+        if float(h.get("value") or 0) > 0.5:
+            seen = (self.world.seen_faction.get(zid) or {}) if self.world is not None else {}
+            fac = str(seen.get("faction") or "")
+            return f"{fac}'s" if fac and fac not in ("neutral", "ashwalkers") else "held"
+        return "empty"
+
     def _questions(self) -> Dict[str, Tuple[str, Optional[str]]]:
         if not self.world:
             return {}
@@ -263,8 +281,8 @@ class Clock:
                         ctrl = str(truth.get("controllingFaction") or "neutral")
                         if ctrl not in ("ashwalkers", "neutral") and not rec.get("contactFlagged"):
                             rec["contactFlagged"] = True
-                            found.append({"pause": "contact", "heroId": hid, "zoneId": zid,
-                                          "witness": f"{(self.state.get('characters') or {}).get(hid, {}).get('name', hid)} reports {self.graph.label.get(zid, zid)} is {ctrl}'s now"})
+                            # the witness line is written after the fold (see below): belief, not truth
+                            found.append({"pause": "contact", "heroId": hid, "zoneId": zid, "witness": None})
                         elif ctrl in ("ashwalkers", "neutral"):
                             rec.pop("contactFlagged", None)
                 elif rec.get("where") == "transit" and float(rec.get("eta") or 0) <= self.minute:
@@ -276,6 +294,12 @@ class Clock:
                                   "witness": f"{(self.state.get('characters') or {}).get(hid, {}).get('name', hid)} {'is on' if rec['where'] == 'posted' else 'is back from'} {self.graph.label.get(str(rec.get('zoneId') or rec.get('fromZoneId')), rec.get('zoneId') or 'the road')}"})
             self._hazard_posted(found)
             self.world.flush()
+            for f in found:
+                if f.get("pause") == "contact" and f.get("witness") is None:
+                    zid = str(f.get("zoneId"))
+                    word = self._believed_word(zid, self.world.zone_summary(zid))
+                    name = (self.state.get("characters") or {}).get(f.get("heroId"), {}).get("name", f.get("heroId"))
+                    f["witness"] = f"{name} reports {self.graph.label.get(zid, zid)} is {word} now"
         return found
 
     @staticmethod
@@ -307,8 +331,8 @@ class Clock:
                     self.world.observe({f"obs_hero_{hid}_fit": 0.3}, 1.0, source=f"post:{hid}", minute=self.minute)
                 name = (chars.get(hid) or {}).get("name", hid)
                 found.append({"pause": "casualty", "heroId": hid, "zoneId": rec["zoneId"],
-                              "witness": f"{name} was hit on {self.graph.label.get(str(rec['zoneId']), rec['zoneId'])} ({ctrl}'s ground); coming home wounded"})
-                self.state.setdefault("intel", []).append({"kind": "casualty", "about": "post", "zoneId": rec["zoneId"], "heroId": hid, "label": self.graph.label.get(str(rec["zoneId"]), rec["zoneId"]), "toFaction": ctrl, "eta": POST_ETA, "source": f"post:{hid}", "minute": round(self.minute, 1), "missionNumber": int(self.state.get("missionNumber") or 0), "camp": True})
+                              "witness": f"{name} was hit on {self.graph.label.get(str(rec['zoneId']), rec['zoneId'])}; coming home wounded"})
+                self.state.setdefault("intel", []).append({"kind": "casualty", "about": "post", "zoneId": rec["zoneId"], "heroId": hid, "label": self.graph.label.get(str(rec["zoneId"]), rec["zoneId"]), "eta": POST_ETA, "source": f"post:{hid}", "minute": round(self.minute, 1), "missionNumber": int(self.state.get("missionNumber") or 0), "camp": True})
 
     def _all_zones(self) -> List[Dict[str, Any]]:
         out = []
@@ -375,9 +399,12 @@ class Clock:
             return {"ok": False, "error": f"unknown zone {zone_id}"}
         travel = self.graph.travel_minutes(self.camp.get("homeZoneId"), zone_id, home_map=self.camp.get("homeMapId"))
         out = self.run(travel + SCOUT_MINUTES, active_map=self.graph.map_of.get(zone_id), until_pause=False, reason=f"scout:{zone_id}")
+        # The ground the patrol walks is the truth; what comes home is an OBSERVATION of it, folded
+        # into the belief world at a modest eta. The hub (and the pause line) hear only the fold.
         ctrl_now = str(truth.get("controllingFaction") or "neutral")
+        unrest = _clamp(float((truth.get("abstract") or {}).get("instability") or 0.0))
         lost = ctrl_now not in ("ashwalkers", "neutral") and self._roll("scout", zone_id, int(self.minute // STEP_MINUTES)) < SCOUT_LOSS_HOSTILE
-        scout_eta = SCOUT_LOSS_ETA if lost else SCOUT_ETA
+        scout_eta = SCOUT_LOSS_ETA if lost else round(max(SCOUT_ETA_MIN, min(SCOUT_ETA_MAX, SCOUT_ETA_MAX - 0.25 * unrest)), 3)
         if lost:
             # the patrol that did not all come back: a field unit is spent, the report is thinner
             roster = self.state.get("roster") or {}
@@ -387,10 +414,11 @@ class Clock:
                 cadre[spent] = int(cadre[spent]) - 1
             out["patrolLoss"] = {"zoneId": zone_id, "spent": spent}
             out["pauses"].append({"pause": "casualty", "minute": round(self.minute, 1), "during": f"scout:{zone_id}", "zoneId": zone_id,
-                                  "witness": f"the patrol to {self.graph.label.get(zone_id, zone_id)} ran into {ctrl_now}; not all of it came back" + (f" (lost a {spent})" if spent else "")})
+                                  "witness": f"the patrol to {self.graph.label.get(zone_id, zone_id)} was fired on; not all of it came back" + (f" (lost a {spent})" if spent else "")})
             self.camp["pauses"].append(out["pauses"][-1])
         if self.world is not None and zone_id in self.world.host.engine.field.clusters:
             before = self.world.zone_summary(zone_id)
+            believed_before = self._believed_word(zone_id, before, before=True)
             obs = self._B._drop_obs(truth)
             self.world.begin_batch()
             self.world.observe_zone(zone_id, source="scout", eta=scout_eta, minute=self.minute, **obs)
@@ -401,15 +429,20 @@ class Clock:
                     self.world.observe_zone(nz, source="scout:adjacent", eta=NEIGHBOUR_ETA, minute=self.minute, held=nobs["held"], threat=nobs["threat"])
             self.world.flush()
             after = self.world.zone_summary(zone_id)
-            # surprisal: how wrong we were, weighted by how sure we were
-            s = before["ours"]["conf"] * abs(obs["ours"] - before["ours"]["value"]) + before["held"]["conf"] * abs(obs["held"] - before["held"]["value"])
-            out["scouted"] = {"zoneId": zone_id, "label": self.graph.label.get(zone_id, zone_id), "found": str(truth.get("controllingFaction") or "neutral"),
-                              "believed": ("ours" if before["ours"]["value"] > 0.5 else ("held" if before["held"]["value"] > 0.5 else "empty")) if max(before["ours"]["conf"], before["held"]["conf"]) >= 0.15 else "nobody had looked",
+            found_word = self._believed_word(zone_id, after)
+            # surprise: how far the fold moved us, weighted by how sure we were before
+            s = before["ours"]["conf"] * abs(after["ours"]["value"] - before["ours"]["value"]) + before["held"]["conf"] * abs(after["held"]["value"] - before["held"]["value"])
+            out["scouted"] = {"zoneId": zone_id, "label": self.graph.label.get(zone_id, zone_id), "found": found_word,
+                              "believed": believed_before, "eta": scout_eta,
                               "surprise": round(s, 3), "before": before, "after": after}
-            self.state.setdefault("intel", []).append({"kind": "scout", "about": "scout", "zoneId": zone_id, "label": self.graph.label.get(zone_id, zone_id), "found": out["scouted"]["found"], "believed": out["scouted"]["believed"], "surprise": out["scouted"]["surprise"], "eta": scout_eta, "source": "patrol", "minute": round(self.minute, 1), "missionNumber": int(self.state.get("missionNumber") or 0), "camp": True})
+            self.state.setdefault("intel", []).append({"kind": "scout", "about": "scout", "zoneId": zone_id, "label": self.graph.label.get(zone_id, zone_id), "found": found_word, "believed": believed_before, "surprise": out["scouted"]["surprise"], "eta": scout_eta, "source": "patrol", "minute": round(self.minute, 1), "missionNumber": int(self.state.get("missionNumber") or 0), "camp": True})
             out["pauses"].append({"pause": "arrival", "minute": round(self.minute, 1), "during": f"scout:{zone_id}", "zoneId": zone_id,
-                                  "witness": f"patrol back from {self.graph.label.get(zone_id, zone_id)}: {out['scouted']['found']}" + (f" (we believed {out['scouted']['believed']})" if s > 0.3 else "")})
+                                  "witness": f"patrol back from {self.graph.label.get(zone_id, zone_id)}: {found_word}" + (f" (we believed {believed_before})" if s > 0.3 else "")})
             self.camp["pauses"].append(out["pauses"][-1])
+        else:
+            # no belief world: the patrol still went, but nothing can be said about what it saw
+            out["scouted"] = {"zoneId": zone_id, "label": self.graph.label.get(zone_id, zone_id), "found": "unclear",
+                              "believed": "nobody had looked", "eta": scout_eta, "surprise": 0.0, "before": None, "after": None}
         out["ok"] = True
         return out
 
@@ -468,11 +501,8 @@ class Clock:
             face["dark"] = sum(1 for r in frame["nodes"] if r["role"] == "ours" and r["state"] == "dark")
         else:
             face["belief"] = "unavailable: " + getattr(self, "world_error", "Umwelt not importable")
-        try:
-            import perspectives_v1 as P
-            face["divergence"] = {k: {"right": v["right"], "ghost": len(v["ghostHoldings"]), "dark": v["dark"]} for k, v in P.divergence(self.state, self.ws).get("perspectives", {}).items()}
-        except Exception:
-            pass
+        # No divergence digest on the camp face (pass 8B): how RIGHT another faction's picture is
+        # compares their mind to the truth, and the player side carries neither.
         (self.ws / "outbox" / "camp.latest.json").write_text(json.dumps(face, indent=2, ensure_ascii=False), encoding="utf-8")
         return face
 

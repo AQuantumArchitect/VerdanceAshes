@@ -14,19 +14,42 @@ Write-Host "=== Verdance's Ashes tester setup ==="
 Write-Host "Workspace: $Workspace"
 
 # ---- locate BAR ---------------------------------------------------------
-if (-not $BarDataRoot) { $BarDataRoot = Find-BARDataRoot }
-if (-not $BarDataRoot -and -not $NonInteractive) {
-  Write-Host ""
-  Write-Host "Could not auto-detect your Beyond All Reason install."
-  $BarDataRoot = Read-Host "Enter the full path to your BAR 'data' directory (contains engine\ and games\)"
+# verdance_config.json barDataRoot is authoritative; then BAR_DATA_ROOT; then the
+# standard installer / Program Files / Steam folders (Find-BARDataRoot in _common.ps1).
+function Normalize-BARDataRootInput([string]$Text) {
+  if (-not $Text) { return "" }
+  $p = $Text.Trim().Trim('"').Trim("'").TrimEnd('\')
+  if (-not $p) { return "" }
+  # Accept the install folder too (the one that holds data\), and a path into engine\ or games\.
+  $dataSub = Join-Path $p "data"
+  if ((Test-Path (Join-Path $dataSub "games")) -and !(Test-Path (Join-Path $p "games"))) { $p = $dataSub }
+  foreach ($tail in @("\engine", "\games")) {
+    if ($p.ToLower().EndsWith($tail)) { $p = $p.Substring(0, $p.Length - $tail.Length) }
+  }
+  return $p
 }
-if (-not $BarDataRoot -or !(Test-Path $BarDataRoot)) {
-  throw "No Beyond All Reason data directory found. Install BAR first (https://www.beyondallreason.info), or pass -BarDataRoot."
+
+if ($BarDataRoot) { $BarDataRoot = Normalize-BARDataRootInput $BarDataRoot }
+if (-not $BarDataRoot) { $BarDataRoot = Find-BARDataRoot -Workspace $Workspace }
+
+if (-not $NonInteractive) {
+  $tries = 0
+  while ($tries -lt 3) {
+    $problem = $null
+    try { Assert-BARDataRoot -BarDataRoot $BarDataRoot } catch { $problem = $_.Exception.Message }
+    if (-not $problem) { break }
+    $tries += 1
+    Write-Host ""
+    if ($BarDataRoot) { Write-Host $problem } else { Write-Host "Could not auto-detect your Beyond All Reason install." }
+    Write-Host "It is usually  $env:LOCALAPPDATA\Programs\Beyond-All-Reason\data"
+    Write-Host "(or ...\Steam\steamapps\common\Beyond All Reason\data for the Steam build)."
+    $answer = Read-Host "Enter the full path to your BAR 'data' folder (contains engine\ and games\), or press Enter to stop"
+    if (-not $answer -or -not $answer.Trim()) { break }
+    $BarDataRoot = Normalize-BARDataRootInput $answer
+  }
 }
-if (!(Test-Path (Join-Path $BarDataRoot "games"))) { throw "'$BarDataRoot' does not look like a BAR data directory (no games\ folder)." }
-$engineDirs = Get-ChildItem (Join-Path $BarDataRoot "engine") -Directory -ErrorAction SilentlyContinue |
-  Where-Object { Test-Path (Join-Path $_.FullName "spring.exe") }
-if (-not $engineDirs) { throw "No engine with spring.exe found under $BarDataRoot\engine. Launch BAR once so it downloads an engine, then re-run setup." }
+Assert-BARDataRoot -BarDataRoot $BarDataRoot
+$engineDirs = Get-BAREngineDirs -BarDataRoot $BarDataRoot
 Write-Host "BAR data root: $BarDataRoot"
 Write-Host "Engine: $($engineDirs[-1].Name)"
 
@@ -51,10 +74,13 @@ if ($Junction) {
 # ---- fresh campaign state -----------------------------------------------
 $statePath = Join-Path $Workspace "state\campaign_state.json"
 if (Test-Path $statePath) {
-  Write-Host "Existing campaign state found; leaving it untouched. (Use RESET_CAMPAIGN.bat for a fresh start.)"
+  Write-Host "Existing campaign state found; leaving it untouched. (Run RESET.bat for a fresh start.)"
 } else {
+  # A fresh clone / unzip has no state\campaign_state.json: init-state writes mission 1.
+  New-Item -ItemType Directory -Force -Path (Split-Path -Parent $statePath) | Out-Null
   & (Join-Path $ScriptDir "migrate_state_v1.ps1") -Workspace $Workspace
-  Write-Host "Initialized a fresh campaign state."
+  if (!(Test-Path $statePath)) { throw "Fresh campaign state was not written to $statePath" }
+  Write-Host "Initialized a fresh campaign state (mission 1)."
 }
 
 # ---- materialize first mission ------------------------------------------
@@ -65,5 +91,4 @@ if (!(Test-Path $intentPath)) {
 
 Write-Host ""
 Write-Host "=== Setup complete ==="
-Write-Host "Run PLAY_SESSION_V1.bat to build and play the next campaign mission."
-Write-Host "Or run LAUNCH_VERDANCE_CONSOLE.bat for the full control panel."
+Write-Host "Run PLAY.bat (leave the window open while you play). RESET.bat starts the campaign over."

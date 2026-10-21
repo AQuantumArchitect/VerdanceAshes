@@ -2,7 +2,7 @@
 
 **One product, two skins:** BAR in-theater HUD + HTML war-room hub.
 
-Version: **0.9** · **pass seven 2026-10-20**: three surfaces (minimap board · sidebar · infil/exfil cards), one encoding, no pings. Protocol credit laws stay in `docs/CAMPAIGN_BAR_PROTOCOL.md` and `tools/match_credit_v1.py`. Theater/home rules: `docs/THEATER_MAP_AND_HOME.md`.
+Version: **0.9** · **pass seven 2026-10-20**: three surfaces (minimap board · sidebar · infil/exfil cards), one encoding, no pings. Protocol credit laws stay in `docs/CAMPAIGN_BAR_PROTOCOL.md` and `tools/match_credit_v1.py`. Theater/home rules: `docs/archive/THEATER_MAP_AND_HOME.md`.
 
 ---
 

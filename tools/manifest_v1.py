@@ -4,6 +4,12 @@
 The gadget writes facts: who was on the pad, who and what was not, where the company extracted to,
 what it looked at. This module is the only place those facts become campaign meaning:
 
+  facts in     result.status        terminal KIND: extracted | wiped | closed (never a verdict)
+               result.manifest      {kind, destination, going, staying, enemyOnPad, objectiveComplete, seen}
+               result.objectiveComplete / objectiveCompleteHow / allObjectivesDone / requiredMarksLeft
+               (pass nine: the gadget no longer writes verdict, zoneFlipped, cleanExtract,
+               extractionStatus, credits or freeTnbMint — those are computed here and in
+               match_credit_v1 from the facts above)
   verdict      wiped → defeat · closed (engine ended without a manifest) → abandon ·
                extracted → victory if the objective was done and nobody was left, else partial
   people left  stay where they stood: camp.people[hid] = {where: "field", zoneId}; they do not board the
@@ -23,8 +29,38 @@ def manifest_of(result: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     return m if isinstance(m, dict) and m.get("schema", "").startswith("verdance-manifest") else None
 
 
+def objective_done(result: Dict[str, Any]) -> bool:
+    """The primary objective completed, as the gadget reported it (manifest stamp first)."""
+    m = manifest_of(result)
+    if m is not None and m.get("objectiveComplete") is not None:
+        return bool(m.get("objectiveComplete"))
+    if result.get("objectiveComplete") is not None:
+        return bool(result.get("objectiveComplete"))
+    # older results: an objective row that says complete / destroyed / claimed
+    for row in result.get("objectiveResults") or []:
+        if isinstance(row, dict) and row.get("status") in ("complete", "destroyed", "claimed"):
+            return True
+    return bool(result.get("destroyedObjectiveIds"))
+
+
+def heroes_left(result: Dict[str, Any]) -> list:
+    """Hero ids the company left standing in the field when it lifted (manifest.staying)."""
+    m = manifest_of(result)
+    if m is None:
+        return []
+    return [str(h.get("heroId") or "") for h in (m.get("staying") or {}).get("heroes") or [] if isinstance(h, dict)]
+
+
 def verdict_from(result: Dict[str, Any]) -> Optional[str]:
-    """None when the result carries no manifest (legacy results keep their own status)."""
+    """None when the result carries no manifest and no terminal kind (legacy results keep
+    their own status).
+
+    extracted → victory when the objective was done and nobody was left, else partial
+    wiped     → defeat
+    closed    → abandon (the engine ended the game without a manifest)
+    A result without a manifest but with a terminal kind (fallback blob, old gadget) is
+    read the same way, with extracted → partial since the headcount is unknown.
+    """
     m = manifest_of(result)
     status = str(result.get("status") or "")
     if m is None:
@@ -36,9 +72,7 @@ def verdict_from(result: Dict[str, Any]) -> Optional[str]:
         return "defeat"
     if kind == "closed":
         return "abandon"
-    left = (m.get("staying") or {}).get("heroes") or []
-    done = bool(m.get("objectiveComplete") if m.get("objectiveComplete") is not None else result.get("objectiveComplete"))
-    return "victory" if (done and not left) else "partial"
+    return "victory" if (objective_done(result) and not heroes_left(result)) else "partial"
 
 
 def extraction_status_from(result: Dict[str, Any]) -> Optional[str]:

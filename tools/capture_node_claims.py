@@ -405,13 +405,28 @@ def hub_capture_contracts(
 ) -> List[Dict[str, Any]]:
     """Hub board contracts: seize/hold living shell nodes (not empty grass).
 
-    Prefer quest_generator same_map candidates when available; else zoneMemory scan.
+    PLAYER-FACING (pass 8B): everything here rides into hub_state.json, so who holds a target is the
+    company's BELIEF (hub_belief_v1), never zoneMemory.controllingFaction. `against` is the believed
+    holder or "unknown"; the engine re-derives the real opponent when it builds the match.
+
+    Prefer quest_generator same_map candidates when available; else a belief scan of known zones.
     Each contract stamps clear_hold_shell + freeTnbMint=false for deploy compile.
     """
     from pathlib import Path as _Path
 
     ws = _Path(workspace) if workspace is not None else None
     contracts: List[Dict[str, Any]] = []
+
+    def _believed(mid: str, zid: str) -> str:
+        try:
+            import hub_belief_v1  # type: ignore
+            rows = hub_belief_v1.belief_surface(ws or _Path(__file__).resolve().parents[1], state, mid).get("zones") or {}
+            return hub_belief_v1.believed_holder(rows.get(str(zid)))
+        except Exception:
+            return "unknown"
+
+    def _against_word(holder: str) -> str:
+        return holder if holder not in ("ashwalkers", "nullmercs", "neutral", "empty", "unknown", "held") else "unknown"
 
     # Prefer graph-legal quest candidates (Mode A hub contracts).
     try:
@@ -425,9 +440,12 @@ def hub_capture_contracts(
                 patron=patron,
                 limit=max(limit * 2, 8),
                 from_zone_ids=from_zone_ids,
+                perspective="belief",
             )
             for c in raw:
                 arch = c.get("objectiveArchetype") or "seize_lane"
+                c = dict(c)
+                c["against"] = _against_word(str(c.get("against") or "unknown"))
                 stamped = stamp_sortie_capture(dict(c))
                 mode = stamped.get("captureMode") or (
                     CAPTURE_MODE if is_capture_kind(arch) else ("raid_scar" if arch == "eco_raid" else "other")
@@ -448,7 +466,8 @@ def hub_capture_contracts(
                     "holdUnderRegrow": True,
                     "emptyGrassClaim": False,
                     "score": c.get("score"),
-                    "against": c.get("against") or "armada",
+                    "against": c.get("against") or "unknown",
+                    "believedHolder": _believed(str(c.get("mapId")), str(c.get("targetZoneId"))),
                     "patron": patron,
                     "sortie": stamped,
                     "source": "capture_node_claims+quest_gen",
@@ -466,7 +485,8 @@ def hub_capture_contracts(
         pass
 
     zm = state.get("zoneMemory") or {}
-    # Prefer enemy-held living-shell zones as capture targets.
+    # Fallback scan: zoneMemory only NAMES the zones; who holds each is the company's belief.
+    # Zones we believe are ours are not targets; dark zones are offered as "unknown".
     for mid, zones in zm.items():
         if map_id and mid != map_id:
             continue
@@ -475,15 +495,16 @@ def hub_capture_contracts(
         for zid, zrec in zones.items():
             if not isinstance(zrec, dict):
                 continue
-            ctrl = zrec.get("controllingFaction") or (zrec.get("abstract") or {}).get("control")
-            if ctrl in ("nullmercs", "ashwalkers"):
+            holder = _believed(str(mid), str(zid))
+            if holder in ("nullmercs", "ashwalkers"):
                 continue
+            against = _against_word(holder)
             order = stamp_sortie_capture({
                 "mapId": mid,
                 "targetZoneId": zid,
                 "objectiveArchetype": "seize_lane",
                 "patron": patron,
-                "against": ctrl or "armada",
+                "against": against,
                 "sessionMode": state.get("sessionMode") or "same_map",
                 "occupationModel": OCCUPATION_MODEL,
             })
@@ -500,7 +521,8 @@ def hub_capture_contracts(
                 "clearFraction": CLEAR_FRACTION,
                 "holdUnderRegrow": True,
                 "emptyGrassClaim": False,
-                "controllingFaction": ctrl,
+                "against": against,
+                "believedHolder": holder,
                 "sortie": order,
                 "source": "capture_node_claims",
             })

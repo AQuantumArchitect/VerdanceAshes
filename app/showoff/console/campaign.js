@@ -550,13 +550,6 @@
     return hit || null;
   }
 
-  function wildRecruitTeaseAtZone(mapId, zoneId) {
-    // Soft teaser for unmarked pads: still name the home hero, but mark as ambient.
-    if (!zoneId) return null;
-    const hits = wildRecruitsForMap(mapId).filter(w => String(w.zoneId || "") === String(zoneId));
-    return hits[0] || null;
-  }
-
   function companyStatusRank(entry) {
     // Sort: deployed → base → away → dead → locked
     const t = entry.tier || "locked";
@@ -977,29 +970,12 @@
         </div>`;
     }
 
-    renderBroTzarButton();
     updateDeployGate();
   }
 
   // Back-compat aliases — older call sites
   function renderMuster() { renderCompany(); }
   function renderAces() { renderCompany(); }
-
-  function renderBroTzarButton() {
-    const btn = $("btn-bro-tzar");
-    if (!btn) return;
-    // Bro's company seat *is* the Tzar — no paid call-in button.
-    btn.hidden = true;
-    btn.disabled = true;
-  }
-
-  async function orderBroTzar() {
-    const bro = (companySurface().broTzar) || {};
-    if (bro.inCompany) {
-      return toast("Bro is the Tzar — he drops with the company. No Tnb.", "ok");
-    }
-    return toast("Hire Bro into the company — he is the Tzar", "err");
-  }
 
   function updateDeployGate() {
     const btn = $("btn-deploy");
@@ -1047,7 +1023,7 @@
     if (!plan) return "Pick a sortie on the map first";
     const m = plan.marks || {};
     if (!(m.captureZoneIds && m.captureZoneIds.length)) return "Mark a target on the map first";
-    if (!m.deployZoneId) return "Mark an infil pad first";
+    if (!m.deployZoneId) return "Mark the pad first";
     return "";
   }
 
@@ -1321,7 +1297,7 @@
       return toast("Pick exactly " + crewSeatCap() + " packs", "err");
     }
     if (!state.hostLive) {
-      return toast("Open the wire first (kernel on :8770) to seal the company", "err");
+      return toast("Start PLAY.bat and keep its window open to seal the company", "err");
     }
     try {
       toast("Sealing company…");
@@ -1607,7 +1583,7 @@
       title.textContent = "Campfire map — campaign disconnected";
       body.innerHTML =
         `You can study the war from here, but you cannot drop into a fight. ` +
-        `Run <b>PLAY.bat</b> (leave it open), then choose a green <b>sortie</b> and <b>Drop into battle</b>.`;
+        `Start <b>PLAY.bat</b> and keep its window open, then choose a green <b>sortie</b> and <b>Drop into battle</b>.`;
       return;
     }
     const sortie = (state.hub.node && (state.hub.node.sortieMapId || state.hub.node.regionHint)) || state.focusMap;
@@ -1616,7 +1592,7 @@
       body.innerHTML =
         `Select a <b>map chip</b> above the board (start with <b>${esc(prettyMap(sortie))}</b> or home <b>${esc(prettyMap(home))}</b>). ` +
         `Recommended sorties for that ground appear under the map — mark the route, then <b>Drop</b>. ` +
-        `Raise camp from the left <b>Camp</b> chip; buy packs at the <b>Broker</b>.`;
+        `<b>Home</b> is the camp — raise it there; the <b>Broker</b> is in <b>Company</b>.`;
       return;
     }
     const pressure = state.hub.graphPressure || "";
@@ -1649,7 +1625,7 @@
     $("hud-badges").innerHTML = bits.join("");
     $("foot-left").textContent = live
       ? `Campaign connected · sortie ${h.missionNumber || 1}`
-      : `Map only · run PLAY.bat to fight`;
+      : `Map only · start PLAY.bat and keep its window open`;
     renderNextStep();
   }
 
@@ -1756,7 +1732,7 @@
     $("shop-note").textContent =
       (state.hostLive
         ? "Each purchase shows its cost and delivery time. Construction equipment can require Tenebrium as well as metal."
-        : "Preview only. Run PLAY.bat to make campaign purchases.");
+        : "Preview only. Start PLAY.bat and keep its window open to make campaign purchases.");
 
     const kit = c.deployKit || [];
     const inbound = c.inbound || c.pendingDeliveries || [];
@@ -2196,18 +2172,10 @@
     toast("Mark the Rock Jungle founding route, then Drop", "ok");
   }
   function openBrokerFromCamp() {
+    // The Broker lives in the Company workspace; workspaces.js switches on the same click.
     hideCampSheet();
-    const tab = $("tab-shop");
-    if (tab) tab.click();
-    else {
-      ["shop", "theaters", "manifold"].forEach(name => {
-        const panel = $("panel-" + name);
-        if (panel) panel.hidden = name !== "shop";
-      });
-      document.querySelectorAll(".tab").forEach(t => {
-        t.classList.toggle("active", t.dataset.tab === "shop");
-      });
-    }
+    const shop = $("panel-shop");
+    if (shop) shop.hidden = false;
     toast("Broker open — buy before you Drop", "ok");
   }
 
@@ -2280,10 +2248,7 @@
       return;
     }
     if (kind === "shop") {
-      document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === "shop"));
       $("panel-shop").hidden = false;
-      $("panel-theaters").hidden = true;
-      if ($("panel-manifold")) $("panel-manifold").hidden = true;
       logLine("The broker's tent is open.");
       toast("Broker — hire before you drop", "ok");
       return;
@@ -2435,11 +2400,8 @@
     const control = String(row.control || "unknown").toLowerCase();
     let believed = String(row.believed || "").toLowerCase();
     if (!["ours", "held", "empty", "dark", "unsure"].includes(believed)) {
-      believed = control === "ashwalkers" ? "ours"
-        : control === "empty" ? "empty"
-        : control === "unknown" ? "dark"
-        : (control === "held" || FACTION_KEYS.has(control)) ? "held"
-        : "unsure";
+      // A row with no belief word is not a belief: say "nobody looked", never a made-up percentage.
+      believed = "dark";
     }
     const st = String(row.state || "").toLowerCase();
     out.believed = believed;
@@ -3141,10 +3103,8 @@
     // Offline map-only: download plan, guide player to PLAY_CAMPAIGN
     try {
       downloadJson("hub_deploy_plan.json", plan);
-      logLine(`Map-only plan for ${prettyMap(plan.mapId)}. Run PLAY.bat to fight.`);
-      toast("Map only — run PLAY.bat to open the wire and drop for real.", "err");
-      const ov = $("deploy-overlay");
-      if (ov) ov.classList.remove("show");
+      logLine(`Map-only plan for ${prettyMap(plan.mapId)}. Start PLAY.bat and keep its window open to fight.`);
+      toast("Map only — start PLAY.bat and keep its window open to drop for real.", "err");
       state.hub.lastResult = { kind: "deploy_stub", mapId: plan.mapId, contractKind: plan.contractKind };
     } finally {
       state.dropping = false;
@@ -3177,12 +3137,11 @@
     }
     if (!state.hostLive && state.hub.flags) state.hub.flags.deployStub = true;
     if (!state.hostLive) {
-      logLine("Map only — run PLAY.bat to fight in BAR.");
+      logLine("Map only — start PLAY.bat and keep its window open to fight in BAR.");
     }
     renderBadges();
     if (state.hostLive) {
       startResultPoll();
-      startFieldPoll();
       pullHubState().catch(() => {});
     }
   }
@@ -3380,13 +3339,6 @@
     }
     if (patch.homeEval) state.hub.homeEval = patch.homeEval;
     if (patch.homeCamp) state.hub.homeCamp = patch.homeCamp;
-    if (patch.regions && Array.isArray(patch.regions)) {
-      const byId = Object.fromEntries(patch.regions.map(r => [r.mapId, r]));
-      (state.hub.regions || []).forEach(r => {
-        const u = byId[r.mapId];
-        if (u && u.control) r.control = u.control;
-      });
-    }
     if (state.hub.flags) state.hub.flags.deployStub = false;
     const debrief = patch.debrief || (patch.lastResult && patch.lastResult.debrief) || null;
     const tokens = (patch.lastResult && patch.lastResult.tokens) || (debrief && debrief.changed) || [];
@@ -3475,7 +3427,7 @@
 
   async function pullBarResult() {
     if (!state.hostLive) {
-      return toast("Open the wire first — run PLAY.bat", "err");
+      return toast("Start PLAY.bat and keep its window open", "err");
     }
     toast("Listening for the last sortie…");
     try {
@@ -3519,7 +3471,7 @@
 
   async function abandonSortie() {
     if (!state.hostLive) {
-      return toast("Open the wire first — run PLAY.bat", "err");
+      return toast("Start PLAY.bat and keep its window open", "err");
     }
     if (!confirm("Abandon this sortie? No zone flip, no fake win. Next Drop unlocks.")) return;
     try {
@@ -3600,7 +3552,7 @@
 
   async function saveCampaign() {
     if (!state.hostLive) {
-      return toast("Open the wire first (PLAY.bat / kernel on :8770)", "err");
+      return toast("Start PLAY.bat and keep its window open", "err");
     }
     const mn = (state.hub && state.hub.missionNumber) || 1;
     const suggested = "mission_" + mn;
@@ -3631,7 +3583,7 @@
 
   async function loadCampaign() {
     if (!state.hostLive) {
-      return toast("Open the wire first (PLAY.bat / kernel on :8770)", "err");
+      return toast("Start PLAY.bat and keep its window open", "err");
     }
     let saves = [];
     try {
@@ -3739,19 +3691,6 @@
 
   // Pass five: there is no "BAR paused on the map" state any more. The sortie ends on the
   // manifest in BAR; the kernel brings the result home; the debrief arrives through /api/result.
-  function startFieldPoll() { /* retired */ }
-
-  // Tabs
-  document.querySelectorAll(".tab").forEach(tab => {
-    tab.onclick = () => {
-      document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t === tab));
-      const name = tab.dataset.tab;
-      $("panel-shop").hidden = name !== "shop";
-      $("panel-theaters").hidden = name !== "theaters";
-      $("panel-manifold").hidden = name !== "manifold";
-      if (name === "manifold") renderQuantum();
-    };
-  });
 
   document.querySelectorAll(".mode-btn").forEach(btn => {
     btn.onclick = () => {
@@ -3808,7 +3747,6 @@
       toast("Pick 3 packs, then Confirm company", "ok");
     };
   }
-  if ($("btn-bro-tzar")) $("btn-bro-tzar").onclick = () => orderBroTzar();
   $("btn-pull-result").onclick = () => pullBarResult();
   if ($("btn-abandon")) $("btn-abandon").onclick = () => abandonSortie();
   if ($("btn-reset-campaign")) $("btn-reset-campaign").onclick = () => resetCampaign();
@@ -3816,7 +3754,7 @@
   if ($("btn-load-campaign")) $("btn-load-campaign").onclick = () => loadCampaign();
   if ($("hc-dismiss")) $("hc-dismiss").onclick = () => hideHomecoming();
   $("btn-sync-hub").onclick = async () => {
-    if (!state.hostLive) return toast("Run PLAY.bat for a live map", "err");
+    if (!state.hostLive) return toast("Start PLAY.bat and keep its window open for a live map", "err");
     try {
       await fetch(api("/api/rebuild-hub"), { method: "POST" });
       await pullHubState();

@@ -5,7 +5,7 @@
 ## Recalibration (read this first)
 
 **One Drop = one collapse of the world graph.** Hub holds superposition between fights; BAR measures; `bring_home` records.  
-Law + inventory: [`docs/GRAPH_COLLAPSE_SSOT.md`](docs/GRAPH_COLLAPSE_SSOT.md)
+Law + inventory: [`docs/archive/GRAPH_COLLAPSE_SSOT.md`](docs/archive/GRAPH_COLLAPSE_SSOT.md)
 
 World SSOT: `state/campaign_state.json` → `graph`  
 Character graph: `data/story/hero_umwelt.json` + `support_web.json`  
@@ -13,13 +13,13 @@ Combat lens (optional): molecule soft policy — not world truth; rollback `va_m
 
 ## Docs
 
-- **Graph SSOT / Drop-as-collapse:** [`docs/GRAPH_COLLAPSE_SSOT.md`](docs/GRAPH_COLLAPSE_SSOT.md)
+- **Graph SSOT / Drop-as-collapse:** [`docs/archive/GRAPH_COLLAPSE_SSOT.md`](docs/archive/GRAPH_COLLAPSE_SSOT.md)
 - **Narrative readings (ρ_N over readings, attractors, voices, the roll):** [`docs/NARRATIVE_READINGS_SSOT.md`](docs/NARRATIVE_READINGS_SSOT.md) — faces: `outbox/readings.latest.json`, `outbox/occasions.latest.md`
 - Deploy truth: [`docs/DEPLOY_TRUTH.md`](docs/DEPLOY_TRUTH.md)
 - Ship architecture: [`docs/SHIP_ARCHITECTURE.md`](docs/SHIP_ARCHITECTURE.md)
 - **Campaign ↔ BAR protocol:** [`docs/CAMPAIGN_BAR_PROTOCOL.md`](docs/CAMPAIGN_BAR_PROTOCOL.md) — after a fight the kernel brings the result home; if not: Pull result / Abandon.
 - **Ash Console UI:** [`docs/UI_ASH_CONSOLE.md`](docs/UI_ASH_CONSOLE.md) — shared feel for BAR HUD + HTML hub.
-- **Theater map + home jungle:** [`docs/THEATER_MAP_AND_HOME.md`](docs/THEATER_MAP_AND_HOME.md) — map-first sorties, quiet-rim or Ashwalker-base infil/exfil, Rock Jungle home, rep curve.
+- **Theater map + home jungle:** [`docs/archive/THEATER_MAP_AND_HOME.md`](docs/archive/THEATER_MAP_AND_HOME.md) — map-first sorties, quiet-rim or Ashwalker-base infil/exfil, Rock Jungle home, rep curve.
 - Hero / FE graph foundation: [`docs/HERO_GRAPH_UMWELT_FOUNDATION.md`](docs/HERO_GRAPH_UMWELT_FOUNDATION.md)
 - Quantum design law (aspiration): [`BAR_verdant_ashes_campaign/quantum_graph_framework.md`](BAR_verdant_ashes_campaign/quantum_graph_framework.md)
 
@@ -33,7 +33,7 @@ Combat lens (optional): molecule soft policy — not world truth; rollback `va_m
 
 Also here: Desktop **`Verdance Playtest.bat`** / **`Verdance End Playtest.bat`**, or `START_PLAYTEST.bat` / `END_PLAYTEST.bat`.
 
-Player brief + hitlist: [`docs/LUKE_PLAYTEST_TODAY.md`](docs/LUKE_PLAYTEST_TODAY.md)  
+Player brief + hitlist: [`docs/archive/LUKE_PLAYTEST_TODAY.md`](docs/archive/LUKE_PLAYTEST_TODAY.md)  
 Scorecard: [`docs/HUMAN_PLAY_SCORECARD.md`](docs/HUMAN_PLAY_SCORECARD.md)
 
 ```
@@ -54,7 +54,7 @@ Leave `PLAY.bat` open → green sortie → **Drop into battle** → homecoming c
 - `outbox/war_map.json` / `campaign_surface.latest.json`
 - `outbox/human_playthrough.latest.json` (and yurt-sync vitals copies, if present)
 
-Everything else in `outbox/` is derive or bot — see [`GRAPH_COLLAPSE_SSOT.md`](docs/GRAPH_COLLAPSE_SSOT.md).
+Everything else in `outbox/` is derive or bot — see [`GRAPH_COLLAPSE_SSOT.md`](docs/archive/GRAPH_COLLAPSE_SSOT.md).
 
 ---
 
@@ -62,7 +62,7 @@ Everything else in `outbox/` is derive or bot — see [`GRAPH_COLLAPSE_SSOT.md`]
 
 Luke does **not** need to run proxy / overnight / residual / dual-gym scripts. Those exist for swarm seats and unit tests.
 
-Doc shelf (bots only): [`docs/PROXY_CAMPAIGN.md`](docs/PROXY_CAMPAIGN.md) · [`docs/HIVE_BAR_RESIDUAL_BRIDGE.md`](docs/HIVE_BAR_RESIDUAL_BRIDGE.md) · [`docs/OVERNIGHT_HIVE_BAR_0_8_5.md`](docs/OVERNIGHT_HIVE_BAR_0_8_5.md) · [`docs/BAR_SWARM_ORGANIC.md`](docs/BAR_SWARM_ORGANIC.md) · [`docs/SWARM_BAR_TRAINING_PATHWAY.md`](docs/SWARM_BAR_TRAINING_PATHWAY.md) · [`docs/UMWELT_GYM_PATHWAY.md`](docs/UMWELT_GYM_PATHWAY.md)
+Doc shelf (bots only): [`docs/archive/PROXY_CAMPAIGN.md`](docs/archive/PROXY_CAMPAIGN.md) · [`docs/HIVE_BAR_RESIDUAL_BRIDGE.md`](docs/HIVE_BAR_RESIDUAL_BRIDGE.md) · [`docs/OVERNIGHT_HIVE_BAR_0_8_5.md`](docs/OVERNIGHT_HIVE_BAR_0_8_5.md) · [`docs/BAR_SWARM_ORGANIC.md`](docs/BAR_SWARM_ORGANIC.md) · [`docs/SWARM_BAR_TRAINING_PATHWAY.md`](docs/SWARM_BAR_TRAINING_PATHWAY.md) · [`docs/UMWELT_GYM_PATHWAY.md`](docs/UMWELT_GYM_PATHWAY.md)
 
 **Bot faces (ignore unless debugging farms):** `proxy_campaign`, `hive_bar_residual`, `overnight_hive_bar`, `training_pathway_morning`, `campaign_fruit`, `bar_swarm_*`, hive `cognifold_faces` / muscle portfolio.
 

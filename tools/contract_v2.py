@@ -193,27 +193,34 @@ def normalize_result(raw: Dict[str, Any], *, campaign_id: str = "verdance_ashes"
     """
     if not isinstance(raw, dict):
         raw = {}
-    # Pass five: a result that carries a manifest has no verdict of its own; Python reads one off it.
+    # Law: Lua reports facts, Python interprets. The gadget result carries no verdict,
+    # no credits block and no extraction judgement (pass nine); whatever an older result
+    # still carries under those names is dropped here so it can never steer the credit
+    # table. status on a current result is the terminal KIND (extracted | wiped | closed).
+    raw = dict(raw)
+    for _k in ("credits", "zoneFlipped", "zoneFlipEligible", "cleanExtract", "freeTnbMint",
+               "mapSpent", "theaterExhausted"):
+        raw.pop(_k, None)
+    terminal_kind = _s(raw.get("status") or "")
+    if terminal_kind not in ("extracted", "wiped", "closed"):
+        terminal_kind = ""
+    # Pass five: the manifest is the ending; the verdict is read off it (manifest_v1).
     try:
         import manifest_v1 as _mf
         _v = _mf.verdict_from(raw)
         if _v:
-            raw = dict(raw)
             raw["status"] = _v
             raw["verdict"] = _v
-            _es = _mf.extraction_status_from(raw)
-            if _es is not None:
-                raw["extractionStatus"] = _es
-                raw["cleanExtract"] = (_es == "clean")
+        _es = _mf.extraction_status_from(raw)
+        if _es is not None:
+            raw["extractionStatus"] = _es
     except Exception:  # noqa: BLE001
         pass
     status = raw.get("status") or raw.get("verdict") or raw.get("result")
-    # Map extraction cleanliness early for credit table
+    # Clean extraction = the company lifted with no enemy on the pad (manifest.enemyOnPad == 0).
+    # Legacy results without a manifest keep their own extractionStatus / clean flag.
     ext = _s(raw.get("extractionStatus")).lower()
-    clean_extract = _b(raw.get("cleanExtract") or raw.get("clean"), False) or ext in (
-        "clean",
-        "success",
-    )
+    clean_extract = ext in ("clean", "success") or _b(raw.get("clean"), False)
     heroes = raw.get("heroes") or raw.get("heroResults") or {}
     survivors = raw.get("playerSurvivors") if isinstance(raw.get("playerSurvivors"), dict) else {}
     survivor_xp = (
@@ -280,6 +287,11 @@ def normalize_result(raw: Dict[str, Any], *, campaign_id: str = "verdance_ashes"
     if chapter <= 0:
         chapter = 1
 
+    # Zone flip is the credit table's call (capture: claim; raid: full victory), never the gadget's.
+    zone_flipped = bool(credit.get("zoneFlip")) if credit else bool(
+        (credits_block or {}).get("zoneFlipEligible") and verdict in ("victory", "partial")
+    )
+
     return {
         "schemaVersion": RESULT_V2,
         "campaignId": raw.get("campaignId") or campaign_id,
@@ -291,10 +303,11 @@ def normalize_result(raw: Dict[str, Any], *, campaign_id: str = "verdance_ashes"
         "chapterIndex": chapter,
         "verdict": verdict,
         "status": verdict,  # flatten for legacy process_result readers
+        "terminalKind": terminal_kind,  # what the gadget reported: extracted | wiped | closed
         "terminalReason": _s(raw.get("terminalReason") or ""),
         "success": success,
         "cleanExtract": clean_extract,
-        "zoneFlipped": _b(raw.get("zoneFlipped"), False),
+        "zoneFlipped": zone_flipped,
         "targetZoneId": raw.get("targetZoneId"),
         "deploymentZoneId": raw.get("deploymentZoneId"),
         "extractionZoneId": raw.get("extractionZoneId"),
@@ -303,6 +316,14 @@ def normalize_result(raw: Dict[str, Any], *, campaign_id: str = "verdance_ashes"
             (credits_block or {}).get("objectiveComplete"),
             _b(raw.get("objectiveComplete"), False),
         ),
+        # Gadget facts about how the primary resolved (pass nine; absent on older results).
+        "objectiveKind": raw.get("objectiveKind"),
+        "objectiveMode": raw.get("objectiveMode"),
+        "objectiveCompleteHow": _s(raw.get("objectiveCompleteHow") or ""),
+        "objectiveCompleteFrame": _i(raw.get("objectiveCompleteFrame"), 0),
+        "nodeClaimedFrame": _i(raw.get("nodeClaimedFrame"), 0),
+        "requiredMarksLeft": _i(raw.get("requiredMarksLeft"), 0),
+        "allObjectivesDone": _b(raw.get("allObjectivesDone"), False),
         "objectiveBypassed": _b(raw.get("objectiveBypassed"), False),
         # Rescue-contract fail latch from gadget (partial RTB path).
         "objectiveFailed": _b(
@@ -425,6 +446,14 @@ def result_v2_to_v1_fields(r: Dict[str, Any]) -> Dict[str, Any]:
         "extractionZoneId": r.get("extractionZoneId"),
         "extractionStatus": r.get("extractionStatus"),
         "objectiveComplete": r.get("objectiveComplete"),
+        "objectiveKind": r.get("objectiveKind"),
+        "objectiveMode": r.get("objectiveMode"),
+        "objectiveCompleteHow": r.get("objectiveCompleteHow"),
+        "objectiveCompleteFrame": r.get("objectiveCompleteFrame"),
+        "nodeClaimedFrame": r.get("nodeClaimedFrame"),
+        "requiredMarksLeft": r.get("requiredMarksLeft"),
+        "allObjectivesDone": r.get("allObjectivesDone"),
+        "terminalKind": r.get("terminalKind"),
         "objectiveBypassed": r.get("objectiveBypassed"),
         "objectiveFailed": r.get("objectiveFailed"),
         "objectiveFailReason": r.get("objectiveFailReason"),

@@ -72,13 +72,24 @@ def zones(state):
                     yield mid, zid, z
 
 
-def eligible(fid, state):
+def holds_ground(state, workspace=None):
+    """Does the company BELIEVE it holds any zone? Reads the belief frame (and, before the first
+    fold, the company's own claim ledger). Never zoneMemory.controllingFaction: a zone that flipped
+    while nobody was looking is still 'ours' in camp until someone goes and sees."""
+    try:
+        import hub_belief_v1
+        return bool(hub_belief_v1.believed_ours(Path(workspace or ROOT), state))
+    except Exception:
+        return False
+
+
+def eligible(fid, state, workspace=None):
     home = state.get("homeCamp") or {}
     history = state.get("history") or []
     if fid == "place":
         return not (state.get("flags") or {}).get("homeCleared", False)
     if fid == "shelter":
-        return any(z.get("controllingFaction") == "ashwalkers" for _, _, z in zones(state))
+        return holds_ground(state, workspace)
     if fid == "bring_back":
         return True
     if fid == "friends":
@@ -90,23 +101,23 @@ def eligible(fid, state):
     return False
 
 
-def reconcile(state, data):
+def reconcile(state, data, workspace=None):
     n = ensure(state)
     for spec in data["threads"]:
         fid = spec["id"]
-        if fid not in n["threads"] and eligible(fid, state):
+        if fid not in n["threads"] and eligible(fid, state, workspace):
             n["threads"][fid] = {"id": fid, "stage": "Available", "openedTurn": n["turn"],
                                   "history": [], "supportingEvents": [], "presentations": 0}
         t = n["threads"].get(fid)
         if not t:
             continue
-        if fid != "place" and t["stage"] == "Resolved" and n["turn"] >= t.get("resolvedTurn", n["turn"]) + 3 and eligible(fid, state):
+        if fid != "place" and t["stage"] == "Resolved" and n["turn"] >= t.get("resolvedTurn", n["turn"]) + 3 and eligible(fid, state, workspace):
             t.update(stage="Available", cycle=t.get("cycle", 1) + 1, explanation=spec["callback"] + " A new opportunity has emerged.")
             t.pop("deadline", None)
         if fid == "place" and ((state.get("homeCamp") or {}).get("level", 0) > 0 or (state.get("flags") or {}).get("homeCleared")):
             if t["stage"] not in ("Resolved", "Committed"):
                 t.update(stage="Resolved", explanation="Your camp is established. The next task is securing the surrounding wilds.")
-        elif fid == "shelter" and not eligible(fid, state) and t["stage"] in ("Available", "Committed"):
+        elif fid == "shelter" and not eligible(fid, state, workspace) and t["stage"] in ("Available", "Committed"):
             t.update(stage="Changed", explanation=spec["changed"])
 
 
@@ -186,7 +197,7 @@ def project(state, choices=(), workspace=None):
         return {"enabled": False, "revision": revision(state), "threads": [], "scenes": [], "chronicle": []}
     snapshot = copy.deepcopy(state)
     data = catalog(workspace)
-    reconcile(snapshot, data)
+    reconcile(snapshot, data, workspace)
     n = snapshot["narrative"]
     owned = company_ids(snapshot)
     out = []
@@ -272,7 +283,7 @@ def choose(state, choice_id, expected_revision, request_id, workspace=None):
     if not match:
         return {"ok": False, "error": "This response is no longer available."}
     row, choice = match
-    reconcile(state, catalog(workspace))
+    reconcile(state, catalog(workspace), workspace)
     n = state["narrative"]
     t = n["threads"][row["id"]]
     n["leadership"].append({"choiceId": choice_id, "stance": choice.get("stance", ""), "words": choice["label"], "turn": n["turn"], "eventId": request_id})
@@ -318,7 +329,7 @@ def accept_result(state, result, credit, workspace=None, before=None):
     if key in n["processedResults"]:
         return None
     data = catalog(workspace)
-    reconcile(state, data)
+    reconcile(state, data, workspace)
     n["turn"] += 1
     n["processedResults"].append(key)
     consequences = []

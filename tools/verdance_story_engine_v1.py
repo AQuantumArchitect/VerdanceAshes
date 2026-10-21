@@ -6664,11 +6664,27 @@ def separate_intent_zones(intent: Dict[str, Any],
             return False
 
     deploy = intent.get("deploymentZoneId")
-    if not _mouth(deploy) and not _near(deploy if isinstance(deploy, str) else None):
-        if nearest:
+    # The pad the player stamped on the hub is theirs: legality was judged from belief at stamp
+    # time, and a far pad is a choice (a long walk), not an error. The engine moves a stamped pad
+    # only when it is not landable at this water level, and says so on the intent so the briefing
+    # can carry it. Unstamped (engine-chosen) pads still snap to the nearest dry shore.
+    stamped = str(intent.get("source") or "") in ("hub_deploy_plan", "hub_stamp", "stamp_deploy_plan_v1")
+    if isinstance(deploy, str) and deploy and not _mouth(deploy) and not _near(deploy):
+        landable = True
+        try:
+            landable = zone_is_landable(zones.get(deploy) or {}, level)
+        except Exception:
+            landable = True
+        if nearest and (not stamped or not landable):
+            intent["padSnapped"] = {"from": deploy, "to": nearest, "reason": "flooded" if not landable else "far_from_objective"}
             _write("deploymentZoneId", nearest)
     deploy = intent.get("deploymentZoneId")
     extract = intent.get("extractionZoneId")
+    if not intent.get("finale") and isinstance(deploy, str) and deploy:
+        # One pad: the company lifts where it landed. Only a finale names a different door.
+        if extract != deploy:
+            _write("extractionZoneId", deploy)
+        return intent
     if not _mouth(extract) and not _near(extract if isinstance(extract, str) else None):
         if _mouth(deploy) or _near(deploy if isinstance(deploy, str) else None):
             _write("extractionZoneId", str(deploy))

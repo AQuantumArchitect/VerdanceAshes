@@ -1,315 +1,61 @@
-# hub_state.v1 + cyoa_node.v1
+# hub_state — the hub's JSON
 
-Stable contracts for the **HTML war-map hub** (showoff → Steam shell).  
-Generated from `campaign_state.json` + `war_map.json` + `world_zone_graph.v1.json`.  
-Consumed by `app/showoff/` (and later the Electron/Tauri shell).
+`tools/build_hub_state_v1.py` builds it from `state/campaign_state.json`, the belief frame (`outbox/intel.latest.json`), the zone graph and the commerce catalog, and writes `app/showoff/hub_state.json` (+ `hub_state.embed.js` for file:// opens). The kernel serves it at `GET /api/hub-state` and rebuilds it after every stamp and every homecoming.
 
-## hub_state.v1
+**Law.** Everything in it is the company's belief or the company's own books. No field is derived from the truth frame or another faction's mind. Enemy economies, true controllers and the other minds' pictures are not in this file; the dev-only routes that expose them refuse unless `devMode` is on.
 
-```json
-{
-  "schemaVersion": "verdance-hub-state/1.0",
-  "campaignId": "verdance_ashes",
-  "missionNumber": 1,
-  "seed": 28,
-  "generatedAt": "ISO-8601",
-  "tagline": "Aces, a war map, and sorties that feed the story.",
-  "reputation": {
-    "armada": 0,
-    "cortex": 0,
-    "nullmercs": 0,
-    "sev": 0
-  },
-  "bay": {
-    "unlocked": false,
-    "threshold": 40,
-    "label": "Null Mercs mod bay",
-    "hint": "Bay locked — raise Null Mercs reputation."
-  },
-  "aces": [
-    {
-      "id": "vane",
-      "name": "Ash-Captain Vane",
-      "faction": "ashwalkers",
-      "unitDef": "legbal",
-      "level": 2,
-      "rank": "Runner",
-      "campaignXp": 118.4,
-      "wounds": 0,
-      "status": "active",
-      "scars": [],
-      "deployable": true,
-      "bonds": { "ketha": 10 }
-    }
-  ],
-  "regions": [
-    {
-      "mapId": "greenest_fields",
-      "displayName": "Greenest Fields",
-      "descriptor": "The Synthesized Utopia",
-      "family": "economy",
-      "control": "contested",
-      "dominantEnemy": "armada",
-      "threatBand": "light",
-      "controlCounts": {},
-      "selectable": true
-    }
-  ],
-  "node": { "...": "see cyoa_node.v1 — current beat" },
-  "lastResult": null,
-  "history": [],
-  "sessionMode": "same_map",
-  "occupationModel": "living_shell",
-  "factionBanks": { "armada": 0, "cortex": 2, "nullmercs": 0, "ashwalkers": 0 },
-  "tenebrium": 0,
-  "commerce": { "...": "see hub commerce surface below" },
-  "flags": {
-    "mode": "hub",
-    "deployStub": true,
-    "shopSurface": true,
-    "deployCompileLaunch": true
-  }
-}
-```
+## Top level
 
-### Field notes
+| Key | What |
+|---|---|
+| `schemaVersion`, `generatedAt`, `campaignId`, `missionNumber`, `arc`, `seed` | Identity. |
+| `theater` | The map the next Drop is on: `mapId`, `zones[]` (below), `openTargets`, `intelByZone`. |
+| `belief` | The company's belief over every zone it knows (`zones{zoneId→row}`, `counts{current,stale,dark}`, `surprise[]` from the last homecoming, `asOfMinute`). Theater zones are the same rows filtered to one map. |
+| `camp` | Camp time and people: `clockMinutes`, `people{heroId→{where: camp\|posted\|transit\|field, zoneId, wounded, eta}}`, `nextPadZoneId/MapId` (a destination chosen at the last manifest), `homeZoneId/MapId`, `lastManifest`. |
+| `exposure` | Our side of the mirror only: per faction, which of our holdings they `known`/`suspected`/`blind` on, and `ofOurs` (a fraction). Never their beliefs about the world. |
+| `aces[]` | Heroes: `id, name, rank, level, status, wounds, scars, bonds, loadout, unitDef, campaignXp, deployable, where`. `deployable` is false for anyone posted, in transit or left in the field. |
+| `company`, `companion`, `reputation`, `supportWeb`, `commerce`, `tenebrium`, `bay` | The company's books: people, standing, shelves, bag, Tenebrium bank. |
+| `captureContracts[]`, `claimedNodes`, `nodeClaims`, `captureMode`, `homeCamp`, `homeEval` | Open contracts and holdings. `against` on a contract is the *believed* holder. |
+| `history[]` | Beads: one per sortie, with `manifest`, verdict, map. |
+| `lastResult` | The homecoming card: `verdict` (victory\|partial\|defeat\|abandon\|incomplete), `headline`, `reasonHint`, `tokens`, `manifest`. |
+| `narrative`, `tagline`, `node`, `pathSignal`, `graph`, `graphPressure`, `spectral`, `campaignRho`, `occupationModel` | Readings face, story node, and the company's own belief-derived pressure summaries. |
+| `features`, `flags`, `sessionMode`, `sessionHomeMap` | Hub switches. |
 
-| Field | Owner | Notes |
+## A zone row (`theater.zones[]` and `belief.zones{}`)
+
+| Field | Meaning | Paints |
 |---|---|---|
-| `aces` | From `campaign_state.roster.heroes` + `characters` | Playtest: surface Vane + Ketha first; others read-only |
-| `bonds` | Optional on characters | v1: only `vane↔ketha` required |
-| `bay` | Derived from `reputation.nullmercs` | UI stub until G8; never blocks Deploy |
-| `regions` | From `war_map.regions` | Click → filters contracts / flavor |
-| `node` | Generator | Current CYOA beat (choices) |
-| `lastResult` | After sortie | Tokens for coupling: zone, verdict, xpDeltas |
-| `flags.deployStub` | Shell | true until real BAR launch wired |
-| `flags.shopSurface` | Shell | commerce catalog projected into `commerce.shop` |
-| `flags.deployCompileLaunch` | Shell | Deploy → host stamp + intent + build + optional launch |
-| `graph` | From `campaign_state.graph` | q0/q2/q6/q7 campaign qubits for density room |
-| `spectral` | `lastSpectral` or derived | λ max, energy, participation, factionWeights |
-| `pathSignal` | Campaign path A/B/C | Shown under spectrum |
-| `sessionMode` | Kernel paint | Default `same_map` (Mode A focus chain) |
-| `occupationModel` | Kernel paint | Default `living_shell` |
-| `factionBanks` | Kernel + bag | Armada crisis → 0; player banks track Tenebrium |
-| `tenebrium` | Commerce bag | Top-level paint for badges / HUD |
-| `commerce` | Catalog + bag | Shop shelf, deploy kit, balances (read-only build) |
+| `zoneId`, `label`, `mapId` | Identity | — |
+| `believed` | `ours` \| `held` \| `empty` \| `dark` \| `unsure` | fill kind |
+| `control` | `ashwalkers`, a faction name (who we last **saw** holding it), `held`, `empty`, `unknown` | fill colour (`--f-*`) |
+| `confidence` | 0..1 | fill alpha |
+| `state` | `current` \| `stale` \| `dark` | border: solid / dashed / none |
+| `ageMin`, `source` | How old the word is, where it came from | tooltip |
+| `threat` | Believed threat 0..1 | hatch weight |
+| `surprise` | Last homecoming's contradiction here, if any (`believed`, `found`, `surprise`, `eta`) | ✗ / ○ |
+| `people[]` | Heroes posted here or left here (`heroId, name, where, wounded`) | ⚑ |
+| `holding` | Structures we left here (count) | ■ |
+| `openTarget`, `preferred`, `claimed`, `hazard` | Contract / legality hints | rings |
 
-### Density matrix room (UI)
-
-Sourced from earlier prototypes:
-
-- `inbox/.../tactical_map_comprehension_matrix.jsx` — local ρ heat grid + entanglement SVG  
-- `inbox/handoff_v3/verdance_command_deck.jsx` — graph scalars + spectrum bar  
-
-Hub builds **local ρ** for the focused theater from zone-board geometry + graph pressure
-(off-diagonal coherence). Graph scalars are global campaign axes (not map-local).
-
----
-
-## cyoa_node.v1
+## The deploy plan (`POST /api/deploy`)
 
 ```json
-{
-  "id": "hub_open_m1",
-  "kind": "choice",
-  "speaker": "ketha",
-  "text": "Front is quiet. Pick a scar before Armada finishes the pour.",
-  "regionHint": "greenest_fields",
-  "choices": [
-    {
-      "id": "c_raid_gf",
-      "label": "Raid Greenest Fields eco",
-      "kind": "deploy",
-      "effect": {
-        "mapId": "greenest_fields",
-        "contractKind": "eco_raid",
-        "edgeId": null,
-        "deployAces": ["vane", "ketha"]
-      }
-    },
-    {
-      "id": "c_talk",
-      "label": "Talk with Ketha",
-      "kind": "talk",
-      "effect": {
-        "social": "vane_ketha_hearth",
-        "bondDelta": { "vane": { "ketha": 2 } }
-      }
-    },
-    {
-      "id": "c_rest",
-      "label": "Rest the aces",
-      "kind": "rest",
-      "effect": {
-        "healWounds": 1,
-        "stressDelta": -5
-      }
-    },
-    {
-      "id": "c_merc",
-      "label": "Take a Null Mercs contract",
-      "kind": "deploy",
-      "effect": {
-        "mapId": "koom_valley",
-        "contractKind": "seize_lane",
-        "repDelta": { "nullmercs": 3 }
-      }
-    }
-  ]
-}
-```
-
-### Choice kinds
-
-| `kind` | Meaning | Playtest |
-|---|---|---|
-| `deploy` | Commit sortie (shell → BAR later) | Opens C&C board → Deploy |
-| `shop` | Open broker shop panel | Catalog shelf from `commerce.shop` |
-| `talk` | Interpersonal membrane beat | Template dialogue + bond delta |
-| `rest` | Heal / lower stress | Local state only |
-| `travel` | Change focus region without sortie | Optional |
-| `bay` | Open mod bay | Locked until G8 |
-
----
-
-## hub commerce surface (`commerce`)
-
-Built by `tools/build_hub_state_v1.py` from `data/commerce/commerce_catalog.json`
-+ `state/campaign_state.json` → `commerce`. **No story-engine mutation** in the
-builder; the HTML shop may demo-buy in-memory and download a receipt JSON.
-Live campaign purchase remains `purchase_listing` on the engine / host path.
-
-```json
-{
-  "schemaVersion": "verdance-hub-commerce/1.0",
-  "tenebrium": 0,
-  "metalK": 0,
-  "metal": { "id": "campaign_metal", "label": "Metal", "shortLabel": "1km$", "unitMetal": 1000 },
-  "resource": { "id": "tenebrium", "label": "Tenebrium", "shortLabel": "Tnb" },
-  "shop": [
-    {
-      "id": "crash_of_brutes",
-      "label": "Crash of Brutes",
-      "kind": "purchase_package",
-      "tenebriumCost": 0,
-      "metalCostK": 4,
-      "available": false,
-      "blockedReason": "need 4×1km$ metal",
-      "owned": false,
-      "tags": ["merc", "armor"]
-    }
-  ],
-  "deployKit": [
-    { "listingId": "punch_of_thugs", "kind": "purchase_package", "unitDef": "corthud", "count": 7, "loan": false }
-  ],
-  "owned": {},
-  "upgrades": {},
-  "notes": "Tenebrium is black-hole metal… Campaign metal banks as floor(endMetal/1000)."
-}
-```
-
-Shelf gates mirror the engine (rep, arc, cost, already-owned, requires) for paint only.
-
-### Effects (minimal)
-
-- `mapId`, `contractKind`, `deployAces[]` — stamp next mission
-- `bondDelta`, `healWounds`, `stressDelta`, `repDelta` — hub-only advances
-- `edgeId` — optional world_zone_graph edge for legality later
-
----
-
-## Generator
-
-- Script: `tools/build_hub_state_v1.py`
-- Inputs: `state/campaign_state.json`, `outbox/war_map.json`, `data/commerce/commerce_catalog.json`
-- Output: `app/showoff/hub_state.json` (+ embed helper for offline HTML)
-- Showoff entry: `app/showoff/index.html` (hub + shop + Deploy board)
-- Story autoplay (old demo): `app/showoff/story_autoplay.html`
-
-## Coupling rule
-
-Every post-choice or post-result line should be able to cite at least one **token**:  
-`mapId`, `verdict`, `aceId`, `xpDelta`, `wound`, `rep.nullmercs`, `control`.  
-If the text cannot point at a token, it is flavor-only and must not claim causality.
-
----
-
-## deploy_plan.v1 (C&C board layer)
-
-Opened from a `deploy` choice. Player marks the **zone board** for the chosen map
-before the sortie is committed (shell stamp → BAR seed later).
-
-```json
-{
-  "schemaVersion": "verdance-deploy-plan/1.0",
-  "mapId": "greenest_fields",
-  "contractKind": "eco_raid",
+{ "schemaVersion": "verdance-deploy-plan/1.0",
+  "mapId": "the_rock_jungle",
   "deployAces": ["vane", "ketha"],
-  "arcId": 2,
-  "maxCaptureMarks": 2,
-  "marks": {
-    "deployZoneId": "GF_SE_STAGING",
-    "extractZoneId": "GF_SE_STAGING",
-    "captureZoneIds": ["GF_SE_ENERGY_WORKS", "GF_NORTH_DESERT_EDGE"]
-  },
-  "markMode": "capture"
-}
+  "marks": { "deployZoneId": "TRJ_SW_LANE", "captureZoneIds": ["TRJ_C_GATE"], "secondaryCaptureZoneIds": [] } }
 ```
 
-### Arc caps (C&C escalation)
+One pad: `extract = deploy` always (the stamp normalises it; there is no separate extraction zone). Legality is judged from belief in `tools/stamp_deploy_plan_v1.py`: ours, or a rim zone believed empty/dark/unsure with threat ≤ 0.4, or `camp.nextPadZoneId`. An illegal zone is refused with the belief sentence ("believed held by Armada (88%)").
 
-| Arc | Missions | Max **capture** marks | Intent |
-|---|---|---|---|
-| 1 First Scar | 1–5 | **1** | Single strike objective |
-| 2 Second Scar | 6–10 | **2** | Dual capture / multi-pressure |
-| 3 Third Scar | 11–15 | **3** | Multipressure climax |
+Stamp → `outbox/next_sortie_order.json` → story intent (`outbox/next_mission_intent.json`, with `intel` = the company's belief) → `generated/va_intel_current.lua`, `va_pad_current.lua`, `va_current.lua` → BAR. The kernel owns launch and ingest (`tools/verdance_kernel/sortie.py`).
 
-Also always set (auto-defaults, player can re-mark):
-- **Deploy** zone (one) — where the warband stages  
-- **Extract** zone (one) — usually same as deploy early on  
+## Files beside it
 
-Zone boards: `tools/build_zone_boards_v1.py` → `app/showoff/boards.embed.js`  
-(`window.ZONE_BOARDS[mapId].zones[]` with bounds + capturable flags).
-
-### Seed stamp (BAR glue — G2)
-
-`deploy_plan.marks.captureZoneIds[0]` → primary `objective.targetZoneId`  
-additional ids → `secondaryCaptureZoneIds` on seed + minimap secondary paint  
-`deployZoneId` / `extractZoneId` → `deploymentZoneId` / `extractionZoneId`  
-`choiceId` → `hubChoiceId` on seed; `deployAces[]` carried for briefing
-
-Pipeline:
-
-```
-tools/stamp_deploy_plan_v1.py   → outbox/next_sortie_order.json
-tools/hub_host_v1.py POST /api/deploy[?launch=1]
-  → stamp → story intent → build_next_mission → optional play_session
-```
-
-Offline HTML (`file://` or `SHOW_OFF.bat`) still runs the CYOA as a **stub** and downloads
-`hub_deploy_plan.json` (+ stub result). Live BAR path: `app\bin\HUB_HOST.bat` →
-http://127.0.0.1:8770/ — **Deploy** POSTs `deploy_plan.v1` to
-`POST /api/deploy?launch=1` → stamp → story intent → `build_next_mission` →
-`play_session` (compile + launch). Shop is always painted from hub_state commerce.
-
-### Result pull (G4)
-
-After a BAR sortie:
-
-```
-scripts/extract_latest_result.ps1  → inbox/latest_va_result.json
-python tools/apply_result_to_hub_v1.py
-  → advance --write-state + hub_state rebuild
-  → outbox/hub_result.latest.json
-```
-
-Hub host: `POST /api/advance?extract=1`. Hub UI: **Pull BAR result** (also polls `/api/result`).
-Density-matrix room: **ρ Manifold** tab (local ρ + graph qubits + `campaignRho` axes).
-
-### Mode A integration
-
-- After each advance, `campaign_state.sessionHomeMap` locks the theater just fought.
-- Hub stamps (`source: hub_deploy_plan`) are **consumed** once that map is played so the
-  next materialize walks Mode A / quest_batch (debrief **1/2/3** picks are kept).
-- Hub open-node prefers same-map continues; optional travel contracts are labeled as hops.
-- Live shop: `POST /api/purchase` → `purchase_listing` → campaign bag + hub rebuild.
+| File | Written by | Read by |
+|---|---|---|
+| `outbox/intel.latest.json` | belief fold (homecoming, camp clock) | `hub_belief_v1`, `intel_lua_v1` |
+| `outbox/divergence.latest.json` | perspectives worker | `/api/exposure` (company side only) |
+| `outbox/readings.latest.json`, `occasions.latest.json`, `chronicle.latest.json` | readings | hub narrative / chronicle |
+| `outbox/provision.latest.json` | map download | `/api/health` |
+| `outbox/camp.latest.json` | camp clock | hub Home |

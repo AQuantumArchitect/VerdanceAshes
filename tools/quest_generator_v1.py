@@ -113,16 +113,44 @@ def load_json(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8-sig"))
 
 
-def zone_control(state: Dict[str, Any], map_id: str, zone_id: str) -> str:
+# Two perspectives on who holds a zone. "truth" is the engine's own (zoneMemory) and is only for
+# building the actual match. "belief" is what the company has seen (hub_belief_v1): anything that
+# reaches the player — hub capture contracts, `against` on a card — must come from here.
+def _belief_rows(workspace: Optional[Path], state: Dict[str, Any], map_id: str) -> Dict[str, Dict[str, Any]]:
+    try:
+        import hub_belief_v1  # type: ignore
+        return hub_belief_v1.belief_surface(Path(workspace or WS_DEFAULT), state, map_id).get("zones") or {}
+    except Exception:
+        return {}
+
+
+def believed_control(state: Dict[str, Any], map_id: str, zone_id: str, workspace: Optional[Path] = None,
+                     rows: Optional[Dict[str, Dict[str, Any]]] = None) -> str:
+    """ashwalkers | <faction> | held | empty | unknown — never a zoneMemory read."""
+    import hub_belief_v1  # type: ignore
+    rows = _belief_rows(workspace, state, map_id) if rows is None else rows
+    return hub_belief_v1.believed_holder(rows.get(str(zone_id)))
+
+
+def zone_control(state: Dict[str, Any], map_id: str, zone_id: str, *, perspective: str = "truth",
+                 workspace: Optional[Path] = None, rows: Optional[Dict[str, Dict[str, Any]]] = None) -> str:
+    if perspective == "belief":
+        try:
+            word = believed_control(state, map_id, zone_id, workspace, rows)
+        except Exception:
+            word = "unknown"
+        return {"empty": "neutral", "unknown": "neutral"}.get(word, word)
     zm = (state.get("zoneMemory") or {}).get(map_id, {}).get(zone_id, {}) or {}
     return zm.get("controllingFaction") or (zm.get("abstract") or {}).get("control") or "neutral"
 
 
-def patron_held_zones(state: Dict[str, Any], map_id: str, patron: str) -> List[str]:
+def patron_held_zones(state: Dict[str, Any], map_id: str, patron: str, *, perspective: str = "truth",
+                      workspace: Optional[Path] = None) -> List[str]:
     bloc = BLOC.get(patron, patron)
     held = []
+    rows = _belief_rows(workspace, state, map_id) if perspective == "belief" else None
     for zid, zm in ((state.get("zoneMemory") or {}).get(map_id) or {}).items():
-        ctrl = zm.get("controllingFaction") or (zm.get("abstract") or {}).get("control") or "neutral"
+        ctrl = zone_control(state, map_id, str(zid), perspective=perspective, workspace=workspace, rows=rows)
         if BLOC.get(ctrl, ctrl) == bloc:
             held.append(str(zid))
     return sorted(held)
@@ -145,6 +173,7 @@ def score_candidate(
     zone_id: str,
     node: Dict[str, Any],
     against: str,
+    ctrl: Optional[str] = None,
 ) -> float:
     """Higher = better next contract. Uses q-scalars + rep lightly."""
     graph = state.get("graph") or {}
@@ -172,7 +201,7 @@ def score_candidate(
     if merc >= 40:
         score += 0.15
     # Prefer not already flipped to nullmercs/ashwalkers
-    ctrl = zone_control(state, map_id, zone_id)
+    ctrl = ctrl if ctrl is not None else zone_control(state, map_id, zone_id)
     if BLOC.get(ctrl, ctrl) == "nullmercs":
         score -= 2.0
     if ctrl == "neutral":
@@ -191,8 +220,13 @@ def generate_quests(
     patron: str = "nullmercs",
     limit: int = 6,
     from_zone_ids: Optional[List[str]] = None,
+    perspective: str = "truth",
 ) -> List[Dict[str, Any]]:
-    """Return ranked legal sortie candidates (same_map only)."""
+    """Return ranked legal sortie candidates (same_map only).
+
+    perspective="truth" (engine: build the real match) reads zoneMemory. perspective="belief"
+    (anything the hub shows) reads only what the company has seen; `against` is then the believed
+    holder or "unknown"."""
     if map_id:
         maps = [wzg.canonical_map_id(map_id)]
     else:
@@ -209,7 +243,8 @@ def generate_quests(
 
     out: List[Dict[str, Any]] = []
     for mid in maps:
-        held = list(from_zone_ids) if from_zone_ids else patron_held_zones(state, mid, patron)
+        held = list(from_zone_ids) if from_zone_ids else patron_held_zones(state, mid, patron, perspective=perspective, workspace=workspace)
+        rows = _belief_rows(workspace, state, mid) if perspective == "belief" else None
         if not held:
             # Seed from deploy-eligible nodes so fresh campaigns still get options.
             graph = wzg.load_world_zone_graph(workspace) or {}
@@ -223,15 +258,18 @@ def generate_quests(
         adj = wzg.load_map_adjacency(workspace, mid)
         for zid in targets:
             node = wzg.zone_node(workspace, zid) or {"zoneId": zid, "mapId": mid}
-            ctrl = zone_control(state, mid, zid)
-            against = ctrl if ctrl not in ("neutral", "nullmercs", "ashwalkers") else "armada"
+            ctrl = zone_control(state, mid, zid, perspective=perspective, workspace=workspace, rows=rows)
+            if perspective == "belief":
+                against = ctrl if ctrl not in ("neutral", "nullmercs", "ashwalkers") else "unknown"
+            else:
+                against = ctrl if ctrl not in ("neutral", "nullmercs", "ashwalkers") else "armada"
             if BLOC.get(ctrl, ctrl) == BLOC.get(patron, patron):
                 continue  # already held by patron bloc
             # Neighbors among held become fromZoneIds
             nbrs = set(adj.get(zid) or [])
             from_z = sorted(nbrs.intersection(held)) or held[:1]
             arch = archetype_for_node(node)
-            sc = score_candidate(state, mid, zid, node, against)
+            sc = score_candidate(state, mid, zid, node, against, ctrl)
             capture_mode = None
             if arch in ("seize_lane", "gate_control", "hold_plateau"):
                 capture_mode = "clear_hold_shell"

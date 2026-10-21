@@ -48,19 +48,67 @@ QUESTIONS = {
 }
 
 
-def _umwelt():
+class UmweltUnavailable(RuntimeError):
+    """Raised by build_spec / VerdanceWorld when the umwelt package cannot be imported.
+
+    A plain Exception (never SystemExit): every caller folds belief inside try/except
+    Exception and reports VA_BELIEF_SKIP / VA_BELIEF_FAIL; a SystemExit would have
+    escaped those handlers and killed the homecoming it was meant to decorate."""
+
+
+_UMWELT_WARNED = False
+
+
+def umwelt_search_paths() -> List[Path]:
+    """Where the umwelt package may live, first match wins (sys.path order):
+    UMWELT_SRC, a sibling clone, ~/umwelt, ~/ws-win/umwelt, then LAST the shipped
+    snapshot tools/_vendor and the embedded runtime's runtime/site-packages."""
+    out: List[Path] = []
     src = os.environ.get("UMWELT_SRC")
-    if src and src not in sys.path:
-        sys.path.insert(0, src)
-    for cand in (ROOT.parent / "umwelt" / "src", Path.home() / "ws-win" / "umwelt" / "src", Path.home() / "umwelt" / "src"):
-        if cand.is_dir() and str(cand) not in sys.path:
-            sys.path.insert(0, str(cand))
+    if src:
+        out.append(Path(src))
+    out += [ROOT.parent / "umwelt" / "src",
+            Path.home() / "umwelt" / "src",
+            Path.home() / "ws-win" / "umwelt" / "src",
+            Path(__file__).resolve().parent / "_vendor",
+            ROOT / "runtime" / "site-packages"]
+    return out
+
+
+def _umwelt():
+    """(umwelt.spec.schema, umwelt.host.api) or None when Umwelt is not importable.
+
+    Never raises SystemExit. A failed import logs one line to stderr (once per process)
+    and returns None; the campaign then runs without the belief world (VA_BELIEF_SKIP)."""
+    global _UMWELT_WARNED
+    # Last candidates are appended, not inserted: a developer clone must beat the vendored snapshot.
+    for cand in umwelt_search_paths():
+        try:
+            if cand.is_dir() and (cand / "umwelt" / "__init__.py").is_file() and str(cand) not in sys.path:
+                sys.path.append(str(cand))
+        except OSError:
+            continue
     try:
         from umwelt.spec.schema import DomainSpec, NodeSpec, BridgeSpec, BindingSpec, DriverSpec, AxisFace  # noqa
         from umwelt.host.api import GameHost  # noqa
-    except ImportError as exc:  # pragma: no cover
-        raise SystemExit("Umwelt not importable. Set UMWELT_SRC=<umwelt>/src or pip install -e <umwelt>. " + str(exc))
+    except Exception as exc:  # noqa: BLE001 - ImportError, or numpy/scipy missing under it
+        if not _UMWELT_WARNED:
+            _UMWELT_WARNED = True
+            print(f"umwelt_world_v1: Umwelt not importable ({type(exc).__name__}: {exc}); belief world off. "
+                  "Set UMWELT_SRC=<umwelt>/src, or ship with numpy/scipy + tools/_vendor.", file=sys.stderr)
+        return None
     return sys.modules["umwelt.spec.schema"], sys.modules["umwelt.host.api"]
+
+
+def umwelt_available() -> bool:
+    return _umwelt() is not None
+
+
+def _require_umwelt():
+    mods = _umwelt()
+    if mods is None:
+        raise UmweltUnavailable("Umwelt not importable; belief world skipped (VA_BELIEF_SKIP)")
+    return mods
 
 
 def _load(path: Path) -> Any:
@@ -88,7 +136,7 @@ def build_spec(workspace: Path, extra_zones: Optional[Iterable[Dict[str, Any]]] 
     """extra_zones: [{zoneId, mapId, label}] present in a save but missing from the zone
     graph (the graph is older than zoneMemory). They get nodes but no bridges, and a
     data-gap note; regenerate world_zone_graph to retire the parameter."""
-    schema, _ = _umwelt()
+    schema, _ = _require_umwelt()
     graph = world_graph(workspace)
     zones = [n for n in graph.get("nodes") or [] if n.get("zoneId")]
     known = {str(z["zoneId"]) for z in zones}
@@ -161,7 +209,7 @@ class VerdanceWorld:
     """One company, one mind. Wraps GameHost with the Verdance vocabulary."""
 
     def __init__(self, workspace: Path, start_minute: float = 0.0, extra_zones: Optional[Iterable[Dict[str, Any]]] = None):
-        _, api = _umwelt()
+        _, api = _require_umwelt()
         self.workspace = Path(workspace)
         self.extra_zones = list(extra_zones or [])
         self.spec = build_spec(self.workspace, self.extra_zones)

@@ -189,6 +189,14 @@ function Get-ArcProfile {
 function Add-CommerceDeployToKit {
   # WO-043: broker deployables — loan packs (damaged Thugs), Crash of Brutes,
   # Cortex grunt fab printer, faction constructors, fab nanos.
+  #
+  # SPAWN RULE (one owner): in BAR these units are spawned ONCE, by
+  # VA_LOGISTICS.spawnCommerceDeployKit in game_verdance_campaign.lua, straight
+  # from mission.commerce.deploy. The copies composed into the player kit here are
+  # for the layout / previews only; every one of them is stamped commerceDeploy=true
+  # plus a packageTag, and the gadget's setup spawn skips any spec carrying that
+  # stamp (VA_CREW_isCommerceKitSpec). An untagged nano or constructor used to pass
+  # the gadget's anchor-keep filter and land twice.
   param($Kit, $Commerce)
   $kit = @($Kit)
   if (-not $Commerce -or -not $Commerce.PSObject.Properties["deploy"]) { return $kit }
@@ -200,6 +208,8 @@ function Add-CommerceDeployToKit {
     $kind = if ($d.kind) { [string]$d.kind } else { "package" }
     $ox = -200 + (55 * ($i % 5))
     $oz = -280 - (40 * [Math]::Floor($i / 5))
+    # Same fallback id the gadget uses for an unlisted item (kit_<1-based index>).
+    $tag = if ($d.packageTag) { [string]$d.packageTag } elseif ($d.listingId) { [string]$d.listingId } else { "kit_" + ($i + 1) }
     if ($kind -eq "unit_printer") {
       $fac = if ($d.factoryDef) { [string]$d.factoryDef } else { "corlab" }
       $product = if ($d.product) { [string]$d.product } else { "corak" }
@@ -208,23 +218,29 @@ function Add-CommerceDeployToKit {
       $printer.printerProduct = $product
       $printer.printerMetalIncome = if ($null -ne $d.metalIncome) { [double]$d.metalIncome } else { 8 }
       $printer.printerEnergyIncome = if ($null -ne $d.energyIncome) { [double]$d.energyIncome } else { 40 }
-      if ($d.listingId) { $printer.packageTag = [string]$d.listingId }
+      $printer.packageTag = $tag
+      $printer.commerceDeploy = $true
       $kit += $printer
       $seed = if ($null -ne $d.seedCount) { [Math]::Max(0, [int]$d.seedCount) } else { 4 }
       if ($seed -gt 0) {
         $seedSpec = Spec $product $seed ($ox + 80) $oz 70
-        if ($d.listingId) { $seedSpec.packageTag = [string]$d.listingId }
+        $seedSpec.packageTag = $tag + "_seed"
+        $seedSpec.commerceDeploy = $true
         $kit += $seedSpec
       }
     } elseif ($kind -eq "nano") {
       $ndef = if ($d.unitDef) { [string]$d.unitDef } else { "cornanotc" }
       $nc = if ($null -ne $d.count) { [Math]::Max(1, [int]$d.count) } else { 1 }
-      $kit += (Spec $ndef $nc ($ox - 80) ($oz + 40) 90)
+      $nSpec = Spec $ndef $nc ($ox - 80) ($oz + 40) 90
+      $nSpec.packageTag = $tag
+      $nSpec.commerceDeploy = $true
+      $kit += $nSpec
     } elseif ($kind -eq "constructor") {
       $cdef = if ($d.unitDef) { [string]$d.unitDef } else { "armck" }
       $cc = if ($null -ne $d.count) { [Math]::Max(1, [int]$d.count) } else { 1 }
       $cSpec = Spec $cdef $cc $ox ($oz + 60) 90
-      if ($d.listingId) { $cSpec.packageTag = [string]$d.listingId }
+      $cSpec.packageTag = $tag
+      $cSpec.commerceDeploy = $true
       $kit += $cSpec
     } else {
       # package / loan pack
@@ -236,8 +252,8 @@ function Add-CommerceDeployToKit {
       if ($null -ne $d.healthFracMin) { $pSpec.healthFracMin = [double]$d.healthFracMin }
       if ($null -ne $d.healthFracMax) { $pSpec.healthFracMax = [double]$d.healthFracMax }
       if ($d.loan -eq $true -or $d.loan -eq 1) { $pSpec.loanPackage = $true }
-      if ($d.packageTag) { $pSpec.packageTag = [string]$d.packageTag }
-      elseif ($d.listingId) { $pSpec.packageTag = [string]$d.listingId }
+      $pSpec.packageTag = $tag
+      $pSpec.commerceDeploy = $true
       $kit += $pSpec
     }
     $i += 1

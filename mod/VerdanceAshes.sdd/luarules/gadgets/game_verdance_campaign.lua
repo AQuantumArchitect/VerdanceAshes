@@ -104,6 +104,7 @@ if not gadgetHandler:IsSyncedCode() then
   end
 
   function gadget:Shutdown()
+    gadgetHandler:RemoveSyncAction("VERDANCE_TRACK")
     gadgetHandler:RemoveSyncAction("VERDANCE_MISSION_EVENT")
     gadgetHandler:RemoveSyncAction("VERDANCE_HERO_EVENT")
     gadgetHandler:RemoveSyncAction("VERDANCE_BEAT")
@@ -111,16 +112,27 @@ if not gadgetHandler:IsSyncedCode() then
   return
 end
 
+-- ---------------------------------------------------------------------------
+-- Why so many things in this file are globals instead of `local`.
+--
+-- Lua 5.1 (the engine's Lua) allows at most 200 `local` names in one function,
+-- and a chunk's top level IS one function. This file is near that cap. When it
+-- is exceeded the gadget fails to load and BAR's Initial Spawn drops a stock
+-- commander instead of the company. So: hot-path state and small helpers that
+-- need upvalue speed stay `local`; everything else is a gadget-environment
+-- global, either a bare `function name()` or a field on one of the packed
+-- tables (VA_KINDS, VA_CREW_SELECT, VA_FIELD_RECRUIT, VAQ, VA_LOGISTICS,
+-- VA_TRANSLATION). A gadget's globals live in that gadget's own environment,
+-- so they do not leak into other gadgets; GG.* is the only cross-gadget
+-- surface. The second cap that matters is 60 upvalues per function, which is
+-- why gadget:GameFrame calls out to helpers instead of touching state directly.
+-- ---------------------------------------------------------------------------
+
 local mission
 local zoneMap
 local status = "inactive"
 local holdFrames = 0
 local debugAutoProgress = 0
-local spawnedCompanions = {}
-local lastProgressFrame = 0
--- Packed tables + later helpers as gadget-env globals (not `local function`):
--- keep main-chunk locals under Lua 5.1's 200-local hard limit.
--- (Exceeded → Failed to load campaign → BAR Initial Spawn leaves a stock Legion com.)
 local headless = { autoStart = false, fastWin = false, quit = false, started = false, quitFrame = nil }
 local playableSetupSpawned = false
 -- Muster the Band: packed table (Lua 5.1 local budget). Fresh chapter only.
@@ -150,11 +162,6 @@ VAQ = { module = nil, kernel = nil, lastTransitionFrame = 0, arrivals = {} }
 
 -- Objective automation (gadget-env globals — Lua 5.1 main-chunk local budget).
 CHECK_PERIOD = 30                 -- frames between objective checks
-EXTRACTION_HOLD_FRAMES = 300      -- 10s hold once extract is armed (leave-then-return if already on pad)
-BAIL_HOLD_FRAMES = 240            -- 8s RTB bail when primary is unfinished
--- Fallback only while the company is standing on the exfil pad and the hold
--- counter never fills. Off-pad auto-bank opened the stay menu at the objective.
-AUTO_EVAC_FRAMES = 900            -- 30s on the pad after armed → bank anyway
 PRESENCE_HOLD_DEFAULT = 900       -- 30s hold for seize/gate objectives
 WIPE_GRACE_FRAMES = 900           -- no wipe-defeat before 30s
 -- Dev telemetry: one table so GameFrame stays under Lua 5.1's 60-upvalue cap.
@@ -167,24 +174,33 @@ local devTel = {
   cmdTotal = 0,
 }
 
-local DESTRUCTION_KINDS = {
-  strike_relay = true,
-  destroy_key_structure = true,
-  economy_disrupt = true,
-  hive_clear_or_bypass = true,
+-- Objective kinds → how the gadget resolves them (one table, gadget-env).
+-- Every kind Python emits (verdance_story_engine_v1 / quest_generator_v1
+-- ROLE_ARCHETYPE) must land in exactly one mode; vaObjectiveMode() below echoes
+-- the choice at setup as VA_OBJECTIVE_KIND so the infolog shows it.
+--   capture  clear the living-shell pocket (CLEAR_FRACTION of eco+teeth), then
+--            hold the node under regrow pressure → node claimed. Without a
+--            living shell the same kinds fall back to a plain presence hold.
+--            siege = take the citadel; multipressure = hold the swamp under
+--            pressure from all sides (the regrow waves are the pressure).
+--   survive  stand in the target zone for requiredHoldFrames. No targets are
+--            booked for it even when a shell is loaded (survive ≠ raze).
+--   fortify  raise defensive value in the target zone (fortifyDefensiveValue).
+--   choice   several target forces; wrecking any one of them completes.
+--   targets  destruction kinds (strike_relay, destroy_key_structure,
+--            economy_disrupt, hive_clear_or_bypass, sortie, anything unlisted):
+--            every booked target must die. eco_raid credits at
+--            RAID_CREDIT_FRACTION instead (see UnitDestroyed).
+VA_KINDS = {
+  capture = { seize_lane = true, gate_control = true, hold_plateau = true, siege = true, multipressure = true },
+  survive = { survive_wilds = true },
+  fortify = { fortify_zone = true, home_founding = true },
+  choice = { choose_target_then_extract = true },
 }
--- Presence / capture kinds: claim a living shell node (clear pocket + hold under regrow).
-local PRESENCE_KINDS = { seize_lane = true, gate_control = true, hold_plateau = true }
--- Capture = clear pocket then hold under regrow pressure (not empty-grass stand).
-local CAPTURE_KINDS = { seize_lane = true, gate_control = true, hold_plateau = true }
--- Fortify / secure: build storage, BP, army, and especially defensive value on a zone.
-local FORTIFY_KINDS = { fortify_zone = true, secure_foothold = true, home_founding = true }
-local CHOICE_KINDS = { choose_target_then_extract = true }
 
 local playerTeamID = 0
 local playerAllyTeamID = 0
 local gaiaTeamID = -1
-local gaiaAllyTeamID = -1
 local teamAllyTeam = {}                 -- teamID -> allyTeamID
 local teamFaction = {}                  -- teamID -> world faction (nullmercs/armada/cortex/...)
 local objectiveTargets = {}             -- unitID -> forceId (objective_target structures)
@@ -200,20 +216,12 @@ local rescueContractFailReason = ""
 local rescueContractFailHero = ""
 local chosenTargetForceId = nil
 local zoneHoldFrames = 0
-local extractionHoldFrames = 0
-local extractionClean = true
-local playerLeftExtraction = false
--- Victory extract loop: open the LZ, then only count hold after the pad is
--- re-armed (leave-first if the company is already standing on it).
--- playerRequest: mid-mission Exfil button — opens LZ + bail/partial hold.
-local extractLoop = {
-  opened = false,
-  mustLeave = false,
-  armed = false,
-  playerRequest = false,
-  openedFrame = nil,
-  armedFrame = nil,
-}
+-- Frames at which the objective facts latched (0 = never). Exported in the result.
+local objectiveCompleteFrame = 0
+local nodeClaimedFrame = 0
+-- The pad geometry only (pass five: there is no extract loop, timer or hold —
+-- the sortie ends when the player confirms the manifest in game_verdance_exfil.lua).
+local extractLoop = { padRadius = 560 }
 local playerCommanders = {}             -- unitID -> true
 
 -- Pillar B: in-mission dynamism (escalation waves, hot extraction, callable
@@ -372,9 +380,6 @@ local extraObj = {
   purgeTeams = {},     -- teamID -> true
   announced = false,   -- all-objectives-done broadcast latch
 }
--- No-fail stalemate guard: a player with no mobile combat power and no way to
--- build any can neither win nor lose; end it instead of hanging forever.
-local stalemate = { frames = 0, limit = 5400, warned = false }  -- 3 min force-spent ends mission
 local RAID_CREDIT_FRACTION = 0.6        -- wreck this share of the works to credit the raid
 local CLEAR_FRACTION = 0.6              -- pocket clear threshold for capture claims
 local raidWaveThresholds = { 0.15, 0.35, 0.55, 0.8 }  -- damage % that summons each QRF wave
@@ -394,39 +399,11 @@ local capture = {
 local terminal = false
 local terminalReason = ""
 local lastResultJson = nil     -- the one result this sortie wrote (dev telemetry re-sends it)
--- Mode A chapter tracking (declared early so resultJson can close over them)
+-- Chapter index carried in the result key (always 1: there is no same-map continue).
 local sortieChapter = 1
--- Soft-terminal glue: defer UI candidate refresh one frame (rules-param race),
--- and auto-quitforce after a confirmed extract_leave so BAR actually closes.
-local leaveJob = {
-  candRefreshDue = nil,   -- frame to emit candidates_refresh
-  quitDue = nil,          -- frame to quitforce after EXIT
-}
 local targetZoneRect = nil              -- {x1, z1, x2, z2} in elmos
 local extractionZoneRect = nil
 local debugAutoProgressAllowed = false
--- Verification harness state, consolidated into ONE table: Lua 5.1 caps a
--- function at 60 upvalues, and gadget:GameFrame already rides close to it.
--- va_test_killobjective_frame / va_test_killhero_frames=400,3600 /
--- va_test_rezwreck_frame / va_test_destroywreck_frame / va_test_teleport_extract_frame
--- va_test_techgate_frame (Drop 3: spawns a con bot + echoes gate verdicts)
--- va_test_secondary_frame (Drop 4: wrecks all secondary marks)
-local testHooks = {
-  killObjectiveFrame = nil, killObjectiveDone = false,
-  killHeroFrames = {}, killHeroIdx = 1,
-  rezWreckFrame = nil, rezWreckDone = false,
-  destroyWreckFrame = nil, destroyWreckDone = false,
-  teleportExtractFrame = nil, teleportExtractDone = false,
-  techGateFrame = nil, techGateDone = false,
-  killSecondaryFrame = nil, killSecondaryDone = false,  -- Drop 4: va_test_secondary_frame
-  hydroFrame = nil, hydroTo = nil, hydroDone = false, hydroProbe = nil,
-}
-
-local function clamp(x, lo, hi)
-  if x < lo then return lo end
-  if x > hi then return hi end
-  return x
-end
 
 local function truthy(v)
   if v == true or v == 1 then return true end
@@ -690,41 +667,26 @@ end
 
 local objectiveCompleteHow = ""
 
-local function extractionStatusString()
-  if not terminal then return "" end
-  if extractLoop.completed then
-    return extractionClean and "clean" or "contested"
-  end
-  return ""
-end
-
--- Objective credit is only reported on non-defeat outcomes: the story engine
--- treats any completed/destroyed objective as a success signal for graph deltas.
-local function objectiveCredited()
-  return objectiveComplete and status ~= "defeat"
-end
-
+-- The primary objective id, listed once it completed by any path (destroyed,
+-- zone held, node claimed). Python reads this as "the objective was done".
 function destroyedObjectiveIdsJson()
   local oid = mission.objective and mission.objective.id
-  -- Capture claims (node_claimed / zone_held) still count as objective credit for graph.
-  if oid and objectiveCredited() and objectiveCompleteHow ~= "zone_held" and objectiveCompleteHow ~= "node_claimed" then
-    return '[' .. jstr(oid) .. ']'
-  end
-  -- Capture path: report claimed node as destroyedObjective so zone flip + graph fire.
-  if oid and objectiveCredited() and (objectiveCompleteHow == "node_claimed" or objectiveCompleteHow == "zone_held") then
+  if oid and objectiveComplete then
     return '[' .. jstr(oid) .. ']'
   end
   return '[]'
 end
 
+-- One row for the primary objective: how far it got and how it completed.
+-- status is the mechanic that finished it, not a judgement of the sortie.
 function objectiveResultsJson()
   local obj = mission.objective or {}
   if not obj.id then return '[]' end
   local objStatus = "incomplete"
-  if objectiveCredited() then
+  if objectiveComplete then
     if objectiveCompleteHow == "node_claimed" then
       objStatus = "claimed"
-    elseif objectiveCompleteHow == "zone_held" then
+    elseif objectiveCompleteHow == "zone_held" or objectiveCompleteHow == "zone_fortified" then
       objStatus = "complete"
     else
       objStatus = "destroyed"
@@ -733,13 +695,17 @@ function objectiveResultsJson()
   local damage = 0
   if objectiveTargetCount > 0 then
     damage = objectiveTargetsDestroyed / objectiveTargetCount
-  elseif objectiveCredited() then
+  elseif objectiveComplete then
     damage = 1
   end
   return '[{' .. table.concat({
     '"objectiveId":' .. jstr(obj.id),
     '"kind":' .. jstr(obj.kind or ""),
+    '"mode":' .. jstr(vaObjectiveMode(obj.kind)),
     '"status":' .. jstr(objStatus),
+    '"how":' .. jstr(objectiveCompleteHow or ""),
+    '"targetsTotal":' .. jnum(objectiveTargetCount),
+    '"targetsDestroyed":' .. jnum(objectiveTargetsDestroyed),
     '"damage":' .. jnum(damage, 3),
   }, ',') .. '}]'
 end
@@ -867,106 +833,23 @@ function survivingInstallsJson()
   return '[' .. table.concat(parts, ',') .. ']'
 end
 
--- Player-built structures for next-Drop footprint (DRY SoT with living shell).
--- Living-shell units stay on the shell/scar/heldInstall path; this exports only
--- company-built pads so claimed zones are not empty dirt on re-entry.
-function playerFootprintJson()
-  local parts = {}
-  local count = 0
-  local maxN = 64
-  local mapId = tostring((mission and mission.deploymentMapId) or "")
+-- One walk over the player's units at terminal, five facts out of it:
+--   footprint    company-built structures (pads / mex / storage) so a claimed zone is
+--                not empty dirt on re-entry. Heroes and their pack structures travel
+--                with the sheet and are skipped (saving them respawns a second Solarium).
+--   survivors    mobile combat units by def (legacy cadre carry).
+--   survivorXp   per def: count / peak+avg engine XP / peak+avg craft XP (fighters AND
+--                constructors; rez bots and builders carry craft XP). Named heroes use
+--                their sticky peak when it beats live engine XP.
+--   loanUnitHp   per def HP quality of units tagged va_loan_package (broker settle).
+--   armyValue    metal of living mobile combat units (banked as army budget by Python).
+-- Self-contained on purpose: the shared unit helpers are defined further down.
+function playerUnitFacts()
+  local out = { footprint = {}, footprintCount = 0, survivors = {}, xp = {}, loan = {}, armyValue = 0 }
+  local maxFootprint = 64
   local deployZ = tostring((mission and mission.deploymentZoneId) or "")
-  local units = Spring.GetTeamUnits(playerTeamID) or {}
-  for i = 1, #units do
-    if count >= maxN then break end
-    local uid = units[i]
-    if Spring.ValidUnitID(uid) and not Spring.GetUnitIsDead(uid) then
-      local dID = Spring.GetUnitDefID(uid)
-      local ud = dID and UnitDefs[dID]
-      if ud then
-        local structure = ud.isBuilding or ud.isFactory or ((ud.speed or 1) == 0)
-        local commander = ud.customParams and ud.customParams.iscommander
-        local shell = Spring.GetUnitRulesParam and Spring.GetUnitRulesParam(uid, "va_living_shell")
-        local isShell = (shell == 1 or shell == true or shell == "1")
-        -- Named heroes and their pack structures travel with the sheet.
-        -- Saving them here respawns a second Solarium on the next drop.
-        local heroMark = Spring.GetUnitRulesParam and Spring.GetUnitRulesParam(uid, "va_hero_id")
-        local packMark = Spring.GetUnitRulesParam and Spring.GetUnitRulesParam(uid, "va_pack_id")
-        local travels = (heroMark ~= nil and heroMark ~= "" and heroMark ~= 0)
-          or (packMark ~= nil and packMark ~= "" and packMark ~= 0)
-        if structure and (not commander) and (not isShell) and (not travels) then
-          local x, _, z = Spring.GetUnitPosition(uid)
-          local hp, maxHp = Spring.GetUnitHealth(uid)
-          local facing = 0
-          if Spring.GetUnitBuildFacing then
-            facing = tonumber(Spring.GetUnitBuildFacing(uid)) or 0
-          end
-          local zoneId = deployZ
-          if zoneMap and type(zoneMap.zones) == "table" and x and z then
-            local sx = Game.mapSizeX or 1
-            local sz = Game.mapSizeZ or 1
-            for _, zrec in ipairs(zoneMap.zones) do
-              local b = zrec.bounds or {}
-              local x1 = normalizedToElmos(b.xMin, sx)
-              local z1 = normalizedToElmos(b.zMin, sz)
-              local x2 = normalizedToElmos(b.xMax, sx)
-              local z2 = normalizedToElmos(b.zMax, sz)
-              if x >= x1 and x <= x2 and z >= z1 and z <= z2 then
-                zoneId = tostring(zrec.zoneId or zoneId)
-                break
-              end
-            end
-          end
-          count = count + 1
-          parts[#parts + 1] = '{'
-            .. '"unitDefName":' .. jstr(ud.name or "")
-            .. ',"x":' .. jnum(x or 0, 1)
-            .. ',"z":' .. jnum(z or 0, 1)
-            .. ',"facing":' .. jnum(facing)
-            .. ',"hpFrac":' .. jnum((maxHp and maxHp > 0 and hp) and (hp / maxHp) or 1, 3)
-            .. ',"zoneId":' .. jstr(zoneId)
-            .. ',"owner":"player"'
-            .. ',"role":"player_footprint"'
-            .. '}'
-        end
-      end
-    end
-  end
-  Spring.Echo("VA_PLAYER_FOOTPRINT count=" .. tostring(count) .. " map=" .. mapId)
-  return '[' .. table.concat(parts, ',') .. ']'
-end
-
--- Pillar C: the player's surviving mobile combat units by def, so the campaign
--- engine can carry a veteran cadre forward and attrite losses. Self-contained
--- (the shared unit helpers are defined further down, after this function).
--- Also aggregates loan-pack HP quality for broker settle (contract v2 loanUnitHp).
---
--- XP carry: counts stay in playerSurvivors (legacy). Rich XP lives in
--- playerSurvivorXp so the next drop can re-seed SetUnitExperience / craft XP
--- at ~majority retain (campaign applies XP_KEEP_FRAC).
-function playerSurvivorsJson()
-  local counts = {}
-  local units = Spring.GetTeamUnits(playerTeamID) or {}
-  for i = 1, #units do
-    local uID = units[i]
-    local dID = Spring.GetUnitDefID(uID)
-    local ud = dID and UnitDefs[dID]
-    if ud then
-      local structure = ud.isBuilding or ud.isFactory or (ud.speed == 0)
-      local commander = ud.customParams and ud.customParams.iscommander
-      local fights = ud.canAttack or (ud.weapons and #ud.weapons > 0)
-      if (not structure) and (not commander) and fights then
-        counts[ud.name] = (counts[ud.name] or 0) + 1
-      end
-    end
-  end
-  local parts = {}
-  for name, c in pairs(counts) do parts[#parts + 1] = jstr(name) .. ':' .. jnum(c) end
-  return '{' .. table.concat(parts, ',') .. '}'
-end
-
-function playerSurvivorXpJson()
-  local bags = {}
+  local sx = Game.mapSizeX or 1
+  local sz = Game.mapSizeZ or 1
   local units = Spring.GetTeamUnits(playerTeamID) or {}
   for i = 1, #units do
     local uID = units[i]
@@ -974,30 +857,71 @@ function playerSurvivorXpJson()
       local dID = Spring.GetUnitDefID(uID)
       local ud = dID and UnitDefs[dID]
       if ud then
-        local structure = ud.isBuilding or ud.isFactory or (ud.speed == 0)
+        local structure = ud.isBuilding or ud.isFactory or ((ud.speed or 1) == 0)
         local commander = ud.customParams and ud.customParams.iscommander
-        -- Include fighters + constructors (craft XP matters for rezbots/builders).
         local fights = ud.canAttack or (ud.weapons and #ud.weapons > 0)
         local builder = (tonumber(ud.buildSpeed) or 0) > 0 or ud.canResurrect or ud.canRepair
+        local x, _, z = Spring.GetUnitPosition(uID)
+        local hp, maxHp = Spring.GetUnitHealth(uID)
+        local hpFrac = (maxHp and maxHp > 0 and hp) and (hp / maxHp) or 1
+        -- footprint: structures only, never commanders / living shell / hero pack kit
+        if structure and not commander and out.footprintCount < maxFootprint then
+          local shell = Spring.GetUnitRulesParam(uID, "va_living_shell")
+          local isShell = (shell == 1 or shell == true or shell == "1")
+          local heroMark = Spring.GetUnitRulesParam(uID, "va_hero_id")
+          local packMark = Spring.GetUnitRulesParam(uID, "va_pack_id")
+          local travels = (heroMark ~= nil and heroMark ~= "" and heroMark ~= 0)
+            or (packMark ~= nil and packMark ~= "" and packMark ~= 0)
+          if (not isShell) and (not travels) then
+            local facing = 0
+            if Spring.GetUnitBuildFacing then
+              facing = tonumber(Spring.GetUnitBuildFacing(uID)) or 0
+            end
+            local zoneId = deployZ
+            if zoneMap and type(zoneMap.zones) == "table" and x and z then
+              for _, zrec in ipairs(zoneMap.zones) do
+                local b = zrec.bounds or {}
+                if x >= normalizedToElmos(b.xMin, sx) and x <= normalizedToElmos(b.xMax, sx)
+                    and z >= normalizedToElmos(b.zMin, sz) and z <= normalizedToElmos(b.zMax, sz) then
+                  zoneId = tostring(zrec.zoneId or zoneId)
+                  break
+                end
+              end
+            end
+            out.footprintCount = out.footprintCount + 1
+            out.footprint[#out.footprint + 1] = '{'
+              .. '"unitDefName":' .. jstr(ud.name or "")
+              .. ',"x":' .. jnum(x or 0, 1)
+              .. ',"z":' .. jnum(z or 0, 1)
+              .. ',"facing":' .. jnum(facing)
+              .. ',"hpFrac":' .. jnum(hpFrac, 3)
+              .. ',"zoneId":' .. jstr(zoneId)
+              .. ',"owner":"player"'
+              .. ',"role":"player_footprint"'
+              .. '}'
+          end
+        end
+        -- survivors / armyValue: mobile combat units
+        if (not structure) and (not commander) and fights then
+          out.survivors[ud.name] = (out.survivors[ud.name] or 0) + 1
+          out.armyValue = out.armyValue + (tonumber(ud.metalCost or ud.metal or 0) or 0)
+        end
+        -- survivorXp: mobile fighters + constructors
         if (not structure) and (not commander) and (fights or builder) then
           local xp = 0
           if Spring.GetUnitExperience then
             xp = tonumber((Spring.GetUnitExperience(uID))) or 0
           end
-          -- Named heroes: sticky peak beats live engine XP if higher.
           local hid = heroByUnitID and heroByUnitID[uID]
           if hid and heroes and heroes[hid] then
             local peak = math.max(tonumber(heroes[hid].peakXp) or 0, tonumber(heroes[hid].lastXp) or 0)
             if peak > xp then xp = peak end
           end
-          local craft = 0
-          if Spring.GetUnitRulesParam then
-            craft = tonumber((Spring.GetUnitRulesParam(uID, "va_craft_xp"))) or 0
-          end
-          local b = bags[ud.name]
+          local craft = tonumber((Spring.GetUnitRulesParam(uID, "va_craft_xp"))) or 0
+          local b = out.xp[ud.name]
           if not b then
             b = { count = 0, sumXp = 0, peakXp = 0, sumCraft = 0, peakCraft = 0 }
-            bags[ud.name] = b
+            out.xp[ud.name] = b
           end
           b.count = b.count + 1
           b.sumXp = b.sumXp + xp
@@ -1005,11 +929,40 @@ function playerSurvivorXpJson()
           b.sumCraft = b.sumCraft + craft
           if craft > b.peakCraft then b.peakCraft = craft end
         end
+        -- loanUnitHp: anything tagged as a broker loan
+        local loan = Spring.GetUnitRulesParam(uID, "va_loan_package")
+        if (loan == 1 or loan == true or loan == "1") and ud.name then
+          local frac = (tonumber(maxHp) or 0) > 0 and ((tonumber(hp) or 0) / tonumber(maxHp)) or 0
+          local b = out.loan[ud.name]
+          if not b then
+            b = { count = 0, sum = 0, min = 1 }
+            out.loan[ud.name] = b
+          end
+          b.count = b.count + 1
+          b.sum = b.sum + frac
+          if frac < b.min then b.min = frac end
+        end
       end
     end
   end
+  Spring.Echo("VA_PLAYER_FOOTPRINT count=" .. tostring(out.footprintCount)
+    .. " map=" .. tostring((mission and mission.deploymentMapId) or ""))
+  return out
+end
+
+function playerFootprintJson(facts)
+  return '[' .. table.concat(facts.footprint, ',') .. ']'
+end
+
+function playerSurvivorsJson(facts)
   local parts = {}
-  for name, b in pairs(bags) do
+  for name, c in pairs(facts.survivors) do parts[#parts + 1] = jstr(name) .. ':' .. jnum(c) end
+  return '{' .. table.concat(parts, ',') .. '}'
+end
+
+function playerSurvivorXpJson(facts)
+  local parts = {}
+  for name, b in pairs(facts.xp) do
     local avg = (b.count > 0) and (b.sumXp / b.count) or 0
     local avgCraft = (b.count > 0) and (b.sumCraft / b.count) or 0
     parts[#parts + 1] = jstr(name) .. ':{'
@@ -1023,34 +976,9 @@ function playerSurvivorXpJson()
   return '{' .. table.concat(parts, ',') .. '}'
 end
 
-function loanUnitHpJson()
-  -- unitDef -> { count, avgHpFrac, minHpFrac } for units tagged va_loan_package
-  local bags = {}
-  local units = Spring.GetTeamUnits(playerTeamID) or {}
-  for i = 1, #units do
-    local uID = units[i]
-    local loan = Spring.GetUnitRulesParam and Spring.GetUnitRulesParam(uID, "va_loan_package")
-    if loan == 1 or loan == true or loan == "1" then
-      local dID = Spring.GetUnitDefID(uID)
-      local ud = dID and UnitDefs[dID]
-      if ud and ud.name then
-        local hp, maxHp = Spring.GetUnitHealth(uID)
-        maxHp = tonumber(maxHp) or 0
-        hp = tonumber(hp) or 0
-        local frac = (maxHp > 0) and (hp / maxHp) or 0
-        local b = bags[ud.name]
-        if not b then
-          b = { count = 0, sum = 0, min = 1 }
-          bags[ud.name] = b
-        end
-        b.count = b.count + 1
-        b.sum = b.sum + frac
-        if frac < b.min then b.min = frac end
-      end
-    end
-  end
+function loanUnitHpJson(facts)
   local parts = {}
-  for name, b in pairs(bags) do
+  for name, b in pairs(facts.loan) do
     local avg = (b.count > 0) and (b.sum / b.count) or 0
     parts[#parts + 1] = jstr(name) .. ':{'
       .. '"count":' .. jnum(b.count)
@@ -1115,6 +1043,11 @@ function shellScarsJson()
   return '[' .. table.concat(parts, ',') .. ']'
 end
 
+-- The result is facts only (law: Lua reports facts, Python interprets).
+-- status is the terminal KIND (extracted | wiped | closed), never a verdict;
+-- tools/manifest_v1.py and tools/match_credit_v1.py turn these facts into
+-- victory / partial / defeat / abandon, zone flips and credits. Nothing here
+-- may compute a judgement — if Python needs something, export the fact.
 local function resultJson()
   local alive, total = companionCounts()
   local req = mission.objective and mission.objective.requiredFrames or 600
@@ -1122,25 +1055,14 @@ local function resultJson()
   local obj = mission.objective or {}
   local targetZone = mission.targetZoneId or obj.targetZoneId or ""
   local patron = mission.patron or (mission.worldConflict and mission.worldConflict.patron) or ""
-  -- Node claim = capture clear+hold completed. Never free-mints Tnb (reclaim only).
+  -- Capture state machine facts: the pocket was cleared / the hold finished.
   local nodeClaimed = capture.nodeClaimed or (objectiveCompleteHow == "node_claimed")
-  -- Protocol: zone flip eligible only on claim (capture) or full victory (non-capture).
-  -- partial never empty-grass flips.
-  local zoneFlipEligible = false
-  if capture.mode then
-    zoneFlipEligible = nodeClaimed == true and (status == "victory" or status == "partial")
-  else
-    zoneFlipEligible = (status == "victory") and (objectiveCredited() or objectiveComplete) and targetZone ~= ""
-  end
-  local zoneFlipped = zoneFlipEligible
-  local extStatus = extractionStatusString()
-  local cleanExtract = (extStatus == "clean")
   local chapter = sortieChapter or 1
   local reasonSafe = tostring(terminalReason or "none"):gsub("|", "_")
   local cid = mission.campaignId or "verdance_ashes"
   local mid = mission.missionId or "va_unknown"
   local mn = tostring(mission.missionNumber or 0)
-  -- Hardened resultKey: unique across Mode A chapters and re-tries
+  -- resultKey: unique per sortie attempt (chapter + terminal kind + reason + frame).
   local rkey = cid .. "|" .. mid .. "|" .. mn
     .. "|ch" .. tostring(chapter)
     .. "|" .. tostring(status)
@@ -1175,41 +1097,20 @@ local function resultJson()
   -- allotment only; settle nets it out so unused seed does not inflate the bag.
   local metalKBrought = math.floor(tonumber(com.metalKBrought or 0) or 0)
   local metalKFieldStart = math.floor(tonumber(com.fieldStartMetalK or com.metalKFieldStart or 0) or 0)
-  -- Living mobile combat metal — banks into commerce.armyBudget on homecoming.
-  -- Inline structure check (isStructure is a later local; do not call it here).
-  local armyValue = 0
-  if Spring.GetTeamUnits then
-    local units = Spring.GetTeamUnits(playerTeamID) or {}
-    for i = 1, #units do
-      local uid = units[i]
-      if Spring.ValidUnitID(uid) and not Spring.GetUnitIsDead(uid) then
-        local defID = Spring.GetUnitDefID(uid)
-        local ud = defID and UnitDefs[defID]
-        if ud then
-          local isBuilding = (ud.isBuilding == true) or (ud.speed or 0) < 0.1
-          local metal = tonumber(ud.metalCost or ud.metal or 0) or 0
-          local wcount = 0
-          if ud.weapons then wcount = #ud.weapons end
-          if (not isBuilding) and (wcount > 0 or (ud.speed or 0) > 0.5) then
-            armyValue = armyValue + metal
-          end
-        end
-      end
-    end
-  end
+  -- One walk over the player's units: footprint, survivors, XP, loan HP, army metal.
+  local facts = playerUnitFacts()
   return '{' .. table.concat({
     '"schemaVersion":' .. jstr("verdance-match-result/2.0"),
     '"campaignId":' .. jstr(cid),
     '"missionId":' .. jstr(mid),
     '"missionNumber":' .. jnum(mission.missionNumber or 0),
     '"playerTeamId":' .. jnum(playerTeamID),
-    '"armyValue":' .. jnum(armyValue, 2),
-    '"metrics":{"armyValue":' .. jnum(armyValue, 2) .. '}',
+    '"armyValue":' .. jnum(facts.armyValue, 2),
+    '"metrics":{"armyValue":' .. jnum(facts.armyValue, 2) .. '}',
     '"chapterIndex":' .. jnum(chapter),
     '"pathSignal":' .. jstr(mission.pathSignal or "B"),
+    -- terminal kind only: extracted | wiped | closed (Python reads the verdict off the manifest)
     '"status":' .. jstr(status),
-    '"verdict":' .. jstr(status),
-    -- pass five: the manifest is the ending; Python reads the verdict off it
     '"manifest":' .. ((GG and GG.VA_ManifestJson) and GG.VA_ManifestJson() or 'null'),
     '"resultKey":' .. jstr(rkey),
     '"sortieId":' .. jstr(tostring(sortieId)),
@@ -1222,29 +1123,38 @@ local function resultJson()
     '"deploymentZoneId":' .. jstr(mission.deploymentZoneId or ""),
     '"targetZoneId":' .. jstr(targetZone),
     '"patron":' .. jstr(patron),
-    '"zoneFlipped":' .. tostring(zoneFlipped == true),
-    '"zoneFlipEligible":' .. tostring(zoneFlipEligible == true),
+    -- capture state machine (facts)
     '"nodeClaimed":' .. tostring(nodeClaimed == true),
+    '"nodeClaimedFrame":' .. jnum(nodeClaimedFrame),
     '"pocketCleared":' .. tostring(capture.pocketCleared == true),
     '"capturePhase":' .. jstr(capture.phase or "idle"),
     '"captureMode":' .. tostring(capture.mode == true),
     '"regrowWaves":' .. jnum(capture.regrowWaves or 0),
+    '"zoneHoldFrames":' .. jnum(zoneHoldFrames),
     '"terminalReason":' .. jstr(terminalReason),
+    -- primary objective (facts)
+    '"objectiveKind":' .. jstr(obj.kind or ""),
+    '"objectiveMode":' .. jstr(vaObjectiveMode(obj.kind)),
     '"objectiveComplete":' .. tostring(objectiveComplete == true),
+    '"objectiveCompleteHow":' .. jstr(objectiveCompleteHow or ""),
+    '"objectiveCompleteFrame":' .. jnum(objectiveCompleteFrame),
     '"objectiveBypassed":' .. tostring(objectiveBypassed == true),
+    '"objectiveTargetsTotal":' .. jnum(objectiveTargetCount),
+    '"objectiveTargetsDestroyed":' .. jnum(objectiveTargetsDestroyed),
+    -- required secondary marks still open + the full-victory gate the HUD showed (EXTRACT phase)
+    '"requiredMarksLeft":' .. jnum(MarksLib.requiredLeft(marks)),
+    '"allObjectivesDone":' .. tostring(vaAllObjectivesDone() == true),
     -- objectiveFailed is the SoT latch (rescue contract destroyed). Alias kept
     -- for older hub/kernel readers. Fail hero lets company.fieldPool mark lost.
     '"objectiveFailed":' .. tostring(rescueContractFailed == true),
     '"objectiveFailReason":' .. jstr(rescueContractFailReason or ""),
     '"objectiveFailHero":' .. jstr(rescueContractFailHero or ""),
     '"rescueContractFailed":' .. tostring(rescueContractFailed == true),
-    '"extractionStatus":' .. jstr(extStatus),
-    '"cleanExtract":' .. tostring(cleanExtract == true),
     '"extractionZoneId":' .. jstr(mission.extractionZoneId or obj.extractionZoneId or ""),
     '"chosenTargetForceId":' .. jstr(chosenTargetForceId or ""),
-    '"playerSurvivors":' .. playerSurvivorsJson(),
-    '"playerSurvivorXp":' .. playerSurvivorXpJson(),
-    '"loanUnitHp":' .. loanUnitHpJson(),
+    '"playerSurvivors":' .. playerSurvivorsJson(facts),
+    '"playerSurvivorXp":' .. playerSurvivorXpJson(facts),
+    '"loanUnitHp":' .. loanUnitHpJson(facts),
     '"shellScars":' .. shellScarsJson(),
     '"heroResults":' .. heroResultsJson(),
     '"recruitedHeroIds":' .. recruitedHeroIdsJson(),
@@ -1253,7 +1163,7 @@ local function resultJson()
     '"objectiveResults":' .. objectiveResultsJson(),
     '"secondaryResults":' .. secondaryResultsJson(),
     '"survivingInstalls":' .. survivingInstallsJson(),
-    '"playerFootprint":' .. playerFootprintJson(),
+    '"playerFootprint":' .. playerFootprintJson(facts),
     -- pass three belief contract, produced by game_verdance_belief_observe.lua (GG, no new locals here)
     '"observedZones":' .. ((GG and GG.VA_ObservedZonesJson) and GG.VA_ObservedZonesJson() or 'null'),
     '"beliefExport":' .. ((GG and GG.VA_BeliefExportJson) and GG.VA_BeliefExportJson() or 'null'),
@@ -1265,16 +1175,6 @@ local function resultJson()
     '"farmSortie":' .. tostring((mission.difficulty and mission.difficulty.farmSortie) or (mission.progression and mission.progression.farmSortie) or false),
     '"sessionMode":' .. jstr(mission.sessionMode or "same_map"),
     '"occupationModel":' .. jstr(mission.occupationModel or "living_shell"),
-    '"mapSpent":' .. tostring((Spring.GetGameRulesParam("va_map_spent") == 1) or (Spring.GetGameRulesParam("va_map_spent") == true)),
-    '"theaterExhausted":' .. tostring((Spring.GetGameRulesParam("va_map_spent") == 1) or (Spring.GetGameRulesParam("va_map_spent") == true)),
-    '"credits":{'
-      .. '"objectiveComplete":' .. tostring(objectiveComplete == true)
-      .. ',"nodeClaimed":' .. tostring(nodeClaimed == true)
-      .. ',"pocketCleared":' .. tostring(capture.pocketCleared == true)
-      .. ',"zoneFlipEligible":' .. tostring(zoneFlipEligible == true)
-      .. ',"cleanExtract":' .. tostring(cleanExtract == true)
-      .. ',"raidCredit":' .. tostring((not capture.mode) and objectiveComplete == true)
-      .. '}',
     '"map":{"name":' .. jstr(Game.mapName or "") .. ',"sizeX":' .. jnum(Game.mapSizeX or 0) .. ',"sizeZ":' .. jnum(Game.mapSizeZ or 0) .. '}',
     '"zoneMap":{' .. zoneMapJson() .. '}',
     '"economy":{' .. economyJson() .. '}',
@@ -1304,8 +1204,7 @@ local function resultJson()
     '"tenebriumFactionBanks":' .. (tenebLoot.factionBanksJson and tenebLoot.factionBanksJson() or '{}'),
     '"armadaTenebriumCrisis":' .. tostring(tenebLoot.armadaCrisis == true),
     '"quantumTransitionJournal":' .. (VAQ.kernel and VAQ.kernel:journalJson() or '[]'),
-    '"finalQuantumState":' .. (VAQ.kernel and VAQ.kernel:json() or 'null'),
-    '"freeTnbMint":false'
+    '"finalQuantumState":' .. (VAQ.kernel and VAQ.kernel:json() or 'null')
   }, ',') .. '}'
 end
 
@@ -1340,13 +1239,12 @@ local function logResult()
     json = "{"
       .. '"schemaVersion":"verdance-match-result/2.0-fallback",'
       .. '"status":' .. jstr(tostring(status or "unknown")) .. ","
-      .. '"verdict":' .. jstr(tostring(status or "unknown")) .. ","
       .. '"terminalReason":' .. jstr(tostring(terminalReason or "result_json_error")) .. ","
+      .. '"objectiveComplete":' .. tostring(objectiveComplete == true) .. ","
       .. '"objectiveFailed":' .. tostring(rescueContractFailed == true) .. ","
       .. '"objectiveFailHero":' .. jstr(tostring(rescueContractFailHero or "")) .. ","
       .. '"tenebriumBank":' .. jnum((tenebLoot and tenebLoot.bank) or 0) .. ","
-      .. '"tenebriumLooted":' .. jnum((tenebLoot and (tenebLoot.looted or tenebLoot.total)) or 0) .. ","
-      .. '"freeTnbMint":false'
+      .. '"tenebriumLooted":' .. jnum((tenebLoot and (tenebLoot.looted or tenebLoot.total)) or 0)
       .. "}"
   end
   lastResultJson = json
@@ -1376,7 +1274,6 @@ local function startMission()
   vaInitWaterline()
   holdFrames = 0
   debugAutoProgress = debugAutoProgressAllowed and 1 or 0
-  lastProgressFrame = Spring.GetGameFrame()
   if tenebLoot.initFromMission then tenebLoot.initFromMission() end
   Spring.SetGameRulesParam("va_status", status, { public = true })
   Spring.Echo("VA_START " .. tostring(mission.missionId) .. " zone=" .. tostring(mission.zone or "unknown"))
@@ -1597,19 +1494,6 @@ local function harvestMentorXp(unitID, heroId)
   Spring.Echo("VA_MENTOR_HARVEST mentor=" .. heroId
     .. " xp=" .. tostring(xp) .. " bank=" .. tostring(bag.bankXp)
     .. " field=" .. tostring(rec and rec.fieldStat or "?"))
-end
-
--- Compat wrappers
-local function stampWheelieXp(unitID)
-  if packMentors["spoke"] then stampMentorSubordinate(unitID, "spoke") end
-end
-
-local function harvestWheelieXp(unitID)
-  harvestMentorXp(unitID, "spoke")
-end
-
-local function heroHasWheelieMentor(spec)
-  return heroIsPackMentor("spoke", spec, nil) or heroIsPackMentor(spec and spec.heroId, spec, nil)
 end
 
 local function registerPackMentor(heroId, rec, seedXp)
@@ -2237,10 +2121,17 @@ function VA_CREW_isAnchorKeep(spec)
   return false
 end
 
--- Bought broker kit (punch / fabs / constructors tagged from Add-CommerceDeployToKit).
--- These are spawned once via VA_LOGISTICS.spawnCommerceDeployKit — not the layout force.
+-- Bought broker kit (punch / fabs / constructors / nanos from mission.commerce.deploy).
+-- RULE (one owner): VA_LOGISTICS.spawnCommerceDeployKit spawns the commerce deploy
+-- bag at GameStart, straight from mission.commerce.deploy. The layout force in
+-- playableSetup may still carry copies of those items (scripts/build_next_mission_v1.ps1
+-- Add-CommerceDeployToKit composes them into the player kit for previews); the setup
+-- spawn must skip every one of them or the kit lands twice. The PS1 stamps each such
+-- spec with commerceDeploy=true and a packageTag; the tag heuristics below cover
+-- seeds built before the stamp existed.
 function VA_CREW_isCommerceKitSpec(spec)
   if not spec then return false end
+  if spec.commerceDeploy == true or spec.commerceDeploy == 1 then return true end
   if spec.unitPrinter == true or spec.unitPrinter == 1 then return true end
   local tag = tostring(spec.packageTag or "")
   if tag == "" then return false end
@@ -3141,8 +3032,10 @@ local function spawnPlayableSetup()
       local groupZ = tonumber(group.dz or group.z or 0) or 0
       for _, spec in ipairs(group.units or {}) do
         local isPlayer = (force.role == "player_anchor" or force.id == "player_deployment")
-        if useCrewKit and isPlayer and VA_CREW_isCommerceKitSpec(spec) then
-          -- Broker bag units spawn from mission.commerce.deploy (once, via logistics).
+        if isPlayer and VA_CREW_isCommerceKitSpec(spec) then
+          -- Commerce deploy bag: spawned ONCE by VA_LOGISTICS.spawnCommerceDeployKit at
+          -- GameStart from mission.commerce.deploy. Never from the layout force
+          -- (see VA_CREW_isCommerceKitSpec for the rule).
         elseif useCrewKit and isPlayer and not VA_CREW_isAnchorKeep(spec) then
           -- Combat heroes + cadre come from the sealed hub packet (spawn below).
         else
@@ -3271,6 +3164,16 @@ local function spawnPlayableSetup()
   Spring.Echo("VA_PLAYABLE_SETUP spawned forces=" .. tostring(#forces) .. " units=" .. tostring(totalSpawned))
   Spring.Echo("VA_ESCALATION_SETUP enemyTeam=" .. tostring(objectiveTeamID) .. " mercTeam=" .. tostring(mercTeamID) .. " mercsAllied=" .. tostring(mercsAllied))
   Spring.Echo("VA_OBJECTIVE_ARMED kind=" .. tostring(mission.objective and mission.objective.kind or "none") .. " targets=" .. tostring(objectiveTargetCount))
+  do
+    local kind = tostring(mission.objective and mission.objective.kind or "")
+    local shell = mission.livingShell
+    local hasShell = type(shell) == "table" and shell.enabled ~= false
+    Spring.Echo("VA_OBJECTIVE_KIND kind=" .. (kind ~= "" and kind or "none")
+      .. " mode=" .. vaObjectiveMode(kind)
+      .. " targets=" .. tostring(objectiveTargetCount)
+      .. " zone=" .. tostring(targetZoneRect and "yes" or "no")
+      .. " shell=" .. tostring(hasShell and 1 or 0))
+  end
 end
 
 local function resourceIncome(teamID, resourceName)
@@ -3729,12 +3632,14 @@ end
 -- Consumes real zoneBuckets, runs Hermitian math, emits packet.
 -- ============================================================
 
-local MAX_WATER_HEIGHT = 250.0
-local BASE_COUPLING = 0.3
-local BASE_HYDRO_COUPLING = 0.6
-local ENTANGLEMENT_THRESHOLD = 0.1
-local DENSITY_HOTSPOT = 0.8
-local HYDRO_HAZARD_THRESHOLD = 0.4
+-- Tuning constants packed into one gadget-env table (main-chunk local budget).
+VA_TRANSLATION = {
+  BASE_COUPLING = 0.3,
+  BASE_HYDRO_COUPLING = 0.6,
+  ENTANGLEMENT_THRESHOLD = 0.1,
+  DENSITY_HOTSPOT = 0.8,
+  HYDRO_HAZARD_THRESHOLD = 0.4,
+}
 
 -- Determine zone hydro type from zone tags
 local function getZoneHydroType(zone)
@@ -3958,9 +3863,6 @@ function vaStepWaterline()
   if math.abs(remaining) <= math.abs(vaWaterStep) or vaWaterStep == 0 then
     vaApplyWaterline(vaWaterTarget)
     Spring.Echo(string.format("VA_HYDRO_DONE level=%.3f sunk=%.1f", vaWaterLevel, vaWaterApplied))
-    if testHooks and testHooks.hydroDone and not testHooks.hydroProbe then
-      testHooks.hydroProbe = Spring.GetGameFrame() + 90
-    end
     vaWaterTarget = nil
     vaWaterStep = 0
     return
@@ -3985,34 +3887,6 @@ function vaInitWaterline()
   Spring.Echo(string.format("VA_HYDRO_INIT level=%.3f sunk=%.1f amplitude=%s",
     vaWaterLevel, vaWaterApplied,
     tostring(hydro and hydro.amplitude or "n/a")))
-end
-
--- What the terrain and the army look like right now, for the flood probe.
-function vaEchoHydroProbe(tag, frame)
-  local sx, sz = Game.mapSizeX or 0, Game.mapSizeZ or 0
-  local samples = {}
-  for _, at in ipairs({ 0.25, 0.5, 0.75 }) do
-    local x, z = sx * at, sz * at
-    samples[#samples + 1] = string.format("%.0f", Spring.GetGroundHeight(x, z) or 0)
-  end
-  local alive, underwater, structures = 0, 0, 0
-  for _, teamID in ipairs(Spring.GetTeamList() or {}) do
-    for _, unitID in ipairs(Spring.GetTeamUnits(teamID) or {}) do
-      if Spring.ValidUnitID(unitID) and not Spring.GetUnitIsDead(unitID) then
-        alive = alive + 1
-        local ux, uy, uz = Spring.GetUnitPosition(unitID)
-        if uy and uy < 0 then underwater = underwater + 1 end
-        local ud = UnitDefs[Spring.GetUnitDefID(unitID) or -1]
-        if ud and (ud.isImmobile or (ud.speed or 0) <= 0) then
-          structures = structures + 1
-        end
-      end
-    end
-  end
-  Spring.Echo(string.format(
-    "VA_HYDRO_PROBE %s frame=%d level=%.3f sunk=%.1f ground=%s units=%d underwater=%d structures=%d",
-    tag, frame, tonumber(vaWaterLevel) or 0, tonumber(vaWaterApplied) or 0,
-    table.concat(samples, "/"), alive, underwater, structures))
 end
 
 function vaBeginWaterline(target, seconds)
@@ -4107,7 +3981,7 @@ local function generateTranslationPacket(zoneBuckets)
         local stronger = math.max(zones[i].av, zones[j].av, 1.0)
         local pressure = math.tanh(weaker / 2000.0) * (weaker / stronger)
         local crossing = (flow[key] or 0) / flowPeak
-        local c = BASE_COUPLING * borderShare * (0.65 * pressure + 0.35 * crossing)
+        local c = VA_TRANSLATION.BASE_COUPLING * borderShare * (0.65 * pressure + 0.35 * crossing)
         matrix[i][j] = c
         matrix[j][i] = c
       end
@@ -4115,7 +3989,7 @@ local function generateTranslationPacket(zoneBuckets)
     -- Step 3: Hydrological coupling -- how much of this zone the current
     -- waterline actually takes, measured from its own flood curve.
     local wet = vaZoneSubmerged(zoneMap.zones[i], rho_H)
-    local hc = BASE_HYDRO_COUPLING * wet
+    local hc = VA_TRANSLATION.BASE_HYDRO_COUPLING * wet
     matrix[i][N+1] = hc
     matrix[N+1][i] = hc
   end
@@ -4146,7 +4020,7 @@ local function generateTranslationPacket(zoneBuckets)
   for i = 1, N do
     for j = i + 1, N do
       local coupling = matrix[i][j]
-      if coupling > ENTANGLEMENT_THRESHOLD then
+      if coupling > VA_TRANSLATION.ENTANGLEMENT_THRESHOLD then
         table.insert(packet.entanglements, {
           zoneIds  = { zones[i].zoneId, zones[j].zoneId },
           names    = { zones[i].name, zones[j].name },
@@ -4157,14 +4031,14 @@ local function generateTranslationPacket(zoneBuckets)
   end
 
   for _, node in ipairs(packet.nodes) do
-    if node.type == "low-flood" and node.hydroCoupling > HYDRO_HAZARD_THRESHOLD then
+    if node.type == "low-flood" and node.hydroCoupling > VA_TRANSLATION.HYDRO_HAZARD_THRESHOLD then
       table.insert(packet.factoids, {
         type    = "HAZARD",
         zoneId  = node.zoneId,
         message = node.name .. " is critically exposed to current hydrology levels.",
       })
     end
-    if node.density > DENSITY_HOTSPOT then
+    if node.density > VA_TRANSLATION.DENSITY_HOTSPOT then
       table.insert(packet.factoids, {
         type    = "HOTSPOT",
         zoneId  = node.zoneId,
@@ -4275,6 +4149,17 @@ local function objectiveKind()
   return mission and mission.objective and mission.objective.kind or ""
 end
 
+-- How a kind resolves (see VA_KINDS). Gadget-env global: resultJson / setup echo call it.
+function vaObjectiveMode(kind)
+  kind = tostring(kind or "")
+  if VA_KINDS.capture[kind] then return "capture" end
+  if VA_KINDS.survive[kind] then return "presence" end
+  if VA_KINDS.fortify[kind] then return "fortify" end
+  if VA_KINDS.choice[kind] then return "targets_choice" end
+  if kind == "eco_raid" then return "targets_raid" end
+  return "targets_all"
+end
+
 local function zoneRectFor(zoneId)
   if not zoneId or not zoneMap or type(zoneMap.zones) ~= "table" then return nil end
   local sx = Game.mapSizeX or 0
@@ -4296,8 +4181,7 @@ end
 -- Exfil is a pad on the zone anchor, the same point the marker uses.
 -- A shrunk bounding-box center can sit in the river while the marker the
 -- player flies to is the dry anchor, so the pad scan never sees them.
-extractLoop.padRadius = 560
-
+-- (padRadius lives on the extractLoop table declared at the top of the file.)
 extractLoop.applyPad = function(zoneId)
   extractionZoneRect = nil
   if not zoneId then return end
@@ -4339,37 +4223,6 @@ function VA_padPoint()
   return nil, nil
 end
 
--- Cylinder so a transport hovering on the marker counts. Rectangle queries
--- miss some airborne units whose collision volume is still in the air.
-extractLoop.scan = function()
-  local playerPresent, enemyCombat = false, false
-  if not extractionZoneRect then return playerPresent, enemyCombat end
-  local cx = (extractionZoneRect[1] + extractionZoneRect[3]) * 0.5
-  local cz = (extractionZoneRect[2] + extractionZoneRect[4]) * 0.5
-  local radius = math.max(extractLoop.padRadius, (extractionZoneRect[3] - extractionZoneRect[1]) * 0.5)
-  local units
-  if Spring.GetUnitsInCylinder then
-    units = Spring.GetUnitsInCylinder(cx, cz, radius) or {}
-  else
-    units = Spring.GetUnitsInRectangle(extractionZoneRect[1], extractionZoneRect[2], extractionZoneRect[3], extractionZoneRect[4]) or {}
-  end
-  for i = 1, #units do
-    local uid = units[i]
-    if Spring.ValidUnitID(uid) and not Spring.GetUnitIsDead(uid) then
-      local team = Spring.GetUnitTeam(uid)
-      if team == playerTeamID then
-        local x, _, z = Spring.GetUnitPosition(uid)
-        local zone = x and zoneForPosition(x, z)
-        local extractionZoneId = mission.extractionZoneId or (mission.objective or {}).extractionZoneId
-        if zone and zone.zoneId == extractionZoneId then playerPresent = true end
-      elseif team ~= gaiaTeamID and not Spring.AreTeamsAllied(playerTeamID, team) then
-        if canFight(Spring.GetUnitDefID(uid)) then enemyCombat = true end
-      end
-    end
-  end
-  return playerPresent, enemyCombat
-end
-
 local function scanZoneRect(rect)
   local playerPresent, enemyCombat = false, false
   if not rect then return playerPresent, enemyCombat end
@@ -4388,56 +4241,6 @@ local function scanZoneRect(rect)
     end
   end
   return playerPresent, enemyCombat
-end
-
--- Army-value (combat metal) on a pad vs whole player team. Used to scale
--- extract hold speed: concentrate AV on exfil → bank faster.
-local function unitArmyMetal(unitID)
-  if not unitID or not Spring.ValidUnitID(unitID) or Spring.GetUnitIsDead(unitID) then
-    return 0
-  end
-  local defID = Spring.GetUnitDefID(unitID)
-  if not defID or not canFight(defID) then return 0 end
-  if isStructure(defID) or unitIsPadTooth(unitID) then return 0 end
-  return unitDefMetal(defID) or 0
-end
-
-local function teamArmyValue(teamID)
-  local total = 0
-  local units = Spring.GetTeamUnits(teamID) or {}
-  for i = 1, #units do
-    total = total + unitArmyMetal(units[i])
-  end
-  return total
-end
-
-local function scanZoneArmyValue(rect)
-  local padAv, enemyCombat = 0, false
-  if not rect then return padAv, enemyCombat end
-  local units = Spring.GetUnitsInRectangle(rect[1], rect[2], rect[3], rect[4]) or {}
-  for i = 1, #units do
-    local uid = units[i]
-    if Spring.ValidUnitID(uid) and not Spring.GetUnitIsDead(uid) then
-      local team = Spring.GetUnitTeam(uid)
-      if team == playerTeamID then
-        padAv = padAv + unitArmyMetal(uid)
-      elseif team ~= gaiaTeamID and not Spring.AreTeamsAllied(playerTeamID, team) then
-        if canFight(Spring.GetUnitDefID(uid)) then enemyCombat = true end
-      end
-    end
-  end
-  return padAv, enemyCombat
-end
-
--- Concentration 0..1 → hold rate multiplier. Token scout ≈ 0.4x; full stack ≈ 1.75x.
-local function extractHoldRateFromAv(padAv, totalAv)
-  local conc = 0
-  if totalAv and totalAv > 1 then
-    conc = math.min(1, (padAv or 0) / totalAv)
-  elseif (padAv or 0) > 0 then
-    conc = 1
-  end
-  return 0.35 + 1.4 * conc, conc
 end
 
 -- Pillar B wave machinery -----------------------------------------------------
@@ -4723,10 +4526,8 @@ function broadcastHeroEvent(event, rec, x, z)
   end
 end
 
-openExtractLoop = nil  -- forward: single EXTRACT opener (gadget-env; local budget)
-
--- One fail path: latch → publish → open EXTRACT. checkExtraction shares the
--- same openExtractLoop (idempotent) and banks partial on hold.
+-- One fail path: latch → publish. The player decides when to lift (manifest);
+-- there is no extract loop to open.
 function failRescueContract(rec, how)
   if rescueContractFailed then return false end
   if not rec or not rec.wasFieldRecruit or rec.recruited then return false end
@@ -4745,7 +4546,6 @@ function failRescueContract(rec, how)
   if SendToUnsynced then
     SendToUnsynced("VERDANCE_MISSION_EVENT", "objective_failed", rescueContractFailReason)
   end
-  openExtractLoop("recruit_lost")
   return true
 end
 
@@ -5350,7 +5150,9 @@ function beatTriggerMet(b, frame)
   elseif k == "objective_complete" then
     return objectiveComplete
   elseif k == "extraction_started" then
-    return extractionHoldFrames > 0
+    -- There is no extract loop any more: "extraction started" = the EXTRACT phase
+    -- opened (every objective done); the player ends the sortie via the manifest.
+    return extraObj.announced == true
   elseif k == "hero_down" then
     return heroInState(b.heroId, "down", "down_pending_wreck")
   elseif k == "hero_recovered" then
@@ -5481,9 +5283,6 @@ function vaMaybeAnnounceAllDone()
   Spring.SetGameRulesParam("va_all_objectives_done", 1, { public = true })
   Spring.Echo("VA_ALL_OBJECTIVES_DONE")
   if SendToUnsynced then SendToUnsynced("VERDANCE_MISSION_EVENT", "all_objectives_complete", "") end
-  -- Same snappy path as failRescueContract: open LZ immediately so marker /
-  -- mustLeave / armed match the bark (do not wait for next checkExtraction).
-  if openExtractLoop then openExtractLoop("rally") end
 end
 
 function vaCheckPurge(frame)
@@ -5503,11 +5302,12 @@ function onObjectiveComplete(how)
   if objectiveComplete then return end
   objectiveComplete = true
   objectiveCompleteHow = how or "complete"
+  objectiveCompleteFrame = Spring.GetGameFrame() or 0
   Spring.SetGameRulesParam("va_objective_complete", 1, { public = true })
   Spring.Echo("VA_OBJECTIVE_COMPLETE mission=" .. tostring(mission.missionId) .. " how=" .. objectiveCompleteHow)
   if SendToUnsynced then SendToUnsynced("VERDANCE_MISSION_EVENT", "objective_complete", objectiveCompleteHow) end
   -- Builder / fortify mission joins: Consul (etc.) sign on when the zone is secured.
-  if how == "zone_fortified" or FORTIFY_KINDS[objectiveKind()] then
+  if how == "zone_fortified" or VA_KINDS.fortify[objectiveKind()] then
     recruitAssistFortifyOnSecure()
   end
   -- Retrieve-stash: if the stash pilot was wrecked+rezzed already they joined via
@@ -5569,101 +5369,6 @@ function findEnemyCampTeam()
   return nil
 end
 
-function destroyEnemyInRect(rect, padding)
-  if not rect then return 0 end
-  padding = padding or 200
-  local x1, z1 = rect[1] - padding, rect[2] - padding
-  local x2, z2 = rect[3] + padding, rect[4] + padding
-  local killed = 0
-  local units = Spring.GetUnitsInRectangle(x1, z1, x2, z2) or {}
-  for i = 1, #units do
-    local uid = units[i]
-    if Spring.ValidUnitID(uid) and not Spring.GetUnitIsDead(uid) then
-      local team = Spring.GetUnitTeam(uid)
-      if team and team ~= playerTeamID and team ~= gaiaTeamID
-          and not Spring.AreTeamsAllied(playerTeamID, team) then
-        -- Do not wipe named player heroes (they are always player team).
-        Spring.DestroyUnit(uid, false, true)
-        killed = killed + 1
-        if objectiveTargets[uid] then
-          objectiveTargets[uid] = nil
-        end
-      end
-    end
-  end
-  return killed
-end
-
--- Real same-map continue camps (not 1 fus + 2 LLT mockups). Eco sprawl, beefy
--- static teeth, mobile infantry. Wheelies stay a player toy -- no armfav/scout cars.
-function continueCampBlueprint(kind)
-  local works = {}   -- objective-tagged structures
-  local guard = {}   -- non-objective teeth + infantry
-  if kind == "eco_raid" or kind == "economy_disrupt" then
-    works = {
-      { def = "armfus", dx = 0, dz = 0, count = 1 },
-      { def = "armsolar", dx = -180, dz = 40, count = 4, spacing = 70 },
-      { def = "armsolar", dx = 160, dz = -60, count = 4, spacing = 70 },
-      { def = "armsolar", dx = 40, dz = 180, count = 3, spacing = 70 },
-      { def = "armwin", dx = -80, dz = -160, count = 4, spacing = 80 },
-      { def = "armwin", dx = 200, dz = 120, count = 3, spacing = 80 },
-      { def = "armmakr", dx = -120, dz = 120, count = 4, spacing = 75 },
-      { def = "armmakr", dx = 130, dz = 40, count = 3, spacing = 75 },
-      { def = "armadvsol", dx = 0, dz = -100, count = 2, spacing = 90 },
-      { def = "armestor", dx = 90, dz = -40, count = 2, spacing = 80 },
-      { def = "armmstor", dx = -60, dz = 40, count = 2, spacing = 80 },
-    }
-    guard = {
-      { def = "armllt", dx = -200, dz = -140, count = 3, spacing = 120 },
-      { def = "armllt", dx = 200, dz = -140, count = 3, spacing = 120 },
-      { def = "armllt", dx = 0, dz = 220, count = 2, spacing = 120 },
-      { def = "armbeamer", dx = -160, dz = 40, count = 1 },
-      { def = "armbeamer", dx = 160, dz = 40, count = 1 },
-      { def = "armdrag", dx = -240, dz = -180, count = 8, spacing = 36 },
-      { def = "armdrag", dx = 240, dz = -180, count = 8, spacing = 36 },
-      { def = "armrad", dx = 0, dz = -60, count = 1 },
-      { def = "armrl", dx = -80, dz = 80, count = 1 },
-      { def = "armpw", dx = -60, dz = 100, count = 5, spacing = 70 },
-      { def = "armham", dx = 70, dz = 90, count = 3, spacing = 80 },
-      { def = "armwar", dx = 0, dz = 140, count = 2, spacing = 90 },
-    }
-  elseif kind == "strike_relay" or kind == "destroy_key_structure" then
-    works = {
-      { def = "armtarg", dx = 0, dz = 0, count = 1 },
-      { def = "armfus", dx = 120, dz = 40, count = 1 },
-      { def = "armarad", dx = -40, dz = -80, count = 1 },
-    }
-    guard = {
-      { def = "armllt", dx = -150, dz = -100, count = 3, spacing = 110 },
-      { def = "armllt", dx = 150, dz = -100, count = 3, spacing = 110 },
-      { def = "armbeamer", dx = 0, dz = 120, count = 2, spacing = 140 },
-      { def = "armdrag", dx = -200, dz = -160, count = 10, spacing = 36 },
-      { def = "armpw", dx = -40, dz = 60, count = 4, spacing = 70 },
-      { def = "armwar", dx = 50, dz = 80, count = 2, spacing = 90 },
-      { def = "armham", dx = 0, dz = -120, count = 2, spacing = 80 },
-    }
-  else
-    -- seize_lane / gate_control: holdable camp with real teeth, not empty grass.
-    works = {}
-    guard = {
-      { def = "armllt", dx = -140, dz = -100, count = 3, spacing = 110 },
-      { def = "armllt", dx = 140, dz = -100, count = 3, spacing = 110 },
-      { def = "armllt", dx = 0, dz = 160, count = 2, spacing = 110 },
-      { def = "armbeamer", dx = -80, dz = 40, count = 1 },
-      { def = "armbeamer", dx = 80, dz = 40, count = 1 },
-      { def = "armdrag", dx = -200, dz = -150, count = 8, spacing = 36 },
-      { def = "armdrag", dx = 200, dz = -150, count = 8, spacing = 36 },
-      { def = "armrad", dx = 0, dz = -40, count = 1 },
-      { def = "armpw", dx = -50, dz = 70, count = 6, spacing = 70 },
-      { def = "armham", dx = 60, dz = 70, count = 3, spacing = 80 },
-      { def = "armwar", dx = 0, dz = 120, count = 3, spacing = 90 },
-      { def = "armwin", dx = 100, dz = 20, count = 2, spacing = 70 },
-      { def = "armsolar", dx = -100, dz = 20, count = 2, spacing = 70 },
-    }
-  end
-  return works, guard
-end
-
 function isEcoStructureDef(ud)
   if not ud then return false end
   local n = string.lower(tostring(ud.name or ""))
@@ -5705,7 +5410,13 @@ function claimLivingShellObjectives()
     return 0
   end
   local kind = objectiveKind()
-  local captureMode = CAPTURE_KINDS[kind]
+  -- Survive kinds stand in the zone; they never book the shell as targets
+  -- (survive is a presence hold, not a raze). Nothing to claim.
+  if VA_KINDS.survive[kind] then
+    shellObjectivesClaimed = true
+    return 0
+  end
+  local captureMode = VA_KINDS.capture[kind]
     or (mission.objective and mission.objective.captureMode == "clear_hold_shell")
     or (mission.objective and mission.objective.captureMode == true)
   -- Drop 4 raze strength: the whole pocket (teeth included) joins the book
@@ -5874,176 +5585,6 @@ function claimOptionalHighValueSecondaries()
   return tagged
 end
 
--- Count taggable enemy occupation in a zone (same rules as promote) without mutating.
--- Used to filter spent stay rows before the UI offers them.
-function zoneHasPromotableOccupation(zoneId, kindHint, pocketId)
-  kindHint = kindHint or "eco_raid"
-  local rect = zoneRectFor(zoneId)
-  if not rect then return false end
-  local units = Spring.GetUnitsInRectangle(rect[1], rect[2], rect[3], rect[4]) or {}
-  for i = 1, #units do
-    local uid = units[i]
-    if Spring.ValidUnitID(uid) and not Spring.GetUnitIsDead(uid) then
-      local unitPocket = Spring.GetUnitRulesParam(uid, "va_shell_pocket")
-      local pocketMatches = not pocketId or pocketId == ""
-        or (unitPocket and tostring(unitPocket) == tostring(pocketId))
-      local team = Spring.GetUnitTeam(uid)
-      if pocketMatches and team and team ~= playerTeamID and team ~= gaiaTeamID
-          and not Spring.AreTeamsAllied(playerTeamID, team) then
-        local dID = Spring.GetUnitDefID(uid)
-        local ud = dID and UnitDefs[dID]
-        local eco = isEcoStructureDef(ud)
-        local building = ud and (ud.isBuilding or (ud.speed or 1) == 0)
-        if eco or (building and kindHint ~= "eco_raid") then
-          return true
-        end
-      end
-    end
-  end
-  return false
-end
-
--- Promote pre-placed occupation eco in a zone into the active raid objective.
--- Returns how many structures were re-tagged (0 = zone empty / needs spawn).
-function promoteOccupationInZone(zoneId, kindHint, pocketId)
-  kindHint = kindHint or "eco_raid"
-  local rect = zoneRectFor(zoneId)
-  if not rect then return 0 end
-  objectiveTargets = {}
-  objectiveTargetCount = 0
-  objectiveTargetsDestroyed = 0
-  targetForceStructures = {}
-  local forceId = "promote_" .. tostring(zoneId)
-  local teamID = findEnemyCampTeam()
-  local units = Spring.GetUnitsInRectangle(rect[1], rect[2], rect[3], rect[4]) or {}
-  local tagged = 0
-  for i = 1, #units do
-    local uid = units[i]
-    if Spring.ValidUnitID(uid) and not Spring.GetUnitIsDead(uid) then
-      local unitPocket = Spring.GetUnitRulesParam(uid, "va_shell_pocket")
-      local pocketMatches = not pocketId or pocketId == ""
-        or (unitPocket and tostring(unitPocket) == tostring(pocketId))
-      local team = Spring.GetUnitTeam(uid)
-      if pocketMatches and team and team ~= playerTeamID and team ~= gaiaTeamID
-          and not Spring.AreTeamsAllied(playerTeamID, team) then
-        local dID = Spring.GetUnitDefID(uid)
-        local ud = dID and UnitDefs[dID]
-        local eco = isEcoStructureDef(ud)
-        local building = ud and (ud.isBuilding or (ud.speed or 1) == 0)
-        -- Eco raids only credit energy economy. Other kinds can tag buildings.
-        if eco or (building and kindHint ~= "eco_raid") then
-          objectiveTargets[uid] = forceId
-          objectiveTargetCount = objectiveTargetCount + 1
-          targetForceStructures[forceId] = (targetForceStructures[forceId] or 0) + 1
-          tagged = tagged + 1
-          if teamID == nil then teamID = team end
-        end
-      end
-    end
-  end
-  if teamID then objectiveTeamID = teamID end
-  Spring.SetGameRulesParam("va_objective_total", objectiveTargetCount, { public = true })
-  Spring.SetGameRulesParam("va_objective_destroyed", 0, { public = true })
-  Spring.Echo("VA_PROMOTE_OCCUPATION zone=" .. tostring(zoneId)
-    .. " tagged=" .. tostring(tagged) .. " team=" .. tostring(teamID)
-    .. " kind=" .. tostring(kindHint) .. " pocket=" .. tostring(pocketId or ""))
-  return tagged
-end
-
-
-
-
-
-
--- Defend-install chapter state (one table — local budget).
-VA_DEFEND = {
-  armed = false,
-  pocketId = "",
-  zoneId = "",
-  assetUnitID = nil,
-  holdFrames = 0,
-  needFrames = 900, -- 30s hold after contact / or until wave clears
-  waveSpawned = false,
-  lost = false,
-}
-
-function armDefendInstall(cand, targetZone)
-  VA_DEFEND.armed = true
-  VA_DEFEND.pocketId = tostring(cand.pocketId or "")
-  VA_DEFEND.zoneId = tostring(targetZone or "")
-  VA_DEFEND.holdFrames = 0
-  VA_DEFEND.needFrames = 900
-  VA_DEFEND.waveSpawned = false
-  VA_DEFEND.lost = false
-  VA_DEFEND.assetUnitID = nil
-  local units = Spring.GetAllUnits() or {}
-  for i = 1, #units do
-    local uid = units[i]
-    if Spring.ValidUnitID(uid) and not Spring.GetUnitIsDead(uid) then
-      local hv = Spring.GetUnitRulesParam(uid, "va_high_value")
-      local pocket = tostring(Spring.GetUnitRulesParam(uid, "va_shell_pocket") or "")
-      if hv == 1 and (VA_DEFEND.pocketId == "" or pocket == VA_DEFEND.pocketId) then
-        VA_DEFEND.assetUnitID = uid
-        Spring.SetUnitRulesParam(uid, "va_defend_asset", 1, { public = true })
-        break
-      end
-    end
-  end
-  Spring.SetGameRulesParam("va_defend_armed", 1, { public = true })
-  Spring.SetGameRulesParam("va_defend_hold", 0, { public = true })
-  Spring.SetGameRulesParam("va_defend_need", VA_DEFEND.needFrames, { public = true })
-  Spring.Echo("VA_DEFEND_ARMED pocket=" .. VA_DEFEND.pocketId
-    .. " asset=" .. tostring(VA_DEFEND.assetUnitID))
-  -- Justified aggression: one counter-pack aimed at the vault.
-  if objectiveTeamID or findEnemyCampTeam() then
-    local tid = objectiveTeamID or findEnemyCampTeam()
-    local ax, az = nil, nil
-    if VA_DEFEND.assetUnitID then
-      ax, _, az = Spring.GetUnitPosition(VA_DEFEND.assetUnitID)
-    end
-    if ax and spawnWave then
-      spawnWave(tid, (waves and waves.baseSize or 4) + 3, ax, az, "defend_aggression")
-      VA_DEFEND.waveSpawned = true
-    end
-  end
-end
-
-function checkDefendInstall(frame)
-  if not VA_DEFEND.armed or terminal then return end
-  local uid = VA_DEFEND.assetUnitID
-  if not uid or not Spring.ValidUnitID(uid) or Spring.GetUnitIsDead(uid) then
-    VA_DEFEND.lost = true
-    VA_DEFEND.armed = false
-    Spring.SetGameRulesParam("va_defend_armed", 0, { public = true })
-    setTerminal("defeat", "defend_install_lost")
-    return
-  end
-  VA_DEFEND.holdFrames = VA_DEFEND.holdFrames + CHECK_PERIOD
-  Spring.SetGameRulesParam("va_defend_hold", VA_DEFEND.holdFrames, { public = true })
-  if VA_DEFEND.holdFrames >= VA_DEFEND.needFrames then
-    VA_DEFEND.armed = false
-    Spring.SetGameRulesParam("va_defend_armed", 0, { public = true })
-    onObjectiveComplete("defend_held")
-  end
-end
-
-
-
--- Eco starter chassis that must never open a stay-contract sitting on the
--- new enemy mark (Solarium nano, Hearth fusion, etc.).
-local CONTINUE_ECO_STARTER_DEFS = {
-  armnanotc = true, cornanotc = true, legnanotc = true,
-  armfus = true, corfus = true, legfus = true,
-}
-local CONTINUE_ECO_HERO_IDS = {
-  solarium = true, hearth = true, consul = true, twitch = true, lumen = true,
-}
-
-
-
-
-
-
 -- Heavy terminal work (quantum transition, result JSON, telemetry, GameOver).
 -- Extracted from setTerminal so the exfil path can paint a loading screen first.
 -- Pass five: the sortie ends once, with facts. No verdict here (Python reads the manifest),
@@ -6085,10 +5626,7 @@ end
 
 -- The exfil gadget calls this when the player confirms the manifest.
 function GG.VA_EndSortie(kind)
-  if kind == "extracted" then
-    extractLoop.completed = true
-    extractionClean = (tonumber(Spring.GetGameRulesParam("va_pad_enemy")) or 0) == 0
-  end
+  -- Clean vs contested extraction is Python's reading of manifest.enemyOnPad.
   setTerminal(kind, kind)
 end
 
@@ -6181,7 +5719,7 @@ end
 function checkFortifyObjective(frame)
   if objectiveComplete or not targetZoneRect then return end
   local kind = objectiveKind()
-  if not FORTIFY_KINDS[kind] then return end
+  if not VA_KINDS.fortify[kind] then return end
   local obj = mission and mission.objective or {}
   -- Territory secure = defensive value only (circle of dirt / Warder teeth).
   local needDef = tonumber(obj.fortifyDefensiveValue) or 800
@@ -6199,13 +5737,13 @@ end
 function checkPresenceObjective(frame)
   if objectiveComplete then return end
   local kind = objectiveKind()
-  if FORTIFY_KINDS[kind] then
+  if VA_KINDS.fortify[kind] then
     checkFortifyObjective(frame)
     return
   end
-  -- Presence kinds hold the target zone; destruction kinds with zero spawned
-  -- targets fall back to the same zone-hold rule so missions stay winnable.
-  local presenceMode = PRESENCE_KINDS[kind] or CAPTURE_KINDS[kind]
+  -- Capture and survive kinds hold the target zone; destruction kinds with zero
+  -- booked targets fall back to the same zone-hold rule so missions stay winnable.
+  local presenceMode = VA_KINDS.capture[kind] or VA_KINDS.survive[kind]
     or (objectiveTargetCount == 0 and targetZoneRect ~= nil)
   if not presenceMode or not targetZoneRect then return end
 
@@ -6273,6 +5811,7 @@ function checkPresenceObjective(frame)
       end
       if zoneHoldFrames >= required then
         capture.nodeClaimed = true
+        nodeClaimedFrame = frame
         capture.phase = "claimed"
         Spring.SetGameRulesParam("va_node_claimed", 1, { public = true })
         Spring.SetGameRulesParam("va_capture_phase", "claimed", { public = true })
@@ -6310,27 +5849,6 @@ function checkPresenceObjective(frame)
     onObjectiveComplete("zone_held")
   end
 end
-
--- Quantum bail: leaving the pad and doing *something* else (secondary marks,
--- field recruit, any raid damage) still moves φ forward. RTB then banks a hinge.
-function vaSideWorkCredit()
-  if objectiveTargetsDestroyed > 0 then return true, "raid_damage" end
-  if #(VA_FIELD_RECRUIT.recruited or {}) > 0 then return true, "field_recruit" end
-  if MarksLib.doneCount(marks) > 0 then return true, "secondary" end
-  if objectiveComplete then return true, "primary" end
-  return false, ""
-end
-
-
-
-
-
-openExtractLoop = function(reason)
-  -- Availability alone does not start a phase, timer, or departure screen.
-  extractLoop.opened = true
-  Spring.SetGameRulesParam("va_extract_open", 1, { public = true })
-end
-
 
 function checkPlayerWipe(frame)
   if frame < WIPE_GRACE_FRAMES then return end
@@ -6400,6 +5918,8 @@ end
     playerTeamID = function() return playerTeamID end,
     playerAllyTeamID = function() return playerAllyTeamID end,
     mission = function() return mission end,
+    -- single writer of the va_tenebrium_* rules params (see publishTenebriumRules)
+    publishRules = function() publishTenebriumRules() end,
   })
   if not pack.ok then
     Spring.Echo("VA_TENEBRIUM_HANDLERS_ATTACH_FAIL " .. tostring(pack.err))
@@ -6412,124 +5932,6 @@ end
   end
 end)()
 
-
--- Verification harness: scripted objective kills, hero kills, rez orders,
--- wreck destruction, and LZ teleports, all armed via va_test_* modoptions.
--- Lives outside GameFrame so its state costs GameFrame a single upvalue.
--- Gadget-env global (not local) — main-chunk local budget.
-function runTestHarness(frame)
-  -- Hydrology probe: sample ground and units, move the waterline, sample again.
-  -- Terraforming under a live battle is the one mechanic here whose engine-side
-  -- consequences are not documented anywhere, so the probe measures them.
-  if testHooks.hydroFrame and not testHooks.hydroDone and frame >= testHooks.hydroFrame then
-    testHooks.hydroDone = true
-    vaEchoHydroProbe("before", frame)
-    vaBeginWaterline(testHooks.hydroTo or 0.8, 12)
-  end
-  if testHooks.hydroProbe and frame >= testHooks.hydroProbe then
-    testHooks.hydroProbe = nil
-    vaEchoHydroProbe("after", frame)
-  end
-
-  if testHooks.killObjectiveFrame and not testHooks.killObjectiveDone and frame >= testHooks.killObjectiveFrame then
-    testHooks.killObjectiveDone = true
-    local ids = {}
-    for unitID in pairs(objectiveTargets) do ids[#ids + 1] = unitID end
-    for _, unitID in ipairs(ids) do Spring.DestroyUnit(unitID, false, false) end
-    Spring.Echo("VA_TEST_KILLOBJECTIVE destroyed=" .. tostring(#ids) .. " frame=" .. tostring(frame))
-  end
-  -- Drop 4: wreck every secondary mark so probes can watch the required-left
-  -- gate open (VA_SECONDARY_COMPLETE ... VA_ALL_OBJECTIVES_DONE).
-  if testHooks.killSecondaryFrame and not testHooks.killSecondaryDone and frame >= testHooks.killSecondaryFrame then
-    testHooks.killSecondaryDone = true
-    local ids = {}
-    MarksLib.eachTarget(marks, function(unitID)
-      ids[#ids + 1] = unitID
-    end)
-    for _, unitID in ipairs(ids) do Spring.DestroyUnit(unitID, false, false) end
-    Spring.Echo("VA_TEST_KILLSECONDARY destroyed=" .. tostring(#ids) .. " frame=" .. tostring(frame))
-  end
-  if testHooks.killHeroIdx <= #testHooks.killHeroFrames and frame >= testHooks.killHeroFrames[testHooks.killHeroIdx] then
-    testHooks.killHeroIdx = testHooks.killHeroIdx + 1
-    local ids = {}
-    for id, rec in pairs(heroes) do
-      if rec.state == "alive" and rec.unitID and Spring.ValidUnitID(rec.unitID) then ids[#ids + 1] = id end
-    end
-    table.sort(ids)
-    if ids[1] then
-      Spring.Echo("VA_TEST_KILLHERO id=" .. ids[1] .. " frame=" .. tostring(frame))
-      Spring.DestroyUnit(heroes[ids[1]].unitID, false, false)
-    end
-  end
-  if testHooks.rezWreckFrame and not testHooks.rezWreckDone and frame >= testHooks.rezWreckFrame then
-    testHooks.rezWreckDone = true
-    local featureID
-    for fid in pairs(heroByFeatureID) do featureID = fid end
-    if featureID and CMD and CMD.RESURRECT then
-      local units = Spring.GetTeamUnits(playerTeamID) or {}
-      for i = 1, #units do
-        local dID = Spring.GetUnitDefID(units[i])
-        local ud = dID and UnitDefs[dID]
-        if ud and ud.canResurrect then
-          Spring.GiveOrderToUnit(units[i], CMD.RESURRECT, { featureID + Game.maxUnits }, {})
-          Spring.Echo("VA_TEST_REZWRECK feature=" .. tostring(featureID) .. " rezbot=" .. tostring(units[i]))
-          break
-        end
-      end
-    end
-  end
-  if testHooks.destroyWreckFrame and not testHooks.destroyWreckDone and frame >= testHooks.destroyWreckFrame then
-    testHooks.destroyWreckDone = true
-    for fid in pairs(heroByFeatureID) do
-      Spring.Echo("VA_TEST_DESTROYWRECK feature=" .. tostring(fid))
-      Spring.DestroyFeature(fid)
-    end
-  end
-  if testHooks.techGateFrame and not testHooks.techGateDone and frame >= testHooks.techGateFrame then
-    testHooks.techGateDone = true
-    -- Tech-gate probe (Drop 3 Wave 1): spawn a con bot at the deploy beacon,
-    -- echo the gate's verdict for a def matrix (policy check), then issue a
-    -- real build order so the engine's AllowUnitCreation path produces a
-    -- genuine VA_TECH_GATE_DENY when the gate is armed.
-    local dx, dz = VA_padPoint()
-    dx, dz = dx or 512, dz or 512
-    local dy = Spring.GetGroundHeight(dx, dz) or 0
-    local builder = Spring.CreateUnit("legck", dx, dy, dz, 0, playerTeamID)
-    for _, defName in ipairs({ "legalab", "leglab", "legsolar", "legcen", "legshot" }) do
-      local ud = UnitDefNames[defName]
-      if ud then
-        local ok = vaTechGateAllows(ud.id, builder, playerTeamID)
-        Spring.Echo("VA_TEST_TECHGATE def=" .. defName .. " allowed=" .. tostring(ok and true or false))
-      end
-    end
-    if builder then
-      local advLab = UnitDefNames["legalab"]
-      if advLab then Spring.GiveOrderToUnit(builder, -advLab.id, { dx + 140, dy, dz + 140 }, {}) end
-      local solar = UnitDefNames["legsolar"]
-      if solar then Spring.GiveOrderToUnit(builder, -solar.id, { dx - 140, dy, dz - 140 }, { "shift" }) end
-    end
-    Spring.Echo("VA_TEST_TECHGATE_DONE builder=" .. tostring(builder) .. " frame=" .. tostring(frame))
-  end
-  if testHooks.teleportExtractFrame and not testHooks.teleportExtractDone and frame >= testHooks.teleportExtractFrame then
-    testHooks.teleportExtractDone = true
-    if extractionZoneRect and Spring.SetUnitPosition then
-      local ex = (extractionZoneRect[1] + extractionZoneRect[3]) * 0.5
-      local ez = (extractionZoneRect[2] + extractionZoneRect[4]) * 0.5
-      local moved = 0
-      local units = Spring.GetTeamUnits(playerTeamID) or {}
-      for i = 1, #units do
-        local dID = Spring.GetUnitDefID(units[i])
-        if dID and not isStructure(dID) then
-          local ox = ex + ((moved % 5) - 2) * 40
-          local oz = ez + math.floor(moved / 5) * 40
-          pcall(Spring.SetUnitPosition, units[i], ox, oz)
-          moved = moved + 1
-        end
-      end
-      Spring.Echo("VA_TEST_TELEPORT_EXTRACT moved=" .. tostring(moved) .. " frame=" .. tostring(frame))
-    end
-  end
-end
 
 function gadget:Initialize()
   Spring.Echo("VA_CAMPAIGN_BRIDGE_LOADED")
@@ -6685,22 +6087,10 @@ function gadget:Initialize()
       .. " absent from this match; using team " .. tostring(playerTeamID))
   end
   playerAllyTeamID = teamAllyTeam[playerTeamID] or 0
-  gaiaAllyTeamID = teamAllyTeam[gaiaTeamID] or -1
   debugAutoProgressAllowed = headless.fastWin or truthy(modOptions.va_debug_autoprogress)
-  testHooks.killObjectiveFrame = tonumber(modOptions.va_test_killobjective_frame or "")
-  testHooks.killSecondaryFrame = tonumber(modOptions.va_test_secondary_frame or "")
-  -- Accepts comma OR colon separators (colon survives ExtraModOptions strings).
-  for s in tostring(modOptions.va_test_killhero_frames or ""):gmatch("[^,:]+") do
-    local n = tonumber(s:match("^%s*(.-)%s*$"))
-    if n and n > 0 then testHooks.killHeroFrames[#testHooks.killHeroFrames + 1] = math.floor(n) end
-  end
-  table.sort(testHooks.killHeroFrames)
-  testHooks.rezWreckFrame = tonumber(modOptions.va_test_rezwreck_frame or "")
-  testHooks.destroyWreckFrame = tonumber(modOptions.va_test_destroywreck_frame or "")
-  testHooks.teleportExtractFrame = tonumber(modOptions.va_test_teleport_extract_frame or "")
-  testHooks.techGateFrame = tonumber(modOptions.va_test_techgate_frame or "")
-  testHooks.hydroFrame = tonumber(modOptions.va_test_hydro_frame or "")
-  testHooks.hydroTo = tonumber(modOptions.va_test_hydro_to or "")
+  -- The player's team is a fact other gadgets need (craft_xp, veterancy,
+  -- unit_behavior resolve it at GameStart); publish it once, clamped.
+  Spring.SetGameRulesParam("va_player_team", playerTeamID, { public = true })
   -- Headless spins forever building the unit-icon texture atlas at frame 30.
   -- The shell-bake and cartography gadgets both learned this the hard way and
   -- carry the same guard; every va_* probe runs through THIS gadget, so it
@@ -6715,8 +6105,8 @@ function gadget:Initialize()
   -- thing that would run. Without it, spring-headless builds the full widget set
   -- and icon atlas and never reaches frame 0. Absent in a real session, so the
   -- player keeps their UI.
-  local noUi = (headless.autoStart or balance.exportFrame or #fib.milestones > 0
-    or testHooks.hydroFrame) or truthy(modOptions.va_no_ui)
+  local noUi = (headless.autoStart or balance.exportFrame or #fib.milestones > 0)
+    or truthy(modOptions.va_no_ui)
   -- The third argument is useOverlay, and it is load-bearing, not a nicety. The
   -- engine documents it as "the value will only be set in memory, and not be
   -- restored for the next game" -- meaning WITHOUT it these three writes persist
@@ -6737,8 +6127,8 @@ function gadget:Initialize()
   -- up for their unattended batches; profiling runs come through this gadget and
   -- need the same. Guarded by the profiling condition, so a real session is
   -- untouched. va_headless_speed=0 opts out.
-  if (headless.autoStart or balance.exportFrame or #fib.milestones > 0
-      or testHooks.hydroFrame) and Spring.SendCommands then
+  if (headless.autoStart or balance.exportFrame or #fib.milestones > 0)
+      and Spring.SendCommands then
     local simSpeed = tonumber(modOptions.va_headless_speed or "") or 20
     if simSpeed > 0 then
       Spring.SendCommands("setmaxspeed " .. simSpeed)
@@ -7078,10 +6468,6 @@ function gadget:GameFrame(frame)
     headless.quitFrame = nil
   end
 
-  -- Verification harness (objective kill, hero kill/rez/wreck, LZ teleport):
-  -- one function call so GameFrame stays under Lua 5.1's 60-upvalue cap.
-  runTestHarness(frame)
-
   -- WO-043c: shard spawn + wreck-gone loss timeout.
   if frame % 5 == 0 then
     tenebLoot.tickPending(frame)
@@ -7157,7 +6543,6 @@ function gadget:GameFrame(frame)
   -- Objective automation checks (playable sessions)
   if status == "active" and not terminal and frame % CHECK_PERIOD == 0 then
     checkPresenceObjective(frame)
-    checkDefendInstall(frame)
     vaCheckPurge(frame)
     checkPlayerWipe(frame)
     checkHeroWreckTimeouts(frame)
@@ -7353,7 +6738,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
     Spring.Echo("VA_OBJECTIVE_TARGET_DOWN force=" .. forceId .. " destroyed=" .. tostring(objectiveTargetsDestroyed) .. "/" .. tostring(objectiveTargetCount))
     if not objectiveComplete and status == "active" and not terminal then
       local kind = objectiveKind()
-      if CHOICE_KINDS[kind] then
+      if VA_KINDS.choice[kind] then
         if (targetForceStructures[forceId] or 0) <= 0 then
           chosenTargetForceId = forceId
           onObjectiveComplete("target_destroyed")
@@ -7364,7 +6749,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
         if objectiveTargetsDestroyed >= need then
           onObjectiveComplete("works_crippled")
         end
-      elseif CAPTURE_KINDS[kind] or capture.mode then
+      elseif VA_KINDS.capture[kind] or capture.mode then
         -- Capture: destruction only clears the pocket; hold under regrow is required.
         -- Do not auto-complete on last structure kill.
         if capture.mode and capture.phase == "clear" then
@@ -7564,8 +6949,12 @@ function VA_LOGISTICS.armPendingDeliveries()
   VA_LOGISTICS.publishInboundHud()
 end
 
--- t=0 commerce bag (pawn-launcher packs, constructors, fabs) — mission.commerce.deploy.
+-- t=0 commerce bag (pawn-launcher packs, constructors, fabs, nanos) — mission.commerce.deploy.
 -- Deferred map-web packs stay on pendingDeliveries; this only loads what already paid at the hub.
+-- RULE (one owner): this is the ONLY spawner of the commerce deploy bag. The layout force
+-- in playableSetup carries preview copies of the same items (stamped commerceDeploy=true by
+-- scripts/build_next_mission_v1.ps1 Add-CommerceDeployToKit) and spawnPlayableSetup skips
+-- them via VA_CREW_isCommerceKitSpec. Spawning here AND there is the double-spawn bug.
 function VA_LOGISTICS.spawnCommerceDeployKit()
   if VA_LOGISTICS.deployKitSpawned then
     Spring.Echo("VA_COMMERCE_DEPLOY already_spawned")
@@ -7813,10 +7202,9 @@ end
 
 function gadget:TextCommand(command)
   if type(command) ~= "string" then return false end
-  -- Allow full-string commands with args (vacontinue 2, vatnb 8, vabrutecrash 4, vacrewconfirm …).
-  if command:match("^vacontinue") or command:match("^vatnb") or command:match("^vabrutecrash")
-      or command:match("^vacrewconfirm") or command:match("^vacrewauto")
-      or command:match("^vaexfil") or command:match("^vapack") then
+  -- Allow full-string commands with args (vatnb 8, vabrutecrash 4, vacrewconfirm …).
+  if command:match("^vatnb") or command:match("^vabrutecrash")
+      or command:match("^vacrewconfirm") or command:match("^vapack") then
     if command:match("^vacrewconfirm") then
       local rest = command:match("^vacrewconfirm[%s:]+(.+)$") or ""
       local picks = {}

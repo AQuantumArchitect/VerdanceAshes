@@ -39,8 +39,10 @@ import io
 import json
 import os
 import sys
+import time
 import urllib.parse
 import urllib.request
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional
 
@@ -151,6 +153,68 @@ def _download(url: str, dest: Path, expect_md5: str, expect_size: int,
     os.replace(part, dest)
 
 
+class ProgressFile:
+    """Writes {map, bytes, total, percent, state, error} to a small JSON file the hub can poll.
+
+    state is one of downloading | done | failed. Rewritten at most every `every` seconds
+    while bytes arrive (and always on a state change), atomically via os.replace so a
+    reader never sees a half-written file.
+    """
+
+    def __init__(self, path: Path, map_name: str, every: float = 2.0) -> None:
+        self.path = Path(path)
+        self.map_name = map_name
+        self.every = every
+        self._last = 0.0
+        self._bytes = 0
+        self._total = 0
+
+    def _write(self, state: str, error: Optional[str] = None) -> None:
+        pct = int(self._bytes * 100 / self._total) if self._total else (100 if state == "done" else 0)
+        rec = {"schemaVersion": "verdance-provision/1.0", "map": self.map_name, "bytes": self._bytes,
+               "total": self._total, "percent": max(0, min(100, pct)), "state": state, "error": error,
+               "at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}
+        try:
+            self.path.parent.mkdir(parents=True, exist_ok=True)
+            tmp = self.path.with_suffix(self.path.suffix + ".tmp")
+            tmp.write_text(json.dumps(rec), encoding="utf-8")
+            os.replace(tmp, self.path)
+        except OSError:
+            pass
+        self._last = time.monotonic()
+
+    def start(self, total: int = 0) -> None:
+        self._bytes, self._total = 0, int(total or 0)
+        self._write("downloading")
+
+    def progress(self, done: int, total: int) -> None:
+        self._bytes, self._total = int(done), int(total or self._total)
+        if time.monotonic() - self._last >= self.every or (self._total and done >= self._total):
+            self._write("downloading")
+
+    def done(self, total: int = 0) -> None:
+        if total:
+            self._bytes = self._total = int(total)
+        elif self._total:
+            self._bytes = self._total
+        self._write("done")
+
+    def failed(self, error: str) -> None:
+        self._write("failed", error=str(error))
+
+
+def _chain_progress(*callbacks: Optional[Callable[[int, int], None]]) -> Optional[Callable[[int, int], None]]:
+    live = [cb for cb in callbacks if cb]
+    if not live:
+        return None
+
+    def report(done: int, total: int) -> None:
+        for cb in live:
+            cb(done, total)
+
+    return report
+
+
 def _default_progress(name: str) -> Callable[[int, int], None]:
     state = {"pct": -1}
 
@@ -179,7 +243,7 @@ def archive_for(workspace: Optional[Path], map_name: str) -> Optional[str]:
 
 def ensure(map_name: str, bar_root: Path, workspace: Optional[Path] = None,
            dry_run: bool = False, verify: bool = False,
-           quiet: bool = False) -> Dict[str, Any]:
+           quiet: bool = False, progress: Optional[ProgressFile] = None) -> Dict[str, Any]:
     """Guarantee <bar_root>/maps/<archive> exists. Returns a status dict.
 
     Disk is checked BEFORE the network, which matters more than it looks. This
@@ -196,9 +260,18 @@ def ensure(map_name: str, bar_root: Path, workspace: Optional[Path] = None,
 
     known = archive_for(workspace, map_name)
     if known and (maps_dir / known).exists() and not verify:
+        if progress:
+            progress.done()
         return {"map": map_name, "status": "present", "path": str(maps_dir / known)}
 
-    entry = resolve(map_name)
+    if progress:
+        progress.start()
+    try:
+        entry = resolve(map_name)
+    except MapProvisionError as exc:
+        if progress:
+            progress.failed(str(exc))
+        raise
     filename = str(entry["filename"])
     dest = maps_dir / filename
     size = int(entry.get("size") or 0)
@@ -211,23 +284,41 @@ def ensure(map_name: str, bar_root: Path, workspace: Optional[Path] = None,
         # only unverified files here are BAR's own. --verify forces the check.
         local = dest.stat().st_size
         if local == size and not verify:
+            if progress:
+                progress.done(size)
             return {"map": map_name, "status": "present", "path": str(dest)}
         if verify and md5 and _md5(dest) == md5:
+            if progress:
+                progress.done(size)
             return {"map": map_name, "status": "verified", "path": str(dest)}
         if local == size and verify:
+            if progress:
+                progress.failed("right size, wrong checksum")
             return {"map": map_name, "status": "corrupt", "path": str(dest)}
         if not quiet:
             print(f"    {filename} is the wrong size ({local} vs {size}); refetching.")
 
     if dry_run:
+        if progress:
+            progress.done()
         return {"map": map_name, "status": "would-download",
                 "path": str(dest), "sizeMB": round(size / 1048576, 1)}
 
     maps_dir.mkdir(parents=True, exist_ok=True)
     if not quiet:
         print(f"  Downloading {map_name} ({size / 1048576:.0f} MB) from BAR's map service...")
-    _download(entry["mirrors"][0], dest, md5, size,
-              None if quiet else _default_progress(filename))
+    if progress:
+        progress.start(size)
+    try:
+        _download(entry["mirrors"][0], dest, md5, size,
+                  _chain_progress(None if quiet else _default_progress(filename),
+                                  progress.progress if progress else None))
+    except MapProvisionError as exc:
+        if progress:
+            progress.failed(str(exc))
+        raise
+    if progress:
+        progress.done(size)
     return {"map": map_name, "status": "downloaded", "path": str(dest)}
 
 
@@ -241,6 +332,9 @@ def main() -> int:
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--verify", action="store_true", help="md5 files already present")
     ap.add_argument("--quiet", action="store_true")
+    ap.add_argument("--progress-json", default="",
+                    help="write {map, bytes, total, percent, state, error} here at least every 2 s "
+                         "(the kernel passes outbox/provision.latest.json so the hub can poll it)")
     args = ap.parse_args()
 
     ws = workspace_root(args.workspace)
@@ -267,17 +361,24 @@ def main() -> int:
 
     rc = 0
     for name in wanted:
+        progress = ProgressFile(Path(args.progress_json), name) if args.progress_json else None
         try:
             res = ensure(name, bar_root, workspace=ws, dry_run=args.dry_run,
-                         verify=args.verify, quiet=args.quiet)
+                         verify=args.verify, quiet=args.quiet, progress=progress)
             if not args.quiet or res["status"] not in ("present", "verified"):
                 print(f"  {res['status']:<16} {name}")
             if res["status"] == "corrupt":
                 print(f"    ^ right size, wrong checksum: {res['path']}")
                 rc = 1
         except MapProvisionError as exc:
+            if progress:
+                progress.failed(str(exc))
             print(f"  FAILED           {name}: {exc}")
             rc = 1
+        except Exception as exc:  # noqa: BLE001 - the status file must still say failed
+            if progress:
+                progress.failed(f"{type(exc).__name__}: {exc}")
+            raise
     return rc
 
 

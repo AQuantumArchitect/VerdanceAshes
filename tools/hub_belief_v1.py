@@ -112,6 +112,54 @@ def belief_surface(ws: Path, state: Dict[str, Any], map_id: Optional[str] = None
     return out
 
 
+def believed_holder(row: Optional[Dict[str, Any]]) -> str:
+    """One word for who the company believes holds a zone, from a belief_surface row.
+
+    "ashwalkers" (ours) | <faction> (held, when we saw who) | "held" (held, by whom unknown)
+    | "empty" | "unknown" (dark / unsure / no row). Never a truth read.
+    """
+    if not row:
+        return "unknown"
+    bel = str(row.get("believed") or "dark")
+    if bel == "ours":
+        return "ashwalkers"
+    if bel == "held":
+        return str(row.get("faction") or "held").lower()
+    if bel == "empty":
+        return "empty"
+    return "unknown"
+
+
+def _own_ledger_zones(state: Dict[str, Any]) -> set:
+    """Zones the company itself claimed or built on: company knowledge (a stale 'ours'), not truth."""
+    out: set = set()
+    # claimedNodes: {mapId: {zoneId: rec}}   nodeClaims: {mapId: [rec{zoneId}]}
+    for mid, zones in (state.get("claimedNodes") or {}).items():
+        if isinstance(zones, dict):
+            out.update(str(z) for z, rec in zones.items() if isinstance(rec, dict))
+    for mid, items in (state.get("nodeClaims") or {}).items():
+        if isinstance(items, list):
+            out.update(str(r.get("zoneId")) for r in items if isinstance(r, dict) and r.get("zoneId"))
+    for m, units in (state.get("playerFootprints") or {}).items():
+        for u in units or []:
+            if isinstance(u, dict) and u.get("zoneId"):
+                out.add(str(u["zoneId"]))
+    return out
+
+
+def believed_ours(ws: Path, state: Dict[str, Any]) -> set:
+    """Zone ids the company believes it holds: the belief frame first, then its own claim ledger
+    when no frame has been written yet (a fresh campaign has looked at nothing)."""
+    try:
+        surf = belief_surface(ws, state, None)
+    except Exception:
+        surf = {"zones": {}, "source": "none"}
+    ours = {zid for zid, r in (surf.get("zones") or {}).items() if r.get("believed") == "ours"}
+    if surf.get("source") == "none":
+        ours |= _own_ledger_zones(state)
+    return ours
+
+
 def camp_surface(state: Dict[str, Any]) -> Dict[str, Any]:
     camp = state.get("camp") or {}
     names = {hid: (ch.get("name") or hid) for hid, ch in (state.get("characters") or {}).items() if isinstance(ch, dict)}

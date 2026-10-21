@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(git -C \"C:\\\\Users\\\\Luke Spooner\\\\Documents\\\\BAR_Verdance_Workspace\" log --oneline -15)",
-      "Bash(python -c ' *)"
-    ]
-  }
-}

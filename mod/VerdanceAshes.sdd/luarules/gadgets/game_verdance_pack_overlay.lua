@@ -131,12 +131,6 @@ GG.VA_PackOverlayStamp = function(unitID, packId, role)
   Pack.stampMember(unitID, packId, role or "mate")
 end
 
--- Pack leg only (legacy name kept for call sites).
-GG.VA_PackApplySpeed = function(unitID, speedMult)
-  if not Pack or not unitID then return false end
-  return Pack.applySpeedMult(unitID, speedMult)
-end
-
 -- Mid-Drop A/B: /vapack off|on|drag off|drag on|status
 GG.VA_PackSet = function(opts)
   opts = opts or {}
@@ -168,10 +162,6 @@ end
 GG.VA_MobilitySetVet = function(unitID, speedMult, move)
   if not Mobility or not unitID then return false end
   return Mobility.setVetMult(unitID, speedMult, move)
-end
-GG.VA_MobilitySetPack = function(unitID, speedMult)
-  if not Mobility or not unitID then return false end
-  return Mobility.setPackMult(unitID, speedMult)
 end
 
 local function parseOnOff(tok)

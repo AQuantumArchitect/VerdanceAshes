@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Drop-as-collapse helpers — format M(G, result) for hub / stamp / debrief.
 
-Law: docs/GRAPH_COLLAPSE_SSOT.md
+Law: docs/archive/GRAPH_COLLAPSE_SSOT.md
 Live mutators: verdance_story_engine_v1.apply_graph_deltas + measure_graph_from_world
 """
 from __future__ import annotations

@@ -1,16 +1,18 @@
 // Camp tab: the interstitial layer (passes two..four). Self-contained: reads the DERIVE faces the
-// kernel serves (/api/camp, /api/intel, /api/chronicle, /api/divergence) and runs the clock through
+// kernel serves (/api/camp, /api/intel, /api/chronicle, /api/exposure) and runs the clock through
 // POST /api/camp-act. Nothing here touches campaign.js state; the hub re-pulls after an action.
 //
 // Law: the hub shows INTEL, never truth. Zone rows come from the company's own belief frame
-// (value/confidence/age/source). "dark" means nobody has looked.
+// (value/confidence/age/source). "dark" means nobody has looked. /api/exposure is our side of the
+// mirror only (which of OUR believed holdings they have eyes on); /api/divergence and /api/truth
+// are dev faces the kernel refuses to the player.
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]);
 const api = (p) => (window.Verdance && typeof window.Verdance.api === "function") ? window.Verdance.api(p) : p;
 const notify = (m, k) => { try { window.Verdance && window.Verdance.notify && window.Verdance.notify(m, k); } catch (_) {} };
 
-const S = { camp: null, intel: null, chronicle: null, divergence: null, busy: false, mapFilter: null, heroPick: null, zonePick: null };
+const S = { camp: null, intel: null, chronicle: null, exposure: null, busy: false, mapFilter: null, heroPick: null, zonePick: null };
 
 async function getJson(path) {
   const r = await fetch(api(path), { cache: "no-store" });
@@ -19,13 +21,13 @@ async function getJson(path) {
 }
 
 export async function refreshCamp() {
-  const [camp, intel, chron, div] = await Promise.allSettled([
-    getJson("/api/camp"), getJson("/api/intel"), getJson("/api/chronicle"), getJson("/api/divergence"),
+  const [camp, intel, chron, exp] = await Promise.allSettled([
+    getJson("/api/camp"), getJson("/api/intel"), getJson("/api/chronicle"), getJson("/api/exposure"),
   ]);
   S.camp = camp.status === "fulfilled" && camp.value.ok ? camp.value.camp : null;
   S.intel = intel.status === "fulfilled" && intel.value.ok ? intel.value.face : null;
   S.chronicle = chron.status === "fulfilled" && chron.value.ok ? chron.value.face : null;
-  S.divergence = div.status === "fulfilled" && div.value.ok ? div.value : null;
+  S.exposure = exp.status === "fulfilled" && exp.value.ok && exp.value.present ? exp.value : null;
   render();
 }
 
@@ -87,9 +89,8 @@ function render() {
   const heroes = (Array.isArray(camp.people) ? camp.people : Object.entries(camp.people || {}).map(([heroId, rec]) => ({ heroId, ...(rec || {}) }))).map(h => ({ ...h, hid: h.heroId || h.hid }));
   const atCamp = heroes.filter(h => (h.where || "camp") === "camp" && h.status !== "dead" && h.inCompany !== false);
   const away = heroes.filter(h => h.where === "posted" || h.where === "transit" || (h.where === "field" && h.status !== "dead"));
-  const div = S.divergence && S.divergence.face;
-  const pend = S.divergence && S.divergence.pending;
-  const crossed = div && div.crossed && div.crossed.armada && div.crossed.armada.aboutCompany;
+  const pend = S.exposure && S.exposure.pending;
+  const crossed = S.exposure && S.exposure.factions && S.exposure.factions.armada;
   const surprise = (S.intel && S.intel.surprise) || null;
   const pauses = (camp.pauses || []).slice(-6).reverse();
 
@@ -148,7 +149,7 @@ function render() {
         <td class="muted">${esc(stateWord(o) === "dark" ? "never" : (o.age_min != null ? clock(o.age_min) + " ago" : stateWord(o)))}${o.source ? " · " + esc(String(o.source).split(":")[0]) : ""}</td></tr>`; }).join("")}
     </tbody></table>
 
-    ${crossed ? `<h3>What they know of us</h3><p class="camp-note">Armada has eyes on ${esc(crossed.known.length)} of our ${esc(crossed.ofOurs)} holdings, suspects ${esc(crossed.suspected.length)}, is blind to ${esc(crossed.blind.length)}.${pend && pend.queued ? " <em>(their picture is still catching up)</em>" : ""}</p>` : ""}
+    ${crossed ? `<h3>What they know of us</h3><p class="camp-note">Armada has eyes on ${esc((crossed.known || []).length)} of the ${esc(crossed.ofOurs)} zones we believe are ours, suspects ${esc((crossed.suspected || []).length)}, is blind to ${esc((crossed.blind || []).length)}.${pend && pend.queued ? " <em>(their picture is still catching up)</em>" : ""}</p>` : ""}
 
     ${S.chronicle && !$("panel-camp-chronicle") ? `<h3>The chronicle</h3><div class="camp-chronicle">${renderChronicle(S.chronicle)}</div>` : ""}
   `;
@@ -208,44 +209,25 @@ async function act(action, btn) {
 
 function mount() {
   // Command console (console/workspaces.js): the camp lives in the "home" workspace, the dance
-  // chronicle under "chronicle". Legacy tabs layout: a fourth right-column tab. Either way the
-  // panel element is #panel-camp and render() owns its contents.
+  // chronicle under "chronicle". The panel element is #panel-camp and render() owns its contents.
   const home = $("workspace-home");
+  if (!home) return;
   const panel = document.createElement("div");
   panel.id = "panel-camp";
-  if (home) {
-    panel.className = "camp-panel";
-    home.appendChild(panel);
-    const chron = $("workspace-chronicle");
-    if (chron) {
-      const d = document.createElement("div");
-      d.id = "panel-camp-chronicle"; d.className = "camp-panel";
-      chron.appendChild(d);
-    }
-    document.addEventListener("click", (e) => {
-      const b = e.target.closest && e.target.closest("[data-workspace]");
-      if (b && (b.dataset.workspace === "home" || b.dataset.workspace === "chronicle")) setTimeout(refreshCamp, 0);
-    }, true);
-    const camp = $("camp-chip");
-    if (camp) camp.addEventListener("click", () => setTimeout(refreshCamp, 0));
-  } else {
-    const tabs = document.querySelector(".tabs");
-    const right = $("col-right");
-    if (!tabs || !right || $("tab-camp")) return;
-    const btn = document.createElement("button");
-    btn.type = "button"; btn.className = "tab"; btn.dataset.tab = "camp"; btn.id = "tab-camp"; btn.textContent = "Camp";
-    tabs.appendChild(btn);
-    panel.hidden = true;
-    right.appendChild(panel);
-    const all = () => document.querySelectorAll(".tab");
-    btn.addEventListener("click", () => {
-      all().forEach(t => t.classList.toggle("active", t === btn));
-      ["shop", "theaters", "manifold"].forEach(n => { const p = $("panel-" + n); if (p) p.hidden = true; });
-      panel.hidden = false;
-      refreshCamp();
-    });
-    all().forEach(t => { if (t !== btn) t.addEventListener("click", () => { panel.hidden = true; }); });
+  panel.className = "camp-panel";
+  home.appendChild(panel);
+  const chron = $("workspace-chronicle");
+  if (chron) {
+    const d = document.createElement("div");
+    d.id = "panel-camp-chronicle"; d.className = "camp-panel";
+    chron.appendChild(d);
   }
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest && e.target.closest("[data-workspace]");
+    if (b && (b.dataset.workspace === "home" || b.dataset.workspace === "chronicle")) setTimeout(refreshCamp, 0);
+  }, true);
+  const camp = $("camp-chip");
+  if (camp) camp.addEventListener("click", () => setTimeout(refreshCamp, 0));
   const css = document.createElement("style");
   css.textContent = `
     .camp-panel{margin-top:.9rem}

@@ -17,6 +17,17 @@ if gadgetHandler:IsSyncedCode() then
   return
 end
 
+-- Operator-only: never runs in a player session. Arm it with the modoption
+-- va_capability_probe=1 (it writes a probe file under LuaUI/Config).
+local function truthy(v)
+  if v == true or v == 1 then return true end
+  if type(v) == "string" then
+    v = v:lower()
+    return v == "1" or v == "true" or v == "yes" or v == "on"
+  end
+  return false
+end
+
 local probed = false
 
 local function probe()
@@ -74,6 +85,13 @@ local function probe()
     .. "}")
   -- Do NOT call Spring.Reload here — log capability only (Mode B gated).
   Spring.Echo("VA_PROBE_DONE")
+end
+
+function gadget:Initialize()
+  local mo = Spring.GetModOptions and Spring.GetModOptions() or {}
+  if not truthy(mo.va_capability_probe) then
+    gadgetHandler:RemoveGadget(self)
+  end
 end
 
 function gadget:GameFrame(frame)
