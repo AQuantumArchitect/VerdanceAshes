@@ -101,7 +101,7 @@ function widget:Update()
     lastRoleKey = key
     board:refreshRoles()
   end
-  local tick = tonumber(Spring.GetGameRulesParam("va_obs_tick")) or -1
+  local tick = tonumber((Spring.GetGameRulesParam("va_obs_tick"))) or -1
   if tick ~= lastTick then
     lastTick = tick
     checkSurprises()
@@ -163,7 +163,7 @@ local function groundY(x, z) return (Spring.GetGroundHeight(x, z) or 0) end
 
 function widget:DrawWorld()
   if not board or Spring.IsGUIHidden() then return end
-  if (tonumber(Spring.GetGameRulesParam("va_terminal")) or 0) == 1 then return end
+  if (tonumber((Spring.GetGameRulesParam("va_terminal"))) or 0) == 1 then return end
   local px, pz, pr = board:pad()
   if not px then return end
   local steam = Ash.COL.steam
@@ -179,7 +179,7 @@ function widget:DrawWorld()
       gl.Vertex(x, groundY(x, z) + 10, z)
     end
   end)
-  local hostile = (tonumber(Spring.GetGameRulesParam("va_pad_enemy_live")) or 0) > 0
+  local hostile = (tonumber((Spring.GetGameRulesParam("va_pad_enemy_live"))) or 0) > 0
   local inner = math.max(60, pr - 40)
   local ic = hostile and Ash.COL.warn or steam
   local ia = hostile and (0.55 + 0.4 * math.abs(math.sin(os.clock() * 4))) or 0.3

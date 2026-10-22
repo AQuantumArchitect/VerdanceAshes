@@ -39,7 +39,7 @@ local function readLua(path)
   return nil
 end
 
-local function num(name, default) return tonumber(Spring.GetGameRulesParam(name)) or default end
+local function num(name, default) return tonumber((Spring.GetGameRulesParam(name))) or default end
 
 local function paused()
   if Spring.IsGamePaused then return Spring.IsGamePaused() == true end

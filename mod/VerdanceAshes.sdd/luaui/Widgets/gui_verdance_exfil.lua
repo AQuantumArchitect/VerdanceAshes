@@ -46,7 +46,7 @@ end
 
 local function setModal(on) if WG then WG.vaExfilModal = on and true or false end end
 local function setPaused(on) pcall(Spring.SendCommands, on and "pause 1" or "pause 0") end
-local function num(name, default) return tonumber(Spring.GetGameRulesParam(name)) or default end
+local function num(name, default) return tonumber((Spring.GetGameRulesParam(name))) or default end
 
 local function sortedKeys(t)
   local ks = {}

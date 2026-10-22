@@ -276,7 +276,7 @@ local function manifest()
     m.seen = GG.VA_ObservedZonesTable() or {}
   end
   m.tenebrium = (GG and GG.VA_TenebriumBank) and GG.VA_TenebriumBank() or nil
-  m.objectiveComplete = (tonumber(Spring.GetGameRulesParam("va_objective_complete")) or 0) == 1
+  m.objectiveComplete = (tonumber((Spring.GetGameRulesParam("va_objective_complete"))) or 0) == 1
   return m
 end
 
@@ -314,8 +314,8 @@ local function hudScan()
         heroes[#heroes + 1] = {
           id = tostring(hid), name = tostring(Spring.GetUnitRulesParam(uid, "va_hero_name") or hid), unit = uid,
           hp = (hp and maxHp and maxHp > 0) and (hp / maxHp) or 1, x = math.floor(x or 0), z = math.floor(z or 0),
-          onPad = onPad, zone = zoneOf(x, z) or "", crit = (tonumber(Spring.GetUnitRulesParam(uid, "va_hero_critical")) or 0) == 1,
-          level = tonumber(Spring.GetUnitRulesParam(uid, "va_hero_level")) or 1, rank = tostring(Spring.GetUnitRulesParam(uid, "va_hero_rank") or ""),
+          onPad = onPad, zone = zoneOf(x, z) or "", crit = (tonumber((Spring.GetUnitRulesParam(uid, "va_hero_critical"))) or 0) == 1,
+          level = tonumber((Spring.GetUnitRulesParam(uid, "va_hero_level"))) or 1, rank = tostring(Spring.GetUnitRulesParam(uid, "va_hero_rank") or ""),
           vet = tostring(Spring.GetUnitRulesParam(uid, "va_vet_rank") or ""), state = "alive",
           dist = math.floor(math.sqrt(dx * dx + dz * dz)),
         }

@@ -117,7 +117,8 @@ _G.PAUSED = false
 _G.FRAME = 0
 _G.SENT = {}
 _G.Spring = {
-  GetGameRulesParam = function(n) return RULES[n] end,
+  -- Like the engine: an unset rules param returns NO values (not nil), so tonumber(f()) throws.
+  GetGameRulesParam = function(n) local v = RULES[n]; if v == nil then return end; return v end,
   GetViewGeometry = function() return 1920, 1080 end,
   Echo = function(...) local t = {...}; for i = 1, #t do t[i] = tostring(t[i]) end; print("  [echo] " .. table.concat(t, " ")) end,
   GetGameFrame = function() return FRAME end, GetGameSeconds = function() return FRAME / 30 end,
@@ -125,11 +126,11 @@ _G.Spring = {
   SendCommands = function(c) if c == "pause 1" then PAUSED = true elseif c == "pause 0" then PAUSED = false end; SENT[#SENT+1] = c end,
   SendLuaRulesMsg = function(m) SENT[#SENT+1] = m end,
   GetGroundHeight = function() return 10 end, MarkerAddLine = function(...) SENT[#SENT+1] = "line" end, MarkerAddPoint = function() error("no pings allowed") end,
-  PlaySoundFile = function() return true end, GetUnitRulesParam = function() return nil end, GetUnitDefID = function() return nil end,
+  PlaySoundFile = function() return true end, GetUnitRulesParam = function() return end, GetUnitDefID = function() return nil end,
   ValidUnitID = function(u) return u == 101 or u == 102 end, SelectUnitArray = function(t) SENT[#SENT+1] = "select " .. tostring(t[1]) end,
   SetCameraTarget = function(x, y, z) SENT[#SENT+1] = "cam " .. tostring(x) end, WorldToScreenCoords = function(x, y, z) return 100, 100, 0.5 end,
   GetMyTeamID = function() return 0 end, GetTeamUnits = function() return {} end, GetAllFeatures = function() return {} end,
-  GetUnitPosition = function() return 0, 0, 0 end, IsUnitVisible = function() return true end, GetFeatureRulesParam = function() return nil end,
+  GetUnitPosition = function() return 0, 0, 0 end, IsUnitVisible = function() return true end, GetFeatureRulesParam = function() return end,
   ValidFeatureID = function() return false end, GetFeaturePosition = function() return 0, 0, 0 end,
 }
 _G.UnitDefs = {}
@@ -167,6 +168,18 @@ local function step(label, fn)
   if not ok then FAILED = true end
 end
 local mm, sb, inf, ex, vo, ht = W_gui_verdance_minimap, W_gui_verdance_sidebar, W_gui_verdance_infil, W_gui_verdance_exfil, W_gui_verdance_voice, W_gui_verdance_hero_tags
+step("pre-game: nothing published yet", function()
+  local saved = RULES; RULES = {}
+  for _, w in ipairs({ mm, sb, inf, ex, vo, ht }) do
+    if w.Update then w:Update() end
+    if w.GameFrame then w:GameFrame(0) end
+    if w.DrawScreen then w:DrawScreen() end
+    if w.DrawWorld then w:DrawWorld() end
+    if w.DrawInMiniMap then w:DrawInMiniMap(300, 300) end
+    if w.DrawScreenEffects then w:DrawScreenEffects() end
+  end
+  RULES = saved
+end)
 step("board shared", function() assert(WG.vaBoard and #WG.vaBoard.zones > 5, "zones " .. tostring(WG.vaBoard and #WG.vaBoard.zones)) end)
 step("board roles", function() local b = WG.vaBoard; assert(b.padId == "TRJ_SW_LANE", b.padId); assert(b.objectiveId, "obj"); local px = b:pad(); assert(px == 1578, tostring(px)) end)
 step("believed", function() local s, c, f = WG.vaBoard:believed("TRJ_NW_MUSTER"); assert(s == "held" and f == "armada", s .. " " .. tostring(f)) end)
