@@ -542,6 +542,32 @@ class CampaignKernel:
                                              "updatedAt": last.get("at") or w.get("startedAt"), "startedAt": w.get("startedAt"),
                                              "applied": w.get("applied"), "last": last}}
 
+    def live(self) -> dict[str, Any]:
+        """The match as the company sees it right now: the minimap widget's live report
+        (LuaUI/Config/verdance/live.json). Only for the mission the hub dropped, and only while
+        fresh; it never touches belief, which moves at homecoming."""
+        from verdance_kernel.sortie import find_bar_data_root
+        root = find_bar_data_root(self.ws)
+        path = Path(root) / "LuaUI" / "Config" / "verdance" / "live.json" if root else None
+        if not path or not path.is_file():
+            return {"live": False}
+        age = datetime.now().timestamp() - path.stat().st_mtime
+        if age > 20:
+            return {"live": False, "ageSec": round(age)}
+        data = None
+        for _ in range(3):  # BAR writes in place; a torn read just tries again
+            try:
+                data = json.loads(path.read_text(encoding="utf-8"))
+                break
+            except (ValueError, OSError):
+                threading.Event().wait(0.05)
+        if not isinstance(data, dict) or data.get("schema") != "verdance-live/1":
+            return {"live": False}
+        intent = load_json(self.ws / "outbox" / "next_mission_intent.json", {}) or {}
+        if intent.get("missionId") and data.get("missionId") and str(data["missionId"]) != str(intent["missionId"]):
+            return {"live": False, "reason": "another mission"}
+        return dict(data, live=True, ageSec=round(age, 1))
+
     # ── ops ──────────────────────────────────────────────────
 
     def rebuild_hub(self, *, skip_apply: bool = False) -> dict[str, Any]:

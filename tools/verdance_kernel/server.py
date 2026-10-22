@@ -101,6 +101,10 @@ def make_handler(kernel: CampaignKernel, showoff: Path):
                 code, body, ct = _json_bytes(kernel.session_status())
                 return self._send(code, body, ct)
 
+            if path == "/api/live":
+                code, body, ct = _json_bytes(kernel.live())
+                return self._send(code, body, ct)
+
             if path == "/api/hub-state":
                 code, body, ct = _json_bytes(kernel.get_hub_surface())
                 return self._send(code, body, ct)

@@ -83,7 +83,7 @@ states_json = json.dumps({"vane": {"name": "Vane", "state": "alive", "missionCri
 
 prelude = r'''
 local FILES = FX_JSON
-local json_decode
+json_decode = nil
 do
   -- reuse our own decoder for the fixture map
   local chunk = loadfile(FX_JSON_LUA)
@@ -165,6 +165,7 @@ def main():
         path = os.path.join(WIDGETS, w + '.lua')
         run(st, f"W_{w} = LOADW({json.dumps(path)}, {json.dumps(w)}); if W_{w}.Initialize then W_{w}:Initialize() end; print('init ok {w}')", w)
     import glob
+    run(st, "LIVE_OUT = " + json.dumps(os.path.join(HERE, "fx", "live.json")), "live")
     run(st, "WIDGET_PATHS = " + "{" + ",".join(json.dumps(p) for p in sorted(glob.glob(os.path.join(WIDGETS, "gui_verdance_*.lua")))) + "}", "paths")
     script = r'''
 local function step(label, fn)
@@ -237,6 +238,16 @@ step("exfil esc then enter", function() ex:KeyPress(27); assert(not WG.vaExfilMo
 step("sortie over", function() RULES.va_terminal = 1; RULES.va_status = "extracted"; ex:Update(); ex:DrawScreen(); GLOBALS.VerdanceMissionEvent("sortie_over", "extracted"); sb:DrawScreen(); mm:DrawWorld() end)
 step("mission events", function() RULES.va_terminal = 0; GLOBALS.VerdanceMissionEvent("objective_complete", "x"); GLOBALS.VerdanceHeroEvent("down", "grath", "Grath", 0, 1, 2); GLOBALS.VerdanceBeat("bark", "Ketha", "ambient line", 5); GLOBALS.VerdanceBeat("wave_warning", 1, 2, 3, "north"); GLOBALS.VerdanceVetRank(101, "green", "hardened", 1, 2, 3, "m"); vo:DrawScreen() end)
 step("infil reopen", function() inf:TextCommand("vabrief"); inf:DrawScreen(); inf:KeyPress(13) end)
+step("live report written for the hub", function()
+  WG.vaLivePath = LIVE_OUT
+  RULES.va_obs_tick = (RULES.va_obs_tick or 0) + 1; mm:Update()
+  local fh = assert(io.open(LIVE_OUT, "rb"), "no live.json"); local raw = fh:read("a"); fh:close()
+  local d = json_decode(raw)
+  assert(d.schema == "verdance-live/1", "schema")
+  assert(d.padZoneId == "TRJ_SW_LANE", tostring(d.padZoneId))
+  assert(d.zones.TRJ_NW_MUSTER and d.zones.TRJ_NW_MUSTER.eta == 0.8, raw:sub(1, 300))
+  assert(#d.heroes >= 2 and d.pad.people == 1, "heroes/pad")
+end)
 step("plain BAR skirmish: every Verdance widget stands down", function()
   MODOPTS = {}
   for _, n in ipairs(WIDGET_PATHS) do assert(LOADW(n, n) == false, n .. " loaded outside a hub match") end

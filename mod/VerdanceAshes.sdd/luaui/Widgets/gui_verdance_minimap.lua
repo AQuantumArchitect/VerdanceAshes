@@ -75,6 +75,43 @@ local function checkSurprises()
   if WG then WG.vaContradicted = contradicted end
 end
 
+-- The live report: what this board shows, written beside BAR every observation tick so the
+-- hub can paint it on a second screen. Company view only (our sight, our people, the pad);
+-- the hub keeps it apart from belief, which still moves only at homecoming.
+local LIVE_PATH = "LuaUI/Config/verdance/live.json"
+local function q(v) return '"' .. tostring(v):gsub('[%c"\\]', function(c) return string.format("\\u%04x", c:byte()) end) .. '"' end
+local function n(v)
+  v = tonumber(v) or 0
+  if v == math.floor(v) and math.abs(v) < 1e9 then return string.format("%d", v) end
+  return string.format("%.3f", v)
+end
+local function writeLive()
+  if not (io and io.open) then return end
+  local m = board.mission or {}
+  local zs = {}
+  for _, z in ipairs(board.zones) do
+    local eta, enemy, seen = board:eta(z.id), board:enemySeen(z.id), board:exposure(z.id)
+    if eta > 0.01 or enemy > 0 or seen > 0.01 or contradicted[z.id] then
+      zs[#zs + 1] = q(z.id) .. ':{"eta":' .. n(eta) .. ',"enemy":' .. n(enemy) .. ',"exposure":' .. n(seen)
+        .. (contradicted[z.id] and (',"found":' .. q(contradicted[z.id])) or "") .. "}"
+    end
+  end
+  local function rule(name) return tonumber((Spring.GetGameRulesParam(name))) or 0 end
+  local heroes = Spring.GetGameRulesParam("va_hud_heroes_json")
+  if type(heroes) ~= "string" or heroes:sub(1, 1) ~= "[" then heroes = "[]" end
+  local body = '{"schema":"verdance-live/1","missionId":' .. q(m.missionId or "") .. ',"mapId":' .. q(m.deploymentMapId or "")
+    .. ',"frame":' .. n(Spring.GetGameFrame()) .. ',"mapX":' .. n(board.mapX) .. ',"mapZ":' .. n(board.mapZ)
+    .. ',"padZoneId":' .. q(board.padId or "") .. ',"status":' .. q(Spring.GetGameRulesParam("va_status") or "")
+    .. ',"pad":{"people":' .. n(rule("va_pad_people")) .. ',"units":' .. n(rule("va_pad_units")) .. ',"enemy":' .. n(rule("va_pad_enemy_live")) .. "}"
+    .. ',"objective":{"done":' .. n(rule("va_objective_destroyed")) .. ',"total":' .. n(rule("va_objective_total")) .. "}"
+    .. ',"zones":{' .. table.concat(zs, ",") .. '},"heroes":' .. heroes .. "}"
+  local path = (WG and WG.vaLivePath) or LIVE_PATH
+  if Spring.CreateDir then pcall(Spring.CreateDir, path:match("^(.*)/") or ".") end
+  local fh = io.open(path, "w") -- one small write; the hub retries a torn read
+  if not fh then return end
+  fh:write(body); fh:close()
+end
+
 function widget:Initialize()
   if not Board then
     Spring.Echo("VA_MINIMAP no va_board.lua include; widget idle")
@@ -106,6 +143,7 @@ function widget:Update()
   if tick ~= lastTick then
     lastTick = tick
     checkSurprises()
+    writeLive()
   end
 end
 

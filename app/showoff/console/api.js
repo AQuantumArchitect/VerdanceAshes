@@ -27,6 +27,7 @@ export const api = {
   // GET faces
   status: () => get("/api/status"),
   session: () => get("/api/session"),
+  live: () => getJson("/api/live"),
   hubState: () => get("/api/hub-state"),
   result: () => get("/api/result"),
   health: () => get("/api/health"),

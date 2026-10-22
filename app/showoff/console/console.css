@@ -266,6 +266,22 @@ details.advanced summary { color:var(--steam); }
 .board-route { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:3; }
 .board-empty { padding:1rem; color:var(--muted); font-size:var(--fs-md); }
 .hide-route #board-route { visibility:hidden; }
+/* Live board (live.js): what the company sees this minute, over the belief board. */
+.is-live #board-route { visibility:hidden; } /* the next plan's marks are not this fight's */
+.is-live .zone.deploy-mark, .is-live .zone.capture-mark { --zfill:transparent; --zline:color-mix(in srgb, var(--ash) 30%, transparent); --zw:1; }
+.lv-pad { fill:none; stroke:var(--good); stroke-width:2.5; vector-effect:non-scaling-stroke; }
+.board-live { position:absolute; inset:0; pointer-events:none; z-index:4; }
+.lv-layer { position:absolute; inset:0; width:100%; height:100%; }
+.lv-sight { fill:rgba(var(--steam-rgb), calc(var(--eta) * .32)); stroke:rgba(var(--steam-rgb), calc(var(--eta) * .9)); stroke-width:1.5; vector-effect:non-scaling-stroke; }
+.lv-mark { position:absolute; transform:translate(-50%, -2.3rem); font-size:var(--fs-xs); background:var(--shade-deep); padding:0 .3rem; border-radius:var(--r-sm); white-space:nowrap; }
+.lv-hero { position:absolute; transform:translate(-50%, -50%); display:flex; align-items:center; gap:.25rem; font-size:var(--fs-xs); color:var(--ink); text-shadow:0 0 3px var(--bg); white-space:nowrap; }
+.lv-hero i { width:.6rem; height:.6rem; border-radius:50%; background:var(--good); box-shadow:0 0 0 2px var(--bg); }
+.lv-hero.hurt i { background:var(--warn); }
+.lv-hero.down i { background:transparent; border:2px solid var(--bad); }
+.lv-hero.on-pad i { box-shadow:0 0 0 2px var(--bg), 0 0 0 4px var(--good); }
+.lv-strip { position:absolute; left:var(--sp-2); top:var(--sp-2); font-size:var(--fs-sm); background:var(--panel); border:1px solid rgba(var(--steam-rgb), .5); border-radius:var(--r-sm); padding:.2rem .5rem; }
+.lv-strip b { color:var(--steam); letter-spacing:.08em; }
+.board-live .bad { color:var(--bad); } .board-live .muted { color:var(--muted); }
 /* route: out in warn, back in good (one pad: pad → wound → back) */
 .board-route .route-out { fill:var(--warn); }
 .board-route .route-back { fill:var(--good); }

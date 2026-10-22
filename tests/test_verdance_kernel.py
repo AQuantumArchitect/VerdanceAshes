@@ -94,3 +94,27 @@ def test_save_load_campaign_roundtrip(tmp_path=None):
     finally:
         if saves.exists():
             shutil.rmtree(saves)
+
+
+def test_live_report_fresh_matching_and_stale():
+    """/api/live serves the minimap's live report only for the dropped mission and only while fresh."""
+    import json, os, tempfile, time
+    ws = Path(tempfile.mkdtemp(prefix="va_live_"))
+    (ws / "outbox").mkdir()
+    bar = ws / "bar" / "data"
+    live_dir = bar / "LuaUI" / "Config" / "verdance"
+    live_dir.mkdir(parents=True)
+    (ws / "verdance_config.json").write_text(json.dumps({"barDataRoot": str(bar)}), encoding="utf-8")
+    (ws / "outbox" / "next_mission_intent.json").write_text(json.dumps({"missionId": "va_007"}), encoding="utf-8")
+    k = CampaignKernel(ws)
+    assert k.live() == {"live": False}
+    report = {"schema": "verdance-live/1", "missionId": "va_007", "mapId": "greenest_fields", "zones": {}, "heroes": []}
+    path = live_dir / "live.json"
+    path.write_text(json.dumps(report), encoding="utf-8")
+    assert k.live()["live"] is True
+    path.write_text(json.dumps(dict(report, missionId="va_006")), encoding="utf-8")
+    assert k.live()["live"] is False  # a report from an earlier match
+    path.write_text(json.dumps(report), encoding="utf-8")
+    old = time.time() - 60
+    os.utime(path, (old, old))
+    assert k.live()["live"] is False  # BAR closed: the board goes back to belief

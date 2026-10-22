@@ -8,6 +8,7 @@ import { renderCompany, renderShop, sealCompany, toggleCrew, tryBuy, recommendCo
 import { raiseCamp, openFoundingSortie, confirmHearthTalk, cancelHearthTalk, refreshCamp, renderCampCard } from "./home.js";
 import { showHomecoming, hideHomecoming, pullHubState, pullBarResult, abandonSortie, startResultPoll } from "./homecoming.js";
 import { installSystemDrawer, renderRegions, renderQuantum, showCoach, hideCoach } from "./system.js";
+import { installLive } from "./live.js";
 import { installShell, renderBadges, renderHeadline, showWorkspace } from "./shell.js";
 
 // Narrow facade — the same surface the shell used to reach the legacy script through.
@@ -97,6 +98,7 @@ function boot() {
   renderCompany();
   logLine(`The map answers · home ${prettyMap(H.sessionHomeMap || "the_rock_jungle")} · ops ${prettyMap(state.focusMap)} · ${availableMaps().length} maps · ${(commerce().shop || []).length} broker listings`);
   installShell();
+  installLive();
   probeHost();
   refreshCamp();
   // First open: the company intro owns formation. Defer one tick so a racing pullHubState

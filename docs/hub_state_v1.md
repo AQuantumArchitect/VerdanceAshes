@@ -59,3 +59,7 @@ Stamp → `outbox/next_sortie_order.json` → story intent (`outbox/next_mission
 | `outbox/readings.latest.json`, `occasions.latest.json`, `chronicle.latest.json` | readings | hub narrative / chronicle |
 | `outbox/provision.latest.json` | map download | `/api/health` |
 | `outbox/camp.latest.json` | camp clock | hub Home |
+
+## The live board (`GET /api/live`)
+
+While a dropped sortie is being fought, the minimap widget (`gui_verdance_minimap.lua`) writes `LuaUI/Config/verdance/live.json` in BAR's data folder every observation tick: per zone our sight (`eta`), enemies seen, exposure and any contradiction (`found`); our heroes' positions; pad and objective counts. The kernel serves it only for the mission in `outbox/next_mission_intent.json` and only while it is under 20 s old; otherwise `{"live": false}`. The hub (`console/live.js`) paints it over the belief board on the fight's map and drops it when the match ends. It is the company's sight, not the ground, and it never writes belief; belief still moves at homecoming.

@@ -54,3 +54,7 @@ outbox/provision.latest.json
 # Per-machine assistant config and operator notes (contain local paths).
 .claude/settings.local.json
 .agents/
+mod/VerdanceAshes.sdd/singleplayer/verdance_ashes/generated/va_intel_current.lua
+outbox/va_intel_current.lua
+outbox/va_pad_current.lua
+mod/VerdanceAshes.sdd/singleplayer/verdance_ashes/generated/va_pad_current.lua
