@@ -21,6 +21,8 @@ function gadget:GetInfo()
 end
 
 local config = VFS.Include('LuaRules/Configs/raptor_spawn_defs.lua')
+-- Verdance keeps its authored hives only in a hub-launched match; otherwise this is stock BAR.
+local VA_ACTIVE = VFS.Include("LuaRules/Configs/va_active.lua")
 local EnemyLib = VFS.Include('LuaRules/Gadgets/Include/SpawnerEnemyLib.lua')
 
 --------------------------------------------------------------------------------
@@ -1422,7 +1424,7 @@ if gadgetHandler:IsSyncedCode() then
 		local unitDef = UnitDefs[unitDefID]
 
 		-- Campaign hives are not spawned by SpawnBurrow, so they never entered burrows.
-		if unitDefID == config.burrowDef then
+		if VA_ACTIVE and unitDefID == config.burrowDef then
 			local x, y, z = GetUnitPosition(unitID)
 			SetupBurrow(unitID, x, y, z)
 		end
@@ -1966,7 +1968,7 @@ if gadgetHandler:IsSyncedCode() then
 			local units = GetTeamUnits(raptorTeamID)
 			for _, unitID in ipairs(units) do
 				-- The wipe removes the starting commander. Authored hives are the occupation.
-				if GetUnitDefID(unitID) ~= config.burrowDef then
+				if not VA_ACTIVE or GetUnitDefID(unitID) ~= config.burrowDef then
 					DestroyUnit(unitID, false, true)
 				end
 			end

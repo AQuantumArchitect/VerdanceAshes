@@ -42,3 +42,7 @@ export\dist\                            ← only ship output
 | WP3 ship.ps1 | done |
 | WP4 kernel mod sync + player script resolve | done |
 | WP5 attic | done (folder removed from tree; see `docs/ARCHIVE.md`) |
+
+## Plain BAR stays plain
+
+Verdance runs only in a match the hub launched (`va_campaign=1`) or a shell bake (`va_shell_bake=1`); `luarules/configs/va_active.lua` is the one test. Picked from BAR's own skirmish menu, every Verdance gadget, widget and unit override stands down and the raptor spawner behaves as stock. The HUD harness checks this every run.

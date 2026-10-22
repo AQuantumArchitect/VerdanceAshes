@@ -1,3 +1,4 @@
+if not VFS.Include("LuaRules/Configs/va_active.lua") then return false end -- plain BAR unless the hub launched this
 function widget:GetInfo()
   return {
     name    = "Verdance Playtest Recorder",

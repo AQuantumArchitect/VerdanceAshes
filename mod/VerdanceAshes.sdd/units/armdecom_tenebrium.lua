@@ -1,3 +1,4 @@
+if not VFS.Include("LuaRules/Configs/va_active.lua") then return {} end -- plain BAR unless the hub launched this
 -- Verdance override for BAR's Armada decoy commander (armdecom).
 -- MUST be a full unitdef: BAR's loader replaces by name (no deep merge).
 --

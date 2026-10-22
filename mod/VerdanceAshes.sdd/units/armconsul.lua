@@ -1,3 +1,4 @@
+if not VFS.Include("LuaRules/Configs/va_active.lua") then return {} end -- plain BAR unless the hub launched this
 -- Verdance override: Ashwalker Consul keeps Armada chassis but can plant
 -- Legion vehicle works too (player side is Legion-coloured Ashwalkers).
 return {

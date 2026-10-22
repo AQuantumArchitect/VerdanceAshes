@@ -1,3 +1,4 @@
+if not VFS.Include("LuaRules/Configs/va_active.lua") then return {} end -- plain BAR unless the hub launched this
 -- Verdance Fast Trapper: Commando pet mine-layer.
 -- Clone of stock cormlv (Trapper) with a hard speed bump so pets keep pace.
 -- Full unitdef (BAR loader replaces by name; no deep merge).

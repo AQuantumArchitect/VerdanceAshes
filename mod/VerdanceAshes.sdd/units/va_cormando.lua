@@ -1,3 +1,4 @@
+if not VFS.Include("LuaRules/Configs/va_active.lua") then return {} end -- plain BAR unless the hub launched this
 -- Verdance Cinder Hook: beefed Cortex Commando (cormando) chassis.
 -- Full unitdef (BAR loader replaces by name; no deep merge).
 -- Saboteur with pets — health/regen/punch stacked hard for company hero use.

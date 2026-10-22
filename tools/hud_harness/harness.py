@@ -71,6 +71,7 @@ files = {
 for inc in ('va_ash_tokens.lua', 'va_json.lua', 'va_board.lua'):
     files["luaui/Include/" + inc] = open(os.path.join(INCLUDE, inc), encoding='utf-8').read()
     files["LuaUI/Include/" + inc] = files["luaui/Include/" + inc]
+files["LuaRules/Configs/va_active.lua"] = open(os.path.join(WS, "mod", "VerdanceAshes.sdd", "luarules", "configs", "va_active.lua"), encoding='utf-8').read()
 fx_json = json.dumps(files, ensure_ascii=False)
 
 heroes_json = json.dumps([
@@ -116,7 +117,9 @@ _G.RULES = { va_pad_x = 1578, va_pad_z = 6357, va_pad_r = 560, va_pad_zone = "TR
 _G.PAUSED = false
 _G.FRAME = 0
 _G.SENT = {}
+MODOPTS = { va_campaign = "1" }
 _G.Spring = {
+  GetModOptions = function() return MODOPTS end,
   -- Like the engine: an unset rules param returns NO values (not nil), so tonumber(f()) throws.
   GetGameRulesParam = function(n) local v = RULES[n]; if v == nil then return end; return v end,
   GetViewGeometry = function() return 1920, 1080 end,
@@ -144,7 +147,7 @@ function LOADW(path, name)
   local fh = assert(io.open(path, "rb")); local src = fh:read("a"); fh:close()
   local f, err = load(src, name)
   if not f then error(err) end
-  f()
+  if f() == false then return false end
   return _G.widget
 end
 '''
@@ -161,6 +164,8 @@ def main():
     for w in ('gui_verdance_voice', 'gui_verdance_minimap', 'gui_verdance_sidebar', 'gui_verdance_infil', 'gui_verdance_exfil', 'gui_verdance_hero_tags'):
         path = os.path.join(WIDGETS, w + '.lua')
         run(st, f"W_{w} = LOADW({json.dumps(path)}, {json.dumps(w)}); if W_{w}.Initialize then W_{w}:Initialize() end; print('init ok {w}')", w)
+    import glob
+    run(st, "WIDGET_PATHS = " + "{" + ",".join(json.dumps(p) for p in sorted(glob.glob(os.path.join(WIDGETS, "gui_verdance_*.lua")))) + "}", "paths")
     script = r'''
 local function step(label, fn)
   local ok, err = pcall(fn)
@@ -232,6 +237,11 @@ step("exfil esc then enter", function() ex:KeyPress(27); assert(not WG.vaExfilMo
 step("sortie over", function() RULES.va_terminal = 1; RULES.va_status = "extracted"; ex:Update(); ex:DrawScreen(); GLOBALS.VerdanceMissionEvent("sortie_over", "extracted"); sb:DrawScreen(); mm:DrawWorld() end)
 step("mission events", function() RULES.va_terminal = 0; GLOBALS.VerdanceMissionEvent("objective_complete", "x"); GLOBALS.VerdanceHeroEvent("down", "grath", "Grath", 0, 1, 2); GLOBALS.VerdanceBeat("bark", "Ketha", "ambient line", 5); GLOBALS.VerdanceBeat("wave_warning", 1, 2, 3, "north"); GLOBALS.VerdanceVetRank(101, "green", "hardened", 1, 2, 3, "m"); vo:DrawScreen() end)
 step("infil reopen", function() inf:TextCommand("vabrief"); inf:DrawScreen(); inf:KeyPress(13) end)
+step("plain BAR skirmish: every Verdance widget stands down", function()
+  MODOPTS = {}
+  for _, n in ipairs(WIDGET_PATHS) do assert(LOADW(n, n) == false, n .. " loaded outside a hub match") end
+  MODOPTS = { va_campaign = "1" }
+end)
 print(FAILED and "HARNESS FAILED" or "HARNESS PASSED")
 '''
     run(st, script, "script")

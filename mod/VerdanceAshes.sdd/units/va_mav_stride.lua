@@ -1,3 +1,4 @@
+if not VFS.Include("LuaRules/Configs/va_active.lua") then return {} end -- plain BAR unless the hub launched this
 -- Verdance Armada Saloon mark: Stride Gunslinger.
 -- Distinct chassis from stock armmav — baked mobility (no pack-overlay speed).
 -- House: Armada Saloon. Mark: Stride.
