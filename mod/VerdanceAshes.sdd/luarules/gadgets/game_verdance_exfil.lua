@@ -170,6 +170,21 @@ local function build()
     return false
   end
   pad = { zoneId = zid, label = zoneLabel[zid] or zid, x = x, z = z, r = tonumber(p and p.radius) or PAD_RADIUS }
+  -- The pad is the whole zone the company landed in (the infil zone), not a circle inside it.
+  -- reach: the farthest corner of the zone from the pad point, for the unit queries below.
+  local cw, ch, reach, cells = mapX / cols, mapZ / rows, 0, 0
+  for ci, owner in pairs(cellToZone) do
+    if owner == zid then
+      cells = cells + 1
+      local cx, cz = (ci % cols) * cw, math.floor(ci / cols) * ch
+      for _, k in ipairs({ { 0, 0 }, { 1, 0 }, { 0, 1 }, { 1, 1 } }) do
+        local dx, dz = cx + k[1] * cw - x, cz + k[2] * ch - z
+        reach = math.max(reach, math.sqrt(dx * dx + dz * dz))
+      end
+    end
+  end
+  pad.zoned = cells > 0
+  pad.reach = pad.zoned and reach or pad.r
   Spring.SetGameRulesParam("va_pad_x", math.floor(x), { public = true })
   Spring.SetGameRulesParam("va_pad_z", math.floor(z), { public = true })
   Spring.SetGameRulesParam("va_pad_r", math.floor(pad.r), { public = true })
@@ -208,6 +223,26 @@ local function destinations()
   return out
 end
 
+-- On the pad = in the pad zone (falls back to the circle only if the zone has no cells).
+local function onPadAt(x, z)
+  if not pad or not x or not z then return false end
+  if pad.zoned then return zoneOf(x, z) == pad.zoneId end
+  local dx, dz = x - pad.x, z - pad.z
+  return dx * dx + dz * dz <= pad.r * pad.r
+end
+
+local function enemiesOnPad()
+  local n = 0
+  for _, uid in ipairs(Spring.GetUnitsInCylinder(pad.x, pad.z, pad.reach) or {}) do
+    local team = Spring.GetUnitTeam(uid)
+    if team ~= nil and team ~= gaiaTeamID and not Spring.AreTeamsAllied(playerTeamID, team) then
+      local ux, _, uz = Spring.GetUnitPosition(uid)
+      if onPadAt(ux, uz) then n = n + 1 end
+    end
+  end
+  return n
+end
+
 -- The manifest is a headcount, not a judgement.
 local function manifest()
   local m = {
@@ -222,7 +257,6 @@ local function manifest()
   }
   if not pad then return m end
   local units = Spring.GetTeamUnits(playerTeamID) or {}
-  local r2 = pad.r * pad.r
   for i = 1, #units do
     local uid = units[i]
     if Spring.ValidUnitID(uid) and not Spring.GetUnitIsDead(uid) then
@@ -233,8 +267,7 @@ local function manifest()
       local metal = (ud and ud.metalCost) or 0
       local hid = Spring.GetUnitRulesParam(uid, "va_hero_id")
       local hname = Spring.GetUnitRulesParam(uid, "va_hero_name")
-      local dx, dz = (x or 0) - pad.x, (z or 0) - pad.z
-      local onPad = (dx * dx + dz * dz) <= r2
+      local onPad = onPadAt(x, z)
       local zid = zoneOf(x, z) or "?"
       if onPad and not structure then
         local g = m.going
@@ -247,14 +280,16 @@ local function manifest()
         g.metal = g.metal + metal
       else
         local s = m.staying
-        if structure then
+        local isHero = hid and hid ~= "" and hid ~= 0
+        if isHero then
+          -- a person who stays is a person in the field, even one who cannot walk (a turret hero)
+          s.heroes[#s.heroes + 1] = { heroId = tostring(hid), name = tostring(hname or hid), zoneId = zid, label = zoneLabel[zid] or zid }
+        elseif structure then
           local row = s.structures[zid] or { count = 0, metal = 0, label = zoneLabel[zid] or zid }
           row.count = row.count + 1
           row.metal = row.metal + metal
           s.structures[zid] = row
           s.structureCount = s.structureCount + 1
-        elseif hid and hid ~= "" and hid ~= 0 then
-          s.heroes[#s.heroes + 1] = { heroId = tostring(hid), name = tostring(hname or hid), zoneId = zid, label = zoneLabel[zid] or zid }
         else
           s.units[zid] = (s.units[zid] or 0) + 1
           s.unitCount = s.unitCount + 1
@@ -264,14 +299,7 @@ local function manifest()
     end
   end
   -- who else is standing on our pad
-  local near = Spring.GetUnitsInCylinder(pad.x, pad.z, pad.r) or {}
-  for i = 1, #near do
-    local uid = near[i]
-    local team = Spring.GetUnitTeam(uid)
-    if team ~= nil and team ~= gaiaTeamID and not Spring.AreTeamsAllied(playerTeamID, team) then
-      m.enemyOnPad = m.enemyOnPad + 1
-    end
-  end
+  m.enemyOnPad = enemiesOnPad()
   -- what we looked at (observe gadget), as a map zone -> eta
   if GG and GG.VA_ObservedZonesTable then
     m.seen = GG.VA_ObservedZonesTable() or {}
@@ -292,7 +320,6 @@ local function hudScan()
   if next(teamAlly) == nil then resolvePlayerTeam() end
   local heroes = {}
   local onPeople, onUnits, offUnits, offStructures = 0, 0, 0, 0
-  local r2 = pad.r * pad.r
   for _, uid in ipairs(Spring.GetTeamUnits(playerTeamID) or {}) do
     if Spring.ValidUnitID(uid) and not Spring.GetUnitIsDead(uid) then
       local x, _, z = Spring.GetUnitPosition(uid)
@@ -301,8 +328,7 @@ local function hudScan()
       local structure = ud and (ud.isBuilding or ud.isFactory or ((ud.speed or 1) == 0))
       local hid = Spring.GetUnitRulesParam(uid, "va_hero_id")
       local isHero = hid ~= nil and tostring(hid) ~= "" and tostring(hid) ~= "0"
-      local dx, dz = (x or 0) - pad.x, (z or 0) - pad.z
-      local onPad = (dx * dx + dz * dz) <= r2
+      local onPad = onPadAt(x, z)
       if structure then
         offStructures = offStructures + 1
       elseif onPad then
@@ -331,11 +357,7 @@ local function hudScan()
       heroes[#heroes + 1] = { id = tostring(hid or name), name = name, x = math.floor(fx or 0), z = math.floor(fz or 0), zone = zoneOf(fx, fz) or "", state = "down", feature = fid }
     end
   end
-  local enemy = 0
-  for _, uid in ipairs(Spring.GetUnitsInCylinder(pad.x, pad.z, pad.r) or {}) do
-    local team = Spring.GetUnitTeam(uid)
-    if team ~= nil and team ~= gaiaTeamID and not Spring.AreTeamsAllied(playerTeamID, team) then enemy = enemy + 1 end
-  end
+  local enemy = enemiesOnPad()
   Spring.SetGameRulesParam("va_hud_heroes_json", toJson(heroes), { public = true })
   Spring.SetGameRulesParam("va_pad_people", onPeople, { public = true })
   Spring.SetGameRulesParam("va_pad_units", onUnits, { public = true })
@@ -391,26 +413,35 @@ function gadget:GameStart()
   if not ready then ready = build() end
 end
 
-function gadget:RecvLuaMsg(msg, playerID)
-  if type(msg) ~= "string" or msg:sub(1, 7) ~= "VA_CMD:" then return end
-  local cmd = msg:sub(8)
+-- The campaign gadget hands us "manifest" and "extract:<dest>" (GG.VA_ExfilCmd): a message
+-- sent to every gadget can be swallowed by an earlier one, and in BAR it was.
+local function exfilCmd(cmd)
   if cmd == "manifest" then
     if not ready then Spring.Echo("VA_EXFIL_ERR not ready"); return end
     if next(teamAlly) == nil then resolvePlayerTeam() end
     local m = manifest()
     SendToUnsynced("VERDANCE_MANIFEST", toJson(m))
-    return
+    return true
   end
   local dest = cmd:match("^extract:(.+)$")
   if dest then
     if not ready then Spring.Echo("VA_EXFIL_ERR not ready"); return end
     if next(teamAlly) == nil then resolvePlayerTeam() end
     endWith("extracted", dest)
-    return
+    return true
   end
+  return false
+end
+
+GG.VA_ExfilCmd = exfilCmd
+
+function gadget:RecvLuaMsg(msg, playerID)
+  if type(msg) ~= "string" or msg:sub(1, 7) ~= "VA_CMD:" then return end
+  if exfilCmd(msg:sub(8)) then return true end
 end
 
 function gadget:Shutdown()
+  GG.VA_ExfilCmd = nil
   GG.VA_Manifest = nil
   GG.VA_ManifestJson = nil
   GG.VA_WipedManifest = nil

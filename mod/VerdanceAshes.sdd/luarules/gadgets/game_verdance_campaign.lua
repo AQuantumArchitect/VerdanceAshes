@@ -7231,6 +7231,10 @@ function gadget:RecvLuaMsg(msg, playerID)
     VA_CREW_confirm(picks)
     return
   end
+  if (cmd == "manifest" or cmd:match("^extract:")) and GG.VA_ExfilCmd then
+    GG.VA_ExfilCmd(cmd)
+    return true
+  end
   if not runVerdanceCommand(cmd) then
     Spring.Echo("VA_UNKNOWN_CMD " .. tostring(cmd))
   end

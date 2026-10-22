@@ -206,6 +206,25 @@ function widget:DrawWorld()
   local px, pz, pr = board:pad()
   if not px then return end
   local steam = Ash.COL.steam
+  -- The pad is the whole landing zone (the exfil gadget counts by zone): outline it on the
+  -- ground, the same edges the minimap draws. Warn colour, faster pulse, while enemies stand on it.
+  local zone = board.padId and board.byId[board.padId]
+  if zone and zone.edges and #zone.edges > 0 then
+    local hostile = (tonumber((Spring.GetGameRulesParam("va_pad_enemy_live"))) or 0) > 0
+    local c = hostile and Ash.COL.warn or steam
+    local speed = hostile and 4 or 1.6
+    gl.Color(c[1], c[2], c[3], 0.4 + 0.35 * math.abs(math.sin(os.clock() * speed)))
+    gl.LineWidth(3)
+    gl.BeginEnd(GL.LINES, function()
+      for _, e in ipairs(zone.edges) do
+        gl.Vertex(e[1], groundY(e[1], e[2]) + 10, e[2])
+        gl.Vertex(e[3], groundY(e[3], e[4]) + 10, e[4])
+      end
+    end)
+    gl.LineWidth(1)
+    gl.Color(1, 1, 1, 1)
+    return
+  end
   local segs = 48
   local twoPi = math.pi * 2
   local pulse = 0.35 + 0.35 * math.abs(math.sin(os.clock() * 1.6))
