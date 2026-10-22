@@ -1,6 +1,6 @@
 {
   "schema": "hive-bar-residual/1.1",
-  "at": "2026-10-21T16:40:51.980682+00:00",
+  "at": "2026-10-22T00:27:56.538138+00:00",
   "source": "test",
   "kind": "player_proxy",
   "ran_on": "wargen",

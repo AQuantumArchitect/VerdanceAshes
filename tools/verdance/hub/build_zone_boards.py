@@ -73,6 +73,58 @@ def is_inter_map_lane(zone_id: str, role: str, tags: list, bounds: dict) -> bool
     return any(k in blob for k in keys)
 
 
+def zone_shape(z: dict, bounds: dict) -> dict:
+    """The zone as the game draws it (luaui/Include/va_board.lua): the authored cells, outlined
+    where a cell's neighbour is not in the zone. Returns {"d": SVG path, "box": [x, y, w, h],
+    "cells": n} in 0..100 board units; a zone without cells is its bounds rectangle."""
+    grid = z.get("cellGrid") or {}
+    cols, rows = int(grid.get("cols") or 96), int(grid.get("rows") or 96)
+    cells = set()
+    if z.get("shape") == "cells":
+        for run in z.get("cells") or []:
+            start, length = (run[0], run[1]) if isinstance(run, (list, tuple)) else (run.get("start", 0), run.get("length", 0))
+            cells.update(i for i in range(int(start), int(start) + int(length)) if 0 <= i // cols < rows)
+    if not cells:
+        x0, x1, z0, z1 = (round(bounds[k] * 100, 2) for k in ("xMin", "xMax", "zMin", "zMax"))
+        return {"d": f"M{x0} {z0}H{x1}V{z1}H{x0}Z", "box": [x0, z0, round(x1 - x0, 2), round(z1 - z0, 2)], "cells": 0}
+    # Directed boundary edges, clockwise around each cell (screen coords: z grows down), so the
+    # zone's inside is always on the right; chaining them gives closed loops (holes included).
+    nxt: dict = {}
+    for i in cells:
+        c, r = i % cols, i // cols
+        if not (r > 0 and i - cols in cells):
+            nxt.setdefault((c, r), []).append((c + 1, r))
+        if not (c < cols - 1 and i + 1 in cells):
+            nxt.setdefault((c + 1, r), []).append((c + 1, r + 1))
+        if not (r < rows - 1 and i + cols in cells):
+            nxt.setdefault((c + 1, r + 1), []).append((c, r + 1))
+        if not (c > 0 and i - 1 in cells):
+            nxt.setdefault((c, r + 1), []).append((c, r))
+    sx, sz = 100.0 / cols, 100.0 / rows
+    parts = []
+    while nxt:
+        start = min(nxt)
+        loop, cur = [start], start
+        while True:
+            outs = nxt[cur]
+            step = outs.pop()
+            if not outs:
+                del nxt[cur]
+            if step == start:
+                break
+            loop.append(step)
+            cur = step
+        # drop points in the middle of a straight run
+        pts = [p for k, p in enumerate(loop)
+               if (loop[k - 1][0] - p[0]) * (loop[(k + 1) % len(loop)][1] - p[1])
+               != (loop[k - 1][1] - p[1]) * (loop[(k + 1) % len(loop)][0] - p[0])]
+        parts.append("M" + "L".join(f"{round(x * sx, 2):g} {round(y * sz, 2):g}" for x, y in pts) + "Z")
+    xs = [i % cols for i in cells]
+    ys = [i // cols for i in cells]
+    box = [round(min(xs) * sx, 2), round(min(ys) * sz, 2), round((max(xs) + 1 - min(xs)) * sx, 2), round((max(ys) + 1 - min(ys)) * sz, 2)]
+    return {"d": "".join(parts), "box": box, "cells": len(cells)}
+
+
 def build_boards() -> dict:
     boards = {}
     for path in sorted(AUTH.glob("*.authored.zone_map.json")):
@@ -112,6 +164,7 @@ def build_boards() -> dict:
                     "role": role,
                     "tags": tags,
                     "bounds": bounds,
+                    "shape": zone_shape(z, bounds),
                     "anchor": {"x": round(ax, 4), "z": round(az, 4)},
                     "dry": dry,
                     "edgeScore": es,

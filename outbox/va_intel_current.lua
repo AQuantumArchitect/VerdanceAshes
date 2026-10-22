@@ -10,139 +10,14 @@ return {
       label = "Northwest Muster",
       ours = {
         v = nil,
-        c = 0.019,
+        c = 0.021,
         state = "dark",
         age = nil,
         src = nil
       },
       held = {
         v = nil,
-        c = 0.019,
-        state = "dark",
-        age = nil,
-        src = nil
-      },
-      strength = {
-        v = nil,
-        c = 0.002,
-        state = "dark",
-        age = nil,
-        src = nil
-      },
-      threat = {
-        v = 0.65,
-        c = 0.301,
-        state = "current",
-        age = 0.0,
-        src = "rumour:clash"
-      }
-    },
-    TRJ_SE_MUSTER = {
-      label = "Southeast Muster",
-      ours = {
-        v = nil,
-        c = 0.019,
-        state = "dark",
-        age = nil,
-        src = nil
-      },
-      held = {
-        v = nil,
-        c = 0.019,
-        state = "dark",
-        age = nil,
-        src = nil
-      },
-      strength = {
-        v = nil,
-        c = 0.002,
-        state = "dark",
-        age = nil,
-        src = nil
-      },
-      threat = {
-        v = nil,
-        c = 0.233,
-        state = "dark",
-        age = nil,
-        src = nil
-      }
-    },
-    TRJ_NE_SHALLOWS = {
-      label = "Northeast Shallows",
-      ours = {
-        v = 0.404,
-        c = 0.193,
-        state = "current",
-        age = 360.0,
-        src = "rumour:flip"
-      },
-      held = {
-        v = 0.615,
-        c = 0.229,
-        state = "current",
-        age = 360.0,
-        src = "rumour:flip",
-        faction = "neutral"
-      },
-      strength = {
-        v = nil,
-        c = 0.002,
-        state = "dark",
-        age = nil,
-        src = nil
-      },
-      threat = {
-        v = 0.666,
-        c = 0.332,
-        state = "current",
-        age = 0.0,
-        src = "rumour:clash"
-      }
-    },
-    TRJ_SW_SHALLOWS = {
-      label = "Southwest Shallows",
-      ours = {
-        v = nil,
-        c = 0.019,
-        state = "dark",
-        age = nil,
-        src = nil
-      },
-      held = {
-        v = nil,
-        c = 0.019,
-        state = "dark",
-        age = nil,
-        src = nil
-      },
-      strength = {
-        v = nil,
-        c = 0.002,
-        state = "dark",
-        age = nil,
-        src = nil
-      },
-      threat = {
-        v = 0.651,
-        c = 0.302,
-        state = "current",
-        age = 0.0,
-        src = "rumour:clash"
-      }
-    },
-    TRJ_NW_GATE = {
-      label = "Northwest Gate",
-      ours = {
-        v = nil,
-        c = 0.019,
-        state = "dark",
-        age = nil,
-        src = nil
-      },
-      held = {
-        v = nil,
-        c = 0.019,
+        c = 0.021,
         state = "dark",
         age = nil,
         src = nil
@@ -162,18 +37,18 @@ return {
         src = "rumour:clash"
       }
     },
-    TRJ_SE_GATE = {
-      label = "Southeast Gate",
+    TRJ_SE_MUSTER = {
+      label = "Southeast Muster",
       ours = {
         v = nil,
-        c = 0.019,
+        c = 0.021,
         state = "dark",
         age = nil,
         src = nil
       },
       held = {
         v = nil,
-        c = 0.019,
+        c = 0.021,
         state = "dark",
         age = nil,
         src = nil
@@ -187,7 +62,132 @@ return {
       },
       threat = {
         v = nil,
-        c = 0.273,
+        c = 0.248,
+        state = "dark",
+        age = nil,
+        src = nil
+      }
+    },
+    TRJ_NE_SHALLOWS = {
+      label = "Northeast Shallows",
+      ours = {
+        v = 0.405,
+        c = 0.191,
+        state = "current",
+        age = 360.0,
+        src = "rumour:flip"
+      },
+      held = {
+        v = 0.615,
+        c = 0.23,
+        state = "current",
+        age = 360.0,
+        src = "rumour:flip",
+        faction = "neutral"
+      },
+      strength = {
+        v = nil,
+        c = 0.002,
+        state = "dark",
+        age = nil,
+        src = nil
+      },
+      threat = {
+        v = 0.672,
+        c = 0.345,
+        state = "current",
+        age = 0.0,
+        src = "rumour:clash"
+      }
+    },
+    TRJ_SW_SHALLOWS = {
+      label = "Southwest Shallows",
+      ours = {
+        v = nil,
+        c = 0.021,
+        state = "dark",
+        age = nil,
+        src = nil
+      },
+      held = {
+        v = nil,
+        c = 0.021,
+        state = "dark",
+        age = nil,
+        src = nil
+      },
+      strength = {
+        v = nil,
+        c = 0.002,
+        state = "dark",
+        age = nil,
+        src = nil
+      },
+      threat = {
+        v = 0.659,
+        c = 0.317,
+        state = "current",
+        age = 0.0,
+        src = "rumour:clash"
+      }
+    },
+    TRJ_NW_GATE = {
+      label = "Northwest Gate",
+      ours = {
+        v = nil,
+        c = 0.021,
+        state = "dark",
+        age = nil,
+        src = nil
+      },
+      held = {
+        v = nil,
+        c = 0.021,
+        state = "dark",
+        age = nil,
+        src = nil
+      },
+      strength = {
+        v = nil,
+        c = 0.002,
+        state = "dark",
+        age = nil,
+        src = nil
+      },
+      threat = {
+        v = 0.663,
+        c = 0.326,
+        state = "current",
+        age = 0.0,
+        src = "rumour:clash"
+      }
+    },
+    TRJ_SE_GATE = {
+      label = "Southeast Gate",
+      ours = {
+        v = nil,
+        c = 0.021,
+        state = "dark",
+        age = nil,
+        src = nil
+      },
+      held = {
+        v = nil,
+        c = 0.021,
+        state = "dark",
+        age = nil,
+        src = nil
+      },
+      strength = {
+        v = nil,
+        c = 0.002,
+        state = "dark",
+        age = nil,
+        src = nil
+      },
+      threat = {
+        v = nil,
+        c = 0.29,
         state = "dark",
         age = nil,
         src = nil
@@ -197,14 +197,14 @@ return {
       label = "Central Spillway",
       ours = {
         v = nil,
-        c = 0.019,
+        c = 0.021,
         state = "dark",
         age = nil,
         src = nil
       },
       held = {
         v = nil,
-        c = 0.019,
+        c = 0.021,
         state = "dark",
         age = nil,
         src = nil
@@ -217,8 +217,8 @@ return {
         src = nil
       },
       threat = {
-        v = 0.664,
-        c = 0.328,
+        v = 0.67,
+        c = 0.341,
         state = "current",
         age = 0.0,
         src = "rumour:clash"
@@ -228,14 +228,14 @@ return {
       label = "Central Inner Spillway",
       ours = {
         v = nil,
-        c = 0.019,
+        c = 0.021,
         state = "dark",
         age = nil,
         src = nil
       },
       held = {
         v = nil,
-        c = 0.019,
+        c = 0.021,
         state = "dark",
         age = nil,
         src = nil
@@ -248,8 +248,8 @@ return {
         src = nil
       },
       threat = {
-        v = 0.66,
-        c = 0.32,
+        v = 0.667,
+        c = 0.333,
         state = "current",
         age = 0.0,
         src = "rumour:clash"
@@ -259,14 +259,14 @@ return {
       label = "Northeast Lane",
       ours = {
         v = nil,
-        c = 0.019,
+        c = 0.021,
         state = "dark",
         age = nil,
         src = nil
       },
       held = {
         v = nil,
-        c = 0.019,
+        c = 0.021,
         state = "dark",
         age = nil,
         src = nil
@@ -279,8 +279,8 @@ return {
         src = nil
       },
       threat = {
-        v = 0.673,
-        c = 0.346,
+        v = 0.679,
+        c = 0.358,
         state = "current",
         age = 0.0,
         src = "rumour:clash"
@@ -290,14 +290,14 @@ return {
       label = "Southwest Lane",
       ours = {
         v = nil,
-        c = 0.019,
+        c = 0.021,
         state = "dark",
         age = nil,
         src = nil
       },
       held = {
         v = nil,
-        c = 0.019,
+        c = 0.021,
         state = "dark",
         age = nil,
         src = nil
@@ -311,7 +311,7 @@ return {
       },
       threat = {
         v = nil,
-        c = 0.268,
+        c = 0.285,
         state = "dark",
         age = nil,
         src = nil
@@ -321,14 +321,14 @@ return {
       label = "Northwest Outer Muster",
       ours = {
         v = nil,
-        c = 0.019,
+        c = 0.021,
         state = "dark",
         age = nil,
         src = nil
       },
       held = {
         v = nil,
-        c = 0.019,
+        c = 0.021,
         state = "dark",
         age = nil,
         src = nil
@@ -342,7 +342,7 @@ return {
       },
       threat = {
         v = nil,
-        c = 0.228,
+        c = 0.238,
         state = "dark",
         age = nil,
         src = nil
@@ -352,14 +352,14 @@ return {
       label = "Southeast Outer Muster",
       ours = {
         v = nil,
-        c = 0.019,
+        c = 0.021,
         state = "dark",
         age = nil,
         src = nil
       },
       held = {
         v = nil,
-        c = 0.019,
+        c = 0.021,
         state = "dark",
         age = nil,
         src = nil
@@ -373,7 +373,7 @@ return {
       },
       threat = {
         v = nil,
-        c = 0.261,
+        c = 0.278,
         state = "dark",
         age = nil,
         src = nil
@@ -383,14 +383,14 @@ return {
       label = "Northeast Rim",
       ours = {
         v = nil,
-        c = 0.019,
+        c = 0.021,
         state = "dark",
         age = nil,
         src = nil
       },
       held = {
         v = nil,
-        c = 0.019,
+        c = 0.021,
         state = "dark",
         age = nil,
         src = nil
@@ -403,8 +403,8 @@ return {
         src = nil
       },
       threat = {
-        v = 0.668,
-        c = 0.336,
+        v = 0.674,
+        c = 0.348,
         state = "current",
         age = 0.0,
         src = "rumour:clash"
@@ -414,14 +414,14 @@ return {
       label = "Southwest Rim",
       ours = {
         v = nil,
-        c = 0.019,
+        c = 0.021,
         state = "dark",
         age = nil,
         src = nil
       },
       held = {
         v = nil,
-        c = 0.019,
+        c = 0.021,
         state = "dark",
         age = nil,
         src = nil
@@ -435,7 +435,7 @@ return {
       },
       threat = {
         v = nil,
-        c = 0.271,
+        c = 0.289,
         state = "dark",
         age = nil,
         src = nil
@@ -445,14 +445,14 @@ return {
       label = "West Muster",
       ours = {
         v = nil,
-        c = 0.019,
+        c = 0.021,
         state = "dark",
         age = nil,
         src = nil
       },
       held = {
         v = nil,
-        c = 0.019,
+        c = 0.021,
         state = "dark",
         age = nil,
         src = nil
@@ -466,7 +466,7 @@ return {
       },
       threat = {
         v = nil,
-        c = 0.291,
+        c = 0.306,
         state = "dark",
         age = nil,
         src = nil
@@ -476,14 +476,14 @@ return {
       label = "East Muster",
       ours = {
         v = nil,
-        c = 0.019,
+        c = 0.021,
         state = "dark",
         age = nil,
         src = nil
       },
       held = {
         v = nil,
-        c = 0.019,
+        c = 0.021,
         state = "dark",
         age = nil,
         src = nil
@@ -497,7 +497,7 @@ return {
       },
       threat = {
         v = nil,
-        c = 0.28,
+        c = 0.296,
         state = "dark",
         age = nil,
         src = nil

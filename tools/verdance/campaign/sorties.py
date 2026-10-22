@@ -11,7 +11,7 @@ import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from verdance.common import WORKSPACE_ROOT, canonical_map_id, load_json, save_json, utc_now
+from verdance.common import ARCHETYPE_VERB, WORKSPACE_ROOT, canonical_map_id, load_json, save_json, utc_now
 from .schema import CAMPAIGN_ID, zone_maps_from_workspace
 from .objectives import _load_map_adjacency
 from verdance.company.company import (
@@ -434,17 +434,18 @@ def generate_mode_a_sortie(state: Dict[str, Any], workspace: Optional[Path]) -> 
     return pick
 
 
-def objective_from_sortie(order: Dict[str, Any], state: Dict[str, Any]) -> Dict[str, Any]:
+def objective_from_sortie(order: Dict[str, Any], state: Dict[str, Any], workspace: Optional[Path] = None) -> Dict[str, Any]:
     """Build objectiveTarget from a validated sortie order (contract)."""
     zone_id = order["targetZoneId"]
     map_id = order["mapId"]
     archetype = order.get("objectiveArchetype") or "gate_control"
     against = order.get("against") or "neutral"
-    label = str(order.get("label") or f"Contract: {archetype} on {zone_id}")
-    zones = (state.get("zoneMemory") or {}).get(map_id, {}) or {}
-    zm = zones.get(zone_id) or {}
-    if zm.get("label") and not order.get("label"):
-        label = f"{archetype}: {zm.get('label')}"
+    # Plain words, as the hub writes them: "Raid Southeast Plateau".
+    zone_label = ((state.get("zoneMemory") or {}).get(map_id, {}) or {}).get(zone_id, {}).get("label")
+    if not zone_label and workspace is not None:
+        authored = zone_maps_from_workspace(Path(workspace)).get(canonical_map_id(map_id)) or {}
+        zone_label = next((z.get("label") for z in authored.get("zones") or [] if z.get("zoneId") == zone_id), None)
+    label = str(order.get("label") or f"{ARCHETYPE_VERB.get(archetype, 'Strike')} {zone_label or zone_id}")
     obj = {
         "id": zone_id,
         "kind": archetype,

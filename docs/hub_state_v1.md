@@ -29,9 +29,9 @@
 | `believed` | `ours` \| `held` \| `empty` \| `dark` \| `unsure` | fill kind |
 | `control` | `ashwalkers`, a faction name (who we last **saw** holding it), `held`, `empty`, `unknown` | fill colour (`--f-*`) |
 | `confidence` | 0..1 | fill alpha |
-| `state` | `current` \| `stale` \| `dark` | border: solid / dashed / none |
+| `state` | `current` \| `stale` \| `dark` | outline: solid / dashed / hairline + `?` |
 | `ageMin`, `source` | How old the word is, where it came from | tooltip |
-| `threat` | Believed threat 0..1 | hatch weight |
+| `threat` | Believed threat 0..1 | threat bar |
 | `surprise` | Last homecoming's contradiction here, if any (`believed`, `found`, `surprise`, `eta`) | ✗ / ○ |
 | `people[]` | Heroes posted here or left here (`heroId, name, where, wounded`) | ⚑ |
 | `holding` | Structures we left here (count) | ■ |

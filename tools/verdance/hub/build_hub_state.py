@@ -14,7 +14,7 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-from verdance.common import WORKSPACE_ROOT, load_json
+from verdance.common import ARCHETYPE_VERB, WORKSPACE_ROOT, load_json
 from verdance.belief import hub_belief
 from verdance.readings.narrative import project as narrative_project
 from verdance.campaign import (
@@ -363,15 +363,7 @@ def _quest_continue_choices(
         cands = cands.get("candidates") or []
     if not isinstance(cands, list):
         return out
-    arch_verb = {
-        "eco_raid": "Raid",
-        "seize_lane": "Take",
-        "strike_relay": "Cut",
-        "destroy_key_structure": "Break",
-        "hive_clear_or_bypass": "Clear",
-        "gate_control": "Hold",
-        "economy_disrupt": "Starve",
-    }
+    arch_verb = ARCHETYPE_VERB
     arch_blurb = {
         "eco_raid": "Hit the works. Leave before their guns arrive.",
         "seize_lane": "Stand on the scar and stay standing.",

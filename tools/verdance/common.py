@@ -109,6 +109,19 @@ def save_json(path: Path, obj: Any, indent: int = 2, sort_keys: bool = False) ->
         raise
 
 
+# The contract kinds in plain words: the one verb a player reads ("Raid Southeast Plateau").
+ARCHETYPE_VERB = {
+    "eco_raid": "Raid",
+    "seize_lane": "Take",
+    "strike_relay": "Cut",
+    "destroy_key_structure": "Break",
+    "hive_clear_or_bypass": "Clear",
+    "gate_control": "Hold",
+    "hold_plateau": "Hold",
+    "economy_disrupt": "Starve",
+}
+
+
 def canonical_map_id(map_id: Optional[str]) -> str:
     """Lower-cased, alias-resolved map id; ``"unknown"`` when empty."""
     if not map_id:

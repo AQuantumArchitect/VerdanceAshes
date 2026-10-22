@@ -240,10 +240,10 @@ details.advanced summary { color:var(--steam); }
 .legend-row span::before { content:""; display:inline-block; width:.45rem; height:.45rem; border-radius:2px; margin-right:.25rem; vertical-align:middle; }
 .legend-row .lg-infil::before { background:var(--good); }
 .legend-row .lg-target::before { background:var(--warn); }
-.legend-row .lg-stale::before { background:transparent; border:1px dotted var(--ash); }
-.legend-row .lg-dark::before { background:repeating-linear-gradient(135deg, color-mix(in srgb, var(--ash) 50%, transparent) 0 1px, transparent 1px 3px); border:1px dashed var(--ash); }
+.legend-row .lg-stale::before { background:transparent; border:1px dashed var(--ash); }
+.legend-row .lg-dark::before { background:transparent; border:1px solid color-mix(in srgb, var(--ash) 45%, transparent); }
 .legend-row .lg-threat::before { background:var(--bad); height:.2rem; }
-.legend-row .lg-eyes::before { background:transparent; border:1px dashed var(--bad); border-radius:50%; }
+.legend-row .lg-eyes::before { background:repeating-linear-gradient(135deg, var(--bad) 0 1px, transparent 1px 3px); border:1px solid color-mix(in srgb, var(--bad) 60%, transparent); }
 .legend-row .lg-open::before { background:transparent; border:1px solid var(--warn); }
 .cc-overlays { display:flex; gap:1rem; border:0; padding:.25rem .4rem; margin:.2rem 0; font-size:var(--fs-sm); }
 .cc-overlays legend { float:left; margin-right:1rem; color:var(--muted); }
@@ -272,72 +272,75 @@ details.advanced summary { color:var(--steam); }
 .board-route .route-line { stroke:var(--warn); }
 .board-route .route-return { fill:var(--good); stroke:var(--bg); stroke-opacity:.6; }
 
-/* Zones — belief paint (colour + shape + border; alpha = confidence).
-   --conf is set inline per zone by renderBoard. Fill alpha floors at .08 so a
-   low-confidence belief still reads as a belief, not as empty. */
+/* Zones — the in-game board's encoding (luaui/Include/va_board.lua), on the zone's real shape.
+   The div spans the zone's box and takes no pointer; its svg path is the zone. Belief paints the
+   path: fill colour = who we believe holds it, alpha = confidence (--conf, set inline), border
+   solid = current / dashed = stale, nobody looked = hairline + ?. Hatch means one thing only:
+   how much of us they see (exposure). */
 .zone {
   --conf:0; --fill-a:calc(.08 + var(--conf) * .42); --owner:var(--muted);
-  position:absolute; border:1px solid color-mix(in srgb, var(--steam) 28%, transparent);
-  background:color-mix(in srgb, var(--edge) 20%, var(--shade)); border-radius:var(--r-sm); font-size:var(--fs-xs);
-  color:var(--ink); padding:.15rem .25rem; overflow:hidden; cursor:pointer;
-  transition:background .12s, border-color .12s, box-shadow .12s; z-index:1;
+  --zfill:transparent; --zline:color-mix(in srgb, var(--ash) 30%, transparent); --zw:1; --zdash:none;
+  position:absolute; font-size:var(--fs-xs); color:var(--ink); cursor:pointer; z-index:1; pointer-events:none;
 }
-.zone:hover { border-color:var(--gold); z-index:4; }
-.zone.capturable { border-color:var(--line-solid); }
-.zone.open-target { box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--warn) 45%, transparent); }
-.zone.claimed { background:color-mix(in srgb, var(--good) 12%, transparent); }
-.zone.fog { opacity:.55; filter:saturate(.45) brightness(.8); border-color:color-mix(in srgb, var(--steam) 12%, transparent); }
+.zone .z-shape { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+.zone .z-area {
+  fill:var(--zfill); stroke:var(--zline); stroke-width:var(--zw); stroke-dasharray:var(--zdash);
+  vector-effect:non-scaling-stroke; pointer-events:all; transition:fill .12s, stroke .12s;
+}
+.zone .z-exposed { fill:url(#exp-hatch); stroke:none; pointer-events:none; }
+.board-defs { position:absolute; width:0; height:0; }
+.exp-hatch-line { fill:color-mix(in srgb, var(--bad) 70%, transparent); }
+.zone:hover, .zone:focus-visible { z-index:4; --zline:var(--gold); --zw:1.5; }
+.zone.open-target { --zline:color-mix(in srgb, var(--warn) 55%, transparent); }
+.zone.claimed { --zfill:color-mix(in srgb, var(--good) 12%, transparent); }
+.zone.fog { opacity:.55; filter:saturate(.45) brightness(.8); }
 .zone.fog .zone-label { color:color-mix(in srgb, var(--ink) 50%, transparent); }
 .zone.fog .zone-chip { display:none; }
-.zone.fog:hover { opacity:.75; border-color:color-mix(in srgb, var(--gold) 35%, transparent); }
-.zone.bel-ours { --owner:var(--good); background:color-mix(in srgb, var(--edge) calc(var(--fill-a) * 100%), transparent); border:1px solid color-mix(in srgb, var(--good) calc((.35 + var(--conf) * .6) * 100%), transparent); }
-.zone.bel-held { --owner:var(--warn); background:color-mix(in srgb, var(--warn) calc(var(--fill-a) * 100%), transparent); border:1px solid var(--warn); }
-.zone.bel-held.fac-armada { --owner:var(--f-armada); background:color-mix(in srgb, var(--f-armada) calc(var(--fill-a) * 100%), transparent); border-color:color-mix(in srgb, var(--f-armada) calc((.4 + var(--conf) * .6) * 100%), transparent); }
-.zone.bel-held.fac-cortex { --owner:var(--f-cortex); background:color-mix(in srgb, var(--f-cortex) calc(var(--fill-a) * 100%), transparent); border-color:color-mix(in srgb, var(--f-cortex) calc((.4 + var(--conf) * .6) * 100%), transparent); }
-.zone.bel-held.fac-nullmercs, .zone.bel-held.fac-legion { --owner:var(--f-nullmercs); background:color-mix(in srgb, var(--f-nullmercs) calc(var(--fill-a) * 100%), transparent); border-color:color-mix(in srgb, var(--f-nullmercs) calc((.4 + var(--conf) * .6) * 100%), transparent); }
-.zone.bel-held.fac-wild, .zone.bel-held.fac-raptors, .zone.bel-held.fac-raptor { --owner:var(--f-wild); background:color-mix(in srgb, var(--f-wild) calc(var(--fill-a) * 100%), transparent); border-color:color-mix(in srgb, var(--f-wild) calc((.4 + var(--conf) * .6) * 100%), transparent); }
-.zone.bel-held.fac-scavengers { --owner:var(--f-scavengers); background:color-mix(in srgb, var(--f-scavengers) calc(var(--fill-a) * 100%), transparent); border-color:color-mix(in srgb, var(--f-scavengers) calc((.4 + var(--conf) * .6) * 100%), transparent); }
-.zone.bel-empty { --owner:var(--ink); background:transparent; border:1px solid color-mix(in srgb, var(--ink) calc((.25 + var(--conf) * .4) * 100%), transparent); }
-.zone.bel-unsure { background:color-mix(in srgb, var(--muted) calc((.1 + var(--conf) * .3) * 100%), transparent); border:1px solid color-mix(in srgb, var(--muted) 50%, transparent); }
-.zone.bel-dark {
-  --owner:var(--ash);
-  background:repeating-linear-gradient(135deg, color-mix(in srgb, var(--ash) 16%, transparent) 0 3px, transparent 3px 9px);
-  border:1px dashed color-mix(in srgb, var(--ash) 45%, transparent);
+.zone.fog:hover { opacity:.75; }
+.zone.bel-ours { --owner:var(--good); --zfill:color-mix(in srgb, var(--edge) calc(var(--fill-a) * 100%), transparent); --zline:color-mix(in srgb, var(--good) calc((.35 + var(--conf) * .6) * 100%), transparent); }
+.zone.bel-held { --owner:var(--warn); --zfill:color-mix(in srgb, var(--owner) calc(var(--fill-a) * 100%), transparent); --zline:color-mix(in srgb, var(--owner) calc((.4 + var(--conf) * .6) * 100%), transparent); }
+.zone.bel-held.fac-armada { --owner:var(--f-armada); }
+.zone.bel-held.fac-cortex { --owner:var(--f-cortex); }
+.zone.bel-held.fac-nullmercs, .zone.bel-held.fac-legion { --owner:var(--f-nullmercs); }
+.zone.bel-held.fac-wild, .zone.bel-held.fac-raptors, .zone.bel-held.fac-raptor { --owner:var(--f-wild); }
+.zone.bel-held.fac-scavengers { --owner:var(--f-scavengers); }
+.zone.bel-empty { --owner:var(--ink); --zline:color-mix(in srgb, var(--muted) calc((.35 + var(--conf) * .4) * 100%), transparent); }
+.zone.bel-unsure { --zline:color-mix(in srgb, var(--ash) 45%, transparent); --zdash:3 3; }
+.zone.bel-dark { --owner:var(--ash); --zline:color-mix(in srgb, var(--ash) 28%, transparent); }
+.zone.st-stale { --zdash:3 3; }
+/* labels and glyphs sit at the zone's anchor, not its box corner */
+.zone .z-anchor {
+  position:absolute; left:var(--lx); top:var(--ly); transform:translate(-50%, -50%);
+  display:flex; flex-direction:column; align-items:center; gap:1px; pointer-events:none; text-align:center; max-width:90%;
 }
-.zone .z-q { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:var(--fs-2xl); color:color-mix(in srgb, var(--ash) 50%, transparent); pointer-events:none; font-weight:600; }
-.zone .z-stale { position:absolute; inset:2px; border:1px dotted var(--ash); border-radius:4px; pointer-events:none; }
-.zone .z-threat { position:absolute; left:0; top:0; height:3px; background:var(--bad); opacity:.85; pointer-events:none; }
-.zone .z-corner { position:absolute; right:14px; top:1px; display:flex; gap:2px; font-size:var(--fs-xs); line-height:1; pointer-events:auto; }
+.zone-label { line-height:1.15; font-size:var(--fs-sm); text-shadow:0 0 3px var(--bg); white-space:nowrap; }
+.zone .z-q { font-size:var(--fs-xl); line-height:1; color:color-mix(in srgb, var(--ash) 55%, transparent); font-weight:600; }
+.zone .z-threat { display:block; height:3px; background:var(--bad); opacity:.85; align-self:stretch; }
+.zone .z-corner { display:flex; gap:2px; font-size:var(--fs-sm); line-height:1; }
+.zone .z-corner:empty, .zone .z-foot:empty { display:none; }
 .zone .z-surprise { color:var(--warn); font-weight:700; }
 .zone .z-surprise.muted { color:var(--muted); }
 .zone .z-eyes { color:var(--bad); }
-.zone .z-foot { position:absolute; right:3px; bottom:2px; display:flex; gap:.3rem; font-size:var(--fs-xs); line-height:1; background:color-mix(in srgb, var(--panel) 75%, transparent); padding:1px 3px; border-radius:3px; }
-.zone .z-foot:empty { display:none; }
+.zone .z-foot { display:flex; gap:.3rem; font-size:var(--fs-xs); line-height:1; background:color-mix(in srgb, var(--panel) 75%, transparent); padding:1px 3px; border-radius:3px; }
 .zone .z-people.good { color:var(--good); }
 .zone .z-people.bad { color:var(--bad); }
 .zone .z-hold { color:var(--gold); }
-.zone.exp-known { box-shadow:0 0 0 2px color-mix(in srgb, var(--bad) 45%, transparent); outline:1px dashed color-mix(in srgb, var(--bad) 60%, transparent); outline-offset:3px; }
-.zone.exp-suspected { outline:1px dotted color-mix(in srgb, var(--warn) 70%, transparent); outline-offset:3px; }
-/* legal pads carry a STANDING mark: dashed edge inner ring + △ (even outside Pad mode) */
-.zone.pad-legal::before, .zone.pad-illegal::before { content:"△"; position:absolute; right:3px; top:1px; font-size:var(--fs-xs); line-height:1; color:var(--edge); pointer-events:none; }
-.zone.pad-legal::after { content:""; position:absolute; inset:3px; border:1px dashed color-mix(in srgb, var(--edge) 75%, transparent); border-radius:4px; pointer-events:none; }
-.zone.pad-legal.mode-lz:hover { border-color:var(--good); }
+.zone.exp-suspected { --zline:color-mix(in srgb, var(--warn) 70%, transparent); --zdash:1 2; }
+/* legal pads carry a standing △ beside the name (even outside Pad mode) */
+.zone.pad-legal .zone-label::after, .zone.pad-illegal .zone-label::after { content:" △"; color:var(--edge); }
 .zone.pad-illegal { filter:grayscale(1) brightness(.8); cursor:not-allowed; }
-.zone.pad-illegal::before { color:var(--muted); text-decoration:line-through; }
-/* Ash Console marks: pad=good, wound=warn */
-.zone.deploy-mark { background:color-mix(in srgb, var(--good) 22%, transparent); border-color:var(--good); box-shadow:0 0 0 1px var(--edge), 0 0 12px color-mix(in srgb, var(--good) 20%, transparent); z-index:5; }
-.zone.deploy-mark::before { color:var(--good); }
-.zone.capture-mark { background:color-mix(in srgb, var(--warn) 28%, transparent); border-color:var(--warn); box-shadow:0 0 12px color-mix(in srgb, var(--warn) 30%, transparent); z-index:5; }
-.zone.exp-known.deploy-mark { box-shadow:0 0 0 1px var(--edge), 0 0 0 3px color-mix(in srgb, var(--bad) 50%, transparent); }
-.zone.has-recruit { box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--warn) 55%, transparent), 0 0 10px color-mix(in srgb, var(--warn) 15%, transparent); }
-.zone.has-recruit::after { content:"rez"; position:absolute; right:2px; bottom:14px; font-size:var(--fs-xs); letter-spacing:.06em; text-transform:uppercase; color:var(--warn); opacity:.9; }
-.zone-label { pointer-events:none; line-height:1.15; position:relative; z-index:1; padding-right:1rem; font-size:var(--fs-sm); }
-.zone-chip { display:inline-block; font-size:var(--fs-xs); letter-spacing:.05em; text-transform:uppercase; padding:0 .25rem; border-radius:4px; margin-top:.1rem; border:1px solid color-mix(in srgb, var(--warn) 40%, transparent); color:var(--warn); }
-/* owner chip + intel line (belief words from the zone's data attributes) */
-.cc-owner { position:absolute; left:5px; top:26px; font-size:var(--fs-sm); font-weight:bold; color:var(--owner); background:color-mix(in srgb, var(--bg) 86%, transparent); padding:2px 4px; z-index:1; }
-.cc-intel { font-size:var(--fs-xs); display:block; position:absolute; bottom:3px; left:5px; background:color-mix(in srgb, var(--panel) 87%, transparent); padding:1px 3px; }
-.hide-intelligence .cc-intel { display:none; }
-.hide-ownership #board-zones .zone { background:color-mix(in srgb, var(--edge) 14%, var(--bg)); border-color:var(--line-solid); }
+.zone.pad-illegal .zone-label::after { color:var(--muted); text-decoration:line-through; }
+.zone.pad-legal.mode-lz:hover { --zline:var(--good); }
+/* the plan's marks: pad = good, wound = warn */
+.zone.deploy-mark { z-index:5; --zfill:color-mix(in srgb, var(--good) 22%, transparent); --zline:var(--good); --zw:2; --zdash:none; }
+.zone.deploy-mark .zone-label::after { color:var(--good); }
+.zone.capture-mark { z-index:5; --zfill:color-mix(in srgb, var(--warn) 28%, transparent); --zline:var(--warn); --zw:2; --zdash:none; }
+.zone.has-recruit { --zline:color-mix(in srgb, var(--warn) 70%, transparent); }
+.zone-chip { display:inline-block; font-size:var(--fs-xs); letter-spacing:.05em; text-transform:uppercase; padding:0 .25rem; border-radius:4px; border:1px solid color-mix(in srgb, var(--warn) 40%, transparent); color:var(--warn); background:color-mix(in srgb, var(--bg) 70%, transparent); }
+/* owner word, only when we believe someone holds the zone */
+.cc-owner { font-size:var(--fs-xs); font-weight:bold; color:var(--owner); background:color-mix(in srgb, var(--bg) 80%, transparent); padding:1px 4px; border-radius:3px; }
+.hide-intelligence .zone .z-q, .hide-intelligence .zone .z-corner, .hide-intelligence .zone .z-threat, .hide-intelligence .zone .z-exposed { display:none; }
+.hide-ownership #board-zones .zone { --zfill:color-mix(in srgb, var(--edge) 10%, transparent); --zline:var(--line-solid); --zdash:none; }
 .hide-ownership .cc-owner, .hide-ownership .cc-faction-key { display:none; }
 
 .theater-actions { flex:1; display:flex; flex-wrap:wrap; gap:.45rem; justify-content:space-between; align-items:center; margin:0; }

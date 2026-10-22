@@ -38,7 +38,7 @@ Not a second brand. Not a debug strip. Not “partial looks like victory.”
 |---|---|
 | Pad (land and lift, one point) | `steam` ring r=560, △ glyph |
 | Objective / wound | `warn` |
-| Belief fill | ours `edge`/`good` · held-by-faction = that faction's colour · held-unseen `warn` · empty border only · nobody looked = hatch + `?` · alpha = confidence · stale = dotted `ash` ring |
+| Belief fill | ours `edge`/`good` · held-by-faction = that faction's colour · held-unseen `warn` · empty border only · nobody looked = hairline + `?` · alpha = confidence · stale = dashed outline · the zone is its authored cell outline, the same shape BAR's minimap draws (`boards.embed.js` from `build_zone_boards.py`) |
 | Exposure | `bad` diagonal hatch (α = how much of us they see) + ◉ at the zone they believe we are in |
 | History | ✗ `warn` / ○ `muted` where the briefing was contradicted · ⚑ people left · ■ `gold` holdings |
 

@@ -24,12 +24,10 @@ export function edgeScore(z) {
   return Math.min(cx, 1 - cx, cz, 1 - cz);
 }
 export function isRimZone(z) { return edgeScore(z) <= RIM_THRESHOLD; }
+// The zone's anchor in board units — where the game puts the pad and where labels sit.
 export function zoneCenter(z) {
-  const b = (z && z.bounds) || {};
-  return {
-    x: (((Number(b.xMin) || 0) + (Number(b.xMax) || 1)) / 2) * 100,
-    y: (((Number(b.zMin) || 0) + (Number(b.zMax) || 1)) / 2) * 100,
-  };
+  const p = zonePoint(z);
+  return { x: p.x * 100, y: p.z * 100 };
 }
 function zonePoint(z) {
   const a = z && z.anchor;
@@ -358,7 +356,11 @@ function drawRouteArrows(plan, zones) {
       <marker id="arr-back" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto-start-reverse"><path d="M0,0 L5,2.5 L0,5 Z" class="route-back"/></marker>
     </defs>`);
   if (pad && target) {
-    const a = zoneCenter(pad), b = zoneCenter(target);
+    // Stop short of both anchors so the heads sit beside the zone names, not on them.
+    const p = zoneCenter(pad), q = zoneCenter(target);
+    const len = Math.hypot(q.x - p.x, q.y - p.y) || 1, trim = Math.min(6, len / 4);
+    const ux = (q.x - p.x) / len, uy = (q.y - p.y) / len;
+    const a = { x: p.x + ux * trim, y: p.y + uy * trim }, b = { x: q.x - ux * trim, y: q.y - uy * trim };
     parts.push(`<line class="route-line" x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke-width="0.9" stroke-opacity="0.9" marker-start="url(#arr-back)" marker-end="url(#arr-out)"/>`);
     const mx = a.x + (b.x - a.x) * 0.18, my = a.y + (b.y - a.y) * 0.18;
     parts.push(`<text class="route-return" x="${mx}" y="${my}" dy="-1.2" text-anchor="middle" font-size="3.2" stroke-width="0.3" paint-order="stroke">↩</text>`);
@@ -389,11 +391,15 @@ export function renderBoard() {
     drawRouteArrows(plan, []);
   } else {
     const m = plan.marks || {};
-    el.innerHTML = zones.map(z => {
+    // Big zones first so nested ones sit on top — the same order the in-game board paints.
+    const byArea = zones.slice().sort((a, b) => ((b.shape && b.shape.cells) || 0) - ((a.shape && a.shape.cells) || 0));
+    el.innerHTML = byArea.map(z => {
       const b = z.bounds || { xMin: 0, xMax: 0.2, zMin: 0, zMax: 0.2 };
-      const left = (b.xMin || 0) * 100, top = (b.zMin || 0) * 100;
-      const w = Math.max(4, ((b.xMax || 0) - (b.xMin || 0)) * 100);
-      const h = Math.max(4, ((b.zMax || 0) - (b.zMin || 0)) * 100);
+      const shape = z.shape || { d: "", box: [(b.xMin || 0) * 100, (b.zMin || 0) * 100, ((b.xMax || 0) - (b.xMin || 0)) * 100, ((b.zMax || 0) - (b.zMin || 0)) * 100] };
+      const [left, top, w, h] = shape.box;
+      const pt = zonePoint(z);
+      const lx = w > 0 ? ((pt.x * 100 - left) / w) * 100 : 50;
+      const ly = h > 0 ? ((pt.z * 100 - top) / h) * 100 : 50;
       const intel = intelFor(plan.mapId, z.zoneId) || {};
       const bel = beliefOf(plan.mapId, z.zoneId);
       const legal = padLegality(plan.mapId, z);
@@ -434,7 +440,6 @@ export function renderBoard() {
       const peopleGlyph = bel.people.length ? `<span class="z-people ${anyWounded ? "bad" : "good"}" title="${esc(peopleNames.join(", "))}">⚑ ${bel.people.length}</span>` : "";
       const holdGlyph = bel.holding > 0 ? `<span class="z-hold" title="${bel.holding} of our structures left here">■ ${bel.holding}</span>` : "";
       const darkGlyph = bel.believed === "dark" ? `<span class="z-q" aria-hidden="true">?</span>` : "";
-      const stale = bel.state === "stale" ? `<i class="z-stale" aria-hidden="true"></i>` : "";
       const tipBits = [
         z.label || z.zoneId,
         `believed ${believedWord(bel)}`,
@@ -448,16 +453,22 @@ export function renderBoard() {
         eyes === "known" ? "Armada has eyes on it" : eyes === "suspected" ? "Armada may suspect it" : null,
         legal.ok ? `pad: ${legal.why}` : (lzMode ? `no pad: ${legal.why}` : null),
       ].filter(Boolean);
-      // style= carries geometry + the confidence custom property only; colour comes from classes.
+      // The div spans the zone's box; the svg path is the zone (authored cells, as in-game) and is
+      // the only part that takes the pointer, so nested zones click true. style= carries geometry,
+      // the label point and the confidence custom property only; colour comes from classes.
+      const hatch = eyes === "known" ? `<path class="z-exposed" d="${shape.d}" fill-rule="evenodd"/>` : "";
       return `<div role="button" tabindex="0" class="${cls.join(" ")}" data-zone="${esc(z.zoneId)}"
           data-believed="${esc(bel.believed)}" data-control="${esc(bel.control)}" data-conf="${bel.confidence.toFixed(2)}" data-state="${esc(bel.state)}"
-          style="left:${left}%;top:${top}%;width:${w}%;height:${h}%;--conf:${bel.confidence.toFixed(2)}"
+          style="left:${left}%;top:${top}%;width:${w}%;height:${h}%;--conf:${bel.confidence.toFixed(2)};--lx:${lx.toFixed(1)}%;--ly:${ly.toFixed(1)}%"
           title="${esc(tipBits.join(" · "))}${esc(recruitTitle)}${fogNote}">
-          ${threatBar}${stale}
-          <div class="zone-label">${esc(z.label || z.zoneId)}</div>${chip}
-          <span class="z-corner">${spBadge}${eyeBadge}</span>
-          ${darkGlyph}
-          <span class="z-foot">${peopleGlyph}${holdGlyph}</span>
+          <svg class="z-shape" viewBox="${left} ${top} ${w} ${h}" preserveAspectRatio="none" aria-hidden="true"><path class="z-area" d="${shape.d}" fill-rule="evenodd"/>${hatch}</svg>
+          <div class="z-anchor">
+            <div class="zone-label">${esc(z.label || z.zoneId)}</div>${chip}
+            <span class="z-corner">${spBadge}${eyeBadge}</span>
+            ${darkGlyph}
+            <span class="z-foot">${peopleGlyph}${holdGlyph}</span>
+            ${threatBar}
+          </div>
         </div>`;
     }).join("");
     el.querySelectorAll(".zone").forEach(z => {
@@ -575,15 +586,16 @@ export function updateIntelligence(narrative, mapId) {
   document.querySelectorAll("#board-zones .zone").forEach(zone => {
     const record = narrative?.intelligence?.[`${mapId}:${zone.dataset.zone}`];
     const ownerText = ownerFromBelief(zone);
+    // One word for who we believe holds it, and only when we believe someone does. Dark, empty
+    // and unsure say it with the shape (hairline + ?, outline, dashes), as the in-game board does.
+    const anchor = zone.querySelector(".z-anchor") || zone;
     let owner = zone.querySelector(".cc-owner");
-    if (!owner) { owner = document.createElement("span"); owner.className = "cc-owner"; zone.append(owner); }
-    if (owner.textContent !== ownerText) owner.textContent = ownerText;
-    let label = zone.querySelector(".cc-intel");
-    if (!label) { label = document.createElement("span"); label.className = "cc-intel"; zone.append(label); }
+    const believedHolder = ["ours", "held"].includes(zone.dataset.believed);
+    if (believedHolder && !owner) { owner = document.createElement("span"); owner.className = "cc-owner"; anchor.append(owner); }
+    if (!believedHolder && owner) { owner.remove(); owner = null; }
+    if (owner && owner.textContent !== ownerText) owner.textContent = ownerText;
     const conf = Math.round(Number(zone.dataset.conf || 0) * 100);
     const st = zone.dataset.state || "dark";
-    const intelText = record ? `${record.status === "Confirmed" ? "●" : "◐"} ${record.status}` : (st === "dark" ? "○ Dark" : `${st === "current" ? "●" : "◐"} ${conf}% · ${st}`);
-    if (label.textContent !== intelText) label.textContent = intelText;
     const name = zone.querySelector(".zone-label")?.textContent || zone.dataset.zone;
     const aria = `${name}. Believed ${ownerText.slice(2)}, ${conf}% sure, ${st}.${record ? " " + record.status + "." : ""}`;
     if (zone.getAttribute("aria-label") !== aria) zone.setAttribute("aria-label", aria);

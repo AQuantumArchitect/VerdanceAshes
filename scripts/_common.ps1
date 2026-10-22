@@ -303,6 +303,15 @@ function ConvertTo-LuaStringLiteral {
   if ($null -eq $Value) { return '""' }
   $escaped = $Value.Replace('\', '\\').Replace('"', '\"')
   $escaped = $escaped.Replace("`r", '\r').Replace("`n", '\n').Replace("`t", '\t')
+  # The seed files are written ASCII; carry anything else (an em dash, a name with an accent)
+  # as Lua decimal byte escapes of its UTF-8, so it reaches BAR intact instead of as "?".
+  if ($escaped -match '[^\x00-\x7F]') {
+    $sb = New-Object System.Text.StringBuilder
+    foreach ($b in [System.Text.Encoding]::UTF8.GetBytes($escaped)) {
+      if ($b -lt 128) { [void]$sb.Append([char]$b) } else { [void]$sb.Append('\' + $b) }
+    }
+    $escaped = $sb.ToString()
+  }
   return '"' + $escaped + '"'
 }
 

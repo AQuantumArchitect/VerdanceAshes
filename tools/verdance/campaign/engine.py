@@ -250,7 +250,7 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
             if not deploy_zone:
                 _, deploy_zone = choose_next_map_zone(state, workspace)
                 map_id = canonical_map_id(sortie["mapId"])
-        objective = objective_from_sortie(sortie, state)
+        objective = objective_from_sortie(sortie, state, workspace)
         # Multi-capture from hub board (arc 2+): primary stays targetZoneId.
         caps = list(sortie.get("captureZoneIds") or [])
         secondary = list(
@@ -286,7 +286,7 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
     if (sortie or {}).get("openingMission"):
         title = "Opening Raid - Greenest Fields Decoy Farms" if title else None
     elif contract_active:
-        title = f"Contract — {objective.get('label') or objective.get('targetZoneId')}"
+        title = objective.get("label") or objective.get("targetZoneId")
     if finale_plan:
         title = finale_plan["title"]
     rep = state.get("reputation", {}) or {}
