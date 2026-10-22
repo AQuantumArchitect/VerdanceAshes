@@ -213,7 +213,8 @@ export function toggleCrew(id) {
 export function recommendCompany() {
   if (companySealed()) return;
   const pool = crewBandOrder().filter(id => !crewCoreIds().includes(id) && !["dead", "lost"].includes(String(aceById(id)?.status || "active")));
-  const priorities = ["solarium", "vane", "volt", "hearth", "consul", "warder"];
+  // Solarium + Anvil + Consul: the company that won the first playtest; the rest by band order.
+  const priorities = ["solarium", "anvil", "consul", "vane", "volt", "hearth", "warder"];
   const ordered = [...priorities.filter(id => pool.includes(id)), ...pool.filter(id => !priorities.includes(id))];
   const selected = [];
   let budget = crewWallet(), metal = crewMetalK();

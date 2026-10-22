@@ -887,7 +887,7 @@
     },
     "solarium": {
       "role": "band",
-      "unitDef": "armnanotc",
+      "unitDef": "armck",
       "hireTnb": 1,
       "packTotal": 1,
       "extras": 0,
@@ -947,9 +947,13 @@
         {
           "unitDef": "armrad",
           "count": 1
+        },
+        {
+          "unitDef": "armcir",
+          "count": 1
         }
       ],
-      "blurb": "Beamer ring + Ferrets + Thistles + LLTs. Owns a circle of dirt.",
+      "blurb": "Beamer ring + Ferrets + Thistles + LLTs + a Chainsaw. Owns a circle of dirt.",
       "name": "Warder",
       "tags": [
         "area_control",
@@ -1177,11 +1181,11 @@
     },
     "lumen": {
       "role": "band",
-      "unitDef": "armageo",
+      "unitDef": "armack",
       "hireTnb": 0,
       "packTotal": 1,
       "extras": 0,
-      "blurb": "Advanced geo — saint garden. Tithe the grid; keep the lights devout.",
+      "blurb": "T2 constructor of the saint garden. Raises Prudes and Pulsars, and nothing else.",
       "name": "Sister Lumen",
       "sizing": "fixed",
       "startXp": 0.05,
@@ -1192,6 +1196,10 @@
         "eco",
         "geo",
         "saint"
+      ],
+      "buildOnly": [
+        "armgmm",
+        "armanni"
       ]
     },
     "anvil": {

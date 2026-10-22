@@ -311,7 +311,7 @@ M.HEROES = {
   solarium = {
     name = "Solarium",
     role = "band",
-    unitDef = "armnanotc",
+    unitDef = "armck",
     hireTnb = 1,
     packTotal = 1,
     extras = 0,
@@ -366,6 +366,10 @@ M.HEROES = {
       {
         unitDef = "armllt",
         count = 2,
+      },
+      {
+        unitDef = "armcir",
+        count = 1,
       },
       {
         unitDef = "armrad",
@@ -523,14 +527,15 @@ M.HEROES = {
   lumen = {
     name = "Sister Lumen",
     role = "band",
-    unitDef = "armageo",
+    unitDef = "armack",
+    buildOnly = { "armgmm", "armanni" },
     hireTnb = 0,
     packTotal = 1,
     extras = 0,
     startXp = 0.05,
     packMind = "solo",
     tags = { "eco", "geo", "saint" },
-    blurb = "Advanced geo — saint garden. Tithe the grid; keep the lights devout.",
+    blurb = "T2 constructor of the saint garden. Raises Prudes and Pulsars, and nothing else.",
   },
   anvil = {
     name = "Anvil Mire",

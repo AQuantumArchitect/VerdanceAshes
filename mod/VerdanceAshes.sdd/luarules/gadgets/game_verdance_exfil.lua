@@ -344,7 +344,7 @@ local function hudScan()
           onPad = onPad, zone = zoneOf(x, z) or "", crit = (tonumber((Spring.GetUnitRulesParam(uid, "va_hero_critical"))) or 0) == 1,
           level = tonumber((Spring.GetUnitRulesParam(uid, "va_hero_level"))) or 1, rank = tostring(Spring.GetUnitRulesParam(uid, "va_hero_rank") or ""),
           vet = tostring(Spring.GetUnitRulesParam(uid, "va_vet_rank") or ""), state = "alive",
-          dist = math.floor(math.sqrt(dx * dx + dz * dz)),
+          dist = math.floor(math.sqrt(((x or 0) - pad.x) ^ 2 + ((z or 0) - pad.z) ^ 2)),
         }
       end
     end

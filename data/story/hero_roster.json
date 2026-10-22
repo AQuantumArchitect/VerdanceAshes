@@ -282,7 +282,7 @@
     {
       "heroId": "solarium",
       "name": "Solarium",
-      "unitDef": "armnanotc",
+      "unitDef": "armck",
       "missionCritical": false,
       "status": "locked",
       "xp": 0.06,
@@ -683,7 +683,7 @@
     {
       "heroId": "lumen",
       "name": "Sister Lumen",
-      "unitDef": "armageo",
+      "unitDef": "armack",
       "missionCritical": false,
       "status": "locked",
       "xp": 0.05,

@@ -58,6 +58,7 @@ Spring = {
   GetUnitDefID = function(id) return U[id].def end, GetUnitTeam = function(id) return U[id].team end,
   GetUnitRulesParam = function(id, k) local u = U[id]; if k == "va_hero_id" or k == "va_hero_name" then return u.hero end end,
   AreTeamsAllied = function(a, b) return a == b end,
+  GetUnitHealth = function() return 80, 100 end, GetUnitExperience = function() return 0 end,
   GetTeamList = function() return { 0, 1 } end, GetGaiaTeamID = function() return -1 end,
   GetMyTeamID = function() return 0 end, GetTeamInfo = function(t) return t, 0, false, false, "", t end,
   GetPlayerList = function() return { 0 } end, GetPlayerInfo = function() return "p", true, false, 0, 0 end,
@@ -71,6 +72,10 @@ assert(chunk() ~= false, "gadget stood down")
 if gadget.Initialize then gadget:Initialize() end
 if gadget.GameStart then gadget:GameStart() end
 assert(GG.VA_ExfilCmd, "GG.VA_ExfilCmd not registered")
+-- the once-a-second HUD scan (GameFrame) must run clean: it killed LuaRules in a playtest
+for f = 1, 61 do gadget:GameFrame(f) end
+assert(RULES.va_hud_heroes_json and RULES.va_hud_heroes_json:find('"dist"'), "hud scan published no heroes")
+print("ok   hud scan runs and publishes heroes")
 GG.VA_ExfilCmd("manifest")
 assert(#SENT == 1 and SENT[1][1] == "VERDANCE_MANIFEST", "no manifest sent")
 local m = SENT[1][2]

@@ -1702,6 +1702,7 @@ local function registerHeroSpawn(unitID, spec)
     rec.recruitMode = tostring(spec.recruitMode or "wreck_rez")
   end
   heroByUnitID[unitID] = id
+  VA_HERO_applyBuildOnly(unitID, id)
   Spring.SetUnitRulesParam(unitID, "va_hero", 1, { public = true })
   Spring.SetUnitRulesParam(unitID, "va_hero_id", id, { public = true })
   Spring.SetUnitRulesParam(unitID, "va_hero_name", rec.name, { public = true })
@@ -2069,6 +2070,30 @@ local function spawnUnitSpec(spec, teamID, baseX, baseZ, groupX, groupZ, claimed
     spawned = spawned + spawnOneUnit(defName, x, z, facing, teamID, spec, force)
   end
   return spawned
+end
+
+-- A hero whose pack says buildOnly = { ... } can build those and nothing else (Sister Lumen:
+-- Prude and Pulsar). Called whenever a unit becomes a hero: spawn, and rez / chassis promote.
+function VA_HERO_applyBuildOnly(unitID, heroId)
+  local roster = VA_CREW_loadRoster and VA_CREW_loadRoster()
+  local pack = roster and roster.HEROES and roster.HEROES[tostring(heroId)]
+  local only = pack and pack.buildOnly
+  if type(only) ~= "table" or not (Spring.GetUnitCmdDescs and Spring.RemoveUnitCmdDesc) then return end
+  local keep = {}
+  for _, name in ipairs(only) do keep[name] = true end
+  local descs = Spring.GetUnitCmdDescs(unitID) or {}
+  local removed = 0
+  for i = #descs, 1, -1 do
+    local c = descs[i]
+    if c and c.id and c.id < 0 then
+      local bud = UnitDefs[-c.id]
+      if not (bud and keep[bud.name]) then
+        pcall(Spring.RemoveUnitCmdDesc, unitID, i)
+        removed = removed + 1
+      end
+    end
+  end
+  Spring.Echo("VA_HERO_BUILD_ONLY id=" .. tostring(heroId) .. " unit=" .. tostring(unitID) .. " kept=" .. table.concat(only, ",") .. " removed=" .. removed)
 end
 
 -- Muster the Band helpers (globals — keep main-chunk locals free).
@@ -3159,6 +3184,16 @@ local function spawnPlayableSetup()
     Spring.SetGameRulesParam("va_purge_armed", 1, { public = true })
     Spring.SetGameRulesParam("va_purge_done", 0, { public = true })
     Spring.Echo("VA_PURGE_ARMED teams=" .. tostring(purgeCount))
+  end
+  -- The centre of the drop zone is marked by a T1 radar (the exfil gadget published the pad
+  -- point at load). It is ours and it stays: left behind, it is a holding like any structure.
+  do
+    local px, pz = tonumber((Spring.GetGameRulesParam("va_pad_x"))), tonumber((Spring.GetGameRulesParam("va_pad_z")))
+    if px and pz and px >= 0 and pz >= 0 and UnitDefNames and UnitDefNames["armrad"] then
+      local py = Spring.GetGroundHeight(px, pz) or 0
+      local radar = Spring.CreateUnit("armrad", px, py, pz, 0, playerTeamID)
+      Spring.Echo("VA_PAD_RADAR unit=" .. tostring(radar) .. " @ " .. math.floor(px) .. "," .. math.floor(pz))
+    end
   end
   Spring.SetGameRulesParam("va_playable_setup", 1, { public = true })
   Spring.SetGameRulesParam("va_playable_units", totalSpawned, { public = true })
@@ -4572,6 +4607,7 @@ function heroRecovered(rec, newUnitID)
   rec.unitID = newUnitID
   rec.rezGraceUntil = nil
   heroByUnitID[newUnitID] = rec.id
+  VA_HERO_applyBuildOnly(newUnitID, rec.id)
   Spring.SetUnitRulesParam(newUnitID, "va_hero", 1, { public = true })
   Spring.SetUnitRulesParam(newUnitID, "va_hero_id", rec.id, { public = true })
   Spring.SetUnitRulesParam(newUnitID, "va_hero_name", rec.name, { public = true })
