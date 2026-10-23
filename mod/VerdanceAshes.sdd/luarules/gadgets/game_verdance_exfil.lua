@@ -236,8 +236,11 @@ local function enemiesOnPad()
   for _, uid in ipairs(Spring.GetUnitsInCylinder(pad.x, pad.z, pad.reach) or {}) do
     local team = Spring.GetUnitTeam(uid)
     if team ~= nil and team ~= gaiaTeamID and not Spring.AreTeamsAllied(playerTeamID, team) then
+      -- an enemy that can move; walls and turrets in the zone are not "on the pad"
+      local ud = UnitDefs[Spring.GetUnitDefID(uid) or -1]
+      local mobile = ud and not ud.isBuilding and (ud.speed or 0) > 0
       local ux, _, uz = Spring.GetUnitPosition(uid)
-      if onPadAt(ux, uz) then n = n + 1 end
+      if mobile and onPadAt(ux, uz) then n = n + 1 end
     end
   end
   return n
@@ -366,7 +369,18 @@ local function hudScan()
   Spring.SetGameRulesParam("va_pad_enemy_live", enemy, { public = true })
 end
 
+-- Memory watch (a playtest hit BAR's 1.2 GB Lua limit): once a game minute, how much the
+-- synced Lua heap holds before and after a full collection. Kept high after = a leak; falls
+-- back = churn. The LuaUI side is logged by the minimap widget.
+local function memWatch(f, side)
+  if f % 1800 ~= 900 or not collectgarbage then return end
+  local before = collectgarbage("count")
+  collectgarbage("collect")
+  Spring.Echo(string.format("VA_LUAMEM %s frame=%d before=%.0fMB after=%.0fMB", side, f, before / 1024, collectgarbage("count") / 1024))
+end
+
 function gadget:GameFrame(f)
+  memWatch(f, "rules")
   if ready and f % 30 == 7 then hudScan() end
 end
 
@@ -420,7 +434,12 @@ local function exfilCmd(cmd)
     if not ready then Spring.Echo("VA_EXFIL_ERR not ready"); return end
     if next(teamAlly) == nil then resolvePlayerTeam() end
     local m = manifest()
-    SendToUnsynced("VERDANCE_MANIFEST", toJson(m))
+    -- Posted as rules params (how every HUD fact travels); the exfil widget opens on a new seq.
+    local seq = (tonumber((Spring.GetGameRulesParam("va_manifest_seq"))) or 0) + 1
+    Spring.SetGameRulesParam("va_manifest_json", toJson(m), { public = true })
+    Spring.SetGameRulesParam("va_manifest_seq", seq, { public = true })
+    Spring.Echo("VA_EXFIL_MANIFEST seq=" .. seq .. " going=" .. #m.going.heroes .. "h/" .. m.going.unitCount
+      .. " staying=" .. #m.staying.heroes .. "h/" .. m.staying.unitCount .. "u enemyOnPad=" .. m.enemyOnPad)
     return true
   end
   local dest = cmd:match("^extract:(.+)$")
@@ -447,42 +466,19 @@ function gadget:Shutdown()
   GG.VA_WipedManifest = nil
 end
 
-else -- unsynced: hand the manifest to LuaUI, close the game a few seconds after the sortie ends
+else -- unsynced: close the game a few seconds after the sortie ends (the widget shows the card)
 
 local quitAt = nil
 
-function gadget:Initialize()
-  gadgetHandler:AddSyncAction("VERDANCE_MANIFEST", function(_, json)
-    if Script.LuaUI and Script.LuaUI.VerdanceManifest then
-      Script.LuaUI.VerdanceManifest(json)
-    else
-      Spring.Echo("VA_EXFIL_ERR no exfil widget to show the manifest")
-    end
-  end)
-  gadgetHandler:AddSyncAction("VERDANCE_SORTIE_OVER", function(_, kind)
-    -- the widget shows the closing card; we own the clock so the game closes even if it does not
-    quitAt = os.clock() + 6.0
-    pcall(Spring.SendCommands, "pause 1")
-    if Script.LuaUI and Script.LuaUI.VerdanceMissionEventExfil then
-      Script.LuaUI.VerdanceMissionEventExfil("sortie_over", kind)
-    end
-    if Script.LuaUI and Script.LuaUI.VerdanceMissionEvent then
-      Script.LuaUI.VerdanceMissionEvent("sortie_over", kind)
-    end
-  end)
-end
-
 function gadget:Update()
+  if not quitAt and (tonumber((Spring.GetGameRulesParam("va_terminal"))) or 0) == 1 then
+    quitAt = os.clock() + 6.0
+  end
   if quitAt and os.clock() >= quitAt then
-    quitAt = nil
+    quitAt = math.huge
     Spring.Echo("VA_SORTIE_QUIT")
     Spring.SendCommands("quitforce")
   end
-end
-
-function gadget:Shutdown()
-  gadgetHandler:RemoveSyncAction("VERDANCE_MANIFEST")
-  gadgetHandler:RemoveSyncAction("VERDANCE_SORTIE_OVER")
 end
 
 end

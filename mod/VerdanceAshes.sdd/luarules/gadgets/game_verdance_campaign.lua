@@ -1702,7 +1702,6 @@ local function registerHeroSpawn(unitID, spec)
     rec.recruitMode = tostring(spec.recruitMode or "wreck_rez")
   end
   heroByUnitID[unitID] = id
-  VA_HERO_applyBuildOnly(unitID, id)
   Spring.SetUnitRulesParam(unitID, "va_hero", 1, { public = true })
   Spring.SetUnitRulesParam(unitID, "va_hero_id", id, { public = true })
   Spring.SetUnitRulesParam(unitID, "va_hero_name", rec.name, { public = true })
@@ -2070,30 +2069,6 @@ local function spawnUnitSpec(spec, teamID, baseX, baseZ, groupX, groupZ, claimed
     spawned = spawned + spawnOneUnit(defName, x, z, facing, teamID, spec, force)
   end
   return spawned
-end
-
--- A hero whose pack says buildOnly = { ... } can build those and nothing else (Sister Lumen:
--- Prude and Pulsar). Called whenever a unit becomes a hero: spawn, and rez / chassis promote.
-function VA_HERO_applyBuildOnly(unitID, heroId)
-  local roster = VA_CREW_loadRoster and VA_CREW_loadRoster()
-  local pack = roster and roster.HEROES and roster.HEROES[tostring(heroId)]
-  local only = pack and pack.buildOnly
-  if type(only) ~= "table" or not (Spring.GetUnitCmdDescs and Spring.RemoveUnitCmdDesc) then return end
-  local keep = {}
-  for _, name in ipairs(only) do keep[name] = true end
-  local descs = Spring.GetUnitCmdDescs(unitID) or {}
-  local removed = 0
-  for i = #descs, 1, -1 do
-    local c = descs[i]
-    if c and c.id and c.id < 0 then
-      local bud = UnitDefs[-c.id]
-      if not (bud and keep[bud.name]) then
-        pcall(Spring.RemoveUnitCmdDesc, unitID, i)
-        removed = removed + 1
-      end
-    end
-  end
-  Spring.Echo("VA_HERO_BUILD_ONLY id=" .. tostring(heroId) .. " unit=" .. tostring(unitID) .. " kept=" .. table.concat(only, ",") .. " removed=" .. removed)
 end
 
 -- Muster the Band helpers (globals — keep main-chunk locals free).
@@ -4617,7 +4592,6 @@ function heroRecovered(rec, newUnitID)
   rec.unitID = newUnitID
   rec.rezGraceUntil = nil
   heroByUnitID[newUnitID] = rec.id
-  VA_HERO_applyBuildOnly(newUnitID, rec.id)
   Spring.SetUnitRulesParam(newUnitID, "va_hero", 1, { public = true })
   Spring.SetUnitRulesParam(newUnitID, "va_hero_id", rec.id, { public = true })
   Spring.SetUnitRulesParam(newUnitID, "va_hero_name", rec.name, { public = true })
@@ -4686,6 +4660,25 @@ function heroOnFeatureCreated(featureID, allyTeamID, sourceID)
     sourceID = GG.GetCorpsePriorUnitID(featureID)
   end
   local id = sourceID and heroPendingWreck[sourceID]
+  if not id then
+    -- No source link (seen with a Halberd hovertank): take the corpse of the hero's chassis
+    -- that appears where they fell.
+    local fx, _, fz = Spring.GetFeaturePosition(featureID)
+    local fdef = Spring.GetFeatureDefID and FeatureDefs[Spring.GetFeatureDefID(featureID) or -1]
+    local fname = fdef and fdef.name or ""
+    if fx then
+      for deadUnitID, hid in pairs(heroPendingWreck) do
+        local r = heroes[hid]
+        local chassis = r and tostring(r.unitDefName or "") or ""
+        local dx, dz = fx - (r and r.deathX or fx), fz - (r and r.deathZ or fz)
+        if chassis ~= "" and fname:sub(1, #chassis) == chassis and dx * dx + dz * dz <= 300 * 300 then
+          id, sourceID = hid, deadUnitID
+          Spring.Echo("VA_HERO_WRECK_BY_POSITION id=" .. hid .. " feature=" .. tostring(featureID) .. " def=" .. fname)
+          break
+        end
+      end
+    end
+  end
   if not id then return end
   heroPendingWreck[sourceID] = nil
   local rec = heroes[id]
@@ -4766,6 +4759,13 @@ function vaTechGateAllows(unitDefID, builderID, builderTeam)
 end
 
 -- Match a freshly created unit back to a downed hero (feature id, def+position).
+-- A hero can come back by rez while down, in rez grace, waiting for the wreck, or "lost" only
+-- because the wreck never linked (no_wreck): the corpse may still be lying there.
+function heroRezzable(rec)
+  local st = rec and rec.state
+  return st == "down" or st == "rez_grace" or st == "down_pending_wreck" or (st == "lost" and rec.diedHow == "no_wreck")
+end
+
 function findHeroForResurrection(unitID, unitDefID, builderID)
   local featureID = resolveWorkerFeatureID(builderID)
   if featureID and heroByFeatureID[featureID] then
@@ -4779,7 +4779,7 @@ function findHeroForResurrection(unitID, unitDefID, builderID)
 
   local bestId, bestDist = nil, nil
   for id, rec in pairs(heroes) do
-    if rec.state == "down" or rec.state == "rez_grace" or rec.state == "down_pending_wreck" then
+    if heroRezzable(rec) then
       local expected = rec.unitDefName or ""
       if expected == "" or expected == defName then
         local dx = x - (rec.deathX or x)
@@ -4800,7 +4800,7 @@ function heroOnUnitCreated(unitID, unitDefID, unitTeam, builderID)
   local anyDown = next(heroByFeatureID) ~= nil
   if not anyDown then
     for _, rec in pairs(heroes) do
-      if rec.state == "down" or rec.state == "rez_grace" or rec.state == "down_pending_wreck" then
+      if heroRezzable(rec) then
         anyDown = true
         break
       end

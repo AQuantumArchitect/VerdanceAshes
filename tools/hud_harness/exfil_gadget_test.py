@@ -36,6 +36,7 @@ local U = {
   [3] = { x = 3900, z = 1900, def = 2, team = 0, hero = "solarium" },
   [4] = { x = 2048, z = 3500, def = 1, team = 0 },
   [9] = { x = 300,  z = 1800, def = 1, team = 1 },
+  [10] = { x = 600, z = 600, def = 2, team = 1 },  -- an enemy wall/turret in the pad zone: not "on the pad"
 }
 UnitDefs = { [1] = { name = "corthud", speed = 50, metalCost = 100 }, [2] = { name = "armnanotc", speed = 0, metalCost = 200 } }
 Game = { mapSizeX = 4096, mapSizeZ = 4096 }
@@ -77,14 +78,14 @@ for f = 1, 61 do gadget:GameFrame(f) end
 assert(RULES.va_hud_heroes_json and RULES.va_hud_heroes_json:find('"dist"'), "hud scan published no heroes")
 print("ok   hud scan runs and publishes heroes")
 GG.VA_ExfilCmd("manifest")
-assert(#SENT == 1 and SENT[1][1] == "VERDANCE_MANIFEST", "no manifest sent")
-local m = SENT[1][2]
+assert(RULES.va_manifest_seq == 1 and type(RULES.va_manifest_json) == "string", "no manifest posted")
+local m = RULES.va_manifest_json
 local function has(pat, why) assert(m:find(pat, 1, true), why .. "\n" .. m) end
 has('"going":{"heroes":[{"heroId":"pavise"', "hero in the pad zone goes")
 has('"unitCount":1,"units":{"corthud":1}}', "a unit at the zone's far corner (outside the old circle) goes")
 has('"staying":{"heroes":[{"heroId":"solarium"', "an immobile hero stays as a person, not a building")
 has('"units":{"FAR":1}', "a unit outside the pad zone stays")
-has('"enemyOnPad":1', "an enemy anywhere in the pad zone is on the pad")
+has('"enemyOnPad":1', "a mobile enemy anywhere in the pad zone is on the pad; a wall is not")
 print("ok   manifest: pad is the landing zone; Solarium stays as a person")
 GG.VA_ExfilCmd("extract:home")
 assert(ENDED[1] == "extracted", "extract did not end the sortie")

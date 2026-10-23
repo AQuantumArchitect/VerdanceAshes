@@ -683,7 +683,7 @@
     {
       "heroId": "lumen",
       "name": "Sister Lumen",
-      "unitDef": "armack",
+      "unitDef": "va_lumen",
       "missionCritical": false,
       "status": "locked",
       "xp": 0.05,

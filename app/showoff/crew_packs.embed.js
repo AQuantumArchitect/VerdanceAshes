@@ -502,6 +502,9 @@ window.CREW_PACKS = {
     },
     "armanni": {
       "label": "Pulsar"
+    },
+    "va_lumen": {
+      "label": "Adv. Construction Vehicle"
     }
   },
   "heroes": {
@@ -1195,25 +1198,21 @@ window.CREW_PACKS = {
     },
     "lumen": {
       "role": "band",
-      "unitDef": "armack",
+      "unitDef": "va_lumen",
       "hireTnb": 0,
       "packTotal": 1,
       "extras": 0,
-      "blurb": "T2 constructor of the saint garden. Raises Prudes and Pulsars, and nothing else.",
+      "blurb": "T2 construction vehicle of the saint garden. Raises Prudes and Pulsars, and nothing else.",
       "name": "Sister Lumen",
       "sizing": "fixed",
-      "startXp": 0.412,
-      "packCombined": 529,
-      "packMetal": 430,
-      "packEnergy": 6900,
+      "startXp": 0.392,
+      "packCombined": 647,
+      "packMetal": 550,
+      "packEnergy": 6800,
       "tags": [
         "eco",
         "geo",
         "saint"
-      ],
-      "buildOnly": [
-        "armgmm",
-        "armanni"
       ]
     },
     "anvil": {

@@ -132,7 +132,19 @@ function widget:Shutdown()
   end
 end
 
+-- Memory watch, LuaUI side (see game_verdance_exfil.lua): once a game minute.
+local lastMemFrame = -1
+local function memWatch()
+  local f = Spring.GetGameFrame() or 0
+  if f - lastMemFrame < 1800 or not collectgarbage then return end
+  lastMemFrame = f
+  local before = collectgarbage("count")
+  collectgarbage("collect")
+  Spring.Echo(string.format("VA_LUAMEM ui frame=%d before=%.0fMB after=%.0fMB", f, before / 1024, collectgarbage("count") / 1024))
+end
+
 function widget:Update()
+  memWatch()
   if not board then return end
   local key = board:roleKeyNow()
   if key ~= lastRoleKey then

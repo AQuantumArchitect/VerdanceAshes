@@ -797,7 +797,7 @@
       "allowBail": true,
       "allowKite": false,
       "faction": "armada",
-      "unitDef": "armack",
+      "unitDef": "va_lumen",
       "voice": {
         "hook": "Tithe the grid.",
         "blurb": "Advanced geo \u2014 saint garden. Tithe the grid; keep the lights devout.",

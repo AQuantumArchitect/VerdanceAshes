@@ -123,19 +123,22 @@ function widget:VerdanceMissionEvent(eventStatus, reason)
 end
 
 function widget:Initialize()
-  widgetHandler:RegisterGlobal(widget, "VerdanceManifest", function(json) widget:VerdanceManifest(json) end)
-  widgetHandler:RegisterGlobal(widget, "VerdanceMissionEventExfil", function(e, r) widget:VerdanceMissionEvent(e, r) end)
   -- the infil card may already own the modal flag; never clear it here
 end
 
 function widget:Shutdown()
-  widgetHandler:DeregisterGlobal(widget, "VerdanceManifest")
-  widgetHandler:DeregisterGlobal(widget, "VerdanceMissionEventExfil")
   if phase ~= "field" then setModal(false) end
 end
 
+local lastManifestSeq = 0
 function widget:Update()
   if phase == "over" then return end
+  -- The exfil gadget posts the manifest as rules params; a new seq opens the screen.
+  local seq = num("va_manifest_seq", 0)
+  if seq > lastManifestSeq then
+    lastManifestSeq = seq
+    if phase == "field" then widget:VerdanceManifest(Spring.GetGameRulesParam("va_manifest_json")) end
+  end
   if num("va_terminal", 0) == 1 then
     widget:VerdanceMissionEvent("sortie_over", tostring(Spring.GetGameRulesParam("va_status") or "extracted"))
   end
