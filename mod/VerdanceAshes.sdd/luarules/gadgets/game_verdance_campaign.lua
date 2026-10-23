@@ -6898,8 +6898,6 @@ function VA_LOGISTICS.spawnPackageDelivery(spec)
   end
   local mode = tostring(spec.mode or "map_web")
   local tx, tz = VA_LOGISTICS.infilAnchor()
-  local ox, oz = teamUnitCentroid(objectiveTeamID)
-  local fightX, fightZ = ox or tx, oz or tz
   local x, z
   if mode == "pawn_launcher" then
     -- Land near infil with tight scatter.
@@ -6948,11 +6946,7 @@ function VA_LOGISTICS.spawnPackageDelivery(spec)
         local _, maxH = Spring.GetUnitHealth(uid)
         if maxH and maxH > 0 then pcall(Spring.SetUnitHealth, uid, maxH * hfrac) end
       end
-      if CMD and CMD.FIGHT then
-        local destX, destZ = (mode == "pawn_launcher") and tx or fightX, (mode == "pawn_launcher") and tz or fightZ
-        pcall(Spring.GiveOrderToUnit, uid, CMD.FIGHT,
-          { destX, Spring.GetGroundHeight(destX, destZ), destZ }, {})
-      end
+      -- Delivered units wait where they land: only named heroes act on their own.
     end
   end
   Spring.Echo("VA_DELIVERY_ARRIVE listing=" .. tostring(spec.listingId or "")

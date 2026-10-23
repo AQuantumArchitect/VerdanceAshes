@@ -4,7 +4,7 @@ local gadget = gadget
 function gadget:GetInfo()
   return {
     name = "Verdance Unit Behavior Assist",
-    desc = "Idle/assist micro: rez repair + tree eat, Phobos frontline kite, skirmisher Dgun standoff",
+    desc = "Named heroes only: idle/assist micro (rez repair + tree eat, kite, Dgun standoff). Every other unit is the player's.",
     author = "Verdance",
     date = "2026-09-06",
     license = "GPL v2 or later",
@@ -21,7 +21,7 @@ end
   Player-assist micro for Verdance sorties (human play, not autoplay).
 
   Policy (v6 — belief-driven intents):
-  - Named heroes + rez bots: sense → BeliefField → IntentResolver → actuators.
+  - Named heroes only: sense → BeliefField → IntentResolver → actuators.
   - Pack grunts stay manual (pack drag / speed in pack_overlay).
   - Intents: bail | kite | craft | push | hold. Hero Codex doctrine (va_hero_doctrine)
     biases thresholds; Kiln plods to defenses with no kite/bail.
@@ -1332,8 +1332,9 @@ function gadget:GameFrame(frame)
       if ud then
         local isHero = (Spring.GetUnitRulesParam(unitID, "va_hero") or 0) == 1
         local rez = isRezBot(ud)
-        -- Pack grunts stay manual. Only named heroes + rez bots get assist AI.
-        if isHero or rez then
+        -- The assist AI is a named hero's own judgement: ONLY named heroes get it. Every
+        -- other unit (pack escorts, rez bots, anything built) is the player's to order.
+        if isHero then
           assist[#assist + 1] = { unitID, ud, rez }
         end
       end
