@@ -144,6 +144,9 @@ def main() -> int:
     (ws / "inbox" / "latest_va_result.json").write_text(json.dumps(result), encoding="utf-8")
     home = k.bring_home() if "extract" not in k.bring_home.__code__.co_varnames else k.bring_home(extract=False)
     state2 = json.loads(state_path.read_text(encoding="utf-8-sig"))
+    hr = ws / "outbox" / "hub_result.latest.json"
+    check("the open hub can see the homecoming (hub_result kept, with at)",
+          hr.is_file() and bool(json.loads(hr.read_text(encoding="utf-8-sig")).get("at")))
     check("homecoming advanced the campaign", int(state2.get("missionNumber") or 0) >= 2, json.dumps(home)[:300])
     bead = (state2.get("history") or [{}])[-1]
     check("bead carries the manifest", isinstance(bead.get("manifest"), dict))

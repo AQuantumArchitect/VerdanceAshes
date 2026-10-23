@@ -236,7 +236,7 @@ local function postManifest() RULES.va_manifest_json = manifest; RULES.va_manife
 step("exfil manifest open (rules params)", function() postManifest(); assert(WG.vaExfilModal and PAUSED) end)
 step("exfil draw", function() CALLS.text = 0; ex:DrawScreen(); assert(CALLS.text > 20, "little drawn " .. CALLS.text) end)
 step("exfil dest keys", function() ex:KeyPress(275); ex:DrawScreen(); ex:KeyPress(276) end)
-step("exfil esc then enter", function() ex:KeyPress(27); assert(not WG.vaExfilModal); postManifest(); ex:KeyPress(13); assert(SENT[#SENT - 1] == "VA_CMD:extract:home", SENT[#SENT - 1]); ex:DrawScreen() end)
+step("exfil esc then enter", function() ex:KeyPress(27); assert(not WG.vaExfilModal); postManifest(); ex:KeyPress(13); assert(SENT[#SENT] == "VA_CMD:extract:home", SENT[#SENT]); assert(PAUSED, "confirming the lift unpaused the game"); ex:DrawScreen() end)
 step("sortie over", function() RULES.va_terminal = 1; RULES.va_status = "extracted"; ex:Update(); ex:DrawScreen(); GLOBALS.VerdanceMissionEvent("sortie_over", "extracted"); sb:DrawScreen(); mm:DrawWorld() end)
 step("mission events", function() RULES.va_terminal = 0; GLOBALS.VerdanceMissionEvent("objective_complete", "x"); GLOBALS.VerdanceHeroEvent("down", "grath", "Grath", 0, 1, 2); GLOBALS.VerdanceBeat("bark", "Ketha", "ambient line", 5); GLOBALS.VerdanceBeat("wave_warning", 1, 2, 3, "north"); GLOBALS.VerdanceVetRank(101, "green", "hardened", 1, 2, 3, "m"); vo:DrawScreen() end)
 step("infil reopen", function() inf:TextCommand("vabrief"); inf:DrawScreen(); inf:KeyPress(13) end)

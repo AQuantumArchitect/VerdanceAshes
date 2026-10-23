@@ -570,7 +570,7 @@ class CampaignKernel:
 
     # ── ops ──────────────────────────────────────────────────
 
-    def rebuild_hub(self, *, skip_apply: bool = False) -> dict[str, Any]:
+    def rebuild_hub(self, *, skip_apply: bool = False, keep_result: bool = False) -> dict[str, Any]:
         out: dict[str, Any] = {}
         # war_map is required input for hub paint — regenerate from live state.
         war_path = self.ws / "outbox" / "war_map.json"
@@ -601,9 +601,10 @@ class CampaignKernel:
         apply_info: dict[str, Any]
         if skip_apply:
             apply_info = {"skipped": True, "reason": "skip_apply_no_result_ingest"}
-            # Drop stale debrief paint so the board shows the live missionNumber.
+            # Drop stale debrief paint so the board shows the live missionNumber. Not after a
+            # homecoming (keep_result): that file is how the open hub learns the sortie is home.
             stale = self.ws / "outbox" / "hub_result.latest.json"
-            if stale.is_file():
+            if stale.is_file() and not keep_result:
                 try:
                     stale.unlink()
                     apply_info["clearedHubResult"] = True
@@ -1324,7 +1325,7 @@ class CampaignKernel:
                 # the board paints the belief the fold just wrote.
                 if hub_apply.get("ok"):
                     try:
-                        self.rebuild_hub(skip_apply=True)
+                        self.rebuild_hub(skip_apply=True, keep_result=True)
                     except Exception as exc:  # noqa: BLE001
                         hub_apply["postRebuildError"] = str(exc)
                 hub = self.get_hub_surface()

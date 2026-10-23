@@ -92,13 +92,16 @@ function widget:VerdanceManifest(json)
   Spring.Echo("VA_EXFIL_UI manifest open going=" .. tostring(#(m.going and m.going.heroes or {})) .. "h staying=" .. tostring(#(m.staying and m.staying.heroes or {})) .. "h")
 end
 
+local extractingSince = nil
 local function confirm()
   if phase ~= "manifest" or not manifest then return end
   local d = (manifest.destinations or {})[destIdx] or { id = "home" }
   phase = "extracting"
+  extractingSince = os.clock()
+  -- The game stays paused: the lift is decided, nothing more happens on the field. The
+  -- message is handled while paused; if the sortie has not ended in 3 s, unpause as a fallback.
   Spring.SendLuaRulesMsg("VA_CMD:extract:" .. tostring(d.id or "home"))
   Spring.Echo("VA_EXFIL_UI confirm dest=" .. tostring(d.id))
-  setPaused(false)
 end
 
 local function cancel()
@@ -133,6 +136,11 @@ end
 local lastManifestSeq = 0
 function widget:Update()
   if phase == "over" then return end
+  if phase == "extracting" and extractingSince and os.clock() - extractingSince > 3 and num("va_terminal", 0) ~= 1 then
+    extractingSince = nil
+    Spring.Echo("VA_EXFIL_UI extract not handled while paused; unpausing")
+    setPaused(false)
+  end
   -- The exfil gadget posts the manifest as rules params; a new seq opens the screen.
   local seq = num("va_manifest_seq", 0)
   if seq > lastManifestSeq then
