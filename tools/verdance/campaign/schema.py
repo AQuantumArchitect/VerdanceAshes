@@ -257,8 +257,7 @@ def default_v1_state() -> Dict[str, Any]:
             "homeCleared": False,
         },
         "characters": {
-            # Sheet xp stays small so ensure_roster does not scale Pavise into L4 (Hardened = BAR ~0.45).
-            "pavise": { "id": "pavise", "name": "Pavise", "faction": "ashwalkers", "unitDef": "armwar", "xp": 40, "player": False, "home": None, "status": "locked", "wounds": 0, "scars": [] },
+            "pavise": { "id": "pavise", "name": "Pavise", "faction": "ashwalkers", "unitDef": "armwar", "xp": 0, "player": False, "home": None, "status": "locked", "wounds": 0, "scars": [] },
             "vane": { "id": "vane", "name": "Ash-Captain Vane", "faction": "ashwalkers", "unitDef": "legcen", "xp": 1480, "player": False, "home": None, "status": "locked", "wounds": 0, "scars": [] },
             "ketha": { "id": "ketha", "name": "Ketha", "faction": "ashwalkers", "unitDef": "legrezbot", "xp": 1120, "player": True, "home": None, "status": "active", "wounds": 0, "scars": [] },
             "anselm": { "id": "anselm", "name": "Broker Anselm Rue", "faction": "nullmercs", "unitDef": "legcen", "xp": 1900, "player": False, "home": ["greenest_fields", "GF_CENTRAL_OPEN_GRASSLAND"], "status": "active", "wounds": 0, "scars": [] },
@@ -307,9 +306,9 @@ def default_v1_state() -> Dict[str, Any]:
                     "unitDef": "armwar",
                     "missionCritical": False,
                     "status": "locked",  # a pick now (the recommended you), not core
-                    "xp": 0.45,
-                    "campaignXp": 40.0,
-                    "peakBarXp": 0.45,
+                    "xp": 0.0,  # starting XP comes from the pack cost curve (crew_packs xpCurve)
+                    "campaignXp": 0.0,
+                    "peakBarXp": 0.0,
                     "timesWounded": 0,
                 },
                 {

@@ -517,11 +517,11 @@
       "name": "Ash-Captain Vane",
       "sizing": "leadFill",
       "massBand": "mid",
-      "packCombined": 2052,
+      "packCombined": 2057,
       "packMetal": 1680,
       "packEnergy": 26400,
       "massTarget": 2064,
-      "startXp": 0.06
+      "startXp": 0.157
     },
     "ketha": {
       "role": "core",
@@ -538,7 +538,7 @@
       "packCombined": 600,
       "packMetal": 520,
       "packEnergy": 5600,
-      "startXp": 0.06
+      "startXp": 0.4
     },
     "brakhov": {
       "role": "band",
@@ -552,7 +552,7 @@
       "packCombined": 2957,
       "packMetal": 2300,
       "packEnergy": 46000,
-      "startXp": 0.0
+      "startXp": 0.007
     },
     "verse": {
       "role": "band",
@@ -567,7 +567,7 @@
       "packCombined": 3000,
       "packMetal": 2400,
       "packEnergy": 42000,
-      "startXp": 0.14
+      "startXp": 0.0
     },
     "odessa": {
       "role": "band",
@@ -579,11 +579,11 @@
       "name": "Odessa Krail",
       "sizing": "leadFill",
       "massBand": "mid",
-      "packCombined": 2367,
+      "packCombined": 2366,
       "packMetal": 1800,
       "packEnergy": 39600,
       "massTarget": 2064,
-      "startXp": 0.035
+      "startXp": 0.106
     },
     "cauter": {
       "role": "band",
@@ -595,11 +595,11 @@
       "name": "Cauter Bel-Ansa",
       "sizing": "leadFill",
       "massBand": "mid",
-      "packCombined": 2164,
+      "packCombined": 2166,
       "packMetal": 1880,
       "packEnergy": 20000,
       "massTarget": 2064,
-      "startXp": 0.045
+      "startXp": 0.139
     },
     "rusk": {
       "role": "band",
@@ -611,11 +611,11 @@
       "name": "Rusk Halloway",
       "sizing": "leadFill",
       "massBand": "mid",
-      "packCombined": 2106,
+      "packCombined": 2109,
       "packMetal": 1800,
       "packEnergy": 21600,
       "massTarget": 2064,
-      "startXp": 0.06
+      "startXp": 0.149
     },
     "grath": {
       "role": "band",
@@ -626,10 +626,10 @@
       "blurb": "Six Karkinos — mid-line. Three wars of arrears.",
       "name": "Grath Arrears",
       "sizing": "fixed",
-      "packCombined": 2064,
-      "packMetal": 1860,
-      "packEnergy": 14400,
-      "startXp": 0.06
+      "packCombined": 2203,
+      "packMetal": 1980,
+      "packEnergy": 15600,
+      "startXp": 0.133
     },
     "halq": {
       "role": "band",
@@ -641,11 +641,11 @@
       "name": "Sisu Halq",
       "sizing": "leadFill",
       "massBand": "mid",
-      "packCombined": 2057,
+      "packCombined": 2062,
       "packMetal": 1760,
       "packEnergy": 21120,
       "massTarget": 2064,
-      "startXp": 0.06
+      "startXp": 0.156
     },
     "yeva": {
       "role": "band",
@@ -662,10 +662,10 @@
       "blurb": "Sharpshooter + five Eidolons. Whisper finds; ghosts walked.",
       "name": "Whisper-of-Ash Yeva",
       "sizing": "fixed",
-      "packCombined": 2196,
+      "packCombined": 2198,
       "packMetal": 1305,
       "packEnergy": 62500,
-      "startXp": 0.031
+      "startXp": 0.134
     },
     "spoke": {
       "role": "band",
@@ -686,7 +686,7 @@
       "packCombined": 448,
       "packMetal": 368,
       "packEnergy": 5600,
-      "startXp": 0.06
+      "startXp": 0.425
     },
     "auditor": {
       "role": "band",
@@ -698,9 +698,9 @@
       "blurb": "T3 ledger mech — still skirmishes like it has somewhere to be.",
       "name": "The Last Auditor",
       "sizing": "fixed",
-      "packCombined": 5786,
-      "packMetal": 4500,
-      "packEnergy": 90000,
+      "packCombined": 5064,
+      "packMetal": 3950,
+      "packEnergy": 78000,
       "startXp": 0.0
     },
     "twitch": {
@@ -727,7 +727,7 @@
       "packCombined": 540,
       "packMetal": 440,
       "packEnergy": 7000,
-      "startXp": 0.06
+      "startXp": 0.41
     },
     "consul": {
       "role": "band",
@@ -749,10 +749,10 @@
           "count": 1
         }
       ],
-      "packCombined": 577,
-      "packMetal": 470,
+      "packCombined": 587,
+      "packMetal": 480,
       "packEnergy": 7500,
-      "startXp": 0.06
+      "startXp": 0.402
     },
     "veil": {
       "role": "band",
@@ -774,10 +774,10 @@
       "blurb": "Jammer + Compass + Gremlins. Fog is the answer.",
       "name": "Veil & Compass",
       "sizing": "fixed",
-      "packCombined": 1901,
+      "packCombined": 1900,
       "packMetal": 1555,
       "packEnergy": 24150,
-      "startXp": 0.06
+      "startXp": 0.183
     },
     "commando": {
       "role": "band",
@@ -798,10 +798,10 @@
       "blurb": "Commando + Trappers + Hercules. Mines before the argument.",
       "name": "Cinder Hook",
       "sizing": "fixed",
-      "packCombined": 2173,
+      "packCombined": 2172,
       "packMetal": 1804,
       "packEnergy": 25750,
-      "startXp": 0.02
+      "startXp": 0.138
     },
     "tick": {
       "role": "band",
@@ -819,10 +819,10 @@
         "tick_eyes"
       ],
       "sizing": "fixed",
-      "packCombined": 500,
+      "packCombined": 506,
       "packMetal": 420,
       "packEnergy": 6000,
-      "startXp": 0.06
+      "startXp": 0.416
     },
     "fatboy": {
       "role": "band",
@@ -837,7 +837,7 @@
       "packCombined": 1686,
       "packMetal": 1400,
       "packEnergy": 20000,
-      "startXp": 0.02
+      "startXp": 0.219
     },
     "bro": {
       "role": "band",
@@ -856,7 +856,7 @@
       "packCombined": 2050,
       "packMetal": 1650,
       "packEnergy": 28000,
-      "startXp": 0.01
+      "startXp": 0.158
     },
     "stride": {
       "role": "band",
@@ -876,7 +876,7 @@
       "packMetal": 1950,
       "packEnergy": 33000,
       "massTarget": 2064,
-      "startXp": 0.035
+      "startXp": 0.096
     },
     "hearth": {
       "role": "band",
@@ -891,9 +891,9 @@
       "blurb": "Quiet sun that refuses to go out — hero fusion, ENERGY field.",
       "name": "Hearth",
       "sizing": "fixed",
-      "packCombined": 4557,
-      "packMetal": 4200,
-      "packEnergy": 25000,
+      "packCombined": 3607,
+      "packMetal": 3350,
+      "packEnergy": 18000,
       "startXp": 0.0,
       "canLead": false
     },
@@ -931,11 +931,11 @@
         "eco_lab"
       ],
       "sizing": "fixed",
-      "packCombined": 2699,
-      "packMetal": 2242,
-      "packEnergy": 31870,
+      "packCombined": 2519,
+      "packMetal": 2122,
+      "packEnergy": 27770,
       "fieldEffect": "build",
-      "startXp": 0.06
+      "startXp": 0.08
     },
     "warder": {
       "role": "band",
@@ -973,11 +973,11 @@
         "pad_tooth"
       ],
       "sizing": "fixed",
-      "packCombined": 2353,
-      "packMetal": 2030,
-      "packEnergy": 22790,
+      "packCombined": 3210,
+      "packMetal": 2780,
+      "packEnergy": 30090,
       "formation": "triangle",
-      "startXp": 0.06,
+      "startXp": 0.0,
       "canLead": false
     },
     "noctua": {
@@ -996,7 +996,7 @@
       "sizing": "fixed",
       "blurb": "Drone plant + Noctua wing. Dreams in flight paths.",
       "name": "Noctua Bay",
-      "packCombined": 1958,
+      "packCombined": 1954,
       "packMetal": 1390,
       "packEnergy": 39500,
       "escorts": [
@@ -1005,7 +1005,7 @@
           "count": 24
         }
       ],
-      "startXp": 0.051,
+      "startXp": 0.174,
       "canLead": false
     },
     "mira": {
@@ -1040,7 +1040,7 @@
         "sparkle_battery",
         "tone_break"
       ],
-      "startXp": 0.04,
+      "startXp": 0.021,
       "packCombined": 2873,
       "packMetal": 2340,
       "packEnergy": 37300
@@ -1064,7 +1064,7 @@
         "mobile_aa",
         "sky_saint"
       ],
-      "startXp": 0.03,
+      "startXp": 0.326,
       "packCombined": 1041,
       "packMetal": 880,
       "packEnergy": 11300
@@ -1083,8 +1083,8 @@
         "all_terrain",
         "self_replicate"
       ],
-      "startXp": 0.045,
-      "packCombined": 1620,
+      "startXp": 0.23,
+      "packCombined": 1621,
       "packMetal": 1250,
       "packEnergy": 26000
     },
@@ -1097,8 +1097,8 @@
       "blurb": "Bull pair — tread command. Orders walk; the line salutes itself.",
       "name": "Ash-Marshal Quill",
       "sizing": "fixed",
-      "startXp": 0.04,
-      "packCombined": 2272,
+      "startXp": 0.121,
+      "packCombined": 2271,
       "packMetal": 1900,
       "packEnergy": 26000,
       "tags": [
@@ -1116,8 +1116,8 @@
       "blurb": "Belcher trio — napalm skirm. Mira's sister energy, but she walks it in.",
       "name": "Kit Sparkler",
       "sizing": "leadFill",
-      "startXp": 0.04,
-      "packCombined": 1887,
+      "startXp": 0.186,
+      "packCombined": 1886,
       "packMetal": 1650,
       "packEnergy": 16500,
       "tags": [
@@ -1137,7 +1137,7 @@
       "blurb": "Ambassador pair — stealth rockets. Soft breach; the wall never saw the bill.",
       "name": "Vale Soft",
       "sizing": "fixed",
-      "startXp": 0.035,
+      "startXp": 0.162,
       "packCombined": 2026,
       "packMetal": 1840,
       "packEnergy": 13000,
@@ -1156,7 +1156,7 @@
       "blurb": "Traveler anti-nuke — debt pad. Still paying for the last sky.",
       "name": "Nox Tithe",
       "sizing": "fixed",
-      "startXp": 0.03,
+      "startXp": 0.163,
       "packCombined": 2020,
       "packMetal": 1510,
       "packEnergy": 35700,
@@ -1181,8 +1181,8 @@
       "blurb": "Roughneck wing (x5). Gunship manners. Altitude is an opinion.",
       "name": "Ceil Rat",
       "sizing": "leadFill",
-      "startXp": 0.045,
-      "packCombined": 1995,
+      "startXp": 0.168,
+      "packCombined": 1993,
       "packMetal": 1550,
       "packEnergy": 31000,
       "tags": [
@@ -1202,10 +1202,10 @@
       "blurb": "T2 constructor of the saint garden. Raises Prudes and Pulsars, and nothing else.",
       "name": "Sister Lumen",
       "sizing": "fixed",
-      "startXp": 0.05,
-      "packCombined": 1986,
-      "packMetal": 1600,
-      "packEnergy": 27000,
+      "startXp": 0.412,
+      "packCombined": 529,
+      "packMetal": 430,
+      "packEnergy": 6900,
       "tags": [
         "eco",
         "geo",
@@ -1225,8 +1225,8 @@
       "blurb": "Turtle pair — amph plod. The river learns his weight.",
       "name": "Anvil Mire",
       "sizing": "fixed",
-      "startXp": 0.04,
-      "packCombined": 1928,
+      "startXp": 0.179,
+      "packCombined": 1929,
       "packMetal": 1500,
       "packEnergy": 30000,
       "tags": [
@@ -1244,8 +1244,8 @@
       "blurb": "Jaguar pack (x5). Lightning eyes. Sight is a wound you give them.",
       "name": "Volt Lash",
       "sizing": "leadFill",
-      "startXp": 0.045,
-      "packCombined": 2105,
+      "startXp": 0.149,
+      "packCombined": 2107,
       "packMetal": 1650,
       "packEnergy": 32000,
       "tags": [
@@ -1270,7 +1270,7 @@
       "packCombined": 314,
       "packMetal": 270,
       "packEnergy": 3100,
-      "startXp": 0.45,
+      "startXp": 0.448,
       "fieldEffect": "pavise_ward"
     },
     "halbard": {
@@ -1286,7 +1286,7 @@
       "packCombined": 826,
       "packMetal": 640,
       "packEnergy": 13000,
-      "startXp": 0.08
+      "startXp": 0.362
     }
   },
   "factories": {
@@ -1483,5 +1483,10 @@
     "lumen",
     "anvil",
     "volt"
-  ]
+  ],
+  "xpCurve": {
+    "max": 0.5,
+    "zeroAt": 3000,
+    "notes": "startXp = max * (1 - packCombined / zeroAt), floor 0. zeroAt = the Javelin pair."
+  }
 }

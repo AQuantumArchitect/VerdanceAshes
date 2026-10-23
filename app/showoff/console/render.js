@@ -120,7 +120,9 @@ export function renderHeroCard(opts) {
     .concat(o.panel ? ["panel"] : [])
     .concat(stats.wounds ? ["wounded"] : [])
     .filter(Boolean).join(" ");
-  const xpLine = stats.xp != null ? `xp ${stats.xp}` : (o.xpLabel || "");
+  // Earned campaign XP once there is some; before that, the start XP the pack's cost buys.
+  const startXp = Number(h.startXp) || 0;
+  const xpLine = stats.xp ? `xp ${stats.xp}` : (startXp > 0 ? `start xp ${startXp.toFixed(2)}` : (o.xpLabel || "green"));
   const levelLine = `L${stats.level}`;
   // Sticky peak: career rank (Green/Proven/…). "Runner" is a SPEED tag, not a rank.
   // Legacy "Blooded" read as wounded — display as Proven.
