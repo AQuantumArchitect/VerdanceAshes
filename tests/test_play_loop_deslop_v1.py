@@ -9,7 +9,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CAMPAIGN = ROOT / "mod" / "VerdanceAshes.sdd" / "luarules" / "gadgets" / "game_verdance_campaign.lua"
 COMPILER = ROOT / "scripts" / "build_next_mission_v1.ps1"
-PLAY_SESSION = ROOT / "scripts" / "play_session_v1.ps1"
 CONTINUITY = ROOT / "tools" / "verdance" / "company" / "continuity_audit.py"
 CREW_WIDGET = ROOT / "mod" / "VerdanceAshes.sdd" / "luaui" / "Widgets" / "gui_verdance_crew_select.lua"
 OVERMIND = ROOT / "mod" / "VerdanceAshes.sdd" / "luaui" / "Widgets" / "campaign_overmind_widget.lua"
@@ -20,7 +19,6 @@ class PlayLoopDeslopTests(unittest.TestCase):
     def setUpClass(cls):
         cls.campaign = CAMPAIGN.read_text(encoding="utf-8")
         cls.compiler = COMPILER.read_text(encoding="utf-8")
-        cls.play_session = PLAY_SESSION.read_text(encoding="utf-8")
         cls.continuity = CONTINUITY.read_text(encoding="utf-8")
 
     def test_scar_exact_suppress(self):

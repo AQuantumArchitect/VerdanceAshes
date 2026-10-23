@@ -31,7 +31,7 @@ Combat lens (optional): molecule soft policy — not world truth; rollback `va_m
 
 **Other machines:** `SHIP.bat` → `export\dist\VerdanceAshes_vX.Y.Z` (+ zip). Recipients run SETUP then PLAY from the unzipped folder. Optional: `python -m verdance_kernel ship --my-games`.
 
-Feedback after a session: hub → System → **Export feedback bundle** (writes `export\feedback_<stamp>.zip`). Tracked sessions: `app\bin\forge\PLAY_TRACKED.bat` (`docs/TRACKED_PLAYTEST.md`).
+Feedback after a session: hub → System → **Export feedback bundle** (writes `export\feedback_<stamp>.zip`).
 
 ```
 SETUP.bat          # once: BAR + mutator + hub
@@ -67,15 +67,22 @@ Doc shelf (bots only): [`docs/archive/PROXY_CAMPAIGN.md`](docs/archive/PROXY_CAM
 
 Root `VERSION` (kernel reads it). Consolidation line starts at **0.8.0**. Current line: **0.12.7** (pass five boundary + pass six HUD).
 
-## Forge tools
+## Dev tools
 
-Operator / ant / overnight live under **`app\bin\forge\`** (bot/seat path, not “type this to play”).
+Content and test scripts (not the player path), run with PowerShell from the workspace:
 
 ```
-app\bin\forge\RUN_CAMPAIGN.bat
-app\bin\forge\DEV_LAUNCH.bat
-app\bin\forge\operator\          # legacy PS1 wrappers
+scripts\bake_living_shell.ps1            # bake an enemy base template (local headless)
+scripts\forge\cloud\Invoke-CloudShellBake.ps1   # the same bake on a cloud host
+scripts\run_headless_smoke.ps1           # headless BAR smoke of the mission seed
+scripts\run_headless_balance_test.ps1    # headless balance telemetry
+scripts\verify_hero_lifecycle.ps1        # hero down / wreck / rez in real BAR
+scripts\run_zone_cartography_survey.ps1  # zone map surveys
+scripts\run_ai_duel_suite.ps1            # AI vs AI zone-flow duels
 ```
+
+The old launchers, the proxy-AI and the overnight tooling live on the git branch
+`archive/tooling-2026-10-22`.
 
 ## Kernel CLI (seats / automation)
 

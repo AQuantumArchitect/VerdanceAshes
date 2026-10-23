@@ -54,7 +54,7 @@ python -m verdance_kernel status
 python -m verdance_kernel ship
 ```
 
-Operator notes live in [`HOME.md`](HOME.md); forge launchers (overnight, proxy, tracked play) live under `app/bin/forge/`.
+Operator notes and the dev tools live in [`HOME.md`](HOME.md).
 
 ## Code map
 

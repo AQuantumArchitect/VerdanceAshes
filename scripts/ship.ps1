@@ -176,8 +176,7 @@ $scriptList = @(
   "_common.ps1",
   "setup_tester.ps1",
   "install_mod_archive.ps1",
-  # pass five: the kernel launches spring and reads the infolog itself; play_session_v1 /
-  # extract_latest_result / run_full_cycle are operator (headless) tools, not the player path.
+  # pass five: the kernel launches spring and reads the infolog itself.
   "build_next_mission_v1.ps1",
   "install_playable_slice.ps1",
   "extract_latest_telemetry.ps1",
@@ -188,7 +187,7 @@ $scriptList = @(
 foreach ($s in $scriptList) {
   Copy-File (Join-Path $Workspace "scripts\$s") (Join-Path $staging "scripts\$s")
 }
-# player helpers: only the live player path. smoke_play_path is a forge tool and stays home.
+# player helpers: only the live player path.
 $playerScripts = @(
   "setup_play.ps1",
   "reset_campaign.ps1",
@@ -208,7 +207,7 @@ foreach ($d in @("state", "inbox", "outbox", "ledger", "playable_runs", "reports
 # seed empty ledger
 "{}" | Set-Content -Encoding UTF8 (Join-Path $staging "ledger\processed_results.json")
 
-# ---- app\bin launcher glue (same as forge product) ----
+# ---- app\bin launcher glue ----
 New-Item -ItemType Directory -Force -Path (Join-Path $staging "app\bin") | Out-Null
 Copy-File (Join-Path $Workspace "app\bin\_env.bat") (Join-Path $staging "app\bin\_env.bat")
 Copy-File (Join-Path $Workspace "app\bin\PLAY.bat") (Join-Path $staging "app\bin\PLAY.bat")

@@ -17,7 +17,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 . (Join-Path (Split-Path -Parent $MyInvocation.MyCommand.Path) "_common.ps1")
-# Packet parsing moved to lib_packet_parse.ps1 so harvest_human_run_v1.ps1 can reuse
+# Packet parsing lives in lib_packet_parse.ps1 --
 # it -- this file launches a headless match in its own body and cannot be dot-sourced.
 . (Join-Path (Split-Path -Parent $MyInvocation.MyCommand.Path) "lib_packet_parse.ps1")
 

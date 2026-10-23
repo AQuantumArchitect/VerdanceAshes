@@ -1146,7 +1146,7 @@ function Add-EcoSprawlCamp {
 
 if (-not $IntentPath) { $IntentPath = Join-Path $Workspace "outbox\next_mission_intent.json" }
 if (-not $StatePath) { $StatePath = Join-Path $Workspace "state\campaign_state.json" }
-if (!(Test-Path $IntentPath)) { throw "No next mission intent at $IntentPath. Run ADVANCE_CAMPAIGN_V1.bat or scripts\advance_campaign_v1.ps1 first." }
+if (!(Test-Path $IntentPath)) { throw "No next mission intent at $IntentPath. Drop from the hub (PLAY.bat), or run scripts\advance_campaign_v1.ps1 first." }
 
 $config = Get-VerdanceConfig -Workspace $Workspace
 $intent = Get-Content -Raw -LiteralPath $IntentPath | ConvertFrom-Json
@@ -3552,8 +3552,7 @@ if (-not $SaveName) {
 
 $installer = Join-Path $ScriptDir "install_playable_slice.ps1"
 # One call site, so the modoption passthrough cannot be forgotten on one of the four
-# branches this replaced. play_tracked_v1.ps1 uses it to arm va_play_track; without a
-# route from the launcher to [MODOPTIONS] a played mission emits no telemetry at all.
+# branches this replaced.
 #
 # HASHTABLE, not an array. This is the whole bug that broke every launch path:
 # PowerShell splats an array POSITIONALLY and never re-parses its "-Name" strings as
@@ -3563,7 +3562,7 @@ $installer = Join-Path $ScriptDir "install_playable_slice.ps1"
 #   Cannot convert value "-Variant" to type "System.Int32"
 # before the installer executes a single statement. $ErrorActionPreference = "Stop"
 # turns that into exit 1, the kernel reports "build failed -- not launching", and BAR
-# is never started -- from the hub, play_session_v1, play_tracked_v1, all of them.
+# is never started.
 $installerArgs = @{
   Workspace        = $Workspace
   ScenarioPath     = $scenarioPath
