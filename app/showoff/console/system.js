@@ -102,6 +102,7 @@ async function refreshHub() {
 }
 function forgetLocalPicks() {
   state.crewBand = [];
+  state.crewYou = null;
   state.sortieSynced = false;
   state.knownCompanyIds = null;
   state.selectedZoneId = null;

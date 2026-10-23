@@ -751,7 +751,7 @@
     "afterTurn": 2,
     "minSharedDeployments": 2,
     "title": "The weight of an order",
-    "setup": "Pavise is holding a page that has been rewritten twice. Ketha is waiting for him to put it down.",
+    "setup": "Pavise is holding a page that has been rewritten twice. Ketha is waiting for her to put it down.",
     "beats": [
       {
         "speaker": "pavise",

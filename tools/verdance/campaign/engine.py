@@ -990,6 +990,14 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
             "finaleKind": (finale_plan_for_state({**state, "missionNumber": completed_mission}) or {}).get("kind"),
             "pathSignal": state.get("pathSignal"),
         }
+        # Rescued heroes who saw the campaign through become starting options from now on.
+        try:
+            from verdance.company.company import unlock_rescued_survivors
+            gained = unlock_rescued_survivors(state, workspace)
+            if gained:
+                state["campaignComplete"]["unlocked"] = gained
+        except Exception:  # noqa: BLE001
+            pass
     if hero_joins:
         bead.setdefault("storyTags", []).append("hero-joined")
         # Readings layer: the bead must carry WHO joined, not just that someone did.

@@ -10,9 +10,9 @@ M.KARK_ANCHOR = 6
 M.JAV_ANCHOR = 2
 M.SEAT_CAP = 3
 M.START_WALLET_TNB = 3
-M.PLAYTEST_ALL_UNLOCKED = true
+M.PLAYTEST_ALL_UNLOCKED = false
 
-M.CORE = { "pavise", "ketha" }
+M.CORE = { "ketha" }
 
 M.HEROES = {
   vane = {
@@ -563,7 +563,7 @@ M.HEROES = {
   },
   pavise = {
     name = "Pavise",
-    role = "core",
+    role = "band",
     unitDef = "armwar",
     hireTnb = 0,
     packTotal = 1,
@@ -571,7 +571,7 @@ M.HEROES = {
     fieldEffect = "pavise_ward",
     startXp = 0.45,
     packMind = "solo",
-    blurb = "War buddy Centurion — solo, high XP, Centurion HP aura.",
+    blurb = "Grey-haired shield captain. One Centurion; her ward steadies everyone near her. Temperate, until you touch her people.",
   },
   halbard = {
     name = "Halbard",
@@ -630,7 +630,7 @@ M.MENTOR_PRODUCTS = {
 }
 
 M.BAND_ORDER = {
-  "vane", "halbard", "hearth", "twitch", "consul", "solarium", "spoke", "tick",
+  "pavise", "vane", "halbard", "hearth", "twitch", "consul", "solarium", "spoke", "tick",
   "noctua", "veil", "odessa", "cauter", "grath", "rusk", "halq", "verse",
   "stride", "yeva", "auditor", "mira", "brakhov", "bro", "fatboy", "kettle",
   "warder", "commando", "infestor", "quill", "kit", "vale", "nox", "ceil",

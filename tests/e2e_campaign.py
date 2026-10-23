@@ -80,16 +80,15 @@ def main() -> int:
     pad = (legal[0] if legal else (zones[0] if zones else {})).get("zoneId")
     target = next((z.get("zoneId") for z in zones if z.get("openTarget")), None) or (zones[-1].get("zoneId") if zones else None)
     check("theater offers a pad and a target", bool(pad and target), f"pad={pad} target={target} zones={len(zones)}")
-    # the hub preamble: seal the company with three band packs from the crew roster
-    packs = []
-    cp = ws / "data" / "story" / "crew_packs.json"
-    if cp.is_file():
-        raw = json.loads(cp.read_text(encoding="utf-8-sig"))
-        heroes = raw.get("heroes") or {}
-        items = heroes.items() if isinstance(heroes, dict) else [(h.get("id"), h) for h in heroes]
-        packs = [str(hid) for hid, h in items if isinstance(h, dict) and h.get("role") == "band"][: int(raw.get("seatCap") or 3)]
-    seal = k.seal_company(band=packs)
+    # the hub preamble: Ketha always; three picks, the first is you and must walk
+    bad = k.seal_company(band=["warder", "solarium", "halbard"])
+    check("a building cannot be you", not bad.get("ok") and "cannot lead" in str(bad.get("error")), json.dumps(bad)[:200])
+    seal = k.seal_company(band=["pavise", "solarium", "halbard"])
     check("company sealed (preamble)", bool(seal.get("ok")), json.dumps(seal)[:300])
+    st_sealed = json.loads(state_path.read_text(encoding="utf-8-sig"))
+    you_row = next((h for h in (st_sealed.get("roster") or {}).get("heroes") or [] if h.get("heroId") == "pavise"), {})
+    check("you are Pavise, mission-critical; Ketha is core", (st_sealed.get("company") or {}).get("you") == "pavise" and you_row.get("missionCritical") is True
+          and (st_sealed.get("company") or {}).get("core") == ["ketha"], json.dumps(st_sealed.get("company"))[:200])
     hub = k.rebuild_hub(skip_apply=True)
     hs = json.loads(hs_path.read_text(encoding="utf-8-sig"))
     plan = {"schemaVersion": "verdance-deploy-plan/1.0", "mapId": map_id, "deployAces": [a["id"] for a in (hs.get("aces") or []) if a.get("deployable")][:2],

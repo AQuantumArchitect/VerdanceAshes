@@ -17,7 +17,8 @@ export const state = {
   log: [],
   rhoSel: { i: 0, j: 0 },
   lastResultAt: null,
-  crewBand: [], // preamble picks; after seal = who drops (at-base = owned − this)
+  crewBand: [], // preamble companions; after seal = who drops (at-base = owned − this)
+  crewYou: null, // preamble: the first pick, the hero the player is
   dropping: false, // true while /api/deploy is in flight
   buyBusy: false,
   warm: { phase: "idle", locked: false, timer: null, poll: null, startedAt: 0 },

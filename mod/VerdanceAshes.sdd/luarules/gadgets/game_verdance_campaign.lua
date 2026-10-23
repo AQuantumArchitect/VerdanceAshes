@@ -2255,7 +2255,8 @@ function VA_CREW_spawnHeroPack(heroId, baseX, baseZ, dx0)
     spacing = 100,
     heroId = tostring(heroId),
     heroName = tostring(h.name or heroId),
-    missionCritical = h.missionCritical == true,
+    -- you (the first company pick, mission.you) are mission-critical, like Ketha
+    missionCritical = h.missionCritical == true or (mission ~= nil and tostring(mission.you or "") == tostring(heroId)),
     heroTrait = h.heroTrait,
     heroTags = h.tags or h.traits,
     packageTag = "crew_" .. tostring(heroId),
@@ -3049,6 +3050,15 @@ local function spawnPlayableSetup()
     local baseX = normalizedToElmos(base.x or 0.5, Game.mapSizeX or 0)
     local baseZ = normalizedToElmos(base.z or 0.5, Game.mapSizeZ or 0)
     if force.role == "player_anchor" or force.id == "player_deployment" then
+      -- The company lands on the pad. One point: the exfil gadget publishes it (va_pad_x/z)
+      -- from the pad file, and the radar, the ground outline and extraction use the same one.
+      local px, pz = tonumber((Spring.GetGameRulesParam("va_pad_x"))), tonumber((Spring.GetGameRulesParam("va_pad_z")))
+      if px and pz and px >= 0 and pz >= 0 then
+        if math.abs(px - baseX) + math.abs(pz - baseZ) > 64 then
+          Spring.Echo("VA_LANDING_ON_PAD force was " .. math.floor(baseX) .. "," .. math.floor(baseZ) .. " pad " .. math.floor(px) .. "," .. math.floor(pz))
+        end
+        baseX, baseZ = px, pz
+      end
       VA_CREW_SELECT.anchorX = baseX
       VA_CREW_SELECT.anchorZ = baseZ
     end

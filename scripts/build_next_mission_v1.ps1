@@ -1262,97 +1262,18 @@ if ($escPlan) {
 }
 
 $deployZoneId = [string]$intent.deploymentZoneId
-$extractZoneId = [string]$intent.extractionZoneId
 $targetZoneId = if ($intent.objectiveTarget -and $intent.objectiveTarget.targetZoneId) { [string]$intent.objectiveTarget.targetZoneId } else { "" }
 $adjForMap = Get-ZoneAdjacencyMap -Workspace $Workspace -MapId ([string]$intent.mapId)
-# A far dry corner is not an exit. Snap infil/exfil onto the nearest dry pad
-# the company can walk to. The running kernel may still have stamped the old
-# cross-river muster; this process reads the fixed story engine from disk.
-if ($targetZoneId -and $intent.mapId) {
-  try {
-    $env:PYTHONPATH = (Join-Path $Workspace "tools")
-    $routeArgs = [ordered]@{
-      mapId = [string]$intent.mapId
-      targetZoneId = [string]$targetZoneId
-      deploymentZoneId = [string]$deployZoneId
-      extractionZoneId = [string]$extractZoneId
-      level = 0.0
-    }
-    if ($intent.hydrology -and $null -ne $intent.hydrology.level) {
-      $routeArgs.level = [double]$intent.hydrology.level
-    }
-    $routeIn = Join-Path $env:TEMP ("va_ground_route_{0}.json" -f [guid]::NewGuid().ToString("N"))
-    $routeOut = Join-Path $env:TEMP ("va_ground_route_out_{0}.json" -f [guid]::NewGuid().ToString("N"))
-    ($routeArgs | ConvertTo-Json -Compress) | Set-Content -LiteralPath $routeIn -Encoding UTF8
-    $pyRoute = @(
-      "import json, sys"
-      "from pathlib import Path"
-      "sys.path.insert(0, r'" + (Join-Path $Workspace "tools") + "')"
-      "from verdance_story_engine_v1 import separate_intent_zones"
-      "args = json.loads(Path(r'" + $routeIn + "').read_text(encoding='utf-8-sig'))"
-      "intent = {'mapId': args['mapId'], 'targetZoneId': args['targetZoneId'], 'deploymentZoneId': args['deploymentZoneId'], 'extractionZoneId': args['extractionZoneId'], 'hydrology': {'level': args.get('level') or 0}}"
-      "separate_intent_zones(intent, Path(r'" + $Workspace + "'))"
-      "Path(r'" + $routeOut + "').write_text(json.dumps({'deploymentZoneId': intent.get('deploymentZoneId'), 'extractionZoneId': intent.get('extractionZoneId')}), encoding='utf-8')"
-    ) -join "; "
-    & python -c $pyRoute
-    if (Test-Path -LiteralPath $routeOut) {
-      $snapped = Get-Content -Raw -LiteralPath $routeOut | ConvertFrom-Json
-      if ($snapped.deploymentZoneId) {
-        $deployZoneId = [string]$snapped.deploymentZoneId
-        Add-OrSetProperty $intent "deploymentZoneId" $deployZoneId
-      }
-      if ($snapped.extractionZoneId) {
-        $extractZoneId = [string]$snapped.extractionZoneId
-        Add-OrSetProperty $intent "extractionZoneId" $extractZoneId
-        if ($intent.objectiveTarget) {
-          Add-OrSetProperty $intent.objectiveTarget "extractionZoneId" $extractZoneId
-        }
-      }
-      if ($extractZoneId -ne [string]$routeArgs.extractionZoneId -or $deployZoneId -ne [string]$routeArgs.deploymentZoneId) {
-        Write-Host ("Ground route snap: deploy {0} -> {1}; extract {2} -> {3}" -f `
-          $routeArgs.deploymentZoneId, $deployZoneId, $routeArgs.extractionZoneId, $extractZoneId)
-      }
-    }
-    Remove-Item -LiteralPath $routeIn, $routeOut -Force -ErrorAction SilentlyContinue
-  } catch {
-    Write-Host ("Ground route snap skipped: {0}" -f $_.Exception.Message)
-  }
-}
+# The pad is the zone the player chose on the hub (legality is judged there, from belief). The
+# builder never moves it: no route snap, no slide toward the target. Infil, pad, radar and
+# extraction are one place.
 $openingMission = [bool]($intent.PSObject.Properties["openingMission"] -and $intent.openingMission)
 
 $deployZone = Get-ZoneById $zoneMap $deployZoneId
 $targetZone = Get-ZoneById $zoneMap $targetZoneId
 $deployCenter = Get-ZoneCenter $deployZone @(0.16, 0.16)
 $enemyCenter = Get-ZoneCenter $targetZone @(0.84, 0.84)
-# The measured anchor is the dry pad. Sliding it toward a flooded target
-# (Rock Jungle NE lane -> inner spillway) plants the company in the lake
-# even when the interpolated point is still inside the lane's loose box.
-function Test-ZoneWetPad {
-  param($Zone)
-  if (-not $Zone) { return $false }
-  if ($Zone.hydrology -and $null -ne $Zone.hydrology.restingSubmerged -and [double]$Zone.hydrology.restingSubmerged -gt 0.08) {
-    return $true
-  }
-  if ($Zone.tags) {
-    foreach ($tag in @($Zone.tags)) {
-      if ($tag -eq "water" -or $tag -eq "shore" -or $tag -eq "shallows") { return $true }
-    }
-  }
-  return $false
-}
-$deployZoneWet = (Test-ZoneWetPad $deployZone) -or (Test-ZoneWetPad $targetZone)
-# WO-004 front-band: for contracts, slide deploy toward the target border so
-# first contact lands in ~90s instead of a long march from a corner shelf.
 $isContract = ($intent.PSObject.Properties["contractActive"] -and $intent.contractActive) -or ($intent.PSObject.Properties["fromZoneIds"] -and $intent.fromZoneIds -and @($intent.fromZoneIds).Count -gt 0)
-if ($isContract -and $deployZone -and $targetZone -and -not $openingMission -and -not $deployZoneWet) {
-  $dx = $deployCenter[0]; $dz = $deployCenter[1]
-  $ex = $enemyCenter[0]; $ez = $enemyCenter[1]
-  # Adjacent mode: milder slide (already next door).
-  $blend = if ([string]$arcProfile.objectiveAdjacency -eq "required") { 0.25 } else { 0.45 }
-  $deployCenter = @(((1 - $blend) * $dx + $blend * $ex), ((1 - $blend) * $dz + $blend * $ez))
-} elseif ($deployZoneWet -and $isContract -and -not $openingMission) {
-  Write-Host ("Front-band slide skipped for {0}: anchor stays on the dry pad" -f $deployZoneId)
-}
 $frontBand = $isContract -or ($intent.objective -in @("seize_lane", "gate_control"))
 
 $enemySide = Get-EnemySide ([string]$intent.mapId) $intent
@@ -3569,6 +3490,8 @@ $scenario = [ordered]@{
     hubChoiceId = $hubChoiceIdVal
     deployAces = @($hubDeployAces)
     crewBand = @($hubCrewBand)
+    # The hero the player is (first company pick): mission-critical in the field.
+    you = $(if ($state -and $state.company -and $state.company.PSObject.Properties["you"] -and $state.company.you) { [string]$state.company.you } else { $null })
     missionCallIns = $(
       if ($intent.PSObject.Properties["missionCallIns"] -and $intent.missionCallIns) {
         @($intent.missionCallIns)

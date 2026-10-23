@@ -258,7 +258,7 @@ def default_v1_state() -> Dict[str, Any]:
         },
         "characters": {
             # Sheet xp stays small so ensure_roster does not scale Pavise into L4 (Hardened = BAR ~0.45).
-            "pavise": { "id": "pavise", "name": "Pavise", "faction": "ashwalkers", "unitDef": "armwar", "xp": 40, "player": True, "home": None, "status": "active", "wounds": 0, "scars": [] },
+            "pavise": { "id": "pavise", "name": "Pavise", "faction": "ashwalkers", "unitDef": "armwar", "xp": 40, "player": False, "home": None, "status": "locked", "wounds": 0, "scars": [] },
             "vane": { "id": "vane", "name": "Ash-Captain Vane", "faction": "ashwalkers", "unitDef": "legcen", "xp": 1480, "player": False, "home": None, "status": "locked", "wounds": 0, "scars": [] },
             "ketha": { "id": "ketha", "name": "Ketha", "faction": "ashwalkers", "unitDef": "legrezbot", "xp": 1120, "player": True, "home": None, "status": "active", "wounds": 0, "scars": [] },
             "anselm": { "id": "anselm", "name": "Broker Anselm Rue", "faction": "nullmercs", "unitDef": "legcen", "xp": 1900, "player": False, "home": ["greenest_fields", "GF_CENTRAL_OPEN_GRASSLAND"], "status": "active", "wounds": 0, "scars": [] },
@@ -303,10 +303,10 @@ def default_v1_state() -> Dict[str, Any]:
                 {
                     "heroId": "pavise",
                     "name": "Pavise",
-                    # Solo Centurion left hand (armwar) — war buddy, Hardened BAR XP, HP aura.
+                    # Solo Centurion left hand (armwar) — grey shield captain, Hardened BAR XP, HP aura.
                     "unitDef": "armwar",
                     "missionCritical": False,
-                    "status": "active",
+                    "status": "locked",  # a pick now (the recommended you), not core
                     "xp": 0.45,
                     "campaignXp": 40.0,
                     "peakBarXp": 0.45,
@@ -352,12 +352,13 @@ def default_v1_state() -> Dict[str, Any]:
             "upgrades": {},
             "ledger": [],
         },
-        # Fire Emblem company: sealed on hub preamble (pick 3 packs). Unpicked
+        # Fire Emblem company: sealed on hub preamble (Ketha always; pick 3, the first is you). Unpicked
         # band heroes live in fieldPool until wreck/rez or sortie recruit.
         "company": {
             "sealed": False,
-            "core": ["pavise", "ketha"],
+            "core": ["ketha"],
             "band": [],
+            "you": None,
             "joinedLater": [],
             "sealedAt": None,
             "seatCap": 3,

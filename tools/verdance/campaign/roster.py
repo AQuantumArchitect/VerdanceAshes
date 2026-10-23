@@ -79,6 +79,10 @@ def ensure_roster(state: Dict[str, Any]) -> Dict[str, Any]:
                            "peakBarXp": 0.0}.items():
             hero.setdefault(key, value)
         hid = str(hero.get("heroId") or "")
+        # You (the first company pick) are mission-critical for the whole campaign.
+        if hid and hid == str((state.get("company") or {}).get("you") or ""):
+            hero["missionCritical"] = True
+            hero["you"] = True
         src = authored.get(hid)
         if isinstance(src, dict):
             if src.get("name"):

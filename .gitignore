@@ -60,3 +60,4 @@ outbox/va_pad_current.lua
 mod/VerdanceAshes.sdd/singleplayer/verdance_ashes/generated/va_pad_current.lua
 # a tool writes these Windows-path-named files when run on Linux; never track them
 C:*
+state/profile.json

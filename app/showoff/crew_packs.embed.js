@@ -1,6 +1,6 @@
 window.CREW_PACKS = {
   "schemaVersion": "verdance-crew-packs/1.6",
-  "notes": "Baseline ~2k combined (Karkinos). Gap-fill wave: Quill/Kit/Vale/Nox/Ceil/Lumen/Anvil/Volt. Character SSOT: data/story/hero_codex.json Core left hand=Pavise (armwar). Vane Phobos is band swarm. Halbard=corhal.",
+  "notes": "Baseline ~2k combined (Karkinos). Gap-fill wave: Quill/Kit/Vale/Nox/Ceil/Lumen/Anvil/Volt. Character SSOT: data/story/hero_codex.json Core left hand=Pavise (armwar). Vane Phobos is band swarm. Halbard=corhal. Company: Ketha always ships; the player picks 3 (first = you, must be able to walk). Starters unlock more by rescue (state/profile.json).",
   "energyPerMetal": 70,
   "packAnchor": {
     "javelinPair": {
@@ -18,9 +18,8 @@ window.CREW_PACKS = {
   },
   "seatCap": 3,
   "startWalletTnb": 3,
-  "playtestAllUnlocked": true,
+  "playtestAllUnlocked": false,
   "core": [
-    "pavise",
     "ketha"
   ],
   "chassis": {
@@ -491,6 +490,18 @@ window.CREW_PACKS = {
       "combined": 826,
       "label": "Halberd",
       "hasBuildPower": false
+    },
+    "armcir": {
+      "label": "Chainsaw"
+    },
+    "armack": {
+      "label": "Adv. Construction Bot"
+    },
+    "armgmm": {
+      "label": "Prude"
+    },
+    "armanni": {
+      "label": "Pulsar"
     }
   },
   "heroes": {
@@ -883,7 +894,8 @@ window.CREW_PACKS = {
       "packCombined": 4557,
       "packMetal": 4200,
       "packEnergy": 25000,
-      "startXp": 0.0
+      "startXp": 0.0,
+      "canLead": false
     },
     "solarium": {
       "role": "band",
@@ -965,7 +977,8 @@ window.CREW_PACKS = {
       "packMetal": 2030,
       "packEnergy": 22790,
       "formation": "triangle",
-      "startXp": 0.06
+      "startXp": 0.06,
+      "canLead": false
     },
     "noctua": {
       "role": "band",
@@ -992,7 +1005,8 @@ window.CREW_PACKS = {
           "count": 24
         }
       ],
-      "startXp": 0.051
+      "startXp": 0.051,
+      "canLead": false
     },
     "mira": {
       "role": "band",
@@ -1243,14 +1257,14 @@ window.CREW_PACKS = {
       "massTarget": 2064
     },
     "pavise": {
-      "role": "core",
+      "role": "band",
       "unitDef": "armwar",
       "hireTnb": 0,
       "packTotal": 1,
       "extras": 0,
       "packMind": "solo",
       "noTnbStake": false,
-      "blurb": "War buddy Centurion — solo, high XP, Centurion HP aura.",
+      "blurb": "Grey-haired shield captain. One Centurion; her ward steadies everyone near her. Temperate, until you touch her people.",
       "name": "Pavise",
       "sizing": "fixed",
       "packCombined": 314,
@@ -1327,16 +1341,13 @@ window.CREW_PACKS = {
     }
   },
   "starterUnlocks": [
+    "pavise",
+    "solarium",
+    "halbard",
     "vane",
-    "grath",
-    "odessa",
-    "verse",
-    "mira",
-    "kettle",
-    "spoke",
+    "consul",
     "warder",
-    "rusk",
-    "halbard"
+    "spoke"
   ],
   "roleSpread": {
     "core": [
@@ -1438,6 +1449,7 @@ window.CREW_PACKS = {
     }
   },
   "bandOrder": [
+    "pavise",
     "vane",
     "halbard",
     "hearth",

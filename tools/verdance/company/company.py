@@ -84,7 +84,7 @@ RAID_OPTIONAL_RECRUIT_ARCHETYPES = frozenset(
     }
 )
 
-CORE_DEFAULT = ["vane", "ketha"]
+CORE_DEFAULT = ["ketha"]
 SEAT_CAP_DEFAULT = 3
 
 
@@ -102,6 +102,43 @@ def load_crew_packs(workspace: Optional[Path] = None) -> Dict[str, Any]:
         return json.loads(path.read_text(encoding="utf-8-sig"))
     except Exception:  # noqa: BLE001
         return {}
+
+
+PROFILE_REL = Path("state") / "profile.json"
+
+
+def load_profile(workspace: Optional[Path] = None) -> Dict[str, Any]:
+    """The player's record across campaigns (survives a campaign reset): heroes unlocked by rescue."""
+    path = _workspace(workspace) / PROFILE_REL
+    try:
+        data = json.loads(path.read_text(encoding="utf-8-sig")) if path.is_file() else {}
+    except Exception:  # noqa: BLE001
+        data = {}
+    data.setdefault("unlocked", [])
+    return data
+
+
+def unlock_rescued_survivors(state: Dict[str, Any], workspace: Optional[Path] = None) -> List[str]:
+    """At the end of a campaign: every hero rescued in the field (joined after the seal) who is
+    still alive becomes a starting option for every campaign after this one."""
+    company = state.get("company") or {}
+    rescued = {str(h) for h in (company.get("joinedLater") or [])}
+    field = state.get("fieldPool") or {}
+    rescued |= {str(h) for h, e in field.items() if isinstance(e, dict) and str(e.get("status")) == "recruited"}
+    alive = {str(h.get("heroId")) for h in ((state.get("roster") or {}).get("heroes") or [])
+             if isinstance(h, dict) and str(h.get("status") or "") in ("active", "wounded")}
+    new = sorted(rescued & alive)
+    profile = load_profile(workspace)
+    gained = [h for h in new if h not in profile["unlocked"]]
+    if gained:
+        from datetime import datetime, timezone
+        profile["unlocked"] = sorted(set(profile["unlocked"]) | set(gained))
+        profile.setdefault("history", []).append({"campaignId": state.get("campaignId"), "unlocked": gained,
+                                                  "at": datetime.now(timezone.utc).isoformat(timespec="seconds")})
+        path = _workspace(workspace) / PROFILE_REL
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(profile, indent=2), encoding="utf-8")
+    return gained
 
 
 def load_hero_roster_map(workspace: Optional[Path] = None) -> Dict[str, Dict[str, Any]]:
@@ -137,19 +174,27 @@ def core_hero_ids(packs: Optional[Dict[str, Any]] = None) -> List[str]:
     return list(CORE_DEFAULT)
 
 
+def hero_can_lead(hid: str, packs: Optional[Dict[str, Any]] = None) -> bool:
+    """The first pick is you, and you walk: a hero on a building chassis (canLead: false) cannot lead."""
+    packs = packs if packs is not None else load_crew_packs()
+    pack = (packs.get("heroes") or {}).get(str(hid)) or {}
+    return pack.get("canLead", True) is not False
+
+
 def seat_cap(packs: Optional[Dict[str, Any]] = None) -> int:
     packs = packs or {}
     return int(packs.get("seatCap") or SEAT_CAP_DEFAULT)
 
 
-def starter_unlock_ids(packs: Optional[Dict[str, Any]] = None) -> List[str]:
-    """Curated first-run hire board (not the full catalog)."""
-    packs = packs if packs is not None else load_crew_packs()
+def starter_unlock_ids(packs: Optional[Dict[str, Any]] = None, workspace: Optional[Path] = None) -> List[str]:
+    """Who you may start a campaign with: the authored starters plus every hero this player has
+    unlocked by rescuing them and bringing them through a campaign alive (state/profile.json)."""
+    packs = packs if packs is not None else load_crew_packs(workspace)
     band = band_hero_ids(packs)
     raw = packs.get("starterUnlocks") or packs.get("starterUnlockPool") or []
     if not isinstance(raw, list):
-        return []
-    allowed = {str(x) for x in raw}
+        raw = []
+    allowed = {str(x) for x in raw} | {str(x) for x in load_profile(workspace).get("unlocked") or []}
     return [h for h in band if h in allowed]
 
 
@@ -179,6 +224,7 @@ def empty_company(packs: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         "sealed": False,
         "core": core_hero_ids(packs),
         "band": [],
+        "you": None,
         "joinedLater": [],
         "sealedAt": None,
         "seatCap": seat_cap(packs),
@@ -404,6 +450,8 @@ def _legacy_auto_seal(
     company["sealed"] = True
     company["core"] = core
     company["band"] = picks
+    if not company.get("you"):
+        company["you"] = picks[0] if picks else None
     company["joinedLater"] = later
     company["sealedAt"] = company.get("sealedAt") or utc_now()
     company["legacyAutoSeal"] = True
@@ -594,6 +642,11 @@ def seal_company(
 
     if len(picks) != cap:
         return False, f"pick exactly {cap} packs (got {len(picks)})", company
+    # The first pick is you: the hero the player is. You lead on foot.
+    you = picks[0]
+    if not hero_can_lead(you, packs):
+        name = ((packs.get("heroes") or {}).get(you) or {}).get("name") or you
+        return False, f"{name} cannot lead (a building cannot walk); pick someone who can as yourself", company
 
     # Builders spend Tnb; Cortex packs spend km$ (1km$ = 1000 BAR metal bag).
     commerce = state.setdefault("commerce", {})
@@ -643,6 +696,11 @@ def seal_company(
         _set_roster_status(state, hid, "active", player=True)
     for hid in picks:
         _set_roster_status(state, hid, "active", player=True)
+    # You are mission-critical: if you go down in the field, the company must bring you back.
+    for h in ((state.get("roster") or {}).get("heroes") or []):
+        if isinstance(h, dict) and str(h.get("heroId") or h.get("id") or "") == you:
+            h["missionCritical"] = True
+            h["you"] = True
 
     # Wild pool = unpicked band who are not already company-owned rescues.
     field: Dict[str, Any] = {}
@@ -693,6 +751,7 @@ def seal_company(
     company["sealed"] = True
     company["core"] = core
     company["band"] = picks
+    company["you"] = you
     company["joinedLater"] = later
     company["sealedAt"] = utc_now()
     company["formationTnbSpent"] = spent_tnb
@@ -1167,6 +1226,7 @@ def hub_company_surface(state: Dict[str, Any], workspace: Optional[Path] = None)
             "blurb": pack.get("blurb") or row.get("fiction") or "",
             "role": pack.get("role") or "band",
             "premium": bool(pack.get("premium")),
+            "canLead": pack.get("canLead", True) is not False,
             "escorts": escort_labels,
         }
 
@@ -1210,6 +1270,7 @@ def hub_company_surface(state: Dict[str, Any], workspace: Optional[Path] = None)
         "preambleNeeded": not sealed,
         "core": [card(h) for h in (company.get("core") or core_hero_ids(packs))],
         "band": list(company.get("band") or []),
+        "you": company.get("you"),
         "joinedLater": list(company.get("joinedLater") or []),
         "seatCap": int(company.get("seatCap") or seat_cap(packs)),
         # Preamble wallets: Tnb for build-power / reactor seats only.

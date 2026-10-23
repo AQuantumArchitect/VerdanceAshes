@@ -196,39 +196,43 @@ export function toggleCrew(id) {
     noteRosterChanged();
     return;
   }
-  // Preamble formation: pick exactly seatCap packs.
-  if (i >= 0) {
-    state.crewBand.splice(i, 1);
-    renderCompany();
-    renderCompanyIntro();
-    return;
-  }
-  if (state.crewBand.length >= crewSeatCap()) return toast("Pick exactly " + crewSeatCap() + " packs", "err");
-  if (crewSpent() + crewHireCost(id) > crewWallet()) return toast("Not enough formation Tnb for that build-power seat", "err");
-  state.crewBand.push(id);
+  // Preamble formation: the first pick is you (state.crewYou; must walk), then companions.
+  if (state.crewYou === id) state.crewYou = null;
+  else if (i >= 0) state.crewBand.splice(i, 1);
+  else if (state.crewBand.length + (state.crewYou ? 1 : 0) >= crewSeatCap()) return toast(`Pick exactly ${crewSeatCap()}: yourself and ${crewSeatCap() - 1} others`, "err");
+  else if (formationSpent() + crewHireCost(id) > crewWallet()) return toast("Not enough formation Tnb for that build-power seat", "err");
+  else if (!state.crewYou && heroCanLead(id)) state.crewYou = id;
+  else if (state.crewBand.length >= crewSeatCap() - 1) return toast(`${crewHeroName(id)} cannot lead; pick who you are first`, "err");
+  else state.crewBand.push(id);
   renderCompany();
   renderCompanyIntro();
 }
 
+/* Heroes not yet unlocked: rescue one in the field and bring them through a campaign alive. */
+function lockedHeroIds(pool) {
+  const open = new Set(pool.concat(crewCoreIds()));
+  return Object.keys(CREW.heroes || {}).filter(id => CREW.heroes[id]?.role === "band" && !open.has(id));
+}
+
+/* The first pick is you: the hero the player is. Buildings cannot lead. */
+export function heroCanLead(id) { return crewPack(id).canLead !== false; }
+function formationPicks() { return (state.crewYou ? [state.crewYou] : []).concat(state.crewBand); }
+function formationSpent() { return formationPicks().reduce((n, id) => n + crewHireCost(id), 0); }
+
 export function recommendCompany() {
   if (companySealed()) return;
-  const pool = crewBandOrder().filter(id => !crewCoreIds().includes(id) && !["dead", "lost"].includes(String(aceById(id)?.status || "active")));
-  // Solarium + Anvil + Consul: the company that won the first playtest; the rest by band order.
-  const priorities = ["solarium", "anvil", "consul", "vane", "volt", "hearth", "warder"];
-  const ordered = [...priorities.filter(id => pool.includes(id)), ...pool.filter(id => !priorities.includes(id))];
-  const selected = [];
-  let budget = crewWallet(), metal = crewMetalK();
-  for (const id of ordered) {
-    if (selected.length >= crewSeatCap()) break;
-    const cost = crewHireCost(id), metalCost = Number(crewPack(id)?.hireKm || 0);
-    if (cost > budget || metalCost > metal) continue;
-    selected.push(id); budget -= cost; metal -= metalCost;
+  // You are Pavise; Solarium and Halbard come with you. The real choice it sets up:
+  // swap Halbard for Vane (stronger, worse against the early beamer fights).
+  const pool = new Set(crewBandOrder());
+  const pick = ["pavise", "solarium", "halbard"].filter(id => pool.has(id) && !["dead", "lost"].includes(String(aceById(id)?.status || "active")));
+  if (pick.length !== crewSeatCap() || pick.reduce((n, id) => n + crewHireCost(id), 0) > crewWallet()) {
+    return toast("The recommended company is not available. Choose individually.", "warn");
   }
-  if (selected.length !== crewSeatCap()) return toast("No affordable complete recommendation. Choose packs individually.", "warn");
-  state.crewBand = selected;
+  state.crewYou = pick[0];
+  state.crewBand = pick.slice(1);
   renderCompany();
   renderCompanyIntro();
-  toast("Suggested company selected. Review and edit before confirming.", "ok");
+  toast("You are Pavise, with Solarium and Halbard. Swap Halbard for Vane if you want more punch.", "ok");
 }
 
 /* ---- company intro (first run) ------------------------------------------------------- */
@@ -253,6 +257,7 @@ export function syncCompanyIntroGate() {
 }
 function renderCompanyIntro() {
   const grid = $("company-intro-grid");
+  const slotsEl = $("company-intro-slots");
   const metaEl = $("company-intro-meta");
   const countEl = $("company-intro-count");
   const sealBtn = $("btn-seal-company-intro");
@@ -260,57 +265,73 @@ function renderCompanyIntro() {
   if (companySealed()) { hideCompanyIntro(); return; }
   const cap = crewSeatCap();
   const coreIds = crewCoreIds();
-  const unlocked = crewBandOrder().filter(id => !coreIds.includes(id));
-  // One grid: cores sit with the rest of the roster, sorted eco → startXp → cost.
-  const gridIds = sortHeroGridIds(coreIds.concat(unlocked));
+  const picks = formationPicks();
+  const pool = crewBandOrder().filter(id => !coreIds.includes(id));
   if (metaEl) {
-    const spent = crewSpent(), wallet = crewWallet();
+    const spent = formationSpent(), wallet = crewWallet();
     metaEl.innerHTML =
-      `<span class="chip">${unlocked.length} unlocked</span>` +
-      `<span class="chip">${coreIds.length} core</span>` +
-      `<span class="chip">${state.crewBand.length}/${cap} selected</span>` +
+      `<span class="chip">${coreIds.map(crewHeroName).join(", ")} always comes</span>` +
+      `<span class="chip">${picks.length}/${cap} chosen</span>` +
       (spent > 0 ? `<span class="chip">${wallet - spent}/${wallet} Tnb left (builders)</span>` : `<span class="chip">Combat seats free</span>`);
   }
-  const full = state.crewBand.length >= cap;
-  grid.innerHTML = gridIds.map(id => {
-    if (coreIds.includes(id)) {
-      return renderHeroCard({ id, tag: "core", classes: ["core", "on"], panel: true, compact: true, hideCost: true, disabled: true });
+  // Slots: you (void-touched, top), then the companions.
+  if (slotsEl) {
+    const youCard = state.crewYou
+      ? renderHeroCard({ id: state.crewYou, tag: "you", classes: ["on", "toggleable"], panel: true, compact: true, hideCost: true, dataCrew: state.crewYou, type: "button" })
+      : `<div class="slot-empty">Choose who you are. Anyone who can walk.</div>`;
+    const companions = [];
+    for (let k = 0; k < cap - 1; k++) {
+      const id = state.crewBand[k];
+      companions.push(id
+        ? renderHeroCard({ id, classes: ["on", "toggleable"], panel: true, compact: true, hideCost: true, dataCrew: id, type: "button" })
+        : `<div class="slot-empty">Companion</div>`);
     }
-    const on = state.crewBand.includes(id);
+    slotsEl.innerHTML =
+      `<div class="slot-you"><div class="slot-label">You · void-touched</div>${youCard}</div>` +
+      `<div class="slot-companions"><div class="slot-label">Who comes with you</div><div class="slot-row">${companions.join("")}</div></div>`;
+  }
+  const full = picks.length >= cap;
+  const needYou = !state.crewYou;
+  grid.innerHTML = pool.filter(id => !picks.includes(id)).map(id => {
     const cost = crewHireCost(id), costKm = crewHireKm(id);
-    const broke = !on && (crewSpent() + cost > crewWallet());
-    const lockedPick = (!on && full) || broke;
-    const canToggle = !(lockedPick && !on);
+    const broke = formationSpent() + cost > crewWallet();
+    // While "you" is open and only one seat is left, a building cannot take it.
+    const noLead = needYou && !heroCanLead(id) && state.crewBand.length >= cap - 1;
+    const locked = full || broke || noLead;
     return renderHeroCard({
       id,
-      classes: [on ? "on" : "", lockedPick ? "locked" : "", canToggle ? "toggleable" : ""].filter(Boolean),
+      tag: heroCanLead(id) ? null : "cannot lead",
+      classes: [locked ? "locked" : "toggleable"].filter(Boolean),
       costTnb: cost, costKm, pickable: true, showFreeCost: true, panel: true, compact: true,
-      dataCrew: canToggle ? id : null, disabled: !canToggle, type: "button",
+      dataCrew: locked ? null : id, disabled: locked, type: "button",
     });
-  }).join("") || `<div class="panel-card meta">No unlocked packs yet — recruit in the field.</div>`;
+  }).join("") + lockedHeroIds(pool).map(id => renderHeroCard({
+    id, tag: "rescue to unlock", classes: ["locked", "rescue-locked"], panel: true, compact: true, hideCost: true, disabled: true,
+  })).join("");
   if (countEl) {
-    countEl.innerHTML = state.crewBand.length === cap
-      ? `Ready · <b>${crewCoreIds().concat(state.crewBand).map(crewHeroName).join(" · ")}</b>`
-      : `Pick <b>${cap - state.crewBand.length}</b> more pack${cap - state.crewBand.length === 1 ? "" : "s"}`;
+    countEl.innerHTML = picks.length === cap
+      ? `Ready · <b>${crewHeroName(state.crewYou)}</b> (you) · ${state.crewBand.map(crewHeroName).join(" · ")} · ${coreIds.map(crewHeroName).join(" · ")}`
+      : (needYou ? "Choose who you are" : `Pick <b>${cap - picks.length}</b> more`);
   }
   if (sealBtn) {
-    sealBtn.disabled = state.crewBand.length !== cap;
-    sealBtn.textContent = state.crewBand.length === cap ? "Confirm company" : `Confirm (${state.crewBand.length}/${cap})`;
+    sealBtn.disabled = picks.length !== cap || needYou;
+    sealBtn.textContent = picks.length === cap ? "Confirm company" : `Confirm (${picks.length}/${cap})`;
   }
 }
 
 export async function sealCompany() {
   if (companySealed()) return toast("Company already sealed", "ok");
-  if (state.crewBand.length !== crewSeatCap()) return toast("Pick exactly " + crewSeatCap() + " packs", "err");
+  if (!state.crewYou || formationPicks().length !== crewSeatCap()) return toast("Choose who you are, then " + (crewSeatCap() - 1) + " others", "err");
   if (!state.hostLive) return toast("Start PLAY.bat and keep its window open to seal the company", "err");
   try {
     toast("Sealing company…");
-    const { ok, data: j } = await api.sealCompany(state.crewBand.slice());
+    const { ok, data: j } = await api.sealCompany(formationPicks());
     if (!ok || j.ok === false) return toast((j && j.error) || "Seal failed", "err");
     if (j.hub) state.hub = j.hub;
     else await pullHubState();
     // Formation picks become the first sortie roster; the rest of the catalogue stays locked.
     state.sortieSynced = true;
+    state.crewYou = null;
     syncCrewFromHub();
     hideCompanyIntro();
     renderCompany();
