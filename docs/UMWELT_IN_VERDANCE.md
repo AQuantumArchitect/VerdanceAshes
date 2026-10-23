@@ -63,6 +63,10 @@ The engine that holds these pictures is **Umwelt** ([AQuantumArchitect/umwelt](h
 5. **Homecoming.** Python folds the observed zones into the company's belief at their η; the surprise per zone is recorded; people left become obligations; structures become holdings; the other minds are folded by their own observation policy (what *they* could see of us) on a background worker; verdicts are derived from the manifest.
 6. **Camp.** Minutes pass. Posted heroes scout (an observation at modest η), patrols take losses, rumours flip zones — all as belief updates. The next stamp starts from the result.
 
+## A vivarium, not a spawner
+
+The world remembers. When a drop is built, enemy bases come only from the campaign's memory of who holds each zone: ground the company or the Mercs hold, and ground nobody holds (cleared, empty, wild), gets no base from the template (`Get-ScarredZoneSet` in `scripts/build_next_mission_v1.ps1`; the world's memory has the last word over partial battle damage). Reinforcement waves come from somewhere that exists: a team with nothing left on the map sends no one (`spawnWave`). Anyone who returns was moved there by the simulation between sorties, and so is in memory as the holder. The hub offers no contract against nobody: ground the company saw empty, or holds, is not a target (`capture_node_claims.NO_FIGHT_HOLDERS`), while dark ground stays open because nobody has looked.
+
 ## Why this is interesting
 
 - Fog of war becomes **epistemic**: "nobody looked" is a state with consequences, not a grey overlay.

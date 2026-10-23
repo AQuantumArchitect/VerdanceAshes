@@ -4343,6 +4343,13 @@ end
 
 local function spawnWave(fromTeamID, count, targetX, targetZ, label)
   if not fromTeamID or count < 1 then return 0 end
+  -- Vivarium: reinforcements come from somewhere that exists. A team with nothing left on
+  -- this map (its base gone, or never placed because the ground is vacant) sends no one;
+  -- the Mercs answer a call the player makes, so they are exempt.
+  if fromTeamID ~= mercTeamID and (Spring.GetTeamUnitCount(fromTeamID) or 0) == 0 then
+    Spring.Echo("VA_WAVE_SKIPPED team=" .. tostring(fromTeamID) .. " kind=" .. tostring(label) .. " reason=nobody_on_the_map")
+    return 0
+  end
   -- Every pressure producer shares one response budget per credited chapter.
   -- Neither regrowth nor objective completion may add another commander pack.
   if VAQ.responseChapter == sortieChapter then return 0 end

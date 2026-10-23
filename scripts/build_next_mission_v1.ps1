@@ -1478,6 +1478,23 @@ function Get-ScarredZoneSet {
       }
     }
   }
+  # Vivarium: the world remembers, and has the last word over the ledger's partial thinning.
+  # Ground the company or the Mercs hold is ours (player_bloc); ground the campaign says no
+  # empire holds (cleared, empty, wild) is vacant and gets no enemy base from the template.
+  # Anyone who comes back was moved there by the simulation, and is in zoneMemory as holder.
+  if ($zm) {
+    foreach ($p in @($zm.PSObject.Properties)) {
+      $mem = $p.Value
+      if (-not $mem) { continue }
+      $ctrl = [string]$(if ($mem.controllingFaction) { $mem.controllingFaction } else { "" })
+      if (-not $ctrl) { continue }
+      if ($ctrl -in @("ashwalkers", "nullmercs")) {
+        $scarred[[string]$p.Name] = [ordered]@{ reason = "player_bloc"; scar = 1.0 }
+      } elseif ($ctrl -notin @("armada", "cortex")) {
+        $scarred[[string]$p.Name] = [ordered]@{ reason = "vacant"; scar = 1.0 }
+      }
+    }
+  }
   return $scarred
 }
 
@@ -1640,6 +1657,12 @@ function Build-LivingShellFromTemplate {
       $scar = 0.25
       if ($scarInfo.scar) { $scar = [double]$scarInfo.scar }
       $reason = [string]$(if ($scarInfo.reason) { $scarInfo.reason } else { "" })
+      if ($reason -eq "vacant") {
+        # Nobody holds this ground: no enemy unit of the template stands on it, prize or not.
+        if ($uPocket) { $suppressedPockets[$uPocket] = $true }
+        $thinnedUnits++
+        continue
+      }
       if ($isOptional) {
         if ($reason -in @("player_bloc", "claimed")) {
           # Prize stays; ownership flips to the company on re-entry.

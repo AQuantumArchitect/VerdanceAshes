@@ -386,6 +386,10 @@ def hub_claim_surface(state: Dict[str, Any], map_id: Optional[str] = None) -> Di
     }
 
 
+# Believed holders that leave nothing to fight: ours, the Mercs', and ground seen empty (or neutral).
+NO_FIGHT_HOLDERS = ("ashwalkers", "nullmercs", "empty", "neutral")
+
+
 def hub_capture_contracts(
     workspace: Any,
     state: Dict[str, Any],
@@ -434,6 +438,10 @@ def hub_capture_contracts(
             )
             for c in raw:
                 arch = c.get("objectiveArchetype") or "seize_lane"
+                # Vivarium: no contract against nobody. Ground the company saw empty, or holds
+                # (with the Mercs), offers no fight; dark ground stays open (nobody has looked).
+                if _believed(str(c.get("mapId")), str(c.get("targetZoneId"))) in NO_FIGHT_HOLDERS:
+                    continue
                 c = dict(c)
                 c["against"] = _against_word(str(c.get("against") or "unknown"))
                 stamped = stamp_sortie_capture(dict(c))
@@ -486,7 +494,7 @@ def hub_capture_contracts(
             if not isinstance(zrec, dict):
                 continue
             holder = _believed(str(mid), str(zid))
-            if holder in ("nullmercs", "ashwalkers"):
+            if holder in NO_FIGHT_HOLDERS:
                 continue
             against = _against_word(holder)
             order = stamp_sortie_capture({
