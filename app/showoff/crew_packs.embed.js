@@ -1345,8 +1345,6 @@ window.CREW_PACKS = {
     "solarium",
     "halbard",
     "vane",
-    "consul",
-    "warder",
     "spoke"
   ],
   "roleSpread": {

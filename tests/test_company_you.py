@@ -19,8 +19,9 @@ def _ws():
 
 def test_first_pick_is_you_and_must_walk():
     ws = _ws(); st = default_v1_state()
-    ok, err, _ = C.seal_company(st, ["warder", "pavise", "solarium"], workspace=ws)
-    assert not ok and "cannot lead" in err
+    packs = C.load_crew_packs(ws)
+    assert not C.hero_can_lead("warder", packs) and not C.hero_can_lead("hearth", packs) and C.hero_can_lead("pavise", packs)
+    assert set(C.starter_unlock_ids(packs, ws)) == {"pavise", "solarium", "halbard", "vane", "spoke"}
     ok, err, comp = C.seal_company(st, ["pavise", "solarium", "halbard"], workspace=ws)
     assert ok, err
     assert comp["you"] == "pavise" and comp["core"] == ["ketha"]

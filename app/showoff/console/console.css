@@ -626,7 +626,6 @@ details.advanced summary { color:var(--steam); }
 .slot-row { display:grid; grid-template-columns:1fr 1fr; gap:.45rem; }
 .slot-empty { min-height:5.5rem; display:grid; place-items:center; text-align:center; padding:var(--sp-2); border:1px dashed var(--line); border-radius:var(--r-md); color:var(--muted); font-size:var(--fs-sm); }
 /* You: void-touched. A black glow: the card sinks into a dark haze with a bruise-violet rim. */
-.company-intro-grid .hero-card.rescue-locked { opacity:.42; filter:grayscale(.7); }
 .slot-you .slot-label { color:color-mix(in srgb, var(--void-rim) 60%, var(--ink)); }
 .slot-you .hero-card, .slot-you .slot-empty {
   background:radial-gradient(120% 140% at 50% 0%, color-mix(in srgb, var(--void-rim) 22%, var(--void)) 0%, var(--void) 70%);

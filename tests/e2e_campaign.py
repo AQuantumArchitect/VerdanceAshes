@@ -81,8 +81,8 @@ def main() -> int:
     target = next((z.get("zoneId") for z in zones if z.get("openTarget")), None) or (zones[-1].get("zoneId") if zones else None)
     check("theater offers a pad and a target", bool(pad and target), f"pad={pad} target={target} zones={len(zones)}")
     # the hub preamble: Ketha always; three picks, the first is you and must walk
-    bad = k.seal_company(band=["warder", "solarium", "halbard"])
-    check("a building cannot be you", not bad.get("ok") and "cannot lead" in str(bad.get("error")), json.dumps(bad)[:200])
+    bad = k.seal_company(band=["anvil", "solarium", "halbard"])
+    check("only starters can be picked (Anvil unlocks by rescue)", not bad.get("ok") and "not unlocked" in str(bad.get("error")), json.dumps(bad)[:200])
     seal = k.seal_company(band=["pavise", "solarium", "halbard"])
     check("company sealed (preamble)", bool(seal.get("ok")), json.dumps(seal)[:300])
     st_sealed = json.loads(state_path.read_text(encoding="utf-8-sig"))

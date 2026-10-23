@@ -208,12 +208,6 @@ export function toggleCrew(id) {
   renderCompanyIntro();
 }
 
-/* Heroes not yet unlocked: rescue one in the field and bring them through a campaign alive. */
-function lockedHeroIds(pool) {
-  const open = new Set(pool.concat(crewCoreIds()));
-  return Object.keys(CREW.heroes || {}).filter(id => CREW.heroes[id]?.role === "band" && !open.has(id));
-}
-
 /* The first pick is you: the hero the player is. Buildings cannot lead. */
 export function heroCanLead(id) { return crewPack(id).canLead !== false; }
 function formationPicks() { return (state.crewYou ? [state.crewYou] : []).concat(state.crewBand); }
@@ -305,9 +299,7 @@ function renderCompanyIntro() {
       costTnb: cost, costKm, pickable: true, showFreeCost: true, panel: true, compact: true,
       dataCrew: locked ? null : id, disabled: locked, type: "button",
     });
-  }).join("") + lockedHeroIds(pool).map(id => renderHeroCard({
-    id, tag: "rescue to unlock", classes: ["locked", "rescue-locked"], panel: true, compact: true, hideCost: true, disabled: true,
-  })).join("");
+  }).join("");
   if (countEl) {
     countEl.innerHTML = picks.length === cap
       ? `Ready · <b>${crewHeroName(state.crewYou)}</b> (you) · ${state.crewBand.map(crewHeroName).join(" · ")} · ${coreIds.map(crewHeroName).join(" · ")}`
