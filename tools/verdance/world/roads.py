@@ -154,8 +154,10 @@ def open_maps(state: Dict[str, Any]) -> set:
     return opened
 
 
-def door_markers(state: Dict[str, Any], workspace: Path, map_id: str) -> Dict[str, Dict[str, Any]]:
-    """The doors on one map, for the hub board: where each leads and whether we hold it."""
+def door_markers(state: Dict[str, Any], workspace: Optional[Path], map_id: str) -> Dict[str, Dict[str, Any]]:
+    """The doors on one map, for the boards: where each leads and whether we hold it."""
+    if workspace is None:
+        return {}
     opened = open_maps(state)
     out = {}
     for zid, door in load_doors(Path(workspace)).items():
