@@ -98,7 +98,7 @@ _G.VFS = { Include = function(path)
   return f()
 end, FileExists = function(p) return FS[p] ~= nil end, LoadFile = function(p) return FS[p] end }
 _G.Game = { mapSizeX = 8192, mapSizeZ = 8192 }
-_G.GL = { LINES = 1, LINE_LOOP = 2, QUADS = 7, POINTS = 0, TRIANGLES = 4 }
+_G.GL = { LINES = 1, LINE_LOOP = 2, QUADS = 7, POINTS = 0, TRIANGLES = 4, TRIANGLE_FAN = 6 }
 local calls = { text = 0, rect = 0, vertex = 0 }
 _G.CALLS = calls
 _G.gl = {
@@ -161,7 +161,7 @@ def main():
     pre = prelude.replace("FX_JSON_LUA", json.dumps(os.path.join(INCLUDE, 'va_json.lua'))).replace("FX_JSON", rd('files.json')).replace("HEROES_JSON", rd('heroes.json')).replace("STATES_JSON", rd('states.json'))
     run(st, pre, "prelude")
     widgets = {}
-    for w in ('gui_verdance_voice', 'gui_verdance_minimap', 'gui_verdance_sidebar', 'gui_verdance_infil', 'gui_verdance_exfil', 'gui_verdance_hero_tags'):
+    for w in ('gui_verdance_voice', 'gui_verdance_minimap', 'gui_verdance_sidebar', 'gui_verdance_infil', 'gui_verdance_exfil', 'gui_verdance_hero_tags', 'gui_verdance_tnb_bar'):
         path = os.path.join(WIDGETS, w + '.lua')
         run(st, f"W_{w} = LOADW({json.dumps(path)}, {json.dumps(w)}); if W_{w}.Initialize then W_{w}:Initialize() end; print('init ok {w}')", w)
     import glob
@@ -254,6 +254,12 @@ step("plain BAR skirmish: every Verdance widget stands down", function()
   MODOPTS = {}
   for _, n in ipairs(WIDGET_PATHS) do assert(LOADW(n, n) == false, n .. " loaded outside a hub match") end
   MODOPTS = { va_campaign = "1" }
+end)
+step("tnb chip draws beside the metal bar", function()
+  WG["topbar"] = { GetPosition = function() return { 400, 1040, 1920, 1080, 1 } end }
+  RULES.va_tenebrium_bank = 7; W_gui_verdance_tnb_bar:GameFrame(60); local before = CALLS.text
+  W_gui_verdance_tnb_bar:DrawScreen(); assert(CALLS.text > before, "no number drawn")
+  WG["topbar"] = nil; W_gui_verdance_tnb_bar:DrawScreen()
 end)
 print(FAILED and "HARNESS FAILED" or "HARNESS PASSED")
 '''

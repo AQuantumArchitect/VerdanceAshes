@@ -4,7 +4,7 @@ local widget = widget
 function widget:GetInfo()
   return {
     name = "Verdance Tnb Bar",
-    desc = "Tenebrium strip under BAR's resource bar: bank · looted · field, with a pip per Tnb and a flash when the bank moves",
+    desc = "Tenebrium on BAR's top bar: a black glowing donut and the bank, just left of metal; the number flashes when the bank moves",
     author = "Verdance",
     date = "2026-10-20",
     license = "GPL v2 or later",
@@ -13,22 +13,16 @@ function widget:GetInfo()
   }
 end
 
--- The ONE place Tenebrium is read on the HUD. Feeds from game_verdance_campaign.lua
--- publishTenebriumRules(): va_tenebrium_bank / va_tenebrium_looted / va_tenebrium_spent /
--- va_tenebrium_wrecks_unclaimed (every 30 frames). Tooltip-free by design; the numbers
--- are the whole message.
+-- The ONE place Tenebrium is read on the HUD: the bank (va_tenebrium_bank, published by
+-- game_verdance_campaign.lua every 30 frames), one number on BAR's top bar.
 
 local vsx, vsy = Spring.GetViewGeometry()
-local bank, looted, spent, field = 0, 0, 0, 0
+local bank = 0
 local lastBank = nil
 local flashUntil = 0
 local flashKind = nil      -- "good" (bank rose) | "warn" (bank fell)
 local lastPoll = -999
 
-local BAR_W = 260
-local BAR_H = 26
-local BAR_TOP_GAP = 58     -- just under BAR's resource bar
-local PIP_MAX = 12
 local FLASH_SECONDS = 1.5
 
 local COL = {
@@ -71,9 +65,6 @@ end
 
 local function poll()
   bank = math.floor(numParam("va_tenebrium_bank", 0) + 0.5)
-  looted = math.floor(numParam("va_tenebrium_looted", 0) + 0.5)
-  spent = math.floor(numParam("va_tenebrium_spent", 0) + 0.5)
-  field = math.floor(numParam("va_tenebrium_wrecks_unclaimed", 0) + 0.5)
   if lastBank ~= nil and bank ~= lastBank then
     flashKind = (bank > lastBank) and "good" or "warn"
     flashUntil = os.clock() + FLASH_SECONDS
@@ -97,63 +88,58 @@ function widget:GameFrame(frame)
   end
 end
 
+-- A disc of triangles; alpha may fall off from centre (a) to rim (b).
+local function disc(cx, cy, r, c, a, b, segs)
+  gl.BeginEnd(GL.TRIANGLE_FAN, function()
+    gl.Color(c[1], c[2], c[3], a)
+    gl.Vertex(cx, cy)
+    gl.Color(c[1], c[2], c[3], b)
+    for i = 0, segs do
+      local t = i / segs * math.pi * 2
+      gl.Vertex(cx + math.cos(t) * r, cy + math.sin(t) * r)
+    end
+  end)
+end
+
+-- The Tenebrium mark: a black donut breathing a faint violet glow. The hole shows the bar.
+local VOID = { 0.012, 0.004, 0.02 }
+local function donut(cx, cy, r, glowA)
+  disc(cx, cy, r * 1.9, { 0.23, 0.12, 0.36 }, glowA, 0.0, 32) -- violet haze
+  disc(cx, cy, r, VOID, 0.97, 0.97, 32)                   -- the black ring
+  gl.Color(COL.tnb[1], COL.tnb[2], COL.tnb[3], 0.55)
+  gl.LineWidth(1)
+  gl.BeginEnd(GL.LINE_LOOP, function()
+    for i = 0, 31 do local t = i / 32 * math.pi * 2; gl.Vertex(cx + math.cos(t) * r, cy + math.sin(t) * r) end
+  end)
+  disc(cx, cy, r * 0.42, { 0.07, 0.09, 0.08 }, 1.0, 1.0, 20) -- the hole
+end
+
 function widget:DrawScreen()
   if Spring.IsGUIHidden() then return end
   local ok, err = pcall(function()
-    local x1 = vsx * 0.5 - BAR_W * 0.5
-    local x2 = x1 + BAR_W
-    local y2 = vsy - BAR_TOP_GAP
-    local y1 = y2 - BAR_H
-
-    -- Flash wash (good when the bank rose, warn when it fell) — redundant with the number.
-    local now = os.clock()
-    local flashA = 0
-    if flashKind and now < flashUntil then
-      flashA = math.max(0, (flashUntil - now) / FLASH_SECONDS)
-    end
-
-    if Ash and Ash.panel then
-      Ash.panel(x1, y1, x2, y2, { accent = COL.tnb })
+    -- Just left of BAR's metal bar (WG.topbar publishes its area); top-centre if it is absent.
+    local pos = WG and WG["topbar"] and WG["topbar"].GetPosition and WG["topbar"].GetPosition()
+    local h, scale, right, y1
+    if pos then
+      scale = pos[5] or 1
+      h = (pos[4] - pos[2])
+      right, y1 = pos[1] - 6 * scale, pos[2]
     else
-      gl.Color(COL.panel[1], COL.panel[2], COL.panel[3], COL.panel[4] or 0.9)
-      gl.Rect(x1, y1, x2, y2)
-      gl.Color(COL.tnb[1], COL.tnb[2], COL.tnb[3], 0.85)
-      gl.Rect(x1, y1, x1 + 3, y2)
+      scale, h = 1, 40
+      right, y1 = vsx * 0.5, vsy - h
     end
-    if flashA > 0 then
-      local fc = (flashKind == "good") and COL.good or COL.warn
-      gl.Color(fc[1], fc[2], fc[3], 0.28 * flashA)
-      gl.Rect(x1 + 3, y1, x2, y2)
-    end
-
-    -- Text: "TNB  bank 7  ·  looted 3  ·  field 2" — bank large/bold.
-    local tx = x1 + 12
-    local ty = y1 + 9
-    text("TNB", tx, ty, 10, COL.ash, "l")
-    tx = tx + gl.GetTextWidth("TNB") * 10 + 10
-    text("bank", tx, ty, 9, COL.muted, "l")
-    tx = tx + gl.GetTextWidth("bank") * 9 + 4
-    local bankStr = tostring(bank)
-    local bankCol = COL.tnb
-    if flashA > 0 then
-      bankCol = (flashKind == "good") and COL.good or COL.warn
-    end
-    text(bankStr, tx, ty - 1, 14, bankCol, "l")
-    tx = tx + gl.GetTextWidth(bankStr) * 14 + 8
-    local rest = string.format("·  looted %d  ·  field %d", looted, field)
-    text(rest, tx, ty, 9, COL.muted, "l")
-
-    -- Pip row: one violet pip per Tnb up to PIP_MAX, then "+n".
-    local px = x1 + 12
-    local py = y1 + 3
-    local pips = math.min(PIP_MAX, math.max(0, bank))
-    gl.Color(COL.tnb[1], COL.tnb[2], COL.tnb[3], 0.9)
-    for i = 1, pips do
-      gl.Rect(px + (i - 1) * 9, py, px + (i - 1) * 9 + 6, py + 3)
-    end
-    if bank > PIP_MAX then
-      text("+" .. tostring(bank - PIP_MAX), px + pips * 9 + 2, py - 1, 8, COL.tnb, "l")
-    end
+    local now = os.clock()
+    local flashA = (flashKind and now < flashUntil) and math.max(0, (flashUntil - now) / FLASH_SECONDS) or 0
+    local size = math.floor(h * 0.42)
+    local label = tostring(bank)
+    local tw = gl.GetTextWidth(label) * size
+    local r = h * 0.2
+    local cy = y1 + h * 0.5
+    local cx = right - tw - 10 * scale - r
+    donut(cx, cy, r, 0.55 + 0.25 * math.abs(math.sin(now * 1.3)))
+    local col = COL.tnb
+    if flashA > 0 then col = (flashKind == "good") and COL.good or COL.warn end
+    text(label, right, cy - size * 0.35, size, col, "r")
     gl.Color(1, 1, 1, 1)
   end)
   if not ok and not widget._vaTnbFailLogged then
