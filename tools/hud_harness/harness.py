@@ -194,7 +194,7 @@ step("sentence", function() print("    " .. WG.vaBoard:sentence("TRJ_NW_MUSTER")
 step("infil update (pause hammer)", function() inf:Update(); assert(PAUSED, "not paused"); inf:Update() end)
 step("infil draw", function() inf:DrawScreen(); assert(CALLS.text > 20, "little drawn " .. CALLS.text) end)
 step("infil modal fences sidebar", function() assert(WG.vaExfilModal == true); sb:DrawScreen(); vo:DrawScreen() end)
-step("infil Enter begins", function() assert(inf:KeyPress(13)); assert(not PAUSED); assert(WG.vaSortieBegan == true); assert(WG.vaExfilModal == false) end)
+step("infil Enter closes the card; the field stays paused", function() assert(inf:KeyPress(13)); assert(PAUSED, "Enter unpaused the game"); assert(WG.vaSortieBegan == true); assert(WG.vaExfilModal == false); PAUSED = false end)
 -- sidebar after begin
 FRAME = 400
 step("sidebar poll+route", function() sb:GameFrame(400); assert(WG.vaRoute and WG.vaRoute.stage == "push", tostring(WG.vaRoute and WG.vaRoute.stage)); assert(WG.vaHeroes and #WG.vaHeroes == 4, "heroes " .. tostring(WG.vaHeroes and #WG.vaHeroes)) end)

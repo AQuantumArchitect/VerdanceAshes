@@ -426,7 +426,7 @@ details.advanced summary { color:var(--steam); }
 .company-head { display:flex; flex-wrap:wrap; gap:.35rem; justify-content:space-between; align-items:flex-start; margin-bottom:.35rem; }
 .company-head h2 { margin:0; }
 .company-wallet { font-size:var(--fs-xs); color:var(--tnb); border:1px solid color-mix(in srgb, var(--tnb) 35%, transparent); border-radius:var(--r-pill); padding:.15rem .45rem; white-space:nowrap; }
-.company-recruit { margin:0 0 .55rem; padding:.45rem; border-radius:12px; border:1px solid color-mix(in srgb, var(--warn) 50%, transparent); background:linear-gradient(135deg, color-mix(in srgb, var(--warn) 12%, transparent), transparent 55%), var(--shade); }
+.company-recruit { margin:var(--sp-2) 0 .55rem; padding:.45rem; border-radius:12px; border:1px solid color-mix(in srgb, var(--warn) 50%, transparent); background:linear-gradient(135deg, color-mix(in srgb, var(--warn) 12%, transparent), transparent 55%), var(--shade); }
 .company-recruit .cr-kicker { font-size:var(--fs-xs); letter-spacing:.12em; text-transform:uppercase; color:var(--warn); margin:0 0 .35rem; }
 .company-recruit .hero-card { margin:0; border-color:color-mix(in srgb, var(--warn) 45%, transparent); cursor:default; }
 .cc-members { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:.5rem; }
@@ -626,6 +626,9 @@ details.advanced summary { color:var(--steam); }
 .slot-row { display:grid; grid-template-columns:1fr 1fr; gap:.45rem; }
 .slot-empty { min-height:5.5rem; display:grid; place-items:center; text-align:center; padding:var(--sp-2); border:1px dashed var(--line); border-radius:var(--r-md); color:var(--muted); font-size:var(--fs-sm); }
 /* You: void-touched. A black glow: the card sinks into a dark haze with a bruise-violet rim. */
+.cr-note { margin:.3rem 0 0; font-size:var(--fs-xs); line-height:1.45; color:var(--muted); }
+.cr-list .good { color:var(--good); }
+.cr-list { list-style:none; margin:.2rem 0 .35rem; padding:0; display:grid; gap:.2rem; font-size:var(--fs-sm); }
 .slot-you .slot-label { color:color-mix(in srgb, var(--void-rim) 60%, var(--ink)); }
 .slot-you .hero-card, .slot-you .slot-empty {
   background:radial-gradient(120% 140% at 50% 0%, color-mix(in srgb, var(--void-rim) 22%, var(--void)) 0%, var(--void) 70%);

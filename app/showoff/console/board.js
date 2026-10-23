@@ -296,7 +296,7 @@ export function defaultMarks(mapId) {
 }
 
 /* ---- wild recruits (wrecks this Drop can seed) ------------------------------------- */
-function wildRecruitsForMap(mapId) {
+export function wildRecruitsForMap(mapId) {
   const raw = companySurface().wild;
   const mid = String(mapId || "");
   return (Array.isArray(raw) ? raw.filter(w => w && typeof w === "object") : []).filter(w => String(w.mapId || "") === mid);
@@ -311,7 +311,7 @@ function markedZonesForPlan(plan) {
 }
 // Mirror tools/company_v1.field_recruits_for_map: marked pads seat first (up to 3), then
 // ambient fills to limit 2. Teasing EVERY wild pad lied about which wrecks Drop actually bakes.
-function predictedFieldRecruits(mapId, plan) {
+export function predictedFieldRecruits(mapId, plan) {
   const mid = String(mapId || "");
   const marked = new Set(markedZonesForPlan(plan));
   const rows = wildRecruitsForMap(mid).map(w => {

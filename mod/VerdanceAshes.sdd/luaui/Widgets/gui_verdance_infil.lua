@@ -4,7 +4,7 @@ local widget = widget
 function widget:GetInfo()
   return {
     name = "Verdance Infil",
-    desc = "The landing card: who you brought, the belief board with the pad and the job marked, what the company thinks it is walking into. The game waits, paused, until Enter.",
+    desc = "The landing card: who you brought, the belief board with the pad and the job marked, what the company thinks it is walking into. The game waits, paused; Enter closes the card and the field stays paused until the player presses Pause.",
     author = "Verdance",
     date = "2026-10-20",
     license = "GPL v2 or later",
@@ -134,12 +134,14 @@ local function setModal(on)
   if WG then WG.vaExfilModal = on and true or false end
 end
 
+-- Closing the card does not start the clock: the field stays paused so the player can queue
+-- orders (builders first), then presses BAR's Pause key to begin. A sortie that ends while the
+-- card is up, or a player who unpauses with the card open, also closes it.
 local function begin()
   phase = "field"
   if WG then WG.vaSortieBegan = true end
   setModal(false)
-  pcall(Spring.SendCommands, "pause 0")
-  Spring.Echo("VA_UI_SORTIE_BEGAN frame=" .. tostring(Spring.GetGameFrame() or 0))
+  Spring.Echo("VA_UI_SORTIE_BEGAN frame=" .. tostring(Spring.GetGameFrame() or 0) .. " paused=" .. tostring(paused()))
 end
 
 local function reopen()
@@ -351,8 +353,8 @@ function widget:DrawScreen()
   local by = math.max(vsy * 0.08, colBot - 64)
   if C.lines[1] then Ash.voiceBlock(x0 + 330 + (Wd - 330) * 0.5, by + 21, Wd - 330, "Ketha", C.lines[1], 1) end
   Ash.actionRow(x0, by, x0 + 300, by + 42, { fill = Ash.COL.steam, focused = true })
-  text("BEGIN   [Enter]", x0 + 150, by + 15, 14, Ash.COL.ink, "c")
+  text("TO THE FIELD   [Enter]", x0 + 150, by + 15, 14, Ash.COL.ink, "c")
   buttons[#buttons + 1] = { x0, by, x0 + 300, by + 42, action = "begin" }
-  text("The pad is where you land and where you lift. What is not on it when you press EXTRACT stays on Verdance.  /vabrief reopens this card.", x0, by - 18, 11, Ash.COL.muted, "l")
+  text("The field stays paused: queue your orders, then press Pause to begin.  The pad is where you land and where you lift; what is not on it at EXTRACT stays on Verdance.  /vabrief reopens this card.", x0, by - 18, 11, Ash.COL.muted, "l")
   gl.Color(1, 1, 1, 1)
 end

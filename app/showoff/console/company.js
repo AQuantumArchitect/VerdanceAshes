@@ -3,7 +3,7 @@
 import { state, CREW, list, companySurface, companySealed, commerce, metalKOf, prettyMapShort, repLabel, zoneLabelAny } from "./state.js";
 import { api } from "./api.js";
 import { $, esc, toast, logLine, downloadJson, renderHeroCard, crewPack, crewHeroName, aceById, heroNameAny } from "./render.js";
-import { wildRecruitAtZone, renderBoard } from "./board.js";
+import { wildRecruitAtZone, predictedFieldRecruits, renderBoard } from "./board.js";
 import { updateDeployGate, noteRosterChanged, dropRosterSealed, refreshTheaterForFocus } from "./operations.js";
 import { renderBadges, renderHeadline } from "./shell.js";
 import { showCoach } from "./system.js";
@@ -392,29 +392,30 @@ export function buildCompanyEntries() {
 }
 
 /* ---- the Company workspace ----------------------------------------------------------- */
+/* Where you go decides who can be rescued. Always on the company panel: the heroes whose
+   wrecks this drop will place (the marked zones seat first), and who waits on other maps. */
 function renderCompanyRecruitSlot() {
   const wrap = $("company-recruit");
   const cardEl = $("company-recruit-card");
   const kicker = $("company-recruit-kicker");
   if (!wrap || !cardEl) return;
   const mapId = (state.plan && state.plan.mapId) || state.focusMap;
-  const zoneId = state.selectedZoneId || ((state.plan && state.plan.marks && (state.plan.marks.captureZoneIds || [])[0]) || null);
-  const hit = wildRecruitAtZone(mapId, zoneId);
-  if (!hit) {
-    wrap.hidden = true;
-    cardEl.innerHTML = "";
-    return;
-  }
-  const h = crewPack(hit.id);
-  const how = ((hit.recruit && hit.recruit.type) || "wreck_rez").replace(/_/g, " ");
-  if (kicker) kicker.textContent = `Belief collapse · ${how} · wreck`;
-  cardEl.innerHTML = renderHeroCard({
-    id: hit.id, name: hit.name || crewHeroName(hit.id), classes: ["tier-locked", "wild"],
-    meta: `${prettyMapShort(hit.mapId || mapId)} · ${hit.zoneId || zoneId || "zone"}`,
-    blurb: (hit.recruit && hit.recruit.blurb) || h.blurb || "Their wreck is on this pad — rez them to join. No live poof.",
-    panel: true, disabled: true,
-  });
-  wrap.hidden = false;
+  const here = mapId ? predictedFieldRecruits(mapId, state.plan || { mapId, marks: {} }) : [];
+  const wild = (companySurface().wild || []).filter(w => w && typeof w === "object");
+  const elsewhere = {};
+  for (const w of wild) if (w.mapId && w.mapId !== mapId) elsewhere[w.mapId] = (elsewhere[w.mapId] || 0) + 1;
+  if (kicker) kicker.textContent = "Where you go decides who you can rescue";
+  const rows = here.map(r => {
+    const marked = (state.plan?.marks?.captureZoneIds || []).includes(r.zoneId) || state.plan?.marks?.deployZoneId === r.zoneId;
+    return `<li><b>${esc(r.name || crewHeroName(r.id))}</b> · wreck at ${esc(zoneLabelAny(r.zoneId, mapId) || r.zoneId || "somewhere here")}` +
+      `${marked ? ` <span class="good">on your route</span>` : ""}</li>`;
+  }).join("");
+  const away = Object.entries(elsewhere).map(([m, n]) => `${esc(prettyMapShort(m))} (${n})`).join(", ");
+  cardEl.innerHTML =
+    (rows ? `<ul class="cr-list">${rows}</ul><p class="cr-note">Rez the wreck with Ketha and they join for this campaign; bring them home alive at the end and they become a starter.</p>`
+          : `<p class="cr-note">Nobody waits on ${esc(prettyMapShort(mapId) || "this map")} this drop.</p>`) +
+    (away ? `<p class="cr-note">Waiting elsewhere: ${away}.</p>` : "");
+  wrap.hidden = !companySealed();
 }
 export function renderCompany() {
   const sealed = companySealed();
