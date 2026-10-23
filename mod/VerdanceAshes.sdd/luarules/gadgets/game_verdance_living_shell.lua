@@ -4,7 +4,7 @@ local gadget = gadget
 function gadget:GetInfo()
   return {
     name = "Verdance Living Shell",
-    desc = "Spawn frozen living-shell templates + contact wrath (ephemeral, not saved)",
+    desc = "Spawn the enemy's standing base from its frozen living-shell template",
     author = "Verdance",
     date = "2026-07-27",
     license = "GPL v2 or later",
@@ -21,14 +21,9 @@ end
 local S = {
   mission = nil,
   shell = nil,
-  wrath = nil,
   spawned = false,
-  contactFrame = nil,
-  wrathFired = false,
   playerTeam = 0,
   enemyTeam = nil,
-  shellUnitSet = {},
-  ephemeralSet = {},
   primaryZoneId = nil,
   mapSizeX = 1,
   mapSizeZ = 1,
@@ -109,21 +104,6 @@ local function zoneRect(zoneId)
   return nil
 end
 
-local function teamCentroid(teamID)
-  local units = Spring.GetTeamUnits(teamID) or {}
-  local sx, sz, n = 0, 0, 0
-  for _, u in ipairs(units) do
-    if not S.ephemeralSet[u] then
-      local x, _, z = Spring.GetUnitPosition(u)
-      if x then sx = sx + x; sz = sz + z; n = n + 1 end
-    end
-  end
-  if n < 1 then
-    return S.mapSizeX * 0.5, S.mapSizeZ * 0.5
-  end
-  return sx / n, sz / n
-end
-
 local function spawnShell()
   local shell = S.shell
   if not shell or not shell.units then return 0 end
@@ -195,7 +175,6 @@ local function spawnShell()
       if unitID then
         spawned = spawned + 1
         if not isFootprint then
-          S.shellUnitSet[unitID] = true
           Spring.SetUnitRulesParam(unitID, "va_living_shell", 1, { public = true })
         else
           Spring.SetUnitRulesParam(unitID, "va_player_footprint", 1, { public = true })
@@ -289,73 +268,6 @@ local function spawnShell()
   return spawned
 end
 
-local function fireWrath()
-  local wrath = S.wrath
-  if not wrath or not wrath.enabled then return end
-  local teamID = S.enemyTeam
-  if not teamID then return end
-  local pack = wrath.pack or {}
-  local units = pack.units or wrath.units or {}
-  local px, pz = teamCentroid(S.playerTeam)
-  local scatter = tonumber(pack.scatterElmos or wrath.scatterElmos) or 180
-  local spawned = 0
-  local i = 0
-  for _, entry in ipairs(units) do
-    local defName = entry.unitDefName or entry.def
-    local count = tonumber(entry.count) or 1
-    if defName and UnitDefNames and UnitDefNames[defName] then
-      for _ = 1, count do
-        i = i + 1
-        local ang = (i * 2.399) -- golden-ish
-        local r = scatter * (0.35 + (i % 5) * 0.12)
-        local ux = px + math.cos(ang) * r
-        local uz = pz + math.sin(ang) * r
-        ux = math.max(32, math.min(S.mapSizeX - 32, ux))
-        uz = math.max(32, math.min(S.mapSizeZ - 32, uz))
-        local uy = Spring.GetGroundHeight(ux, uz)
-        local unitID = Spring.CreateUnit(defName, ux, uy, uz, 0, teamID)
-        if unitID then
-          spawned = spawned + 1
-          S.ephemeralSet[unitID] = true
-          Spring.SetUnitRulesParam(unitID, "va_ephemeral", 1, { public = true })
-          Spring.SetUnitRulesParam(unitID, "va_wrath", 1, { public = true })
-          if CMD and CMD.FIGHT then
-            Spring.GiveOrderToUnit(unitID, CMD.FIGHT, { px, Spring.GetGroundHeight(px, pz), pz }, {})
-          end
-        end
-      end
-    end
-  end
-  Spring.Echo("VA_WRATH_DROP count=" .. tostring(spawned) .. " nearPlayer=1")
-  if wrath.telegraph ~= false then
-    local bark = (pack.telegraphBark or wrath.telegraphBark
-      or "Contact. Armada response inbound - get clear.")
-    Spring.Echo("VA_WRATH_BARK " .. tostring(bark))
-    if SendToUnsynced then
-      SendToUnsynced("VERDANCE_BEAT", "bark", "Ketha", tostring(bark), 8)
-    end
-  end
-end
-
-local function noteContact(why)
-  if S.contactFrame then return end
-  if not S.wrath or not S.wrath.enabled then return end
-  S.contactFrame = Spring.GetGameFrame()
-  local sec = tonumber(S.wrath.responseSeconds) or 120
-  Spring.Echo("VA_CONTACT why=" .. tostring(why or "hit")
-    .. " responseSeconds=" .. tostring(sec)
-    .. " frame=" .. tostring(S.contactFrame))
-  Spring.SetGameRulesParam("va_contact_frame", S.contactFrame, { public = true })
-  Spring.SetGameRulesParam("va_wrath_deadline", S.contactFrame + math.floor(sec * 30), { public = true })
-  if S.wrath.telegraph ~= false then
-    Spring.Echo("VA_WRATH_BARK Contact made. Response inbound in ~" .. tostring(sec) .. "s.")
-    if SendToUnsynced then
-      SendToUnsynced("VERDANCE_BEAT", "bark", "Ketha",
-        "Contact. You've got about " .. tostring(sec) .. " seconds before the response.", 7)
-    end
-  end
-end
-
 local function modFlag(name)
   local mo = Spring.GetModOptions and Spring.GetModOptions() or {}
   local v = mo[name]
@@ -376,7 +288,6 @@ function gadget:Initialize()
   S.mission = loadMission()
   if not S.mission then return end
   S.shell = S.mission.livingShell
-  S.wrath = S.mission.wrath
   if S.mission.balance and S.mission.balance.playerTeamID then
     S.playerTeam = tonumber(S.mission.balance.playerTeamID) or 0
   end
@@ -385,9 +296,6 @@ function gadget:Initialize()
   end
   if S.shell and S.shell.enabled then
     Spring.Echo("VA_SHELL_ARMED template=" .. tostring(S.shell.templateId or "?"))
-  end
-  if S.wrath and S.wrath.enabled then
-    Spring.Echo("VA_WRATH_ARMED responseSeconds=" .. tostring(S.wrath.responseSeconds or 120))
   end
 end
 
@@ -414,40 +322,6 @@ function gadget:GameFrame(frame)
         end
       end
       spawnShell()
-    end
-  end
-
-  if S.contactFrame and not S.wrathFired and S.wrath and S.wrath.enabled then
-    local sec = tonumber(S.wrath.responseSeconds) or 120
-    local deadline = S.contactFrame + math.floor(sec * 30)
-    if frame >= deadline then
-      S.wrathFired = true
-      fireWrath()
-    end
-  end
-end
-
-function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, projectileID, attackerID, attackerDefID, attackerTeam)
-  if S.contactFrame then return end
-  if not S.wrath or not S.wrath.enabled then return end
-  if not attackerTeam then return end
-  -- Player hit enemy shell / garrison, or enemy hit player.
-  if attackerTeam == S.playerTeam and unitTeam ~= S.playerTeam then
-    noteContact("player_damaged_enemy")
-  elseif unitTeam == S.playerTeam and attackerTeam ~= S.playerTeam then
-    noteContact("enemy_damaged_player")
-  end
-end
-
-function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerDefID, attackerTeam)
-  if S.ephemeralSet[unitID] then
-    S.ephemeralSet[unitID] = nil
-    return
-  end
-  if S.shellUnitSet[unitID] then
-    S.shellUnitSet[unitID] = nil
-    if attackerTeam == S.playerTeam then
-      noteContact("shell_structure_killed")
     end
   end
 end

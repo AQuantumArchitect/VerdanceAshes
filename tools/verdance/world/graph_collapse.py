@@ -112,13 +112,11 @@ def collapse_payload(
     graph_after: Optional[Dict[str, Any]] = None,
     graph_delta: Optional[Dict[str, Any]] = None,
     graph_measured: Optional[Dict[str, Any]] = None,
-    quantum_authoritative: bool = False,
 ) -> Dict[str, Any]:
     """Structured collapse record for hub_result / advance report."""
     chips = collapse_chips(graph_delta, graph_measured)
     return {
         "schemaVersion": "verdance-graph-collapse/1.0",
-        "quantumAuthoritative": bool(quantum_authoritative),
         "delta": {k: round(_f(v), 4) for k, v in (graph_delta or {}).items()},
         "measured": graph_measured or {},
         "graph": snapshot_graph(graph_after),

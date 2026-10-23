@@ -16,11 +16,6 @@
   ],
   "raidHint": "seize_or_raid_lane",
   "captureLater": "flip node",
-  "wrath": {
-   "packId": "armada_gunslinger_response_v1",
-   "responseSeconds": 110,
-   "notes": "Default Armada pack; faction-colored answer when contact pocket is Cortex (compiler may swap cortex_qrf)."
-  },
   "source": "placeholder",
   "realBakeStatus": "pending_cloud_or_iconsatlas"
  },

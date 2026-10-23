@@ -369,7 +369,7 @@ def main() -> int:
     if "--self-test" in sys.argv:
         print(json.dumps(self_test(), indent=2))
         raise SystemExit(0)
-    print("world_tick: use from kernel_campaign_sim_v1 or --self-test")
+    print("world_tick: run by the campaign engine at homecoming; --self-test to check it")
     return 0
 
 

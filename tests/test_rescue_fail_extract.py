@@ -132,7 +132,8 @@ def test_credit_and_contract_know_recruit_lost():
     assert n["objectiveFailReason"] == "wreck_destroyed"
     assert n["objectiveFailHero"] == "fatboy"
     assert n["rescueContractFailed"] is True
-    flat = __import__("contract_v2", fromlist=["result_v2_to_v1_fields"]).result_v2_to_v1_fields(n)
+    from verdance.hub.contract import result_v2_to_v1_fields
+    flat = result_v2_to_v1_fields(n)
     assert flat["objectiveFailed"] is True
     assert flat["objectiveFailHero"] == "fatboy"
 

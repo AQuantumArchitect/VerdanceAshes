@@ -122,7 +122,7 @@ end
 -- commander instead of the company. So: hot-path state and small helpers that
 -- need upvalue speed stay `local`; everything else is a gadget-environment
 -- global, either a bare `function name()` or a field on one of the packed
--- tables (VA_KINDS, VA_CREW_SELECT, VA_FIELD_RECRUIT, VAQ, VA_LOGISTICS,
+-- tables (VA_KINDS, VA_CREW_SELECT, VA_FIELD_RECRUIT, VA_REINFORCE, VA_LOGISTICS,
 -- VA_TRANSLATION). A gadget's globals live in that gadget's own environment,
 -- so they do not leak into other gadgets; GG.* is the only cross-gadget
 -- surface. The second cap that matters is 60 upvalues per function, which is
@@ -157,9 +157,8 @@ VA_FIELD_RECRUIT = {
 }
 local balance = { exportFrame = nil, exported = false, quitAfterExport = false }
 local fib = { milestones = {}, idx = 1, quitAfterLast = false }
--- Quantum kernel lives in an include module to keep this Lua 5.1 main chunk
--- below its 200-local limit. Global table by design; all public names are VAQ.*.
-VAQ = { module = nil, kernel = nil, lastTransitionFrame = 0, arrivals = {} }
+-- Enemy reinforcements share one budget per sortie chapter (global: main-chunk local limit).
+VA_REINFORCE = { usedChapter = nil }
 
 -- Objective automation (gadget-env globals — Lua 5.1 main-chunk local budget).
 CHECK_PERIOD = 30                 -- frames between objective checks
@@ -1200,8 +1199,7 @@ local function resultJson()
     '"tenebriumTeamBanks":' .. (tenebLoot.teamBanksJson and tenebLoot.teamBanksJson() or '{}'),
     '"tenebriumFactionBanks":' .. (tenebLoot.factionBanksJson and tenebLoot.factionBanksJson() or '{}'),
     '"armadaTenebriumCrisis":' .. tostring(tenebLoot.armadaCrisis == true),
-    '"quantumTransitionJournal":' .. (VAQ.kernel and VAQ.kernel:journalJson() or '[]'),
-    '"finalQuantumState":' .. (VAQ.kernel and VAQ.kernel:json() or 'null')
+    '"zoneDv":' .. zoneDvJson()
   }, ',') .. '}'
 end
 
@@ -1258,7 +1256,6 @@ local function finishHeadlessResult(outcome)
   terminalReason = "headless_fastwin"
   Spring.SetGameRulesParam("va_hold_frames", holdFrames, { public = true })
   Spring.Echo("VA_HEADLESS_RESULT_READY mission=" .. tostring(mission.missionId) .. " status=" .. status)
-  VAQ.transition(terminalReason)
   logResult()
   if logAndBroadcastTranslation then logAndBroadcastTranslation() end
   if headless.quit then
@@ -3344,90 +3341,33 @@ local function makeTeamBucket(teamID)
   }
 end
 
-function VAQ.zoneSamples()
-  local buckets = {}
+-- A fact for Python: defensive value (metal in armed structures and pad teeth) per zone per
+-- faction, at the end of the sortie. Control and presence are read from it at home.
+function zoneDvJson()
+  local byZone = {}
   for _, unitID in ipairs(Spring.GetAllUnits() or {}) do
     local teamID = Spring.GetUnitTeam(unitID)
-    if teamID and teamID ~= gaiaTeamID then
+    local defID = Spring.GetUnitDefID(unitID)
+    if teamID and teamID ~= gaiaTeamID and defID and canFight(defID)
+        and (isStructure(defID) or unitIsPadTooth(unitID)) then
       local x, _, z = Spring.GetUnitPosition(unitID)
       local zone = x and zoneForPosition(x, z)
-      local defID = Spring.GetUnitDefID(unitID)
-      if zone and zone.zoneId and defID then
-        local zoneId = tostring(zone.zoneId)
-        local bucket = buckets[zoneId]
-        if not bucket then
-          -- byFactionDv is ownership; av/bp remain pressure/economy axes.
-          bucket = { zoneId = zoneId, av = 0, bp = 0, dp = 0, byFactionDv = {} }
-          buckets[zoneId] = bucket
-        end
-        local faction = tostring(teamFaction[teamID] or "neutral"):lower()
-        local metal = unitDefMetal(defID)
-        local ud = UnitDefs[defID]
-        if isBuilder(defID) then bucket.bp = bucket.bp + (tonumber(ud and ud.buildSpeed) or 0) end
-        if canFight(defID) then
-          if isStructure(defID) or unitIsPadTooth(unitID) then
-            bucket.dp = bucket.dp + metal
-            bucket.byFactionDv[faction] = (bucket.byFactionDv[faction] or 0) + metal
-          else
-            bucket.av = bucket.av + metal
-          end
-        end
+      if zone and zone.zoneId then
+        local faction = (teamID == playerTeamID) and "ashwalkers" or tostring(teamFaction[teamID] or "neutral"):lower()
+        local row = byZone[tostring(zone.zoneId)] or {}
+        row[faction] = (row[faction] or 0) + unitDefMetal(defID)
+        byZone[tostring(zone.zoneId)] = row
       end
     end
   end
-  local samples = {}
-  for _, bucket in pairs(buckets) do
-    -- Territory control = defensive value only (no army/build metal ownership).
-    local control, peak = "neutral", 0
-    for faction, value in pairs(bucket.byFactionDv or {}) do
-      if value > peak then control, peak = faction, value end
-    end
-    bucket.control, bucket.byFactionDv = control, nil
-    samples[#samples + 1] = bucket
+  local parts = {}
+  for zid, row in pairs(byZone) do
+    local inner = {}
+    for faction, v in pairs(row) do inner[#inner + 1] = jstr(faction) .. ":" .. jnum(math.floor(v)) end
+    parts[#parts + 1] = jstr(zid) .. ":{" .. table.concat(inner, ",") .. "}"
   end
-  table.sort(samples, function(a, b) return a.zoneId < b.zoneId end)
-  return samples
-end
-
-function VAQ.transition(reason)
-  if not VAQ.kernel then return false, "kernel_unavailable" end
-  local frame = Spring.GetGameFrame() or 0
-  local target = mission.targetZoneId or (mission.objective and mission.objective.targetZoneId) or ""
-  local damage = objectiveTargetCount > 0 and (objectiveTargetsDestroyed / objectiveTargetCount)
-    or (objectiveComplete and 1 or 0)
-  local requestId = tostring(mission.missionId or "mission") .. "|ch" .. tostring(sortieChapter or 1)
-    .. "|f" .. tostring(frame)
-  local ok, statusText, journal = VAQ.kernel:transition({
-    requestId = requestId,
-    contractId = tostring(mission.missionId or "") .. ":" .. tostring(sortieChapter or 1),
-    mapId = mission.deploymentMapId,
-    targetZoneId = target,
-    elapsedMinutes = math.max(0.05, (frame - (VAQ.lastTransitionFrame or 0)) / 1800),
-    objectiveDamage = damage,
-    zoneFlipped = status == "victory" and objectiveComplete,
-    patron = mission.patron or (mission.worldConflict and mission.worldConflict.patron) or "nullmercs",
-    against = (mission.worldConflict and mission.worldConflict.primaryEnemy) or "armada",
-    pathSignal = mission.pathSignal or "B",
-    zoneSamples = VAQ.zoneSamples(),
-    reason = reason,
-  })
-  if ok then
-    VAQ.lastTransitionFrame = frame
-    local snapshot = VAQ.kernel:snapshot()
-    Spring.SetGameRulesParam("va_quantum_transition", snapshot.transitionIndex or 0, { public = true })
-    Spring.SetGameRulesParam("va_quantum_clock", snapshot.clockMinutes or 0, { public = true })
-    Spring.SetGameRulesParam("va_quantum_hash", snapshot.stateHash or "", { public = true })
-    Spring.Echo("VA_QUANTUM_TRANSITION index=" .. tostring(snapshot.transitionIndex)
-      .. " clock=" .. tostring(snapshot.clockMinutes) .. " hash=" .. tostring(snapshot.stateHash)
-      .. " dispatch=" .. tostring(journal and journal.dispatchId or "none"))
-    if SendToUnsynced then
-      SendToUnsynced("VERDANCE_MISSION_EVENT", "quantum_transition",
-        tostring(snapshot.transitionIndex) .. "|" .. tostring(snapshot.stateHash or ""))
-    end
-  else
-    Spring.Echo("VA_QUANTUM_TRANSITION_SKIP reason=" .. tostring(statusText))
-  end
-  return ok, statusText
+  table.sort(parts)
+  return "{" .. table.concat(parts, ",") .. "}"
 end
 
 local function teamBucketJson(bucket)
@@ -4299,13 +4239,10 @@ local function teamCombatDefNames(teamID)
   return defs
 end
 
--- Same constraint as player infil: reinforcements enter from the map rim, never
--- pop in midfield next to the fight. Anchor toward the destination, then pick
--- the nearest walkable border point (shared geometry with VAQ.entryFor).
-function VAQ.responseDefs(teamID)
+-- What a team sends: its own combat units (no builders, no commanders, no decoys).
+function responseDefs(teamID)
   if tostring(teamFaction[teamID] or ""):lower() == "armada" then
-    return { "armdecom", "armflea", "armflea", "armflea", "armflea",
-      "armpw", "armpw", "armpw", "armpw", "corthud", "corthud" }
+    return { "armflea", "armflea", "armflea", "armflea", "armpw", "armpw", "armpw", "armpw", "armwar", "armwar" }
   end
   local defs = {}
   for _, name in ipairs(teamCombatDefNames(teamID)) do
@@ -4317,6 +4254,66 @@ function VAQ.responseDefs(teamID)
     end
   end
   return defs
+end
+
+-- The player's side can neither see the spot nor stand near it.
+local SIGHT_MARGIN = 2200
+function unseenByPlayer(x, z)
+  local y = Spring.GetGroundHeight(x, z)
+  local ok, any, los, radar = pcall(Spring.GetPositionLosState, x, y, z, playerAllyTeamID)
+  if not ok or any or los or radar then return false end
+  for _, team in ipairs(Spring.GetTeamList() or {}) do
+    if team == playerTeamID or Spring.AreTeamsAllied(playerTeamID, team) then
+      for _, unitID in ipairs(Spring.GetTeamUnits(team) or {}) do
+        local ux, _, uz = Spring.GetUnitPosition(unitID)
+        if ux and (ux - x) * (ux - x) + (uz - z) * (uz - z) < SIGHT_MARGIN * SIGHT_MARGIN then return false end
+      end
+    end
+  end
+  return true
+end
+
+-- THE entry rule, for every reinforcement: a team comes in only on the map edge, only inside a
+-- zone its faction truly holds (mission.entryZones, from the kernel), and, if hostile, only where
+-- the player cannot see and is not near. No such spot means no reinforcements: nobody walks in
+-- from nowhere. (Allies such as the Mercs enter the same way but may be seen arriving.)
+function enemyEntry(teamID, defs, towardX, towardZ)
+  local faction = tostring(teamFaction[teamID] or ""):lower()
+  local hostile = not Spring.AreTeamsAllied(teamID, playerTeamID)
+  local owned = {}
+  local entry = (mission and mission.entryZones) or {}
+  local blocs = (faction == "nullmercs") and { "nullmercs", "ashwalkers" } or { faction }
+  for _, bloc in ipairs(blocs) do
+    for _, zid in ipairs(entry[bloc] or {}) do owned[tostring(zid)] = true end
+  end
+  if next(owned) == nil then return nil, "no_owned_zone" end
+  local sx, sz, inset, step = Game.mapSizeX or 1, Game.mapSizeZ or 1, 160, 128
+  local spots = {}
+  local function consider(x, z)
+    local zone = zoneForPosition(x, z)
+    if zone and owned[tostring(zone.zoneId)] then spots[#spots + 1] = { x = x, z = z } end
+  end
+  for x = inset, sx - inset, step do consider(x, inset); consider(x, sz - inset) end
+  for z = inset, sz - inset, step do consider(inset, z); consider(sx - inset, z) end
+  if #spots == 0 then return nil, "no_owned_edge" end
+  local ax, az = towardX or sx * 0.5, towardZ or sz * 0.5
+  table.sort(spots, function(a, b)
+    return (a.x - ax) ^ 2 + (a.z - az) ^ 2 < (b.x - ax) ^ 2 + (b.z - az) ^ 2
+  end)
+  for _, pos in ipairs(spots) do
+    local ok = true
+    for i, defName in ipairs(defs) do
+      local def = UnitDefNames[defName]
+      local ux, uz = pos.x + ((i - 1) % 3 - 1) * 48, pos.z + math.floor((i - 1) / 3) * 48
+      if not def or (hostile and not unseenByPlayer(ux, uz))
+          or not Spring.TestMoveOrder(def.id, ux, Spring.GetGroundHeight(ux, uz), uz, 0, 0, 0, true, true, true) then
+        ok = false
+        break
+      end
+    end
+    if ok then return pos.x, pos.z end
+  end
+  return nil, "every_owned_edge_in_sight"
 end
 
 -- Where the enemy sends its answer: the zone it BELIEVES we are in (what it has seen of us,
@@ -4345,16 +4342,19 @@ local function spawnWave(fromTeamID, count, targetX, targetZ, label)
   end
   -- Every pressure producer shares one response budget per credited chapter.
   -- Neither regrowth nor objective completion may add another commander pack.
-  if VAQ.responseChapter == sortieChapter then return 0 end
-  local defs = VAQ.responseDefs(fromTeamID)
+  if VA_REINFORCE.usedChapter == sortieChapter then return 0 end
+  local defs = responseDefs(fromTeamID)
   if #defs == 0 then return 0 end
-  local cx, cz = VAQ.entryFor({ destinationZoneId = mission.objective.targetZoneId }, defs)
-  if not cx then return 0 end
+  local cx, cz = enemyEntry(fromTeamID, defs, targetX, targetZ)
+  if not cx then
+    Spring.Echo("VA_WAVE_SKIPPED team=" .. tostring(fromTeamID) .. " kind=" .. tostring(label) .. " reason=" .. tostring(cz))
+    return 0
+  end
   local spawned = 0
   for i, defName in ipairs(defs) do
     local x = cx + ((i - 1) % 3 - 1) * 48
     local z = cz + math.floor((i - 1) / 3) * 48
-    if VAQ.hiddenFromPlayer(x, z) and VAQ.playerDistanceOk(x, z) then
+    if Spring.AreTeamsAllied(fromTeamID, playerTeamID) or unseenByPlayer(x, z) then
       local uID = Spring.CreateUnit(defName, x, Spring.GetGroundHeight(x, z), z, 0, fromTeamID)
       if uID then
         spawned = spawned + 1
@@ -4365,7 +4365,7 @@ local function spawnWave(fromTeamID, count, targetX, targetZ, label)
     end
   end
   if spawned > 0 then
-    VAQ.responseChapter = sortieChapter
+    VA_REINFORCE.usedChapter = sortieChapter
     Spring.Echo("VA_WAVE_SPAWNED team=" .. tostring(fromTeamID) .. " count=" .. spawned
       .. " kind=" .. tostring(label or "reinforce") .. " rim=1")
     if SendToUnsynced then
@@ -4374,142 +4374,6 @@ local function spawnWave(fromTeamID, count, targetX, targetZ, label)
     end
   end
   return spawned
-end
-
-function VAQ.teamForFaction(faction)
-  faction = tostring(faction or ""):lower()
-  for teamID, value in pairs(teamFaction) do
-    if tostring(value or ""):lower() == faction then return teamID end
-  end
-  if objectiveTeamID and faction ~= "nullmercs" and faction ~= "ashwalkers" then return objectiveTeamID end
-  return nil
-end
-
-function VAQ.playerDistanceOk(x, z)
-  for _, team in ipairs(Spring.GetTeamList() or {}) do
-    if team == playerTeamID or Spring.AreTeamsAllied(playerTeamID, team) then
-      for _, unitID in ipairs(Spring.GetTeamUnits(team) or {}) do
-        local ux, _, uz = Spring.GetUnitPosition(unitID)
-        if ux then
-          local dx, dz = ux - x, uz - z
-          if dx * dx + dz * dz < 2200 * 2200 then return false end
-        end
-      end
-    end
-  end
-  return true
-end
-
-function VAQ.hiddenFromPlayer(x, z)
-  local y = Spring.GetGroundHeight(x, z)
-  local ok, any, los, radar = pcall(Spring.GetPositionLosState, x, y, z, playerAllyTeamID)
-  if not ok then return false end
-  return not (any or los or radar)
-end
-
-function VAQ.entryFor(arrival, defs)
-  local margin, candidates = 192, {}
-  local sx, sz = Game.mapSizeX or 1, Game.mapSizeZ or 1
-  for i = 1, 8 do
-    local t = i / 9
-    candidates[#candidates + 1] = { x = margin, z = t * sz }
-    candidates[#candidates + 1] = { x = sx - margin, z = t * sz }
-    candidates[#candidates + 1] = { x = t * sx, z = margin }
-    candidates[#candidates + 1] = { x = t * sx, z = sz - margin }
-  end
-  local snapshot = VAQ.kernel and VAQ.kernel:snapshot() or nil
-  local zone = snapshot and snapshot.zones and snapshot.zones[arrival.destinationZoneId]
-  local anchor = zone and zone.anchor or { x = 0.5, z = 0.5 }
-  local ax, az = (tonumber(anchor.x) or 0.5) * sx, (tonumber(anchor.z) or 0.5) * sz
-  table.sort(candidates, function(a, b)
-    local adx, adz, bdx, bdz = a.x - ax, a.z - az, b.x - ax, b.z - az
-    local da, db = adx * adx + adz * adz, bdx * bdx + bdz * bdz
-    if da == db then return (a.x + a.z) < (b.x + b.z) end
-    return da < db
-  end)
-  for _, pos in ipairs(candidates) do
-    local y = Spring.GetGroundHeight(pos.x, pos.z)
-    local valid = VAQ.hiddenFromPlayer(pos.x, pos.z) and VAQ.playerDistanceOk(pos.x, pos.z)
-    if valid then
-      for i, defName in ipairs(defs) do
-        local def = UnitDefNames[defName]
-        local ux, uz = pos.x + ((i - 1) % 3 - 1) * 48, pos.z + math.floor((i - 1) / 3) * 48
-        if not def or not VAQ.hiddenFromPlayer(ux, uz) or not VAQ.playerDistanceOk(ux, uz)
-            or not Spring.TestMoveOrder(def.id, ux, Spring.GetGroundHeight(ux, uz), uz, 0, 0, 0, true, true, true) then
-          valid = false
-          break
-        end
-      end
-    end
-    if valid then return pos.x, pos.z end
-  end
-  return nil
-end
-
-function VAQ.spawnArrival(arrival, frame)
-  local teamID = VAQ.teamForFaction(arrival.faction)
-  if not teamID then return false, "no_faction_team" end
-  if VAQ.responseChapter == sortieChapter then return false, "chapter_response_already_arrived" end
-  local defs = VAQ.responseDefs(teamID)
-  if #defs == 0 then return false, "no_mobile_recipe" end
-  local x, z = VAQ.entryFor(arrival, defs)
-  if not x then return false, "no_hidden_ingress" end
-  local count = #defs
-  local targetRect = zoneRectFor(arrival.destinationZoneId)
-  local tx, tz = x, z
-  if targetRect then
-    tx = (targetRect[1] + targetRect[3]) * 0.5
-    tz = (targetRect[2] + targetRect[4]) * 0.5
-  end
-  local spawned = 0
-  for i = 1, count do
-    local defName = defs[((i - 1) % #defs) + 1]
-    local offset = (i - 1) * 48
-    local ux = math.max(32, math.min((Game.mapSizeX or 64) - 32, x + (((i - 1) % 3) - 1) * 48))
-    local uz = math.max(32, math.min((Game.mapSizeZ or 64) - 32, z + math.floor((i - 1) / 3) * 48))
-    if VAQ.hiddenFromPlayer(ux, uz) and VAQ.playerDistanceOk(ux, uz) then
-      local unitID = Spring.CreateUnit(defName, ux, Spring.GetGroundHeight(ux, uz), uz, 0, teamID)
-      if unitID then
-        spawned = spawned + 1
-        Spring.SetUnitRulesParam(unitID, "va_quantum_transit", tostring(arrival.id), { public = true })
-        Spring.SetUnitRulesParam(unitID, "va_source_zone", tostring(arrival.sourceZoneId), { public = true })
-        if CMD and CMD.FIGHT then
-          Spring.GiveOrderToUnit(unitID, CMD.FIGHT,
-            { tx, Spring.GetGroundHeight(tx, tz), tz }, {})
-        end
-      end
-    end
-  end
-  if spawned <= 0 then return false, "formation_became_visible" end
-  VAQ.responseChapter = sortieChapter
-  VAQ.kernel:ackArrival(arrival.id, arrival.mass, VAQ.kernel:snapshot().clockMinutes
-    + (frame - VAQ.lastTransitionFrame) / 1800)
-  Spring.SetGameRulesParam("va_reinforcement_entry_x", math.floor(x), { public = true })
-  Spring.SetGameRulesParam("va_reinforcement_entry_z", math.floor(z), { public = true })
-  Spring.SetGameRulesParam("va_reinforcement_source", tostring(arrival.sourceZoneId), { public = true })
-  Spring.Echo("VA_QUANTUM_ARRIVAL id=" .. tostring(arrival.id)
-    .. " source=" .. tostring(arrival.sourceZoneId)
-    .. " destination=" .. tostring(arrival.destinationZoneId)
-    .. " spawned=" .. tostring(spawned) .. " x=" .. math.floor(x) .. " z=" .. math.floor(z))
-  if SendToUnsynced then
-    SendToUnsynced("VERDANCE_BEAT", "wave_warning", x, Spring.GetGroundHeight(x, z), z,
-      "reinforcements from " .. tostring(arrival.sourceZoneId))
-  end
-  return true, "arrived"
-end
-
-function VAQ.processArrivals(frame)
-  if not VAQ.kernel or terminal or status ~= "active" then return end
-  local snapshot = VAQ.kernel:snapshot()
-  local now = (tonumber(snapshot.clockMinutes) or 0) + (frame - (VAQ.lastTransitionFrame or 0)) / 1800
-  for _, arrival in ipairs(VAQ.kernel:dueArrivals(now, currentMapId and currentMapId() or mission.deploymentMapId)) do
-    local ok, reason = VAQ.spawnArrival(arrival, frame)
-    if not ok then
-      VAQ.kernel:deferArrival(arrival.id, now + (300 / 1800), reason)
-      Spring.SetGameRulesParam("va_reinforcement_deferred", 1, { public = true })
-      Spring.Echo("VA_QUANTUM_ARRIVAL_DEFER id=" .. tostring(arrival.id) .. " reason=" .. tostring(reason))
-    end
-  end
 end
 
 -- ============================================================
@@ -5207,6 +5071,18 @@ function runBeatSpawn(b, action)
   else teamID = tonumber(t) end
   if not teamID then return end
   local x, _, z = beatActionXYZ(action)
+  if teamID ~= playerTeamID and not Spring.AreTeamsAllied(teamID, playerTeamID) then
+    local defs = {}
+    for _, u in ipairs(action.units or {}) do
+      for _ = 1, tonumber(u.count) or 1 do defs[#defs + 1] = u.unitDefName or u.def end
+    end
+    local ex, ez = enemyEntry(teamID, defs, x, z)
+    if not ex then
+      Spring.Echo("VA_BEAT_SPAWN_SKIPPED id=" .. tostring(b.id) .. " reason=" .. tostring(ez))
+      return
+    end
+    x, z = ex, ez
+  end
   local spawned = 0
   local i = 0
   for _, u in ipairs(action.units or {}) do
@@ -5605,7 +5481,7 @@ function claimOptionalHighValueSecondaries()
   return tagged
 end
 
--- Heavy terminal work (quantum transition, result JSON, telemetry, GameOver).
+-- Heavy terminal work (result JSON, telemetry, GameOver).
 -- Extracted from setTerminal so the exfil path can paint a loading screen first.
 -- Pass five: the sortie ends once, with facts. No verdict here (Python reads the manifest),
 -- no deferred crunch, no soft-continue, no engine GameOver. The exfil gadget owns the manifest
@@ -5614,7 +5490,6 @@ function runTerminalCrunch(opts)
   opts = opts or {}
   local kind = opts.reason or terminalReason
   Spring.Echo("VA_TERMINAL_CRUNCH kind=" .. tostring(kind) .. " frame=" .. tostring(Spring.GetGameFrame() or 0))
-  VAQ.transition(kind)
   logResult()
   if devTel.enabled and SendToUnsynced then
     SendToUnsynced("VERDANCE_TRACK", "result", lastResultJson or "")
@@ -5957,19 +5832,6 @@ function gadget:Initialize()
   Spring.Echo("VA_CAMPAIGN_BRIDGE_LOADED")
   mission = readMission()
   zoneMap = readZoneMap()
-  do
-    local okQ, module = pcall(VFS.Include, "luarules/gadgets/include/va_quantum_campaign.lua")
-    if okQ and type(module) == "table" and type(mission.campaignQuantumState) == "table" then
-      VAQ.module = module
-      VAQ.kernel = module.new(mission.campaignQuantumState, {})
-      local snapshot = VAQ.kernel:snapshot()
-      Spring.Echo("VA_QUANTUM_READY schema=" .. tostring(snapshot.schemaVersion)
-        .. " index=" .. tostring(snapshot.transitionIndex)
-        .. " hash=" .. tostring(snapshot.stateHash))
-    else
-      Spring.Echo("VA_QUANTUM_LEGACY reason=" .. tostring(okQ and "seed_missing" or module))
-    end
-  end
   local modOptions = Spring.GetModOptions() or {}
   -- Dev telemetry arm: mission seed, modoption, or generated flag file.
   do
@@ -6161,9 +6023,6 @@ function gadget:Initialize()
   waves.nextFrame = tonumber(mission.escalation and mission.escalation.firstWaveFrame) or 1800
   local wi = tonumber(modOptions.va_wave_interval or ""); if wi and wi > 0 then waves.interval = wi end
   local wf = tonumber(modOptions.va_first_wave or ""); if wf and wf > 0 then waves.nextFrame = wf end
-  -- Quantum transit is the sole runtime source of reinforcements. Legacy seeds
-  -- keep the old escalation path; quantum seeds never run both systems.
-  if VAQ.kernel then waves.enabled = false end
   local obj = mission.objective or {}
   targetZoneRect = zoneRectFor(obj.targetZoneId)
   -- One pad (pass five): the company lands and lifts from the same point — the deployment
@@ -6420,9 +6279,6 @@ function gadget:GameFrame(frame)
 
   if vaZoneFlowSample > 0 and frame > 0 and frame % vaZoneFlowSample == 0 then
     vaSampleZoneFlow()
-  end
-  if VAQ.kernel and frame > 0 and frame % 30 == 0 then
-    VAQ.processArrivals(frame)
   end
   tickPendingDeliveries(frame)
 
@@ -6833,22 +6689,18 @@ function VA_LOGISTICS.spawnPackageDelivery(spec)
     x = tx + ((math.random() * 2) - 1) * 160
     z = tz + ((math.random() * 2) - 1) * 160
   else
-    local arrival = { destinationZoneId = mission and mission.targetZoneId or "", mass = 0.05 }
-    x, z = VAQ.entryFor(arrival, { defName })
-    if not x then
-      local sx, sz = Game.mapSizeX or 1, Game.mapSizeZ or 1
-      local edges = {
-        { x = 220, z = tz }, { x = sx - 220, z = tz },
-        { x = tx, z = 220 }, { x = tx, z = sz - 220 },
-      }
-      local best, bestD = edges[1], -1
-      for _, e in ipairs(edges) do
-        local dx, dz = e.x - tx, e.z - tz
-        local d = dx * dx + dz * dz
-        if d > bestD then best, bestD = e, d end
-      end
-      x, z = best.x, best.z
+    -- Deliveries come in over the map edge nearest the company's pad.
+    local sx, sz = Game.mapSizeX or 1, Game.mapSizeZ or 1
+    local edges = {
+      { x = 220, z = tz }, { x = sx - 220, z = tz },
+      { x = tx, z = 220 }, { x = tx, z = sz - 220 },
+    }
+    local best, bestD = edges[1], math.huge
+    for _, e in ipairs(edges) do
+      local d = (e.x - tx) ^ 2 + (e.z - tz) ^ 2
+      if d < bestD then best, bestD = e, d end
     end
+    x, z = best.x, best.z
   end
   local spawned = 0
   local hmin = tonumber(spec.healthFracMin) or 1

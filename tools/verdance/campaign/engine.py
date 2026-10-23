@@ -124,16 +124,28 @@ from verdance.world import (
 )
 from verdance.belief import manifest as _mf, homecoming as _bh, intel_lua as _il
 from verdance.world.graph_collapse import collapse_chips, collapse_payload, character_collapse_chips
-from verdance.world.quantum_campaign_state import (
-    bootstrap as _bootstrap_quantum,
-    persist_exported as _persist_quantum,
-)
 from verdance.readings import (
     readings as _readings,
     occasions as _occasions,
     story_dance as _dance,
     chronicle as _chron,
 )
+
+def entry_zones_for(state: Dict[str, Any], map_id: str, workspace: Optional[Path] = None) -> Dict[str, List[str]]:
+    """faction -> zone ids it controls on this map (zoneMemory truth, current zone ids)."""
+    out: Dict[str, List[str]] = {}
+    for zone_id, zone in ((state.get("zoneMemory") or {}).get(map_id) or {}).items():
+        if not isinstance(zone, dict):
+            continue
+        ctrl = str(zone.get("controllingFaction") or (zone.get("abstract") or {}).get("control") or "").lower()
+        if ctrl in ("", "neutral", "contested", "wild", "none"):
+            continue
+        zid = str(canonical_zone_id(zone_id, workspace) or zone_id)
+        out.setdefault(ctrl, [])
+        if zid not in out[ctrl]:
+            out[ctrl].append(zid)
+    return {k: sorted(v) for k, v in sorted(out.items())}
+
 
 def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = None) -> Dict[str, Any]:
     ensure_roster(state)
@@ -309,13 +321,6 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
     flavor = (sortie or {}).get("flavor")
     against = (sortie or {}).get("against") or objective.get("enemyFaction") or "armada"
     patron = (sortie or {}).get("patron") or objective.get("patron") or "nullmercs"
-    quantum_state = None
-    if workspace is not None:
-        try:
-
-            quantum_state = _bootstrap_quantum(state, Path(workspace))
-        except Exception:
-            quantum_state = None
     intent = {
         "schemaVersion": INTENT_SCHEMA,
         "campaignId": state.get("campaignId", CAMPAIGN_ID),
@@ -359,6 +364,10 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
         "beats": generate_beats(state, voice, family, objective,
                                 map_waterline(state, map_id, workspace)),
         "persistentBaseRehydrate": rehydrate,
+        # Who may bring reinforcements in, and where: the zones each faction truly holds on this
+        # map. The gadget lets a team enter only on the map edge inside one of its own zones, out
+        # of the player's sight. Truth, not belief: this is the world deciding, not the company.
+        "entryZones": entry_zones_for(state, map_id, workspace),
         "offscreenPressureSummary": pressure,
         "roster": build_roster_intent(state),
         "commerce": build_commerce_intent(state, workspace),
@@ -402,7 +411,6 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
             + (["finale", "finale-" + str(finale_plan.get("kind"))] if finale_plan else [])
             + (["epilogue"] if state.get("campaignComplete") else []),
         "campaignComplete": bool(state.get("campaignComplete")),
-        "campaignQuantumState": quantum_state,
         "environment": {
             "mapFamily": family,
             "campaignClockMinutes": round(float(state.get("campaignClockMinutes", 0.0)), 2),
@@ -493,17 +501,12 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
     narrative_evidence = {k: copy.deepcopy(result[k]) for k in ("observedZoneIds", "deployAces", "deployedHeroes", "sortieHeroes") if k in result}
     state = migrate_state(state)
     ensure_zone_memory(state, workspace)
-    raw_quantum_state = copy.deepcopy(result.get("finalQuantumState"))
-    raw_quantum_journal = copy.deepcopy(result.get("quantumTransitionJournal") or [])
     # Normalize is law: MatchResult v2 fields only (no raw override soup).
     credit: Dict[str, Any] = {}
     try:
 
         normalized = normalize_result(result)
         result = result_v2_to_v1_fields(normalized)
-        if raw_quantum_state:
-            result["finalQuantumState"] = raw_quantum_state
-            result["quantumTransitionJournal"] = raw_quantum_journal
         credit = credit_from_result(result)
         result["resultKey"] = credit.get("resultKey") or result.get("resultKey")
         result["status"] = credit.get("verdict") or result.get("status")
@@ -634,24 +637,16 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
     except Exception:
         pass
 
-    quantum_authoritative = False
-    if raw_quantum_state:
-        try:
-
-            quantum_authoritative = _persist_quantum(state, result)
-        except Exception:
-            quantum_authoritative = False
+    # The world evolves here, in Python, once per homecoming. BAR only reported facts.
     old_clock = float(state.get("campaignClockMinutes", 0.0) or 0.0)
-    if not quantum_authoritative:
-        state["campaignClockMinutes"] = round(old_clock + elapsed, 4)
+    state["campaignClockMinutes"] = round(old_clock + elapsed, 4)
     measured_zones = update_measured_zone_memory(state, result, telemetry, workspace)
-    graph_delta = {} if quantum_authoritative else apply_graph_deltas(state, result, elapsed)
+    graph_delta = apply_graph_deltas(state, result, elapsed)
     apply_reputation_companion(state, result, elapsed)
-    if not quantum_authoritative:
-        try:
-            evaluate_home_clear(state, result)
-        except Exception:
-            pass
+    try:
+        evaluate_home_clear(state, result)
+    except Exception:
+        pass
     clean_extract = bool((credit.get("credits") or {}).get("cleanExtract")) or (
         result.get("extractionStatus", "") in ("clean", "success") or bool(result.get("cleanExtract"))
     )
@@ -805,26 +800,17 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
         _wt.power_response(state)
     except Exception:
         attachment_delta = None
-    spectral = None if quantum_authoritative else (spectral_summary(translation, state) if translation else None)
+    spectral = spectral_summary(translation, state) if translation else None
     if spectral:
         state["lastSpectral"] = spectral
-    graph_measured = (copy.deepcopy(state.get("graph") or {}) if quantum_authoritative
-                      else measure_graph_from_world(state, result, spectral))
+    graph_measured = measure_graph_from_world(state, result, spectral)
     update_destroyed_objectives(state, result)
-    if not quantum_authoritative:
-        reset_live_raptors_but_escalate(state, result, elapsed, workspace)
-    offscreen_tick = ({
-        "source": "lua_quantum_kernel",
-        "elapsedMinutes": elapsed,
-        "transitionCount": len(raw_quantum_journal),
-    } if quantum_authoritative else tick_offscreen_zones(state, map_id, measured_zones, elapsed, workspace))
-    front_flips = [] if quantum_authoritative else apply_front_decay(state, map_id, measured_zones, elapsed)
-    regression_flips = [] if quantum_authoritative else apply_player_regression(state, map_id, measured_zones, elapsed, workspace)
+    reset_live_raptors_but_escalate(state, result, elapsed, workspace)
+    offscreen_tick = tick_offscreen_zones(state, map_id, measured_zones, elapsed, workspace)
+    front_flips = apply_front_decay(state, map_id, measured_zones, elapsed)
+    regression_flips = apply_player_regression(state, map_id, measured_zones, elapsed, workspace)
     clash_report: Optional[Dict[str, Any]] = None
     try:
-        if quantum_authoritative:
-            raise RuntimeError("Lua quantum kernel already evolved offscreen state")
-
         clash_report = _clash.run_offscreen_clashes(
             state,
             workspace,
@@ -1127,7 +1113,6 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
             graph_after=state.get("graph"),
             graph_delta=graph_delta,
             graph_measured=graph_measured,
-            quantum_authoritative=bool(quantum_authoritative),
         )
     except Exception:
         collapse = None

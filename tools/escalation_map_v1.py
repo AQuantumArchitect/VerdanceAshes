@@ -107,19 +107,15 @@ def ramp_factor(n: int) -> float:
 
 
 def load_craft_knobs(real_ws: Path) -> Optional[Dict[str, Any]]:
-    for name, active_gate in (("app/brain/campaign_craft.json", True), ("app/brain/craft_recipe.json", False)):
-        p = real_ws / name
-        if not p.exists():
-            continue
-        try:
-            data = json.loads(p.read_text(encoding="utf-8-sig"))
-        except Exception:
-            continue
-        if active_gate and not data.get("active"):
-            continue
-        if data.get("knobs"):
-            return dict(data["knobs"])
-    return None
+    """data/escalation/difficulty.json, in the knob names the chart below reads."""
+    p = real_ws / "data" / "escalation" / "difficulty.json"
+    try:
+        d = json.loads(p.read_text(encoding="utf-8-sig"))
+    except Exception:
+        return None
+    acts = d.get("actScale") or {}
+    return {"enemy_aggro": d.get("enemyAggro"), "arc1_scale": acts.get("1"),
+            "arc2_scale": acts.get("2"), "arc3_scale": acts.get("3")}
 
 
 def compiler_scale_mirror(

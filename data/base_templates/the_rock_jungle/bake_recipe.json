@@ -14,10 +14,6 @@
                                        ],
                           "raidHint":  "survive_pathing",
                           "captureLater":  "corridor",
-                          "wrath":  {
-                                        "packId":  "wild_thin_v1",
-                                        "responseSeconds":  150
-                                    },
                           "source":  "bake",
                           "realBakeStatus":  "baked_local_headed_gpu",
                           "bakedAt":  "2026-07-28T20:15:43",
@@ -91,10 +87,5 @@
                                "wallPerPocket":  4,
                                "radarPerPocket":  1,
                                "scatterRadius":  0.04
-                           },
-    "wrathDefault":  {
-                         "packId":  "wild_thin_v1",
-                         "responseSeconds":  150,
-                         "startOn":  "first_contact"
-                     }
+                           }
 }

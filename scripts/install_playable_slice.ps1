@@ -487,7 +487,7 @@ if ($Launch -or $runHeadless) {
   # catch it. Fetches from BAR's own content service; cache hit is a stat call.
   # Workspace-relative, not script-relative: in a shipped dist the workspace
   # root IS the dist root, and scripts\ sits beside tools\ there too.
-  $provisioner = Join-Path $Workspace "tools\map_provisioner_v1.py"
+  $provisioner = Join-Path $Workspace "tools\verdance\world\map_provisioner.py"
   if (Test-Path -LiteralPath $provisioner) {
     # Resolving Python is the only step allowed to fail softly. If the
     # provisioner actually runs and reports the map is unavailable, that is a
@@ -496,7 +496,8 @@ if ($Launch -or $runHeadless) {
     try { $mapPy = Get-VerdancePython $Workspace }
     catch { Write-Warning "No Python for the map check; relying on the map already being installed." }
     if ($mapPy) {
-      & $mapPy $provisioner --workspace $Workspace --bar-data-root $config.barDataRoot `
+      $env:PYTHONPATH = Join-Path $Workspace "tools"
+      & $mapPy -m verdance.world.map_provisioner --workspace $Workspace --bar-data-root $config.barDataRoot `
         --map $mapName --quiet | Out-Host
       if ($LASTEXITCODE -ne 0) {
         throw ("Could not provision the map '$mapName'. BAR exits with a fatal " +

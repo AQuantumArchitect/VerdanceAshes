@@ -85,11 +85,5 @@
     "radarPerPocket": 1,
     "scatterRadius": 0.06,
     "notes": "Placeholder only if battle bake not yet run. Real density comes from BARb 1v1 dump."
-  },
-  "wrathDefault": {
-    "packId": "armada_gunslinger_response_v1",
-    "responseSeconds": 90,
-    "holdResponseSeconds": 120,
-    "startOn": "first_contact"
   }
 }

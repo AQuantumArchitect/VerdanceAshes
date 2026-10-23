@@ -15,10 +15,6 @@
   ],
   "raidHint": "bite_outer_rings",
   "captureLater": "outer rings",
-  "wrath": {
-   "packId": "bastion_heavy_v1",
-   "responseSeconds": 90
-  },
   "source": "placeholder",
   "realBakeStatus": "pending_cloud_or_iconsatlas"
  },

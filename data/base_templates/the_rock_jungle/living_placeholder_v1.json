@@ -15,10 +15,6 @@
   ],
   "raidHint": "survive_pathing",
   "captureLater": "corridor",
-  "wrath": {
-   "packId": "wild_thin_v1",
-   "responseSeconds": 150
-  },
   "source": "placeholder",
   "realBakeStatus": "pending_cloud_or_iconsatlas"
  },

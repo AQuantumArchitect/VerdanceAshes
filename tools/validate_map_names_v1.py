@@ -128,7 +128,7 @@ def main() -> int:
         try:
             from verdance.world import map_provisioner as mp
         except ImportError:
-            print("WARN map_provisioner_v1 not importable; skipping the online check.")
+            print("WARN verdance.world.map_provisioner not importable; skipping the online check.")
             return 0
         bad = 0
         for name in sorted(valid):

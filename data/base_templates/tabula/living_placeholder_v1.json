@@ -16,10 +16,6 @@
   ],
   "raidHint": "bite_outer_rings",
   "captureLater": "step hold",
-  "wrath": {
-   "packId": "armada_gunslinger_response_v1",
-   "responseSeconds": 120
-  },
   "source": "placeholder",
   "realBakeStatus": "pending_cloud_or_iconsatlas"
  },

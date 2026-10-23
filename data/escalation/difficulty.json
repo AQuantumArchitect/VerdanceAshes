@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "verdance-difficulty/1",
+  "notes": "How hard the enemy hits, by act. The builder multiplies its enemy scale by enemyAggro x the act's scale x a slow ramp after mission 5 (clamped 0.55-1.95). Raise act3 to make the late maps harder.",
+  "enemyAggro": 1.35,
+  "actScale": {
+    "1": 0.94,
+    "2": 0.95,
+    "3": 1.67
+  }
+}

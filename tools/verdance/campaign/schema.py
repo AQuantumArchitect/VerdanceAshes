@@ -370,6 +370,7 @@ def default_v1_state() -> Dict[str, Any]:
 def migrate_state(raw: Dict[str, Any]) -> Dict[str, Any]:
     if raw.get("schemaVersion") == STATE_SCHEMA:
         state = copy.deepcopy(raw)
+        state.pop("campaignQuantumState", None)  # the retired Lua kernel's copy of the world
     else:
         state = default_v1_state()
         state["campaignId"] = raw.get("campaignId", CAMPAIGN_ID)

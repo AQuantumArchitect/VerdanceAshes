@@ -12,7 +12,6 @@
     "arcKinds": ["strike_relay"],
     "raidHint": "strike_core_extract",
     "captureLater": "cut node",
-    "wrath": { "packId": "cortex_qrf_v1", "responseSeconds": 100 },
     "source": "placeholder",
     "realBakeStatus": "pending_cloud_or_iconsatlas"
   },
@@ -112,10 +111,5 @@
     "wallPerPocket": 10,
     "radarPerPocket": 1,
     "scatterRadius": 0.05
-  },
-  "wrathDefault": {
-    "packId": "cortex_qrf_v1",
-    "responseSeconds": 100,
-    "startOn": "first_contact"
   }
 }

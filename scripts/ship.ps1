@@ -78,7 +78,6 @@ foreach ($f in @("va_current.lua", "zone_map_current.lua")) {
 }
 
 # ---- UI ----
-# app\brain (quantum-BAR-AI dev tapes / weights) is forge-only and is not staged.
 Copy-Into (Join-Path $Workspace "app\showoff") (Join-Path $staging "app\showoff")
 foreach ($noise in @("legacy.html", "hub_state.json", "hub_state.embed.js")) {
   # legacy.html is retired; hub_state.* is runtime output that SETUP/PLAY regenerate.
@@ -92,50 +91,12 @@ Get-ChildItem (Join-Path $staging "tools") -Recurse -Directory -Filter "__pycach
   Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
 
 # The campaign package ships whole: tools\verdance (belief / readings / world / company / hub /
-# campaign) is one tree, so there is no per-module list to forget. The thin compat shims at the
-# old flat paths (tools\<name>_v1.py) ship too while build_next_mission_v1.ps1 and the other
-# PowerShell still call them by path; remove them after the first public playtest.
+# campaign) is one tree, so there is no per-module list to forget. Scripts run its modules with
+# `python -m verdance.<package>.<module>` (PYTHONPATH = tools).
 # The parity gate below still runs tools\ship_parity_check_v1.py over the staged tree and fails
 # the ship if anything staged imports something that is not here.
 Copy-Into (Join-Path $Workspace "tools\verdance") (Join-Path $staging "tools\verdance")
 $toolPy = @(
-  # compat shims (python tools\<name>.py / import <name>) -> verdance.*
-  "apply_result_to_hub_v1.py",
-  "stamp_deploy_plan_v1.py",
-  "build_hub_state_v1.py",
-  "build_zone_boards_v1.py",
-  "verdance_story_engine_v1.py",
-  "world_tick_v1.py",
-  "world_zone_graph.py",
-  "contract_v2.py",
-  "attachments_v1.py",
-  "quest_generator_v1.py",
-  "capture_node_claims.py",
-  "escalation_ladder_v1.py",
-  "match_credit_v1.py",
-  "graph_collapse_v1.py",
-  "narrative_v1.py",
-  "offscreen_clash_v1.py",
-  "map_provisioner_v1.py",
-  "commerce_delivery_v1.py",
-  "company_v1.py",
-  "continuity_audit_v1.py",
-  "landing_zones_v1.py",
-  "quantum_campaign_state_v1.py",
-  "hero_observe_v1.py",
-  "map_umwelt_v1.py",
-  "readings_v1.py",
-  "occasions_v1.py",
-  "belief_homecoming_v1.py",
-  "umwelt_world_v1.py",
-  "hub_belief_v1.py",
-  "perspectives_v1.py",
-  "camp_clock_v1.py",
-  "story_dance_v1.py",
-  "chronicle_v1.py",
-  "intel_lua_v1.py",
-  "manifest_v1.py",
-  "wet_reach_v1.py",
   # Ship so a player build can self-check; also what the gates below run.
   "ship_parity_check_v1.py",
   "validate_map_names_v1.py"
@@ -227,8 +188,7 @@ $scriptList = @(
 foreach ($s in $scriptList) {
   Copy-File (Join-Path $Workspace "scripts\$s") (Join-Path $staging "scripts\$s")
 }
-# player helpers: only the live player path. overnight_hive_bar / proxy_campaign /
-# night_preflight / smoke_play_path are forge tools and stay home.
+# player helpers: only the live player path. smoke_play_path is a forge tool and stays home.
 $playerScripts = @(
   "setup_play.ps1",
   "reset_campaign.ps1",

@@ -131,12 +131,6 @@ class NarrativeTests(unittest.TestCase):
         t=next(t for t in narrative.project(s,workspace=WS)["threads"] if t["id"]=="shelter")
         self.assertEqual(t["stage"],"Changed"); self.assertTrue(t["choices"])
 
-    def test_quantum_authority_does_not_change_world_twice(self):
-        for authoritative in (False,True):
-            s=fresh(); graph=copy.deepcopy(s["graph"]); commerce=copy.deepcopy(s["commerce"])
-            result(s,quantum_authoritative=authoritative)
-            self.assertEqual(s["graph"],graph); self.assertEqual(s["commerce"],commerce)
-
     def test_disabled_feature_preserves_state(self):
         s=fresh(); s["features"]={"narrative":False}; before=copy.deepcopy(s)
         self.assertIsNone(result(s)); self.assertFalse(narrative.project(s)["enabled"])

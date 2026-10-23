@@ -427,7 +427,7 @@ function New-MissionCard {
     "seize_lane" { "Clear the living-shell pocket (~60% eco+teeth), hold under regrow pressure to claim the node, then extract. Claim does not mint free Tnb." }
     "gate_control" { "Clear the gate pocket on the living shell, hold under regrow pressure to claim, then extract. No free Tnb mint." }
     "hold_plateau" { "Clear the plateau shell pocket, hold under regrow pressure to claim the step, then extract. No free Tnb mint." }
-    "eco_raid" { "Raid the marked energy works (wreck ~60%), then extract before Armada wrath piles on. The rest of the map is already occupied -- pick another scar later if you want." }
+    "eco_raid" { "Raid the marked energy works (wreck ~60%), then extract before Armada's answer arrives. The rest of the map is already occupied -- pick another scar later if you want." }
     "economy_disrupt" { "Destroy the enemy economy centerpiece, then extract." }
     "strike_relay" { "Destroy the key relay structure, then extract." }
     "destroy_key_structure" { "Destroy the marked key structure, then extract." }
@@ -1284,7 +1284,6 @@ $script:primaryEnemySide = $null
 $script:secondaryMeta = @()  # Drop 4: placed secondary-objective camps (id/zone/required/x/z)
 $nextMissionCandidates = @()  # rebuilt after occupation so picks point at live camps
 $script:livingShellPayload = $null
-$script:wrathPayload = $null
 
 function Resolve-LivingShellTemplatePath {
   param([string]$Ws, [string]$MapId)
@@ -1311,13 +1310,6 @@ function Resolve-LivingShellTemplatePath {
     Select-Object -First 1
   if ($any) { return $any.FullName }
   return $null
-}
-
-function Load-WrathPack {
-  param([string]$Ws, [string]$PackId = "armada_gunslinger_response_v1")
-  $p = Join-Path $Ws "data\base_templates\wrath\$PackId.json"
-  if (!(Test-Path $p)) { return $null }
-  return (Get-Content -Raw -LiteralPath $p | ConvertFrom-Json)
 }
 
 function Test-HighValueUnitDef {
@@ -1796,52 +1788,6 @@ function Build-LivingShellFromTemplate {
   }
 }
 
-function Arm-WrathFromRecipe {
-  param([string]$Ws, [string]$MapId, [string]$FallbackPack = "armada_gunslinger_response_v1", [int]$MissionNumber = 1)
-  $packId = $FallbackPack
-  $respSec = 120
-  $recipePath = Join-Path $Ws "data\base_templates\$MapId\bake_recipe.json"
-  if (Test-Path $recipePath) {
-    $bakeRec = Get-Content -Raw -LiteralPath $recipePath | ConvertFrom-Json
-    $wd = $bakeRec.wrathDefault
-    if (-not $wd -and $bakeRec.characterCard -and $bakeRec.characterCard.wrath) {
-      $wd = $bakeRec.characterCard.wrath
-    }
-    if ($wd) {
-      if ($wd.packId) { $packId = [string]$wd.packId }
-      if ($wd.responseSeconds) { $respSec = [int]$wd.responseSeconds }
-    }
-  }
-  $wrathPack = Load-WrathPack -Ws $Ws -PackId $packId
-  if (-not $wrathPack) { return $null }
-  # Playtest: early wrath was ~4x too hot. Delay and thin the pack for first sorties.
-  $wrathSoft = if ($MissionNumber -le 1) { 0.25 }
-               elseif ($MissionNumber -le 2) { 0.35 }
-               elseif ($MissionNumber -le 4) { 0.5 }
-               else { 1.0 }
-  $respSec = [int][Math]::Max(90, [Math]::Round($respSec / $wrathSoft))
-  $units = @($wrathPack.units | ForEach-Object {
-    $c = [int][Math]::Max(1, [Math]::Round([int]$_.count * $wrathSoft))
-    [ordered]@{ unitDefName = [string]$_.unitDefName; count = $c }
-  })
-  return [ordered]@{
-    enabled = $true
-    startOn = "first_contact"
-    responseSeconds = $respSec
-    packId = [string]$wrathPack.packId
-    ephemeral = $true
-    telegraph = $true
-    telegraphBark = if ($wrathPack.telegraphBark) { [string]$wrathPack.telegraphBark } else { "Contact. Response inbound." }
-    scatterElmos = if ($wrathPack.scatterElmos) { [int]$wrathPack.scatterElmos } else { 180 }
-    pressureSoft = $wrathSoft
-    pack = [ordered]@{
-      units = $units
-      scatterElmos = if ($wrathPack.scatterElmos) { [int]$wrathPack.scatterElmos } else { 180 }
-      telegraphBark = if ($wrathPack.telegraphBark) { [string]$wrathPack.telegraphBark } else { $null }
-    }
-  }
-}
-
 # Kinds that load living-shell occupation when a template exists (outbound 38).
 $script:shellCapableKinds = @(
   "eco_raid", "eco_expand", "economy_disrupt",
@@ -1968,11 +1914,6 @@ function Try-ApplyLivingShell {
       }
       $script:mapOccupation += $occ
     }
-    $script:wrathPayload = Arm-WrathFromRecipe -Ws $Ws -MapId $MapId -MissionNumber $missionNumber
-    if ($script:wrathPayload) {
-      Write-Host ("Wrath armed: pack={0} responseSeconds={1} soft={2}" -f `
-        $script:wrathPayload.packId, $script:wrathPayload.responseSeconds, $script:wrathPayload.pressureSoft)
-    }
     Write-Host ("Living shell: {0} units / {1} pockets from {2}" -f `
       $script:livingShellPayload.unitCount, @($shellTpl.pockets).Count, (Split-Path -Leaf $shellPath))
     return $true
@@ -2003,49 +1944,23 @@ $pressureTier = if ($missionNumber -le 1) { 0.25 }
 $rampFactor = [Math]::Min(1.0, 0.55 + 0.1 * ($missionNumber - 1))
 $enemyScale = [Math]::Round(([Math]::Max(0.35, [Math]::Min(2.0, $scaleCenter / 6000.0)) * $diffCoeff * $rampFactor * $pressureTier), 3)
 Write-Host ("Pressure soft-open: mission={0} tier={1} ramp={2} → enemyScale={3}" -f $missionNumber, $pressureTier, $rampFactor, $enemyScale)
-# Overnight champion craft: enemy_aggro × per-arc scale (app/brain/craft_recipe.json).
-$craftStamp = $null
-$craftKnobs = $null
-$craftPath = Join-Path $Workspace "app\brain\craft_recipe.json"
-$campaignCraftPath = Join-Path $Workspace "app\brain\campaign_craft.json"
-if (Test-Path $campaignCraftPath) {
+# Difficulty by act (data/escalation/difficulty.json): enemy aggression x the act's scale.
+$difficultyPath = Join-Path $Workspace "data\escalation\difficulty.json"
+if (Test-Path $difficultyPath) {
   try {
-    $cc = Get-Content -Raw -LiteralPath $campaignCraftPath | ConvertFrom-Json
-    if ($cc.active -and $cc.knobs) { $craftKnobs = $cc.knobs; $craftStamp = $cc.stamp }
-  } catch {}
+    $dif = Get-Content -Raw -LiteralPath $difficultyPath | ConvertFrom-Json
+    $actKey = if ($missionNumber -le 5) { "1" } elseif ($missionNumber -le 10) { "2" } else { "3" }
+    $arcS = [double]$dif.actScale.$actKey
+    if (-not $arcS -or $arcS -le 0) { $arcS = 1.0 }
+    $aggro = [double]$dif.enemyAggro
+    if (-not $aggro -or $aggro -le 0) { $aggro = 1.0 }
+    $arcRamp = 1.0 + 0.03 * [Math]::Max(0, $missionNumber - 5)
+    $enemyScale = [Math]::Round([Math]::Min(1.95, [Math]::Max(0.55, $enemyScale * $aggro * $arcS * $arcRamp)), 3)
+    Write-Host "Difficulty: act=$actKey aggro=$aggro actScale=$arcS -> enemyScale=$enemyScale"
+  } catch { Write-Warning "difficulty.json unreadable: $($_.Exception.Message)" }
 }
-if (-not $craftKnobs -and (Test-Path $craftPath)) {
-  try {
-    $cr = Get-Content -Raw -LiteralPath $craftPath | ConvertFrom-Json
-    if ($cr.knobs) { $craftKnobs = $cr.knobs; $craftStamp = $cr.stamp }
-  } catch {}
-}
-if ($craftKnobs) {
-  $arcS = if ($missionNumber -le 5) { [double]$craftKnobs.arc1_scale }
-          elseif ($missionNumber -le 10) { [double]$craftKnobs.arc2_scale }
-          else { [double]$craftKnobs.arc3_scale }
-  if (-not $arcS -or $arcS -le 0) { $arcS = 1.0 }
-  $aggro = [double]($craftKnobs.enemy_aggro)
-  if (-not $aggro -or $aggro -le 0) { $aggro = 1.0 }
-  $arcRamp = 1.0 + 0.03 * [Math]::Max(0, $missionNumber - 5)
-  $enemyScale = [Math]::Round([Math]::Min(1.95, [Math]::Max(0.55, $enemyScale * $aggro * $arcS * $arcRamp)), 3)
-  Write-Host "CRAFT scale: stamp=$craftStamp aggro=$aggro arcS=$arcS → enemyScale=$enemyScale"
-}
-# Dev launch: dense player telemetry flag for the campaign gadget.
-$devModePath = Join-Path $Workspace "app\brain\dev_mode.json"
 $devTelemetry = $false
 $devPeriod = 150
-if (Test-Path $devModePath) {
-  try {
-    $dm = Get-Content -Raw -LiteralPath $devModePath | ConvertFrom-Json
-    if ($dm.enabled) {
-      $devTelemetry = $true
-      if ($dm.telemetry -and $dm.telemetry.samplePeriodFrames) {
-        $devPeriod = [int]$dm.telemetry.samplePeriodFrames
-      }
-    }
-  } catch {}
-}
 # Farm sorties (optional XP grind) intentionally run light so power fantasy is clear.
 $isFarmSortie = $false
 if ($intent.PSObject.Properties["flavor"] -and [string]$intent.flavor -eq "farm_patrol") { $isFarmSortie = $true }
@@ -2851,10 +2766,6 @@ switch ($objectiveKind) {
         }
         Write-Host ("Occupied map: {0} Armada eco nodes pre-placed (primary + pockets)." -f $script:mapOccupation.Count)
       }
-      $script:wrathPayload = Arm-WrathFromRecipe -Ws $Workspace -MapId ([string]$intent.mapId)
-      if ($script:wrathPayload) {
-        Write-Host ("Wrath armed: pack={0} responseSeconds={1}" -f $script:wrathPayload.packId, $script:wrathPayload.responseSeconds)
-      }
     }
   }
   "hive_clear_or_bypass" {
@@ -3291,7 +3202,7 @@ if ($state -and $state.PSObject.Properties["fieldPool"] -and $state.fieldPool) {
       "import json, sys"
       "from pathlib import Path"
       "sys.path.insert(0, r'" + (Join-Path $Workspace "tools") + "')"
-      "from company_v1 import field_recruits_for_map"
+      "from verdance.company.company import field_recruits_for_map"
       "args = json.loads(Path(r'" + $rankArgsPath + "').read_text(encoding='utf-8-sig'))"
       "state = json.loads(Path(args['statePath']).read_text(encoding='utf-8-sig'))"
       "rows = field_recruits_for_map(state, args['mapId'], workspace=Path(args['workspace']), limit=int(args.get('limit') or 2), marked_zone_ids=list(args.get('markedZoneIds') or []), objective_archetype=args.get('objectiveArchetype') or '')"
@@ -3449,11 +3360,9 @@ $scenario = [ordered]@{
     hydrology = $(if ($intent.PSObject.Properties["hydrology"] -and $intent.hydrology) { $intent.hydrology }
                   else { [ordered]@{ level = 0.0; amplitude = 0.0 } })
     finale = $(if ($isFinale) { $intent.finale } else { $null })
-    campaignQuantumState = $(
-      if ($intent.PSObject.Properties["campaignQuantumState"] -and $intent.campaignQuantumState) {
-        $intent.campaignQuantumState
-      } else { $null }
-    )
+    # faction -> zones it truly holds here. Reinforcements enter only on the map edge inside one
+    # of their own zones, out of the player's sight (game_verdance_campaign.lua enemyEntry).
+    entryZones = $(if ($intent.PSObject.Properties["entryZones"] -and $intent.entryZones) { $intent.entryZones } else { [ordered]@{} })
     battlefieldManifest = [ordered]@{
       schemaVersion = "verdance-battlefield-manifest/1.0"
       initializationEndsFrame = 90
@@ -3518,7 +3427,6 @@ $scenario = [ordered]@{
       enemyAI = [string]$arcProfile.enemyAI
       farmSortie = [bool]$isFarmSortie
       label = $difficultyLine
-      craftStamp = $craftStamp
     }
     progression = [ordered]@{
       mode = $xpMode
@@ -3531,18 +3439,9 @@ $scenario = [ordered]@{
       samplePeriodFrames = [int]$devPeriod
       learnFaster = [bool]$devTelemetry
     }
-    craft = $(
-      if ($craftKnobs) {
-        [ordered]@{
-          stamp = $craftStamp
-          knobs = $craftKnobs
-        }
-      } else { $null }
-    )
     nextMissionCandidates = @($nextMissionCandidates)
     mapOccupation = @($script:mapOccupation)
     livingShell = $(if ($script:livingShellPayload) { $script:livingShellPayload } else { $null })
-    wrath = $(if ($script:wrathPayload) { $script:wrathPayload } else { $null })
     occupationModel = "living_shell"
     sessionMode = if ($intent.sessionMode) { [string]$intent.sessionMode } else { "same_map" }
     capture = [ordered]@{

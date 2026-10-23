@@ -255,28 +255,6 @@ $report = [ordered]@{
 ($report | ConvertTo-Json -Depth 8) | Set-Content -Encoding UTF8 -LiteralPath $reportPath
 ($report | ConvertTo-Json -Depth 8) | Set-Content -Encoding UTF8 -LiteralPath (Join-Path $Workspace "outbox\cloud_bake_harvest.latest.json")
 
-# --- Membrane refresh ---
-if ($RefreshMembrane -or $report.okCount -gt 0) {
-  Write-Host "=== Refreshing shell character membrane ==="
-  $py = $null
-  $umweltPy = "C:\Users\Luke Spooner\ws-win\umwelt\.venv\Scripts\python.exe"
-  if (Test-Path $umweltPy) { $py = $umweltPy }
-  else {
-    try { $py = Get-VerdancePython -Workspace $Workspace } catch { $py = $null }
-  }
-  if ($py) {
-    $env:PYTHONPATH = "$Workspace\tools;C:\Users\Luke Spooner\ws-win\umwelt\src"
-    try {
-      & $py -m quantum_bar_ai.shell_character_membrane $Workspace
-      Write-Host "Membrane refreshed -> outbox/shell_character_membrane.latest.json"
-    } catch {
-      Write-Warning "Membrane refresh failed: $_"
-    }
-  } else {
-    Write-Warning "No Python for membrane refresh."
-  }
-}
-
 Write-Host ""
 Write-Host "Cloud bake complete: $($report.okCount)/$($report.total) templates harvested"
 Write-Host "Report: $reportPath"
