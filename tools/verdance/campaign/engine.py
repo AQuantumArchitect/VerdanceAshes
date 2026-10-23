@@ -148,6 +148,15 @@ def entry_zones_for(state: Dict[str, Any], map_id: str, workspace: Optional[Path
     return {k: sorted(v) for k, v in sorted(out.items())}
 
 
+def wild_zones_for(state: Dict[str, Any], map_id: str, workspace: Optional[Path] = None) -> List[str]:
+    """Zone ids the wild controls on this map (zoneMemory truth, current zone ids)."""
+    out = set()
+    for zone_id, zone in ((state.get("zoneMemory") or {}).get(map_id) or {}).items():
+        if isinstance(zone, dict) and str(zone.get("controllingFaction") or (zone.get("abstract") or {}).get("control") or "").lower() == "wild":
+            out.add(str(canonical_zone_id(zone_id, workspace) or zone_id))
+    return sorted(out)
+
+
 def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = None) -> Dict[str, Any]:
     ensure_roster(state)
     ensure_commerce(state, workspace)
@@ -369,6 +378,8 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
         # map. The gadget lets a team enter only on the map edge inside one of its own zones, out
         # of the player's sight. Truth, not belief: this is the world deciding, not the company.
         "entryZones": entry_zones_for(state, map_id, workspace),
+        # Zones the wild truly holds here: on the Rock Jungle each gets a raptor den.
+        "wildZones": wild_zones_for(state, map_id, workspace),
         # The doors on this map, for the in-game board: where each leads and whether the
         # company's ledger says it holds it.
         "doors": [dict(zoneId=zid, **d) for zid, d in _roads.door_markers(state, workspace, map_id).items()],

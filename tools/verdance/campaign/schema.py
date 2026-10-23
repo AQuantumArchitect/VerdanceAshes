@@ -436,9 +436,18 @@ NULLMERC_FOOTHOLD_ROLES = (
 )
 
 
+WILD_HOME_MAP = "the_rock_jungle"
+
+
 def ensure_zone_memory(state: Dict[str, Any], workspace: Path) -> None:
     zone_maps = zone_maps_from_workspace(workspace)
     zone_memory = state.setdefault("zoneMemory", {})
+    doors = state.get("doors") if isinstance(state.get("doors"), dict) else {}
+
+    def held_door(zone_id: str) -> bool:
+        rec = doors.get(zone_id)
+        return bool(isinstance(rec, dict) and rec.get("held"))
+
     actors = state.setdefault("offscreenActors", {})
     hazard_state = state.setdefault("hazardState", {})
     for map_id, zone_map in zone_maps.items():
@@ -465,7 +474,12 @@ def ensure_zone_memory(state: Dict[str, Any], workspace: Path) -> None:
                 continue
             tags = set(str(t).lower() for t in zone.get("tags", []) or [])
             role = str(zone.get("role", "")).lower()
-            if "raptors" in tags or "wilds" in tags or "hive" in role or "raptor" in role:
+            if map_id == WILD_HOME_MAP and held_door(zone_id):
+                actor = "Ashwalkers"
+                control = "ashwalkers"
+            elif map_id == WILD_HOME_MAP or "raptors" in tags or "wilds" in tags or "hive" in role or "raptor" in role:
+                # The Rock Jungle is wild ground end to end: raptors hold every zone until
+                # someone out-builds them there.
                 actor = "RaptorsAI"
                 control = "wild"
             elif "start" in tags and ("legion" in role or "player" in role):
@@ -493,6 +507,12 @@ def ensure_zone_memory(state: Dict[str, Any], workspace: Path) -> None:
             map_actors.setdefault(zone_id, actor)
             if zone_id not in zones:
                 zones[zone_id] = blank_zone_memory(map_id, zone_id, zone.get("label", zone_id), control)
+            elif map_id == WILD_HOME_MAP and control == "wild":
+                # Saves from before the jungle went wild: unclaimed ground there is the wild's.
+                zm = zones[zone_id]
+                if str(zm.get("controllingFaction") or (zm.get("abstract") or {}).get("control") or "neutral").lower() in ("neutral", "contested", "none", ""):
+                    zm["controllingFaction"] = "wild"
+                    zm.setdefault("abstract", {})["control"] = "wild"
             if actor == "RaptorsAI":
                 hazard_state.setdefault(map_id, {}).setdefault(zone_id, {
                     "pressure": zones[zone_id]["abstract"].get("hazardPressure", 0.2),

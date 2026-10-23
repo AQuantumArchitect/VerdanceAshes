@@ -1281,6 +1281,7 @@ $description = Get-ObjectiveDescription $intent
 # Occupation list filled during camp assembly (eco_raid Arc A fills the map).
 $script:mapOccupation = @()
 $script:primaryEnemyTeamID = $null
+$script:wildTeamID = $null   # the raptor team the Rock Jungle dens ride (Add-RaptorCamp)
 $script:primaryEnemySide = $null
 $script:secondaryMeta = @()  # Drop 4: placed secondary-objective camps (id/zone/required/x/z)
 $nextMissionCandidates = @()  # rebuilt after occupation so picks point at live camps
@@ -2107,6 +2108,10 @@ function PushToRim([double[]]$c, [double]$threshold = 0.28) {
   return @($x, $z)
 }
 $wildCenter = PushToRim @(0.08, 0.50)
+# The Rock Jungle's hive stands in its south-west corner (owner call, 2026-10-23): the nest,
+# the queen and every new burrow (the raptor startbox) all sit there.
+$jungleHiveCenter = Get-ZoneCenter (Get-ZoneById $zoneMap "TRJ_SW_LANE") @(0.14, 0.84)
+if ($isRockJungle) { $wildCenter = $jungleHiveCenter }
 
 # --- Camp assembly ---------------------------------------------------------
 # Each camp -> one team on its own allyteam (contractor centerpieces share the
@@ -2301,6 +2306,49 @@ function Add-RaptorCamp {
   $script:baseRecipes["camp${teamID}_swarm"] = $swarmSpecs
   $script:forces += [ordered]@{ id = "camp${teamID}_swarm"; label = "Raptor swarm"; teamID = $teamID; side = "Raptors"; faction = "wild"; role = $(if ($AsObjective) { "garrison" } else { "wild_pressure" }); base = [ordered]@{ x = $Center[0]; z = $Center[1] }; recipe = "camp${teamID}_swarm" }
   $script:ai += [ordered]@{ name = "RaptorsDefenseAI(Verdance)"; shortName = "RaptorsAI"; team = $teamID; version = "<not-versioned>" }
+  if ($null -eq $script:wildTeamID) { $script:wildTeamID = $teamID }
+}
+
+function Add-WildDens {
+  # The Rock Jungle is wild ground: every zone the wild truly holds (intent.wildZones) gets a
+  # den -- a raptor turret, which is the wild's defensive value there, so the zone is the
+  # wild's until someone out-builds it -- and a pack that moseys between its zone and the
+  # nearest den, with a gunship looping wider. The hive zone and the ground around the
+  # company's pad are left alone. Packs carry patrol orders only, so the raptor AI's waves
+  # stay its own and these never march on the pad unprompted.
+  param([double[]]$PadCenter, [string]$HiveZoneId)
+  if ($null -eq $script:wildTeamID) { return }
+  $held = @()
+  if ($intent.PSObject.Properties["wildZones"] -and $intent.wildZones) { $held = @($intent.wildZones | ForEach-Object { [string]$_ }) }
+  $dens = @()
+  foreach ($z in @($zoneMap.zones)) {
+    $zid = [string]$z.zoneId
+    if ($zid -eq $HiveZoneId -or $held -notcontains $zid) { continue }
+    $c = Get-ZoneCenter $z $null
+    if (-not $c) { continue }
+    $dx = $c[0] - $PadCenter[0]; $dz = $c[1] - $PadCenter[1]
+    if ([Math]::Sqrt($dx * $dx + $dz * $dz) -lt 0.22) { continue }
+    $dens += ,@($zid, $c, $(if ($z.label) { [string]$z.label } else { $zid }))
+  }
+  $scale = 1.0 + [Math]::Max(0.0, [Math]::Min(1.0, $maxHazard))
+  foreach ($den in $dens) {
+    $zid, $c, $label = $den
+    $near = @($dens | Where-Object { $_[0] -ne $zid } | Sort-Object { ($_[1][0] - $c[0]) * ($_[1][0] - $c[0]) + ($_[1][1] - $c[1]) * ($_[1][1] - $c[1]) })
+    $denPoint = @{ x = $c[0]; z = $c[1] }
+    $walk = @($denPoint)
+    $fly = @($denPoint)
+    if ($near.Count -ge 1) { $walk += @{ x = $near[0][1][0]; z = $near[0][1][1] }; $fly += @{ x = $near[0][1][0]; z = $near[0][1][1] } }
+    if ($near.Count -ge 2) { $fly += @{ x = $near[1][1][0]; z = $near[1][1][1] } }
+    $recipe = "wild_den_$zid"
+    $script:baseRecipes[$recipe] = @(
+      (Spec "raptor_turret_basic_t2_v1" 1 0 0 120),
+      (Spec "raptor_land_swarmer_basic_t1_v1" (Get-ScaledCount 5 $scale) 90 -60 70 -Patrol $walk),
+      (Spec "raptor_land_swarmer_basic_t2_v1" (Get-ScaledCount 2 $scale) -110 70 80 -Patrol $walk),
+      (Spec "raptor_air_gunship_basic_t2_v1" 1 0 -160 90 -Patrol $fly)
+    )
+    $script:forces += [ordered]@{ id = $recipe; label = "Wild den: $label"; teamID = $script:wildTeamID; side = "Raptors"; faction = "wild"; role = "wild_pressure"; zoneId = $zid; base = [ordered]@{ x = $c[0]; z = $c[1] }; recipe = $recipe }
+  }
+  Write-Host ("Rock Jungle wilds: {0} dens across the zones the wild holds." -f $dens.Count)
 }
 
 function Add-NullMercCamp {
@@ -2735,7 +2783,8 @@ switch ($objectiveKind) {
     }
   }
   "hive_clear_or_bypass" {
-    Add-RaptorCamp $enemyCenter $true $description
+    # On the Rock Jungle the hive is the south-west nest, wherever the card aimed.
+    Add-RaptorCamp $(if ($isRockJungle) { $jungleHiveCenter } else { $enemyCenter }) $true $description
   }
   "choose_target_then_extract" {
     # Two rival faction camps flanking the contested center; they are on
@@ -2911,6 +2960,7 @@ if ($mercsPresent) {
 if ($hasWild -and $objectiveKind -ne "hive_clear_or_bypass") {
   Add-RaptorCamp $wildCenter $false "Raptor wild pressure"
 }
+if ($isRockJungle -and -not $isFinale) { Add-WildDens $deployCenter "TRJ_SW_LANE" }
 
 # Same-faction camps must never shoot each other: Spring allies only through
 # explicit pacts and every camp rides its own allyteam, so pact all armada-
