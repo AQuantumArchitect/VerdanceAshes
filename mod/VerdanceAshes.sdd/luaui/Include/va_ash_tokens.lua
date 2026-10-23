@@ -51,7 +51,7 @@ Ash.PHASE = {
 
 -- Glyph vocabulary (one meaning each, everywhere: minimap, sidebar, infil, exfil, hub)
 Ash.GLYPH = {
-  pad = "△", objective = "◆", markReq = "◆", markOpt = "◇", done = "✓", failed = "✗",
+  pad = "△", doorHeld = "■", doorShut = "□", objective = "◆", markReq = "◆", markOpt = "◇", done = "✓", failed = "✗",
   onPad = "●", offPad = "○", down = "✚", left = "⚑", holding = "■", unknown = "?",
   exposed = "◉", contradictedHeld = "✗", contradictedEmpty = "○",
 }

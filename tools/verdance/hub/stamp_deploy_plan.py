@@ -81,17 +81,10 @@ def normalize_plan(raw: dict) -> dict:
     caps = list(marks.get("captureZoneIds") or raw.get("captureZoneIds") or [])
     deploy = marks.get("deployZoneId") or raw.get("deployZoneId") or raw.get("deploymentZoneId")
     extract = marks.get("extractZoneId") or raw.get("extractZoneId") or raw.get("extractionZoneId")
-    # A mouth card's doors win over a board mark that snapped inland.
-    infil = raw.get("infilZoneId") or (marks.get("infilZoneId") if isinstance(marks, dict) else None)
-    exfil = raw.get("exfilZoneId") or (marks.get("exfilZoneId") if isinstance(marks, dict) else None)
-    if infil:
-        deploy = infil
-    # Pass six: raiders land and lift from the same pad. The exfil/extract mark is accepted for
+    # Pass six: raiders land and lift from the same pad. The extract mark is accepted for
     # schema compatibility but always equals the pad.
-    exfil = None
     extract = deploy
     map_id = raw.get("mapId") or raw.get("map")
-    wet = bool(raw.get("wetReach") or infil)
     return {
         "schemaVersion": raw.get("schemaVersion") or PLAN_SCHEMA,
         "mapId": map_id,
@@ -112,17 +105,11 @@ def normalize_plan(raw: dict) -> dict:
         "pathSignal": raw.get("pathSignal"),
         "sessionMode": raw.get("sessionMode") or "same_map",
         "occupationModel": raw.get("occupationModel") or "living_shell",
-        "wetReach": wet,
-        "infilZoneId": infil or deploy,
-        "exfilZoneId": exfil or extract,
-        "headingMapId": raw.get("headingMapId"),
-        "headingZoneId": raw.get("headingZoneId"),
-        "alongTheWay": list(raw.get("alongTheWay") or []),
     }
 
 
 def choice_pads(ws: Path, choice_id: str | None, map_id: str | None = None) -> set[str]:
-    """Infil/exfil the active hub sortie already named.
+    """Pads the active hub sortie already named.
 
     Those pads are the route on the seal. The quiet-rim rule still applies to
     a freehand mark; it does not veto the sortie the player just confirmed.
@@ -136,8 +123,6 @@ def choice_pads(ws: Path, choice_id: str | None, map_id: str | None = None) -> s
         "deploymentZoneId",
         "preferredExtractionZoneId",
         "extractionZoneId",
-        "infilZoneId",
-        "exfilZoneId",
     )
 
     def take(effect: dict) -> set[str]:
@@ -324,12 +309,6 @@ def plan_to_sortie(plan: dict, state: dict | None = None) -> dict:
         "captureZoneIds": caps,
         "deploymentZoneId": deploy,
         "extractionZoneId": extract,
-        "wetReach": bool(plan.get("wetReach")),
-        "infilZoneId": plan.get("infilZoneId") or deploy,
-        "exfilZoneId": plan.get("exfilZoneId") or extract,
-        "headingMapId": plan.get("headingMapId"),
-        "headingZoneId": plan.get("headingZoneId"),
-        "alongTheWay": list(plan.get("alongTheWay") or []),
         "patron": plan.get("patron") or "nullmercs",
         "patronBloc": "nullmercs",
         "against": plan.get("against") or "armada",

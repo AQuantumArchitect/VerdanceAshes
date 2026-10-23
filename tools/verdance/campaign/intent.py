@@ -16,7 +16,7 @@ from .progression import ensure_progression
 from .measure import expected_presence_band
 from .voice import load_ketha_voice, pick_line, result_streak
 from .objectives import zone_center_norm
-from verdance.world import wet_reach as _wet, escalation_ladder as _ladder
+from verdance.world import roads as _roads, escalation_ladder as _ladder
 
 # A landing zone this wet at rest is a beach, not a beachhead.
 DRY_ENOUGH_TO_LAND = 0.35
@@ -186,15 +186,10 @@ def separate_intent_zones(intent: Dict[str, Any],
                 objective["extractionZoneId"] = zid
 
     nearest = ranked[0][1] if ranked else None
-    # A mouth is the door off this map. The nearest dry shore of an inland
-    # hero must not move it. Non-mouth pads still snap.
-    try:
-
-        def _mouth(zid: Any) -> bool:
-            return bool(zid) and _wet.is_mouth(zid, workspace, map_id)
-    except Exception:
-        def _mouth(zid: Any) -> bool:
-            return False
+    # A door is the way off this map: the nearest dry shore of an inland hero must not
+    # move a pad that stands on one. Other pads still snap.
+    def _mouth(zid: Any) -> bool:
+        return _roads.is_door(zid, workspace)
 
     deploy = intent.get("deploymentZoneId")
     # The pad the player stamped on the hub is theirs: legality was judged from belief at stamp

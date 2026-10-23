@@ -43,7 +43,7 @@ def plan_for(hs, choice, boards):
     pad = None
     if camp.get("nextPadZoneId") in zones and camp.get("nextPadMapId") in (None, map_id):
         pad = camp["nextPadZoneId"]
-    pad = pad or eff.get("preferredDeployZoneId") or eff.get("deploymentZoneId") or eff.get("infilZoneId")
+    pad = pad or eff.get("preferredDeployZoneId") or eff.get("deploymentZoneId")
     if not pad:
         legal = [z for z in tz if z.get("preferred") or z.get("believed") in ("ours", "empty", "dark", "unsure")]
         pad = (legal[0] if legal else (tz[0] if tz else {})).get("zoneId") or next(iter(zones), None)
@@ -76,6 +76,8 @@ def fake_result(state, intent, plan, hs, n, brought):
         "heroResults": {h: {"heroId": h, "name": h, "state": "alive", "outcome": "alive"} for h in heroes},
         "tenebriumBank": 4, "tenebriumLooted": 4, "tenebriumSpent": 0,
         "observedZones": dict(seen),
+        # the company dug in at its pad and its target: it holds both at homecoming (doors too)
+        "zoneDv": {str(target): {"ashwalkers": 900}, str(pad): {"ashwalkers": 600}},
         "beliefExport": {z: {"eta": e, "enemyNow": 0, "friendNow": 3 if z == pad else 0} for z, e in seen.items()},
         "manifest": {
             "schema": "verdance-manifest/1", "kind": "extracted", "destination": "home",
@@ -150,7 +152,8 @@ def main() -> int:
         home = k.bring_home(extract=False) if "extract" in k.bring_home.__code__.co_varnames else k.bring_home()
         st2 = jload(sp)
         bead = (st2.get("history") or [{}])[-1]
-        row.update(verdict=bead.get("verdict"), after=st2.get("missionNumber"), reserve=sum(((st2.get("roster") or {}).get("reserve") or {}).values()))
+        row.update(verdict=bead.get("verdict"), after=st2.get("missionNumber"), reserve=sum(((st2.get("roster") or {}).get("reserve") or {}).values()),
+                   doors=sorted(z for z, d in (st2.get("doors") or {}).items() if d.get("held")))
         if int(st2.get("missionNumber") or 0) <= int(st.get("missionNumber") or 0) and not st2.get("campaignComplete"):
             row["stall"] = "mission did not advance: " + json.dumps(home)[:300]
             log.append(row)

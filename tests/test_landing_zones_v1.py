@@ -75,9 +75,9 @@ class TestLandingZones(unittest.TestCase):
 
     def test_opening_uses_quiet_rim(self):
         opening = engine.opening_sortie_order(engine.default_v1_state())
-        # Standard safe GF infil/exfil is the shell-free north desert.
-        self.assertEqual(opening["deploymentZoneId"], "GF_NE_PLATEAU")
-        self.assertEqual(opening["extractionZoneId"], "GF_NE_PLATEAU")
+        # The opening lands on the start road's door on Greenest Fields, and lifts from it.
+        self.assertEqual(opening["deploymentZoneId"], "GF_NW_MUSTER")
+        self.assertEqual(opening["extractionZoneId"], "GF_NW_MUSTER")
         authored = ROOT / "data" / "zone_maps" / "authored" / "greenest_fields.authored.zone_map.json"
         import json
 

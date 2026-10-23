@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""WO-020a: Build world_zone_graph.v1.json from authored zone maps + adjacency."""
+"""Build world_zone_graph.v1.json from the authored zone maps, their adjacency, and the roads."""
 from __future__ import annotations
 
 import json
@@ -11,15 +11,20 @@ AUTHORED = WS / "data" / "zone_maps" / "authored"
 OUT = WS / "data" / "zone_maps" / "world_zone_graph.v1.json"
 ADJ = AUTHORED / "zone_adjacency.json"
 
-# Authored narrative cross-map links (campaign arc).
+# The roads between maps (owner-approved rewiring, 2026-10-23). Each end is a door:
+# a corner or edge zone of its map, never a finale pad. A ring runs
+# Rock Jungle -> Greenest Fields -> Koom Valley -> Tabula -> Ancient Bastion ->
+# All That Simmers -> Eye of Horus -> Rock Jungle, with one shortcut from the
+# Rock Jungle to Tabula. The first road is the start road.
 STRATEGIC_LINKS = [
-    {"from": "GF_SE_STAGING", "to": "EOH_NW_CRATER_CAMP", "kind": "strategic_link", "cost": 2, "notes": "Greenest -> Eye corridor"},
-    {"from": "EOH_SE_CORTEX_POCKET", "to": "KOOM_NW_GREEN_SHELF", "kind": "strategic_link", "cost": 2, "notes": "Eye -> Koom approach"},
-    {"from": "KOOM_SE_GREEN_SHELF", "to": "TAB_NW_PLATEAU", "kind": "strategic_link", "cost": 2, "notes": "Koom south -> Tabula north"},
-    {"from": "TAB_SE_PLATEAU", "to": "AB_WESTERN_MUSTER_GROUNDS", "kind": "strategic_link", "cost": 2, "notes": "Tabula -> Bastion"},
-    {"from": "TAB_EASTERN_ROCK_GATES", "to": "RJ_NW_JUNGLE_SHELF", "kind": "strategic_link", "cost": 3, "notes": "Tabula east -> Rock Jungle"},
-    {"from": "AB_EASTERN_BASTION_WALL", "to": "ATS_NW_CANOPY_START", "kind": "strategic_link", "cost": 3, "notes": "Bastion -> All That Simmers"},
-    {"from": "RJ_SE_JUNGLE_SHELF", "to": "ATS_SW_ARMADA_LAGOON", "kind": "strategic_link", "cost": 3, "notes": "Jungle south -> Simmers"},
+    {"from": "TRJ_NW_OUTER_MUSTER", "to": "GF_NW_MUSTER", "travelMinutes": 16, "notes": "The start road: home to Greenest Fields"},
+    {"from": "GF_SE_PLATEAU", "to": "KV_NW_MUSTER", "travelMinutes": 16, "notes": "Greenest Fields' lower desert to Koom Valley"},
+    {"from": "KV_SE_MUSTER", "to": "T_NW_RESERVE", "travelMinutes": 15, "notes": "Koom Valley to Tabula"},
+    {"from": "T_SE_RESERVE", "to": "AB_NE_HEIGHTS", "travelMinutes": 18, "notes": "Tabula to the Bastion's north heights"},
+    {"from": "AB_SE_HEIGHTS", "to": "ATS_NW_SHORE", "travelMinutes": 24, "notes": "The Bastion's south heights to All That Simmers"},
+    {"from": "ATS_SW_MUSTER", "to": "EOH_SE_BASTION", "travelMinutes": 20, "notes": "All That Simmers to the Eye"},
+    {"from": "EOH_NW_BASTION", "to": "TRJ_SE_OUTER_MUSTER", "travelMinutes": 20, "notes": "The Eye back home"},
+    {"from": "T_W_CAUSEWAY", "to": "TRJ_NE_RIM", "travelMinutes": 22, "notes": "The shortcut: Tabula's west causeway to home"},
 ]
 
 
@@ -89,7 +94,7 @@ def main() -> int:
     id_map = (migration.get("zones") if isinstance(migration, dict) else None) or migration or {}
     known = {n["zoneId"] for n in nodes}
     for link in STRATEGIC_LINKS:
-        edge = dict(link)
+        edge = {"kind": "strategic_link", "cost": 2, **link}
         for end in ("from", "to"):
             mapped = id_map.get(edge[end])
             if isinstance(mapped, str):

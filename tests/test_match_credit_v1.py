@@ -21,7 +21,7 @@ def _base(**kwargs):
         "missionNumber": 3,
         "chapterIndex": 1,
         "mapId": "greenest_fields",
-        "targetZoneId": "GF_SE_STAGING",
+        "targetZoneId": "GF_C_INNER_GATE",
         "frame": 9000,
         "freeTnbMint": True,  # raw may lie — normalize must force false
     }
@@ -208,9 +208,9 @@ class TestProcessResultCredit(unittest.TestCase):
         self.state = migrate_state(default_v1_state())
         # Ensure zone memory for flip tests
         self.state.setdefault("zoneMemory", {}).setdefault("greenest_fields", {})[
-            "GF_SE_STAGING"
+            "GF_C_INNER_GATE"
         ] = {
-            "zoneId": "GF_SE_STAGING",
+            "zoneId": "GF_C_INNER_GATE",
             "controllingFaction": "armada",
             "abstract": {"control": "armada"},
         }
@@ -225,7 +225,7 @@ class TestProcessResultCredit(unittest.TestCase):
             terminalReason="soft_clock_no_extract",
             mapId="greenest_fields",
             deploymentMapId="greenest_fields",
-            targetZoneId="GF_SE_STAGING",
+            targetZoneId="GF_C_INNER_GATE",
             captureMode="clear_hold_shell",
             nodeClaimed=False,
             objectiveComplete=True,
@@ -235,7 +235,7 @@ class TestProcessResultCredit(unittest.TestCase):
         self.assertTrue(report.get("processed"))
         self.assertFalse(report.get("zoneFlipped"))
         self.assertEqual(report.get("verdict"), "partial")
-        zm = state["zoneMemory"]["greenest_fields"]["GF_SE_STAGING"]
+        zm = state["zoneMemory"]["greenest_fields"]["GF_C_INNER_GATE"]
         self.assertEqual(zm.get("controllingFaction"), "armada")
 
     def test_victory_claim_flips(self):
@@ -247,7 +247,7 @@ class TestProcessResultCredit(unittest.TestCase):
             terminalReason="extracted",
             mapId="greenest_fields",
             deploymentMapId="greenest_fields",
-            targetZoneId="GF_SE_STAGING",
+            targetZoneId="GF_C_INNER_GATE",
             captureMode="clear_hold_shell",
             nodeClaimed=True,
             pocketCleared=True,

@@ -90,77 +90,87 @@
     ]
   },
   "ancient_bastion": {
-    "AB_NW_LANE": [
-      "AB_NE_CITADEL",
-      "AB_NE_RESERVE",
-      "AB_NW_BASTION",
-      "AB_NW_CITADEL",
-      "AB_SW_LANE",
-      "AB_W_LANE"
+    "AB_W_KEEP": [
+      "AB_NW_RAMPART",
+      "AB_SW_RAMPART",
+      "AB_W_GATEHOUSES"
     ],
-    "AB_SW_LANE": [
-      "AB_NW_LANE",
-      "AB_SE_CITADEL",
-      "AB_SE_RESERVE",
-      "AB_SW_BASTION",
-      "AB_SW_CITADEL",
-      "AB_W_INNER_LANE"
+    "AB_W_GATEHOUSES": [
+      "AB_C_WALL",
+      "AB_NW_TOR",
+      "AB_N_WALL",
+      "AB_SW_TOR",
+      "AB_S_WALL",
+      "AB_W_KEEP"
     ],
-    "AB_NE_RESERVE": [
-      "AB_E_BASTION",
-      "AB_NE_CITADEL",
-      "AB_NW_LANE"
+    "AB_NW_RAMPART": [
+      "AB_NW_TOR",
+      "AB_W_KEEP"
     ],
-    "AB_SE_RESERVE": [
-      "AB_E_OUTER_BASTION",
-      "AB_SE_CITADEL",
-      "AB_SW_LANE"
+    "AB_SW_RAMPART": [
+      "AB_SW_TOR",
+      "AB_W_KEEP"
     ],
-    "AB_NW_BASTION": [
-      "AB_NW_CITADEL",
-      "AB_NW_LANE"
+    "AB_NW_TOR": [
+      "AB_NW_RAMPART",
+      "AB_N_WALL",
+      "AB_W_GATEHOUSES"
     ],
-    "AB_SW_BASTION": [
-      "AB_SW_CITADEL",
-      "AB_SW_LANE"
+    "AB_SW_TOR": [
+      "AB_SW_RAMPART",
+      "AB_S_WALL",
+      "AB_W_GATEHOUSES"
     ],
-    "AB_NW_CITADEL": [
-      "AB_NW_BASTION",
-      "AB_NW_LANE"
+    "AB_N_WALL": [
+      "AB_C_WALL",
+      "AB_NE_CRATERS",
+      "AB_NE_HEIGHTS",
+      "AB_NW_TOR",
+      "AB_W_GATEHOUSES"
     ],
-    "AB_SW_CITADEL": [
-      "AB_SW_BASTION",
-      "AB_SW_LANE"
+    "AB_C_WALL": [
+      "AB_NE_CRATERS",
+      "AB_N_WALL",
+      "AB_SE_CRATERS",
+      "AB_S_WALL",
+      "AB_W_GATEHOUSES"
     ],
-    "AB_W_LANE": [
-      "AB_NW_LANE",
-      "AB_W_INNER_LANE"
+    "AB_S_WALL": [
+      "AB_C_WALL",
+      "AB_SE_CRATERS",
+      "AB_SE_HEIGHTS",
+      "AB_SW_TOR",
+      "AB_W_GATEHOUSES"
     ],
-    "AB_W_INNER_LANE": [
-      "AB_SW_LANE",
-      "AB_W_LANE"
+    "AB_NE_CRATERS": [
+      "AB_C_WALL",
+      "AB_E_RIDGE",
+      "AB_NE_HEIGHTS",
+      "AB_N_WALL",
+      "AB_SE_CRATERS"
     ],
-    "AB_E_BASTION": [
-      "AB_E_OUTER_BASTION",
-      "AB_NE_CITADEL",
-      "AB_NE_RESERVE"
+    "AB_SE_CRATERS": [
+      "AB_C_WALL",
+      "AB_E_RIDGE",
+      "AB_NE_CRATERS",
+      "AB_SE_HEIGHTS",
+      "AB_S_WALL"
     ],
-    "AB_E_OUTER_BASTION": [
-      "AB_E_BASTION",
-      "AB_SE_CITADEL",
-      "AB_SE_RESERVE"
+    "AB_NE_HEIGHTS": [
+      "AB_E_RIDGE",
+      "AB_NE_CRATERS",
+      "AB_N_WALL"
     ],
-    "AB_NE_CITADEL": [
-      "AB_E_BASTION",
-      "AB_NE_RESERVE",
-      "AB_NW_LANE",
-      "AB_SE_CITADEL"
+    "AB_SE_HEIGHTS": [
+      "AB_E_RIDGE",
+      "AB_SE_CRATERS",
+      "AB_S_WALL"
     ],
-    "AB_SE_CITADEL": [
-      "AB_E_OUTER_BASTION",
-      "AB_NE_CITADEL",
-      "AB_SE_RESERVE",
-      "AB_SW_LANE"
+    "AB_E_RIDGE": [
+      "AB_NE_CRATERS",
+      "AB_NE_HEIGHTS",
+      "AB_SE_CRATERS",
+      "AB_SE_HEIGHTS"
     ]
   },
   "eye_of_horus": {

@@ -3,19 +3,23 @@
   "mapId": "ancient_bastion",
   "mapName": "Ancient Bastion Remake 0.5",
   "templateId": "living_placeholder_v1",
-  "character": "Taelith-Armada Citadel - outer belts + eastern fortress spine",
+  "character": "Taelith-Armada Citadel - the western castle, walls across the approach",
   "characterCard": {
     "descriptor": "Taelith-Armada Citadel",
-    "blurb": "Siege benchmark. Outer approach belts + eastern citadel spine (D8). Bite outer rings; do not full-wipe the fortress.",
+    "blurb": "Siege benchmark. A castle in the west with the Keep as its spine; outworks in the crater field and the three walls across the approach. Bite the outer works; do not full-wipe the castle.",
     "shellAtT0": "Outer works + citadel teeth",
     "growMix": "fortify_hard citadel + fortify gate + thin killfield + hold flanks",
-    "arcKinds": ["siege"],
+    "arcKinds": [
+      "siege"
+    ],
     "raidHint": "bite_outer_rings",
     "captureLater": "outer rings",
     "source": "placeholder",
     "realBakeStatus": "pending_cloud_or_iconsatlas"
   },
-  "arcKinds": ["siege"],
+  "arcKinds": [
+    "siege"
+  ],
   "raidHint": "bite_outer_rings",
   "captureLater": "outer rings",
   "faction": "armada",
@@ -26,76 +30,81 @@
   "aiShortName": "SimpleAI",
   "teamCount": 5,
   "fixedRngSeed": 55,
-  "notes": "Citadel wall = BARb hard (D-heavy). Gatefield = BARb medium. Outer flanks = SimpleAI hold. Killfield thin. Siege benchmark - not global eco tuning. campaignForces ARM D8.",
+  "notes": "Keep = BARb hard (D-heavy). Gatefield = BARb medium. Outer flanks = SimpleAI hold. Killfield thin. Siege benchmark - not global eco tuning. campaignForces ARM D8.",
   "occupation": {
     "decoyCommanders": true,
     "decoyPerPocket": 1,
     "notes": "Decoy coms on outer belts after strip. Citadel remains D-heavy teeth. Sims use normal commanders."
   },
   "playerClear": {
-    "zoneId": "AB_WESTERN_MUSTER_GROUNDS",
-    "bounds": { "xMin": 0.0, "xMax": 0.28, "zMin": 0.0, "zMax": 0.30 },
-    "notes": "Western muster - legion siege staging."
+    "zoneId": "AB_NE_HEIGHTS",
+    "bounds": {
+      "xMin": 0.72,
+      "xMax": 1.0,
+      "zMin": 0.0,
+      "zMax": 0.3
+    },
+    "notes": "North heights - the landing ground east of the castle."
   },
   "starts": [
     {
       "pocketId": "ab_citadel_wall",
-      "zoneId": "AB_EASTERN_BASTION_WALL",
-      "label": "Eastern Bastion Wall",
+      "zoneId": "AB_W_KEEP",
+      "label": "The Keep",
       "kind": "citadel",
       "faction": "armada",
       "side": "Armada",
       "growProfile": "fortify_hard",
-      "x": 0.83,
+      "x": 0.17,
       "z": 0.61,
       "primaryCandidate": true,
       "densityScale": 1.5
     },
     {
       "pocketId": "ab_gatefield",
-      "zoneId": "AB_CITADEL_GATEFIELD",
-      "label": "Citadel Gatefield",
+      "zoneId": "AB_NE_CRATERS",
+      "label": "Crater Outworks",
       "kind": "gate",
       "faction": "armada",
       "side": "Armada",
       "growProfile": "fortify",
-      "x": 0.38,
+      "x": 0.62,
       "z": 0.42,
       "densityScale": 1.1
     },
     {
       "pocketId": "ab_killfield",
-      "zoneId": "AB_CENTRAL_KILLFIELD",
-      "label": "Central Killfield",
+      "zoneId": "AB_C_WALL",
+      "label": "Centre Wall Killfield",
       "kind": "thin",
       "faction": "armada",
       "side": "Armada",
       "growProfile": "thin",
-      "x": 0.56,
+      "x": 0.44,
       "z": 0.47,
       "densityScale": 0.55
     },
     {
       "pocketId": "ab_north_flank",
-      "zoneId": "AB_NORTHERN_FLANKING_LEDGE",
-      "label": "Northern Flanking Ledge",
+      "zoneId": "AB_N_WALL",
+      "label": "North Wall",
       "kind": "mixed",
       "faction": "armada",
       "side": "Armada",
       "growProfile": "hold",
-      "x": 0.62,
+      "x": 0.38,
       "z": 0.12,
       "densityScale": 0.85
     },
     {
       "pocketId": "ab_south_road",
-      "zoneId": "AB_SOUTHERN_SERVICE_ROAD",
-      "label": "Southern Service Road",
+      "zoneId": "AB_S_WALL",
+      "label": "South Wall",
       "kind": "mixed",
       "faction": "armada",
       "side": "Armada",
       "growProfile": "hold",
-      "x": 0.62,
+      "x": 0.38,
       "z": 0.86,
       "densityScale": 0.85
     }

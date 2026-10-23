@@ -13,7 +13,6 @@ from typing import Any, Dict, List, Optional
 
 from verdance.common import ARCHETYPE_VERB, WORKSPACE_ROOT, canonical_map_id, load_json, save_json, utc_now
 from .schema import CAMPAIGN_ID, zone_maps_from_workspace
-from .objectives import _load_map_adjacency
 from verdance.company.company import (
     company_deploy_aces,
     company_deploy_band,
@@ -23,7 +22,7 @@ from verdance.company.company import (
 )
 from verdance.company.quest_generator import generate_quests, write_quest_batch
 from verdance.company.capture_node_claims import stamp_objective_capture
-from verdance.world import escalation_ladder as ladder, landing_zones as _lz
+from verdance.world import escalation_ladder as ladder
 from verdance.hub.contract import normalize_sortie, sortie_v2_to_v1_order
 from verdance.company import quest_generator as qg
 
@@ -154,11 +153,10 @@ def opening_sortie_order(state: Dict[str, Any], workspace: Optional[Path] = None
     story's deliberate opening raid. An explicit non-Jungle session home or a
     non-empty history means the player has already chosen a different flow.
 
-    Fresh campaigns own no ground, so the opening enters from the standard
-    shell-free north desert rim (`GF_NE_PLATEAU`), hits the southeast decoy
-    plateau, and extracts back to that same open pad — a stack left there
-    becomes the first Ashwalker sortie origin for later raids. NW muster is
-    the alternate quiet rim (also kept clear of living-shell eco).
+    The company starts on the start road, holding both of its doors, so the opening lands
+    on Greenest Fields' end of it (`GF_NW_MUSTER`), hits the southeast decoy plateau, and
+    lifts from the same pad. The plateau is also the door to Koom Valley: break the farms
+    and hold the corner, and the next road opens.
     """
     if int(state.get("missionNumber", 1) or 1) != 1:
         return None
@@ -170,25 +168,7 @@ def opening_sortie_order(state: Dict[str, Any], workspace: Optional[Path] = None
     # Mission one locks map/objective. Sealed company band still drops via
     # apply_sealed_company_to_packet so hub muster matches BAR.
     deploy_aces = ["pavise", "ketha"]
-    # Standard safe GF infil/exfil: north desert (shell-free). NW muster backup.
-    rim_pad = "GF_NE_PLATEAU"
-    if workspace is not None:
-        try:
-
-            zmap = zone_maps_from_workspace(Path(workspace)).get("greenest_fields") or {}
-            zones = list(zmap.get("zones") or [])
-            adj = _load_map_adjacency(workspace, "greenest_fields")
-            picked = _lz.pick_quiet_rim_pad(
-                "greenest_fields",
-                state=state,
-                zones=zones,
-                adjacency=adj,
-                preferred=["GF_NE_PLATEAU", "GF_NW_MUSTER", "GF_SW_MUSTER"],
-            )
-            if picked:
-                rim_pad = picked
-        except Exception:
-            pass
+    rim_pad = "GF_NW_MUSTER"  # the start road's door on Greenest Fields
     order = {
         "schemaVersion": "verdance-sortie-order/1.0",
         "campaignId": state.get("campaignId", CAMPAIGN_ID),
@@ -223,12 +203,12 @@ def opening_sortie_order(state: Dict[str, Any], workspace: Optional[Path] = None
         },
         "label": "Raid Greenest Fields for Tenebrium",
         "hubBlurb": (
-            "Jump the Fields first: land the quiet north desert rim, break Armada decoy farms "
-            "on the southeast plateau for Tenebrium, then extract back to that open pad. "
-            "A stack left on exfil becomes your first Fields foothold."
+            "Cross the start road to Greenest Fields: land on its north-west muster, break the "
+            "Armada decoy farms on the southeast plateau for Tenebrium, and lift from the same pad. "
+            "Hold the plateau too and the road to Koom Valley opens."
         ),
         "notes": (
-            "Opening Tnb raid from shell-free north desert (standard safe infil/exfil). "
+            "Opening Tnb raid from the start road's door, Greenest Fields' north-west muster. "
             "Hit Armada decoy commanders with Thugs and Legion Karkinos. "
             "Home is the Rock Jungle — this sortie funds that base."
         ),

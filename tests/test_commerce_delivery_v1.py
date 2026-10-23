@@ -19,17 +19,16 @@ from verdance.campaign import (
 )
 
 
-def test_eye_to_greenest_is_short_corridor():
+def test_eye_to_greenest_runs_through_home():
     route, minutes = shortest_map_route("eye_of_horus", "greenest_fields", ROOT)
-    assert route[0] == "eye_of_horus"
-    assert route[-1] == "greenest_fields"
-    assert minutes == 14.0
+    assert route == ["eye_of_horus", "the_rock_jungle", "greenest_fields"], route
+    assert minutes == 36.0
 
 
-def test_eye_to_simmers_is_long_haul():
-    route, minutes = shortest_map_route("eye_of_horus", "all_that_simmers", ROOT)
+def test_greenest_to_simmers_is_long_haul():
+    route, minutes = shortest_map_route("greenest_fields", "all_that_simmers", ROOT)
     # a long haul: at least two maps between the ends, whichever corridor the graph authors
-    assert route[0] == "eye_of_horus" and route[-1] == "all_that_simmers"
+    assert route[0] == "greenest_fields" and route[-1] == "all_that_simmers"
     assert len(route) >= 4, route
     assert minutes >= 50.0
 
@@ -45,7 +44,7 @@ def test_crash_eta_from_eye():
     assert eta["mode"] == "map_web"
     assert eta["sourceMapId"] == "eye_of_horus"
     assert eta["deferred"] is True
-    assert eta["etaSeconds"] == 140
+    assert eta["etaSeconds"] == 360
     assert "Eye of Horus" in (eta["summary"] or "")
 
 

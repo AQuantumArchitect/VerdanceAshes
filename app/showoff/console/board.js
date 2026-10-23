@@ -441,8 +441,14 @@ export function renderBoard() {
       const peopleGlyph = bel.people.length ? `<span class="z-people ${anyWounded ? "bad" : "good"}" title="${esc(peopleNames.join(", "))}">⚑ ${bel.people.length}</span>` : "";
       const holdGlyph = bel.holding > 0 ? `<span class="z-hold" title="${bel.holding} of our structures left here">■ ${bel.holding}</span>` : "";
       const darkGlyph = bel.believed === "dark" ? `<span class="z-q" aria-hidden="true">?</span>` : "";
+      // A door: the way to another map. Held (from the company's own ledger) means the road is open.
+      const door = intel.door;
+      if (door) cls.push("is-door", door.held ? "door-held" : "door-shut");
+      const doorWord = door ? `door to ${door.farMapName}: ${door.held ? "held, the road is open" : "not held, the road is shut"}` : null;
+      const doorBadge = door ? `<div class="z-door" title="${esc(doorWord)}"><b aria-hidden="true">${door.held ? "■" : "□"}</b> ${esc(door.farMapName)}</div>` : "";
       const tipBits = [
         z.label || z.zoneId,
+        doorWord,
         `believed ${believedWord(bel)}`,
         bel.known ? `${Math.round(bel.confidence * 100)}%` : null,
         bel.state,
@@ -464,7 +470,7 @@ export function renderBoard() {
           title="${esc(tipBits.join(" · "))}${esc(recruitTitle)}${fogNote}">
           <svg class="z-shape" viewBox="${left} ${top} ${w} ${h}" preserveAspectRatio="none" aria-hidden="true"><path class="z-area" d="${shape.d}" fill-rule="evenodd"/>${hatch}</svg>
           <div class="z-anchor">
-            <div class="zone-label">${esc(z.label || z.zoneId)}</div>${chip}
+            <div class="zone-label">${esc(z.label || z.zoneId)}</div>${chip}${doorBadge}
             <span class="z-corner">${spBadge}${eyeBadge}</span>
             ${darkGlyph}
             <span class="z-foot">${peopleGlyph}${holdGlyph}</span>

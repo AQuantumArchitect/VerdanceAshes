@@ -76,36 +76,41 @@ def test_contract_v2_preserves_hub_fields():
     assert "KOOM_CENTRAL_FLUID_SCAR" in v1["captureZoneIds"]
 
 
-def test_stamp_writes_outbox(tmp_path: Path | None = None):
-    # Use real workspace outbox (idempotent) if available
-    ws = ROOT
-    if not (ws / "state" / "campaign_state.json").is_file():
-        return
-    plan = {
-        "mapId": "greenest_fields",
-        "contractKind": "eco_raid",
-        "choiceId": "c_test_pytest",
-        "deployAces": ["vane", "ketha"],
-        "sessionMode": "same_map",
-        "marks": {
-            # Live campaign_state may paint NW muster as Armada; use an
-            # Ashwalker-held rim pad so the LZ rule is what we exercise.
-            "deployZoneId": "GF_S_PLATEAU",
-            "extractZoneId": "GF_S_PLATEAU",
-            "captureZoneIds": ["GF_SE_PLATEAU"],
-        },
-    }
-    report = stamp(plan, ws)
-    assert report["ok"] is True, report
-    assert report["hubChoiceId"] == "c_test_pytest"
-    order = json.loads((ws / "outbox" / "next_sortie_order.json").read_text(encoding="utf-8-sig"))
-    assert order["hubChoiceId"] == "c_test_pytest"
-    assert order["targetZoneId"] == "GF_SE_PLATEAU"
-    assert order["deploymentZoneId"] == "GF_S_PLATEAU"
-    assert order["source"] == "hub_deploy_plan"
-    assert order["sessionMode"] == "same_map"
-    home = json.loads((ws / "outbox" / "session_home.latest.json").read_text(encoding="utf-8-sig"))
-    assert home["sessionHomeMap"] == "greenest_fields"
+def test_stamp_writes_outbox():
+    # A fresh campaign in a scratch workspace: the stamp must not depend on a live save.
+    import shutil
+    import tempfile
+
+    from verdance.campaign import default_v1_state, migrate_state, save_json
+
+    ws = Path(tempfile.mkdtemp())
+    try:
+        (ws / "data").symlink_to(ROOT / "data")
+        (ws / "outbox").mkdir()
+        save_json(ws / "state" / "campaign_state.json", migrate_state(default_v1_state()))
+        plan = {
+            "mapId": "greenest_fields",
+            "contractKind": "eco_raid",
+            "choiceId": "c_test_pytest",
+            "deployAces": ["vane", "ketha"],
+            "sessionMode": "same_map",
+            # The start road's door: a pad the company holds from the first drop.
+            "marks": {"deployZoneId": "GF_NW_MUSTER", "extractZoneId": "GF_NW_MUSTER",
+                      "captureZoneIds": ["GF_SE_PLATEAU"]},
+        }
+        report = stamp(plan, ws)
+        assert report["ok"] is True, report
+        assert report["hubChoiceId"] == "c_test_pytest"
+        order = json.loads((ws / "outbox" / "next_sortie_order.json").read_text(encoding="utf-8-sig"))
+        assert order["hubChoiceId"] == "c_test_pytest"
+        assert order["targetZoneId"] == "GF_SE_PLATEAU"
+        assert order["deploymentZoneId"] == "GF_NW_MUSTER"
+        assert order["source"] == "hub_deploy_plan"
+        assert order["sessionMode"] == "same_map"
+        home = json.loads((ws / "outbox" / "session_home.latest.json").read_text(encoding="utf-8-sig"))
+        assert home["sessionHomeMap"] == "greenest_fields"
+    finally:
+        shutil.rmtree(ws, ignore_errors=True)
 
 
 def test_consume_played_hub_sorties():

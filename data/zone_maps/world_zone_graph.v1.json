@@ -1,7 +1,7 @@
 {
   "schemaVersion": "verdance-world-zone-graph/1.0",
   "nodeCount": 102,
-  "edgeCount": 190,
+  "edgeCount": 196,
   "nodes": [
     {
       "zoneId": "ATS_C_BASTION",
@@ -779,141 +779,143 @@
       }
     },
     {
-      "zoneId": "AB_NW_LANE",
+      "zoneId": "AB_W_KEEP",
       "mapId": "ancient_bastion",
       "mapName": "Ancient Bastion Remake 0.5",
-      "label": "Northwest Lane",
-      "role": "lane",
+      "label": "The Keep",
+      "role": "fortress",
       "tags": [
-        "low",
         "metal",
         "choke",
         "start",
-        "northwest"
+        "fortress",
+        "west"
       ],
       "bounds": {
         "xMin": 0.0,
-        "xMax": 0.5521,
-        "zMin": 0.0,
-        "zMax": 0.5
+        "xMax": 0.2292,
+        "zMin": 0.2812,
+        "zMax": 0.7188
       },
       "deployEligible": true,
       "extractEligible": true,
       "anchor": {
-        "x": 0.4115,
-        "z": 0.3385
+        "x": 0.1094,
+        "z": 0.4948
       },
       "evidence": {
-        "cellCount": 1434.0,
-        "presenceShare": 0.1818,
-        "presenceDensity": 1.1686,
-        "structureDensity": 0.5307,
+        "cellCount": 913.0,
+        "presenceShare": 0.0145,
+        "presenceDensity": 0.1467,
+        "structureDensity": 0.4797,
         "fightDensity": 0.0,
-        "trafficDensity": 1.7835,
-        "transitDensity": 3.3606,
+        "trafficDensity": 0.0706,
+        "transitDensity": 0.1471,
         "hazard": 0.0,
-        "defence": 0.2299,
-        "contest": 0.1297,
+        "defence": 1.6797,
+        "contest": 0.1763,
         "water": 0.0,
-        "buildable": 0.7932,
-        "slope": 0.0995,
-        "metal": 0.6704,
-        "relativeHeight": 0.2809,
+        "buildable": 0.7275,
+        "slope": 0.1334,
+        "metal": 1.4541,
+        "relativeHeight": 0.398,
+        "choke": 0.9565,
+        "hasStart": true,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 23,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "AB_W_GATEHOUSES",
+      "mapId": "ancient_bastion",
+      "mapName": "Ancient Bastion Remake 0.5",
+      "label": "Gatehouses",
+      "role": "gate",
+      "tags": [
+        "metal",
+        "choke",
+        "start",
+        "fortress",
+        "west"
+      ],
+      "bounds": {
+        "xMin": 0.2188,
+        "xMax": 0.3333,
+        "zMin": 0.2812,
+        "zMax": 0.7188
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.2865,
+        "z": 0.4948
+      },
+      "evidence": {
+        "cellCount": 431.0,
+        "presenceShare": 0.1085,
+        "presenceDensity": 2.3195,
+        "structureDensity": 0.8707,
+        "fightDensity": 0.0,
+        "trafficDensity": 3.9504,
+        "transitDensity": 4.5368,
+        "hazard": 0.0,
+        "defence": 0.1888,
+        "contest": 0.0489,
+        "water": 0.0,
+        "buildable": 0.6162,
+        "slope": 0.2115,
+        "metal": 0.8497,
+        "relativeHeight": 0.3041,
         "choke": 1.0,
         "hasStart": true,
         "floodsAt": 2.0,
         "restingSubmerged": 0.0,
-        "metalSpots": 21,
+        "metalSpots": 9,
         "drownedMetal": 0.0
       }
     },
     {
-      "zoneId": "AB_SW_LANE",
+      "zoneId": "AB_NW_RAMPART",
       "mapId": "ancient_bastion",
       "mapName": "Ancient Bastion Remake 0.5",
-      "label": "Southwest Lane",
-      "role": "lane",
+      "label": "North Rampart",
+      "role": "citadel",
       "tags": [
-        "low",
         "metal",
-        "start",
-        "southwest"
+        "fortress",
+        "northwest"
       ],
       "bounds": {
         "xMin": 0.0,
-        "xMax": 0.5521,
-        "zMin": 0.5,
-        "zMax": 1.0
+        "xMax": 0.2708,
+        "zMin": 0.125,
+        "zMax": 0.2812
       },
       "deployEligible": true,
       "extractEligible": true,
       "anchor": {
-        "x": 0.401,
-        "z": 0.6406
+        "x": 0.1198,
+        "z": 0.2448
       },
       "evidence": {
-        "cellCount": 1434.0,
-        "presenceShare": 0.1818,
-        "presenceDensity": 1.1686,
-        "structureDensity": 0.5307,
+        "cellCount": 202.0,
+        "presenceShare": 0.0357,
+        "presenceDensity": 1.6288,
+        "structureDensity": 3.6665,
         "fightDensity": 0.0,
-        "trafficDensity": 1.7835,
-        "transitDensity": 3.3606,
+        "trafficDensity": 0.8105,
+        "transitDensity": 0.221,
         "hazard": 0.0,
-        "defence": 0.2299,
-        "contest": 0.2965,
+        "defence": 1.1569,
+        "contest": 0.176,
         "water": 0.0,
-        "buildable": 0.7902,
-        "slope": 0.1004,
-        "metal": 0.8619,
-        "relativeHeight": 0.2812,
+        "buildable": 0.7188,
+        "slope": 0.1045,
+        "metal": 1.3597,
+        "relativeHeight": 0.5421,
         "choke": 0.4348,
-        "hasStart": true,
-        "floodsAt": 2.0,
-        "restingSubmerged": 0.0,
-        "metalSpots": 24,
-        "drownedMetal": 0.0
-      }
-    },
-    {
-      "zoneId": "AB_NE_RESERVE",
-      "mapId": "ancient_bastion",
-      "mapName": "Ancient Bastion Remake 0.5",
-      "label": "Northeast Reserve",
-      "role": "reserve",
-      "tags": [
-        "contested",
-        "northeast"
-      ],
-      "bounds": {
-        "xMin": 0.5312,
-        "xMax": 1.0,
-        "zMin": 0.0,
-        "zMax": 0.4688
-      },
-      "deployEligible": true,
-      "extractEligible": true,
-      "anchor": {
-        "x": 0.8177,
-        "z": 0.2865
-      },
-      "evidence": {
-        "cellCount": 1702.0,
-        "presenceShare": 0.0959,
-        "presenceDensity": 0.5191,
-        "structureDensity": 0.711,
-        "fightDensity": 0.0,
-        "trafficDensity": 0.2854,
-        "transitDensity": 0.4014,
-        "hazard": 0.0,
-        "defence": 0.6841,
-        "contest": 0.5068,
-        "water": 0.0,
-        "buildable": 0.5426,
-        "slope": 0.0693,
-        "metal": 0.2152,
-        "relativeHeight": 0.4013,
-        "choke": 0.3913,
         "hasStart": false,
         "floodsAt": 2.0,
         "restingSubmerged": 0.0,
@@ -922,88 +924,233 @@
       }
     },
     {
-      "zoneId": "AB_SE_RESERVE",
+      "zoneId": "AB_SW_RAMPART",
       "mapId": "ancient_bastion",
       "mapName": "Ancient Bastion Remake 0.5",
-      "label": "Southeast Reserve",
-      "role": "reserve",
+      "label": "South Rampart",
+      "role": "citadel",
       "tags": [
-        "southeast"
+        "metal",
+        "contested",
+        "fortress",
+        "southwest"
       ],
       "bounds": {
-        "xMin": 0.5312,
-        "xMax": 1.0,
-        "zMin": 0.5312,
+        "xMin": 0.0,
+        "xMax": 0.2812,
+        "zMin": 0.7188,
+        "zMax": 0.8854
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.1198,
+        "z": 0.7552
+      },
+      "evidence": {
+        "cellCount": 209.0,
+        "presenceShare": 0.0366,
+        "presenceDensity": 1.6146,
+        "structureDensity": 3.5441,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.7839,
+        "transitDensity": 0.2212,
+        "hazard": 0.0,
+        "defence": 1.1281,
+        "contest": 0.5235,
+        "water": 0.0,
+        "buildable": 0.7131,
+        "slope": 0.0961,
+        "metal": 0.8761,
+        "relativeHeight": 0.5399,
+        "choke": 0.0,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 6,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "AB_NW_TOR",
+      "mapId": "ancient_bastion",
+      "mapName": "Ancient Bastion Remake 0.5",
+      "label": "Northwest Tor",
+      "role": "reserve",
+      "tags": [
+        "low",
+        "choke",
+        "northwest"
+      ],
+      "bounds": {
+        "xMin": 0.0,
+        "xMax": 0.3333,
+        "zMin": 0.0,
+        "zMax": 0.2812
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.1823,
+        "z": 0.1198
+      },
+      "evidence": {
+        "cellCount": 662.0,
+        "presenceShare": 0.1069,
+        "presenceDensity": 1.4876,
+        "structureDensity": 1.6144,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.9379,
+        "transitDensity": 0.581,
+        "hazard": 0.0,
+        "defence": 0.5537,
+        "contest": 0.1613,
+        "water": 0.0,
+        "buildable": 0.769,
+        "slope": 0.1046,
+        "metal": 0.4841,
+        "relativeHeight": 0.204,
+        "choke": 0.7391,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 8,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "AB_SW_TOR",
+      "mapId": "ancient_bastion",
+      "mapName": "Ancient Bastion Remake 0.5",
+      "label": "Southwest Tor",
+      "role": "reserve",
+      "tags": [
+        "low",
+        "metal",
+        "contested",
+        "southwest"
+      ],
+      "bounds": {
+        "xMin": 0.0,
+        "xMax": 0.3333,
+        "zMin": 0.7188,
         "zMax": 1.0
       },
       "deployEligible": true,
       "extractEligible": true,
       "anchor": {
-        "x": 0.8177,
-        "z": 0.7135
+        "x": 0.1823,
+        "z": 0.8802
       },
       "evidence": {
-        "cellCount": 1702.0,
-        "presenceShare": 0.0959,
-        "presenceDensity": 0.5191,
-        "structureDensity": 0.711,
+        "cellCount": 655.0,
+        "presenceShare": 0.1059,
+        "presenceDensity": 1.4906,
+        "structureDensity": 1.6315,
         "fightDensity": 0.0,
-        "trafficDensity": 0.2854,
-        "transitDensity": 0.4014,
+        "trafficDensity": 0.9477,
+        "transitDensity": 0.5809,
         "hazard": 0.0,
-        "defence": 0.6841,
-        "contest": 0.0916,
+        "defence": 0.5584,
+        "contest": 0.5235,
         "water": 0.0,
-        "buildable": 0.534,
-        "slope": 0.0722,
-        "metal": 0.1614,
-        "relativeHeight": 0.4144,
+        "buildable": 0.783,
+        "slope": 0.0977,
+        "metal": 0.629,
+        "relativeHeight": 0.2013,
         "choke": 0.0,
         "hasStart": false,
         "floodsAt": 2.0,
         "restingSubmerged": 0.0,
-        "metalSpots": 7,
+        "metalSpots": 8,
         "drownedMetal": 0.0
       }
     },
     {
-      "zoneId": "AB_NW_BASTION",
+      "zoneId": "AB_N_WALL",
       "mapId": "ancient_bastion",
       "mapName": "Ancient Bastion Remake 0.5",
-      "label": "Northwest Bastion",
-      "role": "fortress",
+      "label": "North Wall",
+      "role": "causeway",
       "tags": [
-        "metal",
-        "northwest"
+        "low",
+        "north"
       ],
       "bounds": {
-        "xMin": 0.0,
-        "xMax": 0.2812,
+        "xMin": 0.3333,
+        "xMax": 0.5208,
         "zMin": 0.0,
-        "zMax": 0.3229
+        "zMax": 0.3021
       },
       "deployEligible": true,
       "extractEligible": true,
       "anchor": {
-        "x": 0.1094,
-        "z": 0.1719
+        "x": 0.4323,
+        "z": 0.2344
       },
       "evidence": {
-        "cellCount": 478.0,
-        "presenceShare": 0.0836,
-        "presenceDensity": 1.6117,
-        "structureDensity": 2.8418,
+        "cellCount": 522.0,
+        "presenceShare": 0.0392,
+        "presenceDensity": 0.6928,
+        "structureDensity": 0.2466,
         "fightDensity": 0.0,
-        "trafficDensity": 0.8398,
-        "transitDensity": 0.2955,
+        "trafficDensity": 0.9865,
+        "transitDensity": 3.9462,
         "hazard": 0.0,
-        "defence": 0.9024,
-        "contest": 0.1705,
+        "defence": 0.1809,
+        "contest": 0.1602,
         "water": 0.0,
-        "buildable": 0.6579,
-        "slope": 0.154,
-        "metal": 1.0535,
-        "relativeHeight": 0.3959,
+        "buildable": 0.87,
+        "slope": 0.0587,
+        "metal": 0.0877,
+        "relativeHeight": 0.217,
+        "choke": 0.3043,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 3,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "AB_C_WALL",
+      "mapId": "ancient_bastion",
+      "mapName": "Ancient Bastion Remake 0.5",
+      "label": "Centre Wall",
+      "role": "lane",
+      "tags": [
+        "low",
+        "metal",
+        "central"
+      ],
+      "bounds": {
+        "xMin": 0.3333,
+        "xMax": 0.5208,
+        "zMin": 0.3021,
+        "zMax": 0.6979
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.4427,
+        "z": 0.4948
+      },
+      "evidence": {
+        "cellCount": 684.0,
+        "presenceShare": 0.2169,
+        "presenceDensity": 2.9225,
+        "structureDensity": 1.0398,
+        "fightDensity": 0.0,
+        "trafficDensity": 4.8208,
+        "transitDensity": 4.6361,
+        "hazard": 0.0,
+        "defence": 0.1792,
+        "contest": 0.1192,
+        "water": 0.0,
+        "buildable": 0.8339,
+        "slope": 0.081,
+        "metal": 0.6693,
+        "relativeHeight": 0.2338,
         "choke": 0.4348,
         "hasStart": false,
         "floodsAt": 2.0,
@@ -1013,45 +1160,93 @@
       }
     },
     {
-      "zoneId": "AB_SW_BASTION",
+      "zoneId": "AB_S_WALL",
       "mapId": "ancient_bastion",
       "mapName": "Ancient Bastion Remake 0.5",
-      "label": "Southwest Bastion",
-      "role": "fortress",
+      "label": "South Wall",
+      "role": "causeway",
       "tags": [
-        "metal",
+        "low",
         "contested",
-        "southwest"
+        "south"
       ],
       "bounds": {
-        "xMin": 0.0,
-        "xMax": 0.2812,
-        "zMin": 0.6771,
+        "xMin": 0.3333,
+        "xMax": 0.5208,
+        "zMin": 0.6979,
         "zMax": 1.0
       },
       "deployEligible": true,
       "extractEligible": true,
       "anchor": {
-        "x": 0.1094,
-        "z": 0.8281
+        "x": 0.4323,
+        "z": 0.7656
       },
       "evidence": {
-        "cellCount": 478.0,
-        "presenceShare": 0.0836,
-        "presenceDensity": 1.6117,
-        "structureDensity": 2.8418,
+        "cellCount": 522.0,
+        "presenceShare": 0.0392,
+        "presenceDensity": 0.6928,
+        "structureDensity": 0.2466,
         "fightDensity": 0.0,
-        "trafficDensity": 0.8398,
-        "transitDensity": 0.2955,
+        "trafficDensity": 0.9865,
+        "transitDensity": 3.9462,
         "hazard": 0.0,
-        "defence": 0.9024,
-        "contest": 0.5235,
+        "defence": 0.1809,
+        "contest": 0.4204,
         "water": 0.0,
-        "buildable": 0.675,
-        "slope": 0.1394,
-        "metal": 0.9577,
-        "relativeHeight": 0.396,
+        "buildable": 0.8604,
+        "slope": 0.0567,
+        "metal": 0.2631,
+        "relativeHeight": 0.2172,
         "choke": 0.0,
+        "hasStart": false,
+        "floodsAt": 2.0,
+        "restingSubmerged": 0.0,
+        "metalSpots": 3,
+        "drownedMetal": 0.0
+      }
+    },
+    {
+      "zoneId": "AB_NE_CRATERS",
+      "mapId": "ancient_bastion",
+      "mapName": "Ancient Bastion Remake 0.5",
+      "label": "North Craters",
+      "role": "main_field",
+      "tags": [
+        "low",
+        "metal",
+        "contested",
+        "northeast"
+      ],
+      "bounds": {
+        "xMin": 0.5208,
+        "xMax": 0.8646,
+        "zMin": 0.0833,
+        "zMax": 0.5
+      },
+      "deployEligible": true,
+      "extractEligible": true,
+      "anchor": {
+        "x": 0.6823,
+        "z": 0.3385
+      },
+      "evidence": {
+        "cellCount": 924.0,
+        "presenceShare": 0.0778,
+        "presenceDensity": 0.7759,
+        "structureDensity": 1.7474,
+        "fightDensity": 0.0,
+        "trafficDensity": 0.4694,
+        "transitDensity": 0.2686,
+        "hazard": 0.0,
+        "defence": 1.128,
+        "contest": 0.3637,
+        "water": 0.0,
+        "buildable": 0.8639,
+        "slope": 0.0313,
+        "metal": 0.545,
+        "relativeHeight": 0.1631,
+        "choke": 0.3913,
         "hasStart": false,
         "floodsAt": 2.0,
         "restingSubmerged": 0.0,
@@ -1060,230 +1255,91 @@
       }
     },
     {
-      "zoneId": "AB_NW_CITADEL",
+      "zoneId": "AB_SE_CRATERS",
       "mapId": "ancient_bastion",
       "mapName": "Ancient Bastion Remake 0.5",
-      "label": "Northwest Citadel",
-      "role": "citadel",
-      "tags": [
-        "low",
-        "northwest"
-      ],
-      "bounds": {
-        "xMin": 0.1146,
-        "xMax": 0.4062,
-        "zMin": 0.0,
-        "zMax": 0.2604
-      },
-      "deployEligible": true,
-      "extractEligible": true,
-      "anchor": {
-        "x": 0.2135,
-        "z": 0.099
-      },
-      "evidence": {
-        "cellCount": 458.0,
-        "presenceShare": 0.0544,
-        "presenceDensity": 1.0941,
-        "structureDensity": 1.1006,
-        "fightDensity": 0.0,
-        "trafficDensity": 0.6472,
-        "transitDensity": 0.5881,
-        "hazard": 0.0,
-        "defence": 0.5155,
-        "contest": 0.1746,
-        "water": 0.0,
-        "buildable": 0.848,
-        "slope": 0.0549,
-        "metal": 0.2999,
-        "relativeHeight": 0.1916,
-        "choke": 0.2609,
-        "hasStart": false,
-        "floodsAt": 2.0,
-        "restingSubmerged": 0.0,
-        "metalSpots": 5,
-        "drownedMetal": 0.0
-      }
-    },
-    {
-      "zoneId": "AB_SW_CITADEL",
-      "mapId": "ancient_bastion",
-      "mapName": "Ancient Bastion Remake 0.5",
-      "label": "Southwest Citadel",
-      "role": "citadel",
-      "tags": [
-        "low",
-        "contested",
-        "southwest"
-      ],
-      "bounds": {
-        "xMin": 0.1146,
-        "xMax": 0.4062,
-        "zMin": 0.7396,
-        "zMax": 1.0
-      },
-      "deployEligible": true,
-      "extractEligible": true,
-      "anchor": {
-        "x": 0.2135,
-        "z": 0.901
-      },
-      "evidence": {
-        "cellCount": 458.0,
-        "presenceShare": 0.0544,
-        "presenceDensity": 1.0941,
-        "structureDensity": 1.1006,
-        "fightDensity": 0.0,
-        "trafficDensity": 0.6472,
-        "transitDensity": 0.5881,
-        "hazard": 0.0,
-        "defence": 0.5155,
-        "contest": 0.5235,
-        "water": 0.0,
-        "buildable": 0.8502,
-        "slope": 0.0561,
-        "metal": 0.1999,
-        "relativeHeight": 0.192,
-        "choke": 0.0,
-        "hasStart": false,
-        "floodsAt": 2.0,
-        "restingSubmerged": 0.0,
-        "metalSpots": 5,
-        "drownedMetal": 0.0
-      }
-    },
-    {
-      "zoneId": "AB_W_LANE",
-      "mapId": "ancient_bastion",
-      "mapName": "Ancient Bastion Remake 0.5",
-      "label": "West Lane",
-      "role": "lane",
-      "tags": [
-        "low",
-        "west"
-      ],
-      "bounds": {
-        "xMin": 0.2188,
-        "xMax": 0.3854,
-        "zMin": 0.3438,
-        "zMax": 0.5
-      },
-      "deployEligible": true,
-      "extractEligible": true,
-      "anchor": {
-        "x": 0.3177,
-        "z": 0.4635
-      },
-      "evidence": {
-        "cellCount": 123.0,
-        "presenceShare": 0.0383,
-        "presenceDensity": 2.8687,
-        "structureDensity": 0.8457,
-        "fightDensity": 0.0,
-        "trafficDensity": 5.0252,
-        "transitDensity": 5.9423,
-        "hazard": 0.0,
-        "defence": 0.1482,
-        "contest": 0.0444,
-        "water": 0.0,
-        "buildable": 0.811,
-        "slope": 0.1107,
-        "metal": 0.3722,
-        "relativeHeight": 0.1798,
-        "choke": 0.2174,
-        "hasStart": false,
-        "floodsAt": 2.0,
-        "restingSubmerged": 0.0,
-        "metalSpots": 1,
-        "drownedMetal": 0.0
-      }
-    },
-    {
-      "zoneId": "AB_W_INNER_LANE",
-      "mapId": "ancient_bastion",
-      "mapName": "Ancient Bastion Remake 0.5",
-      "label": "West Inner Lane",
-      "role": "lane",
+      "label": "South Craters",
+      "role": "main_field",
       "tags": [
         "low",
         "metal",
-        "start",
-        "west"
+        "southeast"
       ],
       "bounds": {
-        "xMin": 0.2188,
-        "xMax": 0.3854,
+        "xMin": 0.5208,
+        "xMax": 0.8646,
         "zMin": 0.5,
-        "zMax": 0.6562
+        "zMax": 0.9167
       },
       "deployEligible": true,
       "extractEligible": true,
       "anchor": {
-        "x": 0.3177,
-        "z": 0.5365
+        "x": 0.6719,
+        "z": 0.6615
       },
       "evidence": {
-        "cellCount": 123.0,
-        "presenceShare": 0.0383,
-        "presenceDensity": 2.8687,
-        "structureDensity": 0.8457,
+        "cellCount": 947.0,
+        "presenceShare": 0.0801,
+        "presenceDensity": 0.7795,
+        "structureDensity": 1.7217,
         "fightDensity": 0.0,
-        "trafficDensity": 5.0252,
-        "transitDensity": 5.9423,
+        "trafficDensity": 0.4679,
+        "transitDensity": 0.2718,
         "hazard": 0.0,
-        "defence": 0.1482,
-        "contest": 0.0444,
+        "defence": 1.1061,
+        "contest": 0.143,
         "water": 0.0,
-        "buildable": 0.8028,
-        "slope": 0.1134,
-        "metal": 0.7444,
-        "relativeHeight": 0.1805,
-        "choke": 0.1739,
-        "hasStart": true,
+        "buildable": 0.8999,
+        "slope": 0.0205,
+        "metal": 0.5801,
+        "relativeHeight": 0.1663,
+        "choke": 0.1304,
+        "hasStart": false,
         "floodsAt": 2.0,
         "restingSubmerged": 0.0,
-        "metalSpots": 3,
+        "metalSpots": 12,
         "drownedMetal": 0.0
       }
     },
     {
-      "zoneId": "AB_E_BASTION",
+      "zoneId": "AB_NE_HEIGHTS",
       "mapId": "ancient_bastion",
       "mapName": "Ancient Bastion Remake 0.5",
-      "label": "East Bastion",
-      "role": "fortress",
+      "label": "North Heights",
+      "role": "plateau",
       "tags": [
-        "east"
+        "contested",
+        "northeast"
       ],
       "bounds": {
-        "xMin": 0.6354,
+        "xMin": 0.5208,
         "xMax": 1.0,
-        "zMin": 0.3854,
-        "zMax": 0.5
+        "zMin": 0.0,
+        "zMax": 0.3021
       },
       "deployEligible": true,
       "extractEligible": true,
       "anchor": {
-        "x": 0.7448,
-        "z": 0.4635
+        "x": 0.8594,
+        "z": 0.1823
       },
       "evidence": {
-        "cellCount": 176.0,
-        "presenceShare": 0.0237,
-        "presenceDensity": 1.2423,
-        "structureDensity": 2.1351,
+        "cellCount": 894.0,
+        "presenceShare": 0.0278,
+        "presenceDensity": 0.2864,
+        "structureDensity": 0.1072,
         "fightDensity": 0.0,
-        "trafficDensity": 0.5602,
-        "transitDensity": 0.2624,
+        "trafficDensity": 0.1876,
+        "transitDensity": 0.7503,
         "hazard": 0.0,
-        "defence": 0.8591,
-        "contest": 0.0391,
+        "defence": 0.1893,
+        "contest": 0.4228,
         "water": 0.0,
-        "buildable": 0.5982,
-        "slope": 0.0659,
+        "buildable": 0.3735,
+        "slope": 0.0924,
         "metal": 0.0,
-        "relativeHeight": 0.3584,
-        "choke": 0.3478,
+        "relativeHeight": 0.5094,
+        "choke": 0.0,
         "hasStart": false,
         "floodsAt": 2.0,
         "restingSubmerged": 0.0,
@@ -1292,144 +1348,92 @@
       }
     },
     {
-      "zoneId": "AB_E_OUTER_BASTION",
+      "zoneId": "AB_SE_HEIGHTS",
       "mapId": "ancient_bastion",
       "mapName": "Ancient Bastion Remake 0.5",
-      "label": "East Outer Bastion",
-      "role": "fortress",
+      "label": "South Heights",
+      "role": "plateau",
       "tags": [
-        "metal",
-        "east"
+        "southeast"
       ],
       "bounds": {
-        "xMin": 0.6354,
+        "xMin": 0.5208,
         "xMax": 1.0,
-        "zMin": 0.5,
-        "zMax": 0.6146
+        "zMin": 0.6979,
+        "zMax": 1.0
       },
       "deployEligible": true,
       "extractEligible": true,
       "anchor": {
-        "x": 0.7552,
-        "z": 0.5365
+        "x": 0.8177,
+        "z": 0.8177
       },
       "evidence": {
-        "cellCount": 176.0,
-        "presenceShare": 0.0237,
-        "presenceDensity": 1.2423,
-        "structureDensity": 2.1351,
+        "cellCount": 895.0,
+        "presenceShare": 0.0277,
+        "presenceDensity": 0.2856,
+        "structureDensity": 0.1069,
         "fightDensity": 0.0,
-        "trafficDensity": 0.5602,
-        "transitDensity": 0.2624,
+        "trafficDensity": 0.1872,
+        "transitDensity": 0.7488,
         "hazard": 0.0,
-        "defence": 0.8591,
-        "contest": 0.039,
+        "defence": 0.1893,
+        "contest": 0.1848,
         "water": 0.0,
-        "buildable": 0.682,
-        "slope": 0.0568,
-        "metal": 0.7803,
-        "relativeHeight": 0.3771,
-        "choke": 0.1304,
+        "buildable": 0.3709,
+        "slope": 0.0936,
+        "metal": 0.0,
+        "relativeHeight": 0.5106,
+        "choke": 0.0,
         "hasStart": false,
         "floodsAt": 2.0,
         "restingSubmerged": 0.0,
-        "metalSpots": 2,
+        "metalSpots": 0,
         "drownedMetal": 0.0
       }
     },
     {
-      "zoneId": "AB_NE_CITADEL",
+      "zoneId": "AB_E_RIDGE",
       "mapId": "ancient_bastion",
       "mapName": "Ancient Bastion Remake 0.5",
-      "label": "Northeast Citadel",
-      "role": "citadel",
+      "label": "East Ridge",
+      "role": "rim_control",
       "tags": [
-        "low",
-        "metal",
-        "contested",
-        "northeast"
+        "east"
       ],
       "bounds": {
-        "xMin": 0.5417,
-        "xMax": 0.6771,
-        "zMin": 0.2188,
-        "zMax": 0.5
+        "xMin": 0.75,
+        "xMax": 1.0,
+        "zMin": 0.3021,
+        "zMax": 0.6979
       },
       "deployEligible": true,
       "extractEligible": true,
       "anchor": {
-        "x": 0.6198,
-        "z": 0.3594
+        "x": 0.8906,
+        "z": 0.4948
       },
       "evidence": {
-        "cellCount": 237.0,
-        "presenceShare": 0.0223,
-        "presenceDensity": 0.8677,
-        "structureDensity": 1.2433,
+        "cellCount": 756.0,
+        "presenceShare": 0.0831,
+        "presenceDensity": 1.0129,
+        "structureDensity": 0.501,
         "fightDensity": 0.0,
-        "trafficDensity": 0.6337,
-        "transitDensity": 0.5097,
+        "trafficDensity": 0.4501,
+        "transitDensity": 0.8984,
         "hazard": 0.0,
-        "defence": 0.7252,
-        "contest": 0.4097,
+        "defence": 0.2462,
+        "contest": 0.0314,
         "water": 0.0,
-        "buildable": 0.7576,
-        "slope": 0.0588,
-        "metal": 0.5795,
-        "relativeHeight": 0.1517,
-        "choke": 0.3043,
-        "hasStart": false,
-        "floodsAt": 1.0,
-        "restingSubmerged": 0.0,
-        "metalSpots": 2,
-        "drownedMetal": 1.0
-      }
-    },
-    {
-      "zoneId": "AB_SE_CITADEL",
-      "mapId": "ancient_bastion",
-      "mapName": "Ancient Bastion Remake 0.5",
-      "label": "Southeast Citadel",
-      "role": "citadel",
-      "tags": [
-        "low",
-        "metal",
-        "contested",
-        "southeast"
-      ],
-      "bounds": {
-        "xMin": 0.5417,
-        "xMax": 0.6771,
-        "zMin": 0.5,
-        "zMax": 0.7812
-      },
-      "deployEligible": true,
-      "extractEligible": true,
-      "anchor": {
-        "x": 0.5885,
-        "z": 0.6198
-      },
-      "evidence": {
-        "cellCount": 237.0,
-        "presenceShare": 0.0223,
-        "presenceDensity": 0.8677,
-        "structureDensity": 1.2433,
-        "fightDensity": 0.0,
-        "trafficDensity": 0.6337,
-        "transitDensity": 0.5097,
-        "hazard": 0.0,
-        "defence": 0.7252,
-        "contest": 0.3716,
-        "water": 0.0,
-        "buildable": 0.9044,
-        "slope": 0.0225,
-        "metal": 0.5795,
-        "relativeHeight": 0.1619,
-        "choke": 0.1304,
+        "buildable": 0.3963,
+        "slope": 0.0919,
+        "metal": 0.0,
+        "relativeHeight": 0.5371,
+        "choke": 0.0,
         "hasStart": false,
         "floodsAt": 2.0,
         "restingSubmerged": 0.0,
-        "metalSpots": 2,
+        "metalSpots": 0,
         "drownedMetal": 0.0
       }
     },
@@ -5071,155 +5075,190 @@
       "mapId": "all_that_simmers"
     },
     {
-      "from": "AB_NW_LANE",
-      "to": "AB_NE_CITADEL",
+      "from": "AB_W_KEEP",
+      "to": "AB_NW_RAMPART",
       "kind": "same_map",
       "cost": 1,
       "mapId": "ancient_bastion"
     },
     {
-      "from": "AB_NW_LANE",
-      "to": "AB_NE_RESERVE",
+      "from": "AB_W_KEEP",
+      "to": "AB_SW_RAMPART",
       "kind": "same_map",
       "cost": 1,
       "mapId": "ancient_bastion"
     },
     {
-      "from": "AB_NW_LANE",
-      "to": "AB_NW_BASTION",
+      "from": "AB_W_KEEP",
+      "to": "AB_W_GATEHOUSES",
       "kind": "same_map",
       "cost": 1,
       "mapId": "ancient_bastion"
     },
     {
-      "from": "AB_NW_LANE",
-      "to": "AB_NW_CITADEL",
+      "from": "AB_W_GATEHOUSES",
+      "to": "AB_C_WALL",
       "kind": "same_map",
       "cost": 1,
       "mapId": "ancient_bastion"
     },
     {
-      "from": "AB_NW_LANE",
-      "to": "AB_SW_LANE",
+      "from": "AB_W_GATEHOUSES",
+      "to": "AB_NW_TOR",
       "kind": "same_map",
       "cost": 1,
       "mapId": "ancient_bastion"
     },
     {
-      "from": "AB_NW_LANE",
-      "to": "AB_W_LANE",
+      "from": "AB_W_GATEHOUSES",
+      "to": "AB_N_WALL",
       "kind": "same_map",
       "cost": 1,
       "mapId": "ancient_bastion"
     },
     {
-      "from": "AB_SW_LANE",
-      "to": "AB_SE_CITADEL",
+      "from": "AB_W_GATEHOUSES",
+      "to": "AB_SW_TOR",
       "kind": "same_map",
       "cost": 1,
       "mapId": "ancient_bastion"
     },
     {
-      "from": "AB_SW_LANE",
-      "to": "AB_SE_RESERVE",
+      "from": "AB_W_GATEHOUSES",
+      "to": "AB_S_WALL",
       "kind": "same_map",
       "cost": 1,
       "mapId": "ancient_bastion"
     },
     {
-      "from": "AB_SW_LANE",
-      "to": "AB_SW_BASTION",
+      "from": "AB_NW_RAMPART",
+      "to": "AB_NW_TOR",
       "kind": "same_map",
       "cost": 1,
       "mapId": "ancient_bastion"
     },
     {
-      "from": "AB_SW_LANE",
-      "to": "AB_SW_CITADEL",
+      "from": "AB_SW_RAMPART",
+      "to": "AB_SW_TOR",
       "kind": "same_map",
       "cost": 1,
       "mapId": "ancient_bastion"
     },
     {
-      "from": "AB_SW_LANE",
-      "to": "AB_W_INNER_LANE",
+      "from": "AB_NW_TOR",
+      "to": "AB_N_WALL",
       "kind": "same_map",
       "cost": 1,
       "mapId": "ancient_bastion"
     },
     {
-      "from": "AB_NE_RESERVE",
-      "to": "AB_E_BASTION",
+      "from": "AB_SW_TOR",
+      "to": "AB_S_WALL",
       "kind": "same_map",
       "cost": 1,
       "mapId": "ancient_bastion"
     },
     {
-      "from": "AB_NE_RESERVE",
-      "to": "AB_NE_CITADEL",
+      "from": "AB_N_WALL",
+      "to": "AB_C_WALL",
       "kind": "same_map",
       "cost": 1,
       "mapId": "ancient_bastion"
     },
     {
-      "from": "AB_SE_RESERVE",
-      "to": "AB_E_OUTER_BASTION",
+      "from": "AB_N_WALL",
+      "to": "AB_NE_CRATERS",
       "kind": "same_map",
       "cost": 1,
       "mapId": "ancient_bastion"
     },
     {
-      "from": "AB_SE_RESERVE",
-      "to": "AB_SE_CITADEL",
+      "from": "AB_N_WALL",
+      "to": "AB_NE_HEIGHTS",
       "kind": "same_map",
       "cost": 1,
       "mapId": "ancient_bastion"
     },
     {
-      "from": "AB_NW_BASTION",
-      "to": "AB_NW_CITADEL",
+      "from": "AB_C_WALL",
+      "to": "AB_NE_CRATERS",
       "kind": "same_map",
       "cost": 1,
       "mapId": "ancient_bastion"
     },
     {
-      "from": "AB_SW_BASTION",
-      "to": "AB_SW_CITADEL",
+      "from": "AB_C_WALL",
+      "to": "AB_SE_CRATERS",
       "kind": "same_map",
       "cost": 1,
       "mapId": "ancient_bastion"
     },
     {
-      "from": "AB_W_LANE",
-      "to": "AB_W_INNER_LANE",
+      "from": "AB_C_WALL",
+      "to": "AB_S_WALL",
       "kind": "same_map",
       "cost": 1,
       "mapId": "ancient_bastion"
     },
     {
-      "from": "AB_E_BASTION",
-      "to": "AB_E_OUTER_BASTION",
+      "from": "AB_S_WALL",
+      "to": "AB_SE_CRATERS",
       "kind": "same_map",
       "cost": 1,
       "mapId": "ancient_bastion"
     },
     {
-      "from": "AB_E_BASTION",
-      "to": "AB_NE_CITADEL",
+      "from": "AB_S_WALL",
+      "to": "AB_SE_HEIGHTS",
       "kind": "same_map",
       "cost": 1,
       "mapId": "ancient_bastion"
     },
     {
-      "from": "AB_E_OUTER_BASTION",
-      "to": "AB_SE_CITADEL",
+      "from": "AB_NE_CRATERS",
+      "to": "AB_E_RIDGE",
       "kind": "same_map",
       "cost": 1,
       "mapId": "ancient_bastion"
     },
     {
-      "from": "AB_NE_CITADEL",
-      "to": "AB_SE_CITADEL",
+      "from": "AB_NE_CRATERS",
+      "to": "AB_NE_HEIGHTS",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "ancient_bastion"
+    },
+    {
+      "from": "AB_NE_CRATERS",
+      "to": "AB_SE_CRATERS",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "ancient_bastion"
+    },
+    {
+      "from": "AB_SE_CRATERS",
+      "to": "AB_E_RIDGE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "ancient_bastion"
+    },
+    {
+      "from": "AB_SE_CRATERS",
+      "to": "AB_SE_HEIGHTS",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "ancient_bastion"
+    },
+    {
+      "from": "AB_NE_HEIGHTS",
+      "to": "AB_E_RIDGE",
+      "kind": "same_map",
+      "cost": 1,
+      "mapId": "ancient_bastion"
+    },
+    {
+      "from": "AB_SE_HEIGHTS",
+      "to": "AB_E_RIDGE",
       "kind": "same_map",
       "cost": 1,
       "mapId": "ancient_bastion"
@@ -6156,68 +6195,68 @@
       "mapId": "the_rock_jungle"
     },
     {
-      "from": "GF_C_INNER_GATE",
-      "to": "EOH_NW_BASTION",
       "kind": "strategic_link",
       "cost": 2,
-      "travelMinutes": 14,
-      "notes": "Greenest -> Eye corridor"
-    },
-    {
-      "from": "EOH_SE_BASTION",
-      "to": "KV_NW_MUSTER",
-      "kind": "strategic_link",
-      "cost": 2,
+      "from": "TRJ_NW_OUTER_MUSTER",
+      "to": "GF_NW_MUSTER",
       "travelMinutes": 16,
-      "notes": "Eye -> Koom approach"
+      "notes": "The start road: home to Greenest Fields"
     },
     {
+      "kind": "strategic_link",
+      "cost": 2,
+      "from": "GF_SE_PLATEAU",
+      "to": "KV_NW_MUSTER",
+      "travelMinutes": 16,
+      "notes": "Greenest Fields' lower desert to Koom Valley"
+    },
+    {
+      "kind": "strategic_link",
+      "cost": 2,
       "from": "KV_SE_MUSTER",
       "to": "T_NW_RESERVE",
-      "kind": "strategic_link",
-      "cost": 2,
       "travelMinutes": 15,
-      "notes": "Koom south -> Tabula north"
+      "notes": "Koom Valley to Tabula"
     },
     {
+      "kind": "strategic_link",
+      "cost": 2,
       "from": "T_SE_RESERVE",
-      "to": "AB_NW_BASTION",
-      "kind": "strategic_link",
-      "cost": 2,
+      "to": "AB_NE_HEIGHTS",
       "travelMinutes": 18,
-      "notes": "Tabula -> Bastion"
+      "notes": "Tabula to the Bastion's north heights"
     },
     {
-      "from": "T_C_SPILLWAY",
-      "to": "TRJ_NW_MUSTER",
-      "kind": "strategic_link",
-      "cost": 3,
-      "travelMinutes": 22,
-      "notes": "Tabula east -> Rock Jungle"
-    },
-    {
-      "from": "AB_SE_RESERVE",
-      "to": "ATS_NW_SPILLWAY",
-      "kind": "strategic_link",
-      "cost": 3,
-      "travelMinutes": 24,
-      "notes": "Bastion -> All That Simmers"
-    },
-    {
-      "from": "TRJ_SE_MUSTER",
-      "to": "ATS_SW_PLATEAU",
-      "kind": "strategic_link",
-      "cost": 3,
-      "travelMinutes": 20,
-      "notes": "Jungle south -> Simmers"
-    },
-    {
-      "from": "GF_NW_MUSTER",
-      "to": "TRJ_NW_OUTER_MUSTER",
       "kind": "strategic_link",
       "cost": 2,
-      "travelMinutes": 16,
-      "notes": "Greenest north muster -> Rock Jungle home shelf"
+      "from": "AB_SE_HEIGHTS",
+      "to": "ATS_NW_SHORE",
+      "travelMinutes": 24,
+      "notes": "The Bastion's south heights to All That Simmers"
+    },
+    {
+      "kind": "strategic_link",
+      "cost": 2,
+      "from": "ATS_SW_MUSTER",
+      "to": "EOH_SE_BASTION",
+      "travelMinutes": 20,
+      "notes": "All That Simmers to the Eye"
+    },
+    {
+      "kind": "strategic_link",
+      "cost": 2,
+      "from": "EOH_NW_BASTION",
+      "to": "TRJ_SE_OUTER_MUSTER",
+      "travelMinutes": 20,
+      "notes": "The Eye back home"
+    },
+    {
+      "kind": "strategic_link",
+      "cost": 2,
+      "from": "T_W_CAUSEWAY",
+      "to": "TRJ_NE_RIM",
+      "travelMinutes": 22,
+      "notes": "The shortcut: Tabula's west causeway to home"
     }
   ],
   "notes": "Same-map edges from zone_adjacency.json; strategic_link edges authored for campaign arc."

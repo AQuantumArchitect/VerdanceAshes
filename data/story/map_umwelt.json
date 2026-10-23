@@ -214,7 +214,7 @@
       "note": "Home spillway heart — pad + energy soft.",
       "mapPressureDelta": { "pad": 0.25, "energy": 0.2, "fog": -0.1 }
     },
-    "AB_NW_BASTION": {
+    "AB_W_GATEHOUSES": {
       "mapId": "ancient_bastion",
       "note": "Siege face — max pad / offense.",
       "mapPressureDelta": { "pad": 0.2, "offense": 0.15, "mobility": -0.1 }

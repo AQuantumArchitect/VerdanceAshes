@@ -361,6 +361,19 @@ function Board:paint(proj, opts)
       if opts.labels then Ash.text("PAD", sx, sy + (gs + 2) * 0.9, gs - 2, Ash.COL.steam, "c") end
     end
   end
+  -- doors: the way to another map. ■ held (the road is open), □ not held.
+  for _, d in ipairs((self.mission and self.mission.doors) or {}) do
+    local z = self.byId[tostring(d.zoneId or "")]
+    if z then
+      local wx, wz = z.ax or z.cx, z.az or z.cz
+      local col = d.held and Ash.COL.warn or Ash.with(Ash.COL.warn, 0.7)
+      glyph(wx, wz, d.held and G.doorHeld or G.doorShut, col, gs)
+      if opts.labels then
+        local sx, sy = proj(wx, wz)
+        Ash.text("TO " .. string.upper(tostring(d.farMapName or "")), sx, sy + gs * 0.9, gs - 2, col, "c")
+      end
+    end
+  end
   -- the objective ◆ (good once complete)
   do
     local ox, oz = self:objectivePoint()

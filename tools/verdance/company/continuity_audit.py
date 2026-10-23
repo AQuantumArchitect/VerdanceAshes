@@ -139,7 +139,7 @@ def marked_zone_ids(
 
     # Sortie attention: where the player aimed / dropped.
     if isinstance(result, dict):
-        for key in ("targetZoneId", "deploymentZoneId", "infilZoneId"):
+        for key in ("targetZoneId", "deploymentZoneId"):
             add(result.get(key))
     if isinstance(mb, dict):
         add(mb.get("targetZoneId"))
@@ -149,7 +149,6 @@ def marked_zone_ids(
         # Hub seal often stamps chosen target here without a list.
         sortie = mb.get("sortie") if isinstance(mb.get("sortie"), dict) else {}
         add(sortie.get("targetZoneId"))
-        add(sortie.get("infilZoneId"))
 
     return out
 
@@ -620,7 +619,7 @@ def audit_zone_remap(mission: Dict[str, Any], marks: Sequence[str]) -> Tuple[Lis
     ignore_suffixes = ("_MUSTER", "_START", "_EXTRACT", "_RIM", "_SHELF")
     ignore_exact: Set[str] = set()
     mb = mission_base(mission)
-    for key in ("deploymentZoneId", "extractionZoneId", "infilZoneId"):
+    for key in ("deploymentZoneId", "extractionZoneId"):
         v = str(mb.get(key) or "")
         if v:
             ignore_exact.add(v)

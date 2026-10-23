@@ -120,7 +120,7 @@ from verdance.company import attachments as _att
 from verdance.world import (
     world_tick as _wt,
     offscreen_clash as _clash,
-    wet_reach as _wet,
+    roads as _roads,
     landing_zones as _lz_seed,
 )
 from verdance.belief import manifest as _mf, homecoming as _bh, intel_lua as _il
@@ -369,6 +369,9 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
         # map. The gadget lets a team enter only on the map edge inside one of its own zones, out
         # of the player's sight. Truth, not belief: this is the world deciding, not the company.
         "entryZones": entry_zones_for(state, map_id, workspace),
+        # The doors on this map, for the in-game board: where each leads and whether the
+        # company's ledger says it holds it.
+        "doors": [dict(zoneId=zid, **d) for zid, d in _roads.door_markers(state, workspace, map_id).items()],
         "offscreenPressureSummary": pressure,
         "roster": build_roster_intent(state),
         "commerce": build_commerce_intent(state, workspace),
@@ -449,21 +452,6 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
             or []
         ),
     }
-    # Mouth cards name their own doors. Carry them so the snap can see them
-    # and the result's extract zone is the heading, not a near shore.
-    infil_named = (sortie or {}).get("infilZoneId") or (sortie or {}).get("deploymentZoneId")
-    exfil_named = (sortie or {}).get("exfilZoneId") or (sortie or {}).get("extractionZoneId")
-    if (sortie or {}).get("wetReach") or (sortie or {}).get("headingZoneId"):
-        if infil_named:
-            intent["deploymentZoneId"] = infil_named
-            intent["infilZoneId"] = infil_named
-        if exfil_named:
-            intent["extractionZoneId"] = exfil_named
-            intent["exfilZoneId"] = exfil_named
-        intent["wetReach"] = True
-        intent["headingMapId"] = (sortie or {}).get("headingMapId")
-        intent["headingZoneId"] = (sortie or {}).get("headingZoneId")
-        intent["alongTheWay"] = list((sortie or {}).get("alongTheWay") or [])
     apply_sealed_company_to_packet(intent, state, workspace)
     # Authored content still names zones that a re-cut retired; translate the
     # whole intent forward in one place rather than trusting every source.
@@ -643,6 +631,7 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
     state["campaignClockMinutes"] = round(old_clock + elapsed, 4)
     measured_zones = update_measured_zone_memory(state, result, telemetry, workspace)
     dv_flips = apply_zone_dv(state, result, workspace)
+    door_changes = _roads.record_homecoming(state, result, workspace)
     graph_delta = apply_graph_deltas(state, result, elapsed)
     apply_reputation_companion(state, result, elapsed)
     try:
@@ -823,6 +812,13 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
     except Exception:
         clash_report = None
     bead = append_history_bead(state, result, elapsed, graph_delta)
+    if door_changes:
+        bead["doors"] = door_changes
+        tags = bead.setdefault("storyTags", [])
+        if any(d["held"] for d in door_changes):
+            tags.append("door-taken")
+        if any(not d["held"] for d in door_changes):
+            tags.append("door-lost")
     if dv_flips:
         bead["zonesChangedHands"] = list(dv_flips)
         if any(((state.get("zoneMemory") or {}).get(map_id, {}).get(z) or {}).get("controllingFaction") == "ashwalkers"
@@ -907,18 +903,6 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
             "occupationModel",
             result.get("occupationModel") or state.get("occupationModel") or "living_shell",
         )
-        # Holding the heading mouth opens the far map. A quit off that pad does not.
-        try:
-
-            headed = _wet.apply_heading(state, result, workspace)
-            if headed:
-                bead.setdefault("storyTags", []).append("wet-reach")
-                bead["wetReach"] = headed
-        except Exception as wet_exc:
-            try:
-                print(f"VA_WET_REACH_STAMP_FAIL {wet_exc}")
-            except Exception:
-                pass
     # Drop 3: the campaign answers the result — recruits sign on, act-2
     # victories mint earned specials, and a finale victory closes the book.
     completed_mission = int(result.get("missionNumber", state.get("missionNumber", 1)) or 1)

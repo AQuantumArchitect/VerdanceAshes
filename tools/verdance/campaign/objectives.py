@@ -15,7 +15,7 @@ from .schema import ALPHA_SPINE, CAMPAIGN_ID, MAP_DISPLAY, map_family, zone_maps
 from .zones import canonical_zone_id
 from .hydrology import update_hydrology_bloom
 from .measure import expected_presence_band
-from verdance.world import landing_zones as _lz, wet_reach as _wet
+from verdance.world import landing_zones as _lz, roads as _roads
 from verdance.world.zone_graph import load_map_adjacency as _wzg_load_map_adjacency
 
 def update_destroyed_objectives(state: Dict[str, Any], result: Dict[str, Any]) -> None:
@@ -126,7 +126,7 @@ def _objective_for_map_raw(map_id: str, state: Dict[str, Any]) -> Dict[str, Any]
         ]
         for oid, label in candidates:
             if oid not in destroyed:
-                return {"id": oid, "kind": "destroy_key_structure", "label": label, "targetZoneId": "AB_EASTERN_BASTION_WALL"}
+                return {"id": oid, "kind": "destroy_key_structure", "label": label, "targetZoneId": "AB_W_KEEP"}
     if mid == "the_rock_jungle":
         return {"id": "RJ_HIVE_CAUSEWAY", "kind": "hive_clear_or_bypass", "label": "Break a hive or hold a causeway", "targetZoneId": "RJ_CENTRAL_LAGOON_MAZE"}
     if mid == "all_that_simmers":
@@ -156,24 +156,16 @@ def choose_next_map_zone(state: Dict[str, Any],
     if requested:
         return (canonical_map_id(requested.get("mapId")),
                 canonical_zone_id(requested.get("deploymentZoneId", "unknown_zone"), workspace))
-    # Mission number is the act clock. Geography is the collapse, then the
-    # landing a heading extract already wrote. ALPHA_SPINE is not a map picker.
+    # Mission number is the act clock. Geography is the road lean: its map and its pad.
+    # ALPHA_SPINE is not a map picker.
     try:
-
-        arrival = _wet._arrival(state)
-        if arrival and arrival.get("mapId") and arrival.get("zoneId"):
-            return (
-                canonical_map_id(arrival.get("mapId")),
-                canonical_zone_id(arrival.get("zoneId"), workspace),
-            )
         if workspace is not None:
-            collapsed = _wet.collapse_sorties(state, Path(workspace))
-            cards = collapsed.get("cards") or []
-            if cards:
-                effect = cards[0].get("effect") or {}
+            cards = _roads.road_sorties(state, Path(workspace)).get("cards") or []
+            effect = (cards[0].get("effect") or {}) if cards else {}
+            if effect.get("preferredDeployZoneId"):
                 return (
                     canonical_map_id(effect.get("mapId")),
-                    canonical_zone_id(effect.get("infilZoneId") or "TRJ_NW_OUTER_MUSTER", workspace),
+                    canonical_zone_id(effect["preferredDeployZoneId"], workspace),
                 )
     except Exception:
         pass
@@ -259,13 +251,13 @@ def consequence_note(front: Dict[str, Any]) -> str:
 
 def enumerate_front_targets(state: Dict[str, Any], limit: int = 3,
                             workspace: Optional[Path] = None) -> List[Dict[str, Any]]:
-    """The collapsed doors, lean first. Mission number does not pick a map."""
+    """The road sorties, lean first. Mission number does not pick a map."""
     limit = max(1, min(int(limit or 3), 4))
     cards: List[Dict[str, Any]] = []
     try:
 
         root = workspace or WORKSPACE_ROOT
-        cards = list((_wet.collapse_sorties(state, root).get("cards")) or [])
+        cards = list((_roads.road_sorties(state, root).get("cards")) or [])
     except Exception:
         cards = []
     seen: List[str] = []
@@ -280,7 +272,7 @@ def enumerate_front_targets(state: Dict[str, Any], limit: int = 3,
         if card.get("recommended") and lean_map is None:
             lean_map = map_id
         front = summarize_front(state, map_id)
-        front["deploymentZoneId"] = effect.get("infilZoneId")
+        front["deploymentZoneId"] = effect.get("preferredDeployZoneId")
         front["objective"] = {
             "kind": effect.get("contractKind"),
             "label": card.get("label"),
@@ -433,7 +425,7 @@ def extraction_zone_for(map_id: str, deployment_zone: str,
     """
 
     legacy = {
-        "ancient_bastion": "AB_WESTERN_MUSTER_GROUNDS",
+        "ancient_bastion": "AB_NW_TOR",
         "the_rock_jungle": "RJ_NW_JUNGLE_SHELF",
         "all_that_simmers": "ATS_NW_CANOPY_START",
     }

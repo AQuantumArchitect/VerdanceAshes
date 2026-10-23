@@ -21,10 +21,11 @@ export function ensureTheaterPlan(choice) {
     && ((BOARDS[mapId] || {}).zones || []).some(z => z.zoneId === camp.nextPadZoneId));
   // The camp's own next pad (where the company actually is) outranks an authored pad.
   // Honor story/engine pads even when midfield — LZ legality is stamp-side.
-  if (preferredDeploy && !campPadHere) marks.deployZoneId = preferredDeploy;
+  // A road card stands on a door (the far door of a crossing, or the door you hold on this
+  // map): that pad is the point of the sortie, so neither the camp pad nor the snap moves it.
+  const padLocked = !!(effect.padLocked && preferredDeploy);
+  if (preferredDeploy && (padLocked || !campPadHere)) marks.deployZoneId = preferredDeploy;
   // ONE PAD: authored extraction/exfil pads are ignored. You leave from where you landed.
-  const mouthCard = !!(effect.wetReach && effect.infilZoneId && effect.exfilZoneId);
-  if (mouthCard && !campPadHere) marks.deployZoneId = effect.infilZoneId;
   marks.extractZoneId = marks.deployZoneId;
   const against = effect.against || (mapId === "eye_of_horus" ? "cortex" : mapId === "the_rock_jungle" ? "wild" : "armada");
   state.plan = {
@@ -44,14 +45,8 @@ export function ensureTheaterPlan(choice) {
     commerceDeploy: { tenebrium: commerce().tenebrium, kit: commerce().deployKit || [] },
     patron: "nullmercs",
     against,
-    wetReach: mouthCard,
-    infilZoneId: effect.infilZoneId || null,
-    exfilZoneId: effect.exfilZoneId || null,
-    headingMapId: effect.headingMapId || null,
-    headingZoneId: effect.headingZoneId || null,
-    alongTheWay: (effect.alongTheWay || []).slice(),
   };
-  if (!state.plan.wetReach) snapGroundRoute(mapId, marks);
+  if (!padLocked) snapGroundRoute(mapId, marks);
   state.markMode = state.markMode || "capture";
   state.focusMap = mapId;
   return state.plan;
@@ -359,7 +354,7 @@ function authoredPads(plan) {
   const ch = ((state.hub.node || {}).choices || []).find(c => c && c.id === (plan && plan.choiceId));
   const e = (ch && ch.effect) || {};
   // One pad: only authored landing pads count. Authored exfil fields are ignored.
-  return new Set([e.preferredDeployZoneId, e.deploymentZoneId, e.infilZoneId].filter(Boolean).map(String));
+  return new Set([e.preferredDeployZoneId, e.deploymentZoneId].filter(Boolean).map(String));
 }
 function canLaunchFrom(plan, z) {
   if (!z) return false;

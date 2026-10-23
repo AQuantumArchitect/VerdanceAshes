@@ -7,7 +7,7 @@ Lanes (see docs/UMWELT_IN_VERDANCE.md):
                the manifest and mission credit.
 - ``readings`` the narrative face: readings, occasions, narrative projection, chronicle,
                the story dance.
-- ``world``    the world under the campaign: zone graph, landing zones, wet reach, map umwelt,
+- ``world``    the world under the campaign: zone graph, landing zones, roads and doors, map umwelt,
                escalation ladder, the offscreen war, world tick, graph collapse, quantum state,
                map provisioning.
 - ``company``  the company: roster, attachments, hero observation, commerce delivery, capture

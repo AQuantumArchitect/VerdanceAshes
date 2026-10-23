@@ -494,92 +494,212 @@
     ]
   },
   "zones": {
-    "AB_WESTERN_MUSTER_GROUNDS": {
+    "AB_W_KEEP": {
+      "submergedAt": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "floodsAt": null,
+      "restingSubmerged": 0.0
+    },
+    "AB_W_GATEHOUSES": {
+      "submergedAt": [
+        0.0,
+        0.0,
+        0.0,
+        0.012,
+        0.058,
+        0.079,
+        0.104,
+        0.135,
+        0.186
+      ],
+      "floodsAt": null,
+      "restingSubmerged": 0.0
+    },
+    "AB_NW_RAMPART": {
+      "submergedAt": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "floodsAt": null,
+      "restingSubmerged": 0.0
+    },
+    "AB_SW_RAMPART": {
+      "submergedAt": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "floodsAt": null,
+      "restingSubmerged": 0.0
+    },
+    "AB_NW_TOR": {
+      "submergedAt": [
+        0.0,
+        0.0,
+        0.005,
+        0.015,
+        0.021,
+        0.035,
+        0.065,
+        0.128,
+        0.193
+      ],
+      "floodsAt": null,
+      "restingSubmerged": 0.0
+    },
+    "AB_SW_TOR": {
+      "submergedAt": [
+        0.0,
+        0.0,
+        0.005,
+        0.015,
+        0.026,
+        0.047,
+        0.079,
+        0.144,
+        0.208
+      ],
+      "floodsAt": null,
+      "restingSubmerged": 0.0
+    },
+    "AB_N_WALL": {
       "submergedAt": [
         0.0,
         0.0,
         0.004,
-        0.01,
-        0.014,
-        0.022,
-        0.034,
-        0.074,
-        0.112
-      ],
-      "floodsAt": null,
-      "restingSubmerged": 0.0
-    },
-    "AB_CITADEL_GATEFIELD": {
-      "submergedAt": [
-        0.0,
-        0.0,
-        0.0,
-        0.009,
-        0.037,
-        0.062,
-        0.095,
-        0.131,
-        0.159
-      ],
-      "floodsAt": null,
-      "restingSubmerged": 0.0
-    },
-    "AB_CENTRAL_KILLFIELD": {
-      "submergedAt": [
-        0.0,
-        0.097,
-        0.157,
-        0.194,
-        0.223,
-        0.243,
-        0.281,
-        0.303,
-        0.325
-      ],
-      "floodsAt": null,
-      "restingSubmerged": 0.0
-    },
-    "AB_EASTERN_BASTION_WALL": {
-      "submergedAt": [
-        0.0,
         0.017,
-        0.044,
-        0.069,
-        0.086,
-        0.097,
-        0.107,
-        0.11,
+        0.059,
+        0.09,
+        0.098,
+        0.103,
         0.115
       ],
       "floodsAt": null,
       "restingSubmerged": 0.0
     },
-    "AB_NORTHERN_FLANKING_LEDGE": {
+    "AB_C_WALL": {
       "submergedAt": [
         0.0,
-        0.004,
-        0.02,
-        0.036,
-        0.054,
-        0.068,
-        0.083,
-        0.093,
-        0.107
+        0.0,
+        0.0,
+        0.006,
+        0.025,
+        0.053,
+        0.095,
+        0.11,
+        0.121
       ],
       "floodsAt": null,
       "restingSubmerged": 0.0
     },
-    "AB_SOUTHERN_SERVICE_ROAD": {
+    "AB_S_WALL": {
       "submergedAt": [
         0.0,
-        0.008,
-        0.019,
-        0.036,
+        0.0,
+        0.004,
+        0.017,
         0.054,
-        0.075,
-        0.095,
+        0.086,
         0.113,
-        0.129
+        0.121,
+        0.132
+      ],
+      "floodsAt": null,
+      "restingSubmerged": 0.0
+    },
+    "AB_NE_CRATERS": {
+      "submergedAt": [
+        0.0,
+        0.096,
+        0.174,
+        0.244,
+        0.287,
+        0.323,
+        0.357,
+        0.377,
+        0.39
+      ],
+      "floodsAt": null,
+      "restingSubmerged": 0.0
+    },
+    "AB_SE_CRATERS": {
+      "submergedAt": [
+        0.0,
+        0.058,
+        0.121,
+        0.169,
+        0.203,
+        0.224,
+        0.252,
+        0.264,
+        0.289
+      ],
+      "floodsAt": null,
+      "restingSubmerged": 0.0
+    },
+    "AB_NE_HEIGHTS": {
+      "submergedAt": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "floodsAt": null,
+      "restingSubmerged": 0.0
+    },
+    "AB_SE_HEIGHTS": {
+      "submergedAt": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "floodsAt": null,
+      "restingSubmerged": 0.0
+    },
+    "AB_E_RIDGE": {
+      "submergedAt": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
       ],
       "floodsAt": null,
       "restingSubmerged": 0.0

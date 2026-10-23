@@ -66,7 +66,7 @@ The Python side is one package, `tools/verdance`, split by lane (the lanes are e
 | `tools/verdance/common.py` | the one `load_json` / `save_json` / `clamp` / `utc_now` / `canonical_map_id` |
 | `tools/verdance/belief/` | what the company **believes**: the Umwelt world, homecoming folds, faction perspectives, the camp clock, the hub's belief face, the intel the Drop carries, the manifest and mission credit |
 | `tools/verdance/readings/` | the narrative face: readings, occasions, narrative threads, the chronicle, the story dance |
-| `tools/verdance/world/` | the world under the campaign: zone graph, landing zones, wet reach, map umwelt, escalation ladder, the offscreen war, world tick, graph collapse, quantum state, map provisioning |
+| `tools/verdance/world/` | the world under the campaign: zone graph, landing zones, roads and doors, map umwelt, escalation ladder, the offscreen war, world tick, graph collapse, quantum state, map provisioning |
 | `tools/verdance/company/` | the company: roster and seats, attachments, hero observation, commerce delivery, capture claims, quest generation, continuity audit |
 | `tools/verdance/hub/` | the hub surfaces: hub state, zone boards, result application, the deploy stamp, the sortie contract |
 | `tools/verdance/campaign/` | the story engine, split by seam (`engine.py` = `process_result` / `materialize_next_intent` / CLI; schema, measure, commerce, roster, hydrology, objectives, sorties, intent, voice, acts, home, zones, progression, living_shell) |

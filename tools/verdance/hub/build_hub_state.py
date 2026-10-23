@@ -24,7 +24,7 @@ from verdance.campaign import (
     commander_is_unlocked,
     ensure_roster,
 )
-from verdance.world.wet_reach import collapse_sorties
+from verdance.world import roads as _roads
 from verdance.company.company import ensure_company, hub_company_surface
 from verdance.company import capture_node_claims as cnc
 from verdance.company.commerce_delivery import delivery_eta
@@ -458,6 +458,11 @@ def build_theater(state: dict, map_id: str, capture_contracts: list | None = Non
             belief = hub_belief.belief_surface(ROOT, state, map_id).get("zones") or {}
         except Exception:  # noqa: BLE001
             belief = {}
+    # Doors: where each leads and whether the company's ledger says it holds it.
+    try:
+        doors = _roads.door_markers(state, ROOT, map_id)
+    except Exception:  # noqa: BLE001
+        doors = {}
     for zid, z in zm.items():
         if not isinstance(z, dict):
             continue
@@ -498,6 +503,7 @@ def build_theater(state: dict, map_id: str, capture_contracts: list | None = Non
                 "claimed": claimed,
                 "preferred": zid in open_ids or bool(abstract.get("preferredObjective")),
                 "hazard": 0.0,
+                "door": doors.get(str(zid)),
             }
         )
     # Prefer open targets even if zoneMemory empty for that id
@@ -524,17 +530,15 @@ def build_theater(state: dict, map_id: str, capture_contracts: list | None = Non
     }
 
 
-def _wet_reach_choices(state: dict, deploy_aces: list) -> tuple[list[dict], str | None]:
-    """The collapsed three. Each card says where you are and where you are heading."""
+def _road_choices(state: dict, deploy_aces: list) -> tuple[list[dict], str | None]:
+    """The road sorties: a crossing from a held door, or a door to take. At most three."""
     try:
-        collapsed = collapse_sorties(state, ROOT)
+        sorties = _roads.road_sorties(state, ROOT)
     except Exception as exc:  # noqa: BLE001
-        print(f"VA_WET_REACH_HUB_FAIL {exc}")
+        print(f"VA_ROADS_HUB_FAIL {exc}")
         return [], None
     choices: list[dict] = []
-    for card in collapsed.get("cards") or []:
-        if not isinstance(card, dict):
-            continue
+    for card in sorties.get("cards") or []:
         effect = dict(card.get("effect") or {})
         effect["deployAces"] = list(deploy_aces)
         choices.append({
@@ -545,8 +549,7 @@ def _wet_reach_choices(state: dict, deploy_aces: list) -> tuple[list[dict], str 
             "recommended": bool(card.get("recommended")),
             "effect": effect,
         })
-    voice = str(collapsed.get("voice") or "") or None
-    return choices, voice
+    return choices, (str(sorties.get("voice") or "") or None)
 
 
 def build_open_node(state: dict, regions: list[dict], aces: list[dict], rep: dict) -> dict:
@@ -563,14 +566,6 @@ def build_open_node(state: dict, regions: list[dict], aces: list[dict], rep: dic
     home_ready = bool(flags.get("homeClearReady")) or tnb >= 3 or camp_level >= 1
     home_cleared = bool(flags.get("homeCleared"))
     fresh_opening = mission_n == 1 and not state.get("history") and not state.get("lastResult")
-
-    # Prefer a raid theater (economy / crater) when sitting on home wilds.
-    raid_map = "greenest_fields"
-    for r in regions:
-        if r["mapId"] != home and r.get("family") in ("economy", "tempo"):
-            raid_map = r["mapId"]
-            break
-    crater = next((r["mapId"] for r in regions if r["mapId"] == "eye_of_horus"), None)
 
     deploy_aces = [a["id"] for a in aces if a.get("deployable")][:2]
 
@@ -602,7 +597,7 @@ def build_open_node(state: dict, regions: list[dict], aces: list[dict], rep: dic
                 effect = dict(ch.get("effect") or {})
                 choices.append({**ch, "effect": effect})
         elif focus_spent:
-            # Empty primary; Journey A (home) + need_outflow (Eye / return) fill in.
+            # Empty primary; Journey A (home) fills in.
             choices = []
         elif focus == HOME_MAP_ID:
             clear_blurb = (
@@ -727,115 +722,12 @@ def build_open_node(state: dict, regions: list[dict], aces: list[dict], rep: dic
                 c["effect"] = effect
                 break
 
-    # Home camp raise lives on the left-bar camp overlay (not main journeys).
-
-    # Journey B — raid abroad for Tnb (skip if opening already seats that map).
-    already_raid_maps = {
-        str((c.get("effect") or {}).get("mapId") or "")
-        for c in choices
-        if c.get("kind") == "deploy"
-    }
-    spent = state.get("spentTheaters") if isinstance(state.get("spentTheaters"), dict) else {}
-    last_sortie = str(state.get("lastSortieMapId") or "")
-    # Outflow when sitting on / returning from a spent raid theater (esp. Greenest).
-    # World spine: GF → Eye → Koom → Tabula → Bastion/Jungle. Hub PLAY has no
-    # Mode B Reload host, so these doors are the real cross-map flow.
-    need_outflow = (
-        focus == "greenest_fields"
-        or last_sortie == "greenest_fields"
-        or "greenest_fields" in spent
-        or focus == HOME_MAP_ID
-        or home == HOME_MAP_ID
-    )
-    if need_outflow:
-        raid_name = next(
-            (r["displayName"] for r in regions if r["mapId"] == raid_map), raid_map
-        )
-        gf_spent = "greenest_fields" in spent or last_sortie == "greenest_fields"
-        # Never re-offer a spent raid theater as the Tnb door.
-        skip_raid = (
-            raid_map in already_raid_maps
-            or raid_map in spent
-            or (gf_spent and raid_map == "greenest_fields")
-        )
-        if not skip_raid:
-            choices.append(
-                {
-                    "id": f"c_raid_tnb_{raid_map}",
-                    "label": f"Raid {raid_name} for Tenebrium",
-                    "blurb": (
-                        "Jump the Fields on the way: crack Armada decoy farms for Tnb, "
-                        "optionally plant a presence, then haul loot home to fund the jungle camp."
-                    ),
-                    "kind": "deploy",
-                    "effect": {
-                        "mapId": raid_map,
-                        "contractKind": "eco_raid",
-                        "deployAces": deploy_aces,
-                        "sessionMode": "map_travel",
-                        "against": "armada",
-                        "journey": "tnb_raid",
-                    },
-                }
-            )
-        if crater and crater not in already_raid_maps:
-            choices.append(
-                {
-                    "id": "c_raid_crater",
-                    "label": (
-                        "Leave the Fields — strike the Horus crater"
-                        if (focus == "greenest_fields" or gf_spent)
-                        else "Strike the Horus crater"
-                    ),
-                    "blurb": (
-                        "Greenest is spent. Take the corridor into the glassed Eye — "
-                        "Cortex still smiles at customers until you glass their gear."
-                        if (focus == "greenest_fields" or gf_spent)
-                        else "Cortex still smiles at customers — until you glass their gear."
-                    ),
-                    "kind": "deploy",
-                    "effect": {
-                        "mapId": "eye_of_horus",
-                        "contractKind": "destroy_key_structure",
-                        "deployAces": deploy_aces,
-                        "sessionMode": "map_travel",
-                        "against": "cortex",
-                        "journey": "spine_outflow",
-                    },
-                }
-            )
-        # Explicit home return when focus/last sortie is a raid theater.
-        if focus != HOME_MAP_ID and HOME_MAP_ID not in already_raid_maps:
-            choices.append(
-                {
-                    "id": "c_return_home_shelf",
-                    "label": "Return to the Rock Jungle shelf",
-                    "blurb": (
-                        "Bank the Fields. Dig the Ashwalker camp back on limestone — "
-                        "raptors, eco, and a pad you own."
-                    ),
-                    "kind": "deploy",
-                    "effect": {
-                        "mapId": HOME_MAP_ID,
-                        "contractKind": "fortify_zone",
-                        "preferredCaptureZoneId": "TRJ_NW_GATE",
-                        "preferredDeployZoneId": "TRJ_NW_OUTER_MUSTER",
-                        "preferredExtractionZoneId": "TRJ_NW_OUTER_MUSTER",
-                        "deployAces": deploy_aces,
-                        "sessionMode": "map_travel",
-                        "against": "wild",
-                        "journey": "home_founding",
-                    },
-                }
-            )
-
-    # After the opener, the doors are the collapse. The hardcoded Jungle
-    # pockets, Greenest raid, and Horus strike are not the campaign.
-    wet_voice = None
+    # After the opener, the roads are the campaign: cross from a door you hold, or take one.
+    road_voice = None
     if not fresh_opening:
-        wet_choices, wet_voice = _wet_reach_choices(state, deploy_aces)
-        if wet_choices:
-            choices = wet_choices
+        road_choices, road_voice = _road_choices(state, deploy_aces)
+        if road_choices:
+            choices = road_choices
 
     # Act III is the finale and nothing else: the hub offers exactly the battle the kernel will
     # stage (its map, pad and target), so the board, the plan and the drop agree.
@@ -921,8 +813,8 @@ def build_open_node(state: dict, regions: list[dict], aces: list[dict], rep: dic
     if null_rep >= BAY_THRESHOLD and mission_n > 1:
         ketha_line += " They still say your name in the bay."
 
-    if wet_voice:
-        ketha_line = wet_voice
+    if road_voice:
+        ketha_line = road_voice
     if finale:
         ketha_line = f"This is the last fight. {(finale.get('objective') or {}).get('label') or finale.get('title')}."
     done = state.get("campaignComplete")

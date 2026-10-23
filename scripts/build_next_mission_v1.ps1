@@ -3329,6 +3329,8 @@ $scenario = [ordered]@{
     # faction -> zones it truly holds here. Reinforcements enter only on the map edge inside one
     # of their own zones, out of the player's sight (game_verdance_campaign.lua enemyEntry).
     entryZones = $(if ($intent.PSObject.Properties["entryZones"] -and $intent.entryZones) { $intent.entryZones } else { [ordered]@{} })
+    # The doors on this map (zoneId, farMapName, held): drawn on the in-game board.
+    doors = @($(if ($intent.PSObject.Properties["doors"] -and $intent.doors) { $intent.doors } else { @() }))
     battlefieldManifest = [ordered]@{
       schemaVersion = "verdance-battlefield-manifest/1.0"
       initializationEndsFrame = 90

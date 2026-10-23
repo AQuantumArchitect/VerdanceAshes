@@ -338,6 +338,10 @@ details.advanced summary { color:var(--steam); }
 .zone .z-surprise { color:var(--warn); font-weight:700; }
 .zone .z-surprise.muted { color:var(--muted); }
 .zone .z-eyes { color:var(--bad); }
+/* Doors: the way to another map. Filled square = held (the road is open); hollow = shut. */
+.zone .z-door { display:inline-block; margin-top:2px; font-size:var(--fs-xs); letter-spacing:.04em; text-transform:uppercase; padding:0 .3rem; border-radius:3px; border:1px dashed var(--warn); color:var(--warn); background:color-mix(in srgb, var(--bg) 75%, transparent); white-space:nowrap; }
+.zone.door-held .z-door { border-style:solid; }
+.zone.fog .z-door { opacity:.7; }
 .zone .z-foot { display:flex; gap:.3rem; font-size:var(--fs-xs); line-height:1; background:color-mix(in srgb, var(--panel) 75%, transparent); padding:1px 3px; border-radius:3px; }
 .zone .z-people.good { color:var(--good); }
 .zone .z-people.bad { color:var(--bad); }

@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 from verdance.common import canonical_map_id, load_json, utc_now
+from verdance.campaign.zones import canonical_zone_id
 
 CAMPAIGN_ID = "verdance_ashes"
 STATE_SCHEMA = "verdance-campaign-state/1.0"
@@ -37,7 +38,7 @@ ALPHA_SPINE = [
     ("eye_of_horus", "EOH_NW_CRATER_CAMP"),
     ("koom_valley", "KOOM_NW_GREEN_SHELF"),
     ("tabula", "TAB_NW_PLATEAU"),
-    ("ancient_bastion", "AB_WESTERN_MUSTER_GROUNDS"),
+    ("ancient_bastion", "AB_NW_TOR"),
     ("the_rock_jungle", "RJ_NW_JUNGLE_SHELF"),
     ("all_that_simmers", "ATS_NW_CANOPY_START"),
 ]
@@ -264,7 +265,7 @@ def default_v1_state() -> Dict[str, Any]:
             "grath": { "id": "grath", "name": "Grath Arrears", "faction": "nullmercs", "unitDef": "legkark", "xp": 2400, "player": False, "home": ["koom_valley", "KOOM_WEST_RIDGE_POCKET"], "status": "active", "wounds": 0, "scars": [] },
             "halq": { "id": "halq", "name": "Sisu Halq", "faction": "nullmercs", "unitDef": "legbal", "xp": 1350, "player": False, "home": ["the_rock_jungle", "RJ_WESTERN_CAUSEWAY"], "status": "active", "wounds": 0, "scars": [] },
             "brask": { "id": "brask", "name": "Line-Captain Odell Brask", "faction": "armada", "unitDef": "armcom", "xp": 1600, "player": False, "home": ["greenest_fields", "GF_SE_ENERGY_WORKS"], "status": "active", "wounds": 0, "scars": [] },
-            "solvang": { "id": "solvang", "name": "Warden-Marshal Teir Solvang", "faction": "armada", "unitDef": "armcom", "xp": 3100, "player": False, "home": ["ancient_bastion", "AB_EASTERN_BASTION_WALL"], "status": "active", "wounds": 0, "scars": [] },
+            "solvang": { "id": "solvang", "name": "Warden-Marshal Teir Solvang", "faction": "armada", "unitDef": "armcom", "xp": 3100, "player": False, "home": ["ancient_bastion", "AB_W_KEEP"], "status": "active", "wounds": 0, "scars": [] },
             "voren": { "id": "voren", "name": "Bastion-Keeper Ilsa Voren", "faction": "armada", "unitDef": "armcom", "xp": 2050, "player": False, "home": ["tabula", "TAB_SE_PLATEAU"], "status": "active", "wounds": 0, "scars": [] },
             "ixt": { "id": "ixt", "name": "Dealer-Prime Ixt", "faction": "cortex", "unitDef": "corcom", "xp": 2600, "player": False, "home": ["eye_of_horus", "EOH_SE_CORTEX_POCKET"], "status": "active", "wounds": 0, "scars": [] },
             "calder": { "id": "calder", "name": "Synthwright Calder Nyx", "faction": "cortex", "unitDef": "corcom", "xp": 1750, "player": False, "home": ["greenest_fields", "GF_SE_SYNTH_START"], "status": "active", "wounds": 0, "scars": [] }
@@ -326,6 +327,10 @@ def default_v1_state() -> Dict[str, Any]:
         },
         "processedResults": {},
         "zoneMemory": {},
+        # The company's door ledger (verdance.world.roads): it starts holding both
+        # doors of the start road, home's north-west muster and Greenest Fields'.
+        "doors": {zid: {"held": True, "since": 0, "by": "start"}
+                  for zid in ("TRJ_NW_OUTER_MUSTER", "GF_NW_MUSTER")},
         "offscreenActors": {},
         "destroyedObjectives": {},
         "persistentBaseSnapshots": {},
@@ -371,6 +376,7 @@ def migrate_state(raw: Dict[str, Any]) -> Dict[str, Any]:
     if raw.get("schemaVersion") == STATE_SCHEMA:
         state = copy.deepcopy(raw)
         state.pop("campaignQuantumState", None)  # the retired Lua kernel's copy of the world
+        state.pop("wetReach", None)  # the retired two-door sortie's ledger; doors replace it
     else:
         state = default_v1_state()
         state["campaignId"] = raw.get("campaignId", CAMPAIGN_ID)
@@ -438,6 +444,17 @@ def ensure_zone_memory(state: Dict[str, Any], workspace: Path) -> None:
     for map_id, zone_map in zone_maps.items():
         zones = zone_memory.setdefault(map_id, {})
         map_actors = actors.setdefault(map_id, {})
+        # A re-cut retires zone ids: what the campaign remembers about a retired
+        # zone passes to the zone that inherited its ground (first heir wins).
+        live = {z.get("zoneId") for z in zone_map.get("zones", []) or []}
+        for old_id in [k for k in zones if k not in live]:
+            heir = canonical_zone_id(old_id, workspace)
+            memory = zones.pop(old_id)
+            map_actors.pop(old_id, None)
+            if heir in live and heir not in zones and isinstance(memory, dict):
+                label = next((z.get("label") for z in zone_map["zones"] if z.get("zoneId") == heir), heir)
+                memory.update(zoneId=heir, label=label)
+                zones[heir] = memory
         merc_assigned = any(
             (z.get("controllingFaction") or z.get("abstract", {}).get("control")) == "nullmercs"
             for z in zones.values()
