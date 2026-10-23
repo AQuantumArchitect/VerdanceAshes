@@ -106,8 +106,10 @@ function pathHtml(s) {
   return ["A", "B", "C"].map(k => {
     const f = (s.finales || {})[k] || {};
     const lead = k === s.pathLeader;
+    const reads = ((s.pathReads || {})[k] || []).map(r => `${esc(r.question)} → ${esc(pretty(r.pole))}`).join(" · ");
     return `<div class="sg-path${lead ? " lead" : ""}"><b>${k}</b><span>${esc(f.title || k)}</span>` +
-      `<span class="sg-qbar"><i style="width:${(Number(p[k] || 0) / max * 100).toFixed(0)}%"></i></span><span>${Number(p[k] || 0).toFixed(2)}</span></div>`;
+      `<span class="sg-qbar"><i style="width:${(Number(p[k] || 0) / max * 100).toFixed(0)}%"></i></span><span>${Number(p[k] || 0).toFixed(2)}</span>` +
+      (reads ? `<small class="sg-reads">${reads}</small>` : "") + `</div>`;
   }).join("");
 }
 
@@ -125,5 +127,5 @@ export function renderStory() {
     (left > 0 ? `The finale comes in ${left} sortie${left === 1 ? "" : "s"}.` : `The finale is now.`) + `</p>` +
     graphSvg(s) +
     `<div class="sg-cols"><div><h3>The open questions</h3><p class="sg-note">The finale checkpoints need three of these answered. A full bar is answered.</p>${questionsHtml(s)}</div>` +
-    `<div><h3>Which finale</h3><p class="sg-note">The finale is picked by the path signal, which grows with each sortie's road.</p>${pathHtml(s)}</div></div>`;
+    `<div><h3>Which finale</h3><p class="sg-note">The finale is the story the company believes about itself: each path reads two of its questions. The strongest lean picks it.</p>${pathHtml(s)}</div></div>`;
 }

@@ -274,6 +274,11 @@ def fold_homecoming(state: Dict[str, Any], result: Dict[str, Any], bead: Dict[st
     out = workspace / "outbox" / "intel.latest.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(frame, indent=2, ensure_ascii=False), encoding="utf-8")
+    # The finale path is what the company believes about itself, not a tally of roads taken.
+    signals = W.path_signals(frame)
+    graph = state.setdefault("graph", {})
+    for k, v in signals.items():
+        graph["pathSignal" + k] = v
     try:
         P.divergence(state, workspace)
     except Exception:

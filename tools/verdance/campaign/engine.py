@@ -33,6 +33,7 @@ from .hydrology import advance_planet_hydrology, map_waterline
 from .measure import (
     apply_front_decay,
     apply_graph_deltas,
+    apply_zone_dv,
     apply_player_regression,
     bp_access,
     get_elapsed_minutes,
@@ -641,6 +642,7 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
     old_clock = float(state.get("campaignClockMinutes", 0.0) or 0.0)
     state["campaignClockMinutes"] = round(old_clock + elapsed, 4)
     measured_zones = update_measured_zone_memory(state, result, telemetry, workspace)
+    dv_flips = apply_zone_dv(state, result, workspace)
     graph_delta = apply_graph_deltas(state, result, elapsed)
     apply_reputation_companion(state, result, elapsed)
     try:
@@ -821,6 +823,11 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
     except Exception:
         clash_report = None
     bead = append_history_bead(state, result, elapsed, graph_delta)
+    if dv_flips:
+        bead["zonesChangedHands"] = list(dv_flips)
+        if any(((state.get("zoneMemory") or {}).get(map_id, {}).get(z) or {}).get("controllingFaction") == "ashwalkers"
+               for z in dv_flips):
+            bead.setdefault("storyTags", []).append("presence-established")
     if front_flips:
         bead.setdefault("storyTags", []).append("territory-lost")
     if regression_flips:

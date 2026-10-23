@@ -1482,10 +1482,20 @@ def _story_surface(state: dict, mission_n: int) -> dict:
         "questions": [{"pair": q["pair"], "question": q.get("question"), "c": q["c"], "status": q["status"],
                        "leaning": q.get("leaning")} for q in (face or {}).get("coherence") or []],
         "path": path, "pathLeader": finale_path_for_state(state),
+        "pathReads": _path_reads(),
         "finales": {k: {"kind": v["kind"], "title": v["title"]} for k, v in FINALE_PLANS.items()},
         "finaleAtMission": ACT2_END_MISSION + 1, "missionNumber": mission_n,
         "timeline": timeline,
     }
+
+
+def _path_reads() -> dict:
+    """What each finale path reads off the company's questions (verdance.belief.world.PATH_READS)."""
+    try:
+        from verdance.belief.world import PATH_READS, QUESTIONS
+    except Exception:  # noqa: BLE001
+        return {}
+    return {k: [{"question": QUESTIONS[q]["question"], "pole": pole} for q, pole in reads] for k, reads in PATH_READS.items()}
 
 
 def _reserve_surface(state: dict) -> dict:

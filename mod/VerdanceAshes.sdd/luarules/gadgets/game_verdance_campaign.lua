@@ -3341,9 +3341,9 @@ local function makeTeamBucket(teamID)
   }
 end
 
--- A fact for Python: defensive value (metal in armed structures and pad teeth) per zone per
--- faction, at the end of the sortie. Control and presence are read from it at home.
-function zoneDvJson()
+-- Defensive value (metal in armed structures and pad teeth) per zone per faction, right now.
+-- The live answer to "who holds this zone": reinforcements read it, and so does Python at home.
+function zoneDvTable()
   local byZone = {}
   for _, unitID in ipairs(Spring.GetAllUnits() or {}) do
     local teamID = Spring.GetUnitTeam(unitID)
@@ -3360,6 +3360,11 @@ function zoneDvJson()
       end
     end
   end
+  return byZone
+end
+
+function zoneDvJson()
+  local byZone = zoneDvTable()
   local parts = {}
   for zid, row in pairs(byZone) do
     local inner = {}
@@ -4285,6 +4290,12 @@ function enemyEntry(teamID, defs, towardX, towardZ)
   local blocs = (faction == "nullmercs") and { "nullmercs", "ashwalkers" } or { faction }
   for _, bloc in ipairs(blocs) do
     for _, zid in ipairs(entry[bloc] or {}) do owned[tostring(zid)] = true end
+  end
+  -- ... and the zones it holds right now: the most defensive value standing there is its.
+  for zid, row in pairs(zoneDvTable()) do
+    local best, leader = 0, nil
+    for f, v in pairs(row) do if v > best then best, leader = v, f end end
+    for _, bloc in ipairs(blocs) do if leader == bloc then owned[zid] = true end end
   end
   if next(owned) == nil then return nil, "no_owned_zone" end
   local sx, sz, inset, step = Game.mapSizeX or 1, Game.mapSizeZ or 1, 160, 128
@@ -5299,6 +5310,8 @@ function isShellTeethDef(ud, defID)
 end
 
 function claimLivingShellObjectives()
+  -- A presence job (fortify) is measured in defensive value; no enemy building is its target.
+  if VA_KINDS.fortify[objectiveKind()] then shellObjectivesClaimed = true; return 0 end
   if shellObjectivesClaimed then return 0 end
   local shell = mission and mission.livingShell
   if not shell or shell.enabled == false then

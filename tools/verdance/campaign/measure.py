@@ -25,6 +25,7 @@ from .schema import (
     map_family,
 )
 from .hydrology import hydrology_activity, hydrology_wind_pace
+from .zones import canonical_zone_id
 
 def get_elapsed_minutes(result: Dict[str, Any], telemetry: Optional[Dict[str, Any]], map_id: str) -> float:
     if result.get("elapsedMinutes") is not None:
@@ -280,6 +281,37 @@ def update_measured_zone_memory(state: Dict[str, Any], result: Dict[str, Any], t
         state["zoneMemory"][map_id][zone_id] = zone_mem
         measured_zone_ids.append(zone_id)
     return measured_zone_ids
+
+
+def apply_zone_dv(state: Dict[str, Any], result: Dict[str, Any], workspace: Optional[Path] = None) -> List[str]:
+    """Presence is defensive value. The gadget reports, per zone, the metal standing in each
+    faction's armed structures at the end (result.zoneDv); whoever has the most holds the zone.
+    Only zones it reports change hands: a zone with nothing standing is left as it was believed."""
+    dv = result.get("zoneDv")
+    if not isinstance(dv, dict) or not dv:
+        return []
+    map_id = canonical_map_id(result.get("deploymentMapId") or result.get("mapId") or "")
+    if not map_id:
+        return []
+    memory = state.setdefault("zoneMemory", {}).setdefault(map_id, {})
+    changed = []
+    for zone_id, row in dv.items():
+        if not isinstance(row, dict):
+            continue
+        vals = {str(f): float(v or 0) for f, v in row.items()}
+        leader, best = max(vals.items(), key=lambda kv: kv[1]) if vals else (None, 0.0)
+        if not leader or best <= 0:
+            continue
+        zid = str(canonical_zone_id(zone_id, workspace) or zone_id)
+        before = (memory.get(zid) or {}).get("controllingFaction")
+        zone_mem = memory.get(zid) or blank_zone_memory(map_id, zid, zid, leader)
+        if before != leader:
+            changed.append(zid)
+        zone_mem["controllingFaction"] = leader
+        zone_mem.setdefault("abstract", {})["control"] = leader
+        zone_mem["dv"] = {f: round(v) for f, v in vals.items()}
+        memory[zid] = zone_mem
+    return changed
 
 
 def actor_for_zone(state: Dict[str, Any], map_id: str, zone_id: str, zone_mem: Dict[str, Any]) -> str:

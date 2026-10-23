@@ -31,3 +31,15 @@ def test_lift_limit_holds_and_grows():
 def test_an_old_save_starts_its_reserve_from_the_cadre():
     roster = {"cadre": {"armsh": 3}}
     assert R.ensure_reserve(roster) == {"armsh": 3}
+
+
+def test_presence_is_defensive_value():
+    from verdance.campaign.measure import apply_zone_dv
+    state = {"zoneMemory": {"tabula": {"T_C_SPILLWAY": {"controllingFaction": "neutral", "abstract": {"control": "neutral"}}}}}
+    result = {"deploymentMapId": "tabula", "zoneDv": {"T_C_SPILLWAY": {"ashwalkers": 900, "armada": 300},
+                                                      "T_C_INNER_SPILLWAY": {"armada": 1200}}}
+    changed = apply_zone_dv(state, result)
+    zm = state["zoneMemory"]["tabula"]
+    assert zm["T_C_SPILLWAY"]["controllingFaction"] == "ashwalkers"
+    assert zm["T_C_INNER_SPILLWAY"]["controllingFaction"] == "armada"
+    assert set(changed) == {"T_C_SPILLWAY", "T_C_INNER_SPILLWAY"}

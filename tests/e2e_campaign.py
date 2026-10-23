@@ -105,6 +105,7 @@ def main() -> int:
     check("stamp + intent written", intent_path.is_file(), json.dumps(dep)[:300] if not intent_path.is_file() else "")
     intent = json.loads(intent_path.read_text(encoding="utf-8-sig")) if intent_path.is_file() else {}
     check("intent carries company intel (belief, not truth)", isinstance(intent.get("intel"), dict) and intent["intel"].get("perspective") == "company")
+    check("intent says where each faction may reinforce from (its own zones)", isinstance(intent.get("entryZones"), dict), str(intent.get("entryZones"))[:160])
     check("one pad: extraction == deployment", (intent.get("extractionZoneId") in (None, intent.get("deploymentZoneId"))), f"{intent.get('deploymentZoneId')} vs {intent.get('extractionZoneId')}")
     check("intent honours the chosen pad", str(intent.get("deploymentZoneId")) == str(pad), f"plan={pad} intent={intent.get('deploymentZoneId')}")
     if "--stop-after-intent" in sys.argv:

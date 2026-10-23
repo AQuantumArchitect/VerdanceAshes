@@ -50,6 +50,33 @@ QUESTIONS = {
 }
 
 
+# The finale paths, read off the company's own questions. Each path is the story the company has
+# come to believe about itself; its signal is how far the two questions lean its way (0..1).
+#   A overthrow   we fight as someone's blade, and Armada is falling
+#   B sovereignty the war and the paper are ours
+#   C spire jump  the camp is home, and we go back for our own
+PATH_READS = {
+    "A": (("whose_war", "auxiliary"), ("pressure", "armada_falling")),
+    "B": (("whose_war", "sovereign"), ("whose_paper", "sovereign")),
+    "C": (("home_or_hospital", "rooted"), ("go_back", "rooted")),
+}
+
+
+def path_signals(frame: Dict[str, Any]) -> Dict[str, float]:
+    """A/B/C from the belief frame's questions: the mean lean toward each path's two poles."""
+    by_id = {q.get("id"): q for q in frame.get("questions") or []}
+    out = {}
+    for path, reads in PATH_READS.items():
+        total = 0.0
+        for qid, pole in reads:
+            q = by_id.get(qid) or {}
+            z = float((q.get("bloch") or [0, 0, 0])[2])
+            toward = z if pole == q.get("pole_0") else -z  # pole_0 is +z
+            total += max(0.0, toward)
+        out[path] = round(total / len(reads), 4)
+    return out
+
+
 class UmweltUnavailable(RuntimeError):
     """Raised by build_spec / VerdanceWorld when the umwelt package cannot be imported.
 

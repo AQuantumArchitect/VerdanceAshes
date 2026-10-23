@@ -43,6 +43,8 @@ Spring = {
   TestMoveOrder = function() return true end,
 }
 function setPlayerAt(x, z) PLAYER_UNITS[1] = { x, z } end
+LIVE_DV = {}
+function zoneDvTable() return LIVE_DV end
 '''
 
 CHECKS = r'''
@@ -66,7 +68,17 @@ setPlayerAt(160, 2048)
 local px, pz = enemyEntry(1, defs, 3000, 3000)
 out.near = { x = px, z = pz, d = px and math.sqrt((px - 160) ^ 2 + (pz - 2048) ^ 2) }
 setPlayerAt(3000, 3000)
--- 5. Mercs (allied) enter on their own ground and may be seen doing it.
+-- 5. Live ownership alone is enough: the kernel sent nothing, but Armada's defences stand in ARM_W.
+mission.entryZones = {}
+LIVE_DV = { ARM_W = { armada = 1200 } }
+local lx, lz = enemyEntry(1, defs, 3000, 3000)
+out.live = { x = lx, z = lz, zone = lx and zoneForPosition(lx, lz).zoneId }
+-- 6. Out-built: the player has more defensive value in ARM_W now, so Armada cannot enter there.
+LIVE_DV = { ARM_W = { armada = 300, ashwalkers = 900 } }
+local ox, owhy = enemyEntry(1, defs, 3000, 3000)
+out.outbuilt = { x = ox, why = owhy }
+LIVE_DV = {}
+-- 7. Mercs (allied) enter on their own ground and may be seen doing it.
 mission.entryZones = { ashwalkers = { "HOME" } }
 SEEN = function() return true end
 local mx, mz = enemyEntry(2, defs, 3000, 3000)
@@ -106,6 +118,8 @@ check("a faction holding nothing sends no one", r["nothing"].get("x") is None an
 check("no entry anywhere the player can see", r["seen"].get("x") is None, r["seen"])
 n = r["near"]
 check("no entry within 2200 of the player", n.get("x") is None or n["d"] >= 2200, n)
+check("live defensive value alone opens a zone to its holder", r["live"].get("zone") == "ARM_W", r["live"])
+check("a zone the player out-builds is closed to the enemy", r["outbuilt"].get("x") is None, r["outbuilt"])
 check("allied Mercs enter on their own ground, seen or not", r["mercs"].get("zone") == "HOME", r["mercs"])
 print("ENEMY ENTRY " + ("PASSED" if ok else "FAILED"))
 sys.exit(0 if ok else 1)

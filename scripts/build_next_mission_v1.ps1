@@ -432,6 +432,7 @@ function New-MissionCard {
     "strike_relay" { "Destroy the key relay structure, then extract." }
     "destroy_key_structure" { "Destroy the marked key structure, then extract." }
     "farm_patrol" { "Farm sortie: clear the patrol camp for XP, then extract. Campaign clock barely moves." }
+    "fortify_zone" { "Nobody holds $TargetZone. Establish presence: build defences there until its defensive value reaches the goal, then extract." }
     default { "Complete the marked objective, then extract." }
   }
   if ($Intent.openingMission) {
@@ -1857,28 +1858,6 @@ function Try-ApplyLivingShell {
     $script:livingShellPayload = Merge-PlayerFootprintIntoShell -State $state -MapId $MapId `
       -ShellPayload $script:livingShellPayload
     $script:livingShellPayload.commanderPolicy = if ($commanderPolicy) { $commanderPolicy } else { "normal" }
-    $selectedPocket = @($script:livingShellPayload.pockets | Where-Object {
-      [string]$_.pocketId -eq [string]$script:livingShellPayload.primaryPocketId
-    }) | Select-Object -First 1
-    # Keep raid bookkeeping on the pocket that actually exists. Hub marks like
-    # GF_NE_PLATEAU may have no shell pad — remapping prevents empty eco_raid.
-    if ($selectedPocket -and $selectedPocket.zoneId) {
-      $pocketZone = [string]$selectedPocket.zoneId
-      if ($pocketZone -and $pocketZone -ne [string]$PrimaryZoneId) {
-        Write-Host ("Living shell: remapping objective zone {0} -> {1} (pocket {2})" -f `
-          $PrimaryZoneId, $pocketZone, $script:livingShellPayload.primaryPocketId)
-        $script:livingShellPayload.primaryZoneId = $pocketZone
-        $script:livingShellPayload.requestedZoneId = [string]$PrimaryZoneId
-        $script:shellRemappedZoneId = $pocketZone
-        if ($script:forces) {
-          foreach ($force in @($script:forces)) {
-            if ($force -and [string]$force.id -eq "living_shell_anchor") {
-              $force.zoneId = $pocketZone
-            }
-          }
-        }
-      }
-    }
     $script:livingShellPayload.spawnLimit = [int]$script:livingShellPayload.unitCount
     if ($script:livingShellPayload.spawnLimit -lt 1) { $script:livingShellPayload.spawnLimit = 51 }
     if ($intent.openingMission) {
@@ -1975,6 +1954,46 @@ if ($isFinale) {
   Write-Host ("Finale scale: kind={0} -> enemyScale={1}" -f $finaleKind, $enemyScale)
 }
 $maxHazard = if ($intent.offscreenPressureSummary -and $intent.offscreenPressureSummary.maxHazard) { [double]$intent.offscreenPressureSummary.maxHazard } else { 0.0 }
+# Aiming at ground where no enemy base stands is establishing presence there: build defensive
+# value in that zone (fortify_zone; the gadget measures DV). The target never moves. The enemy
+# still stands where its bases are, and anchors on the nearest of them, not on the empty zone.
+function Get-StandingPocketZones {
+  param([string]$MapId)
+  $path = Resolve-LivingShellTemplatePath -Ws $Workspace -MapId $MapId
+  if (-not $path) { return $null }  # no template: cannot judge, leave the job alone
+  $tpl = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json
+  $scarred = Get-ScarredZoneSet -State $state -MapId $MapId
+  $deadHv = Get-DestroyedHighValuePockets -State $state -MapId $MapId
+  $zones = @{}
+  foreach ($pk in @($tpl.pockets)) {
+    $zid = [string]$pk.zoneId
+    if ($zid -and -not $scarred.ContainsKey($zid) -and -not $deadHv.ContainsKey([string]$pk.pocketId)) { $zones[$zid] = $true }
+  }
+  return $zones
+}
+$script:presenceFrom = $null
+if (-not $isFinale -and $targetZoneId -and ($script:shellCapableKinds -contains $objectiveKind) -and $objectiveKind -ne "survive_wilds") {
+  $standing = Get-StandingPocketZones -MapId ([string]$intent.mapId)
+  if ($standing -and $standing.Count -gt 0 -and -not $standing.ContainsKey($targetZoneId)) {
+    $script:presenceFrom = $objectiveKind
+    $objectiveKind = "fortify_zone"
+    $tzLabel = if ($targetZone -and $targetZone.label) { [string]$targetZone.label } else { $targetZoneId }
+    if ($intent.objectiveTarget) {
+      $intent.objectiveTarget.kind = "fortify_zone"
+      $intent.objectiveTarget | Add-Member -NotePropertyName label -NotePropertyValue "Establish presence in $tzLabel" -Force
+    }
+    $best = $null; $bestD = [double]::MaxValue
+    foreach ($zid in @($standing.Keys)) {
+      $zc = Get-ZoneCenter (Get-ZoneById $zoneMap $zid) $null
+      if ($zc) {
+        $d = [Math]::Pow($zc[0] - $enemyCenter[0], 2) + [Math]::Pow($zc[1] - $enemyCenter[1], 2)
+        if ($d -lt $bestD) { $best = $zc; $bestD = $d }
+      }
+    }
+    if ($best) { $enemyCenter = $best }
+    Write-Host ("Presence: nothing stands in {0}; the job is to establish presence there (was {1})." -f $targetZoneId, $script:presenceFrom)
+  }
+}
 $presenceKind = $objectiveKind -in @("seize_lane", "gate_control", "hold_plateau")
 $fortifyKind = $objectiveKind -in @("fortify_zone", "home_founding")
 $mapFamily = if ($intent.environment -and $intent.environment.mapFamily) { [string]$intent.environment.mapFamily } else { "tempo" }
@@ -2602,59 +2621,12 @@ function New-RehydrateSpecs {
 # Hand-scattered mapOccupation camps are deprecated fallback when no template exists.
 # Prefer living-shell occupation for all shell-capable kinds (outbound 37/38/44).
 $usedShell = $false
-$script:shellRemappedZoneId = $null
-# Continuity: never aim sortie/story at a fusion vault the player already blew.
-$preDestroyedHv = Get-DestroyedHighValuePockets -State $state -MapId ([string]$intent.mapId)
-if ($preDestroyedHv.Count -gt 0 -and $targetZoneId) {
-  $deadZones = @{}
-  foreach ($pair in @(
-    @{ p = "gf_c_gate_fus"; z = "GF_C_GATE" },
-    @{ p = "gf_c_inner_fus"; z = "GF_C_INNER_GATE" }
-  )) {
-    if ($preDestroyedHv.ContainsKey([string]$pair.p)) { $deadZones[[string]$pair.z] = $true }
-  }
-  if ($state.PSObject.Properties["heldInstallations"] -and $state.heldInstallations) {
-    $mapHeld = $state.heldInstallations.([string]$intent.mapId)
-    if ($mapHeld) {
-      foreach ($pocketId in @($preDestroyedHv.Keys)) {
-        $rec = $mapHeld.$pocketId
-        if ($rec -and $rec.zoneId) { $deadZones[[string]$rec.zoneId] = $true }
-      }
-    }
-  }
-  if ($deadZones.ContainsKey($targetZoneId)) {
-    $alt = $null
-    foreach ($cand in @("GF_NW_BASTION", "GF_SE_PLATEAU", "GF_SW_BASTION", "GF_NE_PLATEAU")) {
-      if (-not $deadZones.ContainsKey($cand) -and $cand -ne $deployZoneId) { $alt = $cand; break }
-    }
-    if ($alt) {
-      Write-Host ("Continuity: retarget away from destroyed fusion zone {0} -> {1}" -f $targetZoneId, $alt)
-      $targetZoneId = $alt
-      $targetZone = Get-ZoneById $zoneMap $targetZoneId
-      $enemyCenter = Get-ZoneCenter $targetZone $enemyCenter
-      if ($intent.objectiveTarget) { $intent.objectiveTarget.targetZoneId = $alt }
-      if ($intent.PSObject.Properties["targetZoneId"]) { $intent.targetZoneId = $alt }
-      if ($intent.PSObject.Properties["storyIntent"] -and $intent.storyIntent) {
-        $intent.storyIntent.targetZoneId = $alt
-        if ($intent.storyIntent.objectiveTarget) {
-          $intent.storyIntent.objectiveTarget.targetZoneId = $alt
-        }
-      }
-      # Strip dead fusion pads from hub capture marks / secondaries.
-      if ($intent.PSObject.Properties["captureZoneIds"] -and $intent.captureZoneIds) {
-        $intent.captureZoneIds = @($intent.captureZoneIds | Where-Object { -not $deadZones.ContainsKey([string]$_) })
-      }
-      if ($intent.PSObject.Properties["secondaryCaptureZoneIds"] -and $intent.secondaryCaptureZoneIds) {
-        $intent.secondaryCaptureZoneIds = @($intent.secondaryCaptureZoneIds | Where-Object { -not $deadZones.ContainsKey([string]$_) })
-      }
-    }
-  }
-}
 $usedShell = $false
 if ($isWildHomeFounding) {
   # Founding shelf stays empty — player builds the Ashwalker pad; raptors are the only pressure.
   Write-Host "Skipping living-shell occupation on Rock Jungle wild home founding."
-} elseif ($script:shellCapableKinds -contains $objectiveKind) {
+} elseif (($script:shellCapableKinds -contains $objectiveKind) -or $script:presenceFrom) {
+  # The enemy's bases stand whatever the job is; a presence job still has the world around it.
   $anchorSide = $enemySide
   if ($objectiveKind -eq "eco_raid" -or $objectiveKind -eq "eco_expand") { $anchorSide = "Armada" }
   if ($objectiveKind -eq "survive_wilds") { $anchorSide = "Legion" }
@@ -2662,12 +2634,6 @@ if ($isWildHomeFounding) {
   if (([string]$intent.mapId) -eq "ancient_bastion") { $anchorSide = "Armada" }
   $usedShell = Try-ApplyLivingShell -Ws $Workspace -MapId ([string]$intent.mapId) `
     -PrimaryZoneId $targetZoneId -Description $description -EnemyCenter $enemyCenter -AnchorSide $anchorSide
-  if ($usedShell -and $script:shellRemappedZoneId) {
-    $targetZoneId = [string]$script:shellRemappedZoneId
-    if ($intent.objectiveTarget) {
-      $intent.objectiveTarget.targetZoneId = $targetZoneId
-    }
-  }
 }
 # DRY: company pads always rehydrate when we have a footprint bag — even if
 # the occupation shell path skipped (non-capable kind / missing template).

@@ -593,6 +593,7 @@ details.advanced summary { color:var(--steam); }
 .sg-q, .sg-path { display:grid; grid-template-columns:1fr 6rem 7.5rem; gap:.5rem; align-items:center; font-size:var(--fs-sm); padding:.15rem 0; }
 .sg-path { grid-template-columns:1.2rem 1fr 6rem 3rem; }
 .sg-path b { color:var(--muted); }
+.sg-path .sg-reads { grid-column:2 / -1; color:var(--muted); font-size:var(--fs-xs); margin-top:-.15rem; }
 .sg-path.lead b, .sg-path.lead span:nth-child(2) { color:var(--tnb); }
 .sg-qbar { height:.4rem; border-radius:3px; background:var(--shade-deep); overflow:hidden; }
 .sg-qbar i { display:block; height:100%; background:var(--gold); }
