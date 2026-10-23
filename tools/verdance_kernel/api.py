@@ -1215,29 +1215,6 @@ class CampaignKernel:
                 build_report = (
                     self.build_mission() if intent_report.get("ok") and mod_report.get("ok") is not False else {"ok": False, "skipped": True, "reason": "mod sync failed" if mod_report.get("ok") is False else "intent failed"}
                 )
-                # Consume armyBudget once the Drop is actually built — escorts already
-                # stamped into the kit from commerce intent preview.
-                army_budget_spent = None
-                if build_report.get("ok"):
-                    try:
-
-                        sp = state_path(self.ws)
-                        if sp.is_file():
-                            st = migrate_state(load_json(sp))
-                            commerce = ensure_commerce(st, self.ws)
-                            prev_army = int(commerce.get("armyBudget") or 0)
-                            if prev_army > 0:
-                                commerce["armyBudget"] = 0
-                                commerce.setdefault("ledger", []).append({
-                                    "op": "army_budget_drop_spend",
-                                    "spent": prev_army,
-                                    "remaining": 0,
-                                    "at": utc_now(),
-                                })
-                                save_json(sp, st)
-                                army_budget_spent = prev_army
-                    except Exception as e:  # noqa: BLE001
-                        army_budget_spent = {"error": str(e)}
                 launch_report: dict[str, Any] = {"skipped": True}
                 if launch and build_report.get("ok"):
                     # The build already installed the seed and wrote the startscript; the kernel starts the engine.
@@ -1271,7 +1248,6 @@ class CampaignKernel:
                     "intent": intent_report,
                     "build": build_report,
                     "launch": launch_report,
-                    "armyBudgetSpent": army_budget_spent,
                     "seedHint": {
                         "targetZoneId": intent_zones.get("targetZoneId")
                         or stamp_report.get("targetZoneId"),

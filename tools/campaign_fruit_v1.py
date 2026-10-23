@@ -388,8 +388,8 @@ def write_soft_doctrine(digest: Dict[str, Any], *, workspace: Path) -> Path:
     op = workspace / "outbox" / "bar_swarm_doctrine_soft.json"
     write_json(op, face)
     try:
-        HIVE_VITALS.mkdir(parents=True, exist_ok=True)
-        write_json(HIVE_VITALS / "bar_swarm_doctrine_soft.json", face)
+        if HIVE_VITALS.is_absolute() and HIVE_VITALS.is_dir():  # only the owner's synced hive, never a stray relative dir
+            write_json(HIVE_VITALS / "bar_swarm_doctrine_soft.json", face)
         # also a thin hive_rts-compatible nudge if missing posture elsewhere
     except OSError:
         pass

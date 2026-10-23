@@ -2,7 +2,7 @@
 """Advance campaign from BAR result and refresh hub_state for the CYOA shell (G4).
 
 Pipeline:
-  inbox/latest_va_result.json  (from extract_latest_result.ps1)
+  inbox/latest_va_result.json  (written by the kernel's sortie watcher)
     → story engine advance --write-state
     → build_hub_state_v1 with lastResult tokens
     → outbox/hub_result.latest.json  (delta the HTML hub can merge)
@@ -273,7 +273,7 @@ def apply(ws: Path, *, skip_advance: bool = False, result_path: Path | None = No
             return {
                 "ok": False,
                 "error": f"no result at {result_path}",
-                "hint": "Run extract_latest_result.ps1 after a BAR sortie",
+                "hint": "The kernel's sortie watcher writes it when a BAR sortie ends",
             }
         advance_info = run_advance(ws, result_path)
 

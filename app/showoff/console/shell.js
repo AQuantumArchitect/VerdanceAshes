@@ -26,7 +26,6 @@ export function renderBadges() {
     `<span class="badge">${esc(sessionLabel(h.sessionMode))}</span>`,
     `<span class="badge tnb">Tenebrium ${h.tenebrium ?? commerce().tenebrium ?? 0}</span>`,
     `<span class="badge gold" title="Campaign metal available between sorties">${(metalKOf(commerce()) * 1000).toLocaleString()} metal</span>`,
-    (Number(commerce().armyBudget || 0) > 0 ? `<span class="badge" title="Extracted mobile army — ships as escorts on the next Drop">Army bank ${Math.round(Number(commerce().armyBudget || 0))}</span>` : ""),
   ].join("");
   $("foot-left").textContent = live ? `Campaign connected · sortie ${h.missionNumber || 1}` : `Map only · start PLAY.bat and keep its window open`;
 }

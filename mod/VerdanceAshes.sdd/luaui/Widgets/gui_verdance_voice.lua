@@ -110,7 +110,7 @@ function widget:VerdanceBeat(kind, a, b, c, d)
   elseif kind == "crew_ready" or kind == "field_recruit" then
     if type(d) == "string" and d ~= "" then say("", d, 6) elseif type(c) == "string" and c ~= "" then say("", c, 6) end
   end
-  -- "marker" and "tech_locked" beats draw nothing: no pings.
+  -- "marker" beats draw nothing: no pings.
 end
 
 local function unitLabel(unitID)

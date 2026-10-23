@@ -983,29 +983,16 @@ class ActStructureTests(unittest.TestCase):
         self.assertEqual(engine.act_for_mission(11), 3)
         self.assertEqual(engine.act_for_mission(19), 3)
 
-    def test_tech_policy_shapes(self):
-        # Emergent play: every act is full fab; Tnb/BP is the only gate.
-        for act in (1, 2, 3):
-            pol = engine.tech_policy_for_act(act)
-            self.assertEqual(pol["buildTech"], 3)
-            self.assertTrue(pol["buildStructures"])
-            self.assertFalse(pol.get("gateEnabled", True))
-
     def test_act1_intent_carries_ground_control_policy(self):
         intent = engine.materialize_next_intent(self._state(2), None)
         self.assertEqual(intent["act"]["act"], 1)
-        self.assertEqual(intent["techPolicy"]["mode"], "ground_control")
-        self.assertEqual(intent["techPolicy"]["buildTech"], 3)
-        self.assertTrue(intent["techPolicy"]["buildStructures"])
+        self.assertNotIn("techPolicy", intent)  # no fabrication gate: Tnb and build power only
         self.assertIsNone(intent["finale"])
         self.assertIn("ground_control", intent["storyTags"])
 
     def test_act2_intent_constrained_rts(self):
         intent = engine.materialize_next_intent(self._state(7), None)
         self.assertEqual(intent["act"]["act"], 2)
-        self.assertEqual(intent["techPolicy"]["mode"], "constrained_rts")
-        self.assertEqual(intent["techPolicy"]["buildTech"], 3)
-        self.assertTrue(intent["techPolicy"]["buildStructures"])
         self.assertIsNone(intent["finale"])
 
     def test_finale_path_leader_beats_stale_letter(self):

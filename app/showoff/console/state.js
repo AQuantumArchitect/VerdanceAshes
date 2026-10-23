@@ -15,7 +15,6 @@ export const state = {
   markMode: "capture",
   plan: null,
   log: [],
-  rhoSel: { i: 0, j: 0 },
   lastResultAt: null,
   crewBand: [], // preamble companions; after seal = who drops (at-base = owned − this)
   crewYou: null, // preamble: the first pick, the hero the player is
@@ -96,7 +95,6 @@ export function jobLabel(kind) {
     gate_control: "Hold the gate",
     home_clear: "Clear the home wilds",
     fortify_zone: "Fortify and secure the zone",
-    secure_foothold: "Secure the foothold",
     home_founding: "Found the camp — dig in",
   })[kind] || String(kind || "Sortie").replace(/_/g, " ");
 }

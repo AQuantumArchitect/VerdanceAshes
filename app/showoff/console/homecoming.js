@@ -1,5 +1,6 @@
 // Homecoming: the debrief card (verdict words, chips, manifest), merging a result into the
 // hub, the result poll, bring-it-home and Abandon.
+import { renderStory } from "./story.js";
 import { state, zoneLabelAny, ensureFocusMapAvailable } from "./state.js";
 import { api } from "./api.js";
 import { $, esc, toast, logLine, heroNameAny } from "./render.js";
@@ -7,7 +8,7 @@ import { renderMapPicker } from "./board.js";
 import { refreshTheaterForFocus } from "./operations.js";
 import { renderCompany, renderShop, syncCrewFromHub, syncCompanyIntroGate } from "./company.js";
 import { renderBadges, renderHeadline } from "./shell.js";
-import { renderRegions, renderQuantum } from "./system.js";
+import { renderRegions } from "./system.js";
 
 /* Ash Console copy table — keep in sync with match_credit_v1 + va_ash_tokens */
 export const VERDICT_UI = {
@@ -96,16 +97,10 @@ export function mergeHubPatch(patch) {
   if (patch.aces) state.hub.aces = patch.aces;
   if (patch.missionNumber != null) {
     state.hub.missionNumber = patch.missionNumber;
-    const n = patch.missionNumber; // arc rebuild light
-    state.hub.arc = n <= 5 ? { id: 1, title: "First Scar", maxCaptureMarks: 1 }
-      : n <= 10 ? { id: 2, title: "Second Scar", maxCaptureMarks: 2 }
-      : { id: 3, title: "Third Scar", maxCaptureMarks: 3 };
   }
   if (patch.reputation) state.hub.reputation = patch.reputation;
-  if (patch.graph) state.hub.graph = patch.graph;
-  if (patch.graphPressure) state.hub.graphPressure = patch.graphPressure;
-  if (patch.collapse) state.hub.lastCollapse = patch.collapse;
-  if (patch.spectral) state.hub.spectral = patch.spectral;
+  if (patch.arc) state.hub.arc = patch.arc;
+  if (patch.storyState) state.hub.storyState = patch.storyState;
   if (patch.node) state.hub.node = patch.node;
   if (patch.lastResult) state.hub.lastResult = patch.lastResult;
   // Belief frame / camp / exposure / theater rows ride along with a homecoming.
@@ -169,7 +164,7 @@ export function mergeHubPatch(patch) {
   renderShop();
   renderHeadline();
   renderMapPicker();
-  renderQuantum();
+  renderStory();
 }
 
 export async function pullHubState() {
@@ -187,7 +182,7 @@ export async function pullHubState() {
   renderRegions();
   renderShop();
   renderHeadline();
-  renderQuantum();
+  renderStory();
   refreshTheaterForFocus();
   syncCompanyIntroGate(); // re-open the formation picker if a refresh left us unsealed without it
   logLine("Map refreshed from the living campaign");

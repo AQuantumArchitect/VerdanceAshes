@@ -14,7 +14,6 @@ from typing import Any, Dict, Optional
 # Act structure (story pacing only — NOT a build lock):
 #   Acts still label chapters / finales. Fabrication is unconstrained BAR;
 #   Tenebrium + concurrent BP ceiling is the only build-power gate.
-#   (Retired Drop-2 techPolicy scaffolding that blocked T2 / structures.)
 # ---------------------------------------------------------------------------
 
 ACT1_END_MISSION = 5
@@ -98,30 +97,6 @@ def act_profile_for_state(state: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
-def tech_policy_for_act(act: int) -> Dict[str, Any]:
-    """Fabrication policy for the mission seed (informational).
-
-    Emergent play: no Act tech gate. buildTech=3 / buildStructures=True always.
-    Live enforcement is Tenebrium only (allowCreate costOf + concurrent BP cap).
-    Act number still labels story chapter; it does not lock fabs.
-    """
-    a = int(act or 1)
-    if a <= 1:
-        mode = "ground_control"
-    elif a == 2:
-        mode = "constrained_rts"
-    else:
-        mode = "unbound"
-    return {
-        "act": max(1, a),
-        "mode": mode,
-        "buildTech": 3,
-        "buildStructures": True,
-        "gateEnabled": False,
-        "note": "Unconstrained fab. Constructors / BP still cost Tnb (ceil(bp/150)).",
-    }
-
-
 def finale_path_for_state(state: Dict[str, Any]) -> str:
     """The path whose signal leads decides which finale fires; the current
     pathSignal letter breaks ties (deterministic)."""
@@ -164,5 +139,4 @@ __all__ = [
     "act_profile_for_state",
     "finale_path_for_state",
     "finale_plan_for_state",
-    "tech_policy_for_act",
 ]

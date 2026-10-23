@@ -1,4 +1,5 @@
 // Boot order for the war-room hub. Everything else is a module with no top-level effects.
+import { renderStory } from "./story.js";
 import { installReserve } from "./reserve.js";
 import { state, H, commerce, prettyMap, availableMaps, ensureFocusMapAvailable, companySealed } from "./state.js";
 import { probeKernel } from "./api.js";
@@ -8,7 +9,7 @@ import { refreshTheaterForFocus, showDropConfirm, hideDropConfirm, onDropConfirm
 import { renderCompany, renderShop, sealCompany, toggleCrew, tryBuy, recommendCompany, showCompanyIntro, companyMemberIds, fieldPeople } from "./company.js";
 import { raiseCamp, openFoundingSortie, confirmHearthTalk, cancelHearthTalk, refreshCamp, renderCampCard } from "./home.js";
 import { showHomecoming, hideHomecoming, pullHubState, pullBarResult, abandonSortie, startResultPoll } from "./homecoming.js";
-import { installSystemDrawer, renderRegions, renderQuantum, showCoach, hideCoach } from "./system.js";
+import { installSystemDrawer, renderRegions, showCoach, hideCoach } from "./system.js";
 import { installLive } from "./live.js";
 import { installShell, renderBadges, renderHeadline, showWorkspace } from "./shell.js";
 
@@ -95,7 +96,7 @@ function boot() {
   renderRegions();
   renderShop();
   renderHeadline();
-  renderQuantum();
+  renderStory();
   refreshTheaterForFocus(); // paints the board and the company
   renderCompany();
   logLine(`The map answers · home ${prettyMap(H.sessionHomeMap || "the_rock_jungle")} · ops ${prettyMap(state.focusMap)} · ${availableMaps().length} maps · ${(commerce().shop || []).length} broker listings`);

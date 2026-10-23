@@ -25,7 +25,6 @@ from verdance.campaign import (
     ensure_roster,
 )
 from verdance.world.wet_reach import collapse_sorties
-from verdance.world.graph_collapse import pressure_brief
 from verdance.company.company import ensure_company, hub_company_surface
 from verdance.company import capture_node_claims as cnc
 from verdance.company.commerce_delivery import delivery_eta
@@ -922,12 +921,6 @@ def build_open_node(state: dict, regions: list[dict], aces: list[dict], rep: dic
     if null_rep >= BAY_THRESHOLD and mission_n > 1:
         ketha_line += " They still say your name in the bay."
 
-    # World graph G pressure (Drop will collapse these axes on homecoming).
-    try:
-
-        pressure = pressure_brief(state.get("graph") or {})
-    except Exception:
-        pressure = ""
     if wet_voice:
         ketha_line = wet_voice
     if finale:
@@ -957,62 +950,7 @@ def build_open_node(state: dict, regions: list[dict], aces: list[dict], rep: dic
         "regionHint": theater_hint,
         "sortieMapId": recommended_map or theater_hint,
         "sessionHomeMap": home or focus,
-        "graphPressure": pressure or None,
         "choices": choices,
-    }
-
-
-def project_campaign_rho(state: dict, mission_n: int) -> dict:
-    """Bridge campaign graph qubits → CampaignRho-style axes for the density room.
-
-    Signed poles match tools/quantum_bar_ai/campaign_manifold.CampaignRho.
-    """
-    g = state.get("graph") or {}
-    q0 = float(g.get("q0_armada_cortex") or 0.5)
-    q2 = float(g.get("q2_void_structure") or 0.15)
-    q6 = float(g.get("q6_contested") or 0.5)
-    q6i = float(g.get("q6_independent") or 0.24)
-    q7 = float(g.get("q7_resource_scarcity") or 0.5)
-    path_a = float(g.get("pathSignalA") or 0.33)
-    path_b = float(g.get("pathSignalB") or 0.34)
-    path_c = float(g.get("pathSignalC") or 0.33)
-    # Signed [-1, +1] from classical [0,1] qubits where applicable
-    arm_cor = max(-1.0, min(1.0, 2.0 * q0 - 1.0))
-    void_struct = max(-1.0, min(1.0, 2.0 * q2 - 1.0))
-    zone_control = max(-1.0, min(1.0, 2.0 * q6 - 1.0))
-    tenebrium = max(-1.0, min(1.0, 2.0 * q7 - 1.0))  # high scarcity → +pole scarce
-    # invert scarcity reading: high q7 = scarce = negative tenebrium wealth
-    tenebrium = -abs(tenebrium) if q7 >= 0.5 else (1.0 - q7) * 0.4
-    phi = max(0.0, min(1.0, (max(1, mission_n) - 1) / 14.0))
-    # Classical diag stand-in (2 bins per axis, as CampaignRho.packed_diag)
-    axes = {
-        "arm_cor": round(arm_cor, 4),
-        "schism": round(max(-1.0, min(1.0, 2.0 * q6i - 1.0)), 4),
-        "void_struct": round(void_struct, 4),
-        "zone_control": round(zone_control, 4),
-        "tenebrium": round(tenebrium, 4),
-        "phi": round(phi, 4),
-        "path_a": round(path_a, 4),
-        "path_b": round(path_b, 4),
-        "path_c": round(path_c, 4),
-    }
-    packed: list[float] = []
-    for key in ("arm_cor", "schism", "void_struct", "zone_control", "tenebrium"):
-        v = max(-1.0, min(1.0, float(axes[key])))
-        p1 = (v + 1.0) / 2.0
-        packed.extend([round(1.0 - p1, 4), round(p1, 4)])
-    purity = round(max(0.15, min(0.95, 1.0 - 0.35 * q6 - 0.15 * q2)), 4)
-    entropy = round(max(0.05, min(1.2, 0.4 + 0.5 * q6 + 0.2 * q2)), 4)
-    return {
-        "schemaVersion": "verdance-campaign-rho/1.0",
-        "source": "graph_qubits",
-        "axes": axes,
-        "packedDiag": packed,
-        "purity": purity,
-        "entropy": entropy,
-        "width": round(max(0.15, min(0.95, 0.2 + 0.55 * q6)), 4),
-        "sessionHomeMap": state.get("sessionHomeMap"),
-        "missionNumber": mission_n,
     }
 
 
@@ -1270,7 +1208,6 @@ def build_commerce_surface(state: dict, mission_n: int) -> dict:
         },
         "tenebrium": tenebrium,
         "metalK": metal_k,
-        "armyBudget": int(bag.get("armyBudget") or 0),
         "owned": owned,
         "upgrades": upgrades,
         "shop": shop,
@@ -1339,49 +1276,11 @@ def build_hub(state: dict, war: dict) -> dict:
     mission_n = int(state.get("missionNumber") or war.get("missionNumber") or 1)
     fresh_opening = mission_n == 1 and not state.get("history") and not state.get("lastResult")
     arc = arc_from_mission(mission_n)
-    graph = dict(state.get("graph") or {})
-    # Ensure canonical qubits for the density-matrix room (framework defaults).
-    graph.setdefault("q0_armada_cortex", 0.5)
-    graph.setdefault("q2_void_structure", 0.15)
-    graph.setdefault("q6_contested", 0.85)
-    graph.setdefault("q6_independent", 0.24)
-    graph.setdefault("q7_resource_scarcity", 0.98)
-    graph.setdefault("pathSignalA", 0.0)
-    graph.setdefault("pathSignalB", 0.1)
-    graph.setdefault("pathSignalC", 0.0)
-    try:
-
-        graph_pressure = pressure_brief(graph)
-    except Exception:
-        graph_pressure = (
-            f"contested={float(graph.get('q6_contested') or 0):.2f} · "
-            f"scarcity={float(graph.get('q7_resource_scarcity') or 0):.2f}"
-        )
-    spectral = state.get("lastSpectral") or {
-        "dominantEigenvalue": round(1.0 + float(graph.get("q6_contested") or 0) * 0.3, 4),
-        "energy": round(
-            sum(float(graph.get(k) or 0) for k in (
-                "q0_armada_cortex", "q2_void_structure", "q6_contested",
-                "q6_independent", "q7_resource_scarcity",
-            )),
-            3,
-        ),
-        "participation": round(0.55 + float(graph.get("q6_independent") or 0) * 0.3, 4),
-        "spread": round(float(graph.get("q6_contested") or 0.5) * 0.6, 4),
-        "factionWeights": {
-            "ashwalkers": 0.2,
-            "armada": 0.35,
-            "nullmercs": 0.2,
-            "neutral": 0.25,
-        },
-    }
-
     commerce = build_commerce_surface(state, mission_n)
     faction_banks = build_faction_banks(state, commerce)
     session_mode = state.get("sessionMode") or "same_map"
     occupation_model = state.get("occupationModel") or "living_shell"
     session_home = state.get("sessionHomeMap") or pick_focus_region(regions, state)
-    campaign_rho = project_campaign_rho(state, mission_n)
 
     company_surface: dict = {}
     try:
@@ -1484,10 +1383,6 @@ def build_hub(state: dict, war: dict) -> dict:
         "nodeClaims": state.get("nodeClaims") or state.get("claimedNodes") or {},
         "factionBanks": faction_banks,
         "tenebrium": commerce.get("tenebrium", 0),
-        "graph": graph,
-        "graphPressure": graph_pressure,
-        "spectral": spectral,
-        "campaignRho": campaign_rho,
         "reputation": rep,
         "companion": {
             "id": companion.get("id") or "ketha",
@@ -1511,6 +1406,7 @@ def build_hub(state: dict, war: dict) -> dict:
         "supportWeb": _support_web_surface(aces, company_surface, state),
         "company": company_surface,
         "reserve": _reserve_surface(state),
+        "storyState": _story_surface(state, mission_n),
         "regions": regions,
         "node": node,
         "lastResult": _with_manifest(_load_last_hub_result(), state),
@@ -1524,8 +1420,6 @@ def build_hub(state: dict, war: dict) -> dict:
             "shopSurface": True,
             "deployCompileLaunch": True,
             "resultPull": True,
-            "densityMatrix": True,
-            "campaignRho": True,
             "modeASameMap": session_mode == "same_map",
             "captureNodeClaims": True,
             "noFreeTnbMint": True,
@@ -1549,6 +1443,49 @@ def _with_manifest(payload, state):
     out = dict(payload or {})
     out["manifest"] = m
     return out
+
+
+def _story_surface(state: dict, mission_n: int) -> dict:
+    """The story state for the hub's graph: the checkpoint graph (data/story/attractors.json)
+    with how near the company stands to each checkpoint now, the six questions, the path
+    signals that pick the finale, and the path so far (one snapshot per sortie)."""
+    from verdance.campaign.acts import ACT2_END_MISSION, FINALE_PLANS, finale_path_for_state
+    from verdance.readings import readings as rd
+    doc = load_json(ROOT / "data" / "story" / "attractors.json") or {}
+    face_path = ROOT / "outbox" / "readings.latest.json"
+    face = None
+    try:
+        face = load_json(face_path) if face_path.is_file() else None
+        if face and (face.get("generatedFrom") or {}).get("campaignId") != state.get("campaignId"):
+            face = None
+        face = face or rd.project(json.loads(json.dumps(state)), ROOT)
+    except Exception:  # noqa: BLE001
+        face = {}
+    att = (face or {}).get("attractor") or {}
+    scored = {a["id"]: a for a in att.get("all") or []}
+    nodes = []
+    for a in doc.get("attractors") or []:
+        sc = scored.get(a["id"], {})
+        nodes.append({"id": a["id"], "title": a.get("title"), "gloss": a.get("gloss"),
+                      "terminal": bool(a.get("terminal")), "fidelity": sc.get("fidelity", 0.0),
+                      "inside": bool(sc.get("inside")), "unmet": sc.get("unmet") or [],
+                      "edges": [{"to": e.get("to"), "when": e.get("when")} for e in a.get("edges") or []]})
+    g = state.get("graph") or {}
+    path = {k: round(float(g.get("pathSignal" + k) or 0.0), 3) for k in ("A", "B", "C")}
+    timeline = [{"mission": b.get("missionNumber"), "mapId": b.get("mapId"), "verdict": b.get("verdict"),
+                 "attractor": (b.get("story") or {}).get("attractor"),
+                 "settled": sum(1 for q in ((b.get("story") or {}).get("questions") or {}).values() if q.get("status") == "settled")}
+                for b in state.get("history") or [] if isinstance(b, dict) and b.get("story")]
+    return {
+        "nodes": nodes, "current": att.get("current"), "inside": bool(att.get("inside")),
+        "settledPairs": att.get("settledPairs", 0),
+        "questions": [{"pair": q["pair"], "question": q.get("question"), "c": q["c"], "status": q["status"],
+                       "leaning": q.get("leaning")} for q in (face or {}).get("coherence") or []],
+        "path": path, "pathLeader": finale_path_for_state(state),
+        "finales": {k: {"kind": v["kind"], "title": v["title"]} for k, v in FINALE_PLANS.items()},
+        "finaleAtMission": ACT2_END_MISSION + 1, "missionNumber": mission_n,
+        "timeline": timeline,
+    }
 
 
 def _reserve_surface(state: dict) -> dict:

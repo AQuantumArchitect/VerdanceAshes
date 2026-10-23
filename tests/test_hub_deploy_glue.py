@@ -145,32 +145,3 @@ def test_consume_played_hub_sorties():
         shutil.rmtree(td, ignore_errors=True)
 
 
-def test_campaign_rho_projection():
-    from verdance.hub.build_hub_state import project_campaign_rho
-
-    state = {
-        "graph": {
-            "q0_armada_cortex": 0.7,
-            "q2_void_structure": 0.2,
-            "q6_contested": 0.8,
-            "q6_independent": 0.3,
-            "q7_resource_scarcity": 0.9,
-        },
-        "sessionHomeMap": "koom_valley",
-    }
-    rho = project_campaign_rho(state, 3)
-    assert rho["schemaVersion"] == "verdance-campaign-rho/1.0"
-    assert rho["axes"]["arm_cor"] > 0  # Armada lean
-    assert rho["axes"]["phi"] > 0
-    assert len(rho["packedDiag"]) >= 8
-    assert rho["sessionHomeMap"] == "koom_valley"
-
-
-if __name__ == "__main__":
-    test_normalize_plan_marks()
-    test_plan_to_sortie_secondary()
-    test_contract_v2_preserves_hub_fields()
-    test_stamp_writes_outbox()
-    test_consume_played_hub_sorties()
-    test_campaign_rho_projection()
-    print("ok")

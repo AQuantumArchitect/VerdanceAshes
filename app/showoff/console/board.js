@@ -2,11 +2,12 @@
 // LAW: the board paints what the COMPANY believes, never the truth. Every colour, glyph
 // and gate below reads from theater.zones[] (belief rows) or hub.belief.zones; nothing
 // reads an authoritative control string.
+import { renderStory } from "./story.js";
 import { state, session, BOARDS, clamp01, prettyMap, prettyMapShort, jobLabel, deployChoicesForMap, availableMaps, ensureFocusMapAvailable, companySurface } from "./state.js";
 import { $, esc, escape, pretty, field, toast, logLine } from "./render.js";
 import { refreshTheaterForFocus, updateDeployGate } from "./operations.js";
 import { renderCompany } from "./company.js";
-import { renderRegions, renderQuantum } from "./system.js";
+import { renderRegions } from "./system.js";
 import { renderHeadline } from "./shell.js";
 
 const RIM_THRESHOLD = 0.28;
@@ -536,7 +537,7 @@ export function focusMapAndRepaint(mapId, why) {
   state.focusMap = mapId;
   state.selectedZoneId = null;
   renderRegions();
-  renderQuantum();
+  renderStory();
   refreshTheaterForFocus(); // repaints the map picker, the board and the company
   renderHeadline();
   logLine(`${why} → ${prettyMap(mapId)}`);

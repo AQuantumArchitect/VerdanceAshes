@@ -1,4 +1,4 @@
-"""Commerce: the catalogue, army budget, purchases, deliveries, faction banks, and settling the shop after a sortie.
+"""Commerce: the catalogue, purchases, deliveries, faction banks, and settling the shop after a sortie.
 
 Split out of the single-file story engine in pass ten; the public names are re-exported by
 ``verdance.campaign`` so ``from verdance.campaign import <name>`` keeps working.
@@ -69,141 +69,6 @@ def _catalog_starting_tenebrium(catalog: Optional[Dict[str, Any]] = None) -> int
     return 0
 
 
-# Soft cap on extracted mobile army value carried into the next Drop (metal).
-ARMY_BUDGET_SOFT_CAP = 18000
-# Convert budget → deploy escorts (approx metal cost per chassis).
-ARMY_BUDGET_ESCORTS = (
-    ("legcen", 160, 20),   # Phobos swarm — cheap mobile mass
-    ("legkark", 520, 4),   # Karkinos — mid punch
-    ("legshot", 280, 6),   # Shotgun — close riot
-)
-
-
-def apply_army_budget_from_result(
-    state: Dict[str, Any],
-    result: Dict[str, Any],
-    *,
-    workspace: Optional[Path] = None,
-) -> Dict[str, Any]:
-    """Bank living mobile armyValue into commerce.armyBudget on extract/homecoming.
-
-    Structures stay on playerFootprints (map-local). This bag is the cross-map
-    "leave with a bigger army" carry — spent into deploy escorts on the next Drop.
-    """
-    commerce = ensure_commerce(state, workspace)
-    commerce.setdefault("armyBudget", 0)
-
-    def _army_from(obj: Any) -> float:
-        if not isinstance(obj, dict):
-            return 0.0
-        try:
-            return float((obj.get("metrics") or {}).get("armyValue") or obj.get("armyValue") or 0)
-        except (TypeError, ValueError):
-            return 0.0
-
-    army = _army_from(result)
-    # Prefer player team bucket from result / embedded telemetry.
-    candidates: List[Any] = []
-    for key in ("teams", "teamMetrics"):
-        raw = result.get(key)
-        if isinstance(raw, list):
-            candidates.extend(raw)
-        elif isinstance(raw, dict):
-            candidates.extend(raw.values())
-    tel = result.get("telemetry") if isinstance(result.get("telemetry"), dict) else {}
-    for key in ("teams", "teamMetrics"):
-        raw = tel.get(key)
-        if isinstance(raw, list):
-            candidates.extend(raw)
-        elif isinstance(raw, dict):
-            candidates.extend(raw.values())
-    player_tid = result.get("playerTeamId")
-    if player_tid is None:
-        player_tid = tel.get("playerTeamId")
-    for bucket in candidates:
-        if not isinstance(bucket, dict):
-            continue
-        tid = bucket.get("teamId")
-        fac = str(bucket.get("faction") or "").lower()
-        is_player = (
-            tid == player_tid
-            or tid in (0, "0")
-            or fac in ("ashwalkers", "player")
-        )
-        if is_player:
-            val = _army_from(bucket)
-            if val > 0:
-                army = val
-                break
-    if army <= 0:
-        return {"armyBudget": int(commerce.get("armyBudget") or 0), "gained": 0}
-    prev = int(commerce.get("armyBudget") or 0)
-    room = max(0, ARMY_BUDGET_SOFT_CAP - prev)
-    # Soft diminishing once past half the cap.
-    gained = int(round(army))
-    if prev >= ARMY_BUDGET_SOFT_CAP // 2:
-        gained = int(round(gained * 0.55))
-    gained = max(0, min(room, gained))
-    commerce["armyBudget"] = prev + gained
-    if gained:
-        commerce.setdefault("ledger", []).append({
-            "op": "army_budget_bank",
-            "gained": gained,
-            "armyValue": int(round(army)),
-            "armyBudget": commerce["armyBudget"],
-            "at": utc_now(),
-        })
-    return {
-        "armyBudget": int(commerce["armyBudget"]),
-        "gained": gained,
-        "armyValue": int(round(army)),
-    }
-
-
-def spend_army_budget_into_deploy(
-    commerce: Dict[str, Any],
-    deploy: List[Dict[str, Any]],
-) -> Dict[str, Any]:
-    """Convert armyBudget into t=0 combat escort packages; consume the bag."""
-    budget = int(commerce.get("armyBudget") or 0)
-    if budget <= 0:
-        return {"spent": 0, "units": 0, "remaining": 0}
-    spent = 0
-    units = 0
-    remaining = budget
-    for unit_def, cost, cap in ARMY_BUDGET_ESCORTS:
-        if remaining < cost or cap <= 0:
-            continue
-        count = min(cap, remaining // cost)
-        if count <= 0:
-            continue
-        deploy.append({
-            "listingId": f"army_bank_{unit_def}",
-            "kind": "package",
-            "unitDef": unit_def,
-            "count": int(count),
-            "healthFrac": 1.0,
-            "loan": False,
-            "packageTag": "army_budget",
-            "label": f"Exfil army · {unit_def}",
-        })
-        take = int(count * cost)
-        spent += take
-        units += int(count)
-        remaining -= take
-    # Leftover metal under cheapest chassis → field seed bump handled by caller.
-    commerce["armyBudget"] = int(remaining)
-    if spent:
-        commerce.setdefault("ledger", []).append({
-            "op": "army_budget_spend",
-            "spent": spent,
-            "units": units,
-            "remaining": int(remaining),
-            "at": utc_now(),
-        })
-    return {"spent": spent, "units": units, "remaining": int(remaining)}
-
-
 def default_commerce_state(catalog: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     cat = catalog or {}
     metal_meta = cat.get("metal") or {}
@@ -212,7 +77,6 @@ def default_commerce_state(catalog: Optional[Dict[str, Any]] = None) -> Dict[str
     return {
         "tenebrium": tnb0,
         "metalK": metal0,
-        "armyBudget": 0,
         "owned": {},
         "upgrades": {},
         "ledger": [],
@@ -303,7 +167,6 @@ def ensure_commerce(state: Dict[str, Any], workspace: Optional[Path] = None) -> 
     commerce.setdefault("upgrades", {})
     commerce.setdefault("ledger", [])
     commerce.setdefault("pendingDeliveries", [])
-    commerce.setdefault("armyBudget", 0)
     owned = commerce["owned"]
     listings = catalog.get("listings") or {}
 
@@ -767,37 +630,17 @@ def build_commerce_intent(state: Dict[str, Any], workspace: Optional[Path] = Non
     access = bp_access(state)
     # Keep bag queue aligned with what the compiler will seed.
     commerce["pendingDeliveries"] = copy.deepcopy(pending)
-    # Preview escorts from armyBudget without consuming — commit_deploy spends once.
-    army_budget = int(commerce.get("armyBudget") or 0)
-    army_preview: List[Dict[str, Any]] = []
-    if army_budget > 0:
-        preview_bag = {"armyBudget": army_budget, "ledger": []}
-        spend_army_budget_into_deploy(preview_bag, army_preview)
-        for row in army_preview:
-            deploy.append(copy.deepcopy(row))
     metal_meta = catalog.get("metal") or {}
     # Operating allotment only — campaign metalK stays home and export ADDs.
     field_start_k = int(metal_meta.get("fieldStartMetalK") or 1)
     if field_start_k < 0:
         field_start_k = 0
-    leftover_preview = max(0, army_budget - sum(
-        int(r.get("count") or 0) * next(
-            (c for d, c, _cap in ARMY_BUDGET_ESCORTS if d == r.get("unitDef")),
-            0,
-        )
-        for r in army_preview
-    ))
-    unit_metal = int(metal_meta.get("unitMetal") or METAL_UNIT or 1000)
-    if leftover_preview >= unit_metal:
-        field_start_k += leftover_preview // unit_metal
     field_start_e = int(metal_meta.get("fieldStartEnergy") or 3000)
     if field_start_e < 0:
         field_start_e = 0
     return {
         "tenebrium": int(commerce.get("tenebrium") or 0),
         "metalK": int(commerce.get("metalK") or 0),
-        "armyBudget": army_budget,
-        "armyBudgetUnits": sum(int(r.get("count") or 0) for r in army_preview),
         # Explicit: bag does not enter BAR; gadget reads these for field seed.
         "metalKBrought": 0,
         "fieldStartMetalK": field_start_k,
@@ -1131,13 +974,7 @@ def settle_commerce_after_sortie(
     })
     if len(commerce.get("ledger") or []) > 80:
         commerce["ledger"] = commerce["ledger"][-60:]
-    # Cross-map army carry: bank living mobile armyValue into armyBudget.
-    army_bank = apply_army_budget_from_result(state, result, workspace=workspace)
-    if army_bank.get("gained"):
-        notes.append(
-            f"+{army_bank['gained']} army bank (field armyValue={army_bank.get('armyValue', 0)}; "
-            f"bag={army_bank.get('armyBudget', 0)})"
-        )
+    # The army itself travels in the company reserve (verdance.company.reserve), not here.
 
     # Keep faction bank mirror for null/ash in sync with commerce bag.
     banks = ensure_faction_banks(state)
@@ -1146,8 +983,6 @@ def settle_commerce_after_sortie(
     return {
         "tenebrium": commerce["tenebrium"],
         "metalK": commerce["metalK"],
-        "armyBudget": int(commerce.get("armyBudget") or 0),
-        "armyBudgetGained": int(army_bank.get("gained") or 0),
         "gainedTenebrium": gained_t,
         "gainedMetalK": gained_k,
         "notes": notes,
@@ -1156,11 +991,8 @@ def settle_commerce_after_sortie(
 
 
 __all__ = [
-    "ARMY_BUDGET_ESCORTS",
-    "ARMY_BUDGET_SOFT_CAP",
     "METAL_UNIT",
     "_catalog_starting_tenebrium",
-    "apply_army_budget_from_result",
     "build_commerce_intent",
     "commerce_arc_number",
     "commerce_dest_map_id",
@@ -1172,5 +1004,4 @@ __all__ = [
     "load_commerce_catalog",
     "purchase_listing",
     "settle_commerce_after_sortie",
-    "spend_army_budget_into_deploy",
 ]

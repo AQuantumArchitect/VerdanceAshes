@@ -1,6 +1,6 @@
 // System drawer: READY TO DROP, the feedback bundle, campaign controls (save / load /
 // reset / refresh), the theaters list and the ρ diagnostics. Plus the how-to coach.
-import { state, BOARDS, prettyMap, availableMaps, deployChoicesForMap, companySealed } from "./state.js";
+import { state, availableMaps, deployChoicesForMap, companySealed } from "./state.js";
 import { api } from "./api.js";
 import { $, esc, pretty, toast, logLine } from "./render.js";
 import { beliefCountsForMap, focusMapAndRepaint } from "./board.js";
@@ -233,101 +233,3 @@ export function renderRegions() {
 
 /* ---- ρ diagnostics (war-map density matrix) --------------------------------------------- */
 // Heat from dark green to gold, as a mix of the tokens.
-const heatColor = (v) => `color-mix(in srgb, var(--gold) ${Math.round(Math.max(0, Math.min(1, v)) * 100)}%, var(--panel-raised))`;
-function buildRho(mapId) {
-  const zones = ((BOARDS[mapId] || {}).zones) || [];
-  if (!zones.length) return { labels: [], matrix: [], zones: [] };
-  const n = zones.length;
-  const centers = zones.map(z => {
-    const b = z.bounds || {};
-    return { x: ((b.xMin || 0) + (b.xMax || 1)) / 2, z: ((b.zMin || 0) + (b.zMax || 1)) / 2, zone: z };
-  });
-  const matrix = Array.from({ length: n }, () => Array(n).fill(0));
-  const g = state.hub.graph || {};
-  const contest = Math.min(1.5, Number(g.q6_contested) || 0.85);
-  const voidS = Number(g.q2_void_structure) || 0.15;
-  for (let i = 0; i < n; i++) {
-    const ctrl = (zones[i].control || zones[i].defaultControl || "neutral");
-    matrix[i][i] = Math.min(1, 0.35 + 0.4 * contest * (ctrl === "contested" || ctrl === "armada" ? 1 : 0.6));
-    for (let j = i + 1; j < n; j++) {
-      const dx = centers[i].x - centers[j].x, dz = centers[i].z - centers[j].z;
-      const dist = Math.sqrt(dx * dx + dz * dz) || 0.01;
-      let coh = Math.exp(-dist * (2.2 + voidS * 2)) * contest * 0.85;
-      if (zones[i].capturable && zones[j].capturable) coh *= 1.15;
-      coh = Math.min(0.95, coh);
-      matrix[i][j] = coh;
-      matrix[j][i] = coh;
-    }
-  }
-  let mx = 0.001;
-  for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) mx = Math.max(mx, matrix[i][j]);
-  for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) matrix[i][j] = matrix[i][j] / mx;
-  return { labels: zones.map(z => (z.label || z.zoneId || "?").slice(0, 10)), matrix, zones, centers };
-}
-export function renderQuantum() {
-  const mapId = state.focusMap || state.hub.sessionHomeMap || (state.hub.node && state.hub.node.regionHint) || ((state.hub.regions || [])[0] && (state.hub.regions || [])[0].mapId);
-  const g = state.hub.graph || {};
-  const rhoCamp = state.hub.campaignRho || {};
-  const axes = rhoCamp.axes || {};
-  const keys = [
-    ["Armada↔Cortex", g.q0_armada_cortex], ["Void scars", g.q2_void_structure], ["Contested", g.q6_contested],
-    ["Independents", g.q6_independent], ["Scarcity", g.q7_resource_scarcity],
-  ];
-  if (axes.arm_cor != null) keys.push(["Faction pull", axes.arm_cor], ["Path tilt", axes.phi], ["Tenebrium pressure", axes.tenebrium]);
-  $("graph-scalars").innerHTML = keys.map(([k, v]) => `<span class="scalar-pill">${k} <b>${Number(v || 0).toFixed(2)}</b></span>`).join("");
-  const sp = state.hub.spectral || {};
-  const energy = Number(sp.energy || keys.reduce((s, [, v]) => s + Math.abs(Number(v || 0)), 0));
-  $("spec-bar").innerHTML = `<i style="width:${Math.min(100, Math.round((energy / 6) * 100))}%"></i>`;
-  const pur = rhoCamp.purity != null ? Number(rhoCamp.purity).toFixed(2) : "—";
-  const ent = rhoCamp.entropy != null ? Number(rhoCamp.entropy).toFixed(2) : "—";
-  $("spec-meta").textContent = `Theater: ${prettyMap(mapId)} · war energy ${energy.toFixed(2)} · focus ${pur} · chaos ${ent}`;
-  const adv = $("rho-advanced");
-  if (adv) {
-    adv.textContent =
-      `q0=${Number(g.q0_armada_cortex || 0).toFixed(3)} q2=${Number(g.q2_void_structure || 0).toFixed(3)} ` +
-      `q6c=${Number(g.q6_contested || 0).toFixed(3)} q7=${Number(g.q7_resource_scarcity || 0).toFixed(3)} ` +
-      `λ=${Number(sp.dominantEigenvalue || 0).toFixed(3)} path=${state.hub.pathSignal || "B"}`;
-  }
-  const rho = buildRho(mapId);
-  const n = rho.matrix.length;
-  if (!n) {
-    $("rho-table").innerHTML = "<tr><td class='empty'>No zone board — run build_zone_boards_v1.py</td></tr>";
-    $("ent-svg").innerHTML = "";
-    $("rho-inspect").textContent = "";
-    return;
-  }
-  state.rhoSel.i = Math.min(state.rhoSel.i, n - 1);
-  state.rhoSel.j = Math.min(state.rhoSel.j, n - 1);
-  let body = "<tr><th></th>" + rho.labels.map(l => `<th title="${esc(l)}">${esc(l.slice(0, 4))}</th>`).join("") + "</tr>";
-  for (let i = 0; i < n; i++) {
-    body += `<tr><th title="${esc(rho.labels[i])}">${esc(rho.labels[i].slice(0, 4))}</th>`;
-    for (let j = 0; j < n; j++) {
-      const v = rho.matrix[i][j];
-      const sel = (state.rhoSel.i === i && state.rhoSel.j === j) ? " sel" : "";
-      body += `<td class="${sel}" data-i="${i}" data-j="${j}" style="background:${heatColor(v)}" title="${v.toFixed(3)}"></td>`;
-    }
-    body += "</tr>";
-  }
-  $("rho-table").innerHTML = body;
-  $("rho-table").querySelectorAll("td[data-i]").forEach(td => {
-    td.onclick = () => { state.rhoSel = { i: +td.dataset.i, j: +td.dataset.j }; renderQuantum(); };
-  });
-  const si = state.rhoSel.i, sj = state.rhoSel.j;
-  $("rho-inspect").textContent = `Link ${rho.matrix[si][sj].toFixed(2)} · ${rho.labels[si]} ↔ ${rho.labels[sj]}`;
-  // Entanglement SVG — edges for strong off-diagonals
-  const W = 280, Hh = 140, pad = 18;
-  const pts = (rho.centers || []).map((c, idx) => ({ x: pad + c.x * (W - 2 * pad), y: pad + c.z * (Hh - 2 * pad), i: idx }));
-  let edges = "";
-  for (let i = 0; i < n; i++) {
-    for (let j = i + 1; j < n; j++) {
-      const v = rho.matrix[i][j];
-      if (v < 0.35) continue;
-      edges += `<line x1="${pts[i].x}" y1="${pts[i].y}" x2="${pts[j].x}" y2="${pts[j].y}" stroke-opacity="${(0.15 + v * 0.7).toFixed(3)}" stroke-width="${0.6 + v * 2.2}"/>`;
-    }
-  }
-  const nodes = pts.map((p, i) => {
-    const hot = i === si || i === sj;
-    return `<circle cx="${p.x}" cy="${p.y}" r="${hot ? 5.5 : 3.5}" fill="${hot ? "var(--gold)" : "var(--edge)"}" opacity="0.9"/>`;
-  }).join("");
-  $("ent-svg").innerHTML = edges + nodes;
-}

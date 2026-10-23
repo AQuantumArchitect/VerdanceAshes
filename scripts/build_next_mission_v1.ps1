@@ -123,7 +123,7 @@ function Get-ObjectiveDescription {
   $ok = if ($Intent.objectiveTarget -and $Intent.objectiveTarget.kind) {
     [string]$Intent.objectiveTarget.kind
   } else { [string]$Intent.objective }
-  if ($ok -in @("fortify_zone", "secure_foothold", "home_founding")) {
+  if ($ok -in @("fortify_zone", "home_founding")) {
     $zid = if ($Intent.objectiveTarget -and $Intent.objectiveTarget.targetZoneId) {
       [string]$Intent.objectiveTarget.targetZoneId
     } elseif ($Intent.targetZoneId) { [string]$Intent.targetZoneId } else { "the zone" }
@@ -421,7 +421,7 @@ function New-NextMissionCandidates {
 function New-MissionCard {
   # WO-031: plain-English mission card (not Ketha flavor dump).
   # Difficulty + XP lines stay explicit so tuning never hides behind fog.
-  param($Intent, $ArcProfile, [string]$MapTitle, [string]$Description, [string]$DeployZone, [string]$TargetZone, [string]$ExtractZone, [string]$DifficultyLine = "", [string]$XpLine = "", [string]$HeroLine = "")
+  param($Intent, $ArcProfile, [string]$MapTitle, [string]$Description, [string]$DeployZone, [string]$TargetZone, [string]$DifficultyLine = "", [string]$XpLine = "", [string]$HeroLine = "")
   $kind = if ($Intent.objectiveTarget -and $Intent.objectiveTarget.kind) { [string]$Intent.objectiveTarget.kind } else { [string]$Intent.objective }
   $objLine = switch ($kind) {
     "seize_lane" { "Clear the living-shell pocket (~60% eco+teeth), hold under regrow pressure to claim the node, then extract. Claim does not mint free Tnb." }
@@ -464,10 +464,9 @@ function New-MissionCard {
   }
   if ($XpLine) { $tools = "$tools  |  $XpLine" }
   if ($HeroLine) { $tools = "$tools  |  $HeroLine" }
-  $mins = if ($kind -eq "eco_raid" -or [int]($Intent.missionNumber) -le 3) { 7 } else { 10 }
-  $timerLine = "Soft clock about $mins minutes -- when it hits zero the sortie ends. Objective first, then extract."
+  $timerLine = "No clock. Get who and what you want onto the pad, then press EXTRACT. What is off the pad stays."
   return [ordered]@{
-    situation = "Map: $MapTitle. Deploy $DeployZone. Target $TargetZone. Extract $ExtractZone."
+    situation = "Map: $MapTitle. Land on $DeployZone. Target $TargetZone. Leave from the same pad."
     objective = $objLine
     howToWin = $tools
     howItEnds = $timerLine
@@ -1177,11 +1176,6 @@ $actName = if ($intent.PSObject.Properties["act"] -and $intent.act -and $intent.
            elseif ($actNum -eq 1) { "ground_control" } elseif ($actNum -eq 2) { "constrained_rts" } else { "unbound_finale" }
 $isFinale = [bool]($intent.PSObject.Properties["finale"] -and $intent.finale)
 $finaleKind = if ($isFinale -and $intent.finale.kind) { [string]$intent.finale.kind } else { "" }
-# Unconstrained fab for all acts — Tnb/BP is the only build-power gate.
-$techPolicy = if ($intent.PSObject.Properties["techPolicy"] -and $intent.techPolicy) { $intent.techPolicy }
-              elseif ($actNum -eq 1) { [ordered]@{ act = 1; mode = "ground_control"; buildTech = 3; buildStructures = $true; gateEnabled = $false } }
-              elseif ($actNum -eq 2) { [ordered]@{ act = 2; mode = "constrained_rts"; buildTech = 3; buildStructures = $true; gateEnabled = $false } }
-              else { [ordered]@{ act = 3; mode = "unbound"; buildTech = 3; buildStructures = $true; gateEnabled = $false } }
 if ($actNum -ge 3) {
   $arcProfile.id = "unbound_finale"
   $arcProfile.playerEco = $true
@@ -1206,8 +1200,7 @@ if ($actNum -ge 3) {
   # com_solar_farm flavor still overrides this below, as before.
   $arcProfile.enemyMode = "warband"
 }
-Write-Host ("Act structure: act={0} ({1}) finale={2} buildTech={3} buildStructures={4}" -f `
-  $actNum, $actName, $finaleKind, $techPolicy.buildTech, $techPolicy.buildStructures)
+Write-Host ("Act structure: act={0} ({1}) finale={2}" -f $actNum, $actName, $finaleKind)
 # WO-037: sandbox flavor from intent or explicit greenest com-soup contracts.
 if ($intent.PSObject.Properties["flavor"] -and $intent.flavor) {
   $arcProfile.flavor = [string]$intent.flavor
@@ -2068,7 +2061,7 @@ if ($isFinale) {
 }
 $maxHazard = if ($intent.offscreenPressureSummary -and $intent.offscreenPressureSummary.maxHazard) { [double]$intent.offscreenPressureSummary.maxHazard } else { 0.0 }
 $presenceKind = $objectiveKind -in @("seize_lane", "gate_control", "hold_plateau")
-$fortifyKind = $objectiveKind -in @("fortify_zone", "secure_foothold", "home_founding")
+$fortifyKind = $objectiveKind -in @("fortify_zone", "home_founding")
 $mapFamily = if ($intent.environment -and $intent.environment.mapFamily) { [string]$intent.environment.mapFamily } else { "tempo" }
 # Rock Jungle founding / dig-in: empty deep wilds (raptors only). No Armada/Cortex camps,
 # no living-shell scrap occupation, no Null Merc foothold on the shelf.
@@ -2238,9 +2231,8 @@ if ($isFarmSortie) { $difficultyLine = "$difficultyLine | FARM SORTIE (bonus XP,
 $extractZone = Get-ZoneById $zoneMap ([string]$intent.extractionZoneId)
 $deployLabel = if ($deployZone -and $deployZone.label) { [string]$deployZone.label } else { [string]$intent.deploymentZoneId }
 $targetLabel = if ($targetZone -and $targetZone.label) { [string]$targetZone.label } else { [string]$targetZoneId }
-$extractLabel = if ($extractZone -and $extractZone.label) { [string]$extractZone.label } else { [string]$intent.extractionZoneId }
 $missionCard = New-MissionCard $intent $arcProfile $map.title $description `
-  $deployLabel $targetLabel $extractLabel `
+  $deployLabel $targetLabel `
   -DifficultyLine $difficultyLine -XpLine $xpLine -HeroLine $heroLine
 # G4: stamp hub C&C language onto the in-BAR briefing card
 if ($intent.hubChoiceId -or $intent.captureZoneIds -or $intent.deployAces) {
@@ -3452,7 +3444,6 @@ $scenario = [ordered]@{
     arcProfile = $arcProfile
     act = $(if ($intent.PSObject.Properties["act"] -and $intent.act) { $intent.act }
             else { [ordered]@{ act = $actNum; name = $actName } })
-    techPolicy = $techPolicy
     # The waterline this mission inherits from the planet's water cycle. The
     # gadget applies it at start and flood beats move it from there.
     hydrology = $(if ($intent.PSObject.Properties["hydrology"] -and $intent.hydrology) { $intent.hydrology }

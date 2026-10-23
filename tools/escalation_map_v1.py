@@ -220,15 +220,6 @@ def synth_victory(intent: Dict[str, Any]) -> Dict[str, Any]:
     return result
 
 
-def _tech_summary(policy: Dict[str, Any]) -> str:
-    if not policy:
-        return "?"
-    if not policy.get("buildStructures", True):
-        return "no-build"
-    max_tech = int(policy.get("buildTech", 3) or 3)
-    return "full" if max_tech >= 3 else ("T%d" % max_tech)
-
-
 def _objective_summary(intent: Dict[str, Any]) -> str:
     plan = intent.get("escalationPlan") or {}
     secs = list(plan.get("secondaries") or [])
@@ -279,7 +270,6 @@ def simulate(real_ws: Path, missions: int = 12) -> List[Dict[str, Any]]:
                 "enemyMode": arc["enemyMode"],
                 "waves": str(plan.get("wavesMode") or arc["escalation"]),
                 "commanders": arc["playerCommanders"],
-                "tech": _tech_summary(intent.get("techPolicy") or {}),
                 "enemyScale": scale["enemyScale"],
                 "rawScale": scale.get("preWindow"),
                 "band": scale["band"],

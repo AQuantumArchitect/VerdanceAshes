@@ -72,7 +72,9 @@ def main() -> int:
     hs = json.loads(hs_path.read_text(encoding="utf-8-sig")) if hs_path.is_file() else {}
     check("hub_state has belief/camp/exposure", all(key in hs for key in ("belief", "camp", "exposure")), str(sorted(hs.keys()))[:200])
     leak = json.dumps(hs)
-    check("hub_state carries no truth", "controllingFaction" not in leak and '"actually"' not in leak)
+    check("hub_state carries no truth", "controllingFaction" not in leak and '"actually"' not in leak
+          and not any(k in hs for k in ("graph", "campaignRho", "spectral", "graphPressure")), "true world graph on the hub")
+    check("hub shows the story state", bool((hs.get("storyState") or {}).get("nodes")))
     theater = hs.get("theater") or {}
     zones = theater.get("zones") or []
     map_id = theater.get("mapId") or state.get("sessionHomeMap")

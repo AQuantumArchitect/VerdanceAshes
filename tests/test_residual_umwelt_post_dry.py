@@ -62,9 +62,12 @@ def test_try_umwelt_post_dark_safe():
 
 def test_write_residual_embeds_umwelt_post():
     r = residual.build_residual(_fixture(), workspace=WS, ran_on="wargen", source="test")
-    result = residual.write_residual(r, WS, also_hive=True, umwelt_post=True)
+    import tempfile
+    tmp = Path(tempfile.mkdtemp(prefix="va_residual_"))  # never the real outbox or a machine path
+    (tmp / "outbox").mkdir()
+    result = residual.write_residual(r, tmp, also_hive=False, umwelt_post=True)
     assert result["written"]
-    op = residual.residual_write_paths(WS)["operator"]
+    op = residual.residual_write_paths(tmp)["operator"]
     disk = json.loads(op.read_text(encoding="utf-8"))
     assert "umweltPost" in disk
     assert "umweltd_dark" in disk["umweltPost"]

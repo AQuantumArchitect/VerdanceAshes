@@ -461,11 +461,6 @@ end
 
 GG.VA_ExfilCmd = exfilCmd
 
-function gadget:RecvLuaMsg(msg, playerID)
-  if type(msg) ~= "string" or msg:sub(1, 7) ~= "VA_CMD:" then return end
-  if exfilCmd(msg:sub(8)) then return true end
-end
-
 function gadget:Shutdown()
   GG.VA_ExfilCmd = nil
   GG.VA_Manifest = nil

@@ -245,15 +245,7 @@ local doctrine = {
   hotExtractOnly = false,
   playerComsAllowed = 0,
   sawPlayerCom = false,
-  -- Act tech gate RETIRED. Emergent play: Tnb/BP is the only fab gate.
-  -- Seed techPolicy is informational. Force only via va_force_tech_gate=1.
-  techGateEnabled = false,
-  techMaxLevel = 3,
-  techBuildStructures = true,
-  actNumber = 0,
-  actMode = "",
-  techDenials = 0,
-  techLastDenyFrame = -999,
+  actNumber = 0, -- story label only; Tnb and build power are the only fabrication gate
 }
 local printerUnits = {}  -- unitID -> { metal/frame, energy/frame, team }
 -- WO-043c: Tenebrium is a full in-mission resource (not engine metal).
@@ -4738,38 +4730,6 @@ function builderCanResurrect(builderID)
   return ud and ud.canResurrect == true
 end
 
--- Act tech gate (retired for play). Kept for va_force_tech_gate harness only.
--- Live games: always allows; Tnb allowCreate is the real fabrication gate.
--- Resurrection remains exempt if a harness re-arms the lock.
-function vaTechGateAllows(unitDefID, builderID, builderTeam)
-  if not doctrine.techGateEnabled then return true end
-  if builderTeam ~= playerTeamID or not builderID then return true end
-  if builderCanResurrect(builderID) and Spring.GetUnitWorkerTask then
-    local cmdID = Spring.GetUnitWorkerTask(builderID)
-    if cmdID == CMD.RESURRECT then return true end
-  end
-  local ud = UnitDefs[unitDefID]
-  if not ud then return true end
-  local tech = tonumber(ud.customParams and ud.customParams.techlevel) or 1
-  local denyTech = tech > doctrine.techMaxLevel
-  local denyStruct = (not doctrine.techBuildStructures) and ud.isBuilding == true
-  if not denyTech and not denyStruct then return true end
-  doctrine.techDenials = doctrine.techDenials + 1
-  local frame = Spring.GetGameFrame() or 0
-  if frame - doctrine.techLastDenyFrame > 300 then
-    doctrine.techLastDenyFrame = frame
-    SendToUnsynced("VERDANCE_BEAT", "tech_locked",
-      tostring(ud.name or "unit"),
-      denyStruct and "structures" or ("t" .. tostring(tech)),
-      doctrine.actNumber, tostring(doctrine.actMode))
-    Spring.Echo("VA_TECH_GATE_DENY def=" .. tostring(ud.name)
-      .. " tech=" .. tostring(tech) .. " cap=" .. tostring(doctrine.techMaxLevel)
-      .. " structures=" .. tostring(doctrine.techBuildStructures)
-      .. " denials=" .. tostring(doctrine.techDenials))
-  end
-  return false
-end
-
 -- Match a freshly created unit back to a downed hero (feature id, def+position).
 -- A hero can come back by rez while down, in rez grace, waiting for the wreck, or "lost" only
 -- because the wreck never linked (no_wreck): the corpse may still be lying there.
@@ -6083,45 +6043,13 @@ function gadget:Initialize()
   end
   doctrine.hotExtractOnly = (mission.escalation and mission.escalation.hotExtractOnly == true)
       or (tostring(arc.escalation or "") == "off")
-  -- Act labels for HUD/story. Fabrication gate stays OFF — Tnb allowCreate
-  -- is the only player build lock (costOf + concurrent BP ceiling).
+  -- Act label for the HUD and story (pacing only; nothing is gated on it).
   do
-    local tp = mission.techPolicy
     local actInfo = mission.act
-    doctrine.actNumber = tonumber((type(actInfo) == "table" and actInfo.act)
-      or (type(tp) == "table" and tp.act)) or 0
-    doctrine.actMode = tostring((type(tp) == "table" and tp.mode)
-      or (type(actInfo) == "table" and actInfo.name) or "")
-    doctrine.techMaxLevel = 3
-    doctrine.techBuildStructures = true
-    doctrine.techGateEnabled = false
-    -- Opt-in only for headless / harness (never from story seed).
-    local forceGate = tostring(modOptions.va_force_tech_gate or "")
-    if forceGate == "1" or forceGate == "true" then
-      if type(tp) == "table" then
-        doctrine.techMaxLevel = tonumber(tp.buildTech) or 1
-        doctrine.techBuildStructures = (tp.buildStructures ~= false)
-      else
-        doctrine.techMaxLevel = 1
-        doctrine.techBuildStructures = false
-      end
-      doctrine.techGateEnabled = true
-    end
+    doctrine.actNumber = tonumber(type(actInfo) == "table" and actInfo.act) or 0
     local actLabel = (type(actInfo) == "table" and actInfo.label) and tostring(actInfo.label) or ""
     Spring.SetGameRulesParam("va_act", doctrine.actNumber, { public = true })
     Spring.SetGameRulesParam("va_act_label", actLabel, { public = true })
-    Spring.SetGameRulesParam("va_tech_cap", tonumber(doctrine.techMaxLevel) or 3, { public = true })
-    Spring.SetGameRulesParam("va_tech_structures", doctrine.techBuildStructures and 1 or 0, { public = true })
-    Spring.SetGameRulesParam("va_tech_gate", doctrine.techGateEnabled and 1 or 0, { public = true })
-    if doctrine.techGateEnabled then
-      Spring.Echo("VA_TECH_GATE forced act=" .. tostring(doctrine.actNumber)
-        .. " mode=" .. doctrine.actMode
-        .. " maxTech=" .. tostring(doctrine.techMaxLevel)
-        .. " structures=" .. tostring(doctrine.techBuildStructures))
-    else
-      Spring.Echo("VA_TECH_GATE off (Tnb/BP only) act=" .. tostring(doctrine.actNumber)
-        .. " mode=" .. doctrine.actMode)
-    end
   end
   gaiaTeamID = Spring.GetGaiaTeamID()
   for _, tid in ipairs(Spring.GetTeamList()) do
@@ -6722,7 +6650,6 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 end
 
 function gadget:AllowUnitCreation(unitDefID, builderID, builderTeam, x, y, z, facing)
-  if not vaTechGateAllows(unitDefID, builderID, builderTeam) then return false end
   return tenebLoot.allowCreate(unitDefID, builderTeam, builderID)
 end
 

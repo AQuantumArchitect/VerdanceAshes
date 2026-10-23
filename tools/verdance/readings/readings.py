@@ -936,6 +936,21 @@ def project(state: Dict[str, Any], workspace: Path, previous_face: Optional[Dict
     }
 
 
+def snapshot(face: Dict[str, Any]) -> Dict[str, Any]:
+    """The story state in a few numbers: where the company stands among the checkpoints, the
+    reading weights (rho's diagonal) and the six questions. Stamped on each history bead."""
+    att = face.get("attractor") or {}
+    return {
+        "attractor": att.get("current"),
+        "inside": bool(att.get("inside")),
+        "fidelity": {a["id"]: a["fidelity"] for a in att.get("all") or []},
+        "readings": {r["id"]: r["weight"] for r in face.get("readings") or []},
+        "questions": {"|".join(q["pair"]): {"c": q["c"], "status": q["status"], "leaning": q["leaning"]}
+                      for q in face.get("coherence") or []},
+        "purity": (face.get("rho") or {}).get("purity"),
+    }
+
+
 # ----------------------------------------------------------------------------- readout
 
 def readout(face: Dict[str, Any]) -> str:

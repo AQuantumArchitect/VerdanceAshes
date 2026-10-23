@@ -27,7 +27,7 @@ from .schema import (
     zone_infrastructure_for,
 )
 from .zones import canonical_zone_id, canonicalize_zone_ids
-from .acts import act_for_mission, act_profile_for_state, finale_plan_for_state, tech_policy_for_act
+from .acts import act_for_mission, act_profile_for_state, finale_plan_for_state
 from .progression import apply_reputation_companion, ensure_progression
 from .hydrology import advance_planet_hydrology, map_waterline
 from .measure import (
@@ -322,7 +322,6 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
         "missionId": state.get("currentMissionId", mission_id(int(state.get("missionNumber", 1)))),
         "missionNumber": int(state.get("missionNumber", 1)),
         "act": act_info,
-        "techPolicy": tech_policy_for_act(act_info["act"]),
         "finale": finale_plan,
         "mapId": map_id,
         "deploymentZoneId": deploy_zone,
@@ -1069,6 +1068,9 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
                 except Exception:
                     _prev_face = None
             _face = _readings.project(json.loads(json.dumps(state)), _ws, _prev_face)
+            # The story state after this sortie rides on its bead, so the path can be replayed.
+            if state.get("history") and isinstance(state["history"][-1], dict):
+                state["history"][-1]["story"] = _readings.snapshot(_face)
             _prev_occ = None
             _occ_path = _out / "occasions.latest.json"
             if _occ_path.exists():

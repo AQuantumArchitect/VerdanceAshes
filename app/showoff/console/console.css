@@ -569,21 +569,37 @@ details.advanced summary { color:var(--steam); }
 #cc-feedback textarea { width:100%; background:var(--shade); color:var(--ink); border:1px solid color-mix(in srgb, var(--edge) 35%, transparent); border-radius:5px; font:inherit; font-size:var(--fs-sm); padding:.35rem .45rem; margin-bottom:.4rem; resize:vertical; }
 #cc-feedback button { padding:.45rem .7rem; }
 .sys-note { font-size:var(--fs-sm); color:var(--muted); margin:0 0 .45rem; line-height:1.35; }
-.scalar-row { display:flex; flex-wrap:wrap; gap:.3rem; margin:.35rem 0; }
-.scalar-pill { font-size:var(--fs-xs); padding:.2rem .4rem; border-radius:var(--r-sm); background:var(--shade); border:1px solid var(--line); color:var(--steam); }
-.scalar-pill b { color:var(--gold); font-weight:600; }
-.spec-bar { height:.45rem; border-radius:4px; background:var(--shade-deep); overflow:hidden; margin:.25rem 0 .5rem; }
-.spec-bar > i { display:block; height:100%; background:linear-gradient(90deg, var(--edge), var(--steam)); }
-.ent-svg { width:100%; height:9rem; background:var(--shade); border-radius:8px; margin:.4rem 0; }
-.ent-svg line { stroke:var(--steam); }
-.rho-wrap { overflow:auto; max-height:14rem; }
-.rho-table { border-collapse:collapse; font-size:var(--fs-xs); font-family:var(--mono); }
-.rho-table th, .rho-table td { width:1.35rem; height:1.35rem; text-align:center; border:1px solid var(--shade); cursor:pointer; padding:0; }
-.rho-table th { color:var(--muted); font-weight:500; background:var(--shade); max-width:2.2rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding:0 .1rem; }
-.rho-table td.sel { outline:1px solid var(--gold); }
-.rho-table td.empty { color:var(--muted); padding:.4rem; width:auto; height:auto; cursor:default; }
-.rho-inspect { font-size:var(--fs-sm); color:var(--steam); margin-top:.35rem; }
-.rho-advanced { margin-top:.35rem; font-family:var(--mono); font-size:var(--fs-xs); line-height:1.4; }
+/* story state (chronicle): the checkpoint graph, the questions, the path signals */
+.story-graph { margin:.6rem 0 1.2rem; }
+.story-graph h2 { color:var(--gold); font-weight:500; margin:.2rem 0 .3rem; }
+.sg-lede, .sg-note { color:var(--muted); font-size:var(--fs-sm); line-height:1.4; margin:0 0 .4rem; max-width:62rem; }
+.sg-lede b { color:var(--ink); font-weight:600; }
+.sg-svg { width:100%; max-width:56rem; height:auto; display:block; background:var(--shade); border:1px solid var(--line-soft); border-radius:10px; }
+.sg-svg marker path { fill:color-mix(in srgb, var(--muted) 60%, transparent); }
+.sg-edge { stroke:color-mix(in srgb, var(--muted) 35%, transparent); stroke-width:1; }
+.sg-trail { fill:none; stroke:var(--gold); stroke-width:2.5; stroke-opacity:.55; stroke-dasharray:5 4; }
+.sg-node circle { fill:color-mix(in srgb, var(--edge) calc(var(--f) * 85%), var(--panel-raised)); stroke:var(--line); stroke-width:1; }
+.sg-node.visited circle { stroke:color-mix(in srgb, var(--gold) 55%, transparent); }
+.sg-node.inside circle { stroke:var(--good); stroke-width:1.5; }
+.sg-node.here circle { stroke:var(--gold); stroke-width:3; filter:drop-shadow(0 0 6px color-mix(in srgb, var(--gold) 55%, transparent)); }
+.sg-node.finale circle { fill:color-mix(in srgb, var(--tnb) calc(var(--f) * 70%), var(--panel-raised)); stroke-dasharray:3 2; }
+.sg-node.finale.picked circle { stroke:var(--tnb); stroke-width:2.5; stroke-dasharray:none; }
+.sg-node text { text-anchor:middle; fill:var(--ink); font-size:11px; }
+.sg-node .sg-sub { fill:var(--muted); font-size:9.5px; }
+.sg-node.here .sg-sub { fill:var(--gold); }
+.sg-node.finale.picked .sg-sub { fill:var(--tnb); }
+.sg-node .sg-lock { font-size:10px; }
+.sg-cols { display:grid; grid-template-columns:repeat(auto-fit, minmax(20rem,1fr)); gap:.4rem 1.6rem; max-width:56rem; margin-top:.6rem; }
+.sg-q, .sg-path { display:grid; grid-template-columns:1fr 6rem 7.5rem; gap:.5rem; align-items:center; font-size:var(--fs-sm); padding:.15rem 0; }
+.sg-path { grid-template-columns:1.2rem 1fr 6rem 3rem; }
+.sg-path b { color:var(--muted); }
+.sg-path.lead b, .sg-path.lead span:nth-child(2) { color:var(--tnb); }
+.sg-qbar { height:.4rem; border-radius:3px; background:var(--shade-deep); overflow:hidden; }
+.sg-qbar i { display:block; height:100%; background:var(--gold); }
+.sg-path .sg-qbar i { background:var(--tnb); }
+.sg-qstat { color:var(--muted); font-size:var(--fs-xs); }
+.sg-q.settled .sg-qstat { color:var(--good); }
+.sg-q.torn .sg-qstat { color:var(--warn); }
 
 /* ───────────────────────────── overlays ───────────────────────────── */
 .status-toast {

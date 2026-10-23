@@ -456,7 +456,7 @@ local function drawMission(x, y, right)
       frac = S.zoneHold / need
       label = string.format("holding %ds / %ds", math.floor(S.zoneHold / 30), math.floor(need / 30))
       col = Ash.COL.steam
-    elseif S.fortifyNeedDef > 0 or M.kind == "fortify_zone" or M.kind == "secure_foothold" or M.kind == "home_founding" then
+    elseif S.fortifyNeedDef > 0 or M.kind == "fortify_zone" or M.kind == "home_founding" then
       local need = (S.fortifyNeedDef > 0) and S.fortifyNeedDef or 800
       frac = S.fortifyDef / need
       label = string.format("defence %d / %d", math.floor(S.fortifyDef), math.floor(need))
