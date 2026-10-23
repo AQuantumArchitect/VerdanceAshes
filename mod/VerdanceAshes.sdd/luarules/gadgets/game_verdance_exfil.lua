@@ -420,8 +420,9 @@ end
 
 -- the campaign gadget calls this when the company is wiped: same manifest, nobody on the pad
 function GG.VA_WipedManifest()
-  if not ready then return end
+  if not ready then return false end -- no pad loaded: the campaign gadget ends the sortie itself
   endWith("wiped", "none")
+  return true
 end
 
 function gadget:Initialize()

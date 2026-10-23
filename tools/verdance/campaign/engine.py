@@ -505,10 +505,6 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
         if raw_quantum_state:
             result["finalQuantumState"] = raw_quantum_state
             result["quantumTransitionJournal"] = raw_quantum_journal
-        # Preserve telemetry-adjacent extras from raw when normalize omitted them
-        for k in ("graph", "reputation", "zoneMap", "economy", "map", "primaryCompanion"):
-            if k in (result if False else {}) or k not in result:
-                pass
         credit = credit_from_result(result)
         result["resultKey"] = credit.get("resultKey") or result.get("resultKey")
         result["status"] = credit.get("verdict") or result.get("status")
@@ -695,17 +691,6 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
     result["_xpTier"] = xp_tier
     roster_success = success or (xp_tier == "partial")
     update_roster(state, result, roster_success, clean_extract)
-    # Scale hero XP for partial/loss after update_roster base apply
-    if xp_tier in ("partial", "loss"):
-        mult = 0.5 if xp_tier == "partial" else 0.25
-        for hero in (state.get("roster") or {}).get("heroes") or []:
-            if not isinstance(hero, dict):
-                continue
-            gain = float(hero.get("lastSortieXpGain") or 0)
-            if gain > 0 and xp_tier == "partial":
-                # update_roster already applied full-ish; leave partial as-is if already scaled
-                pass
-            _ = mult  # roster gains use success bool; partial already lower via status
     # Abstract regrow first: heal *prior* scars over campaign time, then stamp new scars.
     regrow_report = apply_abstract_regrow(state, map_id, elapsed)
     apply_shell_scars(state, result, map_id)

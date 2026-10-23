@@ -547,7 +547,9 @@ function Add-ReserveToKit {
     $def = [string]$p.Name
     $cnt = [int]$p.Value
     if ($cnt -gt 0 -and $def -notmatch '^(arm|cor|leg)com$') {
-      $Kit += (Spec $def $cnt (-130 - 70 * ($i % 3)) (-160 - 70 * [Math]::Floor($i / 3)) 90)
+      $r = Spec $def $cnt (-130 - 70 * ($i % 3)) (-160 - 70 * [Math]::Floor($i / 3)) 90
+      $r.reserve = $true  # the gadget lands reserve specs with the company
+      $Kit += $r
       $i++
     }
   }
@@ -1217,6 +1219,11 @@ if ($intent.difficulty -and $intent.difficulty.enemyAI) {
   $arcProfile.enemyAI = [string]$intent.difficulty.enemyAI
 } elseif ($intent.environment -and $intent.environment.hardMode) {
   $arcProfile.enemyAI = "barbarian"
+} elseif ($actNum -ge 2 -or ([string]$intent.mapId) -eq "tabula") {
+  # Tabula and everything after: a BARbarian opponent with its real commander, so the map has
+  # threat and motion as the company's army grows.
+  $arcProfile.enemyAI = "barbarian"
+  $arcProfile.sweepEnemyCommanders = $false
 }
 if ($arcProfile.flavor -eq "com_solar_farm") {
   $arcProfile.sweepEnemyCommanders = $false

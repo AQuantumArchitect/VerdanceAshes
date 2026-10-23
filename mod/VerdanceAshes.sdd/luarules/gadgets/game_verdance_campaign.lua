@@ -3051,8 +3051,9 @@ local function spawnPlayableSetup()
           -- Commerce deploy bag: spawned ONCE by VA_LOGISTICS.spawnCommerceDeployKit at
           -- GameStart from mission.commerce.deploy. Never from the layout force
           -- (see VA_CREW_isCommerceKitSpec for the rule).
-        elseif useCrewKit and isPlayer and not VA_CREW_isAnchorKeep(spec) then
-          -- Combat heroes + cadre come from the sealed hub packet (spawn below).
+        elseif useCrewKit and isPlayer and not spec.reserve and not VA_CREW_isAnchorKeep(spec) then
+          -- Heroes come from the sealed hub packet (spawn below). The reserve the player
+          -- chose (spec.reserve, Add-ReserveToKit) lands with the company.
         else
           forceSpawned = forceSpawned + spawnUnitSpec(spec, teamID, baseX, baseZ, groupX, groupZ, claimedMetalSpots, force)
         end
@@ -5914,7 +5915,7 @@ function checkPlayerWipe(frame)
   local count = Spring.GetTeamUnitCount(playerTeamID) or 0
   if count <= 0 then
     -- nobody left to confirm a manifest: the exfil gadget stamps an empty one and we end
-    if GG and GG.VA_WipedManifest then GG.VA_WipedManifest() else setTerminal("wiped", "player_wiped") end
+    if not (GG and GG.VA_WipedManifest and GG.VA_WipedManifest()) then setTerminal("wiped", "player_wiped") end
   end
 end
 
@@ -6071,8 +6072,9 @@ function gadget:Initialize()
   -- Living shells already place armdecom/cordecom/legdecom eco nodes. The
   -- engine still drops a free real commander for SimpleAI/BARb; leaving that
   -- com alive is what produces "decoy" deaths with commanderExplosion + 1250 m
-  -- wrecks. Sweep whenever a living shell is in the mission.
-  if not doctrine.sweepEnemy then
+  -- wrecks. Sweep whenever a living shell is in the mission, unless the arc keeps the enemy's
+  -- real commander (act II on: a commander is the threat that moves the map).
+  if not doctrine.sweepEnemy and arc.sweepEnemyCommanders ~= false then
     local shell = mission.livingShell
     if type(shell) == "table" and type(shell.units) == "table" and #shell.units > 0 then
       doctrine.sweepEnemy = true
@@ -6564,7 +6566,7 @@ function gadget:GameFrame(frame)
     if frame == 3 or frame == 8 or frame == 30 or frame == 90 then
       local removed = 0
       for _, tid in ipairs(Spring.GetTeamList() or {}) do
-        if tid ~= playerTeamID and tid ~= gaiaTeamID then
+        if tid ~= playerTeamID and tid ~= gaiaTeamID and not Spring.AreTeamsAllied(tid, playerTeamID) then
           local units = Spring.GetTeamUnits(tid) or {}
           for i = 1, #units do
             local uID = units[i]
@@ -7161,8 +7163,18 @@ tickPendingDeliveries = function(...) return VA_LOGISTICS.tickPendingDeliveries(
 spawnBruteCrashFromEdge = function(...) return VA_LOGISTICS.spawnBruteCrashFromEdge(...) end
 spawnCommerceDeployKit = function(...) return VA_LOGISTICS.spawnCommerceDeployKit(...) end
 
+-- Playtest commands change the sortie (grant, spawn, end, reset): cheats only, so a player's
+-- typo can never freeze or end a real drop.
+local VA_CHEAT_COMMANDS = { vatnb = true, vabrutecrash = true, vaheadless = true, vareset = true,
+  vaspawnlayout = true, vastart = true, varesult = true, vaexport = true, vatest_killobjective = true }
+
 function runVerdanceCommand(cmd)
   if type(cmd) ~= "string" then return false end
+  local head = cmd:match("^(%a[%w_]*)") or cmd
+  if VA_CHEAT_COMMANDS[head] and not Spring.IsCheatingEnabled() then
+    Spring.Echo("VA_CMD_DENIED " .. head .. " needs /cheat")
+    return true
+  end
   -- Exfil (manifest / extract:<dest>) is owned by game_verdance_exfil.lua.
   -- Operator / playtest: grant liquid Tenebrium so BP constructors unlock.
   local tnbAmt = cmd:match("^vatnb[%s:]+(%-?%d+)")

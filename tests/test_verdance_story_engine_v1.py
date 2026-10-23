@@ -464,10 +464,6 @@ class RosterTests(unittest.TestCase):
             playerSurvivors=survivors,
             resultKey="verdance_ashes|va_{:03d}|{}|victory".format(n, n))
 
-    def test_cadre_trims_to_cap(self):
-        trimmed = engine.trim_cadre({"legcen": 20, "leggat": 20}, 12)
-        self.assertLessEqual(sum(trimmed.values()), 12)
-
     def test_intent_exposes_roster_and_merc_foothold_scale(self):
         with make_workspace() as tmp:
             root = Path(tmp)
@@ -1069,23 +1065,18 @@ class HeroRosterArcTests(unittest.TestCase):
         self.assertEqual(by_id["grath"]["status"], "active")
         self.assertTrue(state["characters"]["grath"]["player"])
 
-    def test_act2_reward_grants_into_cadre(self):
+    def test_act2_reward_grants_into_reserve(self):
         state = self._state(7)
         rec = engine.apply_act_rewards(state, 6, True)
         self.assertIsNotNone(rec)
         roster = state["roster"]
-        self.assertGreaterEqual(roster["cadre"].get("legshot", 0), 2)
+        self.assertGreaterEqual(roster["reserve"].get("legshot", 0), 2)
         self.assertEqual(len(roster["grants"]), 1)
-        self.assertEqual(roster["cadreCap"], engine.CADRE_CAP_BASE + 2)
         # Duplicate grant for the same mission is refused.
         self.assertIsNone(engine.apply_act_rewards(state, 6, True))
         # Act-1 missions and non-victories mint nothing.
         self.assertIsNone(engine.apply_act_rewards(state, 3, True))
         self.assertIsNone(engine.apply_act_rewards(state, 7, False))
-
-    def test_grant_cap_bonus_clamped(self):
-        roster = {"grants": [{"units": {"legshot": 6}}, {"units": {"legamph": 6}}]}
-        self.assertEqual(engine.grant_cap_bonus(roster), engine.GRANT_CAP_BONUS_MAX)
 
 
 class Drop3TextureTests(unittest.TestCase):

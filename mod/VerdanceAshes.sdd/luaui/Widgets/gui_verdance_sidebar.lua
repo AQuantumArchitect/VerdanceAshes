@@ -321,10 +321,6 @@ function widget:TextCommand(cmd)
     if begun() and not terminal() then Spring.SendLuaRulesMsg("VA_CMD:manifest") end
     return true
   end
-  if cmd:match("^vatnb") or cmd:match("^vabrutecrash") then
-    Spring.SendLuaRulesMsg("VA_CMD:" .. cmd)
-    return true
-  end
   return false
 end
 

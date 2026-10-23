@@ -297,7 +297,6 @@ def default_v1_state() -> Dict[str, Any]:
                 "unlocked": False,
             },
             "cadre": {},
-            "cadreCap": 12,
             "heroes": [
                 {
                     "heroId": "pavise",

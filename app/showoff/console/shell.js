@@ -78,10 +78,12 @@ export function paint() {
   const n = session.narrative;
   const snap = snapshot();
   $("cc-pending").hidden = snap.hub.lastResult?.verdict !== "incomplete";
-  const choices = (snap.hub.node?.choices || []).filter(c => c.kind === "deploy" && (c.effect?.mapId === snap.focusMap));
+  // The finale shows from any map (it is the only operation left); everything else is per theater.
+  const choices = (snap.hub.node?.choices || []).filter(c => c.kind === "deploy" && (c.finale || c.effect?.mapId === snap.focusMap));
+  const over = snap.hub.node?.kind === "epilogue";
   const ranking = n?.operations || [];
   choices.sort((a, b) => ranking.findIndex(o => o.id === a.id) - ranking.findIndex(o => o.id === b.id));
-  const signature = JSON.stringify([n, snap.live, snap.focusMap, snap.plan?.choiceId, snap.hub.homeCamp, snap.hub.aces, snap.hub.lastResult, snap.hub.camp, session.allThreads, session.selectedThread, session.error]);
+  const signature = JSON.stringify([snap.hub.node?.kind, snap.hub.node?.choices?.length, n, snap.live, snap.focusMap, snap.plan?.choiceId, snap.hub.homeCamp, snap.hub.aces, snap.hub.lastResult, snap.hub.camp, session.allThreads, session.selectedThread, session.error]);
   updateIntelligence(n, snap.focusMap);
   if (signature === session.signature) return;
   session.signature = signature;
@@ -90,7 +92,8 @@ export function paint() {
   $("operations-rail").innerHTML = '<p class="cc-eyebrow">Company operations</p><h2>Where do we go next?</h2>' + fieldLine(fieldPeople()) +
     choices.slice(0, 3).map(c => `<button class="cc-operation" type="button" data-operation="${escape(c.id)}" ${c.disabled ? "disabled" : ""} aria-pressed="${c.id === snap.plan?.choiceId}"><strong>${escape(c.label)}</strong><span>${escape(ranking.find(o => o.id === c.id)?.recommendation || "Plan the route and inspect the requirements.")}</span></button>`).join("") +
     (choices.length > 3 ? `<details><summary>All ${choices.length} operations</summary>${choices.slice(3).map(c => `<button type="button" data-operation="${escape(c.id)}" ${c.disabled ? "disabled" : ""}>${escape(c.label)}</button>`).join("")}</details>` : "") +
-    (!choices.length ? "<p>No operation on this theater. Select another map or refresh after your return.</p>" : "") +
+    (over ? `<p class="cc-epilogue">${escape(snap.hub.node.text)}</p><p>The campaign is complete. The chronicle and the company remain.</p>`
+      : !choices.length ? "<p>No operation on this theater. Select another map or refresh after your return.</p>" : "") +
     '<section id="cc-operation-details" aria-label="Selected operation"></section>';
   $("cc-matters").innerHTML = '<p class="cc-eyebrow">Around the company table</p><h2>Company matters</h2><p class="cc-matters-intro">People, principles, and promises.</p>' +
     shown.map(t => `<button class="cc-thread" type="button" data-thread="${escape(t.id)}" aria-pressed="${t.id === session.selectedThread}"><small>${escape(t.stage)}${t.remaining !== null ? ` · ${t.remaining} sorties left` : ""}</small><strong>${escape(t.title)}</strong><span>${escape(t.reason)}</span></button>`).join("") +

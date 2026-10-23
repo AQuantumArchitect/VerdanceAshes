@@ -1069,6 +1069,12 @@ class CampaignKernel:
         plan = dict(plan or {})
         # Hub-only. Must not ride into the stamped intent.
         token = str(plan.pop("rosterToken", "") or "")
+        try:
+            done = (load_json(self.ws / "state" / "campaign_state.json") or {}).get("campaignComplete")
+        except Exception:  # noqa: BLE001
+            done = None
+        if done:
+            return {"ok": False, "accepted": False, "error": "The war is over. The campaign is complete."}
         if launch:
             with self._lock:
                 if self._busy:

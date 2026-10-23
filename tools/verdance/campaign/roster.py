@@ -15,7 +15,6 @@ from verdance.common import WORKSPACE_ROOT, clamp, load_json, utc_now
 from .schema import default_v1_state
 from .acts import act_for_mission
 from .progression import (
-    CADRE_CAP_BASE,
     PERK_LADDER,
     ROSTER_MAX_LEVEL,
     ROSTER_XP_PER_LEVEL,
@@ -35,7 +34,6 @@ def ensure_roster(state: Dict[str, Any]) -> Dict[str, Any]:
     for key, value in default["commander"].items():
         commander.setdefault(key, copy.deepcopy(value))
     roster.setdefault("cadre", {})
-    roster.setdefault("cadreCap", CADRE_CAP_BASE)
     roster.setdefault("cadreXp", {})
     heroes = roster.setdefault("heroes", [])
     known = {str(h.get("heroId")) for h in heroes if isinstance(h, dict)}
@@ -122,13 +120,6 @@ def roster_level_for_xp(xp: float) -> int:
     return int(min(ROSTER_MAX_LEVEL, 1 + int(max(0.0, xp) // ROSTER_XP_PER_LEVEL)))
 
 
-def commander_cadre_cap(commander: Dict[str, Any]) -> int:
-    cap = CADRE_CAP_BASE
-    if "veteran_cadre" in (commander.get("perks") or []):
-        cap += 6
-    return cap
-
-
 def expire_scars(commander: Dict[str, Any], mission_number: int) -> None:
     kept = []
     for scar in commander.get("scars", []) or []:
@@ -187,8 +178,6 @@ def update_roster(state: Dict[str, Any], result: Dict[str, Any], success: bool, 
                 if perk and perk not in commander.setdefault("perks", []):
                     commander["perks"].append(perk)
             commander["level"] = new_level
-    # Cap = perk base + act-2 grant bonus (earned specials never squeeze T1 vets).
-    roster["cadreCap"] = commander_cadre_cap(commander) + grant_cap_bonus(roster)
 
     # The reserve (verdance.company.reserve): this drop's bring left it; what lifted off the
     # pad (minus hero packs) comes back. Survivors left in the field are not carried.
@@ -336,18 +325,6 @@ def _merge_cadre_xp(roster: Dict[str, Any], result: Dict[str, Any], *, defeat: b
         }
 
 
-def trim_cadre(cadre: Dict[str, int], cap: int) -> Dict[str, int]:
-    total = sum(cadre.values())
-    if total <= cap:
-        return {d: int(c) for d, c in cadre.items() if c > 0}
-    # Proportionally scale down to the cap; deterministic order by unit def.
-    scale = cap / float(total)
-    trimmed: Dict[str, int] = {}
-    for unit_def in sorted(cadre):
-        kept = int(math.floor(cadre[unit_def] * scale))
-        if kept > 0:
-            trimmed[unit_def] = kept
-    return trimmed
 
 
 def commander_active_perks(commander: Dict[str, Any]) -> List[str]:
@@ -475,17 +452,6 @@ ACT2_REWARD_TABLE = {
     9: {"units": {"leginc": 2}, "label": "Sustained heat-ray pair — the kiln walks"},
     10: {"units": {"legkeres": 1}, "label": "A Keres. The finale wants an answer."},
 }
-GRANT_CAP_BONUS_MAX = 8
-
-
-def grant_cap_bonus(roster: Dict[str, Any]) -> int:
-    """Granted specials travel as cadre; each raises the cadre cap so rewards
-    never squeeze out the T1 veterans (bonus clamped)."""
-    total = 0
-    for g in roster.get("grants") or []:
-        if isinstance(g, dict):
-            total += sum(int(c or 0) for c in (g.get("units") or {}).values())
-    return min(GRANT_CAP_BONUS_MAX, total)
 
 
 def apply_act_rewards(
@@ -502,9 +468,10 @@ def apply_act_rewards(
     for g in grants:
         if isinstance(g, dict) and int(g.get("mission", -1)) == int(completed_mission):
             return None  # belt + braces on top of the resultKey ledger
-    cadre = roster.setdefault("cadre", {})
+    from verdance.company.reserve import ensure_reserve
+    reserve = ensure_reserve(roster)  # earned specials wait in the reserve like everything else
     for unit_def, count in reward["units"].items():
-        cadre[unit_def] = int(cadre.get(unit_def, 0) or 0) + int(count)
+        reserve[unit_def] = int(reserve.get(unit_def, 0) or 0) + int(count)
     rec = {
         "mission": int(completed_mission),
         "units": dict(reward["units"]),
@@ -512,7 +479,6 @@ def apply_act_rewards(
         "at": utc_now(),
     }
     grants.append(rec)
-    roster["cadreCap"] = commander_cadre_cap(roster.get("commander") or {}) + grant_cap_bonus(roster)
     return rec
 
 
@@ -754,7 +720,6 @@ def build_roster_intent(state: Dict[str, Any]) -> Dict[str, Any]:
             "unlocked": commander.get("unlocked") is True,
         },
         "cadre": {str(d): int(c) for d, c in (roster.get("cadre") or {}).items() if c},
-        "cadreCap": int(roster.get("cadreCap", CADRE_CAP_BASE)),
         "cadreXp": {
             str(d): {
                 "xp": round(float((bag or {}).get("xp") or 0.0), 4),
@@ -788,7 +753,6 @@ __all__ = [
     "ACT2_REWARD_TABLE",
     "CADRE_XP_DEFEAT_FRAC",
     "CADRE_XP_KEEP_FRAC",
-    "GRANT_CAP_BONUS_MAX",
     "WHEELIE_HERO_REP_UNLOCK",
     "_HERO_ROSTER_CACHE",
     "_away_from_camp",
@@ -800,11 +764,9 @@ __all__ = [
     "apply_recruitment_beats",
     "build_roster_intent",
     "commander_active_perks",
-    "commander_cadre_cap",
     "commander_is_unlocked",
     "ensure_roster",
     "expire_scars",
-    "grant_cap_bonus",
     "grant_commander",
     "hero_intent_entries",
     "load_commander_beats",
@@ -813,6 +775,5 @@ __all__ = [
     "merc_foothold_scale",
     "roster_level_for_xp",
     "scrap_commander",
-    "trim_cadre",
     "update_roster",
 ]

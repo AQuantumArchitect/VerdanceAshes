@@ -43,7 +43,9 @@ def run_advance(ws: Path, result_path: Path) -> dict:
         str(result_path),
         "--write-state",
     ]
+    adv = ws / "outbox" / "advance_report.v1.json"
     try:
+        adv.unlink(missing_ok=True)  # a failed advance must not show the last sortie's report
         r = subprocess.run(cmd, cwd=str(ws), capture_output=True, text=True, timeout=180, env=tools_env(ws))
         report: dict[str, Any] = {
             "ok": r.returncode == 0,
@@ -51,9 +53,7 @@ def run_advance(ws: Path, result_path: Path) -> dict:
             "stdout_tail": (r.stdout or "")[-2500:],
             "stderr_tail": (r.stderr or "")[-800:],
         }
-        # Prefer structured advance_report if written
-        adv = ws / "outbox" / "advance_report.v1.json"
-        if adv.is_file():
+        if r.returncode == 0 and adv.is_file():
             try:
                 report["advanceReport"] = json.loads(adv.read_text(encoding="utf-8-sig"))
             except Exception:  # noqa: BLE001

@@ -66,7 +66,9 @@ def sorties_home(state: Dict[str, Any]) -> int:
 
 
 def lift_cap(state: Dict[str, Any]) -> float:
-    return LIFT_BASE + LIFT_PER_SORTIE * sorties_home(state)
+    perks = (((state.get("roster") or {}).get("commander") or {}).get("perks") or [])
+    veteran = 1 if "veteran_cadre" in perks else 0  # the commander's level-3 perk
+    return LIFT_BASE + LIFT_PER_SORTIE * (sorties_home(state) + veteran)
 
 
 def bring_value(bring: Dict[str, int], workspace: Optional[Path] = None) -> float:

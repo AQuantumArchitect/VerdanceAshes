@@ -838,6 +838,28 @@ def build_open_node(state: dict, regions: list[dict], aces: list[dict], rep: dic
         if wet_choices:
             choices = wet_choices
 
+    # Act III is the finale and nothing else: the hub offers exactly the battle the kernel will
+    # stage (its map, pad and target), so the board, the plan and the drop agree.
+    from verdance.campaign.acts import finale_plan_for_state
+    finale = finale_plan_for_state(state)
+    if finale:
+        obj = finale.get("objective") or {}
+        choices = [{
+            "id": "c_finale_" + str(finale.get("kind")),
+            "label": finale.get("title"),
+            "blurb": obj.get("label"),
+            "kind": "deploy",
+            "recommended": True,
+            "finale": True,
+            "effect": {
+                "mapId": finale.get("mapId"),
+                "preferredDeployZoneId": finale.get("deploymentZoneId"),
+                "preferredCaptureZoneId": obj.get("targetZoneId"),
+                "contractKind": obj.get("kind"),
+                "against": obj.get("enemyFaction"),
+            },
+        }]
+
     # Camp / broker / hearth / bay are left-bar or right-tab surfaces —
     # main journeys stay deploy-only (mission pick).
 
@@ -908,8 +930,13 @@ def build_open_node(state: dict, regions: list[dict], aces: list[dict], rep: dic
         pressure = ""
     if wet_voice:
         ketha_line = wet_voice
-    if pressure and mission_n > 1:
-        ketha_line += f" World reads: {pressure}."
+    if finale:
+        ketha_line = f"This is the last fight. {(finale.get('objective') or {}).get('label') or finale.get('title')}."
+    done = state.get("campaignComplete")
+    if done:
+        # The war is over: no more drops. The chronicle and the company stay to be read.
+        choices = []
+        ketha_line = "It's done. The empires broke first. Whatever grows in these ashes grows ours."
 
     # Theater should show the recommended sortie map, not only home ground.
     # Home stays on sessionHomeMap / badges; regionHint drives the briefing table.
@@ -924,7 +951,7 @@ def build_open_node(state: dict, regions: list[dict], aces: list[dict], rep: dic
 
     return {
         "id": f"hub_open_m{mission_n}",
-        "kind": "choice",
+        "kind": "epilogue" if done else "choice",
         "speaker": "ketha",
         "text": ketha_line,
         "regionHint": theater_hint,
@@ -1448,7 +1475,6 @@ def build_hub(state: dict, war: dict) -> dict:
         "camp": hub_belief.camp_surface(state),
         "exposure": hub_belief.exposure_surface(ROOT),
         "homeCamp": home_camp,
-        "flags": flags,
         "homeEval": home_eval if isinstance(home_eval, dict) else {},
         "occupationModel": occupation_model,
         "captureMode": "clear_hold_shell",

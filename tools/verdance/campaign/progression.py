@@ -124,14 +124,13 @@ ROSTER_XP_PER_LEVEL = 80.0
 ROSTER_MAX_LEVEL = 8
 PERK_LADDER = {
     2: "field_repair",     # extra starting build power
-    3: "veteran_cadre",    # +6 cadre cap
+    3: "veteran_cadre",    # the lift carries one more sortie's worth (reserve.lift_cap)
     4: "rapid_deploy",     # one bonus starting unit
     5: "ash_resolve",      # tougher commander
     6: "blood_tempo",      # extra metal/energy on deploy
     7: "named_guard",      # tougher hero HP floor
     8: "cracked_core",     # commander + heroes start highly experienced
 }
-CADRE_CAP_BASE = 12
 
 # Named-hero campaign XP (integer ladder). Never decreases on death — scars and
 # status may, but the blood learned stays on the character sheet.
@@ -224,7 +223,6 @@ def normalize_hero_rank_label(rank: Any) -> str:
 
 __all__ = [
     "ARMADA_RAID_HIT",
-    "CADRE_CAP_BASE",
     "CORTEX_CRATER_MAPS",
     "CORTEX_GRUDGE_DEFEAT_DAMAGE",
     "CORTEX_GRUDGE_PARTIAL",
