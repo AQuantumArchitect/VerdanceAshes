@@ -1967,8 +1967,11 @@ if gadgetHandler:IsSyncedCode() then
 			PutRaptorAlliesInRaptorTeam(n)
 			local units = GetTeamUnits(raptorTeamID)
 			for _, unitID in ipairs(units) do
-				-- The wipe removes the starting commander. Authored hives are the occupation.
-				if not VA_ACTIVE or GetUnitDefID(unitID) ~= config.burrowDef then
+				-- The wipe removes the starting commander. Under Verdance only that: authored hives
+				-- and anything the campaign placed on this team (a captive hero) stay standing.
+				local ud = UnitDefs[GetUnitDefID(unitID)]
+				local isCom = ud and ud.customParams and ud.customParams.iscommander
+				if not VA_ACTIVE or isCom then
 					DestroyUnit(unitID, false, true)
 				end
 			end

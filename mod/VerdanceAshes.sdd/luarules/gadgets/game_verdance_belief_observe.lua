@@ -23,8 +23,10 @@ end
 --   GG.VA_ObservedZonesJson()  -> {"GF_S_PLATEAU":0.83, ...}      eta per zone, 0..1
 --   GG.VA_BeliefExportJson()   -> {"GF_S_PLATEAU":{"ours":..,"held":..,"strength":..,"threat":..}, ...}
 --
--- eta is the share of a zone's cells inside the player's line of sight, with a
--- recency half-life: a zone fully seen eight minutes ago reads 0.5 now. The campaign
+-- eta is how much of a zone the company has looked at: each of its sample points counts once
+-- seen, fading with an eight-minute half-life. A scout sweeping a zone adds up its whole path
+-- (it does not need to see the whole zone at one instant); a zone fully seen eight minutes ago
+-- reads 0.5 now. The campaign
 -- engine (tools/belief_homecoming_v1.py) observes the Drop's truth for each zone at
 -- exactly that eta, so a zone we drove through is known and a zone we only glanced at
 -- stays a rumour. beliefExport is what the HUD could honestly have believed at exit
@@ -197,14 +199,18 @@ local function sample(frame)
   -- 1. line of sight share per zone
   for _, id in ipairs(zoneOrder) do
     local rec, o = zones[id], obs[id]
-    local seen = 0
+    local seen, coverage = 0, 0
+    rec.seenWeight = rec.seenWeight or {}
     for i = 1, #rec.points do
       local p = rec.points[i]
-      if Spring.IsPosInLos(p[1], p[2], p[3], playerAllyTeamID) then seen = seen + 1 end
+      local w = (rec.seenWeight[i] or 0) * decay
+      if Spring.IsPosInLos(p[1], p[2], p[3], playerAllyTeamID) then seen = seen + 1; w = 1 end
+      rec.seenWeight[i] = w
+      coverage = coverage + w
     end
     local share = (#rec.points > 0) and (seen / #rec.points) or 0
     o.lastShare = share
-    o.eta = math.max(o.eta * decay, share)
+    o.eta = (#rec.points > 0) and (coverage / #rec.points) or 0
     o.enemyRecent = o.enemyRecent * RECENT_DECAY
     o.friendNow = 0
     o.enemyNow = 0
@@ -283,8 +289,8 @@ local function belief(o)
   if anyStruct or o.enemyPeak > 0 or o.friendNow > 0 then
     held = 1.0
   else
-    -- fully seen and empty is a real finding; a glance at nothing is not
-    held = (o.lastShare >= 0.6) and 0.1 or 0.4
+    -- swept and empty is a real finding (coverage adds up along the path); a glance is not
+    held = (o.eta >= 0.6) and 0.1 or 0.4
   end
   strength = clamp01(o.enemyStructPeak / 8 + o.enemyPeak / 16)
   threat = clamp01(o.enemyRecent / 10)
