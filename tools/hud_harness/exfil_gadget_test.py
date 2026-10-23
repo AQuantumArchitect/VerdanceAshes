@@ -33,6 +33,7 @@ local mission = { missionId = "t1", deploymentMapId = "t", deploymentZoneId = "P
 local U = {
   [1] = { x = 2048, z = 1024, def = 1, team = 0, hero = "pavise" },
   [2] = { x = 100,  z = 100,  def = 1, team = 0 },
+  [5] = { x = 300,  z = 300,  def = 1, team = 0, tag = "crew_escort_pavise_1" },  -- an escort: pack, not army
   [3] = { x = 3900, z = 1900, def = 2, team = 0, hero = "solarium" },
   [4] = { x = 2048, z = 3500, def = 1, team = 0 },
   [9] = { x = 300,  z = 1800, def = 1, team = 1 },
@@ -57,7 +58,7 @@ Spring = {
   ValidUnitID = function(id) return U[id] ~= nil end, GetUnitIsDead = function() return false end,
   GetUnitPosition = function(id) local u = U[id]; return u.x, 0, u.z end,
   GetUnitDefID = function(id) return U[id].def end, GetUnitTeam = function(id) return U[id].team end,
-  GetUnitRulesParam = function(id, k) local u = U[id]; if k == "va_hero_id" or k == "va_hero_name" then return u.hero end end,
+  GetUnitRulesParam = function(id, k) local u = U[id]; if k == "va_hero_id" or k == "va_hero_name" then return u.hero end; if k == "va_package_tag" then return u.tag end end,
   AreTeamsAllied = function(a, b) return a == b end,
   GetUnitHealth = function() return 80, 100 end, GetUnitExperience = function() return 0 end,
   GetTeamList = function() return { 0, 1 } end, GetGaiaTeamID = function() return -1 end,
@@ -82,7 +83,8 @@ assert(RULES.va_manifest_seq == 1 and type(RULES.va_manifest_json) == "string", 
 local m = RULES.va_manifest_json
 local function has(pat, why) assert(m:find(pat, 1, true), why .. "\n" .. m) end
 has('"going":{"heroes":[{"heroId":"pavise"', "hero in the pad zone goes")
-has('"unitCount":1,"units":{"corthud":1}}', "a unit at the zone's far corner (outside the old circle) goes")
+has('"packUnits":{"corthud":1}', "an escort is counted as pack, not army")
+has('"unitCount":2', "a unit at the zone's far corner (outside the old circle) goes, and the escort")
 has('"staying":{"heroes":[{"heroId":"solarium"', "an immobile hero stays as a person, not a building")
 has('"units":{"FAR":1}', "a unit outside the pad zone stays")
 has('"enemyOnPad":1', "a mobile enemy anywhere in the pad zone is on the pad; a wall is not")

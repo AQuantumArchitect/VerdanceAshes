@@ -6,6 +6,7 @@ import { defaultMarks, snapGroundRoute, isLegalLanding, padLegality, padExposed,
 import { renderCompany, buildCompanyEntries, crewCoreIds, droppingPackIds, sealedDeployAces, livingCoreIds, heroIsDeployable, heroAway, heroWhereLabel, companyOwnedBand, showCompanyIntro, hideCompanyIntro } from "./company.js";
 import { renderBadges } from "./shell.js";
 import { hideCoach } from "./system.js";
+import { renderReserve, reserveBring, resetReserveBring } from "./reserve.js";
 
 /* ---- plan ------------------------------------------------------------------- */
 export function ensureTheaterPlan(choice) {
@@ -175,6 +176,7 @@ function sessionIsThisDrop(st) {
   return updated + 2000 >= started;
 }
 export function renderDropSquad() {
+  renderReserve(dropRosterSealed());
   const squadEl = $("drop-squad");
   const kicker = $("drop-squad-kicker");
   const go = $("drop-confirm-go");
@@ -329,6 +331,7 @@ export function showDropConfirm() {
     return;
   }
   if (phase !== "up") {
+    resetReserveBring();
     state.warm.phase = "idle";
     state.warm.locked = false;
     if (state.warm.timer) {
@@ -383,6 +386,7 @@ async function commitDeploy(launch) {
   // Drop roster = packs marked Dropping. Core is added server-side and here.
   plan.crewBand = droppingPackIds();
   plan.deployAces = sealedDeployAces();
+  plan.reserveBring = { ...reserveBring() };
   if (!(plan.marks && plan.marks.captureZoneIds && plan.marks.captureZoneIds.length)) return blockDrop("Mark a target (wound) on the map first");
   if (!plan.marks.deployZoneId) return blockDrop("Mark a pad first");
   plan.marks.extractZoneId = plan.marks.deployZoneId; // ONE pad

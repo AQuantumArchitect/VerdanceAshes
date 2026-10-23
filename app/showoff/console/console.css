@@ -654,6 +654,19 @@ details.advanced summary { color:var(--steam); }
 .drop-squad .hero-card { background:color-mix(in srgb, var(--bg) 32%, transparent); }
 .drop-squad .hero-card.core { border-color:var(--line-gold); }
 .drop-squad .theater-sub { grid-column:1 / -1; }
+.drop-reserve { flex:0 1 auto; min-height:0; display:flex; flex-direction:column; }
+.drop-reserve .drop-squad-kicker b { color:var(--gold); }
+.drop-reserve .rv-note { letter-spacing:.04em; text-transform:none; color:var(--muted); }
+.drop-reserve .rv-suggest { float:right; font-size:var(--fs-xs); padding:.1rem .5rem; }
+.rv-meter { height:4px; border-radius:2px; background:var(--line-soft); margin:0 0 .4rem; overflow:hidden; }
+.rv-meter i { display:block; height:100%; background:var(--gold); transition:width .15s; }
+.rv-list { display:grid; grid-template-columns:repeat(auto-fill, minmax(15rem,1fr)); gap:.25rem .8rem; overflow:auto; max-height:9.5rem; }
+.rv-row { display:grid; grid-template-columns:1fr auto 1.6rem 1.6rem 2.2rem 1.6rem; align-items:center; gap:.3rem; font-size:var(--fs-sm); color:var(--muted); }
+.rv-row.on { color:var(--ink, inherit); }
+.rv-row .rv-name { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.rv-row .rv-val, .rv-row .rv-of { font-size:var(--fs-xs); color:var(--ash); }
+.rv-row b { text-align:right; color:var(--gold); }
+.rv-row button { padding:0; height:1.5rem; line-height:1; }
 
 /* ───────────────────────────── responsive · motion ───────────────────────────── */
 @media (min-width:1800px) { .app { grid-template-columns:290px minmax(600px,1fr) 360px; } }

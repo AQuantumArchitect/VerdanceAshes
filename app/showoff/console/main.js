@@ -1,4 +1,5 @@
 // Boot order for the war-room hub. Everything else is a module with no top-level effects.
+import { installReserve } from "./reserve.js";
 import { state, H, commerce, prettyMap, availableMaps, ensureFocusMapAvailable, companySealed } from "./state.js";
 import { probeKernel } from "./api.js";
 import { $, toast, logLine } from "./render.js";
@@ -31,6 +32,7 @@ function bindControls() {
   $("btn-deploy").onclick = showDropConfirm;
   $("drop-confirm-cancel").onclick = hideDropConfirm;
   $("drop-confirm-go").onclick = onDropConfirmGo;
+  installReserve();
   $("drop-confirm").addEventListener("click", ev => { if (ev.target === $("drop-confirm")) hideDropConfirm(); });
   document.addEventListener("keydown", ev => { if (ev.key === "Escape") hideDropConfirm(); });
   // Hero cards (intro grid, drop squad) toggle through one delegated handler.

@@ -1484,6 +1484,7 @@ def build_hub(state: dict, war: dict) -> dict:
         "aces": aces,
         "supportWeb": _support_web_surface(aces, company_surface, state),
         "company": company_surface,
+        "reserve": _reserve_surface(state),
         "regions": regions,
         "node": node,
         "lastResult": _with_manifest(_load_last_hub_result(), state),
@@ -1522,6 +1523,15 @@ def _with_manifest(payload, state):
     out = dict(payload or {})
     out["manifest"] = m
     return out
+
+
+def _reserve_surface(state: dict) -> dict:
+    """The company's reserve for the hub: units, names, values, the lift limit, the suggestion."""
+    try:
+        from verdance.company.reserve import hub_surface
+        return hub_surface(state, ROOT)
+    except Exception:  # noqa: BLE001
+        return {"units": [], "liftCap": 0, "suggested": {}}
 
 
 def _load_last_hub_result():

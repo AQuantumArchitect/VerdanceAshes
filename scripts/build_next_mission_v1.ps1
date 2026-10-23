@@ -299,15 +299,6 @@ function New-TacticsPlayerKit {
     $kit += (Spec $printer.printerProduct 6 100 -100 70)
   }
   $kit = Add-CommerceDeployToKit $kit $Commerce
-  if ($Roster -and $Roster.cadre) {
-    foreach ($p in $Roster.cadre.PSObject.Properties) {
-      $def = [string]$p.Name
-      $cnt = [int]$p.Value
-      if ($cnt -gt 0 -and -not ($def -like "*com") -and -not ($def -like "*lab") -and -not ($def -like "*ck") -and -not ($def -like "*ca") -and $def -ne "legbal") {
-        $kit += (Spec $def ([Math]::Min($cnt, 3)) -130 -150 90)
-      }
-    }
-  }
   switch ($Family) {
     "tempo" { $kit += (Spec "legcen" 2 -60 -260 90) }
     "siege" { $kit += (Spec "legcen" 2 -200 -200 90) }
@@ -545,6 +536,24 @@ function Spec {
   return $s
 }
 
+function Add-ReserveToKit {
+  # The company's reserve: roster.cadre is what the player chose to bring this drop (the hub's
+  # Reserve panel, clamped to the lift limit in Python). Every kit gets it the same way, all of
+  # it, any unit type but a commander.
+  param($Kit, $Roster)
+  if (-not $Roster -or -not $Roster.cadre) { return $Kit }
+  $i = 0
+  foreach ($p in $Roster.cadre.PSObject.Properties) {
+    $def = [string]$p.Name
+    $cnt = [int]$p.Value
+    if ($cnt -gt 0 -and $def -notmatch '^(arm|cor|leg)com$') {
+      $Kit += (Spec $def $cnt (-130 - 70 * ($i % 3)) (-160 - 70 * [Math]::Floor($i / 3)) 90)
+      $i++
+    }
+  }
+  return $Kit
+}
+
 function Get-CadreXpBag {
   # roster.cadreXp[def] -> seed xp / craftXp for the next drop.
   param($Roster, [string]$Def)
@@ -687,10 +696,7 @@ function New-PlayerKitFromRoster {
     foreach ($p in $Roster.cadre.PSObject.Properties) {
       $cnt = [int]$p.Value
       $def = [string]$p.Name
-      if ($cnt -gt 0 -and $def -notmatch '^(arm|cor|leg)com') {
-        $kit += (Spec $def $cnt -120 -160 95)
-        $cadreTotal += $cnt
-      }
+      if ($cnt -gt 0 -and $def -notmatch '^(arm|cor|leg)com') { $cadreTotal += $cnt }  # spawned by Add-ReserveToKit
     }
   }
   # Floor: a thin cadre (fresh campaign or a rout) still fields a minimum strike element.
@@ -735,15 +741,6 @@ function New-FinaleKitFromRoster {
     (Spec "legkark" 2 170 40 110),
     (Spec "legrezbot" 6 -170 70 80)
   )
-  if ($Roster -and $Roster.cadre) {
-    foreach ($p in $Roster.cadre.PSObject.Properties) {
-      $cnt = [int]$p.Value
-      $def = [string]$p.Name
-      if ($cnt -gt 0 -and $def -notmatch '^(arm|cor|leg)com') {
-        $kit += (Spec $def $cnt -130 -160 90)
-      }
-    }
-  }
   $kit = Add-CommerceDeployToKit $kit $Commerce
   # Finale: still spawn named heroes from roster (full company walks out).
   $heroes = if ($Roster -and $Roster.PSObject.Properties["heroes"]) { $Roster.heroes } else { $null }
@@ -766,16 +763,6 @@ function New-StrikeTeam {
     (Spec "legrezbot" 6 -150 70 80)
   )
   $kit = Add-CommerceDeployToKit $kit $Commerce
-  # Veteran cadre carried from prior sorties (combat only; never com / Ballista).
-  if ($Roster -and $Roster.cadre) {
-    foreach ($p in $Roster.cadre.PSObject.Properties) {
-      $def = [string]$p.Name
-      $cnt = [int]$p.Value
-      if ($cnt -gt 0 -and -not ($def -like "*com") -and $def -ne "legbal" -and $def -ne "leginc" -and $def -ne "legjav") {
-        $kit += (Spec $def $cnt -130 -150 90)
-      }
-    }
-  }
   # Heroes + balance packs are sealed by the HTML hub muster and spawned by the
   # campaign gadget from mission.crewBand / deployAces — never bake the roster here.
   return $kit
@@ -2217,6 +2204,7 @@ if ($openingMission) {
   $playerKit = New-PlayerKit $mapFamily
   $playerKit = Add-CommerceDeployToKit $playerKit $commerce
 }
+$playerKit = Add-ReserveToKit $playerKit $roster
 if ($commerce) {
   $tnb = if ($null -ne $commerce.tenebrium) { $commerce.tenebrium } else { 0 }
   $mk = if ($null -ne $commerce.metalK) { $commerce.metalK } elseif ($null -ne $commerce.credits) { $commerce.credits } else { 0 }

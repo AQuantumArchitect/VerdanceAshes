@@ -150,6 +150,8 @@ def main() -> int:
     check("homecoming advanced the campaign", int(state2.get("missionNumber") or 0) >= 2, json.dumps(home)[:300])
     bead = (state2.get("history") or [{}])[-1]
     check("bead carries the manifest", isinstance(bead.get("manifest"), dict))
+    check("what lifted is in the reserve", ((state2.get("roster") or {}).get("reserve") or {}).get("corthud") == 4,
+          json.dumps((state2.get("roster") or {}).get("reserve"))[:200])
     verdict = (bead.get("verdict") or (bead.get("manifest") or {}).get("verdict") or "").lower()
     check("verdict derived from manifest (partial: a person left)", verdict in ("partial", "hinge"), f"verdict={verdict!r}")
     people = ((state2.get("camp") or {}).get("people") or {})
@@ -163,6 +165,7 @@ def main() -> int:
         check("seen zone observed into belief (current, eta 0.8)", bool(rows) and rows[0].get("state") == "current" and abs(float(rows[0].get("eta") or 0) - 0.8) < 0.05, json.dumps(rows[:1])[:200])
     hs2 = json.loads(hs_path.read_text(encoding="utf-8-sig"))
     lr = hs2.get("lastResult") or {}
+    check("hub shows the reserve and the lift limit", bool((hs2.get("reserve") or {}).get("liftCap")) and any(u.get("unitDef") == "corthud" for u in (hs2.get("reserve") or {}).get("units") or []))
     check("hub lastResult has the manifest and a verdict word", isinstance(lr.get("manifest"), dict) and bool(lr.get("verdict")))
     aces = {a["id"]: a for a in hs2.get("aces") or []}
     check("left hero not deployable on the hub", bool(left) and aces.get(left[0], {}).get("deployable") is False)

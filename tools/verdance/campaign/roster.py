@@ -190,20 +190,10 @@ def update_roster(state: Dict[str, Any], result: Dict[str, Any], success: bool, 
     # Cap = perk base + act-2 grant bonus (earned specials never squeeze T1 vets).
     roster["cadreCap"] = commander_cadre_cap(commander) + grant_cap_bonus(roster)
 
-    # Cadre: survivors carry; a defeat routs most of them.
-    survivors = result.get("playerSurvivors")
-    if isinstance(survivors, dict) and survivors:
-        keep_fraction = 0.4 if defeat else 1.0
-        carried: Dict[str, int] = {}
-        for unit_def, count in survivors.items():
-            kept = int(math.floor(float(count) * keep_fraction))
-            if kept > 0:
-                carried[str(unit_def)] = kept
-        roster["cadre"] = trim_cadre(carried, roster["cadreCap"])
-    elif defeat and roster.get("cadre"):
-        # No survivor report but a defeat: rout the carried cadre by 40%.
-        routed = {d: int(math.floor(c * 0.6)) for d, c in roster["cadre"].items()}
-        roster["cadre"] = {d: c for d, c in routed.items() if c > 0}
+    # The reserve (verdance.company.reserve): this drop's bring left it; what lifted off the
+    # pad (minus hero packs) comes back. Survivors left in the field are not carried.
+    from verdance.company.reserve import homecoming as _reserve_homecoming
+    _reserve_homecoming(roster, result)
 
     # Veteran XP bank by unitDef — majority retain between drops.
     # Named heroes already track peakBarXp; this covers packs / escorts / cadre.

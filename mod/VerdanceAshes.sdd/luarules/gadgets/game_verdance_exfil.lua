@@ -253,7 +253,7 @@ local function manifest()
     frame = Spring.GetGameFrame() or 0,
     pad = pad and { zoneId = pad.zoneId, label = pad.label, x = math.floor(pad.x), z = math.floor(pad.z), radius = pad.r } or nil,
     destinations = destinations(),
-    going = { heroes = {}, units = {}, unitCount = 0, structures = 0, metal = 0 },
+    going = { heroes = {}, units = {}, packUnits = {}, unitCount = 0, structures = 0, metal = 0 },
     staying = { heroes = {}, units = {}, unitCount = 0, structures = {}, structureCount = 0, metal = 0 },
     enemyOnPad = 0,
     seen = {},
@@ -279,6 +279,12 @@ local function manifest()
         else
           g.units[ud and ud.name or "?"] = (g.units[ud and ud.name or "?"] or 0) + 1
           g.unitCount = g.unitCount + 1
+          -- A hero's pack and escorts come back with the hero every drop; everything else that
+          -- lifts is the company's army and goes into the reserve (units minus packUnits).
+          local tag = tostring(Spring.GetUnitRulesParam(uid, "va_package_tag") or "")
+          if tag:sub(1, 5) == "crew_" then
+            g.packUnits[ud and ud.name or "?"] = (g.packUnits[ud and ud.name or "?"] or 0) + 1
+          end
         end
         g.metal = g.metal + metal
       else

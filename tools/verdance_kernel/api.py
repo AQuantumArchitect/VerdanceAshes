@@ -1156,6 +1156,17 @@ class CampaignKernel:
                         plan["rosterNote"] = (
                             f"{len(band)} packs + {len(aces) - len(band)} core"
                         )
+                        # The reserve: what boards this drop (roster.cadre), clamped to what the
+                        # reserve holds and the lift limit; no choice sent = the suggestion.
+                        from verdance.company import reserve as _reserve
+                        roster = st.setdefault("roster", {})
+                        held = _reserve.ensure_reserve(roster)
+                        cap = _reserve.lift_cap(st)
+                        asked = plan.get("reserveBring")
+                        roster["cadre"] = (_reserve.clamp_bring(asked, held, cap, self.ws) if isinstance(asked, dict)
+                                           else _reserve.default_bring(held, cap, self.ws))
+                        plan["reserveBring"] = dict(roster["cadre"])
+                        save_json(sp, st)
                         # Bro Tzar (and future call-ins): stamp then consume so one order = one Drop.
                         calls = peek_mission_call_ins(st)
                         if calls:
