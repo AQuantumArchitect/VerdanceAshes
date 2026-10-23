@@ -348,6 +348,29 @@ def make_handler(kernel: CampaignKernel, showoff: Path):
     return KernelHandler
 
 
+HUB_TITLE = "Verdance's Ashes"  # app/showoff/index.html <title>
+
+
+def bring_hub_forward(url: str) -> None:
+    """After a sortie: put the player back on the hub, which has already brought the result
+    home and opened the homecoming card. On Windows, focus the browser window already showing
+    the hub (by its title) so no new tab opens; otherwise, or if that fails, open the URL."""
+    import subprocess
+    import webbrowser
+    if sys.platform == "win32":
+        script = f"$w = New-Object -ComObject WScript.Shell; if ($w.AppActivate(\"{HUB_TITLE}\")) {{ exit 0 }} else {{ exit 1 }}"
+        try:
+            r = subprocess.run(["powershell", "-NoProfile", "-Command", script], capture_output=True, timeout=10)
+            if r.returncode == 0:
+                return
+        except Exception:  # noqa: BLE001
+            pass
+    try:
+        webbrowser.open(url)
+    except Exception:  # noqa: BLE001
+        pass
+
+
 def serve(
     workspace: str | Path | None = None,
     *,
@@ -365,10 +388,11 @@ def serve(
         print(f"ERROR: missing {showoff / 'index.html'}", file=sys.stderr)
         return 2
 
+    url = f"http://{host}:{port}/"
     if enable_bridge:
-        bridge = BarBridge(kernel)
+        bridge = BarBridge(kernel, on_home=lambda ev: bring_hub_forward(url))
         bridge.start()
-        print("  BAR bridge: auto-apply watching")
+        print("  BAR bridge: auto-apply watching; the hub comes forward when the sortie is home")
 
     # Ensure hub + surface exist
     if not (showoff / "hub_state.json").is_file():
@@ -382,7 +406,6 @@ def serve(
 
     handler = make_handler(kernel, showoff)
     server = ThreadingHTTPServer((host, port), handler)
-    url = f"http://{host}:{port}/"
     print(f"Verdance kernel on {url}")
     print(f"  workspace: {kernel.ws}")
     print(f"  schema:    {kernel.status().get('schemaVersion')}")

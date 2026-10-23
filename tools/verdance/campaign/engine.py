@@ -723,11 +723,12 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
             if res == "dead":
                 c["status"] = "dead"
             elif res in ("recovered", "wounded"):
+                # Going down leaves a scar either way; only a hero still down at the end is wounded.
                 c["wounds"] = c.get("wounds", 0) + 1
                 if not isinstance(c.get("scars"), list):
                     c["scars"] = []
                 c["scars"].append(f"wound_{c['wounds']}")
-                c["status"] = "wounded"
+                c["status"] = "wounded" if res == "wounded" else "active"
     for hero in (state.get("roster") or {}).get("heroes") or []:
         if not isinstance(hero, dict):
             continue

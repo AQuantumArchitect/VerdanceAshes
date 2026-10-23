@@ -44,3 +44,16 @@ def test_rescued_survivor_unlocks_for_next_campaign():
     assert C.unlock_rescued_survivors(st, ws) == ["anvil"]
     assert "anvil" in json.loads((ws / "state" / "profile.json").read_text())["unlocked"]
     assert "anvil" in C.starter_unlock_ids(C.load_crew_packs(ws), ws)
+
+
+def test_rezzed_hero_on_the_pad_comes_home_healthy():
+    """Pavise went down, was rezzed, extracted with everyone: she is active, not wounded."""
+    from verdance.campaign.roster import update_roster
+    st = default_v1_state()
+    for h in st["roster"]["heroes"]:
+        h["status"] = "active"
+    result = {"status": "extracted", "namedOutcomes": [{"charId": "pavise", "outcome": "recovered"}],
+              "heroResults": {"pavise": {"status": "survived", "wasDown": True, "xp": 0.5}}}
+    update_roster(st, result, True, True)
+    pav = next(h for h in st["roster"]["heroes"] if h["heroId"] == "pavise")
+    assert pav["status"] == "active", pav

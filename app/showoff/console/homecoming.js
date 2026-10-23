@@ -253,5 +253,5 @@ export function startResultPoll() {
         await pullHubState(); // full hub pull so Tnb/km$ cannot lag behind the debrief card
       }
     } catch (_) { /* host down */ }
-  }, 8000);
+  }, 2000); // the kernel brings the result home during BAR's closing countdown; be ready first
 }

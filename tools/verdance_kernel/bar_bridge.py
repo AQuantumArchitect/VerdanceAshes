@@ -23,9 +23,11 @@ if TYPE_CHECKING:
 
 class BarBridge:
     def __init__(self, kernel: "CampaignKernel", *, poll_seconds: float = 2.0,
-                 on_auto_apply: Callable[[dict[str, Any]], None] | None = None) -> None:
+                 on_auto_apply: Callable[[dict[str, Any]], None] | None = None,
+                 on_home: Callable[[dict[str, Any]], None] | None = None) -> None:
         self.kernel = kernel
         self.on_auto_apply = on_auto_apply
+        self.on_home = on_home  # BAR closed and the sortie is home (or came back incomplete)
         self._started_at = utc_now()
         self.watch = SortieWatch(kernel.ws, kernel.bring_home, kernel._incomplete_home, poll_seconds=poll_seconds, on_event=self._on_event)
         kernel.attach_bridge(self)
@@ -53,6 +55,11 @@ class BarBridge:
             out.write_text(json.dumps(dict(ev, writtenAt=utc_now()), indent=2) + "\n", encoding="utf-8")
         except Exception:  # noqa: BLE001
             pass
+        if ev.get("event") in ("home", "incomplete") and self.on_home:
+            try:
+                self.on_home(ev)
+            except Exception:  # noqa: BLE001
+                pass
         if ev.get("event") in ("applied", "incomplete"):
             hr = hub_result_path(self.kernel.ws)
             if hr.is_file():

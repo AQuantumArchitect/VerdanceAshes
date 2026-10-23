@@ -489,11 +489,15 @@ function namedOutcomesJson()
       -- skip
     else
     local raw = rec.result or (rec.everDown and "wounded" or "survived")
+    if raw == "survived" and rec.everDown then raw = "recovered" end
     local outcome = nil
     local cause = rec.diedHow or ""
     if raw == "dead" then
       outcome = "dead"
       if cause == "" then cause = "wreck_destroyed" end
+    elseif raw == "recovered" then
+      outcome = "recovered"
+      cause = "reclaimed_friendly"
     elseif raw == "wounded" then
       -- recovered in-match via rez vs left wounded at game end
       if rec.everDown and rec.state == "alive" then
@@ -5102,8 +5106,9 @@ function finalizeHeroStates()
       -- Still a wreck (or rez race unresolved): critical = wounded carry, else dead.
       rec.result = rec.missionCritical and "wounded" or "dead"
     else
-      -- alive: recovered mid-match still counts as wounded scar unless fully clean.
-      rec.result = rec.everDown and "wounded" or "survived"
+      -- alive at the end = home in good health, even if they went down and were rezzed
+      -- (the rescue is still reported, as a "recovered" named outcome, for the story).
+      rec.result = "survived"
       if rec.unitID and Spring.ValidUnitID(rec.unitID) and Spring.GetUnitExperience then
         local cur = Spring.GetUnitExperience(rec.unitID) or 0
         rec.lastXp = cur

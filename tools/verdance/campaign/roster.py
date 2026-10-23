@@ -239,7 +239,10 @@ def update_roster(state: Dict[str, Any], result: Dict[str, Any], success: bool, 
             res = str(by_named[hid].get("outcome", ""))
             if res == "dead":
                 hero["status"] = "dead"
-            elif res in ("recovered", "wounded"):
+            elif res == "recovered":
+                # went down, was rezzed, came home: in good health (the rescue is story, not a wound)
+                hero["status"] = "active"
+            elif res == "wounded":
                 hero["status"] = "wounded"
                 hero["timesWounded"] = int(hero.get("timesWounded", 0) or 0) + 1
             elif res == "survived":
