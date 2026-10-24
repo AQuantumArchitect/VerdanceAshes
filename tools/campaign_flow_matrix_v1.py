@@ -662,7 +662,7 @@ def mission_stop(lattice: Lattice, state: Dict[str, Any], number: int,
                  workspace: Path) -> Dict[str, Any]:
     """Where mission N happens, and what it is trying to take.
 
-    The spine and the per-map objective tables still speak in pre-migration
+    The per-map objective tables still speak in pre-migration
     zone ids; the engine translates them forward at point of use, so this does
     the same rather than keeping a second copy of the mapping.
     """
@@ -675,8 +675,13 @@ def mission_stop(lattice: Lattice, state: Dict[str, Any], number: int,
         target = engine.canonical_zone_id(plan["objective"]["targetZoneId"], workspace)
         kind = str(plan["kind"])
     else:
-        map_id, deploy_raw = engine.ALPHA_SPINE[(number - 1) % len(engine.ALPHA_SPINE)]
-        deploy = engine.canonical_zone_id(deploy_raw, workspace)
+        # walk the road ring from the first drop (Greenest Fields, across the start road),
+        # home last; land on the map's first door
+        from verdance.campaign.schema import WORLD_MAPS
+        from verdance.world.roads import load_doors
+        walk = WORLD_MAPS[1:] + WORLD_MAPS[:1]
+        map_id = walk[(number - 1) % len(walk)]
+        deploy = next((z for z, d in sorted(load_doors(workspace).items()) if d["mapId"] == map_id), None)
         objective = engine.objective_for_map(map_id, state) or {}
         target = engine.canonical_zone_id(objective.get("targetZoneId"), workspace)
         kind = str(objective.get("kind") or "sortie")

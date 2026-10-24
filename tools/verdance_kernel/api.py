@@ -1108,6 +1108,7 @@ class CampaignKernel:
         from verdance_kernel import hot_drop as _hot
         from verdance_kernel.sortie import find_bar_data_root, pid_alive
         from verdance.company import reserve as _reserve
+        from verdance.world import theaters as _theaters
         hot = self._hot
         if not hot:
             return {"ok": False, "error": "No field is loaded. Choose a sortie first."}
@@ -1133,6 +1134,8 @@ class CampaignKernel:
             asked = (body or {}).get("reserveBring")
             roster["cadre"] = (_reserve.clamp_bring(asked, held, cap, self.ws) if isinstance(asked, dict)
                                else _reserve.default_bring(held, cap, self.ws))
+            if _theaters.is_solo(load_json(self.ws / "outbox" / "next_mission_intent.json", {})):
+                band, aces, roster["cadre"] = [], [], {}     # the kings' showdown: the commander alone
             save_json(sp, st)
             _hot.record_roster(self.ws, band, aces)
             path = _hot.write_drop(root, _hot.drop_line(hot["token"], band, roster["cadre"]))

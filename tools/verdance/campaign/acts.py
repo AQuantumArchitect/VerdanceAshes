@@ -26,7 +26,8 @@ ACT_LABELS = {
     3: "Act III — The Finale: full unconstrained war, massive starts",
 }
 
-# Path-keyed finales on the three designated maps (owner map-pool decision):
+# Path-keyed finales on the three designated maps (owner map-pool decision). Each lands on a
+# road door of its map (pads are doors or held ground):
 # ancient_bastion = overthrow (A), all_that_simmers = sovereignty (B),
 # the_rock_jungle = spire jump (C).
 FINALE_PLANS = {
@@ -34,7 +35,7 @@ FINALE_PLANS = {
         "pathKey": "A",
         "kind": "overthrow",
         "mapId": "ancient_bastion",
-        "deploymentZoneId": "AB_E_RIDGE",
+        "deploymentZoneId": "AB_NE_HEIGHTS",
         "title": "Finale — Overthrow",
         "objective": {
             "id": "FINALE_OVERTHROW",
@@ -48,13 +49,15 @@ FINALE_PLANS = {
         "pathKey": "B",
         "kind": "sovereignty",
         "mapId": "all_that_simmers",
-        "deploymentZoneId": "ATS_NW_SPILLWAY",
+        "deploymentZoneId": "ATS_NW_SHORE",
         "title": "Finale — Sovereignty",
+        # The kings' showdown (owner call, 2026-10-23): a classic game of BAR. Armada, Null Mercs
+        # and the company each start with one commander; last commander standing takes the throne.
         "objective": {
             "id": "FINALE_SOVEREIGNTY",
-            "kind": "destroy_key_structure",
-            "label": "Sovereignty — break both empires' command posts on the simmering ground",
-            "targetZoneId": "ATS_NE_PLATEAU",
+            "kind": "kings_showdown",
+            "label": "Sovereignty — the kings' showdown: one commander each, last one standing takes the throne",
+            "targetZoneId": "ATS_C_BASTION",
             "enemyFaction": "armada",
         },
     },
@@ -62,7 +65,7 @@ FINALE_PLANS = {
         "pathKey": "C",
         "kind": "spire_jump",
         "mapId": "the_rock_jungle",
-        "deploymentZoneId": "TRJ_NW_MUSTER",
+        "deploymentZoneId": "TRJ_NW_OUTER_MUSTER",
         "title": "Finale — Spire Jump",
         "objective": {
             "id": "FINALE_SPIRE_JUMP",

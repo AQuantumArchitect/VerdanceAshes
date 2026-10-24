@@ -166,7 +166,17 @@ export function noteRosterChanged() {
   renderDropSquad();
   paintWarmStatus();
 }
+// A kings' showdown (hub.theaters, from verdance.world.theaters): the commander walks out alone.
+function soloCommand(mapId) { return ((state.hub.theaters || {})[mapId] || {}).kind === "kings_showdown"; }
 export function renderDropSquad() {
+  if (state.plan && soloCommand(state.plan.mapId)) {
+    const squadEl = $("drop-squad"), kicker = $("drop-squad-kicker");
+    if (kicker) kicker.textContent = "Who is dropping · the commander alone";
+    if (squadEl) squadEl.innerHTML = `<div class="theater-sub">The kings' showdown: Armada, Null Mercs and the company each start with one commander and nothing else. Last commander standing takes the throne. The packs and the reserve stay home.</div>`;
+    renderReserve(true);
+    paintDropButton();
+    return;
+  }
   renderReserve(dropRosterSealed());
   const squadEl = $("drop-squad");
   const kicker = $("drop-squad-kicker");
@@ -197,6 +207,10 @@ export function renderDropSquad() {
     if (fallenHome.length) html += `<div class="theater-sub spaced">Fallen stay home · ${fallenHome.map(crewHeroName).map(esc).join(" · ")}</div>`;
     squadEl.innerHTML = html;
   }
+  paintDropButton();
+}
+function paintDropButton() {
+  const go = $("drop-confirm-go");
   if (go) {
     const phase = state.warm && state.warm.phase;
     go.disabled = phase === "loading" || phase === "dropping";
@@ -300,7 +314,8 @@ async function launchField() {
 async function dropCompany() {
   setWarm("dropping");
   try {
-    const { data } = await api.drop({ crewBand: droppingPackIds(), reserveBring: { ...reserveBring() } });
+    const solo = soloCommand((state.plan || {}).mapId);
+    const { data } = await api.drop(solo ? { crewBand: [], reserveBring: {} } : { crewBand: droppingPackIds(), reserveBring: { ...reserveBring() } });
     if (!(data && data.ok)) {
       const err = (data && data.error) || "The drop did not go through.";
       toast(err, "err");
@@ -363,12 +378,13 @@ function preparePlan() {
   const dep = zones.find(z => z.zoneId === plan.marks.deployZoneId);
   if (!dep || !canLaunchFrom(plan, dep)) {
     const why = dep ? padLegality(plan.mapId, dep).why : "no such zone";
-    blockDrop(`The pad must be believed ours, a quiet rim, or the camp's next pad — ${why}`);
+    blockDrop(`The pad must be a door we hold, ground believed ours, or the camp's next pad — ${why}`);
     return null;
   }
-  plan.crewBand = droppingPackIds();
-  plan.deployAces = sealedDeployAces();
-  plan.reserveBring = { ...reserveBring() };
+  const solo = soloCommand(plan.mapId);
+  plan.crewBand = solo ? [] : droppingPackIds();
+  plan.deployAces = solo ? [] : sealedDeployAces();
+  plan.reserveBring = solo ? {} : { ...reserveBring() };
   plan.commerceDeploy = { tenebrium: commerce().tenebrium, kit: commerce().deployKit || [] };
   return plan;
 }

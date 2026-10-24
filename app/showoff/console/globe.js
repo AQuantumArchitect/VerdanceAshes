@@ -8,16 +8,22 @@
 // Plain canvas, no library: an orthographic sphere sampled per pixel from an equirectangular
 // texture, redrawn only while it moves.
 
-const PLACE = {            // where each field sits on the planet (degrees): home in the middle, the ring around it
-  the_rock_jungle:  { lon: 0,   lat: 0 },
-  greenest_fields:  { lon: -34, lat: 22 },
-  koom_valley:      { lon: 0,   lat: 38 },
-  tabula:           { lon: 36,  lat: 22 },
-  ancient_bastion:  { lon: 40,  lat: -16 },
-  all_that_simmers: { lon: 14,  lat: -40 },
-  eye_of_horus:     { lon: -26, lat: -30 },
+// Where each field sits on the planet (degrees), and its turn (quarter turns clockwise). Laid out
+// so every road leaves its field from the side facing the far field and crosses open ash: the
+// chain runs Greenest -> Koom -> Tabula -> Bastion -> Simmers -> Eye -> home, with home's shortcut
+// east to Tabula. Greenest Fields sits turned a quarter anticlockwise: the start road leaves both
+// it and the Rock Jungle from their north-west corners, so one of the two must turn to face the
+// other. (Searched over every turn and placement; see the globe layout note in the project docs.)
+const PLACE = {
+  the_rock_jungle:  { lon: 0,     lat: 0 },
+  greenest_fields:  { lon: -12,   lat: 27.1, rot: 3 },
+  koom_valley:      { lon: 20.7,  lat: 32.8 },
+  tabula:           { lon: 32.2,  lat: 10.9 },
+  ancient_bastion:  { lon: 28.1,  lat: -8.8 },
+  all_that_simmers: { lon: 57.7,  lat: -26.6 },
+  eye_of_horus:     { lon: 30,    lat: -30.1 },
 };
-const SIZE = 32;           // degrees across a field's long side
+const SIZE = 26;           // degrees across a field's long side
 const TW = 2048, TH = 1024;
 const RAD = Math.PI / 180;
 
@@ -68,12 +74,22 @@ function groundCanvas() {
   ground.getContext("2d").drawImage(small, 0, 0, TW, TH);
   return ground;
 }
+// A field may sit turned on the planet (PLACE.rot, quarter turns clockwise) so that each road's
+// two doors face each other across the gap; its picture and its doors turn with it.
+function turned(m) { return ((PLACE[m] && PLACE[m].rot) || 0) % 4; }
 function fieldRect(m) {
   const p = PLACE[m], im = G.images[m];
-  const big = im ? Math.max(im.naturalWidth, im.naturalHeight) : 1;
-  const wDeg = SIZE * (im ? im.naturalWidth / big : 1), hDeg = SIZE * (im ? im.naturalHeight / big : 1);
+  let iw = im ? im.naturalWidth : 1, ih = im ? im.naturalHeight : 1;
+  if (turned(m) % 2) [iw, ih] = [ih, iw];
+  const big = Math.max(iw, ih);
+  const wDeg = SIZE * iw / big, hDeg = SIZE * ih / big;
   const lonSpan = wDeg / Math.cos(p.lat * RAD);
   return { lon0: p.lon - lonSpan / 2, lat0: p.lat + hDeg / 2, lonSpan, hDeg };
+}
+// A point on the map (x east, z south, 0..1) to the same point on the turned field.
+function turnPoint(m, x, z) {
+  for (let k = 0; k < turned(m); k++) [x, z] = [1 - z, x];
+  return [x, z];
 }
 const texX = lon => (lon + 180) / 360 * TW;
 const texY = lat => (90 - lat) / 180 * TH;
@@ -87,7 +103,13 @@ function buildTexture(visible) {
     if (!PLACE[m] || !G.images[m]) continue;
     const r = fieldRect(m);
     const px = texX(r.lon0), py = texY(r.lat0), w = r.lonSpan / 360 * TW, h = r.hDeg / 180 * TH;
-    x.drawImage(G.images[m], px, py, w, h);
+    const k = turned(m);
+    x.save();
+    x.translate(px + w / 2, py + h / 2);
+    x.rotate(k * Math.PI / 2);
+    if (k % 2) x.drawImage(G.images[m], -h / 2, -w / 2, h, w);
+    else x.drawImage(G.images[m], -w / 2, -h / 2, w, h);
+    x.restore();
     x.strokeStyle = "rgba(238,246,238,.7)"; x.lineWidth = 2; x.strokeRect(px, py, w, h);
   }
   G.tex = x.getImageData(0, 0, TW, TH).data;
@@ -154,8 +176,8 @@ function drawHalo(ctx, g) {
   ctx.beginPath(); ctx.arc(g.cx, g.cy, g.R * 1.12, 0, Math.PI * 2); ctx.fill();
 }
 function doorLonLat(end) {
-  const r = fieldRect(end.mapId);
-  return [r.lon0 + end.x * r.lonSpan, r.lat0 - end.z * r.hDeg];
+  const r = fieldRect(end.mapId), [x, z] = turnPoint(end.mapId, end.x, end.z);
+  return [r.lon0 + x * r.lonSpan, r.lat0 - z * r.hDeg];
 }
 function slerpPath(a, b, upto) {
   const va = toLocal(a[0], a[1]), vb = toLocal(b[0], b[1]);
@@ -208,13 +230,23 @@ function drawLabels(ctx, visible) {
   const gold = css("--gold", "#d4c49a"), ink = css("--ink", "#eef6ee"), good = css("--good", "#7dff8a");
   for (const m of visible) {
     if (!PLACE[m] || !G.images[m]) continue;
-    const r = fieldRect(m), p = project(PLACE[m].lon, r.lat0 + 2.2, 0.01);
+    // The name sits just inside the field's top edge, so neighbours a road-gap apart never collide.
+    const r = fieldRect(m), p = project(PLACE[m].lon, r.lat0 - 1.0, 0.01);
     if (!p.front) continue;
     const focused = m === G.opts.focus;
-    ctx.font = `${focused ? 700 : 600} ${focused ? 15 : 13}px system-ui, sans-serif`;
-    ctx.textAlign = "center"; ctx.textBaseline = "bottom";
+    ctx.font = `${focused ? 700 : 600} ${focused ? 14 : 12}px system-ui, sans-serif`;
+    ctx.textAlign = "center"; ctx.textBaseline = "top";
     ctx.lineWidth = 4; ctx.strokeStyle = "rgba(4,9,7,.85)"; ctx.strokeText(G.opts.names[m] || m, p.x, p.y);
     ctx.fillStyle = focused ? ink : gold; ctx.fillText(G.opts.names[m] || m, p.x, p.y);
+    const water = (G.opts.water || {})[m];
+    if (water && focused) {     // the next sortie's water there: dry bed, shallows, amphibious
+      const q = project(PLACE[m].lon, r.lat0 - r.hDeg + 1.0, 0.01);
+      if (q.front) {
+        ctx.font = "600 11px system-ui, sans-serif"; ctx.textBaseline = "bottom";
+        ctx.lineWidth = 3; ctx.strokeText(`≈ ${water}`, q.x, q.y);
+        ctx.fillStyle = css("--steam", "#7ec8ff"); ctx.fillText(`≈ ${water}`, q.x, q.y);
+      }
+    }
     if (focused) {     // trace the field's edge
       ctx.save(); ctx.strokeStyle = good; ctx.lineWidth = 2; ctx.beginPath();
       const edge = [];
@@ -245,12 +277,18 @@ function tick() {
   if (Math.abs(G.toYaw - G.yaw) > 0.001 || Math.abs(G.toPitch - G.pitch) > 0.001) G.raf = requestAnimationFrame(tick);
 }
 function kick() { if (!G.raf) G.raf = requestAnimationFrame(tick); }
+// Turn to the focused field, leaning toward the middle of the walked world so its neighbours
+// stay on the near side of the planet.
 function faceField(m) {
   if (!PLACE[m]) return;
-  let yaw = -PLACE[m].lon * RAD;
+  const seen = ((G.opts && G.opts.visible) || []).filter(v => PLACE[v]);
+  const mid = k => seen.reduce((s, v) => s + PLACE[v][k], 0) / (seen.length || 1);
+  const lon = seen.length > 1 ? 0.6 * PLACE[m].lon + 0.4 * mid("lon") : PLACE[m].lon;
+  const lat = seen.length > 1 ? 0.6 * PLACE[m].lat + 0.4 * mid("lat") : PLACE[m].lat;
+  let yaw = -lon * RAD;
   while (yaw - G.yaw > Math.PI) yaw -= 2 * Math.PI;
   while (G.yaw - yaw > Math.PI) yaw += 2 * Math.PI;
-  G.toYaw = yaw; G.toPitch = PLACE[m].lat * RAD;
+  G.toYaw = yaw; G.toPitch = lat * RAD;
 }
 
 // ---- input ------------------------------------------------------------------------------------
@@ -301,7 +339,8 @@ function loadImages() {
   return G.loading;
 }
 
-// opts: { visible: [mapId], focus: mapId, roads: hub world roads, names: {mapId: name}, onPick(mapId) }
+// opts: { visible: [mapId], focus: mapId, roads: hub world roads, names: {mapId: name},
+//         water: {mapId: assault word}, onPick(mapId) }
 export function renderGlobe(host, opts) {
   if (!host) return;
   const first = !G.canvas || G.host !== host;

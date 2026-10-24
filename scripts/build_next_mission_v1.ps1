@@ -1235,6 +1235,21 @@ if ($commanderRow -and $commanderRow.PSObject.Properties["unlocked"] -and $comma
 }
 $arcProfile.playerCommanders = $(if ($commanderUnlocked) { 1 } else { 0 })
 Write-Host ("Command walker: {0}" -f $(if ($commanderUnlocked) { "unlocked" } else { "scrap" }))
+# The field's standing set piece (verdance.world.theaters, on the intent): Koom's standing war,
+# All That Simmers' kings' showdown. The engine decides it; this script only places it.
+$theater = if ($intent.PSObject.Properties["theater"] -and $intent.theater) { $intent.theater } else { $null }
+$isKings = [bool]($theater -and [string]$theater.kind -eq "kings_showdown")
+$isStandingWar = [bool]($theater -and [string]$theater.kind -eq "standing_war")
+$script:kings = @()
+if ($isKings) {
+  # A classic game of BAR: every king starts with its commander and nothing else, and keeps it.
+  $arcProfile.playerCommanders = 1
+  $arcProfile.sweepEnemyCommanders = $false
+  $arcProfile.enemyAI = "barbarian"
+  $arcProfile.allowEnemyProduction = $true
+  $arcProfile.escalation = "off"
+  Write-Host "Kings' showdown: one commander each, last one standing takes the throne."
+}
 # Drop 4 escalation ladder: the engine's authored plan (scale window,
 # objective strength, waves override, secondary objectives). One authority
 # for pacing — the compiler honors every field it stamps.
@@ -2126,7 +2141,9 @@ $strikeDoctrine = ([int]$arcProfile.playerCommanders -le 0) -or ($objectiveKind 
 # Drop 2: act 2+ is base-building doctrine even on raid contracts; act 3 is the
 # finale kit (massive start).
 if ($actNum -ge 2) { $strikeDoctrine = $false }
-if ($openingMission) {
+if ($isKings) {
+  $playerKit = @()      # the start commander is the company's king; nobody else walks out
+} elseif ($openingMission) {
   $playerKit = New-OpeningStrikeTeam $commerce
   Write-Host "Opening kit: mercenary Punch of Thugs + 2 Karkinos + Phobos Vane + durable rez-bot Ketha; no commander suit."
 } elseif ($actNum -ge 3 -or $isFinale) {
@@ -2320,45 +2337,105 @@ function Get-HotDrop {
 }
 
 function Add-WildDens {
-  # The Rock Jungle is wild ground: every zone the wild truly holds (intent.wildZones) gets a
-  # den -- a raptor turret, which is the wild's defensive value there, so the zone is the
-  # wild's until someone out-builds it -- and a pack that moseys between its zone and the
-  # nearest den, with a gunship looping wider. The hive zone and the ground around the
-  # company's pad are left alone. Packs carry patrol orders only, so the raptor AI's waves
-  # stay its own and these never march on the pad unprompted.
-  param([double[]]$PadCenter, [string]$HiveZoneId)
-  if ($null -eq $script:wildTeamID) { return }
-  $held = @()
-  if ($intent.PSObject.Properties["wildZones"] -and $intent.wildZones) { $held = @($intent.wildZones | ForEach-Object { [string]$_ }) }
+  # Wild ground (the Rock Jungle end to end, the Eye's crater rim): the engine names every den on
+  # the intent (intent.wildDens: zone, label, point; none on the hive, none near the pad). Each is
+  # a raptor turret -- the wild's defensive value there, so the zone is the wild's until someone
+  # out-builds it -- with a pack that moseys between it and the nearest den and a gunship looping
+  # wider. Packs carry patrol orders only, so the raptor AI's waves stay its own and these never
+  # march on the pad unprompted.
   $dens = @()
-  foreach ($z in @($zoneMap.zones)) {
-    $zid = [string]$z.zoneId
-    if ($zid -eq $HiveZoneId -or $held -notcontains $zid) { continue }
-    $c = Get-ZoneCenter $z $null
-    if (-not $c) { continue }
-    $dx = $c[0] - $PadCenter[0]; $dz = $c[1] - $PadCenter[1]
-    if ([Math]::Sqrt($dx * $dx + $dz * $dz) -lt 0.22) { continue }
-    $dens += ,@($zid, $c, $(if ($z.label) { [string]$z.label } else { $zid }))
-  }
+  if ($intent.PSObject.Properties["wildDens"] -and $intent.wildDens) { $dens = @($intent.wildDens) }
+  if ($dens.Count -eq 0) { return }
+  if ($null -eq $script:wildTeamID) { Add-RaptorCamp @([double]$dens[0].x, [double]$dens[0].z) $false "Raptor wild ground" }
   $scale = 1.0 + [Math]::Max(0.0, [Math]::Min(1.0, $maxHazard))
+  $n = 0
   foreach ($den in $dens) {
-    $zid, $c, $label = $den
-    $near = @($dens | Where-Object { $_[0] -ne $zid } | Sort-Object { ($_[1][0] - $c[0]) * ($_[1][0] - $c[0]) + ($_[1][1] - $c[1]) * ($_[1][1] - $c[1]) })
+    $c = @([double]$den.x, [double]$den.z)
+    $near = @($dens | Where-Object { $_ -ne $den } | Sort-Object { ([double]$_.x - $c[0]) * ([double]$_.x - $c[0]) + ([double]$_.z - $c[1]) * ([double]$_.z - $c[1]) })
     $denPoint = @{ x = $c[0]; z = $c[1] }
     $walk = @($denPoint)
     $fly = @($denPoint)
-    if ($near.Count -ge 1) { $walk += @{ x = $near[0][1][0]; z = $near[0][1][1] }; $fly += @{ x = $near[0][1][0]; z = $near[0][1][1] } }
-    if ($near.Count -ge 2) { $fly += @{ x = $near[1][1][0]; z = $near[1][1][1] } }
-    $recipe = "wild_den_$zid"
+    if ($near.Count -ge 1) { $walk += @{ x = [double]$near[0].x; z = [double]$near[0].z }; $fly += @{ x = [double]$near[0].x; z = [double]$near[0].z } }
+    if ($near.Count -ge 2) { $fly += @{ x = [double]$near[1].x; z = [double]$near[1].z } }
+    $n += 1
+    $recipe = "wild_den_{0}_{1}" -f [string]$den.zoneId, $n
     $script:baseRecipes[$recipe] = @(
       (Spec "raptor_turret_basic_t2_v1" 1 0 0 120),
       (Spec "raptor_land_swarmer_basic_t1_v1" (Get-ScaledCount 5 $scale) 90 -60 70 -Patrol $walk),
       (Spec "raptor_land_swarmer_basic_t2_v1" (Get-ScaledCount 2 $scale) -110 70 80 -Patrol $walk),
       (Spec "raptor_air_gunship_basic_t2_v1" 1 0 -160 90 -Patrol $fly)
     )
-    $script:forces += [ordered]@{ id = $recipe; label = "Wild den: $label"; teamID = $script:wildTeamID; side = "Raptors"; faction = "wild"; role = "wild_pressure"; zoneId = $zid; base = [ordered]@{ x = $c[0]; z = $c[1] }; recipe = $recipe }
+    $label = if ($den.label) { [string]$den.label } else { [string]$den.zoneId }
+    $script:forces += [ordered]@{ id = $recipe; label = "Wild den: $label"; teamID = $script:wildTeamID; side = "Raptors"; faction = "wild"; role = "wild_pressure"; zoneId = [string]$den.zoneId; base = [ordered]@{ x = $c[0]; z = $c[1] }; recipe = $recipe }
   }
-  Write-Host ("Rock Jungle wilds: {0} dens across the zones the wild holds." -f $dens.Count)
+  Write-Host ("Wild ground: {0} dens." -f $dens.Count)
+}
+
+function Get-WarFaction {
+  param([string]$Faction)
+  if ($Faction -eq "nullmercs") { return @{ T = $MERC; side = "Legion"; label = "Null Mercs" } }
+  return @{ T = $FACTION["Armada"]; side = "Armada"; label = "Armada" }
+}
+
+function New-WarTeam {
+  param([string]$Faction, [double[]]$Center, [string]$Label, [double]$Rect = 0.16)
+  $W = Get-WarFaction $Faction
+  $teamID = $script:nextTeam; $script:nextTeam += 1
+  $allyID = $script:nextAllyTeam; $script:nextAllyTeam += 1
+  $script:allyTeams += [ordered]@{ id = $allyID; startRect = New-StartRect $Center $Rect }
+  $script:teams += [ordered]@{ id = $teamID; side = $W.side; allyTeam = $allyID; base = @($Center[0], $Center[1]); rgb = $W.T.rgb; label = "$($W.label) - $Label"; faction = $Faction }
+  $script:ai += [ordered]@{ name = "BARb($($W.label) $Label)"; shortName = "BARb"; team = $teamID; version = "<not-versioned>" }
+  if ($Faction -eq "armada" -and $null -eq $script:primaryEnemyTeamID) { $script:primaryEnemyTeamID = $teamID; $script:primaryEnemySide = "Armada" }
+  return @{ teamID = $teamID; allyID = $allyID; W = $W }
+}
+
+function Add-StandingWar {
+  # Koom Valley: Null Mercs and Armada already at war across the valley. Each side holds its
+  # corner (eco, a lab, defenses facing the other) under a BARbarian that keeps producing, and its
+  # army is on the line at its spillway, patrolling into the other side's. The company jumps in
+  # from a door on the flank; the Mercs are allies or not as the company's standing with them says.
+  param($Theater)
+  $camps = @($Theater.camps)
+  for ($i = 0; $i -lt $camps.Count; $i++) {
+    $camp = $camps[$i]; $foe = $camps[($i + 1) % $camps.Count]
+    $c = @([double]$camp.x, [double]$camp.z)
+    $wt = New-WarTeam ([string]$camp.faction) $c ([string]$camp.label)
+    $T = $wt.W.T
+    $fx = [Math]::Sign([double]$foe.x - $c[0]); if ($fx -eq 0) { $fx = 1 }
+    $fz = [Math]::Sign([double]$foe.z - $c[1]); if ($fz -eq 0) { $fz = 1 }
+    $works = "war$($wt.teamID)_works"
+    $script:baseRecipes[$works] = @(
+      (Spec $T.mex 4 -160 120 120 $true), (Spec $T.wind 6 140 170 85), (Spec $T.solar 2 260 60 95),
+      (Spec $T.llt 4 (170 * $fx) (150 * $fz) 150), (Spec $T.wall 8 (270 * $fx) (240 * $fz) 40),
+      (Spec $T.aa 2 (-90 * $fx) (60 * $fz) 170), (Spec $T.radar 1 0 -80 100),
+      (Spec $T.lab 1 -300 -150 120), (Spec $T.nano 2 -210 -240 90)
+    )
+    $script:forces += [ordered]@{ id = $works; label = "$($wt.W.label) works"; teamID = $wt.teamID; side = $wt.W.side; faction = [string]$camp.faction; role = "garrison"; zoneId = [string]$camp.zoneId; base = [ordered]@{ x = $c[0]; z = $c[1] }; recipe = $works }
+    $line = @(@{ x = [double]$camp.front.x; z = [double]$camp.front.z }, @{ x = [double]$foe.front.x; z = [double]$foe.front.z })
+    $army = "war$($wt.teamID)_line"
+    $script:baseRecipes[$army] = @(
+      (Spec $T.raider 8 0 0 80 -Patrol $line), (Spec $T.skirm 6 -120 60 90 -Patrol $line),
+      (Spec $T.assault 4 120 -60 95 -Patrol $line)
+    )
+    $script:forces += [ordered]@{ id = $army; label = "$($wt.W.label) line"; teamID = $wt.teamID; side = $wt.W.side; faction = [string]$camp.faction; role = "standing_war"; zoneId = [string]$camp.front.zoneId; base = [ordered]@{ x = [double]$camp.front.x; z = [double]$camp.front.z }; recipe = $army }
+    if ([string]$camp.faction -eq "nullmercs" -and $mercsAllied) {
+      $script:alliances += [ordered]@{ allyTeamA = 0; allyTeamB = $wt.allyID; allied = $true }
+    }
+  }
+  Write-Host ("Standing war: {0}" -f (($camps | ForEach-Object { "$($_.faction)@$($_.zoneId)" }) -join " vs "))
+}
+
+function Add-Kings {
+  # All That Simmers, the kings' showdown: a classic game of BAR. Each rival is a BARbarian on its
+  # own seat with its start commander and nothing else; the company's commander is the third
+  # king. Everyone is at war with everyone. The kings gadget reports who falls.
+  param($Theater)
+  $script:kings = @([ordered]@{ teamID = 0; faction = "ashwalkers"; label = "The company" })
+  foreach ($k in @($Theater.kings)) {
+    $wt = New-WarTeam ([string]$k.faction) @([double]$k.x, [double]$k.z) ([string]$k.label) 0.12
+    $script:kings += [ordered]@{ teamID = $wt.teamID; faction = [string]$k.faction; label = "$($wt.W.label) king"; zoneId = [string]$k.zoneId }
+  }
+  Write-Host ("Kings: {0}" -f (($script:kings | ForEach-Object { $_.faction }) -join ", "))
 }
 
 function Add-NullMercCamp {
@@ -2683,6 +2760,8 @@ $usedShell = $false
 if ($isWildHomeFounding) {
   # Founding shelf stays empty — player builds the Ashwalker pad; raptors are the only pressure.
   Write-Host "Skipping living-shell occupation on Rock Jungle wild home founding."
+} elseif ($theater -and ($isKings -or $isStandingWar)) {
+  Write-Host ("Set piece {0}: no living-shell occupation." -f [string]$theater.kind)
 } elseif (($script:shellCapableKinds -contains $objectiveKind) -or $script:presenceFrom) {
   # The enemy's bases stand whatever the job is; a presence job still has the world around it.
   $anchorSide = $enemySide
@@ -2701,19 +2780,14 @@ if (-not $usedShell) {
   if ($fpOnly) { $usedShell = $true }
 }
 
-# Drop 2 finale setpieces: authored camps keyed by path (no living shell —
-# these are designed closing battles, not procedural occupation).
-if ($isFinale) {
+# The field's set piece replaces the usual camps; then the finale setpieces, authored by path
+# (no living shell: designed closing battles, not procedural occupation).
+if ($isKings) {
+  Add-Kings $theater
+} elseif ($isStandingWar) {
+  Add-StandingWar $theater
+} elseif ($isFinale) {
   switch ($finaleKind) {
-    "sovereignty" {
-      # Break BOTH empires: two fortified command posts on their authored ground.
-      $armZone = Get-ZoneById $zoneMap "ATS_NE_ARMADA_RIDGE"
-      $corZone = Get-ZoneById $zoneMap "ATS_SE_CORTEX_BASIN"
-      $armC = Get-ZoneCenter $armZone @((Clamp01 ($enemyCenter[0] - 0.14)), (Clamp01 ($enemyCenter[1] - 0.08)))
-      $corC = Get-ZoneCenter $corZone @((Clamp01 ($enemyCenter[0] + 0.14)), (Clamp01 ($enemyCenter[1] + 0.10)))
-      Add-FactionCamp "Armada" $armC (Centerpiece-CommandPost $FACTION["Armada"]) "Armada command post" -WithEco $true -WithProduction $true -SupportSpecs (Support-Relay $FACTION["Armada"])
-      Add-FactionCamp "Cortex" $corC (Centerpiece-CommandPost $FACTION["Cortex"]) "Cortex command post" -WithEco $true -WithProduction $true -WithJammers $true -SupportSpecs (Support-Relay $FACTION["Cortex"])
-    }
     "spire_jump" {
       # Burn the hive heart; a deep nest keeps the pressure honest.
       Add-RaptorCamp $enemyCenter $true $description
@@ -2819,13 +2893,13 @@ switch ($objectiveKind) {
 }
 
 # Drop 3 act-1 texture: roving warband packs on the approach axis.
-if (-not $isFinale -and [string]$arcProfile.enemyMode -eq "warband") {
+if (-not $isFinale -and -not $theater -and [string]$arcProfile.enemyMode -eq "warband") {
   Add-WarbandPacks $deployCenter $enemyCenter ([Math]::Max(0.6, $enemyScale * 0.8))
 }
 
 # Drop 4 escalation: secondary-objective camps at the plan's resolved zones.
 # Skip anything that collides with the deploy/target zones or lacks a center.
-if ($escSecondaries.Count -gt 0 -and -not $isFinale -and $zoneMap -and $zoneMap.zones) {
+if ($escSecondaries.Count -gt 0 -and -not $isFinale -and -not $isKings -and $zoneMap -and $zoneMap.zones) {
   $secSide = if ($script:primaryEnemySide) { [string]$script:primaryEnemySide } else { $enemySide }
   foreach ($sec in $escSecondaries) {
     if (-not $sec -or -not $sec.zoneId) { continue }
@@ -2887,7 +2961,7 @@ if ($script:livingShellPayload -and $script:livingShellPayload.pockets -and -not
 # Drop 3 finale dressing: persistent-base snapshots walk back onto the field.
 # Player-bloc zones return as standing team-0 bases; empire zones as thin
 # static camps on the primary enemy team. Deploy/target zones stay untouched.
-if ($isFinale -and $intent.PSObject.Properties["persistentBaseRehydrate"] -and $intent.persistentBaseRehydrate) {
+if ($isFinale -and -not $isKings -and $intent.PSObject.Properties["persistentBaseRehydrate"] -and $intent.persistentBaseRehydrate) {
   $rehydrated = 0
   foreach ($entry in @($intent.persistentBaseRehydrate)) {
     if ($rehydrated -ge 3) { break }
@@ -2924,7 +2998,7 @@ if ($isFinale -and $intent.PSObject.Properties["persistentBaseRehydrate"] -and $
 
 # Null Merc foothold: same rim constraint as player infil — enter from an edge
 # lane on the flank, not a mid-map pop-in on the deploy→target axis.
-if ($mercsPresent) {
+if ($mercsPresent -and -not $theater) {
   $axisX = $enemyCenter[0] - $deployCenter[0]
   $axisZ = $enemyCenter[1] - $deployCenter[1]
   $axisLen = [Math]::Sqrt($axisX * $axisX + $axisZ * $axisZ)
@@ -2967,10 +3041,10 @@ if ($mercsPresent) {
 }
 
 # Wild pressure nest on wild-family maps whose objective is not already the hive.
-if ($hasWild -and $objectiveKind -ne "hive_clear_or_bypass") {
+if ($hasWild -and -not $isKings -and $objectiveKind -ne "hive_clear_or_bypass") {
   Add-RaptorCamp $wildCenter $false "Raptor wild pressure"
 }
-if ($isRockJungle -and -not $isFinale) { Add-WildDens $deployCenter "TRJ_SW_LANE" }
+if (-not $isFinale -and -not $isKings) { Add-WildDens }
 
 # Same-faction camps must never shoot each other: Spring allies only through
 # explicit pacts and every camp rides its own allyteam, so pact all armada-
@@ -3394,6 +3468,9 @@ $scenario = [ordered]@{
     hotDrop = $(Get-HotDrop)
     # The doors on this map (zoneId, farMapName, held): drawn on the in-game board.
     doors = @($(if ($intent.PSObject.Properties["doors"] -and $intent.doors) { $intent.doors } else { @() }))
+    # The field's set piece, and for a kings' showdown the kings the kings gadget watches.
+    theater = $theater
+    kings = @($script:kings)
     battlefieldManifest = [ordered]@{
       schemaVersion = "verdance-battlefield-manifest/1.0"
       initializationEndsFrame = 90

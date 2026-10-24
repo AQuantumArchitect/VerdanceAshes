@@ -26,21 +26,14 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from verdance.common import edge_score, load_json, save_json, utc_now
-from verdance.world import zone_graph as wzg, landing_zones as lz
+from verdance.common import load_json, save_json, utc_now
+from verdance.world import zone_graph as wzg, landing_zones as lz, roads as _roads
 from verdance.world.graph_collapse import snapshot_graph, pressure_brief
 from verdance.company.company import ensure_company, sortie_roster, peek_mission_call_ins
 from verdance.belief import hub_belief
 
 SORTIE_SCHEMA = "verdance-sortie-order/1.0"
 PLAN_SCHEMA = "verdance-deploy-plan/1.0"
-RIM_EDGE_THRESHOLD = lz.RIM_EDGE_THRESHOLD
-
-
-def is_rim_zone(bounds: dict, *, threshold: float = RIM_EDGE_THRESHOLD) -> bool:
-    return lz.is_rim_zone(bounds, threshold=threshold)
-
-
 def zone_meta_lookup(ws: Path, map_id: str) -> dict[str, dict]:
     """zoneId → {bounds, tags, role} from authored zone map."""
     if not map_id:
@@ -163,7 +156,7 @@ def blocking_lz_warnings(warns: list[str], pads: set[str]) -> list[str]:
 def soft_validate(plan: dict, ws: Path, state: dict | None = None) -> list[str]:
     """Warnings + hard LZ errors (LZ_* → stamp still writes but valid may fail).
 
-    Legal infil/exfil: quiet rim OR Ashwalker-majority established base.
+    Legal pad: a door the company holds, ground believed ours, or the camp's next pad.
     Legacy RIM_* codes are no longer emitted; midfield is fine when owned.
     """
     warns: list[str] = []
@@ -189,46 +182,30 @@ def soft_validate(plan: dict, ws: Path, state: dict | None = None) -> list[str]:
         if bounds is None and str(zone_id) not in meta_by_id:
             warns.append(f"UNKNOWN_{kind}_ZONE: {zone_id}")
             return
-        # Pass six: legality is judged on what the COMPANY BELIEVES, never on the truth.
-        # legal = believed ours · a rim we believe empty / nobody has looked at, with low believed
-        # threat · the pad the last manifest said we would land on.
+        # Legality is judged on what the company knows, never on the truth: a pad is ground we
+        # believe is ours, a door our ledger says we hold, or the pad the last manifest set.
+        if _roads.held(state, str(zone_id)):
+            return
         bel = None
         try:
             bel = (hub_belief.belief_surface(ws, state, str(map_id or "")).get("zones") or {}).get(str(zone_id))
         except Exception:  # noqa: BLE001
             bel = None
-        if bel is not None:
-            camp = state.get("camp") or {}
-            if str(camp.get("nextPadZoneId") or "") == str(zone_id):
-                return
-            if bel.get("believed") == "ours":
-                return
-            rim = bounds is not None and is_rim_zone(bounds)
-            threat = float(bel.get("threat") or 0.0)
-            if bel.get("believed") in ("empty", "dark", "unsure") and rim and threat <= 0.4:
-                return
-            why = {"held": f"believed held by {bel.get('faction') or 'someone'} ({int(float(bel.get('confidence') or 0) * 100)}%)",
-                   "empty": "believed empty but not a rim", "dark": "nobody has looked and it is not a rim",
-                   "unsure": "not a rim", "ours": "ours"}.get(bel.get("believed") or "dark", "not a legal pad")
-            if threat > 0.4 and bel.get("believed") in ("empty", "dark", "unsure"):
-                why = f"believed threat too high ({threat:.2f})"
-            warns.append(f"LZ_{kind}: {zone_id} illegal ({why}); a pad is ground we believe is ours, or a quiet rim")
+        camp = state.get("camp") or {}
+        if str(camp.get("nextPadZoneId") or "") == str(zone_id):
             return
-        ok, reason = lz.legal_landing_reason(
-            state,
-            str(map_id or ""),
-            str(zone_id),
-            bounds,
-            tags=meta.get("tags"),
-            role=str(meta.get("role") or ""),
-        )
-        if ok:
+        if bel is not None and bel.get("believed") == "ours":
             return
-        score = edge_score(bounds) if bounds else 0.5
-        warns.append(
-            f"LZ_{kind}: {zone_id} illegal ({reason}, edgeScore={score:.2f}); "
-            f"infil/exfil need quiet rim or Ashwalker-majority base"
-        )
+        if bel is None:
+            ok, reason = lz.legal_landing_reason(state, str(map_id or ""), str(zone_id), bounds,
+                                                 tags=meta.get("tags"), role=str(meta.get("role") or ""))
+            if ok:
+                return
+        conf = int(float((bel or {}).get("confidence") or 0) * 100)
+        why = {"held": f"believed held by {(bel or {}).get('faction') or 'someone'} ({conf}%)",
+               "empty": "believed empty, not ours", "dark": "nobody has looked; not ours",
+               "unsure": "not ours"}.get((bel or {}).get("believed") or "dark", "not ours")
+        warns.append(f"LZ_{kind}: {zone_id} illegal ({why}); a pad is ground we believe is ours, or a door we hold")
 
     if deploy:
         _lz_warn("DEPLOY", str(deploy))

@@ -5,7 +5,7 @@ Authoritative atlas: data/zone_maps/world_zone_graph.v1.json
 Legacy zone_adjacency.json is a fallback / derived cache only.
 
 Session rule (kernel): same-map edges drive legal contracts and promote picks.
-strategic_link edges drive Mode B map travel (session host Reload path).
+strategic_link edges are the roads between maps; verdance.world.roads owns travel over them.
 """
 
 from __future__ import annotations
@@ -183,101 +183,6 @@ def strategic_link_edges(workspace: Path) -> List[Dict[str, Any]]:
     return out
 
 
-def mode_b_travel_candidates(
-    workspace: Path,
-    from_zone_ids: Iterable[str],
-    *,
-    current_map_id: Optional[str] = None,
-) -> List[Dict[str, Any]]:
-    """Legal Mode B hops off held/from zones via strategic_link edges.
-
-    Each hop lands on a different map (or at least a destination zone node).
-    Session host uses these for Reload-path map travel; Mode A ignores them.
-    """
-    nodes = {}
-    graph = load_world_zone_graph(workspace)
-    if graph:
-        nodes = nodes_by_id(graph)
-    held = [str(z) for z in from_zone_ids if z]
-    if not held:
-        return []
-    held_set = set(held)
-    cur_map = canonical_map_id(current_map_id) if current_map_id else ""
-    hops: List[Dict[str, Any]] = []
-    seen: Set[Tuple[str, str]] = set()
-
-    for e in strategic_link_edges(workspace):
-        a = str(e.get("from") or "")
-        b = str(e.get("to") or "")
-        endpoints = ((a, b), (b, a))
-        for src, dst in endpoints:
-            if src not in held_set:
-                continue
-            src_node = nodes.get(src) or {}
-            dst_node = nodes.get(dst) or {}
-            src_map = canonical_map_id(src_node.get("mapId") or e.get("mapId"))
-            dst_map = canonical_map_id(dst_node.get("mapId"))
-            if not dst_map:
-                continue
-            # Mode B is map travel: skip if destination is same map as current focus.
-            focus = cur_map or src_map
-            if focus and dst_map == focus:
-                continue
-            key = (src, dst)
-            if key in seen:
-                continue
-            seen.add(key)
-            hops.append(
-                {
-                    "id": f"mode_b_{src}_{dst}",
-                    "fromZoneId": src,
-                    "fromZoneIds": [src],
-                    "targetZoneId": dst,
-                    "mapId": dst_map,
-                    "fromMapId": src_map or focus,
-                    "kind": "strategic_link",
-                    "edgeKind": "strategic_link",
-                    "sessionMode": "reload_travel",
-                    "travelMode": "mode_b",
-                    "cost": e.get("cost", 2),
-                    "notes": e.get("notes") or "",
-                    "label": (dst_node.get("label") or dst),
-                    "title": f"Travel — {dst_node.get('label') or dst}",
-                    "plain": (
-                        f"Mode B map travel via strategic_link: "
-                        f"{src_map or '?'} → {dst_map} ({dst}). "
-                        "Session host Reload path builds + relaunches."
-                    ),
-                    "objectiveArchetype": "seize_lane",
-                    "patron": "nullmercs",
-                    "against": "armada",
-                }
-            )
-    # Stable order: cost then map then zone
-    hops.sort(key=lambda h: (int(h.get("cost") or 99), str(h.get("mapId")), str(h.get("targetZoneId"))))
-    return hops
-
-
-def validate_mode_b_hop(
-    workspace: Path,
-    from_zone_id: str,
-    target_zone_id: str,
-) -> Optional[Dict[str, Any]]:
-    """Return the hop dict if strategic_link connects from→to (either direction)."""
-    src = str(from_zone_id or "")
-    dst = str(target_zone_id or "")
-    if not src or not dst:
-        return None
-    for hop in mode_b_travel_candidates(workspace, [src]):
-        if hop.get("targetZoneId") == dst and hop.get("fromZoneId") == src:
-            return hop
-    # Also accept when from is any endpoint and target matches
-    for hop in mode_b_travel_candidates(workspace, [src]):
-        if hop.get("targetZoneId") == dst:
-            return hop
-    return None
-
-
 def graph_stats(workspace: Path) -> Dict[str, Any]:
     graph = load_world_zone_graph(workspace)
     if not graph:
@@ -308,20 +213,12 @@ def main() -> int:
     p = argparse.ArgumentParser(description="World zone graph kernel probe")
     p.add_argument("--workspace", default=".", help="Workspace root")
     p.add_argument("--map", default="", help="Optional mapId for adjacency dump")
-    p.add_argument(
-        "--mode-b-from",
-        default="",
-        help="Zone id: dump Mode B strategic_link travel candidates",
-    )
     args = p.parse_args()
     ws = Path(args.workspace).resolve()
     print(json.dumps(graph_stats(ws), indent=2))
     if args.map:
         adj = load_map_adjacency(ws, args.map)
         print(json.dumps({"mapId": canonical_map_id(args.map), "adjacency": adj}, indent=2))
-    if args.mode_b_from:
-        hops = mode_b_travel_candidates(ws, [args.mode_b_from])
-        print(json.dumps({"fromZoneId": args.mode_b_from, "modeBHops": hops}, indent=2))
     return 0
 
 

@@ -309,6 +309,22 @@ details.advanced summary { color:var(--steam); }
   vector-effect:non-scaling-stroke; pointer-events:all; transition:fill .12s, stroke .12s;
 }
 .zone .z-exposed { fill:url(#exp-hatch); stroke:none; pointer-events:none; }
+.zone .z-water { fill:var(--steam); fill-opacity:calc(var(--wet) * .5); stroke:none; pointer-events:none; }
+.hide-water .zone .z-water { display:none; }
+/* The waterline: the next sortie's level on this map, where it is heading, and the assault word. */
+.waterline { display:flex; gap:.5rem; align-items:stretch; padding:.3rem .55rem; border:1px solid color-mix(in srgb, var(--steam) 30%, transparent); background:var(--shade); }
+.waterline .wl-gauge { position:relative; width:.6rem; min-height:2.6rem; border:1px solid color-mix(in srgb, var(--steam) 45%, transparent); background:color-mix(in srgb, var(--ash) 18%, var(--bg)); }
+.waterline .wl-fill { position:absolute; left:0; right:0; bottom:0; background:color-mix(in srgb, var(--steam) 65%, transparent); }
+.waterline .wl-next { position:absolute; left:-.25rem; right:-.25rem; height:0; border-top:1px dashed var(--ink); }
+.waterline .wl-cap { position:absolute; left:-.25rem; right:-.25rem; height:0; border-top:2px solid var(--warn); }
+.waterline .wl-text { display:flex; flex-direction:column; line-height:1.2; }
+.waterline .wl-text b { font-size:var(--fs-md); text-transform:capitalize; color:var(--ink); }
+.waterline.wl-amphibious .wl-text b { color:var(--steam); }
+.waterline.wl-dry-bed .wl-text b, .waterline.wl-dry .wl-text b { color:var(--gold); }
+.waterline .wl-num { color:var(--muted); font-size:var(--fs-xs); }
+.waterline .wl-trend { white-space:nowrap; }
+.map-chip .tag-water { color:var(--steam); }
+.map-chip .tag-water.wl-dry-bed { color:var(--gold); }
 .board-defs { position:absolute; width:0; height:0; }
 .exp-hatch-line { fill:color-mix(in srgb, var(--bad) 70%, transparent); }
 .zone:hover, .zone:focus-visible { z-index:4; --zline:var(--gold); --zw:1.5; }

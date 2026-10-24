@@ -1169,6 +1169,8 @@ local function resultJson()
     '"playerFootprint":' .. playerFootprintJson(facts),
     -- pass three belief contract, produced by game_verdance_belief_observe.lua (GG, no new locals here)
     '"observedZones":' .. ((GG and GG.VA_ObservedZonesJson) and GG.VA_ObservedZonesJson() or 'null'),
+    -- the kings' showdown, from game_verdance_kings.lua: who fell, when, to whom
+    '"kings":' .. ((GG and GG.VA_KingsJson) and GG.VA_KingsJson() or 'null'),
     '"beliefExport":' .. ((GG and GG.VA_BeliefExportJson) and GG.VA_BeliefExportJson() or 'null'),
     '"purge":{"armed":' .. tostring(extraObj.purge == true)
       .. ',"done":' .. tostring(extraObj.purgeDone == true) .. '}',
@@ -5559,6 +5561,11 @@ function GG.VA_EndSortie(kind)
   setTerminal(kind, kind)
 end
 
+-- The kings gadget calls this when every rival king has fallen and ours stands.
+function GG.VA_ObjectiveComplete(how)
+  onObjectiveComplete(how)
+end
+
 function GG.VA_TenebriumBank()
   return tonumber(tenebLoot and tenebLoot.bank) or 0
 end
@@ -5666,6 +5673,7 @@ end
 function checkPresenceObjective(frame)
   if objectiveComplete then return end
   local kind = objectiveKind()
+  if kind == "kings_showdown" then return end  -- the kings gadget decides; no zone hold stands in
   if VA_KINDS.fortify[kind] then
     checkFortifyObjective(frame)
     return

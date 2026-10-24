@@ -86,8 +86,9 @@
         <div class="theater-head">
           <div>
             <h2 id="theater-title">Theater</h2>
-            <p class="theater-sub" id="theater-sub">Click a wound (target). The pad is one zone — you land there and you lift from there: a zone we believe is ours, a quiet rim, or the camp's next pad (△). The board shows what the company believes, not the ground.</p>
+            <p class="theater-sub" id="theater-sub">Click a wound (target). The pad is one zone — you land there and you lift from there: a road door we hold, a zone we believe is ours, or the camp's next pad (△). The board shows what the company believes, not the ground.</p>
           </div>
+          <div class="waterline" id="waterline" aria-live="polite"></div>
           <div class="mode-bar">
             <span class="label">Mark</span>
             <button type="button" class="mode-btn active" data-mode="capture">Wound</button>
@@ -108,6 +109,7 @@
           <label><input type="checkbox" data-overlay="ownership" checked> Ownership</label>
           <label><input type="checkbox" data-overlay="intelligence" checked> Intelligence</label>
           <label><input type="checkbox" data-overlay="route" checked> Route</label>
+          <label><input type="checkbox" data-overlay="water" checked> Water</label>
         </fieldset>
         <!-- Belief key: what the COMPANY believes holds each zone. Faction colour = "we believe they hold it". -->
         <div class="cc-faction-key" aria-label="Belief legend">

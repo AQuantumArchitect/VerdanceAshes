@@ -179,23 +179,27 @@ def test_stamp_believed_held_is_illegal_with_the_sentence():
     warns = _lz_warnings(ws, PAD)
     assert len(warns) == 1, warns
     assert warns[0].startswith(f"LZ_DEPLOY: {PAD} illegal (believed held by armada (70%))"), warns[0]
-    assert warns[0].endswith("a pad is ground we believe is ours, or a quiet rim")
+    assert warns[0].endswith("a pad is ground we believe is ours, or a door we hold")
 
 
-def test_stamp_rim_believed_empty_is_legal():
+def test_stamp_open_ground_is_never_a_pad():
+    # Believed empty, or nobody has looked: open ground either way, rim or midfield.
     ws = _ws_for_stamp([
         {"node": PAD, "role": "held", "value": 0.1, "confidence": 0.6, "state": "current",
          "age_min": 0.0, "source": "drop:m1", "mapId": MAP, "label": "Northeast Plateau"},
     ])
-    assert _lz_warnings(ws, PAD) == []
-
-
-def test_stamp_rim_nobody_looked_is_legal_but_midfield_dark_is_not():
-    # The frame exists (so legality is judged on belief) but says nothing about these zones.
+    warns = _lz_warnings(ws, PAD)
+    assert len(warns) == 1 and "believed empty, not ours" in warns[0], warns
     ws = _ws_for_stamp([])
-    assert _lz_warnings(ws, PAD) == []
     warns = _lz_warnings(ws, MID)
-    assert len(warns) == 1 and "nobody has looked and it is not a rim" in warns[0], warns
+    assert len(warns) == 1 and "nobody has looked; not ours" in warns[0], warns
+
+
+def test_stamp_a_held_door_is_a_pad():
+    ws = _ws_for_stamp([])
+    state = dict(_state(), doors={"GF_NW_MUSTER": {"held": True, "mapId": MAP}})
+    warns = [w for w in stamp.soft_validate(_plan("GF_NW_MUSTER"), ws, state) if w.startswith("LZ_")]
+    assert warns == [], warns
 
 
 # --------------------------------------------------------------------------- intel → Lua

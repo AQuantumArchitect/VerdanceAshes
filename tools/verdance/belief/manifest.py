@@ -30,8 +30,23 @@ def manifest_of(result: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     return m if isinstance(m, dict) and m.get("schema", "").startswith("verdance-manifest") else None
 
 
+def throne_taken(result: Dict[str, Any]) -> Optional[bool]:
+    """The kings' showdown, read from the kings gadget's facts: the throne is the company's when
+    every rival king fell and ours stands. None when the sortie was not a showdown."""
+    kings = result.get("kings")
+    if not isinstance(kings, list) or not kings:
+        return None
+    ours = [k for k in kings if isinstance(k, dict) and str(k.get("faction")) == "ashwalkers"]
+    rivals = [k for k in kings if isinstance(k, dict) and str(k.get("faction")) != "ashwalkers"]
+    return bool(rivals) and all(k.get("fallen") for k in rivals) and not any(k.get("fallen") for k in ours)
+
+
 def objective_done(result: Dict[str, Any]) -> bool:
-    """The primary objective completed, as the gadget reported it (manifest stamp first)."""
+    """The primary objective completed, as the gadget reported it (manifest stamp first; a
+    kings' showdown is the throne, read from the kings' facts)."""
+    throne = throne_taken(result)
+    if throne is not None:
+        return throne
     m = manifest_of(result)
     if m is not None and m.get("objectiveComplete") is not None:
         return bool(m.get("objectiveComplete"))

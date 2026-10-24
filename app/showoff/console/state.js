@@ -96,6 +96,7 @@ export function jobLabel(kind) {
     home_clear: "Clear the home wilds",
     fortify_zone: "Fortify and secure the zone",
     home_founding: "Found the camp — dig in",
+    kings_showdown: "Take the throne — last commander standing",
   })[kind] || String(kind || "Sortie").replace(/_/g, " ");
 }
 

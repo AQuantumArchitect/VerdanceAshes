@@ -116,7 +116,22 @@
     ]
   },
   "zones": {
-    "GF_SE_STAGING": {
+    "GF_NW_BASTION": {
+      "submergedAt": [
+        0.001,
+        0.001,
+        0.001,
+        0.001,
+        0.001,
+        0.001,
+        0.001,
+        0.001,
+        0.001
+      ],
+      "floodsAt": null,
+      "restingSubmerged": 0.001
+    },
+    "GF_SW_BASTION": {
       "submergedAt": [
         0.0,
         0.0,
@@ -131,7 +146,7 @@
       "floodsAt": null,
       "restingSubmerged": 0.0
     },
-    "GF_SE_ENERGY_WORKS": {
+    "GF_NW_MUSTER": {
       "submergedAt": [
         0.0,
         0.0,
@@ -146,7 +161,7 @@
       "floodsAt": null,
       "restingSubmerged": 0.0
     },
-    "GF_NW_GREEN_START": {
+    "GF_SW_MUSTER": {
       "submergedAt": [
         0.0,
         0.0,
@@ -161,7 +176,7 @@
       "floodsAt": null,
       "restingSubmerged": 0.0
     },
-    "GF_CENTRAL_OPEN_GRASSLAND": {
+    "GF_NW_CITADEL": {
       "submergedAt": [
         0.0,
         0.0,
@@ -176,7 +191,7 @@
       "floodsAt": null,
       "restingSubmerged": 0.0
     },
-    "GF_NORTH_DESERT_EDGE": {
+    "GF_SW_CITADEL": {
       "submergedAt": [
         0.0,
         0.0,
@@ -191,7 +206,82 @@
       "floodsAt": null,
       "restingSubmerged": 0.0
     },
-    "GF_SOUTH_DESERT_EDGE": {
+    "GF_N_PLATEAU": {
+      "submergedAt": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "floodsAt": null,
+      "restingSubmerged": 0.0
+    },
+    "GF_S_PLATEAU": {
+      "submergedAt": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "floodsAt": null,
+      "restingSubmerged": 0.0
+    },
+    "GF_C_GATE": {
+      "submergedAt": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "floodsAt": null,
+      "restingSubmerged": 0.0
+    },
+    "GF_C_INNER_GATE": {
+      "submergedAt": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "floodsAt": null,
+      "restingSubmerged": 0.0
+    },
+    "GF_NE_PLATEAU": {
+      "submergedAt": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "floodsAt": null,
+      "restingSubmerged": 0.0
+    },
+    "GF_SE_PLATEAU": {
       "submergedAt": [
         0.0,
         0.0,

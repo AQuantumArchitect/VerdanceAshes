@@ -11,21 +11,11 @@ import { renderRegions } from "./system.js";
 import { renderHeadline } from "./shell.js";
 import { renderGlobe } from "./globe.js";
 
-const RIM_THRESHOLD = 0.28;
 // Faction names the board may colour. Colour means "we believe this faction holds it".
 const FACTION_KEYS = new Set(["armada", "cortex", "nullmercs", "wild", "raptors", "raptor", "scavengers", "legion"]);
-const PAD_THREAT_MAX = 0.4;
 const FACTION_WORD = { armada: "Armada", cortex: "Cortex", nullmercs: "Null Mercs", wild: "Wild", raptors: "Raptors", raptor: "Raptors", scavengers: "Scavengers", legion: "Legion" };
 
 /* ---- geometry ---------------------------------------------------------------- */
-export function edgeScore(z) {
-  if (z && z.edgeScore != null) return Number(z.edgeScore);
-  const b = (z && z.bounds) || {};
-  const cx = ((Number(b.xMin) || 0) + (Number(b.xMax) || 1)) / 2;
-  const cz = ((Number(b.zMin) || 0) + (Number(b.zMax) || 1)) / 2;
-  return Math.min(cx, 1 - cx, cz, 1 - cz);
-}
-export function isRimZone(z) { return edgeScore(z) <= RIM_THRESHOLD; }
 // The zone's anchor in board units — where the game puts the pad and where labels sit.
 export function zoneCenter(z) {
   const p = zonePoint(z);
@@ -220,22 +210,29 @@ function zoneInOps(mapId, z) {
   return false;
 }
 function isBelievedOurs(mapId, zoneId) { return beliefOf(mapId, zoneId).believed === "ours"; }
-// Pad legality from belief: ours, OR a rim zone believed empty/dark with low believed
-// threat, OR the camp's own next pad. Returns the reason either way so an illegal click can say WHY.
+// A road door on this map, and whether the company's ledger says it holds it.
+function doorOf(mapId, zoneId) {
+  for (const r of ((state.hub.world || {}).roads || [])) {
+    for (const end of [r.a, r.b]) if (end && end.mapId === mapId && end.zoneId === zoneId) return end;
+  }
+  return null;
+}
+// A pad is ground we believe is ours, a road door we hold, or the camp's own next pad.
+// Open ground is never a pad. Returns the reason either way so an illegal click can say WHY.
 export function padLegality(mapId, z) {
   if (!z) return { ok: false, why: "no such zone" };
   const camp = state.hub.camp || {};
   if (camp.nextPadZoneId && camp.nextPadZoneId === z.zoneId && (!camp.nextPadMapId || camp.nextPadMapId === mapId)) {
     return { ok: true, why: "the camp's next pad" };
   }
+  const door = doorOf(mapId, z.zoneId);
+  if (door && door.held) return { ok: true, why: `a door we hold · ${door.label || "road"}` };
   const b = beliefOf(mapId, z.zoneId);
   const pct = `${Math.round(b.confidence * 100)}%`;
   if (b.believed === "ours") return { ok: true, why: `believed ours · ${pct}` };
+  if (door) return { ok: false, why: "a door we do not hold yet" };
   if (b.believed === "held") return { ok: false, why: `believed held · ${pct}` };
-  if (b.believed === "unsure") return { ok: false, why: `unsure what is there · ${pct}` };
-  if (!isRimZone(z)) return { ok: false, why: "not a rim" };
-  if ((b.threat ?? 0) > PAD_THREAT_MAX) return { ok: false, why: `threat too high · ${Math.round((b.threat || 0) * 100)}%` };
-  return { ok: true, why: b.believed === "dark" ? "rim · nobody has looked" : `rim · believed empty · ${pct}` };
+  return { ok: false, why: "not ours" };
 }
 export function isLegalLanding(mapId, z) { return padLegality(mapId, z).ok; }
 
@@ -260,27 +257,12 @@ export function snapGroundRoute(mapId, marks) {
 }
 export function defaultMarks(mapId) {
   const zones = (BOARDS[mapId] || {}).zones || [];
-  // Pad: the camp's next pad when it is on this map; else a legal pad from belief
-  // (believed ours first, then quiet rim lanes).
+  // Pad: the camp's next pad when it is on this map; else a door we hold; else ground believed ours.
   const camp = state.hub.camp || {};
   const campPad = camp.nextPadZoneId && (!camp.nextPadMapId || camp.nextPadMapId === mapId) ? zones.find(z => z.zoneId === camp.nextPadZoneId) : null;
   const legal = zones.filter(z => isLegalLanding(mapId, z));
-  const byEdge = legal.slice().sort((a, b) => {
-    const owned = (z) => (isBelievedOurs(mapId, z.zoneId) ? 0 : 1);
-    const lane = (z) => (z && z.interMapLane) ? 0 : 1;
-    return (owned(a) - owned(b)) || (lane(a) - lane(b)) || (edgeScore(a) - edgeScore(b));
-  });
-  const rim = byEdge.filter(z => isRimZone(z));
-  const lanes = rim.filter(z => z.interMapLane);
-  const owned = byEdge.filter(z => isBelievedOurs(mapId, z.zoneId));
-  const deployPool = owned.length ? owned : (lanes.length ? lanes : (rim.length ? rim : byEdge));
-  const deploy =
-    campPad ||
-    deployPool.find(z => z.deployDefault) ||
-    deployPool.find(z => z.interMapLane) ||
-    deployPool.find(z => /start|staging|shelf|camp|muster/i.test(String(z.role || "") + " " + (z.tags || []).join(" "))) ||
-    deployPool[0] ||
-    zones[0];
+  const doors = legal.filter(z => (doorOf(mapId, z.zoneId) || {}).held);
+  const deploy = campPad || doors[0] || legal.find(z => z.deployDefault) || legal[0] || null;
   const theater = state.hub.theater || {};
   const openId = ((theater.openTargets || [])[0] || {}).zoneId;
   const caps = zones.filter(z => z.capturable || z.preferredObjective);
@@ -370,6 +352,34 @@ function drawRouteArrows(plan, zones) {
   svg.innerHTML = parts.join("");
 }
 
+/* ---- the waterline ------------------------------------------------------------------ */
+// The next sortie's water on this map (hub.water, from the planet's hydrology): the level, where
+// it is heading, and what that makes the assault. Koom's waterline is capped, so its flats stay dry.
+function waterOf(mapId) { return ((state.hub.water || {})[mapId]) || null; }
+function waterUnder(mapId, zoneId) { const w = waterOf(mapId); return w ? Number((w.zones || {})[zoneId] || 0) : 0; }
+const ASSAULT_LINE = {
+  "dry bed": "The basins are dry: a ground assault across the bed.",
+  "shallows": "The low ground is wading-deep: slow for tanks, fine for bots and hover.",
+  "amphibious": "The low ground is under: an amphibious assault, or go around.",
+  "dry": "No water here.",
+};
+function renderWaterline(mapId) {
+  const el = $("waterline");
+  if (!el) return;
+  const w = waterOf(mapId);
+  if (!w) { el.hidden = true; el.innerHTML = ""; return; }
+  el.hidden = false;
+  const pct = v => `${Math.round((Number(v) || 0) * 100)}%`;
+  const arrow = { rising: "▲", falling: "▼", steady: "■" }[w.trend] || "";
+  const cap = w.cap != null ? `<i class="wl-cap" style="bottom:${pct(w.cap)}" title="this basin never fills past ${pct(w.cap)}"></i>` : "";
+  el.className = `waterline wl-${String(w.assault).replace(/\s+/g, "-")}`;
+  el.title = `${ASSAULT_LINE[w.assault] || ""} Next sortie after this: ${pct(w.nextLevel)}.`;
+  el.innerHTML =
+    `<div class="wl-gauge" aria-hidden="true"><i class="wl-fill" style="height:${pct(w.level)}"></i><i class="wl-next" style="bottom:${pct(w.nextLevel)}"></i>${cap}</div>` +
+    `<div class="wl-text"><span class="label">Waterline</span><b>${esc(w.assault)}</b>` +
+    `<span class="wl-num">${pct(w.level)} <span class="wl-trend">${arrow} ${esc(w.trend)} to ${pct(w.nextLevel)}</span></span></div>`;
+}
+
 export function renderBoard() {
   if (!state.plan) refreshTheaterForFocus();
   const plan = state.plan;
@@ -385,8 +395,10 @@ export function renderBoard() {
     const homeNote = plan.mapId === "the_rock_jungle"
       ? (flags.homeCleared ? " · home cleared" : ` · camp L${camp}${flags.homeClearReady ? " · clear ready" : " · need Tnb to scale"}`)
       : "";
-    sub.textContent = `${jobLabel(plan.contractKind)} · ${(plan.deployAces || []).join(", ") || "your aces"}${homeNote}`;
+    const piece = (state.hub.theaters || {})[plan.mapId];
+    sub.textContent = `${jobLabel(plan.contractKind)} · ${(plan.deployAces || []).join(", ") || "your aces"}${homeNote}` + (piece ? ` · ${piece.label}` : "");
   }
+  renderWaterline(plan.mapId);
   const lzMode = state.markMode === "pad";
   if (!zones.length) {
     el.innerHTML = `<div class="board-empty">No zone board for <b>${esc(plan.mapId)}</b>. Run tools/build_zone_boards_v1.py.</div>`;
@@ -405,9 +417,11 @@ export function renderBoard() {
       const intel = intelFor(plan.mapId, z.zoneId) || {};
       const bel = beliefOf(plan.mapId, z.zoneId);
       const legal = padLegality(plan.mapId, z);
+      const under = waterUnder(plan.mapId, z.zoneId);
       const cls = ["zone"];
+      if (under >= 0.5) cls.push("wet");
       if (z.capturable) cls.push("capturable");
-      cls.push(isRimZone(z) ? "rim-eligible" : "midfield");
+      if (doorOf(plan.mapId, z.zoneId)) cls.push("door");
       if (legal.ok) cls.push("lz-eligible", "pad-legal");
       else if (lzMode) cls.push("pad-illegal");
       if (lzMode) cls.push("mode-lz");
@@ -460,16 +474,18 @@ export function renderBoard() {
         sp ? `✗ believed ${sp.believed}, found ${sp.found}` : null,
         eyes === "known" ? "Armada has eyes on it" : eyes === "suspected" ? "Armada may suspect it" : null,
         legal.ok ? `pad: ${legal.why}` : (lzMode ? `no pad: ${legal.why}` : null),
+        under ? `${Math.round(under * 100)}% under water` : null,
       ].filter(Boolean);
       // The div spans the zone's box; the svg path is the zone (authored cells, as in-game) and is
       // the only part that takes the pointer, so nested zones click true. style= carries geometry,
       // the label point and the confidence custom property only; colour comes from classes.
       const hatch = eyes === "known" ? `<path class="z-exposed" d="${shape.d}" fill-rule="evenodd"/>` : "";
+      const water = under ? `<path class="z-water" d="${shape.d}" fill-rule="evenodd" style="--wet:${under.toFixed(2)}"/>` : "";
       return `<div role="button" tabindex="0" class="${cls.join(" ")}" data-zone="${esc(z.zoneId)}"
           data-believed="${esc(bel.believed)}" data-control="${esc(bel.control)}" data-conf="${bel.confidence.toFixed(2)}" data-state="${esc(bel.state)}"
           style="left:${left}%;top:${top}%;width:${w}%;height:${h}%;--conf:${bel.confidence.toFixed(2)};--lx:${lx.toFixed(1)}%;--ly:${ly.toFixed(1)}%"
           title="${esc(tipBits.join(" · "))}${esc(recruitTitle)}${fogNote}">
-          <svg class="z-shape" viewBox="${left} ${top} ${w} ${h}" preserveAspectRatio="none" aria-hidden="true"><path class="z-area" d="${shape.d}" fill-rule="evenodd"/>${hatch}</svg>
+          <svg class="z-shape" viewBox="${left} ${top} ${w} ${h}" preserveAspectRatio="none" aria-hidden="true"><path class="z-area" d="${shape.d}" fill-rule="evenodd"/>${water}${hatch}</svg>
           <div class="z-anchor">
             <div class="zone-label">${esc(z.label || z.zoneId)}</div>${chip}${doorBadge}
             <span class="z-corner">${spBadge}${eyeBadge}</span>
@@ -498,7 +514,7 @@ export function renderBoard() {
   const padNote = state.padNote && state.padNote.mapId === plan.mapId ? `<br><span class="warn">${esc(state.padNote.text)}</span>` : "";
   $("marks-sum").innerHTML =
     `<b>Pad</b> ${esc(zoneName(m.deployZoneId))} → <b>wound</b> ${(m.captureZoneIds || []).map(z => esc(zoneName(z))).join(", ") || "—"} → back to <b>${esc(zoneName(m.deployZoneId))}</b><br>` +
-    `marking <b>${esc(modeLabel)}</b> · ${legalN} legal pad${legalN === 1 ? "" : "s"} (△) · ops ${opsLit}/${zones.length || 0} zones · believed ours, or a quiet rim` +
+    `marking <b>${esc(modeLabel)}</b> · ${legalN} legal pad${legalN === 1 ? "" : "s"} (△) · ops ${opsLit}/${zones.length || 0} zones · a door we hold, or ground believed ours` +
     (padEyes === "known" ? `<br><span class="bad">◉ Armada has eyes on this pad.</span>` : "") +
     padNote;
   updateIntelligence(session.narrative, plan.mapId);
@@ -561,6 +577,7 @@ export function renderMapPicker() {
   renderGlobe($("globe"), {
     visible, focus, roads: world.roads || [],
     names: Object.fromEntries(visible.map(m => [m, prettyMapShort(m)])),
+    water: Object.fromEntries(visible.map(m => [m, (waterOf(m) || {}).assault]).filter(([, a]) => a && a !== "dry")),
     onPick: (mapId) => (mapId === state.focusMap ? refreshTheaterForFocus() : focusMapAndRepaint(mapId, "Picked on the planet")),
   });
   el.innerHTML = maps.map(mapId => {
@@ -569,6 +586,8 @@ export function renderMapPicker() {
     const tags = [];
     if (mapId === home) tags.push(`<span class="tag-home">home</span>`);
     tags.push(`<span class="tag-count">${n} sortie${n === 1 ? "" : "s"}</span>`);
+    const w = waterOf(mapId);
+    if (w && w.assault !== "dry") tags.push(`<span class="tag-water wl-${String(w.assault).replace(/\s+/g, "-")}" title="Waterline ${Math.round(w.level * 100)}%, ${esc(w.trend)}">≈ ${esc(w.assault)}</span>`);
     return `<button type="button" class="map-chip${active ? " active" : ""}" data-map="${esc(mapId)}" role="tab" aria-selected="${active ? "true" : "false"}">
         <span class="mc-name">${esc(prettyMapShort(mapId))}</span>
         <span class="mc-meta">${tags.join("")}</span>
@@ -628,7 +647,7 @@ export function zoneInspector(zoneId, mapId, narrative) {
     field("Knowledge", record?.status || (st === "dark" ? "Unknown" : "From the company's own looking")) +
     field("Source", record?.source || "No explicit battlefield observation is recorded.") +
     (record?.lastObservedTurn != null ? field("Last observed", `Completed sortie ${record.lastObservedTurn}. Conditions may have changed since then.`) : field("Last observed", "See the zone tooltip for how long ago the company looked.")) +
-    field("Pad rules", "A pad is legal when we believe the zone is ours, when it is a quiet rim we believe empty or have not looked at, or when it is the camp's next pad. You leave from where you landed.") +
+    field("Pad rules", "A pad is legal when it is a road door the company holds, a zone we believe is ours, or the camp's next pad. Open ground is never a pad. You leave from where you landed.") +
     field("Forecast", "Belief is not the ground. A route suggestion is not a promise of safety.");
 }
 export function installOverlays() {

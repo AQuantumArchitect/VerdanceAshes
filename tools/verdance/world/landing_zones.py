@@ -1,19 +1,18 @@
 #!/usr/bin/env python3
 """Legal landing / extract pads for Verdance sorties.
 
-A zone is a legal infil/exfil pad when either:
+A zone is a legal pad (you land there and lift from there) when either:
 
-1. Quiet rim — on the map edge (`edgeScore ≤ RIM_EDGE_THRESHOLD`) and not
-   enemy-held / contested, OR
-2. Ashwalker base — `controllingFaction == ashwalkers` AND Ashwalkers hold a
-   majority of the zone's defensive-value stack (factionPresence = DV).
-   Claimed / established bases with no fresh stack still count (majority
-   vacuously).
+1. A door the company holds -- an end of a road between maps, held in the company's door
+   ledger (verdance.world.roads). A new campaign holds the two doors of the start road,
+   so the first drops land on the road between Greenest Fields and the Rock Jungle; or
+2. Ashwalker ground -- `controllingFaction == ashwalkers` AND Ashwalkers hold a majority of
+   the zone's defensive-value stack (factionPresence = DV). Claimed / established bases
+   with no fresh stack still count (majority vacuously).
 
-Territory control is DV-only: parked armies do not buy an EXIT pad; teeth do
-(Warder Beamer/LLT rings, turrets, fortify). Fresh campaigns have no Ashwalker
-ground, so the first raid must enter from a quiet rim. A clean extract with a
-holding DV stack seeds that pad as Ashwalker ground for later sorties.
+There is no landing on open ground: the company arrives by a road and stands on what it holds.
+A sortie card may still name its own pad (a crossing lands on the far door); the stamp
+accepts the pads its chosen card names.
 """
 from __future__ import annotations
 
@@ -115,19 +114,6 @@ def zone_is_contested(
     return False
 
 
-def is_quiet_rim(
-    bounds: dict,
-    *,
-    control: str = "unknown",
-    tags: Optional[list] = None,
-    role: str = "",
-    threshold: float = RIM_EDGE_THRESHOLD,
-) -> bool:
-    if not is_rim_zone(bounds, threshold=threshold):
-        return False
-    return not zone_is_contested(control=control, tags=tags, role=role)
-
-
 def legal_landing_reason(
     state: Optional[dict],
     map_id: str,
@@ -138,16 +124,12 @@ def legal_landing_reason(
     role: str = "",
 ) -> Tuple[bool, str]:
     """Return (ok, reason_code). reason_code is for stamp errors / UI."""
+    from verdance.world.roads import held as door_held
+    if state and door_held(state, zone_id):
+        return True, "held_door"
     if is_ashwalker_majority(state, map_id, zone_id):
         return True, "ashwalker_base"
-    control = zone_control(state, map_id, zone_id) if state else "unknown"
-    if bounds is not None and is_quiet_rim(
-        bounds, control=control, tags=tags, role=role
-    ):
-        return True, "quiet_rim"
-    if bounds is not None and is_rim_zone(bounds):
-        return False, "contested_rim"
-    return False, "midfield_unowned"
+    return False, "not_ours"
 
 
 def is_legal_landing(
@@ -163,79 +145,6 @@ def is_legal_landing(
         state, map_id, zone_id, bounds, tags=tags, role=role
     )
     return ok
-
-
-def fortress_neighbor_penalty(
-    zone_id: str,
-    *,
-    zones_by_id: Optional[Dict[str, dict]] = None,
-    adjacency: Optional[Dict[str, list]] = None,
-) -> int:
-    """How many fortress/bastion/citadel neighbors a pad has (higher = hotter approach)."""
-    zones_by_id = zones_by_id or {}
-    adjacency = adjacency or {}
-    penalty = 0
-    for nbr in adjacency.get(str(zone_id), []) or []:
-        meta = zones_by_id.get(str(nbr)) or {}
-        role = str(meta.get("role") or "").lower()
-        tags = {str(t).lower() for t in (meta.get("tags") or [])}
-        if role in ("fortress", "bastion", "citadel") or tags & {"fortress", "bastion", "citadel"}:
-            penalty += 2
-        ctrl = str(meta.get("controllingFaction") or (meta.get("abstract") or {}).get("control") or "").lower()
-        if ctrl in ENEMY_CONTROL:
-            penalty += 1
-    return penalty
-
-
-def pick_quiet_rim_pad(
-    map_id: str,
-    *,
-    state: Optional[dict] = None,
-    zones: Optional[list] = None,
-    adjacency: Optional[Dict[str, list]] = None,
-    preferred: Optional[list] = None,
-) -> Optional[str]:
-    """Best quiet-rim LZ: legal, fewest fortress/enemy neighbors, then true edge."""
-    if not zones:
-        return None
-    zones_by_id = {
-        str(z.get("zoneId")): z
-        for z in zones
-        if isinstance(z, dict) and z.get("zoneId")
-    }
-    preferred = list(preferred or [])
-    pref_rank = {str(z): i for i, z in enumerate(preferred)}
-    scored: list[tuple] = []
-    for z in zones:
-        zid = str(z.get("zoneId") or "")
-        if not zid:
-            continue
-        bounds = z.get("bounds") if isinstance(z.get("bounds"), dict) else None
-        ok, reason = legal_landing_reason(
-            state,
-            map_id,
-            zid,
-            bounds,
-            tags=list(z.get("tags") or []),
-            role=str(z.get("role") or ""),
-        )
-        if not ok or reason != "quiet_rim":
-            # Ashwalker bases also fine, but opening wants quiet rim first.
-            if not (ok and reason == "ashwalker_base"):
-                continue
-        pen = fortress_neighbor_penalty(
-            zid, zones_by_id=zones_by_id, adjacency=adjacency
-        )
-        # Lower = better. Explicit preferred order beats generic rim scoring.
-        pref = pref_rank.get(zid, len(preferred) + 1)
-        role = str(z.get("role") or "").lower()
-        tags = {str(t).lower() for t in (z.get("tags") or [])}
-        startish = 0 if (role == "start" or "start" in tags or "muster" in tags) else 1
-        scored.append((pen, pref, startish, edge_score(bounds or {}), zid))
-    if not scored:
-        return None
-    scored.sort()
-    return scored[0][4]
 
 
 def seed_ashwalker_pad(

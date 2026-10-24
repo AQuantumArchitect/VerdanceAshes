@@ -78,7 +78,10 @@ def main() -> int:
     theater = hs.get("theater") or {}
     zones = theater.get("zones") or []
     map_id = theater.get("mapId") or state.get("sessionHomeMap")
-    legal = [z for z in zones if z.get("preferred") or z.get("believed") in ("ours", "empty", "dark", "unsure")]
+    # a pad is a door the company holds (or ground believed ours); never open ground
+    held = {end["zoneId"] for r in ((hs.get("world") or {}).get("roads") or []) for end in (r["a"], r["b"])
+            if end.get("held") and end.get("mapId") == map_id}
+    legal = [z for z in zones if z.get("zoneId") in held or z.get("believed") == "ours"]
     pad = (legal[0] if legal else (zones[0] if zones else {})).get("zoneId")
     target = next((z.get("zoneId") for z in zones if z.get("openTarget")), None) or (zones[-1].get("zoneId") if zones else None)
     check("theater offers a pad and a target", bool(pad and target), f"pad={pad} target={target} zones={len(zones)}")

@@ -448,7 +448,7 @@ class WarMapTests(unittest.TestCase):
             state = sample_state()
             engine.ensure_zone_memory(state, root)
             war = engine.build_war_map(state)
-            self.assertEqual(len(war["regions"]), len(engine.ALPHA_SPINE))
+            self.assertEqual(len(war["regions"]), len(engine.WORLD_MAPS))
             for region in war["regions"]:
                 self.assertIn("control", region)
                 self.assertIn("threatBand", region)
@@ -949,20 +949,6 @@ class BeatsAndExtractionTests(unittest.TestCase):
         b = engine.materialize_next_intent(copy.deepcopy(state), ROOT)["beats"]
         self.assertEqual(a, b)
 
-    def test_extraction_zone_differs_from_deploy_when_map_allows(self):
-        with make_workspace() as tmp:
-            root = Path(tmp)
-            # greenest_fields fixture has energy_edge zones distinct from deploy.
-            zone = engine.extraction_zone_for("greenest_fields", "GF_NW_GREEN_START",
-                                              root, "GF_SE_SYNTH_START")
-            self.assertNotEqual(zone, "GF_NW_GREEN_START")
-            self.assertNotEqual(zone, "GF_SE_SYNTH_START")
-
-    def test_extraction_zone_falls_back_to_deploy(self):
-        # No workspace zone map available: deploy zone remains the LZ.
-        zone = engine.extraction_zone_for("koom_valley", "KOOM_NW_GREEN_SHELF")
-        self.assertEqual(zone, "KOOM_NW_GREEN_SHELF")
-
 
 class ActStructureTests(unittest.TestCase):
     """Drop 2: acts — ground control, constrained RTS, path-keyed finales."""
@@ -1422,14 +1408,14 @@ class AuthoredZoneIdsAreLiveTests(unittest.TestCase):
     A fixture cannot catch this. Only the shipping data can.
     """
 
-    def test_alpha_spine_deploy_zones_all_exist(self):
+    def test_every_door_is_a_live_zone(self):
+        from verdance.world.roads import load_doors
         valid = engine.valid_zone_ids(ROOT)
         self.assertTrue(valid, "no authored zone ids loaded; the check would be vacuous")
-        for map_id, zone_id in engine.ALPHA_SPINE:
-            resolved = engine.canonical_zone_id(zone_id, ROOT)
-            self.assertIn(resolved, valid,
-                          f"ALPHA_SPINE deploy zone for {map_id} ({zone_id}) "
-                          f"resolves to {resolved}, which is not a live zone")
+        doors = load_doors(ROOT)
+        self.assertEqual({d["mapId"] for d in doors.values()}, set(engine.WORLD_MAPS))
+        for zone_id, door in doors.items():
+            self.assertIn(zone_id, valid, f"door {zone_id} on {door['mapId']} is not a live zone")
 
     def test_choose_next_map_zone_is_live_for_every_mission(self):
         valid = engine.valid_zone_ids(ROOT)
@@ -1441,7 +1427,7 @@ class AuthoredZoneIdsAreLiveTests(unittest.TestCase):
 
     def test_objective_fallback_targets_all_exist(self):
         valid = engine.valid_zone_ids(ROOT)
-        for map_id, _zone in engine.ALPHA_SPINE:
+        for map_id in engine.WORLD_MAPS:
             objective = engine.objective_for_map(map_id, {}, ROOT)
             target = objective.get("targetZoneId")
             if target is None:

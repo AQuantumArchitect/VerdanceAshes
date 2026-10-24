@@ -75,6 +75,11 @@ def fake_result(state, intent, plan, hs, n, brought):
         "secondaryResults": [], "playerSurvivors": dict(lifted),
         "heroResults": {h: {"heroId": h, "name": h, "state": "alive", "outcome": "alive"} for h in heroes},
         "tenebriumBank": 4, "tenebriumLooted": 4, "tenebriumSpent": 0,
+        # a kings' showdown reports its kings: both rivals fell, ours stands
+        "kings": ([{"faction": "ashwalkers", "teamID": 0, "fallen": False}]
+                  + [{"faction": k["faction"], "teamID": i + 1, "fallen": True, "minute": 20.0 + i, "by": "ashwalkers"}
+                     for i, k in enumerate((intent.get("theater") or {}).get("kings") or [])])
+                 if (intent.get("theater") or {}).get("kind") == "kings_showdown" else None,
         "observedZones": dict(seen),
         # the company dug in at its pad and its target: it holds both at homecoming (doors too)
         "zoneDv": {str(target): {"ashwalkers": 900}, str(pad): {"ashwalkers": 600}},
@@ -146,6 +151,11 @@ def main() -> int:
             break
         intent = jload(ip)
         row["objective"] = (intent.get("objectiveTarget") or {}).get("kind")
+        row["setPiece"] = (intent.get("theater") or {}).get("kind")
+        if row["setPiece"] == "kings_showdown" and not (intent.get("soloCommand") and not intent.get("deployAces")):
+            row["stall"] = "kings' showdown without a solo commander"
+            log.append(row)
+            break
         row["enemyAI"] = intent.get("enemyAI") or (intent.get("arcProfile") or {}).get("enemyAI")
         (ws / "inbox").mkdir(exist_ok=True)
         (ws / "inbox" / "latest_va_result.json").write_text(json.dumps(fake_result(st, intent, plan, hs, n, (jload(sp).get("roster") or {}).get("cadre") or {})), encoding="utf-8")

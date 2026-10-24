@@ -315,6 +315,54 @@ def map_waterline(state: Dict[str, Any], map_id: str,
     }
 
 
+# What the hub calls an assault at this waterline, read off the zones that can flood (those
+# that are at least half under at the top of the swing): their mean share under water.
+ASSAULT_WORDS = ((0.45, "amphibious"), (0.2, "shallows"), (0.0, "dry bed"))
+
+
+def _share_at(levels: List[float], shares: List[float], level: float) -> float:
+    if not levels or not shares:
+        return 0.0
+    if level <= levels[0]:
+        return float(shares[0])
+    for i in range(1, len(levels)):
+        if level <= levels[i]:
+            a, b = float(levels[i - 1]), float(levels[i])
+            k = (level - a) / (b - a) if b > a else 0.0
+            return float(shares[i - 1]) + k * (float(shares[i]) - float(shares[i - 1]))
+    return float(shares[-1])
+
+
+def waterline_surface(state: Dict[str, Any], map_id: str,
+                      workspace: Optional[Path] = None) -> Dict[str, Any]:
+    """The next sortie's waterline on one map, for the hub: the level now and next, how much of
+    each zone is under, and what that makes an assault (dry bed, shallows, amphibious)."""
+    line = map_waterline(state, map_id, workspace)
+    profile = load_map_hydrology(map_id, workspace) or {}
+    levels = [float(x) for x in profile.get("levels") or []]
+    level, nxt = float(line.get("level") or 0.0), float(line.get("nextLevel") or 0.0)
+    if float(line.get("amplitude") or 0.0) <= 0.0:
+        level = nxt = 0.0                     # a map the cycle never touches
+    zones: Dict[str, float] = {}
+    floodable: List[float] = []
+    for zid, rec in (profile.get("zones") or {}).items():
+        shares = [float(x) for x in rec.get("submergedAt") or []]
+        now = _share_at(levels, shares, level)
+        if now >= 0.02:
+            zones[zid] = round(now, 3)
+        if shares and max(shares) >= 0.5:
+            floodable.append(now)
+    if line.get("amplitude", 0) <= 0 and not floodable:
+        word = "dry"
+    else:
+        wet = sum(floodable) / len(floodable) if floodable else 0.0
+        word = next(w for cut, w in ASSAULT_WORDS if wet >= cut)
+    trend = "rising" if nxt > level + 0.02 else "falling" if nxt < level - 0.02 else "steady"
+    return {"level": round(level, 3), "nextLevel": round(nxt, 3), "trend": trend,
+            "cap": HYDRO_LEVEL_CAP.get(map_id), "areaSubmerged": line.get("areaSubmerged"),
+            "assault": word, "zones": zones}
+
+
 def hydrology_swing(state: Dict[str, Any], workspace: Optional[Path] = None) -> Dict[str, float]:
     """How far each map's waterline moved this mission, 0..1 against that
     map's own peak swing. A map that cannot swing (Greenest Fields, whose
@@ -466,6 +514,7 @@ def update_hydrology_bloom(state: Dict[str, Any], map_id: str,
 
 
 __all__ = [
+    "ASSAULT_WORDS",
     "BLOOM",
     "HYDRO_EVENT_MIN_AMPLITUDE",
     "HYDRO_EVENT_SECONDS",
@@ -493,5 +542,6 @@ __all__ = [
     "hydrology_wind_range",
     "load_map_hydrology",
     "map_waterline",
+    "waterline_surface",
     "update_hydrology_bloom",
 ]

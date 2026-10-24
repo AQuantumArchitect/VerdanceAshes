@@ -11,12 +11,11 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 from verdance.common import WORKSPACE_ROOT, canonical_map_id, clamp, load_json, utc_now
-from .schema import ALPHA_SPINE, CAMPAIGN_ID, MAP_DISPLAY, map_family, zone_maps_from_workspace
+from .schema import WORLD_MAPS, CAMPAIGN_ID, MAP_DISPLAY, map_family, zone_maps_from_workspace
 from .zones import canonical_zone_id
 from .hydrology import update_hydrology_bloom
 from .measure import expected_presence_band
-from verdance.world import landing_zones as _lz, roads as _roads
-from verdance.world.zone_graph import load_map_adjacency as _wzg_load_map_adjacency
+from verdance.world import roads as _roads
 
 def update_destroyed_objectives(state: Dict[str, Any], result: Dict[str, Any]) -> None:
     map_id = canonical_map_id(result.get("deploymentMapId") or result.get("mapId"))
@@ -146,7 +145,7 @@ def choose_next_map_zone(state: Dict[str, Any],
                          workspace: Optional[Path] = None) -> Tuple[str, str]:
     """Map and deployment zone for the next mission, zone id translated forward.
 
-    ALPHA_SPINE may still name legacy ids that migrate forward
+    Authored ids may still be legacy ones that migrate forward
     (EOH_NW_CRATER_CAMP, KOOM_NW_GREEN_SHELF, …). It is the deployment-zone
     source for every mission whose intent does not specify one.
     nextMapOverride is authored too, so it goes through the same translation
@@ -157,7 +156,6 @@ def choose_next_map_zone(state: Dict[str, Any],
         return (canonical_map_id(requested.get("mapId")),
                 canonical_zone_id(requested.get("deploymentZoneId", "unknown_zone"), workspace))
     # Mission number is the act clock. Geography is the road lean: its map and its pad.
-    # ALPHA_SPINE is not a map picker.
     try:
         if workspace is not None:
             cards = _roads.road_sorties(state, Path(workspace)).get("cards") or []
@@ -291,7 +289,7 @@ def build_war_map(state: Dict[str, Any]) -> Dict[str, Any]:
     """The strategic snapshot the console renders during the next-ready pause:
     faction control per region, the offered fronts, and recent territory swings."""
     regions = []
-    for map_id, _ in ALPHA_SPINE:
+    for map_id in WORLD_MAPS:
         front = summarize_front(state, map_id)
         front["control"] = dominant_faction(front.get("controlCounts", {}))
         regions.append(front)
@@ -386,102 +384,6 @@ def zone_center_norm(zone: Dict[str, Any]) -> Tuple[float, float]:
     )
 
 
-def _load_map_adjacency(workspace: Optional[Path], map_id: str) -> Dict[str, List[str]]:
-    """Same-map adjacency for kernel walks (extract, promote, contracts).
-
-    Prefers data/zone_maps/world_zone_graph.v1.json; falls back to legacy
-    zone_adjacency.json via tools/verdance/world/zone_graph.py.
-    """
-    if workspace is None:
-        return {}
-    try:
-        # Ensure tools/ is importable when this file is executed as a script.
-
-        return _wzg_load_map_adjacency(Path(workspace), map_id, kinds=("same_map",))
-    except Exception:
-        pass
-    path = Path(workspace) / "data" / "zone_maps" / "authored" / "zone_adjacency.json"
-    if not path.exists():
-        return {}
-    try:
-        data = load_json(path)
-    except Exception:
-        return {}
-    block = data.get(canonical_map_id(map_id)) or {}
-    return {str(k): [str(x) for x in (v or [])] for k, v in block.items()}
-
-
-def extraction_zone_for(map_id: str, deployment_zone: str,
-                        workspace: Optional[Path] = None,
-                        target_zone: Optional[str] = None,
-                        mission_number: Optional[int] = None,
-                        adjacency_mode: Optional[str] = None,
-                        state: Optional[Dict[str, Any]] = None) -> str:
-    """Pick extraction LZ.
-
-    Legal pads only: quiet rim OR Ashwalker-majority base. Prefer the deploy
-    pad when it is already legal (open-area stack for exfil). WO-039 adjacency
-    modes still prefer neighbors of the target, filtered to legal pads.
-    """
-
-    legacy = {
-        "ancient_bastion": "AB_NW_TOR",
-        "the_rock_jungle": "RJ_NW_JUNGLE_SHELF",
-        "all_that_simmers": "ATS_NW_CANOPY_START",
-    }
-    mode = adjacency_mode
-    if mode is None and mission_number is not None:
-        mode = "required" if int(mission_number) <= 3 else "preferred" if int(mission_number) <= 6 else "forward"
-    mode = mode or "forward"
-
-    adj = _load_map_adjacency(workspace, map_id)
-    target_nbrs = list(adj.get(str(target_zone), []) or []) if target_zone else []
-
-    zones_by_id: Dict[str, Any] = {}
-    if workspace is not None:
-        zone_map_early = zone_maps_from_workspace(Path(workspace)).get(canonical_map_id(map_id))
-        if zone_map_early:
-            zones_by_id = {
-                str(z.get("zoneId")): z
-                for z in zone_map_early.get("zones", []) or []
-                if z.get("zoneId")
-            }
-
-    def _rim_score(zone: Dict[str, Any]) -> float:
-        return _lz.edge_score(zone.get("bounds") or {})
-
-    def _is_legal(zid: str) -> bool:
-        zone = zones_by_id.get(zid) or {}
-        bounds = zone.get("bounds") if isinstance(zone.get("bounds"), dict) else None
-        return _lz.is_legal_landing(
-            state,
-            canonical_map_id(map_id),
-            zid,
-            bounds,
-            tags=list(zone.get("tags") or []),
-            role=str(zone.get("role") or ""),
-        )
-
-    # Prefer returning to the deploy pad when it is already a legal open LZ.
-    if deployment_zone and _is_legal(str(deployment_zone)):
-        if mode == "forward":
-            pass  # still allow a forward quiet rim below
-        else:
-            return str(deployment_zone)
-
-    # Adjacent / preferred: stay local, legal pads only.
-    if mode in ("required", "preferred") and target_zone and target_nbrs:
-        pool = [z for z in target_nbrs if z not in (deployment_zone, target_zone)]
-        legal_pool = [z for z in pool if _is_legal(z)]
-        if legal_pool:
-            return legal_pool[0]
-        if deployment_zone and deployment_zone in target_nbrs and _is_legal(str(deployment_zone)):
-            return str(deployment_zone)
-        # No legal neighbor: fall back to deploy if legal, else legacy.
-        if deployment_zone and _is_legal(str(deployment_zone)):
-            return str(deployment_zone)
-        return legacy.get(canonical_map_id(map_id), deployment_zone)
-
     if workspace is not None and zones_by_id:
         deploy = zones_by_id.get(deployment_zone)
         target = zones_by_id.get(target_zone) if target_zone else None
@@ -520,7 +422,6 @@ def extraction_zone_for(map_id: str, deployment_zone: str,
 
 
 __all__ = [
-    "_load_map_adjacency",
     "_objective_for_map_raw",
     "append_history_bead",
     "build_war_map",
@@ -528,7 +429,6 @@ __all__ = [
     "consequence_note",
     "dominant_faction",
     "enumerate_front_targets",
-    "extraction_zone_for",
     "objective_for_map",
     "reset_live_raptors_but_escalate",
     "story_tags_for_result",

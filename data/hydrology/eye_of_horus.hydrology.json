@@ -128,95 +128,185 @@
     ]
   },
   "zones": {
-    "EOH_NW_CRATER_CAMP": {
+    "EOH_NW_BASTION": {
       "submergedAt": [
         0.0,
-        0.014,
-        0.052,
-        0.094,
-        0.115,
-        0.141,
-        0.161,
-        0.19,
-        0.208
+        0.008,
+        0.025,
+        0.038,
+        0.051,
+        0.064,
+        0.075,
+        0.092,
+        0.103
       ],
       "floodsAt": null,
       "restingSubmerged": 0.0
     },
-    "EOH_SE_CORTEX_POCKET": {
+    "EOH_SE_BASTION": {
+      "submergedAt": [
+        0.0,
+        0.025,
+        0.052,
+        0.067,
+        0.077,
+        0.1,
+        0.115,
+        0.152,
+        0.164
+      ],
+      "floodsAt": null,
+      "restingSubmerged": 0.0
+    },
+    "EOH_NW_MUSTER": {
+      "submergedAt": [
+        0.0,
+        0.021,
+        0.088,
+        0.172,
+        0.205,
+        0.245,
+        0.278,
+        0.317,
+        0.344
+      ],
+      "floodsAt": null,
+      "restingSubmerged": 0.0
+    },
+    "EOH_SE_MUSTER": {
+      "submergedAt": [
+        0.0,
+        0.063,
+        0.121,
+        0.178,
+        0.208,
+        0.23,
+        0.248,
+        0.299,
+        0.326
+      ],
+      "floodsAt": null,
+      "restingSubmerged": 0.0
+    },
+    "EOH_C_GATE": {
+      "submergedAt": [
+        0.0,
+        0.003,
+        0.015,
+        0.037,
+        0.052,
+        0.068,
+        0.08,
+        0.098,
+        0.108
+      ],
+      "floodsAt": null,
+      "restingSubmerged": 0.0
+    },
+    "EOH_C_INNER_GATE": {
       "submergedAt": [
         0.0,
         0.034,
-        0.069,
-        0.102,
-        0.123,
-        0.148,
-        0.163,
-        0.207,
-        0.222
+        0.067,
+        0.101,
+        0.117,
+        0.138,
+        0.146,
+        0.176,
+        0.192
       ],
       "floodsAt": null,
       "restingSubmerged": 0.0
     },
-    "EOH_GLASSED_CENTER": {
-      "submergedAt": [
-        0.0,
-        0.002,
-        0.007,
-        0.013,
-        0.016,
-        0.019,
-        0.022,
-        0.026,
-        0.03
-      ],
-      "floodsAt": null,
-      "restingSubmerged": 0.0
-    },
-    "EOH_WESTERN_DEBRIS_LANE": {
+    "EOH_NE_CAUSEWAY": {
       "submergedAt": [
         0.0,
         0.01,
-        0.031,
-        0.048,
-        0.059,
+        0.029,
+        0.045,
+        0.057,
         0.078,
         0.094,
-        0.13,
-        0.147
+        0.129,
+        0.143
       ],
       "floodsAt": null,
       "restingSubmerged": 0.0
     },
-    "EOH_EASTERN_DEBRIS_LANE": {
+    "EOH_SW_CAUSEWAY": {
       "submergedAt": [
         0.0,
-        0.015,
-        0.029,
-        0.047,
-        0.062,
-        0.086,
+        0.026,
+        0.04,
+        0.055,
+        0.065,
+        0.082,
         0.099,
-        0.135,
-        0.149
+        0.139,
+        0.156
       ],
       "floodsAt": null,
       "restingSubmerged": 0.0
     },
-    "EOH_SOUTHERN_CROSSFIRE_SHELF": {
+    "EOH_C_LANE": {
       "submergedAt": [
-        0.001,
-        0.033,
-        0.053,
-        0.076,
-        0.089,
-        0.101,
-        0.117,
-        0.154,
-        0.17
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.004,
+        0.004,
+        0.004
       ],
       "floodsAt": null,
-      "restingSubmerged": 0.001
+      "restingSubmerged": 0.0
+    },
+    "EOH_C_INNER_LANE": {
+      "submergedAt": [
+        0.0,
+        0.0,
+        0.0,
+        0.004,
+        0.008,
+        0.013,
+        0.013,
+        0.013,
+        0.021
+      ],
+      "floodsAt": null,
+      "restingSubmerged": 0.0
+    },
+    "EOH_W_LANE": {
+      "submergedAt": [
+        0.0,
+        0.0,
+        0.016,
+        0.035,
+        0.047,
+        0.063,
+        0.067,
+        0.078,
+        0.098
+      ],
+      "floodsAt": null,
+      "restingSubmerged": 0.0
+    },
+    "EOH_E_LANE": {
+      "submergedAt": [
+        0.0,
+        0.012,
+        0.016,
+        0.031,
+        0.059,
+        0.075,
+        0.082,
+        0.141,
+        0.165
+      ],
+      "floodsAt": null,
+      "restingSubmerged": 0.0
     }
   }
 }

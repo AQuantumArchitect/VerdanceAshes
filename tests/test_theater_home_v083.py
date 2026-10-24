@@ -57,11 +57,7 @@ class TestCortexGrudge(unittest.TestCase):
         self.assertGreater(c, 50)
 
 
-class TestRimStamp(unittest.TestCase):
-    def test_rim_helpers(self):
-        self.assertTrue(stamp.is_rim_zone({"xMin": 0, "xMax": 0.2, "zMin": 0, "zMax": 0.2}))
-        self.assertFalse(stamp.is_rim_zone({"xMin": 0.35, "xMax": 0.65, "zMin": 0.35, "zMax": 0.65}))
-
+class TestPadStamp(unittest.TestCase):
     def test_unowned_midfield_deploy_invalidates(self):
         # Central spillway is midfield + unowned on Rock Jungle → illegal LZ.
         plan = {

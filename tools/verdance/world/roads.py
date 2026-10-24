@@ -332,7 +332,13 @@ def _card(job: Dict[str, Any], lean: bool) -> Dict[str, Any]:
         lines = [f"{door['label']} is the door to {far_name}, and you do not hold it.",
                  "Out-build everyone there and the road opens. If it is empty, establishing presence is enough."]
         contract = "seize_lane"
-    if along:
+    if job["mapId"] == "all_that_simmers":
+        # Every drop on All That Simmers is the kings' showdown (verdance.world.theaters).
+        label = f"The kings' showdown on {map_name}, from {door['label'] if job['kind'] != 'cross' else door['farLabel']}"
+        lines = ["Armada, Null Mercs and the company each start with one commander and nothing else.",
+                 "Last commander standing takes the throne. The packs and the reserve stay home."]
+        contract = "kings_showdown"
+    if along and contract != "kings_showdown":
         lines.append(along)
     lines.append("The world leans this way." if lean else "Still open.")
     effect: Dict[str, Any] = {

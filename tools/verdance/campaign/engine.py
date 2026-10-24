@@ -121,6 +121,7 @@ from verdance.world import (
     world_tick as _wt,
     offscreen_clash as _clash,
     roads as _roads,
+    theaters as _theaters,
     landing_zones as _lz_seed,
 )
 from verdance.belief import manifest as _mf, homecoming as _bh, intel_lua as _il
@@ -378,7 +379,7 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
         # map. The gadget lets a team enter only on the map edge inside one of its own zones, out
         # of the player's sight. Truth, not belief: this is the world deciding, not the company.
         "entryZones": entry_zones_for(state, map_id, workspace),
-        # Zones the wild truly holds here: on the Rock Jungle each gets a raptor den.
+        # Zones the wild truly holds here (the dens on them are placed below, once the pad is final).
         "wildZones": wild_zones_for(state, map_id, workspace),
         # The doors on this map, for the in-game board: where each leads and whether the
         # company's ledger says it holds it.
@@ -467,7 +468,15 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
     # Authored content still names zones that a re-cut retired; translate the
     # whole intent forward in one place rather than trusting every source.
     intent = canonicalize_zone_ids(intent, workspace)
-    separate_intent_zones(intent, workspace)
+    separate_intent_zones(intent, workspace, state=state)
+    # The field's standing set piece and the wild's dens, placed around the final pad.
+    pad = intent.get("deploymentZoneId")
+    intent["wildDens"] = _theaters.wild_dens(state, map_id, workspace, pad)
+    theater = _theaters.theater_for(state, map_id, workspace, pad)
+    if theater:
+        intent["theater"] = theater
+        if theater.get("kind") == "kings_showdown":
+            _theaters.solo_command(intent)
     intent["operationSummary"] = operation_summary({
         "id": intent.get("hubChoiceId") or intent.get("missionId"),
         "label": intent.get("title") or "Company operation",

@@ -18,13 +18,11 @@ from verdance.common import ARCHETYPE_VERB, WORKSPACE_ROOT, load_json
 from verdance.belief import hub_belief
 from verdance.readings.narrative import project as narrative_project
 from verdance.campaign import (
-    ground_pads_by_distance,
-    ground_pad_is_near,
     evaluate_home_clear,
     commander_is_unlocked,
     ensure_roster,
 )
-from verdance.world import roads as _roads
+from verdance.world import roads as _roads, landing_zones as _lz, theaters as _theaters
 from verdance.company.company import ensure_company, hub_company_surface
 from verdance.company import capture_node_claims as cnc
 from verdance.company.commerce_delivery import delivery_eta
@@ -325,26 +323,6 @@ def pick_focus_region(regions: list[dict], state: dict | None = None) -> str:
     return regions[0]["mapId"] if regions else HOME_MAP_ID
 
 
-def _near_ground_pad(map_id: str, target_zone: str) -> str | None:
-    """Nearest dry pad-sized shore to the objective. None if the map has no pads."""
-    try:
-
-        ranked = ground_pads_by_distance(map_id, target_zone, ROOT, 0.0)
-    except Exception:  # noqa: BLE001
-        return None
-    return ranked[0][1] if ranked else None
-
-
-def _pad_is_near(zone_id: str, map_id: str, target_zone: str) -> bool:
-    if not zone_id:
-        return False
-    try:
-
-        return bool(ground_pad_is_near(zone_id, map_id, target_zone, ROOT, 0.0))
-    except Exception:  # noqa: BLE001
-        return False
-
-
 def _quest_continue_choices(
     state: dict, focus: str, deploy_aces: list, limit: int = 3
 ) -> list[dict]:
@@ -402,10 +380,12 @@ def _quest_continue_choices(
         blurb = arch_blurb.get(str(arch), "Drop in, cut the objective, come home.")
         from_ids = q.get("fromZoneIds") if isinstance(q.get("fromZoneIds"), list) else []
         from_pad = from_ids[0] if from_ids else q.get("deploymentZoneId")
-        near_pad = _near_ground_pad(str(map_id), str(zone))
-        deploy_pad = from_pad
-        if near_pad and not _pad_is_near(str(from_pad or ""), str(map_id), str(zone)):
-            deploy_pad = near_pad
+        # The pad is a door we hold or ground we hold on this map; never open ground near the target.
+        deploy_pad = from_pad if from_pad and _lz.is_legal_landing(state, str(map_id), str(from_pad), {}) else None
+        deploy_pad = deploy_pad or next((z for z, d in sorted(_roads.load_doors(ROOT).items())
+                                         if d.get("mapId") == map_id and _roads.held(state, z)), None)
+        if not deploy_pad:
+            continue
         out.append(
             {
                 "id": f"c_mode_a_{i}_{zone}",
@@ -418,7 +398,7 @@ def _quest_continue_choices(
                     "deployAces": deploy_aces,
                     "preferredCaptureZoneId": zone,
                     "preferredDeployZoneId": deploy_pad,
-                    "preferredExtractionZoneId": near_pad or deploy_pad,
+                    "preferredExtractionZoneId": deploy_pad,
                     "sessionMode": "same_map",
                     "source": "quest_batch",
                 },
@@ -1137,6 +1117,18 @@ def _world_surface(state: dict) -> dict:
         return {"openMaps": [], "roads": []}
 
 
+def _water_surface(state: dict) -> dict:
+    """The next sortie's waterline on every map: level, trend, zones under, and the assault word."""
+    from verdance.campaign import WORLD_MAPS, waterline_surface
+    out: dict = {}
+    for map_id in WORLD_MAPS:
+        try:
+            out[map_id] = waterline_surface(state, map_id, ROOT)
+        except Exception as exc:  # noqa: BLE001
+            print(f"VA_WATER_SURFACE_FAIL {map_id} {exc}")
+    return out
+
+
 def build_hub(state: dict, war: dict) -> dict:
     repair_session_home(state)
     rep = dict(state.get("reputation") or {})
@@ -1310,6 +1302,8 @@ def build_hub(state: dict, war: dict) -> dict:
         "reserve": _reserve_surface(state),
         "storyState": _story_surface(state, mission_n),
         "world": _world_surface(state),
+        "water": _water_surface(state),
+        "theaters": dict(_theaters.SET_PIECES),
         "regions": regions,
         "node": node,
         "lastResult": _with_manifest(_load_last_hub_result(), state),

@@ -31,16 +31,11 @@ MAP_FAMILIES = {
     "all_that_simmers": "wild",
 }
 
-# Deploy pads are quiet rim (or migrate to quiet rim). Never midfield unowned ground.
-# Greenest: north desert (GF_NE_PLATEAU) is the standard shell-free infil/exfil.
-ALPHA_SPINE = [
-    ("greenest_fields", "GF_NE_PLATEAU"),
-    ("eye_of_horus", "EOH_NW_CRATER_CAMP"),
-    ("koom_valley", "KOOM_NW_GREEN_SHELF"),
-    ("tabula", "TAB_NW_PLATEAU"),
-    ("ancient_bastion", "AB_NW_TOR"),
-    ("the_rock_jungle", "RJ_NW_JUNGLE_SHELF"),
-    ("all_that_simmers", "ATS_NW_CANOPY_START"),
+# The seven maps in road order: home, then around the ring (data/zone_maps/world_zone_graph.v1.json
+# holds the roads themselves; verdance.world.roads reads them). Order only: never a map picker.
+WORLD_MAPS = [
+    "the_rock_jungle", "greenest_fields", "koom_valley", "tabula",
+    "ancient_bastion", "all_that_simmers", "eye_of_horus",
 ]
 
 # Display metadata for the War Map (Pillar A). Kept in-engine so the front-end
@@ -437,6 +432,7 @@ NULLMERC_FOOTHOLD_ROLES = (
 
 
 WILD_HOME_MAP = "the_rock_jungle"
+from verdance.world.theaters import EYE_RIM_ZONES, STANDING_CONTROL  # noqa: E402
 
 
 def ensure_zone_memory(state: Dict[str, Any], workspace: Path) -> None:
@@ -474,10 +470,17 @@ def ensure_zone_memory(state: Dict[str, Any], workspace: Path) -> None:
                 continue
             tags = set(str(t).lower() for t in zone.get("tags", []) or [])
             role = str(zone.get("role", "")).lower()
+            standing = STANDING_CONTROL.get(map_id, {}).get(zone_id)
             if map_id == WILD_HOME_MAP and held_door(zone_id):
                 actor = "Ashwalkers"
                 control = "ashwalkers"
-            elif map_id == WILD_HOME_MAP or "raptors" in tags or "wilds" in tags or "hive" in role or "raptor" in role:
+            elif standing:
+                # A set piece's ground (Koom's standing war): its side holds it from the start.
+                actor = "NullMercsAI" if standing == "nullmercs" else "SimpleAI"
+                control = standing
+            elif (map_id == WILD_HOME_MAP or (map_id == "eye_of_horus" and zone_id in EYE_RIM_ZONES)
+                  or "raptors" in tags or "wilds" in tags or "hive" in role or "raptor" in role):
+                # The Eye's outer rim is raptor ground too (owner call, 2026-10-23); Cortex keeps the eye.
                 # The Rock Jungle is wild ground end to end: raptors hold every zone until
                 # someone out-builds them there.
                 actor = "RaptorsAI"
@@ -507,12 +510,13 @@ def ensure_zone_memory(state: Dict[str, Any], workspace: Path) -> None:
             map_actors.setdefault(zone_id, actor)
             if zone_id not in zones:
                 zones[zone_id] = blank_zone_memory(map_id, zone_id, zone.get("label", zone_id), control)
-            elif map_id == WILD_HOME_MAP and control == "wild":
-                # Saves from before the jungle went wild: unclaimed ground there is the wild's.
+            elif standing or (control == "wild" and (map_id == WILD_HOME_MAP or map_id == "eye_of_horus")):
+                # Older saves: unclaimed ground a set piece stands on (the wild jungle, the Eye's rim,
+                # Koom's two camps) goes to whoever the set piece says holds it.
                 zm = zones[zone_id]
                 if str(zm.get("controllingFaction") or (zm.get("abstract") or {}).get("control") or "neutral").lower() in ("neutral", "contested", "none", ""):
-                    zm["controllingFaction"] = "wild"
-                    zm.setdefault("abstract", {})["control"] = "wild"
+                    zm["controllingFaction"] = control
+                    zm.setdefault("abstract", {})["control"] = control
             if actor == "RaptorsAI":
                 hazard_state.setdefault(map_id, {}).setdefault(zone_id, {
                     "pressure": zones[zone_id]["abstract"].get("hazardPressure", 0.2),
@@ -547,7 +551,7 @@ def blank_zone_memory(map_id: str, zone_id: str, label: str, control: str) -> Di
 
 
 __all__ = [
-    "ALPHA_SPINE",
+    "WORLD_MAPS",
     "BP_PER_TNB",
     "CAMPAIGN_ID",
     "EVENTS_SCHEMA",

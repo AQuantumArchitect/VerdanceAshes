@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Quiet rim + Ashwalker-majority landing pad rules."""
+"""Pads: a door the company holds, or Ashwalker-majority ground. Never open ground."""
 from __future__ import annotations
 
 import sys
@@ -14,31 +14,22 @@ from verdance import campaign as engine
 
 
 class TestLandingZones(unittest.TestCase):
-    def test_quiet_rim_vs_midfield(self):
+    def test_open_ground_is_never_a_pad(self):
         rim = {"xMin": 0.0, "xMax": 0.2, "zMin": 0.0, "zMax": 0.2}
         mid = {"xMin": 0.35, "xMax": 0.65, "zMin": 0.35, "zMax": 0.65}
-        ok, reason = lz.legal_landing_reason({}, "greenest_fields", "Z_RIM", rim)
-        self.assertTrue(ok)
-        self.assertEqual(reason, "quiet_rim")
-        ok, reason = lz.legal_landing_reason({}, "greenest_fields", "Z_MID", mid)
-        self.assertFalse(ok)
-        self.assertEqual(reason, "midfield_unowned")
+        for zid, b in (("Z_RIM", rim), ("Z_MID", mid)):
+            ok, reason = lz.legal_landing_reason({}, "greenest_fields", zid, b)
+            self.assertFalse(ok)
+            self.assertEqual(reason, "not_ours")
 
-    def test_enemy_rim_is_contested(self):
-        rim = {"xMin": 0.0, "xMax": 0.2, "zMin": 0.0, "zMax": 0.2}
-        state = {
-            "zoneMemory": {
-                "greenest_fields": {
-                    "Z_RIM": {
-                        "controllingFaction": "armada",
-                        "abstract": {"control": "armada"},
-                    }
-                }
-            }
-        }
-        ok, reason = lz.legal_landing_reason(state, "greenest_fields", "Z_RIM", rim)
+    def test_a_held_door_is_a_pad(self):
+        state = engine.default_v1_state()
+        ok, reason = lz.legal_landing_reason(state, "greenest_fields", "GF_NW_MUSTER", {})
+        self.assertTrue(ok)
+        self.assertEqual(reason, "held_door")
+        # the far door of the Koom road is not ours until we walk it
+        ok, reason = lz.legal_landing_reason(state, "greenest_fields", "GF_SE_PLATEAU", {})
         self.assertFalse(ok)
-        self.assertEqual(reason, "contested_rim")
 
     def test_ashwalker_majority_unlocks_midfield(self):
         mid = {"xMin": 0.35, "xMax": 0.65, "zMin": 0.35, "zMax": 0.65}
@@ -71,31 +62,18 @@ class TestLandingZones(unittest.TestCase):
         }
         ok, reason = lz.legal_landing_reason(state, "greenest_fields", "Z_FOB", mid)
         self.assertFalse(ok)
-        self.assertEqual(reason, "midfield_unowned")
+        self.assertEqual(reason, "not_ours")
 
-    def test_opening_uses_quiet_rim(self):
-        opening = engine.opening_sortie_order(engine.default_v1_state())
+    def test_opening_lands_on_the_start_road(self):
+        state = engine.default_v1_state()
+        opening = engine.opening_sortie_order(state)
         # The opening lands on the start road's door on Greenest Fields, and lifts from it.
         self.assertEqual(opening["deploymentZoneId"], "GF_NW_MUSTER")
         self.assertEqual(opening["extractionZoneId"], "GF_NW_MUSTER")
-        authored = ROOT / "data" / "zone_maps" / "authored" / "greenest_fields.authored.zone_map.json"
-        import json
-
-        data = json.loads(authored.read_text(encoding="utf-8"))
-        by_id = {z.get("zoneId"): z for z in data["zones"]}
-        for zid in ("GF_NE_PLATEAU", "GF_NW_MUSTER"):
-            meta = by_id.get(zid)
-            self.assertIsNotNone(meta, zid)
-            ok, reason = lz.legal_landing_reason(
-                {},
-                "greenest_fields",
-                zid,
-                meta["bounds"],
-                tags=meta.get("tags"),
-                role=str(meta.get("role") or ""),
-            )
+        for zid in ("GF_NW_MUSTER", "TRJ_NW_OUTER_MUSTER"):
+            map_id = "greenest_fields" if zid.startswith("GF_") else "the_rock_jungle"
+            ok, reason = lz.legal_landing_reason(state, map_id, zid, {})
             self.assertTrue(ok, f"{zid}: {reason}")
-            self.assertEqual(reason, "quiet_rim")
 
 
 if __name__ == "__main__":

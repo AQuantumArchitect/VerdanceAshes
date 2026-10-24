@@ -4773,37 +4773,97 @@
     ]
   },
   "zones": {
-    "ATS_CENTRAL_HIVE_FLATS": {
+    "ATS_C_BASTION": {
       "submergedAt": [
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.003,
-        0.009,
+        0.002,
+        0.002,
+        0.005,
         0.016,
-        0.074
+        0.037,
+        0.047,
+        0.059,
+        0.066,
+        0.122
+      ],
+      "floodsAt": null,
+      "restingSubmerged": 0.002
+    },
+    "ATS_C_INNER_BASTION": {
+      "submergedAt": [
+        0.007,
+        0.026,
+        0.04,
+        0.057,
+        0.075,
+        0.103,
+        0.127,
+        0.148,
+        0.223
+      ],
+      "floodsAt": null,
+      "restingSubmerged": 0.007
+    },
+    "ATS_NW_SPILLWAY": {
+      "submergedAt": [
+        0.182,
+        0.292,
+        0.38,
+        0.458,
+        0.526,
+        0.592,
+        0.677,
+        0.746,
+        0.827
+      ],
+      "floodsAt": 0.5,
+      "restingSubmerged": 0.182
+    },
+    "ATS_SE_SPILLWAY": {
+      "submergedAt": [
+        0.182,
+        0.281,
+        0.359,
+        0.425,
+        0.502,
+        0.601,
+        0.696,
+        0.782,
+        0.848
+      ],
+      "floodsAt": 0.5,
+      "restingSubmerged": 0.182
+    },
+    "ATS_NE_GATE": {
+      "submergedAt": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.004,
+        0.017,
+        0.043,
+        0.114
       ],
       "floodsAt": null,
       "restingSubmerged": 0.0
     },
-    "ATS_NW_CANOPY_START": {
+    "ATS_SW_GATE": {
       "submergedAt": [
-        0.176,
-        0.28,
-        0.415,
-        0.533,
-        0.642,
-        0.748,
-        0.86,
-        0.976,
-        0.98
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.005,
+        0.021,
+        0.034,
+        0.1
       ],
-      "floodsAt": 0.375,
-      "restingSubmerged": 0.176
+      "floodsAt": null,
+      "restingSubmerged": 0.0
     },
-    "ATS_NE_ARMADA_RIDGE": {
+    "ATS_NE_PLATEAU": {
       "submergedAt": [
         0.0,
         0.0,
@@ -4818,22 +4878,7 @@
       "floodsAt": null,
       "restingSubmerged": 0.0
     },
-    "ATS_SE_CORTEX_BASIN": {
-      "submergedAt": [
-        0.252,
-        0.36,
-        0.456,
-        0.541,
-        0.613,
-        0.702,
-        0.808,
-        0.94,
-        0.979
-      ],
-      "floodsAt": 0.375,
-      "restingSubmerged": 0.252
-    },
-    "ATS_SW_ARMADA_LAGOON": {
+    "ATS_SW_PLATEAU": {
       "submergedAt": [
         0.0,
         0.0,
@@ -4848,35 +4893,125 @@
       "floodsAt": null,
       "restingSubmerged": 0.0
     },
-    "ATS_NW_CENTER_APPROACH": {
+    "ATS_N_SHORE": {
       "submergedAt": [
-        0.183,
-        0.382,
-        0.513,
-        0.572,
-        0.608,
-        0.628,
-        0.659,
-        0.685,
-        0.78
+        0.077,
+        0.197,
+        0.357,
+        0.496,
+        0.618,
+        0.731,
+        0.831,
+        0.882,
+        0.955
       ],
-      "floodsAt": 0.25,
-      "restingSubmerged": 0.183
+      "floodsAt": 0.5,
+      "restingSubmerged": 0.077
     },
-    "ATS_SW_NE_SWAMP_LANE": {
+    "ATS_S_SHORE": {
       "submergedAt": [
-        0.083,
-        0.158,
-        0.196,
-        0.225,
-        0.25,
-        0.277,
-        0.307,
+        0.214,
         0.329,
-        0.396
+        0.422,
+        0.573,
+        0.738,
+        0.84,
+        0.894,
+        0.916,
+        0.961
+      ],
+      "floodsAt": 0.375,
+      "restingSubmerged": 0.214
+    },
+    "ATS_NW_SHORE": {
+      "submergedAt": [
+        0.264,
+        0.325,
+        0.417,
+        0.521,
+        0.625,
+        0.715,
+        0.828,
+        0.996,
+        1.0
+      ],
+      "floodsAt": 0.375,
+      "restingSubmerged": 0.264
+    },
+    "ATS_SE_SHORE": {
+      "submergedAt": [
+        0.238,
+        0.287,
+        0.381,
+        0.483,
+        0.564,
+        0.655,
+        0.777,
+        0.942,
+        1.0
+      ],
+      "floodsAt": 0.5,
+      "restingSubmerged": 0.238
+    },
+    "ATS_NE_OUTER_PLATEAU": {
+      "submergedAt": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
       ],
       "floodsAt": null,
-      "restingSubmerged": 0.083
+      "restingSubmerged": 0.0
+    },
+    "ATS_SW_OUTER_PLATEAU": {
+      "submergedAt": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "floodsAt": null,
+      "restingSubmerged": 0.0
+    },
+    "ATS_NE_MUSTER": {
+      "submergedAt": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "floodsAt": null,
+      "restingSubmerged": 0.0
+    },
+    "ATS_SW_MUSTER": {
+      "submergedAt": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "floodsAt": null,
+      "restingSubmerged": 0.0
     }
   }
 }

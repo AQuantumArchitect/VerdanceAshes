@@ -151,8 +151,13 @@ def ground_pad_is_near(
 
 
 def separate_intent_zones(intent: Dict[str, Any],
-                          workspace: Optional[Path] = None) -> Dict[str, Any]:
+                          workspace: Optional[Path] = None,
+                          state: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """Infil and exfil are dry pads the company can walk to from the objective.
+
+    With the campaign state in hand, a pad is only ever somewhere the company may land: a door it
+    holds or ground it holds (landing_zones). A pad that is not, or that the water has taken,
+    moves to the nearest such pad, never onto open ground.
 
     The objective may sit in a flooded basin. A dry corner on the far shore is
     not an exit: at Rock Jungle's river level that crossing needs air
@@ -192,19 +197,33 @@ def separate_intent_zones(intent: Dict[str, Any],
         return _roads.is_door(zid, workspace)
 
     deploy = intent.get("deploymentZoneId")
-    # The pad the player stamped on the hub is theirs: legality was judged from belief at stamp
-    # time, and a far pad is a choice (a long walk), not an error. The engine moves a stamped pad
-    # only when it is not landable at this water level, and says so on the intent so the briefing
-    # can carry it. Unstamped (engine-chosen) pads still snap to the nearest dry shore.
     stamped = str(intent.get("source") or "") in ("hub_deploy_plan", "hub_stamp", "stamp_deploy_plan_v1")
-    if isinstance(deploy, str) and deploy and not _mouth(deploy) and not _near(deploy):
-        landable = True
+
+    def _landable(zid: Any) -> bool:
         try:
-            landable = zone_is_landable(zones.get(deploy) or {}, level)
+            return zone_is_landable(zones.get(str(zid)) or {}, level)
         except Exception:
-            landable = True
-        if nearest and (not stamped or not landable):
-            intent["padSnapped"] = {"from": deploy, "to": nearest, "reason": "flooded" if not landable else "far_from_objective"}
+            return True
+
+    if state is not None:
+        from verdance.world import landing_zones as _lz
+
+        def _ours(zid: Any) -> bool:
+            return _lz.is_legal_landing(state, map_id, str(zid), (zones.get(str(zid)) or {}).get("bounds") or {})
+
+        if isinstance(deploy, str) and deploy and not (_ours(deploy) and _landable(deploy)):
+            tz = zones.get(target) or {}
+            pads = sorted((_anchor_dist(tz, z), zid) for zid, z in zones.items()
+                          if zid != target and _ours(zid) and _landable(zid))
+            if pads:
+                intent["padSnapped"] = {"from": deploy, "to": pads[0][1],
+                                        "reason": "flooded" if not _landable(deploy) else "not_ours"}
+                _write("deploymentZoneId", pads[0][1])
+    elif isinstance(deploy, str) and deploy and not _mouth(deploy) and not _near(deploy):
+        # No ledger (tools, old tests): the pad the player stamped is theirs and moves only when
+        # flooded; an engine-chosen pad snaps to the nearest dry shore.
+        if nearest and (not stamped or not _landable(deploy)):
+            intent["padSnapped"] = {"from": deploy, "to": nearest, "reason": "flooded" if not _landable(deploy) else "far_from_objective"}
             _write("deploymentZoneId", nearest)
     deploy = intent.get("deploymentZoneId")
     extract = intent.get("extractionZoneId")
