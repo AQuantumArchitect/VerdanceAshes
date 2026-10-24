@@ -483,7 +483,9 @@ def ensure_zone_memory(state: Dict[str, Any], workspace: Path) -> None:
         return bool(isinstance(rec, dict) and rec.get("held"))
 
     holdings = template_holdings(workspace)
-    fresh = not state.get("history")
+    # Maps the company has never flown still stand as the campaign began: older saves pick up the
+    # template holdings there (a map it has flown keeps what the sorties made of it).
+    flown = {str(h.get("mapId")) for h in state.get("history") or [] if isinstance(h, dict)}
     actors = state.setdefault("offscreenActors", {})
     hazard_state = state.setdefault("hazardState", {})
     for map_id, zone_map in zone_maps.items():
@@ -556,10 +558,10 @@ def ensure_zone_memory(state: Dict[str, Any], workspace: Path) -> None:
             if zone_id not in zones:
                 zones[zone_id] = blank_zone_memory(map_id, zone_id, zone.get("label", zone_id), control)
             elif (standing or (control == "wild" and (map_id == WILD_HOME_MAP or map_id == "eye_of_horus"))
-                  or (template_held and control == template_held and fresh)):
+                  or (template_held and control == template_held and map_id not in flown)):
                 # Older saves: unclaimed ground a set piece stands on (the wild jungle, the Eye's rim,
                 # Koom's two camps) goes to whoever the set piece says holds it; before the first
-                # sortie, so does ground a base template stands on.
+                # sortie there, so does ground a base template stands on.
                 zm = zones[zone_id]
                 if str(zm.get("controllingFaction") or (zm.get("abstract") or {}).get("control") or "neutral").lower() in ("neutral", "contested", "none", ""):
                     zm["controllingFaction"] = control
