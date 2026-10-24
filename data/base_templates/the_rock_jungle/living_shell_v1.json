@@ -53,7 +53,7 @@
    "pocketId": "rj_se_scrap",
    "facing": 0,
    "z": 0.9102,
-   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "zoneId": "TRJ_SE_OUTER_MUSTER",
    "x": 1.1504,
    "keepClass": "mex"
   },
@@ -62,7 +62,7 @@
    "pocketId": "rj_east_causeway",
    "facing": 0,
    "z": 0.4258,
-   "zoneId": "RJ_EASTERN_CAUSEWAY",
+   "zoneId": "TRJ_NE_RIM",
    "x": 1.0977,
    "keepClass": "mex"
   },
@@ -71,7 +71,7 @@
    "pocketId": "rj_se_scrap",
    "facing": 0,
    "z": 0.9395,
-   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "zoneId": "TRJ_SE_OUTER_MUSTER",
    "x": 1.1406,
    "keepClass": "mex"
   },
@@ -80,7 +80,7 @@
    "pocketId": "rj_east_causeway",
    "facing": 0,
    "z": 0.4238,
-   "zoneId": "RJ_EASTERN_CAUSEWAY",
+   "zoneId": "TRJ_NE_RIM",
    "x": 1.0547,
    "keepClass": "mex"
   },
@@ -89,7 +89,7 @@
    "pocketId": "rj_se_scrap",
    "facing": 0,
    "z": 0.9141,
-   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "zoneId": "TRJ_SE_OUTER_MUSTER",
    "x": 1.1191,
    "keepClass": "mex"
   },
@@ -98,7 +98,7 @@
    "pocketId": "rj_east_causeway",
    "facing": 0,
    "z": 0.3945,
-   "zoneId": "RJ_EASTERN_CAUSEWAY",
+   "zoneId": "TRJ_NE_RIM",
    "x": 1.0781,
    "keepClass": "mex"
   },
@@ -107,7 +107,7 @@
    "pocketId": "rj_se_scrap",
    "facing": 1,
    "z": 0.9209,
-   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "zoneId": "TRJ_SE_OUTER_MUSTER",
    "x": 1.1514,
    "keepClass": "energy"
   },
@@ -116,7 +116,7 @@
    "pocketId": "rj_se_scrap",
    "facing": 1,
    "z": 0.9111,
-   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "zoneId": "TRJ_SE_OUTER_MUSTER",
    "x": 1.1729,
    "keepClass": "energy"
   },
@@ -125,7 +125,7 @@
    "pocketId": "rj_se_scrap",
    "facing": 3,
    "z": 0.9209,
-   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "zoneId": "TRJ_SE_OUTER_MUSTER",
    "x": 1.1357,
    "keepClass": "energy"
   },
@@ -134,7 +134,7 @@
    "pocketId": "rj_se_scrap",
    "facing": 0,
    "z": 0.9326,
-   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "zoneId": "TRJ_SE_OUTER_MUSTER",
    "x": 1.1729,
    "keepClass": "energy"
   },
@@ -143,7 +143,7 @@
    "pocketId": "rj_se_scrap",
    "facing": 3,
    "z": 0.9404,
-   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "zoneId": "TRJ_SE_OUTER_MUSTER",
    "x": 1.1201,
    "keepClass": "energy"
   },
@@ -152,7 +152,7 @@
    "pocketId": "rj_se_scrap",
    "facing": 3,
    "z": 0.96,
-   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "zoneId": "TRJ_SE_OUTER_MUSTER",
    "x": 1.1162,
    "keepClass": "energy"
   },
@@ -161,7 +161,7 @@
    "pocketId": "rj_se_scrap",
    "facing": 0,
    "z": 0.9795,
-   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "zoneId": "TRJ_SE_OUTER_MUSTER",
    "x": 1.1416,
    "keepClass": "energy"
   },
@@ -170,7 +170,7 @@
    "pocketId": "rj_se_scrap",
    "facing": 1,
    "z": 0.9795,
-   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "zoneId": "TRJ_SE_OUTER_MUSTER",
    "x": 1.1592,
    "keepClass": "energy"
   },
@@ -179,7 +179,7 @@
    "pocketId": "rj_se_scrap",
    "facing": 2,
    "z": 0.96,
-   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "zoneId": "TRJ_SE_OUTER_MUSTER",
    "x": 1.1592,
    "keepClass": "energy"
   },
@@ -188,7 +188,7 @@
    "pocketId": "rj_se_scrap",
    "facing": 0,
    "z": 0.9395,
-   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "zoneId": "TRJ_SE_OUTER_MUSTER",
    "x": 1.1523,
    "keepClass": "storage"
   },
@@ -197,7 +197,7 @@
    "pocketId": "rj_se_scrap",
    "facing": 1,
    "z": 0.9336,
-   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "zoneId": "TRJ_SE_OUTER_MUSTER",
    "x": 1.1895,
    "keepClass": "defense"
   },
@@ -206,7 +206,7 @@
    "pocketId": "rj_se_scrap",
    "facing": 0,
    "z": 0.957,
-   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "zoneId": "TRJ_SE_OUTER_MUSTER",
    "x": 1.0469,
    "keepClass": "static"
   },
@@ -216,7 +216,7 @@
    "z": 0.85,
    "x": 0.85,
    "role": "autonomous_decoy_farmer",
-   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "zoneId": "TRJ_SE_MUSTER",
    "facing": 0,
    "unitDefName": "legdecom"
   },
@@ -226,7 +226,7 @@
    "z": 0.42,
    "x": 0.84,
    "role": "autonomous_decoy_farmer",
-   "zoneId": "RJ_EASTERN_CAUSEWAY",
+   "zoneId": "TRJ_NE_SHALLOWS",
    "facing": 0,
    "unitDefName": "legdecom"
   }

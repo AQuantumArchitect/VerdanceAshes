@@ -9,7 +9,7 @@
   "descriptor": "Limestone Spire Labyrinth",
   "blurb": "PVE outlier. Sparse Null scrap only; center is raptor wilds (not baked buildings). Do not use for global eco tuning.",
   "shellAtT0": "Thin Null scrap + wilds",
-  "growMix": "2\u00c3\u2014 scrap Null only",
+  "growMix": "2Ã— scrap Null only",
   "arcKinds": [
    "survive_wilds"
   ],
@@ -81,7 +81,7 @@
    "x": 0.8546,
    "z": 0.8665,
    "facing": 3,
-   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "zoneId": "TRJ_SE_MUSTER",
    "pocketId": "rj_se_scrap",
    "keepClass": "energy",
    "faction": "nullmercs"
@@ -91,7 +91,7 @@
    "x": 0.8484,
    "z": 0.848,
    "facing": 0,
-   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "zoneId": "TRJ_SE_MUSTER",
    "pocketId": "rj_se_scrap",
    "keepClass": "energy",
    "faction": "nullmercs"
@@ -101,7 +101,7 @@
    "x": 0.825,
    "z": 0.8535,
    "facing": 0,
-   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "zoneId": "TRJ_SE_MUSTER",
    "pocketId": "rj_se_scrap",
    "keepClass": "mex",
    "faction": "nullmercs"
@@ -111,7 +111,7 @@
    "x": 0.8178,
    "z": 0.8229,
    "facing": 3,
-   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "zoneId": "TRJ_SE_MUSTER",
    "pocketId": "rj_se_scrap",
    "keepClass": "defense",
    "faction": "nullmercs"
@@ -121,7 +121,7 @@
    "x": 0.8895,
    "z": 0.8511,
    "facing": 0,
-   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "zoneId": "TRJ_SE_OUTER_MUSTER",
    "pocketId": "rj_se_scrap",
    "keepClass": "defense",
    "faction": "nullmercs"
@@ -131,7 +131,7 @@
    "x": 0.8503,
    "z": 0.8858,
    "facing": 3,
-   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "zoneId": "TRJ_SE_MUSTER",
    "pocketId": "rj_se_scrap",
    "keepClass": "wall",
    "faction": "nullmercs"
@@ -141,7 +141,7 @@
    "x": 0.8082,
    "z": 0.8597,
    "facing": 2,
-   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "zoneId": "TRJ_SE_MUSTER",
    "pocketId": "rj_se_scrap",
    "keepClass": "wall",
    "faction": "nullmercs"
@@ -151,7 +151,7 @@
    "x": 0.8544,
    "z": 0.8511,
    "facing": 0,
-   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "zoneId": "TRJ_SE_MUSTER",
    "pocketId": "rj_se_scrap",
    "keepClass": "intel",
    "faction": "nullmercs"
@@ -161,7 +161,7 @@
    "x": 0.8529,
    "z": 0.8552,
    "facing": 2,
-   "zoneId": "RJ_SE_JUNGLE_SHELF",
+   "zoneId": "TRJ_SE_MUSTER",
    "pocketId": "rj_se_scrap",
    "keepClass": "decoy_node",
    "faction": "nullmercs"
@@ -171,7 +171,7 @@
    "x": 0.8139,
    "z": 0.4053,
    "facing": 0,
-   "zoneId": "RJ_EASTERN_CAUSEWAY",
+   "zoneId": "TRJ_NE_SHALLOWS",
    "pocketId": "rj_east_causeway",
    "keepClass": "mex",
    "faction": "nullmercs"
@@ -181,7 +181,7 @@
    "x": 0.8019,
    "z": 0.4069,
    "facing": 3,
-   "zoneId": "RJ_EASTERN_CAUSEWAY",
+   "zoneId": "TRJ_NE_SHALLOWS",
    "pocketId": "rj_east_causeway",
    "keepClass": "defense",
    "faction": "nullmercs"
@@ -191,7 +191,7 @@
    "x": 0.8173,
    "z": 0.3914,
    "facing": 2,
-   "zoneId": "RJ_EASTERN_CAUSEWAY",
+   "zoneId": "TRJ_NE_SHALLOWS",
    "pocketId": "rj_east_causeway",
    "keepClass": "defense",
    "faction": "nullmercs"
@@ -201,7 +201,7 @@
    "x": 0.8317,
    "z": 0.3937,
    "facing": 2,
-   "zoneId": "RJ_EASTERN_CAUSEWAY",
+   "zoneId": "TRJ_NE_SHALLOWS",
    "pocketId": "rj_east_causeway",
    "keepClass": "wall",
    "faction": "nullmercs"
@@ -211,7 +211,7 @@
    "x": 0.8355,
    "z": 0.4221,
    "facing": 0,
-   "zoneId": "RJ_EASTERN_CAUSEWAY",
+   "zoneId": "TRJ_NE_SHALLOWS",
    "pocketId": "rj_east_causeway",
    "keepClass": "intel",
    "faction": "nullmercs"
@@ -221,7 +221,7 @@
    "x": 0.8438,
    "z": 0.4165,
    "facing": 2,
-   "zoneId": "RJ_EASTERN_CAUSEWAY",
+   "zoneId": "TRJ_NE_SHALLOWS",
    "pocketId": "rj_east_causeway",
    "keepClass": "decoy_node",
    "faction": "nullmercs"

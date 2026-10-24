@@ -147,3 +147,25 @@ def test_the_builder_fields_the_war_the_kings_and_the_dens():
     eye = _probe({"wildDens": dens})
     assert sum(1 for f in eye["forces"] if f["id"].startswith("wild_den_")) == len(dens)
     assert [t["faction"] for t in eye["teams"]] == ["wild"]
+
+
+def test_a_new_campaign_has_its_bases_standing():
+    # The mission builder fields a template's units only where zone memory says their faction
+    # holds the ground. A fresh world must say so, or Greenest Fields drops onto an empty map.
+    s = _state()
+    gf = {z: v["controllingFaction"] for z, v in s["zoneMemory"]["greenest_fields"].items()}
+    assert {"GF_SE_PLATEAU", "GF_NW_BASTION", "GF_C_GATE"} <= {z for z, f in gf.items() if f == "armada"}
+    for map_id, held in engine.template_holdings(ROOT).items():
+        mem = s["zoneMemory"][map_id]
+        for zid, fac in held.items():
+            assert mem[zid]["controllingFaction"] in (fac, "wild"), (map_id, zid)
+
+
+def test_base_templates_name_live_zones():
+    for path in sorted((ROOT / "data" / "base_templates").glob("*/*.json")):
+        data = json.loads(path.read_text(encoding="utf-8-sig"))
+        if not isinstance(data, dict) or not data.get("units"):
+            continue
+        live = set(theaters._zones(data["mapId"], ROOT))
+        stale = {u.get("zoneId") for u in data["units"]} - live
+        assert not stale, (path.name, sorted(stale)[:4])

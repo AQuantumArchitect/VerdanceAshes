@@ -432,6 +432,44 @@ NULLMERC_FOOTHOLD_ROLES = (
 
 
 WILD_HOME_MAP = "the_rock_jungle"
+# Fields whose living shell is not the world at the start: the wild home, and the two set pieces
+# that replace the shell (Koom's standing war, All That Simmers' showdown).
+SHELL_FREE_MAPS = {"the_rock_jungle", "koom_valley", "all_that_simmers"}
+_HOLDINGS: Dict[str, Dict[str, Dict[str, str]]] = {}
+
+
+def template_holdings(workspace: Path) -> Dict[str, Dict[str, str]]:
+    """{mapId: {zoneId: faction}}: who the base templates stand in, zone by zone (the faction with
+    most units there). This is the world at the campaign's start: a base stands where its faction
+    holds the ground, and the mission builder only fields a base where the world says it stands."""
+    key = str(Path(workspace).resolve())
+    if key in _HOLDINGS:
+        return _HOLDINGS[key]
+    out: Dict[str, Dict[str, str]] = {}
+    root = Path(workspace) / "data" / "base_templates"
+    for path in sorted(root.glob("*/*.json")) if root.exists() else []:
+        if path.stem.startswith(("bake_recipe", "grow_profiles", "strip_filter")):
+            continue
+        try:
+            data = load_json(path)
+        except Exception:  # noqa: BLE001
+            continue
+        if not isinstance(data, dict) or not data.get("units"):
+            continue
+        map_id = str(data.get("mapId") or path.parent.name)
+        if map_id in SHELL_FREE_MAPS:
+            continue
+        counts: Dict[str, Dict[str, int]] = {}
+        for u in data["units"]:
+            zid, fac = u.get("zoneId"), str(u.get("faction") or data.get("faction") or "").lower()
+            if zid and fac in ("armada", "cortex", "nullmercs"):
+                counts.setdefault(str(zid), {}).setdefault(fac, 0)
+                counts[str(zid)][fac] += 1
+        held = out.setdefault(map_id, {})
+        for zid, by in counts.items():
+            held.setdefault(zid, max(sorted(by), key=lambda f: by[f]))
+    _HOLDINGS[key] = out
+    return out
 from verdance.world.theaters import EYE_RIM_ZONES, STANDING_CONTROL  # noqa: E402
 
 
@@ -444,6 +482,8 @@ def ensure_zone_memory(state: Dict[str, Any], workspace: Path) -> None:
         rec = doors.get(zone_id)
         return bool(isinstance(rec, dict) and rec.get("held"))
 
+    holdings = template_holdings(workspace)
+    fresh = not state.get("history")
     actors = state.setdefault("offscreenActors", {})
     hazard_state = state.setdefault("hazardState", {})
     for map_id, zone_map in zone_maps.items():
@@ -471,6 +511,7 @@ def ensure_zone_memory(state: Dict[str, Any], workspace: Path) -> None:
             tags = set(str(t).lower() for t in zone.get("tags", []) or [])
             role = str(zone.get("role", "")).lower()
             standing = STANDING_CONTROL.get(map_id, {}).get(zone_id)
+            template_held = holdings.get(map_id, {}).get(zone_id)
             if map_id == WILD_HOME_MAP and held_door(zone_id):
                 actor = "Ashwalkers"
                 control = "ashwalkers"
@@ -485,6 +526,10 @@ def ensure_zone_memory(state: Dict[str, Any], workspace: Path) -> None:
                 # someone out-builds them there.
                 actor = "RaptorsAI"
                 control = "wild"
+            elif template_held:
+                # A base template stands here at the start: its faction holds the ground.
+                actor = "SimpleDefenderAI" if template_held == "armada" else ("NullMercsAI" if template_held == "nullmercs" else "SimpleAI")
+                control = template_held
             elif "start" in tags and ("legion" in role or "player" in role):
                 actor = "Ashwalkers"
                 control = "ashwalkers"
@@ -510,9 +555,11 @@ def ensure_zone_memory(state: Dict[str, Any], workspace: Path) -> None:
             map_actors.setdefault(zone_id, actor)
             if zone_id not in zones:
                 zones[zone_id] = blank_zone_memory(map_id, zone_id, zone.get("label", zone_id), control)
-            elif standing or (control == "wild" and (map_id == WILD_HOME_MAP or map_id == "eye_of_horus")):
+            elif (standing or (control == "wild" and (map_id == WILD_HOME_MAP or map_id == "eye_of_horus"))
+                  or (template_held and control == template_held and fresh)):
                 # Older saves: unclaimed ground a set piece stands on (the wild jungle, the Eye's rim,
-                # Koom's two camps) goes to whoever the set piece says holds it.
+                # Koom's two camps) goes to whoever the set piece says holds it; before the first
+                # sortie, so does ground a base template stands on.
                 zm = zones[zone_id]
                 if str(zm.get("controllingFaction") or (zm.get("abstract") or {}).get("control") or "neutral").lower() in ("neutral", "contested", "none", ""):
                     zm["controllingFaction"] = control
@@ -551,6 +598,8 @@ def blank_zone_memory(map_id: str, zone_id: str, label: str, control: str) -> Di
 
 
 __all__ = [
+    "SHELL_FREE_MAPS",
+    "template_holdings",
     "WORLD_MAPS",
     "BP_PER_TNB",
     "CAMPAIGN_ID",
