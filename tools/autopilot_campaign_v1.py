@@ -250,6 +250,14 @@ def main() -> int:
                 (run_dir / f"sortie_{n:02d}.infolog.txt").write_bytes(fh.read())
         except Exception:  # noqa: BLE001
             pass
+        crash = None
+        try:
+            txt = (run_dir / f"sortie_{n:02d}.infolog.txt").read_text(encoding="utf-8", errors="replace")
+            if "has crashed" in txt:
+                lines = [l for l in txt.splitlines() if "VA_" in l and "has crashed" not in l]
+                crash = {"lastVerdanceLine": (lines[-1][:240] if lines else None)}
+        except Exception:  # noqa: BLE001
+            pass
         st2 = jload(sp)
         bead = (st2.get("history") or [{}])[-1]
         heroes = {h.get("heroId"): h.get("status") for h in ((st2.get("roster") or {}).get("heroes") or [])
@@ -264,6 +272,12 @@ def main() -> int:
         print(json.dumps(row))
         with log_path.open("a", encoding="utf-8") as fh:
             fh.write(json.dumps(row) + "\n")
+        if crash:
+            row["crashed"] = crash
+            print("[autopilot] the engine CRASHED; stopping. Last Verdance line:", crash["lastVerdanceLine"])
+            with log_path.open("a", encoding="utf-8") as fh:
+                fh.write(json.dumps({"n": n, "crashed": crash}) + "\n")
+            break
         if st2.get("campaignComplete") or stalls >= args.max_stalls:
             break
 

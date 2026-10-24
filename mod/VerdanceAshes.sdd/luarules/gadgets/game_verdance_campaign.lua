@@ -1801,6 +1801,10 @@ end
 -- by cliffs. Global on purpose (the main chunk is at the local cap). nil when nothing fits.
 function vaPathReaches(ud, x, z, tx, tz)
   if not (Spring.RequestPath and ud.moveDef and ud.moveDef.name) then return true end
+  -- Before the first sim frame the path system is not up: RequestPath at GameStart (f=-1) is an
+  -- engine access violation (autopilot run 2026-10-24, field-recruit wreck seeding). Standing
+  -- ground is enough then.
+  if (Spring.GetGameFrame and Spring.GetGameFrame() or 0) < 1 then return true end
   local path = Spring.RequestPath(ud.moveDef.name, x, Spring.GetGroundHeight(x, z), z, tx, Spring.GetGroundHeight(tx, tz), tz, 64)
   if not path then return false end
   local pts = path.GetPathWayPoints and path:GetPathWayPoints() or nil
