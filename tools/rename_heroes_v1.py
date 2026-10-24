@@ -64,6 +64,11 @@ def rename_state(path: Path) -> None:
     raw = path.read_bytes()
     state = json.loads(raw.decode("utf-8-sig"))
     n = 0
+    for old, new in UNITDEFS.values():
+        bank = (state.get("roster") or {}).get("cadreXp")      # her veterancy is banked by unit type
+        if isinstance(bank, dict) and old in bank and new not in bank:
+            bank[new] = dict(bank[old])
+            n += 1
     for hid, (old, new) in UNITDEFS.items():
         for row in [(state.get("characters") or {}).get(hid), (state.get("fieldPool") or {}).get(hid)] + [
                 h for h in (state.get("roster") or {}).get("heroes") or [] if isinstance(h, dict) and h.get("heroId") == hid]:
