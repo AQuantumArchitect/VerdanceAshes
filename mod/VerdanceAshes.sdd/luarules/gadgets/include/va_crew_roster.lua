@@ -586,13 +586,13 @@ M.HEROES = {
   halbard = {
     name = "Ilse 'Halbard' Varn",
     role = "band",
-    unitDef = "corhal",
+    unitDef = "va_halberd",
     hireTnb = 0,
     packTotal = 1,
     extras = 0,
     startXp = 0.362,
     packMind = "solo",
-    blurb = "Drives the Cortex Halberd assault hovertank.",
+    blurb = "Drives the Cortex Halberd with a heat ray in place of its cannon. The ray runs on the company's energy bank, so she wants Solarium behind her.",
   },
   thresh = {
     name = "Dama Thresh",
