@@ -496,9 +496,24 @@ function gadget:UnitGiven(unitID, unitDefID, newTeam, oldTeam)
   end
 end
 
+-- The company's aircraft earn half again as much XP: the same as pricing them a third cheaper
+-- in the engine's damage-for-XP sum (owner call, 2026-10-23; the pack's starting XP takes the
+-- same third off in tools/verdance/company/pack_xp.py).
+local AIR_XP_BONUS = 0.5
+local airBoosting = false
+
 function gadget:UnitExperience(unitID, unitDefID, unitTeam, xp, oldXp)
   if not enabled then return end
   if unitTeam ~= playerTeam then return end
+  if not airBoosting and Spring.SetUnitExperience and xp > (oldXp or 0) then
+    local ud = UnitDefs[unitDefID]
+    if ud and ud.canFly then
+      airBoosting = true
+      xp = xp + (xp - (oldXp or 0)) * AIR_XP_BONUS
+      Spring.SetUnitExperience(unitID, xp)
+      airBoosting = false
+    end
+  end
   if not isPlayerVetUnit(unitID, unitDefID) then return end
   local rec = ensureVet(unitID, unitDefID)
   if not rec then return end

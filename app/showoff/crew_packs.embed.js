@@ -738,24 +738,23 @@ window.CREW_PACKS = {
       "hireTnb": 1,
       "packTotal": 1,
       "extras": 0,
-      "factory": "consul_works",
       "fieldEffect": "build",
       "tags": [
         "field_office"
       ],
-      "blurb": "Deserted sideways; Consul + nano. Builds like apology.",
+      "blurb": "Deserted sideways; Consul + two Butlers. Builds like apology.",
       "name": "Armada Consul",
       "sizing": "fixed",
       "escorts": [
         {
-          "unitDef": "armnanotc",
-          "count": 1
+          "unitDef": "armfark",
+          "count": 2
         }
       ],
-      "packCombined": 587,
-      "packMetal": 480,
-      "packEnergy": 7500,
-      "startXp": 0.402
+      "packCombined": 817,
+      "packMetal": 670,
+      "packEnergy": 10300,
+      "startXp": 0.364
     },
     "veil": {
       "role": "band",
@@ -804,7 +803,8 @@ window.CREW_PACKS = {
       "packCombined": 2172,
       "packMetal": 1804,
       "packEnergy": 25750,
-      "startXp": 0.138
+      "startXp": 0.143,
+      "packXpCombined": 2140
     },
     "tick": {
       "role": "band",
@@ -922,23 +922,19 @@ window.CREW_PACKS = {
         {
           "unitDef": "armestor",
           "count": 1
-        },
-        {
-          "unitDef": "armck",
-          "count": 1
         }
       ],
-      "blurb": "Eco nest — solars, converters, storage, butler. Spreadsheets first.",
+      "blurb": "Eco nest: Solarium is the constructor, with solars, converters and storage. Spreadsheets first.",
       "name": "Solarium",
       "tags": [
         "eco_lab"
       ],
       "sizing": "fixed",
-      "packCombined": 2519,
-      "packMetal": 2122,
-      "packEnergy": 27770,
+      "packCombined": 2386,
+      "packMetal": 2012,
+      "packEnergy": 26170,
       "fieldEffect": "build",
-      "startXp": 0.08
+      "startXp": 0.102
     },
     "warder": {
       "role": "band",
@@ -1008,8 +1004,9 @@ window.CREW_PACKS = {
           "count": 24
         }
       ],
-      "startXp": 0.174,
-      "canLead": false
+      "startXp": 0.258,
+      "canLead": false,
+      "packXpCombined": 1451
     },
     "mira": {
       "role": "band",
@@ -1058,19 +1055,24 @@ window.CREW_PACKS = {
         {
           "unitDef": "armferret",
           "count": 1
+        },
+        {
+          "unitDef": "armatlas",
+          "count": 1
         }
       ],
-      "blurb": "Archangel + Ferret. Sky-saint so Mira can play. Chainsaw soul.",
+      "blurb": "Archangel + Ferret, and a Stork to carry the Archangel. Sky-saint so Mira can play. Chainsaw soul.",
       "name": "Saint Kettle",
       "sizing": "fixed",
       "tags": [
         "mobile_aa",
         "sky_saint"
       ],
-      "startXp": 0.326,
-      "packCombined": 1041,
-      "packMetal": 880,
-      "packEnergy": 11300
+      "startXp": 0.317,
+      "packCombined": 1128,
+      "packMetal": 948,
+      "packEnergy": 12600,
+      "packXpCombined": 1099
     },
     "infestor": {
       "role": "band",
@@ -1184,7 +1186,7 @@ window.CREW_PACKS = {
       "blurb": "Roughneck wing (x5). Gunship manners. Altitude is an opinion.",
       "name": "Ceil Rat",
       "sizing": "leadFill",
-      "startXp": 0.168,
+      "startXp": 0.279,
       "packCombined": 1993,
       "packMetal": 1550,
       "packEnergy": 31000,
@@ -1194,7 +1196,8 @@ window.CREW_PACKS = {
         "sky"
       ],
       "massBand": "mid",
-      "massTarget": 2064
+      "massTarget": 2064,
+      "packXpCombined": 1329
     },
     "lumen": {
       "role": "band",
@@ -1202,17 +1205,23 @@ window.CREW_PACKS = {
       "hireTnb": 0,
       "packTotal": 1,
       "extras": 0,
-      "blurb": "T2 construction vehicle of the saint garden. Raises Prudes and Pulsars, and nothing else.",
+      "blurb": "T2 construction vehicle of the saint garden. Raises Prudes and Pulsars, and nothing else; a Cortex Printer keeps her patched.",
       "name": "Sister Lumen",
       "sizing": "fixed",
-      "startXp": 0.392,
-      "packCombined": 647,
-      "packMetal": 550,
-      "packEnergy": 6800,
+      "startXp": 0.317,
+      "packCombined": 1096,
+      "packMetal": 920,
+      "packEnergy": 12300,
       "tags": [
         "eco",
         "geo",
         "saint"
+      ],
+      "escorts": [
+        {
+          "unitDef": "corvac",
+          "count": 1
+        }
       ]
     },
     "anvil": {
@@ -1302,13 +1311,6 @@ window.CREW_PACKS = {
       "product": "armflea",
       "label": "Tick Stream Bay",
       "fiction": "Armada bot lab locked to fleas — live capture on field, hire-drop at LZ"
-    },
-    "consul_works": {
-      "structureDef": "armnanotc",
-      "boundHero": "consul",
-      "product": null,
-      "label": "Consul Works",
-      "fiction": "Armada field office"
     },
     "twitch_kit": {
       "structureDef": null,

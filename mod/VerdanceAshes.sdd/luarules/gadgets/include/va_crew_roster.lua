@@ -188,18 +188,17 @@ M.HEROES = {
     hireTnb = 1,
     packTotal = 1,
     extras = 0,
-    factory = "consul_works",
     fieldEffect = "build",
-    startXp = 0.402,
+    startXp = 0.364,
     packMind = "solo",
     tags = { "field_office" },
     escorts = {
       {
-        unitDef = "armnanotc",
-        count = 1,
+        unitDef = "armfark",
+        count = 2,
       },
     },
-    blurb = "Deserted sideways; Consul + nano. Builds like apology.",
+    blurb = "Deserted sideways; Consul + two Butlers. Builds like apology.",
   },
   veil = {
     name = "Veil & Compass",
@@ -230,7 +229,7 @@ M.HEROES = {
     hireTnb = 0,
     packTotal = 1,
     extras = 0,
-    startXp = 0.138,
+    startXp = 0.143,
     packMind = "solo",
     escorts = {
       {
@@ -316,7 +315,7 @@ M.HEROES = {
     packTotal = 1,
     extras = 0,
     fieldEffect = "build",
-    startXp = 0.08,
+    startXp = 0.102,
     packMind = "solo",
     tags = { "eco_lab" },
     escorts = {
@@ -336,12 +335,8 @@ M.HEROES = {
         unitDef = "armestor",
         count = 1,
       },
-      {
-        unitDef = "armck",
-        count = 1,
-      },
     },
-    blurb = "Eco nest — solars, converters, storage, butler. Spreadsheets first.",
+    blurb = "Eco nest: Solarium is the constructor, with solars, converters and storage. Spreadsheets first.",
   },
   warder = {
     name = "Warder",
@@ -387,7 +382,7 @@ M.HEROES = {
     extras = 0,
     factory = "legion_drone_bay",
     fieldEffect = "vision",
-    startXp = 0.174,
+    startXp = 0.258,
     packMind = "solo",
     tags = { "scout", "air_scout", "drone_bay" },
     escorts = {
@@ -435,7 +430,7 @@ M.HEROES = {
     hireTnb = 0,
     packTotal = 1,
     extras = 0,
-    startXp = 0.326,
+    startXp = 0.317,
     packMind = "solo",
     tags = { "mobile_aa", "sky_saint" },
     escorts = {
@@ -443,8 +438,12 @@ M.HEROES = {
         unitDef = "armferret",
         count = 1,
       },
+      {
+        unitDef = "armatlas",
+        count = 1,
+      },
     },
-    blurb = "Archangel + Ferret. Sky-saint so Mira can play. Chainsaw soul.",
+    blurb = "Archangel + Ferret, and a Stork to carry the Archangel. Sky-saint so Mira can play. Chainsaw soul.",
   },
   infestor = {
     name = "Infestor Hive",
@@ -519,7 +518,7 @@ M.HEROES = {
     hireTnb = 0,
     packTotal = 5,
     extras = 4,
-    startXp = 0.168,
+    startXp = 0.279,
     packMind = "solo",
     tags = { "skirmish", "gunship", "sky" },
     blurb = "Roughneck wing (x5). Gunship manners. Altitude is an opinion.",
@@ -531,10 +530,16 @@ M.HEROES = {
     hireTnb = 0,
     packTotal = 1,
     extras = 0,
-    startXp = 0.392,
+    startXp = 0.317,
     packMind = "solo",
     tags = { "eco", "geo", "saint" },
-    blurb = "T2 construction vehicle of the saint garden. Raises Prudes and Pulsars, and nothing else.",
+    escorts = {
+      {
+        unitDef = "corvac",
+        count = 1,
+      },
+    },
+    blurb = "T2 construction vehicle of the saint garden. Raises Prudes and Pulsars, and nothing else; a Cortex Printer keeps her patched.",
   },
   anvil = {
     name = "Anvil Mire",
@@ -597,12 +602,6 @@ M.FACTORIES = {
     boundHero = "tick",
     product = "armflea",
     label = "Tick Stream Bay",
-  },
-  consul_works = {
-    structureDef = "armnanotc",
-    boundHero = "consul",
-    product = nil,
-    label = "Consul Works",
   },
   twitch_kit = {
     structureDef = nil,
