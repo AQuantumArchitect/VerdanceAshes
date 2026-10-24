@@ -228,6 +228,50 @@ local function resolvePlayerTeam()
   playerAllyTeamID = teamAlly[playerTeamID] or 0
 end
 
+-- Extract anywhere (modoption va_extract_anywhere=1; the autopilot turns it on): when the
+-- extraction is called, the pad goes to the zone where most of the company stands (a hero
+-- weighs five units). Whoever is elsewhere stays in the field, as before. Python reads the
+-- pad off the manifest like any other.
+local function extractAnywhere()
+  local o = Spring.GetModOptions and Spring.GetModOptions() or {}
+  return tostring(o.va_extract_anywhere) == "1" or tostring(o.va_autopilot) == "1"
+end
+
+local function padToCompany()
+  if not pad then return false end
+  if next(teamAlly) == nil then resolvePlayerTeam() end
+  local weight = {}
+  for _, uid in ipairs(Spring.GetTeamUnits(playerTeamID) or {}) do
+    if Spring.ValidUnitID(uid) and not Spring.GetUnitIsDead(uid) then
+      local dID = Spring.GetUnitDefID(uid)
+      local ud = dID and UnitDefs[dID]
+      local structure = ud and (ud.isBuilding or ud.isFactory or ((ud.speed or 1) == 0))
+      if not structure then
+        local x, _, z = Spring.GetUnitPosition(uid)
+        local zid = zoneOf(x, z)
+        if zid and anchorOf[zid] then
+          local hid = Spring.GetUnitRulesParam(uid, "va_hero_id")
+          local isHero = hid ~= nil and tostring(hid) ~= "" and tostring(hid) ~= "0"
+          weight[zid] = (weight[zid] or 0) + (isHero and 5 or 1)
+        end
+      end
+    end
+  end
+  local best, bw = nil, 0
+  for zid, w in pairs(weight) do
+    if w > bw or (w == bw and best and zid < best) then best, bw = zid, w end
+  end
+  if not best or best == pad.zoneId then return false end
+  local from = pad.zoneId
+  placePad(best, anchorOf[best][1], anchorOf[best][2], PAD_RADIUS)
+  Spring.SetGameRulesParam("va_pad_moved", 1, { public = true })
+  Spring.Echo("VA_EXFIL extract anywhere: pad " .. tostring(from) .. " -> " .. best .. " weight=" .. bw)
+  return true
+end
+
+GG.VA_PadToCompany = padToCompany
+GG.VA_ZoneAnchor = function(zid) local a = anchorOf[tostring(zid or "")]; if a then return a[1], a[2] end end
+
 local function destinations()
   local out = { { id = "home", label = "Back to camp", kind = "camp" } }
   local links = mission and mission.pad and mission.pad.links
@@ -473,6 +517,7 @@ local function exfilCmd(cmd)
   if cmd == "manifest" then
     if not ready then Spring.Echo("VA_EXFIL_ERR not ready"); return end
     if next(teamAlly) == nil then resolvePlayerTeam() end
+    if extractAnywhere() then padToCompany() end
     local m = manifest()
     -- Posted as rules params (how every HUD fact travels); the exfil widget opens on a new seq.
     local seq = (tonumber((Spring.GetGameRulesParam("va_manifest_seq"))) or 0) + 1
@@ -486,6 +531,7 @@ local function exfilCmd(cmd)
   if dest then
     if not ready then Spring.Echo("VA_EXFIL_ERR not ready"); return end
     if next(teamAlly) == nil then resolvePlayerTeam() end
+    if extractAnywhere() then padToCompany() end
     endWith("extracted", dest)
     return true
   end
@@ -499,6 +545,8 @@ function gadget:Shutdown()
   GG.VA_Manifest = nil
   GG.VA_ManifestJson = nil
   GG.VA_WipedManifest = nil
+  GG.VA_PadToCompany = nil
+  GG.VA_ZoneAnchor = nil
 end
 
 else -- unsynced: close the game a few seconds after the sortie ends (the widget shows the card)
