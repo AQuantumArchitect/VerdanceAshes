@@ -43,7 +43,7 @@ downloads them from the same place it always does.
 opened in your browser) and leaves it running -- leave the window open:
 
 ```
-war map -> choose a sortie -> Drop into battle -> BAR launches -> play
+planet -> field -> sortie -> Launch (BAR loads behind the hub) -> pick who goes -> Drop -> play
    |-- the kernel's BAR bridge brings the result home automatically
    +-- back on the war map: hire mercs, rest, talk, or take the next drop
 ```

@@ -10,6 +10,7 @@ import os
 import subprocess
 import sys
 import threading
+import time
 from functools import wraps
 from datetime import datetime, timezone
 from pathlib import Path
@@ -91,6 +92,14 @@ def _first_error_line(*reports: dict[str, Any]) -> str:
     return "deploy pipeline failed -- see build.stderr_tail"
 
 
+def _plan_key(plan: dict[str, Any] | None) -> str:
+    """What fixes the loaded field: the map, the pad, the targets and the job. Not the company."""
+    p = plan or {}
+    m = p.get("marks") or {}
+    return json.dumps([p.get("mapId"), p.get("contractKind"), m.get("deployZoneId"),
+                       sorted(m.get("captureZoneIds") or [])], sort_keys=True)
+
+
 def _spring_already_open() -> str | None:
     """Name of a running spring.exe, or None.
 
@@ -159,6 +168,8 @@ class CampaignKernel:
         self._last_mod_sync: dict[str, Any] | None = None
         self._error: str | None = None
         self._bridge = None  # set by bar_bridge if attached
+        self._hot: dict[str, Any] | None = None   # the hot-drop launch: token, pid, dropped (verdance_kernel.hot_drop)
+        self._hot_behind: threading.Event | None = None
         self.started_at = utc_now()
 
     def _resolve_ps1(self, key: str) -> Path | None:
@@ -184,6 +195,7 @@ class CampaignKernel:
             "showoff": str(showoff_dir(self.ws)),
             "busy": self._busy,
             "deployPhase": self._deploy_phase,
+            "hotDrop": self.hot_drop_status(),
             "error": self._error,
             "lastDeploy": self._last_deploy,
             "lastLaunch": self._last_launch,
@@ -1039,6 +1051,99 @@ class CampaignKernel:
                     report["watch"] = {"ok": False, "error": str(e)}
         return report
 
+    # ── hot drop: load while the player chooses, drop into the running game ──
+
+    def hot_drop_status(self) -> dict[str, Any]:
+        from verdance_kernel import hot_drop as _hot
+        phase = None
+        if self._bridge is not None:
+            phase = (getattr(self._bridge, "status", lambda: {})() or {}).get("phase")
+        return _hot.status_of(self._hot, phase)
+
+    def _arm_hot(self, token: str, launch_report: dict[str, Any], plan: dict[str, Any]) -> None:
+        from verdance_kernel import hot_drop as _hot
+        self._clear_hot()
+        self._hot = {"token": token, "pid": launch_report.get("pid"), "mapId": plan.get("mapId"),
+                     "plan": _plan_key(plan), "at": utc_now(), "dropped": False}
+        if launch_report.get("pid"):
+            self._hot_behind = threading.Event()
+            _hot.keep_behind(int(launch_report["pid"]), self._hot_behind)
+
+    def _clear_hot(self) -> None:
+        if self._hot_behind is not None:
+            self._hot_behind.set()
+        self._hot_behind = None
+        self._hot = None
+
+    def preload(self, plan: dict[str, Any]) -> dict[str, Any]:
+        """The sortie is chosen: build and launch now, every candidate pack compiled in, nobody on
+        the field. The player picks who goes while the level loads; drop() sends them in."""
+        from verdance_kernel.sortie import pid_alive
+        hot = self._hot
+        if hot and not hot.get("dropped"):
+            if pid_alive(hot.get("pid")) and hot.get("mapId") == (plan or {}).get("mapId") \
+                    and hot.get("plan") == _plan_key(plan):
+                return {"ok": True, "accepted": True, "already": True, "phase": self.hot_drop_status().get("phase")}
+            self.cancel_preload()
+            for _ in range(40):                  # let the old field close before the new one starts
+                if not pid_alive(hot.get("pid")):
+                    break
+                time.sleep(0.25)
+            self._clear_hot()
+        plan = dict(plan or {}, hotDrop=True)
+        return self.commit_deploy(plan, launch=True)
+
+    def cancel_preload(self) -> dict[str, Any]:
+        """The player backed out before dropping: close the loaded field. Nothing went."""
+        from verdance_kernel import hot_drop as _hot
+        hot = self._hot
+        if not hot or hot.get("dropped"):
+            return {"ok": True, "cancelled": False}
+        stopped = _hot.stop_engine(int(hot["pid"])) if hot.get("pid") else False
+        _hot.disarm(self.ws)
+        return {"ok": True, "cancelled": True, "stopped": stopped}
+
+    def drop(self, body: dict[str, Any]) -> dict[str, Any]:
+        """Send the chosen packs (and reserve) into the loaded field."""
+        from verdance_kernel import hot_drop as _hot
+        from verdance_kernel.sortie import find_bar_data_root, pid_alive
+        from verdance.company import reserve as _reserve
+        hot = self._hot
+        if not hot:
+            return {"ok": False, "error": "No field is loaded. Choose a sortie first."}
+        if hot.get("dropped"):
+            return {"ok": True, "already": True}
+        if not pid_alive(hot.get("pid")):
+            self._clear_hot()
+            return {"ok": False, "error": "Beyond All Reason closed before the drop. Choose the sortie again."}
+        if self.hot_drop_status().get("phase") != "ready":
+            return {"ok": False, "error": "The field is still loading. Drop wakes when it is ready."}
+        root = find_bar_data_root(self.ws)
+        if not root:
+            return {"ok": False, "error": "BAR's data folder was not found."}
+        with self._lock:
+            sp = state_path(self.ws)
+            st = migrate_state(load_json(sp))
+            ensure_company(st, self.ws)
+            requested = (body or {}).get("crewBand")
+            band, aces = sortie_roster(st, [str(x) for x in requested] if isinstance(requested, list) else None)
+            roster = st.setdefault("roster", {})
+            held = _reserve.ensure_reserve(roster)
+            cap = _reserve.lift_cap(st)
+            asked = (body or {}).get("reserveBring")
+            roster["cadre"] = (_reserve.clamp_bring(asked, held, cap, self.ws) if isinstance(asked, dict)
+                               else _reserve.default_bring(held, cap, self.ws))
+            save_json(sp, st)
+            _hot.record_roster(self.ws, band, aces)
+            path = _hot.write_drop(root, _hot.drop_line(hot["token"], band, roster["cadre"]))
+            hot["dropped"] = True
+            hot["droppedAt"] = utc_now()
+            if self._hot_behind is not None:
+                self._hot_behind.set()
+        forward = _hot.bring_forward(int(hot["pid"])) if hot.get("pid") else False
+        return {"ok": True, "at": utc_now(), "crewBand": band, "deployAces": aces,
+                "reserveBring": dict(roster["cadre"]), "dropFile": str(path), "broughtForward": forward}
+
     def _deploy_async(self, plan: dict[str, Any]) -> None:
         try:
             result = self._deploy_body(plan, launch=True)
@@ -1120,6 +1225,8 @@ class CampaignKernel:
     def _deploy_body(self, plan: dict[str, Any], *, launch: bool = True) -> dict[str, Any]:
         # The build used to run under _lock on the request thread, which froze
         # every other hub call. This block stays indented; the lock is gone.
+        plan = dict(plan or {})
+        hot = bool(plan.pop("hotDrop", False))
         if True:
             try:
                 if launch and _spring_already_open():
@@ -1156,6 +1263,10 @@ class CampaignKernel:
                         requested = plan.get("crewBand")
                         if requested is None:
                             requested = plan.get("deployAces")
+                        if hot:
+                            # Hot drop: every pack the company could send is compiled in; the
+                            # Drop names who actually goes (CampaignKernel.drop).
+                            requested = None
                         band, aces = sortie_roster(st, requested)
                         plan["crewBand"] = band
                         plan["deployAces"] = aces
@@ -1169,8 +1280,11 @@ class CampaignKernel:
                         held = _reserve.ensure_reserve(roster)
                         cap = _reserve.lift_cap(st)
                         asked = plan.get("reserveBring")
-                        roster["cadre"] = (_reserve.clamp_bring(asked, held, cap, self.ws) if isinstance(asked, dict)
-                                           else _reserve.default_bring(held, cap, self.ws))
+                        if hot:
+                            roster["cadre"] = {d: int(n) for d, n in held.items() if int(n or 0) > 0}
+                        else:
+                            roster["cadre"] = (_reserve.clamp_bring(asked, held, cap, self.ws) if isinstance(asked, dict)
+                                               else _reserve.default_bring(held, cap, self.ws))
                         plan["reserveBring"] = dict(roster["cadre"])
                         save_json(sp, st)
                         # Bro Tzar (and future call-ins): stamp then consume so one order = one Drop.
@@ -1189,6 +1303,12 @@ class CampaignKernel:
                         "at": utc_now(),
                     }
 
+                # Arm (or clear) the hot drop before the build reads it.
+                from verdance_kernel import hot_drop as _hot
+                from verdance_kernel.sortie import find_bar_data_root
+                hot_token = _hot.arm(self.ws, find_bar_data_root(self.ws)) if hot else None
+                if not hot:
+                    _hot.disarm(self.ws)
                 # Stamp → intent → build FIRST, then sync the built seed into BAR.
                 # Syncing before build used to freeze a stale SDD under data/games
                 # while the workspace seed moved on — hub marks never reached BAR.
@@ -1221,6 +1341,8 @@ class CampaignKernel:
                     with self._lock:
                         self._deploy_phase = "launching"
                     launch_report = self.launch_bar()
+                    if hot_token and launch_report.get("ok") and not launch_report.get("skipped"):
+                        self._arm_hot(hot_token, launch_report, plan)
                 elif launch and not build_report.get("ok"):
                     launch_report = {"ok": False, "reason": "build failed — not launching"}
 
@@ -1377,6 +1499,12 @@ class CampaignKernel:
         mode: str,
     ) -> dict[str, Any]:
         """Write presentable incomplete debrief without mutating campaign credit."""
+        hot = self._hot
+        if hot and not hot.get("dropped"):
+            # The field was loaded for a drop that never happened: nothing went, nothing to report.
+            self._clear_hot()
+            return {"ok": True, "at": utc_now(), "mode": mode, "cancelled": True,
+                    "headline": "The field closed before the drop. Nothing went."}
         try:
 
             credit = credit_from_result({"status": "incomplete", "terminalReason": reason})

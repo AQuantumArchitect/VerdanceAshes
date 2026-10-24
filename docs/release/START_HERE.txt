@@ -15,8 +15,9 @@ ONE PATH
 3. On the war map (http://127.0.0.1:8770):
      - Choose a green "sortie"
      - Confirm the objective (green) on the briefing table
-     - Click Drop into battle
-   The first Drop on a new map downloads that map from BAR's content
+     - Click Launch: the field loads in BAR behind the hub
+     - Pick who goes, then click Drop
+   The first Launch on a new map downloads that map from BAR's content
    service (about 100 MB); the hub shows the progress.
 4. Play the sortie in BAR. Space dismisses the briefing.
    After a win, 1/2/3 can keep fighting on the same map.

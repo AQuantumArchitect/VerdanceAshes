@@ -216,6 +216,10 @@ details.advanced summary { color:var(--steam); }
 }
 .theater-lock-banner button:hover { background:color-mix(in srgb, var(--gold) 22%, transparent); }
 
+/* The planet: drawn on a canvas by globe.js; fields are the maps' own pictures. */
+.globe { position:relative; margin:0 0 .55rem; border:1px solid var(--line); border-radius:6px;
+  background:radial-gradient(ellipse at 50% 45%, color-mix(in srgb, var(--edge) 10%, var(--bg)) 0%, var(--bg) 70%); overflow:hidden; }
+.globe-canvas { display:block; width:100%; cursor:grab; touch-action:none; }
 .map-picker { display:flex; flex-wrap:wrap; gap:.4rem; margin:0 0 .55rem; align-items:stretch; }
 .map-chip {
   appearance:none; border:1px solid var(--line-strong); background:color-mix(in srgb, var(--panel) 75%, transparent);

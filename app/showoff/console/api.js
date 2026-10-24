@@ -43,6 +43,10 @@ export const api = {
   campTalk: (body) => post("/api/camp-talk", body),
   sealCompany: (band) => post("/api/seal-company", { band }),
   deploy: (plan, launch) => post("/api/deploy" + (launch ? "?launch=1" : ""), plan),
+  // Hot drop: load the field on sortie pick, then drop the chosen packs into the running game.
+  preload: (plan) => post("/api/preload", plan),
+  drop: (body) => post("/api/drop", body),
+  cancelPreload: () => post("/api/cancel-preload"),
   purchase: (listingId) => post("/api/purchase", { listingId }),
   homeBuild: () => call("/api/home-build", { method: "POST" }),
   advanceExtract: () => call("/api/advance?extract=1", { method: "POST" }),

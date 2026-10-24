@@ -218,6 +218,25 @@ def make_handler(kernel: CampaignKernel, showoff: Path):
                 code, body, ct = _json_bytes(result, code)
                 return self._send(code, body, ct)
 
+            if path in ("/api/preload", "/api/drop", "/api/cancel-preload"):
+                # Hot drop (verdance_kernel.hot_drop): load the field on sortie pick, drop the
+                # chosen packs into the running game, or close the loaded field.
+                try:
+                    body_in = _read_json_body(self) if path != "/api/cancel-preload" else {}
+                except Exception as e:  # noqa: BLE001
+                    code, body, ct = _json_bytes({"ok": False, "error": f"bad json: {e}"}, 400)
+                    return self._send(code, body, ct)
+                body_in = body_in if isinstance(body_in, dict) else {}
+                if path == "/api/preload":
+                    result = kernel.preload(body_in)
+                elif path == "/api/drop":
+                    result = kernel.drop(body_in)
+                else:
+                    result = kernel.cancel_preload()
+                code = 202 if result.get("accepted") else (200 if result.get("ok") else 409)
+                code, body, ct = _json_bytes(result, code)
+                return self._send(code, body, ct)
+
             if path == "/api/purchase":
                 try:
                     body_in = _read_json_body(self)

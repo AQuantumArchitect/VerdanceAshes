@@ -689,6 +689,7 @@ def build_open_node(state: dict, regions: list[dict], aces: list[dict], rep: dic
                     ),
                     "preferredDeployZoneId": "TRJ_NW_OUTER_MUSTER",
                     "preferredExtractionZoneId": "TRJ_NW_OUTER_MUSTER",
+                    "padLocked": True,   # home's door
                     "deployAces": deploy_aces,
                     "sessionMode": "same_map",
                     "against": "wild",
@@ -1127,6 +1128,15 @@ def build_faction_banks(state: dict, commerce: dict) -> dict:
     return {"nullmercs": tnb, "ashwalkers": tnb}
 
 
+def _world_surface(state: dict) -> dict:
+    """The planet the globe draws: walked maps and the roads between them (company record)."""
+    try:
+        return _roads.world_surface(state, ROOT)
+    except Exception as exc:  # noqa: BLE001
+        print(f"VA_WORLD_SURFACE_FAIL {exc}")
+        return {"openMaps": [], "roads": []}
+
+
 def build_hub(state: dict, war: dict) -> dict:
     repair_session_home(state)
     rep = dict(state.get("reputation") or {})
@@ -1299,6 +1309,7 @@ def build_hub(state: dict, war: dict) -> dict:
         "company": company_surface,
         "reserve": _reserve_surface(state),
         "storyState": _story_surface(state, mission_n),
+        "world": _world_surface(state),
         "regions": regions,
         "node": node,
         "lastResult": _with_manifest(_load_last_hub_result(), state),

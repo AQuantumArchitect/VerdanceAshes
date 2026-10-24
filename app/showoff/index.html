@@ -81,6 +81,7 @@
           <b>Form the company first.</b> Pick 3 packs, then Confirm —
           <button type="button" id="btn-open-company-intro">Open company picker</button>
         </div>
+        <div class="globe" id="globe"></div>
         <div class="map-picker" id="map-picker" role="tablist" aria-label="Operational maps"></div>
         <div class="theater-head">
           <div>
@@ -193,7 +194,7 @@
       <div class="marks-sum" id="marks-sum">Pick a wound on the map.</div>
       <div class="actions">
         <button type="button" class="btn-ghost" id="btn-clear-marks" title="Reset marks to defaults">Reset route</button>
-        <button type="button" class="btn-primary" id="btn-deploy">Drop into battle</button>
+        <button type="button" class="btn-primary" id="btn-deploy">Launch</button>
       </div>
     </div>
     <span id="foot-left">Verdance's Ashes</span>
@@ -207,15 +208,15 @@
 <div class="scrim drop-confirm" id="drop-confirm" role="dialog" aria-modal="true" aria-labelledby="drop-confirm-title">
   <div class="sheet-card drop-confirm-card">
     <p class="epigraph">Before the match</p>
-    <h2 id="drop-confirm-title">Drop into battle?</h2>
-    <p class="lede" id="drop-confirm-body">Confirm to seal this route and open Beyond All Reason.</p>
+    <h2 id="drop-confirm-title">Into the field</h2>
+    <p class="lede" id="drop-confirm-body">Launch loads this field in Beyond All Reason behind the hub.</p>
     <div class="drop-squad-kicker" id="drop-squad-kicker">Who is dropping</div>
     <div class="drop-squad" id="drop-squad" aria-label="Who is dropping"></div>
     <div class="drop-reserve" id="drop-reserve" aria-label="What boards from the reserve"></div>
-    <p class="hint" id="drop-warm-status">Pick who ships, then press Confirm drop. The level does not load until the company is locked.</p>
+    <p class="hint" id="drop-warm-status">Launch loads the field now. You pick who goes while it loads, then drop them in.</p>
     <div class="sheet-actions">
-      <button type="button" class="btn-ghost" id="drop-confirm-cancel">Cancel</button>
-      <button type="button" class="btn-primary" id="drop-confirm-go">Confirm drop</button>
+      <button type="button" class="btn-ghost" id="drop-confirm-cancel">Back to the map</button>
+      <button type="button" class="btn-primary" id="drop-confirm-go">Launch</button>
     </div>
   </div>
 </div>
@@ -252,7 +253,7 @@
     </p>
     <ol class="steps">
       <li><span class="n">1</span><span><b>Form the Company</b> on first open — core always ships; pick <b>3 unlocked packs</b>. Unpicked heroes stay off your board until a field recruit.</span></li>
-      <li><span class="n">2</span><span>Pick a <b>mission</b> on the main screen, mark the <b>wound</b> and the <b>pad</b> (you lift from where you landed), then <b>Drop into battle</b>.</span></li>
+      <li><span class="n">2</span><span>Pick a <b>field</b> on the planet and a <b>sortie</b> on it, mark the <b>wound</b> and the <b>pad</b> (you lift from where you landed), then <b>Launch</b>. The field loads behind the hub while you pick who goes; <b>Drop</b> sends them in.</span></li>
       <li><span class="n">3</span><span>In BAR, take the objective, get what you want to keep onto the pad and press <b>EXTRACT</b> (the fight also ends if the company is wiped). The clock never ends a sortie — overtime only wakes the map. The kernel brings the result home to this screen.</span></li>
       <li><span class="n">4</span><span><b>Home</b> is the camp — raise the jungle shelf there. The <b>Broker</b> is in <b>Company</b> and shows each available purchase and its exact cost.</span></li>
       <li><span class="n">5</span><span><b>Save / Load / Reset</b> live under <b>System</b> in the top bar.</span></li>

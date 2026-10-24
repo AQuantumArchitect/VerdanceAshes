@@ -227,6 +227,7 @@ def opening_hub_choice(state: Dict[str, Any], workspace: Optional[Path] = None) 
     effect["preferredDeployZoneId"] = order["deploymentZoneId"]
     effect["preferredCaptureZoneId"] = order["targetZoneId"]
     effect["preferredExtractionZoneId"] = order["extractionZoneId"]
+    effect["padLocked"] = True   # the start road's door: the hub does not snap it toward the target
     return {
         "id": order["hubChoiceId"],
         "label": order.get("label") or "Raid Greenest Fields for Tenebrium",

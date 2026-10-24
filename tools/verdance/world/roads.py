@@ -96,6 +96,7 @@ def load_doors(workspace: Path) -> Dict[str, Dict[str, Any]]:
                 "farMapId": _canon_map(nodes[far].get("mapId")),
                 "farLabel": str(nodes[far].get("label") or far),
                 "travelMinutes": minutes,
+                "anchor": dict(nodes[near].get("anchor") or {"x": 0.5, "z": 0.5}),
             }
     _CACHE[key] = doors
     return doors
@@ -171,6 +172,29 @@ def door_markers(state: Dict[str, Any], workspace: Optional[Path], map_id: str) 
             "farOpen": door["farMapId"] in opened,
         }
     return out
+
+
+def world_surface(state: Dict[str, Any], workspace: Path) -> Dict[str, Any]:
+    """The planet for the hub's globe: walked maps, and every road with its two doors.
+
+    Only the company's own record goes in: which maps it has walked and which doors its
+    ledger says it holds. Where a road leads past the edge of the walked world, the hub
+    draws it into the dark."""
+    doors = load_doors(Path(workspace))
+    seen, roads = set(), []
+    for zid, door in sorted(doors.items()):
+        key = tuple(sorted((zid, door["farZoneId"])))
+        if key in seen:
+            continue
+        seen.add(key)
+        ends = []
+        for z in key:
+            d = doors[z]
+            ends.append({"zoneId": z, "mapId": d["mapId"], "label": d["label"],
+                         "x": round(float(d["anchor"].get("x", 0.5)), 4), "z": round(float(d["anchor"].get("z", 0.5)), 4),
+                         "held": held(state, z)})
+        roads.append({"a": ends[0], "b": ends[1], "travelMinutes": door["travelMinutes"]})
+    return {"openMaps": sorted(open_maps(state)), "homeMapId": HOME_MAP_ID, "roads": roads}
 
 
 # --- what pulls the company one way or another ---------------------------------

@@ -2309,6 +2309,16 @@ function Add-RaptorCamp {
   if ($null -eq $script:wildTeamID) { $script:wildTeamID = $teamID }
 }
 
+function Get-HotDrop {
+  # outbox\hot_drop.json exists only for a hot-drop launch; its token keeps a stale drop file out.
+  $p = Join-Path $Workspace "outbox\hot_drop.json"
+  if (!(Test-Path $p)) { return $null }
+  try { $hd = Get-Content -Raw -LiteralPath $p | ConvertFrom-Json } catch { return $null }
+  if (-not $hd.token) { return $null }
+  Write-Host "Hot drop: the company waits off the field until the drop."
+  return [ordered]@{ token = [string]$hd.token }
+}
+
 function Add-WildDens {
   # The Rock Jungle is wild ground: every zone the wild truly holds (intent.wildZones) gets a
   # den -- a raptor turret, which is the wild's defensive value there, so the zone is the
@@ -3379,6 +3389,9 @@ $scenario = [ordered]@{
     # faction -> zones it truly holds here. Reinforcements enter only on the map edge inside one
     # of their own zones, out of the player's sight (game_verdance_campaign.lua enemyEntry).
     entryZones = $(if ($intent.PSObject.Properties["entryZones"] -and $intent.entryZones) { $intent.entryZones } else { [ordered]@{} })
+    # Hot drop (tools/verdance_kernel/hot_drop.py): the kernel launched this before the player
+    # chose who goes. The company waits off the field until the drop file names them.
+    hotDrop = $(Get-HotDrop)
     # The doors on this map (zoneId, farMapName, held): drawn on the in-game board.
     doors = @($(if ($intent.PSObject.Properties["doors"] -and $intent.doors) { $intent.doors } else { @() }))
     battlefieldManifest = [ordered]@{

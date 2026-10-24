@@ -542,7 +542,11 @@ class SortieWatch:
                         if not self.applied and not self.seen:
                             self.phase = "closed-without-result"
                             rep = self.incomplete(reason="closed_without_result", extract_info={"watch": self.status()}, mode="auto")
-                            self._emit({"event": "incomplete", "ok": False, "headline": rep.get("headline")})
+                            if rep.get("cancelled"):
+                                # a hot-drop field closed before anyone dropped: nothing went, nothing to report
+                                self._emit({"event": "cancelled", "ok": True, "headline": rep.get("headline")})
+                            else:
+                                self._emit({"event": "incomplete", "ok": False, "headline": rep.get("headline")})
                         else:
                             self.phase = "home"
                             self._emit({"event": "home", "applied": list(self.applied)})

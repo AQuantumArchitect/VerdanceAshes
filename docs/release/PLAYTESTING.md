@@ -15,8 +15,9 @@ RESET.bat   start over
 2. **Choose a sortie** — green cards in the center. Stay on home ground first.
 3. **Briefing table** — green = objective, blue = landing. Defaults are usually fine.
    The minimap paints what the company **believes** about each zone, not the truth.
-4. **Drop into battle** — Beyond All Reason should open into the mission. The first
-   Drop on a new map downloads it first; the hub shows the progress.
+4. **Launch, then Drop** — Launch loads the field in Beyond All Reason behind the hub
+   while you pick who goes; Drop sends them in and brings BAR to the front. The first
+   Launch on a new map downloads it first; the hub shows the progress.
 5. **Play** — briefing (Space to dismiss), clear the objective, extract if prompted.
    After a win, **1 / 2 / 3** can take the next pocket on the same map.
 6. **Bring it home** — bridge usually auto-applies. Fallback: **After the fight — bring it home**.

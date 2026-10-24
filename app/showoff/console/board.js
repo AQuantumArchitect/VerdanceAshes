@@ -9,6 +9,7 @@ import { refreshTheaterForFocus, updateDeployGate } from "./operations.js";
 import { renderCompany } from "./company.js";
 import { renderRegions } from "./system.js";
 import { renderHeadline } from "./shell.js";
+import { renderGlobe } from "./globe.js";
 
 const RIM_THRESHOLD = 0.28;
 // Faction names the board may colour. Colour means "we believe this faction holds it".
@@ -554,6 +555,14 @@ export function renderMapPicker() {
   const focus = ensureFocusMapAvailable();
   const home = state.hub.sessionHomeMap || (state.hub.homeCamp && state.hub.homeCamp.mapId) || "the_rock_jungle";
   const maps = availableMaps();
+  // The planet: every field a sortie can go to or the company has walked, and the roads.
+  const world = state.hub.world || {};
+  const visible = maps.concat((world.openMaps || []).filter(m => !maps.includes(m)));
+  renderGlobe($("globe"), {
+    visible, focus, roads: world.roads || [],
+    names: Object.fromEntries(visible.map(m => [m, prettyMapShort(m)])),
+    onPick: (mapId) => (mapId === state.focusMap ? refreshTheaterForFocus() : focusMapAndRepaint(mapId, "Picked on the planet")),
+  });
   el.innerHTML = maps.map(mapId => {
     const n = deployChoicesForMap(mapId).length;
     const active = mapId === focus;

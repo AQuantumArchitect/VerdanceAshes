@@ -21,7 +21,7 @@ One path, from the folder you unzipped (or cloned):
 4. On the war map:
    - choose a green **sortie**
    - confirm the objective on the briefing table (defaults are fine)
-   - **Drop into battle**
+   - **Launch** (the field loads behind the hub), pick who goes, then **Drop**
 5. Play the BAR mission (briefing → objective → extract).
 6. The kernel's BAR bridge brings the result home automatically.
    If the map does not move: **After the fight — bring it home**.

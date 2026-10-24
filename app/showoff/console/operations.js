@@ -96,79 +96,75 @@ function dropBlockReason() {
 export function updateDeployGate() {
   const btn = $("btn-deploy");
   if (!btn) return;
-  const warmPhase = state.warm && state.warm.phase;
-  if (warmPhase === "up") {
-    btn.disabled = false;
-    btn.classList.add("dropping");
-    btn.title = "Recoil is open. This returns to the confirm screen.";
-    btn.textContent = "Recoil is open";
+  const phase = state.warm && state.warm.phase;
+  btn.classList.toggle("dropping", phase === "loading" || phase === "ready" || phase === "dropping" || phase === "up");
+  btn.disabled = false;
+  if (phase === "up") {
+    btn.title = "The company is in the field. This opens the drop sheet.";
+    btn.textContent = "In the field";
     return;
   }
-  if (state.dropping || warmPhase === "loading") {
-    btn.disabled = false;
-    btn.classList.add("dropping");
-    btn.title = "The level is loading. Open the confirm screen to see who is shipping.";
-    btn.textContent = "Recoil is loading…";
+  if (phase === "loading" || phase === "ready" || phase === "dropping") {
+    btn.title = "The field is loaded (or loading) behind this screen. Open the sheet to pick who goes and drop.";
+    btn.textContent = phase === "loading" ? "Field loading… pick who goes" : "Field ready · pick who goes";
     return;
   }
-  btn.classList.remove("dropping");
-  btn.disabled = false; // unsealed: the button opens the company picker
   if (!companySealed()) {
     btn.title = "Open the company picker — pick 3 packs, then Confirm";
     btn.textContent = "Form company to Drop";
     return;
   }
-  const packs = droppingPackIds().length;
-  const coreN = livingCoreIds().length;
-  const roster = `${packs} pack${packs === 1 ? "" : "s"} + ${coreN} core`;
   const block = dropBlockReason();
   if (block) {
     btn.title = block;
     btn.textContent = block;
     return;
   }
-  btn.title = `This drop ships ${roster}. Core always comes. Choose who deploys after pressing Launch.`;
-  btn.textContent = state.hostLive ? `Launch · ${roster}` : `Save plan · ${roster}`;
+  btn.title = "Load this field now. You pick who goes while it loads, then drop them in.";
+  btn.textContent = state.hostLive ? "Launch" : "Save plan";
 }
 
-/* ---- drop confirm sheet + warm poll ---------------------------------------------- */
+/* ---- the drop sheet: the field loads while you pick who goes (hot drop) ------------ */
+// Phases: idle → loading (the kernel built and started BAR; packs still open) → ready (the field
+// is in, paused, nobody of ours on it) → dropping → up (the company is in). The roster locks only
+// at the drop. tools/verdance_kernel/hot_drop.py has the other half.
 export function dropRosterSealed() {
   const phase = state.warm && state.warm.phase;
-  return phase === "loading" || phase === "sealing" || phase === "up"; // locked on Confirm drop, before the level compiles
+  return phase === "dropping" || phase === "up";
 }
 function dropConfirmOpen() {
   const el = $("drop-confirm");
   return !!(el && el.classList.contains("show"));
 }
 export function hideDropConfirm() {
+  // Closing the sheet leaves a loading field loading: reopening it picks up where it was.
   const el = $("drop-confirm");
   if (el) el.classList.remove("show");
-  if (state.warm && state.warm.timer) {
-    clearTimeout(state.warm.timer);
-    state.warm.timer = null;
-  }
+}
+function setWarm(phase, text) {
+  state.warm.phase = phase;
+  state.warm.locked = phase === "dropping" || phase === "up";
+  paintWarmStatus(text);
+  renderDropSquad();
+  updateDeployGate();
 }
 function paintWarmStatus(text) {
   const el = $("drop-warm-status");
   if (!el) return;
   const phase = state.warm && state.warm.phase;
   el.textContent = text || (
-    phase === "up" ? "Recoil is open with this company."
-    : (phase === "sealing" || phase === "loading") ? "Dropping… The company is locked. The level loads with that roster."
-    : phase === "failed" ? "The load did not start. Adjust the company and try again."
-    : "Pick who ships, then press Confirm drop. Nothing loads until the company is locked."
+    phase === "loading" ? `Loading ${prettyMap((state.plan || {}).mapId)} in Beyond All Reason behind this screen. Pick who goes; Drop wakes when the field is ready.`
+    : phase === "ready" ? "The field is loaded and paused, the enemy in place. Your company lands the moment you drop."
+    : phase === "dropping" ? "Dropping… the company is landing on the pad."
+    : phase === "up" ? "The company is in the field. Beyond All Reason has the fight."
+    : phase === "failed" ? "The field did not load. Adjust the route and try again."
+    : "Launch loads the field now. You pick who goes while it loads."
   );
 }
 export function noteRosterChanged() {
   if (!dropConfirmOpen()) return;
   renderDropSquad();
   paintWarmStatus();
-}
-function sessionIsThisDrop(st) {
-  const started = state.warm && state.warm.startedAt;
-  if (!started) return false;
-  const updated = Date.parse((st && st.updatedAt) || "") || 0;
-  return updated + 2000 >= started;
 }
 export function renderDropSquad() {
   renderReserve(dropRosterSealed());
@@ -203,89 +199,40 @@ export function renderDropSquad() {
   }
   if (go) {
     const phase = state.warm && state.warm.phase;
-    go.disabled = phase === "loading" || phase === "sealing";
+    go.disabled = phase === "loading" || phase === "dropping";
     go.textContent = phase === "up" ? "Back to the map"
-      : (phase === "sealing" || phase === "loading") ? "Dropping…"
-      : phase === "failed" ? "Try the drop again"
-      : "Confirm drop";
+      : phase === "dropping" ? "Dropping…"
+      : phase === "loading" ? "Field loading…"
+      : phase === "ready" ? "Drop"
+      : phase === "failed" ? "Try again"
+      : state.hostLive ? "Launch" : "Save plan";
   }
 }
 function pollWarm() {
   if (state.warm.poll) clearTimeout(state.warm.poll);
-  const fail = (msg, statusMsg) => {
-    state.warm.locked = false;
-    state.warm.phase = "failed";
-    paintWarmStatus(statusMsg || msg);
-    blockDrop(msg);
-    renderDropSquad();
-    updateDeployGate();
-  };
   const tick = async () => {
-    if (!state.warm || (state.warm.phase !== "loading" && state.warm.phase !== "sealing" && state.warm.phase !== "up")) return;
+    const phase = state.warm.phase;
+    if (phase !== "loading" && phase !== "ready" && phase !== "up") return;
     try {
       const status = (await api.status()).data || {};
-      const deployPhase = String(status.deployPhase || "");
-      if (state.warm.phase === "loading" && deployPhase === "idle" && !status.busy) {
-        return fail("The load stopped before Recoil opened. Try the drop again.", "The load stopped. Adjust the company and try again.");
+      const hot = status.hotDrop || {};
+      if (status.deployPhase === "failed" && phase === "loading") {
+        const msg = String(status.error || (status.lastDeploy && status.lastDeploy.error) || "The field did not load.");
+        blockDrop(msg);
+        return setWarm("failed", msg);
       }
-      if (state.warm.phase === "loading" && (deployPhase === "sealing" || deployPhase === "launching")) {
-        state.warm.phase = "sealing";
-        state.warm.locked = true;
-        paintWarmStatus();
-        renderDropSquad();
-        updateDeployGate();
-      }
-      if (deployPhase === "failed" && state.warm.phase !== "up") {
-        return fail(String(status.error || (status.lastDeploy && status.lastDeploy.error) || "The load did not start."));
-      }
-      const st = ((await api.session()).data || {}).status || {};
-      if (sessionIsThisDrop(st)) {
-        const phase = String(st.phase || "");
-        const loadingPhase = phase === "building" || phase === "preflight" || phase === "starting" || phase === "dropping";
-        // in-game is written only after the level is actually in. A spring pid by itself is still the load.
-        if (phase === "in-game" && st.springPid) {
-          const first = state.warm.phase !== "up";
-          state.warm.phase = "up";
-          state.warm.locked = true;
-          paintWarmStatus("Recoil is open with this company.");
-          renderDropSquad();
-          updateDeployGate();
-          if (first) toast("Recoil is open.", "ok");
-          state.warm.poll = setTimeout(tick, 3000);
-          return;
-        }
-        if (loadingPhase) {
-          state.warm.locked = true;
-          if (state.warm.phase === "loading") state.warm.phase = "sealing";
-          paintWarmStatus("Dropping… The company is locked. The level is loading.");
-          renderDropSquad();
-          updateDeployGate();
-        }
-        if (state.warm.phase === "up" && phase && !loadingPhase && phase !== "in-game") {
-          state.warm.phase = "idle";
-          state.warm.locked = false;
-          paintWarmStatus("Recoil has closed. Choose who ships, then press Confirm drop.");
-          renderDropSquad();
-          updateDeployGate();
-          return;
-        }
-        if (st.error && state.warm.phase !== "up") return fail(String(st.error));
+      if (phase === "loading" && hot.phase === "ready") {
+        setWarm("ready");
+        toast("The field is ready. Drop when your company is set.", "ok");
+      } else if ((phase === "loading" || phase === "ready") && (hot.phase === "none" || hot.phase === "closed") && status.deployPhase !== "building") {
+        return setWarm("idle", "Beyond All Reason closed before the drop. Launch to load the field again.");
+      } else if (phase === "up" && hot.phase !== "dropped") {
+        return setWarm("idle", "Beyond All Reason has closed.");
       }
     } catch (_) { /* keep waiting */ }
-    state.warm.poll = setTimeout(tick, 2000);
+    state.warm.poll = setTimeout(tick, 1500);
   };
   state.warm.poll = setTimeout(tick, 1200);
-}
-async function noteSpringAlreadyOpen() {
-  if (!state.hostLive || !state.warm || (state.warm.phase !== "idle" && state.warm.phase !== "failed")) return;
-  try {
-    const st = ((await api.session()).data || {}).status || {};
-    if (!state.warm || (state.warm.phase !== "idle" && state.warm.phase !== "failed")) return;
-    const phase = String(st.phase || "");
-    if (st.springPid || phase === "in-game" || phase === "dropping") {
-      paintWarmStatus("Recoil is still open from the last fight. Close it, then press Confirm drop. The company locks on that press, and only then does the level load.");
-    }
-  } catch (_) { /* sheet stays idle */ }
 }
 export function showDropConfirm() {
   hideCoach(false);
@@ -314,39 +261,70 @@ export function showDropConfirm() {
       `Drop on <b>${esc(prettyMap(plan.mapId))}</b> · <b>${esc(jobLabel(plan.contractKind))}</b><br>` +
       `Pad <b>${esc(zoneName(m.deployZoneId))}</b> → wound <b>${esc(targets)}</b> → back to <b>${esc(zoneName(m.deployZoneId))}</b>.` +
       (eyes === "known" ? `<br><span class="bad">Armada has eyes on this pad.</span>` : "") +
-      `<p>Get what you want onto the pad and press EXTRACT. What is off the pad stays. What stays becomes a holding.</p><p>Engine launch starts after you confirm this deployment.</p>`;
+      `<p>Get what you want onto the pad and press EXTRACT. What is off the pad stays. What stays becomes a holding.</p>`;
     body.setAttribute("data-route", body.innerHTML);
   }
   const el = $("drop-confirm");
   if (el) el.classList.add("show");
-  const phase = state.warm && state.warm.phase;
-  if (phase === "loading" || phase === "sealing") {
+  const phase = state.warm.phase;
+  if (phase === "idle" || phase === "failed") {
+    resetReserveBring();
+    if (state.hostLive) launchField();
+    else setWarm("idle");
+  } else {
     renderDropSquad();
     paintWarmStatus();
-    return;
   }
-  if (phase !== "up") {
-    resetReserveBring();
-    state.warm.phase = "idle";
-    state.warm.locked = false;
-    if (state.warm.timer) {
-      clearTimeout(state.warm.timer);
-      state.warm.timer = null;
+}
+// Launch: build the mission and start BAR now, with every pack the company could send compiled in.
+async function launchField() {
+  const plan = preparePlan();
+  if (!plan) return;
+  setWarm("loading");
+  try {
+    const { status, data } = await api.preload(plan);
+    if (!(data && (data.accepted || data.ok))) {
+      const err = (data && (data.error || data.reason)) || `The field did not load (${status})`;
+      blockDrop(err);
+      return setWarm("failed", err);
     }
+    if (data.phase === "ready") setWarm("ready");
+    logLine(`Loading ${prettyMap(plan.mapId)} behind the hub. Pick who goes.`);
+    pollWarm();
+  } catch (e) {
+    blockDrop("Wire error: " + e.message);
+    setWarm("failed", "Wire error: " + e.message);
   }
-  renderDropSquad();
-  paintWarmStatus();
-  if (state.warm.phase === "idle" || state.warm.phase === "failed") noteSpringAlreadyOpen();
+}
+// Drop: the packs marked Dropping and the reserve chosen go into the loaded field.
+async function dropCompany() {
+  setWarm("dropping");
+  try {
+    const { data } = await api.drop({ crewBand: droppingPackIds(), reserveBring: { ...reserveBring() } });
+    if (!(data && data.ok)) {
+      const err = (data && data.error) || "The drop did not go through.";
+      toast(err, "err");
+      return setWarm("ready", err);
+    }
+    state.hub.flags = state.hub.flags || {};
+    state.hub.flags.deployStub = false;
+    state.hub.lastResult = { kind: "deploy_committed", at: new Date().toISOString() };
+    renderBadges();
+    logLine(`Dropped ${(data.crewBand || []).length} pack${(data.crewBand || []).length === 1 ? "" : "s"} into ${prettyMap((state.plan || {}).mapId)}.`);
+    setWarm("up", data.broughtForward ? "The company is landing. Beyond All Reason is in front." : "The company is landing. Switch to Beyond All Reason.");
+    pollWarm();
+  } catch (e) {
+    toast("Wire error: " + e.message, "err");
+    setWarm("ready", "Wire error: " + e.message);
+  }
 }
 export function onDropConfirmGo() {
   const phase = state.warm && state.warm.phase;
   if (phase === "up") return hideDropConfirm();
-  if (phase === "loading" || phase === "sealing" || state.dropping) return paintWarmStatus();
-  if (state.warm && state.warm.timer) {
-    clearTimeout(state.warm.timer);
-    state.warm.timer = null;
-  }
-  commitDeploy(true);
+  if (phase === "ready") return dropCompany();
+  if (phase === "loading" || phase === "dropping") return paintWarmStatus();
+  if (!state.hostLive) return commitDeploy(false);
+  launchField();
 }
 
 /* ---- stamp ------------------------------------------------------------------- */
@@ -373,85 +351,37 @@ function blockDrop(msg) {
   const el = $("drop-confirm");
   if (el) el.classList.add("show");
 }
-async function commitDeploy(launch) {
+// The plan as the kernel takes it: one pad, the reserve and kit, the company as it stands.
+function preparePlan() {
   const plan = state.plan;
-  if (!plan) return blockDrop("Pick a sortie on the map first");
-  if (!companySealed()) return blockDrop("Form the company first — pick 3 packs and Confirm");
-  if (state.dropping) return;
-  // Drop roster = packs marked Dropping. Core is added server-side and here.
-  plan.crewBand = droppingPackIds();
-  plan.deployAces = sealedDeployAces();
-  plan.reserveBring = { ...reserveBring() };
-  if (!(plan.marks && plan.marks.captureZoneIds && plan.marks.captureZoneIds.length)) return blockDrop("Mark a target (wound) on the map first");
-  if (!plan.marks.deployZoneId) return blockDrop("Mark a pad first");
+  if (!plan) { blockDrop("Pick a sortie on the map first"); return null; }
+  if (!companySealed()) { blockDrop("Form the company first — pick 3 packs and Confirm"); return null; }
+  if (!(plan.marks && plan.marks.captureZoneIds && plan.marks.captureZoneIds.length)) { blockDrop("Mark a target (wound) on the map first"); return null; }
+  if (!plan.marks.deployZoneId) { blockDrop("Mark a pad first"); return null; }
   plan.marks.extractZoneId = plan.marks.deployZoneId; // ONE pad
   const zones = (BOARDS[plan.mapId] || {}).zones || [];
   const dep = zones.find(z => z.zoneId === plan.marks.deployZoneId);
   if (!dep || !canLaunchFrom(plan, dep)) {
     const why = dep ? padLegality(plan.mapId, dep).why : "no such zone";
-    return blockDrop(`The pad must be believed ours, a quiet rim, or the camp's next pad — ${why}`);
+    blockDrop(`The pad must be believed ours, a quiet rim, or the camp's next pad — ${why}`);
+    return null;
   }
+  plan.crewBand = droppingPackIds();
+  plan.deployAces = sealedDeployAces();
+  plan.reserveBring = { ...reserveBring() };
   plan.commerceDeploy = { tenebrium: commerce().tenebrium, kit: commerce().deployKit || [] };
-  if (state.warm && (state.warm.phase === "loading" || state.warm.phase === "sealing" || state.warm.phase === "up")) {
-    paintWarmStatus();
-    return;
-  }
-  const sheet = $("drop-confirm");
-  if (sheet) sheet.classList.add("show");
-  state.dropping = true;
-  state.warm.locked = true;
-  state.warm.phase = "loading";
-  state.warm.startedAt = Date.now();
-  renderDropSquad();
-  paintWarmStatus();
-  updateDeployGate();
-
-  if (state.hostLive) {
-    try {
-      toast(launch ? "Dropping… The company is locked." : "Sealing the drop…");
-      const { status, data } = await api.deploy(plan, launch);
-      const accepted = !!(data && data.accepted);
-      const launched = !!(data.launch && data.launch.ok && !data.launch.skipped);
-      const reason = (data && (data.error || data.reason || (data.launch && data.launch.reason))) || "";
-      if (!accepted && !launched) {
-        state.warm.locked = false;
-        state.warm.phase = "failed";
-        const err = reason || `Drop failed (${status})`;
-        logLine(err);
-        paintWarmStatus(err);
-        blockDrop(err);
-        return;
-      }
-      logLine(`Loading ${prettyMap(plan.mapId)}. Recoil will open when the level is ready.`);
-      state.hub.flags = state.hub.flags || {};
-      state.hub.flags.deployStub = false;
-      state.hub.lastResult = { kind: "deploy_committed", at: new Date().toISOString(), seedHint: data.seedHint };
-      renderBadges();
-      pollWarm();
-    } catch (e) {
-      state.warm.locked = false;
-      state.warm.phase = "failed";
-      paintWarmStatus("Wire error: " + e.message);
-      blockDrop("Wire error: " + e.message);
-    } finally {
-      state.dropping = false;
-      updateDeployGate();
-      renderDropSquad();
-    }
-    return;
-  }
-
-  state.dropping = false;
-  state.warm.locked = false;
-  state.warm.phase = "idle";
-  // Map-only: download the plan and point at PLAY.bat.
+  return plan;
+}
+// No kernel running (the page opened as a file): save the plan for PLAY.bat.
+function commitDeploy() {
+  const plan = preparePlan();
+  if (!plan) return;
   try {
     downloadJson("hub_deploy_plan.json", plan);
     logLine(`Map-only plan for ${prettyMap(plan.mapId)}. Start PLAY.bat and keep its window open to fight.`);
     toast("Map only — start PLAY.bat and keep its window open to drop for real.", "err");
     state.hub.lastResult = { kind: "deploy_stub", mapId: plan.mapId, contractKind: plan.contractKind };
   } finally {
-    state.dropping = false;
     updateDeployGate();
   }
 }

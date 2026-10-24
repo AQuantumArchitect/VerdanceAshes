@@ -147,6 +147,13 @@ VA_CREW_SELECT = {
   anchorZ = nil,
   roster = nil,
 }
+-- Hot drop (tools/verdance_kernel/hot_drop.py): the kernel launched before the player chose who
+-- goes. The company waits off the field; the drop names the packs and the reserve that board.
+VA_HOT = {
+  token = nil,     -- mission.hotDrop.token; a drop must carry it
+  pending = false, -- loaded and waiting for the drop
+  reserve = {},    -- reserve specs held back: { spec, teamID, baseX, baseZ, groupX, groupZ, force }
+}
 -- Field recruits: wild heroes seeded on this map; wreck+rez joins the company.
 VA_FIELD_RECRUIT = {
   spawned = {},   -- heroId -> true
@@ -2999,6 +3006,10 @@ local function spawnPlayableSetup()
     -- No sealed packet: still run the kit path so autoConfirm can fill.
     useCrewKit = true
   end
+  local hotToken = mission and type(mission.hotDrop) == "table" and mission.hotDrop.token
+  VA_HOT.token = hotToken and tostring(hotToken) or nil
+  VA_HOT.pending = VA_HOT.token ~= nil
+  VA_HOT.reserve = {}
   VA_CREW_SELECT.pending = false
   VA_CREW_SELECT.confirmed = not useCrewKit
   local forces = setup.forces or {}
@@ -3043,6 +3054,10 @@ local function spawnPlayableSetup()
         elseif useCrewKit and isPlayer and not spec.reserve and not VA_CREW_isAnchorKeep(spec) then
           -- Heroes come from the sealed hub packet (spawn below). The reserve the player
           -- chose (spec.reserve, Add-ReserveToKit) lands with the company.
+        elseif VA_HOT.pending and isPlayer and spec.reserve then
+          -- Hot drop: the reserve waits with the company; the drop says how many board.
+          VA_HOT.reserve[#VA_HOT.reserve + 1] = { spec = spec, teamID = teamID, baseX = baseX, baseZ = baseZ,
+            groupX = groupX, groupZ = groupZ, force = force }
         else
           forceSpawned = forceSpawned + spawnUnitSpec(spec, teamID, baseX, baseZ, groupX, groupZ, claimedMetalSpots, force)
         end
@@ -3080,7 +3095,13 @@ local function spawnPlayableSetup()
     end
     return picks
   end
-  if useCrewKit then
+  if VA_HOT.pending then
+    -- Nobody of ours lands until the drop (VA_HOT_drop); the hot-drop widget holds the pause.
+    Spring.SetGameRulesParam("va_hotdrop_pending", 1, { public = true })
+    Spring.SetGameRulesParam("va_hotdrop_token", VA_HOT.token, { public = true })
+    Spring.Echo("VA_HOTDROP_WAITING token=" .. VA_HOT.token .. " reserveSpecs=" .. tostring(#VA_HOT.reserve))
+    VA_CREW_publish()
+  elseif useCrewKit then
     -- Prefer hub-sealed band; fall back to deployAces (minus core); else defaults.
     local picks = collectHubPicks()
     -- Allow re-drop if a prior chapter left confirmed=true with zero units.
@@ -3107,7 +3128,7 @@ local function spawnPlayableSetup()
     VA_CREW_publish()
   end
   -- Empty-field safety: buggy extract / continue left nobody — drop the kit.
-  do
+  if not VA_HOT.pending then
     local alive = 0
     if Spring.GetTeamUnits then
       local units = Spring.GetTeamUnits(playerTeamID) or {}
@@ -5759,7 +5780,7 @@ function checkPresenceObjective(frame)
 end
 
 function checkPlayerWipe(frame)
-  if frame < WIPE_GRACE_FRAMES then return end
+  if frame < WIPE_GRACE_FRAMES or VA_HOT.pending then return end
   local count = Spring.GetTeamUnitCount(playerTeamID) or 0
   if count <= 0 then
     -- nobody left to confirm a manifest: the exfil gadget stamps an empty one and we end
@@ -7077,9 +7098,49 @@ function gadget:TextCommand(command)
   return false
 end
 
+-- The drop: the packs and reserve the player chose on the hub, into the field that is
+-- already loaded. Message: "vahotdrop token|pack,pack|unitdef:n,unitdef:n".
+function VA_HOT_drop(line)
+  if not VA_HOT.pending then
+    Spring.Echo("VA_HOTDROP_IGNORED not_pending")
+    return false
+  end
+  local token, packs, units = tostring(line or ""):match("^([^|]*)|([^|]*)|?(.*)$")
+  if token ~= VA_HOT.token then
+    Spring.Echo("VA_HOTDROP_IGNORED stale_token " .. tostring(token))
+    return false
+  end
+  local picks = {}
+  for id in string.gmatch(packs or "", "[%w_]+") do picks[#picks + 1] = id end
+  local want = {}
+  for def, n in string.gmatch(units or "", "([%w_]+):(%d+)") do want[def] = (want[def] or 0) + tonumber(n) end
+  local landed = 0
+  for _, held in ipairs(VA_HOT.reserve) do
+    local def = tostring(held.spec.unitDefName or "")
+    local n = math.min(want[def] or 0, tonumber(held.spec.count) or 1)
+    if n > 0 then
+      local spec = {}
+      for k, v in pairs(held.spec) do spec[k] = v end
+      spec.count = n
+      want[def] = want[def] - n
+      landed = landed + spawnUnitSpec(spec, held.teamID, held.baseX, held.baseZ, held.groupX, held.groupZ, {}, held.force)
+    end
+  end
+  VA_HOT.pending = false
+  VA_CREW_confirm(picks)
+  sweepPlayerCommanders("hotdrop")
+  Spring.SetGameRulesParam("va_hotdrop_pending", 0, { public = true })
+  Spring.Echo("VA_HOTDROP_DONE packs=" .. table.concat(picks, ",") .. " reserve=" .. tostring(landed))
+  return true
+end
+
 function gadget:RecvLuaMsg(msg, playerID)
   if type(msg) ~= "string" or msg:sub(1, 7) ~= "VA_CMD:" then return end
   local cmd = msg:sub(8)
+  if cmd:match("^vahotdrop ") then
+    VA_HOT_drop(cmd:sub(11))
+    return true
+  end
   if type(cmd) == "string" and cmd:match("^vacrewconfirm") then
     local rest = cmd:match("^vacrewconfirm[%s:]+(.+)$") or ""
     local picks = {}

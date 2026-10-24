@@ -108,6 +108,31 @@ def main() -> int:
     check("intent says where each faction may reinforce from (its own zones)", isinstance(intent.get("entryZones"), dict), str(intent.get("entryZones"))[:160])
     check("one pad: extraction == deployment", (intent.get("extractionZoneId") in (None, intent.get("deploymentZoneId"))), f"{intent.get('deploymentZoneId')} vs {intent.get('extractionZoneId')}")
     check("intent honours the chosen pad", str(intent.get("deploymentZoneId")) == str(pad), f"plan={pad} intent={intent.get('deploymentZoneId')}")
+
+    # hot drop: the field is loaded with every candidate pack; the Drop names who goes
+    from verdance_kernel import hot_drop, sortie as _sortie  # type: ignore
+    bar_root = ws / "fake_bar" / "data"
+    bar_root.mkdir(parents=True, exist_ok=True)
+    token = hot_drop.arm(ws, bar_root)
+    k._hot = {"token": token, "pid": 4242, "mapId": map_id, "plan": "", "dropped": False}
+    real_alive, real_status = _sortie.pid_alive, k.hot_drop_status
+    _sortie.pid_alive = lambda pid: True
+    try:
+        k.hot_drop_status = lambda: {"phase": "loading"}
+        early = k.drop({"crewBand": ["solarium"], "reserveBring": {}})
+        check("no drop while the field is still loading", not early.get("ok"), json.dumps(early)[:200])
+        k.hot_drop_status = lambda: {"phase": "ready"}
+        dropped = k.drop({"crewBand": ["solarium"], "reserveBring": {}})
+        line = (bar_root / "LuaUI" / "Config" / "verdance" / "drop.txt").read_text(encoding="utf-8").strip() if dropped.get("ok") else ""
+        check("the drop file carries the token and the chosen pack", line.startswith(token + "|") and line.split("|")[1] == ",".join(dropped.get("crewBand") or []) and "solarium" in line.split("|")[1], line or json.dumps(dropped)[:200])
+        intent_after = json.loads(intent_path.read_text(encoding="utf-8-sig"))
+        check("the homecoming reads who actually went", intent_after.get("deployAces") == dropped.get("deployAces") and intent_after.get("crewBand") == dropped.get("crewBand"), json.dumps(intent_after.get("deployAces")))
+        check("a second drop changes nothing", k.drop({"crewBand": []}).get("already") is True)
+    finally:
+        _sortie.pid_alive = real_alive
+        k.hot_drop_status = real_status
+        k._clear_hot()
+        hot_drop.disarm(ws)
     if "--stop-after-intent" in sys.argv:
         print(f"-- stopped after intent · workspace {ws}")
         return 1 if FAILED else 0
