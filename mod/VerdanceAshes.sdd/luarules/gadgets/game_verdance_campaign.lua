@@ -444,17 +444,20 @@ end
 function heroResultsJson()
   local parts = {}
   for id, rec in pairs(heroes) do
-    -- peakXp is sticky across death; export max so campaign never loses farmed XP.
-    local xpOut = math.max(tonumber(rec.peakXp) or 0, tonumber(rec.lastXp) or 0)
-    parts[#parts + 1] = jstr(id) .. ':{' .. table.concat({
-      '"status":' .. jstr(rec.result or (rec.everDown and "wounded" or "survived")),
-      '"wasDown":' .. tostring(rec.everDown == true),
-      '"xp":' .. jnum(xpOut, 4),
-      '"level":' .. tostring(tonumber(rec.level) or 1),
-      '"rank":' .. jstr(HeroTags.normalizeRank(rec.rank or "Green")),
-      '"recruited":' .. tostring(rec.recruited == true),
-      '"fieldRecruit":' .. tostring(rec.wasFieldRecruit == true or rec.recruited == true),
-    }, ',') .. '}'
+    -- a pair's partner ("verse#1") is not a campaign hero: the lead reports for the pair
+    if not tostring(id):find("#", 1, true) then
+      -- peakXp is sticky across death; export max so campaign never loses farmed XP.
+      local xpOut = math.max(tonumber(rec.peakXp) or 0, tonumber(rec.lastXp) or 0)
+      parts[#parts + 1] = jstr(id) .. ':{' .. table.concat({
+        '"status":' .. jstr(rec.result or (rec.everDown and "wounded" or "survived")),
+        '"wasDown":' .. tostring(rec.everDown == true),
+        '"xp":' .. jnum(xpOut, 4),
+        '"level":' .. tostring(tonumber(rec.level) or 1),
+        '"rank":' .. jstr(HeroTags.normalizeRank(rec.rank or "Green")),
+        '"recruited":' .. tostring(rec.recruited == true),
+        '"fieldRecruit":' .. tostring(rec.wasFieldRecruit == true or rec.recruited == true),
+      }, ',') .. '}'
+    end
   end
   return '{' .. table.concat(parts, ',') .. '}'
 end
@@ -1553,8 +1556,9 @@ local function pollMentorSubordinateXp(frame)
   end
 end
 
--- Named heroes are flat-tough: 3× stock HP before field-effect folds.
-VA_HERO_HP_MULT = 3.0
+-- Named heroes are flat-tough: 2× stock HP before field-effect folds (owner call, 2026-10-24;
+-- was 3×). Level, wounds and the campaign's own hpMult no longer move it.
+VA_HERO_HP_MULT = 2.0
 
 -- Spring GetUnitRulesParam can return *no value*; tonumber() with zero args
 -- aborts LuaRules (LUA_ERRRUN). Never pass a bare Get* into tonumber().
@@ -1565,7 +1569,7 @@ local function rulesNum(unitID, key)
 end
 
 local function applyHeroModifiers(unitID, rec)
-  local hpMult = tonumber(rec.hpMult) or VA_HERO_HP_MULT or 3.0
+  local hpMult = tonumber(rec.hpMult) or VA_HERO_HP_MULT or 2.0
   if Spring.GetUnitHealth and Spring.SetUnitMaxHealth and Spring.GetUnitDefID then
     local cur, maxH = Spring.GetUnitHealth(unitID)
     if maxH ~= nil then maxH = tonumber(maxH) end
@@ -1630,8 +1634,8 @@ local function registerHeroSpawn(unitID, spec)
       name = tostring(spec.heroName or id),
       unitDefName = tostring(spec.unitDefName or spec.def or ""),
       missionCritical = spec.missionCritical == true,
-      hpMult = tonumber(spec.heroHpMult) or VA_HERO_HP_MULT or 3.0,
-      baseHpMult = tonumber(spec.heroHpMult) or VA_HERO_HP_MULT or 3.0,
+      hpMult = VA_HERO_HP_MULT,
+      baseHpMult = VA_HERO_HP_MULT,
       buildPowerMult = tonumber(spec.heroBuildPowerMult) or 1.0,
       state = "alive",
       everDown = false,
@@ -1648,19 +1652,17 @@ local function registerHeroSpawn(unitID, spec)
     rec.lastXp = rec.peakXp
     rec.level = seedLevel
     rec.rank = seedRank
-    -- Flat 3× toughness is the named-hero floor; mission may raise, not shrink.
-    local wantHp = tonumber(spec.heroHpMult) or VA_HERO_HP_MULT or 3.0
-    if wantHp < (VA_HERO_HP_MULT or 3.0) then wantHp = VA_HERO_HP_MULT or 3.0 end
-    rec.baseHpMult = wantHp
-    rec.hpMult = wantHp
+    -- Flat 2× toughness for every named hero (the field effect may add to it).
+    rec.baseHpMult = VA_HERO_HP_MULT
+    rec.hpMult = VA_HERO_HP_MULT
     if tonumber(spec.heroBuildPowerMult) then rec.buildPowerMult = tonumber(spec.heroBuildPowerMult) end
     if spec.heroTrait then rec.trait = tostring(spec.heroTrait) end
   end
   if rec.baseHpMult == nil then
-    rec.baseHpMult = tonumber(rec.hpMult) or VA_HERO_HP_MULT or 3.0
+    rec.baseHpMult = tonumber(rec.hpMult) or VA_HERO_HP_MULT or 2.0
   end
-  if (tonumber(rec.baseHpMult) or 0) < (VA_HERO_HP_MULT or 3.0) then
-    rec.baseHpMult = VA_HERO_HP_MULT or 3.0
+  if (tonumber(rec.baseHpMult) or 0) ~= VA_HERO_HP_MULT then
+    rec.baseHpMult = VA_HERO_HP_MULT
     rec.hpMult = rec.baseHpMult
   end
   rec.unitID = unitID
@@ -1674,8 +1676,11 @@ local function registerHeroSpawn(unitID, spec)
   do
     local okField, errField = pcall(function()
       local roster = VA_CREW_loadRoster and VA_CREW_loadRoster() or nil
-      local h = roster and ((roster.get and roster.get(id)) or (roster.HEROES and roster.HEROES[id])) or nil
-      local tagList = HeroTags.collectFromHero(h, spec, id)
+      -- a pair's partner ("verse#1") carries its lead's field effect
+      local base = tostring(id):match("^[^#]+") or tostring(id)
+      if base ~= tostring(id) then Spring.SetUnitRulesParam(unitID, "va_partner_of", base, { public = true }) end
+      local h = roster and ((roster.get and roster.get(base)) or (roster.HEROES and roster.HEROES[base])) or nil
+      local tagList = HeroTags.collectFromHero(h, spec, base)
       local field = HeroTags.applyToHero(unitID, rec, tagList, rec.peakXp or seedXp)
       if field and field.tags and #field.tags > 0 then
         Spring.Echo("VA_HERO_FIELD id=" .. id
@@ -2323,7 +2328,7 @@ function VA_CREW_spawnHeroPack(heroId, baseX, baseZ, dx0, heroOnly)
     dz = 40,
     spacing = 100,
     heroId = tostring(heroId),
-    heroName = tostring(h.name or heroId),
+    heroName = tostring(h.fieldName or h.name or heroId),
     -- you (the first company pick, mission.you) are mission-critical, like Ketha
     missionCritical = h.missionCritical == true or (mission ~= nil and tostring(mission.you or "") == tostring(heroId)),
     heroTrait = h.heroTrait,
@@ -2331,18 +2336,14 @@ function VA_CREW_spawnHeroPack(heroId, baseX, baseZ, dx0, heroOnly)
     packageTag = "crew_" .. tostring(heroId),
   }
   -- Pull XP/level from mission.heroes if present; else roster startXp (explicit 0 is green).
-  -- Named heroes are flat 3× HP; mission hpMult may raise above that, never below.
-  heroSpec.heroHpMult = VA_HERO_HP_MULT or 3.0
+  -- Named heroes are flat 2× HP (VA_HERO_HP_MULT); the field effect may add to it.
+  heroSpec.heroHpMult = VA_HERO_HP_MULT or 2.0
   if mission and type(mission.heroes) == "table" then
     for _, mh in ipairs(mission.heroes) do
       if mh and tostring(mh.id or mh.heroId) == tostring(heroId) then
         heroSpec.heroXp = mh.xp
         heroSpec.heroLevel = mh.level
         heroSpec.heroRank = mh.rank
-        local mhHp = tonumber(mh.hpMult)
-        if mhHp and mhHp > (VA_HERO_HP_MULT or 3.0) then
-          heroSpec.heroHpMult = mhHp
-        end
         heroSpec.heroCampaignXp = mh.campaignXp
         if mh.trait then heroSpec.heroTrait = mh.trait end
         break
@@ -2397,6 +2398,20 @@ function VA_CREW_spawnHeroPack(heroId, baseX, baseZ, dx0, heroOnly)
     return 0
   end
   local extras = tonumber(h.extras) or 0
+  -- A pair (Verse & Adder, Anvil & Mire): each partner is a named hero too, as tough as the lead,
+  -- with the pack's field effect. The campaign keeps one record for the pair (the lead's id).
+  for pi, pname in ipairs(h.partners or {}) do
+    if extras <= 0 then break end
+    local pSpec = {}
+    for k, v in pairs(heroSpec) do pSpec[k] = v end
+    pSpec.heroId = tostring(heroId) .. "#" .. tostring(pi)
+    pSpec.heroName = tostring(pname)
+    pSpec.missionCritical = false
+    pSpec.dx = dx + 110 * pi
+    pSpec.packageTag = "crew_pack_" .. tostring(heroId)
+    spawned = spawned + spawnUnitSpec(pSpec, playerTeamID, baseX, baseZ, 0, 0, {}, { role = "player_crew" })
+    extras = extras - 1
+  end
   if extras > 0 then
     if formation == "triangle" then
       -- Base corners of the triangle (hero is the tip).
@@ -2623,8 +2638,8 @@ local function spawnFieldRecruitWreck(fr, x, z)
       name = tostring(fr.heroName or fr.name or hid),
       unitDefName = heroDef,
       missionCritical = false,
-      hpMult = tonumber(fr.heroHpMult) or VA_HERO_HP_MULT or 3.0,
-      baseHpMult = tonumber(fr.heroHpMult) or VA_HERO_HP_MULT or 3.0,
+      hpMult = VA_HERO_HP_MULT,
+      baseHpMult = VA_HERO_HP_MULT,
       buildPowerMult = 1.0,
       state = "alive",
       everDown = false,
@@ -2909,7 +2924,7 @@ function VA_FIELD_spawnRecruits(enemyTeam)
           spacing = 80,
           heroId = hid,
           heroName = tostring(fr.heroName or fr.name or hid),
-          heroHpMult = tonumber(fr.heroHpMult) or VA_HERO_HP_MULT or 3.0,
+          heroHpMult = VA_HERO_HP_MULT,
           heroXp = tonumber(fr.heroXp) or 0,
           recruitable = true,
           recruitMode = mode,

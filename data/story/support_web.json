@@ -183,7 +183,7 @@
     },
     {
       "heroId": "consul",
-      "name": "Armada Consul",
+      "name": "Consul Aurel Weiss",
       "axes": {
         "energy": 0.75,
         "offense": -0.6,
@@ -224,7 +224,7 @@
     },
     {
       "heroId": "twitch",
-      "name": "Twitcher",
+      "name": "Benno 'Twitcher' Sallow",
       "axes": {
         "energy": 0.75,
         "offense": -0.6,
@@ -261,7 +261,7 @@
     },
     {
       "heroId": "spoke",
-      "name": "Spoke",
+      "name": "Ivo 'Spoke' Rask",
       "axes": {
         "energy": 0.0,
         "offense": -0.35,
@@ -302,7 +302,7 @@
     },
     {
       "heroId": "tick",
-      "name": "Tick Stream",
+      "name": "Tamsin 'Tick' Hollis",
       "axes": {
         "energy": 0.0,
         "offense": -0.35,
@@ -339,7 +339,7 @@
     },
     {
       "heroId": "noctua",
-      "name": "Noctua Bay",
+      "name": "Ada Noctua",
       "axes": {
         "energy": 0.0,
         "offense": -0.35,
@@ -594,7 +594,7 @@
     },
     {
       "heroId": "verse",
-      "name": "Verse Adder",
+      "name": "Verse & Adder",
       "axes": {
         "energy": 0.0,
         "offense": 0.35,
@@ -824,7 +824,7 @@
     },
     {
       "heroId": "fatboy",
-      "name": "Fatboy Contract",
+      "name": "Dorran 'Fatboy' Kell",
       "axes": {
         "energy": -0.8,
         "offense": 1.0,
@@ -1248,7 +1248,7 @@
     },
     {
       "heroId": "anvil",
-      "name": "Anvil Mire",
+      "name": "Anvil & Mire",
       "axes": {
         "energy": 0.0,
         "offense": 1.0,
@@ -1445,7 +1445,7 @@
     },
     {
       "heroId": "consul",
-      "name": "Armada Consul",
+      "name": "Consul Aurel Weiss",
       "position": "eco",
       "temperament": [
         "contract"
@@ -1479,7 +1479,7 @@
     },
     {
       "heroId": "twitch",
-      "name": "Twitcher",
+      "name": "Benno 'Twitcher' Sallow",
       "position": "eco",
       "temperament": [
         "mischief"
@@ -1509,7 +1509,7 @@
     },
     {
       "heroId": "spoke",
-      "name": "Spoke",
+      "name": "Ivo 'Spoke' Rask",
       "position": "eyes",
       "temperament": [
         "swarm",
@@ -1544,7 +1544,7 @@
     },
     {
       "heroId": "tick",
-      "name": "Tick Stream",
+      "name": "Tamsin 'Tick' Hollis",
       "position": "eyes",
       "temperament": [
         "swarm"
@@ -1574,7 +1574,7 @@
     },
     {
       "heroId": "noctua",
-      "name": "Noctua Bay",
+      "name": "Ada Noctua",
       "position": "eyes",
       "temperament": [
         "sky"
@@ -1781,7 +1781,7 @@
     },
     {
       "heroId": "verse",
-      "name": "Verse Adder",
+      "name": "Verse & Adder",
       "position": "skirmish",
       "temperament": [
         "glass",
@@ -1972,7 +1972,7 @@
     },
     {
       "heroId": "fatboy",
-      "name": "Fatboy Contract",
+      "name": "Dorran 'Fatboy' Kell",
       "position": "siege",
       "temperament": [
         "plod",
@@ -2322,7 +2322,7 @@
     },
     {
       "heroId": "anvil",
-      "name": "Anvil Mire",
+      "name": "Anvil & Mire",
       "position": "line",
       "temperament": [
         "plod",

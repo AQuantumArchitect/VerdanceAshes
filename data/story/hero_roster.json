@@ -24,7 +24,7 @@
     },
     {
       "heroId": "verse",
-      "name": "Verse Adder",
+      "name": "Verse & Adder",
       "unitDef": "legjav",
       "missionCritical": false,
       "status": "locked",
@@ -192,7 +192,7 @@
     },
     {
       "heroId": "twitch",
-      "name": "Twitcher",
+      "name": "Benno 'Twitcher' Sallow",
       "unitDef": "corfast",
       "missionCritical": false,
       "status": "locked",
@@ -213,7 +213,7 @@
     },
     {
       "heroId": "consul",
-      "name": "Armada Consul",
+      "name": "Consul Aurel Weiss",
       "unitDef": "armconsul",
       "missionCritical": false,
       "status": "locked",
@@ -237,7 +237,7 @@
     },
     {
       "heroId": "spoke",
-      "name": "Spoke",
+      "name": "Ivo 'Spoke' Rask",
       "unitDef": "legscout",
       "missionCritical": false,
       "status": "locked",
@@ -372,7 +372,7 @@
     },
     {
       "heroId": "tick",
-      "name": "Tick Stream",
+      "name": "Tamsin 'Tick' Hollis",
       "unitDef": "armflea",
       "missionCritical": false,
       "status": "locked",
@@ -393,7 +393,7 @@
     },
     {
       "heroId": "fatboy",
-      "name": "Fatboy Contract",
+      "name": "Dorran 'Fatboy' Kell",
       "unitDef": "armfboy",
       "missionCritical": false,
       "status": "locked",
@@ -457,7 +457,7 @@
     },
     {
       "heroId": "noctua",
-      "name": "Noctua Bay",
+      "name": "Ada Noctua",
       "unitDef": "legap",
       "missionCritical": false,
       "status": "locked",
@@ -702,7 +702,7 @@
     },
     {
       "heroId": "anvil",
-      "name": "Anvil Mire",
+      "name": "Anvil & Mire",
       "unitDef": "armcroc",
       "missionCritical": false,
       "status": "locked",
@@ -762,7 +762,7 @@
     },
     {
       "heroId": "halbard",
-      "name": "Halbard",
+      "name": "Ilse 'Halbard' Varn",
       "unitDef": "corhal",
       "missionCritical": false,
       "status": "active",

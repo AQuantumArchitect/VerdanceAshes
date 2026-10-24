@@ -565,7 +565,11 @@
       "extras": 1,
       "packMind": "pair",
       "blurb": "Javelin pair. Counts missiles out loud. Never hits zero clean.",
-      "name": "Verse Adder",
+      "name": "Verse & Adder",
+      "fieldName": "Verse",
+      "partners": [
+        "Adder"
+      ],
       "sizing": "fixed",
       "packCombined": 3000,
       "packMetal": 2400,
@@ -680,7 +684,7 @@
       "fieldEffect": "speed",
       "factory": "wheelie_bay",
       "blurb": "Null Merc kid + Wheelie Bay (×16). Only trusts wheels.",
-      "name": "Spoke",
+      "name": "Ivo 'Spoke' Rask",
       "tags": [
         "scout",
         "wheelie_mentor"
@@ -719,7 +723,7 @@
         "combat_engineer"
       ],
       "blurb": "Trouble fabricator — Twitcher + Cortex nano. Mines and mischief.",
-      "name": "Twitcher",
+      "name": "Benno 'Twitcher' Sallow",
       "sizing": "fixed",
       "escorts": [
         {
@@ -743,7 +747,7 @@
         "field_office"
       ],
       "blurb": "Deserted sideways; Consul + two Butlers. Builds like apology.",
-      "name": "Armada Consul",
+      "name": "Consul Aurel Weiss",
       "sizing": "fixed",
       "escorts": [
         {
@@ -815,7 +819,7 @@
       "fieldEffect": "vision",
       "factory": "tick_stream_bay",
       "blurb": "Flea lab + Tick pack (×20). Speaks in plurals.",
-      "name": "Tick Stream",
+      "name": "Tamsin 'Tick' Hollis",
       "tags": [
         "scout",
         "swarm",
@@ -835,7 +839,7 @@
       "extras": 0,
       "premium": true,
       "blurb": "One Fatboy — plasma house that learned to walk so it could knock.",
-      "name": "Fatboy Contract",
+      "name": "Dorran 'Fatboy' Kell",
       "sizing": "fixed",
       "packCombined": 1686,
       "packMetal": 1400,
@@ -994,7 +998,7 @@
       ],
       "sizing": "fixed",
       "blurb": "Drone plant + Noctua wing. Dreams in flight paths.",
-      "name": "Noctua Bay",
+      "name": "Ada Noctua",
       "packCombined": 1954,
       "packMetal": 1390,
       "packEnergy": 39500,
@@ -1231,7 +1235,11 @@
       "packTotal": 2,
       "extras": 1,
       "blurb": "Turtle pair — amph plod. The river learns his weight.",
-      "name": "Anvil Mire",
+      "name": "Anvil & Mire",
+      "fieldName": "Anvil",
+      "partners": [
+        "Mire"
+      ],
       "sizing": "fixed",
       "startXp": 0.179,
       "packCombined": 1929,
@@ -1289,7 +1297,7 @@
       "extras": 0,
       "packMind": "solo",
       "blurb": "Drives the Cortex Halberd assault hovertank.",
-      "name": "Halbard",
+      "name": "Ilse 'Halbard' Varn",
       "sizing": "fixed",
       "packCombined": 826,
       "packMetal": 640,

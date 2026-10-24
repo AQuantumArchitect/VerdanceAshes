@@ -528,7 +528,7 @@ def maybe_unlock_wheelie_hero(state: Dict[str, Any]) -> bool:
             return False
     heroes.append({
         "heroId": "spoke",
-        "name": "Spoke",
+        "name": "Ivo 'Spoke' Rask",
         "unitDef": "legscout",
         "missionCritical": False,
         "status": "active",
@@ -545,7 +545,7 @@ def maybe_unlock_wheelie_hero(state: Dict[str, Any]) -> bool:
     chars = state.setdefault("characters", {})
     chars.setdefault("spoke", {
         "id": "spoke",
-        "name": "Spoke",
+        "name": "Ivo 'Spoke' Rask",
         "faction": "nullmercs",
         "unitDef": "legscout",
         "xp": 0,

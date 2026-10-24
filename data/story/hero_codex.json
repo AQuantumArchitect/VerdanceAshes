@@ -155,7 +155,7 @@
     },
     {
       "heroId": "consul",
-      "name": "Armada Consul",
+      "name": "Consul Aurel Weiss",
       "position": "eco",
       "combatVerb": "craft",
       "temperament": [
@@ -177,7 +177,7 @@
     },
     {
       "heroId": "twitch",
-      "name": "Twitcher",
+      "name": "Benno 'Twitcher' Sallow",
       "position": "eco",
       "combatVerb": "craft",
       "temperament": [
@@ -199,7 +199,7 @@
     },
     {
       "heroId": "spoke",
-      "name": "Spoke",
+      "name": "Ivo 'Spoke' Rask",
       "position": "eyes",
       "combatVerb": "kite",
       "temperament": [
@@ -222,7 +222,7 @@
     },
     {
       "heroId": "tick",
-      "name": "Tick Stream",
+      "name": "Tamsin 'Tick' Hollis",
       "position": "eyes",
       "combatVerb": "hide",
       "temperament": [
@@ -244,7 +244,7 @@
     },
     {
       "heroId": "noctua",
-      "name": "Noctua Bay",
+      "name": "Ada Noctua",
       "position": "eyes",
       "combatVerb": "hide",
       "temperament": [
@@ -399,7 +399,7 @@
     },
     {
       "heroId": "verse",
-      "name": "Verse Adder",
+      "name": "Verse & Adder",
       "position": "skirmish",
       "combatVerb": "kite",
       "temperament": [
@@ -534,7 +534,7 @@
     },
     {
       "heroId": "fatboy",
-      "name": "Fatboy Contract",
+      "name": "Dorran 'Fatboy' Kell",
       "position": "siege",
       "combatVerb": "plod",
       "temperament": [
@@ -808,7 +808,7 @@
     },
     {
       "heroId": "anvil",
-      "name": "Anvil Mire",
+      "name": "Anvil & Mire",
       "position": "line",
       "combatVerb": "plod",
       "temperament": [
@@ -854,7 +854,7 @@
     },
     {
       "heroId": "halbard",
-      "name": "Halbard",
+      "name": "Ilse 'Halbard' Varn",
       "position": "band_siege",
       "combatVerb": "push",
       "temperament": [

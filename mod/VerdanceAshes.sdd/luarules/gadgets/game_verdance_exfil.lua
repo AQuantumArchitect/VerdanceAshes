@@ -298,7 +298,9 @@ local function manifest()
       local hname = Spring.GetUnitRulesParam(uid, "va_hero_name")
       local onPad = onPadAt(x, z)
       local zid = zoneOf(x, z) or "?"
-      local isHero = hid and hid ~= "" and hid ~= 0
+      -- a pair's partner is named on the field but travels as its lead's pack
+      local partner = Spring.GetUnitRulesParam(uid, "va_partner_of")
+      local isHero = hid and hid ~= "" and hid ~= 0 and not (partner and partner ~= "")
       if lifts(isHero, structure, onPad) then
         local g = m.going
         if isHero then

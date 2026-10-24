@@ -9,189 +9,80 @@ M.DEFAULT_RANK = "Green"
 
 -- φ saturation for field-effect strength from banked XP.
 local PHI = (1 + math.sqrt(5)) * 0.5
-local FIELD_B = 0.55
 
--- Tag catalog: each tag is ONE primary stat (plus optional fiction).
--- Mults multiply; missing keys = 1.0. Keep magnitudes modest.
+-- Tag catalog: each tag is ONE stat, matched to what the hero is (owner pass, 2026-10-24):
+-- artillery reaches farther, gunships and skirmishers fire faster, scouts see farther, the two
+-- siege walkers (Fatboy, Bro) and Thresh's bombs hit a wider area, builders build faster.
+-- The value is the bonus at 2.4 XP; it is nothing at no XP and grows with experience
+-- (M.fieldXpScale). Mults multiply; missing keys = 1.0.
 M.TAGS = {
-  shieldline = {
-    label = "Shieldline",
-    hp = 1.14,
-    fiction = "Holds the gate so someone else can be clever.",
-  },
-  deadbolt = {
-    label = "Deadbolt",
-    reload = 0.90,
-    fiction = "Counts missiles out loud. Never reaches zero without something dying.",
-  },
-  lane_ghost = {
-    label = "Lane Ghost",
-    speed = 1.10,
-    fiction = "Walks point on lanes the clans officially haven't.",
-  },
-  field_surgeon = {
-    label = "Field Surgeon",
-    build = 1.20,
-    fiction = "Nobody stays dead near an honest chassis.",
-  },
-  fordbreaker = {
-    label = "Fordbreaker",
-    hp = 1.10,
-    fiction = "Refuses to dry out.",
-  },
-  kiln_doctrine = {
-    label = "Kiln Doctrine",
-    range = 1.12,
-    fiction = "Burned his name off the hull so the enemy would learn it slow.",
-  },
-  unseen = {
-    label = "Unseen",
-    range = 1.10,
-    fiction = "A Lance that travels with ghosts.",
-  },
-  riot_breaker = {
-    label = "Riot Breaker",
-    hp = 1.10,
-    fiction = "Closes distance like an argument already won.",
-  },
-  merc_debt = {
-    label = "Merc Debt",
-    hp = 1.12,
-    fiction = "Unpaid for three wars — still breaks lines.",
-  },
-  long_arc = {
-    label = "Long Arc",
-    range = 1.14,
-    fiction = "Shoots map coordinates. The targets keep being there.",
-  },
-  combat_engineer = {
-    label = "Combat Engineer",
-    build = 1.22,
-    fiction = "Builds Fiends and trouble in equal measure.",
-  },
-  field_office = {
-    label = "Field Office",
-    build = 1.20,
-    fiction = "Armada paperwork that somehow digs trenches.",
-  },
-  wheelie_mentor = {
-    label = "Wheelie Mentor",
-    speed = 1.08,
-    mentor = true,
-    fiction = "Banks XP from every wheelie. Pack stride scales with the bank.",
-  },
-  tick_eyes = {
-    label = "Tick Eyes",
-    vision = 1.18,
-    mentor = true,
-    fiction = "Flea swarm — the company's eyes. Vision scales with harvested XP.",
-  },
-  pad_heart = {
-    label = "Pad Heart",
-    energy = 1.35,
-    fiction = "Hearth feeds the pad — self and sister fusions burn hotter.",
-  },
-  pavise_ward = {
-    label = "Pavise Ward",
-    hp = 1.14,
-    fiction = "Standing shield — Centurions in the aura remember the war together.",
-  },
-  captain_stride = {
-    label = "Captain Stride",
-    -- Speed removed: pack×vet already made Phobos unpleasant. Keep as fiction/HP-adjacent noop.
-    speed = 1.0,
-    fiction = "Ash-Captain holds the pack rhythm — stride is the thought, not the legs.",
-  },
-  razorback_twins = {
-    label = "Razorback Twins",
-    reload = 0.92,
-    range = 1.06,
-    fiction = "Ex-Razorback pilots. Separate cockpits, shared kill count.",
-  },
-  eco_lab = {
-    label = "Eco Lab",
-    build = 1.18,
-    fiction = "Nano, sun, converter, butlers — wind like wheat.",
-  },
-  area_control = {
-    label = "Area Control",
-    range = 1.14,
-    fiction = "Owns a circle of dirt. Argues with anything that crosses it.",
-  },
-  glass_cadence = {
-    label = "Glass Cadence",
-    reload = 0.88,
-    fiction = "Hits on the beat. Speed is baked into the chassis.",
-  },
-  stubborn = {
-    label = "Stubborn",
-    hp = 1.14,
-    fiction = "Will not be moved. Sometimes that is the plan.",
-  },
-  veil_eyes = {
-    label = "Veil Eyes",
-    vision = 1.16,
-    fiction = "Jammer haze with a radar eye — the fog works for you.",
-  },
-  trapper_pace = {
-    label = "Trapper Pace",
-    speed = 1.12,
-    fiction = "Pets keep up with Cinder Hook.",
-  },
-  ledger_reach = {
-    label = "Ledger Reach",
-    range = 1.12,
-    fiction = "T3 ledger — writes range into the dirt.",
-  },
-  sparkle_battery = {
-    label = "Sparkle Battery",
-    range = 1.14,
-    fiction = "Confetti doctrine — Mira's parade hits farther when she is having fun.",
-  },
-  sky_saint = {
-    label = "Sky Saint",
-    range = 1.12,
-    fiction = "Saint Kettle keeps the air honest so the battery can play.",
-  },
-  hive_growth = {
-    label = "Hive Growth",
-    build = 1.16,
-    fiction = "Infestors mint Infestors — the garden tends itself.",
-  },
+  -- health
+  shieldline = { label = "Shieldline", hp = 1.15, fiction = "Holds the gate so someone else can be clever." },
+  pavise_ward = { label = "Pavise Ward", hp = 1.15, fiction = "Standing shield: Centurions in the aura remember the war together." },
+  stubborn = { label = "Stubborn", hp = 1.15, fiction = "Will not be moved. Sometimes that is the plan." },
+  fordbreaker = { label = "Fordbreaker", hp = 1.15, fiction = "Refuses to dry out." },
+  riot_breaker = { label = "Riot Breaker", hp = 1.15, fiction = "Closes distance like an argument already won." },
+  merc_debt = { label = "Merc Debt", hp = 1.15, fiction = "Unpaid for three wars, still breaks lines." },
+  parade_ground = { label = "Parade Ground", hp = 1.15, fiction = "Two Bulls that take the hit so the order arrives." },
+  weather_tithe = { label = "Weather Tithe", hp = 1.15, fiction = "The circle holds because the ledger will not close." },
+  believer = { label = "Believer", hp = 1.15, fiction = "Sixteen Pawns who think he is the real thing, and fight like it." },
+  shell_game = { label = "Shell Game", hp = 1.15, fiction = "Two Turtles, one floor, no door." },
+  -- weapon range: artillery and the long reach
+  long_arc = { label = "Long Arc", range = 1.15, fiction = "Shoots map coordinates. The targets keep being there." },
+  sparkle_battery = { label = "Sparkle Battery", range = 1.15, fiction = "Confetti doctrine: the parade hits farther when she is having fun." },
+  fog_invoice = { label = "Fog Invoice", range = 1.15, fiction = "Rockets from the static, paid before the target learns the sender." },
+  kiln_doctrine = { label = "Kiln Doctrine", range = 1.12, fiction = "Burned his name off the hull so the enemy would learn it slow." },
+  area_control = { label = "Area Control", range = 1.12, fiction = "Owns a circle of dirt. Argues with anything that crosses it." },
+  ledger_reach = { label = "Ledger Reach", range = 1.12, fiction = "Writes range into the dirt." },
+  sky_saint = { label = "Sky Saint", range = 1.12, fiction = "Keeps the air honest so the battery can play." },
+  -- attack speed: gunships, skirmishers, snipers
+  roof_brawl = { label = "Roof Brawl", reload = 0.85, fiction = "Five Roughnecks that treat the ceiling like a suggestion." },
+  rotor_ducks = { label = "Rotor Ducks", reload = 0.85, fiction = "Cutlasses off the water, guns already turning." },
+  ghost_shot = { label = "Ghost Shot", reload = 0.85, fiction = "Whisper is a suggestion; the shot is a fact, and the next one is sooner." },
+  razorback_twins = { label = "Razorback Twins", reload = 0.85, fiction = "Two Javelins, two cockpits, one count." },
+  glass_cadence = { label = "Glass Cadence", reload = 0.85, fiction = "Hits on the beat. Speed is baked into the chassis." },
+  fuse = { label = "Fuse", reload = 0.85, fiction = "Burn, bail, burn again, a little faster each time." },
+  -- splash: siege walkers and bombs
+  house_call = { label = "House Call", splash = 1.30, fiction = "Knocks until there is no door, and the walls next to it." },
+  wrecking_ball = { label = "Wrecking Ball", splash = 1.30, fiction = "Point at a wall; the wall and its neighbours reconsider." },
+  hailstorm = { label = "Hailstorm", splash = 1.30, fiction = "She has never once looked at what she hits, so she hits all of it." },
+  -- vision: scouts and eyes
+  tick_eyes = { label = "Tick Eyes", vision = 1.20, mentor = true, fiction = "The company's eyes. Vision grows with the XP the swarm harvests." },
+  wheelie_eyes = { label = "Wheelie Eyes", vision = 1.20, mentor = true, fiction = "Banks XP from every wheelie, and sees farther for it." },
+  night_bay = { label = "Night Bay", vision = 1.20, mentor = true, fiction = "Dreams flight paths; wakes as a cloud of eyes." },
+  veil_eyes = { label = "Veil Eyes", vision = 1.20, fiction = "Jammer haze with a radar eye: the fog works for you." },
+  burn_mark = { label = "Burn Mark", vision = 1.20, fiction = "Sees by hurting. Leaves a scar on the map." },
+  payroll = { label = "Payroll", vision = 1.20, fiction = "Knows who is on whose books, and where they stand." },
+  -- build power
+  field_surgeon = { label = "Field Surgeon", build = 1.20, fiction = "Nobody stays dead near an honest chassis." },
+  combat_engineer = { label = "Combat Engineer", build = 1.20, fiction = "Builds trouble in equal measure." },
+  field_office = { label = "Field Office", build = 1.20, fiction = "Armada paperwork that somehow digs trenches." },
+  eco_lab = { label = "Eco Lab", build = 1.20, fiction = "Nano, sun, converter, Butlers: wind like wheat." },
+  geo_tithe = { label = "Geo Tithe", build = 1.20, fiction = "Raises what the garden needs, and calls the surplus holy." },
+  hive_growth = { label = "Hive Growth", build = 1.20, fiction = "Infestors mint Infestors: the garden tends itself." },
+  -- speed and energy
+  trapper_pace = { label = "Trapper Pace", speed = 1.12, fiction = "Pets keep up with Cinder Hook." },
+  pad_heart = { label = "Pad Heart", energy = 1.35, fiction = "Hearth feeds the pad: self and sister fusions burn hotter." },
 }
 
--- Exactly ONE field-effect tag per hero (primary mechanical identity).
--- Scout / factory mentors also bank subordinate XP into this effect.
+-- Exactly ONE field-effect tag per hero: this table is the source of truth (roster traits are
+-- fiction, not mechanics). Self and pack.
 M.HERO_DEFAULTS = {
-  pavise = { "pavise_ward" },       -- Centurion HP aura (self + armwar)
-  vane = { "shieldline" },          -- hp (band flock captain)
-  ketha = { "field_surgeon" },      -- build
-  verse = { "razorback_twins" },    -- reload+range XP (no swarm glue)
-  halbard = { "stubborn" },         -- Halberd hovertank toughness
-  fatboy = { "stubborn" },          -- hp
-  odessa = { "fordbreaker" },       -- hp
-  brakhov = { "kiln_doctrine" },    -- range
-  yeva = { "unseen" },              -- range
-  cauter = { "riot_breaker" },      -- hp
-  grath = { "merc_debt" },          -- hp
-  rusk = { "shieldline" },          -- hp
-  halq = { "long_arc" },            -- range
-  twitch = { "combat_engineer" },   -- build (factory mentor)
-  consul = { "field_office" },      -- build (factory mentor)
-  spoke = { "wheelie_mentor" },     -- speed (scout mentor)
-  tick = { "tick_eyes" },           -- vision (scout mentor)
-  noctua = { "tick_eyes" },         -- vision (air scout / drone bay mentor)
-  hearth = { "pad_heart" },         -- energy (self + sister fusions)
-  solarium = { "eco_lab" },         -- build
-  warder = { "area_control" },      -- range
-  auditor = { "ledger_reach" },     -- range
-  stride = { "glass_cadence" },     -- reload (speed baked in UnitDef)
-  commando = { "trapper_pace" },    -- speed
-  veil = { "veil_eyes" },           -- vision
-  bro = { "stubborn" },             -- hp
-  mira = { "sparkle_battery" },     -- range (parade siege)
-  kettle = { "sky_saint" },         -- range (Archangel AA)
-  infestor = { "hive_growth" },     -- build (self-replicate seed)
+  vane = { "shieldline" }, rusk = { "shieldline" }, pavise = { "pavise_ward" },
+  halbard = { "stubborn" }, odessa = { "fordbreaker" }, cauter = { "riot_breaker" },
+  grath = { "merc_debt" }, quill = { "parade_ground" }, nox = { "weather_tithe" },
+  mask = { "believer" }, anvil = { "shell_game" },
+  halq = { "long_arc" }, mira = { "sparkle_battery" }, vale = { "fog_invoice" },
+  brakhov = { "kiln_doctrine" }, warder = { "area_control" }, auditor = { "ledger_reach" },
+  kettle = { "sky_saint" },
+  ceil = { "roof_brawl" }, gale = { "rotor_ducks" }, yeva = { "ghost_shot" },
+  verse = { "razorback_twins" }, stride = { "glass_cadence" }, kit = { "fuse" },
+  fatboy = { "house_call" }, bro = { "wrecking_ball" }, thresh = { "hailstorm" },
+  tick = { "tick_eyes" }, spoke = { "wheelie_eyes" }, noctua = { "night_bay" },
+  veil = { "veil_eyes" }, volt = { "burn_mark" }, rumor = { "payroll" },
+  ketha = { "field_surgeon" }, twitch = { "combat_engineer" }, consul = { "field_office" },
+  solarium = { "eco_lab" }, lumen = { "geo_tithe" }, infestor = { "hive_growth" },
+  commando = { "trapper_pace" }, hearth = { "pad_heart" },
 }
 
 -- Rare dual-effect exceptions. Primary still comes from HERO_DEFAULTS;
@@ -227,7 +118,7 @@ local function mul(a, b)
   return (tonumber(a) or 1) * (tonumber(b) or 1)
 end
 
-local STAT_KEYS = { "hp", "speed", "range", "reload", "build", "vision", "energy" }
+local STAT_KEYS = { "hp", "speed", "range", "reload", "build", "vision", "energy", "splash" }
 
 local function applyTagStat(out, def, allowPrimary)
   for _, stat in ipairs(STAT_KEYS) do
@@ -247,7 +138,7 @@ end
 
 function M.resolve(tagList)
   local out = {
-    hp = 1, speed = 1, range = 1, reload = 1, build = 1, vision = 1, energy = 1,
+    hp = 1, speed = 1, range = 1, reload = 1, build = 1, vision = 1, energy = 1, splash = 1,
     tags = {},
     labels = {},
     mentor = false,
@@ -300,30 +191,19 @@ function M.collectFromHero(h, spec, heroId)
     push(spec.fieldEffect)
   end
   local id = tostring(heroId or (h and h.id) or (spec and (spec.heroId or spec.id)) or "")
-  -- Roster tags are SoT when present; HERO_DEFAULTS fills gaps + secondaries (Vane).
-  local merged = {}
-  local seen = {}
-  local function add(v)
-    if type(v) == "string" and v ~= "" and not seen[v] then
-      seen[v] = true
-      merged[#merged + 1] = v
-    elseif type(v) == "table" then
-      for _, t in ipairs(v) do add(t) end
-    end
-  end
-  if #list > 0 then
-    for i = 1, #list do add(list[i]) end
-    if id ~= "" and M.HERO_SECONDARIES and M.HERO_SECONDARIES[id] then
-      add(M.HERO_SECONDARIES[id])
-    end
-    return merged
-  end
+  -- The hero's own tag (HERO_DEFAULTS) decides. Roster traits like "saint" or "captain" are
+  -- fiction; only a word that is itself a tag id counts, and only for a hero without one.
   if id ~= "" and M.HERO_DEFAULTS[id] then
-    add(M.HERO_DEFAULTS[id])
-    add(M.HERO_SECONDARIES and M.HERO_SECONDARIES[id])
-    return merged
+    local out = {}
+    for _, tag in ipairs(M.HERO_DEFAULTS[id]) do out[#out + 1] = tag end
+    for _, tag in ipairs((M.HERO_SECONDARIES and M.HERO_SECONDARIES[id]) or {}) do out[#out + 1] = tag end
+    return out
   end
-  return list
+  local known, seen = {}, {}
+  for _, tag in ipairs(list) do
+    if M.TAGS[tag] and not seen[tag] then seen[tag] = true; known[#known + 1] = tag end
+  end
+  return known
 end
 
 function M.isMentorHero(heroId, tagList)
@@ -338,11 +218,13 @@ function M.isMentorHero(heroId, tagList)
   return resolved.mentor == true
 end
 
--- XP → extra field strength (on top of the tag's base mult).
--- Returns a multiplier near 1.0 .. ~1+FIELD_B at high XP.
+-- XP → how much of the tag's bonus is on: nothing at no XP, all of it at FULL_XP (2.4, a hero
+-- the company has carried a long way), a little more past it (×1.19 at 4.0). Saturating, φ-shaped.
+M.FULL_XP = 2.4
 function M.fieldXpScale(xp)
   xp = math.max(0, tonumber(xp) or 0)
-  return 1 + FIELD_B * (xp / (xp + PHI))
+  local theta = function(x) return x / (x + PHI) end
+  return theta(xp) / theta(M.FULL_XP)
 end
 
 -- Compose final field mults: tag base × XP scale on primary (+ rare secondaries).
@@ -350,7 +232,7 @@ function M.composeField(resolved, xp)
   resolved = resolved or M.resolve({})
   local scale = M.fieldXpScale(xp)
   local out = {
-    hp = 1, speed = 1, range = 1, reload = 1, build = 1, vision = 1, energy = 1,
+    hp = 1, speed = 1, range = 1, reload = 1, build = 1, vision = 1, energy = 1, splash = 1,
     primaryStat = resolved.primaryStat,
     secondaryStats = {},
     tags = resolved.tags,
@@ -358,9 +240,8 @@ function M.composeField(resolved, xp)
     mentor = resolved.mentor,
     xpScale = scale,
   }
-  -- XP grows the tag's bonus, not the whole stat: Shieldline's +14% HP becomes +18.5% at 2.4 XP
-  -- (it used to multiply the stat, ×1.52), and Deadbolt's -10% reload grows to -13% instead of
-  -- turning into a 20% slowdown.
+  -- XP grows the tag's bonus, not the whole stat: Shieldline is +0% HP green, +15% at 2.4 XP.
+  -- (It used to multiply the stat, ×1.52, and made reload slower with experience.)
   local function arm(stat)
     if not stat then return end
     out[stat] = 1 + ((tonumber(resolved[stat]) or 1) - 1) * scale
@@ -384,12 +265,9 @@ local function applyRangeMult(unitID, rangeMult)
   if not ud or not ud.weapons then return end
   local maxR = 0
   for i = 1, #ud.weapons do
-    local cur = Spring.GetUnitWeaponState and Spring.GetUnitWeaponState(unitID, i, "range")
-    cur = tonumber(cur)
-    if not cur or cur <= 0 then
-      local wd = WeaponDefs[ud.weapons[i].weaponDef]
-      cur = wd and tonumber(wd.range) or 0
-    end
+    -- from the weapon's own range, never the live one: a refresh must not compound
+    local wd = WeaponDefs[ud.weapons[i].weaponDef]
+    local cur = wd and tonumber(wd.range) or 0
     if cur and cur > 0 then
       local nr = cur * rangeMult
       pcall(Spring.SetUnitWeaponState, unitID, i, "range", nr)
@@ -407,12 +285,8 @@ local function applyReloadMult(unitID, reloadMult)
   local ud = dID and UnitDefs[dID]
   if not ud or not ud.weapons then return end
   for i = 1, #ud.weapons do
-    local cur = Spring.GetUnitWeaponState and Spring.GetUnitWeaponState(unitID, i, "reloadTime")
-    cur = tonumber(cur)
-    if not cur or cur <= 0 then
-      local wd = WeaponDefs[ud.weapons[i].weaponDef]
-      cur = wd and (tonumber(wd.reload) or tonumber(wd.reloadTime)) or 0
-    end
+    local wd = WeaponDefs[ud.weapons[i].weaponDef]
+    local cur = wd and (tonumber(wd.reload) or tonumber(wd.reloadTime)) or 0
     if cur and cur > 0 then
       pcall(Spring.SetUnitWeaponState, unitID, i, "reloadTime", cur * reloadMult)
     end
@@ -531,6 +405,23 @@ local function applyEnergyMult(unitID, energyMult)
   Spring.SetUnitRulesParam(unitID, "va_field_energy_mult", energyMult, { public = true })
 end
 
+-- Splash: every weapon's damage and crater area, from the weapon's own values.
+local function applySplashMult(unitID, splashMult)
+  if not splashMult or math.abs(splashMult - 1) < 0.01 or not Spring.SetUnitWeaponDamages then return end
+  local dID = Spring.GetUnitDefID(unitID)
+  local ud = dID and UnitDefs[dID]
+  if not ud or not ud.weapons then return end
+  for i = 1, #ud.weapons do
+    local wd = WeaponDefs[ud.weapons[i].weaponDef]
+    local aoe = wd and tonumber(wd.damageAreaOfEffect) or 0
+    if aoe > 0 then
+      pcall(Spring.SetUnitWeaponDamages, unitID, i, "damageAreaOfEffect", aoe * splashMult)
+      pcall(Spring.SetUnitWeaponDamages, unitID, i, "craterAreaOfEffect", (tonumber(wd.craterAreaOfEffect) or aoe) * splashMult)
+    end
+  end
+  Spring.SetUnitRulesParam(unitID, "va_field_splash_mult", splashMult, { public = true })
+end
+
 local function applyOneStat(unitID, stat, mult, rec)
   if not stat or not mult then return end
   if stat == "range" then
@@ -547,6 +438,8 @@ local function applyOneStat(unitID, stat, mult, rec)
     applyHpMultLive(unitID, mult, rec)
   elseif stat == "energy" then
     applyEnergyMult(unitID, mult)
+  elseif stat == "splash" then
+    applySplashMult(unitID, mult)
   end
 end
 
@@ -673,6 +566,7 @@ function M.applyToHero(unitID, rec, tagList, xp)
   rec.tagReloadMult = (field.primaryStat == "reload") and field.reload or 1
   rec.tagVisionMult = (field.primaryStat == "vision") and field.vision or 1
   rec.tagEnergyMult = (field.primaryStat == "energy") and field.energy or 1
+  rec.tagSplashMult = (field.primaryStat == "splash") and field.splash or 1
   rec.fieldStat = field.primaryStat
   rec.fieldMult = field.primaryStat and field[field.primaryStat] or 1
   rec.tags = field.tags

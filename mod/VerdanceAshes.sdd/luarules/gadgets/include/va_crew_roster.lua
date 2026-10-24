@@ -51,7 +51,10 @@ M.HEROES = {
     blurb = "Incinerator siege. Name burned off. Always offense — defenses are food.",
   },
   verse = {
-    name = "Verse Adder",
+    name = "Verse & Adder",
+    -- both units of the pair are named heroes: the lead and its partner
+    fieldName = "Verse",
+    partners = { "Adder" },
     role = "band",
     unitDef = "legjav",
     hireTnb = 0,
@@ -134,7 +137,7 @@ M.HEROES = {
     blurb = "Sharpshooter + five Eidolons. Whisper finds; ghosts walked.",
   },
   spoke = {
-    name = "Spoke",
+    name = "Ivo 'Spoke' Rask",
     role = "band",
     unitDef = "legscout",
     hireTnb = 0,
@@ -161,7 +164,7 @@ M.HEROES = {
     blurb = "T3 ledger mech — still skirmishes like it has somewhere to be.",
   },
   twitch = {
-    name = "Twitcher",
+    name = "Benno 'Twitcher' Sallow",
     role = "band",
     unitDef = "corfast",
     hireTnb = 0,
@@ -182,7 +185,7 @@ M.HEROES = {
     blurb = "Trouble fabricator — Twitcher + Cortex nano. Mines and mischief.",
   },
   consul = {
-    name = "Armada Consul",
+    name = "Consul Aurel Weiss",
     role = "band",
     unitDef = "armconsul",
     hireTnb = 1,
@@ -244,7 +247,7 @@ M.HEROES = {
     blurb = "Commando + Trappers + Hercules. Mines before the argument.",
   },
   tick = {
-    name = "Tick Stream",
+    name = "Tamsin 'Tick' Hollis",
     role = "band",
     unitDef = "armflea",
     hireTnb = 0,
@@ -258,7 +261,7 @@ M.HEROES = {
     blurb = "Flea lab + Tick pack (×20). Speaks in plurals.",
   },
   fatboy = {
-    name = "Fatboy Contract",
+    name = "Dorran 'Fatboy' Kell",
     role = "band",
     unitDef = "armfboy",
     hireTnb = 0,
@@ -374,7 +377,7 @@ M.HEROES = {
     blurb = "Beamer ring + Ferrets + Thistles + LLTs. Owns a circle of dirt.",
   },
   noctua = {
-    name = "Noctua Bay",
+    name = "Ada Noctua",
     role = "band",
     unitDef = "legap",
     hireTnb = 0,
@@ -542,7 +545,10 @@ M.HEROES = {
     blurb = "T2 construction vehicle of the saint garden. Raises Prudes and Pulsars, and nothing else; a Cortex Printer keeps her patched.",
   },
   anvil = {
-    name = "Anvil Mire",
+    name = "Anvil & Mire",
+    -- both units of the pair are named heroes: the lead and its partner
+    fieldName = "Anvil",
+    partners = { "Mire" },
     role = "band",
     unitDef = "armcroc",
     hireTnb = 0,
@@ -578,7 +584,7 @@ M.HEROES = {
     blurb = "Grey-haired shield captain. One Centurion; her ward steadies everyone near her. Temperate, until you touch her people.",
   },
   halbard = {
-    name = "Halbard",
+    name = "Ilse 'Halbard' Varn",
     role = "band",
     unitDef = "corhal",
     hireTnb = 0,
