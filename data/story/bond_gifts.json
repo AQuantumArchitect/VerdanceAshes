@@ -167,6 +167,139 @@
         "count": 1,
         "why": "A Castro jammer: more fog on the payroll"
       }
+    ],
+    "ketha__pavise": [
+      {
+        "unitDef": "armrectr",
+        "count": 1,
+        "why": "A Lazarus: another pair of hands for the counting"
+      }
+    ],
+    "consul__solarium": [
+      {
+        "unitDef": "armwin",
+        "count": 4,
+        "why": "Wind turbines that are on the plan and built like an apology"
+      }
+    ],
+    "commando__twitch": [
+      {
+        "unitDef": "armmine1",
+        "count": 6,
+        "why": "A box of light mines nobody asked for"
+      }
+    ],
+    "cauter__kit": [
+      {
+        "unitDef": "corpyro",
+        "count": 2,
+        "why": "Two Fiends for the volume contest"
+      }
+    ],
+    "halq__verse": [
+      {
+        "unitDef": "armseer",
+        "count": 1,
+        "why": "A Prophet radar truck to call the grid for both voices"
+      }
+    ],
+    "auditor__grath": [
+      {
+        "unitDef": "armmstor",
+        "count": 1,
+        "why": "A vault to keep the receipt in"
+      }
+    ],
+    "auditor__verse": [
+      {
+        "unitDef": "cormort",
+        "count": 1,
+        "why": "A Sheldon: cheap shells, good value, both of them approve"
+      }
+    ],
+    "spoke__stride": [
+      {
+        "unitDef": "armflash",
+        "count": 4,
+        "why": "Blitz raiders that know every exit"
+      }
+    ],
+    "bro__halbard": [
+      {
+        "unitDef": "corraid",
+        "count": 2,
+        "why": "Two Brutes to eat what the big ones leave"
+      }
+    ],
+    "brakhov__bro": [
+      {
+        "unitDef": "corcan",
+        "count": 1,
+        "why": "A Sumo: a third opinion on how to arrive"
+      }
+    ],
+    "infestor__solarium": [
+      {
+        "unitDef": "armsolar",
+        "count": 2,
+        "why": "Warm ground for the hive, sun for the books"
+      }
+    ],
+    "infestor__ketha": [
+      {
+        "unitDef": "cornecro",
+        "count": 1,
+        "why": "A Graverobber that drags the named dead home"
+      }
+    ],
+    "hearth__stride": [
+      {
+        "unitDef": "armestor",
+        "count": 1,
+        "why": "Energy storage: the lights stay on for whoever comes back"
+      }
+    ],
+    "rusk__warder": [
+      {
+        "unitDef": "corlevlr",
+        "count": 1,
+        "why": "A Pounder for the doorway the circle reaches"
+      }
+    ],
+    "vale__yeva": [
+      {
+        "unitDef": "armjamt",
+        "count": 1,
+        "why": "A Sneaky Pete: the quiet comes with them"
+      }
+    ],
+    "pavise__quill": [
+      {
+        "unitDef": "armstump",
+        "count": 2,
+        "why": "Two Stouts that follow a quiet order"
+      }
+    ],
+    "lumen__twitch": [
+      {
+        "unitDef": "armeyes",
+        "count": 3,
+        "why": "Beholders watching the blessed traps"
+      }
+    ],
+    "bro__mask": [
+      {
+        "unitDef": "armwar",
+        "count": 2,
+        "why": "Two Centurions as an honour guard for the spare king"
+      }
+    ],
+    "gale__odessa": [
+      {
+        "unitDef": "armamph",
+        "count": 2,
+        "why": "Platypus bots to hold the hinge under the wings"
+      }
     ]
   },
   "pool": [

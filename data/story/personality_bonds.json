@@ -1,0 +1,391 @@
+{
+  "schemaVersion": "verdance-authored-bonds/1.0",
+  "notes": "Personality pairs (2026-10-24): relationships that come from who the heroes are, not what they drive. Every hero who had no written tie gets at least one. Merged by tools/author_bonds_v1.py.",
+  "pairs": [
+    {
+      "a": "pavise", "b": "ketha", "polarity": "bond",
+      "motifs": ["the one who counts the living and the one who counts the dead", "two quiet women who never raise their voices"],
+      "talks": {
+        "C": {"title": "Counting", "beats": [
+          ["narrator", "After every drop, Pavise counts heads. Ketha counts wrecks. They finish at the same moment."],
+          ["pavise", "Eleven walked back."],
+          ["ketha", "Two didn't. I have their names."],
+          ["pavise", "Then between us we have all of them."]]},
+        "B": {"title": "The left and the back", "beats": [
+          ["narrator", "Pavise walks on the commander's left. Ketha walks behind everyone."],
+          ["ketha", "You keep them from falling."],
+          ["pavise", "You pick them up when I fail."],
+          ["ketha", "You don't fail often. I notice when you do. I never tell them."]]},
+        "A": {"title": "Twenty years", "beats": [
+          ["narrator", "Two cups of tea, gone cold. Neither of them drinks it. That is not the point."],
+          ["pavise", "Twenty years with the Armada and I never had someone to hand the ones I lost to."],
+          ["ketha", "Now you do. I'll carry them. You keep walking left."]]}
+      }
+    },
+    {
+      "a": "solarium", "b": "consul", "polarity": "friction",
+      "motifs": ["the budget and the apology", "spreadsheets against penance"],
+      "talks": {
+        "C": {"title": "Line items", "beats": [
+          ["narrator", "Solarium has a spreadsheet. Consul has built three walls that are not on it."],
+          ["solarium", "Spreadsheets, then sunlight. In that order."],
+          ["consul", "I build when it feels owed."],
+          ["solarium", "Feelings are not a budget line."]]},
+        "B": {"title": "Owed", "beats": [
+          ["narrator", "Solarium found a column called 'Consul: apologies'. It balances to the metal."],
+          ["consul", "You started tracking me."],
+          ["solarium", "You were going to build them anyway. I'd rather know what they cost."],
+          ["consul", "Every one of them costs more than metal."]]},
+        "A": {"title": "Balanced books", "beats": [
+          ["narrator", "The pad went up in half the time. Solarium planned it; Consul built it as if someone's life depended on it. Someone's did."],
+          ["solarium", "You were under budget."],
+          ["consul", "First time in years something I built didn't feel like penance."]]}
+      }
+    },
+    {
+      "a": "twitch", "b": "commando", "polarity": "sibling",
+      "motifs": ["two Cortex grins", "the welder and the mines"],
+      "talks": {
+        "C": {"title": "Surprises", "beats": [
+          ["narrator", "Twitcher welded a mine into Cinder Hook's bunk. Cinder Hook mined Twitcher's workbench. Both are delighted."],
+          ["twitch", "Grins with a welder."],
+          ["commando", "Mines before the argument."],
+          ["twitch", "We never have the argument."]]},
+        "B": {"title": "Shop talk", "beats": [
+          ["narrator", "They have started sharing a workbench, which the rest of the camp regards as a strategic threat."],
+          ["commando", "Your welds hold. My mines go off. Think of the children."],
+          ["twitch", "What children."],
+          ["commando", "Exactly."]]},
+        "A": {"title": "Family firm", "beats": [
+          ["narrator", "The enemy's supply road stopped existing. Nobody saw it happen. Two Cortex deserters were laughing in a ditch."],
+          ["twitch", "We should charge for this."],
+          ["commando", "We do. They just don't know where to send the bill."]]}
+      }
+    },
+    {
+      "a": "cauter", "b": "kit", "polarity": "rivalry",
+      "motifs": ["who is loudest at handshake range", "riot against fireworks"],
+      "talks": {
+        "C": {"title": "Volume", "beats": [
+          ["narrator", "Cauter's riot cannon and Kit's Belchers went off at the same wall. Nobody could hear for an hour."],
+          ["cauter", "Riot as punctuation."],
+          ["kit", "Fireworks as a sentence. Mine was longer."],
+          ["cauter", "Mine ended it."]]},
+        "B": {"title": "The scoreboard", "beats": [
+          ["narrator", "They have a chalkboard. It has two columns: 'loud' and 'louder'. They keep switching which one is theirs."],
+          ["kit", "You were louder today. I'm furious."],
+          ["cauter", "You set fire to the chalkboard."],
+          ["kit", "That's a point."]]},
+        "A": {"title": "Duet", "beats": [
+          ["narrator", "They hit the line together. Riot first, then fire, then nothing standing."],
+          ["cauter", "That was the loudest thing I've ever heard."],
+          ["kit", "We should do it again. Louder."]]}
+      }
+    },
+    {
+      "a": "halq", "b": "verse", "polarity": "bond",
+      "motifs": ["coordinates and the count", "two voices doing the same math"],
+      "talks": {
+        "C": {"title": "Numbers", "beats": [
+          ["narrator", "Halq calls grid references. Verse counts missiles. From a distance it sounds like a hymn."],
+          ["halq", "Four-seven, two-nine."],
+          ["verse", "Six, five, four..."],
+          ["halq", "You're counting my rockets."],
+          ["verse", "I count everything. Yours land where you say."]]},
+        "B": {"title": "Harmony", "beats": [
+          ["narrator", "They have started finishing each other's numbers."],
+          ["verse", "Three missiles left."],
+          ["halq", "Three targets on the map."],
+          ["verse", "I never reach zero without something dying."],
+          ["halq", "Then let's make the math come out even."]]},
+        "A": {"title": "Zero", "beats": [
+          ["narrator", "Verse reached zero. Halq's map was empty. Neither of them said a word for a long time."],
+          ["halq", "That's the first time the grid had nothing left on it."],
+          ["verse", "I counted it with you. It sounded better in two voices."]]}
+      }
+    },
+    {
+      "a": "grath", "b": "auditor", "polarity": "tension",
+      "motifs": ["the debtor and the collector", "three wars unpaid, collected in person"],
+      "talks": {
+        "C": {"title": "Arrears", "beats": [
+          ["narrator", "The Auditor sits down next to Grath at the fire. Grath does not move. Nobody else breathes."],
+          ["auditor", "Ledger with legs. Three wars, Grath."],
+          ["grath", "Arrears. Not unpaid. Arrears."],
+          ["auditor", "The difference is interest."]]},
+        "B": {"title": "Payment plan", "beats": [
+          ["narrator", "The Auditor walked beside Grath's Karkinos all sortie, and wrote down every enemy he held back."],
+          ["grath", "Counting my debts again?"],
+          ["auditor", "Counting your payments. You've been making them for years. Nobody wrote them down."]]},
+        "A": {"title": "Paid", "beats": [
+          ["narrator", "The Auditor tore a page out of its ledger and handed it to Grath."],
+          ["grath", "What's this?"],
+          ["auditor", "Receipt. Three wars. Paid in full, by holding the middle."],
+          ["grath", "...I don't know how to stand without the weight."],
+          ["auditor", "Then hold the middle for free. It looks the same from outside."]]}
+      }
+    },
+    {
+      "a": "verse", "b": "auditor", "polarity": "friction",
+      "motifs": ["counting out loud against counting the cost", "the spender and the books"],
+      "talks": {
+        "C": {"title": "Expenditure", "beats": [
+          ["narrator", "Verse counts missiles out loud. The Auditor counts their price, also out loud."],
+          ["verse", "Five, four, three."],
+          ["auditor", "One thousand two hundred, two thousand four hundred..."],
+          ["verse", "You're ruining it."]]},
+        "B": {"title": "Value", "beats": [
+          ["auditor", "Every missile is a word, you said. Do you know what your words cost?"],
+          ["verse", "Do you know what silence costs? I counted it once. It cost us Rusk's gate."],
+          ["auditor", "...I'll add that to the column."]]},
+        "A": {"title": "Worth it", "beats": [
+          ["narrator", "The Auditor has stopped reading the price aloud. It just writes 'worth it' beside each of Verse's volleys."],
+          ["verse", "You stopped counting."],
+          ["auditor", "I started trusting the count you do."]]}
+      }
+    },
+    {
+      "a": "stride", "b": "spoke", "polarity": "attract",
+      "motifs": ["counting exits and trusting wheels", "speed with bad manners"],
+      "talks": {
+        "C": {"title": "Wheels", "beats": [
+          ["narrator", "Spoke trusts nothing that walks. Stride does not walk."],
+          ["spoke", "Only trusts wheels."],
+          ["stride", "We don't count shots. We count exits."],
+          ["spoke", "Show me the exits, then."]]},
+        "B": {"title": "Racing", "beats": [
+          ["narrator", "A Wheelie and a Saloon raced the whole map and both claim they won."],
+          ["stride", "Your bots are fast."],
+          ["spoke", "Your manners are faster. You insulted the referee."],
+          ["stride", "There was no referee."],
+          ["spoke", "Not after you."]]},
+        "A": {"title": "Every exit", "beats": [
+          ["narrator", "When the pad was overrun, every pack got out. Spoke's scouts had found the gaps; Stride had already driven through them."],
+          ["spoke", "I trust you now. Don't make it weird."],
+          ["stride", "We'd never. Weird is a door. We just leave through it."]]}
+      }
+    },
+    {
+      "a": "bro", "b": "halbard", "polarity": "sibling",
+      "motifs": ["two Cortex heavies", "the shrug and the hunger"],
+      "talks": {
+        "C": {"title": "Big", "beats": [
+          ["narrator", "The Tzar and the Halberd park side by side. The ground complains."],
+          ["bro", "Yeah. I'll take that wall."],
+          ["halbard", "Halberd's hungry. Which wall."],
+          ["bro", "Any. Pick one. I'm easy."]]},
+        "B": {"title": "Sharing", "beats": [
+          ["narrator", "They take turns on the walls now. Bro arrives, the Halberd eats what's left."],
+          ["halbard", "You leave a lot."],
+          ["bro", "I'm not angry. I'm available. You're hungry. Works out."]]},
+        "A": {"title": "Brothers", "beats": [
+          ["narrator", "Something big came at the pad. Something bigger met it, and then something hungrier."],
+          ["halbard", "Full."],
+          ["bro", "Good. Nap?"],
+          ["halbard", "Nap."]]}
+      }
+    },
+    {
+      "a": "bro", "b": "brakhov", "polarity": "friction",
+      "motifs": ["the shrug that insults the walk", "forward heat against available"],
+      "talks": {
+        "C": {"title": "Why", "beats": [
+          ["narrator", "Brakhov burned his name off for this war. Bro is here because someone asked nicely."],
+          ["brakhov", "Name gone. Forward heat. Why are you here?"],
+          ["bro", "Someone pointed at a wall."],
+          ["brakhov", "That is not a reason."],
+          ["bro", "It's worked so far."]]},
+        "B": {"title": "Arriving", "beats": [
+          ["narrator", "They reached the same turret line. Brakhov walked into the fire. Bro drove around it and took it from behind."],
+          ["brakhov", "You did not face them."],
+          ["bro", "They're still dead, man."],
+          ["brakhov", "It matters how."]]},
+        "A": {"title": "Reasons", "beats": [
+          ["narrator", "Brakhov asked Bro, at the fire, whether he had ever had a name worth burning."],
+          ["bro", "Had one. Didn't need to burn it. Nobody ever asked for it."],
+          ["brakhov", "...That might be worse."],
+          ["bro", "Nah. It's lighter. You could try it."]]}
+      }
+    },
+    {
+      "a": "infestor", "b": "solarium", "polarity": "attract",
+      "motifs": ["two gardeners", "one grows legs, one grows sun"],
+      "talks": {
+        "C": {"title": "Crops", "beats": [
+          ["narrator", "Solarium plants solar panels in rows. The Infestor plants itself in the gaps between them."],
+          ["solarium", "Those aren't on the plan."],
+          ["infestor", "Company grows itself."],
+          ["solarium", "...They are very tidy rows, at least."]]},
+        "B": {"title": "Fertile", "beats": [
+          ["narrator", "The hive grew twice as fast beside the solar field. Solarium noticed, and added a row."],
+          ["infestor", "Warm ground."],
+          ["solarium", "I can budget for warm ground."]]},
+        "A": {"title": "Harvest", "beats": [
+          ["narrator", "The garden held: panels, converters and a ring of legs that would not let anything near them."],
+          ["solarium", "You're the best fence I've ever planted."],
+          ["infestor", "You are the best soil."]]}
+      }
+    },
+    {
+      "a": "infestor", "b": "ketha", "polarity": "tension",
+      "motifs": ["names and the nameless", "finishing sentences against starting new ones"],
+      "talks": {
+        "C": {"title": "Names", "beats": [
+          ["narrator", "Ketha brings back the dead by name. The Infestor makes new bodies that never had one."],
+          ["ketha", "Wrecks are unfinished sentences. Yours never start."],
+          ["infestor", "Company grows itself."],
+          ["ketha", "Growing isn't the same as remembering."]]},
+        "B": {"title": "Counting legs", "beats": [
+          ["narrator", "Ketha has started naming the Infestor's spawn. There are a lot of them."],
+          ["infestor", "They do not need names."],
+          ["ketha", "Everyone does. Even if they only live a minute. That one's called Brant."]]},
+        "A": {"title": "Brant", "beats": [
+          ["narrator", "One of the hive's bugs came home dragging a hero's wreck back to Ketha's rez-bot."],
+          ["ketha", "Brant brought him back."],
+          ["infestor", "It remembered what you told it."],
+          ["ketha", "Then it's a sentence after all."]]}
+      }
+    },
+    {
+      "a": "hearth", "b": "stride", "polarity": "tension",
+      "motifs": ["furniture and the wanderer", "stay against leave"],
+      "talks": {
+        "C": {"title": "Staying", "beats": [
+          ["narrator", "Stride drove through the pad four times today. Hearth has not moved in a month."],
+          ["stride", "Doesn't it bore you? Sitting?"],
+          ["hearth", "Quiet sun. Won't go out."],
+          ["stride", "That's not an answer."],
+          ["hearth", "It's the only answer. Somebody has to be where you come back to."]]},
+        "B": {"title": "Coming back", "beats": [
+          ["narrator", "Stride drove home through enemy fire because the lights at the pad were still on."],
+          ["stride", "I could see you from across the map."],
+          ["hearth", "That's what I'm for."]]},
+        "A": {"title": "Home", "beats": [
+          ["narrator", "Stride parked next to the reactor and turned the engines off. Nobody had ever seen them do that."],
+          ["hearth", "You're staying?"],
+          ["stride", "For a minute. Don't tell anyone. We have a reputation."]]}
+      }
+    },
+    {
+      "a": "rusk", "b": "warder", "polarity": "bond",
+      "motifs": ["doors and circles", "two who never move"],
+      "talks": {
+        "C": {"title": "Holding", "beats": [
+          ["narrator", "Rusk holds the gate. Warder holds the circle. They sit back to back, not talking."],
+          ["rusk", "Gate, jammed gat, a lie."],
+          ["warder", "Owns a circle of dirt."],
+          ["rusk", "Good dirt?"],
+          ["warder", "Mine."]]},
+        "B": {"title": "The lie", "beats": [
+          ["warder", "What was the lie? At the gate."],
+          ["rusk", "Told them reinforcements were coming. Held six hours on it."],
+          ["warder", "Did they come?"],
+          ["rusk", "No. But I'd have held either way. The lie was for them, not me."]]},
+        "A": {"title": "Reinforcements", "beats": [
+          ["narrator", "Rusk's gate was failing. Warder's beamers rolled up behind it. Warder had left the circle."],
+          ["rusk", "You moved."],
+          ["warder", "The lie should come true once."]]}
+      }
+    },
+    {
+      "a": "yeva", "b": "vale", "polarity": "mirror",
+      "motifs": ["two quiet killers in the fog", "ghosts and invoices"],
+      "talks": {
+        "C": {"title": "Quiet", "beats": [
+          ["narrator", "Two people who never raise their voices have found each other, and the camp is uneasy about it."],
+          ["yeva", "Ghosts already walked it."],
+          ["vale", "The wall never saw the invoice."],
+          ["yeva", "We're the same thing at different distances."]]},
+        "B": {"title": "Leaving", "beats": [
+          ["vale", "You leave before they know you were there."],
+          ["yeva", "So do you. You just leave a bill."],
+          ["vale", "Someone has to pay for the quiet."]]},
+        "A": {"title": "Nothing heard", "beats": [
+          ["narrator", "An entire enemy front lost its commanders and its walls on the same night. Nobody heard a thing."],
+          ["vale", "Your ghosts and my invoices."],
+          ["yeva", "The best kind of night."]]}
+      }
+    },
+    {
+      "a": "pavise", "b": "quill", "polarity": "mentor",
+      "motifs": ["two captains, one who never shouts", "orders that walk and orders that wait"],
+      "talks": {
+        "C": {"title": "Volume", "beats": [
+          ["narrator", "Quill gives orders like artillery. Pavise gives them like weather reports."],
+          ["quill", "Orders walk on treads. They don't ask twice."],
+          ["pavise", "They shouldn't need to. If you have to shout, you've already lost them."],
+          ["quill", "I've never lost a line."]]},
+        "B": {"title": "Listening", "beats": [
+          ["narrator", "Quill tried giving a quiet order. The Bulls followed it faster."],
+          ["quill", "They listened harder."],
+          ["pavise", "People lean in to hear you when you're quiet. They lean back when you shout."]]},
+        "A": {"title": "Succession", "beats": [
+          ["narrator", "Pavise was down. Quill held the line without raising his voice once."],
+          ["pavise", "I heard you on the radio. You sounded like me."],
+          ["quill", "I had a good teacher. Don't you dare die before I'm better at it."]]}
+      }
+    },
+    {
+      "a": "lumen", "b": "twitch", "polarity": "friction",
+      "motifs": ["the saint's garden and the welder's surprises", "faith against mischief"],
+      "talks": {
+        "C": {"title": "Sacred ground", "beats": [
+          ["narrator", "Twitcher welded a booby trap into Sister Lumen's geothermal vent. She found it during prayers."],
+          ["lumen", "Tithe the grid. Not the grid's plumbing."],
+          ["twitch", "It was a gift."],
+          ["lumen", "It hissed."]]},
+        "B": {"title": "Confession", "beats": [
+          ["twitch", "Is there a saint of mischief?"],
+          ["lumen", "No."],
+          ["twitch", "There should be. I'd apply."],
+          ["lumen", "You'd have to stop booby-trapping the altar."],
+          ["twitch", "...I'll think about it."]]},
+        "A": {"title": "Blessed traps", "beats": [
+          ["narrator", "Raiders came for Lumen's Pulsar. Twitcher's traps were all around it. She had let him plant them."],
+          ["lumen", "Holy ground needs a fence."],
+          ["twitch", "Did you just bless my mines?"],
+          ["lumen", "Once. Don't make me regret it."]]}
+      }
+    },
+    {
+      "a": "mask", "b": "bro", "polarity": "attract",
+      "motifs": ["the spare king and the man who'll follow anyone", "belief is available"],
+      "talks": {
+        "C": {"title": "Your Majesty", "beats": [
+          ["narrator", "Bro saluted Mask. Mask was so surprised he saluted back."],
+          ["mask", "Every throne needs a spare."],
+          ["bro", "Sure, boss. Which wall?"],
+          ["mask", "You... believe I'm the commander?"],
+          ["bro", "Do you? Then yeah."]]},
+        "B": {"title": "Royal escort", "beats": [
+          ["narrator", "The Tzar has started following Mask around the battlefield, flattening anything that threatens the Pawns."],
+          ["mask", "You don't have to protect me. I'm a decoy."],
+          ["bro", "Decoys need protecting most. Everybody's aiming at you."]]},
+        "A": {"title": "Crowned", "beats": [
+          ["narrator", "Sixteen Pawns, a Tzar and a decoy commander walked into the enemy's camp like a parade."],
+          ["mask", "They surrendered to me. Me."],
+          ["bro", "Told you. Belief's available. You just had to ask."]]}
+      }
+    },
+    {
+      "a": "odessa", "b": "gale", "polarity": "friction",
+      "motifs": ["who owns the ford", "the hinge and the ducks"],
+      "talks": {
+        "C": {"title": "Parking", "beats": [
+          ["narrator", "Odessa's Telchines came up the ford and found six Cutlasses floating in it."],
+          ["odessa", "Fords are doors. You're parked in my doorway."],
+          ["gale", "Lands where nobody parks. Somebody does now."],
+          ["odessa", "Move."]]},
+        "B": {"title": "Shared water", "beats": [
+          ["gale", "You could cross under us. We float."],
+          ["odessa", "I don't cross under things. I own the hinge."],
+          ["gale", "Then we'll own the sky over your hinge. Deal?"],
+          ["odessa", "...Deal. Stay out of the middle."]]},
+        "A": {"title": "Flood door", "beats": [
+          ["narrator", "The water rose over the ford. Odessa held it from below; Gale held it from above. The enemy never found a way across."],
+          ["odessa", "My door. Your sky."],
+          ["gale", "Our river."]]}
+      }
+    }
+  ]
+}
