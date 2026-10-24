@@ -4850,6 +4850,9 @@ function tryRecruitFieldHero(rec, unitID, reason)
   claimFieldFactoriesForHero(rec.id, rx, rz)
   resolveHeroDownObjective(rec, "recruited")
   broadcastHeroEvent("recruited", rec, rx, rz)
+  if mission and mission.objective and tostring(mission.objective.rezHeroId or "") == tostring(rec.id) then
+    onObjectiveComplete("rescued")
+  end
   Spring.Echo("VA_FIELD_RECRUITED id=" .. tostring(rec.id)
     .. " unit=" .. tostring(unitID)
     .. " reason=" .. tostring(rec.recruitReason))
@@ -5266,6 +5269,9 @@ end
 
 function onObjectiveComplete(how)
   if objectiveComplete then return end
+  -- A wreck in the wound makes raising that hero the job; nothing else stands in for it.
+  local rezHero = mission and mission.objective and mission.objective.rezHeroId
+  if rezHero and how ~= "rescued" then return end
   objectiveComplete = true
   objectiveCompleteHow = how or "complete"
   objectiveCompleteFrame = Spring.GetGameFrame() or 0

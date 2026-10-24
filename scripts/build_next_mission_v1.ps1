@@ -3423,6 +3423,21 @@ if ($state -and $state.PSObject.Properties["fieldPool"] -and $state.fieldPool) {
     $fieldRecruits += $entry
   }
 }
+# A wreck waiting in the wound is the job: raise that hero and the objective is done.
+function Get-RezObjective($Recruits, $WoundZoneIds) {
+  $wound = @(@($WoundZoneIds) | Where-Object { $_ } | ForEach-Object { [string]$_ })
+  foreach ($fr in @($Recruits)) {
+    if ($fr -and $fr.zoneId -and $fr.spawnAsWreck -and ($wound -contains [string]$fr.zoneId)) { return $fr }
+  }
+  return $null
+}
+$rezObjective = Get-RezObjective $fieldRecruits (@($hubCaptureIds) + @($targetZoneId))
+if ($rezObjective) {
+  $description = "Raise {0} from the wreck in the wound and bring them home." -f $rezObjective.heroName
+  Write-Host ("Rez objective: {0}@{1}" -f $rezObjective.heroId, $rezObjective.zoneId)
+  $missionCard["objective"] = "{0} lies wrecked in the wound. Raise them with a rez bot or constructor: that is the job. Then extract." -f $rezObjective.heroName
+  $missionCard["plainObjective"] = $description
+}
 if ($fieldRecruits.Count -gt 0) {
   Write-Host ("Field recruits on {0}: {1} (marks={2})" -f $intent.mapId, `
     (($fieldRecruits | ForEach-Object { "{0}@{1} b={2}" -f $_.heroId, $_.zoneId, $_.beliefScore }) -join ", "), `
@@ -3491,6 +3506,8 @@ $scenario = [ordered]@{
       requiredFrames = $requiredFrames
       description = $description
       targetZoneId = $targetZoneId
+      # A field recruit lying in the wound: rezzing them is the objective (game_verdance_campaign.lua).
+      rezHeroId = $(if ($rezObjective) { [string]$rezObjective.heroId } else { $null })
       extractionZoneId = $intent.extractionZoneId
       captureZoneIds = @($hubCaptureIds)
       secondaryCaptureZoneIds = @($hubSecondaryIds)

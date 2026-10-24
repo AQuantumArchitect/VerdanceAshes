@@ -5,7 +5,8 @@ and launches as soon as the sortie is chosen, with every pack the company could 
 the mission, and the game sits loaded and paused with nothing of ours on the field. When the player
 presses Drop, the kernel writes the final roster to a small file in BAR's data folder; the
 Verdance hot-drop widget reads it, hands it to the campaign gadget (which spawns those packs on the
-pad), and unpauses. The load (about 40 seconds) happens while the player reads and chooses.
+pad) and leaves the field paused: the fight starts when the player switches over and unpauses.
+The load (about 40 seconds) happens while the player reads and chooses.
 
     outbox/hot_drop.json                       the armed token; the mission builder copies it into
                                                the mission (mission.hotDrop.token)
@@ -131,19 +132,18 @@ def keep_behind(pid: int, until: threading.Event, seconds: float = 120.0) -> thr
     return t
 
 
-def bring_forward(pid: int) -> bool:
-    """Restore the engine window and give it the foreground for the drop."""
+def wake_behind(pid: int) -> bool:
+    """Un-minimize the engine window without taking the foreground, and park it under the hub:
+    BAR draws again (so it reads the drop file at once) while the hub keeps the screen. The
+    company lands paused; the player switches over and unpauses when ready."""
     if sys.platform != "win32":
         return False
     user32 = ctypes.windll.user32
     ok = False
     for hwnd in _windows_of(pid):
-        user32.ShowWindow(hwnd, 9)                                   # SW_RESTORE
-        # Windows only lets the foreground process hand the foreground away; a tapped Alt
-        # counts as input from us and lifts that lock.
-        user32.keybd_event(0x12, 0, 0, 0)
-        user32.keybd_event(0x12, 0, 2, 0)
-        ok = bool(user32.SetForegroundWindow(hwnd)) or ok
+        user32.ShowWindow(hwnd, 4)                                   # SW_SHOWNOACTIVATE
+        # HWND_BOTTOM, with SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE
+        ok = bool(user32.SetWindowPos(hwnd, 1, 0, 0, 0, 0, 0x0001 | 0x0002 | 0x0010)) or ok
     return ok
 
 

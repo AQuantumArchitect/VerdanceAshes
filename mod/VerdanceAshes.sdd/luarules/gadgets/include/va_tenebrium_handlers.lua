@@ -275,8 +275,9 @@ return function(tenebLoot, api)
     if not x or not z or amount <= 0 then return nil end
     y = y or (Spring.GetGroundHeight and Spring.GetGroundHeight(x, z)) or 0
     local candidates = {
-      "pilha_crystal1", "pilha_crystal_violet1", "pilha_crystal_blue1",
-      "pilha_crystal_teal1", "armmex_dead", "cormex_dead", "legmex_dead",
+      -- the size-2 crystals: big enough to spot (the size-1 ones vanished into the grass)
+      "pilha_crystal2", "pilha_crystal_violet2", "pilha_crystal_blue2",
+      "pilha_crystal_teal2", "armmex_dead", "cormex_dead", "legmex_dead",
     }
     if not FeatureDefNames then return nil end
     for i = 1, #candidates do
@@ -286,9 +287,7 @@ return function(tenebLoot, api)
         if fid then
           tenebLoot.tagFeature(fid, amount, fromUnit)
           if Spring.SetFeatureResources then
-            local m = select(1, Spring.GetFeatureResources(fid)) or 10
-            local e = select(2, Spring.GetFeatureResources(fid)) or 0
-            pcall(Spring.SetFeatureResources, fid, math.max(m, 30), e)
+            pcall(Spring.SetFeatureResources, fid, 30, 100)   -- the reclaim a small crystal gave
           end
           return fid
         end

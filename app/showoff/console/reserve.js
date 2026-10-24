@@ -38,7 +38,7 @@ export function renderReserve(locked) {
   }).join("");
   host.innerHTML =
     `<div class="drop-squad-kicker">The reserve · lift <b>${Math.round(used)}</b> / ${cap}` +
-    `<span class="rv-note"> · grows ${s.perSortie} with each sortie brought home</span>` +
+    `<span class="rv-note"> · grows ${s.perSortie} with each successful sortie</span>` +
     (locked ? "" : ` <button type="button" class="btn-ghost rv-suggest" data-rv-suggest="1">Suggested</button>`) + `</div>` +
     `<div class="rv-meter"><i style="width:${cap ? Math.min(100, used / cap * 100).toFixed(1) : 0}%"></i></div>` +
     `<div class="rv-list">${rows}</div>`;

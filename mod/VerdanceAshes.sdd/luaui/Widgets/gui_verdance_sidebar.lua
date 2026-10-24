@@ -128,9 +128,13 @@ local function pollHeroes()
       end
     end
   end
+  -- The company is who dropped: a pack compiled into the field but left on the hub (the hot drop
+  -- builds every candidate in) never shows up live, so it is not on the rail.
+  local dropped = {}
   for _, rec in ipairs(list) do
-    if rec.state == "unknown" then rec.state = "absent" end
+    if rec.state ~= "unknown" then dropped[#dropped + 1] = rec else byId[rec.id] = nil end
   end
+  list = dropped
   -- critical first, then alive on pad last so the ones you must fetch sit on top
   table.sort(list, function(a, b)
     local function rank(r) return (r.state == "down" and 0) or (r.state == "alive" and not r.onPad and 1) or (r.state == "alive" and 2) or 3 end
@@ -505,7 +509,6 @@ local function heroStateLabel(rec)
   local G = Ash.GLYPH
   if rec.state == "down" then return G.down .. " down", Ash.COL.bad end
   if rec.state == "lost" then return G.failed .. " lost", Ash.COL.muted end
-  if rec.state == "absent" then return "— not landed", Ash.COL.muted end
   if rec.onPad then return G.onPad .. " on pad", Ash.COL.steam end
   local where = rec.dist and fmtDist(rec.dist) or ""
   return G.offPad .. " " .. where, (rec.dist and rec.dist > 1200) and Ash.COL.warn or Ash.COL.ink
@@ -522,7 +525,7 @@ local function drawCompany(x, y, right)
   for _, rec in ipairs(H.list) do
     local y1, y2 = y - rowH, y
     local strip = rec.crit and Ash.COL.gold or Ash.COL.edge
-    if rec.state == "down" then strip = Ash.COL.bad elseif rec.state == "lost" or rec.state == "absent" then strip = Ash.COL.muted end
+    if rec.state == "down" then strip = Ash.COL.bad elseif rec.state == "lost" then strip = Ash.COL.muted end
     Ash.rect(x, y1 + 2, right, y2 - 2, Ash.with(Ash.COL.bg, 0.55))
     Ash.rect(x, y1 + 2, x + 3, y2 - 2, Ash.with(strip, 0.95))
     local nameCol = (rec.state == "alive") and Ash.COL.ink or Ash.COL.muted

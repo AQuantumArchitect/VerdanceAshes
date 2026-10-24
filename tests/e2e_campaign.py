@@ -196,7 +196,11 @@ def main() -> int:
         check("seen zone observed into belief (current, eta 0.8)", bool(rows) and rows[0].get("state") == "current" and abs(float(rows[0].get("eta") or 0) - 0.8) < 0.05, json.dumps(rows[:1])[:200])
     hs2 = json.loads(hs_path.read_text(encoding="utf-8-sig"))
     lr = hs2.get("lastResult") or {}
-    check("hub shows the reserve and the lift limit", bool((hs2.get("reserve") or {}).get("liftCap")) and any(u.get("unitDef") == "corthud" for u in (hs2.get("reserve") or {}).get("units") or []))
+    rsv = hs2.get("reserve") or {}
+    # the lift starts at nothing and grows 1k per successful sortie (victory / extracted)
+    check("hub shows the reserve and the lift limit",
+          rsv.get("liftCap") == 1000 * int(rsv.get("sortiesHome") or 0) and any(u.get("unitDef") == "corthud" for u in rsv.get("units") or []),
+          json.dumps({k: rsv.get(k) for k in ("liftCap", "sortiesHome", "base", "perSortie")}))
     check("hub lastResult has the manifest and a verdict word", isinstance(lr.get("manifest"), dict) and bool(lr.get("verdict")))
     aces = {a["id"]: a for a in hs2.get("aces") or []}
     check("left hero not deployable on the hub", bool(left) and aces.get(left[0], {}).get("deployable") is False)

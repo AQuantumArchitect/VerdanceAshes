@@ -16,8 +16,9 @@ from typing import Any, Dict, Optional
 
 from verdance.common import WORKSPACE_ROOT
 
-LIFT_BASE = 3000.0        # a Javelin pair's worth on the first drop
-LIFT_PER_SORTIE = 1500.0  # each sortie brought home carries more
+LIFT_BASE = 0.0           # the first drop is the packs alone
+LIFT_PER_SORTIE = 1000.0  # each successful sortie carries 1k metal more
+SUCCESS = ("victory", "extracted")
 _COSTS: Dict[str, Any] = {}
 
 
@@ -59,8 +60,7 @@ def sorties_home(state: Dict[str, Any]) -> int:
     for b in state.get("history") or []:
         if not isinstance(b, dict):
             continue
-        verdict = str(b.get("verdict") or "").lower()
-        if verdict and verdict not in ("defeat", "abandon", "incomplete", "wiped"):
+        if str(b.get("verdict") or "").lower() in SUCCESS:
             n += 1
     return n
 

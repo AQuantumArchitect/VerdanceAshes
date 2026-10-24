@@ -109,6 +109,10 @@ local function step(n) for _ = 1, n do widget:Update(0.25); widget:DrawScreen() 
 step(4)
 out.heldPause = PAUSED
 out.sentEarly = #SENT
+-- the sim ticks with the window minimized (no Update): GameFrame holds the pause too
+PAUSED = false
+widget:GameFrame(1)
+out.frameHeld = PAUSED
 -- a drop file from another game
 local f = realOpen(DROPPATH, "w"); f:write("old999|vane|\n"); f:close()
 step(4)
@@ -118,11 +122,16 @@ f = realOpen(DROPPATH, "w"); f:write("abc123|pavise,halbard|corthud:3\n"); f:clo
 step(4)
 out.sent = SENT[1]
 out.stillPausedAfterSend = PAUSED
--- the gadget lands them
+-- the gadget lands them: the field stays paused, the panel says so
 RULES.va_hotdrop_pending = 0
-step(1)
-out.unpaused = not PAUSED
+step(3)
+out.pausedOnPad = PAUSED
 out.camera = CAMERA
+out.removedEarly = REMOVED
+-- the player unpauses: the widget steps aside
+PAUSED = false
+step(1)
+out.playerUnpaused = not PAUSED
 out.removed = REMOVED
 return enc(out)
 ''' % (json.dumps(DROP), json.dumps(WIDGET))
@@ -147,7 +156,10 @@ w = run(WIDGET_RUN)
 check("the widget holds the pause while the field waits", w["heldPause"] is True and w["sentEarly"] == 0, w)
 check("it ignores a drop file from another game", w["sentStale"] == 0, w)
 check("it sends the real drop to the gadget", w.get("sent") == "VA_CMD:vahotdrop abc123|pavise,halbard|corthud:3", w)
-check("once the company is down it unpauses on the pad and steps aside",
-      w["unpaused"] is True and w["camera"] == [1200, 3400] and w["removed"] is True, w)
+check("once the company is down the field stays paused on the pad",
+      w["pausedOnPad"] is True and w["camera"] == [1200, 3400] and w["removedEarly"] is False, w)
+check("the pause holds from GameFrame (a minimized window still ticks the sim)", w["frameHeld"] is True, w)
+check("the player's unpause starts the fight and the widget steps aside",
+      w["playerUnpaused"] is True and w["removed"] is True, w)
 print("HOT DROP " + ("PASSED" if ok else "FAILED"))
 sys.exit(0 if ok else 1)

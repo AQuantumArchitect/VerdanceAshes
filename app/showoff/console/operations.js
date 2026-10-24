@@ -156,7 +156,7 @@ function paintWarmStatus(text) {
     phase === "loading" ? `Loading ${prettyMap((state.plan || {}).mapId)} in Beyond All Reason behind this screen. Pick who goes; Drop wakes when the field is ready.`
     : phase === "ready" ? "The field is loaded and paused, the enemy in place. Your company lands the moment you drop."
     : phase === "dropping" ? "Dropping… the company is landing on the pad."
-    : phase === "up" ? "The company is in the field. Beyond All Reason has the fight."
+    : phase === "up" ? "The company is down on the pad, the field paused. Switch to Beyond All Reason and unpause when you are ready."
     : phase === "failed" ? "The field did not load. Adjust the route and try again."
     : "Launch loads the field now. You pick who goes while it loads."
   );
@@ -335,8 +335,11 @@ async function dropCompany() {
     state.hub.lastResult = { kind: "deploy_committed", at: new Date().toISOString() };
     renderBadges();
     logLine(`Dropped ${(data.crewBand || []).length} pack${(data.crewBand || []).length === 1 ? "" : "s"} into ${prettyMap((state.plan || {}).mapId)}.`);
-    setWarm("up", data.broughtForward ? "The company is landing. Beyond All Reason is in front." : "The company is landing. Switch to Beyond All Reason.");
+    setWarm("up");
+    toast("The company is down and the field is paused. Switch to Beyond All Reason and unpause when ready.", "ok");
     pollWarm();
+    // The sheet has said its piece: back to the hub menu after a beat.
+    setTimeout(() => { if (state.warm.phase === "up") hideDropConfirm(); }, 2000);
   } catch (e) {
     toast("Wire error: " + e.message, "err");
     setWarm("ready", "Wire error: " + e.message);

@@ -3,7 +3,7 @@ function widget:GetInfo()
   return {
     name    = "Verdance Hot Drop",
     desc    = "Waits with the field loaded and paused until the hub's Drop, then sends the chosen "
-           .. "company in and starts the fight.",
+           .. "company in and leaves the field paused until the player unpauses.",
     author  = "Verdance",
     date    = "2026",
     license = "GNU GPL, v2 or later",
@@ -19,7 +19,10 @@ end
 -- LuaUI/Config/verdance/drop.txt:
 --   token|pack,pack|unitdef:n,unitdef:n
 -- This widget reads it, checks the token against the mission's (va_hotdrop_token, so a file left
--- from an earlier game drops nobody), hands it to the gadget, and unpauses once the company is in.
+-- from an earlier game drops nobody) and hands it to the gadget. The company lands paused: the
+-- fight starts when the player unpauses, so a minimized window never misses the opening.
+-- The pause is held from GameFrame as well as Update: the sim keeps ticking when the window is
+-- minimized even if drawing does not.
 --------------------------------------------------------------------------------
 
 local DROP_FILE = "LuaUI/Config/verdance/drop.txt"
@@ -35,7 +38,8 @@ end
 local sent = false
 local sentAt = 0
 local nudged = false
-local landed = false
+local landed = false     -- the gadget has the company on the field
+local heldDown = false   -- ...and the pause has taken since: the next unpause is the player's
 local since = 0
 local clock = 0
 
@@ -44,6 +48,10 @@ local function paused()
   if Spring.IsGamePaused then return Spring.IsGamePaused() == true end
   local _, _, p = Spring.GetGameSpeed()
   return p == true
+end
+
+local function holdPause()
+  if not paused() then Spring.SendCommands("pause 1") end
 end
 
 local function readDropLine()
@@ -59,8 +67,21 @@ local function readDropLine()
   return body and body:match("^%s*(.-)%s*$") or nil
 end
 
+function widget:GameStart()
+  if pending() then holdPause() end
+end
+
+function widget:GameFrame()
+  if (pending() and not (sent and nudged)) or (landed and not heldDown) then holdPause() end
+end
+
 function widget:Update(dt)
-  if landed then return end
+  if landed then
+    if paused() then heldDown = true
+    elseif heldDown then widgetHandler:RemoveWidget(self)   -- the player unpaused: the fight is on
+    else holdPause() end
+    return
+  end
   clock = clock + (dt or 0)
   if sent then
     -- If the engine waits for a sim frame to deliver the message, give it one.
@@ -68,21 +89,20 @@ function widget:Update(dt)
       nudged = true
       Spring.SendCommands("pause 0")
     end
-    if not pending() then            -- the gadget has the company on the field
+    if not pending() then            -- the gadget has the company on the field: stay paused
       landed = true
+      holdPause()
       local px, pz = tonumber((Spring.GetGameRulesParam("va_pad_x"))), tonumber((Spring.GetGameRulesParam("va_pad_z")))
       if px and pz and px >= 0 and Spring.SetCameraTarget then
         Spring.SetCameraTarget(px, Spring.GetGroundHeight(px, pz) or 0, pz, 0.6)
       end
-      Spring.SendCommands("pause 0")
       Spring.Echo("VA_HOTDROP_LANDED")
-      widgetHandler:RemoveWidget(self)
     end
     return
   end
   if not pending() then return end
   -- Nothing moves until the company is down: hold the pause the start of the sortie set.
-  if not paused() then Spring.SendCommands("pause 1") end
+  holdPause()
   since = since + (dt or 0)
   if since < POLL_SECONDS then return end
   since = 0
@@ -97,11 +117,12 @@ function widget:Update(dt)
 end
 
 function widget:DrawScreen()
-  if landed or not pending() then return end
+  if not landed and not pending() then return end
   local vsx, vsy = Spring.GetViewGeometry()
-  local title = sent and "Dropping…" or "The field is ready"
-  local line = sent and "The company is landing on the pad."
-    or "Choose who goes on the hub, then press Drop. The game starts when they land."
+  local title = landed and "The company is down" or sent and "Dropping…" or "The field is ready"
+  local line = landed and "The field is paused. Unpause (Pause / Break) when you are ready to fight."
+    or sent and "The company is landing on the pad."
+    or "Choose who goes on the hub, then press Drop. The company lands with the field still paused."
   if Ash then
     local w = math.min(vsx - 40, 640)
     local x1, y1 = (vsx - w) / 2, vsy * 0.62

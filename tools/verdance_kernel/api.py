@@ -1143,9 +1143,10 @@ class CampaignKernel:
             hot["droppedAt"] = utc_now()
             if self._hot_behind is not None:
                 self._hot_behind.set()
-        forward = _hot.bring_forward(int(hot["pid"])) if hot.get("pid") else False
+        if hot.get("pid"):
+            _hot.wake_behind(int(hot["pid"]))
         return {"ok": True, "at": utc_now(), "crewBand": band, "deployAces": aces,
-                "reserveBring": dict(roster["cadre"]), "dropFile": str(path), "broughtForward": forward}
+                "reserveBring": dict(roster["cadre"]), "dropFile": str(path)}
 
     def _deploy_async(self, plan: dict[str, Any]) -> None:
         try:

@@ -1,5 +1,5 @@
 """The company's reserve: what lifts comes home (hero packs excepted), what boards leaves it,
-the lift limit holds and grows with sorties brought home."""
+the lift limit starts at nothing and grows with each successful sortie."""
 from verdance.company import reserve as R
 
 
@@ -20,11 +20,12 @@ def test_brought_units_that_did_not_lift_are_gone():
 def test_lift_limit_holds_and_grows():
     reserve = {"armart": 40, "armsh": 40}
     st = {"history": []}
+    assert R.lift_cap(st) == 0 and R.default_bring(reserve, 0) == {}
+    st["history"] = [{"verdict": "victory"}, {"verdict": "partial"}, {"verdict": "defeat"}, {"verdict": "extracted"}]
     cap = R.lift_cap(st)
+    assert cap == 2 * R.LIFT_PER_SORTIE == 2000
     bring = R.default_bring(reserve, cap)
     assert 0 < R.bring_value(bring) <= cap
-    st["history"] = [{"verdict": "victory"}, {"verdict": "partial"}, {"verdict": "defeat"}]
-    assert R.lift_cap(st) == cap + 2 * R.LIFT_PER_SORTIE
     assert R.clamp_bring({"armart": 99}, {"armart": 3}, 1e9) == {"armart": 3}
 
 

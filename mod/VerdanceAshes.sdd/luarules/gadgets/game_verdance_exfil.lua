@@ -246,6 +246,14 @@ local function enemiesOnPad()
   return n
 end
 
+-- What lifts: anything mobile on the pad, and every hero who cannot walk (Hearth's house, a
+-- turret hero) wherever they stand: the company packs a person up, it does not leave them for
+-- being a building.
+local function lifts(isHero, structure, onPad)
+  if isHero and structure then return true end
+  return onPad and not structure
+end
+
 -- The manifest is a headcount, not a judgement.
 local function manifest()
   local m = {
@@ -272,9 +280,10 @@ local function manifest()
       local hname = Spring.GetUnitRulesParam(uid, "va_hero_name")
       local onPad = onPadAt(x, z)
       local zid = zoneOf(x, z) or "?"
-      if onPad and not structure then
+      local isHero = hid and hid ~= "" and hid ~= 0
+      if lifts(isHero, structure, onPad) then
         local g = m.going
-        if hid and hid ~= "" and hid ~= 0 then
+        if isHero then
           g.heroes[#g.heroes + 1] = { heroId = tostring(hid), name = tostring(hname or hid), unitDef = ud and ud.name or "" }
         else
           g.units[ud and ud.name or "?"] = (g.units[ud and ud.name or "?"] or 0) + 1
@@ -289,9 +298,7 @@ local function manifest()
         g.metal = g.metal + metal
       else
         local s = m.staying
-        local isHero = hid and hid ~= "" and hid ~= 0
         if isHero then
-          -- a person who stays is a person in the field, even one who cannot walk (a turret hero)
           s.heroes[#s.heroes + 1] = { heroId = tostring(hid), name = tostring(hname or hid), zoneId = zid, label = zoneLabel[zid] or zid }
         elseif structure then
           local row = s.structures[zid] or { count = 0, metal = 0, label = zoneLabel[zid] or zid }
@@ -338,7 +345,10 @@ local function hudScan()
       local hid = Spring.GetUnitRulesParam(uid, "va_hero_id")
       local isHero = hid ~= nil and tostring(hid) ~= "" and tostring(hid) ~= "0"
       local onPad = onPadAt(x, z)
-      if structure then
+      if isHero and structure then
+        onPeople = onPeople + 1
+        onPad = true            -- packed up where it stands: it lifts with the company
+      elseif structure then
         offStructures = offStructures + 1
       elseif onPad then
         if isHero then onPeople = onPeople + 1 else onUnits = onUnits + 1 end
