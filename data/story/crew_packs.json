@@ -1295,6 +1295,101 @@
       "packMetal": 640,
       "packEnergy": 13000,
       "startXp": 0.362
+    },
+    "thresh": {
+      "role": "band",
+      "unitDef": "corhurc",
+      "hireTnb": 0,
+      "packTotal": 1,
+      "extras": 0,
+      "blurb": "Hailstorm heavy bomber with two Legion Ajax fighters flying cover. Weather comes from above.",
+      "name": "Dama Thresh",
+      "sizing": "fixed",
+      "tags": [
+        "siege",
+        "bomber",
+        "sky"
+      ],
+      "escorts": [
+        {
+          "unitDef": "legafigdef",
+          "count": 2
+        }
+      ],
+      "startXp": 0.377,
+      "packMetal": 670,
+      "packEnergy": 30900,
+      "packCombined": 1111,
+      "packXpCombined": 741
+    },
+    "gale": {
+      "role": "band",
+      "unitDef": "corcut",
+      "hireTnb": 0,
+      "packTotal": 6,
+      "extras": 5,
+      "blurb": "Cutlass seaplane wing (x6). Parks on rivers, lakes and flooded basins. Lands where nobody parks.",
+      "name": "Marrow Gale",
+      "sizing": "leadFill",
+      "tags": [
+        "skirmish",
+        "gunship",
+        "sky",
+        "amph"
+      ],
+      "startXp": 0.295,
+      "massBand": "mid",
+      "massTarget": 2064,
+      "packMetal": 1380,
+      "packEnergy": 32400,
+      "packCombined": 1843,
+      "packXpCombined": 1229
+    },
+    "mask": {
+      "role": "band",
+      "unitDef": "armdecom",
+      "hireTnb": 0,
+      "packTotal": 1,
+      "extras": 0,
+      "blurb": "Decoy Commander and a pack of Pawns (x16). Can capture what walks too close. Every throne needs a spare.",
+      "name": "Mask",
+      "sizing": "fixed",
+      "tags": [
+        "line",
+        "decoy",
+        "captain",
+        "capture"
+      ],
+      "escorts": [
+        {
+          "unitDef": "armpw",
+          "count": 16
+        }
+      ],
+      "startXp": 0.165,
+      "packMetal": 1634,
+      "packEnergy": 26400,
+      "packCombined": 2011
+    },
+    "rumor": {
+      "role": "band",
+      "unitDef": "va_ghost",
+      "hireTnb": 0,
+      "packTotal": 2,
+      "extras": 1,
+      "blurb": "Two Ghost spy bots, cloaked, that walk up to enemy units and turn them. Everything changes sides eventually.",
+      "name": "Rumor",
+      "sizing": "fixed",
+      "tags": [
+        "eyes",
+        "spy",
+        "capture",
+        "fog"
+      ],
+      "startXp": 0.413,
+      "packMetal": 270,
+      "packEnergy": 17600,
+      "packCombined": 521
     }
   },
   "factories": {

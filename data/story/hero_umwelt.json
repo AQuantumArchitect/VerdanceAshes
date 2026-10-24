@@ -1300,6 +1300,154 @@
       "glyph": "+mob·+sig·+fog·−pad",
       "position": "eyes",
       "doctrine": "eyes"
+    },
+    {
+      "heroId": "thresh",
+      "name": "Dama Thresh",
+      "axes": {
+        "energy": 0.0,
+        "offense": 1.0,
+        "mobility": 0.6,
+        "sight": 0.0,
+        "pad": -0.6,
+        "craft": 0.0,
+        "heat": 0.6,
+        "fog": 0.0,
+        "sky": 1.0,
+        "ledger": 0.0
+      },
+      "marks": [
+        {
+          "axis": "offense",
+          "value": 1.0
+        },
+        {
+          "axis": "sky",
+          "value": 1.0
+        },
+        {
+          "axis": "mobility",
+          "value": 0.6
+        },
+        {
+          "axis": "pad",
+          "value": -0.6
+        }
+      ],
+      "glyph": "+off·+sky·+mob·−pad",
+      "position": "siege",
+      "doctrine": "sky_siege"
+    },
+    {
+      "heroId": "gale",
+      "name": "Marrow Gale",
+      "axes": {
+        "energy": 0.0,
+        "offense": 0.5,
+        "mobility": 1.0,
+        "sight": 0.0,
+        "pad": -0.6,
+        "craft": 0.0,
+        "heat": 0.0,
+        "fog": 0.2,
+        "sky": 0.5,
+        "ledger": 0.0
+      },
+      "marks": [
+        {
+          "axis": "mobility",
+          "value": 1.0
+        },
+        {
+          "axis": "pad",
+          "value": -0.6
+        },
+        {
+          "axis": "offense",
+          "value": 0.5
+        },
+        {
+          "axis": "sky",
+          "value": 0.5
+        }
+      ],
+      "glyph": "+mob·−pad·+off·+sky",
+      "position": "skirmish",
+      "doctrine": "skirm"
+    },
+    {
+      "heroId": "mask",
+      "name": "Mask",
+      "axes": {
+        "energy": 0.0,
+        "offense": 0.4,
+        "mobility": 0.0,
+        "sight": 0.0,
+        "pad": 0.5,
+        "craft": 0.6,
+        "heat": 0.0,
+        "fog": 0.5,
+        "sky": 0.0,
+        "ledger": 0.3
+      },
+      "marks": [
+        {
+          "axis": "craft",
+          "value": 0.6
+        },
+        {
+          "axis": "pad",
+          "value": 0.5
+        },
+        {
+          "axis": "fog",
+          "value": 0.5
+        },
+        {
+          "axis": "offense",
+          "value": 0.4
+        }
+      ],
+      "glyph": "+cra·+pad·+fog·+off",
+      "position": "line",
+      "doctrine": "decoy"
+    },
+    {
+      "heroId": "rumor",
+      "name": "Rumor",
+      "axes": {
+        "energy": 0.0,
+        "offense": -0.4,
+        "mobility": 0.0,
+        "sight": 0.5,
+        "pad": -0.5,
+        "craft": 0.6,
+        "heat": 0.0,
+        "fog": 1.0,
+        "sky": 0.0,
+        "ledger": 0.0
+      },
+      "marks": [
+        {
+          "axis": "fog",
+          "value": 1.0
+        },
+        {
+          "axis": "craft",
+          "value": 0.6
+        },
+        {
+          "axis": "sight",
+          "value": 0.5
+        },
+        {
+          "axis": "pad",
+          "value": -0.5
+        }
+      ],
+      "glyph": "+fog·+cra·+sig·−pad",
+      "position": "eyes",
+      "doctrine": "eyes"
     }
   ]
 }

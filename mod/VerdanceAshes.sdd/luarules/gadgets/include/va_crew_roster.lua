@@ -588,6 +588,66 @@ M.HEROES = {
     packMind = "solo",
     blurb = "Drives the Cortex Halberd assault hovertank.",
   },
+  thresh = {
+    name = "Dama Thresh",
+    role = "band",
+    unitDef = "corhurc",
+    hireTnb = 0,
+    packTotal = 1,
+    extras = 0,
+    startXp = 0.377,
+    packMind = "solo",
+    tags = { "siege", "bomber", "sky" },
+    escorts = {
+      {
+        unitDef = "legafigdef",
+        count = 2,
+      },
+    },
+    blurb = "Hailstorm heavy bomber with two Legion Ajax fighters flying cover. Weather comes from above.",
+  },
+  gale = {
+    name = "Marrow Gale",
+    role = "band",
+    unitDef = "corcut",
+    hireTnb = 0,
+    packTotal = 6,
+    extras = 5,
+    startXp = 0.295,
+    packMind = "solo",
+    tags = { "skirmish", "gunship", "sky", "amph" },
+    blurb = "Cutlass seaplane wing (x6). Parks on rivers, lakes and flooded basins. Lands where nobody parks.",
+  },
+  mask = {
+    name = "Mask",
+    role = "band",
+    unitDef = "armdecom",
+    hireTnb = 0,
+    packTotal = 1,
+    extras = 0,
+    startXp = 0.165,
+    packMind = "solo",
+    tags = { "line", "decoy", "captain", "capture" },
+    escorts = {
+      {
+        unitDef = "armpw",
+        count = 16,
+      },
+    },
+    blurb = "Decoy Commander and a pack of Pawns (x16). Can capture what walks too close. Every throne needs a spare.",
+  },
+  rumor = {
+    name = "Rumor",
+    role = "band",
+    unitDef = "va_ghost",
+    hireTnb = 0,
+    packTotal = 2,
+    extras = 1,
+    startXp = 0.413,
+    packMind = "solo",
+    tags = { "eyes", "spy", "capture", "fog" },
+    blurb = "Two Ghost spy bots, cloaked, that walk up to enemy units and turn them. Everything changes sides eventually.",
+  },
 }
 
 M.FACTORIES = {
@@ -629,10 +689,10 @@ M.MENTOR_PRODUCTS = {
 
 M.BAND_ORDER = {
   "pavise", "vane", "halbard", "hearth", "twitch", "consul", "solarium", "spoke", "tick",
-  "noctua", "veil", "odessa", "cauter", "grath", "rusk", "halq", "verse",
-  "stride", "yeva", "auditor", "mira", "brakhov", "bro", "fatboy", "kettle",
-  "warder", "commando", "infestor", "quill", "kit", "vale", "nox", "ceil",
-  "lumen", "anvil", "volt",
+  "noctua", "veil", "odessa", "cauter", "grath", "rusk", "halq", "verse", "stride",
+  "yeva", "auditor", "mira", "brakhov", "bro", "fatboy", "kettle", "warder", "commando",
+  "infestor", "quill", "kit", "vale", "nox", "ceil", "lumen", "anvil", "volt",
+  "thresh", "gale", "mask", "rumor",
 }
 
 function M.isCore(heroId)

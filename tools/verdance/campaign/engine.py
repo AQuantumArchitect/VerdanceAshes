@@ -116,7 +116,7 @@ from verdance.company.company import (
     apply_field_recruits_from_result,
 )
 from verdance.company.capture_node_claims import apply_node_claim, is_capture_result
-from verdance.company import attachments as _att
+from verdance.company import attachments as _att, synergy as _synergy
 from verdance.world import (
     world_tick as _wt,
     offscreen_clash as _clash,
@@ -477,6 +477,9 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
         intent["theater"] = theater
         if theater.get("kind") == "kings_showdown":
             _theaters.solo_command(intent)
+    # Bonds that are worth something on the field: rank-B XP, rank-A gifts. The gadget applies a
+    # row only when both heroes of the pair actually drop.
+    intent.update(_synergy.bond_perks(state, [h.get("heroId") for h in (intent.get("roster") or {}).get("heroes") or []], workspace))
     intent["operationSummary"] = operation_summary({
         "id": intent.get("hubChoiceId") or intent.get("missionId"),
         "label": intent.get("title") or "Company operation",

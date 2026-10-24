@@ -2867,6 +2867,36 @@ function VA_FIELD_spawnRecruits(enemyTeam)
   return spawned
 end
 
+-- Bonds worth something on the field (verdance.company.synergy, on the mission): rank-B XP and a
+-- rank-A pair's gift, a unit neither pack already has. A row counts only when both heroes of the
+-- pair are on this drop.
+function VA_BOND_apply(present, baseX, baseZ, dx0)
+  local here = {}
+  for _, id in ipairs(present or {}) do here[tostring(id)] = true end
+  for _, row in ipairs((mission and mission.bondXp) or {}) do
+    if here[tostring(row.a)] and here[tostring(row.b)] then
+      for _, hid in ipairs({ tostring(row.a), tostring(row.b) }) do
+        local uid = heroes[hid] and heroes[hid].unitID
+        if uid and Spring.ValidUnitID(uid) and Spring.GetUnitExperience and Spring.SetUnitExperience then
+          Spring.SetUnitExperience(uid, (Spring.GetUnitExperience(uid) or 0) + (tonumber(row.xp) or 0))
+        end
+      end
+      Spring.Echo("VA_BOND_XP pair=" .. tostring(row.a) .. "__" .. tostring(row.b) .. " rank=" .. tostring(row.rank) .. " xp=" .. tostring(row.xp))
+    end
+  end
+  local spawned = 0
+  for gi, g in ipairs((mission and mission.bondGifts) or {}) do
+    local def = tostring(g.unitDef or "")
+    if here[tostring(g.a)] and here[tostring(g.b)] and def ~= "" and UnitDefNames and UnitDefNames[def] then
+      spawned = spawned + spawnUnitSpec({ unitDefName = def, count = tonumber(g.count) or 1, dx = (dx0 or 0) + (gi - 1) * 160,
+        dz = 260, spacing = 90, packageTag = "bond_gift_" .. tostring(g.a) .. "__" .. tostring(g.b) },
+        playerTeamID, baseX, baseZ, 0, 0, {}, { role = "player_crew" })
+      Spring.Echo("VA_BOND_GIFT pair=" .. tostring(g.a) .. "__" .. tostring(g.b) .. " def=" .. def .. " n=" .. tostring(g.count))
+    end
+  end
+  return spawned
+end
+
 function VA_CREW_confirm(selectedIds)
   local cs = VA_CREW_SELECT
   if cs.confirmed then
@@ -2916,6 +2946,12 @@ function VA_CREW_confirm(selectedIds)
   end
   for i, id in ipairs(picks) do
     total = total + VA_CREW_spawnHeroPack(id, baseX, baseZ, 400 + (i - 1) * 220)
+  end
+  do
+    local present = {}
+    for _, id in ipairs(roster.CORE or {}) do present[#present + 1] = id end
+    for _, id in ipairs(picks) do present[#present + 1] = id end
+    total = total + VA_BOND_apply(present, baseX, baseZ, 400 + #picks * 220)
   end
   -- No free pad M/E storage — Solarium (and bought eco) own that seat.
   -- Mission-only call-ins (Bro's Tzar, etc.) — not permanent company seats.

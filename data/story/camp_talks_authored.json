@@ -12,14 +12,36 @@
       "polarity": "bond",
       "motif": "captain and unfinished sentences",
       "generated": false,
-      "unlock": { "coDeploy": 1, "campLevelMin": 0, "bondMin": 0 },
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
       "beats": [
-        { "speaker": "narrator", "line": "Embers. Two cups. The pack sleeps in a ring outside the shelf." },
-        { "speaker": "vane", "line": "If I fall mid-stride, finish the sentence." },
-        { "speaker": "ketha", "line": "I don't finish sentences. I haul the body that still owes one." },
-        { "speaker": "vane", "line": "Pack is one thought." },
-        { "speaker": "ketha", "line": "Then keep thinking. I'm expensive to replace." },
-        { "speaker": "narrator", "line": "Neither smiles. The hearth does it for them." }
+        {
+          "speaker": "narrator",
+          "line": "Embers. Two cups. The pack sleeps in a ring outside the shelf."
+        },
+        {
+          "speaker": "vane",
+          "line": "If I fall mid-stride, finish the sentence."
+        },
+        {
+          "speaker": "ketha",
+          "line": "I don't finish sentences. I haul the body that still owes one."
+        },
+        {
+          "speaker": "vane",
+          "line": "Pack is one thought."
+        },
+        {
+          "speaker": "ketha",
+          "line": "Then keep thinking. I'm expensive to replace."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Neither smiles. The hearth does it for them."
+        }
       ]
     },
     {
@@ -32,14 +54,36 @@
       "polarity": "bond",
       "motif": "captain and unfinished sentences",
       "generated": false,
-      "unlock": { "coDeploy": 2, "campLevelMin": 1, "bondMin": 25 },
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
       "beats": [
-        { "speaker": "narrator", "line": "Rain on the shelf. Phobos ghosts drip oil into the mud." },
-        { "speaker": "ketha", "line": "You keep spending the pack like verbs." },
-        { "speaker": "vane", "line": "They're the only grammar I trust." },
-        { "speaker": "ketha", "line": "Trust me with the wrecks, then. Don't make me invent your last word." },
-        { "speaker": "vane", "line": "…Stay close on the next Drop." },
-        { "speaker": "narrator", "line": "Support thickens. The company notices without naming it." }
+        {
+          "speaker": "narrator",
+          "line": "Rain on the shelf. Phobos ghosts drip oil into the mud."
+        },
+        {
+          "speaker": "ketha",
+          "line": "You keep spending the pack like verbs."
+        },
+        {
+          "speaker": "vane",
+          "line": "They're the only grammar I trust."
+        },
+        {
+          "speaker": "ketha",
+          "line": "Trust me with the wrecks, then. Don't make me invent your last word."
+        },
+        {
+          "speaker": "vane",
+          "line": "…Stay close on the next Drop."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Support thickens. The company notices without naming it."
+        }
       ]
     },
     {
@@ -52,14 +96,36 @@
       "polarity": "bond",
       "motif": "fireworks need a clear sky",
       "generated": false,
-      "unlock": { "coDeploy": 1, "campLevelMin": 0, "bondMin": 0 },
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
       "beats": [
-        { "speaker": "narrator", "line": "Mira has glitter on her gauntlet. Kettle has a sky map on his." },
-        { "speaker": "mira", "line": "If I paint the ridge pink, will you scold the clouds?" },
-        { "speaker": "kettle", "line": "I scold anything with wings. You just make it holy work." },
-        { "speaker": "mira", "line": "Napalm is confetti." },
-        { "speaker": "kettle", "line": "Then I'll keep your ceiling honest so the party doesn't die mid-cheer." },
-        { "speaker": "narrator", "line": "Joy and saint — a ridiculous, necessary pair." }
+        {
+          "speaker": "narrator",
+          "line": "Mira has glitter on her gauntlet. Kettle has a sky map on his."
+        },
+        {
+          "speaker": "mira",
+          "line": "If I paint the ridge pink, will you scold the clouds?"
+        },
+        {
+          "speaker": "kettle",
+          "line": "I scold anything with wings. You just make it holy work."
+        },
+        {
+          "speaker": "mira",
+          "line": "Napalm is confetti."
+        },
+        {
+          "speaker": "kettle",
+          "line": "Then I'll keep your ceiling honest so the party doesn't die mid-cheer."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Joy and saint — a ridiculous, necessary pair."
+        }
       ]
     },
     {
@@ -72,14 +138,36 @@
       "polarity": "rivalry",
       "motif": "roast vs soft invoice",
       "generated": false,
-      "unlock": { "coDeploy": 1, "campLevelMin": 0, "bondMin": 0 },
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
       "beats": [
-        { "speaker": "narrator", "line": "One smells like slag. The other like cooled oil and paperwork." },
-        { "speaker": "brakhov", "line": "Name gone. Forward heat." },
-        { "speaker": "vale", "line": "The wall never saw the invoice. Yours always does. That's the problem." },
-        { "speaker": "brakhov", "line": "Walls are food." },
-        { "speaker": "vale", "line": "Walls are clients. You eat the contract before it's signed." },
-        { "speaker": "narrator", "line": "Same wall. Different religion. The hearth records both heresies." }
+        {
+          "speaker": "narrator",
+          "line": "One smells like slag. The other like cooled oil and paperwork."
+        },
+        {
+          "speaker": "brakhov",
+          "line": "Name gone. Forward heat."
+        },
+        {
+          "speaker": "vale",
+          "line": "The wall never saw the invoice. Yours always does. That's the problem."
+        },
+        {
+          "speaker": "brakhov",
+          "line": "Walls are food."
+        },
+        {
+          "speaker": "vale",
+          "line": "Walls are clients. You eat the contract before it's signed."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Same wall. Different religion. The hearth records both heresies."
+        }
       ]
     },
     {
@@ -92,14 +180,36 @@
       "polarity": "rivalry",
       "motif": "roast vs soft invoice",
       "generated": false,
-      "unlock": { "coDeploy": 2, "campLevelMin": 1, "bondMin": 25 },
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
       "beats": [
-        { "speaker": "narrator", "line": "After a Drop where both arrived late to the same ruin." },
-        { "speaker": "vale", "line": "You roasted the jammer. My rockets had nothing quiet left to kill." },
-        { "speaker": "brakhov", "line": "Then walk faster. Or stay fog." },
-        { "speaker": "vale", "line": "Or you learn to leave one hinge standing so I can invoice it." },
-        { "speaker": "brakhov", "line": "…One hinge. Not two." },
-        { "speaker": "narrator", "line": "Rivalry learns a rule. Dangerous." }
+        {
+          "speaker": "narrator",
+          "line": "After a Drop where both arrived late to the same ruin."
+        },
+        {
+          "speaker": "vale",
+          "line": "You roasted the jammer. My rockets had nothing quiet left to kill."
+        },
+        {
+          "speaker": "brakhov",
+          "line": "Then walk faster. Or stay fog."
+        },
+        {
+          "speaker": "vale",
+          "line": "Or you learn to leave one hinge standing so I can invoice it."
+        },
+        {
+          "speaker": "brakhov",
+          "line": "…One hinge. Not two."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Rivalry learns a rule. Dangerous."
+        }
       ]
     },
     {
@@ -112,14 +222,36 @@
       "polarity": "mirror",
       "motif": "parade and walking fireworks",
       "generated": false,
-      "unlock": { "coDeploy": 1, "campLevelMin": 0, "bondMin": 0 },
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
       "beats": [
-        { "speaker": "narrator", "line": "Two grins. One safe. One criminal." },
-        { "speaker": "mira", "line": "You walk the fireworks in. That's cheating." },
-        { "speaker": "kit", "line": "Fireworks at walking distance. You're just shy." },
-        { "speaker": "mira", "line": "I'm artistic." },
-        { "speaker": "kit", "line": "I'm closer. Race you to the next soft target." },
-        { "speaker": "narrator", "line": "The company will regret encouraging this." }
+        {
+          "speaker": "narrator",
+          "line": "Two grins. One safe. One criminal."
+        },
+        {
+          "speaker": "mira",
+          "line": "You walk the fireworks in. That's cheating."
+        },
+        {
+          "speaker": "kit",
+          "line": "Fireworks at walking distance. You're just shy."
+        },
+        {
+          "speaker": "mira",
+          "line": "I'm artistic."
+        },
+        {
+          "speaker": "kit",
+          "line": "I'm closer. Race you to the next soft target."
+        },
+        {
+          "speaker": "narrator",
+          "line": "The company will regret encouraging this."
+        }
       ]
     },
     {
@@ -132,14 +264,36 @@
       "polarity": "mirror",
       "motif": "wages and weather arrears",
       "generated": false,
-      "unlock": { "coDeploy": 1, "campLevelMin": 0, "bondMin": 0 },
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
       "beats": [
-        { "speaker": "narrator", "line": "Ledgers open. Neither man likes the light." },
-        { "speaker": "grath", "line": "Three wars unpaid." },
-        { "speaker": "nox", "line": "Still paying for the last sky." },
-        { "speaker": "grath", "line": "Wages I can shoot. Weather I can't." },
-        { "speaker": "nox", "line": "Then hold the dirt. I'll hold what's above it. We clear different columns." },
-        { "speaker": "narrator", "line": "Arrears recognize arrears." }
+        {
+          "speaker": "narrator",
+          "line": "Ledgers open. Neither man likes the light."
+        },
+        {
+          "speaker": "grath",
+          "line": "Three wars unpaid."
+        },
+        {
+          "speaker": "nox",
+          "line": "Still paying for the last sky."
+        },
+        {
+          "speaker": "grath",
+          "line": "Wages I can shoot. Weather I can't."
+        },
+        {
+          "speaker": "nox",
+          "line": "Then hold the dirt. I'll hold what's above it. We clear different columns."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Arrears recognize arrears."
+        }
       ]
     },
     {
@@ -152,14 +306,36 @@
       "polarity": "tension",
       "motif": "flock captain vs tread marshal",
       "generated": false,
-      "unlock": { "coDeploy": 1, "campLevelMin": 0, "bondMin": 0 },
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
       "beats": [
-        { "speaker": "narrator", "line": "Phobos pace against Bull idle. The camp feels the argument in its boots." },
-        { "speaker": "quill", "line": "Orders walk on treads. Your pack scatters the sentence." },
-        { "speaker": "vane", "line": "Pack is one thought. Yours is a parade that arrives late and loud." },
-        { "speaker": "quill", "line": "Loud wins gates." },
-        { "speaker": "vane", "line": "Thought wins exits. Pick which war you're in." },
-        { "speaker": "narrator", "line": "Two captains. One company. The hearth does not pick a side — yet." }
+        {
+          "speaker": "narrator",
+          "line": "Phobos pace against Bull idle. The camp feels the argument in its boots."
+        },
+        {
+          "speaker": "quill",
+          "line": "Orders walk on treads. Your pack scatters the sentence."
+        },
+        {
+          "speaker": "vane",
+          "line": "Pack is one thought. Yours is a parade that arrives late and loud."
+        },
+        {
+          "speaker": "quill",
+          "line": "Loud wins gates."
+        },
+        {
+          "speaker": "vane",
+          "line": "Thought wins exits. Pick which war you're in."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Two captains. One company. The hearth does not pick a side — yet."
+        }
       ]
     },
     {
@@ -172,14 +348,36 @@
       "polarity": "bond",
       "motif": "coal furniture and grid saint",
       "generated": false,
-      "unlock": { "coDeploy": 1, "campLevelMin": 0, "bondMin": 0 },
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
       "beats": [
-        { "speaker": "narrator", "line": "Neither moves much. The pad is warmer for it." },
-        { "speaker": "hearth", "line": "Quiet sun. Won't go out." },
-        { "speaker": "lumen", "line": "Tithe the grid. I'll make the surplus mean something." },
-        { "speaker": "hearth", "line": "Don't tour. Touring burns wrong." },
-        { "speaker": "lumen", "line": "I don't tour. I root." },
-        { "speaker": "narrator", "line": "Two kinds of stay. The lights approve." }
+        {
+          "speaker": "narrator",
+          "line": "Neither moves much. The pad is warmer for it."
+        },
+        {
+          "speaker": "hearth",
+          "line": "Quiet sun. Won't go out."
+        },
+        {
+          "speaker": "lumen",
+          "line": "Tithe the grid. I'll make the surplus mean something."
+        },
+        {
+          "speaker": "hearth",
+          "line": "Don't tour. Touring burns wrong."
+        },
+        {
+          "speaker": "lumen",
+          "line": "I don't tour. I root."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Two kinds of stay. The lights approve."
+        }
       ]
     },
     {
@@ -192,14 +390,36 @@
       "polarity": "tension",
       "motif": "flight paths vs gunship manners",
       "generated": false,
-      "unlock": { "coDeploy": 1, "campLevelMin": 0, "bondMin": 0 },
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
       "beats": [
-        { "speaker": "narrator", "line": "A bay that dreams. A rat that argues with roofs." },
-        { "speaker": "noctua", "line": "Dreams in flight paths. You scratch them." },
-        { "speaker": "ceil", "line": "Altitude is an opinion. Yours is a spreadsheet with wings." },
-        { "speaker": "noctua", "line": "Eyes first." },
-        { "speaker": "ceil", "line": "Teeth first. Then eyes, if anything's left to see." },
-        { "speaker": "narrator", "line": "Sky is big. Their disagreement is not." }
+        {
+          "speaker": "narrator",
+          "line": "A bay that dreams. A rat that argues with roofs."
+        },
+        {
+          "speaker": "noctua",
+          "line": "Dreams in flight paths. You scratch them."
+        },
+        {
+          "speaker": "ceil",
+          "line": "Altitude is an opinion. Yours is a spreadsheet with wings."
+        },
+        {
+          "speaker": "noctua",
+          "line": "Eyes first."
+        },
+        {
+          "speaker": "ceil",
+          "line": "Teeth first. Then eyes, if anything's left to see."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Sky is big. Their disagreement is not."
+        }
       ]
     },
     {
@@ -212,14 +432,36 @@
       "polarity": "sibling",
       "motif": "gate door and ford door",
       "generated": false,
-      "unlock": { "coDeploy": 1, "campLevelMin": 0, "bondMin": 0 },
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
       "beats": [
-        { "speaker": "narrator", "line": "Dry hinge. Wet hinge. Same religion, different weather." },
-        { "speaker": "rusk", "line": "Gate, jammed gat, a lie." },
-        { "speaker": "odessa", "line": "Fords are doors. Yours just pretend they're walls." },
-        { "speaker": "rusk", "line": "Walls stay shut." },
-        { "speaker": "odessa", "line": "Until the river votes. Then we both hold whatever's left." },
-        { "speaker": "narrator", "line": "Sibling dirt. They'll die arguing which threshold mattered." }
+        {
+          "speaker": "narrator",
+          "line": "Dry hinge. Wet hinge. Same religion, different weather."
+        },
+        {
+          "speaker": "rusk",
+          "line": "Gate, jammed gat, a lie."
+        },
+        {
+          "speaker": "odessa",
+          "line": "Fords are doors. Yours just pretend they're walls."
+        },
+        {
+          "speaker": "rusk",
+          "line": "Walls stay shut."
+        },
+        {
+          "speaker": "odessa",
+          "line": "Until the river votes. Then we both hold whatever's left."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Sibling dirt. They'll die arguing which threshold mattered."
+        }
       ]
     },
     {
@@ -232,14 +474,36 @@
       "polarity": "mirror",
       "motif": "roast plod and wet plod",
       "generated": false,
-      "unlock": { "coDeploy": 1, "campLevelMin": 0, "bondMin": 0 },
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
       "beats": [
-        { "speaker": "narrator", "line": "Two slow things. One burns. One sinks and keeps going." },
-        { "speaker": "brakhov", "line": "Name gone. Forward heat." },
-        { "speaker": "anvil", "line": "The river learns my weight. Heat is optional." },
-        { "speaker": "brakhov", "line": "Optional is how walls survive." },
-        { "speaker": "anvil", "line": "Then I'll sit on the ford you ignore. Arrive how you like — I'll still be there." },
-        { "speaker": "narrator", "line": "Plod recognizes plod. The map gets heavier." }
+        {
+          "speaker": "narrator",
+          "line": "Two slow things. One burns. One sinks and keeps going."
+        },
+        {
+          "speaker": "brakhov",
+          "line": "Name gone. Forward heat."
+        },
+        {
+          "speaker": "anvil",
+          "line": "The river learns my weight. Heat is optional."
+        },
+        {
+          "speaker": "brakhov",
+          "line": "Optional is how walls survive."
+        },
+        {
+          "speaker": "anvil",
+          "line": "Then I'll sit on the ford you ignore. Arrive how you like — I'll still be there."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Plod recognizes plod. The map gets heavier."
+        }
       ]
     },
     {
@@ -252,14 +516,36 @@
       "polarity": "friction",
       "motif": "fog payroll vs lightning wound",
       "generated": false,
-      "unlock": { "coDeploy": 1, "campLevelMin": 0, "bondMin": 0 },
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
       "beats": [
-        { "speaker": "narrator", "line": "One sells unknown. One sells scars that glow." },
-        { "speaker": "veil", "line": "Fog is the payroll." },
-        { "speaker": "volt", "line": "Sight is a wound you give them." },
-        { "speaker": "veil", "line": "Wounds report. Fog collects." },
-        { "speaker": "volt", "line": "Then stay paid. I'll keep drawing the map in burns." },
-        { "speaker": "narrator", "line": "Eyes department, divided. Productive. Loud." }
+        {
+          "speaker": "narrator",
+          "line": "One sells unknown. One sells scars that glow."
+        },
+        {
+          "speaker": "veil",
+          "line": "Fog is the payroll."
+        },
+        {
+          "speaker": "volt",
+          "line": "Sight is a wound you give them."
+        },
+        {
+          "speaker": "veil",
+          "line": "Wounds report. Fog collects."
+        },
+        {
+          "speaker": "volt",
+          "line": "Then stay paid. I'll keep drawing the map in burns."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Eyes department, divided. Productive. Loud."
+        }
       ]
     },
     {
@@ -272,14 +558,36 @@
       "polarity": "sibling",
       "motif": "wheels and plurals",
       "generated": false,
-      "unlock": { "coDeploy": 1, "campLevelMin": 0, "bondMin": 0 },
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
       "beats": [
-        { "speaker": "narrator", "line": "A kid who trusts wheels. A pronoun with a factory." },
-        { "speaker": "spoke", "line": "Only trusts wheels." },
-        { "speaker": "tick", "line": "Speaks in plurals. Wheels are a singular fetish." },
-        { "speaker": "spoke", "line": "Plural dies cheap. Wheels come back." },
-        { "speaker": "tick", "line": "We come back cheaper. Race you to the fog line." },
-        { "speaker": "narrator", "line": "Sight, two dialects. The company is richer for the argument." }
+        {
+          "speaker": "narrator",
+          "line": "A kid who trusts wheels. A pronoun with a factory."
+        },
+        {
+          "speaker": "spoke",
+          "line": "Only trusts wheels."
+        },
+        {
+          "speaker": "tick",
+          "line": "Speaks in plurals. Wheels are a singular fetish."
+        },
+        {
+          "speaker": "spoke",
+          "line": "Plural dies cheap. Wheels come back."
+        },
+        {
+          "speaker": "tick",
+          "line": "We come back cheaper. Race you to the fog line."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Sight, two dialects. The company is richer for the argument."
+        }
       ]
     },
     {
@@ -292,14 +600,36 @@
       "polarity": "attract",
       "motif": "spot meets siege",
       "generated": false,
-      "unlock": { "coDeploy": 1, "campLevelMin": 0, "bondMin": 0 },
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
       "beats": [
-        { "speaker": "narrator", "line": "Beamer hush. Something under the dirt is already grinning." },
-        { "speaker": "warder", "line": "Owns a circle of dirt." },
-        { "speaker": "commando", "line": "Mines before the argument. Your circle's a stage. I dress it." },
-        { "speaker": "warder", "line": "Don't dress it so loud the trespassers hear the punchline." },
-        { "speaker": "commando", "line": "They hear the punchline when they step wrong. You just keep the lights honest." },
-        { "speaker": "narrator", "line": "Pad tooth. Dirty tooth. Same radius — finally useful to each other." }
+        {
+          "speaker": "narrator",
+          "line": "Beamer hush. Something under the dirt is already grinning."
+        },
+        {
+          "speaker": "warder",
+          "line": "Owns a circle of dirt."
+        },
+        {
+          "speaker": "commando",
+          "line": "Mines before the argument. Your circle's a stage. I dress it."
+        },
+        {
+          "speaker": "warder",
+          "line": "Don't dress it so loud the trespassers hear the punchline."
+        },
+        {
+          "speaker": "commando",
+          "line": "They hear the punchline when they step wrong. You just keep the lights honest."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Pad tooth. Dirty tooth. Same radius — finally useful to each other."
+        }
       ]
     },
     {
@@ -312,14 +642,36 @@
       "polarity": "attract",
       "motif": "spot meets siege",
       "generated": false,
-      "unlock": { "coDeploy": 2, "campLevelMin": 1, "bondMin": 25 },
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
       "beats": [
-        { "speaker": "narrator", "line": "After a Drop where the ring held and the mines wrote the footnotes." },
-        { "speaker": "commando", "line": "Your Ferrets waited. My Trappers didn't have to introduce themselves twice." },
-        { "speaker": "warder", "line": "I don't chase. You don't announce. That worked." },
-        { "speaker": "commando", "line": "Mark your circle on the next map. I'll seed the jokes inside it." },
-        { "speaker": "warder", "line": "…Keep them inside. Outside the circle is someone else's comedy." },
-        { "speaker": "narrator", "line": "Support thickens. Trespassers will not enjoy the collaboration." }
+        {
+          "speaker": "narrator",
+          "line": "After a Drop where the ring held and the mines wrote the footnotes."
+        },
+        {
+          "speaker": "commando",
+          "line": "Your Ferrets waited. My Trappers didn't have to introduce themselves twice."
+        },
+        {
+          "speaker": "warder",
+          "line": "I don't chase. You don't announce. That worked."
+        },
+        {
+          "speaker": "commando",
+          "line": "Mark your circle on the next map. I'll seed the jokes inside it."
+        },
+        {
+          "speaker": "warder",
+          "line": "…Keep them inside. Outside the circle is someone else's comedy."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Support thickens. Trespassers will not enjoy the collaboration."
+        }
       ]
     },
     {
@@ -332,14 +684,36 @@
       "polarity": "bond",
       "motif": "supply meets hunger",
       "generated": false,
-      "unlock": { "coDeploy": 1, "campLevelMin": 0, "bondMin": 0 },
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
       "beats": [
-        { "speaker": "narrator", "line": "One refuses to tour. One refuses to cool. The pad feels both." },
-        { "speaker": "hearth", "line": "Quiet sun. Won't go out." },
-        { "speaker": "brakhov", "line": "Name gone. Forward heat." },
-        { "speaker": "hearth", "line": "Then eat from me, not from the wiring. Hunger that chews the grid kills the lights." },
-        { "speaker": "brakhov", "line": "…Feed the roast. Walls after." },
-        { "speaker": "narrator", "line": "Supply meets hunger. Neither calls it friendship. The company does." }
+        {
+          "speaker": "narrator",
+          "line": "One refuses to tour. One refuses to cool. The pad feels both."
+        },
+        {
+          "speaker": "hearth",
+          "line": "Quiet sun. Won't go out."
+        },
+        {
+          "speaker": "brakhov",
+          "line": "Name gone. Forward heat."
+        },
+        {
+          "speaker": "hearth",
+          "line": "Then eat from me, not from the wiring. Hunger that chews the grid kills the lights."
+        },
+        {
+          "speaker": "brakhov",
+          "line": "…Feed the roast. Walls after."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Supply meets hunger. Neither calls it friendship. The company does."
+        }
       ]
     },
     {
@@ -352,14 +726,36 @@
       "polarity": "attract",
       "motif": "spot meets siege",
       "generated": false,
-      "unlock": { "coDeploy": 1, "campLevelMin": 0, "bondMin": 0 },
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
       "beats": [
-        { "speaker": "narrator", "line": "Mud that stays. Lightning that won't." },
-        { "speaker": "anvil", "line": "The river learns my weight." },
-        { "speaker": "volt", "line": "Sight is a wound you give them. I draw the ford before you sit on it." },
-        { "speaker": "anvil", "line": "Draw quiet. I arrive loud enough." },
-        { "speaker": "volt", "line": "Quiet's optional. Accurate isn't. Stay heavy — I'll keep the map bleeding where it should." },
-        { "speaker": "narrator", "line": "Spot meets siege. The ford gets a rumor, then a Turtle." }
+        {
+          "speaker": "narrator",
+          "line": "Mud that stays. Lightning that won't."
+        },
+        {
+          "speaker": "anvil",
+          "line": "The river learns my weight."
+        },
+        {
+          "speaker": "volt",
+          "line": "Sight is a wound you give them. I draw the ford before you sit on it."
+        },
+        {
+          "speaker": "anvil",
+          "line": "Draw quiet. I arrive loud enough."
+        },
+        {
+          "speaker": "volt",
+          "line": "Quiet's optional. Accurate isn't. Stay heavy — I'll keep the map bleeding where it should."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Spot meets siege. The ford gets a rumor, then a Turtle."
+        }
       ]
     },
     {
@@ -372,14 +768,36 @@
       "polarity": "attract",
       "motif": "spot meets siege",
       "generated": false,
-      "unlock": { "coDeploy": 1, "campLevelMin": 0, "bondMin": 0 },
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
       "beats": [
-        { "speaker": "narrator", "line": "Something already walked the lane. Something else is about to occupy it." },
-        { "speaker": "yeva", "line": "Ghosts already walked it." },
-        { "speaker": "anvil", "line": "Then I'll sit where they finished. Ghosts don't hold fords." },
-        { "speaker": "yeva", "line": "They hold rumors. I end careers. You end geography." },
-        { "speaker": "anvil", "line": "Whisper the hinge. I'll be the door." },
-        { "speaker": "narrator", "line": "Snipe and plod — a cruel, complete sentence." }
+        {
+          "speaker": "narrator",
+          "line": "Something already walked the lane. Something else is about to occupy it."
+        },
+        {
+          "speaker": "yeva",
+          "line": "Ghosts already walked it."
+        },
+        {
+          "speaker": "anvil",
+          "line": "Then I'll sit where they finished. Ghosts don't hold fords."
+        },
+        {
+          "speaker": "yeva",
+          "line": "They hold rumors. I end careers. You end geography."
+        },
+        {
+          "speaker": "anvil",
+          "line": "Whisper the hinge. I'll be the door."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Snipe and plod — a cruel, complete sentence."
+        }
       ]
     },
     {
@@ -392,14 +810,36 @@
       "polarity": "attract",
       "motif": "spot meets siege",
       "generated": false,
-      "unlock": { "coDeploy": 1, "campLevelMin": 0, "bondMin": 0 },
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
       "beats": [
-        { "speaker": "narrator", "line": "A plasma house that learned to walk. A Jaguar that learned to listen for footsteps." },
-        { "speaker": "fatboy", "line": "House learned to knock." },
-        { "speaker": "volt", "line": "Sight is a wound you give them. Your knock is a wound you give *me* if I'm still on the porch." },
-        { "speaker": "fatboy", "line": "Then leave the porch. I don't aim for friends. Friends aim for elsewhere." },
-        { "speaker": "volt", "line": "Teach me the cadence. I'll burn the map — just not while you're rewriting it." },
-        { "speaker": "narrator", "line": "First lesson: when the house knocks, the eyes are already gone." }
+        {
+          "speaker": "narrator",
+          "line": "A plasma house that learned to walk. A Jaguar that learned to listen for footsteps."
+        },
+        {
+          "speaker": "fatboy",
+          "line": "House learned to knock."
+        },
+        {
+          "speaker": "volt",
+          "line": "Sight is a wound you give them. Your knock is a wound you give *me* if I'm still on the porch."
+        },
+        {
+          "speaker": "fatboy",
+          "line": "Then leave the porch. I don't aim for friends. Friends aim for elsewhere."
+        },
+        {
+          "speaker": "volt",
+          "line": "Teach me the cadence. I'll burn the map — just not while you're rewriting it."
+        },
+        {
+          "speaker": "narrator",
+          "line": "First lesson: when the house knocks, the eyes are already gone."
+        }
       ]
     },
     {
@@ -412,14 +852,36 @@
       "polarity": "attract",
       "motif": "spot meets siege",
       "generated": false,
-      "unlock": { "coDeploy": 2, "campLevelMin": 1, "bondMin": 25 },
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
       "beats": [
-        { "speaker": "narrator", "line": "After a Drop where Volt's pack ghosted the splash before it landed." },
-        { "speaker": "volt", "line": "Three knocks. I counted. We weren't there for the fourth." },
-        { "speaker": "fatboy", "line": "Good. Porch stays empty when the door learns manners." },
-        { "speaker": "volt", "line": "Bro's Tzar shrugs the same rhythm. Different house. Same homework." },
-        { "speaker": "fatboy", "line": "Learn both cadences. I don't share a contract with regret." },
-        { "speaker": "narrator", "line": "Support becomes timing. Timing becomes not dying to friends." }
+        {
+          "speaker": "narrator",
+          "line": "After a Drop where Volt's pack ghosted the splash before it landed."
+        },
+        {
+          "speaker": "volt",
+          "line": "Three knocks. I counted. We weren't there for the fourth."
+        },
+        {
+          "speaker": "fatboy",
+          "line": "Good. Porch stays empty when the door learns manners."
+        },
+        {
+          "speaker": "volt",
+          "line": "Bro's Tzar shrugs the same rhythm. Different house. Same homework."
+        },
+        {
+          "speaker": "fatboy",
+          "line": "Learn both cadences. I don't share a contract with regret."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Support becomes timing. Timing becomes not dying to friends."
+        }
       ]
     },
     {
@@ -432,14 +894,36 @@
       "polarity": "attract",
       "motif": "spot meets siege",
       "generated": false,
-      "unlock": { "coDeploy": 1, "campLevelMin": 0, "bondMin": 0 },
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
       "beats": [
-        { "speaker": "narrator", "line": "A shrug with a Tzar. A whisper with a career-ending hobby." },
-        { "speaker": "bro", "line": "Yeah. I'll take that wall." },
-        { "speaker": "yeva", "line": "Ghosts already walked it. Try not to take the ghosts too." },
-        { "speaker": "bro", "line": "I don't aim personal. Walls are impersonal." },
-        { "speaker": "yeva", "line": "Then I'll be elsewhere when you get casual. Whistle once if the shrug is loading." },
-        { "speaker": "narrator", "line": "She starts learning the whistle. He pretends he doesn't notice. He notices." }
+        {
+          "speaker": "narrator",
+          "line": "A shrug with a Tzar. A whisper with a career-ending hobby."
+        },
+        {
+          "speaker": "bro",
+          "line": "Yeah. I'll take that wall."
+        },
+        {
+          "speaker": "yeva",
+          "line": "Ghosts already walked it. Try not to take the ghosts too."
+        },
+        {
+          "speaker": "bro",
+          "line": "I don't aim personal. Walls are impersonal."
+        },
+        {
+          "speaker": "yeva",
+          "line": "Then I'll be elsewhere when you get casual. Whistle once if the shrug is loading."
+        },
+        {
+          "speaker": "narrator",
+          "line": "She starts learning the whistle. He pretends he doesn't notice. He notices."
+        }
       ]
     },
     {
@@ -452,14 +936,36 @@
       "polarity": "attract",
       "motif": "spot meets siege",
       "generated": false,
-      "unlock": { "coDeploy": 1, "campLevelMin": 0, "bondMin": 0 },
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
       "beats": [
-        { "speaker": "narrator", "line": "One pays for weather. One invoices the unknown." },
-        { "speaker": "nox", "line": "Still paying for the last sky." },
-        { "speaker": "veil", "line": "Fog is the payroll. Your sky stays honest if my unknown stays employed." },
-        { "speaker": "nox", "line": "Hold the tithe. Don't bill me for ghosts I didn't order." },
-        { "speaker": "veil", "line": "Ghosts are free. Trespassers aren't. Point the circle — I'll own the dark around it." },
-        { "speaker": "narrator", "line": "Debt pad. Fog contract. The ledger and the haze shake hands." }
+        {
+          "speaker": "narrator",
+          "line": "One pays for weather. One invoices the unknown."
+        },
+        {
+          "speaker": "nox",
+          "line": "Still paying for the last sky."
+        },
+        {
+          "speaker": "veil",
+          "line": "Fog is the payroll. Your sky stays honest if my unknown stays employed."
+        },
+        {
+          "speaker": "nox",
+          "line": "Hold the tithe. Don't bill me for ghosts I didn't order."
+        },
+        {
+          "speaker": "veil",
+          "line": "Ghosts are free. Trespassers aren't. Point the circle — I'll own the dark around it."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Debt pad. Fog contract. The ledger and the haze shake hands."
+        }
       ]
     },
     {
@@ -472,14 +978,36 @@
       "polarity": "attract",
       "motif": "spot meets siege",
       "generated": false,
-      "unlock": { "coDeploy": 1, "campLevelMin": 0, "bondMin": 0 },
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
       "beats": [
-        { "speaker": "narrator", "line": "Unpaid wars. Careers that end quietly." },
-        { "speaker": "grath", "line": "Three wars unpaid." },
-        { "speaker": "yeva", "line": "Ghosts already walked it. Some of them are still waiting on your invoice." },
-        { "speaker": "grath", "line": "I shoot wages. You shoot rumors." },
-        { "speaker": "yeva", "line": "Whisper me the hinge that owes you. I'll collect interest the soft way." },
-        { "speaker": "narrator", "line": "Line and fog — arrears with a silencer." }
+        {
+          "speaker": "narrator",
+          "line": "Unpaid wars. Careers that end quietly."
+        },
+        {
+          "speaker": "grath",
+          "line": "Three wars unpaid."
+        },
+        {
+          "speaker": "yeva",
+          "line": "Ghosts already walked it. Some of them are still waiting on your invoice."
+        },
+        {
+          "speaker": "grath",
+          "line": "I shoot wages. You shoot rumors."
+        },
+        {
+          "speaker": "yeva",
+          "line": "Whisper me the hinge that owes you. I'll collect interest the soft way."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Line and fog — arrears with a silencer."
+        }
       ]
     },
     {
@@ -492,14 +1020,36 @@
       "polarity": "attract",
       "motif": "spot meets siege",
       "generated": false,
-      "unlock": { "coDeploy": 1, "campLevelMin": 0, "bondMin": 0 },
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
       "beats": [
-        { "speaker": "narrator", "line": "Anti-nuke that won't tour. A kid who only trusts wheels." },
-        { "speaker": "nox", "line": "Still paying for the last sky." },
-        { "speaker": "spoke", "line": "Only trusts wheels. Sky's a rumor until rubber confirms it." },
-        { "speaker": "nox", "line": "Confirm the approaches. If something falls, I want warning, not poetry." },
-        { "speaker": "spoke", "line": "Wheels don't do poetry. They do early." },
-        { "speaker": "narrator", "line": "Tithe gets a scout. Scout gets a reason to come home." }
+        {
+          "speaker": "narrator",
+          "line": "Anti-nuke that won't tour. A kid who only trusts wheels."
+        },
+        {
+          "speaker": "nox",
+          "line": "Still paying for the last sky."
+        },
+        {
+          "speaker": "spoke",
+          "line": "Only trusts wheels. Sky's a rumor until rubber confirms it."
+        },
+        {
+          "speaker": "nox",
+          "line": "Confirm the approaches. If something falls, I want warning, not poetry."
+        },
+        {
+          "speaker": "spoke",
+          "line": "Wheels don't do poetry. They do early."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Tithe gets a scout. Scout gets a reason to come home."
+        }
       ]
     },
     {
@@ -512,14 +1062,36 @@
       "polarity": "attract",
       "motif": "spot meets siege",
       "generated": false,
-      "unlock": { "coDeploy": 1, "campLevelMin": 0, "bondMin": 0 },
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
       "beats": [
-        { "speaker": "narrator", "line": "A bay that dreams upward. A garden that refuses to leave." },
-        { "speaker": "noctua", "line": "Dreams in flight paths." },
-        { "speaker": "solarium", "line": "Then dream useful. Roots need a map before they spend light." },
-        { "speaker": "noctua", "line": "Eyes first. Your constructors can argue with dirt after." },
-        { "speaker": "solarium", "line": "Bring me the soft ground. I'll grow the hard answer." },
-        { "speaker": "narrator", "line": "Sky map, pad garden. Spot meets stay — and both get fed." }
+        {
+          "speaker": "narrator",
+          "line": "A bay that dreams upward. A garden that refuses to leave."
+        },
+        {
+          "speaker": "noctua",
+          "line": "Dreams in flight paths."
+        },
+        {
+          "speaker": "solarium",
+          "line": "Then dream useful. Roots need a map before they spend light."
+        },
+        {
+          "speaker": "noctua",
+          "line": "Eyes first. Your constructors can argue with dirt after."
+        },
+        {
+          "speaker": "solarium",
+          "line": "Bring me the soft ground. I'll grow the hard answer."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Sky map, pad garden. Spot meets stay — and both get fed."
+        }
       ]
     },
     {
@@ -532,14 +1104,36 @@
       "polarity": "attract",
       "motif": "spot meets siege",
       "generated": false,
-      "unlock": { "coDeploy": 1, "campLevelMin": 0, "bondMin": 0 },
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
       "beats": [
-        { "speaker": "narrator", "line": "A saint of surplus. A pronoun with a factory." },
-        { "speaker": "lumen", "line": "Tithe the grid." },
-        { "speaker": "tick", "line": "Speaks in plurals. Your grid is one mouth. We are many eyes." },
-        { "speaker": "lumen", "line": "Then carpet the fog and bring the surplus a reason." },
-        { "speaker": "tick", "line": "We die cheap. We mint again. Keep the lights — we'll keep the unknown honest." },
-        { "speaker": "narrator", "line": "Holy furniture. Swarm sight. The pad learns it has peripheral vision." }
+        {
+          "speaker": "narrator",
+          "line": "A saint of surplus. A pronoun with a factory."
+        },
+        {
+          "speaker": "lumen",
+          "line": "Tithe the grid."
+        },
+        {
+          "speaker": "tick",
+          "line": "Speaks in plurals. Your grid is one mouth. We are many eyes."
+        },
+        {
+          "speaker": "lumen",
+          "line": "Then carpet the fog and bring the surplus a reason."
+        },
+        {
+          "speaker": "tick",
+          "line": "We die cheap. We mint again. Keep the lights — we'll keep the unknown honest."
+        },
+        {
+          "speaker": "narrator",
+          "line": "Holy furniture. Swarm sight. The pad learns it has peripheral vision."
+        }
       ]
     },
     {
@@ -552,14 +1146,1844 @@
       "polarity": "attract",
       "motif": "spot meets siege",
       "generated": false,
-      "unlock": { "coDeploy": 1, "campLevelMin": 0, "bondMin": 0 },
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
       "beats": [
-        { "speaker": "narrator", "line": "Sky debt. Dirt jokes." },
-        { "speaker": "nox", "line": "Still paying for the last sky." },
-        { "speaker": "commando", "line": "Mines before the argument. Your circle's expensive — I'll make trespass cost more." },
-        { "speaker": "nox", "line": "Don't mine the exit. I still have to leave when the sky settles." },
-        { "speaker": "commando", "line": "Exit stays clean. Approaches get punchlines. Deal?" },
-        { "speaker": "narrator", "line": "Debt and mischief — a pad that bites sideways." }
+        {
+          "speaker": "narrator",
+          "line": "Sky debt. Dirt jokes."
+        },
+        {
+          "speaker": "nox",
+          "line": "Still paying for the last sky."
+        },
+        {
+          "speaker": "commando",
+          "line": "Mines before the argument. Your circle's expensive — I'll make trespass cost more."
+        },
+        {
+          "speaker": "nox",
+          "line": "Don't mine the exit. I still have to leave when the sky settles."
+        },
+        {
+          "speaker": "commando",
+          "line": "Exit stays clean. Approaches get punchlines. Deal?"
+        },
+        {
+          "speaker": "narrator",
+          "line": "Debt and mischief — a pad that bites sideways."
+        }
+      ]
+    },
+    {
+      "id": "ceil__kettle:C",
+      "pairId": "ceil__kettle",
+      "a": "ceil",
+      "b": "kettle",
+      "rank": "C",
+      "title": "Silhouette",
+      "polarity": "rivalry",
+      "motif": "the gunship and the saint who shoots gunships",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "The Archangel's barrels track the Roughneck all the way in to land. Nobody asked them to."
+        },
+        {
+          "speaker": "ceil",
+          "line": "You can stop aiming at me. I'm parked."
+        },
+        {
+          "speaker": "kettle",
+          "line": "Everything with rotors is a prayer I haven't answered yet."
+        },
+        {
+          "speaker": "ceil",
+          "line": "Altitude is an opinion, saint."
+        },
+        {
+          "speaker": "kettle",
+          "line": "Then keep yours low over my pad."
+        }
+      ]
+    },
+    {
+      "id": "ceil__kettle:B",
+      "pairId": "ceil__kettle",
+      "a": "ceil",
+      "b": "kettle",
+      "rank": "B",
+      "title": "Learning the shape",
+      "polarity": "rivalry",
+      "motif": "the gunship and the saint who shoots gunships",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Kettle has chalked a Roughneck's outline on the Archangel's hull. Crossed through, then uncrossed."
+        },
+        {
+          "speaker": "ceil",
+          "line": "Is that me?"
+        },
+        {
+          "speaker": "kettle",
+          "line": "It's the shape I don't shoot. I keep practising not shooting it."
+        },
+        {
+          "speaker": "ceil",
+          "line": "Romantic."
+        },
+        {
+          "speaker": "kettle",
+          "line": "It's harder than shooting. Fly where I can see you and it gets easier."
+        }
+      ]
+    },
+    {
+      "id": "ceil__kettle:A",
+      "pairId": "ceil__kettle",
+      "a": "ceil",
+      "b": "kettle",
+      "rank": "A",
+      "title": "Under the roof",
+      "polarity": "rivalry",
+      "motif": "the gunship and the saint who shoots gunships",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 3,
+        "campLevelMin": 2,
+        "bondMin": 55
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "After the drop, the Roughneck sat out the enemy flak inside Kettle's umbrella for a whole minute."
+        },
+        {
+          "speaker": "ceil",
+          "line": "Their fighters peeled off when they saw who was under me."
+        },
+        {
+          "speaker": "kettle",
+          "line": "They saw a chainsaw with wings over a gunship. Nobody argues with that."
+        },
+        {
+          "speaker": "ceil",
+          "line": "So the sky's ours."
+        },
+        {
+          "speaker": "kettle",
+          "line": "The sky is nobody's. The little bit over you is mine."
+        }
+      ]
+    },
+    {
+      "id": "ceil__nox:C",
+      "pairId": "ceil__nox",
+      "a": "nox",
+      "b": "ceil",
+      "rank": "C",
+      "title": "The bill",
+      "polarity": "tension",
+      "motif": "the debt of the last sky",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Nox will not sit where Ceil's shadow falls."
+        },
+        {
+          "speaker": "nox",
+          "line": "Still paying for the last sky."
+        },
+        {
+          "speaker": "ceil",
+          "line": "I flew that sortie. I know what it cost."
+        },
+        {
+          "speaker": "nox",
+          "line": "You know what it cost you. I hold the rest of the invoice."
+        }
+      ]
+    },
+    {
+      "id": "ceil__nox:B",
+      "pairId": "ceil__nox",
+      "a": "nox",
+      "b": "ceil",
+      "rank": "B",
+      "title": "Instalments",
+      "polarity": "tension",
+      "motif": "the debt of the last sky",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Ceil has started landing beside the Umbrella and saying nothing, which is the most Ceil has ever said."
+        },
+        {
+          "speaker": "ceil",
+          "line": "Tell me what's still owed."
+        },
+        {
+          "speaker": "nox",
+          "line": "Forty-one names and a launch I didn't stop."
+        },
+        {
+          "speaker": "ceil",
+          "line": "Then I'll fly cover over every launch you're near. Count it as an instalment."
+        },
+        {
+          "speaker": "nox",
+          "line": "Debt doesn't take instalments. It takes years."
+        }
+      ]
+    },
+    {
+      "id": "ceil__nox:A",
+      "pairId": "ceil__nox",
+      "a": "nox",
+      "b": "ceil",
+      "rank": "A",
+      "title": "Paid in sky",
+      "polarity": "tension",
+      "motif": "the debt of the last sky",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 3,
+        "campLevelMin": 2,
+        "bondMin": 55
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "The missile came in high. The Umbrella took it. The Roughneck had already cleared the bombers that would have followed."
+        },
+        {
+          "speaker": "nox",
+          "line": "That was the shape of the last sky. Except we won it."
+        },
+        {
+          "speaker": "ceil",
+          "line": "Is the bill smaller?"
+        },
+        {
+          "speaker": "nox",
+          "line": "It's still there. It's just not mine alone anymore."
+        }
+      ]
+    },
+    {
+      "id": "fatboy__kettle:C",
+      "pairId": "fatboy__kettle",
+      "a": "fatboy",
+      "b": "kettle",
+      "rank": "C",
+      "title": "A house with no roof",
+      "polarity": "attract",
+      "motif": "house and roof",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Fatboy's crew watches the sky the way people watch weather."
+        },
+        {
+          "speaker": "fatboy",
+          "line": "House learned to knock. Never learned to duck."
+        },
+        {
+          "speaker": "kettle",
+          "line": "Bombers love a slow house."
+        },
+        {
+          "speaker": "fatboy",
+          "line": "Then be the roof."
+        }
+      ]
+    },
+    {
+      "id": "fatboy__kettle:B",
+      "pairId": "fatboy__kettle",
+      "a": "fatboy",
+      "b": "kettle",
+      "rank": "B",
+      "title": "Shingles",
+      "polarity": "attract",
+      "motif": "house and roof",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "The Archangel now parks a little behind the Fatboy, always on the bombers' side."
+        },
+        {
+          "speaker": "kettle",
+          "line": "Your shells are loud. They bring company."
+        },
+        {
+          "speaker": "fatboy",
+          "line": "Company's why I knock."
+        },
+        {
+          "speaker": "kettle",
+          "line": "Then I'll keep answering the door upstairs."
+        }
+      ]
+    },
+    {
+      "id": "fatboy__kettle:A",
+      "pairId": "fatboy__kettle",
+      "a": "fatboy",
+      "b": "kettle",
+      "rank": "A",
+      "title": "The whole house",
+      "polarity": "attract",
+      "motif": "house and roof",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 3,
+        "campLevelMin": 2,
+        "bondMin": 55
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Three bombing runs, three burning wrecks, one Fatboy still knocking."
+        },
+        {
+          "speaker": "fatboy",
+          "line": "Didn't look up once."
+        },
+        {
+          "speaker": "kettle",
+          "line": "That's the point of a roof."
+        },
+        {
+          "speaker": "fatboy",
+          "line": "House has a roof now. Feels like a home."
+        }
+      ]
+    },
+    {
+      "id": "kettle__warder:C",
+      "pairId": "kettle__warder",
+      "a": "kettle",
+      "b": "warder",
+      "rank": "C",
+      "title": "Whose sky",
+      "polarity": "friction",
+      "motif": "who owns the sky over the pad",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Warder has drawn the pad's circle in the dirt again. Kettle has driven through it again."
+        },
+        {
+          "speaker": "warder",
+          "line": "Owns a circle of dirt. And the air above it."
+        },
+        {
+          "speaker": "kettle",
+          "line": "The air goes where the fight goes. So do I."
+        },
+        {
+          "speaker": "warder",
+          "line": "Then the pad is naked every time you wander."
+        }
+      ]
+    },
+    {
+      "id": "kettle__warder:B",
+      "pairId": "kettle__warder",
+      "a": "kettle",
+      "b": "warder",
+      "rank": "B",
+      "title": "Shifts",
+      "polarity": "friction",
+      "motif": "who owns the sky over the pad",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "They have started taking the sky in shifts, and arguing about the handover."
+        },
+        {
+          "speaker": "kettle",
+          "line": "Your ferrets cover the pad. I cover the march."
+        },
+        {
+          "speaker": "warder",
+          "line": "My ferrets don't chase. They stay."
+        },
+        {
+          "speaker": "kettle",
+          "line": "That's why I trust them with what I leave behind."
+        }
+      ]
+    },
+    {
+      "id": "kettle__warder:A",
+      "pairId": "kettle__warder",
+      "a": "kettle",
+      "b": "warder",
+      "rank": "A",
+      "title": "Two roofs",
+      "polarity": "friction",
+      "motif": "who owns the sky over the pad",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 3,
+        "campLevelMin": 2,
+        "bondMin": 55
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "A bomber wing came for the pad while the Archangel was out on the line. It never reached the circle."
+        },
+        {
+          "speaker": "warder",
+          "line": "Told you the dirt holds."
+        },
+        {
+          "speaker": "kettle",
+          "line": "You did. I came back because I wanted to see it hold."
+        },
+        {
+          "speaker": "warder",
+          "line": "Go wander. The circle will be here."
+        }
+      ]
+    },
+    {
+      "id": "kettle__noctua:C",
+      "pairId": "kettle__noctua",
+      "a": "noctua",
+      "b": "kettle",
+      "rank": "C",
+      "title": "Through the flak",
+      "polarity": "mentor",
+      "motif": "flight paths and friendly flak",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Two of Noctua's drones came home with Archangel burns."
+        },
+        {
+          "speaker": "noctua",
+          "line": "Dreams in flight paths. Yours went through mine."
+        },
+        {
+          "speaker": "kettle",
+          "line": "Mine go where the enemy is. Yours were in the way."
+        },
+        {
+          "speaker": "noctua",
+          "line": "Then teach them where the way is."
+        }
+      ]
+    },
+    {
+      "id": "kettle__noctua:B",
+      "pairId": "kettle__noctua",
+      "a": "noctua",
+      "b": "kettle",
+      "rank": "B",
+      "title": "Lanes",
+      "polarity": "mentor",
+      "motif": "flight paths and friendly flak",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Kettle has painted the drone lanes on Noctua's bay wall: where the flak goes, and where it never goes."
+        },
+        {
+          "speaker": "kettle",
+          "line": "Fly the cold lanes. I'll keep them cold."
+        },
+        {
+          "speaker": "noctua",
+          "line": "They're learning. They hum when they pass you now."
+        },
+        {
+          "speaker": "kettle",
+          "line": "That's the right sound."
+        }
+      ]
+    },
+    {
+      "id": "kettle__noctua:A",
+      "pairId": "kettle__noctua",
+      "a": "noctua",
+      "b": "kettle",
+      "rank": "A",
+      "title": "Swarm hymn",
+      "polarity": "mentor",
+      "motif": "flight paths and friendly flak",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 3,
+        "campLevelMin": 2,
+        "bondMin": 55
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Twenty-four drones and an Archangel fought one sky together and did not touch once."
+        },
+        {
+          "speaker": "noctua",
+          "line": "They fly around your fire like it's weather."
+        },
+        {
+          "speaker": "kettle",
+          "line": "It is weather. You taught them to read it."
+        },
+        {
+          "speaker": "noctua",
+          "line": "You taught me first."
+        }
+      ]
+    },
+    {
+      "id": "ceil__mira:C",
+      "pairId": "ceil__mira",
+      "a": "mira",
+      "b": "ceil",
+      "rank": "C",
+      "title": "From up there",
+      "polarity": "attract",
+      "motif": "spot meets siege, from the sky",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Mira wants to know what napalm looks like from altitude."
+        },
+        {
+          "speaker": "mira",
+          "line": "Napalm is confetti. Tell me it's prettier from up there."
+        },
+        {
+          "speaker": "ceil",
+          "line": "It's a map. You colour it in."
+        },
+        {
+          "speaker": "mira",
+          "line": "Then call me the colours."
+        }
+      ]
+    },
+    {
+      "id": "ceil__mira:B",
+      "pairId": "ceil__mira",
+      "a": "mira",
+      "b": "ceil",
+      "rank": "B",
+      "title": "Spotting",
+      "polarity": "attract",
+      "motif": "spot meets siege, from the sky",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "The Roughneck now flies a lazy circle over Mira's targets before the Barrage speaks."
+        },
+        {
+          "speaker": "ceil",
+          "line": "Left of the ridge, two depots, one gun."
+        },
+        {
+          "speaker": "mira",
+          "line": "You're the best spotter I've ever had. You never ask me to stop."
+        },
+        {
+          "speaker": "ceil",
+          "line": "I'm a gunship. I don't know the word."
+        }
+      ]
+    },
+    {
+      "id": "ceil__mira:A",
+      "pairId": "ceil__mira",
+      "a": "mira",
+      "b": "ceil",
+      "rank": "A",
+      "title": "Fireworks",
+      "polarity": "attract",
+      "motif": "spot meets siege, from the sky",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 3,
+        "campLevelMin": 2,
+        "bondMin": 55
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "The barrage walked exactly where the Roughneck's tracers pointed, and then a little further for joy."
+        },
+        {
+          "speaker": "mira",
+          "line": "Did you see it?"
+        },
+        {
+          "speaker": "ceil",
+          "line": "From up here it looked like a festival."
+        },
+        {
+          "speaker": "mira",
+          "line": "It was. You were the guest of honour."
+        }
+      ]
+    },
+    {
+      "id": "ceil__volt:C",
+      "pairId": "ceil__volt",
+      "a": "volt",
+      "b": "ceil",
+      "rank": "C",
+      "title": "The tally",
+      "polarity": "mirror",
+      "motif": "two kites and one tally",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Volt and Ceil keep score on the same board. Neither agreed to it."
+        },
+        {
+          "speaker": "volt",
+          "line": "Sight is a wound you give them. I gave seven today."
+        },
+        {
+          "speaker": "ceil",
+          "line": "Six of those were already burning when I flew off them."
+        },
+        {
+          "speaker": "volt",
+          "line": "Burning is not dead."
+        }
+      ]
+    },
+    {
+      "id": "ceil__volt:B",
+      "pairId": "ceil__volt",
+      "a": "volt",
+      "b": "ceil",
+      "rank": "B",
+      "title": "Same burnout",
+      "polarity": "mirror",
+      "motif": "two kites and one tally",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Both came back with redlined engines and nothing left in the tank."
+        },
+        {
+          "speaker": "ceil",
+          "line": "You fly like me."
+        },
+        {
+          "speaker": "volt",
+          "line": "You drive like me. With rotors."
+        },
+        {
+          "speaker": "ceil",
+          "line": "One of us should learn to stop."
+        },
+        {
+          "speaker": "volt",
+          "line": "Not today."
+        }
+      ]
+    },
+    {
+      "id": "ceil__volt:A",
+      "pairId": "ceil__volt",
+      "a": "volt",
+      "b": "ceil",
+      "rank": "A",
+      "title": "Shared kills",
+      "polarity": "mirror",
+      "motif": "two kites and one tally",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 3,
+        "campLevelMin": 2,
+        "bondMin": 55
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "The board says fourteen. It doesn't say whose."
+        },
+        {
+          "speaker": "volt",
+          "line": "I stopped counting which were mine."
+        },
+        {
+          "speaker": "ceil",
+          "line": "Me too. Turns out it's faster when you don't."
+        },
+        {
+          "speaker": "volt",
+          "line": "Don't tell anyone we're friends."
+        }
+      ]
+    },
+    {
+      "id": "ceil__commando:C",
+      "pairId": "ceil__commando",
+      "a": "commando",
+      "b": "ceil",
+      "rank": "C",
+      "title": "Hangar kids",
+      "polarity": "sibling",
+      "motif": "siblings of the hangar",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Commando's Hercules pilot and Ceil came up in the same hangar. It shows."
+        },
+        {
+          "speaker": "commando",
+          "line": "Mines before the argument."
+        },
+        {
+          "speaker": "ceil",
+          "line": "You mined the hangar door once. Before the argument."
+        },
+        {
+          "speaker": "commando",
+          "line": "You started the argument."
+        }
+      ]
+    },
+    {
+      "id": "ceil__commando:B",
+      "pairId": "ceil__commando",
+      "a": "commando",
+      "b": "ceil",
+      "rank": "B",
+      "title": "The drop",
+      "polarity": "sibling",
+      "motif": "siblings of the hangar",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "The Hercules dropped Commando's crew behind a line the Roughneck had just emptied."
+        },
+        {
+          "speaker": "ceil",
+          "line": "You were late."
+        },
+        {
+          "speaker": "commando",
+          "line": "You were early. That's the same as being late, but louder."
+        },
+        {
+          "speaker": "ceil",
+          "line": "Like old times."
+        }
+      ]
+    },
+    {
+      "id": "ceil__commando:A",
+      "pairId": "ceil__commando",
+      "a": "commando",
+      "b": "ceil",
+      "rank": "A",
+      "title": "Family business",
+      "polarity": "sibling",
+      "motif": "siblings of the hangar",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 3,
+        "campLevelMin": 2,
+        "bondMin": 55
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Mines, a drop, a gunship pass. Nobody on the other side ever saw the whole of it."
+        },
+        {
+          "speaker": "commando",
+          "line": "We should do this for money."
+        },
+        {
+          "speaker": "ceil",
+          "line": "We do."
+        },
+        {
+          "speaker": "commando",
+          "line": "Then we should do it for fun. It's better for fun."
+        }
+      ]
+    },
+    {
+      "id": "ceil__vane:C",
+      "pairId": "ceil__vane",
+      "a": "vane",
+      "b": "ceil",
+      "rank": "C",
+      "title": "Off the beat",
+      "polarity": "tension",
+      "motif": "rhythm and the thing that breaks it",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Vane's Phobos had the line peeled and ready. Then the Roughneck took it."
+        },
+        {
+          "speaker": "vane",
+          "line": "Pack is one thought. You're a second one."
+        },
+        {
+          "speaker": "ceil",
+          "line": "It was a free kill."
+        },
+        {
+          "speaker": "vane",
+          "line": "Nothing in my rhythm is free. You broke it."
+        }
+      ]
+    },
+    {
+      "id": "ceil__vane:B",
+      "pairId": "ceil__vane",
+      "a": "vane",
+      "b": "ceil",
+      "rank": "B",
+      "title": "Counting in",
+      "polarity": "tension",
+      "motif": "rhythm and the thing that breaks it",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Ceil has started waiting for the pack's beat before diving. Most of the time."
+        },
+        {
+          "speaker": "ceil",
+          "line": "I'm counting your rhythm now. Three, then the peel, then me."
+        },
+        {
+          "speaker": "vane",
+          "line": "Four. You come in on four."
+        },
+        {
+          "speaker": "ceil",
+          "line": "Four, then."
+        }
+      ]
+    },
+    {
+      "id": "ceil__vane:A",
+      "pairId": "ceil__vane",
+      "a": "vane",
+      "b": "ceil",
+      "rank": "A",
+      "title": "In time",
+      "polarity": "tension",
+      "motif": "rhythm and the thing that breaks it",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 3,
+        "campLevelMin": 2,
+        "bondMin": 55
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "The pack peeled, the Roughneck came in on four, and the line folded like a door."
+        },
+        {
+          "speaker": "vane",
+          "line": "That was one thought."
+        },
+        {
+          "speaker": "ceil",
+          "line": "With rotors."
+        },
+        {
+          "speaker": "vane",
+          "line": "Don't spoil it."
+        }
+      ]
+    },
+    {
+      "id": "noctua__yeva:C",
+      "pairId": "noctua__yeva",
+      "a": "yeva",
+      "b": "noctua",
+      "rank": "C",
+      "title": "Ghosts and drones",
+      "polarity": "attract",
+      "motif": "the sniper and the eyes that fly",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Yeva lies in the grass. A drone hums overhead and does not give her away."
+        },
+        {
+          "speaker": "yeva",
+          "line": "Ghosts already walked it."
+        },
+        {
+          "speaker": "noctua",
+          "line": "Drones already flew it. Your ghosts were where I said."
+        },
+        {
+          "speaker": "yeva",
+          "line": "Then we agree."
+        }
+      ]
+    },
+    {
+      "id": "noctua__yeva:B",
+      "pairId": "noctua__yeva",
+      "a": "yeva",
+      "b": "noctua",
+      "rank": "B",
+      "title": "Spotting",
+      "polarity": "attract",
+      "motif": "the sniper and the eyes that fly",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Noctua's drones mark, Yeva's rifle answers. It has become a conversation."
+        },
+        {
+          "speaker": "noctua",
+          "line": "Two hundred metres, behind the wall, the one with the antenna."
+        },
+        {
+          "speaker": "yeva",
+          "line": "I see the antenna. I'll leave the wall standing. It's pretty."
+        }
+      ]
+    },
+    {
+      "id": "noctua__yeva:A",
+      "pairId": "noctua__yeva",
+      "a": "yeva",
+      "b": "noctua",
+      "rank": "A",
+      "title": "Quiet sky",
+      "polarity": "attract",
+      "motif": "the sniper and the eyes that fly",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 3,
+        "campLevelMin": 2,
+        "bondMin": 55
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "A whole enemy relay went silent and nobody on their side heard a shot."
+        },
+        {
+          "speaker": "yeva",
+          "line": "Your drones are the only noise I like."
+        },
+        {
+          "speaker": "noctua",
+          "line": "Your rifle is the only quiet I trust."
+        }
+      ]
+    },
+    {
+      "id": "noctua__tick:C",
+      "pairId": "noctua__tick",
+      "a": "tick",
+      "b": "noctua",
+      "rank": "C",
+      "title": "Whose map",
+      "polarity": "rivalry",
+      "motif": "two swarms of eyes",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Twenty fleas and twenty-four drones reported the same ridge in the same second."
+        },
+        {
+          "speaker": "tick",
+          "line": "We saw it first."
+        },
+        {
+          "speaker": "noctua",
+          "line": "From the ground. I saw it from the sky."
+        },
+        {
+          "speaker": "tick",
+          "line": "We speak in plurals. Plurals win."
+        }
+      ]
+    },
+    {
+      "id": "noctua__tick:B",
+      "pairId": "noctua__tick",
+      "a": "tick",
+      "b": "noctua",
+      "rank": "B",
+      "title": "Splitting the map",
+      "polarity": "rivalry",
+      "motif": "two swarms of eyes",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "They have divided the map: ground to Tick, sky to Noctua. The border is disputed."
+        },
+        {
+          "speaker": "noctua",
+          "line": "The ridge line is mine. It's high."
+        },
+        {
+          "speaker": "tick",
+          "line": "The ridge is dirt. Dirt is ours."
+        },
+        {
+          "speaker": "noctua",
+          "line": "Then we both watch it. Twice the eyes."
+        }
+      ]
+    },
+    {
+      "id": "noctua__tick:A",
+      "pairId": "noctua__tick",
+      "a": "tick",
+      "b": "noctua",
+      "rank": "A",
+      "title": "Every eye",
+      "polarity": "rivalry",
+      "motif": "two swarms of eyes",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 3,
+        "campLevelMin": 2,
+        "bondMin": 55
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Nothing moved on the map that the company did not see from two directions."
+        },
+        {
+          "speaker": "tick",
+          "line": "We counted you in our plurals."
+        },
+        {
+          "speaker": "noctua",
+          "line": "I'll put you in a flight path. It's the nicest thing I know."
+        }
+      ]
+    },
+    {
+      "id": "kettle__thresh:C",
+      "pairId": "kettle__thresh",
+      "a": "thresh",
+      "b": "kettle",
+      "rank": "C",
+      "title": "What she was built for",
+      "polarity": "rivalry",
+      "motif": "the bomber the saint was built to stop",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Kettle has a Hailstorm silhouette chalked inside the Archangel's hatch. It predates Thresh."
+        },
+        {
+          "speaker": "thresh",
+          "line": "Weather comes from above."
+        },
+        {
+          "speaker": "kettle",
+          "line": "And I come from below. That's what they built me for. You."
+        },
+        {
+          "speaker": "thresh",
+          "line": "Then we'll get on. Nobody else takes me seriously."
+        }
+      ]
+    },
+    {
+      "id": "kettle__thresh:B",
+      "pairId": "kettle__thresh",
+      "a": "thresh",
+      "b": "kettle",
+      "rank": "B",
+      "title": "Practice runs",
+      "polarity": "rivalry",
+      "motif": "the bomber the saint was built to stop",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Thresh flies dummy runs over the camp. Kettle tracks every one and fires at none."
+        },
+        {
+          "speaker": "kettle",
+          "line": "Third pass. I had you on all three."
+        },
+        {
+          "speaker": "thresh",
+          "line": "I know. I wanted to know what it feels like to be had."
+        },
+        {
+          "speaker": "kettle",
+          "line": "And?"
+        },
+        {
+          "speaker": "thresh",
+          "line": "Honest. Nobody's ever been honest with me at that altitude."
+        }
+      ]
+    },
+    {
+      "id": "kettle__thresh:A",
+      "pairId": "kettle__thresh",
+      "a": "thresh",
+      "b": "kettle",
+      "rank": "A",
+      "title": "The only sky I trust",
+      "polarity": "rivalry",
+      "motif": "the bomber the saint was built to stop",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 3,
+        "campLevelMin": 2,
+        "bondMin": 55
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Enemy anti-air lit up the whole valley. The Hailstorm flew home through the one corridor Kettle had cleared."
+        },
+        {
+          "speaker": "thresh",
+          "line": "You made me a road."
+        },
+        {
+          "speaker": "kettle",
+          "line": "If anyone shoots you down, it'll be me. I'm not sharing."
+        },
+        {
+          "speaker": "thresh",
+          "line": "That's the kindest threat I've ever had."
+        }
+      ]
+    },
+    {
+      "id": "fatboy__thresh:C",
+      "pairId": "fatboy__thresh",
+      "a": "thresh",
+      "b": "fatboy",
+      "rank": "C",
+      "title": "Two kinds of knocking",
+      "polarity": "mirror",
+      "motif": "the house knocks, the sky knocks",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Fatboy and Thresh compare craters like other people compare scars."
+        },
+        {
+          "speaker": "fatboy",
+          "line": "House learned to knock."
+        },
+        {
+          "speaker": "thresh",
+          "line": "Sky learned to knock louder."
+        },
+        {
+          "speaker": "fatboy",
+          "line": "Louder isn't deeper."
+        }
+      ]
+    },
+    {
+      "id": "fatboy__thresh:B",
+      "pairId": "fatboy__thresh",
+      "a": "thresh",
+      "b": "fatboy",
+      "rank": "B",
+      "title": "The same wall",
+      "polarity": "mirror",
+      "motif": "the house knocks, the sky knocks",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "They hit the same wall on the same sortie. Neither will say who finished it."
+        },
+        {
+          "speaker": "thresh",
+          "line": "Your shells softened it."
+        },
+        {
+          "speaker": "fatboy",
+          "line": "Your bombs took the credit."
+        },
+        {
+          "speaker": "thresh",
+          "line": "The wall didn't mind."
+        }
+      ]
+    },
+    {
+      "id": "fatboy__thresh:A",
+      "pairId": "fatboy__thresh",
+      "a": "thresh",
+      "b": "fatboy",
+      "rank": "A",
+      "title": "Weather and house",
+      "polarity": "mirror",
+      "motif": "the house knocks, the sky knocks",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 3,
+        "campLevelMin": 2,
+        "bondMin": 55
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "One plodding house, one bomber, and an enemy citadel that stopped being a citadel."
+        },
+        {
+          "speaker": "fatboy",
+          "line": "Never looked up."
+        },
+        {
+          "speaker": "thresh",
+          "line": "Never looked down. I think that makes us family."
+        }
+      ]
+    },
+    {
+      "id": "anvil__gale:C",
+      "pairId": "anvil__gale",
+      "a": "gale",
+      "b": "anvil",
+      "rank": "C",
+      "title": "Floating",
+      "polarity": "attract",
+      "motif": "the ford and the wing over it",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Six Cutlasses sit on the river like a flock of ducks. Anvil's Turtles wade past them."
+        },
+        {
+          "speaker": "anvil",
+          "line": "The river learns my weight."
+        },
+        {
+          "speaker": "gale",
+          "line": "The river doesn't notice mine. That's the trick."
+        },
+        {
+          "speaker": "anvil",
+          "line": "Then we're both cheating."
+        }
+      ]
+    },
+    {
+      "id": "anvil__gale:B",
+      "pairId": "anvil__gale",
+      "a": "gale",
+      "b": "anvil",
+      "rank": "B",
+      "title": "Flood season",
+      "polarity": "attract",
+      "motif": "the ford and the wing over it",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "When the waterline rose over Koom, the two of them were the only ones smiling."
+        },
+        {
+          "speaker": "gale",
+          "line": "Everyone else sees a flood. I see a runway."
+        },
+        {
+          "speaker": "anvil",
+          "line": "I see a floor."
+        },
+        {
+          "speaker": "gale",
+          "line": "Same water. Better company."
+        }
+      ]
+    },
+    {
+      "id": "anvil__gale:A",
+      "pairId": "anvil__gale",
+      "a": "gale",
+      "b": "anvil",
+      "rank": "A",
+      "title": "Amphibious",
+      "polarity": "attract",
+      "motif": "the ford and the wing over it",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 3,
+        "campLevelMin": 2,
+        "bondMin": 55
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "The Turtles took the ford while the Cutlasses held the sky over it. The enemy had planned for a dry bed."
+        },
+        {
+          "speaker": "anvil",
+          "line": "Weight first."
+        },
+        {
+          "speaker": "gale",
+          "line": "Wings second. Poetry never."
+        }
+      ]
+    },
+    {
+      "id": "ceil__gale:C",
+      "pairId": "ceil__gale",
+      "a": "gale",
+      "b": "ceil",
+      "rank": "C",
+      "title": "Parking",
+      "polarity": "mirror",
+      "motif": "two gunship wings, one sky",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Ceil parks on the pad. Gale parks on the pond next to it."
+        },
+        {
+          "speaker": "ceil",
+          "line": "Altitude is an opinion."
+        },
+        {
+          "speaker": "gale",
+          "line": "So is the ground. I never land on it."
+        },
+        {
+          "speaker": "ceil",
+          "line": "Show-off."
+        }
+      ]
+    },
+    {
+      "id": "ceil__gale:B",
+      "pairId": "ceil__gale",
+      "a": "gale",
+      "b": "ceil",
+      "rank": "B",
+      "title": "Formation",
+      "polarity": "mirror",
+      "motif": "two gunship wings, one sky",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Roughnecks high, Cutlasses low. They don't call it a formation. It is one."
+        },
+        {
+          "speaker": "gale",
+          "line": "You take the ridges, I take the river."
+        },
+        {
+          "speaker": "ceil",
+          "line": "And whoever finishes first takes the rest."
+        }
+      ]
+    },
+    {
+      "id": "ceil__gale:A",
+      "pairId": "ceil__gale",
+      "a": "gale",
+      "b": "ceil",
+      "rank": "A",
+      "title": "Wing",
+      "polarity": "mirror",
+      "motif": "two gunship wings, one sky",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 3,
+        "campLevelMin": 2,
+        "bondMin": 55
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Eleven gunships over one valley, none of them in the other's way."
+        },
+        {
+          "speaker": "ceil",
+          "line": "Didn't think I'd share a sky."
+        },
+        {
+          "speaker": "gale",
+          "line": "You didn't. We built a bigger one."
+        }
+      ]
+    },
+    {
+      "id": "mask__pavise:C",
+      "pairId": "mask__pavise",
+      "a": "mask",
+      "b": "pavise",
+      "rank": "C",
+      "title": "Left of whom",
+      "polarity": "tension",
+      "motif": "the spare king and the left hand",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Mask's Pawns salute him. Pavise watches and says nothing for a long time."
+        },
+        {
+          "speaker": "pavise",
+          "line": "I still walk your left. The real one's."
+        },
+        {
+          "speaker": "mask",
+          "line": "Every throne needs a spare."
+        },
+        {
+          "speaker": "pavise",
+          "line": "The spare doesn't get a salute."
+        }
+      ]
+    },
+    {
+      "id": "mask__pavise:B",
+      "pairId": "mask__pavise",
+      "a": "mask",
+      "b": "pavise",
+      "rank": "B",
+      "title": "Drawing fire",
+      "polarity": "tension",
+      "motif": "the spare king and the left hand",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "The enemy spent half its artillery on Mask. Pavise noticed who that saved."
+        },
+        {
+          "speaker": "mask",
+          "line": "They think I'm you. Or you're me. I lose track."
+        },
+        {
+          "speaker": "pavise",
+          "line": "You drew fire meant for the company."
+        },
+        {
+          "speaker": "mask",
+          "line": "It's what I was built for. I'm just doing it on purpose now."
+        }
+      ]
+    },
+    {
+      "id": "mask__pavise:A",
+      "pairId": "mask__pavise",
+      "a": "mask",
+      "b": "pavise",
+      "rank": "A",
+      "title": "Two crowns",
+      "polarity": "tension",
+      "motif": "the spare king and the left hand",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 3,
+        "campLevelMin": 2,
+        "bondMin": 55
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Pavise has started walking on Mask's left, too, when the Pawns can see."
+        },
+        {
+          "speaker": "mask",
+          "line": "You don't have to."
+        },
+        {
+          "speaker": "pavise",
+          "line": "I walk the left of whoever they're aiming at. Today it's you."
+        }
+      ]
+    },
+    {
+      "id": "auditor__rumor:C",
+      "pairId": "auditor__rumor",
+      "a": "rumor",
+      "b": "auditor",
+      "rank": "C",
+      "title": "Accounts",
+      "polarity": "friction",
+      "motif": "the ledger and the turncoat",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "The Auditor has a column for every unit the company owns. Rumor keeps adding rows."
+        },
+        {
+          "speaker": "auditor",
+          "line": "Ledger with legs. Where did these four tanks come from?"
+        },
+        {
+          "speaker": "rumor",
+          "line": "Everything changes sides eventually."
+        },
+        {
+          "speaker": "auditor",
+          "line": "Not in my books it doesn't. Not without a receipt."
+        }
+      ]
+    },
+    {
+      "id": "auditor__rumor:B",
+      "pairId": "auditor__rumor",
+      "a": "rumor",
+      "b": "auditor",
+      "rank": "B",
+      "title": "Receipts",
+      "polarity": "friction",
+      "motif": "the ledger and the turncoat",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Rumor now leaves a scrap of paper on every captured unit. It says 'paid'."
+        },
+        {
+          "speaker": "auditor",
+          "line": "That isn't a receipt."
+        },
+        {
+          "speaker": "rumor",
+          "line": "It is to them."
+        }
+      ]
+    },
+    {
+      "id": "auditor__rumor:A",
+      "pairId": "auditor__rumor",
+      "a": "rumor",
+      "b": "auditor",
+      "rank": "A",
+      "title": "Balanced",
+      "polarity": "friction",
+      "motif": "the ledger and the turncoat",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 3,
+        "campLevelMin": 2,
+        "bondMin": 55
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "The books balanced this sortie, for the first time since Rumor arrived."
+        },
+        {
+          "speaker": "auditor",
+          "line": "You captured exactly what we lost."
+        },
+        {
+          "speaker": "rumor",
+          "line": "I read your ledger. I hate leaving you a deficit."
+        }
+      ]
+    },
+    {
+      "id": "rumor__veil:C",
+      "pairId": "rumor__veil",
+      "a": "rumor",
+      "b": "veil",
+      "rank": "C",
+      "title": "Payroll",
+      "polarity": "attract",
+      "motif": "fog is the payroll",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Veil's jammers hide everything. Rumor seems to be inside the fog before it rolls in."
+        },
+        {
+          "speaker": "veil",
+          "line": "Fog is the payroll."
+        },
+        {
+          "speaker": "rumor",
+          "line": "Then I'm paid in advance."
+        }
+      ]
+    },
+    {
+      "id": "rumor__veil:B",
+      "pairId": "rumor__veil",
+      "a": "rumor",
+      "b": "veil",
+      "rank": "B",
+      "title": "Cover",
+      "polarity": "attract",
+      "motif": "fog is the payroll",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "The Ghosts walk into the enemy base inside Veil's blind spot, and walk out with a factory."
+        },
+        {
+          "speaker": "veil",
+          "line": "They never saw you."
+        },
+        {
+          "speaker": "rumor",
+          "line": "They never saw you. I was just standing in it."
+        }
+      ]
+    },
+    {
+      "id": "rumor__veil:A",
+      "pairId": "rumor__veil",
+      "a": "rumor",
+      "b": "veil",
+      "rank": "A",
+      "title": "Nobody",
+      "polarity": "attract",
+      "motif": "fog is the payroll",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 3,
+        "campLevelMin": 2,
+        "bondMin": 55
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "An entire enemy patrol changed sides without a shot, and nobody on either team can say how."
+        },
+        {
+          "speaker": "veil",
+          "line": "The perfect contract."
+        },
+        {
+          "speaker": "rumor",
+          "line": "The perfect rumor."
+        }
       ]
     }
   ]

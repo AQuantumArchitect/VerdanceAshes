@@ -205,6 +205,15 @@ export function renderDropSquad() {
     let html = cards.join("") || `<div class="theater-sub">Nobody living is marked to drop.</div>`;
     if (away.length) html += `<div class="theater-sub spaced">Away from camp · ${away.map(id => `${esc(crewHeroName(id))} (${esc(heroWhereLabel(id))})`).join(" · ")}</div>`;
     if (fallenHome.length) html += `<div class="theater-sub spaced">Fallen stay home · ${fallenHome.map(crewHeroName).map(esc).join(" · ")}</div>`;
+    // Bonds on this drop: rank B adds XP to both, rank A also brings the pair's gift.
+    const going = new Set(livingCoreIds().concat(droppingPackIds()));
+    const perks = state.hub.bondPerks || {};
+    const gifts = (perks.bondGifts || []).filter(g => going.has(g.a) && going.has(g.b));
+    const xps = (perks.bondXp || []).filter(r => going.has(r.a) && going.has(r.b));
+    if (xps.length) html += `<div class="theater-sub spaced"><b>Bonds on this drop</b> · ${xps.map(r => {
+      const g = gifts.find(x => x.a === r.a && x.b === r.b);
+      return `${esc(crewHeroName(r.a))} & ${esc(crewHeroName(r.b))} (rank ${esc(r.rank)}: +${r.xp} XP each${g ? `, bringing ${g.count}× ${esc(g.name || g.unitDef)}` : ""})`;
+    }).join(" · ")}</div>`;
     squadEl.innerHTML = html;
   }
   paintDropButton();

@@ -1,0 +1,411 @@
+{
+  "schemaVersion": "verdance-bond-gifts/1.0",
+  "notes": "What a bond is worth on the field (tools/verdance/company/synergy.py). Both heroes must drop together. Rank B: each starts with bonusXp.B more XP. Rank A: bonusXp.A each, and the pair brings one gift: a unit neither hero's pack already has. A pair's own recommendations are tried in order; if none is new to both packs, the gift is drawn from the pool, weighted toward the axes the pair cares most about (their field profiles), and seeded by campaign + pair + mission so a sortie always rolls the same.",
+  "bonusXp": {
+    "B": 0.05,
+    "A": 0.1
+  },
+  "poolDraw": 5,
+  "recommended": {
+    "ceil__kettle": [
+      {
+        "unitDef": "armhawk",
+        "count": 2,
+        "why": "Highwinds fly top cover: the saint's roof gets wings"
+      }
+    ],
+    "ceil__nox": [
+      {
+        "unitDef": "armawac",
+        "count": 1,
+        "why": "An Oracle radar plane watches the sky Nox still owes"
+      }
+    ],
+    "fatboy__kettle": [
+      {
+        "unitDef": "armrl",
+        "count": 3,
+        "why": "Nettles ring the house: more shingles on the roof"
+      }
+    ],
+    "kettle__warder": [
+      {
+        "unitDef": "armeyes",
+        "count": 3,
+        "why": "Beholders mark the circle's edge so the saint knows when to come home"
+      }
+    ],
+    "kettle__noctua": [
+      {
+        "unitDef": "armpeep",
+        "count": 2,
+        "why": "Blink scouts fly the cold lanes ahead of the swarm"
+      }
+    ],
+    "ceil__mira": [
+      {
+        "unitDef": "armseer",
+        "count": 1,
+        "why": "A Prophet radar truck turns the gunship's calls into firing solutions"
+      }
+    ],
+    "ceil__volt": [
+      {
+        "unitDef": "armflash",
+        "count": 4,
+        "why": "Blitz raiders join the race for the tally"
+      }
+    ],
+    "ceil__commando": [
+      {
+        "unitDef": "armmlv",
+        "count": 1,
+        "why": "A Groundhog lays the mines before the argument, where the gunship points"
+      }
+    ],
+    "ceil__vane": [
+      {
+        "unitDef": "armkam",
+        "count": 2,
+        "why": "Banshees learn to come in on four"
+      }
+    ],
+    "noctua__yeva": [
+      {
+        "unitDef": "armjamt",
+        "count": 1,
+        "why": "A Sneaky Pete keeps the quiet sky quiet"
+      }
+    ],
+    "noctua__tick": [
+      {
+        "unitDef": "armmark",
+        "count": 2,
+        "why": "Compass radar bots: twice the eyes, on the ground and in it"
+      }
+    ],
+    "hearth__lumen": [
+      {
+        "unitDef": "armestor",
+        "count": 1,
+        "why": "Energy storage for the garden's surplus"
+      }
+    ],
+    "kettle__mira": [
+      {
+        "unitDef": "armsfig",
+        "count": 2,
+        "why": "Cyclone fighters so the barrage can play"
+      }
+    ],
+    "ketha__vane": [
+      {
+        "unitDef": "armrectr",
+        "count": 1,
+        "why": "A Lazarus to haul back whoever the pack leaves behind"
+      }
+    ],
+    "odessa__rusk": [
+      {
+        "unitDef": "armjanus",
+        "count": 1,
+        "why": "A Janus to hold the door the siblings won't leave"
+      }
+    ],
+    "spoke__tick": [
+      {
+        "unitDef": "corgator",
+        "count": 2,
+        "why": "Incisors run with the Wheelies and the fleas"
+      }
+    ],
+    "kettle__thresh": [
+      {
+        "unitDef": "legvenator",
+        "count": 2,
+        "why": "Venator interceptors: the storm and the saint share a fighter screen"
+      }
+    ],
+    "fatboy__thresh": [
+      {
+        "unitDef": "corshad",
+        "count": 1,
+        "why": "A Whirlwind: a second, smaller storm for the house to point at"
+      }
+    ],
+    "anvil__gale": [
+      {
+        "unitDef": "armamph",
+        "count": 2,
+        "why": "Platypus bots to hold the ford between the Turtles and the floats"
+      }
+    ],
+    "ceil__gale": [
+      {
+        "unitDef": "corvamp",
+        "count": 2,
+        "why": "Nighthawks fly top cover over both wings"
+      }
+    ],
+    "mask__pavise": [
+      {
+        "unitDef": "armzeus",
+        "count": 1,
+        "why": "A Welder for whichever king they are aiming at"
+      }
+    ],
+    "auditor__rumor": [
+      {
+        "unitDef": "armmstor",
+        "count": 1,
+        "why": "Metal storage: somewhere to put what changed sides"
+      }
+    ],
+    "rumor__veil": [
+      {
+        "unitDef": "corjamt",
+        "count": 1,
+        "why": "A Castro jammer: more fog on the payroll"
+      }
+    ]
+  },
+  "pool": [
+    {
+      "unitDef": "armhawk",
+      "count": 2,
+      "axes": [
+        "sky",
+        "offense"
+      ]
+    },
+    {
+      "unitDef": "legafigdef",
+      "count": 2,
+      "axes": [
+        "sky",
+        "pad"
+      ]
+    },
+    {
+      "unitDef": "corvamp",
+      "count": 2,
+      "axes": [
+        "sky",
+        "fog"
+      ]
+    },
+    {
+      "unitDef": "armkam",
+      "count": 2,
+      "axes": [
+        "sky",
+        "offense",
+        "mobility"
+      ]
+    },
+    {
+      "unitDef": "armawac",
+      "count": 1,
+      "axes": [
+        "sky",
+        "sight"
+      ]
+    },
+    {
+      "unitDef": "armpeep",
+      "count": 2,
+      "axes": [
+        "sight",
+        "sky",
+        "mobility"
+      ]
+    },
+    {
+      "unitDef": "armseer",
+      "count": 1,
+      "axes": [
+        "sight",
+        "ledger"
+      ]
+    },
+    {
+      "unitDef": "armmark",
+      "count": 2,
+      "axes": [
+        "sight"
+      ]
+    },
+    {
+      "unitDef": "armeyes",
+      "count": 3,
+      "axes": [
+        "sight",
+        "pad"
+      ]
+    },
+    {
+      "unitDef": "armjamt",
+      "count": 1,
+      "axes": [
+        "fog"
+      ]
+    },
+    {
+      "unitDef": "corjamt",
+      "count": 1,
+      "axes": [
+        "fog",
+        "pad"
+      ]
+    },
+    {
+      "unitDef": "armspy",
+      "count": 1,
+      "axes": [
+        "fog",
+        "craft"
+      ]
+    },
+    {
+      "unitDef": "armmlv",
+      "count": 1,
+      "axes": [
+        "fog",
+        "craft",
+        "pad"
+      ]
+    },
+    {
+      "unitDef": "armrl",
+      "count": 3,
+      "axes": [
+        "pad",
+        "sky"
+      ]
+    },
+    {
+      "unitDef": "corrl",
+      "count": 3,
+      "axes": [
+        "pad",
+        "sky"
+      ]
+    },
+    {
+      "unitDef": "armbeamer",
+      "count": 1,
+      "axes": [
+        "pad",
+        "heat"
+      ]
+    },
+    {
+      "unitDef": "armjanus",
+      "count": 1,
+      "axes": [
+        "pad",
+        "offense"
+      ]
+    },
+    {
+      "unitDef": "armfark",
+      "count": 1,
+      "axes": [
+        "craft",
+        "energy"
+      ]
+    },
+    {
+      "unitDef": "armrectr",
+      "count": 1,
+      "axes": [
+        "craft",
+        "ledger"
+      ]
+    },
+    {
+      "unitDef": "cornecro",
+      "count": 1,
+      "axes": [
+        "craft",
+        "ledger"
+      ]
+    },
+    {
+      "unitDef": "armwin",
+      "count": 4,
+      "axes": [
+        "energy"
+      ]
+    },
+    {
+      "unitDef": "armestor",
+      "count": 1,
+      "axes": [
+        "energy",
+        "ledger"
+      ]
+    },
+    {
+      "unitDef": "armmstor",
+      "count": 1,
+      "axes": [
+        "ledger"
+      ]
+    },
+    {
+      "unitDef": "corpyro",
+      "count": 2,
+      "axes": [
+        "heat",
+        "offense"
+      ]
+    },
+    {
+      "unitDef": "armzeus",
+      "count": 1,
+      "axes": [
+        "heat",
+        "offense"
+      ]
+    },
+    {
+      "unitDef": "armflash",
+      "count": 4,
+      "axes": [
+        "mobility",
+        "offense"
+      ]
+    },
+    {
+      "unitDef": "corgator",
+      "count": 2,
+      "axes": [
+        "mobility"
+      ]
+    },
+    {
+      "unitDef": "armstump",
+      "count": 2,
+      "axes": [
+        "offense"
+      ]
+    },
+    {
+      "unitDef": "corlevlr",
+      "count": 1,
+      "axes": [
+        "offense",
+        "pad"
+      ]
+    },
+    {
+      "unitDef": "cormort",
+      "count": 1,
+      "axes": [
+        "offense",
+        "sight"
+      ]
+    }
+  ]
+}

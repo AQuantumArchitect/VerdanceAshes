@@ -6,9 +6,9 @@
     "maxDegree": 5,
     "topEdges": 64,
     "heroCount": 35,
-    "edgeCount": 64,
-    "talkCount": 137,
-    "authoredSeeds": 12,
+    "edgeCount": 80,
+    "talkCount": 188,
+    "authoredSeeds": 30,
     "umweltAxes": [
       "energy",
       "offense",
@@ -1551,7 +1551,7 @@
       ],
       "doctrine": "eyes",
       "hook": "Speaks in plurals.",
-      "degree": 3,
+      "degree": 4,
       "umweltGlyph": "+sig·+fog·+mob·−off",
       "umweltMarks": [
         {
@@ -1581,7 +1581,7 @@
       ],
       "doctrine": "eyes",
       "hook": "Dreams in flight paths.",
-      "degree": 3,
+      "degree": 6,
       "umweltGlyph": "+mob·+sig·+fog·+sky",
       "umweltMarks": [
         {
@@ -1616,7 +1616,7 @@
       ],
       "doctrine": "eyes",
       "hook": "Fog is the payroll.",
-      "degree": 5,
+      "degree": 6,
       "umweltGlyph": "+sig·+fog·+mob·+led",
       "umweltMarks": [
         {
@@ -1845,7 +1845,7 @@
       ],
       "doctrine": "skirm",
       "hook": "Ghosts already walked it.",
-      "degree": 5,
+      "degree": 6,
       "umweltGlyph": "+mob·−pad·+sig·+fog",
       "umweltMarks": [
         {
@@ -1879,7 +1879,7 @@
       ],
       "doctrine": "skirm",
       "hook": "Ledger with legs.",
-      "degree": 5,
+      "degree": 6,
       "umweltGlyph": "+mob·+off·−pad·+led",
       "umweltMarks": [
         {
@@ -1980,7 +1980,7 @@
       ],
       "doctrine": "siege_plod",
       "hook": "House learned to knock.",
-      "degree": 5,
+      "degree": 7,
       "umweltGlyph": "+off·−mob·−ene·+pad",
       "umweltMarks": [
         {
@@ -2011,7 +2011,7 @@
       ],
       "doctrine": "arty",
       "hook": "Napalm is confetti.",
-      "degree": 3,
+      "degree": 4,
       "umweltGlyph": "+off·+hea·−ene·−pad",
       "umweltMarks": [
         {
@@ -2042,7 +2042,7 @@
       ],
       "doctrine": "aa_saint",
       "hook": "Sky-saint, chainsaw soul.",
-      "degree": 2,
+      "degree": 6,
       "umweltGlyph": "+pad·+sky·−off",
       "umweltMarks": [
         {
@@ -2094,7 +2094,7 @@
       ],
       "doctrine": "dirty",
       "hook": "Mines before the argument.",
-      "degree": 2,
+      "degree": 3,
       "umweltGlyph": "+fog·+mob·+cra·+pad",
       "umweltMarks": [
         {
@@ -2233,7 +2233,7 @@
       ],
       "doctrine": "pad",
       "hook": "Still paying for the last sky.",
-      "degree": 5,
+      "degree": 6,
       "umweltGlyph": "−mob·+pad·+led·−off",
       "umweltMarks": [
         {
@@ -2264,7 +2264,7 @@
       ],
       "doctrine": "skirm",
       "hook": "Altitude is an opinion.",
-      "degree": 5,
+      "degree": 11,
       "umweltGlyph": "+mob·−pad·+sky·+off",
       "umweltMarks": [
         {
@@ -2330,7 +2330,7 @@
       ],
       "doctrine": "line",
       "hook": "The river learns my weight.",
-      "degree": 5,
+      "degree": 6,
       "umweltGlyph": "+off·−mob·+pad",
       "umweltMarks": [
         {
@@ -2357,7 +2357,7 @@
       ],
       "doctrine": "eyes",
       "hook": "Sight is a wound you give them.",
-      "degree": 5,
+      "degree": 6,
       "umweltGlyph": "+mob·+sig·+fog·−pad",
       "umweltMarks": [
         {
@@ -2384,69 +2384,6 @@
     }
   ],
   "edges": [
-    {
-      "id": "anvil__volt",
-      "a": "anvil",
-      "b": "volt",
-      "score": 1.0,
-      "polarity": "attract",
-      "motifs": [
-        "spot meets siege",
-        "anvil vs kite"
-      ],
-      "sharedTemperament": [],
-      "reasons": [
-        "umwelt spot meets siege (complement=3.275)",
-        "complement (anvil vs kite)",
-        "adjacent columns line/eyes",
-        "same faction armada"
-      ],
-      "authored": false,
-      "aName": "Anvil Mire",
-      "bName": "Volt Lash",
-      "aHook": "The river learns my weight.",
-      "bHook": "Sight is a wound you give them.",
-      "aGlyph": "+off·−mob·+pad",
-      "bGlyph": "+mob·+sig·+fog·−pad",
-      "talkIds": {
-        "C": "anvil__volt:C",
-        "B": "anvil__volt:B",
-        "A": "anvil__volt:A"
-      },
-      "umwelt": {
-        "motif": "spot meets siege",
-        "boost": 0.62,
-        "couples": [
-          {
-            "axis": "siege_sight",
-            "kind": "complement",
-            "cross": [
-              "pad",
-              "sight|fog"
-            ],
-            "a": 1.3,
-            "b": 1.08,
-            "strength": 1.825
-          },
-          {
-            "axis": "mobility",
-            "kind": "complement",
-            "a": -1.0,
-            "b": 1.0,
-            "strength": 1.0
-          },
-          {
-            "axis": "pad",
-            "kind": "complement",
-            "a": 1.0,
-            "b": -0.45,
-            "strength": 0.45
-          }
-        ],
-        "spotterLocked": true,
-        "siegeSpotStrength": 1.825
-      }
-    },
     {
       "id": "anvil__auditor",
       "a": "auditor",
@@ -2567,6 +2504,512 @@
             "a": -0.4,
             "b": 1.0,
             "strength": 0.4
+          }
+        ],
+        "spotterLocked": false,
+        "siegeSpotStrength": 0.0
+      }
+    },
+    {
+      "id": "anvil__ceil",
+      "a": "ceil",
+      "b": "anvil",
+      "score": 1.0,
+      "polarity": "tension",
+      "motifs": [
+        "kite vs hold",
+        "anvil vs kite",
+        "stay meets stride"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "umwelt stay meets stride (complement=2.0)",
+        "complement (anvil vs kite)",
+        "adjacent columns skirmish/line",
+        "doctrine drama skirm/line",
+        "same faction armada"
+      ],
+      "authored": false,
+      "aName": "Ceil Rat",
+      "bName": "Anvil Mire",
+      "aHook": "Altitude is an opinion.",
+      "bHook": "The river learns my weight.",
+      "aGlyph": "+mob·−pad·+sky·+off",
+      "bGlyph": "+off·−mob·+pad",
+      "talkIds": {
+        "C": "anvil__ceil:C",
+        "B": "anvil__ceil:B",
+        "A": "anvil__ceil:A"
+      },
+      "umwelt": {
+        "motif": "stay meets stride",
+        "boost": 0.55,
+        "couples": [
+          {
+            "axis": "mobility",
+            "kind": "complement",
+            "a": 1.0,
+            "b": -1.0,
+            "strength": 1.0
+          },
+          {
+            "axis": "pad",
+            "kind": "complement",
+            "a": -1.0,
+            "b": 1.0,
+            "strength": 1.0
+          },
+          {
+            "axis": "offense",
+            "kind": "mirror",
+            "a": 0.35,
+            "b": 1.0,
+            "strength": 0.193
+          }
+        ],
+        "spotterLocked": false,
+        "siegeSpotStrength": 0.0
+      }
+    },
+    {
+      "id": "anvil__gale",
+      "a": "gale",
+      "b": "anvil",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "the ford and the wing over it",
+        "water as a road"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Marrow Gale",
+      "bName": "Anvil Mire",
+      "aHook": "Lands where nobody parks.",
+      "bHook": "The river learns my weight.",
+      "aGlyph": "+mob·−pad·+off·+sky",
+      "bGlyph": "+off·−mob·+pad",
+      "talkIds": {
+        "C": "anvil__gale:C",
+        "B": "anvil__gale:B",
+        "A": "anvil__gale:A"
+      }
+    },
+    {
+      "id": "anvil__volt",
+      "a": "anvil",
+      "b": "volt",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "spot meets siege",
+        "anvil vs kite"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "umwelt spot meets siege (complement=3.275)",
+        "complement (anvil vs kite)",
+        "adjacent columns line/eyes",
+        "same faction armada"
+      ],
+      "authored": false,
+      "aName": "Anvil Mire",
+      "bName": "Volt Lash",
+      "aHook": "The river learns my weight.",
+      "bHook": "Sight is a wound you give them.",
+      "aGlyph": "+off·−mob·+pad",
+      "bGlyph": "+mob·+sig·+fog·−pad",
+      "talkIds": {
+        "C": "anvil__volt:C",
+        "B": "anvil__volt:B",
+        "A": "anvil__volt:A"
+      },
+      "umwelt": {
+        "motif": "spot meets siege",
+        "boost": 0.62,
+        "couples": [
+          {
+            "axis": "siege_sight",
+            "kind": "complement",
+            "cross": [
+              "pad",
+              "sight|fog"
+            ],
+            "a": 1.3,
+            "b": 1.08,
+            "strength": 1.825
+          },
+          {
+            "axis": "mobility",
+            "kind": "complement",
+            "a": -1.0,
+            "b": 1.0,
+            "strength": 1.0
+          },
+          {
+            "axis": "pad",
+            "kind": "complement",
+            "a": 1.0,
+            "b": -0.45,
+            "strength": 0.45
+          }
+        ],
+        "spotterLocked": true,
+        "siegeSpotStrength": 1.825
+      }
+    },
+    {
+      "id": "anvil__yeva",
+      "a": "yeva",
+      "b": "anvil",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "spot meets siege",
+        "kite vs hold"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "umwelt spot meets siege (complement=2.949)",
+        "adjacent columns skirmish/line",
+        "doctrine drama skirm/line",
+        "same faction armada"
+      ],
+      "authored": false,
+      "aName": "Whisper-of-Ash Yeva",
+      "bName": "Anvil Mire",
+      "aHook": "Ghosts already walked it.",
+      "bHook": "The river learns my weight.",
+      "aGlyph": "+mob·−pad·+sig·+fog",
+      "bGlyph": "+off·−mob·+pad",
+      "talkIds": {
+        "C": "anvil__yeva:C",
+        "B": "anvil__yeva:B",
+        "A": "anvil__yeva:A"
+      },
+      "umwelt": {
+        "motif": "spot meets siege",
+        "boost": 0.62,
+        "couples": [
+          {
+            "axis": "siege_sight",
+            "kind": "complement",
+            "cross": [
+              "pad",
+              "sight|fog"
+            ],
+            "a": 0.65,
+            "b": 1.3,
+            "strength": 1.099
+          },
+          {
+            "axis": "mobility",
+            "kind": "complement",
+            "a": 1.0,
+            "b": -1.0,
+            "strength": 1.0
+          },
+          {
+            "axis": "pad",
+            "kind": "complement",
+            "a": -0.85,
+            "b": 1.0,
+            "strength": 0.85
+          },
+          {
+            "axis": "offense",
+            "kind": "mirror",
+            "a": 0.35,
+            "b": 1.0,
+            "strength": 0.193
+          }
+        ],
+        "spotterLocked": true,
+        "siegeSpotStrength": 1.099
+      }
+    },
+    {
+      "id": "auditor__grath",
+      "a": "grath",
+      "b": "auditor",
+      "score": 1.0,
+      "polarity": "tension",
+      "motifs": [
+        "kite vs hold",
+        "pad functional circle"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "umwelt pad functional circle (complement=1.06)",
+        "adjacent columns line/skirmish",
+        "doctrine drama line/skirm",
+        "front-weight verbs",
+        "same faction legion"
+      ],
+      "authored": false,
+      "aName": "Grath Arrears",
+      "bName": "The Last Auditor",
+      "aHook": "Three wars unpaid.",
+      "bHook": "Ledger with legs.",
+      "aGlyph": "+pad·+off·−mob·+led",
+      "bGlyph": "+mob·+off·−pad·+led",
+      "talkIds": {
+        "C": "auditor__grath:C",
+        "B": "auditor__grath:B",
+        "A": "auditor__grath:A"
+      },
+      "umwelt": {
+        "motif": "pad functional circle",
+        "boost": 0.55,
+        "couples": [
+          {
+            "axis": "pad",
+            "kind": "complement",
+            "a": 0.8,
+            "b": -0.7,
+            "strength": 0.56
+          },
+          {
+            "axis": "mobility",
+            "kind": "complement",
+            "a": -0.5,
+            "b": 1.0,
+            "strength": 0.5
+          },
+          {
+            "axis": "offense",
+            "kind": "mirror",
+            "a": 0.55,
+            "b": 0.75,
+            "strength": 0.227
+          },
+          {
+            "axis": "ledger",
+            "kind": "mirror",
+            "a": 0.45,
+            "b": 0.45,
+            "strength": 0.111
+          }
+        ],
+        "spotterLocked": false,
+        "siegeSpotStrength": 0.0
+      }
+    },
+    {
+      "id": "auditor__halq",
+      "a": "halq",
+      "b": "auditor",
+      "score": 1.0,
+      "polarity": "tension",
+      "motifs": [
+        "kite vs hold",
+        "pad functional circle",
+        "shared:count"
+      ],
+      "sharedTemperament": [
+        "count"
+      ],
+      "reasons": [
+        "umwelt pad functional circle (complement=1.06)",
+        "shared temperament ['count']",
+        "adjacent columns line/skirmish",
+        "doctrine drama line/skirm",
+        "front-weight verbs",
+        "same faction legion"
+      ],
+      "authored": false,
+      "aName": "Sisu Halq",
+      "bName": "The Last Auditor",
+      "aHook": "Shoots map coordinates.",
+      "bHook": "Ledger with legs.",
+      "aGlyph": "+pad·+off·−mob·+led",
+      "bGlyph": "+mob·+off·−pad·+led",
+      "talkIds": {
+        "C": "auditor__halq:C",
+        "B": "auditor__halq:B",
+        "A": "auditor__halq:A"
+      },
+      "umwelt": {
+        "motif": "pad functional circle",
+        "boost": 0.55,
+        "couples": [
+          {
+            "axis": "pad",
+            "kind": "complement",
+            "a": 0.8,
+            "b": -0.7,
+            "strength": 0.56
+          },
+          {
+            "axis": "mobility",
+            "kind": "complement",
+            "a": -0.5,
+            "b": 1.0,
+            "strength": 0.5
+          },
+          {
+            "axis": "offense",
+            "kind": "mirror",
+            "a": 0.55,
+            "b": 0.75,
+            "strength": 0.227
+          },
+          {
+            "axis": "ledger",
+            "kind": "mirror",
+            "a": 0.45,
+            "b": 0.45,
+            "strength": 0.111
+          }
+        ],
+        "spotterLocked": false,
+        "siegeSpotStrength": 0.0
+      }
+    },
+    {
+      "id": "auditor__odessa",
+      "a": "odessa",
+      "b": "auditor",
+      "score": 1.0,
+      "polarity": "tension",
+      "motifs": [
+        "kite vs hold",
+        "pad functional circle"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "umwelt pad functional circle (complement=1.2)",
+        "adjacent columns line/skirmish",
+        "doctrine drama line/skirm",
+        "front-weight verbs",
+        "same faction legion"
+      ],
+      "authored": false,
+      "aName": "Odessa Krail",
+      "bName": "The Last Auditor",
+      "aHook": "Fords are doors.",
+      "bHook": "Ledger with legs.",
+      "aGlyph": "+pad·+off·−mob",
+      "bGlyph": "+mob·+off·−pad·+led",
+      "talkIds": {
+        "C": "auditor__odessa:C",
+        "B": "auditor__odessa:B",
+        "A": "auditor__odessa:A"
+      },
+      "umwelt": {
+        "motif": "pad functional circle",
+        "boost": 0.55,
+        "couples": [
+          {
+            "axis": "pad",
+            "kind": "complement",
+            "a": 1.0,
+            "b": -0.7,
+            "strength": 0.7
+          },
+          {
+            "axis": "mobility",
+            "kind": "complement",
+            "a": -0.5,
+            "b": 1.0,
+            "strength": 0.5
+          },
+          {
+            "axis": "offense",
+            "kind": "mirror",
+            "a": 0.65,
+            "b": 0.75,
+            "strength": 0.268
+          }
+        ],
+        "spotterLocked": false,
+        "siegeSpotStrength": 0.0
+      }
+    },
+    {
+      "id": "auditor__rumor",
+      "a": "rumor",
+      "b": "auditor",
+      "score": 1.0,
+      "polarity": "friction",
+      "motifs": [
+        "the ledger and the turncoat",
+        "count against contract"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Rumor",
+      "bName": "The Last Auditor",
+      "aHook": "Everything changes sides eventually.",
+      "bHook": "Ledger with legs.",
+      "aGlyph": "+fog·+cra·+sig·−pad",
+      "bGlyph": "+mob·+off·−pad·+led",
+      "talkIds": {
+        "C": "auditor__rumor:C",
+        "B": "auditor__rumor:B",
+        "A": "auditor__rumor:A"
+      }
+    },
+    {
+      "id": "auditor__rusk",
+      "a": "rusk",
+      "b": "auditor",
+      "score": 1.0,
+      "polarity": "tension",
+      "motifs": [
+        "kite vs hold",
+        "pad functional circle"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "umwelt pad functional circle (complement=1.2)",
+        "adjacent columns line/skirmish",
+        "doctrine drama line/skirm",
+        "front-weight verbs",
+        "same faction legion"
+      ],
+      "authored": false,
+      "aName": "Rusk Halloway",
+      "bName": "The Last Auditor",
+      "aHook": "Gate, jammed gat, a lie.",
+      "bHook": "Ledger with legs.",
+      "aGlyph": "+pad·+off·−mob",
+      "bGlyph": "+mob·+off·−pad·+led",
+      "talkIds": {
+        "C": "auditor__rusk:C",
+        "B": "auditor__rusk:B",
+        "A": "auditor__rusk:A"
+      },
+      "umwelt": {
+        "motif": "pad functional circle",
+        "boost": 0.55,
+        "couples": [
+          {
+            "axis": "pad",
+            "kind": "complement",
+            "a": 1.0,
+            "b": -0.7,
+            "strength": 0.7
+          },
+          {
+            "axis": "mobility",
+            "kind": "complement",
+            "a": -0.5,
+            "b": 1.0,
+            "strength": 0.5
+          },
+          {
+            "axis": "offense",
+            "kind": "mirror",
+            "a": 0.65,
+            "b": 0.75,
+            "strength": 0.268
           }
         ],
         "spotterLocked": false,
@@ -2727,6 +3170,72 @@
       }
     },
     {
+      "id": "brakhov__hearth",
+      "a": "hearth",
+      "b": "brakhov",
+      "score": 1.0,
+      "polarity": "bond",
+      "motifs": [
+        "supply meets hunger",
+        "weight that stays"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "umwelt supply meets hunger (complement=2.785)",
+        "complement (weight that stays)",
+        "front-weight verbs",
+        "cross-faction contract tension"
+      ],
+      "authored": false,
+      "aName": "Hearth",
+      "bName": "Brakhov the Kiln",
+      "aHook": "Quiet sun. Won't go out.",
+      "bHook": "Name gone. Forward heat.",
+      "aGlyph": "+ene·−mob·+pad·−off",
+      "bGlyph": "−ene·+off·−mob·+hea",
+      "talkIds": {
+        "C": "brakhov__hearth:C",
+        "B": "brakhov__hearth:B",
+        "A": "brakhov__hearth:A"
+      },
+      "umwelt": {
+        "motif": "supply meets hunger",
+        "boost": 0.62,
+        "couples": [
+          {
+            "axis": "energy",
+            "kind": "complement",
+            "a": 1.0,
+            "b": -1.0,
+            "strength": 1.35
+          },
+          {
+            "axis": "offense",
+            "kind": "complement",
+            "a": -0.9,
+            "b": 1.0,
+            "strength": 1.035
+          },
+          {
+            "axis": "mobility",
+            "kind": "mirror",
+            "a": -1.0,
+            "b": -1.0,
+            "strength": 0.55
+          },
+          {
+            "axis": "pad",
+            "kind": "complement",
+            "a": 1.0,
+            "b": -0.4,
+            "strength": 0.4
+          }
+        ],
+        "spotterLocked": false,
+        "siegeSpotStrength": 0.0
+      }
+    },
+    {
       "id": "brakhov__vale",
       "a": "brakhov",
       "b": "vale",
@@ -2855,6 +3364,65 @@
             "a": 0.25,
             "b": 0.25,
             "strength": 0.034
+          }
+        ],
+        "spotterLocked": false,
+        "siegeSpotStrength": 0.0
+      }
+    },
+    {
+      "id": "bro__hearth",
+      "a": "hearth",
+      "b": "bro",
+      "score": 1.0,
+      "polarity": "bond",
+      "motifs": [
+        "supply meets hunger",
+        "weight that stays"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "umwelt supply meets hunger (complement=2.115)",
+        "complement (weight that stays)",
+        "front-weight verbs",
+        "cross-faction contract tension"
+      ],
+      "authored": false,
+      "aName": "Hearth",
+      "bName": "Bro",
+      "aHook": "Quiet sun. Won't go out.",
+      "bHook": "Yeah. I'll take that wall.",
+      "aGlyph": "+ene·−mob·+pad·−off",
+      "bGlyph": "+off·−mob·−ene·+led",
+      "talkIds": {
+        "C": "bro__hearth:C",
+        "B": "bro__hearth:B",
+        "A": "bro__hearth:A"
+      },
+      "umwelt": {
+        "motif": "supply meets hunger",
+        "boost": 0.62,
+        "couples": [
+          {
+            "axis": "energy",
+            "kind": "complement",
+            "a": 1.0,
+            "b": -0.8,
+            "strength": 1.08
+          },
+          {
+            "axis": "offense",
+            "kind": "complement",
+            "a": -0.9,
+            "b": 1.0,
+            "strength": 1.035
+          },
+          {
+            "axis": "mobility",
+            "kind": "mirror",
+            "a": -1.0,
+            "b": -1.0,
+            "strength": 0.55
           }
         ],
         "spotterLocked": false,
@@ -3029,64 +3597,254 @@
       }
     },
     {
-      "id": "anvil__ceil",
+      "id": "ceil__commando",
+      "a": "commando",
+      "b": "ceil",
+      "score": 1.0,
+      "polarity": "sibling",
+      "motifs": [
+        "siblings of the hangar",
+        "mischief meets glass"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Cinder Hook",
+      "bName": "Ceil Rat",
+      "aHook": "Mines before the argument.",
+      "bHook": "Altitude is an opinion.",
+      "aGlyph": "+fog·+mob·+cra·+pad",
+      "bGlyph": "+mob·−pad·+sky·+off",
+      "talkIds": {
+        "C": "ceil__commando:C",
+        "B": "ceil__commando:B",
+        "A": "ceil__commando:A"
+      }
+    },
+    {
+      "id": "ceil__gale",
+      "a": "gale",
+      "b": "ceil",
+      "score": 1.0,
+      "polarity": "mirror",
+      "motifs": [
+        "two gunship wings, one sky",
+        "rotors and floats"
+      ],
+      "sharedTemperament": [
+        "sky"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Marrow Gale",
+      "bName": "Ceil Rat",
+      "aHook": "Lands where nobody parks.",
+      "bHook": "Altitude is an opinion.",
+      "aGlyph": "+mob·−pad·+off·+sky",
+      "bGlyph": "+mob·−pad·+sky·+off",
+      "talkIds": {
+        "C": "ceil__gale:C",
+        "B": "ceil__gale:B",
+        "A": "ceil__gale:A"
+      }
+    },
+    {
+      "id": "ceil__kettle",
       "a": "ceil",
-      "b": "anvil",
+      "b": "kettle",
+      "score": 1.0,
+      "polarity": "rivalry",
+      "motifs": [
+        "the gunship and the saint who shoots gunships",
+        "altitude meets the roof"
+      ],
+      "sharedTemperament": [
+        "sky"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Ceil Rat",
+      "bName": "Saint Kettle",
+      "aHook": "Altitude is an opinion.",
+      "bHook": "Sky-saint, chainsaw soul.",
+      "aGlyph": "+mob·−pad·+sky·+off",
+      "bGlyph": "+pad·+sky·−off",
+      "talkIds": {
+        "C": "ceil__kettle:C",
+        "B": "ceil__kettle:B",
+        "A": "ceil__kettle:A"
+      }
+    },
+    {
+      "id": "ceil__mira",
+      "a": "mira",
+      "b": "ceil",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "spot meets siege, from the sky",
+        "gleeful meets glass"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Mira Barrage",
+      "bName": "Ceil Rat",
+      "aHook": "Napalm is confetti.",
+      "bHook": "Altitude is an opinion.",
+      "aGlyph": "+off·+hea·−ene·−pad",
+      "bGlyph": "+mob·−pad·+sky·+off",
+      "talkIds": {
+        "C": "ceil__mira:C",
+        "B": "ceil__mira:B",
+        "A": "ceil__mira:A"
+      }
+    },
+    {
+      "id": "ceil__nox",
+      "a": "nox",
+      "b": "ceil",
+      "score": 1.0,
+      "polarity": "tension",
+      "motifs": [
+        "the debt of the last sky",
+        "the pilot who was there"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Nox Tithe",
+      "bName": "Ceil Rat",
+      "aHook": "Still paying for the last sky.",
+      "bHook": "Altitude is an opinion.",
+      "aGlyph": "−mob·+pad·+led·−off",
+      "bGlyph": "+mob·−pad·+sky·+off",
+      "talkIds": {
+        "C": "ceil__nox:C",
+        "B": "ceil__nox:B",
+        "A": "ceil__nox:A"
+      }
+    },
+    {
+      "id": "ceil__quill",
+      "a": "quill",
+      "b": "ceil",
       "score": 1.0,
       "polarity": "tension",
       "motifs": [
         "kite vs hold",
-        "anvil vs kite",
-        "stay meets stride"
+        "burn the ceiling",
+        "pad functional circle"
       ],
       "sharedTemperament": [],
       "reasons": [
-        "umwelt stay meets stride (complement=2.0)",
-        "complement (anvil vs kite)",
-        "adjacent columns skirmish/line",
-        "doctrine drama skirm/line",
+        "umwelt pad functional circle (complement=0.45)",
+        "complement (burn the ceiling)",
+        "adjacent columns line/skirmish",
+        "doctrine drama line/skirm",
         "same faction armada"
       ],
       "authored": false,
-      "aName": "Ceil Rat",
-      "bName": "Anvil Mire",
-      "aHook": "Altitude is an opinion.",
-      "bHook": "The river learns my weight.",
-      "aGlyph": "+mob·−pad·+sky·+off",
-      "bGlyph": "+off·−mob·+pad",
+      "aName": "Ash-Marshal Quill",
+      "bName": "Ceil Rat",
+      "aHook": "Orders walk on treads.",
+      "bHook": "Altitude is an opinion.",
+      "aGlyph": "+off·+pad·+hea",
+      "bGlyph": "+mob·−pad·+sky·+off",
       "talkIds": {
-        "C": "anvil__ceil:C",
-        "B": "anvil__ceil:B",
-        "A": "anvil__ceil:A"
+        "C": "ceil__quill:C",
+        "B": "ceil__quill:B",
+        "A": "ceil__quill:A"
       },
       "umwelt": {
-        "motif": "stay meets stride",
-        "boost": 0.55,
+        "motif": "pad functional circle",
+        "boost": 0.296,
         "couples": [
-          {
-            "axis": "mobility",
-            "kind": "complement",
-            "a": 1.0,
-            "b": -1.0,
-            "strength": 1.0
-          },
           {
             "axis": "pad",
             "kind": "complement",
-            "a": -1.0,
-            "b": 1.0,
-            "strength": 1.0
+            "a": 0.45,
+            "b": -1.0,
+            "strength": 0.45
           },
           {
             "axis": "offense",
             "kind": "mirror",
-            "a": 0.35,
-            "b": 1.0,
+            "a": 1.0,
+            "b": 0.35,
             "strength": 0.193
           }
         ],
         "spotterLocked": false,
         "siegeSpotStrength": 0.0
+      }
+    },
+    {
+      "id": "ceil__vane",
+      "a": "vane",
+      "b": "ceil",
+      "score": 1.0,
+      "polarity": "tension",
+      "motifs": [
+        "rhythm and the thing that breaks it",
+        "the pack's kill, taken from above"
+      ],
+      "sharedTemperament": [
+        "glass"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Ash-Captain Vane",
+      "bName": "Ceil Rat",
+      "aHook": "Pack is one thought.",
+      "bHook": "Altitude is an opinion.",
+      "aGlyph": "+mob·−pad·+off·+sig",
+      "bGlyph": "+mob·−pad·+sky·+off",
+      "talkIds": {
+        "C": "ceil__vane:C",
+        "B": "ceil__vane:B",
+        "A": "ceil__vane:A"
+      }
+    },
+    {
+      "id": "ceil__volt",
+      "a": "volt",
+      "b": "ceil",
+      "score": 1.0,
+      "polarity": "mirror",
+      "motifs": [
+        "two kites and one tally",
+        "glass meets glass"
+      ],
+      "sharedTemperament": [
+        "glass"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Volt Lash",
+      "bName": "Ceil Rat",
+      "aHook": "Sight is a wound you give them.",
+      "bHook": "Altitude is an opinion.",
+      "aGlyph": "+mob·+sig·+fog·−pad",
+      "bGlyph": "+mob·−pad·+sky·+off",
+      "talkIds": {
+        "C": "ceil__volt:C",
+        "B": "ceil__volt:B",
+        "A": "ceil__volt:A"
       }
     },
     {
@@ -3154,99 +3912,34 @@
       }
     },
     {
-      "id": "fatboy__lumen",
-      "a": "fatboy",
-      "b": "lumen",
-      "score": 1.0,
-      "polarity": "attract",
-      "motifs": [
-        "push meets refuse",
-        "holy furniture"
-      ],
-      "sharedTemperament": [],
-      "reasons": [
-        "umwelt push meets refuse (complement=2.23)",
-        "complement (holy furniture)",
-        "front-weight verbs",
-        "same faction armada"
-      ],
-      "authored": false,
-      "aName": "Fatboy Contract",
-      "bName": "Sister Lumen",
-      "aHook": "House learned to knock.",
-      "bHook": "Tithe the grid.",
-      "aGlyph": "+off·−mob·−ene·+pad",
-      "bGlyph": "+ene·−off·−mob·+pad",
-      "talkIds": {
-        "C": "fatboy__lumen:C",
-        "B": "fatboy__lumen:B",
-        "A": "fatboy__lumen:A"
-      },
-      "umwelt": {
-        "motif": "push meets refuse",
-        "boost": 0.62,
-        "couples": [
-          {
-            "axis": "offense",
-            "kind": "complement",
-            "a": 1.0,
-            "b": -1.0,
-            "strength": 1.15
-          },
-          {
-            "axis": "energy",
-            "kind": "complement",
-            "a": -0.8,
-            "b": 1.0,
-            "strength": 1.08
-          },
-          {
-            "axis": "mobility",
-            "kind": "mirror",
-            "a": -1.0,
-            "b": -1.0,
-            "strength": 0.55
-          },
-          {
-            "axis": "pad",
-            "kind": "mirror",
-            "a": 0.5,
-            "b": 1.0,
-            "strength": 0.275
-          }
-        ],
-        "spotterLocked": false,
-        "siegeSpotStrength": 0.0
-      }
-    },
-    {
-      "id": "fatboy__volt",
-      "a": "fatboy",
-      "b": "volt",
+      "id": "commando__warder",
+      "a": "warder",
+      "b": "commando",
       "score": 1.0,
       "polarity": "attract",
       "motifs": [
         "spot meets siege",
-        "anvil vs kite"
+        "same circle, different tooth",
+        "mines vs owned dirt"
       ],
       "sharedTemperament": [],
       "reasons": [
-        "umwelt spot meets siege (complement=2.524)",
-        "complement (anvil vs kite)",
-        "adjacent columns siege/eyes",
-        "same faction armada"
+        "umwelt spot meets siege (complement=1.287)",
+        "same position shield",
+        "doctrine drama pad/dirty",
+        "cross-faction contract tension"
       ],
       "authored": false,
-      "aName": "Fatboy Contract",
-      "bName": "Volt Lash",
-      "aHook": "House learned to knock.",
-      "bHook": "Sight is a wound you give them.",
-      "aGlyph": "+off·−mob·−ene·+pad",
-      "bGlyph": "+mob·+sig·+fog·−pad",
+      "aName": "Warder",
+      "bName": "Cinder Hook",
+      "aHook": "Owns a circle of dirt.",
+      "bHook": "Mines before the argument.",
+      "aGlyph": "−mob·+pad·−off",
+      "bGlyph": "+fog·+mob·+cra·+pad",
       "talkIds": {
-        "C": "fatboy__volt:C",
-        "B": "fatboy__volt:B",
-        "A": "fatboy__volt:A"
+        "C": "commando__warder:C",
+        "B": "commando__warder:B",
+        "A": "commando__warder:A"
       },
       "umwelt": {
         "motif": "spot meets siege",
@@ -3259,498 +3952,27 @@
               "pad",
               "sight|fog"
             ],
-            "a": 0.925,
-            "b": 1.08,
-            "strength": 1.299
+            "a": 1.1,
+            "b": 0.55,
+            "strength": 0.787
           },
           {
             "axis": "mobility",
             "kind": "complement",
             "a": -1.0,
-            "b": 1.0,
-            "strength": 1.0
+            "b": 0.5,
+            "strength": 0.5
           },
           {
             "axis": "pad",
-            "kind": "complement",
-            "a": 0.5,
-            "b": -0.45,
-            "strength": 0.225
-          },
-          {
-            "axis": "heat",
             "kind": "mirror",
-            "a": 0.25,
-            "b": 0.45,
-            "strength": 0.062
+            "a": 1.0,
+            "b": 0.35,
+            "strength": 0.193
           }
         ],
         "spotterLocked": true,
-        "siegeSpotStrength": 1.299
-      }
-    },
-    {
-      "id": "auditor__grath",
-      "a": "grath",
-      "b": "auditor",
-      "score": 1.0,
-      "polarity": "tension",
-      "motifs": [
-        "kite vs hold",
-        "pad functional circle"
-      ],
-      "sharedTemperament": [],
-      "reasons": [
-        "umwelt pad functional circle (complement=1.06)",
-        "adjacent columns line/skirmish",
-        "doctrine drama line/skirm",
-        "front-weight verbs",
-        "same faction legion"
-      ],
-      "authored": false,
-      "aName": "Grath Arrears",
-      "bName": "The Last Auditor",
-      "aHook": "Three wars unpaid.",
-      "bHook": "Ledger with legs.",
-      "aGlyph": "+pad·+off·−mob·+led",
-      "bGlyph": "+mob·+off·−pad·+led",
-      "talkIds": {
-        "C": "auditor__grath:C",
-        "B": "auditor__grath:B",
-        "A": "auditor__grath:A"
-      },
-      "umwelt": {
-        "motif": "pad functional circle",
-        "boost": 0.55,
-        "couples": [
-          {
-            "axis": "pad",
-            "kind": "complement",
-            "a": 0.8,
-            "b": -0.7,
-            "strength": 0.56
-          },
-          {
-            "axis": "mobility",
-            "kind": "complement",
-            "a": -0.5,
-            "b": 1.0,
-            "strength": 0.5
-          },
-          {
-            "axis": "offense",
-            "kind": "mirror",
-            "a": 0.55,
-            "b": 0.75,
-            "strength": 0.227
-          },
-          {
-            "axis": "ledger",
-            "kind": "mirror",
-            "a": 0.45,
-            "b": 0.45,
-            "strength": 0.111
-          }
-        ],
-        "spotterLocked": false,
-        "siegeSpotStrength": 0.0
-      }
-    },
-    {
-      "id": "grath__yeva",
-      "a": "grath",
-      "b": "yeva",
-      "score": 1.0,
-      "polarity": "attract",
-      "motifs": [
-        "spot meets siege",
-        "kite vs hold"
-      ],
-      "sharedTemperament": [],
-      "reasons": [
-        "umwelt spot meets siege (complement=1.928)",
-        "adjacent columns line/skirmish",
-        "doctrine drama line/skirm",
-        "cross-faction contract tension"
-      ],
-      "authored": false,
-      "aName": "Grath Arrears",
-      "bName": "Whisper-of-Ash Yeva",
-      "aHook": "Three wars unpaid.",
-      "bHook": "Ghosts already walked it.",
-      "aGlyph": "+pad·+off·−mob·+led",
-      "bGlyph": "+mob·−pad·+sig·+fog",
-      "talkIds": {
-        "C": "grath__yeva:C",
-        "B": "grath__yeva:B",
-        "A": "grath__yeva:A"
-      },
-      "umwelt": {
-        "motif": "spot meets siege",
-        "boost": 0.62,
-        "couples": [
-          {
-            "axis": "siege_sight",
-            "kind": "complement",
-            "cross": [
-              "pad",
-              "sight|fog"
-            ],
-            "a": 0.885,
-            "b": 0.65,
-            "strength": 0.748
-          },
-          {
-            "axis": "pad",
-            "kind": "complement",
-            "a": 0.8,
-            "b": -0.85,
-            "strength": 0.68
-          },
-          {
-            "axis": "mobility",
-            "kind": "complement",
-            "a": -0.5,
-            "b": 1.0,
-            "strength": 0.5
-          },
-          {
-            "axis": "offense",
-            "kind": "mirror",
-            "a": 0.55,
-            "b": 0.35,
-            "strength": 0.106
-          }
-        ],
-        "spotterLocked": true,
-        "siegeSpotStrength": 0.748
-      }
-    },
-    {
-      "id": "auditor__halq",
-      "a": "halq",
-      "b": "auditor",
-      "score": 1.0,
-      "polarity": "tension",
-      "motifs": [
-        "kite vs hold",
-        "pad functional circle",
-        "shared:count"
-      ],
-      "sharedTemperament": [
-        "count"
-      ],
-      "reasons": [
-        "umwelt pad functional circle (complement=1.06)",
-        "shared temperament ['count']",
-        "adjacent columns line/skirmish",
-        "doctrine drama line/skirm",
-        "front-weight verbs",
-        "same faction legion"
-      ],
-      "authored": false,
-      "aName": "Sisu Halq",
-      "bName": "The Last Auditor",
-      "aHook": "Shoots map coordinates.",
-      "bHook": "Ledger with legs.",
-      "aGlyph": "+pad·+off·−mob·+led",
-      "bGlyph": "+mob·+off·−pad·+led",
-      "talkIds": {
-        "C": "auditor__halq:C",
-        "B": "auditor__halq:B",
-        "A": "auditor__halq:A"
-      },
-      "umwelt": {
-        "motif": "pad functional circle",
-        "boost": 0.55,
-        "couples": [
-          {
-            "axis": "pad",
-            "kind": "complement",
-            "a": 0.8,
-            "b": -0.7,
-            "strength": 0.56
-          },
-          {
-            "axis": "mobility",
-            "kind": "complement",
-            "a": -0.5,
-            "b": 1.0,
-            "strength": 0.5
-          },
-          {
-            "axis": "offense",
-            "kind": "mirror",
-            "a": 0.55,
-            "b": 0.75,
-            "strength": 0.227
-          },
-          {
-            "axis": "ledger",
-            "kind": "mirror",
-            "a": 0.45,
-            "b": 0.45,
-            "strength": 0.111
-          }
-        ],
-        "spotterLocked": false,
-        "siegeSpotStrength": 0.0
-      }
-    },
-    {
-      "id": "halq__kit",
-      "a": "halq",
-      "b": "kit",
-      "score": 1.0,
-      "polarity": "tension",
-      "motifs": [
-        "kite vs hold",
-        "chaos vs ledger",
-        "pad functional circle"
-      ],
-      "sharedTemperament": [],
-      "reasons": [
-        "umwelt pad functional circle (complement=1.26)",
-        "complement (chaos vs ledger)",
-        "adjacent columns line/skirmish",
-        "doctrine drama line/skirm",
-        "same faction legion"
-      ],
-      "authored": false,
-      "aName": "Sisu Halq",
-      "bName": "Kit Sparkler",
-      "aHook": "Shoots map coordinates.",
-      "bHook": "Fireworks at walking distance.",
-      "aGlyph": "+pad·+off·−mob·+led",
-      "bGlyph": "+mob·−pad·+off",
-      "talkIds": {
-        "C": "halq__kit:C",
-        "B": "halq__kit:B",
-        "A": "halq__kit:A"
-      },
-      "umwelt": {
-        "motif": "pad functional circle",
-        "boost": 0.55,
-        "couples": [
-          {
-            "axis": "pad",
-            "kind": "complement",
-            "a": 0.8,
-            "b": -0.95,
-            "strength": 0.76
-          },
-          {
-            "axis": "mobility",
-            "kind": "complement",
-            "a": -0.5,
-            "b": 1.0,
-            "strength": 0.5
-          },
-          {
-            "axis": "offense",
-            "kind": "mirror",
-            "a": 0.55,
-            "b": 0.35,
-            "strength": 0.106
-          }
-        ],
-        "spotterLocked": false,
-        "siegeSpotStrength": 0.0
-      }
-    },
-    {
-      "id": "halq__yeva",
-      "a": "halq",
-      "b": "yeva",
-      "score": 1.0,
-      "polarity": "attract",
-      "motifs": [
-        "spot meets siege",
-        "kite vs hold"
-      ],
-      "sharedTemperament": [],
-      "reasons": [
-        "umwelt spot meets siege (complement=1.928)",
-        "adjacent columns line/skirmish",
-        "doctrine drama line/skirm",
-        "cross-faction contract tension"
-      ],
-      "authored": false,
-      "aName": "Sisu Halq",
-      "bName": "Whisper-of-Ash Yeva",
-      "aHook": "Shoots map coordinates.",
-      "bHook": "Ghosts already walked it.",
-      "aGlyph": "+pad·+off·−mob·+led",
-      "bGlyph": "+mob·−pad·+sig·+fog",
-      "talkIds": {
-        "C": "halq__yeva:C",
-        "B": "halq__yeva:B",
-        "A": "halq__yeva:A"
-      },
-      "umwelt": {
-        "motif": "spot meets siege",
-        "boost": 0.62,
-        "couples": [
-          {
-            "axis": "siege_sight",
-            "kind": "complement",
-            "cross": [
-              "pad",
-              "sight|fog"
-            ],
-            "a": 0.885,
-            "b": 0.65,
-            "strength": 0.748
-          },
-          {
-            "axis": "pad",
-            "kind": "complement",
-            "a": 0.8,
-            "b": -0.85,
-            "strength": 0.68
-          },
-          {
-            "axis": "mobility",
-            "kind": "complement",
-            "a": -0.5,
-            "b": 1.0,
-            "strength": 0.5
-          },
-          {
-            "axis": "offense",
-            "kind": "mirror",
-            "a": 0.55,
-            "b": 0.35,
-            "strength": 0.106
-          }
-        ],
-        "spotterLocked": true,
-        "siegeSpotStrength": 0.748
-      }
-    },
-    {
-      "id": "brakhov__hearth",
-      "a": "hearth",
-      "b": "brakhov",
-      "score": 1.0,
-      "polarity": "bond",
-      "motifs": [
-        "supply meets hunger",
-        "weight that stays"
-      ],
-      "sharedTemperament": [],
-      "reasons": [
-        "umwelt supply meets hunger (complement=2.785)",
-        "complement (weight that stays)",
-        "front-weight verbs",
-        "cross-faction contract tension"
-      ],
-      "authored": false,
-      "aName": "Hearth",
-      "bName": "Brakhov the Kiln",
-      "aHook": "Quiet sun. Won't go out.",
-      "bHook": "Name gone. Forward heat.",
-      "aGlyph": "+ene·−mob·+pad·−off",
-      "bGlyph": "−ene·+off·−mob·+hea",
-      "talkIds": {
-        "C": "brakhov__hearth:C",
-        "B": "brakhov__hearth:B",
-        "A": "brakhov__hearth:A"
-      },
-      "umwelt": {
-        "motif": "supply meets hunger",
-        "boost": 0.62,
-        "couples": [
-          {
-            "axis": "energy",
-            "kind": "complement",
-            "a": 1.0,
-            "b": -1.0,
-            "strength": 1.35
-          },
-          {
-            "axis": "offense",
-            "kind": "complement",
-            "a": -0.9,
-            "b": 1.0,
-            "strength": 1.035
-          },
-          {
-            "axis": "mobility",
-            "kind": "mirror",
-            "a": -1.0,
-            "b": -1.0,
-            "strength": 0.55
-          },
-          {
-            "axis": "pad",
-            "kind": "complement",
-            "a": 1.0,
-            "b": -0.4,
-            "strength": 0.4
-          }
-        ],
-        "spotterLocked": false,
-        "siegeSpotStrength": 0.0
-      }
-    },
-    {
-      "id": "bro__hearth",
-      "a": "hearth",
-      "b": "bro",
-      "score": 1.0,
-      "polarity": "bond",
-      "motifs": [
-        "supply meets hunger",
-        "weight that stays"
-      ],
-      "sharedTemperament": [],
-      "reasons": [
-        "umwelt supply meets hunger (complement=2.115)",
-        "complement (weight that stays)",
-        "front-weight verbs",
-        "cross-faction contract tension"
-      ],
-      "authored": false,
-      "aName": "Hearth",
-      "bName": "Bro",
-      "aHook": "Quiet sun. Won't go out.",
-      "bHook": "Yeah. I'll take that wall.",
-      "aGlyph": "+ene·−mob·+pad·−off",
-      "bGlyph": "+off·−mob·−ene·+led",
-      "talkIds": {
-        "C": "bro__hearth:C",
-        "B": "bro__hearth:B",
-        "A": "bro__hearth:A"
-      },
-      "umwelt": {
-        "motif": "supply meets hunger",
-        "boost": 0.62,
-        "couples": [
-          {
-            "axis": "energy",
-            "kind": "complement",
-            "a": 1.0,
-            "b": -0.8,
-            "strength": 1.08
-          },
-          {
-            "axis": "offense",
-            "kind": "complement",
-            "a": -0.9,
-            "b": 1.0,
-            "strength": 1.035
-          },
-          {
-            "axis": "mobility",
-            "kind": "mirror",
-            "a": -1.0,
-            "b": -1.0,
-            "strength": 0.55
-          }
-        ],
-        "spotterLocked": false,
-        "siegeSpotStrength": 0.0
+        "siegeSpotStrength": 0.787
       }
     },
     {
@@ -3824,48 +4046,78 @@
       }
     },
     {
-      "id": "hearth__lumen",
-      "a": "hearth",
-      "b": "lumen",
+      "id": "fatboy__kettle",
+      "a": "fatboy",
+      "b": "kettle",
       "score": 1.0,
-      "polarity": "bond",
+      "polarity": "attract",
       "motifs": [
-        "coal furniture and grid saint",
-        "holy furniture",
-        "shared energy mark",
-        "shared ledger of sun"
+        "house and roof",
+        "plod meets hold"
       ],
       "sharedTemperament": [],
       "reasons": [
-        "authored seed",
-        "umwelt shared energy mark (complement=0.0)",
-        "complement (holy furniture)",
-        "same position eco",
-        "same verb hold",
-        "same faction armada"
+        "authored seed"
       ],
       "authored": true,
-      "aName": "Hearth",
+      "aName": "Fatboy Contract",
+      "bName": "Saint Kettle",
+      "aHook": "House learned to knock.",
+      "bHook": "Sky-saint, chainsaw soul.",
+      "aGlyph": "+off·−mob·−ene·+pad",
+      "bGlyph": "+pad·+sky·−off",
+      "talkIds": {
+        "C": "fatboy__kettle:C",
+        "B": "fatboy__kettle:B",
+        "A": "fatboy__kettle:A"
+      }
+    },
+    {
+      "id": "fatboy__lumen",
+      "a": "fatboy",
+      "b": "lumen",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "push meets refuse",
+        "holy furniture"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "umwelt push meets refuse (complement=2.23)",
+        "complement (holy furniture)",
+        "front-weight verbs",
+        "same faction armada"
+      ],
+      "authored": false,
+      "aName": "Fatboy Contract",
       "bName": "Sister Lumen",
-      "aHook": "Quiet sun. Won't go out.",
+      "aHook": "House learned to knock.",
       "bHook": "Tithe the grid.",
-      "aGlyph": "+ene·−mob·+pad·−off",
+      "aGlyph": "+off·−mob·−ene·+pad",
       "bGlyph": "+ene·−off·−mob·+pad",
       "talkIds": {
-        "C": "hearth__lumen:C",
-        "B": "hearth__lumen:B",
-        "A": "hearth__lumen:A"
+        "C": "fatboy__lumen:C",
+        "B": "fatboy__lumen:B",
+        "A": "fatboy__lumen:A"
       },
       "umwelt": {
-        "motif": "shared energy mark",
-        "boost": 0.55,
+        "motif": "push meets refuse",
+        "boost": 0.62,
         "couples": [
           {
-            "axis": "energy",
-            "kind": "mirror",
+            "axis": "offense",
+            "kind": "complement",
             "a": 1.0,
+            "b": -1.0,
+            "strength": 1.15
+          },
+          {
+            "axis": "energy",
+            "kind": "complement",
+            "a": -0.8,
             "b": 1.0,
-            "strength": 0.55
+            "strength": 1.08
           },
           {
             "axis": "mobility",
@@ -3877,23 +4129,9 @@
           {
             "axis": "pad",
             "kind": "mirror",
-            "a": 1.0,
+            "a": 0.5,
             "b": 1.0,
-            "strength": 0.55
-          },
-          {
-            "axis": "offense",
-            "kind": "mirror",
-            "a": -0.9,
-            "b": -1.0,
-            "strength": 0.495
-          },
-          {
-            "axis": "craft",
-            "kind": "mirror",
-            "a": 0.65,
-            "b": 1.0,
-            "strength": 0.358
+            "strength": 0.275
           }
         ],
         "spotterLocked": false,
@@ -3901,211 +4139,60 @@
       }
     },
     {
-      "id": "kettle__warder",
-      "a": "kettle",
-      "b": "warder",
-      "score": 1.0,
-      "polarity": "bond",
-      "motifs": [
-        "dirt circle and sky hymn",
-        "holy furniture",
-        "shared pad mark",
-        "same circle, different tooth"
-      ],
-      "sharedTemperament": [],
-      "reasons": [
-        "umwelt shared pad mark (complement=0.0)",
-        "complement (holy furniture)",
-        "same position shield",
-        "doctrine drama aa_saint/pad",
-        "same verb hold",
-        "same faction armada"
-      ],
-      "authored": false,
-      "aName": "Saint Kettle",
-      "bName": "Warder",
-      "aHook": "Sky-saint, chainsaw soul.",
-      "bHook": "Owns a circle of dirt.",
-      "aGlyph": "+pad·+sky·−off",
-      "bGlyph": "−mob·+pad·−off",
-      "talkIds": {
-        "C": "kettle__warder:C",
-        "B": "kettle__warder:B",
-        "A": "kettle__warder:A"
-      },
-      "umwelt": {
-        "motif": "shared pad mark",
-        "boost": 0.154,
-        "couples": [
-          {
-            "axis": "pad",
-            "kind": "mirror",
-            "a": 1.0,
-            "b": 1.0,
-            "strength": 0.55
-          },
-          {
-            "axis": "offense",
-            "kind": "mirror",
-            "a": -0.35,
-            "b": -0.35,
-            "strength": 0.067
-          }
-        ],
-        "spotterLocked": false,
-        "siegeSpotStrength": 0.0
-      }
-    },
-    {
-      "id": "kettle__mira",
-      "a": "mira",
-      "b": "kettle",
-      "score": 1.0,
-      "polarity": "bond",
-      "motifs": [
-        "fireworks need a clear sky",
-        "burn the ceiling",
-        "push meets refuse"
-      ],
-      "sharedTemperament": [],
-      "reasons": [
-        "authored seed",
-        "umwelt push meets refuse (complement=0.752)",
-        "complement (burn the ceiling)",
-        "adjacent columns siege/shield",
-        "doctrine drama arty/aa_saint",
-        "cross-faction contract tension"
-      ],
-      "authored": true,
-      "aName": "Mira Barrage",
-      "bName": "Saint Kettle",
-      "aHook": "Napalm is confetti.",
-      "bHook": "Sky-saint, chainsaw soul.",
-      "aGlyph": "+off·+hea·−ene·−pad",
-      "bGlyph": "+pad·+sky·−off",
-      "talkIds": {
-        "C": "kettle__mira:C",
-        "B": "kettle__mira:B",
-        "A": "kettle__mira:A"
-      },
-      "umwelt": {
-        "motif": "push meets refuse",
-        "boost": 0.414,
-        "couples": [
-          {
-            "axis": "offense",
-            "kind": "complement",
-            "a": 1.0,
-            "b": -0.35,
-            "strength": 0.402
-          },
-          {
-            "axis": "pad",
-            "kind": "complement",
-            "a": -0.35,
-            "b": 1.0,
-            "strength": 0.35
-          }
-        ],
-        "spotterLocked": false,
-        "siegeSpotStrength": 0.0
-      }
-    },
-    {
-      "id": "kit__mira",
-      "a": "mira",
-      "b": "kit",
+      "id": "fatboy__thresh",
+      "a": "thresh",
+      "b": "fatboy",
       "score": 1.0,
       "polarity": "mirror",
       "motifs": [
-        "parade and walking fireworks",
-        "close confetti and far confetti",
-        "two kinds of burn",
-        "shared offense mark",
-        "shared:gleeful"
+        "the house knocks, the sky knocks",
+        "siege at two altitudes"
       ],
-      "sharedTemperament": [
-        "gleeful"
-      ],
+      "sharedTemperament": [],
       "reasons": [
-        "authored seed",
-        "umwelt shared offense mark (complement=0.0)",
-        "shared temperament ['gleeful']",
-        "complement (two kinds of burn)",
-        "doctrine drama arty/skirm",
-        "soft-edge verbs",
-        "same faction legion"
+        "authored seed"
       ],
       "authored": true,
-      "aName": "Mira Barrage",
-      "bName": "Kit Sparkler",
-      "aHook": "Napalm is confetti.",
-      "bHook": "Fireworks at walking distance.",
-      "aGlyph": "+off·+hea·−ene·−pad",
-      "bGlyph": "+mob·−pad·+off",
+      "aName": "Dama Thresh",
+      "bName": "Fatboy Contract",
+      "aHook": "Weather comes from above.",
+      "bHook": "House learned to knock.",
+      "aGlyph": "+off·+sky·+mob·−pad",
+      "bGlyph": "+off·−mob·−ene·+pad",
       "talkIds": {
-        "C": "kit__mira:C",
-        "B": "kit__mira:B",
-        "A": "kit__mira:A"
-      },
-      "umwelt": {
-        "motif": "shared offense mark",
-        "boost": 0.128,
-        "couples": [
-          {
-            "axis": "offense",
-            "kind": "mirror",
-            "a": 1.0,
-            "b": 0.35,
-            "strength": 0.193
-          },
-          {
-            "axis": "pad",
-            "kind": "mirror",
-            "a": -0.35,
-            "b": -0.95,
-            "strength": 0.183
-          },
-          {
-            "axis": "heat",
-            "kind": "mirror",
-            "a": 1.0,
-            "b": 0.25,
-            "strength": 0.138
-          }
-        ],
-        "spotterLocked": false,
-        "siegeSpotStrength": 0.0
+        "C": "fatboy__thresh:C",
+        "B": "fatboy__thresh:B",
+        "A": "fatboy__thresh:A"
       }
     },
     {
-      "id": "lumen__noctua",
-      "a": "noctua",
-      "b": "lumen",
+      "id": "fatboy__volt",
+      "a": "fatboy",
+      "b": "volt",
       "score": 1.0,
       "polarity": "attract",
       "motifs": [
         "spot meets siege",
-        "altitude feeds roots"
+        "anvil vs kite"
       ],
       "sharedTemperament": [],
       "reasons": [
-        "umwelt spot meets siege (complement=2.82)",
-        "complement (altitude feeds roots)",
-        "adjacent columns eyes/eco",
-        "cross-faction contract tension"
+        "umwelt spot meets siege (complement=2.524)",
+        "complement (anvil vs kite)",
+        "adjacent columns siege/eyes",
+        "same faction armada"
       ],
       "authored": false,
-      "aName": "Noctua Bay",
-      "bName": "Sister Lumen",
-      "aHook": "Dreams in flight paths.",
-      "bHook": "Tithe the grid.",
-      "aGlyph": "+mob·+sig·+fog·+sky",
-      "bGlyph": "+ene·−off·−mob·+pad",
+      "aName": "Fatboy Contract",
+      "bName": "Volt Lash",
+      "aHook": "House learned to knock.",
+      "bHook": "Sight is a wound you give them.",
+      "aGlyph": "+off·−mob·−ene·+pad",
+      "bGlyph": "+mob·+sig·+fog·−pad",
       "talkIds": {
-        "C": "lumen__noctua:C",
-        "B": "lumen__noctua:B",
-        "A": "lumen__noctua:A"
+        "C": "fatboy__volt:C",
+        "B": "fatboy__volt:B",
+        "A": "fatboy__volt:A"
       },
       "umwelt": {
         "motif": "spot meets siege",
@@ -4118,528 +4205,34 @@
               "pad",
               "sight|fog"
             ],
-            "a": 1.272,
-            "b": 1.1,
-            "strength": 1.82
+            "a": 0.925,
+            "b": 1.08,
+            "strength": 1.299
           },
           {
             "axis": "mobility",
             "kind": "complement",
-            "a": 1.0,
-            "b": -1.0,
+            "a": -1.0,
+            "b": 1.0,
             "strength": 1.0
           },
           {
-            "axis": "offense",
-            "kind": "mirror",
-            "a": -0.35,
-            "b": -1.0,
-            "strength": 0.193
-          }
-        ],
-        "spotterLocked": true,
-        "siegeSpotStrength": 1.82
-      }
-    },
-    {
-      "id": "auditor__odessa",
-      "a": "odessa",
-      "b": "auditor",
-      "score": 1.0,
-      "polarity": "tension",
-      "motifs": [
-        "kite vs hold",
-        "pad functional circle"
-      ],
-      "sharedTemperament": [],
-      "reasons": [
-        "umwelt pad functional circle (complement=1.2)",
-        "adjacent columns line/skirmish",
-        "doctrine drama line/skirm",
-        "front-weight verbs",
-        "same faction legion"
-      ],
-      "authored": false,
-      "aName": "Odessa Krail",
-      "bName": "The Last Auditor",
-      "aHook": "Fords are doors.",
-      "bHook": "Ledger with legs.",
-      "aGlyph": "+pad·+off·−mob",
-      "bGlyph": "+mob·+off·−pad·+led",
-      "talkIds": {
-        "C": "auditor__odessa:C",
-        "B": "auditor__odessa:B",
-        "A": "auditor__odessa:A"
-      },
-      "umwelt": {
-        "motif": "pad functional circle",
-        "boost": 0.55,
-        "couples": [
-          {
             "axis": "pad",
             "kind": "complement",
-            "a": 1.0,
-            "b": -0.7,
-            "strength": 0.7
-          },
-          {
-            "axis": "mobility",
-            "kind": "complement",
-            "a": -0.5,
-            "b": 1.0,
-            "strength": 0.5
-          },
-          {
-            "axis": "offense",
-            "kind": "mirror",
-            "a": 0.65,
-            "b": 0.75,
-            "strength": 0.268
-          }
-        ],
-        "spotterLocked": false,
-        "siegeSpotStrength": 0.0
-      }
-    },
-    {
-      "id": "odessa__yeva",
-      "a": "odessa",
-      "b": "yeva",
-      "score": 1.0,
-      "polarity": "attract",
-      "motifs": [
-        "spot meets siege",
-        "kite vs hold"
-      ],
-      "sharedTemperament": [],
-      "reasons": [
-        "umwelt spot meets siege (complement=2.241)",
-        "adjacent columns line/skirmish",
-        "doctrine drama line/skirm",
-        "cross-faction contract tension"
-      ],
-      "authored": false,
-      "aName": "Odessa Krail",
-      "bName": "Whisper-of-Ash Yeva",
-      "aHook": "Fords are doors.",
-      "bHook": "Ghosts already walked it.",
-      "aGlyph": "+pad·+off·−mob",
-      "bGlyph": "+mob·−pad·+sig·+fog",
-      "talkIds": {
-        "C": "odessa__yeva:C",
-        "B": "odessa__yeva:B",
-        "A": "odessa__yeva:A"
-      },
-      "umwelt": {
-        "motif": "spot meets siege",
-        "boost": 0.62,
-        "couples": [
-          {
-            "axis": "siege_sight",
-            "kind": "complement",
-            "cross": [
-              "pad",
-              "sight|fog"
-            ],
-            "a": 1.055,
-            "b": 0.65,
-            "strength": 0.891
-          },
-          {
-            "axis": "pad",
-            "kind": "complement",
-            "a": 1.0,
-            "b": -0.85,
-            "strength": 0.85
-          },
-          {
-            "axis": "mobility",
-            "kind": "complement",
-            "a": -0.5,
-            "b": 1.0,
-            "strength": 0.5
-          },
-          {
-            "axis": "offense",
-            "kind": "mirror",
-            "a": 0.65,
-            "b": 0.35,
-            "strength": 0.125
-          }
-        ],
-        "spotterLocked": true,
-        "siegeSpotStrength": 0.891
-      }
-    },
-    {
-      "id": "ceil__quill",
-      "a": "quill",
-      "b": "ceil",
-      "score": 1.0,
-      "polarity": "tension",
-      "motifs": [
-        "kite vs hold",
-        "burn the ceiling",
-        "pad functional circle"
-      ],
-      "sharedTemperament": [],
-      "reasons": [
-        "umwelt pad functional circle (complement=0.45)",
-        "complement (burn the ceiling)",
-        "adjacent columns line/skirmish",
-        "doctrine drama line/skirm",
-        "same faction armada"
-      ],
-      "authored": false,
-      "aName": "Ash-Marshal Quill",
-      "bName": "Ceil Rat",
-      "aHook": "Orders walk on treads.",
-      "bHook": "Altitude is an opinion.",
-      "aGlyph": "+off·+pad·+hea",
-      "bGlyph": "+mob·−pad·+sky·+off",
-      "talkIds": {
-        "C": "ceil__quill:C",
-        "B": "ceil__quill:B",
-        "A": "ceil__quill:A"
-      },
-      "umwelt": {
-        "motif": "pad functional circle",
-        "boost": 0.296,
-        "couples": [
-          {
-            "axis": "pad",
-            "kind": "complement",
-            "a": 0.45,
-            "b": -1.0,
-            "strength": 0.45
-          },
-          {
-            "axis": "offense",
-            "kind": "mirror",
-            "a": 1.0,
-            "b": 0.35,
-            "strength": 0.193
-          }
-        ],
-        "spotterLocked": false,
-        "siegeSpotStrength": 0.0
-      }
-    },
-    {
-      "id": "kit__quill",
-      "a": "quill",
-      "b": "kit",
-      "score": 1.0,
-      "polarity": "tension",
-      "motifs": [
-        "kite vs hold",
-        "two kinds of burn",
-        "pad functional circle"
-      ],
-      "sharedTemperament": [],
-      "reasons": [
-        "umwelt pad functional circle (complement=0.427)",
-        "complement (two kinds of burn)",
-        "adjacent columns line/skirmish",
-        "doctrine drama line/skirm",
-        "cross-faction contract tension"
-      ],
-      "authored": false,
-      "aName": "Ash-Marshal Quill",
-      "bName": "Kit Sparkler",
-      "aHook": "Orders walk on treads.",
-      "bHook": "Fireworks at walking distance.",
-      "aGlyph": "+off·+pad·+hea",
-      "bGlyph": "+mob·−pad·+off",
-      "talkIds": {
-        "C": "kit__quill:C",
-        "B": "kit__quill:B",
-        "A": "kit__quill:A"
-      },
-      "umwelt": {
-        "motif": "pad functional circle",
-        "boost": 0.299,
-        "couples": [
-          {
-            "axis": "pad",
-            "kind": "complement",
-            "a": 0.45,
-            "b": -0.95,
-            "strength": 0.427
-          },
-          {
-            "axis": "offense",
-            "kind": "mirror",
-            "a": 1.0,
-            "b": 0.35,
-            "strength": 0.193
+            "a": 0.5,
+            "b": -0.45,
+            "strength": 0.225
           },
           {
             "axis": "heat",
             "kind": "mirror",
-            "a": 0.45,
-            "b": 0.25,
+            "a": 0.25,
+            "b": 0.45,
             "strength": 0.062
           }
         ],
-        "spotterLocked": false,
-        "siegeSpotStrength": 0.0
-      }
-    },
-    {
-      "id": "auditor__rusk",
-      "a": "rusk",
-      "b": "auditor",
-      "score": 1.0,
-      "polarity": "tension",
-      "motifs": [
-        "kite vs hold",
-        "pad functional circle"
-      ],
-      "sharedTemperament": [],
-      "reasons": [
-        "umwelt pad functional circle (complement=1.2)",
-        "adjacent columns line/skirmish",
-        "doctrine drama line/skirm",
-        "front-weight verbs",
-        "same faction legion"
-      ],
-      "authored": false,
-      "aName": "Rusk Halloway",
-      "bName": "The Last Auditor",
-      "aHook": "Gate, jammed gat, a lie.",
-      "bHook": "Ledger with legs.",
-      "aGlyph": "+pad·+off·−mob",
-      "bGlyph": "+mob·+off·−pad·+led",
-      "talkIds": {
-        "C": "auditor__rusk:C",
-        "B": "auditor__rusk:B",
-        "A": "auditor__rusk:A"
-      },
-      "umwelt": {
-        "motif": "pad functional circle",
-        "boost": 0.55,
-        "couples": [
-          {
-            "axis": "pad",
-            "kind": "complement",
-            "a": 1.0,
-            "b": -0.7,
-            "strength": 0.7
-          },
-          {
-            "axis": "mobility",
-            "kind": "complement",
-            "a": -0.5,
-            "b": 1.0,
-            "strength": 0.5
-          },
-          {
-            "axis": "offense",
-            "kind": "mirror",
-            "a": 0.65,
-            "b": 0.75,
-            "strength": 0.268
-          }
-        ],
-        "spotterLocked": false,
-        "siegeSpotStrength": 0.0
-      }
-    },
-    {
-      "id": "rusk__yeva",
-      "a": "rusk",
-      "b": "yeva",
-      "score": 1.0,
-      "polarity": "attract",
-      "motifs": [
-        "spot meets siege",
-        "kite vs hold"
-      ],
-      "sharedTemperament": [],
-      "reasons": [
-        "umwelt spot meets siege (complement=2.241)",
-        "adjacent columns line/skirmish",
-        "doctrine drama line/skirm",
-        "cross-faction contract tension"
-      ],
-      "authored": false,
-      "aName": "Rusk Halloway",
-      "bName": "Whisper-of-Ash Yeva",
-      "aHook": "Gate, jammed gat, a lie.",
-      "bHook": "Ghosts already walked it.",
-      "aGlyph": "+pad·+off·−mob",
-      "bGlyph": "+mob·−pad·+sig·+fog",
-      "talkIds": {
-        "C": "rusk__yeva:C",
-        "B": "rusk__yeva:B",
-        "A": "rusk__yeva:A"
-      },
-      "umwelt": {
-        "motif": "spot meets siege",
-        "boost": 0.62,
-        "couples": [
-          {
-            "axis": "siege_sight",
-            "kind": "complement",
-            "cross": [
-              "pad",
-              "sight|fog"
-            ],
-            "a": 1.055,
-            "b": 0.65,
-            "strength": 0.891
-          },
-          {
-            "axis": "pad",
-            "kind": "complement",
-            "a": 1.0,
-            "b": -0.85,
-            "strength": 0.85
-          },
-          {
-            "axis": "mobility",
-            "kind": "complement",
-            "a": -0.5,
-            "b": 1.0,
-            "strength": 0.5
-          },
-          {
-            "axis": "offense",
-            "kind": "mirror",
-            "a": 0.65,
-            "b": 0.35,
-            "strength": 0.125
-          }
-        ],
         "spotterLocked": true,
-        "siegeSpotStrength": 0.891
-      }
-    },
-    {
-      "id": "noctua__solarium",
-      "a": "solarium",
-      "b": "noctua",
-      "score": 1.0,
-      "polarity": "attract",
-      "motifs": [
-        "spot meets siege",
-        "altitude feeds roots"
-      ],
-      "sharedTemperament": [],
-      "reasons": [
-        "umwelt spot meets siege (complement=1.201)",
-        "complement (altitude feeds roots)",
-        "adjacent columns eco/eyes",
-        "cross-faction contract tension"
-      ],
-      "authored": false,
-      "aName": "Solarium",
-      "bName": "Noctua Bay",
-      "aHook": "Spreadsheets, then sunlight.",
-      "bHook": "Dreams in flight paths.",
-      "aGlyph": "+ene·+cra·+pad·−off",
-      "bGlyph": "+mob·+sig·+fog·+sky",
-      "talkIds": {
-        "C": "noctua__solarium:C",
-        "B": "noctua__solarium:B",
-        "A": "noctua__solarium:A"
-      },
-      "umwelt": {
-        "motif": "spot meets siege",
-        "boost": 0.62,
-        "couples": [
-          {
-            "axis": "siege_sight",
-            "kind": "complement",
-            "cross": [
-              "pad",
-              "sight|fog"
-            ],
-            "a": 0.575,
-            "b": 1.272,
-            "strength": 0.951
-          },
-          {
-            "axis": "mobility",
-            "kind": "complement",
-            "a": -0.25,
-            "b": 1.0,
-            "strength": 0.25
-          },
-          {
-            "axis": "offense",
-            "kind": "mirror",
-            "a": -0.6,
-            "b": -0.35,
-            "strength": 0.116
-          }
-        ],
-        "spotterLocked": true,
-        "siegeSpotStrength": 0.951
-      }
-    },
-    {
-      "id": "solarium__tick",
-      "a": "solarium",
-      "b": "tick",
-      "score": 1.0,
-      "polarity": "attract",
-      "motifs": [
-        "spot meets siege",
-        "grow vs mint"
-      ],
-      "sharedTemperament": [],
-      "reasons": [
-        "umwelt spot meets siege (complement=1.164)",
-        "complement (grow vs mint)",
-        "adjacent columns eco/eyes",
-        "same faction armada"
-      ],
-      "authored": false,
-      "aName": "Solarium",
-      "bName": "Tick Stream",
-      "aHook": "Spreadsheets, then sunlight.",
-      "bHook": "Speaks in plurals.",
-      "aGlyph": "+ene·+cra·+pad·−off",
-      "bGlyph": "+sig·+fog·+mob·−off",
-      "talkIds": {
-        "C": "solarium__tick:C",
-        "B": "solarium__tick:B",
-        "A": "solarium__tick:A"
-      },
-      "umwelt": {
-        "motif": "spot meets siege",
-        "boost": 0.62,
-        "couples": [
-          {
-            "axis": "siege_sight",
-            "kind": "complement",
-            "cross": [
-              "pad",
-              "sight|fog"
-            ],
-            "a": 0.575,
-            "b": 1.272,
-            "strength": 0.951
-          },
-          {
-            "axis": "mobility",
-            "kind": "complement",
-            "a": -0.25,
-            "b": 0.85,
-            "strength": 0.212
-          },
-          {
-            "axis": "offense",
-            "kind": "mirror",
-            "a": -0.6,
-            "b": -0.35,
-            "strength": 0.116
-          }
-        ],
-        "spotterLocked": true,
-        "siegeSpotStrength": 0.951
+        "siegeSpotStrength": 1.299
       }
     },
     {
@@ -4720,6 +4313,206 @@
       }
     },
     {
+      "id": "grath__veil",
+      "a": "veil",
+      "b": "grath",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "spot meets siege",
+        "two ledgers"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "umwelt spot meets siege (complement=2.142)",
+        "complement (two ledgers)",
+        "adjacent columns eyes/line"
+      ],
+      "authored": false,
+      "aName": "Veil & Compass",
+      "bName": "Grath Arrears",
+      "aHook": "Fog is the payroll.",
+      "bHook": "Three wars unpaid.",
+      "aGlyph": "+sig·+fog·+mob·+led",
+      "bGlyph": "+pad·+off·−mob·+led",
+      "talkIds": {
+        "C": "grath__veil:C",
+        "B": "grath__veil:B",
+        "A": "grath__veil:A"
+      },
+      "umwelt": {
+        "motif": "spot meets siege",
+        "boost": 0.62,
+        "couples": [
+          {
+            "axis": "siege_sight",
+            "kind": "complement",
+            "cross": [
+              "pad",
+              "sight|fog"
+            ],
+            "a": 1.3,
+            "b": 0.885,
+            "strength": 1.496
+          },
+          {
+            "axis": "mobility",
+            "kind": "complement",
+            "a": 0.85,
+            "b": -0.5,
+            "strength": 0.425
+          },
+          {
+            "axis": "offense",
+            "kind": "complement",
+            "a": -0.35,
+            "b": 0.55,
+            "strength": 0.221
+          },
+          {
+            "axis": "ledger",
+            "kind": "mirror",
+            "a": 0.4,
+            "b": 0.45,
+            "strength": 0.099
+          }
+        ],
+        "spotterLocked": true,
+        "siegeSpotStrength": 1.496
+      }
+    },
+    {
+      "id": "grath__yeva",
+      "a": "grath",
+      "b": "yeva",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "spot meets siege",
+        "kite vs hold"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "umwelt spot meets siege (complement=1.928)",
+        "adjacent columns line/skirmish",
+        "doctrine drama line/skirm",
+        "cross-faction contract tension"
+      ],
+      "authored": false,
+      "aName": "Grath Arrears",
+      "bName": "Whisper-of-Ash Yeva",
+      "aHook": "Three wars unpaid.",
+      "bHook": "Ghosts already walked it.",
+      "aGlyph": "+pad·+off·−mob·+led",
+      "bGlyph": "+mob·−pad·+sig·+fog",
+      "talkIds": {
+        "C": "grath__yeva:C",
+        "B": "grath__yeva:B",
+        "A": "grath__yeva:A"
+      },
+      "umwelt": {
+        "motif": "spot meets siege",
+        "boost": 0.62,
+        "couples": [
+          {
+            "axis": "siege_sight",
+            "kind": "complement",
+            "cross": [
+              "pad",
+              "sight|fog"
+            ],
+            "a": 0.885,
+            "b": 0.65,
+            "strength": 0.748
+          },
+          {
+            "axis": "pad",
+            "kind": "complement",
+            "a": 0.8,
+            "b": -0.85,
+            "strength": 0.68
+          },
+          {
+            "axis": "mobility",
+            "kind": "complement",
+            "a": -0.5,
+            "b": 1.0,
+            "strength": 0.5
+          },
+          {
+            "axis": "offense",
+            "kind": "mirror",
+            "a": 0.55,
+            "b": 0.35,
+            "strength": 0.106
+          }
+        ],
+        "spotterLocked": true,
+        "siegeSpotStrength": 0.748
+      }
+    },
+    {
+      "id": "halq__kit",
+      "a": "halq",
+      "b": "kit",
+      "score": 1.0,
+      "polarity": "tension",
+      "motifs": [
+        "kite vs hold",
+        "chaos vs ledger",
+        "pad functional circle"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "umwelt pad functional circle (complement=1.26)",
+        "complement (chaos vs ledger)",
+        "adjacent columns line/skirmish",
+        "doctrine drama line/skirm",
+        "same faction legion"
+      ],
+      "authored": false,
+      "aName": "Sisu Halq",
+      "bName": "Kit Sparkler",
+      "aHook": "Shoots map coordinates.",
+      "bHook": "Fireworks at walking distance.",
+      "aGlyph": "+pad·+off·−mob·+led",
+      "bGlyph": "+mob·−pad·+off",
+      "talkIds": {
+        "C": "halq__kit:C",
+        "B": "halq__kit:B",
+        "A": "halq__kit:A"
+      },
+      "umwelt": {
+        "motif": "pad functional circle",
+        "boost": 0.55,
+        "couples": [
+          {
+            "axis": "pad",
+            "kind": "complement",
+            "a": 0.8,
+            "b": -0.95,
+            "strength": 0.76
+          },
+          {
+            "axis": "mobility",
+            "kind": "complement",
+            "a": -0.5,
+            "b": 1.0,
+            "strength": 0.5
+          },
+          {
+            "axis": "offense",
+            "kind": "mirror",
+            "a": 0.55,
+            "b": 0.35,
+            "strength": 0.106
+          }
+        ],
+        "spotterLocked": false,
+        "siegeSpotStrength": 0.0
+      }
+    },
+    {
       "id": "halq__spoke",
       "a": "spoke",
       "b": "halq",
@@ -4797,6 +4590,622 @@
       }
     },
     {
+      "id": "halq__veil",
+      "a": "veil",
+      "b": "halq",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "spot meets siege",
+        "math and invoice"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "umwelt spot meets siege (complement=2.142)",
+        "complement (math and invoice)",
+        "adjacent columns eyes/line"
+      ],
+      "authored": false,
+      "aName": "Veil & Compass",
+      "bName": "Sisu Halq",
+      "aHook": "Fog is the payroll.",
+      "bHook": "Shoots map coordinates.",
+      "aGlyph": "+sig·+fog·+mob·+led",
+      "bGlyph": "+pad·+off·−mob·+led",
+      "talkIds": {
+        "C": "halq__veil:C",
+        "B": "halq__veil:B",
+        "A": "halq__veil:A"
+      },
+      "umwelt": {
+        "motif": "spot meets siege",
+        "boost": 0.62,
+        "couples": [
+          {
+            "axis": "siege_sight",
+            "kind": "complement",
+            "cross": [
+              "pad",
+              "sight|fog"
+            ],
+            "a": 1.3,
+            "b": 0.885,
+            "strength": 1.496
+          },
+          {
+            "axis": "mobility",
+            "kind": "complement",
+            "a": 0.85,
+            "b": -0.5,
+            "strength": 0.425
+          },
+          {
+            "axis": "offense",
+            "kind": "complement",
+            "a": -0.35,
+            "b": 0.55,
+            "strength": 0.221
+          },
+          {
+            "axis": "ledger",
+            "kind": "mirror",
+            "a": 0.4,
+            "b": 0.45,
+            "strength": 0.099
+          }
+        ],
+        "spotterLocked": true,
+        "siegeSpotStrength": 1.496
+      }
+    },
+    {
+      "id": "halq__yeva",
+      "a": "halq",
+      "b": "yeva",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "spot meets siege",
+        "kite vs hold"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "umwelt spot meets siege (complement=1.928)",
+        "adjacent columns line/skirmish",
+        "doctrine drama line/skirm",
+        "cross-faction contract tension"
+      ],
+      "authored": false,
+      "aName": "Sisu Halq",
+      "bName": "Whisper-of-Ash Yeva",
+      "aHook": "Shoots map coordinates.",
+      "bHook": "Ghosts already walked it.",
+      "aGlyph": "+pad·+off·−mob·+led",
+      "bGlyph": "+mob·−pad·+sig·+fog",
+      "talkIds": {
+        "C": "halq__yeva:C",
+        "B": "halq__yeva:B",
+        "A": "halq__yeva:A"
+      },
+      "umwelt": {
+        "motif": "spot meets siege",
+        "boost": 0.62,
+        "couples": [
+          {
+            "axis": "siege_sight",
+            "kind": "complement",
+            "cross": [
+              "pad",
+              "sight|fog"
+            ],
+            "a": 0.885,
+            "b": 0.65,
+            "strength": 0.748
+          },
+          {
+            "axis": "pad",
+            "kind": "complement",
+            "a": 0.8,
+            "b": -0.85,
+            "strength": 0.68
+          },
+          {
+            "axis": "mobility",
+            "kind": "complement",
+            "a": -0.5,
+            "b": 1.0,
+            "strength": 0.5
+          },
+          {
+            "axis": "offense",
+            "kind": "mirror",
+            "a": 0.55,
+            "b": 0.35,
+            "strength": 0.106
+          }
+        ],
+        "spotterLocked": true,
+        "siegeSpotStrength": 0.748
+      }
+    },
+    {
+      "id": "hearth__lumen",
+      "a": "hearth",
+      "b": "lumen",
+      "score": 1.0,
+      "polarity": "bond",
+      "motifs": [
+        "coal furniture and grid saint",
+        "holy furniture",
+        "shared energy mark",
+        "shared ledger of sun"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed",
+        "umwelt shared energy mark (complement=0.0)",
+        "complement (holy furniture)",
+        "same position eco",
+        "same verb hold",
+        "same faction armada"
+      ],
+      "authored": true,
+      "aName": "Hearth",
+      "bName": "Sister Lumen",
+      "aHook": "Quiet sun. Won't go out.",
+      "bHook": "Tithe the grid.",
+      "aGlyph": "+ene·−mob·+pad·−off",
+      "bGlyph": "+ene·−off·−mob·+pad",
+      "talkIds": {
+        "C": "hearth__lumen:C",
+        "B": "hearth__lumen:B",
+        "A": "hearth__lumen:A"
+      },
+      "umwelt": {
+        "motif": "shared energy mark",
+        "boost": 0.55,
+        "couples": [
+          {
+            "axis": "energy",
+            "kind": "mirror",
+            "a": 1.0,
+            "b": 1.0,
+            "strength": 0.55
+          },
+          {
+            "axis": "mobility",
+            "kind": "mirror",
+            "a": -1.0,
+            "b": -1.0,
+            "strength": 0.55
+          },
+          {
+            "axis": "pad",
+            "kind": "mirror",
+            "a": 1.0,
+            "b": 1.0,
+            "strength": 0.55
+          },
+          {
+            "axis": "offense",
+            "kind": "mirror",
+            "a": -0.9,
+            "b": -1.0,
+            "strength": 0.495
+          },
+          {
+            "axis": "craft",
+            "kind": "mirror",
+            "a": 0.65,
+            "b": 1.0,
+            "strength": 0.358
+          }
+        ],
+        "spotterLocked": false,
+        "siegeSpotStrength": 0.0
+      }
+    },
+    {
+      "id": "kettle__mira",
+      "a": "mira",
+      "b": "kettle",
+      "score": 1.0,
+      "polarity": "bond",
+      "motifs": [
+        "fireworks need a clear sky",
+        "burn the ceiling",
+        "push meets refuse"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed",
+        "umwelt push meets refuse (complement=0.752)",
+        "complement (burn the ceiling)",
+        "adjacent columns siege/shield",
+        "doctrine drama arty/aa_saint",
+        "cross-faction contract tension"
+      ],
+      "authored": true,
+      "aName": "Mira Barrage",
+      "bName": "Saint Kettle",
+      "aHook": "Napalm is confetti.",
+      "bHook": "Sky-saint, chainsaw soul.",
+      "aGlyph": "+off·+hea·−ene·−pad",
+      "bGlyph": "+pad·+sky·−off",
+      "talkIds": {
+        "C": "kettle__mira:C",
+        "B": "kettle__mira:B",
+        "A": "kettle__mira:A"
+      },
+      "umwelt": {
+        "motif": "push meets refuse",
+        "boost": 0.414,
+        "couples": [
+          {
+            "axis": "offense",
+            "kind": "complement",
+            "a": 1.0,
+            "b": -0.35,
+            "strength": 0.402
+          },
+          {
+            "axis": "pad",
+            "kind": "complement",
+            "a": -0.35,
+            "b": 1.0,
+            "strength": 0.35
+          }
+        ],
+        "spotterLocked": false,
+        "siegeSpotStrength": 0.0
+      }
+    },
+    {
+      "id": "kettle__noctua",
+      "a": "noctua",
+      "b": "kettle",
+      "score": 1.0,
+      "polarity": "mentor",
+      "motifs": [
+        "flight paths and friendly flak",
+        "the saint teaches the swarm"
+      ],
+      "sharedTemperament": [
+        "sky"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Noctua Bay",
+      "bName": "Saint Kettle",
+      "aHook": "Dreams in flight paths.",
+      "bHook": "Sky-saint, chainsaw soul.",
+      "aGlyph": "+mob·+sig·+fog·+sky",
+      "bGlyph": "+pad·+sky·−off",
+      "talkIds": {
+        "C": "kettle__noctua:C",
+        "B": "kettle__noctua:B",
+        "A": "kettle__noctua:A"
+      }
+    },
+    {
+      "id": "kettle__thresh",
+      "a": "thresh",
+      "b": "kettle",
+      "score": 1.0,
+      "polarity": "rivalry",
+      "motifs": [
+        "the bomber the saint was built to stop",
+        "weather against the roof"
+      ],
+      "sharedTemperament": [
+        "sky"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Dama Thresh",
+      "bName": "Saint Kettle",
+      "aHook": "Weather comes from above.",
+      "bHook": "Sky-saint, chainsaw soul.",
+      "aGlyph": "+off·+sky·+mob·−pad",
+      "bGlyph": "+pad·+sky·−off",
+      "talkIds": {
+        "C": "kettle__thresh:C",
+        "B": "kettle__thresh:B",
+        "A": "kettle__thresh:A"
+      }
+    },
+    {
+      "id": "kettle__warder",
+      "a": "kettle",
+      "b": "warder",
+      "score": 1.0,
+      "polarity": "friction",
+      "motifs": [
+        "who owns the sky over the pad",
+        "the circle and the saint who wanders"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Saint Kettle",
+      "bName": "Warder",
+      "aHook": "Sky-saint, chainsaw soul.",
+      "bHook": "Owns a circle of dirt.",
+      "aGlyph": "+pad·+sky·−off",
+      "bGlyph": "−mob·+pad·−off",
+      "talkIds": {
+        "C": "kettle__warder:C",
+        "B": "kettle__warder:B",
+        "A": "kettle__warder:A"
+      }
+    },
+    {
+      "id": "kit__mira",
+      "a": "mira",
+      "b": "kit",
+      "score": 1.0,
+      "polarity": "mirror",
+      "motifs": [
+        "parade and walking fireworks",
+        "close confetti and far confetti",
+        "two kinds of burn",
+        "shared offense mark",
+        "shared:gleeful"
+      ],
+      "sharedTemperament": [
+        "gleeful"
+      ],
+      "reasons": [
+        "authored seed",
+        "umwelt shared offense mark (complement=0.0)",
+        "shared temperament ['gleeful']",
+        "complement (two kinds of burn)",
+        "doctrine drama arty/skirm",
+        "soft-edge verbs",
+        "same faction legion"
+      ],
+      "authored": true,
+      "aName": "Mira Barrage",
+      "bName": "Kit Sparkler",
+      "aHook": "Napalm is confetti.",
+      "bHook": "Fireworks at walking distance.",
+      "aGlyph": "+off·+hea·−ene·−pad",
+      "bGlyph": "+mob·−pad·+off",
+      "talkIds": {
+        "C": "kit__mira:C",
+        "B": "kit__mira:B",
+        "A": "kit__mira:A"
+      },
+      "umwelt": {
+        "motif": "shared offense mark",
+        "boost": 0.128,
+        "couples": [
+          {
+            "axis": "offense",
+            "kind": "mirror",
+            "a": 1.0,
+            "b": 0.35,
+            "strength": 0.193
+          },
+          {
+            "axis": "pad",
+            "kind": "mirror",
+            "a": -0.35,
+            "b": -0.95,
+            "strength": 0.183
+          },
+          {
+            "axis": "heat",
+            "kind": "mirror",
+            "a": 1.0,
+            "b": 0.25,
+            "strength": 0.138
+          }
+        ],
+        "spotterLocked": false,
+        "siegeSpotStrength": 0.0
+      }
+    },
+    {
+      "id": "kit__quill",
+      "a": "quill",
+      "b": "kit",
+      "score": 1.0,
+      "polarity": "tension",
+      "motifs": [
+        "kite vs hold",
+        "two kinds of burn",
+        "pad functional circle"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "umwelt pad functional circle (complement=0.427)",
+        "complement (two kinds of burn)",
+        "adjacent columns line/skirmish",
+        "doctrine drama line/skirm",
+        "cross-faction contract tension"
+      ],
+      "authored": false,
+      "aName": "Ash-Marshal Quill",
+      "bName": "Kit Sparkler",
+      "aHook": "Orders walk on treads.",
+      "bHook": "Fireworks at walking distance.",
+      "aGlyph": "+off·+pad·+hea",
+      "bGlyph": "+mob·−pad·+off",
+      "talkIds": {
+        "C": "kit__quill:C",
+        "B": "kit__quill:B",
+        "A": "kit__quill:A"
+      },
+      "umwelt": {
+        "motif": "pad functional circle",
+        "boost": 0.299,
+        "couples": [
+          {
+            "axis": "pad",
+            "kind": "complement",
+            "a": 0.45,
+            "b": -0.95,
+            "strength": 0.427
+          },
+          {
+            "axis": "offense",
+            "kind": "mirror",
+            "a": 1.0,
+            "b": 0.35,
+            "strength": 0.193
+          },
+          {
+            "axis": "heat",
+            "kind": "mirror",
+            "a": 0.45,
+            "b": 0.25,
+            "strength": 0.062
+          }
+        ],
+        "spotterLocked": false,
+        "siegeSpotStrength": 0.0
+      }
+    },
+    {
+      "id": "kit__twitch",
+      "a": "twitch",
+      "b": "kit",
+      "score": 1.0,
+      "polarity": "mirror",
+      "motifs": [
+        "grins that escalate",
+        "pad functional circle",
+        "shared:mischief"
+      ],
+      "sharedTemperament": [
+        "mischief"
+      ],
+      "reasons": [
+        "umwelt pad functional circle (complement=0.966)",
+        "shared temperament ['mischief']",
+        "complement (grins that escalate)",
+        "cross-faction contract tension"
+      ],
+      "authored": false,
+      "aName": "Twitcher",
+      "bName": "Kit Sparkler",
+      "aHook": "Grins with a welder.",
+      "bHook": "Fireworks at walking distance.",
+      "aGlyph": "+cra·+ene·−off·+pad",
+      "bGlyph": "+mob·−pad·+off",
+      "talkIds": {
+        "C": "kit__twitch:C",
+        "B": "kit__twitch:B",
+        "A": "kit__twitch:A"
+      },
+      "umwelt": {
+        "motif": "pad functional circle",
+        "boost": 0.54,
+        "couples": [
+          {
+            "axis": "pad",
+            "kind": "complement",
+            "a": 0.5,
+            "b": -0.95,
+            "strength": 0.475
+          },
+          {
+            "axis": "mobility",
+            "kind": "complement",
+            "a": -0.25,
+            "b": 1.0,
+            "strength": 0.25
+          },
+          {
+            "axis": "offense",
+            "kind": "complement",
+            "a": -0.6,
+            "b": 0.35,
+            "strength": 0.241
+          },
+          {
+            "axis": "fog",
+            "kind": "mirror",
+            "a": 0.25,
+            "b": 0.25,
+            "strength": 0.034
+          }
+        ],
+        "spotterLocked": false,
+        "siegeSpotStrength": 0.0
+      }
+    },
+    {
+      "id": "lumen__noctua",
+      "a": "noctua",
+      "b": "lumen",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "spot meets siege",
+        "altitude feeds roots"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "umwelt spot meets siege (complement=2.82)",
+        "complement (altitude feeds roots)",
+        "adjacent columns eyes/eco",
+        "cross-faction contract tension"
+      ],
+      "authored": false,
+      "aName": "Noctua Bay",
+      "bName": "Sister Lumen",
+      "aHook": "Dreams in flight paths.",
+      "bHook": "Tithe the grid.",
+      "aGlyph": "+mob·+sig·+fog·+sky",
+      "bGlyph": "+ene·−off·−mob·+pad",
+      "talkIds": {
+        "C": "lumen__noctua:C",
+        "B": "lumen__noctua:B",
+        "A": "lumen__noctua:A"
+      },
+      "umwelt": {
+        "motif": "spot meets siege",
+        "boost": 0.62,
+        "couples": [
+          {
+            "axis": "siege_sight",
+            "kind": "complement",
+            "cross": [
+              "pad",
+              "sight|fog"
+            ],
+            "a": 1.272,
+            "b": 1.1,
+            "strength": 1.82
+          },
+          {
+            "axis": "mobility",
+            "kind": "complement",
+            "a": 1.0,
+            "b": -1.0,
+            "strength": 1.0
+          },
+          {
+            "axis": "offense",
+            "kind": "mirror",
+            "a": -0.35,
+            "b": -1.0,
+            "strength": 0.193
+          }
+        ],
+        "spotterLocked": true,
+        "siegeSpotStrength": 1.82
+      }
+    },
+    {
       "id": "lumen__spoke",
       "a": "spoke",
       "b": "lumen",
@@ -4864,6 +5273,273 @@
         ],
         "spotterLocked": true,
         "siegeSpotStrength": 1.544
+      }
+    },
+    {
+      "id": "lumen__tick",
+      "a": "tick",
+      "b": "lumen",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "spot meets siege",
+        "grow vs mint"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "umwelt spot meets siege (complement=2.67)",
+        "complement (grow vs mint)",
+        "adjacent columns eyes/eco",
+        "same faction armada"
+      ],
+      "authored": false,
+      "aName": "Tick Stream",
+      "bName": "Sister Lumen",
+      "aHook": "Speaks in plurals.",
+      "bHook": "Tithe the grid.",
+      "aGlyph": "+sig·+fog·+mob·−off",
+      "bGlyph": "+ene·−off·−mob·+pad",
+      "talkIds": {
+        "C": "lumen__tick:C",
+        "B": "lumen__tick:B",
+        "A": "lumen__tick:A"
+      },
+      "umwelt": {
+        "motif": "spot meets siege",
+        "boost": 0.62,
+        "couples": [
+          {
+            "axis": "siege_sight",
+            "kind": "complement",
+            "cross": [
+              "pad",
+              "sight|fog"
+            ],
+            "a": 1.272,
+            "b": 1.1,
+            "strength": 1.82
+          },
+          {
+            "axis": "mobility",
+            "kind": "complement",
+            "a": 0.85,
+            "b": -1.0,
+            "strength": 0.85
+          },
+          {
+            "axis": "offense",
+            "kind": "mirror",
+            "a": -0.35,
+            "b": -1.0,
+            "strength": 0.193
+          }
+        ],
+        "spotterLocked": true,
+        "siegeSpotStrength": 1.82
+      }
+    },
+    {
+      "id": "mask__pavise",
+      "a": "mask",
+      "b": "pavise",
+      "score": 1.0,
+      "polarity": "tension",
+      "motifs": [
+        "the spare king and the left hand",
+        "a crown nobody gave him"
+      ],
+      "sharedTemperament": [
+        "captain"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Mask",
+      "bName": "Pavise",
+      "aHook": "Every throne needs a spare.",
+      "bHook": "I still walk your left.",
+      "aGlyph": "+cra·+pad·+fog·+off",
+      "bGlyph": "",
+      "talkIds": {
+        "C": "mask__pavise:C",
+        "B": "mask__pavise:B",
+        "A": "mask__pavise:A"
+      }
+    },
+    {
+      "id": "mira__twitch",
+      "a": "twitch",
+      "b": "mira",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "push meets refuse",
+        "grins that escalate"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "umwelt push meets refuse (complement=1.472)",
+        "complement (grins that escalate)",
+        "cross-faction contract tension"
+      ],
+      "authored": false,
+      "aName": "Twitcher",
+      "bName": "Mira Barrage",
+      "aHook": "Grins with a welder.",
+      "bHook": "Napalm is confetti.",
+      "aGlyph": "+cra·+ene·−off·+pad",
+      "bGlyph": "+off·+hea·−ene·−pad",
+      "talkIds": {
+        "C": "mira__twitch:C",
+        "B": "mira__twitch:B",
+        "A": "mira__twitch:A"
+      },
+      "umwelt": {
+        "motif": "push meets refuse",
+        "boost": 0.62,
+        "couples": [
+          {
+            "axis": "offense",
+            "kind": "complement",
+            "a": -0.6,
+            "b": 1.0,
+            "strength": 0.69
+          },
+          {
+            "axis": "energy",
+            "kind": "complement",
+            "a": 0.75,
+            "b": -0.6,
+            "strength": 0.607
+          },
+          {
+            "axis": "pad",
+            "kind": "complement",
+            "a": 0.5,
+            "b": -0.35,
+            "strength": 0.175
+          }
+        ],
+        "spotterLocked": false,
+        "siegeSpotStrength": 0.0
+      }
+    },
+    {
+      "id": "noctua__solarium",
+      "a": "solarium",
+      "b": "noctua",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "spot meets siege",
+        "altitude feeds roots"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "umwelt spot meets siege (complement=1.201)",
+        "complement (altitude feeds roots)",
+        "adjacent columns eco/eyes",
+        "cross-faction contract tension"
+      ],
+      "authored": false,
+      "aName": "Solarium",
+      "bName": "Noctua Bay",
+      "aHook": "Spreadsheets, then sunlight.",
+      "bHook": "Dreams in flight paths.",
+      "aGlyph": "+ene·+cra·+pad·−off",
+      "bGlyph": "+mob·+sig·+fog·+sky",
+      "talkIds": {
+        "C": "noctua__solarium:C",
+        "B": "noctua__solarium:B",
+        "A": "noctua__solarium:A"
+      },
+      "umwelt": {
+        "motif": "spot meets siege",
+        "boost": 0.62,
+        "couples": [
+          {
+            "axis": "siege_sight",
+            "kind": "complement",
+            "cross": [
+              "pad",
+              "sight|fog"
+            ],
+            "a": 0.575,
+            "b": 1.272,
+            "strength": 0.951
+          },
+          {
+            "axis": "mobility",
+            "kind": "complement",
+            "a": -0.25,
+            "b": 1.0,
+            "strength": 0.25
+          },
+          {
+            "axis": "offense",
+            "kind": "mirror",
+            "a": -0.6,
+            "b": -0.35,
+            "strength": 0.116
+          }
+        ],
+        "spotterLocked": true,
+        "siegeSpotStrength": 0.951
+      }
+    },
+    {
+      "id": "noctua__tick",
+      "a": "tick",
+      "b": "noctua",
+      "score": 1.0,
+      "polarity": "rivalry",
+      "motifs": [
+        "two swarms of eyes",
+        "plurals against flight paths"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Tick Stream",
+      "bName": "Noctua Bay",
+      "aHook": "Speaks in plurals.",
+      "bHook": "Dreams in flight paths.",
+      "aGlyph": "+sig·+fog·+mob·−off",
+      "bGlyph": "+mob·+sig·+fog·+sky",
+      "talkIds": {
+        "C": "noctua__tick:C",
+        "B": "noctua__tick:B",
+        "A": "noctua__tick:A"
+      }
+    },
+    {
+      "id": "noctua__yeva",
+      "a": "yeva",
+      "b": "noctua",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "the sniper and the eyes that fly",
+        "fog meets sky"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Whisper-of-Ash Yeva",
+      "bName": "Noctua Bay",
+      "aHook": "Ghosts already walked it.",
+      "bHook": "Dreams in flight paths.",
+      "aGlyph": "+mob·−pad·+sig·+fog",
+      "bGlyph": "+mob·+sig·+fog·+sky",
+      "talkIds": {
+        "C": "noctua__yeva:C",
+        "B": "noctua__yeva:B",
+        "A": "noctua__yeva:A"
       }
     },
     {
@@ -4944,319 +5620,6 @@
       }
     },
     {
-      "id": "quill__stride",
-      "a": "stride",
-      "b": "quill",
-      "score": 1.0,
-      "polarity": "tension",
-      "motifs": [
-        "kite vs hold",
-        "pack and brittle edge",
-        "pad functional circle"
-      ],
-      "sharedTemperament": [],
-      "reasons": [
-        "umwelt pad functional circle (complement=0.45)",
-        "complement (pack and brittle edge)",
-        "adjacent columns skirmish/line",
-        "doctrine drama skirm/line",
-        "same faction armada"
-      ],
-      "authored": false,
-      "aName": "Saloon Stride",
-      "bName": "Ash-Marshal Quill",
-      "aHook": "Baked speed, bad manners.",
-      "bHook": "Orders walk on treads.",
-      "aGlyph": "+mob·−pad·+off",
-      "bGlyph": "+off·+pad·+hea",
-      "talkIds": {
-        "C": "quill__stride:C",
-        "B": "quill__stride:B",
-        "A": "quill__stride:A"
-      },
-      "umwelt": {
-        "motif": "pad functional circle",
-        "boost": 0.296,
-        "couples": [
-          {
-            "axis": "pad",
-            "kind": "complement",
-            "a": -1.0,
-            "b": 0.45,
-            "strength": 0.45
-          },
-          {
-            "axis": "offense",
-            "kind": "mirror",
-            "a": 0.35,
-            "b": 1.0,
-            "strength": 0.193
-          }
-        ],
-        "spotterLocked": false,
-        "siegeSpotStrength": 0.0
-      }
-    },
-    {
-      "id": "lumen__tick",
-      "a": "tick",
-      "b": "lumen",
-      "score": 1.0,
-      "polarity": "attract",
-      "motifs": [
-        "spot meets siege",
-        "grow vs mint"
-      ],
-      "sharedTemperament": [],
-      "reasons": [
-        "umwelt spot meets siege (complement=2.67)",
-        "complement (grow vs mint)",
-        "adjacent columns eyes/eco",
-        "same faction armada"
-      ],
-      "authored": false,
-      "aName": "Tick Stream",
-      "bName": "Sister Lumen",
-      "aHook": "Speaks in plurals.",
-      "bHook": "Tithe the grid.",
-      "aGlyph": "+sig·+fog·+mob·−off",
-      "bGlyph": "+ene·−off·−mob·+pad",
-      "talkIds": {
-        "C": "lumen__tick:C",
-        "B": "lumen__tick:B",
-        "A": "lumen__tick:A"
-      },
-      "umwelt": {
-        "motif": "spot meets siege",
-        "boost": 0.62,
-        "couples": [
-          {
-            "axis": "siege_sight",
-            "kind": "complement",
-            "cross": [
-              "pad",
-              "sight|fog"
-            ],
-            "a": 1.272,
-            "b": 1.1,
-            "strength": 1.82
-          },
-          {
-            "axis": "mobility",
-            "kind": "complement",
-            "a": 0.85,
-            "b": -1.0,
-            "strength": 0.85
-          },
-          {
-            "axis": "offense",
-            "kind": "mirror",
-            "a": -0.35,
-            "b": -1.0,
-            "strength": 0.193
-          }
-        ],
-        "spotterLocked": true,
-        "siegeSpotStrength": 1.82
-      }
-    },
-    {
-      "id": "kit__twitch",
-      "a": "twitch",
-      "b": "kit",
-      "score": 1.0,
-      "polarity": "mirror",
-      "motifs": [
-        "grins that escalate",
-        "pad functional circle",
-        "shared:mischief"
-      ],
-      "sharedTemperament": [
-        "mischief"
-      ],
-      "reasons": [
-        "umwelt pad functional circle (complement=0.966)",
-        "shared temperament ['mischief']",
-        "complement (grins that escalate)",
-        "cross-faction contract tension"
-      ],
-      "authored": false,
-      "aName": "Twitcher",
-      "bName": "Kit Sparkler",
-      "aHook": "Grins with a welder.",
-      "bHook": "Fireworks at walking distance.",
-      "aGlyph": "+cra·+ene·−off·+pad",
-      "bGlyph": "+mob·−pad·+off",
-      "talkIds": {
-        "C": "kit__twitch:C",
-        "B": "kit__twitch:B",
-        "A": "kit__twitch:A"
-      },
-      "umwelt": {
-        "motif": "pad functional circle",
-        "boost": 0.54,
-        "couples": [
-          {
-            "axis": "pad",
-            "kind": "complement",
-            "a": 0.5,
-            "b": -0.95,
-            "strength": 0.475
-          },
-          {
-            "axis": "mobility",
-            "kind": "complement",
-            "a": -0.25,
-            "b": 1.0,
-            "strength": 0.25
-          },
-          {
-            "axis": "offense",
-            "kind": "complement",
-            "a": -0.6,
-            "b": 0.35,
-            "strength": 0.241
-          },
-          {
-            "axis": "fog",
-            "kind": "mirror",
-            "a": 0.25,
-            "b": 0.25,
-            "strength": 0.034
-          }
-        ],
-        "spotterLocked": false,
-        "siegeSpotStrength": 0.0
-      }
-    },
-    {
-      "id": "mira__twitch",
-      "a": "twitch",
-      "b": "mira",
-      "score": 1.0,
-      "polarity": "attract",
-      "motifs": [
-        "push meets refuse",
-        "grins that escalate"
-      ],
-      "sharedTemperament": [],
-      "reasons": [
-        "umwelt push meets refuse (complement=1.472)",
-        "complement (grins that escalate)",
-        "cross-faction contract tension"
-      ],
-      "authored": false,
-      "aName": "Twitcher",
-      "bName": "Mira Barrage",
-      "aHook": "Grins with a welder.",
-      "bHook": "Napalm is confetti.",
-      "aGlyph": "+cra·+ene·−off·+pad",
-      "bGlyph": "+off·+hea·−ene·−pad",
-      "talkIds": {
-        "C": "mira__twitch:C",
-        "B": "mira__twitch:B",
-        "A": "mira__twitch:A"
-      },
-      "umwelt": {
-        "motif": "push meets refuse",
-        "boost": 0.62,
-        "couples": [
-          {
-            "axis": "offense",
-            "kind": "complement",
-            "a": -0.6,
-            "b": 1.0,
-            "strength": 0.69
-          },
-          {
-            "axis": "energy",
-            "kind": "complement",
-            "a": 0.75,
-            "b": -0.6,
-            "strength": 0.607
-          },
-          {
-            "axis": "pad",
-            "kind": "complement",
-            "a": 0.5,
-            "b": -0.35,
-            "strength": 0.175
-          }
-        ],
-        "spotterLocked": false,
-        "siegeSpotStrength": 0.0
-      }
-    },
-    {
-      "id": "twitch__veil",
-      "a": "twitch",
-      "b": "veil",
-      "score": 1.0,
-      "polarity": "attract",
-      "motifs": [
-        "spot meets siege",
-        "tricks in the haze"
-      ],
-      "sharedTemperament": [],
-      "reasons": [
-        "umwelt spot meets siege (complement=0.994)",
-        "complement (tricks in the haze)",
-        "adjacent columns eco/eyes"
-      ],
-      "authored": false,
-      "aName": "Twitcher",
-      "bName": "Veil & Compass",
-      "aHook": "Grins with a welder.",
-      "bHook": "Fog is the payroll.",
-      "aGlyph": "+cra·+ene·−off·+pad",
-      "bGlyph": "+sig·+fog·+mob·+led",
-      "talkIds": {
-        "C": "twitch__veil:C",
-        "B": "twitch__veil:B",
-        "A": "twitch__veil:A"
-      },
-      "umwelt": {
-        "motif": "spot meets siege",
-        "boost": 0.61,
-        "couples": [
-          {
-            "axis": "siege_sight",
-            "kind": "complement",
-            "cross": [
-              "pad",
-              "sight|fog"
-            ],
-            "a": 0.463,
-            "b": 1.3,
-            "strength": 0.782
-          },
-          {
-            "axis": "mobility",
-            "kind": "complement",
-            "a": -0.25,
-            "b": 0.85,
-            "strength": 0.212
-          },
-          {
-            "axis": "fog",
-            "kind": "mirror",
-            "a": 0.25,
-            "b": 1.0,
-            "strength": 0.138
-          },
-          {
-            "axis": "offense",
-            "kind": "mirror",
-            "a": -0.6,
-            "b": -0.35,
-            "strength": 0.116
-          }
-        ],
-        "spotterLocked": true,
-        "siegeSpotStrength": 0.782
-      }
-    },
-    {
       "id": "nox__vale",
       "a": "vale",
       "b": "nox",
@@ -5317,387 +5680,6 @@
         ],
         "spotterLocked": true,
         "siegeSpotStrength": 0.947
-      }
-    },
-    {
-      "id": "ceil__vane",
-      "a": "vane",
-      "b": "ceil",
-      "score": 1.0,
-      "polarity": "mentor",
-      "motifs": [
-        "pack and brittle edge",
-        "shared mobility mark",
-        "shared:glass"
-      ],
-      "sharedTemperament": [
-        "glass"
-      ],
-      "reasons": [
-        "umwelt shared mobility mark (complement=0.0)",
-        "shared temperament ['glass']",
-        "complement (pack and brittle edge)",
-        "adjacent columns core_skirm/skirmish",
-        "same verb kite",
-        "cross-faction contract tension"
-      ],
-      "authored": false,
-      "aName": "Ash-Captain Vane",
-      "bName": "Ceil Rat",
-      "aHook": "Pack is one thought.",
-      "bHook": "Altitude is an opinion.",
-      "aGlyph": "+mob·−pad·+off·+sig",
-      "bGlyph": "+mob·−pad·+sky·+off",
-      "talkIds": {
-        "C": "ceil__vane:C",
-        "B": "ceil__vane:B",
-        "A": "ceil__vane:A"
-      },
-      "umwelt": {
-        "motif": "shared mobility mark",
-        "boost": 0.283,
-        "couples": [
-          {
-            "axis": "mobility",
-            "kind": "mirror",
-            "a": 1.0,
-            "b": 1.0,
-            "strength": 0.55
-          },
-          {
-            "axis": "pad",
-            "kind": "mirror",
-            "a": -0.85,
-            "b": -1.0,
-            "strength": 0.468
-          },
-          {
-            "axis": "offense",
-            "kind": "mirror",
-            "a": 0.6,
-            "b": 0.35,
-            "strength": 0.116
-          }
-        ],
-        "spotterLocked": false,
-        "siegeSpotStrength": 0.0
-      }
-    },
-    {
-      "id": "odessa__vane",
-      "a": "vane",
-      "b": "odessa",
-      "score": 1.0,
-      "polarity": "tension",
-      "motifs": [
-        "flock vs tread command",
-        "orders at the gate",
-        "pad functional circle"
-      ],
-      "sharedTemperament": [],
-      "reasons": [
-        "umwelt pad functional circle (complement=1.35)",
-        "complement (orders at the gate)",
-        "doctrine drama phobos/line",
-        "same faction legion"
-      ],
-      "authored": false,
-      "aName": "Ash-Captain Vane",
-      "bName": "Odessa Krail",
-      "aHook": "Pack is one thought.",
-      "bHook": "Fords are doors.",
-      "aGlyph": "+mob·−pad·+off·+sig",
-      "bGlyph": "+pad·+off·−mob",
-      "talkIds": {
-        "C": "odessa__vane:C",
-        "B": "odessa__vane:B",
-        "A": "odessa__vane:A"
-      },
-      "umwelt": {
-        "motif": "pad functional circle",
-        "boost": 0.55,
-        "couples": [
-          {
-            "axis": "pad",
-            "kind": "complement",
-            "a": -0.85,
-            "b": 1.0,
-            "strength": 0.85
-          },
-          {
-            "axis": "mobility",
-            "kind": "complement",
-            "a": 1.0,
-            "b": -0.5,
-            "strength": 0.5
-          },
-          {
-            "axis": "offense",
-            "kind": "mirror",
-            "a": 0.6,
-            "b": 0.65,
-            "strength": 0.215
-          }
-        ],
-        "spotterLocked": false,
-        "siegeSpotStrength": 0.0
-      }
-    },
-    {
-      "id": "quill__vane",
-      "a": "vane",
-      "b": "quill",
-      "score": 1.0,
-      "polarity": "tension",
-      "motifs": [
-        "flock captain vs tread marshal",
-        "flock vs tread command",
-        "pack and brittle edge",
-        "pad functional circle",
-        "shared:captain"
-      ],
-      "sharedTemperament": [
-        "captain"
-      ],
-      "reasons": [
-        "authored seed",
-        "umwelt pad functional circle (complement=0.383)",
-        "shared temperament ['captain']",
-        "complement (pack and brittle edge)",
-        "doctrine drama phobos/line",
-        "cross-faction contract tension"
-      ],
-      "authored": true,
-      "aName": "Ash-Captain Vane",
-      "bName": "Ash-Marshal Quill",
-      "aHook": "Pack is one thought.",
-      "bHook": "Orders walk on treads.",
-      "aGlyph": "+mob·−pad·+off·+sig",
-      "bGlyph": "+off·+pad·+hea",
-      "talkIds": {
-        "C": "quill__vane:C",
-        "B": "quill__vane:B",
-        "A": "quill__vane:A"
-      },
-      "umwelt": {
-        "motif": "pad functional circle",
-        "boost": 0.293,
-        "couples": [
-          {
-            "axis": "pad",
-            "kind": "complement",
-            "a": -0.85,
-            "b": 0.45,
-            "strength": 0.383
-          },
-          {
-            "axis": "offense",
-            "kind": "mirror",
-            "a": 0.6,
-            "b": 1.0,
-            "strength": 0.33
-          }
-        ],
-        "spotterLocked": false,
-        "siegeSpotStrength": 0.0
-      }
-    },
-    {
-      "id": "rusk__vane",
-      "a": "vane",
-      "b": "rusk",
-      "score": 1.0,
-      "polarity": "tension",
-      "motifs": [
-        "flock vs tread command",
-        "orders at the gate",
-        "pad functional circle"
-      ],
-      "sharedTemperament": [],
-      "reasons": [
-        "umwelt pad functional circle (complement=1.35)",
-        "complement (orders at the gate)",
-        "doctrine drama phobos/line",
-        "same faction legion"
-      ],
-      "authored": false,
-      "aName": "Ash-Captain Vane",
-      "bName": "Rusk Halloway",
-      "aHook": "Pack is one thought.",
-      "bHook": "Gate, jammed gat, a lie.",
-      "aGlyph": "+mob·−pad·+off·+sig",
-      "bGlyph": "+pad·+off·−mob",
-      "talkIds": {
-        "C": "rusk__vane:C",
-        "B": "rusk__vane:B",
-        "A": "rusk__vane:A"
-      },
-      "umwelt": {
-        "motif": "pad functional circle",
-        "boost": 0.55,
-        "couples": [
-          {
-            "axis": "pad",
-            "kind": "complement",
-            "a": -0.85,
-            "b": 1.0,
-            "strength": 0.85
-          },
-          {
-            "axis": "mobility",
-            "kind": "complement",
-            "a": 1.0,
-            "b": -0.5,
-            "strength": 0.5
-          },
-          {
-            "axis": "offense",
-            "kind": "mirror",
-            "a": 0.6,
-            "b": 0.65,
-            "strength": 0.215
-          }
-        ],
-        "spotterLocked": false,
-        "siegeSpotStrength": 0.0
-      }
-    },
-    {
-      "id": "grath__veil",
-      "a": "veil",
-      "b": "grath",
-      "score": 1.0,
-      "polarity": "attract",
-      "motifs": [
-        "spot meets siege",
-        "two ledgers"
-      ],
-      "sharedTemperament": [],
-      "reasons": [
-        "umwelt spot meets siege (complement=2.142)",
-        "complement (two ledgers)",
-        "adjacent columns eyes/line"
-      ],
-      "authored": false,
-      "aName": "Veil & Compass",
-      "bName": "Grath Arrears",
-      "aHook": "Fog is the payroll.",
-      "bHook": "Three wars unpaid.",
-      "aGlyph": "+sig·+fog·+mob·+led",
-      "bGlyph": "+pad·+off·−mob·+led",
-      "talkIds": {
-        "C": "grath__veil:C",
-        "B": "grath__veil:B",
-        "A": "grath__veil:A"
-      },
-      "umwelt": {
-        "motif": "spot meets siege",
-        "boost": 0.62,
-        "couples": [
-          {
-            "axis": "siege_sight",
-            "kind": "complement",
-            "cross": [
-              "pad",
-              "sight|fog"
-            ],
-            "a": 1.3,
-            "b": 0.885,
-            "strength": 1.496
-          },
-          {
-            "axis": "mobility",
-            "kind": "complement",
-            "a": 0.85,
-            "b": -0.5,
-            "strength": 0.425
-          },
-          {
-            "axis": "offense",
-            "kind": "complement",
-            "a": -0.35,
-            "b": 0.55,
-            "strength": 0.221
-          },
-          {
-            "axis": "ledger",
-            "kind": "mirror",
-            "a": 0.4,
-            "b": 0.45,
-            "strength": 0.099
-          }
-        ],
-        "spotterLocked": true,
-        "siegeSpotStrength": 1.496
-      }
-    },
-    {
-      "id": "halq__veil",
-      "a": "veil",
-      "b": "halq",
-      "score": 1.0,
-      "polarity": "attract",
-      "motifs": [
-        "spot meets siege",
-        "math and invoice"
-      ],
-      "sharedTemperament": [],
-      "reasons": [
-        "umwelt spot meets siege (complement=2.142)",
-        "complement (math and invoice)",
-        "adjacent columns eyes/line"
-      ],
-      "authored": false,
-      "aName": "Veil & Compass",
-      "bName": "Sisu Halq",
-      "aHook": "Fog is the payroll.",
-      "bHook": "Shoots map coordinates.",
-      "aGlyph": "+sig·+fog·+mob·+led",
-      "bGlyph": "+pad·+off·−mob·+led",
-      "talkIds": {
-        "C": "halq__veil:C",
-        "B": "halq__veil:B",
-        "A": "halq__veil:A"
-      },
-      "umwelt": {
-        "motif": "spot meets siege",
-        "boost": 0.62,
-        "couples": [
-          {
-            "axis": "siege_sight",
-            "kind": "complement",
-            "cross": [
-              "pad",
-              "sight|fog"
-            ],
-            "a": 1.3,
-            "b": 0.885,
-            "strength": 1.496
-          },
-          {
-            "axis": "mobility",
-            "kind": "complement",
-            "a": 0.85,
-            "b": -0.5,
-            "strength": 0.425
-          },
-          {
-            "axis": "offense",
-            "kind": "complement",
-            "a": -0.35,
-            "b": 0.55,
-            "strength": 0.221
-          },
-          {
-            "axis": "ledger",
-            "kind": "mirror",
-            "a": 0.4,
-            "b": 0.45,
-            "strength": 0.099
-          }
-        ],
-        "spotterLocked": true,
-        "siegeSpotStrength": 1.496
       }
     },
     {
@@ -5770,6 +5752,249 @@
       }
     },
     {
+      "id": "odessa__vane",
+      "a": "vane",
+      "b": "odessa",
+      "score": 1.0,
+      "polarity": "tension",
+      "motifs": [
+        "flock vs tread command",
+        "orders at the gate",
+        "pad functional circle"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "umwelt pad functional circle (complement=1.35)",
+        "complement (orders at the gate)",
+        "doctrine drama phobos/line",
+        "same faction legion"
+      ],
+      "authored": false,
+      "aName": "Ash-Captain Vane",
+      "bName": "Odessa Krail",
+      "aHook": "Pack is one thought.",
+      "bHook": "Fords are doors.",
+      "aGlyph": "+mob·−pad·+off·+sig",
+      "bGlyph": "+pad·+off·−mob",
+      "talkIds": {
+        "C": "odessa__vane:C",
+        "B": "odessa__vane:B",
+        "A": "odessa__vane:A"
+      },
+      "umwelt": {
+        "motif": "pad functional circle",
+        "boost": 0.55,
+        "couples": [
+          {
+            "axis": "pad",
+            "kind": "complement",
+            "a": -0.85,
+            "b": 1.0,
+            "strength": 0.85
+          },
+          {
+            "axis": "mobility",
+            "kind": "complement",
+            "a": 1.0,
+            "b": -0.5,
+            "strength": 0.5
+          },
+          {
+            "axis": "offense",
+            "kind": "mirror",
+            "a": 0.6,
+            "b": 0.65,
+            "strength": 0.215
+          }
+        ],
+        "spotterLocked": false,
+        "siegeSpotStrength": 0.0
+      }
+    },
+    {
+      "id": "odessa__yeva",
+      "a": "odessa",
+      "b": "yeva",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "spot meets siege",
+        "kite vs hold"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "umwelt spot meets siege (complement=2.241)",
+        "adjacent columns line/skirmish",
+        "doctrine drama line/skirm",
+        "cross-faction contract tension"
+      ],
+      "authored": false,
+      "aName": "Odessa Krail",
+      "bName": "Whisper-of-Ash Yeva",
+      "aHook": "Fords are doors.",
+      "bHook": "Ghosts already walked it.",
+      "aGlyph": "+pad·+off·−mob",
+      "bGlyph": "+mob·−pad·+sig·+fog",
+      "talkIds": {
+        "C": "odessa__yeva:C",
+        "B": "odessa__yeva:B",
+        "A": "odessa__yeva:A"
+      },
+      "umwelt": {
+        "motif": "spot meets siege",
+        "boost": 0.62,
+        "couples": [
+          {
+            "axis": "siege_sight",
+            "kind": "complement",
+            "cross": [
+              "pad",
+              "sight|fog"
+            ],
+            "a": 1.055,
+            "b": 0.65,
+            "strength": 0.891
+          },
+          {
+            "axis": "pad",
+            "kind": "complement",
+            "a": 1.0,
+            "b": -0.85,
+            "strength": 0.85
+          },
+          {
+            "axis": "mobility",
+            "kind": "complement",
+            "a": -0.5,
+            "b": 1.0,
+            "strength": 0.5
+          },
+          {
+            "axis": "offense",
+            "kind": "mirror",
+            "a": 0.65,
+            "b": 0.35,
+            "strength": 0.125
+          }
+        ],
+        "spotterLocked": true,
+        "siegeSpotStrength": 0.891
+      }
+    },
+    {
+      "id": "quill__stride",
+      "a": "stride",
+      "b": "quill",
+      "score": 1.0,
+      "polarity": "tension",
+      "motifs": [
+        "kite vs hold",
+        "pack and brittle edge",
+        "pad functional circle"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "umwelt pad functional circle (complement=0.45)",
+        "complement (pack and brittle edge)",
+        "adjacent columns skirmish/line",
+        "doctrine drama skirm/line",
+        "same faction armada"
+      ],
+      "authored": false,
+      "aName": "Saloon Stride",
+      "bName": "Ash-Marshal Quill",
+      "aHook": "Baked speed, bad manners.",
+      "bHook": "Orders walk on treads.",
+      "aGlyph": "+mob·−pad·+off",
+      "bGlyph": "+off·+pad·+hea",
+      "talkIds": {
+        "C": "quill__stride:C",
+        "B": "quill__stride:B",
+        "A": "quill__stride:A"
+      },
+      "umwelt": {
+        "motif": "pad functional circle",
+        "boost": 0.296,
+        "couples": [
+          {
+            "axis": "pad",
+            "kind": "complement",
+            "a": -1.0,
+            "b": 0.45,
+            "strength": 0.45
+          },
+          {
+            "axis": "offense",
+            "kind": "mirror",
+            "a": 0.35,
+            "b": 1.0,
+            "strength": 0.193
+          }
+        ],
+        "spotterLocked": false,
+        "siegeSpotStrength": 0.0
+      }
+    },
+    {
+      "id": "quill__vane",
+      "a": "vane",
+      "b": "quill",
+      "score": 1.0,
+      "polarity": "tension",
+      "motifs": [
+        "flock captain vs tread marshal",
+        "flock vs tread command",
+        "pack and brittle edge",
+        "pad functional circle",
+        "shared:captain"
+      ],
+      "sharedTemperament": [
+        "captain"
+      ],
+      "reasons": [
+        "authored seed",
+        "umwelt pad functional circle (complement=0.383)",
+        "shared temperament ['captain']",
+        "complement (pack and brittle edge)",
+        "doctrine drama phobos/line",
+        "cross-faction contract tension"
+      ],
+      "authored": true,
+      "aName": "Ash-Captain Vane",
+      "bName": "Ash-Marshal Quill",
+      "aHook": "Pack is one thought.",
+      "bHook": "Orders walk on treads.",
+      "aGlyph": "+mob·−pad·+off·+sig",
+      "bGlyph": "+off·+pad·+hea",
+      "talkIds": {
+        "C": "quill__vane:C",
+        "B": "quill__vane:B",
+        "A": "quill__vane:A"
+      },
+      "umwelt": {
+        "motif": "pad functional circle",
+        "boost": 0.293,
+        "couples": [
+          {
+            "axis": "pad",
+            "kind": "complement",
+            "a": -0.85,
+            "b": 0.45,
+            "strength": 0.383
+          },
+          {
+            "axis": "offense",
+            "kind": "mirror",
+            "a": 0.6,
+            "b": 1.0,
+            "strength": 0.33
+          }
+        ],
+        "spotterLocked": false,
+        "siegeSpotStrength": 0.0
+      }
+    },
+    {
       "id": "quill__verse",
       "a": "verse",
       "b": "quill",
@@ -5824,120 +6049,69 @@
       }
     },
     {
-      "id": "commando__warder",
-      "a": "warder",
-      "b": "commando",
+      "id": "rumor__veil",
+      "a": "rumor",
+      "b": "veil",
       "score": 1.0,
       "polarity": "attract",
       "motifs": [
-        "spot meets siege",
-        "same circle, different tooth",
-        "mines vs owned dirt"
+        "fog is the payroll",
+        "two contracts in the dark"
       ],
-      "sharedTemperament": [],
+      "sharedTemperament": [
+        "contract",
+        "fog"
+      ],
       "reasons": [
-        "umwelt spot meets siege (complement=1.287)",
-        "same position shield",
-        "doctrine drama pad/dirty",
-        "cross-faction contract tension"
+        "authored seed"
       ],
-      "authored": false,
-      "aName": "Warder",
-      "bName": "Cinder Hook",
-      "aHook": "Owns a circle of dirt.",
-      "bHook": "Mines before the argument.",
-      "aGlyph": "−mob·+pad·−off",
-      "bGlyph": "+fog·+mob·+cra·+pad",
+      "authored": true,
+      "aName": "Rumor",
+      "bName": "Veil & Compass",
+      "aHook": "Everything changes sides eventually.",
+      "bHook": "Fog is the payroll.",
+      "aGlyph": "+fog·+cra·+sig·−pad",
+      "bGlyph": "+sig·+fog·+mob·+led",
       "talkIds": {
-        "C": "commando__warder:C",
-        "B": "commando__warder:B",
-        "A": "commando__warder:A"
-      },
-      "umwelt": {
-        "motif": "spot meets siege",
-        "boost": 0.62,
-        "couples": [
-          {
-            "axis": "siege_sight",
-            "kind": "complement",
-            "cross": [
-              "pad",
-              "sight|fog"
-            ],
-            "a": 1.1,
-            "b": 0.55,
-            "strength": 0.787
-          },
-          {
-            "axis": "mobility",
-            "kind": "complement",
-            "a": -1.0,
-            "b": 0.5,
-            "strength": 0.5
-          },
-          {
-            "axis": "pad",
-            "kind": "mirror",
-            "a": 1.0,
-            "b": 0.35,
-            "strength": 0.193
-          }
-        ],
-        "spotterLocked": true,
-        "siegeSpotStrength": 0.787
+        "C": "rumor__veil:C",
+        "B": "rumor__veil:B",
+        "A": "rumor__veil:A"
       }
     },
     {
-      "id": "anvil__yeva",
-      "a": "yeva",
-      "b": "anvil",
+      "id": "rusk__vane",
+      "a": "vane",
+      "b": "rusk",
       "score": 1.0,
-      "polarity": "attract",
+      "polarity": "tension",
       "motifs": [
-        "spot meets siege",
-        "kite vs hold"
+        "flock vs tread command",
+        "orders at the gate",
+        "pad functional circle"
       ],
       "sharedTemperament": [],
       "reasons": [
-        "umwelt spot meets siege (complement=2.949)",
-        "adjacent columns skirmish/line",
-        "doctrine drama skirm/line",
-        "same faction armada"
+        "umwelt pad functional circle (complement=1.35)",
+        "complement (orders at the gate)",
+        "doctrine drama phobos/line",
+        "same faction legion"
       ],
       "authored": false,
-      "aName": "Whisper-of-Ash Yeva",
-      "bName": "Anvil Mire",
-      "aHook": "Ghosts already walked it.",
-      "bHook": "The river learns my weight.",
-      "aGlyph": "+mob·−pad·+sig·+fog",
-      "bGlyph": "+off·−mob·+pad",
+      "aName": "Ash-Captain Vane",
+      "bName": "Rusk Halloway",
+      "aHook": "Pack is one thought.",
+      "bHook": "Gate, jammed gat, a lie.",
+      "aGlyph": "+mob·−pad·+off·+sig",
+      "bGlyph": "+pad·+off·−mob",
       "talkIds": {
-        "C": "anvil__yeva:C",
-        "B": "anvil__yeva:B",
-        "A": "anvil__yeva:A"
+        "C": "rusk__vane:C",
+        "B": "rusk__vane:B",
+        "A": "rusk__vane:A"
       },
       "umwelt": {
-        "motif": "spot meets siege",
-        "boost": 0.62,
+        "motif": "pad functional circle",
+        "boost": 0.55,
         "couples": [
-          {
-            "axis": "siege_sight",
-            "kind": "complement",
-            "cross": [
-              "pad",
-              "sight|fog"
-            ],
-            "a": 0.65,
-            "b": 1.3,
-            "strength": 1.099
-          },
-          {
-            "axis": "mobility",
-            "kind": "complement",
-            "a": 1.0,
-            "b": -1.0,
-            "strength": 1.0
-          },
           {
             "axis": "pad",
             "kind": "complement",
@@ -5946,15 +6120,224 @@
             "strength": 0.85
           },
           {
+            "axis": "mobility",
+            "kind": "complement",
+            "a": 1.0,
+            "b": -0.5,
+            "strength": 0.5
+          },
+          {
             "axis": "offense",
             "kind": "mirror",
-            "a": 0.35,
+            "a": 0.6,
+            "b": 0.65,
+            "strength": 0.215
+          }
+        ],
+        "spotterLocked": false,
+        "siegeSpotStrength": 0.0
+      }
+    },
+    {
+      "id": "rusk__yeva",
+      "a": "rusk",
+      "b": "yeva",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "spot meets siege",
+        "kite vs hold"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "umwelt spot meets siege (complement=2.241)",
+        "adjacent columns line/skirmish",
+        "doctrine drama line/skirm",
+        "cross-faction contract tension"
+      ],
+      "authored": false,
+      "aName": "Rusk Halloway",
+      "bName": "Whisper-of-Ash Yeva",
+      "aHook": "Gate, jammed gat, a lie.",
+      "bHook": "Ghosts already walked it.",
+      "aGlyph": "+pad·+off·−mob",
+      "bGlyph": "+mob·−pad·+sig·+fog",
+      "talkIds": {
+        "C": "rusk__yeva:C",
+        "B": "rusk__yeva:B",
+        "A": "rusk__yeva:A"
+      },
+      "umwelt": {
+        "motif": "spot meets siege",
+        "boost": 0.62,
+        "couples": [
+          {
+            "axis": "siege_sight",
+            "kind": "complement",
+            "cross": [
+              "pad",
+              "sight|fog"
+            ],
+            "a": 1.055,
+            "b": 0.65,
+            "strength": 0.891
+          },
+          {
+            "axis": "pad",
+            "kind": "complement",
+            "a": 1.0,
+            "b": -0.85,
+            "strength": 0.85
+          },
+          {
+            "axis": "mobility",
+            "kind": "complement",
+            "a": -0.5,
             "b": 1.0,
-            "strength": 0.193
+            "strength": 0.5
+          },
+          {
+            "axis": "offense",
+            "kind": "mirror",
+            "a": 0.65,
+            "b": 0.35,
+            "strength": 0.125
           }
         ],
         "spotterLocked": true,
-        "siegeSpotStrength": 1.099
+        "siegeSpotStrength": 0.891
+      }
+    },
+    {
+      "id": "solarium__tick",
+      "a": "solarium",
+      "b": "tick",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "spot meets siege",
+        "grow vs mint"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "umwelt spot meets siege (complement=1.164)",
+        "complement (grow vs mint)",
+        "adjacent columns eco/eyes",
+        "same faction armada"
+      ],
+      "authored": false,
+      "aName": "Solarium",
+      "bName": "Tick Stream",
+      "aHook": "Spreadsheets, then sunlight.",
+      "bHook": "Speaks in plurals.",
+      "aGlyph": "+ene·+cra·+pad·−off",
+      "bGlyph": "+sig·+fog·+mob·−off",
+      "talkIds": {
+        "C": "solarium__tick:C",
+        "B": "solarium__tick:B",
+        "A": "solarium__tick:A"
+      },
+      "umwelt": {
+        "motif": "spot meets siege",
+        "boost": 0.62,
+        "couples": [
+          {
+            "axis": "siege_sight",
+            "kind": "complement",
+            "cross": [
+              "pad",
+              "sight|fog"
+            ],
+            "a": 0.575,
+            "b": 1.272,
+            "strength": 0.951
+          },
+          {
+            "axis": "mobility",
+            "kind": "complement",
+            "a": -0.25,
+            "b": 0.85,
+            "strength": 0.212
+          },
+          {
+            "axis": "offense",
+            "kind": "mirror",
+            "a": -0.6,
+            "b": -0.35,
+            "strength": 0.116
+          }
+        ],
+        "spotterLocked": true,
+        "siegeSpotStrength": 0.951
+      }
+    },
+    {
+      "id": "twitch__veil",
+      "a": "twitch",
+      "b": "veil",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "spot meets siege",
+        "tricks in the haze"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "umwelt spot meets siege (complement=0.994)",
+        "complement (tricks in the haze)",
+        "adjacent columns eco/eyes"
+      ],
+      "authored": false,
+      "aName": "Twitcher",
+      "bName": "Veil & Compass",
+      "aHook": "Grins with a welder.",
+      "bHook": "Fog is the payroll.",
+      "aGlyph": "+cra·+ene·−off·+pad",
+      "bGlyph": "+sig·+fog·+mob·+led",
+      "talkIds": {
+        "C": "twitch__veil:C",
+        "B": "twitch__veil:B",
+        "A": "twitch__veil:A"
+      },
+      "umwelt": {
+        "motif": "spot meets siege",
+        "boost": 0.61,
+        "couples": [
+          {
+            "axis": "siege_sight",
+            "kind": "complement",
+            "cross": [
+              "pad",
+              "sight|fog"
+            ],
+            "a": 0.463,
+            "b": 1.3,
+            "strength": 0.782
+          },
+          {
+            "axis": "mobility",
+            "kind": "complement",
+            "a": -0.25,
+            "b": 0.85,
+            "strength": 0.212
+          },
+          {
+            "axis": "fog",
+            "kind": "mirror",
+            "a": 0.25,
+            "b": 1.0,
+            "strength": 0.138
+          },
+          {
+            "axis": "offense",
+            "kind": "mirror",
+            "a": -0.6,
+            "b": -0.35,
+            "strength": 0.116
+          }
+        ],
+        "spotterLocked": true,
+        "siegeSpotStrength": 0.782
       }
     },
     {

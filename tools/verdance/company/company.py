@@ -16,6 +16,10 @@ from verdance.common import WORKSPACE_ROOT, utc_now
 # Default homes for wild heroes (must match authored zone_map ids).
 # Spread pads — never pile every missing catalog hero onto GF_C_GATE.
 DEFAULT_HOMES: Dict[str, List[str]] = {
+    "rumor": ["ancient_bastion", "AB_NE_CRATERS"],
+    "mask": ["greenest_fields", "GF_SE_PLATEAU"],
+    "gale": ["tabula", "T_C_SPILLWAY"],
+    "thresh": ["all_that_simmers", "ATS_NE_PLATEAU"],
     "rusk": ["koom_valley", "KV_W_LANE"],
     "verse": ["the_rock_jungle", "TRJ_SE_GATE"],
     "odessa": ["greenest_fields", "GF_C_GATE"],

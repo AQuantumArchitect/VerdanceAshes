@@ -3471,6 +3471,10 @@ $scenario = [ordered]@{
     # The field's set piece, and for a kings' showdown the kings the kings gadget watches.
     theater = $theater
     kings = @($script:kings)
+    # Bonds worth something on the field (verdance.company.synergy): the gadget applies a row only
+    # when both heroes of the pair drop.
+    bondXp = @($(if ($intent.PSObject.Properties["bondXp"] -and $intent.bondXp) { $intent.bondXp } else { @() }))
+    bondGifts = @($(if ($intent.PSObject.Properties["bondGifts"] -and $intent.bondGifts) { $intent.bondGifts } else { @() }))
     battlefieldManifest = [ordered]@{
       schemaVersion = "verdance-battlefield-manifest/1.0"
       initializationEndsFrame = 90

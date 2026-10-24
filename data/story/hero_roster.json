@@ -779,6 +779,86 @@
       "recruit": {
         "type": "band"
       }
+    },
+    {
+      "heroId": "thresh",
+      "name": "Dama Thresh",
+      "unitDef": "corhurc",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.0,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "heat",
+      "traits": [
+        "heat",
+        "sky"
+      ],
+      "fiction": "Cortex built the Hailstorm to end arguments; Thresh flies it to start them. She bought her two Legion fighters off a scrap contract and pays them in altitude. She has never once looked at what she hits.",
+      "recruit": {
+        "type": "band_unlock",
+        "blurb": "Weather comes from above."
+      }
+    },
+    {
+      "heroId": "gale",
+      "name": "Marrow Gale",
+      "unitDef": "corcut",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.0,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "sky",
+      "traits": [
+        "sky",
+        "mischief"
+      ],
+      "fiction": "Gale's wing sleeps on the water like ducks with rotors. When Koom floods, the rest of the company curses the waterline; Gale's crews take it as an invitation.",
+      "recruit": {
+        "type": "band_unlock",
+        "blurb": "Lands where nobody parks."
+      }
+    },
+    {
+      "heroId": "mask",
+      "name": "Mask",
+      "unitDef": "armdecom",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.0,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "captain",
+      "traits": [
+        "captain",
+        "mischief"
+      ],
+      "fiction": "Mask was one of the decoy commanders on the Greenest farms, built to be shot instead of somebody important. He walked off the farm with sixteen Pawns who believed he was the real thing. He has started to believe it too.",
+      "recruit": {
+        "type": "band_unlock",
+        "blurb": "Every throne needs a spare."
+      }
+    },
+    {
+      "heroId": "rumor",
+      "name": "Rumor",
+      "unitDef": "va_ghost",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.0,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "fog",
+      "traits": [
+        "fog",
+        "contract"
+      ],
+      "fiction": "Nobody hired Rumor. Rumor was simply on the payroll one morning, with two Ghosts and a list of units that used to belong to someone else.",
+      "recruit": {
+        "type": "band_unlock",
+        "blurb": "Everything changes sides eventually."
+      }
     }
   ]
 }

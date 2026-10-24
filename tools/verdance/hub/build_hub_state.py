@@ -1117,6 +1117,15 @@ def _world_surface(state: dict) -> dict:
         return {"openMaps": [], "roads": []}
 
 
+def _bond_perks(state: dict, aces: list) -> dict:
+    from verdance.company.synergy import bond_perks
+    try:
+        return bond_perks(state, [a.get("id") for a in aces or [] if a.get("id")], ROOT)
+    except Exception as exc:  # noqa: BLE001
+        print(f"VA_BOND_PERKS_FAIL {exc}")
+        return {"bondXp": [], "bondGifts": []}
+
+
 def _water_surface(state: dict) -> dict:
     """The next sortie's waterline on every map: level, trend, zones under, and the assault word."""
     from verdance.campaign import WORLD_MAPS, waterline_surface
@@ -1304,6 +1313,8 @@ def build_hub(state: dict, war: dict) -> dict:
         "world": _world_surface(state),
         "water": _water_surface(state),
         "theaters": dict(_theaters.SET_PIECES),
+        # Bonds worth something on the field: the Drop dialog shows the rows whose pair both drop.
+        "bondPerks": _bond_perks(state, aces),
         "regions": regions,
         "node": node,
         "lastResult": _with_manifest(_load_last_hub_result(), state),

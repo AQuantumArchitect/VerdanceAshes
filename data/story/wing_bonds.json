@@ -1,0 +1,144 @@
+{
+  "schemaVersion": "verdance-authored-bonds/1.0",
+  "notes": "The new heroes' first relationships (2026-10-23): Thresh's bomber wing, Gale's Cutlasses, Mask and his Pawns, Rumor the spy. Merged by tools/author_bonds_v1.py like the sky pairs.",
+  "pairs": [
+    {
+      "a": "thresh", "b": "kettle", "polarity": "rivalry",
+      "motifs": ["the bomber the saint was built to stop", "weather against the roof"],
+      "talks": {
+        "C": {"title": "What she was built for", "beats": [
+          ["narrator", "Kettle has a Hailstorm silhouette chalked inside the Archangel's hatch. It predates Thresh."],
+          ["thresh", "Weather comes from above."],
+          ["kettle", "And I come from below. That's what they built me for. You."],
+          ["thresh", "Then we'll get on. Nobody else takes me seriously."]]},
+        "B": {"title": "Practice runs", "beats": [
+          ["narrator", "Thresh flies dummy runs over the camp. Kettle tracks every one and fires at none."],
+          ["kettle", "Third pass. I had you on all three."],
+          ["thresh", "I know. I wanted to know what it feels like to be had."],
+          ["kettle", "And?"],
+          ["thresh", "Honest. Nobody's ever been honest with me at that altitude."]]},
+        "A": {"title": "The only sky I trust", "beats": [
+          ["narrator", "Enemy anti-air lit up the whole valley. The Hailstorm flew home through the one corridor Kettle had cleared."],
+          ["thresh", "You made me a road."],
+          ["kettle", "If anyone shoots you down, it'll be me. I'm not sharing."],
+          ["thresh", "That's the kindest threat I've ever had."]]}
+      }
+    },
+    {
+      "a": "thresh", "b": "fatboy", "polarity": "mirror",
+      "motifs": ["the house knocks, the sky knocks", "siege at two altitudes"],
+      "talks": {
+        "C": {"title": "Two kinds of knocking", "beats": [
+          ["narrator", "Fatboy and Thresh compare craters like other people compare scars."],
+          ["fatboy", "House learned to knock."],
+          ["thresh", "Sky learned to knock louder."],
+          ["fatboy", "Louder isn't deeper."]]},
+        "B": {"title": "The same wall", "beats": [
+          ["narrator", "They hit the same wall on the same sortie. Neither will say who finished it."],
+          ["thresh", "Your shells softened it."],
+          ["fatboy", "Your bombs took the credit."],
+          ["thresh", "The wall didn't mind."]]},
+        "A": {"title": "Weather and house", "beats": [
+          ["narrator", "One plodding house, one bomber, and an enemy citadel that stopped being a citadel."],
+          ["fatboy", "Never looked up."],
+          ["thresh", "Never looked down. I think that makes us family."]]}
+      }
+    },
+    {
+      "a": "gale", "b": "anvil", "polarity": "attract",
+      "motifs": ["the ford and the wing over it", "water as a road"],
+      "talks": {
+        "C": {"title": "Floating", "beats": [
+          ["narrator", "Six Cutlasses sit on the river like a flock of ducks. Anvil's Turtles wade past them."],
+          ["anvil", "The river learns my weight."],
+          ["gale", "The river doesn't notice mine. That's the trick."],
+          ["anvil", "Then we're both cheating."]]},
+        "B": {"title": "Flood season", "beats": [
+          ["narrator", "When the waterline rose over Koom, the two of them were the only ones smiling."],
+          ["gale", "Everyone else sees a flood. I see a runway."],
+          ["anvil", "I see a floor."],
+          ["gale", "Same water. Better company."]]},
+        "A": {"title": "Amphibious", "beats": [
+          ["narrator", "The Turtles took the ford while the Cutlasses held the sky over it. The enemy had planned for a dry bed."],
+          ["anvil", "Weight first."],
+          ["gale", "Wings second. Poetry never."]]}
+      }
+    },
+    {
+      "a": "gale", "b": "ceil", "polarity": "mirror",
+      "motifs": ["two gunship wings, one sky", "rotors and floats"],
+      "talks": {
+        "C": {"title": "Parking", "beats": [
+          ["narrator", "Ceil parks on the pad. Gale parks on the pond next to it."],
+          ["ceil", "Altitude is an opinion."],
+          ["gale", "So is the ground. I never land on it."],
+          ["ceil", "Show-off."]]},
+        "B": {"title": "Formation", "beats": [
+          ["narrator", "Roughnecks high, Cutlasses low. They don't call it a formation. It is one."],
+          ["gale", "You take the ridges, I take the river."],
+          ["ceil", "And whoever finishes first takes the rest."]]},
+        "A": {"title": "Wing", "beats": [
+          ["narrator", "Eleven gunships over one valley, none of them in the other's way."],
+          ["ceil", "Didn't think I'd share a sky."],
+          ["gale", "You didn't. We built a bigger one."]]}
+      }
+    },
+    {
+      "a": "mask", "b": "pavise", "polarity": "tension",
+      "motifs": ["the spare king and the left hand", "a crown nobody gave him"],
+      "talks": {
+        "C": {"title": "Left of whom", "beats": [
+          ["narrator", "Mask's Pawns salute him. Pavise watches and says nothing for a long time."],
+          ["pavise", "I still walk your left. The real one's."],
+          ["mask", "Every throne needs a spare."],
+          ["pavise", "The spare doesn't get a salute."]]},
+        "B": {"title": "Drawing fire", "beats": [
+          ["narrator", "The enemy spent half its artillery on Mask. Pavise noticed who that saved."],
+          ["mask", "They think I'm you. Or you're me. I lose track."],
+          ["pavise", "You drew fire meant for the company."],
+          ["mask", "It's what I was built for. I'm just doing it on purpose now."]]},
+        "A": {"title": "Two crowns", "beats": [
+          ["narrator", "Pavise has started walking on Mask's left, too, when the Pawns can see."],
+          ["mask", "You don't have to."],
+          ["pavise", "I walk the left of whoever they're aiming at. Today it's you."]]}
+      }
+    },
+    {
+      "a": "rumor", "b": "auditor", "polarity": "friction",
+      "motifs": ["the ledger and the turncoat", "count against contract"],
+      "talks": {
+        "C": {"title": "Accounts", "beats": [
+          ["narrator", "The Auditor has a column for every unit the company owns. Rumor keeps adding rows."],
+          ["auditor", "Ledger with legs. Where did these four tanks come from?"],
+          ["rumor", "Everything changes sides eventually."],
+          ["auditor", "Not in my books it doesn't. Not without a receipt."]]},
+        "B": {"title": "Receipts", "beats": [
+          ["narrator", "Rumor now leaves a scrap of paper on every captured unit. It says 'paid'."],
+          ["auditor", "That isn't a receipt."],
+          ["rumor", "It is to them."]]},
+        "A": {"title": "Balanced", "beats": [
+          ["narrator", "The books balanced this sortie, for the first time since Rumor arrived."],
+          ["auditor", "You captured exactly what we lost."],
+          ["rumor", "I read your ledger. I hate leaving you a deficit."]]}
+      }
+    },
+    {
+      "a": "rumor", "b": "veil", "polarity": "attract",
+      "motifs": ["fog is the payroll", "two contracts in the dark"],
+      "talks": {
+        "C": {"title": "Payroll", "beats": [
+          ["narrator", "Veil's jammers hide everything. Rumor seems to be inside the fog before it rolls in."],
+          ["veil", "Fog is the payroll."],
+          ["rumor", "Then I'm paid in advance."]]},
+        "B": {"title": "Cover", "beats": [
+          ["narrator", "The Ghosts walk into the enemy base inside Veil's blind spot, and walk out with a factory."],
+          ["veil", "They never saw you."],
+          ["rumor", "They never saw you. I was just standing in it."]]},
+        "A": {"title": "Nobody", "beats": [
+          ["narrator", "An entire enemy patrol changed sides without a shot, and nobody on either team can say how."],
+          ["veil", "The perfect contract."],
+          ["rumor", "The perfect rumor."]]}
+      }
+    }
+  ]
+}
