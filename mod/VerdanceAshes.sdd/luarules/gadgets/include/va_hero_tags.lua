@@ -358,9 +358,12 @@ function M.composeField(resolved, xp)
     mentor = resolved.mentor,
     xpScale = scale,
   }
+  -- XP grows the tag's bonus, not the whole stat: Shieldline's +14% HP becomes +18.5% at 2.4 XP
+  -- (it used to multiply the stat, ×1.52), and Deadbolt's -10% reload grows to -13% instead of
+  -- turning into a 20% slowdown.
   local function arm(stat)
     if not stat then return end
-    out[stat] = (tonumber(resolved[stat]) or 1) * scale
+    out[stat] = 1 + ((tonumber(resolved[stat]) or 1) - 1) * scale
   end
   arm(resolved.primaryStat)
   if type(resolved.secondaryStats) == "table" then

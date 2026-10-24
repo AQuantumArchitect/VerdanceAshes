@@ -23,6 +23,10 @@ end
 local config = VFS.Include('LuaRules/Configs/raptor_spawn_defs.lua')
 -- Verdance keeps its authored hives only in a hub-launched match; otherwise this is stock BAR.
 local VA_ACTIVE = VFS.Include("LuaRules/Configs/va_active.lua")
+-- The Queen's Nest (units/va_queen_nest.lua): when the campaign places one, the queen wakes when it
+-- falls (or her anger fills), not when the roost count runs low.
+local VA_NEST = { def = VA_ACTIVE and UnitDefNames and UnitDefNames.va_queen_nest and UnitDefNames.va_queen_nest.id or nil,
+	id = nil, fallen = false }
 local EnemyLib = VFS.Include('LuaRules/Gadgets/Include/SpawnerEnemyLib.lua')
 
 --------------------------------------------------------------------------------
@@ -1424,9 +1428,13 @@ if gadgetHandler:IsSyncedCode() then
 		local unitDef = UnitDefs[unitDefID]
 
 		-- Campaign hives are not spawned by SpawnBurrow, so they never entered burrows.
-		if VA_ACTIVE and unitDefID == config.burrowDef then
+		if VA_ACTIVE and (unitDefID == config.burrowDef or unitDefID == VA_NEST.def) then
 			local x, y, z = GetUnitPosition(unitID)
 			SetupBurrow(unitID, x, y, z)
+			if unitDefID == VA_NEST.def then
+				VA_NEST.id, VA_NEST.fallen = unitID, false
+				SetGameRulesParam("va_queen_nest", unitID, { public = true })
+			end
 		end
 
 		if unitTeam == raptorTeamID then
@@ -2037,7 +2045,10 @@ if gadgetHandler:IsSyncedCode() then
 			SetGameRulesParam("raptorQueenAnger", math.floor(queenAnger))
 			SetGameRulesParam("raptorTechAnger", math.floor(techAnger))
 
-			if queenAnger >= 100 or (burrowCount <= 1 and t > config.gracePeriod) then
+			-- With a Queen's Nest on the field, only its fall (or full anger) wakes her.
+			local nestWakes = VA_NEST.id and VA_NEST.fallen
+			local countWakes = (not VA_NEST.id) and burrowCount <= 1
+			if queenAnger >= 100 or ((nestWakes or countWakes) and t > config.gracePeriod) then
 				updateSpawnQueen()
 			end
 			updateQueenHealth()
@@ -2122,6 +2133,11 @@ if gadgetHandler:IsSyncedCode() then
 
 	function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID)
 
+		if unitID == VA_NEST.id then
+			VA_NEST.fallen = true
+			SetGameRulesParam("va_queen_nest_fallen", 1, { public = true })
+			Spring.Echo("VA_QUEEN_NEST_FALLEN unit=" .. tostring(unitID))
+		end
 		if unitTeam == raptorTeamID then
 			if config.useEggs then
 				local x,y,z = GetUnitPosition(unitID)

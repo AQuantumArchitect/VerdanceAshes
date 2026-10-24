@@ -128,6 +128,11 @@ def expire_scars(commander: Dict[str, Any], mission_number: int) -> None:
     commander["scars"] = kept
 
 
+# Half the old rate (owner call, 2026-10-24: everyone levelled too fast). The field's engine XP is
+# halved the same way in game_verdance_veterancy.lua (FIELD_XP_RATE).
+CAMPAIGN_XP_PACE = 0.5
+
+
 def _sortie_xp_gains(state: Dict[str, Any], result: Dict[str, Any], success: bool, clean: bool) -> Dict[str, float]:
     """Commander + hero campaign XP for this sortie (mode-aware, farm-boosted)."""
     prog = ensure_progression(state)
@@ -149,9 +154,10 @@ def _sortie_xp_gains(state: Dict[str, Any], result: Dict[str, Any], success: boo
     if farm:
         hero *= 1.85
         cmd *= 1.35
+    pace = CAMPAIGN_XP_PACE
     return {
-        "commander": round(cmd * mult, 2),
-        "hero": round(hero * mult, 2),
+        "commander": round(cmd * mult * pace, 2),
+        "hero": round(hero * mult * pace, 2),
     }
 
 

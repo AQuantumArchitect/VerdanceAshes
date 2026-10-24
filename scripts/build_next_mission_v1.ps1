@@ -907,12 +907,13 @@ function Centerpiece-CommandPost {
 
 function Centerpiece-Hives {
   param([double]$Hazard)
-  # Always three. Two is the stock "nests are gone, send the queen" line if one fails to place.
+  # Two roosts and the Queen's Nest. Burning the roosts is fine; the queen wakes when her nest
+  # falls (or her anger fills), never because the roost count ran low (raptor_spawner_defense.lua).
   $null = $Hazard
   @(
     (Spec "raptor_hive" 1 -120 -40 240),
     (Spec "raptor_hive" 1 140 80 240),
-    (Spec "raptor_hive" 1 0 -220 240)
+    (Spec "va_queen_nest" 1 0 -240 300)
   )
 }
 

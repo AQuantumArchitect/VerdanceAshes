@@ -535,7 +535,7 @@ M.HEROES = {
     tags = { "eco", "geo", "saint" },
     escorts = {
       {
-        unitDef = "corvac",
+        unitDef = "va_printer",
         count = 1,
       },
     },

@@ -4,7 +4,7 @@ local gadget = gadget
 function gadget:GetInfo()
   return {
     name = "Verdance Constructor Craft XP",
-    desc = "Golden-ratio craft XP: capture > rez > build > repair; reclaim=0. Rewards % build power + slight build range.",
+    desc = "Golden-ratio craft XP: capture > rez > build > repair; reclaim=0. Rewards build power and build range, doubling both at full experience.",
     author = "Verdance",
     date = "2026-09-06",
     license = "GPL v2 or later",
@@ -27,8 +27,9 @@ end
   Repair is the unit base (bumped up). Reclaim never pays craft XP.
 
   Rewards (percentage of unit baseline):
-    buildPower  *= 1 + 0.35 * craftXp   (cap 1.80)
-    buildRange  *= 1 + 0.12 * craftXp   (cap 1.25)
+    buildPower  *= 1 + 0.42 * craftXp   (cap 2.00)
+    buildRange  *= 1 + 0.42 * craftXp   (cap 2.00)
+  Full experience (about 2.4, where Ketha stands) doubles both (owner call, 2026-10-24).
 ]]
 
 local PHI = (1 + math.sqrt(5)) * 0.5 -- 1.6180339887...
@@ -46,10 +47,10 @@ local BONUS_REZ = RATE_REZ_TICK * 5.5
 local BONUS_CAPTURE = RATE_REPAIR * PHI3 * 6
 local BONUS_BUILD_FINISH = RATE_BUILD * 3
 
-local BP_PER_XP = 0.35
-local BP_CAP = 1.80
-local RANGE_PER_XP = 0.12
-local RANGE_CAP = 1.25
+local BP_PER_XP = 0.42
+local BP_CAP = 2.00
+local RANGE_PER_XP = 0.42
+local RANGE_CAP = 2.00
 
 local enabled = true
 local playerTeam = 0

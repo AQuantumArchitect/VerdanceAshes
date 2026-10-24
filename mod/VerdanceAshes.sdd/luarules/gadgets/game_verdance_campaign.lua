@@ -1882,6 +1882,11 @@ local function spawnOneUnit(defName, x, z, facing, teamID, spec, force)
   local unitID = Spring.CreateUnit(defName, x, y, z, facing, teamID)
   if unitID then
     Spring.SetUnitRulesParam(unitID, "va_playable_proxy", 1, { public = true })
+    if defName == "va_queen_nest" and Spring.SetUnitPieceMatrix then
+      -- the queen's nest is bigger than a roost: scale its root piece (the unit def widens the box)
+      local s = 1.6
+      pcall(Spring.SetUnitPieceMatrix, unitID, 1, { s, 0, 0, 0, 0, s, 0, 0, 0, 0, s, 0, 0, 0, 0, 1 })
+    end
     -- Pack mates: stamp leader; mentors also mint XP floor + field aura.
     if teamID == playerTeamID and not (spec and (spec.heroId or spec.hero)) then
       local pkg = spec and tostring(spec.packageTag or "") or ""

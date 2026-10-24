@@ -138,7 +138,7 @@ HERO_CAMPAIGN_XP_PER_LEVEL = 100.0
 HERO_MAX_LEVEL = 12
 # BAR unit experience floors by hero level (engine combat bonuses scale with this).
 # Level 1 ~ green, level 6 solid vet, level 12 endgame cracked.
-HERO_BAR_XP_PER_LEVEL = 0.55
+HERO_BAR_XP_PER_LEVEL = 0.35   # was 0.55: level 5 sat at 2.35 XP, close to the veterancy caps
 HERO_BAR_XP_BASE = 0.15
 
 

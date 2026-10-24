@@ -474,13 +474,19 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
   refreshUnit(unitID, "finished")
 end
 
+local bornAt = {}   -- unitID -> frame; XP set in a unit's first second is a carried seed, not combat
+local paced = {}    -- unitID -> the XP we last left it at (the engine reports only grade crossings)
+
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
+  bornAt[unitID] = Spring.GetGameFrame()
   if not enabled or unitTeam ~= playerTeam then return end
   if not isPlayerVetUnit(unitID, unitDefID) then return end
 end
 
 function gadget:UnitDestroyed(unitID)
   vet[unitID] = nil
+  bornAt[unitID] = nil
+  paced[unitID] = nil
 end
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
@@ -496,23 +502,35 @@ function gadget:UnitGiven(unitID, unitDefID, newTeam, oldTeam)
   end
 end
 
--- The company's aircraft earn half again as much XP: the same as pricing them a third cheaper
+-- The company learns at half the engine's rate (owner call, 2026-10-24: everyone levelled too
+-- fast). Its aircraft earn half again as much as that: the same as pricing them a third cheaper
 -- in the engine's damage-for-XP sum (owner call, 2026-10-23; the pack's starting XP takes the
--- same third off in tools/verdance/company/pack_xp.py).
+-- same third off in tools/verdance/company/pack_xp.py). Seeds (XP set as a unit is placed, the
+-- carried veterancy) are left alone.
+local FIELD_XP_RATE = 0.5
 local AIR_XP_BONUS = 0.5
-local airBoosting = false
+local pacing = false
 
 function gadget:UnitExperience(unitID, unitDefID, unitTeam, xp, oldXp)
   if not enabled then return end
   if unitTeam ~= playerTeam then return end
-  if not airBoosting and Spring.SetUnitExperience and xp > (oldXp or 0) then
-    local ud = UnitDefs[unitDefID]
-    if ud and ud.canFly then
-      airBoosting = true
-      xp = xp + (xp - (oldXp or 0)) * AIR_XP_BONUS
+  local seeded = (Spring.GetGameFrame() - (bornAt[unitID] or -999)) < 30
+  if pacing then
+    -- our own write echoing back
+  elseif seeded or not Spring.SetUnitExperience then
+    paced[unitID] = xp
+  else
+    -- everything earned since we last set it, not just the increment that crossed the grade
+    local from = paced[unitID] or oldXp or 0
+    if xp > from then
+      local ud = UnitDefs[unitDefID]
+      local rate = FIELD_XP_RATE * ((ud and ud.canFly) and (1 + AIR_XP_BONUS) or 1)
+      xp = from + (xp - from) * rate
+      pacing = true
       Spring.SetUnitExperience(unitID, xp)
-      airBoosting = false
+      pacing = false
     end
+    paced[unitID] = xp
   end
   if not isPlayerVetUnit(unitID, unitDefID) then return end
   local rec = ensureVet(unitID, unitDefID)

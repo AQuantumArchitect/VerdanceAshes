@@ -1219,7 +1219,7 @@ window.CREW_PACKS = {
       ],
       "escorts": [
         {
-          "unitDef": "corvac",
+          "unitDef": "va_printer",
           "count": 1
         }
       ]
