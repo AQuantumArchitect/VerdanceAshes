@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Give heroes their proper names everywhere a name is written, without touching anything else.
+"""Give heroes their proper names everywhere a name is written, without touching anything else
+(and, in a save, move Halbard onto her own Halberd).
 
 The data files keep their own formatting: only `"name": "<old>"` (JSON) and `name = "<old>",`
 (the gadget roster) are rewritten, for the heroes in NAMES. With --state, a campaign save's cached
@@ -31,6 +32,9 @@ NAMES = {
     "anvil": ("Anvil Mire", "Anvil & Mire"),
 }
 
+# the Halberd is now Halbard's own unit (heat ray); a save made before that still says corhal
+UNITDEFS = {"halbard": ("corhal", "va_halberd")}
+
 DATA = ["data/story/hero_roster.json", "data/story/hero_codex.json", "data/story/crew_packs.json",
         "data/story/hero_umwelt.json", "data/story/support_web.json", "app/showoff/crew_packs.embed.js"]
 ROSTER_LUA = "mod/VerdanceAshes.sdd/luarules/gadgets/include/va_crew_roster.lua"
@@ -60,6 +64,12 @@ def rename_state(path: Path) -> None:
     raw = path.read_bytes()
     state = json.loads(raw.decode("utf-8-sig"))
     n = 0
+    for hid, (old, new) in UNITDEFS.items():
+        for row in [(state.get("characters") or {}).get(hid), (state.get("fieldPool") or {}).get(hid)] + [
+                h for h in (state.get("roster") or {}).get("heroes") or [] if isinstance(h, dict) and h.get("heroId") == hid]:
+            if isinstance(row, dict) and row.get("unitDef") == old:
+                row["unitDef"] = new
+                n += 1
     for hid, (_old, new) in NAMES.items():
         for row in [(state.get("characters") or {}).get(hid), (state.get("fieldPool") or {}).get(hid)] + [
                 h for h in (state.get("roster") or {}).get("heroes") or [] if isinstance(h, dict) and h.get("heroId") == hid]:
@@ -67,14 +77,14 @@ def rename_state(path: Path) -> None:
                 row["name"] = new
                 n += 1
     if not n:
-        print("save: nothing to rename")
+        print("save: nothing to change")
         return
     backup = path.with_name(f"campaign_state.before_rename_{time.strftime('%Y%m%d_%H%M%S')}.json")
     shutil.copy2(path, backup)
     newline = "\r\n" if b"\r\n" in raw[:200] else "\n"
     with open(path, "w", encoding="utf-8", newline=newline) as f:
         f.write(json.dumps(state, indent=2) + "\n")
-    print(f"save: {n} names (backup {backup.name})")
+    print(f"save: {n} fields (backup {backup.name})")
 
 
 def main() -> int:

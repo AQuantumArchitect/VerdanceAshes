@@ -1,6 +1,6 @@
 {
   "schemaVersion": "verdance-crew-packs/1.6",
-  "notes": "Baseline ~2k combined (Karkinos). Gap-fill wave: Quill/Kit/Vale/Nox/Ceil/Lumen/Anvil/Volt. Character SSOT: data/story/hero_codex.json Core left hand=Pavise (armwar). Vane Phobos is band swarm. Halbard=corhal. Company: Ketha always ships; the player picks 3 (first = you, must be able to walk). Starters unlock more by rescue (state/profile.json).",
+  "notes": "Baseline ~2k combined (Karkinos). Gap-fill wave: Quill/Kit/Vale/Nox/Ceil/Lumen/Anvil/Volt. Character SSOT: data/story/hero_codex.json Core left hand=Pavise (armwar). Vane Phobos is band swarm. Halbard=va_halberd. Company: Ketha always ships; the player picks 3 (first = you, must be able to walk). Starters unlock more by rescue (state/profile.json).",
   "energyPerMetal": 70,
   "packAnchor": {
     "javelinPair": {
@@ -485,6 +485,13 @@
       "hasBuildPower": false
     },
     "corhal": {
+      "metal": 640,
+      "energy": 13000,
+      "combined": 826,
+      "label": "Halberd",
+      "hasBuildPower": false
+    },
+    "va_halberd": {
       "metal": 640,
       "energy": 13000,
       "combined": 826,
@@ -1291,12 +1298,12 @@
     },
     "halbard": {
       "role": "band",
-      "unitDef": "corhal",
+      "unitDef": "va_halberd",
       "hireTnb": 0,
       "packTotal": 1,
       "extras": 0,
       "packMind": "solo",
-      "blurb": "Drives the Cortex Halberd assault hovertank.",
+      "blurb": "Drives the Cortex Halberd with a heat ray in place of its cannon. The ray runs on the company's energy bank, so she wants Solarium behind her.",
       "name": "Ilse 'Halbard' Varn",
       "sizing": "fixed",
       "packCombined": 826,

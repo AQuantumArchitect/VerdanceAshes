@@ -215,7 +215,7 @@ function formationSpent() { return formationPicks().reduce((n, id) => n + crewHi
 
 export function recommendCompany() {
   if (companySealed()) return;
-  // You are Pavise; Solarium and Halbard come with you. The real choice it sets up:
+  // You are Pavise; Solarium and Halbard come with you (Halbard's heat ray runs on Solarium's energy bank). The real choice it sets up:
   // swap Halbard for Vane (stronger, worse against the early beamer fights).
   const pool = new Set(crewBandOrder());
   const pick = ["pavise", "solarium", "halbard"].filter(id => pool.has(id) && !["dead", "lost"].includes(String(aceById(id)?.status || "active")));
@@ -226,7 +226,7 @@ export function recommendCompany() {
   state.crewBand = pick.slice(1);
   renderCompany();
   renderCompanyIntro();
-  toast("You are Pavise, with Solarium and Halbard. Swap Halbard for Vane if you want more punch.", "ok");
+  toast("You are Pavise, with Solarium and Halbard: her heat ray runs on the energy bank Solarium fills. Swap Halbard for Vane if you want more punch.", "ok");
 }
 
 /* ---- company intro (first run) ------------------------------------------------------- */

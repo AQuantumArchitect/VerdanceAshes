@@ -1,6 +1,6 @@
 {
   "schemaVersion": "verdance-hero-roster/1.0",
-  "notes": "Named-hero roster. Voice/fiction from hero_codex.json (apply). Core pavise+ketha always ship; Halbard band on corhal.",
+  "notes": "Named-hero roster. Voice/fiction from hero_codex.json (apply). Core pavise+ketha always ship; Halbard band on va_halberd.",
   "heroes": [
     {
       "heroId": "rusk",
@@ -763,7 +763,7 @@
     {
       "heroId": "halbard",
       "name": "Ilse 'Halbard' Varn",
-      "unitDef": "corhal",
+      "unitDef": "va_halberd",
       "missionCritical": false,
       "status": "active",
       "xp": 0.08,

@@ -1,6 +1,6 @@
 {
   "schemaVersion": "verdance-hero-codex/1.0",
-  "notes": "Character + typing + doctrine SSOT. Packs=mass/kit; roster=campaign XP/recruit. Temperament tags are personality axes for charts AND support-web chemistry (tools/support_web_v1.py → data/story/support_web.json + camp_talks.json). Field-effect tags stay in packs. Run: python tools/hero_codex_v1.py chart|list|apply Pavise=core Centurion left hand; Vane=band Phobos swarm; Halbard=corhal.",
+  "notes": "Character + typing + doctrine SSOT. Packs=mass/kit; roster=campaign XP/recruit. Temperament tags are personality axes for charts AND support-web chemistry (tools/support_web_v1.py → data/story/support_web.json + camp_talks.json). Field-effect tags stay in packs. Run: python tools/hero_codex_v1.py chart|list|apply Pavise=core Centurion left hand; Vane=band Phobos swarm; Halbard=va_halberd.",
   "temperamentVocab": [
     "captain",
     "debt",
@@ -866,14 +866,14 @@
       "allowBail": true,
       "allowKite": false,
       "faction": "cortex",
-      "unitDef": "corhal",
+      "unitDef": "va_halberd",
       "voice": {
         "hook": "Halberd's hungry.",
-        "blurb": "Drives the Cortex Halberd assault hovertank.",
+        "blurb": "Drives the Cortex Halberd with a heat ray in place of its cannon. The ray runs on the company's energy bank, so she wants Solarium behind her.",
         "fiction": "Not Pavise. Different spelling, different manners. The Halberd is a door that learned to hover.",
         "tagLine": "Hovertank with a name like a weapon."
       },
-      "notes": "band; corhal; packMind=solo"
+      "notes": "band; va_halberd; packMind=solo"
     },
     {
       "heroId": "thresh",
