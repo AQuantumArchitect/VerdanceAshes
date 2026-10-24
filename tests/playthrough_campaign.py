@@ -22,6 +22,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from e2e_campaign import fresh_workspace  # noqa: E402
+REPO = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO / "tools"))
+from verdance.world.claim import claim_need  # noqa: E402
 
 
 def jload(p: Path):
@@ -81,8 +84,10 @@ def fake_result(state, intent, plan, hs, n, brought):
                      for i, k in enumerate((intent.get("theater") or {}).get("kings") or [])])
                  if (intent.get("theater") or {}).get("kind") == "kings_showdown" else None,
         "observedZones": dict(seen),
-        # the company dug in at its pad and its target: it holds both at homecoming (doors too)
-        "zoneDv": {str(target): {"ashwalkers": 900}, str(pad): {"ashwalkers": 600}},
+        # the company dug in at its pad and its target with the claim presence (the objective will
+        # not complete without it): it holds both at homecoming (doors too)
+        "zoneDv": {str(pad): {"ashwalkers": claim_need(plan["mapId"], REPO)},
+                   str(target): {"ashwalkers": claim_need(plan["mapId"], REPO) + 100}},
         "beliefExport": {z: {"eta": e, "enemyNow": 0, "friendNow": 3 if z == pad else 0} for z, e in seen.items()},
         "manifest": {
             "schema": "verdance-manifest/1", "kind": "extracted", "destination": "home",
@@ -90,7 +95,7 @@ def fake_result(state, intent, plan, hs, n, brought):
             "going": {"heroes": [{"heroId": h, "name": h} for h in heroes], "units": dict(lifted), "packUnits": {},
                       "unitCount": sum(lifted.values()), "metal": 1500},
             "staying": {"heroes": [], "units": {}, "unitCount": 0, "structures": {}, "structureCount": 0, "metal": 0},
-            "enemyOnPad": 0, "seen": seen, "tenebrium": 4, "objectiveComplete": True,
+            "enemyOnPad": 0, "seen": seen, "tenebrium": 4, "objectiveComplete": True, "dropped": list(heroes),
         },
     }
 

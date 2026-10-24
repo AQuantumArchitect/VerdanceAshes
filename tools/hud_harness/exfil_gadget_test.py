@@ -27,7 +27,7 @@ local zoneMap = { mapId = "t", zones = {
   { zoneId = "FAR", label = "Far Field", shape = "cells", cellGrid = { cols = 4, rows = 4 }, cells = { { 8, 8 } }, anchor = { x = 0.5, z = 0.75 } },
 } }
 local mission = { missionId = "t1", deploymentMapId = "t", deploymentZoneId = "PAD", zoneMap = zoneMap,
-  pad = { zoneId = "PAD", x = 0.5, z = 0.25, radius = 300 } }
+  pad = { zoneId = "PAD", x = 0.5, z = 0.25, radius = 300 }, exitDoorZoneId = "FAR" }
 -- units: 1 hero near the pad point, 2 a unit at the zone's far corner (outside the old circle),
 -- 3 an immobile turret in the pad zone (Solarium), 4 a unit in FAR, 9 an enemy in the pad zone.
 local U = {
@@ -41,7 +41,7 @@ local U = {
 }
 UnitDefs = { [1] = { name = "corthud", speed = 50, metalCost = 100 }, [2] = { name = "armnanotc", speed = 0, metalCost = 200 } }
 Game = { mapSizeX = 4096, mapSizeZ = 4096 }
-RULES, SENT, ENDED, GG = {}, {}, {}, {}
+RULES, SENT, ENDED, GG = { va_dropped_heroes = "pavise,solarium,ketha" }, {}, {}, {}
 GG.VA_EndSortie = function(kind) ENDED[#ENDED + 1] = kind end
 VFS = { Include = function(p)
   if p:find("va_active") then return dofile(ACTIVE) end
@@ -89,7 +89,17 @@ has('{"heroId":"solarium","name":"solarium","unitDef":"armnanotc"}]', "an immobi
 has('"staying":{"heroes":[]', "... and is not left behind as a person in the field")
 has('"units":{"FAR":1}', "a unit outside the pad zone stays")
 has('"enemyOnPad":1', "a mobile enemy anywhere in the pad zone is on the pad; a wall is not")
+has('"dropped":["pavise","solarium","ketha"]', "the manifest names who dropped (Python buries whoever is nowhere)")
 print("ok   manifest: pad is the landing zone; an immobile hero lifts from where it stands")
+-- taking a door: once the objective is done the extraction moves onto it
+assert(RULES.va_pad_zone == "PAD", "the pad starts on the landing zone")
+RULES.va_objective_complete = 1
+for f = 62, 92 do gadget:GameFrame(f) end
+assert(RULES.va_pad_zone == "FAR" and RULES.va_pad_moved == 1, "the pad did not move to the exit door")
+GG.VA_ExfilCmd("manifest")
+m = RULES.va_manifest_json
+has('"units":{"corthud":1}', "on the exit door, the unit standing there goes")
+print("ok   taking a door: the extraction moves onto it once the objective is done")
 GG.VA_ExfilCmd("extract:home")
 assert(ENDED[1] == "extracted", "extract did not end the sortie")
 print("ok   extract through the campaign hand-off ends the sortie")

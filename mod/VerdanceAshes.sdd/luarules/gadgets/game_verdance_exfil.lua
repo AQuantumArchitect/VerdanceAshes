@@ -41,6 +41,7 @@ local cols, rows, mapX, mapZ = 96, 96, 1, 1
 local cellToZone = {}
 local zoneLabel = {}
 local lastManifest = nil        -- table, stamped on confirm / wipe
+local anchorOf = {}             -- zoneId -> { x, z } (the zone's anchor, elmos)
 local ready = false
 
 local function jnum(v, d)
@@ -123,6 +124,42 @@ local function zoneOf(x, z)
   return cellToZone[r * cols + c]
 end
 
+-- The pad is the whole zone the company leaves from. Publishes it for the HUD.
+local function placePad(zid, x, z, r)
+  pad = { zoneId = zid, label = zoneLabel[zid] or zid, x = x, z = z, r = r }
+  -- The pad is the whole zone the company landed in (the infil zone), not a circle inside it.
+  -- reach: the farthest corner of the zone from the pad point, for the unit queries below.
+  local cw, ch, reach, cells = mapX / cols, mapZ / rows, 0, 0
+  for ci, owner in pairs(cellToZone) do
+    if owner == zid then
+      cells = cells + 1
+      local cx, cz = (ci % cols) * cw, math.floor(ci / cols) * ch
+      for _, k in ipairs({ { 0, 0 }, { 1, 0 }, { 0, 1 }, { 1, 1 } }) do
+        local dx, dz = cx + k[1] * cw - x, cz + k[2] * ch - z
+        reach = math.max(reach, math.sqrt(dx * dx + dz * dz))
+      end
+    end
+  end
+  pad.zoned = cells > 0
+  pad.reach = pad.zoned and reach or pad.r
+  Spring.SetGameRulesParam("va_pad_x", math.floor(x), { public = true })
+  Spring.SetGameRulesParam("va_pad_z", math.floor(z), { public = true })
+  Spring.SetGameRulesParam("va_pad_r", math.floor(pad.r), { public = true })
+  Spring.SetGameRulesParam("va_pad_zone", zid, { public = true })
+  Spring.Echo("VA_EXFIL pad=" .. zid .. " x=" .. math.floor(x) .. " z=" .. math.floor(z))
+end
+
+-- Taking a door (mission.exitDoorZoneId): once the objective is done the extraction moves onto the
+-- door, so the company leaves by the exit it took.
+local function maybeMoveToExit()
+  local exit = mission and mission.exitDoorZoneId and tostring(mission.exitDoorZoneId)
+  if not exit or not pad or pad.zoneId == exit or not anchorOf[exit] then return end
+  if (tonumber((Spring.GetGameRulesParam("va_objective_complete"))) or 0) ~= 1 then return end
+  placePad(exit, anchorOf[exit][1], anchorOf[exit][2], PAD_RADIUS)
+  Spring.SetGameRulesParam("va_pad_moved", 1, { public = true })
+  Spring.Echo("VA_EXFIL pad moved to the exit door " .. exit)
+end
+
 local function build()
   mission = readLua("singleplayer/verdance_ashes/generated/va_current.lua")
   zoneMap = (mission and type(mission.zoneMap) == "table" and mission.zoneMap)
@@ -136,6 +173,7 @@ local function build()
   cols, rows = tonumber(g.cols) or 96, tonumber(g.rows) or 96
   cellToZone, zoneLabel = {}, {}
   local anchors = {}
+  anchorOf = anchors
   for _, z in ipairs(zoneMap.zones) do
     local id = tostring(z.zoneId or "")
     if id ~= "" then
@@ -169,27 +207,7 @@ local function build()
     Spring.Echo("VA_EXFIL idle: no pad for zone " .. zid)
     return false
   end
-  pad = { zoneId = zid, label = zoneLabel[zid] or zid, x = x, z = z, r = tonumber(p and p.radius) or PAD_RADIUS }
-  -- The pad is the whole zone the company landed in (the infil zone), not a circle inside it.
-  -- reach: the farthest corner of the zone from the pad point, for the unit queries below.
-  local cw, ch, reach, cells = mapX / cols, mapZ / rows, 0, 0
-  for ci, owner in pairs(cellToZone) do
-    if owner == zid then
-      cells = cells + 1
-      local cx, cz = (ci % cols) * cw, math.floor(ci / cols) * ch
-      for _, k in ipairs({ { 0, 0 }, { 1, 0 }, { 0, 1 }, { 1, 1 } }) do
-        local dx, dz = cx + k[1] * cw - x, cz + k[2] * ch - z
-        reach = math.max(reach, math.sqrt(dx * dx + dz * dz))
-      end
-    end
-  end
-  pad.zoned = cells > 0
-  pad.reach = pad.zoned and reach or pad.r
-  Spring.SetGameRulesParam("va_pad_x", math.floor(x), { public = true })
-  Spring.SetGameRulesParam("va_pad_z", math.floor(z), { public = true })
-  Spring.SetGameRulesParam("va_pad_r", math.floor(pad.r), { public = true })
-  Spring.SetGameRulesParam("va_pad_zone", zid, { public = true })
-  Spring.Echo("VA_EXFIL pad=" .. zid .. " x=" .. math.floor(x) .. " z=" .. math.floor(z))
+  placePad(zid, x, z, tonumber(p and p.radius) or PAD_RADIUS)
   return true
 end
 
@@ -322,6 +340,9 @@ local function manifest()
   end
   m.tenebrium = (GG and GG.VA_TenebriumBank) and GG.VA_TenebriumBank() or nil
   m.objectiveComplete = (tonumber((Spring.GetGameRulesParam("va_objective_complete"))) or 0) == 1
+  -- who of the company dropped onto this field (the campaign gadget's va_dropped_heroes)
+  m.dropped = {}
+  for h in tostring(Spring.GetGameRulesParam("va_dropped_heroes") or ""):gmatch("[^,]+") do m.dropped[#m.dropped + 1] = h end
   return m
 end
 
@@ -397,7 +418,7 @@ end
 
 function gadget:GameFrame(f)
   memWatch(f, "rules")
-  if ready and f % 30 == 7 then hudScan() end
+  if ready and f % 30 == 7 then maybeMoveToExit(); hudScan() end
 end
 
 function GG.VA_Manifest()

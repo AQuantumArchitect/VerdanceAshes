@@ -125,6 +125,11 @@ def _is_center_snap_artifact(x: float, z: float, size: Optional[Tuple[float, flo
     return _center_snap_hit(x, size[0]) and _center_snap_hit(z, size[1])
 
 
+# Structures a map keeps between drops (the gadget sends at most as many). Was 64: the wind farm
+# filled it and the converters and storage built after were dropped.
+FOOTPRINT_CAP = 400
+
+
 def apply_player_footprint(state: Dict[str, Any], result: Dict[str, Any], map_id: str) -> Dict[str, Any]:
     """Persist player-built structures so the next Drop rehydrates them.
 
@@ -180,7 +185,7 @@ def apply_player_footprint(state: Dict[str, Any], result: Dict[str, Any], map_id
             "owner": "player",
             "role": str(item.get("role") or "player_footprint"),
         })
-        if len(units) >= 64:
+        if len(units) >= FOOTPRINT_CAP:
             break
     size = _authored_map_size(mid)
     prior_bag = footprints.get(mid) if isinstance(footprints.get(mid), dict) else {}
@@ -237,7 +242,7 @@ def apply_player_footprint(state: Dict[str, Any], result: Dict[str, Any], map_id
                 "latticeHits": lattice_hits,
                 "mapId": mid,
             }
-        units = merged[:64]
+        units = merged[:FOOTPRINT_CAP]
     footprints[mid] = {
         "mapId": mid,
         "updatedAt": utc_now(),

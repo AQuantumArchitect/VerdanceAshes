@@ -174,6 +174,8 @@ local function poll()
   S.pocketClearFrac = num("va_pocket_clear_frac", 0)
   S.fortifyDef = num("va_fortify_def", 0)
   S.fortifyNeedDef = num("va_fortify_need_def", 0)
+  S.claimValue = num("va_claim_value", 0)   -- our presence on the wound (vaClaimStrength)
+  S.claimNeed = num("va_claim_need", 0)
   S.requiredFrames = num("va_required_frames", M.requiredFrames or 19800)
   S.marks = marksList()
   S.requiredLeft = num("va_secondary_required_left", 0)
@@ -474,6 +476,15 @@ local function drawMission(x, y, right)
     y = y - 2
     Ash.meter(x + 14, y, right - 70, y + 5, frac, col)
     text(label, right, y - 1, 9, col, "r")
+    y = y - 14
+  end
+  -- taking the wound needs presence there: armed units and defences, in metal
+  if S.claimNeed > 0 and not S.objectiveComplete and not S.objectiveFailed then
+    local strong = S.claimValue >= S.claimNeed
+    local c = strong and Ash.COL.good or Ash.COL.warn
+    y = y - 2
+    Ash.meter(x + 14, y, right - 70, y + 5, S.claimValue / S.claimNeed, c)
+    text(string.format("presence %d / %d", math.floor(S.claimValue), math.floor(S.claimNeed)), right, y - 1, 9, c, "r")
     y = y - 14
   end
   -- marks: a square per mark, the current one named

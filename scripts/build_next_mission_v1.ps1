@@ -2619,7 +2619,7 @@ function Merge-PlayerFootprintIntoShell {
       localPocketOnly = $false
       units = @()
       pockets = @()
-      spawnLimit = 64
+      spawnLimit = 400
     }
   }
   $units = @()
@@ -2677,7 +2677,7 @@ function Merge-PlayerFootprintIntoShell {
       faction = "ashwalkers"
     }
     $added++
-    if ($added -ge 64) { break }
+    if ($added -ge 400) { break }
   }
   if ($added -gt 0) {
     $ShellPayload.units = $units
@@ -3423,6 +3423,14 @@ if ($state -and $state.PSObject.Properties["fieldPool"] -and $state.fieldPool) {
     $fieldRecruits += $entry
   }
 }
+# People the company left on this map stand where they stood (verdance.belief.manifest.field_people).
+$fieldPeople = @()
+foreach ($fp in @($(if ($intent.PSObject.Properties["fieldPeople"]) { $intent.fieldPeople } else { @() }))) {
+  if (-not $fp -or -not $fp.heroId) { continue }
+  $fz = if ($zoneMap) { Get-ZoneById $zoneMap ([string]$fp.zoneId) } else { $null }
+  $fc = Get-ZoneCenter $fz @(0.5, 0.5)
+  $fieldPeople += [ordered]@{ heroId = [string]$fp.heroId; zoneId = [string]$fp.zoneId; x = [Math]::Round([double]$fc[0], 4); z = [Math]::Round([double]$fc[1], 4) }
+}
 # A wreck waiting in the wound is the job: raise that hero and the objective is done.
 function Get-RezObjective($Recruits, $WoundZoneIds) {
   $wound = @(@($WoundZoneIds) | Where-Object { $_ } | ForEach-Object { [string]$_ })
@@ -3508,6 +3516,9 @@ $scenario = [ordered]@{
       targetZoneId = $targetZoneId
       # A field recruit lying in the wound: rezzing them is the objective (game_verdance_campaign.lua).
       rezHeroId = $(if ($rezObjective) { [string]$rezObjective.heroId } else { $null })
+      # The presence (metal in armed units and defences) a claim needs here (verdance.world.claim):
+      # a zone-taking objective completes only once the company stands there with this much.
+      claimValue = $(if ($intent.PSObject.Properties["claimValue"] -and $intent.claimValue) { [double]$intent.claimValue } else { 400 })
       extractionZoneId = $intent.extractionZoneId
       captureZoneIds = @($hubCaptureIds)
       secondaryCaptureZoneIds = @($hubSecondaryIds)
@@ -3525,7 +3536,7 @@ $scenario = [ordered]@{
       clearFraction = $(if ($presenceKind) { 0.6 } else { $null })
       freeTnbMint = $false
       # Fortify / secure foothold: defensive value = "secured" signal.
-      fortifyDefensiveValue = $(if ($fortifyKind) { 800 } else { $null })
+      fortifyDefensiveValue = $(if ($fortifyKind) { $(if ($intent.PSObject.Properties["claimValue"] -and $intent.claimValue) { [double]$intent.claimValue } else { 400 }) } else { $null })
       fortifyBuildPower = $(if ($fortifyKind) { 90 } else { $null })
       fortifyArmyValue = $(if ($fortifyKind) { 500 } else { $null })
       fortifyStorageStructures = $(if ($fortifyKind) { 1 } else { $null })
@@ -3545,6 +3556,9 @@ $scenario = [ordered]@{
       } else { @() }
     )
     fieldRecruits = @($fieldRecruits)
+    fieldPeople = @($fieldPeople)
+    # Taking a door: once it is ours the extraction moves onto it (game_verdance_exfil.lua).
+    exitDoorZoneId = $(if ($intent.PSObject.Properties["exitDoorZoneId"] -and $intent.exitDoorZoneId) { [string]$intent.exitDoorZoneId } else { $null })
     economy = if ($state -and $state.economy) { $state.economy } else { [ordered]@{ metalIncome = 0; energyIncome = 0; buildPower = 0 } }
     difficulty = [ordered]@{
       enemyScale = $enemyScale

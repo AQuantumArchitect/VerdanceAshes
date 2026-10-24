@@ -125,6 +125,7 @@ from verdance.world import (
     landing_zones as _lz_seed,
 )
 from verdance.belief import manifest as _mf, homecoming as _bh, intel_lua as _il
+from verdance.world.claim import claim_need
 from verdance.world.graph_collapse import collapse_chips, collapse_payload, character_collapse_chips
 from verdance.readings import (
     readings as _readings,
@@ -472,6 +473,14 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
     # The field's standing set piece and the wild's dens, placed around the final pad.
     pad = intent.get("deploymentZoneId")
     intent["wildDens"] = _theaters.wild_dens(state, map_id, workspace, pad)
+    # Whoever the company left here is still here: the gadget stands them where they stood.
+    intent["fieldPeople"] = _mf.field_people(state, map_id)
+    # Taking ground: the presence a claim needs here, and when the wound is a door, the exit the
+    # extraction moves to once it is ours (verdance.world.claim, game_verdance_exfil.lua).
+    intent["claimValue"] = claim_need(map_id, workspace)
+    wound = (intent.get("captureZoneIds") or [intent.get("targetZoneId")])[0]
+    if wound and _roads.is_door(wound, workspace) and wound != pad:
+        intent["exitDoorZoneId"] = wound
     theater = _theaters.theater_for(state, map_id, workspace, pad)
     if theater:
         intent["theater"] = theater

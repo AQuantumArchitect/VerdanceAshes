@@ -68,12 +68,12 @@ class TestPlayerFootprint(unittest.TestCase):
                 "z": float(i + 10),
                 "facing": 0,
             }
-            for i in range(70)
+            for i in range(450)
         )
         out = engine.apply_player_footprint(
             state, {"playerFootprint": rows, "resultKey": "cap"}, "greenest_fields"
         )
-        self.assertEqual(out["kept"], 64)
+        self.assertEqual(out["kept"], 400)   # a whole base, converters and storage included
 
     def test_normalize_preserves_footprint(self):
         raw = {

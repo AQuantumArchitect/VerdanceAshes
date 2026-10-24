@@ -849,7 +849,7 @@ end
 -- Self-contained on purpose: the shared unit helpers are defined further down.
 function playerUnitFacts()
   local out = { footprint = {}, footprintCount = 0, survivors = {}, xp = {}, loan = {}, armyValue = 0 }
-  local maxFootprint = 64
+  local maxFootprint = 400   -- a whole base: the old 64 kept the wind farm and lost the converters
   local deployZ = tostring((mission and mission.deploymentZoneId) or "")
   local sx = Game.mapSizeX or 1
   local sz = Game.mapSizeZ or 1
@@ -1789,6 +1789,64 @@ function vaDryLanding(x, z)
   return x, z
 end
 
+-- The nearest ground a unit can really stand on: a building where it can be built (the hero bays
+-- and turrets failed CreateUnit on rough ground), anything that moves where it can drive, with
+-- room to drive out (the Consul's wreck landed on a hillside nobody could reach). With reachX/Z,
+-- a mobile unit's spot must also have a path to that point (the pad), so it is not a ledge cut off
+-- by cliffs. Global on purpose (the main chunk is at the local cap). nil when nothing fits.
+function vaPathReaches(ud, x, z, tx, tz)
+  if not (Spring.RequestPath and ud.moveDef and ud.moveDef.name) then return true end
+  local path = Spring.RequestPath(ud.moveDef.name, x, Spring.GetGroundHeight(x, z), z, tx, Spring.GetGroundHeight(tx, tz), tz, 64)
+  if not path then return false end
+  local pts = path.GetPathWayPoints and path:GetPathWayPoints() or nil
+  local last = pts and pts[#pts]
+  if not last then return true end
+  local dx, dz = (last[1] or x) - tx, (last[3] or z) - tz
+  return dx * dx + dz * dz <= 400 * 400
+end
+
+function vaStandable(defName, x, z, facing, reachX, reachZ)
+  local ud = UnitDefNames and UnitDefNames[defName]
+  if not ud or not x or not z then return nil end
+  if ud.canFly then return x, z end
+  local mapX, mapZ = Game.mapSizeX or 0, Game.mapSizeZ or 0
+  local building = ud.isBuilding or ud.isFactory or (ud.speed or 0) == 0
+  local pathChecks = 0
+  local function fits(px, pz)
+    if px < 96 or pz < 96 or px > mapX - 96 or pz > mapZ - 96 then return nil end
+    local py = Spring.GetGroundHeight(px, pz)
+    if building then
+      local bx, by, bz = px, py, pz
+      if Spring.Pos2BuildPos then bx, by, bz = Spring.Pos2BuildPos(ud.id, px, py, pz, facing or 0) end
+      if Spring.TestBuildOrder and (Spring.TestBuildOrder(ud.id, bx, by, bz, facing or 0) or 0) > 0 then return bx, bz end
+      return nil
+    end
+    if not Spring.TestMoveOrder then return px, pz end
+    -- the spot and a ring around it: a passable pixel on a cliff face is not ground
+    for _, o in ipairs({ { 0, 0 }, { 56, 0 }, { -56, 0 }, { 0, 56 }, { 0, -56 } }) do
+      local qx, qz = px + o[1], pz + o[2]
+      if not Spring.TestMoveOrder(ud.id, qx, Spring.GetGroundHeight(qx, qz), qz, 0, 0, 0, true, true, true) then return nil end
+    end
+    if reachX and reachZ then
+      pathChecks = pathChecks + 1
+      -- a budget of path queries; past it, standing ground is enough
+      if pathChecks <= 24 and not vaPathReaches(ud, px, pz, reachX, reachZ) then return nil end
+    end
+    return px, pz
+  end
+  local fx, fz = fits(x, z)
+  if fx then return fx, fz end
+  for radius = 48, 960, 48 do
+    local n = math.max(12, math.floor(radius / 24))
+    for i = 0, n - 1 do
+      local ang = (i / n) * math.pi * 2
+      fx, fz = fits(x + math.cos(ang) * radius, z + math.sin(ang) * radius)
+      if fx then return fx, fz end
+    end
+  end
+  return nil
+end
+
 local function spawnOneUnit(defName, x, z, facing, teamID, spec, force)
   -- Occupation shells plant decoy farmers, not real commanders. Remap any
   -- enemy real-com spawn (all maps) so a stale recipe / AI start unit cannot
@@ -1815,6 +1873,10 @@ local function spawnOneUnit(defName, x, z, facing, teamID, spec, force)
       end
       x, z = nx or x, nz or z
     end
+  end
+  if teamID == playerTeamID then
+    local sx, sz = vaStandable(defName, x, z, facing)
+    if sx then x, z = sx, sz end
   end
   local y = Spring.GetGroundHeight(x, z)
   local unitID = Spring.CreateUnit(defName, x, y, z, facing, teamID)
@@ -1895,6 +1957,14 @@ local function spawnOneUnit(defName, x, z, facing, teamID, spec, force)
     -- leaders, not commander suits - tougher and blooded on the field.
     if spec and (spec.heroId or spec.hero) then
       registerHeroSpawn(unitID, spec)
+      -- A builder hero's experience is craft: Ketha at full XP rezzes and builds faster and from
+      -- farther (game_verdance_craft_xp.lua caps it). Combat veterancy does nothing for a rezbot.
+      local hud = UnitDefNames[defName]
+      local heroXp = tonumber(spec.heroXp) or 0
+      if hud and heroXp > 0 and ((tonumber(hud.buildSpeed) or 0) > 0 or hud.canResurrect) then
+        Spring.SetUnitRulesParam(unitID, "va_craft_xp", heroXp, { public = true })
+        if GG and GG.VA_CraftRefresh then pcall(GG.VA_CraftRefresh, unitID) end
+      end
     elseif teamID == playerTeamID and spec then
       -- Non-hero player units: restore banked combat / craft XP between rounds.
       -- Majority retain: campaign bakes keepFrac into spec.xp already; still
@@ -2205,7 +2275,24 @@ function VA_CREW_publish()
   Spring.SetGameRulesParam("va_crew_selected", table.concat(parts, ","), { public = true })
 end
 
-function VA_CREW_spawnHeroPack(heroId, baseX, baseZ, dx0)
+-- Who of the company is on this field (va_dropped_heroes, a rules param so it outlives a LuaRules
+-- reload): the exfil manifest carries it, and a hero who dropped but is neither going nor staying
+-- at extraction did not survive (verdance.campaign.roster).
+VA_DROPPED = VA_DROPPED or {}
+function vaNoteDropped(heroId)
+  heroId = tostring(heroId or "")
+  if heroId == "" then return end
+  for _, h in ipairs(VA_DROPPED) do if h == heroId then return end end
+  local prior = tostring(Spring.GetGameRulesParam("va_dropped_heroes") or "")
+  if #VA_DROPPED == 0 and prior ~= "" then
+    for h in prior:gmatch("[^,]+") do VA_DROPPED[#VA_DROPPED + 1] = h end
+    for _, h in ipairs(VA_DROPPED) do if h == heroId then return end end
+  end
+  VA_DROPPED[#VA_DROPPED + 1] = heroId
+  Spring.SetGameRulesParam("va_dropped_heroes", table.concat(VA_DROPPED, ","), { public = true })
+end
+
+function VA_CREW_spawnHeroPack(heroId, baseX, baseZ, dx0, heroOnly)
   local roster = VA_CREW_loadRoster()
   local h = roster.get and roster.get(heroId) or (roster.HEROES and roster.HEROES[heroId])
   if not h then
@@ -2273,6 +2360,8 @@ function VA_CREW_spawnHeroPack(heroId, baseX, baseZ, dx0)
     heroSpec.dz = 80
   end
   spawned = spawned + spawnUnitSpec(heroSpec, playerTeamID, baseX, baseZ, 0, 0, {}, { role = "player_crew" })
+  if spawned > 0 then vaNoteDropped(heroId) end
+  if heroOnly then return spawned end   -- a person left in the field: their pack went home
   -- Pack / escort XP floor: majority of the hero's banked XP (or cadreXp for def).
   local heroXpFloor = tonumber(heroSpec.heroXp) or 0
   local function cadreXpFor(def)
@@ -2509,20 +2598,12 @@ local function spawnFieldRecruitWreck(fr, x, z)
     end
   end
   local gaia = (Spring.GetGaiaTeamID and Spring.GetGaiaTeamID()) or 0
-  local offsets = {
-    {0, 0}, {96, 0}, {-96, 0}, {0, 96}, {0, -96},
-    {128, 64}, {-128, 64}, {64, -128}, {-64, -128}, {160, 0},
-  }
+  -- Ground the hero can be raised on and walk (or drive) away from: a bay where a bay fits.
   local unitID, sx, sz = nil, x, z
-  for oi = 1, #offsets do
-    local ox, oz = x + offsets[oi][1], z + offsets[oi][2]
-    local oy = (Spring.GetGroundHeight and Spring.GetGroundHeight(ox, oz)) or 0
-    unitID = Spring.CreateUnit(seedDef, ox, oy, oz, 0, gaia)
-    if unitID then
-      sx, sz = ox, oz
-      break
-    end
-  end
+  local padX, padZ = tonumber((Spring.GetGameRulesParam("va_pad_x"))), tonumber((Spring.GetGameRulesParam("va_pad_z")))
+  local gx, gz = vaStandable(seedDef, x, z, 0, (padX or -1) >= 0 and padX or nil, (padZ or -1) >= 0 and padZ or nil)
+  if gx then sx, sz = gx, gz end
+  unitID = Spring.CreateUnit(seedDef, sx, Spring.GetGroundHeight(sx, sz) or 0, sz, 0, gaia)
   if not unitID then
     Spring.Echo("VA_FIELD_RECRUIT_WRECK_FAIL id=" .. hid .. " def=" .. seedDef
       .. " heroDef=" .. heroDef .. " create_unit")
@@ -2940,8 +3021,18 @@ function VA_CREW_confirm(selectedIds)
   local baseX = cs.anchorX or ((Game.mapSizeX or 0) * 0.23)
   local baseZ = cs.anchorZ or ((Game.mapSizeZ or 0) * 0.24)
   local total = 0
-  -- Core always
-  for ci, id in ipairs(roster.CORE or { "vane", "ketha" }) do
+  -- Core always, while they live: mission.heroes names the living (dead heroes are not on it)
+  local living = nil
+  if mission and type(mission.heroes) == "table" and #mission.heroes > 0 then
+    living = {}
+    for _, mh in ipairs(mission.heroes) do living[tostring(mh.id or mh.heroId or "")] = true end
+  end
+  local core = {}
+  for _, id in ipairs(roster.CORE or { "vane", "ketha" }) do
+    if not living or living[tostring(id)] then core[#core + 1] = id
+    else Spring.Echo("VA_CREW_CORE_FALLEN " .. tostring(id)) end
+  end
+  for ci, id in ipairs(core) do
     total = total + VA_CREW_spawnHeroPack(id, baseX, baseZ, (ci - 1) * 200)
   end
   for i, id in ipairs(picks) do
@@ -2949,7 +3040,7 @@ function VA_CREW_confirm(selectedIds)
   end
   do
     local present = {}
-    for _, id in ipairs(roster.CORE or {}) do present[#present + 1] = id end
+    for _, id in ipairs(core) do present[#present + 1] = id end
     for _, id in ipairs(picks) do present[#present + 1] = id end
     total = total + VA_BOND_apply(present, baseX, baseZ, 400 + #picks * 220)
   end
@@ -3400,15 +3491,17 @@ local function makeTeamBucket(teamID)
   }
 end
 
--- Defensive value (metal in armed structures and pad teeth) per zone per faction, right now.
--- The live answer to "who holds this zone": reinforcements read it, and so does Python at home.
+-- Presence per zone per faction, right now: metal in armed structures and pad teeth, and for the
+-- company its armed units as well (an army standing on ground is enough to claim it when you
+-- lift; verdance.world.claim). The live answer to "who holds this zone": reinforcements read it,
+-- the objective's claim check reads it, and so does Python at home.
 function zoneDvTable()
   local byZone = {}
   for _, unitID in ipairs(Spring.GetAllUnits() or {}) do
     local teamID = Spring.GetUnitTeam(unitID)
     local defID = Spring.GetUnitDefID(unitID)
     if teamID and teamID ~= gaiaTeamID and defID and canFight(defID)
-        and (isStructure(defID) or unitIsPadTooth(unitID)) then
+        and (isStructure(defID) or unitIsPadTooth(unitID) or teamID == playerTeamID) then
       local x, _, z = Spring.GetUnitPosition(unitID)
       local zone = x and zoneForPosition(x, z)
       if zone and zone.zoneId then
@@ -5712,6 +5805,19 @@ function checkFortifyObjective(frame)
   end
 end
 
+-- Standing on the wound is not taking it: the company's presence there (armed units and
+-- defences, the same measure Python claims with at home) must reach mission.objective.claimValue
+-- (verdance.world.claim). Published for the rail. Global (the main chunk is at the local cap).
+function vaClaimStrength()
+  local obj = mission and mission.objective or {}
+  local need = tonumber(obj.claimValue) or 0
+  local row = obj.targetZoneId and zoneDvTable()[tostring(obj.targetZoneId)] or nil
+  local ours = math.floor((row and row.ashwalkers) or 0)
+  Spring.SetGameRulesParam("va_claim_value", ours, { public = true })
+  Spring.SetGameRulesParam("va_claim_need", need, { public = true })
+  return ours >= need
+end
+
 function checkPresenceObjective(frame)
   if objectiveComplete then return end
   local kind = objectiveKind()
@@ -5742,6 +5848,7 @@ function checkPresenceObjective(frame)
         cleared = destroyed >= need
       else
         local playerPresent, enemyCombat = scanZoneRect(targetZoneRect)
+      playerPresent = playerPresent and vaClaimStrength()
         cleared = playerPresent and not enemyCombat
       end
       if cleared then
@@ -5766,6 +5873,7 @@ function checkPresenceObjective(frame)
     if capture.phase == "hold" then
       fireRegrowPressure(frame)
       local playerPresent, enemyCombat = scanZoneRect(targetZoneRect)
+      playerPresent = playerPresent and vaClaimStrength()
       -- Player must stay on the node. Enemy contact PAUSES the clock (regrow
       -- waves used to hard-reset to 0 and softlock 22/30 forever). Leave zone
       -- → lose progress. Contested but present → hold what you earned.
@@ -5805,6 +5913,7 @@ function checkPresenceObjective(frame)
 
   -- Legacy presence (no living shell): stand on zone; pause on contact, reset on leave.
   local playerPresent, enemyCombat = scanZoneRect(targetZoneRect)
+      playerPresent = playerPresent and vaClaimStrength()
   if not playerPresent then
     zoneHoldFrames = 0
   elseif not enemyCombat then
@@ -6294,6 +6403,18 @@ function applyFirstDropEcoSoftener()
   Spring.Echo("VA_ECO_SOFTENER drop1 metal=+" .. tostring(metal) .. " energy=+" .. tostring(energy))
 end
 
+-- The people the company left on this map (mission.fieldPeople, from camp.people) are still where
+-- they stood, alone: bring them to the pad (a building hero lifts from where it stands).
+function VA_FIELD_spawnPeople()
+  local sx, sz = Game.mapSizeX or 0, Game.mapSizeZ or 0
+  for _, p in ipairs((mission and mission.fieldPeople) or {}) do
+    if type(p) == "table" and p.heroId then
+      local n = VA_CREW_spawnHeroPack(tostring(p.heroId), normalizedToElmos(p.x or 0.5, sx), normalizedToElmos(p.z or 0.5, sz) - 40, 0, true)
+      Spring.Echo("VA_FIELD_PERSON hero=" .. tostring(p.heroId) .. " zone=" .. tostring(p.zoneId) .. " spawned=" .. tostring(n))
+    end
+  end
+end
+
 function gadget:GameStart()
   -- Bank + crisis flags before any unit stamps/charges.
   if tenebLoot.initFromMission then tenebLoot.initFromMission() end
@@ -6301,6 +6422,7 @@ function gadget:GameStart()
   -- shore the company will actually stand on.
   vaInitWaterline()
   spawnPlayableSetup()
+  VA_FIELD_spawnPeople()
   -- One player commander. Strike sorties reclaim the free start unit;
   -- commander sorties keep it and drop any second body.
   sweepPlayerCommanders("gamestart")

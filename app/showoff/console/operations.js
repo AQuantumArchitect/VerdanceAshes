@@ -277,12 +277,18 @@ export function showDropConfirm() {
   const m = plan.marks || {};
   m.extractZoneId = m.deployZoneId; // one pad: the stamp carries deploy = extract = the same zone
   const targets = (m.captureZoneIds || []).map(zoneName).join(", ") || "—";
+  // Taking a door: once it is ours the extraction moves onto it (game_verdance_exfil.lua).
+  const choice = ((state.hub.node || {}).choices || []).find(c => c && c.id === plan.choiceId);
+  const door = choice && choice.effect && choice.effect.journey === "door" && choice.effect.door;
+  const exitDoor = door && door.zoneId !== m.deployZoneId ? door.zoneId : null;
   const body = $("drop-confirm-body");
   if (body) {
     const eyes = padExposed(m.deployZoneId);
     body.innerHTML =
       `Drop on <b>${esc(prettyMap(plan.mapId))}</b> · <b>${esc(jobLabel(plan.contractKind))}</b><br>` +
-      `Pad <b>${esc(zoneName(m.deployZoneId))}</b> → wound <b>${esc(targets)}</b> → back to <b>${esc(zoneName(m.deployZoneId))}</b>.` +
+      `Pad <b>${esc(zoneName(m.deployZoneId))}</b> → wound <b>${esc(targets)}</b> → ` +
+      (exitDoor ? `once it is yours, leave by the door itself, <b>${esc(zoneName(exitDoor))}</b>.`
+                : `back to <b>${esc(zoneName(m.deployZoneId))}</b>.`) +
       (eyes === "known" ? `<br><span class="bad">Armada has eyes on this pad.</span>` : "") +
       `<p>Get what you want onto the pad and press EXTRACT. What is off the pad stays. What stays becomes a holding.</p>`;
     body.setAttribute("data-route", body.innerHTML);

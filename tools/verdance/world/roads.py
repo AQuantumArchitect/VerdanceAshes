@@ -5,9 +5,11 @@ A road is a strategic_link in the world graph. Each end is a door: a corner or e
 zone of its map. The rules (owner-approved, 2026-10-23):
 
   * You can cross a road only while you hold the door you leave by.
-  * You hold a door when your defences there outweighed everyone else's at the last
-    homecoming that measured it (defensive value, the same measure as presence).
-    A door with nothing standing in it stays as the company last knew it.
+  * You hold a door when your presence there (army or defences) outweighed everyone else's
+    when you lifted, and reached the claim presence (verdance.world.claim: 400 on Greenest
+    Fields, half as much again per road beyond). A door with nothing standing in it stays as
+    the company last knew it.
+  * Taking a door, the extraction moves onto it once it is yours: you leave by the exit.
   * Lose a door and the road is shut to you until you take it back. Maps already
     opened (walked) stay on the board.
   * Crossing lands you on the far door: your foothold on the new map.
@@ -34,6 +36,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from verdance.common import clamp, load_json
 from verdance.company.company import score_field_recruit_belief
+from verdance.world.claim import claim_need, holder
 
 HOME_MAP_ID = "the_rock_jungle"
 PLAYER_FACTIONS = {"ashwalkers", "nullmercs", "legion"}
@@ -114,8 +117,8 @@ def held(state: Dict[str, Any], zone_id: str) -> bool:
 def record_homecoming(state: Dict[str, Any], result: Dict[str, Any], workspace: Optional[Path]) -> List[Dict[str, Any]]:
     """Write what this sortie measured at its map's doors into the ledger.
 
-    Only doors the gadget reported defensive value for change: whoever leads holds it.
-    Returns the doors that changed hands, for the bead."""
+    Only doors the gadget reported presence for change: whoever leads holds it, the company only
+    with the claim presence (verdance.world.claim). Returns the doors that changed hands."""
     if workspace is None:
         return []
     dv = result.get("zoneDv")
@@ -125,12 +128,12 @@ def record_homecoming(state: Dict[str, Any], result: Dict[str, Any], workspace: 
     ledger = state.setdefault("doors", {})
     mission = int(result.get("missionNumber") or state.get("missionNumber") or 0)
     changed: List[Dict[str, Any]] = []
+    need = claim_need(map_id, workspace)
     for zid, door in load_doors(Path(workspace)).items():
         if door["mapId"] != map_id or not isinstance(dv.get(zid), dict):
             continue
-        vals = {str(f).lower(): float(v or 0) for f, v in dv[zid].items()}
-        leader, best = max(vals.items(), key=lambda kv: kv[1]) if vals else ("", 0.0)
-        if best <= 0:
+        leader, _best = holder(dv[zid], need)
+        if not leader:
             continue
         now = leader in PLAYER_FACTIONS
         if now != held(state, zid):
@@ -282,6 +285,7 @@ def legal_jobs(state: Dict[str, Any], workspace: Path) -> List[Dict[str, Any]]:
             score = 1.6 * (TAKE_DOOR + (0.8 if leads_out else 0.0)) + 0.5 * _rescue(heroes) + _q0_bias(state, map_id)
             jobs.append({"kind": "take", "door": door, "mapId": map_id, "padZoneId": pad,
                          "targetZoneId": zid, "shut": leads_out, "heroes": heroes,
+                         "claim": claim_need(map_id, workspace),
                          "score": round(score, 4), "id": f"door_{zid}"})
     jobs.sort(key=lambda j: (-float(j["score"]), j["id"]))
     return jobs
@@ -330,7 +334,8 @@ def _card(job: Dict[str, Any], lean: bool) -> Dict[str, Any]:
         far_name = MAP_NAMES.get(door["farMapId"], door["farMapId"])
         label = f"Take {door['label']} on {map_name}, the door to {far_name}"
         lines = [f"{door['label']} is the door to {far_name}, and you do not hold it.",
-                 "Out-build everyone there and the road opens. If it is empty, establishing presence is enough."]
+                 f"Stand there with {int(job.get('claim') or 0)} metal of army or defences, more than anyone else, and it is yours. "
+                 "Then the extraction moves onto the door: leave by it and the road opens."]
         contract = "seize_lane"
     if job["mapId"] == "all_that_simmers":
         # Every drop on All That Simmers is the kings' showdown (verdance.world.theaters).

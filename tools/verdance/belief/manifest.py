@@ -67,6 +67,41 @@ def heroes_left(result: Dict[str, Any]) -> list:
     return [str(h.get("heroId") or "") for h in (m.get("staying") or {}).get("heroes") or [] if isinstance(h, dict)]
 
 
+def dropped(result: Dict[str, Any]) -> Optional[set]:
+    """Hero ids of the company on this field (manifest.dropped), or None for an older result."""
+    m = manifest_of(result)
+    if m is None or not isinstance(m.get("dropped"), list):
+        return None
+    return {str(h) for h in m["dropped"] if h}
+
+
+def vanished(result: Dict[str, Any]) -> set:
+    """Heroes who dropped but were neither going nor staying when the company lifted: they did not
+    survive the field. The headcount is the truth even when the gadget's hero ledger was lost (a
+    LuaRules reload emptied it once and a dead Ketha came home)."""
+    m = manifest_of(result)
+    who = dropped(result)
+    if m is None or not who:
+        return set()
+    present = {str(h.get("heroId") or "") for side in ("going", "staying")
+               for h in ((m.get(side) or {}).get("heroes") or []) if isinstance(h, dict)}
+    return who - present
+
+
+def field_people(state: Dict[str, Any], map_id: str) -> list:
+    """The people the company left standing on this map (camp.people where == "field"): the next
+    drop here finds them where they stood, so they can be brought home."""
+    chars = state.get("characters") or {}
+    out = []
+    for hid, rec in sorted(((state.get("camp") or {}).get("people") or {}).items()):
+        if not isinstance(rec, dict) or rec.get("where") != "field" or str(rec.get("mapId") or "") != str(map_id):
+            continue
+        if (chars.get(hid) or {}).get("status") == "dead" or not rec.get("zoneId"):
+            continue
+        out.append({"heroId": str(hid), "zoneId": str(rec["zoneId"])})
+    return out
+
+
 def verdict_from(result: Dict[str, Any]) -> Optional[str]:
     """None when the result carries no manifest and no terminal kind (legacy results keep
     their own status).

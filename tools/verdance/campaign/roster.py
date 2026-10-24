@@ -209,6 +209,10 @@ def update_roster(state: Dict[str, Any], result: Dict[str, Any], success: bool, 
     if isinstance(named_outcomes, list) and named_outcomes:
         by_named = {str(o.get("charId")): o for o in named_outcomes if isinstance(o, dict)}
 
+    from verdance.belief import manifest as _manifest
+    on_field = _manifest.dropped(result)        # None for results from before the manifest named them
+    gone = _manifest.vanished(result)
+
     for hero in roster.get("heroes", []) or []:
         if not isinstance(hero, dict):
             continue
@@ -237,9 +241,14 @@ def update_roster(state: Dict[str, Any], result: Dict[str, Any], success: bool, 
                     hero["timesWounded"] = int(hero.get("timesWounded", 0) or 0) + 1
                 elif hr_status == "survived":
                     hero["status"] = "active"
+        elif hid in gone:
+            hero["status"] = "dead"     # dropped, and nowhere on the field when the company lifted
 
-        # --- XP: always grow for heroes that appeared in the result; never drop ---
-        deployed = hid in by_named or hid in hero_results or not (by_named or hero_results)
+        # --- XP: grow for heroes who were on the field (the manifest says who); never drop ---
+        if on_field is not None:
+            deployed = hid in on_field or hid in by_named or hid in hero_results
+        else:
+            deployed = hid in by_named or hid in hero_results or not (by_named or hero_results)
         camp_gain = 0.0
         if deployed:
             prev_camp = float(hero.get("campaignXp") or 0.0)

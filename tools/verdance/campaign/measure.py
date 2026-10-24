@@ -284,9 +284,11 @@ def update_measured_zone_memory(state: Dict[str, Any], result: Dict[str, Any], t
 
 
 def apply_zone_dv(state: Dict[str, Any], result: Dict[str, Any], workspace: Optional[Path] = None) -> List[str]:
-    """Presence is defensive value. The gadget reports, per zone, the metal standing in each
-    faction's armed structures at the end (result.zoneDv); whoever has the most holds the zone.
-    Only zones it reports change hands: a zone with nothing standing is left as it was believed."""
+    """Presence at extraction (result.zoneDv): the metal in each faction's armed structures, and
+    the company's armed units too. Whoever leads holds the zone, except that the company needs the
+    claim presence (verdance.world.claim) to take it. Only zones it reports change hands: a zone
+    with nothing standing, or one we lead without the presence to claim, stays as it was believed."""
+    from verdance.world.claim import claim_need, holder
     dv = result.get("zoneDv")
     if not isinstance(dv, dict) or not dv:
         return []
@@ -294,13 +296,14 @@ def apply_zone_dv(state: Dict[str, Any], result: Dict[str, Any], workspace: Opti
     if not map_id:
         return []
     memory = state.setdefault("zoneMemory", {}).setdefault(map_id, {})
+    need = claim_need(map_id, workspace)
     changed = []
     for zone_id, row in dv.items():
         if not isinstance(row, dict):
             continue
         vals = {str(f): float(v or 0) for f, v in row.items()}
-        leader, best = max(vals.items(), key=lambda kv: kv[1]) if vals else (None, 0.0)
-        if not leader or best <= 0:
+        leader, _best = holder(vals, need)
+        if not leader:
             continue
         zid = str(canonical_zone_id(zone_id, workspace) or zone_id)
         before = (memory.get(zid) or {}).get("controllingFaction")
