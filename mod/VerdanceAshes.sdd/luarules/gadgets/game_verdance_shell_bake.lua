@@ -64,6 +64,12 @@ function gadget:Initialize()
   end
 end
 
+-- One VA_SHELL_UNIT line per live unit:  def x z facing team health build kind
+-- (x z in elmos; health is the fraction of max; build is the fraction built, 1 when finished;
+-- kind is S structure, M ground mobile, A aircraft, W ship, C commander).
+-- The first four fields are what the living-shell strip has always read; the rest are for the war
+-- snapshot (verdance.world.war_snapshot), which keeps who owned a unit and how hurt it was.
+-- Then one VA_SHELL_TEAM line per team with what its bank held.
 local function dumpAllUnits()
   local mapX = Game.mapSizeX or 0
   local mapZ = Game.mapSizeZ or 0
@@ -80,16 +86,35 @@ local function dumpAllUnits()
       if Spring.GetUnitBuildFacing then
         facing = Spring.GetUnitBuildFacing(unitID) or 0
       end
-      -- Elmos absolute; strip script normalizes if needed.
+      local hp, maxHp = Spring.GetUnitHealth(unitID)
+      local hpFrac = (maxHp and maxHp > 0 and hp) and math.min(1, hp / maxHp) or 1
+      local _, built = Spring.GetUnitIsBeingBuilt(unitID)
+      local kind = "M"
+      if ud.customParams and ud.customParams.iscommander then kind = "C"
+      elseif ud.isBuilding or not ud.canMove then kind = "S"
+      elseif ud.canFly then kind = "A"
+      elseif ud.isShip or ud.floatOnWater then kind = "W" end
       Spring.Echo(string.format(
-        "VA_SHELL_UNIT %s %.1f %.1f %d",
+        "VA_SHELL_UNIT %s %.1f %.1f %d %d %.3f %.2f %s",
         ud.name,
         x or 0,
         z or 0,
-        facing
+        facing,
+        Spring.GetUnitTeam(unitID) or -1,
+        hpFrac,
+        built or 1,
+        kind
       ))
       count = count + 1
     end
+  end
+  for _, teamID in ipairs(Spring.GetTeamList() or {}) do
+    local metal, mStor = Spring.GetTeamResources(teamID, "metal")
+    local energy, eStor = Spring.GetTeamResources(teamID, "energy")
+    local _, _, isDead, _, side, allyTeam = Spring.GetTeamInfo(teamID, false)
+    Spring.Echo(string.format("VA_SHELL_TEAM %d %s %d %d %d %d %d",
+      teamID, tostring(side or ""), allyTeam or -1, math.floor(metal or 0), math.floor(mStor or 0),
+      math.floor(energy or 0), math.floor(eStor or 0)))
   end
   Spring.Echo("VA_SHELL_DUMP_END count=" .. tostring(count))
   return count
@@ -111,7 +136,12 @@ function gadget:GameFrame(frame)
     end
   end
   if frame > 0 and frame % 1800 == 0 then
-    Spring.Echo("VA_SHELL_BAKE_TICK frame=" .. tostring(frame) .. " target=" .. tostring(bakeFrames))
+    local per = {}
+    for _, teamID in ipairs(Spring.GetTeamList() or {}) do
+      per[#per + 1] = tostring(teamID) .. ":" .. tostring(Spring.GetTeamUnitCount(teamID) or 0)
+    end
+    Spring.Echo("VA_SHELL_BAKE_TICK frame=" .. tostring(frame) .. " target=" .. tostring(bakeFrames)
+      .. " units=" .. table.concat(per, ","))
   end
   if frame < bakeFrames then return end
   dumped = true
