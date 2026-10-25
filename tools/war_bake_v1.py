@@ -94,7 +94,6 @@ def bake(map_id: str, args, cfg, S) -> int:
     script.write_text(W.startscript(recipe, game_type=str(cfg.get("gameType") or "Verdance Ashes $VERSION"), frames=frames),
                       encoding="ascii")
     infolog = Path(cfg["infolog"])
-    baseline = infolog.stat().st_size if infolog.is_file() else 0
     argv = [str(exe), "--write-dir", cfg["barDataRoot"]] + (["--isolation"] if args.isolation else []) + ["--only-local", str(script)]
     print(f"[war] {map_id}: {len(recipe['teams'])} BARbs, {minutes:g} game minutes ({frames} frames)")
     print("[war] engine:", exe)
@@ -106,9 +105,7 @@ def bake(map_id: str, args, cfg, S) -> int:
         while proc.poll() is None and time.time() - t0 < args.timeout_min * 60:
             time.sleep(10)
             try:
-                with open(infolog, "rb") as fh:
-                    fh.seek(baseline)
-                    tick = W.progress(fh.read().decode("utf-8", errors="replace"))
+                tick = W.progress((out_dir / "engine.txt").read_text(encoding="utf-8", errors="replace"))
             except OSError:
                 tick = None
             if tick and tick["frame"] != shown:
@@ -118,12 +115,15 @@ def bake(map_id: str, args, cfg, S) -> int:
             print("[war] timed out; stopping the engine")
             proc.kill()
     time.sleep(1)
-    try:
-        with open(infolog, "rb") as fh:
-            fh.seek(baseline)
-            text = fh.read().decode("utf-8", errors="replace")
-    except OSError:
-        text = ""
+    # The engine's own output is the whole run. BAR rewrites its infolog from the top at every launch,
+    # so reading it from the old log's size loses the front of the new one (and half of the dump).
+    text = (out_dir / "engine.txt").read_text(encoding="utf-8", errors="replace")
+    if "VA_SHELL_DUMP_END" not in text:
+        try:
+            with open(infolog, "rb") as fh:
+                text = fh.read().decode("utf-8", errors="replace")
+        except OSError:
+            pass
     (out_dir / "infolog.txt").write_text(text, encoding="utf-8")
     rc = finish(text, recipe, minutes, out_dir, args.no_install)
     (out_dir / "summary.json").write_text(json.dumps({"exit": rc, "wallSeconds": int(time.time() - t0), "minutes": minutes, "map": map_id}), encoding="utf-8")
