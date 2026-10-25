@@ -1858,7 +1858,7 @@ function vaStandable(defName, x, z, facing, reachX, reachZ)
   return nil
 end
 
-local function spawnOneUnit(defName, x, z, facing, teamID, spec, force)
+local function spawnOneUnit(defName, x, z, facing, teamID, spec, force, hpPct)
   -- Occupation shells plant decoy farmers, not real commanders. Remap any
   -- enemy real-com spawn (all maps) so a stale recipe / AI start unit cannot
   -- introduce a 700-AoE commanderExplosion + 1250-metal wreck into a raid.
@@ -1870,7 +1870,8 @@ local function spawnOneUnit(defName, x, z, facing, teamID, spec, force)
   end
   do
     local ud = UnitDefNames and UnitDefNames[defName]
-    local skipDry = ud and (ud.canFly or ud.floatOnWater)
+    -- A baked field (Koom's war) already stands on ground the sim used: placed exactly.
+    local skipDry = (ud and (ud.canFly or ud.floatOnWater)) or (spec and spec.exact)
     if not skipDry then
       local nx, nz = vaDryLanding(x, z)
       if math.abs((nx or x) - x) > 40 or math.abs((nz or z) - z) > 40 then
@@ -1893,6 +1894,10 @@ local function spawnOneUnit(defName, x, z, facing, teamID, spec, force)
   local unitID = Spring.CreateUnit(defName, x, y, z, facing, teamID)
   if unitID then
     Spring.SetUnitRulesParam(unitID, "va_playable_proxy", 1, { public = true })
+    if hpPct and hpPct < 100 and Spring.GetUnitHealth and Spring.SetUnitHealth then
+      local _, maxH = Spring.GetUnitHealth(unitID)
+      if maxH then pcall(Spring.SetUnitHealth, unitID, math.max(1, maxH * hpPct / 100)) end
+    end
     if defName == "va_queen_nest" and Spring.SetUnitPieceMatrix then
       -- the queen's nest is bigger than a roost: scale its root piece (the unit def widens the box)
       local s = 1.6
@@ -2108,6 +2113,17 @@ local function spawnUnitSpec(spec, teamID, baseX, baseZ, groupX, groupZ, claimed
   local facing = tonumber(spec.facing or 0) or 0
   local anchorX = baseX + groupX + dx
   local anchorZ = baseZ + groupZ + dz
+
+  if type(spec.at) == "table" then
+    -- Flat [x, z, facing, hp%] per unit, x and z normalized (the baked Koom war).
+    for i = 1, #spec.at - 3, 4 do
+      local ux = normalizedToElmos(spec.at[i], Game.mapSizeX or 0)
+      local uz = normalizedToElmos(spec.at[i + 1], Game.mapSizeZ or 0)
+      spawned = spawned + spawnOneUnit(defName, ux, uz, math.floor(tonumber(spec.at[i + 2]) or 0), teamID, spec, force,
+        tonumber(spec.at[i + 3]))
+    end
+    return spawned
+  end
 
   if spec.atMetalSpots or spec.nearestMetalSpots then
     for i = 1, count do
@@ -3195,6 +3211,10 @@ local function spawnPlayableSetup()
       end
       VA_CREW_SELECT.anchorX = baseX
       VA_CREW_SELECT.anchorZ = baseZ
+    end
+    if type(force.bank) == "table" then
+      vaWarBanks = vaWarBanks or {}
+      vaWarBanks[teamID] = force.bank
     end
     local forceSpawned = 0
     for _, group in ipairs(force.groups or {}) do
@@ -6493,7 +6513,19 @@ function gadget:GameStart()
   publishTenebriumRules()
 end
 
+-- A baked field's banks (Koom's war): what each side held when the sim was frozen. BAR's team
+-- resourcing wipes the banks at GameStart, so they are set once the first frames are through.
+function vaApplyWarBanks()
+  for teamID, bank in pairs(vaWarBanks) do
+    pcall(Spring.SetTeamResource, teamID, "metal", tonumber(bank.metal) or 0)
+    pcall(Spring.SetTeamResource, teamID, "energy", tonumber(bank.energy) or 0)
+    Spring.Echo(string.format("VA_WAR_BANK team=%d metal=%d energy=%d", teamID, tonumber(bank.metal) or 0, tonumber(bank.energy) or 0))
+  end
+  vaWarBanks = nil
+end
+
 function gadget:GameFrame(frame)
+  if vaWarBanks and frame >= 5 then vaApplyWarBanks() end
   -- Deferred exfil crunch (loading screen paints first). One call = one upvalue.
   -- Field-recruit wreck seeds: kill the live unit so BAR leaves a normal rez corpse.
   tickFieldRecruitPendingDeath(frame)

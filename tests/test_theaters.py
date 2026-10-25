@@ -17,6 +17,7 @@ sys.path.insert(0, str(ROOT / "tools"))
 from verdance import campaign as engine  # noqa: E402
 from verdance.belief import manifest  # noqa: E402
 from verdance.campaign.hydrology import waterline_surface  # noqa: E402
+from verdance.world import war_snapshot as _war  # noqa: E402
 from verdance.world import roads, theaters  # noqa: E402
 
 PWSH = shutil.which("pwsh") or ("/opt/pwsh/pwsh" if Path("/opt/pwsh/pwsh").exists() else None)
@@ -55,15 +56,40 @@ def test_jungle_dens_skip_the_hive_and_the_pad():
     assert len(dens) >= 8
 
 
-def test_koom_is_a_standing_war_off_the_doors():
-    war = theaters.standing_war("koom_valley", ROOT)
-    factions = {c["faction"] for c in war["camps"]}
-    assert factions == {"nullmercs", "armada"}
-    doors = {z for z, d in roads.load_doors(ROOT).items() if d["mapId"] == "koom_valley"}
-    assert not {c["zoneId"] for c in war["camps"]} & doors
-    a, b = war["camps"]
-    # the two lines face each other across the valley
-    assert math.hypot(a["front"]["x"] - b["front"]["x"], a["front"]["z"] - b["front"]["z"]) > 0.3
+def test_koom_is_a_standing_war_three_a_side_with_the_company_seat_left_empty():
+    war = theaters.standing_war("koom_valley", ROOT, "KV_NW_MUSTER")
+    camps = war["camps"]
+    assert [c["faction"] for c in camps] == ["nullmercs", "nullmercs", "armada", "armada", "armada"]
+    assert "KV_NW_MUSTER" not in {c["zoneId"] for c in camps}            # the company's seat
+    west, east = [c for c in camps if c["faction"] == "nullmercs"], [c for c in camps if c["faction"] == "armada"]
+    assert max(c["x"] for c in west) < 0.5 < min(c["x"] for c in east)   # Armada on the far side
+    assert war["baked"] and all(c["profile"] == "hard" and c["bank"] and c["units"] for c in camps)
+    for c in camps:                                                      # the engine gives each start commander
+        assert all(u[5] != "C" for u in c["units"])
+    # the seats are the recipe's
+    rec = _war.load_recipe(ROOT)
+    assert {(t["key"], t["zoneId"]) for t in rec["teams"] if t["key"] != rec["playerSeat"]} == \
+        {(c["key"], c["zoneId"]) for c in theaters.KOOM_WAR}
+
+
+def test_koom_war_makes_room_where_the_company_lands():
+    nw = theaters.standing_war("koom_valley", ROOT, "KV_NW_MUSTER")
+    se = theaters.standing_war("koom_valley", ROOT, "KV_SE_MUSTER")
+    pad = _anchor("koom_valley", "KV_SE_MUSTER")
+    n = lambda w: sum(len(c["units"]) for c in w["camps"])  # noqa: E731
+    assert n(se) < n(nw)
+    for c in se["camps"]:
+        assert all(math.hypot(u[1] - pad[0], u[2] - pad[1]) >= theaters.PAD_CLEARANCE for u in c["units"])
+
+
+def test_koom_without_a_baked_field_still_has_seats():
+    with tempfile.TemporaryDirectory() as tmp:
+        for rel in ("data/zone_maps/authored/koom_valley.authored.zone_map.json",):
+            dst = Path(tmp) / rel
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy(ROOT / rel, dst)
+        war = theaters.standing_war("koom_valley", Path(tmp), "KV_NW_MUSTER")
+    assert not war["baked"] and len(war["camps"]) == 5 and not any(c.get("units") for c in war["camps"])
 
 
 def test_simmers_is_a_kings_showdown_from_any_door():
@@ -133,11 +159,19 @@ def _probe(intent):
 
 
 def test_the_builder_fields_the_war_the_kings_and_the_dens():
-    war = _probe({"theater": theaters.standing_war("koom_valley", ROOT), "wildDens": []})
-    assert sorted(t["faction"] for t in war["teams"]) == ["armada", "nullmercs"]
-    assert {a["shortName"] for a in war["ai"]} == {"BARb"}
-    assert sum(1 for f in war["forces"] if f["role"] == "standing_war") == 2
-    assert war["alliances"] == []                       # the Mercs are allies only by standing
+    war = _probe({"theater": theaters.standing_war("koom_valley", ROOT, "KV_NW_MUSTER"), "wildDens": []})
+    assert sorted(t["faction"] for t in war["teams"]) == ["armada"] * 3 + ["nullmercs"] * 2
+    assert {a["shortName"] for a in war["ai"]} == {"BARb"} and {a["options"]["profile"] for a in war["ai"]} == {"hard"}
+    fields = [f for f in war["forces"] if f["role"] == "standing_war"]
+    assert len(fields) == 5 and all(f["bank"]["energy"] > 0 for f in fields)
+    # every baked unit (a commander never) is placed: one spec per unit type, positions flat x z facing hp
+    placed = sum(len(s["at"]) // 4 for f in fields for s in war["recipes"][f["recipe"]])
+    assert placed == sum(len(c["units"]) for c in theaters.standing_war("koom_valley", ROOT, "KV_NW_MUSTER")["camps"])
+    assert all(s["exact"] and len(s["at"]) == 4 * s["count"] for f in fields for s in war["recipes"][f["recipe"]])
+    # seats on a side are allies of each other (the war is two sides, not six); the Mercs are the company's only by standing
+    pacts = {tuple(sorted((a["allyTeamA"], a["allyTeamB"]))) for a in war["alliances"]}
+    assert len(pacts) == 1 + 3 and all(a["allied"] for a in war["alliances"])
+    assert not any(0 in p for p in pacts)
 
     kings = _probe({"theater": theaters.kings_showdown("all_that_simmers", ROOT, "ATS_NW_SHORE"), "wildDens": []})
     assert [k["faction"] for k in kings["kings"]] == ["ashwalkers", "armada", "nullmercs"]

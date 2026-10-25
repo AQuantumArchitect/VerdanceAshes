@@ -3,8 +3,9 @@
     the_rock_jungle   wild ground end to end: a den on every zone the wild holds; the hive in the
                       south-west corner
     eye_of_horus      the crater's outer rim is raptor ground (dens along the edge); Cortex keeps the eye
-    koom_valley       a standing war: Null Mercs and Armada grind across the valley, each from its
-                      own corner, and the company jumps in from a door on the flank
+    koom_valley       a standing war: three Null Mercs on the west, three Armada on the east,
+                      twenty minutes into a full game (tools/koom_war_bake_v1.py plays it once and
+                      saves the field); the company takes the north-west seat the war left empty
     all_that_simmers  the kings' showdown, a classic game of BAR: Armada, Null Mercs and the company
                       each start with one commander and nothing else; last commander standing takes
                       the throne
@@ -19,6 +20,8 @@ import math
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from verdance.world import war_snapshot as _war
+
 # The Rock Jungle's hive (owner call, 2026-10-23): no den there; the hive camp stands in it.
 JUNGLE_HIVE_ZONE = "TRJ_SW_LANE"
 
@@ -31,17 +34,21 @@ EYE_RIM_SEATS = [
 ]
 EYE_RIM_ZONES = sorted({z for z, _, _ in EYE_RIM_SEATS})
 
-# Koom Valley's standing war: each side's corner and the spillway its army holds the line from.
+# Koom Valley's standing war (data/base_templates/koom_valley/war_recipe_3v3.json): three Null Mercs
+# on the west, three Armada on the east, the far side by the Bastion. The Mercs' north-west seat is
+# the company's: BARbarian held it for the sim and the baked field leaves it empty.
 KOOM_WAR = [
-    {"faction": "nullmercs", "zoneId": "KV_NE_MUSTER", "frontZoneId": "KV_NE_SPILLWAY"},
-    {"faction": "armada", "zoneId": "KV_SW_MUSTER", "frontZoneId": "KV_SW_SPILLWAY"},
+    {"key": "w", "faction": "nullmercs", "zoneId": "KV_NW_SPILLWAY"},
+    {"key": "sw", "faction": "nullmercs", "zoneId": "KV_SW_MUSTER"},
+    {"key": "ne", "faction": "armada", "zoneId": "KV_NE_MUSTER"},
+    {"key": "e", "faction": "armada", "zoneId": "KV_NE_SPILLWAY"},
+    {"key": "se", "faction": "armada", "zoneId": "KV_SE_MUSTER"},
 ]
 
 # Who truly holds ground because a set piece stands there (the campaign's zone memory seeds it):
-# Koom's two camps and the spillways their lines hold.
+# the seats Koom's war holds.
 STANDING_CONTROL = {
-    "koom_valley": {c["zoneId"]: c["faction"] for c in KOOM_WAR}
-                   | {c["frontZoneId"]: c["faction"] for c in KOOM_WAR},
+    "koom_valley": {c["zoneId"]: c["faction"] for c in KOOM_WAR},
 }
 
 # All That Simmers' seats: the corners a king can start from. The company's seat is its pad; the
@@ -107,20 +114,33 @@ def wild_dens(state: Dict[str, Any], map_id: str, workspace: Optional[Path], pad
     return seats
 
 
-def standing_war(map_id: str, workspace: Optional[Path]) -> Optional[Dict[str, Any]]:
+def standing_war(map_id: str, workspace: Optional[Path], pad_zone: Optional[str] = None) -> Optional[Dict[str, Any]]:
+    """Koom's war: each seat's side, profile, bank and (from the baked field) the units standing on it,
+    less any that stand where the company lands. Without a baked field the seats come bare and the
+    builder gives them a stock base."""
     if map_id != "koom_valley":
         return None
     zones = _zones(map_id, workspace)
+    snap = _war.load_snapshot(workspace) if workspace is not None else None
+    baked = {t["key"]: t for t in (snap or {}).get("teams") or []}
+    pad = _point(zones.get(str(pad_zone), {})) if pad_zone else None
     camps = []
     for c in KOOM_WAR:
-        seat = _seat(zones, c["zoneId"], faction=c["faction"])
-        front = _seat(zones, c["frontZoneId"])
-        if not seat or not front:
+        seat = _seat(zones, c["zoneId"], faction=c["faction"], key=c["key"])
+        if not seat:
             return None
-        seat["front"] = {"zoneId": front["zoneId"], "x": front["x"], "z": front["z"]}
+        field = baked.get(c["key"])
+        if field:
+            seat.update(x=field["seat"][0], z=field["seat"][1], profile=field["profile"], bank=field["bank"])
+            # the start commander is the engine's; every baked unit but a commander is placed
+            seat["units"] = [u for u in field["units"]
+                             if u[5] != "C" and not (pad and math.hypot(u[1] - pad[0], u[2] - pad[1]) < PAD_CLEARANCE)]
+        else:
+            seat["profile"] = "hard"
+        seat["front"] = {"zoneId": seat["zoneId"], "x": seat["x"], "z": seat["z"]}
         camps.append(seat)
-    return {"kind": "standing_war", "label": "Null Mercs and Armada grind across the valley",
-            "camps": camps}
+    return {"kind": "standing_war", "label": "Null Mercs and Armada, a full war in progress",
+            "baked": bool(baked), "minutes": (snap or {}).get("minutes"), "camps": camps}
 
 
 def kings_showdown(map_id: str, workspace: Optional[Path], pad_zone: Optional[str]) -> Optional[Dict[str, Any]]:
@@ -150,7 +170,7 @@ def kings_showdown(map_id: str, workspace: Optional[Path], pad_zone: Optional[st
 
 # What the hub says about each field's set piece (the board's subtitle, the Drop dialog).
 SET_PIECES = {
-    "koom_valley": {"kind": "standing_war", "label": "Standing war: Null Mercs and Armada grind across the valley; you jump in"},
+    "koom_valley": {"kind": "standing_war", "label": "Standing war: Null Mercs hold the west, Armada the east, twenty minutes in; you take the north-west seat"},
     "all_that_simmers": {"kind": "kings_showdown", "label": "Kings' showdown: one commander each, last one standing takes the throne"},
     "eye_of_horus": {"kind": "wild_rim", "label": "Raptors hold the crater's outer rim; Cortex keeps the eye"},
     "the_rock_jungle": {"kind": "wild_ground", "label": "Wild ground: raptors wander every zone; the hive is in the south-west"},
@@ -183,7 +203,7 @@ def is_solo(intent: Optional[Dict[str, Any]]) -> bool:
 
 def theater_for(state: Dict[str, Any], map_id: str, workspace: Optional[Path], pad_zone: Optional[str]) -> Optional[Dict[str, Any]]:
     """The set piece this field stages, or None for an ordinary field."""
-    return standing_war(map_id, workspace) or kings_showdown(map_id, workspace, pad_zone)
+    return standing_war(map_id, workspace, pad_zone) or kings_showdown(map_id, workspace, pad_zone)
 
 
 __all__ = [
