@@ -145,6 +145,10 @@ def apply_sealed_company_to_packet(
     return packet
 
 
+# Night one's raid: the Armada works next door to the start road's pad, not the far corner.
+OPENING_TARGET = "GF_NW_BASTION"
+
+
 def opening_sortie_order(state: Dict[str, Any], workspace: Optional[Path] = None) -> Optional[Dict[str, Any]]:
     """Return the authored alpha opening for a genuinely fresh campaign.
 
@@ -154,9 +158,11 @@ def opening_sortie_order(state: Dict[str, Any], workspace: Optional[Path] = None
     non-empty history means the player has already chosen a different flow.
 
     The company starts on the start road, holding both of its doors, so the opening lands
-    on Greenest Fields' end of it (`GF_NW_MUSTER`), hits the southeast decoy plateau, and
-    lifts from the same pad. The plateau is also the door to Koom Valley: break the farms
-    and hold the corner, and the next road opens.
+    on Greenest Fields' end of it (`GF_NW_MUSTER`) and raids the Armada works next door in the
+    Northwest Bastion (the living shell's west/central grassland pockets; Cauter's wreck lies
+    there), then lifts from the same pad or the ground it took. The southeast plateau, the
+    door to Koom Valley, is the far corner: the campaign works across the field toward it
+    instead of crossing the whole map on night one (Luke, 2026-10-25).
     """
     if int(state.get("missionNumber", 1) or 1) != 1:
         return None
@@ -173,11 +179,11 @@ def opening_sortie_order(state: Dict[str, Any], workspace: Optional[Path] = None
         "schemaVersion": "verdance-sortie-order/1.0",
         "campaignId": state.get("campaignId", CAMPAIGN_ID),
         "mapId": "greenest_fields",
-        "targetZoneId": "GF_SE_PLATEAU",
+        "targetZoneId": OPENING_TARGET,
         "deploymentZoneId": rim_pad,
         "extractionZoneId": rim_pad,
         "fromZoneIds": [rim_pad],
-        "captureZoneIds": ["GF_SE_PLATEAU"],
+        "captureZoneIds": [OPENING_TARGET],
         "secondaryCaptureZoneIds": [],
         "hubChoiceId": "c_raid_tnb_greenest_fields",
         "deployAces": deploy_aces,
