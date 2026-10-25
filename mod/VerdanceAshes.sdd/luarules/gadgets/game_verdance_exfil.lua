@@ -152,12 +152,27 @@ end
 -- Taking a door (mission.exitDoorZoneId): once the objective is done the extraction moves onto the
 -- door, so the company leaves by the exit it took.
 local function maybeMoveToExit()
-  local exit = mission and mission.exitDoorZoneId and tostring(mission.exitDoorZoneId)
-  if not exit or not pad or pad.zoneId == exit or not anchorOf[exit] then return end
+  if not pad then return end
   if (tonumber((Spring.GetGameRulesParam("va_objective_complete"))) or 0) ~= 1 then return end
-  placePad(exit, anchorOf[exit][1], anchorOf[exit][2], PAD_RADIUS)
-  Spring.SetGameRulesParam("va_pad_moved", 1, { public = true })
-  Spring.Echo("VA_EXFIL pad moved to the exit door " .. exit)
+  -- A rescue goes home the way it came: back to the deployment pad, door or no door.
+  if mission and mission.objective and mission.objective.rezHeroId then return end
+  local exit = mission and mission.exitDoorZoneId and tostring(mission.exitDoorZoneId)
+  if exit and pad.zoneId ~= exit and anchorOf[exit] then
+    placePad(exit, anchorOf[exit][1], anchorOf[exit][2], PAD_RADIUS)
+    Spring.SetGameRulesParam("va_pad_moved", 1, { public = true })
+    Spring.Echo("VA_EXFIL pad moved to the exit door " .. exit)
+    return
+  end
+  -- Territory: the company extracts on the ground it took, once it is secured. What it built there
+  -- stays (the footprint is the zone's holdings); nobody has to walk back to the drop.
+  local rule, zone = "deployment", nil
+  if GG.VA_ExtractRule then rule, zone = GG.VA_ExtractRule() end
+  if rule == "territory" and zone and zone ~= "" and pad.zoneId ~= zone and anchorOf[zone] then
+    placePad(zone, anchorOf[zone][1], anchorOf[zone][2], PAD_RADIUS)
+    Spring.SetGameRulesParam("va_pad_moved", 1, { public = true })
+    Spring.SetGameRulesParam("va_pad_territory", 1, { public = true })
+    Spring.Echo("VA_EXFIL pad moved onto the secured territory " .. zone)
+  end
 end
 
 local function build()
@@ -234,7 +249,10 @@ end
 -- pad off the manifest like any other.
 local function extractAnywhere()
   local o = Spring.GetModOptions and Spring.GetModOptions() or {}
-  return tostring(o.va_extract_anywhere) == "1" or tostring(o.va_autopilot) == "1"
+  if tostring(o.va_extract_anywhere) ~= "1" then return false end
+  local rule = GG.VA_ExtractRule and GG.VA_ExtractRule() or "deployment"
+  local obj = mission and mission.objective or {}
+  return rule ~= "territory" and not obj.rezHeroId
 end
 
 local function padToCompany()

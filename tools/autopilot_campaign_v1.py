@@ -4,8 +4,8 @@
 Each sortie does what playthrough_campaign.py does (take the node's recommended card, plan it the
 way the hub does, commit the drop), then patches the startscript so the company's team is BARb
 (profile hard_aggressive by default) with a spectator host, launches spring-headless, and lets the
-kernel's own SortieWatch bring the result home. The autopilot gadget calls the extraction (the pad
-moves to wherever most of the company stands: extract anywhere).
+kernel's own SortieWatch bring the result home. The autopilot gadget raises a rescue's hero, calls the
+extraction, and walks the company to the pad (territory missions: the ground taken; rescues: the drop).
 
 It runs on a COPY of the workspace (autopilot_runs/<stamp>/ws), so your own campaign is untouched.
 BAR's data\\games\\VerdanceAshes.sdd and infolog.txt are shared: don't play while it runs.
@@ -78,7 +78,7 @@ def patch_startscript(text: str, *, profile: str, speed: int, minutes: float, se
     text = text[:i] + ai[2:] + "  " + text[i:]
     text = re.sub(r"NumUsers=(\d+);", lambda mm: f"NumUsers={int(mm.group(1)) + 1};", text, count=1)
     text = re.sub(r"RecordDemo=\d+;", "RecordDemo=0;", text, count=1)
-    mods = (f"va_autopilot=1;\n    va_extract_anywhere=1;\n    va_headless_autostart=1;\n    va_headless_fastwin=0;\n    va_headless_quit=1;\n    va_headless_speed={speed};\n    va_autopilot_speed={speed};\n"
+    mods = (f"va_autopilot=1;\n    va_headless_autostart=1;\n    va_headless_fastwin=0;\n    va_headless_quit=1;\n    va_headless_speed={speed};\n    va_autopilot_speed={speed};\n"
             f"    va_autopilot_minutes={minutes};\n    va_autopilot_settle={settle};\n    ")
     text = text.replace("va_campaign=1;", "va_campaign=1;\n    " + mods.rstrip(), 1)
     return text, team

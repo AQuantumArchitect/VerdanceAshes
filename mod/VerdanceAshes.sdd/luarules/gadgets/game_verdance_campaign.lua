@@ -5714,6 +5714,18 @@ function setTerminal(kind, reason)
   runTerminalCrunch({ reason = status })
 end
 
+-- Where the company leaves from (2026-10-24): taking ground extracts ON the ground it took, once
+-- secured; a rescue (raise a named hero) goes back to the deployment pad. The exfil gadget asks.
+function GG.VA_ExtractRule()
+  local obj = mission and mission.objective or {}
+  if obj.rezHeroId then return "deployment" end
+  local mode = vaObjectiveMode(objectiveKind())
+  if mode == "capture" or (capture and capture.mode) or VA_KINDS.fortify[objectiveKind()] then
+    return "territory", tostring(obj.targetZoneId or mission.targetZoneId or "")
+  end
+  return "deployment"
+end
+
 -- The exfil gadget calls this when the player confirms the manifest.
 function GG.VA_EndSortie(kind)
   -- Clean vs contested extraction is Python's reading of manifest.enemyOnPad.
