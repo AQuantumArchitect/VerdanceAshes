@@ -525,6 +525,12 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
     # Normalize is law: MatchResult v2 fields only (no raw override soup).
     credit: Dict[str, Any] = {}
     try:
+        # What ground the company holds as it lifts, and what of it was an enemy's: the verdict
+        # reads these (a sortie is won by the ground held, not by one fixed checkbox).
+        result = _mf.with_ground(state, result, workspace)
+    except Exception:
+        pass
+    try:
 
         normalized = normalize_result(result)
         result = result_v2_to_v1_fields(normalized)
@@ -761,6 +767,11 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
     ) or (result.get("capturePhase") == "claimed")
     capture_claim_report = None
     allow_flip = bool(credit.get("zoneFlip"))
+    # A sortie won by ground: the ground that changed hands is the flip (the presence rule already
+    # moved it); the assigned target is not handed to the patron on top of that.
+    ground_win = result.get("objectiveCompleteHow") == _mf.GROUND_TAKEN and bool(result.get("groundTaken"))
+    if ground_win:
+        allow_flip = False
     try:
 
         if is_capture_result(result):
@@ -807,6 +818,8 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
                                 "at": utc_now(),
                             }
                         )
+    if ground_win:
+        zone_flipped = True
     # Commerce: fullSuccess for victory awards; partial still settles loans lightly
     settle = settle_commerce_after_sortie(
         state, result, success or any_positive, clean_extract, zone_flipped, workspace
@@ -851,6 +864,9 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
             tags.append("door-taken")
         if any(not d["held"] for d in door_changes):
             tags.append("door-lost")
+    if ground_win:
+        bead.setdefault("storyTags", []).append("ground-taken")
+        bead["groundTaken"] = list(result.get("groundTaken") or [])
     if dv_flips:
         bead["zonesChangedHands"] = list(dv_flips)
         if any(((state.get("zoneMemory") or {}).get(map_id, {}).get(z) or {}).get("controllingFaction") == "ashwalkers"

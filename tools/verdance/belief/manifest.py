@@ -11,7 +11,11 @@ what it looked at. This module is the only place those facts become campaign mea
                extractionStatus, credits or freeTnbMint — those are computed here and in
                match_credit_v1 from the facts above)
   verdict      wiped → defeat · closed (engine ended without a manifest) → abandon ·
-               extracted → victory if the objective was done and nobody was left, else partial
+               extracted → victory if the job was done and nobody was stranded, else partial
+               The job is done when the primary objective completed OR the company ended the sortie
+               holding ground it took from an enemy (ground_taken). Nobody stranded means no hero
+               was left on ground the company does not hold: a garrison on held ground is a post,
+               not an abandonment. No fixed checklist, no one way to win.
   people left  stay where they stood: camp.people[hid] = {where: "field", zoneId}; they do not board the
                next Drop until recalled or picked up; the dance tape owes "bring <name> back from <zone>"
   things left  structures are already the footprint (result.playerFootprint) and the zone's holdings;
@@ -65,6 +69,73 @@ def heroes_left(result: Dict[str, Any]) -> list:
     if m is None:
         return []
     return [str(h.get("heroId") or "") for h in (m.get("staying") or {}).get("heroes") or [] if isinstance(h, dict)]
+
+
+COMPANY = "ashwalkers"
+GROUND_TAKEN = "ground_taken"
+# Whose zones the company can take: the factions it fights. Neutral ground has no one to take it
+# from; the Mercs are its patron and the Legion its own.
+ENEMY_HOLDERS = frozenset({"armada", "cortex", "wild"})
+
+
+def held_zones(result: Dict[str, Any], workspace=None) -> list:
+    """Zones the company holds when it lifts: its presence in the zone leads and meets the claim
+    need (verdance.world.claim, the same rule that moves zone control). From result.zoneDv, a fact.
+    A result that already carries groundHeld (the campaign read it with the workspace) keeps it."""
+    pre = result.get("groundHeld")
+    if isinstance(pre, list):
+        return [str(z) for z in pre]
+    dv = result.get("zoneDv")
+    if not isinstance(dv, dict) or not dv:
+        return []
+    from verdance.world.claim import claim_need, holder
+    need = claim_need(result.get("deploymentMapId") or result.get("mapId") or "", workspace)
+    out = []
+    for zone_id, row in dv.items():
+        if isinstance(row, dict) and holder(row, need)[0] == COMPANY:
+            out.append(str(zone_id))
+    return sorted(out)
+
+
+def ground_taken(state: Dict[str, Any], result: Dict[str, Any], workspace=None) -> list:
+    """Zones the company holds now that an enemy (or the wild) held before it came. Read-only: the
+    campaign has not yet moved any zone's control when this is asked. Not for a kings' showdown,
+    which has its own end (the throne)."""
+    if throne_taken(result) is not None:
+        return []
+    from verdance.common import canonical_map_id
+    from verdance.campaign.zones import canonical_zone_id
+    map_id = canonical_map_id(result.get("deploymentMapId") or result.get("mapId") or "")
+    memory = ((state.get("zoneMemory") or {}).get(map_id) or {})
+    out = []
+    for zone_id in held_zones(result, workspace):
+        zid = canonical_zone_id(zone_id, workspace) or zone_id
+        before = str((memory.get(zid) or {}).get("controllingFaction") or "").lower()
+        if before in ENEMY_HOLDERS:
+            out.append(str(zid))
+    return sorted(out)
+
+
+def with_ground(state: Dict[str, Any], result: Dict[str, Any], workspace=None) -> Dict[str, Any]:
+    """The result with the two ground facts the campaign reads for it (groundHeld, groundTaken)."""
+    out = dict(result)
+    out["groundHeld"] = held_zones(result, workspace)
+    out["groundTaken"] = ground_taken(state, {**result, "groundHeld": out["groundHeld"]}, workspace)
+    return out
+
+
+def stranded(result: Dict[str, Any], workspace=None) -> list:
+    """Hero ids left in the field on ground the company does not hold. A hero staying on ground the
+    company holds is a garrison. A result with no zoneDv says nothing about the ground, so everyone
+    left counts (the old reading)."""
+    left = [h for h in (((manifest_of(result) or {}).get("staying") or {}).get("heroes") or []) if isinstance(h, dict)]
+    if not left:
+        return []
+    dv = result.get("zoneDv")
+    if not isinstance(dv, dict) or not dv:
+        return [str(h.get("heroId") or "") for h in left]
+    held = set(held_zones(result, workspace))
+    return [str(h.get("heroId") or "") for h in left if str(h.get("zoneId") or "") not in held]
 
 
 def dropped(result: Dict[str, Any]) -> Optional[set]:
@@ -123,7 +194,8 @@ def verdict_from(result: Dict[str, Any]) -> Optional[str]:
         return "defeat"
     if kind == "closed":
         return "abandon"
-    return "victory" if (objective_done(result) and not heroes_left(result)) else "partial"
+    done = objective_done(result) or bool(result.get("groundTaken"))
+    return "victory" if (done and not stranded(result)) else "partial"
 
 
 def extraction_status_from(result: Dict[str, Any]) -> Optional[str]:

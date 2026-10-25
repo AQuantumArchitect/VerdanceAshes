@@ -217,6 +217,10 @@ def normalize_result(raw: Dict[str, Any], *, campaign_id: str = "verdance_ashes"
         _es = _mf.extraction_status_from(raw)
         if _es is not None:
             raw["extractionStatus"] = _es
+        # Won by ground, not by the checkbox: the company ended holding what it took from an enemy.
+        if _v == "victory" and raw.get("groundTaken") and not _mf.objective_done(raw):
+            raw["objectiveComplete"] = True
+            raw["objectiveCompleteHow"] = _mf.GROUND_TAKEN
     except Exception:  # noqa: BLE001
         pass
     status = raw.get("status") or raw.get("verdict") or raw.get("result")
@@ -322,6 +326,8 @@ def normalize_result(raw: Dict[str, Any], *, campaign_id: str = "verdance_ashes"
         "objectiveKind": raw.get("objectiveKind"),
         "objectiveMode": raw.get("objectiveMode"),
         "objectiveCompleteHow": _s(raw.get("objectiveCompleteHow") or ""),
+        "groundHeld": list(raw.get("groundHeld") or []) if isinstance(raw.get("groundHeld"), list) else [],
+        "groundTaken": list(raw.get("groundTaken") or []) if isinstance(raw.get("groundTaken"), list) else [],
         "objectiveCompleteFrame": _i(raw.get("objectiveCompleteFrame"), 0),
         "nodeClaimedFrame": _i(raw.get("nodeClaimedFrame"), 0),
         "requiredMarksLeft": _i(raw.get("requiredMarksLeft"), 0),
@@ -453,6 +459,8 @@ def result_v2_to_v1_fields(r: Dict[str, Any]) -> Dict[str, Any]:
         "objectiveKind": r.get("objectiveKind"),
         "objectiveMode": r.get("objectiveMode"),
         "objectiveCompleteHow": r.get("objectiveCompleteHow"),
+        "groundHeld": r.get("groundHeld") or [],
+        "groundTaken": r.get("groundTaken") or [],
         "objectiveCompleteFrame": r.get("objectiveCompleteFrame"),
         "nodeClaimedFrame": r.get("nodeClaimedFrame"),
         "requiredMarksLeft": r.get("requiredMarksLeft"),
