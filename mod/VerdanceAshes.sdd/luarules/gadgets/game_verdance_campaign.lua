@@ -21,6 +21,8 @@ if not gadgetHandler:IsSyncedCode() then
   local function isHeadless()
     local mo = Spring.GetModOptions and Spring.GetModOptions() or {}
     local v = mo.va_headless_autostart
+    -- An offline bake is headless too: nobody is there to press unpause.
+    if v == nil or v == "" then v = mo.va_shell_bake end
     if v == true or v == 1 then return true end
     if type(v) == "string" then
       v = v:lower()
@@ -6058,6 +6060,13 @@ end)()
 
 
 function gadget:Initialize()
+  -- Offline bakes (the shell grow, the Koom war) are pure BARb sims: no sortie, no hot drop, no start
+  -- pause. Without this the installed mission drops the company in and holds the game at frame 30.
+  if truthy((Spring.GetModOptions() or {}).va_shell_bake) then
+    Spring.Echo("VA_CAMPAIGN_SKIP bake mode - no sortie")
+    gadgetHandler:RemoveGadget(self)
+    return
+  end
   Spring.Echo("VA_CAMPAIGN_BRIDGE_LOADED")
   mission = readMission()
   zoneMap = readZoneMap()
