@@ -12,6 +12,7 @@ builder reads for every drop onto that map (verdance.world.war_snapshot, verdanc
     python tools\\war_bake_v1.py --all                 every map, re-baked
     python tools\\war_bake_v1.py --map koom_valley --minutes 30     a longer war
     python tools\\war_bake_v1.py --windowed            watch it in spring.exe
+    python tools\\war_bake_v1.py --map ancient_bastion --field --no-install   the field sets the war (try it)
     python tools\\war_bake_v1.py --map tabula --from-log PATH       build the snapshot from an infolog you already have
 
 Your own campaign is untouched, but BAR's infolog and data\\games\\VerdanceAshes.sdd are shared: don't
@@ -80,6 +81,15 @@ def bake(map_id: str, args, cfg, S) -> int:
     if not recipe:
         print("[war] no recipe at", W.recipe_rel(map_id))
         return 2
+    if getattr(args, "field", False):
+        # the field decides: richer, steeper ground gets a longer war; each seat develops by its ground
+        from verdance.world import flow as F
+        rep = F.report(map_id, ROOT)
+        plan = rep.get("bake")
+        if plan:
+            recipe = F.apply_plan(recipe, plan)
+            print(f"[war] field plan: {plan['was']['minutes']} -> {plan['minutes']} min; "
+                  + ", ".join(f"{s['key']} {s['handicap']:+d}% {s['profile']}" for s in plan["seats"]))
     minutes = float(args.minutes or recipe.get("minutes") or 20)
     exe = S.engine_exe(cfg, "spring.exe" if args.windowed else "spring-headless.exe")
     prov = S.provision_map(ROOT, cfg, recipe["mapName"])
@@ -139,6 +149,9 @@ def main() -> int:
     ap.add_argument("--isolation", action="store_true", help="pass --isolation to the engine (the old bake script did)")
     ap.add_argument("--timeout-min", type=float, default=90.0, help="wall minutes per map before its run is stopped")
     ap.add_argument("--no-install", action="store_true", help="build and show the snapshot, do not write it")
+    ap.add_argument("--field", action="store_true",
+                    help="length and seat development from the field (verdance.world.flow): worth and slope set the minutes, "
+                         "each seat's ground its Handicap and BARb profile")
     ap.add_argument("--from-log", help="skip the sim: read the dump out of this infolog (needs one --map)")
     args = ap.parse_args()
 

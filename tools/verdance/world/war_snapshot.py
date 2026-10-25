@@ -85,7 +85,7 @@ def startscript(recipe: Dict[str, Any], *, game_type: str, frames: Optional[int]
     for i, t in enumerate(teams):
         side = sides[t["ally"]]
         blocks.append(
-            f"  [TEAM{i}]\n  {{\n    TeamLeader=0;\n    AllyTeam={ally_ids[t['ally']]};\n    Handicap=0;\n"
+            f"  [TEAM{i}]\n  {{\n    TeamLeader=0;\n    AllyTeam={ally_ids[t['ally']]};\n    Handicap={int(t.get('handicap', 0))};\n"
             f"    Side={side['side']};\n    RGBColor={side['rgb']};\n"
             f"    StartPosX={int(t['startElmos'][0])};\n    StartPosZ={int(t['startElmos'][1])};\n  }}\n")
     for i, t in enumerate(teams):

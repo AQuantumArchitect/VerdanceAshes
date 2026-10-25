@@ -245,9 +245,16 @@ def main() -> int:
         time.sleep(1)
         watch.stop()
         try:
+            # BAR truncates infolog.txt at each start, so the baseline offset can point past its end;
+            # the engine's own stdout carries the same lines and is never rewritten.
+            data = b""
             with open(rep["infologPath"], "rb") as fh:
-                fh.seek(int(rep["infologBaseline"]))
-                (run_dir / f"sortie_{n:02d}.infolog.txt").write_bytes(fh.read())
+                size = fh.seek(0, 2)
+                fh.seek(int(rep["infologBaseline"]) if int(rep["infologBaseline"]) <= size else 0)
+                data = fh.read()
+            if not data.strip():
+                data = (run_dir / f"sortie_{n:02d}.engine.txt").read_bytes()
+            (run_dir / f"sortie_{n:02d}.infolog.txt").write_bytes(data)
         except Exception:  # noqa: BLE001
             pass
         crash = None
