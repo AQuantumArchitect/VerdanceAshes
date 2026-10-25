@@ -3,7 +3,7 @@
     the_rock_jungle   wild ground end to end: a den on every zone the wild holds; the hive in the
                       south-west corner
     eye_of_horus      the crater's outer rim is raptor ground (dens along the edge); Cortex keeps the eye
-    koom_valley, greenest_fields, tabula, ancient_bastion, eye_of_horus
+    koom_valley, tabula, ancient_bastion, eye_of_horus (Greenest Fields' war retired 2026-10-25)
                       standing wars: BARbarians fight on the map, one side stacked each way (Koom
                       east/west, Greenest Fields north/south, Tabula east/west, the Bastion a
                       siege, the Eye Cortex south against Armada north), some minutes into a full
@@ -49,11 +49,8 @@ WARS = {
         {"key": "e", "faction": "armada", "zoneId": "KV_NE_SPILLWAY"},
         {"key": "se", "faction": "armada", "zoneId": "KV_SE_MUSTER"},
     ],
-    "greenest_fields": [
-        {"key": "ne", "faction": "nullmercs", "zoneId": "GF_NE_PLATEAU"},
-        {"key": "sw", "faction": "armada", "zoneId": "GF_SW_MUSTER"},
-        {"key": "se", "faction": "armada", "zoneId": "GF_SE_PLATEAU"},
-    ],
+    # greenest_fields: retired 2026-10-25 (Luke): the old field, the living shell's many bases to
+    # clear and harvest, is back. Its war is kept in data/base_templates/greenest_fields/retired_war/.
     "tabula": [
         {"key": "w", "faction": "nullmercs", "zoneId": "T_NW_OUTER_RESERVE"},
         {"key": "wm", "faction": "nullmercs", "zoneId": "T_W_CAUSEWAY"},
@@ -209,7 +206,6 @@ def kings_showdown(map_id: str, workspace: Optional[Path], pad_zone: Optional[st
 # What the hub says about each field's set piece (the board's subtitle, the Drop dialog).
 SET_PIECES = {
     "koom_valley": {"kind": "standing_war", "label": "Standing war: Null Mercs hold the west, Armada the east, twenty minutes in; you take the north-west seat"},
-    "greenest_fields": {"kind": "standing_war", "label": "Standing war: Armada hold the south, Null Mercs the north, twelve minutes in; you take the north-west corner"},
     "tabula": {"kind": "standing_war", "label": "Standing war: Null Mercs hold the west terraces, Armada the east, twenty minutes in; you take the north-west seat"},
     "ancient_bastion": {"kind": "standing_war", "label": "Standing war: Armada hold the western castle, Null Mercs besiege it from the east; you take the north-east seat"},
     "eye_of_horus": {"kind": "standing_war", "label": "Standing war: Cortex hold the south and the glassed centre against Armada in the north; raptors keep the rim between; you take the north-west seat"},

@@ -118,7 +118,8 @@ def test_the_snapshot_file_round_trips():
 
 def test_every_map_has_a_sound_recipe():
     maps = W.war_maps(ROOT)
-    assert set(maps) == {"koom_valley", "greenest_fields", "tabula", "ancient_bastion", "eye_of_horus"}
+    # Greenest Fields' war was retired 2026-10-25 (its living shell is the field again)
+    assert set(maps) == {"koom_valley", "tabula", "ancient_bastion", "eye_of_horus"}
     for m in maps:
         rec = W.load_recipe(ROOT, m)
         terrain = __import__("json").loads((ROOT / "data" / "terrain" / f"{m}.terrain.json").read_text(encoding="utf-8-sig"))

@@ -76,6 +76,5 @@
     "minBuilt": 0.5,
     "note": "Past the cap the cheapest mobile units go first; structures and commanders are kept."
   },
-  "keepShell": true,
-  "keepShellWhy": "The war is young (12 minutes) and thin on a big map; the living shell's commander-grown works (8 pockets, ~313 units) keep the field alive. Shell Armada are allied to the war's Armada seats."
+  "retired": "2026-10-25, Luke: restore the old Greenest Fields (the living shell's many bases to clear and harvest). Move this file back up one folder to field the war again."
 }
