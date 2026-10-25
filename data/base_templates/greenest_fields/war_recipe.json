@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "verdance-war-recipe/1.0",
+  "mapId": "greenest_fields",
+  "mapName": "Greenest Fields 1.3",
+  "mapSize": [
+    8192,
+    8192
+  ],
+  "character": "Greenest Fields, a young war: Armada hold the south, Null Mercs the north, twelve minutes in. The Mercs' north-west corner is the company's; BARbarian holds it for the sim and is pulled out afterwards, with every unit it owned.",
+  "minutes": 12,
+  "seed": 3311,
+  "dry": true,
+  "playerSeat": "nw",
+  "notes": "The terrain has three native seats (SE, SW, NE); the NW corner has none, so the company's seat is a fourth, mirrored from the SW corner. Armada keep the south (their main works are the SE plateau, the Koom door); the Null Mercs the north. A short war: this is the field the company starts on.",
+  "sides": {
+    "north": {
+      "faction": "nullmercs",
+      "side": "Legion",
+      "rgb": "0.25 0.85 0.35"
+    },
+    "south": {
+      "faction": "armada",
+      "side": "Armada",
+      "rgb": "0.25 0.48 1.0"
+    }
+  },
+  "teams": [
+    {
+      "key": "nw",
+      "ally": "north",
+      "profile": "hard_aggressive",
+      "zoneId": "GF_NW_MUSTER",
+      "startElmos": [
+        1200,
+        1200
+      ],
+      "label": "Northwest corner (the company's seat)",
+      "virtual": true
+    },
+    {
+      "key": "ne",
+      "ally": "north",
+      "profile": "hard",
+      "zoneId": "GF_NE_PLATEAU",
+      "startElmos": [
+        6992,
+        1200
+      ],
+      "label": "Northeast"
+    },
+    {
+      "key": "sw",
+      "ally": "south",
+      "profile": "hard",
+      "zoneId": "GF_SW_MUSTER",
+      "startElmos": [
+        1200,
+        6992
+      ],
+      "label": "Southwest"
+    },
+    {
+      "key": "se",
+      "ally": "south",
+      "profile": "hard",
+      "zoneId": "GF_SE_PLATEAU",
+      "startElmos": [
+        6992,
+        6992
+      ],
+      "label": "Southeast"
+    }
+  ],
+  "snapshot": {
+    "maxUnitsPerTeam": 900,
+    "minBuilt": 0.5,
+    "note": "Past the cap the cheapest mobile units go first; structures and commanders are kept."
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "schemaVersion": "verdance-war-recipe/1.0",
+  "mapId": "eye_of_horus",
+  "mapName": "Eye Of Horus 1.7",
+  "mapSize": [
+    6144,
+    7168
+  ],
+  "character": "Eye of Horus, the glassed core: three Cortex seats hold the south and centre against Armada in the north, twenty minutes in. The Armada's north-west seat is the company's.",
+  "minutes": 20,
+  "seed": 3314,
+  "dry": true,
+  "playerSeat": "nw",
+  "notes": "All five seats are the map's own start positions: Cortex take the three southern ones (they hold the centre in force), Armada the two northern ones. The company enters by the NW bastion door and takes the seat beside it, so it tips a two-against-three.",
+  "sides": {
+    "north": {
+      "faction": "armada",
+      "side": "Armada",
+      "rgb": "0.25 0.48 1.0"
+    },
+    "south": {
+      "faction": "cortex",
+      "side": "Cortex",
+      "rgb": "0.9 0.2 0.2"
+    }
+  },
+  "teams": [
+    {
+      "key": "nw",
+      "ally": "north",
+      "profile": "hard_aggressive",
+      "zoneId": "EOH_NW_MUSTER",
+      "startElmos": [
+        573,
+        1075
+      ],
+      "label": "Northwest (the company's seat)"
+    },
+    {
+      "key": "ne",
+      "ally": "north",
+      "profile": "hard",
+      "zoneId": "EOH_NE_CAUSEWAY",
+      "startElmos": [
+        5170,
+        989
+      ],
+      "label": "Northeast"
+    },
+    {
+      "key": "sw",
+      "ally": "south",
+      "profile": "hard",
+      "zoneId": "EOH_SW_CAUSEWAY",
+      "startElmos": [
+        1003,
+        6207
+      ],
+      "label": "Southwest"
+    },
+    {
+      "key": "s",
+      "ally": "south",
+      "profile": "hard",
+      "zoneId": "EOH_C_INNER_GATE",
+      "startElmos": [
+        3308,
+        5992
+      ],
+      "label": "South"
+    },
+    {
+      "key": "se",
+      "ally": "south",
+      "profile": "hard",
+      "zoneId": "EOH_SE_MUSTER",
+      "startElmos": [
+        5557,
+        6078
+      ],
+      "label": "Southeast"
+    }
+  ],
+  "snapshot": {
+    "maxUnitsPerTeam": 900,
+    "minBuilt": 0.5,
+    "note": "Past the cap the cheapest mobile units go first; structures and commanders are kept."
+  }
+}

@@ -12,7 +12,7 @@ sys.path.insert(0, str(ROOT / "tools"))
 
 from verdance.world import war_snapshot as W  # noqa: E402
 
-RECIPE = W.load_recipe(ROOT)
+RECIPE = W.load_recipe(ROOT, "koom_valley")
 
 
 def test_the_recipe_is_a_3v3_with_the_company_seat_on_the_entry_side():
@@ -114,3 +114,37 @@ def test_the_snapshot_file_round_trips():
         back = json.loads(p.read_text(encoding="utf-8"))
         assert back == snap
         assert W.load_snapshot(Path(d))["unitCount"] == snap["unitCount"]
+
+
+def test_every_map_has_a_sound_recipe():
+    maps = W.war_maps(ROOT)
+    assert set(maps) == {"koom_valley", "greenest_fields", "tabula", "ancient_bastion", "eye_of_horus"}
+    for m in maps:
+        rec = W.load_recipe(ROOT, m)
+        terrain = __import__("json").loads((ROOT / "data" / "terrain" / f"{m}.terrain.json").read_text(encoding="utf-8-sig"))
+        mx, mz = rec["mapSize"]
+        assert (mx, mz) == (terrain["size"]["x"], terrain["size"]["z"]), m
+        assert rec["mapName"] == terrain["mapName"], m
+        keys = [t["key"] for t in rec["teams"]]
+        assert len(keys) == len(set(keys)) and rec["playerSeat"] in keys, m
+        assert set(t["ally"] for t in rec["teams"]) == set(rec["sides"]) and len(rec["sides"]) == 2, m
+        for t in rec["teams"]:
+            x, z = t["startElmos"]
+            assert 0 < x < mx and 0 < z < mz, (m, t["key"])
+            assert t["profile"] in ("hard", "hard_aggressive"), (m, t["key"])
+        assert next(t for t in rec["teams"] if t["key"] == rec["playerSeat"])["profile"] == "hard_aggressive", m
+        # the sides are stacked apart: their centroids are far across the map
+        cen = {}
+        for ally in rec["sides"]:
+            pts = [t["startElmos"] for t in rec["teams"] if t["ally"] == ally]
+            cen[ally] = (sum(p[0] for p in pts) / len(pts) / mx, sum(p[1] for p in pts) / len(pts) / mz)
+        a, b = cen.values()
+        assert ((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2) ** 0.5 > 0.4, m
+        # native seats are the terrain's own start positions; the rest say so
+        native = {(p["x"], p["z"]) for p in terrain["startPositions"]}
+        for t in rec["teams"]:
+            assert (tuple(t["startElmos"]) in native) != bool(t.get("virtual")), (m, t["key"])
+        s = W.startscript(rec, game_type="Verdance Ashes $VERSION")
+        assert s.count("[TEAM") == len(rec["teams"]) and s.count("[ALLYTEAM") == 2, m
+        assert f"va_shell_bake_mapid={m};" in s and f"MapName={rec['mapName']};" in s, m
+

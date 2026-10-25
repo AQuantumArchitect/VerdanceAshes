@@ -63,7 +63,7 @@ def test_koom_is_a_standing_war_three_a_side_with_the_company_seat_left_empty():
     assert "KV_NW_MUSTER" not in {c["zoneId"] for c in camps}            # the company's seat
     west, east = [c for c in camps if c["faction"] == "nullmercs"], [c for c in camps if c["faction"] == "armada"]
     assert max(c["x"] for c in west) < 0.5 < min(c["x"] for c in east)   # Armada on the far side
-    assert war["baked"] and all(c["profile"] == "hard" and c["bank"] and c["units"] for c in camps)
+    assert all(c["profile"] == "hard" and c["bank"] and c["units"] for c in camps)
     for c in camps:                                                      # the engine gives each start commander
         assert all(u[5] != "C" for u in c["units"])
     # the seats are the recipe's
@@ -82,14 +82,39 @@ def test_koom_war_makes_room_where_the_company_lands():
         assert all(math.hypot(u[1] - pad[0], u[2] - pad[1]) >= theaters.PAD_CLEARANCE for u in c["units"])
 
 
-def test_koom_without_a_baked_field_still_has_seats():
+def test_a_war_not_yet_baked_leaves_an_ordinary_field():
     with tempfile.TemporaryDirectory() as tmp:
-        for rel in ("data/zone_maps/authored/koom_valley.authored.zone_map.json",):
-            dst = Path(tmp) / rel
-            dst.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy(ROOT / rel, dst)
-        war = theaters.standing_war("koom_valley", Path(tmp), "KV_NW_MUSTER")
-    assert not war["baked"] and len(war["camps"]) == 5 and not any(c.get("units") for c in war["camps"])
+        rel = "data/zone_maps/authored/koom_valley.authored.zone_map.json"
+        dst = Path(tmp) / rel
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy(ROOT / rel, dst)
+        assert theaters.standing_war("koom_valley", Path(tmp), "KV_NW_MUSTER") is None
+    assert theaters.standing_war("the_rock_jungle", ROOT) is None and theaters.standing_war("all_that_simmers", ROOT) is None
+
+
+def test_the_war_table_is_the_recipes_seats():
+    assert sorted(theaters.WARS) == sorted(_war.war_maps(ROOT))
+    for map_id, seats in theaters.WARS.items():
+        rec = _war.load_recipe(ROOT, map_id)
+        assert {(t["key"], rec["sides"][t["ally"]]["faction"], t["zoneId"]) for t in rec["teams"] if t["key"] != rec["playerSeat"]} == \
+            {(c["key"], c["faction"], c["zoneId"]) for c in seats}, map_id
+        assert theaters.STANDING_CONTROL[map_id] == {c["zoneId"]: c["faction"] for c in seats
+                                                      if not (map_id == "eye_of_horus" and c["zoneId"] in theaters.EYE_RIM_ZONES)}
+        zones = theaters._zones(map_id, ROOT)
+        assert {c["zoneId"] for c in seats} <= set(zones), map_id
+
+
+def test_every_baked_war_has_two_sides_and_the_company_seat_empty():
+    baked = [m for m in theaters.WARS if _war.load_snapshot(ROOT, m)]
+    assert "koom_valley" in baked
+    for map_id in baked:
+        rec = _war.load_recipe(ROOT, map_id)
+        pad = next(t for t in rec["teams"] if t["key"] == rec["playerSeat"])
+        war = theaters.standing_war(map_id, ROOT, "KV_NW_MUSTER" if map_id == "koom_valley" else pad["zoneId"])
+        assert {c["faction"] for c in war["camps"]} >= {"armada"} or {c["faction"] for c in war["camps"]} >= {"cortex"}, map_id
+        assert len({c["faction"] for c in war["camps"]}) == 2, map_id
+        assert pad["zoneId"] not in {c["zoneId"] for c in war["camps"]} or map_id == "ancient_bastion", map_id
+        assert all(c["units"] and c["bank"] for c in war["camps"]), map_id
 
 
 def test_simmers_is_a_kings_showdown_from_any_door():
@@ -192,6 +217,8 @@ def test_a_new_campaign_has_its_bases_standing():
     for map_id, held in engine.template_holdings(ROOT).items():
         mem = s["zoneMemory"][map_id]
         for zid, fac in held.items():
+            if zid in theaters.STANDING_CONTROL.get(map_id, {}):
+                continue                                          # a standing war owns its seats' ground
             assert mem[zid]["controllingFaction"] in (fac, "wild"), (map_id, zid)
 
 

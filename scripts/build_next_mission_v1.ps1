@@ -2378,6 +2378,7 @@ function Add-WildDens {
 function Get-WarFaction {
   param([string]$Faction)
   if ($Faction -eq "nullmercs") { return @{ T = $MERC; side = "Legion"; label = "Null Mercs" } }
+  if ($Faction -eq "cortex") { return @{ T = $FACTION["Cortex"]; side = "Cortex"; label = "Cortex" } }
   return @{ T = $FACTION["Armada"]; side = "Armada"; label = "Armada" }
 }
 
@@ -2394,60 +2395,35 @@ function New-WarTeam {
 }
 
 function Add-StandingWar {
-  # Koom Valley: a full war in progress. Each seat is a BARbarian on its own seat; three Null Mercs
-  # hold the west, three Armada the east. When the war was baked (tools/koom_war_bake_v1.py) each
-  # seat's units stand exactly where the sim left them, as hurt as it left them, with the bank it
-  # held; otherwise a stock base and a patrolling line. The company takes the north-west seat the
-  # war left empty. Seats on one side are allied; the Mercs are the company's allies or not as its
-  # standing with them says.
+  # A standing war (Koom, Greenest Fields, Tabula, the Bastion, the Eye): each seat is a BARbarian on
+  # its own seat, and the war was baked (tools/war_bake_v1.py), so each seat's units stand exactly
+  # where the sim left them, as hurt as it left them, with the bank it held. The company takes the
+  # seat the war left empty. Seats on one side are allied; the Mercs are the company's allies or not
+  # as its standing with them says.
   param($Theater)
   $camps = @($Theater.camps)
   $sideAllies = @{}
-  for ($i = 0; $i -lt $camps.Count; $i++) {
-    $camp = $camps[$i]
-    $foe = @($camps | Where-Object { $_.faction -ne $camp.faction } | Sort-Object { ([double]$_.x - [double]$camp.x) * ([double]$_.x - [double]$camp.x) + ([double]$_.z - [double]$camp.z) * ([double]$_.z - [double]$camp.z) } | Select-Object -First 1)
+  foreach ($camp in $camps) {
     $c = @([double]$camp.x, [double]$camp.z)
     $wt = New-WarTeam ([string]$camp.faction) $c ([string]$camp.label)
     if ($camp.PSObject.Properties["profile"] -and $camp.profile) {
       $script:ai[$script:ai.Count - 1].options = [ordered]@{ profile = [string]$camp.profile }
     }
-    $T = $wt.W.T
-    $units = @(); if ($camp.PSObject.Properties["units"] -and $camp.units) { $units = @($camp.units) }
-    if ($units.Count -gt 0) {
-      $field = "war$($wt.teamID)_field"
-      $byDef = [ordered]@{}
-      foreach ($u in $units) {
-        $d = [string]$u[0]
-        if (-not $byDef.Contains($d)) { $byDef[$d] = New-Object System.Collections.Generic.List[double] }
-        $byDef[$d].Add([double]$u[1]); $byDef[$d].Add([double]$u[2]); $byDef[$d].Add([double]$u[3]); $byDef[$d].Add([double]$u[4])
-      }
-      $specs = @()
-      foreach ($d in $byDef.Keys) { $specs += (Spec $d ($byDef[$d].Count / 4) 0 0 0 $false $null $null $null $byDef[$d].ToArray()) }
-      $script:baseRecipes[$field] = $specs
-      $force = [ordered]@{ id = $field; label = "$($wt.W.label) field"; teamID = $wt.teamID; side = $wt.W.side; faction = [string]$camp.faction; role = "standing_war"; zoneId = [string]$camp.zoneId; base = [ordered]@{ x = $c[0]; z = $c[1] }; recipe = $field }
-      if ($camp.PSObject.Properties["bank"] -and $camp.bank) {
-        $force.bank = [ordered]@{ metal = [double]$camp.bank.metal; energy = [double]$camp.bank.energy }
-      }
-      $script:forces += $force
-    } else {
-      $fx = [Math]::Sign([double]$foe[0].x - $c[0]); if ($fx -eq 0) { $fx = 1 }
-      $fz = [Math]::Sign([double]$foe[0].z - $c[1]); if ($fz -eq 0) { $fz = 1 }
-      $works = "war$($wt.teamID)_works"
-      $script:baseRecipes[$works] = @(
-        (Spec $T.mex 4 -160 120 120 $true), (Spec $T.wind 6 140 170 85), (Spec $T.solar 2 260 60 95),
-        (Spec $T.llt 4 (170 * $fx) (150 * $fz) 150), (Spec $T.wall 8 (270 * $fx) (240 * $fz) 40),
-        (Spec $T.aa 2 (-90 * $fx) (60 * $fz) 170), (Spec $T.radar 1 0 -80 100),
-        (Spec $T.lab 1 -300 -150 120), (Spec $T.nano 2 -210 -240 90)
-      )
-      $script:forces += [ordered]@{ id = $works; label = "$($wt.W.label) works"; teamID = $wt.teamID; side = $wt.W.side; faction = [string]$camp.faction; role = "garrison"; zoneId = [string]$camp.zoneId; base = [ordered]@{ x = $c[0]; z = $c[1] }; recipe = $works }
-      $line = @(@{ x = $c[0]; z = $c[1] }, @{ x = [double]$foe[0].x; z = [double]$foe[0].z })
-      $army = "war$($wt.teamID)_line"
-      $script:baseRecipes[$army] = @(
-        (Spec $T.raider 8 0 0 80 -Patrol $line), (Spec $T.skirm 6 -120 60 90 -Patrol $line),
-        (Spec $T.assault 4 120 -60 95 -Patrol $line)
-      )
-      $script:forces += [ordered]@{ id = $army; label = "$($wt.W.label) line"; teamID = $wt.teamID; side = $wt.W.side; faction = [string]$camp.faction; role = "standing_war"; zoneId = [string]$camp.zoneId; base = [ordered]@{ x = $c[0]; z = $c[1] }; recipe = $army }
+    $byDef = [ordered]@{}
+    foreach ($u in @($camp.units)) {
+      $d = [string]$u[0]
+      if (-not $byDef.Contains($d)) { $byDef[$d] = New-Object System.Collections.Generic.List[double] }
+      $byDef[$d].Add([double]$u[1]); $byDef[$d].Add([double]$u[2]); $byDef[$d].Add([double]$u[3]); $byDef[$d].Add([double]$u[4])
     }
+    $specs = @()
+    foreach ($d in $byDef.Keys) { $specs += (Spec $d ($byDef[$d].Count / 4) 0 0 0 $false $null $null $null $byDef[$d].ToArray()) }
+    $field = "war$($wt.teamID)_field"
+    $script:baseRecipes[$field] = $specs
+    $force = [ordered]@{ id = $field; label = "$($wt.W.label) field"; teamID = $wt.teamID; side = $wt.W.side; faction = [string]$camp.faction; role = "standing_war"; zoneId = [string]$camp.zoneId; base = [ordered]@{ x = $c[0]; z = $c[1] }; recipe = $field }
+    if ($camp.PSObject.Properties["bank"] -and $camp.bank) {
+      $force.bank = [ordered]@{ metal = [double]$camp.bank.metal; energy = [double]$camp.bank.energy }
+    }
+    $script:forces += $force
     $f = [string]$camp.faction
     if (-not $sideAllies.ContainsKey($f)) { $sideAllies[$f] = @() }
     $sideAllies[$f] += $wt.allyID

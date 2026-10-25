@@ -1,0 +1,114 @@
+{
+  "schemaVersion": "verdance-war-recipe/1.0",
+  "mapId": "ancient_bastion",
+  "mapName": "Ancient Bastion Remake 0.5",
+  "mapSize": [
+    16384,
+    8192
+  ],
+  "character": "Ancient Bastion, the siege: four Armada seats hold the western castle; Null Mercs besiege it from the east, twenty minutes in. The besiegers' north-east seat, by the Tabula door, is the company's.",
+  "minutes": 20,
+  "seed": 3313,
+  "dry": true,
+  "playerSeat": "ne",
+  "notes": "The terrain's five native seats are all in the western third, so the castle takes four of them (Keep, outworks). The besiegers have no native seats: they stand on the eastern plateaus (buildable ground at x 13581, a forward post at x 11932), the company's beside the NE door. The besiegers are hard_aggressive: a siege is a charge.",
+  "sides": {
+    "keep": {
+      "faction": "armada",
+      "side": "Armada",
+      "rgb": "0.25 0.48 1.0"
+    },
+    "siege": {
+      "faction": "nullmercs",
+      "side": "Legion",
+      "rgb": "0.25 0.85 0.35"
+    }
+  },
+  "teams": [
+    {
+      "key": "keep_s",
+      "ally": "keep",
+      "profile": "hard",
+      "zoneId": "AB_SW_RAMPART",
+      "startElmos": [
+        431,
+        5171
+      ],
+      "label": "The Keep, south"
+    },
+    {
+      "key": "keep_n",
+      "ally": "keep",
+      "profile": "hard",
+      "zoneId": "AB_W_KEEP",
+      "startElmos": [
+        431,
+        3042
+      ],
+      "label": "The Keep, north"
+    },
+    {
+      "key": "out_n",
+      "ally": "keep",
+      "profile": "hard",
+      "zoneId": "AB_NW_RAMPART",
+      "startElmos": [
+        2803,
+        2643
+      ],
+      "label": "North outworks"
+    },
+    {
+      "key": "out_s",
+      "ally": "keep",
+      "profile": "hard",
+      "zoneId": "AB_SW_RAMPART",
+      "startElmos": [
+        2803,
+        5588
+      ],
+      "label": "South outworks"
+    },
+    {
+      "key": "ne",
+      "ally": "siege",
+      "profile": "hard_aggressive",
+      "zoneId": "AB_NE_HEIGHTS",
+      "startElmos": [
+        13581,
+        2643
+      ],
+      "label": "Northeast (the company's seat)",
+      "virtual": true
+    },
+    {
+      "key": "se",
+      "ally": "siege",
+      "profile": "hard_aggressive",
+      "zoneId": "AB_SE_HEIGHTS",
+      "startElmos": [
+        13581,
+        5588
+      ],
+      "label": "Southeast plateau",
+      "virtual": true
+    },
+    {
+      "key": "mid",
+      "ally": "siege",
+      "profile": "hard_aggressive",
+      "zoneId": "AB_E_RIDGE",
+      "startElmos": [
+        11932,
+        4107
+      ],
+      "label": "Forward post",
+      "virtual": true
+    }
+  ],
+  "snapshot": {
+    "maxUnitsPerTeam": 900,
+    "minBuilt": 0.5,
+    "note": "Past the cap the cheapest mobile units go first; structures and commanders are kept."
+  }
+}

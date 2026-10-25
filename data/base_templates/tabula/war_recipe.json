@@ -1,0 +1,126 @@
+{
+  "schemaVersion": "verdance-war-recipe/1.0",
+  "mapId": "tabula",
+  "mapName": "Tabula_Remake 1.5",
+  "mapSize": [
+    8192,
+    7168
+  ],
+  "character": "Tabula, the terrace war: Armada hold the east plateaus, Null Mercs the west, four seats a side, twenty minutes in. The Mercs' north-west seat is the company's.",
+  "minutes": 20,
+  "seed": 3312,
+  "dry": true,
+  "playerSeat": "nw",
+  "notes": "The four west seats are the map's own start positions. The terrain's east start positions lie past its edge (x up to 8903 on an 8192-wide map), so the east seats are the west seats turned half a circle (the zone map measures the field at 0.98 half-turn symmetric): Armada's south-east seat is the Northwest door's opposite, the SE plateau their fortress. The company enters by the NW reserve door and takes the seat beside it.",
+  "sides": {
+    "west": {
+      "faction": "nullmercs",
+      "side": "Legion",
+      "rgb": "0.25 0.85 0.35"
+    },
+    "east": {
+      "faction": "armada",
+      "side": "Armada",
+      "rgb": "0.25 0.48 1.0"
+    }
+  },
+  "teams": [
+    {
+      "key": "nw",
+      "ally": "west",
+      "profile": "hard_aggressive",
+      "zoneId": "T_NW_RESERVE",
+      "startElmos": [
+        1751,
+        424
+      ],
+      "label": "Northwest (the company's seat)"
+    },
+    {
+      "key": "w",
+      "ally": "west",
+      "profile": "hard",
+      "zoneId": "T_NW_OUTER_RESERVE",
+      "startElmos": [
+        885,
+        2103
+      ],
+      "label": "West"
+    },
+    {
+      "key": "wm",
+      "ally": "west",
+      "profile": "hard",
+      "zoneId": "T_W_CAUSEWAY",
+      "startElmos": [
+        332,
+        3247
+      ],
+      "label": "West-centre"
+    },
+    {
+      "key": "sw",
+      "ally": "west",
+      "profile": "hard",
+      "zoneId": "T_SW_CAUSEWAY",
+      "startElmos": [
+        1475,
+        5314
+      ],
+      "label": "Southwest"
+    },
+    {
+      "key": "ne",
+      "ally": "east",
+      "profile": "hard",
+      "zoneId": "T_NE_CAUSEWAY",
+      "startElmos": [
+        6717,
+        1854
+      ],
+      "label": "Northeast",
+      "virtual": true
+    },
+    {
+      "key": "e",
+      "ally": "east",
+      "profile": "hard",
+      "zoneId": "T_SE_OUTER_RESERVE",
+      "startElmos": [
+        7307,
+        5065
+      ],
+      "label": "East",
+      "virtual": true
+    },
+    {
+      "key": "em",
+      "ally": "east",
+      "profile": "hard",
+      "zoneId": "T_E_CAUSEWAY",
+      "startElmos": [
+        7860,
+        3921
+      ],
+      "label": "East-centre",
+      "virtual": true
+    },
+    {
+      "key": "se",
+      "ally": "east",
+      "profile": "hard",
+      "zoneId": "T_SE_RESERVE",
+      "startElmos": [
+        6441,
+        6744
+      ],
+      "label": "Southeast",
+      "virtual": true
+    }
+  ],
+  "snapshot": {
+    "maxUnitsPerTeam": 900,
+    "minBuilt": 0.5,
+    "note": "Past the cap the cheapest mobile units go first; structures and commanders are kept."
+  }
+}

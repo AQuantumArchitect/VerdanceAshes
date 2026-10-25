@@ -1,0 +1,100 @@
+{
+  "schemaVersion": "verdance-war-recipe/1.0",
+  "mapId": "koom_valley",
+  "mapName": "Koom Valley 3 3.1",
+  "mapSize": [
+    12288,
+    8192
+  ],
+  "character": "Koom Valley, the standing war: three Armada on the east flank against three Null Mercs (Legion) on the west, a full war twenty minutes in. The Mercs' north-west seat is the company's; BARbarian holds it for the sim and is pulled out afterwards, with every unit it owned.",
+  "minutes": 20,
+  "seed": 3303,
+  "dry": true,
+  "playerSeat": "nw",
+  "notes": "Seats are the map's own start positions (terrain.startPositions), mirrored east/west: nw=team 1, w=team 5, sw=team 3 and ne=team 4, e=team 6, se=team 2. Armada sit on the far side of the entry door, toward the Bastion; Legion and the company's seat are on this side. Five seats are BARb hard (Hard | Balanced); the company's seat is hard_aggressive.",
+  "sides": {
+    "left": {
+      "faction": "nullmercs",
+      "side": "Legion",
+      "rgb": "0.25 0.85 0.35"
+    },
+    "right": {
+      "faction": "armada",
+      "side": "Armada",
+      "rgb": "0.25 0.48 1.0"
+    }
+  },
+  "teams": [
+    {
+      "key": "nw",
+      "ally": "left",
+      "profile": "hard_aggressive",
+      "zoneId": "KV_NW_MUSTER",
+      "startElmos": [
+        2064,
+        2337
+      ],
+      "label": "Northwest (the company's seat)"
+    },
+    {
+      "key": "w",
+      "ally": "left",
+      "profile": "hard",
+      "zoneId": "KV_NW_SPILLWAY",
+      "startElmos": [
+        3170,
+        4059
+      ],
+      "label": "West"
+    },
+    {
+      "key": "sw",
+      "ally": "left",
+      "profile": "hard",
+      "zoneId": "KV_SW_MUSTER",
+      "startElmos": [
+        1942,
+        5757
+      ],
+      "label": "Southwest"
+    },
+    {
+      "key": "ne",
+      "ally": "right",
+      "profile": "hard",
+      "zoneId": "KV_NE_MUSTER",
+      "startElmos": [
+        10248,
+        2435
+      ],
+      "label": "Northeast"
+    },
+    {
+      "key": "e",
+      "ally": "right",
+      "profile": "hard",
+      "zoneId": "KV_NE_SPILLWAY",
+      "startElmos": [
+        9118,
+        4133
+      ],
+      "label": "East"
+    },
+    {
+      "key": "se",
+      "ally": "right",
+      "profile": "hard",
+      "zoneId": "KV_SE_MUSTER",
+      "startElmos": [
+        10346,
+        5732
+      ],
+      "label": "Southeast"
+    }
+  ],
+  "snapshot": {
+    "maxUnitsPerTeam": 900,
+    "minBuilt": 0.5,
+    "note": "Past the cap the cheapest mobile units go first; structures and commanders are kept."
+  }
+}

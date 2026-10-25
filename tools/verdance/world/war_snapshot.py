@@ -1,14 +1,16 @@
-"""The Koom Valley war snapshot: a real 3v3 BARbarian war, frozen twenty minutes in.
+"""The war snapshots: a real BARbarian war on a map, frozen some minutes in.
 
-Koom is a standing war (``verdance.world.theaters``). Rather than fake it with a few recipes, the war is
-played once by BARb on the map (``tools/koom_war_bake_v1.py``) and the field is saved as it stands:
-every unit, who owned it and how hurt it was, and what each side's bank held. Every Koom drop then
-starts from that war. The company's own seat on the west flank is played by BARb too, so the war has
-the shape of a full game, and is then pulled out: its units are not in the snapshot.
+Koom Valley, Greenest Fields, Tabula, the Ancient Bastion and the Eye of Horus are standing wars
+(``verdance.world.theaters``). Rather than fake one with a few recipes, each war is played once by
+BARb on its map (``tools/war_bake_v1.py``) and the field is saved as it stands: every unit, who owned
+it and how hurt it was, and what each side's bank held. Every drop onto that map then starts from that
+war. The company's own seat is played by BARb too, so the war has the shape of a full game, and is
+then pulled out: its units are not in the snapshot.
 
-The seats (``data/base_templates/koom_valley/war_recipe_3v3.json``) are the map's own start positions.
-This module only reads and writes facts: the recipe becomes a startscript, the engine's dump becomes
-a snapshot, and the snapshot is what the mission builder and the theater read.
+The seats (``data/base_templates/<map>/war_recipe.json``) are the map's own start positions, or, where
+the map has none on a side the war needs, ground chosen to match (``"virtual": true``). This module
+only reads and writes facts: the recipe becomes a startscript, the engine's dump becomes a snapshot,
+and the snapshot is what the mission builder and the theater read.
 """
 from __future__ import annotations
 
@@ -18,8 +20,6 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 MAP_ID = "koom_valley"
-RECIPE_REL = "data/base_templates/koom_valley/war_recipe_3v3.json"
-SNAPSHOT_REL = "data/base_templates/koom_valley/war_snapshot_v1.json"
 SCHEMA = "verdance-war-snapshot/1.0"
 DEFAULT_MAP_SIZE = (12288.0, 8192.0)
 MOBILE_KINDS = ("M", "A", "W")
@@ -32,13 +32,27 @@ def _json(path: Path) -> Dict[str, Any]:
         return {}
 
 
-def load_recipe(workspace: Path) -> Dict[str, Any]:
-    return _json(Path(workspace) / RECIPE_REL)
+def recipe_rel(map_id: str) -> str:
+    return f"data/base_templates/{map_id}/war_recipe.json"
 
 
-def load_snapshot(workspace: Path) -> Optional[Dict[str, Any]]:
-    snap = _json(Path(workspace) / SNAPSHOT_REL)
+def snapshot_rel(map_id: str) -> str:
+    return f"data/base_templates/{map_id}/war_snapshot_v1.json"
+
+
+def load_recipe(workspace: Path, map_id: str = MAP_ID) -> Dict[str, Any]:
+    return _json(Path(workspace) / recipe_rel(map_id))
+
+
+def load_snapshot(workspace: Path, map_id: str = MAP_ID) -> Optional[Dict[str, Any]]:
+    snap = _json(Path(workspace) / snapshot_rel(map_id))
     return snap if snap.get("schemaVersion") == SCHEMA and snap.get("teams") else None
+
+
+def war_maps(workspace: Path) -> List[str]:
+    """Every map that has a war recipe, in name order."""
+    base = Path(workspace) / "data" / "base_templates"
+    return sorted(p.parent.name for p in base.glob("*/war_recipe.json"))
 
 
 # ----------------------------------------------------------------------------- the sim's startscript
@@ -48,9 +62,10 @@ def _num(v: float) -> str:
 
 
 def startscript(recipe: Dict[str, Any], *, game_type: str, frames: Optional[int] = None,
-                map_size: tuple = DEFAULT_MAP_SIZE) -> str:
-    """The BARb 3v3 as a Spring startscript: one ally team per side, a spectator host, seats at the
-    map's own start positions (StartPosType 3 reads StartPosX/Z from the script)."""
+                map_size: Optional[tuple] = None) -> str:
+    """The BARb war as a Spring startscript: one ally team per side, a spectator host, seats at the
+    recipe's positions (StartPosType 3 reads StartPosX/Z from the script)."""
+    map_size = tuple(map_size or recipe.get("mapSize") or DEFAULT_MAP_SIZE)
     teams = recipe["teams"]
     sides = recipe["sides"]
     frames = int(frames or recipe.get("minutes", 20) * 60 * 30)
@@ -101,7 +116,7 @@ _TICK = re.compile(r"VA_SHELL_BAKE_TICK\s+frame=(\d+)\s+target=(\d+)(?:\s+units=
 
 def parse_dump(text: str) -> Dict[str, Any]:
     """Facts out of an infolog: the map size, every unit the dump listed and every team's bank."""
-    out: Dict[str, Any] = {"map": DEFAULT_MAP_SIZE, "units": [], "teams": {}}
+    out: Dict[str, Any] = {"map": None, "units": [], "teams": {}}
     for line in text.splitlines():
         m = _UNIT.search(line)
         if m:
@@ -149,7 +164,7 @@ def build_snapshot(recipe: Dict[str, Any], dump: Dict[str, Any], *, costs: Optio
     unfinished work left behind, each side capped to what a drop can carry."""
     rec_teams = recipe["teams"]
     sides = recipe["sides"]
-    mx, mz = dump.get("map") or DEFAULT_MAP_SIZE
+    mx, mz = dump.get("map") or tuple(recipe.get("mapSize") or DEFAULT_MAP_SIZE)
     cfg = recipe.get("snapshot") or {}
     cap = int(cfg.get("maxUnitsPerTeam") or 900)
     min_built = float(cfg.get("minBuilt") or 0.5)
@@ -190,7 +205,7 @@ def build_snapshot(recipe: Dict[str, Any], dump: Dict[str, Any], *, costs: Optio
 
 
 def write_snapshot(workspace: Path, snapshot: Dict[str, Any]) -> Path:
-    path = Path(workspace) / SNAPSHOT_REL
+    path = Path(workspace) / snapshot_rel(str(snapshot.get("mapId") or MAP_ID))
     path.parent.mkdir(parents=True, exist_ok=True)
     # one line per unit would be big; keep each team's units on a line apiece
     head = {k: v for k, v in snapshot.items() if k != "teams"}
@@ -213,5 +228,5 @@ def write_snapshot(workspace: Path, snapshot: Dict[str, Any]) -> Path:
     return path
 
 
-__all__ = ["MAP_ID", "RECIPE_REL", "SNAPSHOT_REL", "SCHEMA", "load_recipe", "load_snapshot", "startscript", "parse_dump",
-           "progress", "build_snapshot", "write_snapshot"]
+__all__ = ["MAP_ID", "SCHEMA", "recipe_rel", "snapshot_rel", "load_recipe", "load_snapshot", "war_maps", "startscript",
+           "parse_dump", "progress", "build_snapshot", "write_snapshot"]
