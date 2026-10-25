@@ -506,7 +506,7 @@
       "timesWounded": 0,
       "campaignXp": 0.0,
       "name": "Saint Kettle",
-      "unitDef": "armaak",
+      "unitDef": "va_kettle",
       "xp": 0.03,
       "trait": "sky_saint",
       "traits": [

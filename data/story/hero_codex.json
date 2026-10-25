@@ -592,7 +592,7 @@
       "allowBail": true,
       "allowKite": false,
       "faction": "armada",
-      "unitDef": "armaak",
+      "unitDef": "va_kettle",
       "voice": {
         "hook": "Sky-saint, chainsaw soul.",
         "blurb": "Archangel + Ferret. Sky-saint so Mira can play. Chainsaw soul.",

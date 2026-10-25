@@ -405,6 +405,14 @@ window.CREW_PACKS = {
       "hasBuildPower": false,
       "massClass": "av"
     },
+    "va_kettle": {
+      "metal": 520,
+      "energy": 5600,
+      "combined": 600,
+      "label": "Archangel",
+      "hasBuildPower": false,
+      "massClass": "av"
+    },
     "armferret": {
       "metal": 360,
       "energy": 5700,
@@ -1058,7 +1066,7 @@ window.CREW_PACKS = {
     },
     "kettle": {
       "role": "band",
-      "unitDef": "armaak",
+      "unitDef": "va_kettle",
       "hireTnb": 0,
       "packTotal": 1,
       "extras": 0,
