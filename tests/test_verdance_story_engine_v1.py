@@ -296,10 +296,12 @@ class WorldConflictTests(unittest.TestCase):
             self.assertEqual(gf["GF_NORTH_DESERT_EDGE"]["controllingFaction"], "nullmercs")
             self.assertEqual(gf["GF_SOUTH_DESERT_EDGE"]["controllingFaction"], "neutral")
             self.assertEqual(state["offscreenActors"]["greenest_fields"]["GF_NORTH_DESERT_EDGE"], "NullMercsAI")
-            # Re-running never grants a second foothold.
+            # Re-running never grants a second foothold (the standing war's own seats aside).
+            before = sorted(z for z, m in gf.items() if m["controllingFaction"] == "nullmercs")
             engine.ensure_zone_memory(state, root)
-            mercs = [z for z, m in gf.items() if m["controllingFaction"] == "nullmercs"]
-            self.assertEqual(mercs, ["GF_NORTH_DESERT_EDGE"])
+            after = sorted(z for z, m in gf.items() if m["controllingFaction"] == "nullmercs")
+            self.assertEqual(before, after)
+            self.assertIn("GF_NORTH_DESERT_EDGE", after)
 
     def test_intent_world_conflict_block_tracks_merc_reputation(self):
         with make_workspace() as tmp:

@@ -117,6 +117,22 @@ def test_every_baked_war_has_two_sides_and_the_company_seat_empty():
         assert all(c["units"] and c["bank"] for c in war["camps"]), map_id
 
 
+def test_the_builder_fields_every_baked_war_unit_for_unit():
+    for map_id in theaters.WARS:
+        rec = _war.load_recipe(ROOT, map_id)
+        pad = next(t for t in rec["teams"] if t["key"] == rec["playerSeat"])
+        theater = theaters.standing_war(map_id, ROOT, pad["zoneId"])
+        assert theater, map_id
+        war = _probe({"theater": theater, "wildDens": []})
+        fields = [f for f in war["forces"] if f["role"] == "standing_war"]
+        assert len(fields) == len(theater["camps"]), map_id
+        placed = sum(len(s["at"]) // 4 for f in fields for s in war["recipes"][f["recipe"]])
+        assert placed == sum(len(c["units"]) for c in theater["camps"]), map_id
+        assert all(s["exact"] and len(s["at"]) == 4 * s["count"] for f in fields for s in war["recipes"][f["recipe"]]), map_id
+        assert all(f["bank"]["energy"] > 0 for f in fields), map_id
+        assert {a["options"]["profile"] for a in war["ai"]} <= {"hard", "hard_aggressive"}, map_id
+
+
 def test_simmers_is_a_kings_showdown_from_any_door():
     for pad in ("ATS_NW_SHORE", "ATS_SW_MUSTER"):
         show = theaters.kings_showdown("all_that_simmers", ROOT, pad)
