@@ -153,6 +153,9 @@ end
 
 function widget:Initialize()
   compose()
+  -- An offline bake (the Koom war) has no sortie and nobody to press the pause key.
+  local bake = (Spring.GetModOptions() or {}).va_shell_bake
+  if bake == true or bake == 1 or bake == "1" or bake == "true" then mission = nil end
   if not mission then
     phase = "field"
     if WG then WG.vaSortieBegan = true end
