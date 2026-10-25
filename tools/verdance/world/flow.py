@@ -9,9 +9,11 @@ buildable ground, defence, height, slope, choke). This module turns it into thre
   descent    each side's potential: low on its own valuable ground and near its seats. A force pushed
              out of a zone rolls down that potential along the zone edges, preferring chokes (a
              retreat funnels). The path it takes is the war's flow for that side.
-  chain      the sorties that ride the flow: take the zone, the evicted force falls back one step
-             down its descent; if that step is a choke, the next sortie is the choke fight; at the
-             bottom is the side's stronghold. The belief over the graph is continuous; a sortie
+  chain      the sorties that ride the flow, in switchbacks (2026-10-25): ground is measured in rings
+             around the side's stronghold; the chain starts at the shallow end (the enemy's border
+             zone with the most rings to go), and each sortie either crosses the slope along its ring
+             or goes one ring in, never back out, about STAGES sorties in all, taking the gates and
+             works on the way. stages=0 is the old straight dive. The belief over the graph is continuous; a sortie
              collapses it to one zone and its exits, and the result moves mass along these edges.
 
   bake plan  how long a map's standing war should run, and how each seat develops: richer seats and
@@ -119,6 +121,53 @@ def descent(start: str, side: str, phi: Dict[str, float], adj: Dict[str, List[st
     return path
 
 
+STAGES = 5            # how many sorties a flow should take, stronghold included
+
+
+def switchback(start: str, goal: str, adj: Dict[str, List[str]], f: Dict[str, Dict[str, float]],
+               allowed: set, stages: int = STAGES) -> List[str]:
+    """A staged descent to the stronghold. Ground is measured in rings (hops from the stronghold): a
+    step either traverses along its ring or goes one ring in, never back out. The best path has as
+    close to `stages` steps as the map allows, crosses the slope (traverses) instead of diving, takes
+    the gates on the way and ground worth taking. It keeps to `allowed` (the enemy's ground and the
+    contested middle; the company's own ground is not a sortie). Every simple path is weighed: the
+    graphs are small."""
+    ring = hops(adj, [goal])
+    best: Tuple[float, List[str]] = (-1e9, [])
+    traverse_cap = max(1, stages - ring.get(start, 0) - 1)
+
+    def score(path: List[str]) -> float:
+        steps = len(path)
+        gates = sum(f[z]["choke"] >= CHOKE_GATE for z in path[1:-1])
+        worth = sum(f[z]["V"] for z in path[1:-1]) / max(1, steps - 2)
+        # a switchback alternates: across the slope, then down; two traverses in a row is a detour
+        flat = [ring[b] == ring[a] for a, b in zip(path, path[1:])]
+        alternations = sum(1 for x, y in zip(flat, flat[1:]) if x != y)
+        runs = sum(1 for x, y in zip(flat, flat[1:]) if x and y)
+        return -2.0 * abs(steps - stages) + 0.6 * gates + 0.5 * worth + 0.4 * alternations - 0.8 * runs
+
+    def walk(path: List[str], traverses: int) -> None:
+        nonlocal best
+        z = path[-1]
+        if z == goal:
+            sc = score(path)
+            if sc > best[0]:
+                best = (sc, list(path))
+            return
+        if len(path) >= stages + 2:
+            return
+        for n in adj[z]:
+            if n in path or (n != goal and n not in allowed):
+                continue
+            if ring[n] == ring[z] - 1:
+                path.append(n); walk(path, traverses); path.pop()
+            elif ring[n] == ring[z] and traverses < traverse_cap:
+                path.append(n); walk(path, traverses + 1); path.pop()
+
+    walk([start], 0)
+    return best[1]
+
+
 def _route(adj: Dict[str, List[str]], start: str, goal: List[str], f: Dict[str, Dict[str, float]]) -> List[str]:
     """Shortest path to the nearest goal zone, through chokes when there is a choice."""
     best = {start: 0.0}
@@ -139,7 +188,8 @@ def _route(adj: Dict[str, List[str]], start: str, goal: List[str], f: Dict[str, 
     return [start]
 
 
-def chain(attacker_holds: List[str], enemy: str, f, adj, seats, ctrl) -> List[Dict[str, Any]]:
+def chain(attacker_holds: List[str], enemy: str, f, adj, seats, ctrl, stages: int = STAGES,
+          home_side: Optional[str] = None) -> List[Dict[str, Any]]:
     """The sorties that ride one enemy's flow: first the most valuable enemy zone on the company's
     frontier, then down the enemy's descent, marking the gates and the stronghold."""
     phi = potential(enemy, f, adj, seats, ctrl)
@@ -148,20 +198,31 @@ def chain(attacker_holds: List[str], enemy: str, f, adj, seats, ctrl) -> List[Di
     frontier = sorted((z for z in adj if ctrl.get(z) == enemy), key=lambda z: (near.get(z, 99), -f[z]["V"]))
     if not frontier:
         return []
-    path = descent(frontier[0], enemy, phi, adj, f, limit=20)
     # the side's stronghold is its richest seat; the other seats are works on the way
     main = max(seats[enemy], key=lambda z: f[z]["V"])
     goal = [main]
-    if path[-1] not in goal:
-        for z in _route(adj, path[-1], goal, f)[1:]:
-            # a route that doubles back through the descent cuts the detour out
-            path = path[:path.index(z) + 1] if z in path else path + [z]
+    allowed = {z for z in adj if ctrl.get(z) != home_side} if home_side else set(adj)
+    # start at the shallow end: of the enemy's ground on the border with the company's side, the zone
+    # farthest from its stronghold (the most rings to descend), nearest the company on a tie
+    ring = hops(adj, [main])
+    border = [z for z in adj if ctrl.get(z) == enemy and any(n not in allowed for n in adj[z])]
+    if border:
+        frontier = sorted(border, key=lambda z: (-ring.get(z, 0), near.get(z, 99), -f[z]["V"]))
+    path = switchback(frontier[0], main, adj, f, allowed, stages) if stages > 0 else []
+    if not path:
+        # steepest descent, finished by the shortest route (the old behaviour; stages=0 asks for it)
+        path = descent(frontier[0], enemy, phi, adj, f, limit=20)
+        if path[-1] not in goal:
+            for z in _route(adj, path[-1], goal, f)[1:]:
+                path = path[:path.index(z) + 1] if z in path else path + [z]
     out = []
+    ring_of = hops(adj, [main])
     for i, z in enumerate(path):
-        kind = ("stronghold" if z == main else "gate" if f[z]["choke"] >= CHOKE_GATE
-                else "works" if z in seats[enemy] else "field")
+        step_drop = (ring_of[path[i - 1]] - ring_of[z]) if i else 0
+        kind = ("stronghold" if z == main else "works" if z in seats[enemy]
+                else "gate" if f[z]["choke"] >= CHOKE_GATE else "field")
         out.append({"step": i + 1, "zoneId": z, "kind": kind, "V": f[z]["V"], "choke": f[z]["choke"], "slope": f[z]["slope"],
-                    "held": ctrl.get(z),
+                    "held": ctrl.get(z), "drop": step_drop, "ring": ring_of.get(z),
                     "sortie": {"field": "push them off the field: they fall back down the flow",
                                "works": "raid the works: wreck what they built, they fall back",
                                "gate": "assault the choke they fell back through",
@@ -206,7 +267,7 @@ def apply_plan(recipe: Dict[str, Any], plan: Dict[str, Any]) -> Dict[str, Any]:
     return r
 
 
-def report(map_id: str, workspace: Path = ROOT) -> Dict[str, Any]:
+def report(map_id: str, workspace: Path = ROOT, stages: int = STAGES) -> Dict[str, Any]:
     nodes, adj = map_graph(map_id, workspace)
     f = field(nodes)
     rp = workspace / "data" / "base_templates" / map_id / "war_recipe.json"
@@ -224,7 +285,7 @@ def report(map_id: str, workspace: Path = ROOT) -> Dict[str, Any]:
     home = player["ally"] if player else None
     holds = [player["zoneId"]] if player else []
     out["descent"] = {side: {z: descent(z, side, potential(side, f, adj, seats, ctrl), adj, f) for z in adj} for side in seats}
-    out["chains"] = {side: chain(holds, side, f, adj, seats, ctrl) for side in seats if side != home}
+    out["chains"] = {side: chain(holds, side, f, adj, seats, ctrl, stages, home) for side in seats if side != home}
     out["bake"] = bake_plan(recipe, f)
     return out
 
@@ -238,7 +299,7 @@ def _print(rep: Dict[str, Any]) -> None:
     for side, steps in (rep.get("chains") or {}).items():
         print(f"\n  sortie chain against {side}:")
         for s in steps:
-            print(f"    {s['step']}. {s['zoneId']:<20} {s['kind']:<10} {s['sortie']}")
+            print(f"    {s['step']}. {s['zoneId']:<20} {s['kind']:<10} ring {s.get('ring')} {'across' if s['step'] > 1 and not s.get('drop') else 'down  ' if s['step'] > 1 else 'start '}  {s['sortie']}")
     b = rep.get("bake")
     if b:
         print(f"\n  bake: {b['was']['minutes']} -> {b['minutes']} min (mean worth {b['meanWorth']}, mean slope {b['meanSlope']})")
@@ -251,10 +312,11 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--map", action="append", default=[])
     ap.add_argument("--json", action="store_true")
+    ap.add_argument("--stages", type=int, default=STAGES, help="sorties per flow (0 = straight down, the old way)")
     a = ap.parse_args()
     maps = [m for c in a.map for m in c.split(",") if m] or sorted(
         p.parent.name for p in (ROOT / "data" / "base_templates").glob("*/war_recipe.json"))
-    reps = [report(m) for m in maps]
+    reps = [report(m, stages=a.stages) for m in maps]
     if a.json:
         print(json.dumps(reps, indent=1))
     else:

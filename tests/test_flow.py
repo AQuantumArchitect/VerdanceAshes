@@ -34,3 +34,19 @@ def test_richer_steeper_maps_bake_longer():
     gf = F.report("greenest_fields", ROOT)["bake"]["minutes"]
     ab = F.report("ancient_bastion", ROOT)["bake"]["minutes"]
     assert ab > gf
+
+
+def test_chains_switchback_in_stages_and_never_climb_out():
+    staged = 0
+    for m in WAR_MAPS:
+        rep = F.report(m, ROOT)
+        for side, steps in rep["chains"].items():
+            rings = [s["ring"] for s in steps]
+            assert all(b in (a, a - 1) for a, b in zip(rings, rings[1:])), (m, side, rings)
+            staged += len(steps) >= 4
+    assert staged >= 3  # most wars take four or more sorties now, not a dive straight in
+
+
+def test_straight_dive_is_still_available():
+    for s in F.report("greenest_fields", ROOT, stages=0)["chains"].values():
+        assert len(s) <= 3
