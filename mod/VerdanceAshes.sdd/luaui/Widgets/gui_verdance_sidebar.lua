@@ -567,6 +567,14 @@ local function drawPad(x, y, right)
   text(Ash.fit(padLabel, 9, 150), right, y, 9, Ash.COL.steam, "r")
   Ash.rule(x, y - 4, right, Ash.COL.steam, 0.35)
   y = y - 18
+  -- ground taken this sortie is extraction ground too (the exfil gadget's va_taken_zones)
+  local taken = tostring(Spring.GetGameRulesParam("va_taken_zones") or "")
+  if taken ~= "" then
+    local names = {}
+    for zid in taken:gmatch("[^,]+") do names[#names + 1] = (b and b:label(zid)) or zid end
+    text(Ash.fit("also lifts from: " .. table.concat(names, ", "), 9, right - x), x, y, 9, Ash.COL.steam, "l")
+    y = y - 14
+  end
   -- people dots: one per living person, filled when on the pad
   local alive, onPad, off = 0, 0, {}
   for _, rec in ipairs(H.list) do

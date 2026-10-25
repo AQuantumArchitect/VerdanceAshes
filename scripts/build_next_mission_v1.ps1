@@ -1244,6 +1244,9 @@ Write-Host ("Command walker: {0}" -f $(if ($commanderUnlocked) { "unlocked" } el
 $theater = if ($intent.PSObject.Properties["theater"] -and $intent.theater) { $intent.theater } else { $null }
 $isKings = [bool]($theater -and [string]$theater.kind -eq "kings_showdown")
 $isStandingWar = [bool]($theater -and [string]$theater.kind -eq "standing_war")
+# A young war on a big field keeps the map's living shell beside it (theaters: recipe keepShell).
+$keepShell = [bool]($isStandingWar -and $theater.PSObject.Properties["keepShell"] -and $theater.keepShell)
+$script:shellAllyId = $null; $script:shellFaction = $null
 $script:kings = @()
 if ($isKings) {
   # A classic game of BAR: every king starts with its commander and nothing else, and keeps it.
@@ -1832,6 +1835,8 @@ function Try-ApplyLivingShell {
     $teamID = $script:nextTeam; $script:nextTeam += 1
     $allyID = $script:nextAllyTeam; $script:nextAllyTeam += 1
     $sideName = if ($AnchorSide) { $AnchorSide } else { "Armada" }
+    $script:shellAllyId = $allyID
+    $script:shellFaction = $(if ($sideName -eq "Cortex") { "cortex" } elseif ($sideName -eq "Legion") { "nullmercs" } else { "armada" })
     $rgb = if ($FACTION.ContainsKey($sideName)) { $FACTION[$sideName].rgb } else { $FACTION["Armada"].rgb }
     $script:allyTeams += [ordered]@{ id = $allyID; startRect = New-StartRect $EnemyCenter 0.22 }
     $script:teams += [ordered]@{
@@ -2437,6 +2442,16 @@ function Add-StandingWar {
       $script:alliances += [ordered]@{ allyTeamA = $ids[$i]; allyTeamB = $ids[$j]; allied = $true }
     } }
   }
+  # The living shell kept beside the war (keepShell) fights on the war's side of its faction.
+  if ($null -ne $script:shellAllyId -and $script:shellFaction -and $sideAllies.ContainsKey($script:shellFaction)) {
+    foreach ($id in @($sideAllies[$script:shellFaction])) {
+      $script:alliances += [ordered]@{ allyTeamA = $script:shellAllyId; allyTeamB = $id; allied = $true }
+    }
+    if ($script:shellFaction -eq "nullmercs" -and $mercsAllied) {
+      $script:alliances += [ordered]@{ allyTeamA = 0; allyTeamB = $script:shellAllyId; allied = $true }
+    }
+    Write-Host ("Living shell kept beside the war: {0} shell allied to the war's {0}" -f $script:shellFaction)
+  }
   Write-Host ("Standing war: {0}" -f (($camps | ForEach-Object { "$($_.faction)@$($_.zoneId)" }) -join " vs "))
 }
 
@@ -2775,7 +2790,7 @@ $usedShell = $false
 if ($isWildHomeFounding) {
   # Founding shelf stays empty — player builds the Ashwalker pad; raptors are the only pressure.
   Write-Host "Skipping living-shell occupation on Rock Jungle wild home founding."
-} elseif ($theater -and ($isKings -or $isStandingWar)) {
+} elseif ($theater -and ($isKings -or ($isStandingWar -and -not $keepShell))) {
   Write-Host ("Set piece {0}: no living-shell occupation." -f [string]$theater.kind)
 } elseif (($script:shellCapableKinds -contains $objectiveKind) -or $script:presenceFrom) {
   # The enemy's bases stand whatever the job is; a presence job still has the world around it.

@@ -172,7 +172,13 @@ def standing_war(map_id: str, workspace: Optional[Path], pad_zone: Optional[str]
         seat["units"] = [u for u in field["units"]
                          if u[5] != "C" and not (pad and math.hypot(u[1] - pad[0], u[2] - pad[1]) < PAD_CLEARANCE)]
         camps.append(seat)
-    return {"kind": "standing_war", "label": SET_PIECES[map_id]["label"], "minutes": snap.get("minutes"), "camps": camps}
+    out = {"kind": "standing_war", "label": SET_PIECES[map_id]["label"], "minutes": snap.get("minutes"), "camps": camps}
+    # A young war on a big field (Greenest Fields) keeps the map's living shell too: the shell's
+    # little commander-grown works stand beside the war, allied to the war's seats of their faction.
+    recipe = _war.load_recipe(workspace, map_id) if workspace is not None else None
+    if recipe and recipe.get("keepShell"):
+        out["keepShell"] = True
+    return out
 
 
 def kings_showdown(map_id: str, workspace: Optional[Path], pad_zone: Optional[str]) -> Optional[Dict[str, Any]]:

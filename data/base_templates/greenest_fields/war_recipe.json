@@ -75,5 +75,7 @@
     "maxUnitsPerTeam": 900,
     "minBuilt": 0.5,
     "note": "Past the cap the cheapest mobile units go first; structures and commanders are kept."
-  }
+  },
+  "keepShell": true,
+  "keepShellWhy": "The war is young (12 minutes) and thin on a big map; the living shell's commander-grown works (8 pockets, ~313 units) keep the field alive. Shell Armada are allied to the war's Armada seats."
 }
