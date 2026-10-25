@@ -1,0 +1,35 @@
+From 84a5a1327d016f82b4c6a30201d49767cbd89206 Mon Sep 17 00:00:00 2001
+From: Luke <lukespooner4@gmail.com>
+Date: Sun, 25 Oct 2026 00:32:22 -0700
+Subject: [PATCH] Headless: placeholder bitmaps in the texture atlas (headless
+ draws nothing)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01TCQBSUVd1371pQQXb88TDb
+---
+ rts/Rendering/Textures/TextureAtlas.cpp | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/rts/Rendering/Textures/TextureAtlas.cpp b/rts/Rendering/Textures/TextureAtlas.cpp
+index a5dab62..ce86cd0 100644
+--- a/rts/Rendering/Textures/TextureAtlas.cpp
++++ b/rts/Rendering/Textures/TextureAtlas.cpp
+@@ -119,10 +119,15 @@ size_t CTextureAtlas::AddTexFromFile(std::string texName, const std::string& fil
+ 	}
+ 
+ 	CBitmap bitmap;
++#ifdef HEADLESS
++	// headless draws nothing: keep a placeholder, not a decoded RGBA copy of every CEG texture
++	bitmap.Alloc(2, 2, 4);
++#else
+ 	if (!bitmap.Load(file)) {
+ 		bitmap.Alloc(2, 2, 4);
+ 		LOG_L(L_WARNING, "[TexAtlas::%s] could not load texture from file \"%s\"", __func__, file.c_str());
+ 	}
++#endif
+ 
+ 	// only support RGBA for now
+ 	if (bitmap.channels != 4 || bitmap.compressed)
+-- 
+2.43.0
+

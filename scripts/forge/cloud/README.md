@@ -58,3 +58,10 @@ powershell -File scripts/bake_living_shell_headed.ps1 -MapId the_rock_jungle
 ```
 
 Same strip contract as harvest; writes `living_shell_v1.json` with `source=bake`.
+
+## Linux headless Recoil (built from source, 2026-10-24)
+Used to replay built sorties headless in a cloud sandbox with a 6 GB memory cap. Recoil 2026.07.04,
+`engine-headless` + `BARb` + `C-AIInterface`, configured with NO_SOUND and spring-static-libs (18.04).
+To fit 6 GB, springsettings.cfg needs `TextureMemPoolSize = 0` and `UseLuaMemPools = 0`
+(about 2 GB of pools a headless run never uses); `recoil_headless_texatlas.patch` saves about 200 MB more.
+A full 15-minute Greenest Fields sortie then peaks near 4 GB.
