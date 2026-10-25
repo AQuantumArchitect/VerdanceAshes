@@ -47,6 +47,10 @@ def test_chains_switchback_in_stages_and_never_climb_out():
     assert staged >= 3  # most wars take four or more sorties now, not a dive straight in
 
 
-def test_straight_dive_is_still_available():
-    for s in F.report("greenest_fields", ROOT, stages=0)["chains"].values():
-        assert len(s) <= 3
+def test_straight_dive_is_still_available_and_no_longer_than_the_switchbacks():
+    for m in WAR_MAPS:
+        dive = F.report(m, ROOT, stages=0)["chains"]
+        staged = F.report(m, ROOT)["chains"]
+        for side in dive:
+            assert dive[side][-1]["kind"] == "stronghold"
+            assert len(dive[side]) <= len(staged[side]), (m, side)
