@@ -65,7 +65,7 @@ Doc shelf (bots only): [`docs/archive/PROXY_CAMPAIGN.md`](docs/archive/PROXY_CAM
 
 ## Version
 
-Root `VERSION` (kernel reads it). Consolidation line starts at **0.8.0**. Current line: **0.12.7** (pass five boundary + pass six HUD).
+Root `VERSION` (kernel reads it). Consolidation line starts at **0.8.0**. Current line: **0.13.0** (first test export; 0.12.7 was pass five + pass six HUD).
 
 ## Dev tools
 

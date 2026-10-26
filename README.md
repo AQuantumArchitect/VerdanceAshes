@@ -89,4 +89,4 @@ Split on purpose. Read [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE).
 
 ## Status
 
-Public alpha. Version is the root `VERSION` file. Consolidation line starts at 0.8.0 (one play path). Current line: **0.12.7**.
+Public alpha. Version is the root `VERSION` file. Consolidation line starts at 0.8.0 (one play path). Current line: **0.13.0** (first test export: shell-only occupation, graph fallback objectives, SHIP -Dev).

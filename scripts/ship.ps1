@@ -9,6 +9,8 @@ param(
   [switch]$SkipScience,
   [switch]$SkipZip,
   [switch]$InstallToMyGames,
+  # Test-machine build: also stage the headless rig (AUTOPILOT, WAR_BAKE) and the test suite.
+  [switch]$Dev,
   [string]$PythonEmbedZip = "",
   [string]$PythonEmbedUrl = "https://www.python.org/ftp/python/3.12.8/python-3.12.8-embed-amd64.zip"
 )
@@ -29,6 +31,7 @@ if (-not $Version) {
 if (-not $OutDir) { $OutDir = Join-Path $Workspace "export\dist" }
 
 $releaseName = "VerdanceAshes_v$Version"
+if ($Dev) { $releaseName += "_dev" }
 $staging = Join-Path $OutDir $releaseName
 Write-Host "=== Ship $releaseName ==="
 Write-Host "From: $Workspace"
@@ -198,6 +201,22 @@ $playerScripts = @(
 )
 foreach ($s in $playerScripts) {
   Copy-File (Join-Path $Workspace "scripts\player\$s") (Join-Path $staging "scripts\player\$s")
+}
+
+# ---- dev kit (-Dev): the headless rig rides along for a test machine ----
+# AUTOPILOT runs a BARbarian in the company seat on a copy of this tree; WAR_BAKE plays the standing
+# wars. The autopilot imports helpers from tests\, so the suite ships whole.
+if ($Dev) {
+  foreach ($bat in @("AUTOPILOT.bat", "AUTOPILOT_TEST.bat", "WAR_BAKE.bat")) {
+    Copy-File (Join-Path $Workspace $bat) (Join-Path $staging $bat)
+  }
+  foreach ($t in @("autopilot_campaign_v1.py", "war_bake_v1.py")) {
+    Copy-File (Join-Path $Workspace "tools\$t") (Join-Path $staging "tools\$t")
+  }
+  Copy-Into (Join-Path $Workspace "tests") (Join-Path $staging "tests")
+  Get-ChildItem (Join-Path $staging "tests") -Recurse -Directory -Filter "__pycache__" -ErrorAction SilentlyContinue |
+    Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+  Write-Host "Dev kit: AUTOPILOT, WAR_BAKE and tests\ staged."
 }
 
 # ---- empty runtime dirs ----
@@ -403,6 +422,7 @@ $manifest = [ordered]@{
   includesPython  = (Test-Path (Join-Path $staging "runtime\python\python.exe"))
   includesScience = (Test-Path (Join-Path $staging "runtime\python\Lib\site-packages\numpy"))
   includesUmwelt  = (Test-Path (Join-Path $staging "tools\_vendor\umwelt\__init__.py"))
+  includesDevKit  = [bool]$Dev
 }
 $manifest | ConvertTo-Json -Depth 6 | Set-Content -Encoding UTF8 (Join-Path $staging "release_manifest.json")
 

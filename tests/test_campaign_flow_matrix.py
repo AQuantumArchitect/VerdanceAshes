@@ -148,15 +148,16 @@ class DensityMatrixTests(unittest.TestCase):
                                        msg=self.lattice.zone_ids[i])
 
         # Sharper: with the reach switched off, only ground a power actually
-        # stands on has any amplitude, and the great majority of the opening
-        # planet should be a dead row.
+        # stands on has any amplitude. Since the standing wars (2026-10-24) hold
+        # their seats from the opening, about half the planet is a dead row
+        # (52 of 102 zones), down from 82 before them.
         tight = dict(flow.FLOW)
         tight["steps"] = 0.0
         names, vecs, weights = flow.faction_states(self.lattice, self.occ, self.levels, tight)
         matrix = flow.dense(self.lattice, flow.density(self.lattice, names, vecs, weights))
         unheld = [i for i in range(self.lattice.n) if matrix[i][i] < 1e-15]
-        self.assertGreater(len(unheld), 60,
-                           "82 of 102 zones read unclaimed at the opening")
+        self.assertGreater(len(unheld), 40,
+                           "about half the zones read unclaimed at the opening")
         for i in unheld:
             for j in range(self.lattice.dim):
                 self.assertAlmostEqual(matrix[i][j], 0.0, places=15,
@@ -173,9 +174,12 @@ class DensityMatrixTests(unittest.TestCase):
         self.assertGreater(self.occ.get(flow.NEUTRAL, {}).get(
             sorted(self.occ[flow.NEUTRAL])[0], 0.0), 0.0,
             "unclaimed ground still has to exist in the occupation")
-        # ... and it is still counted honestly in the control readout.
+        # ... and it is still counted honestly in the control readout: the largest single
+        # share of the opening (about 0.36 with the standing wars seated), not most of it.
         obs = flow.observables(self.lattice, self.rho, self.occ)
-        self.assertGreater(obs["control"].get(flow.NEUTRAL, 0.0), 0.5)
+        control = obs["control"]
+        self.assertGreater(control.get(flow.NEUTRAL, 0.0), 0.25)
+        self.assertEqual(max(control, key=control.get), flow.NEUTRAL)
 
     def test_coupling_needs_a_power_standing_in_both_places(self):
         """Every non-zero off-diagonal traces to some power with amplitude at

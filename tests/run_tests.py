@@ -45,6 +45,29 @@ def _runnable(fn) -> bool:
     return True
 
 
+def _bootstrap_fresh_tree() -> None:
+    """A fresh clone or a SHIP -Dev unzip has no save until SETUP runs. Several suites read the
+    live save in state/, so write the one SETUP would (init-state, mission 1 intent, hub rebuild);
+    a played save is never touched."""
+    import subprocess
+
+    save = ROOT / "state" / "campaign_state.json"
+    if save.is_file():
+        return
+    env = dict(os.environ, PYTHONPATH=os.pathsep.join([str(TOOLS), os.environ.get("PYTHONPATH", "")]).rstrip(os.pathsep))
+    steps = (
+        ["-m", "verdance.campaign.engine", "init-state", "--workspace", str(ROOT), "--state", str(save), "--write-state"],
+        ["-m", "verdance.campaign.engine", "intent", "--workspace", str(ROOT)],
+        ["-m", "verdance_kernel", "rebuild", "--workspace", str(ROOT)],
+    )
+    for args in steps:
+        r = subprocess.run([sys.executable, *args], cwd=str(ROOT), env=env, capture_output=True, text=True, timeout=900)
+        if r.returncode:
+            print(f"fresh tree: '{args[1]} {args[2]}' failed: {(r.stderr or r.stdout)[-400:]}")
+            return
+    print("fresh tree: wrote the save SETUP would (state/campaign_state.json, mission 1)")
+
+
 def main(argv: list[str]) -> int:
     words = [a for a in argv if not a.startswith("-")]
     verbose = "-v" in argv
@@ -56,6 +79,7 @@ def main(argv: list[str]) -> int:
     if (Path(umwelt) / "umwelt" / "__init__.py").is_file() and umwelt not in sys.path:
         sys.path.append(umwelt)
     os.chdir(ROOT)
+    _bootstrap_fresh_tree()
     files = sorted(TESTS.glob("test_*.py"))
     if words:
         files = [f for f in files if any(w in f.name for w in words)]

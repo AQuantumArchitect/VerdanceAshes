@@ -61,3 +61,9 @@ mod/VerdanceAshes.sdd/singleplayer/verdance_ashes/generated/va_pad_current.lua
 # a tool writes these Windows-path-named files when run on Linux; never track them
 state/profile.json
 autopilot_runs/
+
+# Local clutter kept out of the tree (first test export tidy, 2026-10-26)
+*.bundle
+_to_delete/
+_playtest_backup_*/
+state/

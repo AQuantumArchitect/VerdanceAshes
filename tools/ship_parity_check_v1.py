@@ -41,6 +41,8 @@ _EXTRA_STDLIB = {"__future__", "typing_extensions"}
 # scripts\ship.ps1 (a snapshot of a dependency, not a local module -- its own tree is not analysed).
 _ALLOWED_THIRD_PARTY = {"webview", "numpy", "scipy", "umwelt"}
 _SKIP_DIRS = {"_vendor", "__pycache__"}
+_WORKSPACE_DIRS = {"app", "mod", "tools", "scripts", "docs", "tests", "state", "inbox", "outbox",
+                   "ledger", "export", "logs", "reports", "playable_runs"}
 
 
 def stdlib_names() -> Set[str]:
@@ -122,7 +124,9 @@ def data_dirs_referenced(paths: List[Path]) -> Set[str]:
                          if not ln.lstrip().startswith("#"))
         for pat in pats:
             out.update(pat.findall(code))
-    return out
+    # `("tools", "data", "app", ...)` -- a list of workspace dirs -- reads like the third
+    # spelling. A workspace top-level dir is never a data subdirectory.
+    return out - _WORKSPACE_DIRS
 
 
 def analyse(tools_dir: Path) -> Tuple[Dict[str, Set[str]], Set[str]]:
@@ -182,6 +186,11 @@ def main() -> int:
     needs, unknown = analyse(tools)
     present = {p.stem for p in tools.glob("*.py")}
     present |= {d.name for d in tools.iterdir() if d.is_dir() and (d / "__init__.py").exists()}
+    # A dev-kit ship (ship.ps1 -Dev) stages tests/ too; the autopilot imports its helpers from there.
+    if (root / "tests").is_dir():
+        test_mods = {p.stem for p in (root / "tests").glob("*.py")}
+        unknown -= test_mods
+        present |= test_mods
 
     if args.closure:
         entry = ({e.strip() for e in args.entry.split(",") if e.strip()}
