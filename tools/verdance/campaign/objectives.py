@@ -94,51 +94,35 @@ def story_tags_for_result(result: Dict[str, Any], graph_delta: Dict[str, float])
 
 def objective_for_map(map_id: str, state: Dict[str, Any],
                       workspace: Optional[Path] = None) -> Dict[str, Any]:
-    """Fallback objective for a map, with its target zone id translated forward.
+    """Fallback objective for a map: the zone graph's own top pick, never an authored constant.
 
-    Every targetZoneId below was authored against a pre-migration zone cut and
-    all seven are now retired -- AB_LRPC_EAST_WING, RJ_CENTRAL_LAGOON_MAZE,
-    ATS_CENTRAL_HIVE_FLATS, GF_SE_ENERGY_WORKS, EOH_SE_CORTEX_POCKET,
-    KOOM_CENTRAL_FLUID_SCAR, TAB_WESTERN_ROCK_GATES. Rather than hand-edit the
-    constants on every re-cut (which is what let them go stale in the first
-    place), they are translated at the point of use through the same migration
-    map canonical_zone_id already reads.
-
-    This path only fires when generate_mode_a_sortie finds no legal contract,
-    so it will not show up in an early mission and will show up in a late one.
+    This path only fires when no hub contract stands (so mostly late in a campaign). It used to
+    return one hand-written objective per map, and every one of those zone ids went stale on the
+    next zone re-cut (all seven had, by 2026-10-26). Now it asks the same quest walk the hub board
+    uses for its best legal sortie on this map and turns that into an objective, so the fallback
+    reads the living field exactly like a real contract does. The only authored objectives left
+    are the three finales (acts.FINALE_PLANS).
     """
-    raw = _objective_for_map_raw(map_id, state)
-    target = raw.get("targetZoneId")
-    if target:
-        raw["targetZoneId"] = canonical_zone_id(target, workspace)
-    return raw
+    from .sorties import objective_from_sortie  # sorties imports this module
 
-
-def _objective_for_map_raw(map_id: str, state: Dict[str, Any]) -> Dict[str, Any]:
     mid = canonical_map_id(map_id)
-    destroyed = state.get("destroyedObjectives", {}).get(mid, {})
-    if mid == "ancient_bastion":
-        candidates = [
-            ("AB_LRPC_EAST_WING", "Destroy the eastern LRPC"),
-            ("AB_OUTER_WALL_NORTH", "Break the northern bastion wing"),
-            ("AB_SHIELD_RELAY", "Collapse the shield relay"),
-        ]
-        for oid, label in candidates:
-            if oid not in destroyed:
-                return {"id": oid, "kind": "destroy_key_structure", "label": label, "targetZoneId": "AB_W_KEEP"}
-    if mid == "the_rock_jungle":
-        return {"id": "RJ_HIVE_CAUSEWAY", "kind": "hive_clear_or_bypass", "label": "Break a hive or hold a causeway", "targetZoneId": "RJ_CENTRAL_LAGOON_MAZE"}
-    if mid == "all_that_simmers":
-        return {"id": "ATS_HIVE_OR_FACTION_TARGET", "kind": "choose_target_then_extract", "label": "Choose Armada, Cortex, or hive pressure target", "targetZoneId": "ATS_CENTRAL_HIVE_FLATS"}
-    if mid == "greenest_fields":
-        return {"id": "GF_ARMADA_ENERGY_WORKS", "kind": "eco_raid", "label": "Raid the Armada energy works", "targetZoneId": "GF_SE_ENERGY_WORKS", "enemyFaction": "armada"}
-    if mid == "eye_of_horus":
-        return {"id": "EOH_CORTEX_DEALER_RELAY", "kind": "strike_relay", "label": "Destroy the Cortex dealer relay", "targetZoneId": "EOH_SE_CORTEX_POCKET", "enemyFaction": "cortex"}
-    if mid == "koom_valley":
-        return {"id": "KOOM_FLUID_SCAR_FOOTHOLD", "kind": "seize_lane", "label": "Seize the Central Fluid Scar", "targetZoneId": "KOOM_CENTRAL_FLUID_SCAR"}
-    if mid == "tabula":
-        return {"id": "TAB_ROCK_GATE_CONTROL", "kind": "gate_control", "label": "Control a rock gate and extract", "targetZoneId": "TAB_WESTERN_ROCK_GATES"}
-    return {"id": mid + "_objective", "kind": "sortie", "label": "Complete local objective", "targetZoneId": None}
+    ws = Path(workspace) if workspace is not None else WORKSPACE_ROOT
+    try:
+        from verdance.company.quest_generator import generate_quests
+        cands = generate_quests(ws, state or {}, map_id=mid, limit=1)
+    except Exception:  # noqa: BLE001 -- a broken board falls back to the generic sortie
+        cands = []
+    if cands:
+        pick = dict(cands[0])
+        pick.setdefault("mapId", mid)
+        try:
+            obj = objective_from_sortie(pick, state or {}, ws)
+            obj["source"] = "graph_fallback"
+            return obj
+        except Exception:  # noqa: BLE001
+            pass
+    return {"id": mid + "_objective", "kind": "sortie", "label": "Complete local objective",
+            "targetZoneId": None, "source": "generic_fallback"}
 
 
 def choose_next_map_zone(state: Dict[str, Any],
@@ -422,7 +406,6 @@ def zone_center_norm(zone: Dict[str, Any]) -> Tuple[float, float]:
 
 
 __all__ = [
-    "_objective_for_map_raw",
     "append_history_bead",
     "build_war_map",
     "choose_next_map_zone",

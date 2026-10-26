@@ -658,14 +658,25 @@ def convert_from(occ: Dict[str, Dict[str, float]], zone_id: str,
     return take
 
 
+# The model's own route: what each map's mission aims at, pinned so the matrix's readings stay
+# comparable run to run. This is the experiment's fixture, not game content -- the game's fallback
+# objective now comes from the zone graph (objectives.objective_for_map), and these were its old
+# authored targets, carried here so the tuned observables keep meaning the same thing.
+MODEL_ROUTE = {
+    "greenest_fields": ("GF_SE_PLATEAU", "eco_raid"),
+    "koom_valley": ("KV_SW_SPILLWAY", "seize_lane"),
+    "tabula": ("T_C_INNER_SPILLWAY", "gate_control"),
+    "ancient_bastion": ("AB_W_KEEP", "destroy_key_structure"),
+    "all_that_simmers": ("ATS_C_BASTION", "choose_target_then_extract"),
+    "eye_of_horus": ("EOH_SE_BASTION", "strike_relay"),
+    "the_rock_jungle": ("TRJ_NW_MUSTER", "hive_clear_or_bypass"),
+}
+
+
 def mission_stop(lattice: Lattice, state: Dict[str, Any], number: int,
                  workspace: Path) -> Dict[str, Any]:
-    """Where mission N happens, and what it is trying to take.
-
-    The per-map objective tables still speak in pre-migration
-    zone ids; the engine translates them forward at point of use, so this does
-    the same rather than keeping a second copy of the mapping.
-    """
+    """Where mission N happens, and what it is trying to take (finales from acts, the rest
+    from MODEL_ROUTE)."""
     act = engine.act_for_mission(number)
     if act >= 3:
         path = str(state.get("pathSignal") or "B")
@@ -682,9 +693,7 @@ def mission_stop(lattice: Lattice, state: Dict[str, Any], number: int,
         walk = WORLD_MAPS[1:] + WORLD_MAPS[:1]
         map_id = walk[(number - 1) % len(walk)]
         deploy = next((z for z, d in sorted(load_doors(workspace).items()) if d["mapId"] == map_id), None)
-        objective = engine.objective_for_map(map_id, state) or {}
-        target = engine.canonical_zone_id(objective.get("targetZoneId"), workspace)
-        kind = str(objective.get("kind") or "sortie")
+        target, kind = MODEL_ROUTE.get(map_id, (deploy, "sortie"))
     if target not in lattice.index:
         target = deploy
     # Migration folded some old rectangles together; the engine separates them

@@ -927,7 +927,6 @@ function New-MercFoothold {
   $specs = @(
     (Spec $MERC.radar 1 0 -70 100),
     (Spec $MERC.llt (Get-ScaledCount ([Math]::Max(1, [int](3 * $p))) $S) (160 * $FX) (140 * $FZ) 150),
-    (Spec $MERC.wall (Get-ScaledCount ([Math]::Max(2, [int](6 * $p))) $S) (260 * $FX) (220 * $FZ) 40),
     (Spec $MERC.raider (Get-ScaledCount ([Math]::Max(1, [int](3 * $p))) $S) 110 -290 80 -Patrol (PatrolSweep $PX $PZ)),
     (Spec $MERC.skirm (Get-ScaledCount ([Math]::Max(1, [int](2 * $p))) $S) -130 -310 90 -Patrol (PatrolSweep $PX $PZ))
   )
@@ -1814,7 +1813,7 @@ function Build-LivingShellFromTemplate {
 
 # Kinds that load living-shell occupation when a template exists (outbound 38).
 $script:shellCapableKinds = @(
-  "eco_raid", "eco_expand", "economy_disrupt",
+  "eco_raid", "eco_expand", "economy_disrupt", "destroy_key_structure",
   "seize_lane", "strike_relay", "hold_plateau",
   "siege", "multipressure", "gate_control", "survive_wilds"
 )
@@ -2515,8 +2514,7 @@ function Add-WarbandPacks {
       (Spec $T.raider (Get-ScaledCount 4 $Scale) 60 -60 80 -Patrol (PatrolSweep $swx $swz)),
       (Spec $T.skirm (Get-ScaledCount 3 $Scale) -70 40 90 -Patrol (PatrolSweep $cx $cz)),
       (Spec $T.assault (Get-ScaledCount 2 $Scale) 0 100 95 -Patrol (PatrolSweep $swx $swz)),
-      (Spec $T.radar 1 0 0 100),
-      (Spec $T.wall 3 40 70 40)
+      (Spec $T.radar 1 0 0 100)
     )
     $rid = "warband_pack_$i"
     $script:baseRecipes[$rid] = @($specs)
@@ -2578,7 +2576,6 @@ function Add-SecondaryObjectiveCamp {
   # Teeth + a patrol pair; support hardware, NOT part of the mark.
   $guard = @(
     (Spec $T.llt 2 -90 -70 120),
-    (Spec $T.wall 3 100 80 130),
     (Spec $T.raider (Get-ScaledCount 3 $Scale) 40 130 85 -Patrol (PatrolSweep $Center[0] $Center[1])),
     (Spec $T.skirm (Get-ScaledCount 2 $Scale) -40 -130 90)
   )
@@ -2785,8 +2782,11 @@ function New-RehydrateSpecs {
 # OCCUPATION MODEL LOCK (outbound 44): living shell + decoy + scars is the ONE path.
 # Hand-scattered mapOccupation camps are deprecated fallback when no template exists.
 # Prefer living-shell occupation for all shell-capable kinds (outbound 37/38/44).
+# $usedShell: anything shell-shaped stands (occupation or only the company's footprint).
+# $shellOccupied: the living shell's enemy bases stand. Hand-built camps are the fallback for
+# the second, not the first: a company footprint is not an enemy base.
 $usedShell = $false
-$usedShell = $false
+$shellOccupied = $false
 if ($isWildHomeFounding) {
   # Founding shelf stays empty — player builds the Ashwalker pad; raptors are the only pressure.
   Write-Host "Skipping living-shell occupation on Rock Jungle wild home founding."
@@ -2801,6 +2801,7 @@ if ($isWildHomeFounding) {
   if (([string]$intent.mapId) -eq "ancient_bastion") { $anchorSide = "Armada" }
   $usedShell = Try-ApplyLivingShell -Ws $Workspace -MapId ([string]$intent.mapId) `
     -PrimaryZoneId $targetZoneId -Description $description -EnemyCenter $enemyCenter -AnchorSide $anchorSide
+  $shellOccupied = [bool]$usedShell
 }
 # DRY: company pads always rehydrate when we have a footprint bag — even if
 # the occupation shell path skipped (non-capable kind / missing template).
@@ -2836,7 +2837,7 @@ if ($isKings) {
 } else {
 switch ($objectiveKind) {
   "strike_relay" {
-    if (-not $usedShell) {
+    if (-not $shellOccupied) {
       # The dealer relay sits in a desolate Cortex hideout: jammers everywhere.
       $T = $FACTION[$enemySide]
       $jam = $enemySide -eq "Cortex"
@@ -2844,11 +2845,15 @@ switch ($objectiveKind) {
     }
   }
   "destroy_key_structure" {
-    $T = $FACTION[$enemySide]
-    Add-FactionCamp $enemySide $enemyCenter (Centerpiece-LRPC $T) $description -WithEco $true -WithProduction $true -SupportSpecs (Support-LRPC $T) -FrontBand $frontBand
+    # The shell's works in the target zone are the structure to break; the LRPC fort is the
+    # fallback when no shell stands there.
+    if (-not $shellOccupied) {
+      $T = $FACTION[$enemySide]
+      Add-FactionCamp $enemySide $enemyCenter (Centerpiece-LRPC $T) $description -WithEco $true -WithProduction $true -SupportSpecs (Support-LRPC $T) -FrontBand $frontBand
+    }
   }
   "economy_disrupt" {
-    if (-not $usedShell) {
+    if (-not $shellOccupied) {
       $T = $FACTION[$enemySide]
       Add-FactionCamp $enemySide $enemyCenter (Centerpiece-EcoWorks $T $enemyScale) $description -WithEco $true -FrontBand $frontBand
     }
@@ -2856,7 +2861,7 @@ switch ($objectiveKind) {
   "eco_raid" {
     # Living-shell doctrine (outbound 37/44): frozen AI-grown template is required path.
     # Fallback = hand-scattered occupation pockets (36) — DEPRECATED, log loudly.
-    if (-not $usedShell) {
+    if (-not $shellOccupied) {
       Write-Warning "OCCUPATION FALLBACK: no living shell for $(([string]$intent.mapId))/$objectiveKind — using deprecated hand camps."
       $parsed = if ($intent.enemyInfrastructure -and $intent.enemyInfrastructure.parsed) { $intent.enemyInfrastructure.parsed.armada } else { $null }
       $primaryNode = Add-EcoSprawlCamp $enemyCenter $parsed $enemyScale $faceX $faceZ $description -ZoneId $targetZoneId -Flavor "mixed"
@@ -2912,7 +2917,7 @@ switch ($objectiveKind) {
     if ($isWildHomeFounding -or $againstFaction -eq "wild") {
       # Empty wilds dig-in / fortify: raptor pressure only (added below via hasWild).
       Write-Host ("Wild objective {0}: no empire faction camp." -f $objectiveKind)
-    } elseif (-not $usedShell) {
+    } elseif (-not $shellOccupied) {
       # Presence objectives (seize_lane / gate_control / siege): shell preferred above.
       # Fallback = thin front-band garrison + reinforcement packs (WO-004).
       $T = $FACTION[$enemySide]
@@ -2923,7 +2928,7 @@ switch ($objectiveKind) {
 }
 
 # Drop 3 act-1 texture: roving warband packs on the approach axis.
-if (-not $isFinale -and -not $theater -and [string]$arcProfile.enemyMode -eq "warband") {
+if (-not $isFinale -and -not $theater -and -not $shellOccupied -and [string]$arcProfile.enemyMode -eq "warband") {
   Add-WarbandPacks $deployCenter $enemyCenter ([Math]::Max(0.6, $enemyScale * 0.8))
 }
 
@@ -2941,7 +2946,27 @@ if ($escSecondaries.Count -gt 0 -and -not $isFinale -and -not $isKings -and $zon
     if (-not $secCenter) { continue }
     $secLabel = if ($sec.label) { [string]$sec.label } else { $secZid }
     $secId = if ($sec.id) { [string]$sec.id } else { "sec_" + $secZid.ToLower() }
-    $secMeta = Add-SecondaryObjectiveCamp $secSide $secCenter ([Math]::Max(0.4, $enemyScale * 0.5)) $secId ([bool]$sec.required) $secLabel
+    if ($shellOccupied -and $script:livingShellPayload) {
+      # The mark is the shell's own works in that zone (the gadget tags them); no camp is built.
+      # The opening only spawns its primary pocket, and a scarred or vault pocket is no mark.
+      if ($script:livingShellPayload.localPocketOnly) { continue }
+      $secPk = @($script:livingShellPayload.pockets) | Where-Object {
+        $_ -and [string]$_.zoneId -eq $secZid -and -not $_.scarred -and -not $_.optionalTarget -and [int]$_.unitCount -gt 0
+      } | Select-Object -First 1
+      if (-not $secPk) { continue }
+      $secZones = @()
+      if ($script:livingShellPayload.Contains("secondaryZones")) { $secZones = @($script:livingShellPayload.secondaryZones) }
+      $secZones += [ordered]@{ zoneId = $secZid; id = $secId; required = [bool]$sec.required }
+      $script:livingShellPayload.secondaryZones = $secZones
+      $secMeta = [ordered]@{
+        id = $secId; label = $secLabel; required = [bool]$sec.required
+        x = [double]$secPk.center[0]; z = [double]$secPk.center[1]
+        pocketId = [string]$secPk.pocketId; source = "living_shell_secondary"
+      }
+      Write-Host ("Secondary objective: {0} ({1}) on the shell works at {2}" -f $secId, $(if ($sec.required) { "REQUIRED" } else { "bonus" }), $secZid)
+    } else {
+      $secMeta = Add-SecondaryObjectiveCamp $secSide $secCenter ([Math]::Max(0.4, $enemyScale * 0.5)) $secId ([bool]$sec.required) $secLabel
+    }
     if ($secMeta) {
       $secMeta.zoneId = $secZid
       $script:secondaryMeta += $secMeta

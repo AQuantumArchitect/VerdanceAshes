@@ -756,9 +756,11 @@ class CraftedWorldTests(unittest.TestCase):
                          {"mex": 0, "solar": 0, "wind": 0, "defense": 0})
         self.assertEqual(engine.parse_campaign_forces(None)["solar"], 0)
 
-    def test_greenest_fields_objective_is_armada_eco_raid(self):
-        obj = engine.objective_for_map("greenest_fields", {})
-        self.assertEqual(obj["kind"], "eco_raid")
+    def test_greenest_fields_fallback_objective_comes_from_the_graph(self):
+        # No authored per-map objective any more: the fallback is the quest walk's top pick.
+        obj = engine.objective_for_map("greenest_fields", {}, ROOT)
+        self.assertEqual(obj.get("source"), "graph_fallback")
+        self.assertTrue(obj["targetZoneId"].startswith("GF_"))
         self.assertEqual(obj["enemyFaction"], "armada")
         # The target zone id must NOT trip the compiler's Cortex name heuristic.
         self.assertNotIn("SYNTH", obj["targetZoneId"].upper())

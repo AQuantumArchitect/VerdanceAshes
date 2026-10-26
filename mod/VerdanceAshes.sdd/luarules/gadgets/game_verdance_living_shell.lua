@@ -116,6 +116,11 @@ local function spawnShell()
   S.primaryZoneId = shell.primaryZoneId and tostring(shell.primaryZoneId) or nil
   local primaryPocketId = shell.primaryPocketId and tostring(shell.primaryPocketId) or nil
   local primaryRect = zoneRect(S.primaryZoneId)
+  -- Escalation side marks stand on the shell's own works in their zone (no hand-built camp).
+  local secByZone = {}
+  for _, sz in ipairs(shell.secondaryZones or {}) do
+    if sz.zoneId and sz.id then secByZone[tostring(sz.zoneId)] = sz end
+  end
   local pocketCenters = {}
   for _, pocket in ipairs(shell.pockets or {}) do
     if pocket.pocketId and pocket.center then
@@ -195,6 +200,12 @@ local function spawnShell()
         -- Optional high-value marks (e.g. Greenest center fusion vaults):
         -- fusion keepClass=high_value becomes a bonus secondary, not the primary raid.
         local isHighValue = (u.keepClass == "high_value")
+        local secMark = u.zoneId and secByZone[tostring(u.zoneId)]
+        if secMark then
+          local sud = UnitDefNames[defName]
+          local isBld = sud and (sud.isBuilding or (tonumber(sud.speed) or 0) == 0)
+          if (not isBld) or u.keepClass == "wall" then secMark = nil end
+        end
         if isFootprint then
           Spring.SetUnitRulesParam(unitID, "va_force_role", "player_footprint", { public = true })
           if CMD then
@@ -237,6 +248,10 @@ local function spawnShell()
           Spring.SetUnitRulesParam(unitID, "va_secondary_id", sid, { public = true })
           Spring.SetUnitRulesParam(unitID, "va_secondary_required", 0, { public = true })
           Spring.SetUnitRulesParam(unitID, "va_high_value", 1, { public = true })
+        elseif secMark then
+          Spring.SetUnitRulesParam(unitID, "va_force_role", "objective_secondary", { public = true })
+          Spring.SetUnitRulesParam(unitID, "va_secondary_id", tostring(secMark.id), { public = true })
+          Spring.SetUnitRulesParam(unitID, "va_secondary_required", secMark.required and 1 or 0, { public = true })
         else
           -- Tag primary-pocket eco as raid objective structures.
           local isPrimary = false

@@ -5679,9 +5679,11 @@ function claimOptionalHighValueSecondaries()
             local pocket = tostring(Spring.GetUnitRulesParam(uid, "va_shell_pocket") or "mark")
             sid = "bonus_fus_" .. pocket:lower()
           end
+          -- Fusion vaults are vaults; an escalation side mark on the shell's works is a
+          -- structure mark (enrichFromMission flags it required from mission.secondaries).
           MarksLib.bindTarget(marks, uid, sid, {
             required = false,
-            kind = MarksLib.KIND.vault,
+            kind = highValue and MarksLib.KIND.vault or MarksLib.KIND.structure,
             label = sid,
           })
           tagged = tagged + 1
