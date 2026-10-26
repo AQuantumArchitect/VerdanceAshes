@@ -210,13 +210,19 @@ if ($Dev) {
   foreach ($bat in @("AUTOPILOT.bat", "AUTOPILOT_TEST.bat", "WAR_BAKE.bat")) {
     Copy-File (Join-Path $Workspace $bat) (Join-Path $staging $bat)
   }
-  foreach ($t in @("autopilot_campaign_v1.py", "war_bake_v1.py")) {
-    Copy-File (Join-Path $Workspace "tools\$t") (Join-Path $staging "tools\$t")
+  # Every top-level dev tool and all of data\ (21 MB): the suite reaches past the player surface.
+  Get-ChildItem (Join-Path $Workspace "tools") -File -Filter "*.py" | ForEach-Object {
+    Copy-File $_.FullName (Join-Path $staging ("tools\" + $_.Name))
+  }
+  Get-ChildItem (Join-Path $Workspace "data") -Directory | ForEach-Object {
+    if (-not (Test-Path (Join-Path $staging ("data\" + $_.Name)))) {
+      Copy-Into $_.FullName (Join-Path $staging ("data\" + $_.Name))
+    }
   }
   Copy-Into (Join-Path $Workspace "tests") (Join-Path $staging "tests")
   Get-ChildItem (Join-Path $staging "tests") -Recurse -Directory -Filter "__pycache__" -ErrorAction SilentlyContinue |
     Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
-  Write-Host "Dev kit: AUTOPILOT, WAR_BAKE and tests\ staged."
+  Write-Host "Dev kit: AUTOPILOT, WAR_BAKE, every dev tool, all of data\ and tests\ staged."
 }
 
 # ---- empty runtime dirs ----
@@ -360,6 +366,25 @@ if (-not $SkipPython) {
   Write-Host "Skipping embedded Python"
 }
 
+# ---- belief gate: the vendored Umwelt must import with the names the campaign uses ----
+# 0.13.0's first test export vendored a stale clone (no AxisFace): numpy, scipy and umwelt were all
+# present, and the belief world was still silently off. Check the real import, say so loudly.
+$beliefOk = $false
+$embedPy = Join-Path $staging "runtime\python\python.exe"
+if ((Test-Path $embedPy) -and (Test-Path (Join-Path $staging "tools\_vendor\umwelt\__init__.py"))) {
+  $savedEap2 = $ErrorActionPreference
+  $ErrorActionPreference = "Continue"
+  & $embedPy -c "import sys; from verdance.belief.world import umwelt_available; sys.exit(0 if umwelt_available() else 3)" 2>&1 | Out-Host
+  $beliefOk = ($LASTEXITCODE -eq 0)
+  $ErrorActionPreference = $savedEap2
+  if ($beliefOk) {
+    Write-Host "Belief world: the vendored Umwelt imports (ON)."
+  } else {
+    Write-Warning ("The vendored Umwelt (" + $umweltSrc + ") does not import what the campaign needs; it is probably a stale clone. " +
+                   "git pull it and ship again. This build runs with the belief world OFF, and AUTOPILOT refuses to run without it.")
+  }
+}
+
 # ---- disarm dev telemetry in shipped mod ----
 $flag = Join-Path $staging "mod\VerdanceAshes.sdd\singleplayer\verdance_ashes\generated\dev_telemetry_flag.lua"
 if (Test-Path (Split-Path $flag)) {
@@ -423,6 +448,7 @@ $manifest = [ordered]@{
   includesScience = (Test-Path (Join-Path $staging "runtime\python\Lib\site-packages\numpy"))
   includesUmwelt  = (Test-Path (Join-Path $staging "tools\_vendor\umwelt\__init__.py"))
   includesDevKit  = [bool]$Dev
+  beliefWorks     = [bool]$beliefOk
 }
 $manifest | ConvertTo-Json -Depth 6 | Set-Content -Encoding UTF8 (Join-Path $staging "release_manifest.json")
 

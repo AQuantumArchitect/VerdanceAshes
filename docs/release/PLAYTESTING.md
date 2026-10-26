@@ -36,6 +36,22 @@ tooling and is not shipped.
 6. **Campaign feel** — does the world react across a few missions?
 7. **Vibe** — does it feel like a game, or a tool?
 
+## A test machine (the dev kit)
+
+`SHIP_DEV.bat` (in the workspace) builds `export\dist\VerdanceAshes_v<version>_dev_win64.zip`: the
+player build plus the headless rig. On the test machine:
+
+1. Install Beyond All Reason and launch it once.
+2. Unzip anywhere, run `SETUP.bat` once.
+3. `PLAY.bat` to play; `AUTOPILOT_TEST.bat` for two headless sorties with a hard BARbarian in the
+   company seat; `WAR_BAKE.bat --map <map>` to re-bake a standing war.
+4. `runtime\python\python.exe tests\run_tests.py` runs the suite (a fresh tree gets its SETUP save
+   first).
+
+`release_manifest.json` says what the build carries. `beliefWorks: false` means the vendored Umwelt
+did not import (a stale clone on the building machine): the belief world is off and AUTOPILOT will not
+run. Update the Umwelt clone and ship again.
+
 ## Sending feedback
 
 1. In the hub: **System menu → Export feedback bundle**. It writes
