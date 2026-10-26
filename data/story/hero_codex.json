@@ -458,7 +458,7 @@
       "unitDef": "armsnipe",
       "voice": {
         "hook": "Ghosts already walked it.",
-        "blurb": "Sharpshooter + five Eidolons. Whisper finds; ghosts walked.",
+        "blurb": "Sharpshooter + six Ticks. Whisper finds; the pack follows.",
         "fiction": "She does not take the lane — the ghosts already walked it. Whisper is a suggestion; the shot is a fact. Fog that ends careers.",
         "tagLine": "Unseen — snipe from the rumor."
       },
@@ -962,7 +962,7 @@
       "voice": {
         "hook": "Everything changes sides eventually.",
         "blurb": "Two Ghost spy bots, cloaked, that walk up to enemy units and turn them. Everything changes sides eventually.",
-        "fiction": "Nobody hired Rumor. Rumor was simply on the payroll one morning, with two Ghosts and a list of units that used to belong to someone else.",
+        "fiction": "Nobody hired Rumor. Rumor was simply on the payroll one morning, with four Ghosts, two Gremlins and a list of units that used to belong to someone else.",
         "tagLine": "Cloaked spy bots that capture enemy units."
       },
       "notes": "eyes x fog; capture spy (va_ghost)"

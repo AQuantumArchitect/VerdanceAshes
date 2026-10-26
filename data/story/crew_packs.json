@@ -520,6 +520,13 @@
     },
     "va_lumen": {
       "label": "Adv. Construction Vehicle"
+    },
+    "legcib": {
+      "metal": 100,
+      "energy": 3500,
+      "combined": 150,
+      "label": "Blindfold",
+      "hasBuildPower": false
     }
   },
   "heroes": {
@@ -677,17 +684,17 @@
       "extras": 0,
       "escorts": [
         {
-          "unitDef": "legaspy",
-          "count": 5
+          "unitDef": "armflea",
+          "count": 6
         }
       ],
-      "blurb": "Sharpshooter + five Eidolons. Whisper finds; ghosts walked.",
+      "blurb": "Sharpshooter + six Ticks. Whisper finds; the pack follows.",
       "name": "Whisper-of-Ash Yeva",
       "sizing": "fixed",
-      "packCombined": 2198,
-      "packMetal": 1305,
-      "packEnergy": 62500,
-      "startXp": 0.134
+      "packCombined": 1117,
+      "packMetal": 806,
+      "packEnergy": 21800,
+      "startXp": 0.314
     },
     "spoke": {
       "role": "band",
@@ -728,8 +735,7 @@
     "twitch": {
       "role": "band",
       "unitDef": "corfast",
-      "hireTnb": 0,
-      "hireKm": 1,
+      "hireTnb": 1,
       "packTotal": 1,
       "extras": 0,
       "factory": "twitch_kit",
@@ -1012,20 +1018,24 @@
         "drone_bay"
       ],
       "sizing": "fixed",
-      "blurb": "Drone plant + Noctua wing. Dreams in flight paths.",
+      "blurb": "Drone plant + Noctua wing + three Blindfold radar-killers. Dreams in flight paths.",
       "name": "Ada Noctua",
-      "packCombined": 1954,
-      "packMetal": 1390,
-      "packEnergy": 39500,
+      "packCombined": 2404,
+      "packMetal": 1690,
+      "packEnergy": 50000,
       "escorts": [
         {
           "unitDef": "legfig",
           "count": 24
+        },
+        {
+          "unitDef": "legcib",
+          "count": 3
         }
       ],
-      "startXp": 0.258,
+      "startXp": 0.208,
       "canLead": false,
-      "packXpCombined": 1451
+      "packXpCombined": 1751
     },
     "mira": {
       "role": "band",
@@ -1398,9 +1408,9 @@
       "role": "band",
       "unitDef": "va_ghost",
       "hireTnb": 0,
-      "packTotal": 2,
-      "extras": 1,
-      "blurb": "Two Ghost spy bots, cloaked, that walk up to enemy units and turn them. Everything changes sides eventually.",
+      "packTotal": 4,
+      "extras": 3,
+      "blurb": "Four Ghost spy bots and two Gremlin stealth tanks, all cloaked, walking up to enemy units and turning them. Everything changes sides eventually.",
       "name": "Rumor",
       "sizing": "fixed",
       "tags": [
@@ -1409,10 +1419,16 @@
         "capture",
         "fog"
       ],
-      "startXp": 0.413,
-      "packMetal": 270,
-      "packEnergy": 17600,
-      "packCombined": 521
+      "startXp": 0.232,
+      "packMetal": 1000,
+      "packEnergy": 42600,
+      "packCombined": 1609,
+      "escorts": [
+        {
+          "unitDef": "armgremlin",
+          "count": 2
+        }
+      ]
     }
   },
   "factories": {
