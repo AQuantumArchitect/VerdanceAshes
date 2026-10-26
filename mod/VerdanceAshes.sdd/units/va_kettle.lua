@@ -3,9 +3,9 @@ if not VFS.Include("LuaRules/Configs/va_active.lua") then return {} end -- plain
 -- replaces by name; no deep merge), so only her Archangel changes and every other one stays stock.
 --
 -- Her long-range missile (not the rapid medium-range spray) is turned into a radar-guided one:
---   * it reaches past her own air sight (range 1700 against 1200), so it is fired at the radar blips
---     the company's radars paint, not only at what she can see; game_verdance_kettle.lua picks those
---     blips and locks the launcher onto them;
+--   * it hits ground units as well as air (range 1200 for both, default damage 100, vtol 150), and is
+--     fired at the radar blips the company's radars paint, not only at what she can see;
+--     game_verdance_kettle.lua picks those blips and locks the launcher onto them;
 --   * the missile carries eyes: while it flies, whatever enemy it passes within customparams
 --     va_sight_radius of is in the company's sight, and so is its target, until it lands.
 -- The numbers below are the missile at rest; the gadget reads the sight radius back out of
@@ -115,7 +115,7 @@ return {
 				areaofeffect = 24,
 				avoidfeature = false,
 				burnblow = true,
-				canattackground = false,
+				canattackground = true,
 				castshadow = false,
 				cegtag = "missiletrailaa",
 				craterareaofeffect = 0,
@@ -132,7 +132,7 @@ return {
 				name = "Saint Kettle Radar-Guided Missile",
 				noselfdamage = true,
 				proximitypriority = -1,
-				range = 1700,
+				range = 1200,
 				reloadtime = 1.3,
 				smokecolor = 1,
 				smokeperiod = 6,
@@ -160,6 +160,7 @@ return {
 					va_sight_radius = "320",
 				},
 				damage = {
+					default = 100,
 					vtol = 150,
 				},
 			},
@@ -216,10 +217,9 @@ return {
 		},
 		weapons = {
 			[1] = {
-				badtargetcategory = "NOTAIR LIGHTAIRSCOUT",
 				def = "LONGRANGEMISSILE",
 				fastautoretargeting = true,
-				onlytargetcategory = "VTOL",
+				onlytargetcategory = "NOTSUB",
 			},
 			[2] = {
 				badtargetcategory = "NOTAIR LIGHTAIRSCOUT",

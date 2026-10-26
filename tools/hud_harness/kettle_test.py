@@ -53,7 +53,7 @@ SCENES = PRELUDE + r'''
 local KET, BLIP, GROUND, FRIEND, FAR, SEEN = 10, 20, 21, 22, 23, 24
 local ally = { [KET] = 0, [BLIP] = 1, [GROUND] = 1, [FRIEND] = 0, [FAR] = 1, [SEEN] = 1 }
 local defs = { [KET] = 7, [BLIP] = 30, [GROUND] = 31, [FRIEND] = 30, [FAR] = 30, [SEEN] = 30 }
-local pos = { [KET] = {0, 0, 0}, [BLIP] = {1500, 100, 0}, [GROUND] = {800, 0, 0}, [FRIEND] = {600, 100, 0},
+local pos = { [KET] = {0, 0, 0}, [BLIP] = {1000, 100, 0}, [GROUND] = {800, 0, 0}, [FRIEND] = {600, 100, 0},
               [FAR] = {2500, 100, 0}, [SEEN] = {400, 100, 0} }
 local state = {   -- what the company (ally 0) has of each enemy: los / radar
   [BLIP] = { los = false, radar = true }, [GROUND] = { los = false, radar = true },
@@ -70,7 +70,7 @@ VFS = { Include = function(p) if p:find("va_active") then return true end error(
 Script = { SetWatchWeapon = function(w, on) log.watch = w end }
 UnitDefNames = { va_kettle = { id = 7, weapons = { { weaponDef = 70 }, { weaponDef = 71 } } } }
 UnitDefs = { [7] = { weapons = { { weaponDef = 70 }, { weaponDef = 71 } } }, [30] = { canFly = true }, [31] = { canFly = false } }
-WeaponDefs = { [70] = { id = 70, range = 1700, customParams = { va_radar_lock = "1", va_sight_radius = "320" } },
+WeaponDefs = { [70] = { id = 70, range = 1200, customParams = { va_radar_lock = "1", va_sight_radius = "320" } },
                [71] = { id = 71, range = 880, customParams = {} } }
 local function dist2(a, b) return (a[1]-b[1])^2 + (a[2]-b[2])^2 + (a[3]-b[3])^2 end
 Spring = {
@@ -79,7 +79,7 @@ Spring = {
   GetUnitAllyTeam = function(u) return ally[u] end,
   GetUnitTeam = function(u) return ally[u] end,
   GetUnitPosition = function(u) local p = pos[u]; if p then return p[1], p[2], p[3] end end,
-  GetUnitMaxRange = function() return 1700 end,
+  GetUnitMaxRange = function() return 1200 end,
   GetUnitWeaponTarget = function() return hasTarget end,
   GetUnitsInSphere = function(x, y, z, r)
     local out = {}
@@ -97,20 +97,27 @@ gadget:Initialize()
 local function frames(a, b) for f = a, b do gadget:GameFrame(f) end end
 local out = {}
 
--- an idle launcher locks the one radar-only air blip in reach: not the ground blip, not the
--- friend, not the far one (past 1700), not the one already in sight
+-- an idle launcher locks the nearest radar-only enemy in reach, ground or air: not the friend,
+-- not the far one (past 1200), not the one already in sight
 frames(1, 6)
 out.watched = log.watch
 out.locks = #log.targets
 out.lock = log.targets[1]
 -- the blip is shown to the company so the launcher can aim at it
 out.blipShown = false
-for _, r in ipairs(log.revealed) do if r[1] == BLIP and r[2] == 0 then out.blipShown = true end end
+for _, r in ipairs(log.revealed) do if r[1] == GROUND and r[2] == 0 then out.blipShown = true end end
+
+-- with the ground blip in sight, the air blip is next
+state[GROUND] = { los = true, radar = true }
+log.targets = {}
+frames(7, 12)
+out.airLock = log.targets[1]
+state[GROUND] = { los = false, radar = true }
 
 -- a launcher that already has a target is left alone
 log.targets = {}
 hasTarget = 1
-frames(7, 24)
+frames(13, 24)
 out.busyLocks = #log.targets
 hasTarget = 0
 
@@ -158,7 +165,8 @@ def check(label, cond, detail=""):
 s = run(SCENES)
 check("the long-range missile is the one watched", s["watched"] == 70, s)
 check("an idle launcher locks exactly one blip", s["locks"] == 1, s)
-check("on the radar-only air unit, weapon 1, not as a user order", s["lock"] == [10, 20, False, False, 1], s)
+check("on the nearest radar-only unit (the ground one), weapon 1, not as a user order", s["lock"] == [10, 21, False, False, 1], s)
+check("with the ground one in sight, on the radar-only air unit", s["airLock"] == [10, 20, False, False, 1], s)
 check("and shows it to the company so it can be aimed at", s["blipShown"] is True, s)
 check("a launcher with a target is left alone", s["busyLocks"] == 0, s)
 check("a missile in flight sees the enemy ground unit it passes", s["eyes"].get("21") == 0, s)

@@ -5,7 +5,7 @@ function gadget:GetInfo()
   return {
     name = "Verdance Saint Kettle Missiles",
     desc = "Saint Kettle's long-range anti-air missile is radar-guided and has eyes: the launcher locks "
-        .. "onto air blips her company's radars paint, and the missile in flight shows the company what "
+        .. "onto radar blips, air or ground, her company's radars paint, and the missile in flight shows the company what "
         .. "it passes and what it hunts.",
     author = "Verdance",
     date = "2026-10-25",
@@ -64,12 +64,7 @@ local function reveal(unitID, allyTeam)
   spSetUnitLosState(unitID, allyTeam, { los = true, radar = true, typed = true })
 end
 
-local function isAir(defID)
-  local ud = defID and UnitDefs[defID]
-  return ud ~= nil and (ud.canFly == true or ud.isAirUnit == true)
-end
-
--- The nearest hostile air unit the company has only on radar, inside this Kettle's missile reach.
+-- The nearest hostile unit, air or ground, the company has only on radar, inside this Kettle's missile reach.
 local function radarBlip(unitID, allyTeam)
   local x, y, z = spGetUnitPosition(unitID)
   if not x then return nil end
@@ -78,7 +73,7 @@ local function radarBlip(unitID, allyTeam)
   local best, bestD = nil, nil
   for _, other in ipairs(spGetUnitsInSphere(x, y, z, reach) or {}) do
     local oAlly = spGetUnitAllyTeam(other)
-    if oAlly ~= nil and oAlly ~= allyTeam and isAir(spGetUnitDefID(other)) then
+    if oAlly ~= nil and oAlly ~= allyTeam then
       local inLos, inRadar = los(other, allyTeam)
       if inRadar and not inLos then
         local ox, oy, oz = spGetUnitPosition(other)

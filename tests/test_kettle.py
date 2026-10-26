@@ -35,9 +35,12 @@ def test_only_the_long_range_missile_is_radar_guided_and_sees():
     assert "va_radar_lock" not in sr and "va_sight_radius" not in sr
 
 
-def test_the_long_range_missile_outreaches_her_own_air_sight():
-    # radar blips are only worth shooting at past what she sees herself
-    assert _num(_weapon("longrangemissile"), "range") > _num(UNIT, "airsightdistance")
+def test_the_long_range_missile_reaches_1200_and_hits_ground_and_air():
+    lr = _weapon("longrangemissile")
+    assert _num(lr, "range") == 1200 and "canattackground = true" in lr
+    assert _num(lr, "default") > 0 and _num(lr, "vtol") > 0
+    w1 = UNIT.split("weapons = {", 1)[1].split("[2] = {", 1)[0]
+    assert 'def = "LONGRANGEMISSILE"' in w1 and "VTOL" not in w1
     assert _num(_weapon("shortrangemissile"), "range") == 880
 
 
