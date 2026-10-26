@@ -126,15 +126,15 @@ M.HEROES = {
     hireTnb = 0,
     packTotal = 1,
     extras = 0,
-    startXp = 0.134,
+    startXp = 0.314,
     packMind = "solo",
     escorts = {
       {
-        unitDef = "legaspy",
-        count = 5,
+        unitDef = "armflea",
+        count = 6,
       },
     },
-    blurb = "Sharpshooter + five Eidolons. Whisper finds; ghosts walked.",
+    blurb = "Sharpshooter + six Ticks. Whisper finds; the pack follows.",
   },
   spoke = {
     name = "Ivo 'Spoke' Rask",
@@ -167,8 +167,7 @@ M.HEROES = {
     name = "Benno 'Twitcher' Sallow",
     role = "band",
     unitDef = "corfast",
-    hireTnb = 0,
-    hireKm = 1,
+    hireTnb = 1,
     packTotal = 1,
     extras = 0,
     factory = "twitch_kit",
@@ -385,7 +384,7 @@ M.HEROES = {
     extras = 0,
     factory = "legion_drone_bay",
     fieldEffect = "vision",
-    startXp = 0.258,
+    startXp = 0.208,
     packMind = "solo",
     tags = { "scout", "air_scout", "drone_bay" },
     escorts = {
@@ -393,8 +392,12 @@ M.HEROES = {
         unitDef = "legfig",
         count = 24,
       },
+      {
+        unitDef = "legcib",
+        count = 3,
+      },
     },
-    blurb = "Drone plant + Noctua wing. Dreams in flight paths.",
+    blurb = "Drone plant + Noctua wing + three Blindfold radar-killers. Dreams in flight paths.",
   },
   mira = {
     name = "Mira Barrage",
@@ -647,12 +650,18 @@ M.HEROES = {
     role = "band",
     unitDef = "va_ghost",
     hireTnb = 0,
-    packTotal = 2,
-    extras = 1,
-    startXp = 0.413,
+    packTotal = 4,
+    extras = 3,
+    startXp = 0.232,
     packMind = "solo",
     tags = { "eyes", "spy", "capture", "fog" },
-    blurb = "Two Ghost spy bots, cloaked, that walk up to enemy units and turn them. Everything changes sides eventually.",
+    escorts = {
+      {
+        unitDef = "armgremlin",
+        count = 2,
+      },
+    },
+    blurb = "Four Ghost spy bots and two Gremlin stealth tanks, all cloaked, walking up to enemy units and turning them. Everything changes sides eventually.",
   },
 }
 
