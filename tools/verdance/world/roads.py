@@ -226,12 +226,15 @@ def _wild_on_map(state: Dict[str, Any], map_id: str) -> List[Dict[str, Any]]:
             continue
         recruit = entry.get("recruit") if isinstance(entry.get("recruit"), dict) else {}
         home = entry.get("home") if isinstance(entry.get("home"), list) else []
-        if _canon_map(recruit.get("mapId") or (home[0] if home else "")) != map_id:
+        roam = entry.get("roam") if isinstance(entry.get("roam"), dict) else None
+        # where the company believes they are now (the encounter field), else their authored home
+        at_map = (roam or {}).get("mapId") or recruit.get("mapId") or (home[0] if home else "")
+        if _canon_map(at_map) != map_id:
             continue
-        belief = float(score_field_recruit_belief(state, entry, map_id=map_id))
+        zone = (roam or {}).get("zoneId") or recruit.get("zoneId") or (home[1] if len(home) > 1 else "") or ""
+        belief = float(score_field_recruit_belief(state, dict(entry, recruit=dict(recruit, zoneId=zone)), map_id=map_id))
         rows.append({"heroId": str(entry.get("heroId") or hid), "name": str(entry.get("name") or hid),
-                     "zoneId": str(recruit.get("zoneId") or (home[1] if len(home) > 1 else "") or ""),
-                     "belief": round(belief, 4)})
+                     "zoneId": str(zone), "belief": round(belief, 4)})
     rows.sort(key=lambda r: (-float(r["belief"]), r["heroId"]))
     return rows
 

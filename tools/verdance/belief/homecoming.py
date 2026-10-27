@@ -254,6 +254,15 @@ def fold_homecoming(state: Dict[str, Any], result: Dict[str, Any], bead: Dict[st
         elif o.get("outcome") == "survived":
             world.observe({f"obs_hero_{hid}_fit": 0.9}, 0.6, source=f"drop:m{mission}", minute=now_minute)
 
+    # 4d'. word of the wild: every hero on the field carries word of the wild heroes bound to them
+    # (the encounter field's draw); the field spreads it along the bond web and lets it fade
+    try:
+        from verdance.company import encounters as ENC
+        for hid, value, eta, src in ENC.draw_observations(state, result, workspace):
+            world.observe_draw(hid, value=value, eta=eta, source=src, minute=now_minute)
+    except Exception as exc:  # noqa: BLE001 - the draw is optional; never block the fold
+        print(f"VA_ENCOUNTER_DRAW_FAIL {type(exc).__name__}: {exc}")
+
     world.flush()
     # 4e. the other minds: truth frame (hidden), faction beliefs by policy, divergence
     try:
@@ -275,6 +284,12 @@ def fold_homecoming(state: Dict[str, Any], result: Dict[str, Any], bead: Dict[st
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(frame, indent=2, ensure_ascii=False), encoding="utf-8")
     # The finale path is what the company believes about itself, not a tally of roads taken.
+    try:
+        from verdance.company import encounters as ENC
+        state["encounterBelief"] = ENC.belief_snapshot(world, frame)
+        ENC.refresh_whereabouts(state, workspace)   # where the company now believes the wild are
+    except Exception as exc:  # noqa: BLE001
+        print(f"VA_ENCOUNTER_DRAW_FAIL {type(exc).__name__}: {exc}")
     signals = W.path_signals(frame)
     graph = state.setdefault("graph", {})
     for k, v in signals.items():

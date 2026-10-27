@@ -860,6 +860,10 @@ def join_from_field(
     return True, ""
 
 
+def sealed_now_for_surface(state: Dict[str, Any]) -> bool:
+    return bool((state.get("company") or {}).get("sealed"))
+
+
 def _zone_belief_stack(state: Dict[str, Any], map_id: str, zone_id: str) -> Dict[str, float]:
     zm = ((state.get("zoneMemory") or {}).get(map_id) or {}).get(zone_id) or {}
     if not isinstance(zm, dict):
@@ -942,34 +946,16 @@ def field_recruits_for_map(
         return []
     arch = str(objective_archetype or "").strip().lower()
     field = state.get("fieldPool") or {}
-    candidates: List[Dict[str, Any]] = []
-    for hid, entry in field.items():
-        if not isinstance(entry, dict):
-            continue
-        if str(entry.get("status") or "") != "wild":
-            continue
+
+    def _row(hid: str, entry: Dict[str, Any], rmap: str, zone: str, belief: float) -> Dict[str, Any]:
         recruit = entry.get("recruit") if isinstance(entry.get("recruit"), dict) else {}
-        home = entry.get("home") if isinstance(entry.get("home"), list) else []
-        rmap = str(recruit.get("mapId") or (home[0] if home else "") or "")
-        if rmap != mid:
-            continue
-        zone = str(recruit.get("zoneId") or (home[1] if len(home) > 1 else "") or "")
         seed_xp = recruit.get("seedXp")
         if seed_xp is None and isinstance(entry.get("xp"), (int, float)):
             seed_xp = entry.get("xp")
         mode = str(recruit.get("type") or "wreck_rez")
-        belief = score_field_recruit_belief(
-            state, entry, map_id=mid, marked_zone_ids=marked_zone_ids
-        )
         # Default optional on raid archetypes (and when unset). Explicit false keeps contract.
         raw_opt = recruit.get("optionalJoin")
-        if raw_opt is None:
-            if arch in RAID_OPTIONAL_RECRUIT_ARCHETYPES or arch == "":
-                optional = True
-            else:
-                optional = True  # bonus unless hard-flagged below
-        else:
-            optional = bool(raw_opt)
+        optional = True if raw_opt is None else bool(raw_opt)
         if recruit.get("requiresVictory") or recruit.get("contracted") is True:
             optional = False
         if str(recruit.get("type") or "") in ("rescue_contract", "retrieve_stash") and raw_opt is False:
@@ -1000,7 +986,44 @@ def field_recruits_for_map(
         fab = recruit.get("factory")
         if fab:
             row["factory"] = str(fab)
-        candidates.append(row)
+        return row
+
+    # The encounter field (umwelt.foresight.encounter): who the company meets here is drawn by the
+    # bond web, the company's draw belief and the ground, not by a fixed home. Marked zones are the
+    # company's attention. Falls through to the fixed homes when Umwelt lacks the module.
+    try:
+        from verdance.company import encounters as _enc
+        met = _enc.encounters_for_map(state, mid, workspace=workspace, limit=limit, marked_zone_ids=marked_zone_ids)
+    except Exception as exc:  # noqa: BLE001 - never block a sortie on the encounter field
+        print(f"VA_ENCOUNTER_FAIL {type(exc).__name__}: {exc}")
+        met = None
+    if met is not None:
+        rows = []
+        for m in met:
+            entry = field.get(m["heroId"])
+            if not isinstance(entry, dict):
+                continue
+            row = _row(m["heroId"], entry, mid, str(m["zoneId"]), round(float(m["score"]), 4))
+            row["encounter"] = {"p": m["p"], "anchored": m["anchored"], "reasons": m["reasons"], "label": m["label"]}
+            rows.append(row)
+        return rows
+
+    candidates: List[Dict[str, Any]] = []
+    for hid, entry in field.items():
+        if not isinstance(entry, dict):
+            continue
+        if str(entry.get("status") or "") != "wild":
+            continue
+        recruit = entry.get("recruit") if isinstance(entry.get("recruit"), dict) else {}
+        home = entry.get("home") if isinstance(entry.get("home"), list) else []
+        rmap = str(recruit.get("mapId") or (home[0] if home else "") or "")
+        if rmap != mid:
+            continue
+        zone = str(recruit.get("zoneId") or (home[1] if len(home) > 1 else "") or "")
+        belief = score_field_recruit_belief(
+            state, entry, map_id=mid, marked_zone_ids=marked_zone_ids
+        )
+        candidates.append(_row(hid, entry, rmap, zone, belief))
     candidates.sort(key=lambda r: (-float(r.get("beliefScore") or 0), str(r.get("heroId") or "")))
     # Attention collapse: marked-zone wild heroes always seat (up to 3).
     # Soft floor = max(limit, marked_count) so Fatboy's pad never loses to ambient fill.
@@ -1251,6 +1274,12 @@ def hub_company_surface(state: Dict[str, Any], workspace: Optional[Path] = None)
         }
 
     field = state.get("fieldPool") or {}
+    if any(isinstance(e, dict) and str(e.get("status")) == "wild" and "roam" not in e for e in field.values()):
+        try:   # an older save, or a fresh seal: place the wild before showing them
+            from verdance.company import encounters as _enc
+            _enc.refresh_whereabouts(state, workspace)
+        except Exception as exc:  # noqa: BLE001
+            print(f"VA_ENCOUNTER_FAIL {type(exc).__name__}: {exc}")
     wild = []
     for hid, entry in field.items():
         if not isinstance(entry, dict):
@@ -1258,14 +1287,23 @@ def hub_company_surface(state: Dict[str, Any], workspace: Optional[Path] = None)
         if str(entry.get("status")) != "wild":
             continue
         home = entry.get("home") or []
+        roam = entry.get("roam") if isinstance(entry.get("roam"), dict) else None
         wild.append({
             "id": hid,
             "name": entry.get("name") or hid,
             "unitDef": entry.get("unitDef"),
-            "mapId": home[0] if home else None,
-            "zoneId": home[1] if len(home) > 1 else None,
+            # where the company believes they are (the encounter field), else their authored home
+            "mapId": (roam or {}).get("mapId") or (home[0] if home else None),
+            "zoneId": (roam or {}).get("zoneId") or (home[1] if len(home) > 1 else None),
             "recruit": entry.get("recruit") or {"type": "wreck_rez"},
+            "whereabouts": roam,
         })
+    try:
+        from verdance.company import encounters as _enc
+        encounter_draw = _enc.draws_by_map(state, workspace) if sealed_now_for_surface(state) else None
+    except Exception as exc:  # noqa: BLE001
+        print(f"VA_ENCOUNTER_FAIL {type(exc).__name__}: {exc}")
+        encounter_draw = None
 
     sealed = bool(company.get("sealed"))
     commerce = state.get("commerce") or {}
@@ -1299,6 +1337,8 @@ def hub_company_surface(state: Dict[str, Any], workspace: Optional[Path] = None)
         "unlockedIds": unlocked,
         "pool": [card(h) for h in unlocked],
         "wild": wild,
+        # the seeded draw per map (who the company would meet there, unmarked); None = fixed homes
+        "encounterDraw": encounter_draw,
         "deployAces": company_deploy_aces(state, packs) if sealed else core_hero_ids(packs),
         "deployBand": deploy_band,
         "missionCallIns": pending_calls,

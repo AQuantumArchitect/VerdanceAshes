@@ -38,6 +38,10 @@ DAY_S = 86400.0
 ZONE_ROLES = ("ours", "held", "strength", "threat")
 ZONE_MODES = {"ours": "unitary", "held": "unitary", "strength": "dissipative", "threat": "dissipative"}
 HERO_ROLES = ("fit", "pressure", "frame_intact")
+# draw: the company's sense that someone is near (word of them, a bonded companion joining). The
+# bond web couples it between hero nodes, so the field itself spreads the word; it fades when
+# nobody hears of them. Read by verdance.company.encounters through umwelt.foresight.encounter.
+DRAW_ROLE = "draw"
 
 # Axis faces for the company's questions. pole_0 is +z (value 1.0), pole_1 is -z (value 0.0).
 QUESTIONS = {
@@ -157,6 +161,18 @@ def hero_ids(workspace: Path) -> List[str]:
     return sorted(str(h["heroId"]) for h in load_json(codex).get("heroes") or [] if h.get("heroId"))
 
 
+def bond_pairs(workspace: Path) -> List[Tuple[str, str]]:
+    """The authored bonds and tensions (support_web), one sorted pair each."""
+    path = workspace / "data" / "story" / "support_web.json"
+    if not path.exists():
+        return []
+    out = set()
+    for e in load_json(path).get("edges") or []:
+        if e.get("authored") and e.get("a") and e.get("b") and e["a"] != e["b"]:
+            out.add(tuple(sorted((str(e["a"]), str(e["b"])))))
+    return sorted(out)
+
+
 def build_spec(workspace: Path, extra_zones: Optional[Iterable[Dict[str, Any]]] = None):
     """extra_zones: [{zoneId, mapId, label}] present in a save but missing from the zone
     graph (the graph is older than zoneMemory). They get nodes but no bridges, and a
@@ -190,9 +206,10 @@ def build_spec(workspace: Path, extra_zones: Optional[Iterable[Dict[str, Any]]] 
     nodes.append(schema.NodeSpec("people", parent="verdance", kind="region", roles=("fit",), reduce="mean"))
     for hid in hero_ids(workspace):
         nodes.append(schema.NodeSpec(
-            f"hero:{hid}", parent="people", kind="entity", roles=HERO_ROLES,
-            role_modes={"fit": "dissipative", "pressure": "dissipative", "frame_intact": "dissipative"},
-            params={"gamma_diss": (0.01, 0.005, 0.0005, 0.1), "gamma_diss_pressure": (0.02, 0.01, 0.001, 0.2)},
+            f"hero:{hid}", parent="people", kind="entity", roles=HERO_ROLES + (DRAW_ROLE,),
+            role_modes={"fit": "dissipative", "pressure": "dissipative", "frame_intact": "dissipative", DRAW_ROLE: "dissipative"},
+            params={"gamma_diss": (0.01, 0.005, 0.0005, 0.1), "gamma_diss_pressure": (0.02, 0.01, 0.001, 0.2),
+                    "gamma_diss_draw": (0.03, 0.01, 0.001, 0.3)},
         ))
     # The company: six questions as icon-axes. Dissipative and slow: silence reopens a question.
     nodes.append(schema.NodeSpec(
@@ -206,6 +223,11 @@ def build_spec(workspace: Path, extra_zones: Optional[Iterable[Dict[str, Any]]] 
         a, b = str(e.get("from")), str(e.get("to"))
         kind = "open" if e.get("kind") == "same_map" else "gated"
         bridges.append(schema.BridgeSpec(a, b, shared_roles=("threat",), kind=kind))
+    # the bond web: word of someone travels to the people they are bound to (one bridge per pair)
+    heroes = set(hero_ids(workspace))
+    for a, b in bond_pairs(workspace):
+        if a in heroes and b in heroes:
+            bridges.append(schema.BridgeSpec(f"hero:{a}", f"hero:{b}", shared_roles=(DRAW_ROLE,), kind="open"))
     bindings = []
     norm = {"type": "range", "lo": 0.0, "hi": 1.0}
     for z in zones:
@@ -213,7 +235,7 @@ def build_spec(workspace: Path, extra_zones: Optional[Iterable[Dict[str, Any]]] 
             bindings.append(schema.BindingSpec(f"obs_{z['zoneId']}_{r}", zone=str(z["zoneId"]), role=r, normalizer=norm,
                                                force_observe=True, efficiency=1.0, strength=0.8))
     for hid in hero_ids(workspace):
-        for r in HERO_ROLES:
+        for r in HERO_ROLES + (DRAW_ROLE,):
             bindings.append(schema.BindingSpec(f"obs_hero_{hid}_{r}", zone=f"hero:{hid}", role=r, normalizer=norm,
                                                force_observe=True, efficiency=1.0, strength=0.8))
     for q in QUESTIONS:
@@ -363,6 +385,31 @@ class VerdanceWorld:
         else:
             return
         self.observe({f"obs_company_{question}": value}, max(0.0, min(1.0, float(strength))), source=source, minute=minute)
+
+    def observe_draw(self, hero_id: str, *, value: float, eta: float, source: str, minute: Optional[float] = None) -> None:
+        """Word of a hero: value 1.0 = they are near / heard of; eta = how loud the word is."""
+        c = self.host.engine.field.clusters.get(f"hero:{hero_id}")
+        if c is None or eta <= 0:
+            return
+        try:
+            c.role_bloch(DRAW_ROLE)      # a field saved before draw existed has no such role: skip
+        except Exception:
+            return
+        if True:
+            self.observe({f"obs_hero_{hero_id}_{DRAW_ROLE}": max(0.0, min(1.0, float(value)))}, max(0.0, min(1.0, float(eta))),
+                         source=source, minute=minute)
+
+    def draws(self) -> Dict[str, float]:
+        """{heroId: draw in [0, 1]}; 0.5 = nobody has heard. A field saved before draw existed reads 0.5."""
+        out = {}
+        for hid in hero_ids(self.workspace):
+            c = self.host.engine.field.clusters.get(f"hero:{hid}")
+            try:
+                z = float(c.role_bloch(DRAW_ROLE)[2]) if c is not None else 0.0
+            except Exception:
+                z = 0.0
+            out[hid] = round((z + 1.0) / 2.0, 4)
+        return out
 
     # -- readout
     def bloch(self, node: str, role: str) -> Tuple[float, float, float]:

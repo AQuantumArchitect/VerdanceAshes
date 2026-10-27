@@ -298,6 +298,25 @@ function markedZonesForPlan(plan) {
 export function predictedFieldRecruits(mapId, plan) {
   const mid = String(mapId || "");
   const marked = new Set(markedZonesForPlan(plan));
+  // The encounter field (tools/verdance/company/encounters.py): heroes the company believes are on
+  // a marked zone seat first (up to 3), then the map's own seeded draw, in order, to 2.
+  const draws = companySurface().encounterDraw;
+  if (draws && typeof draws === "object") {
+    const byId = Object.fromEntries(wildRecruitsForMap(mid).map(w => [String(w.id || w.heroId), w]));
+    const all = (Array.isArray(companySurface().wild) ? companySurface().wild : []);
+    const must = all.filter(w => w && String(w.mapId || "") === mid && w.zoneId && marked.has(String(w.zoneId))).slice(0, 3)
+      .map(w => ({ id: w.id, name: w.name, mapId: mid, zoneId: w.zoneId, recruit: w.recruit || { type: "wreck_rez" }, beliefScore: 99, reasons: ["we marked this ground"] }));
+    const taken = new Set(must.map(r => String(r.id)));
+    const out = must.slice();
+    for (const d of (draws[mid] || [])) {
+      if (out.length >= Math.max(2, must.length)) break;
+      if (taken.has(String(d.heroId))) continue;
+      const w = byId[String(d.heroId)] || (all.find(x => String(x.id) === String(d.heroId)) || {});
+      out.push({ id: d.heroId, name: w.name || d.heroId, mapId: mid, zoneId: d.zoneId, recruit: w.recruit || { type: "wreck_rez" }, beliefScore: 1,
+                 reasons: (w.whereabouts && w.whereabouts.reasons) || [] });
+    }
+    return out;
+  }
   const rows = wildRecruitsForMap(mid).map(w => {
     const zone = String(w.zoneId || "");
     let belief = 0.15;
@@ -442,7 +461,8 @@ export function renderBoard() {
       const recruitHere = wildRecruitAtZone(plan.mapId, z.zoneId);
       if (recruitHere) cls.push("has-recruit");
       const chip = recruitHere ? `<div class="zone-chip">rez</div>` : ((intel.openTarget || intel.preferred) ? `<div class="zone-chip">open</div>` : "");
-      const recruitTitle = recruitHere ? ` · THIS DROP wreck: ${recruitHere.name || recruitHere.id}` : "";
+      const recruitWhy = recruitHere && (recruitHere.reasons || []).length ? ` (${recruitHere.reasons.slice(0, 2).join("; ")})` : "";
+      const recruitTitle = recruitHere ? ` · THIS DROP wreck: ${recruitHere.name || recruitHere.id}${recruitWhy}` : "";
       const fogNote = inOps ? "" : " · outside ops";
       // Glyph row: surprise (✗ / ○), exposure (◉), threat bar, people ⚑, holdings ■, dark ?
       const sp = bel.surprise;

@@ -67,6 +67,18 @@ The engine that holds these pictures is **Umwelt** ([AQuantumArchitect/umwelt](h
 
 The world remembers. When a drop is built, enemy bases come only from the campaign's memory of who holds each zone: ground the company or the Mercs hold, and ground nobody holds (cleared, empty, wild), gets no base from the template (`Get-ScarredZoneSet` in `scripts/build_next_mission_v1.ps1`; the world's memory has the last word over partial battle damage). Reinforcement waves come from somewhere that exists: a team with nothing left on the map sends no one (`spawnWave`). Anyone who returns was moved there by the simulation between sorties, and so is in memory as the holder. The hub offers no contract against nobody: ground the company saw empty, or holds, is not a target (`capture_node_claims.NO_FIGHT_HOLDERS`), while dark ground stays open because nobody has looked.
 
+## Who you meet: the encounter field
+
+Wild heroes do not sit at one fixed home each. `umwelt.foresight.encounter` (in the Umwelt repo, `docs/ENCOUNTER.md`) places them, and `tools/verdance/company/encounters.py` feeds it the campaign's own data:
+
+- **The draw.** Every hero node in the company's belief world has a `draw` role, the company's sense that someone is near. The authored bonds and tensions (`support_web.json`) are bridges between hero nodes, so the engine itself carries word along the bond web. At homecoming, every hero who dropped carries word of the wild heroes bound to them; nothing refreshes it, so it fades. The encounter field reads each hero's draw relative to the rest of the wild.
+- **The bond web.** A wild hero bound to someone in the company is more likely to turn up, and polarity decides how. Allies (bond, attract, sibling, mentor, mirror) drift toward ground the company believes is its own. Rivals and tensions wait on ground it believes is disputed. Bond points earned together deepen the pull.
+- **The ground and the mood.** Each zone's character on the hero axes (`map_umwelt.json` pressure, zone deltas, water) is matched against each hero's molecule. The company's six questions, read onto the same axes, tilt who the moment calls for.
+- **Haunts.** The authored home is a soft prior. About half of a hero's meetings fall on their home map, and fewer on the home zone itself.
+- **Anchors.** The constructor-gated recruits (Consul in the jungle), stash retrievals, captures, builders, factory heroes and building heroes keep their authored place.
+
+Each sortie the field samples who appears on the sortie's map: Gumbel-top-k, seeded by campaign, mission and map. Heroes the company believes are on a zone it marked seat first. The hub previews exactly that draw (`company surface.encounterDraw`) and each wild hero's believed whereabouts, with reasons. If the Umwelt clone predates the module, the fixed homes stand (`VA_ENCOUNTER_SKIP`).
+
 ## Why this is interesting
 
 - Fog of war becomes **epistemic**: "nobody looked" is a state with consequences, not a grey overlay.
