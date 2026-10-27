@@ -928,19 +928,23 @@ def score_field_recruit_belief(
     return round(score, 4)
 
 
+def _encounter_per_sortie(workspace: Optional[Path]) -> int:
+    from verdance.company import encounters as _enc
+    return _enc.per_sortie(workspace)
+
+
 def field_recruits_for_map(
     state: Dict[str, Any],
     map_id: str,
     *,
     workspace: Optional[Path] = None,
-    limit: int = 2,
+    limit: Optional[int] = None,
     marked_zone_ids: Optional[List[str]] = None,
     objective_archetype: Optional[str] = None,
 ) -> List[Dict[str, Any]]:
-    """Wild fieldPool heroes for this sortie, ranked by belief-field attention.
-
-    Marked hub zones (target / infil) always outrank ambient wild fills so a
-    Fatboy pad you clicked actually seeds Fatboy — not the first two alphabetically.
+    """Wild fieldPool heroes for this sortie: the encounter field's seeded draw, by the weights in
+    data/story/encounter_rules.json (how many a sortie meets, how much a marked zone draws, how hard a
+    home pulls). Nothing is guaranteed but the builder at the Rock Jungle's entrance.
 
     Dual-ledger law: on eco_raid / seize / etc., wild recruits default to
     **optional** (bonus). Destroying them must not fail the primary board.
@@ -998,8 +1002,10 @@ def field_recruits_for_map(
     # The encounter field (umwelt.foresight.encounter): who the company meets here is drawn by the
     # bond web, the company's draw belief and the ground, not by a fixed home. Marked zones are the
     # company's attention. Falls through to the fixed homes when Umwelt lacks the module.
+    from verdance.company import encounters as _enc
+    if limit is None:
+        limit = _enc.per_sortie(workspace)
     try:
-        from verdance.company import encounters as _enc
         met = _enc.encounters_for_map(state, mid, workspace=workspace, limit=limit, marked_zone_ids=marked_zone_ids)
     except Exception as exc:  # noqa: BLE001 - never block a sortie on the encounter field
         print(f"VA_ENCOUNTER_FAIL {type(exc).__name__}: {exc}")
@@ -1031,21 +1037,22 @@ def field_recruits_for_map(
             state, entry, map_id=mid, marked_zone_ids=marked_zone_ids
         )
         candidates.append(_row(hid, entry, rmap, zone, belief))
-    candidates.sort(key=lambda r: (-float(r.get("beliefScore") or 0), str(r.get("heroId") or "")))
-    # Attention collapse: marked-zone wild heroes always seat (up to 3).
-    # Soft floor = max(limit, marked_count) so Fatboy's pad never loses to ambient fill.
+    # Without the encounter field: the fixed homes, ranked by belief, a marked zone weighting its
+    # hero by the same drawBoost; the entrance builder rule holds here too.
+    boost = float((_enc.rules(workspace).get("markedGround") or {}).get("drawBoost", 1.0))
     marked = {str(z) for z in (marked_zone_ids or []) if z}
-    if marked:
-        must = [c for c in candidates if str(c.get("zoneId") or "") in marked][:3]
-        rest = [c for c in candidates if c not in must]
-        floor = max(int(limit), len(must))
-        out = list(must)
-        for c in rest:
-            if len(out) >= floor:
-                break
-            out.append(c)
-        return out if out else candidates[: max(1, int(limit))]
-    return candidates[: max(1, int(limit))]
+    for c in candidates:
+        if str(c.get("zoneId") or "") in marked:
+            c["beliefScore"] = round(float(c.get("beliefScore") or 0) * boost, 4)
+    out: List[Dict[str, Any]] = []
+    gate = _enc.entrance_builder(state, mid, workspace) if int(limit) > 0 else None
+    if gate:
+        entry = field.get(gate[0])
+        if isinstance(entry, dict):
+            out.append(dict(_row(gate[0], entry, mid, gate[1], 99.0), entrance=True))
+    candidates = [c for c in candidates if c["heroId"] not in {o["heroId"] for o in out}]
+    candidates.sort(key=lambda r: (-float(r.get("beliefScore") or 0), str(r.get("heroId") or "")))
+    return out + candidates[: max(0, int(limit) - len(out))]
 
 
 def _collect_lost_field_recruit_ids(result: Dict[str, Any]) -> List[str]:
@@ -1348,6 +1355,7 @@ def hub_company_surface(state: Dict[str, Any], workspace: Optional[Path] = None)
         "wild": wild,
         # the seeded draw per map (who the company would meet there, unmarked); None = fixed homes
         "encounterDraw": encounter_draw,
+        "encounterPerSortie": _encounter_per_sortie(workspace),
         "deployAces": company_deploy_aces(state, packs) if sealed else core_hero_ids(packs),
         "deployBand": deploy_band,
         "missionCallIns": pending_calls,

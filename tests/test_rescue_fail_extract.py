@@ -87,7 +87,7 @@ def test_eco_raid_field_recruits_default_optional():
     rows = field_recruits_for_map(
         state,
         "greenest_fields",
-        limit=2,
+        limit=50,   # every wild hero on the map: this checks each row's fields, not who is drawn
         marked_zone_ids=["GF_SE_PLATEAU", "GF_NE_PLATEAU"],
         objective_archetype="eco_raid",
     )

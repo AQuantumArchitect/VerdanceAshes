@@ -3391,12 +3391,11 @@ $hubDeployAces = if ($intent.deployAces) { @($intent.deployAces) } else { @() }
 if (-not $hubCrewBand) { $hubCrewBand = @() }
 if ($intent.PSObject.Properties["crewBand"] -and $intent.crewBand) { $hubCrewBand = @($intent.crewBand) }
 
-# Field recruits: belief-field ranked wild heroes for this sortie.
-# Marked hub zones (target / infil) collapse attention onto that pad's hero —
-# so a Fatboy zone you clicked actually seeds Fatboy, not two random GF wilds.
+# Field recruits: the encounter field's draw for this sortie. Marked hub zones (target / infil)
+# make their hero likelier (encounter_rules markedGround), they do not seat them.
 # Wreck-rez modes stamp spawnAsWreck so BAR seeds a corpse, not a live poof.
 $fieldRecruits = @()
-$fieldRecruitCap = 2
+# How many, and who: verdance.company.company.field_recruits_for_map, by data/story/encounter_rules.json.
 $markedRecruitZones = @()
 if ($intent.captureZoneIds) { $markedRecruitZones += @($intent.captureZoneIds) }
 if ($intent.PSObject.Properties["marks"] -and $intent.marks) {
@@ -3419,7 +3418,6 @@ if ($state -and $state.PSObject.Properties["fieldPool"] -and $state.fieldPool) {
       statePath = $StatePath
       workspace = $Workspace
       mapId = $sortieMapId
-      limit = $fieldRecruitCap
       markedZoneIds = @($markedRecruitZones)
       objectiveArchetype = $archForRecruits
     }
@@ -3433,7 +3431,7 @@ if ($state -and $state.PSObject.Properties["fieldPool"] -and $state.fieldPool) {
       "from verdance.company.company import field_recruits_for_map"
       "args = json.loads(Path(r'" + $rankArgsPath + "').read_text(encoding='utf-8-sig'))"
       "state = json.loads(Path(args['statePath']).read_text(encoding='utf-8-sig'))"
-      "rows = field_recruits_for_map(state, args['mapId'], workspace=Path(args['workspace']), limit=int(args.get('limit') or 2), marked_zone_ids=list(args.get('markedZoneIds') or []), objective_archetype=args.get('objectiveArchetype') or '')"
+      "rows = field_recruits_for_map(state, args['mapId'], workspace=Path(args['workspace']), limit=None, marked_zone_ids=list(args.get('markedZoneIds') or []), objective_archetype=args.get('objectiveArchetype') or '')"
       "Path(r'" + $rankOutPath + "').write_text(json.dumps({'rows': rows}), encoding='utf-8')"
     ) -join "; "
     & python -c $pyRank
@@ -3447,45 +3445,11 @@ if ($state -and $state.PSObject.Properties["fieldPool"] -and $state.fieldPool) {
     }
     Remove-Item -LiteralPath $rankArgsPath, $rankOutPath -Force -ErrorAction SilentlyContinue
   } catch {
-    Write-Host ("Field recruit belief rank failed ({0}); falling back." -f $_.Exception.Message)
+    Write-Host ("Field recruit draw failed ({0}); this sortie meets nobody." -f $_.Exception.Message)
     $ranked = @()
   }
-  # Fallback: marked-zone first, then any wild on map (old behavior, but prioritized).
-  if (-not $ranked -or $ranked.Count -eq 0) {
-    $fallback = @()
-    foreach ($prop in @($state.fieldPool.PSObject.Properties)) {
-      $entry = $prop.Value
-      if (-not $entry) { continue }
-      if ([string]$entry.status -ne "wild") { continue }
-      $recruit = $entry.recruit
-      $homeLoc = @(); if ($entry.home) { $homeLoc = @($entry.home) }
-      $rMap = $null
-      if ($recruit -and $recruit.mapId) { $rMap = [string]$recruit.mapId }
-      elseif ($homeLoc.Count -ge 1) { $rMap = [string]$homeLoc[0] }
-      if (-not $rMap -or $rMap -ne $sortieMapId) { continue }
-      $rZone = $null
-      if ($recruit -and $recruit.zoneId) { $rZone = [string]$recruit.zoneId }
-      elseif ($homeLoc.Count -ge 2) { $rZone = [string]$homeLoc[1] }
-      $pri = if ($rZone -and ($markedRecruitZones -contains $rZone)) { 0 } else { 1 }
-      $fallback += [pscustomobject]@{
-        pri = $pri
-        heroId = [string]$(if ($entry.heroId) { $entry.heroId } else { $prop.Name })
-        name = [string]$(if ($entry.name) { $entry.name } else { $prop.Name })
-        unitDef = [string]$(if ($entry.unitDef) { $entry.unitDef } else { "legcen" })
-        zoneId = $rZone
-        recruitMode = [string]$(if ($recruit -and $recruit.type) { $recruit.type } else { "wreck_rez" })
-        requiresVictory = [bool]($recruit -and $recruit.requiresVictory)
-        optionalJoin = [bool]($recruit -and $recruit.optionalJoin)
-        seedXp = $(if ($recruit -and $null -ne $recruit.seedXp) { [double]$recruit.seedXp } else { 0.2 })
-        beliefScore = $(if ($pri -eq 0) { 10.0 } else { 0.15 })
-        spawnAsWreck = $true
-        blurb = $(if ($recruit -and $recruit.blurb) { [string]$recruit.blurb } else { $null })
-      }
-    }
-    $ranked = @($fallback | Sort-Object pri, heroId | Select-Object -First $fieldRecruitCap)
-  }
-  # Trust company_v1 ranking (already applied limit + marked-zone floor).
-  # Re-capping at 2 here used to drop marked wrecks after belief expanded the seat.
+  # No second picker here: if Python could not rank, this sortie meets nobody (logged above).
+  # Python's draw is the whole answer: no re-cap here.
   $rankIndex = 0
   foreach ($row in @($ranked)) {
     if (-not $row) { continue }

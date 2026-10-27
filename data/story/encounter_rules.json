@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "verdance-encounter-rules/1.0",
+  "notes": "Who the company meets in the field, as parameters (owner call, 2026-10-27): everything is a weight the seeded draw selects with, nothing is a guarantee, except the one rule in entranceBuilder. Read by verdance.company.encounters (the encounter field) and the fixed-homes fallback in verdance.company.company.field_recruits_for_map. The mission builder asks Python and never picks recruits itself.",
+  "perSortie": 2,
+  "markedGround": {
+    "drawBoost": 4.0,
+    "notes": "A wild hero believed on a zone the company marked (target, pad) is that many times likelier to be drawn. Attention, not a seat."
+  },
+  "homeZone": {
+    "notes": "How strongly a hero's authored home zone pulls their meeting place, by why they are tied to it. 'fixed' pins them there (a hero who does not walk cannot be met anywhere else); a number multiplies the home zone's haunt weight (1.0 = an ordinary hero). The home map pulls with homeMapHaunt.",
+    "doesNotWalk": "fixed",
+    "retrieve_stash": 3.0,
+    "assist_fortify": 3.0,
+    "capture": 3.0,
+    "factory": 3.0,
+    "builder": 2.5,
+    "default": 1.0,
+    "homeMapHaunt": 2.4
+  },
+  "entranceBuilder": {
+    "notes": "The one hard rule: on the Rock Jungle, a builder hero waits at the entrance. The Consul while the company does not have him; once he is with the company, another wild hero who builds economy (crew_packs heroes buildsEco), drawn by the same weights.",
+    "mapId": "the_rock_jungle",
+    "zoneId": "TRJ_NW_GATE",
+    "prefer": "consul"
+  }
+}

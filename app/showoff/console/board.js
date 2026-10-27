@@ -296,46 +296,29 @@ function markedZonesForPlan(plan) {
 // Mirror tools/company_v1.field_recruits_for_map: marked pads seat first (up to 3), then
 // ambient fills to limit 2. Teasing EVERY wild pad lied about which wrecks Drop actually bakes.
 export function predictedFieldRecruits(mapId, plan) {
+  // Who the company is likely to meet here: the kernel's own seeded draw for this map
+  // (verdance.company.encounters, company.encounterDraw), perSortie deep. Nothing is promised but the
+  // builder at the Rock Jungle's entrance; a marked zone only makes its hero likelier, so a wild hero
+  // believed on marked ground is listed as likelier, not as a seat.
   const mid = String(mapId || "");
   const marked = new Set(markedZonesForPlan(plan));
-  // The encounter field (tools/verdance/company/encounters.py): heroes the company believes are on
-  // a marked zone seat first (up to 3), then the map's own seeded draw, in order, to 2.
-  const draws = companySurface().encounterDraw;
-  if (draws && typeof draws === "object") {
-    const byId = Object.fromEntries(wildRecruitsForMap(mid).map(w => [String(w.id || w.heroId), w]));
-    const all = (Array.isArray(companySurface().wild) ? companySurface().wild : []);
-    const must = all.filter(w => w && String(w.mapId || "") === mid && w.zoneId && marked.has(String(w.zoneId))).slice(0, 3)
-      .map(w => ({ id: w.id, name: w.name, mapId: mid, zoneId: w.zoneId, recruit: w.recruit || { type: "wreck_rez" }, beliefScore: 99, reasons: ["we marked this ground"] }));
-    const taken = new Set(must.map(r => String(r.id)));
-    const out = must.slice();
-    for (const d of (draws[mid] || [])) {
-      if (out.length >= Math.max(2, must.length)) break;
-      if (taken.has(String(d.heroId))) continue;
-      const w = byId[String(d.heroId)] || (all.find(x => String(x.id) === String(d.heroId)) || {});
-      out.push({ id: d.heroId, name: w.name || d.heroId, mapId: mid, zoneId: d.zoneId, recruit: w.recruit || { type: "wreck_rez" }, beliefScore: 1,
-                 reasons: (w.whereabouts && w.whereabouts.reasons) || [] });
-    }
-    return out;
+  const surface = companySurface();
+  const n = Number(surface.encounterPerSortie) || 2;
+  const all = Array.isArray(surface.wild) ? surface.wild : [];
+  const byId = Object.fromEntries(all.map(w => [String(w.id || w.heroId), w]));
+  const draws = (surface.encounterDraw && surface.encounterDraw[mid]) || null;
+  const rows = draws
+    ? draws.slice(0, n).map(d => ({ id: d.heroId, name: (byId[d.heroId] || {}).name || d.heroId, mapId: mid, zoneId: d.zoneId,
+        recruit: (byId[d.heroId] || {}).recruit || { type: "wreck_rez" }, beliefScore: 1, reasons: ((byId[d.heroId] || {}).whereabouts || {}).reasons || [] }))
+    : wildRecruitsForMap(mid).slice(0, n).map(w => ({ id: w.id || w.heroId, name: w.name, mapId: mid, zoneId: w.zoneId || null,
+        recruit: w.recruit || { type: "wreck_rez" }, beliefScore: 1, reasons: [] }));
+  const seen = new Set(rows.map(r => String(r.id)));
+  for (const w of all) {
+    if (!w || String(w.mapId || "") !== mid || !w.zoneId || !marked.has(String(w.zoneId)) || seen.has(String(w.id))) continue;
+    rows.push({ id: w.id, name: w.name, mapId: mid, zoneId: w.zoneId, recruit: w.recruit || { type: "wreck_rez" },
+                beliefScore: 0.5, likelier: true, reasons: ["likelier: we marked this ground"] });
   }
-  const rows = wildRecruitsForMap(mid).map(w => {
-    const zone = String(w.zoneId || "");
-    let belief = 0.15;
-    if (zone && marked.has(zone)) belief += 10;
-    const mode = String((w.recruit && w.recruit.type) || w.recruitMode || "wreck_rez");
-    if (mode === "wreck_rez" || mode === "retrieve_stash" || mode === "capture") belief += 0.2;
-    return { id: w.id || w.heroId, name: w.name, mapId: mid, zoneId: zone || null, recruit: w.recruit || { type: mode }, beliefScore: belief };
-  });
-  rows.sort((a, b) => (b.beliefScore - a.beliefScore) || String(a.id).localeCompare(String(b.id)));
-  const limit = 2;
-  if (marked.size) {
-    const must = rows.filter(r => r.zoneId && marked.has(r.zoneId)).slice(0, 3);
-    const rest = rows.filter(r => !must.includes(r));
-    const floor = Math.max(limit, must.length);
-    const out = must.slice();
-    for (const r of rest) { if (out.length >= floor) break; out.push(r); }
-    return out.length ? out : rows.slice(0, Math.max(1, limit));
-  }
-  return rows.slice(0, Math.max(1, limit));
+  return rows;
 }
 export function wildRecruitAtZone(mapId, zoneId) {
   if (!zoneId) return null;

@@ -1006,7 +1006,8 @@ window.CREW_PACKS = {
       "packCombined": 540,
       "packMetal": 440,
       "packEnergy": 7000,
-      "startXp": 0.41
+      "startXp": 0.41,
+      "buildsEco": true
     },
     "consul": {
       "role": "band",
@@ -1030,7 +1031,8 @@ window.CREW_PACKS = {
       "packCombined": 817,
       "packMetal": 670,
       "packEnergy": 10300,
-      "startXp": 0.364
+      "startXp": 0.364,
+      "buildsEco": true
     },
     "veil": {
       "role": "band",
@@ -1220,7 +1222,8 @@ window.CREW_PACKS = {
       "packMetal": 2012,
       "packEnergy": 26170,
       "fieldEffect": "build",
-      "startXp": 0.102
+      "startXp": 0.102,
+      "buildsEco": true
     },
     "warder": {
       "role": "band",
@@ -1516,7 +1519,8 @@ window.CREW_PACKS = {
           "unitDef": "va_printer",
           "count": 1
         }
-      ]
+      ],
+      "buildsEco": true
     },
     "anvil": {
       "role": "band",
@@ -2087,7 +2091,8 @@ window.CREW_PACKS = {
       ],
       "packMetal": 330,
       "packEnergy": 4800,
-      "packCombined": 399
+      "packCombined": 399,
+      "buildsEco": true
     }
   },
   "factories": {

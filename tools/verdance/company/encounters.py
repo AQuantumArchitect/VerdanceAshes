@@ -38,14 +38,24 @@ ANCHOR_RECRUITS = {"retrieve_stash", "assist_fortify", "capture"}
 OUR_FACTION = "ashwalkers"
 # Chassis whose build power only makes more of themselves: not builders (the Infestor).
 ONLY_BUILDS_ITSELF = {"leginfestor", "va_infestor"}   # prints Infestors (and Goblins): not a builder
-# The constructor-gated jungle find (owner, 2026-10-26): a Consul, or, when the Consul is already
-# with the company, a Twitcher found in the same place.
-CONSTRUCTOR_FIND = ("consul", "twitch")
+# Who is met where is parametric (owner call, 2026-10-27): data/story/encounter_rules.json holds the
+# weights (how hard a home zone pulls, how much a marked zone draws, how many a sortie meets) and the
+# one hard rule, the builder at the Rock Jungle's entrance.
+RULES_REL = Path("data") / "story" / "encounter_rules.json"
+_RULES_DEFAULT = {"perSortie": 2, "markedGround": {"drawBoost": 4.0},
+                  "homeZone": {"doesNotWalk": "fixed", "default": 1.0, "homeMapHaunt": 2.4}, "entranceBuilder": {}}
 
-# A hero's authored home map as a haunt: about half of their meetings happen there (measured over
-# 30 seeded sorties x 7 maps on a fresh campaign), the rest wherever the bond web and the ground
-# pull them. The authored home zone itself is a smaller prior on top.
-HOME_MAP_HAUNT = 2.4
+
+def rules(workspace: Optional[Path] = None) -> Dict[str, Any]:
+    p = Path(workspace or ROOT) / RULES_REL
+    data = load_json(p) if p.exists() else {}
+    out = dict(_RULES_DEFAULT)
+    out.update({k: v for k, v in (data or {}).items() if k in _RULES_DEFAULT})
+    return out
+
+
+def per_sortie(workspace: Optional[Path] = None) -> int:
+    return max(0, int(rules(workspace).get("perSortie") or 2))
 
 # The company's questions on the hero axes: +1 = leaning toward pole_0, -1 = toward pole_1.
 # (axis, weight when the company leans pole_0; the opposite lean gives the negative)
@@ -88,22 +98,43 @@ def _story(workspace: Path, name: str) -> Dict[str, Any]:
     return load_json(p) if p.exists() else {}
 
 
-def anchor_reason(hid: str, pack: Dict[str, Any], roster_row: Dict[str, Any], chassis: Dict[str, Any]) -> Optional[str]:
-    """Why a hero keeps an authored place (None = they roam)."""
+ANCHOR_LABELS = {"assist_fortify": "found where a constructor is needed", "retrieve_stash": "a stash to retrieve",
+                 "capture": "a capture", "factory": "a factory hero", "doesNotWalk": "does not walk",
+                 "builder": "a builder"}
+
+
+def anchor_key(hid: str, pack: Dict[str, Any], roster_row: Dict[str, Any], chassis: Dict[str, Any]) -> Optional[str]:
+    """Why a hero is tied to their authored home (a key of encounter_rules.homeZone), or None."""
     from verdance.company.company import WRECK_SEED_PROXY
     recruit = (roster_row or {}).get("recruit") or {}
     kind = str(recruit.get("type") or "")
     if kind in ANCHOR_RECRUITS:
-        return {"assist_fortify": "found where a constructor is needed", "retrieve_stash": "a stash to retrieve",
-                "capture": "a capture"}[kind]
+        return kind
     if pack.get("factory"):
-        return "a factory hero"
+        return "factory"
     unit = str(pack.get("unitDef") or "")
     if unit in WRECK_SEED_PROXY:
-        return "does not walk"
-    if (chassis.get(unit) or {}).get("hasBuildPower") and unit not in ONLY_BUILDS_ITSELF:
-        return "a builder"
+        return "doesNotWalk"
+    if is_builder(pack, chassis):
+        return "builder"
     return None
+
+
+def anchor_reason(hid: str, pack: Dict[str, Any], roster_row: Dict[str, Any], chassis: Dict[str, Any]) -> Optional[str]:
+    """Why a hero keeps (or leans to) an authored place, in words (None = they roam)."""
+    key = anchor_key(hid, pack, roster_row, chassis)
+    return ANCHOR_LABELS.get(key) if key else None
+
+
+def is_builder(pack: Dict[str, Any], chassis: Dict[str, Any]) -> bool:
+    unit = str(pack.get("unitDef") or "")
+    return bool((chassis.get(unit) or {}).get("hasBuildPower")) and unit not in ONLY_BUILDS_ITSELF
+
+
+def eco_builders(workspace: Optional[Path] = None) -> List[str]:
+    """Heroes who build economy (crew_packs heroes buildsEco): who can wait at the jungle's entrance."""
+    packs = _story(Path(workspace or ROOT), "crew_packs.json")
+    return sorted(h for h, p in (packs.get("heroes") or {}).items() if isinstance(p, dict) and p.get("buildsEco"))
 
 
 def _traits(hid: str, umwelt_rows: Dict[str, Dict[str, Any]], pack: Dict[str, Any]) -> Dict[str, float]:
@@ -234,26 +265,22 @@ def build(state: Dict[str, Any], workspace: Optional[Path] = None):
     entities, anchors = [], {}
     pool = state.get("fieldPool") or {}
     present = present_heroes(state)
-    first, second = CONSTRUCTOR_FIND
-    find_at = _entry_home(pool.get(first)) or _home(first)
+    home_w = rules(ws).get("homeZone") or {}
     for hid, pack in (packs.get("heroes") or {}).items():
         if str(pack.get("role") or "band") != "band":
             continue
         home = _entry_home(pool.get(hid)) or _home(hid)
-        reason = anchor_reason(hid, pack, roster.get(hid) or {}, chassis)
-        if hid == second and first in present and find_at:
-            home, reason = find_at, f"found where a constructor is needed (the {first.capitalize()} is already with you)"
+        key = anchor_key(hid, pack, roster.get(hid) or {}, chassis)
+        weight = home_w.get(key, home_w.get("default", 1.0)) if key else home_w.get("default", 1.0)
         anchored_at = None
-        if reason:
-            anchored_at = home[1] if home else None
-            if anchored_at not in place_ids:
-                anchored_at = home[1] if home and home[1] in place_ids else None
-            if anchored_at:
-                anchors[hid] = reason
+        if key and home and home[1] in place_ids:
+            anchors[hid] = ANCHOR_LABELS.get(key, key)
+            if weight == "fixed":
+                anchored_at = home[1]          # cannot be met anywhere else (does not walk)
         haunts = {}
         if home and home[1] in place_ids:
-            haunts[home[1]] = 1.0
-            haunts[home[0]] = HOME_MAP_HAUNT
+            haunts[home[1]] = 1.0 if weight == "fixed" else float(weight)
+            haunts[home[0]] = float(home_w.get("homeMapHaunt", 2.4))
         entities.append(E.Entity(hid, traits=_traits(hid, um, pack), haunts=haunts, anchored_at=anchored_at,
                                  label=str(pack.get("name") or hid)))
     field = E.EncounterField(entities, places, _relations(E, state, ws), weights=E.Weights(presence_relation=0.7))
@@ -310,7 +337,74 @@ def refresh_whereabouts(state: Dict[str, Any], workspace: Optional[Path] = None)
     return {"placed": sum(1 for h in wild if "roam" in pool.get(h, {})), "wild": len(wild)}
 
 
-def encounters_for_map(state: Dict[str, Any], map_id: str, *, workspace: Optional[Path] = None, limit: int = 2,
+def entrance_builder(state: Dict[str, Any], map_id: str, workspace: Optional[Path] = None,
+                     draw: Optional[Dict[str, float]] = None) -> Optional[Tuple[str, str]]:
+    """The one hard rule (encounter_rules.entranceBuilder): on its map, a builder hero waits at the
+    entrance. The preferred one (the Consul) while still wild; else a wild eco builder drawn by the
+    company's draw, seeded like the rest of the sortie. None off that map or when none is left."""
+    rule = rules(workspace).get("entranceBuilder") or {}
+    if not rule.get("mapId") or str(map_id) != str(rule["mapId"]) or not rule.get("zoneId"):
+        return None
+    wild = set(_wild_ids(state))
+    present = set(present_heroes(state))
+    pool = [h for h in eco_builders(workspace) if h in wild and h not in present]
+    if not pool:
+        return None
+    prefer = str(rule.get("prefer") or "")
+    if prefer in pool:
+        return prefer, str(rule["zoneId"])
+    import hashlib
+    weights = [(h, max(0.05, float((draw or {}).get(h, 0.5)))) for h in pool]
+    roll = int(hashlib.md5(seed_for(state, map_id, "entrance").encode()).hexdigest()[:8], 16) / 0xFFFFFFFF
+    total = sum(w for _, w in weights)
+    acc = 0.0
+    for h, w in weights:
+        acc += w / total
+        if roll <= acc:
+            return h, str(rule["zoneId"])
+    return weights[-1][0], str(rule["zoneId"])
+
+
+def _marked_draw(field, ctx, pool: Dict[str, Any], map_id: str, marked: List[str], boost: float) -> Dict[str, float]:
+    """The draw with the company's attention on it: a wild hero believed on a marked zone of this map
+    is `boost` times likelier to be met. A weight, not a seat."""
+    draw = dict(ctx["draw"])
+    if not marked or boost == 1.0:
+        return draw
+    for hid, ent in field.entities.items():
+        roam = (pool.get(hid) or {}).get("roam") or {}
+        believed = ent.anchored_at or roam.get("zoneId") or next((z for z, w in ent.haunts.items() if z in ctx["maps"] and w >= 1.0), None)
+        if believed in marked and ctx["maps"].get(believed) == str(map_id):
+            draw[hid] = float(draw.get(hid, 0.5)) * boost
+    return draw
+
+
+def _meet(field, ctx, state: Dict[str, Any], map_id: str, k: int, marked: List[str], workspace) -> List[Dict[str, Any]]:
+    """Who is met on this map: the entrance builder (if the rule applies), then the seeded draw."""
+    r = rules(workspace)
+    wild = _wild_ids(state)
+    draw = _marked_draw(field, ctx, state.get("fieldPool") or {}, map_id, marked, float((r.get("markedGround") or {}).get("drawBoost", 1.0)))
+    out: List[Dict[str, Any]] = []
+    gate = entrance_builder(state, map_id, workspace, draw) if k > 0 else None
+    if gate:
+        h, z = gate
+        out.append({"heroId": h, "zoneId": z, "label": ctx["labels"].get(z, z), "score": 99.0, "p": 1.0,
+                    "anchored": True, "reasons": ["a builder waits at the jungle's entrance"]})
+    taken = {o["heroId"] for o in out}
+    picks = field.sample(str(map_id), k - len(out), seed=seed_for(state, map_id), present=ctx["present"],
+                         draw=draw, mood=ctx["mood"], candidates=[h for h in wild if h not in taken]) if k > len(out) else []
+    for e in picks:
+        reasons = list(e.reasons)
+        if e.entity in ctx["anchors"]:
+            reasons = [ctx["anchors"][e.entity]] + [r for r in reasons if r != "anchored here"]
+        if e.place in marked:
+            reasons = ["we marked this ground"] + reasons
+        out.append({"heroId": e.entity, "zoneId": e.place, "label": ctx["labels"].get(e.place, e.place), "score": e.score,
+                    "p": e.p_place, "anchored": e.anchored, "reasons": reasons[:5]})
+    return out
+
+
+def encounters_for_map(state: Dict[str, Any], map_id: str, *, workspace: Optional[Path] = None, limit: Optional[int] = None,
                        marked_zone_ids: Optional[Iterable[str]] = None) -> Optional[List[Dict[str, Any]]]:
     """Who the company meets on this map this sortie: [{heroId, zoneId, score, p, anchored, reasons}],
     seeded by campaign + mission + map. Marked zones are the company's attention. None = no module."""
@@ -319,36 +413,8 @@ def encounters_for_map(state: Dict[str, Any], map_id: str, *, workspace: Optiona
         return None
     field, ctx = built
     marked = [str(z) for z in (marked_zone_ids or []) if z]
-    wild = _wild_ids(state)
-    pool = state.get("fieldPool") or {}
-    # Attention collapse (the hub's target click is the sortie -> character link): a wild hero the
-    # company believes is on a zone it marked is met there, up to three, before the draw.
-    must = []
-    for hid in wild:
-        if len(must) >= 3:
-            break
-        ent = field.entities.get(hid)
-        if ent is None:
-            continue
-        roam = (pool.get(hid) or {}).get("roam") or {}
-        believed = ent.anchored_at or roam.get("zoneId") or next((z for z, w in ent.haunts.items() if z in ctx["maps"] and w >= 1.0), None)
-        if believed in marked and ctx["maps"].get(believed) == str(map_id):
-            must.append((hid, believed))
-    k = max(int(limit), len(must))
-    taken = {h for h, _ in must}
-    # The rest is the map's own draw, unmarked, so the hub can show it before the Drop
-    # (company_surface "encounterDraw": the same seeded order, minus who was marked).
-    picks = field.sample(str(map_id), k - len(must), seed=seed_for(state, map_id), present=ctx["present"],
-                         draw=ctx["draw"], mood=ctx["mood"], candidates=[h for h in wild if h not in taken])
-    out = [{"heroId": h, "zoneId": z, "label": ctx["labels"].get(z, z), "score": 99.0, "p": 1.0,
-            "anchored": h in ctx["anchors"], "reasons": ["we marked this ground"]} for h, z in must]
-    for e in picks:
-        reasons = list(e.reasons)
-        if e.entity in ctx["anchors"]:
-            reasons = [ctx["anchors"][e.entity]] + [r for r in reasons if r != "anchored here"]
-        out.append({"heroId": e.entity, "zoneId": e.place, "label": ctx["labels"].get(e.place, e.place), "score": e.score,
-                    "p": e.p_place, "anchored": e.anchored, "reasons": reasons[:5]})
-    return out
+    k = per_sortie(workspace) if limit is None else int(limit)
+    return _meet(field, ctx, state, map_id, k, marked, workspace)
 
 
 def draws_by_map(state: Dict[str, Any], workspace: Optional[Path] = None, *, depth: int = 5) -> Optional[Dict[str, List[Dict[str, Any]]]]:
@@ -358,12 +424,10 @@ def draws_by_map(state: Dict[str, Any], workspace: Optional[Path] = None, *, dep
     if built is None:
         return None
     field, ctx = built
-    wild = _wild_ids(state)
     out = {}
     for mid in sorted(set(ctx["maps"].values())):
-        picks = field.sample(mid, depth, seed=seed_for(state, mid), present=ctx["present"], draw=ctx["draw"],
-                             mood=ctx["mood"], candidates=wild)
-        out[mid] = [{"heroId": e.entity, "zoneId": e.place, "label": ctx["labels"].get(e.place, e.place)} for e in picks]
+        out[mid] = [{"heroId": e["heroId"], "zoneId": e["zoneId"], "label": e["label"]}
+                    for e in _meet(field, ctx, state, mid, depth, [], workspace)]
     return out
 
 
@@ -400,4 +464,5 @@ def belief_snapshot(world: Any, frame: Dict[str, Any]) -> Dict[str, Any]:
 
 
 __all__ = ["available", "build", "refresh_whereabouts", "encounters_for_map", "draw_observations",
-           "belief_snapshot", "ground_belief", "mood_from_frame", "present_heroes", "anchor_reason"]
+           "belief_snapshot", "ground_belief", "mood_from_frame", "present_heroes", "anchor_reason", "anchor_key",
+           "eco_builders", "entrance_builder", "per_sortie", "rules"]
