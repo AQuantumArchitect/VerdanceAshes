@@ -51,11 +51,12 @@ local BP_PER_XP = 0.42
 local BP_CAP = 2.00
 local RANGE_PER_XP = 0.42
 local RANGE_CAP = 2.00
--- Ketha and her Zagreus reach much farther (owner, 2026-10-26): double from the start, five times
--- at full experience. A Zagreus's 96 elmos become ~190 green, ~480 at 2.4 XP.
-local KETHA_RANGE_BASE = 2.00
-local KETHA_RANGE_PER_XP = 1.25
-local KETHA_RANGE_CAP = 5.00
+-- Ketha and her Zagreus: the build-range bonus is doubled (owner, 2026-10-26): +0.84 per craft XP up
+-- to triple, where everyone else gets +0.42 up to double. A Zagreus's 96 elmos become ~180 at
+-- Ketha's starting experience and 288 at the cap.
+local KETHA_RANGE_BASE = 1.00
+local KETHA_RANGE_PER_XP = 0.84
+local KETHA_RANGE_CAP = 3.00
 
 local function isKetha(unitID)
   for _, key in ipairs({ "va_hero_id", "va_pack_leader", "va_pack_id" }) do
@@ -126,12 +127,8 @@ local function ensureCraft(unitID, ud)
   if not ud then return nil end
   local baseBp = tonumber(ud.buildSpeed) or 0
   local baseRange = tonumber(ud.buildDistance) or 0
-  -- Prefer live params if engine already mutated them.
-  if Spring.GetUnitBuildParams then
-    local live = Spring.GetUnitBuildParams(unitID, "buildDistance")
-      or Spring.GetUnitBuildParams(unitID, "buildRange")
-    if type(live) == "number" and live > 0 then baseRange = live end
-  end
+  -- The base is the unit type's own distance. Never the live value: a refresh would read back what
+  -- the last refresh multiplied and multiply it again (the runaway reach of 2026-10-26).
   if Spring.GetUnitCurrentBuildPower then
     local liveBp = Spring.GetUnitCurrentBuildPower(unitID)
     if type(liveBp) == "number" and liveBp > 0 and baseBp <= 0 then baseBp = liveBp end

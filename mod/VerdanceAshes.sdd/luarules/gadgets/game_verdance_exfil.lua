@@ -154,8 +154,12 @@ end
 local function maybeMoveToExit()
   if not pad then return end
   if (tonumber((Spring.GetGameRulesParam("va_objective_complete"))) or 0) ~= 1 then return end
-  -- A rescue goes home the way it came: back to the deployment pad, door or no door.
-  if mission and mission.objective and mission.objective.rezHeroId then return end
+  -- A rescue goes home the way it came: back to the deployment pad. But a hero raised in the wound
+  -- of a territory mission does not turn it into a rescue: the company leaves by the door, or from
+  -- the ground, it took.
+  local rule = "deployment"
+  if GG.VA_ExtractRule then rule = GG.VA_ExtractRule() end
+  if mission and mission.objective and mission.objective.rezHeroId and rule ~= "territory" then return end
   local exit = mission and mission.exitDoorZoneId and tostring(mission.exitDoorZoneId)
   if exit and pad.zoneId ~= exit and anchorOf[exit] then
     placePad(exit, anchorOf[exit][1], anchorOf[exit][2], PAD_RADIUS)
@@ -165,7 +169,7 @@ local function maybeMoveToExit()
   end
   -- Territory: the company extracts on the ground it took, once it is secured. What it built there
   -- stays (the footprint is the zone's holdings); nobody has to walk back to the drop.
-  local rule, zone = "deployment", nil
+  local zone = nil
   if GG.VA_ExtractRule then rule, zone = GG.VA_ExtractRule() end
   if rule == "territory" and zone and zone ~= "" and pad.zoneId ~= zone and anchorOf[zone] then
     placePad(zone, anchorOf[zone][1], anchorOf[zone][2], PAD_RADIUS)
@@ -341,7 +345,7 @@ local function manifest()
     frame = Spring.GetGameFrame() or 0,
     pad = pad and { zoneId = pad.zoneId, label = pad.label, x = math.floor(pad.x), z = math.floor(pad.z), radius = pad.r } or nil,
     destinations = destinations(),
-    going = { heroes = {}, units = {}, packUnits = {}, unitCount = 0, structures = 0, metal = 0 },
+    going = { heroes = {}, units = {}, packUnits = {}, hiredUnits = {}, unitCount = 0, structures = 0, metal = 0 },
     staying = { heroes = {}, units = {}, unitCount = 0, structures = {}, structureCount = 0, metal = 0 },
     enemyOnPad = 0,
     seen = {},
@@ -379,6 +383,11 @@ local function manifest()
           local tag = tostring(Spring.GetUnitRulesParam(uid, "va_package_tag") or "")
           if tag:sub(1, 5) == "crew_" then
             g.packUnits[ud and ud.name or "?"] = (g.packUnits[ud and ud.name or "?"] or 0) + 1
+          end
+          -- the shop hires for one drop: delivered units lift but never join the reserve
+          local hired = tostring(Spring.GetUnitRulesParam(uid, "va_delivery_mode") or "")
+          if hired ~= "" and hired ~= "0" then
+            g.hiredUnits[ud and ud.name or "?"] = (g.hiredUnits[ud and ud.name or "?"] or 0) + 1
           end
         end
         g.metal = g.metal + metal

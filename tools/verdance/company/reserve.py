@@ -108,9 +108,11 @@ def homecoming(roster: Dict[str, Any], result: Dict[str, Any]) -> Dict[str, Any]
             reserve.pop(d, None)
     going = ((result.get("manifest") or {}).get("going") or {})
     lifted = _counts(going.get("units"))
-    for d, n in _counts(going.get("packUnits")).items():
-        if d in lifted:
-            lifted[d] = max(0, lifted[d] - n)
+    # a hero's pack comes home with the hero; what the shop hired was for this drop only
+    for key in ("packUnits", "hiredUnits"):
+        for d, n in _counts(going.get(key)).items():
+            if d in lifted:
+                lifted[d] = max(0, lifted[d] - n)
     lifted = {d: n for d, n in lifted.items() if n > 0 and not d.endswith("com")}
     for d, n in lifted.items():
         reserve[d] = int(reserve.get(d, 0)) + n

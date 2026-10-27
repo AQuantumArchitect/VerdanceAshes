@@ -781,7 +781,8 @@
       "packCombined": 300,
       "packMetal": 260,
       "packEnergy": 2800,
-      "startXp": 0.45
+      "startXp": 1.0,
+      "startXpFixed": 1.0
     },
     "brakhov": {
       "role": "band",

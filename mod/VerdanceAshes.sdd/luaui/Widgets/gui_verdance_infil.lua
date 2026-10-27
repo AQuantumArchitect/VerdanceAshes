@@ -72,9 +72,27 @@ local function compose()
   for _, h in ipairs(mission.heroes or {}) do
     if h.id then C.heroes[#C.heroes + 1] = { name = tostring(h.name or h.id), crit = h.missionCritical == true, level = tonumber(h.level) or 1, rank = tostring(h.rank or "Runner") } end
   end
-  -- what else you brought: the player's force groups, by human name
+  -- what else you brought: what actually comes down with the heroes: the reserve you chose to bring
+  -- (roster.cadre) and what the shop sent (commerce.deploy). The layout force in playableSetup is a
+  -- preview the gadget discards, so it is read only by an older mission that has neither.
   local counts, order = {}, {}
-  local setup = mission.playableSetup
+  local function add(def, n)
+    local ud = UnitDefNames and UnitDefNames[def]
+    local name = (ud and (ud.humanName or ud.name)) or def
+    if name ~= "" and (tonumber(n) or 0) > 0 then
+      if not counts[name] then counts[name] = 0; order[#order + 1] = name end
+      counts[name] = counts[name] + tonumber(n)
+    end
+  end
+  local cadre = mission.roster and mission.roster.cadre
+  local deploy = mission.commerce and mission.commerce.deploy
+  if type(cadre) == "table" or type(deploy) == "table" then
+    for def, n in pairs(cadre or {}) do add(tostring(def), n) end
+    for _, item in ipairs(deploy or {}) do
+      if type(item) == "table" and item.unitDef then add(tostring(item.unitDef), tonumber(item.count) or 1) end
+    end
+  end
+  local setup = (next(counts) == nil and not cadre and not deploy) and mission.playableSetup or nil
   for _, force in ipairs((setup and setup.forces) or {}) do
     if tonumber(force.teamID) == 0 then
       for _, group in ipairs(force.groups or {}) do

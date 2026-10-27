@@ -5751,9 +5751,12 @@ end
 
 -- Where the company leaves from (2026-10-24): taking ground extracts ON the ground it took, once
 -- secured; a rescue (raise a named hero) goes back to the deployment pad. The exfil gadget asks.
+-- A hero raised in the wound of a territory mission (taking a lane, a door, a plateau) is a rescue
+-- inside a territory mission, not a rescue contract: the company still leaves from the ground it
+-- took (owner, 2026-10-26, after the Greenest Fields door). Only a mission that is the rescue goes
+-- home by the way it came.
 function GG.VA_ExtractRule()
   local obj = mission and mission.objective or {}
-  if obj.rezHeroId then return "deployment" end
   local mode = vaObjectiveMode(objectiveKind())
   if mode == "capture" or (capture and capture.mode) or VA_KINDS.fortify[objectiveKind()] then
     return "territory", tostring(obj.targetZoneId or mission.targetZoneId or "")
@@ -7153,6 +7156,12 @@ function VA_LOGISTICS.spawnCommerceDeployKit()
             packageTag = lid,
           }, playerTeamID, baseX, baseZ, 0, 0, {}, { role = "player_crew" })
           total = total + n
+          -- hired for this drop: the manifest keeps them out of the reserve
+          for _, uid in ipairs(Spring.GetTeamUnits(playerTeamID) or {}) do
+            if tostring(Spring.GetUnitRulesParam(uid, "va_package_tag") or "") == lid then
+              Spring.SetUnitRulesParam(uid, "va_delivery_mode", "kit", { public = true })
+            end
+          end
           Spring.Echo("VA_COMMERCE_DEPLOY constructor=" .. defName .. " n=" .. tostring(n) .. " listing=" .. lid)
         else
           Spring.Echo("VA_COMMERCE_DEPLOY_FAIL constructor_def=" .. defName)
@@ -7203,6 +7212,12 @@ function VA_LOGISTICS.spawnCommerceDeployKit()
             packageTag = lid,
           }, playerTeamID, baseX, baseZ, 0, 0, {}, { role = "player_crew" })
           total = total + n
+          -- hired for this drop: the manifest keeps them out of the reserve
+          for _, uid in ipairs(Spring.GetTeamUnits(playerTeamID) or {}) do
+            if tostring(Spring.GetUnitRulesParam(uid, "va_package_tag") or "") == lid then
+              Spring.SetUnitRulesParam(uid, "va_delivery_mode", "kit", { public = true })
+            end
+          end
         end
       else
         Spring.Echo("VA_COMMERCE_DEPLOY_SKIP kind=" .. kind .. " listing=" .. lid)

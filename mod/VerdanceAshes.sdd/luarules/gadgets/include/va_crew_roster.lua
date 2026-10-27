@@ -35,7 +35,7 @@ M.HEROES = {
     extras = 1,
     noTnbStake = true,
     missionCritical = true,
-    startXp = 0.45,
+    startXp = 1.0,
     packMind = "solo",
     blurb = "Only rez captain — life-line of the kettles. Wrecks come home.",
   },

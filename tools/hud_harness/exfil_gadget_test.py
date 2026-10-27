@@ -33,6 +33,7 @@ local mission = { missionId = "t1", deploymentMapId = "t", deploymentZoneId = "P
 local U = {
   [1] = { x = 2048, z = 1024, def = 1, team = 0, hero = "pavise" },
   [2] = { x = 100,  z = 100,  def = 1, team = 0 },
+  [6] = { x = 200,  z = 200,  def = 1, team = 0, hired = "pawn_launcher" },  -- a Thug from the shop: this drop only
   [5] = { x = 300,  z = 300,  def = 1, team = 0, tag = "crew_escort_pavise_1" },  -- an escort: pack, not army
   [3] = { x = 3900, z = 1900, def = 2, team = 0, hero = "solarium" },
   [4] = { x = 2048, z = 3500, def = 1, team = 0 },
@@ -58,7 +59,7 @@ Spring = {
   ValidUnitID = function(id) return U[id] ~= nil end, GetUnitIsDead = function() return false end,
   GetUnitPosition = function(id) local u = U[id]; return u.x, 0, u.z end,
   GetUnitDefID = function(id) return U[id].def end, GetUnitTeam = function(id) return U[id].team end,
-  GetUnitRulesParam = function(id, k) local u = U[id]; if k == "va_hero_id" or k == "va_hero_name" then return u.hero end; if k == "va_package_tag" then return u.tag end end,
+  GetUnitRulesParam = function(id, k) local u = U[id]; if k == "va_hero_id" or k == "va_hero_name" then return u.hero end; if k == "va_package_tag" then return u.tag end; if k == "va_delivery_mode" then return u.hired end end,
   AreTeamsAllied = function(a, b) return a == b end,
   GetUnitHealth = function() return 80, 100 end, GetUnitExperience = function() return 0 end,
   GetTeamList = function() return { 0, 1 } end, GetGaiaTeamID = function() return -1 end,
@@ -84,14 +85,19 @@ local m = RULES.va_manifest_json
 local function has(pat, why) assert(m:find(pat, 1, true), why .. "\n" .. m) end
 has('"going":{"heroes":[{"heroId":"pavise"', "hero in the pad zone goes")
 has('"packUnits":{"corthud":1}', "an escort is counted as pack, not army")
-has('"unitCount":2', "a unit at the zone's far corner (outside the old circle) goes, and the escort")
+has('"unitCount":3', "a unit at the zone's far corner (outside the old circle) goes, and the escort")
 has('{"heroId":"solarium","name":"solarium","unitDef":"armnanotc"}]', "an immobile hero off the pad is packed up and lifts (Hearth was stranded)")
 has('"staying":{"heroes":[]', "... and is not left behind as a person in the field")
 has('"units":{"FAR":1}', "a unit outside the pad zone stays")
 has('"enemyOnPad":1', "a mobile enemy anywhere in the pad zone is on the pad; a wall is not")
 has('"dropped":["pavise","solarium","ketha"]', "the manifest names who dropped (Python buries whoever is nowhere)")
 print("ok   manifest: pad is the landing zone; an immobile hero lifts from where it stands")
--- taking a door: once the objective is done the extraction moves onto it
+has('"hiredUnits":{"corthud":1}', "a unit the shop sent lifts but is marked hired (kept out of the reserve)")
+print("ok   the shop's units are hired for this drop")
+-- taking a door: once the objective is done the extraction moves onto it, even when the objective was
+-- raising a hero in the wound (a territory mission with a rescue inside it, Greenest Fields 2026-10-26)
+mission.objective = { rezHeroId = "mask", targetZoneId = "FAR" }
+GG.VA_ExtractRule = function() return "territory", "FAR" end
 assert(RULES.va_pad_zone == "PAD", "the pad starts on the landing zone")
 RULES.va_objective_complete = 1
 for f = 62, 92 do gadget:GameFrame(f) end

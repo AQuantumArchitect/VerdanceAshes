@@ -963,6 +963,20 @@ def settle_commerce_after_sortie(
                 "at": utc_now(),
             })
 
+    # What the shop sells is for one drop (owner, 2026-10-26): a bought package or constructor came
+    # down with this sortie and is spent. Anything of it that lifts home is the company's by then
+    # only if it was not hired (the exfil manifest keeps hired units out of the reserve).
+    for lid, rec in list((commerce.get("owned") or {}).items()):
+        if not isinstance(rec, dict) or rec.get("loan"):
+            continue
+        if str(rec.get("kind") or "purchase_package") in ("purchase_package", "package", "constructor"):
+            commerce["owned"].pop(lid, None)
+            commerce.setdefault("ledger", []).append({
+                "op": "drop_spent", "listingId": lid, "qty": rec.get("qty"),
+                "at": utc_now(), "missionNumber": int(state.get("missionNumber", 1) or 1),
+            })
+            notes.append(f"{lid}: spent on this drop")
+
     commerce.setdefault("ledger", []).append({
         "op": "sortie_settle",
         "tenebriumGained": gained_t,
