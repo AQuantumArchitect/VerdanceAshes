@@ -1304,7 +1304,9 @@ $script:mapOccupation = @()
 $script:primaryEnemyTeamID = $null
 $script:wildTeamID = $null   # the raptor team the Rock Jungle dens ride (Add-RaptorCamp)
 $script:primaryEnemySide = $null
-$script:warWrecks = @()   # the standing war's dead (wrecks and heaps), laid by game_verdance_war_wrecks.lua
+$script:warWrecks = @()
+$script:scoutParties = @()   # the Eye's Armada scout parties (game_verdance_scouts.lua)
+$script:eyeStory = if ($intent.PSObject.Properties["eyeStory"] -and $intent.eyeStory) { $intent.eyeStory } else { $null }   # the standing war's dead (wrecks and heaps), laid by game_verdance_war_wrecks.lua
 $script:secondaryMeta = @()  # Drop 4: placed secondary-objective camps (id/zone/required/x/z)
 $nextMissionCandidates = @()  # rebuilt after occupation so picks point at live camps
 $script:livingShellPayload = $null
@@ -2425,7 +2427,16 @@ function Add-StandingWar {
     foreach ($d in $byDef.Keys) { $specs += (Spec $d ($byDef[$d].Count / 4) 0 0 0 $false $null $null $null $byDef[$d].ToArray()) }
     $field = "war$($wt.teamID)_field"
     $script:baseRecipes[$field] = $specs
-    $force = [ordered]@{ id = $field; label = "$($wt.W.label) field"; teamID = $wt.teamID; side = $wt.W.side; faction = [string]$camp.faction; role = "standing_war"; zoneId = [string]$camp.zoneId; base = [ordered]@{ x = $c[0]; z = $c[1] }; recipe = $field }
+    # The Eye (verdance.world.eye_story): Armada's job makes the Cortex camp the target; Cortex's job
+    # makes it the company's ally.
+    $warRole = "standing_war"
+    if ($script:eyeStory -and [string]$camp.faction -eq "cortex") {
+      if ([string]$script:eyeStory.kind -eq "raze_camp") { $warRole = "objective_target" }
+      if ([string]$script:eyeStory.alliedWith -eq "cortex") {
+        $script:alliances += [ordered]@{ allyTeamA = 0; allyTeamB = $wt.allyID; allied = $true }
+      }
+    }
+    $force = [ordered]@{ id = $field; label = "$($wt.W.label) field"; teamID = $wt.teamID; side = $wt.W.side; faction = [string]$camp.faction; role = $warRole; zoneId = [string]$camp.zoneId; base = [ordered]@{ x = $c[0]; z = $c[1] }; recipe = $field }
     if ($camp.PSObject.Properties["bank"] -and $camp.bank) {
       $force.bank = [ordered]@{ metal = [double]$camp.bank.metal; energy = [double]$camp.bank.energy }
     }
@@ -2454,6 +2465,28 @@ function Add-StandingWar {
     Write-Host ("Living shell kept beside the war: {0} shell allied to the war's {0}" -f $script:shellFaction)
   }
   Write-Host ("Standing war: {0}" -f (($camps | ForEach-Object { "$($_.faction)@$($_.zoneId)" }) -join " vs "))
+  if ($script:eyeStory) { Add-EyeScouts $script:eyeStory }
+}
+
+function Add-EyeScouts {
+  # The Eye's Armada scouts (verdance.world.eye_story): one Simple AI team per corner the company did
+  # not land in, empty at the start (game_verdance_scouts.lua strips the engine's commander and walks
+  # the party in at its arrival time). Allied to the company when Armada is the patron.
+  param($Story)
+  foreach ($p in @($Story.scoutParties)) {
+    $c = @([double]$p.x, [double]$p.z)
+    $wt = New-WarTeam "armada" $c ("scouts " + [string]$p.zoneId) 0.06
+    $script:ai[$script:ai.Count - 1].name = "SimpleAI(Armada scouts $([string]$p.zoneId))"
+    $script:ai[$script:ai.Count - 1].shortName = "SimpleAI"
+    if ([string]$Story.alliedWith -eq "armada") {
+      $script:alliances += [ordered]@{ allyTeamA = 0; allyTeamB = $wt.allyID; allied = $true }
+    }
+    $script:scoutParties += [ordered]@{
+      teamID = $wt.teamID; zoneId = [string]$p.zoneId; x = $c[0]; z = $c[1]
+      arriveSeconds = [int]$p.arriveSeconds; units = @($p.units)
+    }
+  }
+  Write-Host ("Eye scouts: {0} Armada parties ({1} hires the company)" -f @($Story.scoutParties).Count, [string]$Story.patron)
 }
 
 function Add-Kings {
@@ -3659,6 +3692,7 @@ $scenario = [ordered]@{
     mapOccupation = @($script:mapOccupation)
     livingShell = $(if ($script:livingShellPayload) { $script:livingShellPayload } else { $null })
     warWrecks = @($script:warWrecks)
+    scoutParties = @($script:scoutParties)
     occupationModel = "living_shell"
     sessionMode = if ($intent.sessionMode) { [string]$intent.sessionMode } else { "same_map" }
     capture = [ordered]@{

@@ -21,7 +21,7 @@ from verdance.common import canonical_map_id
 
 MAX_TIER = 3
 NO_TIERS = {"ancient_bastion", "all_that_simmers"}
-RAPTOR_MAPS = {"the_rock_jungle", "eye_of_horus"}
+RAPTOR_MAPS = {"the_rock_jungle"}  # the Eye's rim was glassed clean (2026-10-26)
 
 # Raptor pace by tier: grace before the first waves, and how far into the raptors' own clock the
 # drop starts (game_verdance raptor_spawner_defense.lua: va_raptor_grace_seconds, va_raptor_clock_seconds).

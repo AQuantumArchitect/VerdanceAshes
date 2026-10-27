@@ -5408,6 +5408,7 @@ end
 
 function onObjectiveComplete(how)
   if objectiveComplete then return end
+  if how == "scouts_stopped" and objectiveKind() ~= "hunt_scouts" then return end
   -- A wreck in the wound makes raising that hero the job; nothing else stands in for it.
   local rezHero = mission and mission.objective and mission.objective.rezHeroId
   if rezHero and how ~= "rescued" then return end
@@ -6871,6 +6872,12 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
         if (targetForceStructures[forceId] or 0) <= 0 then
           chosenTargetForceId = forceId
           onObjectiveComplete("target_destroyed")
+        end
+      elseif kind == "raze_camp" then
+        -- The Eye's camp (verdance.world.eye_story): razed once nearly all its works are down.
+        local need = math.max(1, math.ceil(objectiveTargetCount * 0.85))
+        if objectiveTargetsDestroyed >= need then
+          onObjectiveComplete("camp_razed")
         end
       elseif kind == "eco_raid" then
         -- A raid credits once ENOUGH of the works are wrecked, not all of them.

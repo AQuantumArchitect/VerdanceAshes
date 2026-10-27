@@ -44,7 +44,9 @@ def test_chains_switchback_in_stages_and_never_climb_out():
             rings = [s["ring"] for s in steps]
             assert all(b in (a, a - 1) for a, b in zip(rings, rings[1:])), (m, side, rings)
             staged += len(steps) >= 4
-    assert staged >= 2  # the deep wars (Tabula, the Eye) take four or more sorties, not a dive straight in
+    # the deep war (Tabula's terraces) takes four or more sorties, not a dive straight in; the Eye's
+    # camp is one compact crater since 2026-10-26, three sorties from its gate to its heart
+    assert staged >= 1
 
 
 def test_straight_dive_is_still_available_and_no_longer_than_the_switchbacks():

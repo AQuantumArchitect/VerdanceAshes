@@ -61,7 +61,10 @@ def test_a_tier_recipe_adds_its_seats_and_keeps_the_company_seat():
                 assert 0 < x < mx and 0 < z < mz, (m, tier, t["key"])
         # every seat a tier can add is in the war table, so the theater can field it
         table = {s["key"] for s in theaters.WARS[m]}
-        assert set(W.tier_seat_keys(rec)) - {rec["playerSeat"]} <= table, m
+        fielded = rec.get("fieldSides") or list(rec["sides"])
+        keys = {t["key"] for t in rec["teams"] if t["ally"] in fielded} | \
+            {t["key"] for over in (rec.get("tiers") or {}).values() for t in over.get("addTeams") or [] if t["ally"] in fielded}
+        assert keys - {rec["playerSeat"]} <= table, m
 
 
 def test_a_tier_not_baked_falls_back_to_the_one_below():

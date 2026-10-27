@@ -521,10 +521,11 @@ def ensure_zone_memory(state: Dict[str, Any], workspace: Path) -> None:
                 # A set piece's ground (Koom's standing war): its side holds it from the start.
                 actor = "NullMercsAI" if standing == "nullmercs" else "SimpleAI"
                 control = standing
-            elif (map_id == WILD_HOME_MAP or (map_id == "eye_of_horus" and zone_id in EYE_RIM_ZONES)
+            elif (map_id == WILD_HOME_MAP
                   or "raptors" in tags or "wilds" in tags or "hive" in role or "raptor" in role):
-                # The Eye's outer rim is raptor ground too (owner call, 2026-10-23); Cortex keeps the eye.
-                # The Rock Jungle is wild ground end to end: raptors hold every zone until
+                # The Eye's rim is no longer raptor ground (owner call, 2026-10-26): Armada glassed the
+                # crater to stop the spread, and it worked. The Rock Jungle is wild ground end to end:
+                # raptors hold every zone until
                 # someone out-builds them there.
                 actor = "RaptorsAI"
                 control = "wild"

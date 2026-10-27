@@ -221,6 +221,8 @@ def build_snapshot(recipe: Dict[str, Any], dump: Dict[str, Any], *, costs: Optio
         if t["key"] == player_key:
             pulled = {"key": t["key"], "units": len(mine), "commanders": sum(1 for u in mine if u["kind"] == "C")}
             continue
+        if recipe.get("fieldSides") and t["ally"] not in recipe["fieldSides"]:
+            continue  # a side the history needed but missions do not field (its wrecks stay)
         done = [u for u in mine if u["built"] >= min_built]
         kept = len(done)
         if kept > cap:

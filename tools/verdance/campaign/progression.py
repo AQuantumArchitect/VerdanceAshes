@@ -98,7 +98,9 @@ def apply_reputation_companion(state: Dict[str, Any], result: Dict[str, Any], el
     is_defeat = verdict in ("defeat", "failed", "failure") or status in ("defeat", "failed", "failure")
 
     # Cortex crater grudge — blow up their stuff, customers become enemies fast.
-    cortex_theater = map_id in CORTEX_CRATER_MAPS or "cortex" in against or against == "cor"
+    # On the crater, hunting Armada's scouts for Cortex is not a grudge (verdance.world.eye_story).
+    cortex_theater = ((map_id in CORTEX_CRATER_MAPS and "armada" not in against)
+                      or "cortex" in against or against == "cor")
     if cortex_theater and destroyed:
         if is_victory:
             hit = CORTEX_GRUDGE_VICTORY
@@ -109,6 +111,10 @@ def apply_reputation_companion(state: Dict[str, Any], result: Dict[str, Any], el
         else:
             hit = CORTEX_GRUDGE_PARTIAL * 0.5
         rep["cortex"] = clamp(float(rep.get("cortex", REP_START_CORTEX)) + hit, 0, 100)
+
+    # The crater's patron pays: stopping Armada's scouts for Cortex warms Cortex.
+    if map_id in CORTEX_CRATER_MAPS and "armada" in against and is_victory:
+        rep["cortex"] = clamp(float(rep.get("cortex", REP_START_CORTEX)) + 3.0, 0, 100)
 
     # Modest Armada cool-off when you raid their eco works.
     if against == "armada" and destroyed and (is_victory or is_partial):

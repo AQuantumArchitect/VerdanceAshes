@@ -123,6 +123,7 @@ from verdance.world import (
     roads as _roads,
     theaters as _theaters,
     visit_tiers as _vt,
+    eye_story as _eye,
     landing_zones as _lz_seed,
 )
 from verdance.belief import manifest as _mf, homecoming as _bh, intel_lua as _il
@@ -501,6 +502,19 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
     intent["visitTier"] = visit_tier
     if visit_tier.get("label") and isinstance(intent.get("briefing"), dict):
         intent["briefing"].setdefault("lines", []).append({"speaker": "ketha", "text": visit_tier["label"], "tag": "visit"})
+    # The Eye of Horus: whoever thinks better of the company hires it (verdance.world.eye_story).
+    if canonical_map_id(map_id) == _eye.MAP_ID and not intent.get("finale"):
+        pad_xz = _theaters._point(_theaters._zones(map_id, workspace).get(str(pad), {})) if pad else None
+        eye = _eye.story(state, pad_xz)
+        intent["eyeStory"] = eye
+        intent["objectiveTarget"] = _eye.objective(eye)
+        intent["objective"] = intent["objectiveTarget"]["kind"]
+        intent["targetZoneId"] = intent["objectiveTarget"]["targetZoneId"]
+        for k in ("captureZoneIds", "secondaryCaptureZoneIds", "exitDoorZoneId"):
+            intent.pop(k, None)
+        if isinstance(intent.get("briefing"), dict):
+            intent["briefing"].setdefault("lines", []).append(
+                {"speaker": "ketha", "text": _eye.BRIEFING[eye["patron"]], "tag": "contract"})
     theater = _theaters.theater_for(state, map_id, workspace, pad, visit_tier["tier"])
     if theater:
         intent["theater"] = theater
@@ -691,6 +705,11 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
     dv_flips = apply_zone_dv(state, result, workspace)
     door_changes = _roads.record_homecoming(state, result, workspace)
     graph_delta = apply_graph_deltas(state, result, elapsed)
+    # The Eye's contracts name their enemy (verdance.world.eye_story); the result only names the job.
+    if not result.get("against"):
+        _ek = str(result.get("objectiveKind") or result.get("objectiveArchetype") or "")
+        if _ek in ("hunt_scouts", "raze_camp"):
+            result = {**result, "against": "armada" if _ek == "hunt_scouts" else "cortex"}
     apply_reputation_companion(state, result, elapsed)
     try:
         evaluate_home_clear(state, result)

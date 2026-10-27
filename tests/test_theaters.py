@@ -34,19 +34,10 @@ def _anchor(map_id, zone_id):
     return theaters._point(z)
 
 
-def test_the_eye_rim_is_wild_and_the_eye_is_not():
-    wild = theaters._wild(_state(), "eye_of_horus")
-    assert set(theaters.EYE_RIM_ZONES) <= wild
-    assert not {"EOH_C_GATE", "EOH_C_LANE", "EOH_C_INNER_GATE", "EOH_C_INNER_LANE"} & wild
-
-
-def test_eye_dens_sit_on_the_rim_and_clear_of_the_pad():
-    dens = theaters.wild_dens(_state(), "eye_of_horus", ROOT, "EOH_NW_BASTION")
-    assert len(dens) >= 6
-    pad = _anchor("eye_of_horus", "EOH_NW_BASTION")
-    for d in dens:
-        assert min(d["x"], 1 - d["x"], d["z"], 1 - d["z"]) <= 0.08, d       # on the edge
-        assert math.hypot(d["x"] - pad[0], d["z"] - pad[1]) >= theaters.PAD_CLEARANCE
+def test_the_eye_has_no_wild_ground_left():
+    # Armada glassed the crater to stop the raptors' spread, and it worked (2026-10-26).
+    assert not theaters._wild(_state(), "eye_of_horus")
+    assert theaters.wild_dens(_state(), "eye_of_horus", ROOT, "EOH_NW_BASTION") == []
 
 
 def test_jungle_dens_skip_the_hive_and_the_pad():
@@ -97,7 +88,9 @@ def test_the_war_table_is_the_recipes_seats():
     for map_id, seats in theaters.WARS.items():
         rec = _war.load_recipe(ROOT, map_id)
         every = list(rec["teams"]) + [t for over in (rec.get("tiers") or {}).values() for t in over.get("addTeams") or []]
-        assert {(t["key"], rec["sides"][t["ally"]]["faction"], t["zoneId"]) for t in every if t["key"] != rec["playerSeat"]} == \
+        fielded = rec.get("fieldSides") or list(rec["sides"])  # the Eye fields only its Cortex camp
+        assert {(t["key"], rec["sides"][t["ally"]]["faction"], t["zoneId"]) for t in every
+                if t["key"] != rec["playerSeat"] and t["ally"] in fielded} == \
             {(c["key"], c["faction"], c["zoneId"]) for c in seats}, map_id
         assert theaters.STANDING_CONTROL[map_id] == {c["zoneId"]: c["faction"] for c in seats
                                                       if not (map_id == "eye_of_horus" and c["zoneId"] in theaters.EYE_RIM_ZONES)
@@ -114,7 +107,8 @@ def test_every_baked_war_has_two_sides_and_the_company_seat_empty():
         pad = next(t for t in rec["teams"] if t["key"] == rec["playerSeat"])
         war = theaters.standing_war(map_id, ROOT, "KV_NW_MUSTER" if map_id == "koom_valley" else pad["zoneId"])
         assert {c["faction"] for c in war["camps"]} >= {"armada"} or {c["faction"] for c in war["camps"]} >= {"cortex"}, map_id
-        assert len({c["faction"] for c in war["camps"]}) == 2, map_id
+        # a war fields both its sides, unless its history keeps only one (the Eye's Cortex camp)
+        assert len({c["faction"] for c in war["camps"]}) == len(rec.get("fieldSides") or rec["sides"]), map_id
         assert pad["zoneId"] not in {c["zoneId"] for c in war["camps"]} or map_id == "ancient_bastion", map_id
         assert all(c["units"] and c["bank"] for c in war["camps"]), map_id
 

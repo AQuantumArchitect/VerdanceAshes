@@ -6,19 +6,22 @@
     6144,
     7168
   ],
-  "character": "Eye of Horus, the glassed core: three Cortex seats hold the south and centre against Armada in the north, twenty minutes in. The Armada's north-west seat is the company's.",
+  "character": "The Eye of Horus, the glassed crater: years ago Armada glassed the crater to stop the raptors' terraforming spread; it worked, and cauterized the ground. Long after, a Cortex mercenary operation set up in the uninhabited crater. The bake is that history: four Cortex seats dug in around the crater against four Armada seats assaulting from the corners, twenty to thirty minutes in, deeper each visit. Missions field only the Cortex camp; Armada's assault is gone except for its wrecks.",
   "minutes": 20,
   "seed": 3314,
   "dry": true,
   "playerSeat": "nw",
-  "notes": "All five seats are the map's own start positions: Cortex take the three southern ones (they hold the centre in force), Armada the two northern ones. The company enters by the NW bastion door and takes the seat beside it, so it tips a two-against-three.",
+  "fieldSides": [
+    "crater"
+  ],
+  "notes": "Armada's corners are the map's own start positions (all four are hard_aggressive; nw stands in for the company seat the war code expects and is pulled with the rest of Armada). Cortex's seats sit on the four crater zones. Only the crater side is kept for missions (fieldSides); every side's wrecks are. The assault is meant to fail: Armada's corners are BARb medium (nw hard_aggressive, the company-seat stand-in) and the crater's Cortex dig in: tier 1 twenty minutes at +30%, tier 2 twenty-five at +50%, tier 3 thirty at +70%. By the freeze Armada's corners are wrecks.",
   "sides": {
-    "north": {
+    "corners": {
       "faction": "armada",
       "side": "Armada",
       "rgb": "0.25 0.48 1.0"
     },
-    "south": {
+    "crater": {
       "faction": "cortex",
       "side": "Cortex",
       "rgb": "0.9 0.2 0.2"
@@ -27,58 +30,99 @@
   "teams": [
     {
       "key": "nw",
-      "ally": "north",
+      "ally": "corners",
       "profile": "hard_aggressive",
       "zoneId": "EOH_NW_MUSTER",
       "startElmos": [
         573,
         1075
       ],
-      "label": "Northwest (the company's seat)"
+      "label": "Northwest corner"
     },
     {
       "key": "ne",
-      "ally": "north",
-      "profile": "hard",
+      "ally": "corners",
+      "profile": "medium",
       "zoneId": "EOH_NE_CAUSEWAY",
       "startElmos": [
         5170,
         989
       ],
-      "label": "Northeast"
+      "label": "Northeast corner"
     },
     {
       "key": "sw",
-      "ally": "south",
-      "profile": "hard",
+      "ally": "corners",
+      "profile": "medium",
       "zoneId": "EOH_SW_CAUSEWAY",
       "startElmos": [
         1003,
         6207
       ],
-      "label": "Southwest"
-    },
-    {
-      "key": "s",
-      "ally": "south",
-      "profile": "hard",
-      "zoneId": "EOH_C_INNER_GATE",
-      "startElmos": [
-        3308,
-        5992
-      ],
-      "label": "South"
+      "label": "Southwest corner"
     },
     {
       "key": "se",
-      "ally": "south",
-      "profile": "hard",
+      "ally": "corners",
+      "profile": "medium",
       "zoneId": "EOH_SE_MUSTER",
       "startElmos": [
         5557,
         6078
       ],
-      "label": "Southeast"
+      "label": "Southeast corner"
+    },
+    {
+      "key": "c_n",
+      "ally": "crater",
+      "profile": "va_dig_in",
+      "zoneId": "EOH_C_GATE",
+      "startElmos": [
+        2764,
+        2365
+      ],
+      "label": "Crater north gate",
+      "virtual": true,
+      "handicap": 30
+    },
+    {
+      "key": "c_ne",
+      "ally": "crater",
+      "profile": "va_dig_in",
+      "zoneId": "EOH_C_LANE",
+      "startElmos": [
+        3256,
+        2938
+      ],
+      "label": "Crater lane",
+      "virtual": true,
+      "handicap": 30
+    },
+    {
+      "key": "c_sw",
+      "ally": "crater",
+      "profile": "va_dig_in",
+      "zoneId": "EOH_C_INNER_LANE",
+      "startElmos": [
+        2887,
+        4229
+      ],
+      "label": "Crater inner lane",
+      "virtual": true,
+      "handicap": 30
+    },
+    {
+      "key": "c_s",
+      "ally": "crater",
+      "profile": "va_dig_in",
+      "zoneId": "EOH_C_INNER_GATE",
+      "startElmos": [
+        3502,
+        4730
+      ],
+      "label": "Crater inner gate",
+      "virtual": true,
+      "handicap": 30
     }
   ],
   "snapshot": {
@@ -88,29 +132,17 @@
   },
   "tiers": {
     "2": {
-      "profiles": {
-        "south": "va_dig_in"
+      "minutes": 25,
+      "handicap": {
+        "crater": 50
       }
     },
     "3": {
-      "profiles": {
-        "south": "va_dig_in"
-      },
-      "addTeams": [
-        {
-          "key": "fort_se",
-          "ally": "south",
-          "profile": "va_warden",
-          "zoneId": "EOH_SE_BASTION",
-          "startElmos": [
-            4977,
-            5878
-          ],
-          "label": "South-east bastion fort",
-          "virtual": true,
-          "handicap": 20
-        }
-      ]
+      "minutes": 30,
+      "handicap": {
+        "crater": 70
+      }
     }
-  }
+  },
+  "shape": "encircled"
 }

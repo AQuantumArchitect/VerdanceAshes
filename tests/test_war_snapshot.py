@@ -134,7 +134,7 @@ def test_every_map_has_a_sound_recipe():
             assert 0 < x < mx and 0 < z < mz, (m, t["key"])
             # BAR's own profiles, or one of ours the mod ships (tools/barb_profiles_v1.py)
             ours = ROOT / "mod" / "VerdanceAshes.sdd" / "luarules" / "configs" / "BARb" / "stable" / "config" / t["profile"]
-            assert t["profile"] in ("hard", "hard_aggressive") or (ours / "build_chain.json").is_file(), (m, t["key"])
+            assert t["profile"] in ("easy", "medium", "hard", "hard_aggressive") or (ours / "build_chain.json").is_file(), (m, t["key"])
         assert next(t for t in rec["teams"] if t["key"] == rec["playerSeat"])["profile"] == "hard_aggressive", m
         # the sides are stacked apart: their centroids are far across the map
         cen = {}
@@ -142,7 +142,8 @@ def test_every_map_has_a_sound_recipe():
             pts = [t["startElmos"] for t in rec["teams"] if t["ally"] == ally]
             cen[ally] = (sum(p[0] for p in pts) / len(pts) / mx, sum(p[1] for p in pts) / len(pts) / mz)
         a, b = cen.values()
-        assert ((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2) ** 0.5 > 0.4, m
+        if rec.get("shape") != "encircled":  # the Eye: Armada's corners round Cortex's crater
+            assert ((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2) ** 0.5 > 0.4, m
         # native seats are the terrain's own start positions; the rest say so
         native = {(p["x"], p["z"]) for p in terrain["startPositions"]}
         for t in rec["teams"]:

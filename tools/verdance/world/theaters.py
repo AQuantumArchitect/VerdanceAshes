@@ -36,6 +36,7 @@ EYE_RIM_SEATS = [
     ("EOH_SW_CAUSEWAY", 0.08, 0.92), ("EOH_SW_CAUSEWAY", 0.50, 0.95),
 ]
 EYE_RIM_ZONES = sorted({z for z, _, _ in EYE_RIM_SEATS})
+EYE_RIM_DENS = False  # the rim's dens are off: Armada's glassing burned the spread out
 
 # The standing wars (data/base_templates/<map>/war_recipe.json, baked by tools/war_bake_v1.py): every
 # seat but the company's, with the side that holds it and the zone it stands in. The company's seat
@@ -72,12 +73,13 @@ WARS = {
         {"key": "se", "faction": "nullmercs", "zoneId": "AB_SE_HEIGHTS"},
         {"key": "mid", "faction": "nullmercs", "zoneId": "AB_E_RIDGE"},
     ],
+    # The Eye (2026-10-26): only the Cortex mercenary camp in the glassed crater stands; Armada's assault
+    # from the corners was the bake's history and is gone but for its wrecks.
     "eye_of_horus": [
-        {"key": "ne", "faction": "armada", "zoneId": "EOH_NE_CAUSEWAY"},
-        {"key": "sw", "faction": "cortex", "zoneId": "EOH_SW_CAUSEWAY"},
-        {"key": "s", "faction": "cortex", "zoneId": "EOH_C_INNER_GATE"},
-        {"key": "se", "faction": "cortex", "zoneId": "EOH_SE_MUSTER"},
-        {"key": "fort_se", "faction": "cortex", "zoneId": "EOH_SE_BASTION"},  # tier 3's fort (va_warden)
+        {"key": "c_n", "faction": "cortex", "zoneId": "EOH_C_GATE"},
+        {"key": "c_ne", "faction": "cortex", "zoneId": "EOH_C_LANE"},
+        {"key": "c_sw", "faction": "cortex", "zoneId": "EOH_C_INNER_LANE"},
+        {"key": "c_s", "faction": "cortex", "zoneId": "EOH_C_INNER_GATE"},
     ],
 }
 KOOM_WAR = WARS["koom_valley"]
@@ -144,8 +146,10 @@ def wild_dens(state: Dict[str, Any], map_id: str, workspace: Optional[Path], pad
     wild = _wild(state, map_id)
     pad = _point(zones.get(str(pad_zone), {})) if pad_zone else None
     if map_id == "eye_of_horus":
+        # The glassing worked (owner call, 2026-10-26): no raptor ground left on the Eye. EYE_RIM_SEATS
+        # stay as data, should a remnant ever come back.
         seats = [{"zoneId": z, "label": (zones.get(z) or {}).get("label") or z, "x": x, "z": zz}
-                 for z, x, zz in EYE_RIM_SEATS if z in wild]
+                 for z, x, zz in EYE_RIM_SEATS if z in wild and EYE_RIM_DENS]
     else:
         seats = [s for s in (_seat(zones, z) for z in sorted(wild) if z != JUNGLE_HIVE_ZONE) if s]
     if pad:
@@ -224,7 +228,7 @@ SET_PIECES = {
     "koom_valley": {"kind": "standing_war", "label": "Standing war: Null Mercs hold the west, Armada the east, twenty minutes in; you take the north-west seat"},
     "tabula": {"kind": "standing_war", "label": "Standing war: Null Mercs hold the west terraces, Armada the east, twenty minutes in; you take the north-west seat"},
     "ancient_bastion": {"kind": "standing_war", "label": "Standing war: Armada hold the western castle, Null Mercs besiege it from the east; you take the north-east seat"},
-    "eye_of_horus": {"kind": "standing_war", "label": "Standing war: Cortex hold the south and the glassed centre against Armada in the north; raptors keep the rim between; you take the north-west seat"},
+    "eye_of_horus": {"kind": "standing_war", "label": "The glassed crater: a Cortex mercenary camp dug into the crater Armada once glassed; the corners are littered with Armada's old assault"},
     "all_that_simmers": {"kind": "kings_showdown", "label": "Kings' showdown: one commander each, last one standing takes the throne"},
     "the_rock_jungle": {"kind": "wild_ground", "label": "Wild ground: raptors wander every zone; the hive is in the south-west"},
 }
