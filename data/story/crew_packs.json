@@ -1671,7 +1671,8 @@
       "startXp": 0.165,
       "packMetal": 1634,
       "packEnergy": 26400,
-      "packCombined": 2011
+      "packCombined": 2011,
+      "buildsEco": true
     },
     "rumor": {
       "role": "band",
