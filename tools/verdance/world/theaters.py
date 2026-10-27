@@ -9,9 +9,10 @@
                       siege, the Eye Cortex south against Armada north), some minutes into a full
                       game (tools/war_bake_v1.py plays each once and saves the field); the company
                       takes the seat the war left empty
-    all_that_simmers  the kings' showdown, a classic game of BAR: Armada, Null Mercs and the company
-                      each start with one commander and nothing else; last commander standing takes
-                      the throne
+    all_that_simmers  the kings' showdown, a classic game of BAR: Armada, Cortex, Null Mercs and the
+                      company each start with one commander and nothing else; last commander standing
+                      takes the throne. The company's king is its commander suit
+                      (verdance.campaign.suits); in Cortex's own suit, Cortex does not come
 
 The engine puts what this returns on the mission intent (``theater``, ``wildDens``); the mission
 builder only places it. Positions are normalized map coordinates (x east, z south).
@@ -96,7 +97,7 @@ STANDING_CONTROL = {m: {s["zoneId"]: s["faction"] for s in seats
 # two rivals take the seats that make the widest triangle with it.
 SIMMERS_SEATS = ["ATS_NE_MUSTER", "ATS_SE_SHORE", "ATS_SW_MUSTER", "ATS_NW_SHORE"]
 SIMMERS_THRONE = "ATS_C_BASTION"
-SIMMERS_RIVALS = ("armada", "nullmercs")
+SIMMERS_RIVALS = ("armada", "nullmercs", "cortex")
 
 # A den or a camp never stands this close to the company's pad.
 PAD_CLEARANCE = 0.22
@@ -195,12 +196,19 @@ def standing_war(map_id: str, workspace: Optional[Path], pad_zone: Optional[str]
     recipe = _war.load_recipe(workspace, map_id) if workspace is not None else None
     if recipe and recipe.get("keepShell"):
         out["keepShell"] = True
+    # Tabula (owner call, 2026-10-26): no commanders on the field but the company's own.
+    if recipe and recipe.get("noCommanders"):
+        out["noCommanders"] = True
     return out
 
 
-def kings_showdown(map_id: str, workspace: Optional[Path], pad_zone: Optional[str]) -> Optional[Dict[str, Any]]:
+def kings_showdown(map_id: str, workspace: Optional[Path], pad_zone: Optional[str],
+                   state: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]:
     if map_id != "all_that_simmers":
         return None
+    from verdance.campaign import suits as _suits
+    worn = _suits.suit(state) if state is not None else None
+    rivals = [f for f in SIMMERS_RIVALS if not (f == "cortex" and worn and worn["unitDef"] == "corcom")]
     zones = _zones(map_id, workspace)
     seats = [s for s in (_seat(zones, z) for z in SIMMERS_SEATS) if s]
     pad = _point(zones.get(str(pad_zone), {})) if pad_zone else None
@@ -217,10 +225,21 @@ def kings_showdown(map_id: str, workspace: Optional[Path], pad_zone: Optional[st
     if not pairs:
         return None
     a, b = max(pairs, key=lambda ab: (round(spread(*ab), 4), ab[0]["zoneId"], ab[1]["zoneId"]))
-    kings = [dict(a, faction=SIMMERS_RIVALS[0]), dict(b, faction=SIMMERS_RIVALS[1])]
+    kings = [dict(a, faction=rivals[0]), dict(b, faction=rivals[1])]
+    # the third rival (Cortex) takes the open seat farthest from the company
+    rest = [s for s in open_seats if s["zoneId"] not in (a["zoneId"], b["zoneId"])]
+    if len(rivals) > 2 and rest:
+        c = max(rest, key=lambda s: (round(math.hypot(s["x"] - pad[0], s["z"] - pad[1]), 4), s["zoneId"]))
+        kings.append(dict(c, faction=rivals[2]))
     throne = _seat(zones, SIMMERS_THRONE)
-    return {"kind": "kings_showdown", "label": "The kings' showdown: one commander each, last one standing",
-            "throne": throne, "kings": kings, "company": {"zoneId": pad_zone}}
+    company: Dict[str, Any] = {"zoneId": pad_zone}
+    if worn:
+        company.update(unitDef=worn["unitDef"], side=worn["side"])
+    out = {"kind": "kings_showdown", "label": "The kings' showdown: one commander each, last one standing",
+           "throne": throne, "kings": kings, "company": company}
+    if worn and worn["unitDef"] == "corcom":
+        out["cortexSitsOut"] = True
+    return out
 
 
 # What the hub says about each field's set piece (the board's subtitle, the Drop dialog).
@@ -229,7 +248,7 @@ SET_PIECES = {
     "tabula": {"kind": "standing_war", "label": "Standing war: Null Mercs hold the west terraces, Armada the east, twenty minutes in; you take the north-west seat"},
     "ancient_bastion": {"kind": "standing_war", "label": "Standing war: Armada hold the western castle, Null Mercs besiege it from the east; you take the north-east seat"},
     "eye_of_horus": {"kind": "standing_war", "label": "The glassed crater: a Cortex mercenary camp dug into the crater Armada once glassed; the corners are littered with Armada's old assault"},
-    "all_that_simmers": {"kind": "kings_showdown", "label": "Kings' showdown: one commander each, last one standing takes the throne"},
+    "all_that_simmers": {"kind": "kings_showdown", "label": "Kings' showdown: one commander each, last one standing takes the throne. No duel without a commander suit"},
     "the_rock_jungle": {"kind": "wild_ground", "label": "Wild ground: raptors wander every zone; the hive is in the south-west"},
 }
 
@@ -261,7 +280,7 @@ def is_solo(intent: Optional[Dict[str, Any]]) -> bool:
 def theater_for(state: Dict[str, Any], map_id: str, workspace: Optional[Path], pad_zone: Optional[str],
                 tier: int = 1) -> Optional[Dict[str, Any]]:
     """The set piece this field stages, or None for an ordinary field."""
-    return standing_war(map_id, workspace, pad_zone, tier) or kings_showdown(map_id, workspace, pad_zone)
+    return standing_war(map_id, workspace, pad_zone, tier) or kings_showdown(map_id, workspace, pad_zone, state)
 
 
 __all__ = [

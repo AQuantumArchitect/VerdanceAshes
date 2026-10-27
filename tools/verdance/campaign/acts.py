@@ -116,6 +116,12 @@ def finale_path_for_state(state: Dict[str, Any]) -> str:
         "B": float(graph.get("pathSignalB", 0.0) or 0.0),
         "C": float(graph.get("pathSignalC", 0.0) or 0.0),
     }
+    # Sovereignty is a duel in All That Simmers: no commander suit, no duel (verdance.campaign.suits).
+    from .suits import has_suit
+    if not has_suit(state):
+        signals.pop("B")
+        if current == "B":
+            current = ""
     best = max(signals.values())
     leaders = sorted(k for k, v in signals.items() if v >= best - 1e-9)
     if current in leaders:

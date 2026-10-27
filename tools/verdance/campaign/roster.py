@@ -691,6 +691,12 @@ def apply_commander_story(
         return {"event": "scrap", "reason": "commander_lost"}
     if commander_is_unlocked(state):
         return {"event": "fielded"}
+    # A suit won in the field (game_verdance_suits.lua): stolen off Koom, raised from under the queen.
+    won = result.get("commanderSuit")
+    if isinstance(won, dict) and won.get("unitDef"):
+        from .suits import grant_suit
+        if grant_suit(state, won.get("unitDef"), str(won.get("how") or "field")):
+            return {"event": "unlocked", "reason": "suit:" + str(won.get("how") or "field")}
     tags = [str(t) for t in (result.get("storyTags") or [])]
     sortie = result.get("sortie") if isinstance(result.get("sortie"), dict) else {}
     tags.extend(str(t) for t in (sortie.get("storyTags") or []))
@@ -733,6 +739,7 @@ def build_roster_intent(state: Dict[str, Any]) -> Dict[str, Any]:
             "activePerks": commander_active_perks(commander),
             "scarred": bool(commander.get("scars")),
             "unlocked": commander.get("unlocked") is True,
+            "suitFrom": commander.get("suitFrom"),
         },
         "cadre": {str(d): int(c) for d, c in (roster.get("cadre") or {}).items() if c},
         "cadreXp": {
