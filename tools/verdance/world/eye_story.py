@@ -81,21 +81,22 @@ def story(state: Dict[str, Any], pad_xz: Optional[tuple], workspace: Optional[Pa
 
 
 def objective(story_: Dict[str, Any]) -> Dict[str, Any]:
-    """The contract the Eye's patron offers, as the mission's objective."""
+    """The contract the Eye's patron offers, as the mission's objective. The engine turns it into a
+    capture of the target zone (capture_node_claims.as_territory_capture); the kind stays the reason."""
     if story_["patron"] == "cortex":
         first = (story_.get("scoutParties") or [{}])[0]
         return {"id": "EOH_STOP_THE_SCOUTS", "kind": "hunt_scouts", "patron": "cortex", "enemyFaction": "armada",
-                "label": "Stop the Armada scouts: kill every one of their constructors",
+                "label": "Take the corner the Armada scouts dug into",
                 "targetZoneId": first.get("zoneId") or "EOH_NE_CAUSEWAY"}
     return {"id": "EOH_WIPE_THE_CAMP", "kind": "raze_camp", "patron": "armada", "enemyFaction": "cortex",
-            "label": "Wipe out the mercenary camp in the crater", "targetZoneId": CAMP_ZONE}
+            "label": "Take the crater from the mercenary camp", "targetZoneId": CAMP_ZONE}
 
 
 BRIEFING = {
     "cortex": "Cortex pays well and asks little: Armada is sniffing at the crater again. They've had scouts "
-              "dug into the corners for a few minutes already. Kill their builders. Every one.",
+              "dug into the corners for a few minutes already. Take a corner back from them.",
     "armada": "Armada remembers glassing this crater. They don't like what grew in it since. "
-              "They want the mercenary camp gone, every last works.",
+              "They want the crater taken off the mercenary camp.",
 }
 
 

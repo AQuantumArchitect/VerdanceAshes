@@ -59,7 +59,7 @@ Spring = {
   ValidUnitID = function(id) return U[id] ~= nil end, GetUnitIsDead = function() return false end,
   GetUnitPosition = function(id) local u = U[id]; return u.x, 0, u.z end,
   GetUnitDefID = function(id) return U[id].def end, GetUnitTeam = function(id) return U[id].team end,
-  GetUnitRulesParam = function(id, k) local u = U[id]; if k == "va_hero_id" or k == "va_hero_name" then return u.hero end; if k == "va_package_tag" then return u.tag end; if k == "va_delivery_mode" then return u.hired end end,
+  GetUnitRulesParam = function(id, k) local u = U[id]; if k == "va_hero_id" or k == "va_hero_name" then return u.hero end; if k == "va_package_tag" then return u.tag end; if k == "va_delivery_mode" then return u.hired end; if k == "va_recruited" then return u.recruited end end,
   AreTeamsAllied = function(a, b) return a == b end,
   GetUnitHealth = function() return 80, 100 end, GetUnitExperience = function() return 0 end,
   GetTeamList = function() return { 0, 1 } end, GetGaiaTeamID = function() return -1 end,
@@ -118,6 +118,14 @@ m = RULES.va_manifest_json
 assert(not m:find('"going":{"heroes":[^%%]]*"mask"'), "the raised hero standing on the door must not lift with the spearhead")
 has('"heroId":"mask","label":"Far Field"', "... he stays, to be brought home")
 U[7] = nil
+-- any hero turned or raised this sortie is a rescue, objective or not
+mission.objective = { targetZoneId = "FAR" }
+U[8] = { x = 2048, z = 3500, def = 1, team = 0, hero = "rumor", recruited = 1 }
+GG.VA_ExfilCmd("manifest")
+m = RULES.va_manifest_json
+has('"heroId":"rumor","label":"Far Field"', "a hero recruited this sortie, standing on the door, stays to be brought home")
+has('"rescue":"rumor"', "... and the manifest names the rescue")
+U[8] = nil
 print("ok   two exits: the spearhead leaves by the door, the rescue goes home from the landing zone")
 GG.VA_ExfilCmd("extract:home")
 assert(ENDED[1] == "extracted", "extract did not end the sortie")

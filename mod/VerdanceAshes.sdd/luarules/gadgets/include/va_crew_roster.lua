@@ -482,16 +482,10 @@ M.HEROES = {
     hireTnb = 0,
     packTotal = 5,
     extras = 4,
-    startXp = 0.139,
+    startXp = 0.23,
     packMind = "solo",
     tags = { "infestor", "all_terrain", "self_replicate" },
-    escorts = {
-      {
-        unitDef = "legah",
-        count = 2,
-      },
-    },
-    blurb = "Infestor seed (×5) and two Alpheus hovers for the sky. Stealth spiders that mint more spiders, and Goblins.",
+    blurb = "Infestor seed (×5). Stealth spiders that mint more spiders, and Goblins.",
   },
   quill = {
     name = "Ash-Marshal Quill",

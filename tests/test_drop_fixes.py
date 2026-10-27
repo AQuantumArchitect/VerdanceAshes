@@ -66,12 +66,12 @@ def test_kettle_is_an_archangel_and_a_heavy_transport():
     assert "armhvytrans" in block and "armferret" not in block and "armatlas" not in block
 
 
-def test_the_infestor_prints_goblins_and_flies_cover():
+def test_the_infestor_is_spiders_and_goblins():
     src = (MOD / "units/va_infestor.lua").read_text(encoding="utf-8")
     assert '"leggob"' in src and '"va_infestor"' in src and "T2 Bots/leginfestor.lua" in src
     packs = json.loads((ROOT / "data/story/crew_packs.json").read_text(encoding="utf-8"))
     h = packs["heroes"]["infestor"]
-    assert h["unitDef"] == "va_infestor" and h["escorts"] == [{"unitDef": "legah", "count": 2}]
+    assert h["unitDef"] == "va_infestor" and not h.get("escorts")
     import rename_heroes_v1 as r
     assert r.UNITDEFS["infestor"] == ("leginfestor", "va_infestor")
 

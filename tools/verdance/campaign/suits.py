@@ -3,9 +3,11 @@
 All That Simmers is the kings' showdown, and a king is a commander. The company has no suit at the
 start (roster.commander is scrap); there are three ways to get one (owner call, 2026-10-26):
 
-    bought_cortex   Cortex sells one off its shelf for an outrageous Tenebrium fee
-                    (data/commerce/commerce_catalog.json, cortex_commander_suit). Easter egg: wear
-                    Cortex's own suit to the showdown and Cortex does not come to the fight.
+    loaned_cortex   Cortex loans one off its shelf for ONE fight, for an outrageous Tenebrium fee
+                    (data/commerce/commerce_catalog.json, cortex_commander_suit). It goes back to
+                    Cortex at homecoming, like a hired hero (owner call, 2026-10-27; it used to be
+                    bought for good). Easter egg: wear Cortex's own suit to the showdown and Cortex
+                    does not come to the fight.
     stolen_koom     on Koom Valley, a fallen war commander's wreck raised (or a commander captured)
                     onto the company is its suit (game_verdance_suits.lua)
     queen_rez       a Legion suit lies under the hive queen's corpse wherever she falls; raise it
@@ -19,8 +21,9 @@ from typing import Any, Dict, Optional
 
 SIMMERS = "all_that_simmers"
 WALL = "You can't duel in All That Simmers without a commander suit."
-WALL_HOW = ("Buy one from Cortex, steal one off Koom Valley's war, or raise the Legion suit that lies "
-            "under the hive queen's corpse.")
+WALL_HOW = ("Borrow one from Cortex for a fight, steal one off Koom Valley's war, or raise the Legion "
+            "suit that lies under the hive queen's corpse.")
+LOAN = "loaned_cortex"
 
 SUITS = {
     "corcom": {"faction": "cortex", "side": "Cortex", "label": "a Cortex commander suit"},
@@ -28,6 +31,7 @@ SUITS = {
     "legcom": {"faction": "legion", "side": "Legion", "label": "a Legion commander suit"},
 }
 HOW = {
+    "loaned_cortex": "on loan from Cortex for this fight",
     "bought_cortex": "bought from Cortex",
     "stolen_koom": "stolen off Koom Valley",
     "queen_rez": "raised from under the hive queen",
@@ -74,6 +78,26 @@ def grant_suit(state: Dict[str, Any], unit_def: Any, how: str) -> bool:
     return grant_commander(state, "suit:" + c["suitFrom"])
 
 
+def on_loan(state: Dict[str, Any]) -> bool:
+    """The suit the company wears is Cortex's, for one fight."""
+    s = suit(state)
+    return bool(s and s["how"] == LOAN)
+
+
+def return_loan(state: Dict[str, Any]) -> bool:
+    """After the drop a loaned suit goes back to Cortex, whatever happened in the fight. The fee is
+    not refunded. A suit lost in the field is already scrap; the loan is just cleared."""
+    from .roster import scrap_commander
+    c = _commander(state)
+    if c.get("suitFrom") != LOAN:
+        return False
+    c.pop("suitFrom", None)
+    if c.get("unlocked") is True:
+        scrap_commander(state, "suit_returned_to_cortex")
+        c["unitDef"] = "corcom"
+    return True
+
+
 def cortex_sits_out(state: Dict[str, Any]) -> bool:
     """The easter egg: wearing Cortex's own suit, Cortex does not come to the showdown."""
     s = suit(state)
@@ -87,5 +111,5 @@ def line(state: Dict[str, Any]) -> Optional[str]:
     return f"The company wears {s['label']}, {HOW.get(s['how'], 'from the story')}."
 
 
-__all__ = ["HOW", "SIMMERS", "SUITS", "WALL", "WALL_HOW", "base_def", "cortex_sits_out", "grant_suit",
-           "has_suit", "line", "suit"]
+__all__ = ["HOW", "LOAN", "SIMMERS", "SUITS", "WALL", "WALL_HOW", "base_def", "cortex_sits_out", "grant_suit",
+           "has_suit", "line", "on_loan", "return_loan", "suit"]

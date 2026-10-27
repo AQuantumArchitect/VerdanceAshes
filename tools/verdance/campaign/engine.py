@@ -116,6 +116,7 @@ from verdance.company.company import (
     apply_field_recruits_from_result,
 )
 from verdance.company.capture_node_claims import apply_node_claim, is_capture_result
+from verdance.company import capture_node_claims as _cnc
 from verdance.company import attachments as _att, synergy as _synergy
 from verdance.world import (
     world_tick as _wt,
@@ -307,6 +308,9 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
         objective = objective_for_map(map_id, state, workspace)
         contract_active = False
         sortie = {}
+    # Every job is territory: the zone is the contract, the old job is why it's worth taking.
+    if not finale_plan:
+        objective = _cnc.as_territory_capture(objective)
 
     pressure = zone_pressure_summary(state, map_id)
     zones = state.get("zoneMemory", {}).get(map_id, {})
@@ -507,7 +511,7 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
         pad_xz = _theaters._point(_theaters._zones(map_id, workspace).get(str(pad), {})) if pad else None
         eye = _eye.story(state, pad_xz, workspace)
         intent["eyeStory"] = eye
-        intent["objectiveTarget"] = _eye.objective(eye)
+        intent["objectiveTarget"] = _cnc.as_territory_capture(_eye.objective(eye))
         intent["objective"] = intent["objectiveTarget"]["kind"]
         intent["targetZoneId"] = intent["objectiveTarget"]["targetZoneId"]
         for k in ("captureZoneIds", "secondaryCaptureZoneIds", "exitDoorZoneId"):
@@ -724,6 +728,9 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
         _ek = str(result.get("objectiveKind") or result.get("objectiveArchetype") or "")
         if _ek in ("hunt_scouts", "raze_camp"):
             result = {**result, "against": "armada" if _ek == "hunt_scouts" else "cortex"}
+        elif canonical_map_id(result.get("mapId") or "") == _eye.MAP_ID and _ek == "seize_lane":
+            # A capture on the Eye is against whoever didn't hire us.
+            result = {**result, "against": "armada" if _eye.patron(state) == "cortex" else "cortex"}
     apply_reputation_companion(state, result, elapsed)
     try:
         evaluate_home_clear(state, result)

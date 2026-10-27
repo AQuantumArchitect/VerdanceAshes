@@ -1374,7 +1374,7 @@ window.CREW_PACKS = {
       "hireTnb": 0,
       "packTotal": 5,
       "extras": 4,
-      "blurb": "Infestor seed (×5) and two Alpheus hovers for the sky. Stealth spiders that mint more spiders, and Goblins.",
+      "blurb": "Infestor seed (×5). Stealth spiders that mint more spiders, and Goblins.",
       "name": "Infestor Hive",
       "sizing": "fixed",
       "tags": [
@@ -1382,16 +1382,10 @@ window.CREW_PACKS = {
         "all_terrain",
         "self_replicate"
       ],
-      "startXp": 0.139,
-      "packCombined": 2164,
-      "packMetal": 1670,
-      "packEnergy": 34600,
-      "escorts": [
-        {
-          "unitDef": "legah",
-          "count": 2
-        }
-      ]
+      "startXp": 0.23,
+      "packCombined": 1621,
+      "packMetal": 1250,
+      "packEnergy": 26000
     },
     "quill": {
       "role": "band",

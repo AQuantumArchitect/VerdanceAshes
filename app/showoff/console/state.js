@@ -85,22 +85,18 @@ export function repLabel(k) {
   const map = { armada: "Armada", cortex: "Cortex", nullmercs: "Null Mercs", ashwalkers: "Ashwalkers", sev: "Sev" };
   return map[k] || String(k).replace(/_/g, " ");
 }
+// Every job is territory (2026-10-27): the company takes a zone. What the Null Mercs were hired
+// for there is only the reason it's worth taking. Finales and the home jobs keep their own words.
 export function jobLabel(kind) {
-  return ({
-    eco_raid: "Raid their economy",
-    seize_lane: "Seize and hold the lane",
-    strike_relay: "Cut the relay",
-    destroy_key_structure: "Break the key structure",
+  const own = {
     hive_clear_or_bypass: "Clear or bypass the hive",
-    gate_control: "Hold the gate",
     home_clear: "Clear the home wilds",
-    fortify_zone: "Fortify and secure the zone",
+    fortify_zone: "Take the empty ground — dig in",
     home_founding: "Found the camp — dig in",
     kings_showdown: "Take the throne — last commander standing",
-    hunt_scouts: "Stop the scouts",
-    raze_camp: "Wipe out the camp",
     jump_gate: "The Spire Jump",
-  })[kind] || String(kind || "Sortie").replace(/_/g, " ");
+  };
+  return own[kind] || "Take and hold the zone";
 }
 
 // Zone label from the theater board, the belief frame, or the zone boards. Never invents.

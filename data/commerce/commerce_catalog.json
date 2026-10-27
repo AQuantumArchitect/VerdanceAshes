@@ -190,8 +190,9 @@
     "cortex_commander_suit": {
       "kind": "commander_suit",
       "shelf": "cortex",
-      "label": "Cortex Commander Suit",
-      "blurb": "Cortex will sell you a commander suit, and they want an outrageous price for it. You need a suit to duel in All That Simmers. Wear theirs and Cortex won't turn up for that fight.",
+      "label": "Cortex Commander Suit (one fight)",
+      "blurb": "Cortex will loan you a commander suit for one fight, and they want an outrageous price for it. It goes back to them when you come home. You need a suit to duel in All That Simmers. Wear theirs and Cortex won't turn up for that fight.",
+      "oneDrop": true,
       "unitDef": "corcom",
       "count": 1,
       "tenebriumCost": 15,

@@ -47,9 +47,28 @@ def test_cortex_sells_one_for_an_outrageous_fee():
     s["commerce"]["tenebrium"] = 15
     r = purchase_listing(s, "cortex_commander_suit", ROOT)
     assert r["ok"] and r["tenebriumCost"] >= 10
-    assert suits.suit(s)["unitDef"] == "corcom" and suits.suit(s)["how"] == "bought_cortex"
+    assert suits.suit(s)["unitDef"] == "corcom" and suits.suit(s)["how"] == suits.LOAN and suits.on_loan(s)
     s["commerce"]["tenebrium"] = 99
     assert not purchase_listing(s, "cortex_commander_suit", ROOT)["ok"]       # one suit at a time
+
+
+def test_the_cortex_suit_is_a_loan_for_one_fight():
+    from verdance.campaign.commerce import settle_commerce_after_sortie
+    s = _state()
+    s.setdefault("reputation", {})["cortex"] = 50
+    s.setdefault("commerce", {}).update(tenebrium=30, metalK=40)
+    assert purchase_listing(s, "cortex_commander_suit", ROOT)["ok"]
+    assert s["commerce"]["tenebrium"] == 15 and suits.has_suit(s)
+    settle_commerce_after_sortie(s, {"resultKey": "k1", "status": "extracted"}, True, True, False, ROOT)
+    assert not suits.has_suit(s) and not suits.on_loan(s)                     # back to Cortex
+    assert purchase_listing(s, "cortex_commander_suit", ROOT)["ok"]           # same fee, next fight
+    assert s["commerce"]["tenebrium"] == 0
+
+
+def test_a_suit_won_for_good_is_not_returned():
+    s = _state()
+    suits.grant_suit(s, "armcom", "stolen_koom")
+    assert not suits.return_loan(s) and suits.has_suit(s)
 
 
 def test_a_suit_won_in_the_field_comes_home():

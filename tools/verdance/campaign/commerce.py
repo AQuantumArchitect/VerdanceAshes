@@ -325,13 +325,10 @@ def purchase_listing(
         from verdance.company.rentals import rent
         rent(state, listing, workspace)
     elif kind == "commander_suit":
-        # Cortex's suit (verdance.campaign.suits): the walker is fielded from now on, in Cortex's body.
-        from .suits import grant_suit
-        grant_suit(state, listing.get("unitDef") or "corcom", "bought_cortex")
-        commerce.setdefault("owned", {})[listing_id] = {
-            "qty": 1, "kind": kind, "unitDef": listing.get("unitDef"),
-            "acquiredAtMission": int(state.get("missionNumber", 1) or 1), "source": "purchase",
-        }
+        # Cortex's suit, loaned for one fight (verdance.campaign.suits): the walker is fielded for the
+        # next drop in Cortex's body, and goes back to Cortex at homecoming (settle_commerce_after_sortie).
+        from .suits import grant_suit, LOAN
+        grant_suit(state, listing.get("unitDef") or "corcom", LOAN)
     elif kind == "hero_contract":
         roster = ensure_roster(state)
         heroes = roster.setdefault("heroes", [])
@@ -1008,6 +1005,10 @@ def settle_commerce_after_sortie(
 
     # Rented heroes go back to Cortex; who came home is remembered for the campaign-end unlock.
     from verdance.company.rentals import settle as _settle_rentals
+    from .suits import return_loan as _return_suit
+    if _return_suit(state):
+        notes.append("the Cortex suit went back to Cortex")
+        commerce.setdefault("owned", {}).pop("cortex_commander_suit", None)
     home = _settle_rentals(state, result)
     if home:
         notes.append("rentals home: " + ", ".join(home))

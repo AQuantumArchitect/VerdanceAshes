@@ -3559,7 +3559,9 @@ foreach ($fp in @($(if ($intent.PSObject.Properties["fieldPeople"]) { $intent.fi
   $fc = Get-ZoneCenter $fz @(0.5, 0.5)
   $fieldPeople += [ordered]@{ heroId = [string]$fp.heroId; zoneId = [string]$fp.zoneId; x = [Math]::Round([double]$fc[0], 4); z = [Math]::Round([double]$fc[1], 4) }
 }
-# A wreck waiting in the wound is the job: raise that hero and the objective is done.
+# Rescues are never the job (2026-10-27): every job is territory, and a wreck waiting in the wound
+# is a bonus mark. A raised hero goes home from where the company landed (game_verdance_exfil).
+# Get-RezObjective stays for reference; the mission no longer calls it.
 function Get-RezObjective($Recruits, $WoundZoneIds) {
   $wound = @(@($WoundZoneIds) | Where-Object { $_ } | ForEach-Object { [string]$_ })
   foreach ($fr in @($Recruits)) {
@@ -3567,7 +3569,7 @@ function Get-RezObjective($Recruits, $WoundZoneIds) {
   }
   return $null
 }
-$rezObjective = Get-RezObjective $fieldRecruits (@($hubCaptureIds) + @($targetZoneId))
+$rezObjective = $null
 if ($rezObjective) {
   $description = "Raise {0} from the wreck in the wound and bring them home." -f $rezObjective.heroName
   Write-Host ("Rez objective: {0}@{1}" -f $rezObjective.heroId, $rezObjective.zoneId)
