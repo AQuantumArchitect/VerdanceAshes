@@ -133,7 +133,7 @@ def test_simmers_is_a_kings_showdown_from_any_door():
     for pad in ("ATS_NW_SHORE", "ATS_SW_MUSTER"):
         show = theaters.kings_showdown("all_that_simmers", ROOT, pad)
         kings = show["kings"]
-        assert [k["faction"] for k in kings] == ["armada", "nullmercs"]
+        assert [k["faction"] for k in kings] == ["armada", "nullmercs", "cortex"]
         assert pad not in {k["zoneId"] for k in kings}
         assert show["throne"]["zoneId"] == theaters.SIMMERS_THRONE
 
@@ -211,7 +211,7 @@ def test_the_builder_fields_the_war_the_kings_and_the_dens():
     assert not any(0 in p for p in pacts)
 
     kings = _probe({"theater": theaters.kings_showdown("all_that_simmers", ROOT, "ATS_NW_SHORE"), "wildDens": []})
-    assert [k["faction"] for k in kings["kings"]] == ["ashwalkers", "armada", "nullmercs"]
+    assert [k["faction"] for k in kings["kings"]] == ["ashwalkers", "armada", "nullmercs", "cortex"]
     assert kings["forces"] == [] and kings["alliances"] == []     # commanders only, everyone at war
 
     dens = theaters.wild_dens(_state(), "eye_of_horus", ROOT, "EOH_NW_BASTION")

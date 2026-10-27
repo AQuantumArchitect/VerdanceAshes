@@ -256,6 +256,10 @@ def listing_available(
     kind = str(listing.get("kind") or "")
     if kind == "printer_upgrade" and listing_id in upgrades:
         return False, "upgrade already installed"
+    if kind == "commander_suit":
+        from .suits import has_suit
+        if has_suit(state):
+            return False, "the company already wears a commander suit"
     if kind in ("unit_printer", "loan_package") and listing_id in owned:
         return False, "already owned"
     if kind == "hero_contract":
@@ -311,7 +315,15 @@ def purchase_listing(
     commerce["tenebrium"] = int(commerce.get("tenebrium") or 0) - tcost
     commerce["metalK"] = int(commerce.get("metalK") or 0) - mcost
     kind = str(listing.get("kind") or "purchase_package")
-    if kind == "hero_contract":
+    if kind == "commander_suit":
+        # Cortex's suit (verdance.campaign.suits): the walker is fielded from now on, in Cortex's body.
+        from .suits import grant_suit
+        grant_suit(state, listing.get("unitDef") or "corcom", "bought_cortex")
+        commerce.setdefault("owned", {})[listing_id] = {
+            "qty": 1, "kind": kind, "unitDef": listing.get("unitDef"),
+            "acquiredAtMission": int(state.get("missionNumber", 1) or 1), "source": "purchase",
+        }
+    elif kind == "hero_contract":
         roster = ensure_roster(state)
         heroes = roster.setdefault("heroes", [])
         hid = str(listing.get("heroId") or "hero")

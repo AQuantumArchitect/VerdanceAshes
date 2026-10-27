@@ -290,8 +290,26 @@ def legal_jobs(state: Dict[str, Any], workspace: Path) -> List[Dict[str, Any]]:
                          "targetZoneId": zid, "shut": leads_out, "heroes": heroes,
                          "claim": claim_need(map_id, workspace),
                          "score": round(score, 4), "id": f"door_{zid}"})
+    # The wall (verdance.campaign.suits): no duel in All That Simmers without a commander suit.
+    from verdance.campaign.suits import SIMMERS, has_suit
+    if not has_suit(state):
+        jobs = [j for j in jobs if j["mapId"] != SIMMERS]
     jobs.sort(key=lambda j: (-float(j["score"]), j["id"]))
     return jobs
+
+
+def walls(state: Dict[str, Any], workspace: Path) -> List[Dict[str, Any]]:
+    """Roads the company could take but may not: All That Simmers without a commander suit."""
+    from verdance.campaign.suits import SIMMERS, WALL, WALL_HOW, has_suit
+    if has_suit(state):
+        return []
+    doors = load_doors(workspace)
+    opened = open_maps(state)
+    reach = any(d["mapId"] in opened and ((held(state, z) and d["farMapId"] == SIMMERS) or d["mapId"] == SIMMERS)
+                for z, d in doors.items())
+    if not reach and SIMMERS not in opened:
+        return []
+    return [{"mapId": SIMMERS, "label": WALL, "how": WALL_HOW}]
 
 
 def collapse_seed(state: Dict[str, Any]) -> int:
@@ -343,7 +361,7 @@ def _card(job: Dict[str, Any], lean: bool) -> Dict[str, Any]:
     if job["mapId"] == "all_that_simmers":
         # Every drop on All That Simmers is the kings' showdown (verdance.world.theaters).
         label = f"The kings' showdown on {map_name}, from {door['label'] if job['kind'] != 'cross' else door['farLabel']}"
-        lines = ["Armada, Null Mercs and the company each start with one commander and nothing else.",
+        lines = ["Armada, Cortex, Null Mercs and the company each start with one commander and nothing else.",
                  "Last commander standing takes the throne. The packs and the reserve stay home."]
         contract = "kings_showdown"
     if along and contract != "kings_showdown":
@@ -375,4 +393,8 @@ def road_sorties(state: Dict[str, Any], workspace: Path, *, seed: Optional[int] 
     if cards:
         voice = ("Doors are the way between maps. Hold the door you leave by and the road is open; "
                  "lose it and the road shuts until you take it back.")
-    return {"seed": used, "openMaps": sorted(open_maps(state)), "jobs": jobs, "cards": cards, "voice": voice}
+    wall = walls(state, Path(workspace))
+    if wall:
+        voice = (voice + " " if voice else "") + wall[0]["label"] + " " + wall[0]["how"]
+    return {"seed": used, "openMaps": sorted(open_maps(state)), "jobs": jobs, "cards": cards, "voice": voice,
+            "walls": wall}

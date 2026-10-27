@@ -861,6 +861,8 @@ def listing_available_ui(
         return False, "already owned"
     if listing.get("starterOwned") and listing.get("loan") and listing_id in owned:
         return False, "already owned (starter loan)"
+    if kind == "commander_suit" and ((state.get("roster") or {}).get("commander") or {}).get("unlocked") is True:
+        return False, "the company already wears a commander suit"
     req = listing.get("requires")
     if req and req not in owned:
         return False, f"requires {req}"

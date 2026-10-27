@@ -169,6 +169,23 @@
         "cortex"
       ]
     },
+    "cortex_commander_suit": {
+      "kind": "commander_suit",
+      "shelf": "cortex",
+      "label": "Cortex Commander Suit",
+      "blurb": "Cortex will sell you a commander suit, and they want an outrageous price for it. You need a suit to duel in All That Simmers. Wear theirs and Cortex won't turn up for that fight.",
+      "unitDef": "corcom",
+      "count": 1,
+      "tenebriumCost": 15,
+      "metalCostK": 8,
+      "repMin": {
+        "cortex": 35
+      },
+      "tags": [
+        "commander_suit",
+        "cortex"
+      ]
+    },
     "armada_constructor": {
       "kind": "constructor",
       "shelf": "armada",
