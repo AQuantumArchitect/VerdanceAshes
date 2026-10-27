@@ -939,6 +939,246 @@
         "type": "band_unlock",
         "blurb": "The flight finds the target, then drops on it."
       }
+    },
+    {
+      "heroId": "starlight",
+      "name": "Halcyon Dray",
+      "unitDef": "armmanni",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.0,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "saint",
+      "traits": [
+        "plod",
+        "saint"
+      ],
+      "fiction": "Dray was a lighthouse keeper before the war and never stopped. The Starlight sweeps the ridge line at the speed of a slow thought, and whatever it rests on is no longer a problem.",
+      "recruit": {
+        "type": "band_unlock",
+        "blurb": "The beam arrives before the argument."
+      }
+    },
+    {
+      "heroId": "banisher",
+      "name": "Brother Ansel Tove",
+      "unitDef": "corban",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.0,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "heat",
+      "traits": [
+        "captain",
+        "heat"
+      ],
+      "fiction": "Brother Ansel left a monastery for a contract and kept the habit of the long silence before a verse. His three Banishers are the verse. Nobody who has heard it speaks of it again.",
+      "recruit": {
+        "type": "band_unlock",
+        "blurb": "The volley is the sermon."
+      }
+    },
+    {
+      "heroId": "arrow",
+      "name": "Ysolde 'Arrow' Venn",
+      "unitDef": "corparrow",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.0,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "glass",
+      "traits": [
+        "glass",
+        "mischief"
+      ],
+      "fiction": "Venn keeps a list of every target that walked away. It is a short list and getting shorter. Her Poison Arrows trade range for patience: the first shot is a question and the second is the answer.",
+      "recruit": {
+        "type": "band_unlock",
+        "blurb": "Never misses twice."
+      }
+    },
+    {
+      "heroId": "hornet",
+      "name": "Teague 'Hornet' Marsh",
+      "unitDef": "armblade",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.0,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "sky",
+      "traits": [
+        "sky",
+        "mischief"
+      ],
+      "fiction": "Marsh trained on crop-dusters and has never forgiven the war for being flat. Her Hornets come in low, sting, climb, and come in again. She calls it farming.",
+      "recruit": {
+        "type": "band_unlock",
+        "blurb": "Stings, then returns for the nest."
+      }
+    },
+    {
+      "heroId": "charybdis",
+      "name": "Orrin 'Charybdis' Tidewell",
+      "unitDef": "legehovertank",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.0,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "door",
+      "traits": [
+        "plod",
+        "door"
+      ],
+      "fiction": "Tidewell drives the Charybdis the way a tide comes in: late, wide, and then everywhere. He has never been caught on the wrong side of a ford, because he does not believe in sides.",
+      "recruit": {
+        "type": "band_unlock",
+        "blurb": "The river is a runway."
+      }
+    },
+    {
+      "heroId": "shiva",
+      "name": "Sivan 'Shiva' Ruhl",
+      "unitDef": "corshiva",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.0,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "swarm",
+      "traits": [
+        "captain",
+        "swarm"
+      ],
+      "fiction": "Ruhl feeds her Grunts into the front on purpose, so the enemy can count them and feel safe. Then the Shiva walks through the middle of the count.",
+      "recruit": {
+        "type": "band_unlock",
+        "blurb": "Eight Grunts and a decision."
+      }
+    },
+    {
+      "heroId": "tremor",
+      "name": "Edda 'Tremor' Lund",
+      "unitDef": "cortrem",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.0,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "count",
+      "traits": [
+        "count",
+        "plod"
+      ],
+      "fiction": "Lund shells things she has been shown and never things she has not. Her two Rascals ride ahead to find them and her Augur paints them for the Tremor, which then rearranges the map with her signature.",
+      "recruit": {
+        "type": "band_unlock",
+        "blurb": "Somebody has to see it first."
+      }
+    },
+    {
+      "heroId": "stiletto",
+      "name": "Nadia 'Stiletto' Cole",
+      "unitDef": "armstil",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.0,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "sky",
+      "traits": [
+        "sky",
+        "glass"
+      ],
+      "fiction": "Cole carries her own little power house to every sortie, because Stilettos eat energy and she does not trust the company's grid. When the four of them pass over a position its guns stop mid-sentence.",
+      "recruit": {
+        "type": "band_unlock",
+        "blurb": "Nothing moves; then it is quiet."
+      }
+    },
+    {
+      "heroId": "marauder",
+      "name": "Marlow & Wren",
+      "unitDef": "armmar",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.0,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "mischief",
+      "traits": [
+        "gleeful",
+        "mischief"
+      ],
+      "fiction": "Marlow and Wren have crossed every river in the valley and apologised to none of them. They come out of the water already laughing and leave through the front gate.",
+      "recruit": {
+        "type": "band_unlock",
+        "blurb": "Arrive before the warning."
+      }
+    },
+    {
+      "heroId": "lunkhead",
+      "name": "Tobias 'Lunkhead' Ferrow",
+      "unitDef": "armlun",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.0,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "plod",
+      "traits": [
+        "plod",
+        "captain"
+      ],
+      "fiction": "Ferrow has been hit by everything the war makes and kept the receipts. Nobody remembers hiring the Lunkhead; the company just woke up with an experienced one parked by the gate.",
+      "recruit": {
+        "type": "band_unlock",
+        "blurb": "Already knows where it hurts."
+      }
+    },
+    {
+      "heroId": "stronghold",
+      "name": "Dagny 'Stronghold' Reeve",
+      "unitDef": "legstronghold",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.0,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "sky",
+      "traits": [
+        "sky",
+        "captain"
+      ],
+      "fiction": "Reeve flies the Stronghold low and slow and expects everyone else to keep up. Her Highwinds clear the lane, her Banshees close it, and the transport sets down in the middle as if it had been there all along.",
+      "recruit": {
+        "type": "band_unlock",
+        "blurb": "Brings its own sky."
+      }
+    },
+    {
+      "heroId": "possum",
+      "name": "Pip 'Possum' Calloway",
+      "unitDef": "armmh",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.0,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "swarm",
+      "traits": [
+        "swarm",
+        "gleeful"
+      ],
+      "fiction": "Calloway plays dead on every map until the Seekers have found something worth the rockets. Then seven Possums stand up at once and the sky above them is already covered.",
+      "recruit": {
+        "type": "band_unlock",
+        "blurb": "Cheap, fast, rocket-happy."
+      }
     }
   ]
 }

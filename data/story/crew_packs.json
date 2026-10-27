@@ -562,6 +562,139 @@
       "combined": 225,
       "label": "Horizon",
       "hasBuildPower": false
+    },
+    "armmanni": {
+      "metal": 1200,
+      "energy": 18500,
+      "combined": 1464,
+      "label": "Starlight",
+      "hasBuildPower": false
+    },
+    "corban": {
+      "metal": 1000,
+      "energy": 23000,
+      "combined": 1329,
+      "label": "Banisher",
+      "hasBuildPower": false
+    },
+    "corparrow": {
+      "metal": 1050,
+      "energy": 21000,
+      "combined": 1350,
+      "label": "Poison Arrow",
+      "hasBuildPower": false
+    },
+    "armblade": {
+      "metal": 1250,
+      "energy": 22000,
+      "combined": 1564,
+      "label": "Hornet",
+      "hasBuildPower": false
+    },
+    "legehovertank": {
+      "metal": 1350,
+      "energy": 25000,
+      "combined": 1707,
+      "label": "Charybdis",
+      "hasBuildPower": false
+    },
+    "corshiva": {
+      "metal": 1600,
+      "energy": 23000,
+      "combined": 1929,
+      "label": "Shiva",
+      "hasBuildPower": false
+    },
+    "corak": {
+      "metal": 42,
+      "energy": 820,
+      "combined": 54,
+      "label": "Grunt",
+      "hasBuildPower": false
+    },
+    "cortrem": {
+      "metal": 1850,
+      "energy": 49000,
+      "combined": 2550,
+      "label": "Tremor",
+      "hasBuildPower": false
+    },
+    "corvoyr": {
+      "metal": 99,
+      "energy": 1350,
+      "combined": 118,
+      "label": "Augur",
+      "hasBuildPower": false
+    },
+    "armstil": {
+      "metal": 460,
+      "energy": 38000,
+      "combined": 1003,
+      "label": "Stiletto",
+      "hasBuildPower": false
+    },
+    "armmar": {
+      "metal": 970,
+      "energy": 21000,
+      "combined": 1270,
+      "label": "Marauder",
+      "hasBuildPower": false
+    },
+    "armlun": {
+      "metal": 1150,
+      "energy": 23000,
+      "combined": 1479,
+      "label": "Lunkhead",
+      "hasBuildPower": false
+    },
+    "legstronghold": {
+      "metal": 550,
+      "energy": 13000,
+      "combined": 736,
+      "label": "Stronghold",
+      "hasBuildPower": false
+    },
+    "armhawk": {
+      "metal": 140,
+      "energy": 5700,
+      "combined": 221,
+      "label": "Highwind",
+      "hasBuildPower": false
+    },
+    "armkam": {
+      "metal": 135,
+      "energy": 2300,
+      "combined": 168,
+      "label": "Banshee",
+      "hasBuildPower": false
+    },
+    "armmh": {
+      "metal": 175,
+      "energy": 3000,
+      "combined": 218,
+      "label": "Possum",
+      "hasBuildPower": false
+    },
+    "armsh": {
+      "metal": 85,
+      "energy": 1250,
+      "combined": 103,
+      "label": "Seeker",
+      "hasBuildPower": false
+    },
+    "armah": {
+      "metal": 230,
+      "energy": 4500,
+      "combined": 294,
+      "label": "Sweeper",
+      "hasBuildPower": false
+    },
+    "leghrk": {
+      "metal": 750,
+      "energy": 9000,
+      "combined": 879,
+      "label": "Thanatos",
+      "hasBuildPower": false
     }
   },
   "heroes": {
@@ -1092,8 +1225,8 @@
           "count": 1
         },
         {
-          "unitDef": "armmart",
-          "count": 2
+          "unitDef": "leghrk",
+          "count": 1
         }
       ],
       "blurb": "Parade battery — Barrage, Cleaver, Lance, Arquebus, Mausers. Confetti!",
@@ -1104,10 +1237,10 @@
         "sparkle_battery",
         "tone_break"
       ],
-      "startXp": 0.021,
-      "packCombined": 2873,
-      "packMetal": 2340,
-      "packEnergy": 37300
+      "startXp": 0.005,
+      "packCombined": 2971,
+      "packMetal": 2450,
+      "packEnergy": 36500
     },
     "kettle": {
       "role": "band",
@@ -1549,6 +1682,290 @@
       "packEnergy": 51000,
       "packCombined": 2064,
       "packXpCombined": 1376
+    },
+    "starlight": {
+      "role": "band",
+      "unitDef": "armmanni",
+      "hireTnb": 0,
+      "packTotal": 1,
+      "extras": 0,
+      "blurb": "One Starlight. A beam that does not so much fire as arrive.",
+      "name": "Halcyon Dray",
+      "sizing": "fixed",
+      "tags": [
+        "siege",
+        "beam",
+        "long"
+      ],
+      "startXp": 0.256,
+      "packMetal": 1200,
+      "packEnergy": 18500,
+      "packCombined": 1464
+    },
+    "banisher": {
+      "role": "band",
+      "unitDef": "corban",
+      "hireTnb": 0,
+      "packTotal": 3,
+      "extras": 2,
+      "blurb": "A battery of three Banishers. When the volley lands, the map is quieter.",
+      "name": "Brother Ansel Tove",
+      "sizing": "fixed",
+      "tags": [
+        "line",
+        "battery",
+        "impact"
+      ],
+      "startXp": 0.0,
+      "packMetal": 3000,
+      "packEnergy": 69000,
+      "packCombined": 3986
+    },
+    "arrow": {
+      "role": "band",
+      "unitDef": "corparrow",
+      "hireTnb": 0,
+      "packTotal": 3,
+      "extras": 2,
+      "blurb": "Three Poison Arrows. They never miss twice.",
+      "name": "Ysolde 'Arrow' Venn",
+      "sizing": "fixed",
+      "tags": [
+        "skirmish",
+        "poison",
+        "arrow"
+      ],
+      "startXp": 0.0,
+      "packMetal": 3150,
+      "packEnergy": 63000,
+      "packCombined": 4050
+    },
+    "hornet": {
+      "role": "band",
+      "unitDef": "armblade",
+      "hireTnb": 0,
+      "packTotal": 2,
+      "extras": 1,
+      "blurb": "Two Hornet gunships. A sting that comes back for the rest of the nest.",
+      "name": "Teague 'Hornet' Marsh",
+      "sizing": "fixed",
+      "tags": [
+        "skirmish",
+        "gunship",
+        "sky"
+      ],
+      "startXp": 0.152,
+      "packMetal": 2500,
+      "packEnergy": 44000,
+      "packCombined": 3129,
+      "packXpCombined": 2086
+    },
+    "charybdis": {
+      "role": "band",
+      "unitDef": "legehovertank",
+      "hireTnb": 0,
+      "packTotal": 1,
+      "extras": 0,
+      "blurb": "One Charybdis. A Legion assault hover that treats a river as a runway.",
+      "name": "Orrin 'Charybdis' Tidewell",
+      "sizing": "fixed",
+      "tags": [
+        "line",
+        "hover",
+        "assault"
+      ],
+      "startXp": 0.215,
+      "packMetal": 1350,
+      "packEnergy": 25000,
+      "packCombined": 1707
+    },
+    "shiva": {
+      "role": "band",
+      "unitDef": "corshiva",
+      "hireTnb": 0,
+      "packTotal": 1,
+      "extras": 0,
+      "blurb": "One Shiva with eight Grunts at her heels. The Grunts lead; the Shiva decides.",
+      "name": "Sivan 'Shiva' Ruhl",
+      "sizing": "fixed",
+      "tags": [
+        "line",
+        "walker",
+        "escort"
+      ],
+      "startXp": 0.107,
+      "escorts": [
+        {
+          "unitDef": "corak",
+          "count": 8
+        }
+      ],
+      "packMetal": 1936,
+      "packEnergy": 29560,
+      "packCombined": 2358
+    },
+    "tremor": {
+      "role": "band",
+      "unitDef": "cortrem",
+      "hireTnb": 0,
+      "packTotal": 1,
+      "extras": 0,
+      "blurb": "One Tremor with two Rascal scouts and an Augur. Somebody has to see what she is about to flatten.",
+      "name": "Edda 'Tremor' Lund",
+      "sizing": "fixed",
+      "tags": [
+        "siege",
+        "arty",
+        "spotters"
+      ],
+      "startXp": 0.045,
+      "escorts": [
+        {
+          "unitDef": "corfav",
+          "count": 2
+        },
+        {
+          "unitDef": "corvoyr",
+          "count": 1
+        }
+      ],
+      "packMetal": 2001,
+      "packEnergy": 50890,
+      "packCombined": 2728
+    },
+    "stiletto": {
+      "role": "band",
+      "unitDef": "armstil",
+      "hireTnb": 0,
+      "packTotal": 4,
+      "extras": 3,
+      "blurb": "Four Stiletto EMP bombers and a small power plant to feed them. Nothing moves; then everything is quiet.",
+      "name": "Nadia 'Stiletto' Cole",
+      "sizing": "fixed",
+      "tags": [
+        "siege",
+        "bomber",
+        "emp",
+        "eco"
+      ],
+      "startXp": 0.016,
+      "escorts": [
+        {
+          "unitDef": "armmakr",
+          "count": 2
+        },
+        {
+          "unitDef": "armestor",
+          "count": 1
+        }
+      ],
+      "packMetal": 2012,
+      "packEnergy": 156000,
+      "packCombined": 4241,
+      "packXpCombined": 2903
+    },
+    "marauder": {
+      "role": "band",
+      "unitDef": "armmar",
+      "hireTnb": 0,
+      "packTotal": 2,
+      "extras": 1,
+      "blurb": "Marauder pair. Fast amphibious raiders that arrive before the warning.",
+      "name": "Marlow & Wren",
+      "sizing": "fixed",
+      "tags": [
+        "skirmish",
+        "amphibious",
+        "raider"
+      ],
+      "startXp": 0.077,
+      "packMind": "pair",
+      "fieldName": "Marlow",
+      "partners": [
+        "Wren"
+      ],
+      "packMetal": 1940,
+      "packEnergy": 42000,
+      "packCombined": 2540
+    },
+    "lunkhead": {
+      "role": "band",
+      "unitDef": "armlun",
+      "hireTnb": 0,
+      "packTotal": 1,
+      "extras": 0,
+      "blurb": "One Lunkhead who has seen it all. He starts the sortie already knowing where it will hurt.",
+      "name": "Tobias 'Lunkhead' Ferrow",
+      "sizing": "fixed",
+      "tags": [
+        "line",
+        "hover",
+        "veteran"
+      ],
+      "startXp": 0.45,
+      "startXpFixed": 0.45,
+      "packMetal": 1150,
+      "packEnergy": 23000,
+      "packCombined": 1479
+    },
+    "stronghold": {
+      "role": "band",
+      "unitDef": "legstronghold",
+      "hireTnb": 0,
+      "packTotal": 1,
+      "extras": 0,
+      "blurb": "One Stronghold insertion ship with four Highwind and five Banshee flying escort and cargo. A hot drop that brings its own sky.",
+      "name": "Dagny 'Stronghold' Reeve",
+      "sizing": "fixed",
+      "tags": [
+        "siege",
+        "air",
+        "insertion"
+      ],
+      "startXp": 0.227,
+      "escorts": [
+        {
+          "unitDef": "armhawk",
+          "count": 4
+        },
+        {
+          "unitDef": "armkam",
+          "count": 5
+        }
+      ],
+      "packMetal": 1785,
+      "packEnergy": 47300,
+      "packCombined": 2461,
+      "packXpCombined": 1640
+    },
+    "possum": {
+      "role": "band",
+      "unitDef": "armmh",
+      "hireTnb": 0,
+      "packTotal": 7,
+      "extras": 6,
+      "blurb": "Seven Possums, seven Seekers, three Sweepers. Cheap, fast, rocket-happy hovers with a roof.",
+      "name": "Pip 'Possum' Calloway",
+      "sizing": "fixed",
+      "tags": [
+        "skirmish",
+        "hover",
+        "swarm"
+      ],
+      "startXp": 0.0,
+      "escorts": [
+        {
+          "unitDef": "armsh",
+          "count": 7
+        },
+        {
+          "unitDef": "armah",
+          "count": 3
+        }
+      ],
+      "packMetal": 2510,
+      "packEnergy": 43250,
+      "packCombined": 3128
     }
   },
   "factories": {
@@ -1628,7 +2045,11 @@
       "halq",
       "quill",
       "anvil",
-      "tarn"
+      "tarn",
+      "banisher",
+      "charybdis",
+      "shiva",
+      "lunkhead"
     ],
     "skirmish": [
       "verse",
@@ -1636,7 +2057,11 @@
       "yeva",
       "auditor",
       "kit",
-      "ceil"
+      "ceil",
+      "arrow",
+      "hornet",
+      "marauder",
+      "possum"
     ],
     "siege": [
       "brakhov",
@@ -1646,7 +2071,11 @@
       "vale",
       "phoenix",
       "scylla",
-      "tsunami"
+      "tsunami",
+      "starlight",
+      "tremor",
+      "stiletto",
+      "stronghold"
     ],
     "shield": [
       "kettle",

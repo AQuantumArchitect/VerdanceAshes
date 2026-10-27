@@ -80,10 +80,19 @@ def main() -> int:
     for e in web["edges"]:
         for h in (e["a"], e["b"]):
             degree[h] = degree.get(h, 0) + 1
-    for n in web.get("nodes") or []:
+    nodes = web.setdefault("nodes", [])
+    have = {n["heroId"] for n in nodes}
+    for hid, ch in codex.items():          # every codex hero is a node, however late it joined
+        if hid in have:
+            continue
+        um = umwelt.get(hid) or {}
+        nodes.append({"heroId": hid, "name": ch["name"], "position": ch["position"], "temperament": list(ch.get("temperament") or []),
+                      "doctrine": ch.get("doctrine"), "hook": ch["voice"]["hook"], "degree": 0,
+                      "umweltGlyph": um.get("glyph", ""), "umweltMarks": list(um.get("marks") or [])})
+    for n in nodes:
         n["degree"] = degree.get(n["heroId"], 0)
     params = web.setdefault("params", {})
-    params.update(edgeCount=len(web["edges"]), talkCount=len(talk_rows),
+    params.update(heroCount=len(nodes), edgeCount=len(web["edges"]), talkCount=len(talk_rows),
                   authoredSeeds=sum(1 for e in web["edges"] if e.get("authored")))
     talks["talks"] = list(talk_rows.values())
     written["talks"] = list(written_rows.values())

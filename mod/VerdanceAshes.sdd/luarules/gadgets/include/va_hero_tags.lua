@@ -57,6 +57,18 @@ M.TAGS = {
   wake_rush = { label = "Wake Rush", speed = 1.12, fiction = "The pack surfaces first and the fight is already there." },
   broadside = { label = "Broadside", range = 1.12, fiction = "Writes range onto the water and dares the shore to cross it." },
   tide_table = { label = "Tide Table", vision = 1.20, fiction = "The Horizons read the water; the bombers read the Horizons." },
+  long_light = { label = "Long Light", range = 1.12, fiction = "Writes range onto the horizon and keeps the lamp lit." },
+  scare_radius = { label = "Scare Radius", splash = 1.30, fiction = "The volley hits the place the target would have run to." },
+  venom_tempo = { label = "Venom Tempo", reload = 0.85, fiction = "The second arrow is already on the string." },
+  sting_tempo = { label = "Sting Tempo", reload = 0.85, fiction = "Every pass is faster than the last." },
+  undertow = { label = "Undertow", hp = 1.15, fiction = "Drags the line toward him and holds it there." },
+  grunt_wall = { label = "Grunt Wall", hp = 1.15, fiction = "Eight small reasons not to look at the big one." },
+  tremor_table = { label = "Tremor Table", range = 1.15, fiction = "The map comes with coordinates, and she has all of them." },
+  static_bloom = { label = "Static Bloom", splash = 1.30, fiction = "The pulse covers more ground than the bomb did." },
+  river_rush = { label = "River Rush", speed = 1.12, fiction = "Out of the river, through the gate, gone." },
+  old_scars = { label = "Old Scars", hp = 1.15, fiction = "Every dent is a lesson he did not have to learn twice." },
+  hot_insertion = { label = "Hot Insertion", speed = 1.12, fiction = "Everyone arrives at once, which is the plan." },
+  play_dead = { label = "Play Dead", vision = 1.20, fiction = "The Seekers see for the whole pack." },
   -- build power
   field_surgeon = { label = "Field Surgeon", build = 1.20, fiction = "Nobody stays dead near an honest chassis." },
   combat_engineer = { label = "Combat Engineer", build = 1.20, fiction = "Builds trouble in equal measure." },
@@ -88,6 +100,7 @@ M.HERO_DEFAULTS = {
   solarium = { "eco_lab" }, lumen = { "geo_tithe" }, infestor = { "hive_growth" },
   commando = { "trapper_pace" }, hearth = { "pad_heart" },
   phoenix = { "rises_again" }, tarn = { "wake_rush" }, scylla = { "broadside" }, tsunami = { "tide_table" },
+  starlight = { "long_light" }, banisher = { "scare_radius" }, arrow = { "venom_tempo" }, hornet = { "sting_tempo" }, charybdis = { "undertow" }, shiva = { "grunt_wall" }, tremor = { "tremor_table" }, stiletto = { "static_bloom" }, marauder = { "river_rush" }, lunkhead = { "old_scars" }, stronghold = { "hot_insertion" }, possum = { "play_dead" },
 }
 
 -- Rare dual-effect exceptions. Primary still comes from HERO_DEFAULTS;

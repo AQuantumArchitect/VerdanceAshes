@@ -1,0 +1,258 @@
+{
+  "schemaVersion": "verdance-authored-bonds/1.0",
+  "notes": "Twelve cross-wing and cross-fleet bonds for the bomber, ford, battleship, seaplane and fog heroes: rivals over a contested sky, two ford-takers, the company's biggest guns, and the pretenders of the eyes line.",
+  "pairs": [
+    {
+      "a": "phoenix", "b": "kettle", "polarity": "rivalry",
+      "motifs": ["the bomber that keeps coming back", "a saint who counts to three"],
+      "talks": {
+        "C": {"title": "Three is enough", "beats": [
+          ["narrator", "Kettle's Archangel logs every Phoenix it has dropped. Vell has asked to see the list."],
+          ["kettle", "Three kills on you. I stopped there, out of courtesy."],
+          ["phoenix", "Courtesy is how you end up with a fourth."],
+          ["kettle", "Then the courtesy is mine to regret."]]},
+        "B": {"title": "Cleared hot", "beats": [
+          ["narrator", "They shared a ceiling for one afternoon. Kettle held the flak, and Vell took the run."],
+          ["phoenix", "You had me in the reticle for the whole approach."],
+          ["kettle", "Old habit. I kept thinking you were the other side."],
+          ["phoenix", "I am the other side. I'm just on loan."]]},
+        "A": {"title": "Same sky, other end", "beats": [
+          ["narrator", "A Phoenix came home smoking. Kettle's Ferret walked her wing in to the pad."],
+          ["kettle", "Fourth pass. I'd have bet against it."],
+          ["phoenix", "You'd have lost, and enjoyed it."],
+          ["kettle", "Next time I shoot you, I'll aim to miss. Do not tell the others."]]}
+      }
+    },
+    {
+      "a": "phoenix", "b": "nox", "polarity": "attract",
+      "motifs": ["ash and weather", "two kinds of debt"],
+      "talks": {
+        "C": {"title": "Arrears", "beats": [
+          ["narrator", "Nox asks Vell how many times she has been shot down. Vell asks Nox how long the sky has been owed."],
+          ["nox", "Weather. Since before the finale."],
+          ["phoenix", "Three crashes, one form filed. I think I'm ahead of you."],
+          ["nox", "Nobody is ahead of the sky."]]},
+        "B": {"title": "Filing", "beats": [
+          ["narrator", "Nox keeps a column in the ledger for her. It is headed Phoenix, returns."],
+          ["nox", "You are the only entry that pays back."],
+          ["phoenix", "Fire comes back. That's all it is."],
+          ["nox", "Then it is the one debt I like."]]},
+        "A": {"title": "Fair weather", "beats": [
+          ["narrator", "Nox held the anti-nuke ring while the Phoenixes came in low through its shadow."],
+          ["phoenix", "Nothing fell on us."],
+          ["nox", "That column is closed, then. Thank you for the paperwork."],
+          ["phoenix", "Open a new one. I'll be back."]]}
+      }
+    },
+    {
+      "a": "phoenix", "b": "brakhov", "polarity": "mirror",
+      "motifs": ["fire that returns and fire that walks", "no retreat, only another pass"],
+      "talks": {
+        "C": {"title": "Two ways to burn", "beats": [
+          ["narrator", "Brakhov watches a Phoenix pair peel off a burning turret line and turn for home."],
+          ["brakhov", "You leave."],
+          ["phoenix", "I return. It's a different verb."],
+          ["brakhov", "I do not know that verb."]]},
+        "B": {"title": "The same char", "beats": [
+          ["narrator", "She came back through the Kiln's smoke and landed with soot on her canopy that was not hers."],
+          ["phoenix", "You went in first and left me the good ash."],
+          ["brakhov", "I leave everything the good ash."],
+          ["phoenix", "Then I'll keep landing in it."]]},
+        "A": {"title": "Slow and fast", "beats": [
+          ["narrator", "Her bombs opened the gate, and Brakhov walked through before it stopped glowing."],
+          ["brakhov", "Eight hundred paces. You made it three hundred shorter."],
+          ["phoenix", "You never asked."],
+          ["brakhov", "I am asking now. Come back again."]]}
+      }
+    },
+    {
+      "a": "tarn", "b": "twitch", "polarity": "attract",
+      "motifs": ["out of the river, onto the mine", "a welder who leaves surprises"],
+      "talks": {
+        "C": {"title": "Wet surprise", "beats": [
+          ["narrator", "Twitcher has buried something in the bank. Five Salamanders climb out of the river right beside it."],
+          ["twitch", "You're standing on my best work."],
+          ["tarn", "You've built a landing mat for me. I'm touched."],
+          ["twitch", "It goes off if you cough."]]},
+        "B": {"title": "Muddy shop", "beats": [
+          ["narrator", "Tarn borrows the welder to patch a dented Salamander. It comes back with a trigger added."],
+          ["twitch", "I made it shoot twice. You're welcome."],
+          ["tarn", "It already shot twice."],
+          ["twitch", "Now it does it on purpose."]]},
+        "A": {"title": "The bank is ours", "beats": [
+          ["narrator", "The enemy chased the Salamanders to the shore and found it already laid with Twitcher's gifts."],
+          ["tarn", "You knew where I'd come out."],
+          ["twitch", "I always know where the river ends. I put the fun there."],
+          ["tarn", "Next time, tell me which half of the bank to avoid."]]}
+      }
+    },
+    {
+      "a": "tarn", "b": "commando", "polarity": "mirror",
+      "motifs": ["obstacles as invitations", "the wall that was a door"],
+      "talks": {
+        "C": {"title": "Not a wall", "beats": [
+          ["narrator", "A flooded canyon and a cliff stand between the company and the enemy. Tarn and Cinder Hook both grin."],
+          ["tarn", "That's a lake."],
+          ["commando", "That's a ledge."],
+          ["tarn", "Nobody ever agrees with us. This is lovely."]]},
+        "B": {"title": "Two ways in", "beats": [
+          ["narrator", "She dropped on the cliff while his Salamanders came up through the pond below."],
+          ["commando", "You took the water."],
+          ["tarn", "You took the air. The middle is where everyone else is."],
+          ["commando", "I wouldn't go there."]]},
+        "A": {"title": "Pincer without a map", "beats": [
+          ["narrator", "They met inside the enemy base, from opposite sides, without having planned it."],
+          ["commando", "I thought you'd be late."],
+          ["tarn", "I thought you'd be dry."],
+          ["commando", "Neither of us was ever going to be. Good."]]}
+      }
+    },
+    {
+      "a": "scylla", "b": "warder", "polarity": "friction",
+      "motifs": ["a coast against a circle", "ownership by range"],
+      "talks": {
+        "C": {"title": "Whose edge", "beats": [
+          ["narrator", "The Scylla sits off the shore. The Warder's beamer ring sits on it. The shoreline belongs to both."],
+          ["warder", "That sand is inside my circle."],
+          ["scylla", "That sand is inside my range."],
+          ["warder", "Range is not ownership."]]},
+        "B": {"title": "Overlap", "beats": [
+          ["narrator", "A raiding party landed on the beach. The battleship shelled it, and a beamer finished what was left."],
+          ["scylla", "That was my kill."],
+          ["warder", "That was my dirt."],
+          ["scylla", "The shell made the crater. You only stood in it."]]},
+        "A": {"title": "Border terms", "beats": [
+          ["narrator", "Voss drew a line on the chart at the tide mark. Warder paced it out and left a stake at each end."],
+          ["warder", "Your water, my dirt. I will not apologise for the stakes."],
+          ["scylla", "I would not accept an apology. I'd consider it a retreat."],
+          ["warder", "Good. We understand each other, and I still do not like it."]]}
+      }
+    },
+    {
+      "a": "scylla", "b": "fatboy", "polarity": "mirror",
+      "motifs": ["the biggest guns in the company", "a ship that walks, a house that knocks"],
+      "talks": {
+        "C": {"title": "Heavy company", "beats": [
+          ["narrator", "The war room puts the Scylla and the Fatboy at the same end of the table. The table lists a little."],
+          ["fatboy", "You're a building that floats."],
+          ["scylla", "You're a ship that forgot the sea."],
+          ["fatboy", "I would have called that rude, but it is accurate."]]},
+        "B": {"title": "Two lanes of thunder", "beats": [
+          ["narrator", "She hit the citadel from the bay while he came up the road. They fired within a heartbeat."],
+          ["scylla", "Your shell landed after mine."],
+          ["fatboy", "Mine was heavier."],
+          ["scylla", "Then the citadel had a very bad quarter-hour."]]},
+        "A": {"title": "Neighbours", "beats": [
+          ["narrator", "Evening in camp. The ship rides the harbour, and the house sits on the quay above her."],
+          ["fatboy", "I could knock on you."],
+          ["scylla", "I could answer."],
+          ["fatboy", "Good. It would be a short conversation and a long echo."]]}
+      }
+    },
+    {
+      "a": "scylla", "b": "auditor", "polarity": "tension",
+      "motifs": ["measured by waterline", "a ledger with legs"],
+      "talks": {
+        "C": {"title": "Draft and debt", "beats": [
+          ["narrator", "The Auditor wades down the slip and starts counting the Scylla's turrets. Voss lets it finish."],
+          ["auditor", "Nine barrels. Sixty-one hundred rounds. Who pays?"],
+          ["scylla", "The coast, when I'm done with it."],
+          ["auditor", "I will note that as a promise."]]},
+        "B": {"title": "Cost of a salvo", "beats": [
+          ["narrator", "After the bombardment, the Auditor posts a tally on the pier. The figure is large."],
+          ["auditor", "One hundred and four shells. The shore owes nothing, but I record it."],
+          ["scylla", "You record everything."],
+          ["auditor", "Someone has to. You'd rather not know the number, Commander."]]},
+        "A": {"title": "Reckoning at low tide", "beats": [
+          ["narrator", "The tide went out and left the Scylla's keel two metres from the sea. The Auditor stood beside it, silent for once."],
+          ["scylla", "Go on. Count the days I can't sail."],
+          ["auditor", "Four. I wrote five and corrected it."],
+          ["scylla", "I'll allow you the correction. I'll never allow the ledger."]]}
+      }
+    },
+    {
+      "a": "tsunami", "b": "veil", "polarity": "attract",
+      "motifs": ["seeing first", "three scouts and a haze"],
+      "talks": {
+        "C": {"title": "Cloaked scouting", "beats": [
+          ["narrator", "Three Horizons skim a lake while Veil's jammer rolls a grey bank in behind them."],
+          ["tsunami", "You're hiding my scouts."],
+          ["veil", "Hiding is a service. Billing comes later."],
+          ["tsunami", "I'd pay for a haze that shows only me."]]},
+        "B": {"title": "Invisible lead", "beats": [
+          ["narrator", "She flew the bombers in behind the fog, with nothing on the enemy radar but a flicker."],
+          ["veil", "They saw static."],
+          ["tsunami", "They saw nothing, and then it was too late to look."],
+          ["veil", "A lovely invoice. I'll add it."]]},
+        "A": {"title": "Eyes first", "beats": [
+          ["narrator", "The Horizons found the target, Veil blinded the watchers, and the Tsunamis dropped through a grey gap."],
+          ["tsunami", "I've never been so sure of what I couldn't see."],
+          ["veil", "That is the whole business."],
+          ["tsunami", "Bill the company. I'll tell them we're worth it."]]}
+      }
+    },
+    {
+      "a": "tsunami", "b": "noctua", "polarity": "mentor",
+      "motifs": ["the seaplane wing leader and the night-flyer", "altitude as an argument"],
+      "talks": {
+        "C": {"title": "Lanes and altitude", "beats": [
+          ["narrator", "Noctua unrolls a map of flight paths, in colour, over the lake. Harrow squints at the lowest one."],
+          ["noctua", "That is where your Horizons fly."],
+          ["tsunami", "That's where they have always flown. I keep them wet."],
+          ["noctua", "Fly them higher and they'd see further."]]},
+        "B": {"title": "Landing practice", "beats": [
+          ["narrator", "Harrow taught the drone-bay a seaplane landing. Noctua insisted on a swarm."],
+          ["tsunami", "One at a time. The water forgives gently."],
+          ["noctua", "A hundred of them, and it forgives them all at once."],
+          ["tsunami", "Then I'll bring the lecture notes."]]},
+        "A": {"title": "Night run", "beats": [
+          ["narrator", "The Tsunami wing flew a night strike through Noctua's drone corridor. It was the first time they all came home dry."],
+          ["tsunami", "You flew a road in the dark, and gave the credit to me."],
+          ["noctua", "You taught me that the water will always catch you."],
+          ["tsunami", "I only said it. You made it true."]]}
+      }
+    },
+    {
+      "a": "tsunami", "b": "kettle", "polarity": "tension",
+      "motifs": ["whose sky is it", "bombers coming in low off the water"],
+      "talks": {
+        "C": {"title": "Low and wet", "beats": [
+          ["narrator", "Four Tsunamis cross the shoreline at ten metres. Kettle's Archangel swings to follow."],
+          ["kettle", "You are in my ceiling."],
+          ["tsunami", "I am under it. There is a difference."],
+          ["kettle", "Not to my flak."]]},
+        "B": {"title": "Friendly fire, very friendly", "beats": [
+          ["narrator", "The Archangel fired a salvo at an unmarked wing and got within a hair of the Tsunamis."],
+          ["tsunami", "You nearly had us."],
+          ["kettle", "You flew in without a call sign."],
+          ["tsunami", "I flew in with a plan. You'd have heard it if you asked."]]},
+        "A": {"title": "A corridor each", "beats": [
+          ["narrator", "They split the lake in two on the map. High for the saint, low for the seaplanes."],
+          ["kettle", "Your sky is below the line."],
+          ["tsunami", "Yours is above it. If anyone crosses, we'll both fire."],
+          ["kettle", "That is the first thing you have said that I agree with."]]}
+      }
+    },
+    {
+      "a": "mask", "b": "rumor", "polarity": "tension",
+      "motifs": ["both pretend, one gets paid", "the spare king and the turncoat"],
+      "talks": {
+        "C": {"title": "Two faces", "beats": [
+          ["narrator", "Mask wears a commander's plate. Rumor wears whoever she last turned. They size each other up across the mess table."],
+          ["mask", "I'm sure I've seen you somewhere."],
+          ["rumor", "Everyone has. It was never me."],
+          ["mask", "Funny. I say the same about myself."]]},
+        "B": {"title": "Payroll and plate", "beats": [
+          ["narrator", "Rumor turned an enemy picket in the morning. Mask's Pawns saluted it in the afternoon."],
+          ["rumor", "I get paid for the pretending."],
+          ["mask", "I do it for the pawns. They'd salute a fence post."],
+          ["rumor", "You are better at the job. You just don't know you have one."]]},
+        "A": {"title": "Who is in the plate", "beats": [
+          ["narrator", "A cloaked Ghost walked up to Mask in the dark and hesitated. For once Rumor had nothing to say."],
+          ["rumor", "I can turn anyone. Not you."],
+          ["mask", "Why not me?"],
+          ["rumor", "You already switched sides. The Pawns just haven't noticed yet."]]}
+      }
+    }
+  ]
+}

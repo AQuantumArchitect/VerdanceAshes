@@ -25,6 +25,19 @@ WANT = {  # hero: (unit, packTotal, escorts)
     "tarn": ("corsala", 5, {}),
     "scylla": ("leganavybattleship", 1, {}),
     "tsunami": ("armsb", 4, {"armsehak": 3}),
+    # the kit export (2026-10-26)
+    "starlight": ("armmanni", 1, {}),
+    "banisher": ("corban", 3, {}),
+    "arrow": ("corparrow", 3, {}),
+    "hornet": ("armblade", 2, {}),
+    "charybdis": ("legehovertank", 1, {}),
+    "shiva": ("corshiva", 1, {"corak": 8}),
+    "tremor": ("cortrem", 1, {"corfav": 2, "corvoyr": 1}),
+    "stiletto": ("armstil", 4, {"armmakr": 2, "armestor": 1}),
+    "marauder": ("armmar", 2, {}),
+    "lunkhead": ("armlun", 1, {}),
+    "stronghold": ("legstronghold", 1, {"armhawk": 4, "armkam": 5}),
+    "possum": ("armmh", 7, {"armsh": 7, "armah": 3}),
 }
 
 
@@ -64,3 +77,28 @@ def test_the_new_pairs_are_authored():
     ids = {frozenset((e["a"], e["b"])) for e in web["edges"]}
     for a, b in (("phoenix", "thresh"), ("tarn", "odessa"), ("scylla", "halq"), ("tsunami", "gale")):
         assert frozenset((a, b)) in ids
+
+
+def test_kit_export_particulars():
+    h = PACKS["heroes"]
+    assert h["lunkhead"]["startXpFixed"] == 0.45 and h["lunkhead"]["startXp"] == 0.45   # the showcase high-XP hero
+    assert h["marauder"]["packMind"] == "pair" and h["marauder"]["partners"] == ["Wren"]
+    mira = {e["unitDef"]: e["count"] for e in h["mira"]["escorts"]}
+    assert "armmart" not in mira and mira["leghrk"] == 1                                  # Mousers out, Thanatos in
+    block = re.search(r"\n  mira = \{\n(.*?)\n  \},", LUA, re.S).group(1)
+    assert "armmart" not in block and 'unitDef = "leghrk"' in block
+
+
+def test_every_hero_has_authored_ties_and_a_node():
+    web = _j(S / "support_web.json")
+    deg = {}
+    for e in web["edges"]:
+        if e.get("authored"):
+            for h in (e["a"], e["b"]):
+                deg[h] = deg.get(h, 0) + 1
+    nodes = {n["heroId"] for n in web["nodes"]}
+    for h in PACKS["heroes"]:
+        assert h in nodes, h
+        assert deg.get(h, 0) >= 2, (h, deg.get(h, 0))
+    talks = _j(S / "camp_talks_authored.json")["talks"]
+    assert all(len(t["beats"]) >= 3 for t in talks if t["pairId"].split("__")[0] in WANT)

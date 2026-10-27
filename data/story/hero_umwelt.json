@@ -1596,6 +1596,450 @@
       "glyph": "+sky·+off·+mob·−pad",
       "position": "siege",
       "doctrine": "sky_siege"
+    },
+    {
+      "heroId": "starlight",
+      "name": "Halcyon Dray",
+      "axes": {
+        "energy": 0.2,
+        "offense": 1.0,
+        "mobility": -0.6,
+        "sight": 0.3,
+        "pad": 0.2,
+        "craft": 0.0,
+        "heat": 0.0,
+        "fog": 0.0,
+        "sky": 0.0,
+        "ledger": 0.0
+      },
+      "marks": [
+        {
+          "axis": "offense",
+          "value": 1.0
+        },
+        {
+          "axis": "mobility",
+          "value": -0.6
+        },
+        {
+          "axis": "sight",
+          "value": 0.3
+        },
+        {
+          "axis": "energy",
+          "value": 0.2
+        }
+      ],
+      "glyph": "+off·−mob·+sig·+ene",
+      "position": "siege",
+      "doctrine": "siege_plod"
+    },
+    {
+      "heroId": "banisher",
+      "name": "Brother Ansel Tove",
+      "axes": {
+        "energy": 0.0,
+        "offense": 1.0,
+        "mobility": -0.3,
+        "sight": 0.0,
+        "pad": 0.3,
+        "craft": 0.0,
+        "heat": 0.5,
+        "fog": 0.0,
+        "sky": 0.0,
+        "ledger": 0.0
+      },
+      "marks": [
+        {
+          "axis": "offense",
+          "value": 1.0
+        },
+        {
+          "axis": "heat",
+          "value": 0.5
+        },
+        {
+          "axis": "mobility",
+          "value": -0.3
+        },
+        {
+          "axis": "pad",
+          "value": 0.3
+        }
+      ],
+      "glyph": "+off·+hea·−mob·+pad",
+      "position": "line",
+      "doctrine": "line"
+    },
+    {
+      "heroId": "arrow",
+      "name": "Ysolde 'Arrow' Venn",
+      "axes": {
+        "energy": 0.0,
+        "offense": 0.8,
+        "mobility": 0.7,
+        "sight": 0.2,
+        "pad": -0.7,
+        "craft": 0.0,
+        "heat": 0.0,
+        "fog": 0.0,
+        "sky": 0.0,
+        "ledger": 0.3
+      },
+      "marks": [
+        {
+          "axis": "offense",
+          "value": 0.8
+        },
+        {
+          "axis": "mobility",
+          "value": 0.7
+        },
+        {
+          "axis": "pad",
+          "value": -0.7
+        },
+        {
+          "axis": "ledger",
+          "value": 0.3
+        }
+      ],
+      "glyph": "+off·+mob·−pad·+led",
+      "position": "skirmish",
+      "doctrine": "skirm"
+    },
+    {
+      "heroId": "hornet",
+      "name": "Teague 'Hornet' Marsh",
+      "axes": {
+        "energy": 0.0,
+        "offense": 0.7,
+        "mobility": 1.0,
+        "sight": 0.0,
+        "pad": -0.8,
+        "craft": 0.0,
+        "heat": 0.0,
+        "fog": 0.0,
+        "sky": 0.9,
+        "ledger": 0.0
+      },
+      "marks": [
+        {
+          "axis": "mobility",
+          "value": 1.0
+        },
+        {
+          "axis": "sky",
+          "value": 0.9
+        },
+        {
+          "axis": "pad",
+          "value": -0.8
+        },
+        {
+          "axis": "offense",
+          "value": 0.7
+        }
+      ],
+      "glyph": "+mob·+sky·−pad·+off",
+      "position": "skirmish",
+      "doctrine": "skirm"
+    },
+    {
+      "heroId": "charybdis",
+      "name": "Orrin 'Charybdis' Tidewell",
+      "axes": {
+        "energy": 0.0,
+        "offense": 0.7,
+        "mobility": 0.4,
+        "sight": 0.0,
+        "pad": 0.5,
+        "craft": 0.0,
+        "heat": 0.1,
+        "fog": 0.0,
+        "sky": 0.0,
+        "ledger": 0.0
+      },
+      "marks": [
+        {
+          "axis": "offense",
+          "value": 0.7
+        },
+        {
+          "axis": "pad",
+          "value": 0.5
+        },
+        {
+          "axis": "mobility",
+          "value": 0.4
+        },
+        {
+          "axis": "heat",
+          "value": 0.1
+        }
+      ],
+      "glyph": "+off·+pad·+mob·+hea",
+      "position": "line",
+      "doctrine": "line"
+    },
+    {
+      "heroId": "shiva",
+      "name": "Sivan 'Shiva' Ruhl",
+      "axes": {
+        "energy": 0.0,
+        "offense": 0.8,
+        "mobility": -0.1,
+        "sight": 0.0,
+        "pad": 0.4,
+        "craft": 0.0,
+        "heat": 0.2,
+        "fog": 0.0,
+        "sky": 0.0,
+        "ledger": 0.0
+      },
+      "marks": [
+        {
+          "axis": "offense",
+          "value": 0.8
+        },
+        {
+          "axis": "pad",
+          "value": 0.4
+        },
+        {
+          "axis": "heat",
+          "value": 0.2
+        },
+        {
+          "axis": "mobility",
+          "value": -0.1
+        }
+      ],
+      "glyph": "+off·+pad·+hea·−mob",
+      "position": "line",
+      "doctrine": "line"
+    },
+    {
+      "heroId": "tremor",
+      "name": "Edda 'Tremor' Lund",
+      "axes": {
+        "energy": 0.0,
+        "offense": 1.0,
+        "mobility": -0.8,
+        "sight": 0.3,
+        "pad": 0.6,
+        "craft": 0.0,
+        "heat": 0.0,
+        "fog": 0.0,
+        "sky": 0.0,
+        "ledger": 0.4
+      },
+      "marks": [
+        {
+          "axis": "offense",
+          "value": 1.0
+        },
+        {
+          "axis": "mobility",
+          "value": -0.8
+        },
+        {
+          "axis": "pad",
+          "value": 0.6
+        },
+        {
+          "axis": "ledger",
+          "value": 0.4
+        }
+      ],
+      "glyph": "+off·−mob·+pad·+led",
+      "position": "siege",
+      "doctrine": "arty"
+    },
+    {
+      "heroId": "stiletto",
+      "name": "Nadia 'Stiletto' Cole",
+      "axes": {
+        "energy": 0.5,
+        "offense": 0.8,
+        "mobility": 0.7,
+        "sight": 0.0,
+        "pad": -0.5,
+        "craft": 0.0,
+        "heat": 0.0,
+        "fog": 0.0,
+        "sky": 1.0,
+        "ledger": 0.0
+      },
+      "marks": [
+        {
+          "axis": "sky",
+          "value": 1.0
+        },
+        {
+          "axis": "offense",
+          "value": 0.8
+        },
+        {
+          "axis": "mobility",
+          "value": 0.7
+        },
+        {
+          "axis": "energy",
+          "value": 0.5
+        }
+      ],
+      "glyph": "+sky·+off·+mob·+ene",
+      "position": "siege",
+      "doctrine": "sky_siege"
+    },
+    {
+      "heroId": "marauder",
+      "name": "Marlow & Wren",
+      "axes": {
+        "energy": 0.0,
+        "offense": 0.6,
+        "mobility": 1.0,
+        "sight": 0.0,
+        "pad": -0.8,
+        "craft": 0.0,
+        "heat": 0.0,
+        "fog": 0.2,
+        "sky": 0.0,
+        "ledger": 0.0
+      },
+      "marks": [
+        {
+          "axis": "mobility",
+          "value": 1.0
+        },
+        {
+          "axis": "pad",
+          "value": -0.8
+        },
+        {
+          "axis": "offense",
+          "value": 0.6
+        },
+        {
+          "axis": "fog",
+          "value": 0.2
+        }
+      ],
+      "glyph": "+mob·−pad·+off·+fog",
+      "position": "skirmish",
+      "doctrine": "skirm"
+    },
+    {
+      "heroId": "lunkhead",
+      "name": "Tobias 'Lunkhead' Ferrow",
+      "axes": {
+        "energy": 0.0,
+        "offense": 0.5,
+        "mobility": -0.2,
+        "sight": 0.0,
+        "pad": 0.7,
+        "craft": 0.0,
+        "heat": 0.0,
+        "fog": 0.0,
+        "sky": 0.0,
+        "ledger": 0.3
+      },
+      "marks": [
+        {
+          "axis": "pad",
+          "value": 0.7
+        },
+        {
+          "axis": "offense",
+          "value": 0.5
+        },
+        {
+          "axis": "ledger",
+          "value": 0.3
+        },
+        {
+          "axis": "mobility",
+          "value": -0.2
+        }
+      ],
+      "glyph": "+pad·+off·+led·−mob",
+      "position": "line",
+      "doctrine": "line"
+    },
+    {
+      "heroId": "stronghold",
+      "name": "Dagny 'Stronghold' Reeve",
+      "axes": {
+        "energy": 0.0,
+        "offense": 0.7,
+        "mobility": 0.9,
+        "sight": 0.0,
+        "pad": -0.5,
+        "craft": 0.0,
+        "heat": 0.0,
+        "fog": 0.0,
+        "sky": 1.0,
+        "ledger": 0.0
+      },
+      "marks": [
+        {
+          "axis": "sky",
+          "value": 1.0
+        },
+        {
+          "axis": "mobility",
+          "value": 0.9
+        },
+        {
+          "axis": "offense",
+          "value": 0.7
+        },
+        {
+          "axis": "pad",
+          "value": -0.5
+        }
+      ],
+      "glyph": "+sky·+mob·+off·−pad",
+      "position": "siege",
+      "doctrine": "sky_siege"
+    },
+    {
+      "heroId": "possum",
+      "name": "Pip 'Possum' Calloway",
+      "axes": {
+        "energy": 0.0,
+        "offense": 0.4,
+        "mobility": 0.9,
+        "sight": 0.8,
+        "pad": -0.6,
+        "craft": 0.0,
+        "heat": 0.0,
+        "fog": 0.3,
+        "sky": 0.0,
+        "ledger": 0.0
+      },
+      "marks": [
+        {
+          "axis": "mobility",
+          "value": 0.9
+        },
+        {
+          "axis": "sight",
+          "value": 0.8
+        },
+        {
+          "axis": "pad",
+          "value": -0.6
+        },
+        {
+          "axis": "offense",
+          "value": 0.4
+        }
+      ],
+      "glyph": "+mob·+sig·−pad·+off",
+      "position": "skirmish",
+      "doctrine": "skirm"
     }
   ]
 }

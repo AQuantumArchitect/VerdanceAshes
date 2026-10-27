@@ -8,6 +8,8 @@ the premium reference) or dearer starts green:
 
     startXp = xpCurve.max * max(0, 1 - packXpCombined / xpCurve.zeroAt)
 
+A pack may pin it with "startXpFixed" (a showcase hero, e.g. the Lunkhead).
+
 Aircraft (unit_costs.json "air") count at a third off their cost toward packXpCombined
 (AIR_XP_DISCOUNT), so a pack that flies starts more seasoned. packCombined stays the true cost.
 
@@ -73,7 +75,7 @@ def main() -> int:
             pack["packXpCombined"] = round(xp_combined)
         else:
             pack.pop("packXpCombined", None)
-        pack["startXp"] = start_xp(xp_combined, curve)
+        pack["startXp"] = float(pack["startXpFixed"]) if "startXpFixed" in pack else start_xp(xp_combined, curve)
         rows.append((pack["startXp"], round(combined), hid))
     PACKS.write_text(json.dumps(packs, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     EMBED.write_text("window.CREW_PACKS = " + json.dumps(packs, indent=2, ensure_ascii=False) + ";\n", encoding="utf-8")

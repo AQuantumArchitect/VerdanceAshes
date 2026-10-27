@@ -1,0 +1,902 @@
+{
+  "schemaVersion": "verdance-authored-bonds/1.0",
+  "notes": "Bonds for the Legion water-movers, Cortex pushers, Cortex and Legion artillery and the Armada EMP wing, written to the weave brief.",
+  "pairs": [
+    {
+      "a": "charybdis",
+      "b": "odessa",
+      "polarity": "rivalry",
+      "motifs": [
+        "whose ford is it",
+        "two ways to be wet"
+      ],
+      "talks": {
+        "C": {
+          "title": "Posted notice",
+          "beats": [
+            [
+              "narrator",
+              "Odessa has pegged a strip of cloth to the near bank. Charybdis hovers over it without noticing."
+            ],
+            [
+              "odessa",
+              "That's my ford."
+            ],
+            [
+              "charybdis",
+              "I thought it was a river."
+            ],
+            [
+              "odessa",
+              "It's a river with a tenant."
+            ]
+          ]
+        },
+        "B": {
+          "title": "Toll",
+          "beats": [
+            [
+              "narrator",
+              "They cross at the same hour from opposite banks and meet in the middle, neither slowing."
+            ],
+            [
+              "charybdis",
+              "You came in under me."
+            ],
+            [
+              "odessa",
+              "You came in over me. Someone had to be the floor."
+            ],
+            [
+              "charybdis",
+              "Next crossing, I'll take the bank first."
+            ],
+            [
+              "odessa",
+              "You'll try."
+            ]
+          ]
+        },
+        "A": {
+          "title": "Shared water",
+          "beats": [
+            [
+              "narrator",
+              "The enemy had mined the shallows and watched the deep. The Telchines and the Charybdis came through the middle, a hand's width apart."
+            ],
+            [
+              "odessa",
+              "I'll admit it. It's a wide ford."
+            ],
+            [
+              "charybdis",
+              "It's your ford. I just rent the current."
+            ],
+            [
+              "odessa",
+              "Rent's overdue. Pay it in covering fire."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "charybdis",
+      "b": "anvil",
+      "polarity": "friction",
+      "motifs": [
+        "the tide and the weight",
+        "one flows, one sits"
+      ],
+      "talks": {
+        "C": {
+          "title": "Wake and keel",
+          "beats": [
+            [
+              "narrator",
+              "Anvil's Turtles leave a trench in the mud. Charybdis leaves a ripple that is gone by lunch."
+            ],
+            [
+              "anvil",
+              "I leave a mark."
+            ],
+            [
+              "charybdis",
+              "I leave room for the next tide."
+            ],
+            [
+              "anvil",
+              "That isn't an answer."
+            ]
+          ]
+        },
+        "B": {
+          "title": "Held water",
+          "beats": [
+            [
+              "narrator",
+              "A flooded road. Anvil sat in the middle of it, and the water stacked up behind him like a queue."
+            ],
+            [
+              "charybdis",
+              "You've dammed my road."
+            ],
+            [
+              "anvil",
+              "I've made a floor. You can use it."
+            ],
+            [
+              "charybdis",
+              "I'd rather go round."
+            ],
+            [
+              "anvil",
+              "There is no round. That's why I sat."
+            ]
+          ]
+        },
+        "A": {
+          "title": "Slack tide",
+          "beats": [
+            [
+              "narrator",
+              "The advance stalled at a choke. Anvil held the mouth; Charybdis poured through the gap he left on purpose."
+            ],
+            [
+              "charybdis",
+              "You moved."
+            ],
+            [
+              "anvil",
+              "A hand's width. Don't tell anyone."
+            ],
+            [
+              "charybdis",
+              "The tide never tells. It just comes in."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "charybdis",
+      "b": "tarn",
+      "polarity": "mirror",
+      "motifs": [
+        "rivers as roads",
+        "hover and Salamanders"
+      ],
+      "talks": {
+        "C": {
+          "title": "Both wet",
+          "beats": [
+            [
+              "narrator",
+              "Tarn's Salamanders come up the bank shaking off. Charybdis has not touched the water at all."
+            ],
+            [
+              "tarn",
+              "You skim."
+            ],
+            [
+              "charybdis",
+              "You dive. Same road."
+            ],
+            [
+              "tarn",
+              "Mine's colder."
+            ]
+          ]
+        },
+        "B": {
+          "title": "Off the map",
+          "beats": [
+            [
+              "narrator",
+              "They plotted the same crossing from opposite ends and arrived within a minute of each other."
+            ],
+            [
+              "charybdis",
+              "The map said walk round."
+            ],
+            [
+              "tarn",
+              "The map was written by people who like dry socks."
+            ],
+            [
+              "charybdis",
+              "I like the river better than the map."
+            ]
+          ]
+        },
+        "A": {
+          "title": "Two currents",
+          "beats": [
+            [
+              "narrator",
+              "Salamanders under, hovercraft over, one river holding both. The far line had faced the bridge."
+            ],
+            [
+              "tarn",
+              "They never looked at the water."
+            ],
+            [
+              "charybdis",
+              "Nobody does. It's why it works."
+            ],
+            [
+              "tarn",
+              "Then let's keep it a secret."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "shiva",
+      "b": "rusk",
+      "polarity": "friction",
+      "motifs": [
+        "a door that holds, a bait that leads",
+        "eight Grunts against a jammed gate"
+      ],
+      "talks": {
+        "C": {
+          "title": "Who goes first",
+          "beats": [
+            [
+              "narrator",
+              "Eight Grunts trot to the front of the line. Rusk watches them go with open disapproval."
+            ],
+            [
+              "rusk",
+              "You send them ahead."
+            ],
+            [
+              "shiva",
+              "They lead. I decide."
+            ],
+            [
+              "rusk",
+              "A door doesn't lead. A door stays."
+            ]
+          ]
+        },
+        "B": {
+          "title": "Fed to the line",
+          "beats": [
+            [
+              "narrator",
+              "Shiva's Grunts drew the enemy's count while Rusk's gate held the other side. Both sides called it a good day."
+            ],
+            [
+              "rusk",
+              "You spent your Grunts like coin."
+            ],
+            [
+              "shiva",
+              "I spent them where they were counted."
+            ],
+            [
+              "rusk",
+              "I spent six hours at a gate and one lie. I don't count."
+            ]
+          ]
+        },
+        "A": {
+          "title": "The count",
+          "beats": [
+            [
+              "narrator",
+              "Rusk's gate held; Shiva walked through the middle of it with her Grunts still at her heels."
+            ],
+            [
+              "shiva",
+              "You opened for me."
+            ],
+            [
+              "rusk",
+              "I opened for the count. You happened to be in it."
+            ],
+            [
+              "shiva",
+              "Next time, hold the door a second longer. I like the view."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "shiva",
+      "b": "cauter",
+      "polarity": "friction",
+      "motifs": [
+        "who closes first",
+        "two pushers, one distance"
+      ],
+      "talks": {
+        "C": {
+          "title": "Distance",
+          "beats": [
+            [
+              "narrator",
+              "Shiva and Cauter reach the same ridge from opposite sides, both certain they were first."
+            ],
+            [
+              "cauter",
+              "I was here."
+            ],
+            [
+              "shiva",
+              "I decided to be here."
+            ],
+            [
+              "cauter",
+              "Deciding is slow."
+            ]
+          ]
+        },
+        "B": {
+          "title": "Argument",
+          "beats": [
+            [
+              "narrator",
+              "They closed on the same position, Grunts spreading, shotguns raised, and nobody agreed who gave the order."
+            ],
+            [
+              "shiva",
+              "You went early."
+            ],
+            [
+              "cauter",
+              "I went on time. You went on paper."
+            ],
+            [
+              "shiva",
+              "The paper won."
+            ]
+          ]
+        },
+        "A": {
+          "title": "Both closing",
+          "beats": [
+            [
+              "narrator",
+              "The line broke because two columns arrived from two sides, each sure it had been the second one."
+            ],
+            [
+              "cauter",
+              "That was mine."
+            ],
+            [
+              "shiva",
+              "That was ours. Put it in the minutes."
+            ],
+            [
+              "cauter",
+              "I don't take minutes. I take the ground."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "shiva",
+      "b": "consul",
+      "polarity": "attract",
+      "motifs": [
+        "eight Grunts need paperwork",
+        "building like an apology"
+      ],
+      "talks": {
+        "C": {
+          "title": "Requisition",
+          "beats": [
+            [
+              "narrator",
+              "Shiva's Grunts line up outside the Consul's workshop like a queue at a counter."
+            ],
+            [
+              "shiva",
+              "They need walls."
+            ],
+            [
+              "consul",
+              "They need forms first. I don't build for anonymous labour."
+            ],
+            [
+              "shiva",
+              "Then they'll sign."
+            ]
+          ]
+        },
+        "B": {
+          "title": "Eight signatures",
+          "beats": [
+            [
+              "narrator",
+              "A small bastion went up behind the Grunts, built in an afternoon. Weiss kept the receipts."
+            ],
+            [
+              "consul",
+              "Every nano accounted for."
+            ],
+            [
+              "shiva",
+              "You build like someone paying a debt."
+            ],
+            [
+              "consul",
+              "Is it that obvious?"
+            ]
+          ]
+        },
+        "A": {
+          "title": "Paid up",
+          "beats": [
+            [
+              "narrator",
+              "The Grunts held the front. The Consul's wall held behind them. Neither had expected the other to arrive on time."
+            ],
+            [
+              "shiva",
+              "You've paid more than the contract asked."
+            ],
+            [
+              "consul",
+              "I'm not paying the contract."
+            ],
+            [
+              "shiva",
+              "I know. Keep going. We'll hold the door."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "tremor",
+      "b": "halq",
+      "polarity": "rivalry",
+      "motifs": [
+        "table of coordinates vs long arc",
+        "rival artillery"
+      ],
+      "talks": {
+        "C": {
+          "title": "Two tables",
+          "beats": [
+            [
+              "narrator",
+              "Lund and Halq share a map. Each has drawn the other's firing line in a different colour."
+            ],
+            [
+              "tremor",
+              "Your grid is off by a street."
+            ],
+            [
+              "halq",
+              "Your spotter is off by a hill."
+            ],
+            [
+              "tremor",
+              "My spotter is never wrong. He's just slow."
+            ]
+          ]
+        },
+        "B": {
+          "title": "Same target",
+          "beats": [
+            [
+              "narrator",
+              "Both batteries engaged the same position. The impact fell exactly between their two predictions."
+            ],
+            [
+              "halq",
+              "Mine was closer."
+            ],
+            [
+              "tremor",
+              "Mine was seen. Yours was guessed."
+            ],
+            [
+              "halq",
+              "Guessing is just seeing in advance."
+            ]
+          ]
+        },
+        "A": {
+          "title": "Firing table",
+          "beats": [
+            [
+              "narrator",
+              "The enemy dug in behind a ridge neither could see over. They fired anyway, from either side."
+            ],
+            [
+              "tremor",
+              "Your arc got there first."
+            ],
+            [
+              "halq",
+              "Your Augur told it where to go. I'd call that a draw."
+            ],
+            [
+              "tremor",
+              "I'd call it dinner. You're buying."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "tremor",
+      "b": "spoke",
+      "polarity": "attract",
+      "motifs": [
+        "her spotters and his wheels",
+        "being shown things first"
+      ],
+      "talks": {
+        "C": {
+          "title": "Eyes ahead",
+          "beats": [
+            [
+              "narrator",
+              "Spoke's wheeled scouts roll past Lund's Rascals, who are walking."
+            ],
+            [
+              "spoke",
+              "Wheels. Not boots."
+            ],
+            [
+              "tremor",
+              "I like both, as long as they find it first."
+            ],
+            [
+              "spoke",
+              "I find it. You flatten it. We never need to meet."
+            ]
+          ]
+        },
+        "B": {
+          "title": "Shown first",
+          "beats": [
+            [
+              "narrator",
+              "A scout returned with a ridge, a bunker, and a time. Lund fired without another word."
+            ],
+            [
+              "tremor",
+              "That was clean."
+            ],
+            [
+              "spoke",
+              "You only shell what you've been shown."
+            ],
+            [
+              "tremor",
+              "It's the only honest way to do it."
+            ]
+          ]
+        },
+        "A": {
+          "title": "Picture and sound",
+          "beats": [
+            [
+              "narrator",
+              "Spoke's last wheel sat on a hill with the whole valley in it. The Tremor's shells followed his instructions."
+            ],
+            [
+              "spoke",
+              "You trust my wheels."
+            ],
+            [
+              "tremor",
+              "I trust what they show me. Today that's enough."
+            ],
+            [
+              "spoke",
+              "That's more than I give most people."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "tremor",
+      "b": "mira",
+      "polarity": "tension",
+      "motifs": [
+        "heavy shelling with a signature",
+        "confetti doctrine"
+      ],
+      "talks": {
+        "C": {
+          "title": "Signed",
+          "beats": [
+            [
+              "narrator",
+              "Lund writes her name in the dirt with every volley. Mira's barrage sparkles and her laughter carries across the camp."
+            ],
+            [
+              "tremor",
+              "Shells are a signature."
+            ],
+            [
+              "mira",
+              "They're fireworks!"
+            ],
+            [
+              "tremor",
+              "They're a contract. You don't cheer at a contract."
+            ]
+          ]
+        },
+        "B": {
+          "title": "Both loud",
+          "beats": [
+            [
+              "narrator",
+              "The two batteries fired in the same hour. One was careful. One was a parade."
+            ],
+            [
+              "mira",
+              "Did you see mine?"
+            ],
+            [
+              "tremor",
+              "I saw everything. That's the point."
+            ],
+            [
+              "mira",
+              "Then you saw it sparkle!"
+            ]
+          ]
+        },
+        "A": {
+          "title": "Different sky",
+          "beats": [
+            [
+              "narrator",
+              "The enemy's line was gone. Lund checked her count. Mira checked the sparkle."
+            ],
+            [
+              "tremor",
+              "Efficient."
+            ],
+            [
+              "mira",
+              "Beautiful."
+            ],
+            [
+              "tremor",
+              "Both can be true. I still sign mine."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "stiletto",
+      "b": "hearth",
+      "polarity": "attract",
+      "motifs": [
+        "her own small power plant",
+        "Hearth is the coal of the pad"
+      ],
+      "talks": {
+        "C": {
+          "title": "Power draw",
+          "beats": [
+            [
+              "narrator",
+              "Cole's generator stands at the edge of the pad. Hearth sits at the middle, steady and warm."
+            ],
+            [
+              "stiletto",
+              "I bring my own."
+            ],
+            [
+              "hearth",
+              "Then you won't need mine."
+            ],
+            [
+              "stiletto",
+              "I didn't say I wouldn't borrow."
+            ]
+          ]
+        },
+        "B": {
+          "title": "Lights on",
+          "beats": [
+            [
+              "narrator",
+              "A brownout rolled across the grid. The Stilettos stayed fuelled. Hearth did not flicker."
+            ],
+            [
+              "stiletto",
+              "Your coal held."
+            ],
+            [
+              "hearth",
+              "Your bombers fly. Mine sits. We each do what we're built for."
+            ],
+            [
+              "stiletto",
+              "Mine eats energy. Yours gives it. Convenient."
+            ]
+          ]
+        },
+        "A": {
+          "title": "Shared light",
+          "beats": [
+            [
+              "narrator",
+              "The four Stilettos came back to the pad and found it warm. Hearth had kept the light on."
+            ],
+            [
+              "stiletto",
+              "You waited."
+            ],
+            [
+              "hearth",
+              "I never leave. It's not waiting."
+            ],
+            [
+              "stiletto",
+              "It felt like waiting. I'll take it."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "stiletto",
+      "b": "volt",
+      "polarity": "mirror",
+      "motifs": [
+        "EMP wing and a scout who sees by hurting",
+        "static and burn"
+      ],
+      "talks": {
+        "C": {
+          "title": "Static",
+          "beats": [
+            [
+              "narrator",
+              "Volt's Jaguars paint a target with lightning. Cole's bombers stop it with a pulse."
+            ],
+            [
+              "volt",
+              "I see it by hurting it."
+            ],
+            [
+              "stiletto",
+              "I see it by switching it off."
+            ],
+            [
+              "volt",
+              "We're the same."
+            ]
+          ]
+        },
+        "B": {
+          "title": "Both leave a mark",
+          "beats": [
+            [
+              "narrator",
+              "A position with a burn scar and a silence where its guns used to be."
+            ],
+            [
+              "volt",
+              "Yours is quiet."
+            ],
+            [
+              "stiletto",
+              "Yours is loud. Between us they never knew where to look."
+            ],
+            [
+              "volt",
+              "Good."
+            ]
+          ]
+        },
+        "A": {
+          "title": "Painted and stopped",
+          "beats": [
+            [
+              "narrator",
+              "Volt lit the target. Cole stilled it. Then the Jaguars drove through the quiet."
+            ],
+            [
+              "stiletto",
+              "You light it, I stop it."
+            ],
+            [
+              "volt",
+              "You stop it, I make sure it remembers."
+            ],
+            [
+              "stiletto",
+              "Static and burn. We should make it a doctrine."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "stiletto",
+      "b": "warder",
+      "polarity": "friction",
+      "motifs": [
+        "the pulse that stops guns",
+        "a man who owns a circle with guns"
+      ],
+      "talks": {
+        "C": {
+          "title": "The circle",
+          "beats": [
+            [
+              "narrator",
+              "Stilettos pass overhead. Warder's beamers wait, cloaked, ready to dispute the airspace."
+            ],
+            [
+              "stiletto",
+              "Your guns are about to stop."
+            ],
+            [
+              "warder",
+              "They'll start again. I'll still be here."
+            ],
+            [
+              "stiletto",
+              "That's a very small kingdom."
+            ]
+          ]
+        },
+        "B": {
+          "title": "Quiet guns",
+          "beats": [
+            [
+              "narrator",
+              "The pulse went through. Every gun on the field stopped mid-sentence, Warder's included."
+            ],
+            [
+              "warder",
+              "You switched off my circle."
+            ],
+            [
+              "stiletto",
+              "I switched off everyone's. Yours just resumed first."
+            ],
+            [
+              "warder",
+              "I'd like it noted that I was unimpressed."
+            ]
+          ]
+        },
+        "A": {
+          "title": "Circle and sky",
+          "beats": [
+            [
+              "narrator",
+              "The Stilettos cleared the air above the pad and the Warder's ring held the ground. The enemy found a locked door either way."
+            ],
+            [
+              "stiletto",
+              "Your circle held."
+            ],
+            [
+              "warder",
+              "Your sky was quiet. I'll allow it."
+            ],
+            [
+              "stiletto",
+              "From you, that's a medal."
+            ]
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,263 @@
+{
+  "schemaVersion": "verdance-authored-bonds/1.0",
+  "notes": "Twelve weave pairs linking the raiders, veterans, air groups and swarm-minds that had no authored ties yet.",
+  "pairs": [
+    {
+      "a": "marauder", "b": "commando", "polarity": "sibling",
+      "motifs": ["family of troublemakers", "mines on the doorstep"],
+      "talks": {
+        "C": {"title": "Same Look", "beats": [
+          ["narrator", "Marlow and Wren come out of the creek laughing. Cinder Hook is already kneeling at the gate, planting something."],
+          ["marauder", "We were going to surprise them."],
+          ["commando", "I was going to surprise you first."],
+          ["marauder", "Is that a mine?"],
+          ["commando", "It's a welcome mat."]]},
+        "B": {"title": "Who Goes First", "beats": [
+          ["narrator", "The Marauders arrived before the warning. Cinder Hook's Trappers had arrived before the Marauders."],
+          ["commando", "You're early."],
+          ["marauder", "You're underneath."],
+          ["commando", "Someone has to be. Mind the third step."]]},
+        "A": {"title": "Cousins", "beats": [
+          ["narrator", "The raid went off like a joke with a long setup. Nobody on the enemy side got the punchline in time."],
+          ["marauder", "We don't apologise, you know. To anyone."],
+          ["commando", "Neither do I. I just leave notes in the dirt."],
+          ["marauder", "Leave one for us. We'll read it on the way out."]]}
+      }
+    },
+    {
+      "a": "marauder", "b": "twitch", "polarity": "attract",
+      "motifs": ["two grins", "welder and wet boots"],
+      "talks": {
+        "C": {"title": "Wet Welder", "beats": [
+          ["narrator", "Twitcher is bolting something to the gate when the Marauders drip past him, still laughing."],
+          ["twitch", "You're wet."],
+          ["marauder", "You're building. Both of us look guilty."],
+          ["twitch", "I'm always building. Guilt is a separate project."]]},
+        "B": {"title": "Spare Parts", "beats": [
+          ["narrator", "Twitcher has welded a tow hook to the Marauders' hull. They have not asked why, and they have not removed it."],
+          ["marauder", "It's a good hook."],
+          ["twitch", "It's a good hook for a bad idea. Come see."],
+          ["marauder", "Is it wet?"],
+          ["twitch", "It will be."]]},
+        "A": {"title": "The Bridge That Wasn't", "beats": [
+          ["narrator", "Twitcher laid a bridge over the ford at midnight. The Marauders took it at dawn, and the enemy took the river."],
+          ["twitch", "I never said it would hold a crowd."],
+          ["marauder", "It held us. Everyone else was late."],
+          ["twitch", "Best review I ever had."]]}
+      }
+    },
+    {
+      "a": "marauder", "b": "gale", "polarity": "rivalry",
+      "motifs": ["who owns the river", "ducks with rotors"],
+      "talks": {
+        "C": {"title": "Whose Water", "beats": [
+          ["narrator", "Six Cutlasses sit on the bend. The Marauders come out of it from underneath."],
+          ["marauder", "Mind your floats. This is our river."],
+          ["gale", "Your river has my wing on it."],
+          ["marauder", "Then your wing is parked in our front garden."]]},
+        "B": {"title": "Right of Way", "beats": [
+          ["narrator", "A flooded crossing, two ways through it, and no one willing to wait for the other."],
+          ["gale", "I land. You drive. Same crossing."],
+          ["marauder", "We got there first."],
+          ["gale", "You got there wet. I got there with a view."]]},
+        "A": {"title": "Shared Current", "beats": [
+          ["narrator", "The Cutlasses held the sky over the bend while Marlow and Wren came up through the reeds. The defenders watched the wrong one."],
+          ["marauder", "Fine. It's half your river."],
+          ["gale", "Half is generous. I'll fly over the other half."],
+          ["marauder", "That's our half."],
+          ["gale", "Then I'll wave."]]}
+      }
+    },
+    {
+      "a": "lunkhead", "b": "halbard", "polarity": "mentor",
+      "motifs": ["the veteran with receipts", "the hero with the big gun"],
+      "talks": {
+        "C": {"title": "Where It Hurts", "beats": [
+          ["narrator", "Halbard is polishing a heat ray the size of a cart. Ferrow looks at it the way a man looks at weather."],
+          ["lunkhead", "That's going to run hot."],
+          ["halbard", "It's a very good ray."],
+          ["lunkhead", "I'm sure. I'm still standing a hundred feet behind you when you fire it."]]},
+        "B": {"title": "A Door With Sense", "beats": [
+          ["narrator", "Ferrow walks the Halberd around the camp, pointing at the places a door tends to get hit."],
+          ["lunkhead", "Rear plate. Left hinge. The bit nobody thinks about."],
+          ["halbard", "How do you know?"],
+          ["lunkhead", "Every one of them has a story. I kept the receipts."]]},
+        "A": {"title": "Take the Hit", "beats": [
+          ["narrator", "The ray sang across the field. The return fire found the Lunkhead, who had already moved into it."],
+          ["halbard", "You stepped in front of me."],
+          ["lunkhead", "I stepped where it was going to hurt anyway. Different thing."],
+          ["halbard", "I'll fire twice as slow. For you."],
+          ["lunkhead", "Twice as accurate will do."]]}
+      }
+    },
+    {
+      "a": "lunkhead", "b": "pavise", "polarity": "bond",
+      "motifs": ["the veteran and the shield counterpart", "the left side of the line"],
+      "talks": {
+        "C": {"title": "Same Dirt", "beats": [
+          ["narrator", "Pavise is oiling her Centurion's plate. Ferrow parks his Lunkhead beside it without being asked."],
+          ["lunkhead", "You knew the commander before the suit changed."],
+          ["pavise", "I walked their left. You?"],
+          ["lunkhead", "I just woke up in the company. It felt right."]]},
+        "B": {"title": "Two Old Walls", "beats": [
+          ["narrator", "They hold the gate together, one with a ward and one with receipts."],
+          ["pavise", "You wait for it to hurt."],
+          ["lunkhead", "You wait for it to arrive. Both ways work."],
+          ["pavise", "Mine's quieter."]]},
+        "A": {"title": "Every Warrior", "beats": [
+          ["narrator", "The ward still remembers every Warrior that stood in that dirt. Ferrow finally asks to hear the names."],
+          ["lunkhead", "I've kept the injuries. Never learned the names."],
+          ["pavise", "Then we trade. I'll give you the names."],
+          ["lunkhead", "And I'll tell you which of them it hurt."]]}
+      }
+    },
+    {
+      "a": "lunkhead", "b": "vane", "polarity": "tension",
+      "motifs": ["a veteran who has seen it all", "a pack that is one thought"],
+      "talks": {
+        "C": {"title": "One Mind, One Wall", "beats": [
+          ["narrator", "Vane's twelve Phobos peel off the line together. Ferrow watches them go without turning his head."],
+          ["lunkhead", "Pretty. Do they come back?"],
+          ["vane", "When the beat returns."],
+          ["lunkhead", "Mine stays. That's the difference between us."]]},
+        "B": {"title": "Rhythm and Receipt", "beats": [
+          ["narrator", "Vane counts the beat aloud. Ferrow counts something else under his breath."],
+          ["vane", "You're not keeping time."],
+          ["lunkhead", "I'm keeping score. It runs slower than a rhythm."],
+          ["vane", "It runs later. Mine runs first."]]},
+        "A": {"title": "The Hold", "beats": [
+          ["narrator", "The beat broke under heavy laser fire. The pack scattered, and the only thing still standing was one grey plod."],
+          ["vane", "Your wall held when my rhythm didn't."],
+          ["lunkhead", "A wall is a very short thought. But it survives."],
+          ["vane", "Teach my flock one. Just one."]]}
+      }
+    },
+    {
+      "a": "stronghold", "b": "noctua", "polarity": "rivalry",
+      "motifs": ["two air groups", "a dropship with its own sky"],
+      "talks": {
+        "C": {"title": "Whose Altitude", "beats": [
+          ["narrator", "Reeve and Noctua both file flight paths for the same valley. The charts overlap like a bad argument."],
+          ["stronghold", "I bring my own sky."],
+          ["noctua", "I dream mine. It's less crowded."],
+          ["stronghold", "Not for long."]]},
+        "B": {"title": "Lane Dispute", "beats": [
+          ["narrator", "The Highwinds ran into the drone cloud over the ridge. Both groups broke and re-formed within ten seconds."],
+          ["noctua", "You flew through my wing."],
+          ["stronghold", "I flew over it. The altitude was free."],
+          ["noctua", "The altitude was filed."]]},
+        "A": {"title": "Two Skies", "beats": [
+          ["narrator", "Noctua's drones carpeted the radar while the Stronghold set down in the hole they left. No one dropped a single plane."],
+          ["noctua", "I cleared you a lane."],
+          ["stronghold", "I'll keep to it. Next time I may even file."],
+          ["noctua", "I'll believe it when I see it on paper."]]}
+      }
+    },
+    {
+      "a": "stronghold", "b": "thresh", "polarity": "friction",
+      "motifs": ["an airlift that must arrive", "never looking at what she hits"],
+      "talks": {
+        "C": {"title": "Flight Plan", "beats": [
+          ["narrator", "Reeve hands Thresh a drop zone marked in red. Thresh looks at the sky above it and nothing else."],
+          ["stronghold", "My people land there."],
+          ["thresh", "My weather lands there too."],
+          ["stronghold", "Then move the weather."]]},
+        "B": {"title": "Timing", "beats": [
+          ["narrator", "The Hailstorm cleared the zone with a minute to spare. The Stronghold needed ninety seconds."],
+          ["stronghold", "You were fast."],
+          ["thresh", "I'm always fast. I just don't look at what I hit."],
+          ["stronghold", "I do. Mine have to walk through it."]]},
+        "A": {"title": "Bombs Away, Boots Down", "beats": [
+          ["narrator", "For once Thresh waited. The ship set down in the quiet where the bombs had been, and every passenger stepped out alive."],
+          ["thresh", "I looked. Just once."],
+          ["stronghold", "How was it?"],
+          ["thresh", "Full of your people. I'll not do that again."]]}
+      }
+    },
+    {
+      "a": "stronghold", "b": "vane", "polarity": "attract",
+      "motifs": ["a hot drop", "a flock that moves as one"],
+      "talks": {
+        "C": {"title": "Landing Pattern", "beats": [
+          ["narrator", "Vane's Phobos peel up the slope in one motion. Reeve watches them from the open ramp of the Stronghold."],
+          ["stronghold", "I could put you down where you're needed."],
+          ["vane", "I could be there before you land."],
+          ["stronghold", "Then we both win."]]},
+        "B": {"title": "Same Beat", "beats": [
+          ["narrator", "Highwinds, Banshees and Phobos moved across the field on one rhythm. Nobody had agreed to it."],
+          ["vane", "You keep time."],
+          ["stronghold", "I keep altitude. Close enough."],
+          ["vane", "Close enough is how a swarm begins."]]},
+        "A": {"title": "Drop Zone", "beats": [
+          ["narrator", "The Stronghold set down in the middle of the enemy line. The flock was already waiting there, as if it had always lived in that field."],
+          ["stronghold", "You beat me to my own landing."],
+          ["vane", "I heard you coming. It was the best note of the day."]]}
+      }
+    },
+    {
+      "a": "possum", "b": "tick", "polarity": "sibling",
+      "motifs": ["cheap swarms", "seven Possums and a pile of Ticks"],
+      "talks": {
+        "C": {"title": "Count Them", "beats": [
+          ["narrator", "Pip counts seven hovers. Tamsin counts twenty fleas and gives up at the number."],
+          ["possum", "That's a lot of Ticks."],
+          ["tick", "We prefer to say 'us'."],
+          ["possum", "Same thing. Cheaper, though."]]},
+        "B": {"title": "Cheap Is Quick", "beats": [
+          ["narrator", "Both packs lost a third of their number on the same sortie. Both laughed about it afterwards."],
+          ["tick", "We died cheap."],
+          ["possum", "We played dead cheap. It costs the same."],
+          ["tick", "We'll mint more."],
+          ["possum", "We'll stand up again."]]},
+        "A": {"title": "Plurals", "beats": [
+          ["narrator", "The two swarms covered the fog together, hovers above and fleas below. The enemy radar stopped counting."],
+          ["tick", "We are the eyes."],
+          ["possum", "We are the eyes with rockets. Don't tell the singular ones."],
+          ["tick", "We never speak to the singular ones."]]}
+      }
+    },
+    {
+      "a": "possum", "b": "spoke", "polarity": "rivalry",
+      "motifs": ["rival scout minds", "Seekers against Wheelies"],
+      "talks": {
+        "C": {"title": "Wheels or Rockets", "beats": [
+          ["narrator", "Spoke's Wheelie Bay rolls out sixteen scouts. Pip lets his Seekers hover quietly overhead."],
+          ["spoke", "Wheels don't float away."],
+          ["possum", "Floating doesn't get a tyre punctured."],
+          ["spoke", "Both of us are about to find out."]]},
+        "B": {"title": "Whose Map", "beats": [
+          ["narrator", "The Wheelies and the Seekers reported on the same hill. They gave two different answers."],
+          ["spoke", "My scouts say it's empty."],
+          ["possum", "My Seekers say it isn't."],
+          ["spoke", "Then yours is the nervous kind."],
+          ["possum", "Mine was right last week."]]},
+        "A": {"title": "Eyes Agree", "beats": [
+          ["narrator", "For one afternoon the Wheelies and the Seekers drew the same map. They did not mention it to each other."],
+          ["spoke", "Fine. You see well for something that floats."],
+          ["possum", "You see well for something on wheels."],
+          ["spoke", "Don't tell the bay."]]}
+      }
+    },
+    {
+      "a": "possum", "b": "infestor", "polarity": "friction",
+      "motifs": ["a pack that plays dead", "a hive that grows"],
+      "talks": {
+        "C": {"title": "Playing Dead", "beats": [
+          ["narrator", "The Possums lie still in the grass. The Infestor seed stands in the same patch, and there are now six of them."],
+          ["possum", "You were five this morning."],
+          ["infestor", "The company grows itself."],
+          ["possum", "Mine plays dead. That's half the trick. Yours is just showing off."]]},
+        "B": {"title": "Stillness", "beats": [
+          ["narrator", "Both packs waited in the same hollow for the enemy to pass. One pretended to be empty. The other was quietly adding to itself."],
+          ["infestor", "Patience is a garden."],
+          ["possum", "Patience is a bluff."],
+          ["infestor", "You'll want to move over. I'm planting."]]},
+        "A": {"title": "Ready or Not", "beats": [
+          ["narrator", "Seven Possums stood up on cue. The hive had already put a dozen more behind them."],
+          ["possum", "I didn't ask for the help."],
+          ["infestor", "Nobody asks. They simply become the company."],
+          ["possum", "Then I'll grudgingly say thank you."]]}
+      }
+    }
+  ]
+}
