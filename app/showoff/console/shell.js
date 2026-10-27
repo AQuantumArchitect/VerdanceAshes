@@ -1,6 +1,6 @@
 // Shell: the four workspaces, the operations rail, the matters column and its inspector,
 // the HUD badges, and the narrative poll that keeps them fresh.
-import { state, session, CREW, commerce, metalKOf, prettyMap, sessionLabel } from "./state.js";
+import { state, session, CREW, commerce, metalKOf, prettyMap, sessionLabel, jobLabel } from "./state.js";
 import { api } from "./api.js";
 import { $, esc, escape, pretty, field, operation, thread, reactions, scene, fieldLine, toast } from "./render.js";
 import { updateIntelligence, zoneInspector } from "./board.js";
@@ -73,6 +73,17 @@ function renderInspector() {
   else inspector.innerHTML = field("What kind of company are we?", "Select a company matter above to hear the disagreement and choose your response. These promises shape your history; operations on the left determine where you deploy.");
 }
 
+// One job card on the rail: the job's name (no "Lean ·" prefix: a pill says it), then the map and the
+// kind of job, or the reason the company is pushing it.
+function opCard(c, op, snap) {
+  const raw = String(c.label || "Operation");
+  const lean = !!(c.recommended || c.lean || raw.startsWith("Lean · "));
+  const title = raw.replace(/^Lean · /, "");
+  const kind = (c.effect && (c.effect.objectiveArchetype || c.effect.contractKind)) || "";
+  const sub = (op && op.recommendation) || [prettyMap(c.effect && c.effect.mapId), kind ? jobLabel(kind) : ""].filter(Boolean).join(" · ");
+  return `<button class="cc-operation" type="button" data-operation="${escape(c.id)}" ${c.disabled ? "disabled" : ""} aria-pressed="${c.id === snap.plan?.choiceId}">` +
+    `${lean ? `<em class="cc-lean">lean</em>` : ""}<strong>${escape(title)}</strong><span>${escape(sub)}</span></button>`;
+}
 export function paint() {
   const n = session.narrative;
   const snap = snapshot();
@@ -89,8 +100,8 @@ export function paint() {
   const actionable = n?.threads?.filter(t => ["Available", "Committed", "Changed"].includes(t.stage)) || [];
   const shown = session.allThreads ? actionable : actionable.filter(t => n.recommended.includes(t.id));
   $("operations-rail").innerHTML = '<p class="cc-eyebrow">Company operations</p><h2>Where do we go next?</h2>' + fieldLine(fieldPeople()) +
-    choices.slice(0, 3).map(c => `<button class="cc-operation" type="button" data-operation="${escape(c.id)}" ${c.disabled ? "disabled" : ""} aria-pressed="${c.id === snap.plan?.choiceId}"><strong>${escape(c.label)}</strong><span>${escape(ranking.find(o => o.id === c.id)?.recommendation || "Plan the route and inspect the requirements.")}</span></button>`).join("") +
-    (choices.length > 3 ? `<details><summary>All ${choices.length} operations</summary>${choices.slice(3).map(c => `<button type="button" data-operation="${escape(c.id)}" ${c.disabled ? "disabled" : ""}>${escape(c.label)}</button>`).join("")}</details>` : "") +
+    choices.slice(0, 3).map(c => opCard(c, ranking.find(o => o.id === c.id), snap)).join("") +
+    (choices.length > 3 ? `<details><summary>All ${choices.length} operations</summary>${choices.slice(3).map(c => opCard(c, ranking.find(o => o.id === c.id), snap)).join("")}</details>` : "") +
     (over ? `<p class="cc-epilogue">${escape(snap.hub.node.text)}</p><p>The campaign is complete. The chronicle and the company remain.</p>`
       : !choices.length ? "<p>No operation on this theater. Select another map or refresh after your return.</p>" : "") +
     '<section id="cc-operation-details" aria-label="Selected operation"></section>';
