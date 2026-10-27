@@ -93,6 +93,8 @@ def test_eco_raid_field_recruits_default_optional():
     )
     assert rows
     for r in rows:
+        if r.get("requiresVictory"):
+            continue    # they join by winning the fight (auditor, brakhov): linked to the sortie on purpose
         assert r["optionalJoin"] is True
         assert r["sortieLinked"] is False
     noctua = next(r for r in rows if r["heroId"] == "noctua")
