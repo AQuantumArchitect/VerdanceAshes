@@ -83,7 +83,7 @@ def _state_with_people():
             "doors": {"GF_SE_PLATEAU": {"held": True}}}
 
 
-def test_the_spearhead_crosses_a_held_door():
+def test_someone_on_the_pathway_joins_a_drop_on_either_field():
     from verdance.belief import manifest
     from verdance.world import roads
     st = _state_with_people()
@@ -93,7 +93,9 @@ def test_the_spearhead_crosses_a_held_door():
     assert set(here) == {"halbard", "kettle"}
     assert set(far) == {"halbard"} and far["halbard"]["zoneId"] == door["farZoneId"] and far["halbard"]["spearhead"]
     st["doors"]["GF_SE_PLATEAU"]["held"] = False
-    assert manifest.field_people(st, door["farMapId"], ROOT) == []      # a door lost: the road is shut
+    assert set(p["heroId"] for p in manifest.field_people(st, door["farMapId"], ROOT)) == {"halbard"}  # standing on it is enough
+    assert manifest.joins_drops_on({"mapId": "greenest_fields", "zoneId": "GF_SE_PLATEAU"}, roads.load_doors(ROOT)) == {
+        "greenest_fields": "GF_SE_PLATEAU", door["farMapId"]: door["farZoneId"]}
 
 
 def test_a_field_with_someone_on_it_always_offers_a_job():
@@ -103,3 +105,13 @@ def test_a_field_with_someone_on_it_always_offers_a_job():
     fetch = [c for c in cards if c["id"] == "fetch_greenest_fields"]
     assert fetch and set(fetch[0]["effect"]["fetchHeroIds"]) == {"halbard", "kettle"}
     assert fetch[0]["effect"]["mapId"] == "greenest_fields" and fetch[0]["effect"]["padLocked"]
+
+
+def test_safe_ground_is_held_doors_and_our_own_ground():
+    from verdance.campaign import engine
+    st = {"doors": {"GF_NW_MUSTER": {"held": True}, "GF_SE_PLATEAU": {"held": False}},
+          "zoneMemory": {"greenest_fields": {"GF_NW_CITADEL": {"controllingFaction": "armada"}}}}
+    assert engine._safe_zone_ids(st, "greenest_fields", ROOT, "GF_NW_MUSTER") == ["GF_NW_MUSTER"]
+    assert engine._safe_zone_ids(st, "greenest_fields", ROOT, "GF_C_GATE") == ["GF_NW_MUSTER", "GF_C_GATE"]
+    lua = (MOD / "luarules/gadgets/game_verdance_exfil.lua").read_text(encoding="utf-8")
+    assert "mission.safeZoneIds" in lua and "local function liftsFrom" in lua

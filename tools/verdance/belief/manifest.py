@@ -160,12 +160,26 @@ def vanished(result: Dict[str, Any]) -> set:
     return who - present
 
 
+def joins_drops_on(rec: Dict[str, Any], doors: Dict[str, Any]) -> Dict[str, str]:
+    """Where a drop finds someone left standing: {mapId: zoneId}. Their own map, where they stand;
+    and when they stand on a road door (the pathway between two fields), the far map too, on its
+    far door. Owner call (2026-10-27): someone on the pathway can go to either field."""
+    zone, at_map = str(rec.get("zoneId") or ""), str(rec.get("mapId") or "")
+    out: Dict[str, str] = {}
+    if at_map and zone:
+        out[at_map] = zone
+    door = doors.get(zone) if zone else None
+    if door and door.get("farMapId") and door.get("farZoneId"):
+        out.setdefault(str(door["farMapId"]), str(door["farZoneId"]))
+    return out
+
+
 def field_people(state: Dict[str, Any], map_id: str, workspace: Optional[Path] = None) -> list:
     """The people the company left standing on this map (camp.people where == "field"): the next
     drop here finds them where they stood, so they can be brought home.
 
-    The spearhead (owner, 2026-10-27): someone left standing on a door the company holds is at the
-    mouth of the road, so a drop on the far map finds them on its far door, ready to go on."""
+    The pathway (owner, 2026-10-27): someone left standing on a road door is on the road between two
+    fields, so a drop on either field finds them: on their own door, or on the far map's far door."""
     chars = state.get("characters") or {}
     doors = {}
     if workspace is not None:
@@ -184,10 +198,9 @@ def field_people(state: Dict[str, Any], map_id: str, workspace: Optional[Path] =
         if at_map == str(map_id):
             out.append({"heroId": str(hid), "zoneId": zone})
             continue
-        door = doors.get(zone)
-        held = isinstance((state.get("doors") or {}).get(zone), dict) and (state.get("doors") or {})[zone].get("held")
-        if door and held and str(door.get("farMapId")) == str(map_id):
-            out.append({"heroId": str(hid), "zoneId": str(door["farZoneId"]), "spearhead": True, "fromZoneId": zone})
+        far = joins_drops_on(rec, doors).get(str(map_id))
+        if far:
+            out.append({"heroId": str(hid), "zoneId": far, "spearhead": True, "fromZoneId": zone})
     return out
 
 

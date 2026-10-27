@@ -170,7 +170,7 @@ export function fieldLine(rows) {
   const list = (rows || []).filter(Boolean);
   if (!list.length) return "";
   const word = r => r.where === "transit" ? "on the road" : (r.label || "somewhere");
-  return `<p class="cc-field-people" role="status">Left in the field: ${list.map(r => `<b class="${r.wounded ? "bad" : ""}">${escape(r.name)}</b> (${escape(word(r))}${r.wounded ? " · wounded" : ""})`).join(", ")}</p>`;
+  return `<p class="cc-field-people" role="status">Left in the field: ${list.map(r => `<b class="${r.wounded ? "bad" : ""}">${escape(r.name)}</b> (${escape(word(r))}${r.wounded ? " · wounded" : ""}${r.joinsThisDrop ? " · joins this drop" : ""})`).join(", ")}</p>`;
 }
 
 export function thread(t, live) {

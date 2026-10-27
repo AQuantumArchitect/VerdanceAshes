@@ -13,7 +13,7 @@ import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from verdance.common import canonical_map_id, load_json, save_json, utc_now
+from verdance.common import WORKSPACE_ROOT, canonical_map_id, load_json, save_json, utc_now
 from .schema import (
     CAMPAIGN_ID,
     INTENT_SCHEMA,
@@ -173,6 +173,22 @@ def wild_zones_for(state: Dict[str, Any], map_id: str, workspace: Optional[Path]
         if isinstance(zone, dict) and str(zone.get("controllingFaction") or (zone.get("abstract") or {}).get("control") or "").lower() == "wild":
             out.add(str(canonical_zone_id(zone_id, workspace) or zone_id))
     return sorted(out)
+
+
+def _safe_zone_ids(state: Dict[str, Any], map_id: str, workspace: Optional[Path], pad: Any = None) -> List[str]:
+    """The zones on this map the company holds: its held road doors and its own ground (the same
+    rule as a legal landing pad, verdance.campaign.landing_zones), plus where it lands."""
+    from verdance.world.landing_zones import legal_landing_reason
+    cands = set(str(z) for z in ((state.get("zoneMemory") or {}).get(map_id) or {}))
+    try:
+        cands |= {z for z, d in _roads.load_doors(Path(workspace) if workspace is not None else WORKSPACE_ROOT).items()
+                  if str(d.get("mapId")) == str(map_id)}
+    except Exception:  # noqa: BLE001
+        pass
+    out = sorted(z for z in cands if legal_landing_reason(state, map_id, z, None)[0])
+    if pad and str(pad) not in out:
+        out.append(str(pad))
+    return out
 
 
 def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = None) -> Dict[str, Any]:
@@ -546,6 +562,9 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
         "blurb": intent.get("storyReason") or "Secure the marked objective and bring the company home.",
         "effect": {"mapId": map_id, "contractKind": intent.get("objective")},
     })
+    # Safe ground (owner, 2026-10-27): everything of ours standing in a zone the company holds lifts
+    # when it extracts, not only what stands on the pad. Rescues still go home from the landing zone.
+    intent["safeZoneIds"] = [] if intent.get("finale") else _safe_zone_ids(state, map_id, workspace, intent.get("deploymentZoneId"))
     narrative_view = narrative_project(state, workspace=workspace)
     active_thread = next((t for t in narrative_view.get("threads", []) if t["stage"] == "Committed" and map_id in t["maps"]), None)
     if active_thread:

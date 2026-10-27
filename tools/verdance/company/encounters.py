@@ -43,7 +43,13 @@ ONLY_BUILDS_ITSELF = {"leginfestor", "va_infestor"}   # prints Infestors (and Go
 # one hard rule, the builder at the Rock Jungle's entrance.
 RULES_REL = Path("data") / "story" / "encounter_rules.json"
 _RULES_DEFAULT = {"perSortie": 2, "markedGround": {"drawBoost": 4.0},
-                  "homeZone": {"doesNotWalk": "fixed", "default": 1.0, "homeMapHaunt": 2.4}, "entranceBuilder": {}}
+                  "homeZone": {"doesNotWalk": "fixed", "default": 1.0, "homeMapHaunt": 2.4}, "entranceBuilder": {},
+                  "meetingStance": {"hostileAt": 0.8, "bondedAt": 0.8, "lateFromMission": 6, "hostileAtLate": 0.4,
+                                    "neutral": "authored", "neutralLate": "authored"}}
+ALLY_POLARITY = {"bond", "attract", "sibling", "mentor", "mirror"}
+ADVERSARY_POLARITY = {"rivalry", "tension", "friction"}
+# Recruit kinds that keep their own way of being met (the constructor-gated ones, a stash).
+KEEP_MEETING = {"retrieve_stash", "assist_fortify", "capture"}
 
 
 def rules(workspace: Optional[Path] = None) -> Dict[str, Any]:
@@ -52,6 +58,72 @@ def rules(workspace: Optional[Path] = None) -> Dict[str, Any]:
     out = dict(_RULES_DEFAULT)
     out.update({k: v for k, v in (data or {}).items() if k in _RULES_DEFAULT})
     return out
+
+
+def stance_toward(hid: str, state: Dict[str, Any], workspace: Optional[Path] = None) -> Tuple[float, List[str]]:
+    """How a wild hero stands toward the company now: + bonded, - tension. The sum over the bond web's
+    edges between them and everyone in the company (support_web.json; an authored edge 1.0, a derived
+    one half its score), each deepened by bond points the pair has earned together. Plain Python, so it
+    holds with or without Umwelt's encounter module."""
+    ws = Path(workspace or ROOT)
+    present = set(present_heroes(state))
+    bonds = (state.get("attachments") or {}).get("pairBonds") or {}
+    score, why = 0.0, []
+    for e in _story(ws, "support_web.json").get("edges") or []:
+        a, b, pol = str(e.get("a") or ""), str(e.get("b") or ""), str(e.get("polarity") or "")
+        if hid not in (a, b):
+            continue
+        other = b if a == hid else a
+        if other not in present:
+            continue
+        sign = 1.0 if pol in ALLY_POLARITY else (-1.0 if pol in ADVERSARY_POLARITY else 0.0)
+        if not sign:
+            continue
+        w = 1.0 if e.get("authored") else 0.5 * float(e.get("score") or 0.5)
+        pts = float((bonds.get("__".join(sorted((a, b)))) or {}).get("points") or 0.0)
+        w *= 1.0 + min(1.0, pts / 55.0)
+        score += sign * w
+        why.append(f"{pol} with {other}")
+    return round(score, 3), why
+
+
+def meeting_kind(score: float, state: Dict[str, Any], workspace: Optional[Path] = None) -> str:
+    """'hostile' (alive, on the enemy's side: beat them, then raise the wreck), 'wreck' (down, waiting
+    to be raised), or 'authored' (the way their recruit entry says). Owner call, 2026-10-27: high
+    tension with the party comes in alive and against you, like the Kiln; bonded comes in as a wreck.
+    Later in the campaign it takes less tension (meetingStance in encounter_rules.json)."""
+    st = rules(workspace).get("meetingStance") or {}
+    late = int(state.get("missionNumber", 1) or 1) >= int(st.get("lateFromMission", 6) or 6)
+    hostile_at = float(st.get("hostileAtLate" if late else "hostileAt", 0.8))
+    if score <= -hostile_at:
+        return "hostile"
+    if score >= float(st.get("bondedAt", 0.8)):
+        return "wreck"
+    neutral = str(st.get("neutralLate" if late else "neutral") or "authored")
+    return neutral if neutral in ("hostile", "wreck") else "authored"
+
+
+def apply_meeting_stance(rows: List[Dict[str, Any]], state: Dict[str, Any], workspace: Optional[Path] = None) -> List[Dict[str, Any]]:
+    """Stamp each met hero with how they turn up. A hostile hero spawns alive on the enemy team
+    (recruitMode 'hostile', spawnAsWreck False): put them down and raise the wreck to sign them on.
+    A bonded one is a wreck to raise. Constructor-gated recruits, the entrance builder, the heroes who
+    join by winning (requiresVictory) and heroes who are buildings keep their own way."""
+    for row in rows:
+        mode = str(row.get("recruitMode") or "wreck_rez")
+        if mode in KEEP_MEETING or row.get("entrance") or row.get("requiresVictory") or row.get("wreckUnitDef"):
+            continue
+        if (row.get("encounter") or {}).get("anchored"):
+            continue
+        score, why = stance_toward(str(row.get("heroId")), state, workspace)
+        kind = meeting_kind(score, state, workspace)
+        row["stance"] = {"score": score, "kind": kind, "reasons": why[:4]}
+        if kind == "hostile":
+            row["recruitMode"] = "hostile"
+            row["spawnAsWreck"] = False
+        elif kind == "wreck":
+            row["recruitMode"] = "wreck_rez"
+            row["spawnAsWreck"] = True
+    return rows
 
 
 def per_sortie(workspace: Optional[Path] = None) -> int:

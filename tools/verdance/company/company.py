@@ -970,8 +970,10 @@ def field_recruits_for_map(
                 continue
             row = _row(m["heroId"], entry, mid, str(m["zoneId"]), round(float(m["score"]), 4))
             row["encounter"] = {"p": m["p"], "anchored": m["anchored"], "reasons": m["reasons"], "label": m["label"]}
+            if m["reasons"] and "builder waits" in str(m["reasons"][0]):
+                row["entrance"] = True
             rows.append(row)
-        return rows
+        return _enc.apply_meeting_stance(rows, state, workspace)
 
     candidates: List[Dict[str, Any]] = []
     for hid, entry in field.items():
@@ -1004,7 +1006,7 @@ def field_recruits_for_map(
             out.append(dict(_row(gate[0], entry, mid, gate[1], 99.0), entrance=True))
     candidates = [c for c in candidates if c["heroId"] not in {o["heroId"] for o in out}]
     candidates.sort(key=lambda r: (-float(r.get("beliefScore") or 0), str(r.get("heroId") or "")))
-    return out + candidates[: max(0, int(limit) - len(out))]
+    return _enc.apply_meeting_stance(out + candidates[: max(0, int(limit) - len(out))], state, workspace)
 
 
 def _collect_lost_field_recruit_ids(result: Dict[str, Any]) -> List[str]:
@@ -1264,6 +1266,17 @@ def hub_company_surface(state: Dict[str, Any], workspace: Optional[Path] = None)
             "recruit": entry.get("recruit") or {"type": "wreck_rez"},
             "whereabouts": roam,
         })
+    # How each would turn up if met now: tension with the party = alive and against us (encounters).
+    try:
+        from verdance.company import encounters as _enc_st
+        for w in wild:
+            rec = w["recruit"] if isinstance(w["recruit"], dict) else {}
+            if str(rec.get("type") or "wreck_rez") in _enc_st.KEEP_MEETING or rec.get("requiresVictory"):
+                continue
+            sc, why = _enc_st.stance_toward(str(w["id"]), state, workspace)
+            w["stance"] = {"score": sc, "kind": _enc_st.meeting_kind(sc, state, workspace), "reasons": why[:4]}
+    except Exception as exc:  # noqa: BLE001
+        print(f"VA_STANCE_FAIL {type(exc).__name__}: {exc}")
     try:
         from verdance.company import encounters as _enc
         encounter_draw = _enc.draws_by_map(state, workspace) if sealed_now_for_surface(state) else None

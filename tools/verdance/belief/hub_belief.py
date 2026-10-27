@@ -157,13 +157,25 @@ def believed_ours(ws: Path, state: Dict[str, Any]) -> set:
     return ours
 
 
-def camp_surface(state: Dict[str, Any]) -> Dict[str, Any]:
+def camp_surface(state: Dict[str, Any], workspace: Optional[Path] = None) -> Dict[str, Any]:
     camp = state.get("camp") or {}
     names = {hid: (ch.get("name") or hid) for hid, ch in (state.get("characters") or {}).items() if isinstance(ch, dict)}
+    doors: Dict[str, Any] = {}
+    try:
+        from verdance.world import roads
+        from verdance.common import WORKSPACE_ROOT
+        doors = roads.load_doors(Path(workspace) if workspace is not None else WORKSPACE_ROOT)
+    except Exception:  # noqa: BLE001
+        doors = {}
+    from verdance.belief.manifest import joins_drops_on
     people = []
     for hid, rec in (camp.get("people") or {}).items():
         if isinstance(rec, dict):
-            people.append(dict(rec, heroId=hid, name=names.get(hid, hid)))
+            row = dict(rec, heroId=hid, name=names.get(hid, hid))
+            if rec.get("where") == "field":
+                # A drop on any of these fields finds them (on the pathway: either field).
+                row["joinsDropsOn"] = sorted(joins_drops_on(rec, doors))
+            people.append(row)
     return {"clockMinutes": camp.get("clockMinutes") or state.get("campaignClockMinutes") or 0.0,
             "people": people, "nextPadZoneId": camp.get("nextPadZoneId"), "nextPadMapId": camp.get("nextPadMapId"),
             "homeZoneId": camp.get("homeZoneId"), "homeMapId": camp.get("homeMapId"), "lastManifest": camp.get("lastManifest")}

@@ -211,7 +211,7 @@ local function drawGoing(m, x1, y1, x2, y2)
     local ud = UnitDefNames and UnitDefNames[k]
     list[#list + 1] = { string.format("%d × %s", g.units[k], (ud and (ud.humanName or ud.name)) or k), Ash.COL.ink }
   end
-  if (g.unitCount or 0) == 0 and #(g.heroes or {}) == 0 then list[1] = { Ash.GLYPH.failed .. " nobody is on the pad", Ash.COL.bad, Ash.COL.bad } end
+  if (g.unitCount or 0) == 0 and #(g.heroes or {}) == 0 then list[1] = { Ash.GLYPH.failed .. " nobody is on ground we hold", Ash.COL.bad, Ash.COL.bad } end
   if m.tenebrium then list[#list + 1] = { string.format("%s Tenebrium", tostring(m.tenebrium)), Ash.COL.tnb } end
   if (m.enemyOnPad or 0) > 0 then list[#list + 1] = { string.format("%s %d enemy on the pad", Ash.GLYPH.exposed, m.enemyOnPad), Ash.COL.bad, Ash.COL.bad } end
   rows(x, y, right, y1, list)
@@ -343,7 +343,7 @@ local function drawManifest()
   Ash.actionRow(x0 + 316, by, x0 + 556, by + 42, { fill = Ash.COL.muted, focused = false })
   text("BACK TO THE FIELD   [Esc]", x0 + 436, by + 15, 14, Ash.COL.muted, "c")
   buttons[#buttons + 1] = { x0 + 316, by, x0 + 556, by + 42, action = "cancel" }
-  text("Whatever is not on the pad stays on Verdance. Structures become holdings.", x0, by - 18, 11, Ash.COL.muted, "l")
+  text("Whatever stands on ground we hold lifts; the rest stays on Verdance. Structures become holdings.", x0, by - 18, 11, Ash.COL.muted, "l")
 end
 
 local function drawOver()
