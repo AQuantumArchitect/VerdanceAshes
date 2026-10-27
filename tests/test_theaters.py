@@ -69,7 +69,7 @@ def test_koom_is_a_standing_war_three_a_side_with_the_company_seat_left_empty():
     # the seats are the recipe's
     rec = _war.load_recipe(ROOT)
     assert {(t["key"], t["zoneId"]) for t in rec["teams"] if t["key"] != rec["playerSeat"]} == \
-        {(c["key"], c["zoneId"]) for c in theaters.KOOM_WAR}
+        {(c["key"], c["zoneId"]) for c in theaters.KOOM_WAR if not c["key"].startswith("fort")}
 
 
 def test_koom_war_makes_room_where_the_company_lands():
@@ -96,10 +96,12 @@ def test_the_war_table_is_the_recipes_seats():
     assert sorted(theaters.WARS) == sorted(_war.war_maps(ROOT))
     for map_id, seats in theaters.WARS.items():
         rec = _war.load_recipe(ROOT, map_id)
-        assert {(t["key"], rec["sides"][t["ally"]]["faction"], t["zoneId"]) for t in rec["teams"] if t["key"] != rec["playerSeat"]} == \
+        every = list(rec["teams"]) + [t for over in (rec.get("tiers") or {}).values() for t in over.get("addTeams") or []]
+        assert {(t["key"], rec["sides"][t["ally"]]["faction"], t["zoneId"]) for t in every if t["key"] != rec["playerSeat"]} == \
             {(c["key"], c["faction"], c["zoneId"]) for c in seats}, map_id
         assert theaters.STANDING_CONTROL[map_id] == {c["zoneId"]: c["faction"] for c in seats
-                                                      if not (map_id == "eye_of_horus" and c["zoneId"] in theaters.EYE_RIM_ZONES)}
+                                                      if not (map_id == "eye_of_horus" and c["zoneId"] in theaters.EYE_RIM_ZONES)
+                                                      and not c["key"].startswith("fort")}
         zones = theaters._zones(map_id, ROOT)
         assert {c["zoneId"] for c in seats} <= set(zones), map_id
 

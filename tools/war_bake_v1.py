@@ -14,6 +14,7 @@ builder reads for every drop onto that map (verdance.world.war_snapshot, verdanc
     python tools\\war_bake_v1.py --windowed            watch it in spring.exe
     python tools\\war_bake_v1.py --map ancient_bastion --field --no-install   the field sets the war (try it)
     python tools\\war_bake_v1.py --map tabula --from-log PATH       build the snapshot from an infolog you already have
+    python tools\\war_bake_v1.py --map tabula --tier 2               the war a second visit meets (recipe "tiers")
 
 Your own campaign is untouched, but BAR's infolog and data\\games\\VerdanceAshes.sdd are shared: don't
 play BAR while it runs. A run is kept in headless_runs\\war_<map>_<stamp>\\ (startscript, engine output,
@@ -81,6 +82,7 @@ def bake(map_id: str, args, cfg, S) -> int:
     if not recipe:
         print("[war] no recipe at", W.recipe_rel(map_id))
         return 2
+    recipe = W.recipe_for_tier(recipe, getattr(args, "tier", 1) or 1)
     if getattr(args, "field", False):
         # the field decides: richer, steeper ground gets a longer war; each seat develops by its ground
         from verdance.world import flow as F
@@ -97,7 +99,7 @@ def bake(map_id: str, args, cfg, S) -> int:
         print("[war] map not available:", prov)
         return 2
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    out_dir = ROOT / "headless_runs" / f"war_{map_id}_{stamp}"
+    out_dir = ROOT / "headless_runs" / f"war_{map_id}_t{recipe['tier']}_{stamp}"
     out_dir.mkdir(parents=True, exist_ok=True)
     frames = int(minutes * 60 * 30)
     script = out_dir / "startscript.txt"
@@ -152,6 +154,8 @@ def main() -> int:
     ap.add_argument("--field", action="store_true",
                     help="length and seat development from the field (verdance.world.flow): worth and slope set the minutes, "
                          "each seat's ground its Handicap and BARb profile")
+    ap.add_argument("--tier", type=int, default=1, choices=(1, 2, 3),
+                    help="visit tier to bake (verdance.world.visit_tiers): 2 and 3 apply the recipe's \"tiers\" overrides")
     ap.add_argument("--from-log", help="skip the sim: read the dump out of this infolog (needs one --map)")
     args = ap.parse_args()
 
@@ -173,7 +177,7 @@ def main() -> int:
         if len(wanted) != 1:
             print("[war] --from-log needs exactly one --map")
             return 2
-        recipe = W.load_recipe(ROOT, wanted[0])
+        recipe = W.recipe_for_tier(W.load_recipe(ROOT, wanted[0]), args.tier)
         minutes = float(args.minutes or recipe.get("minutes") or 20)
         return finish(Path(args.from_log).read_text(encoding="utf-8", errors="replace"), recipe, minutes, None, args.no_install)
 

@@ -1304,6 +1304,7 @@ $script:mapOccupation = @()
 $script:primaryEnemyTeamID = $null
 $script:wildTeamID = $null   # the raptor team the Rock Jungle dens ride (Add-RaptorCamp)
 $script:primaryEnemySide = $null
+$script:warWrecks = @()   # the standing war's dead (wrecks and heaps), laid by game_verdance_war_wrecks.lua
 $script:secondaryMeta = @()  # Drop 4: placed secondary-objective camps (id/zone/required/x/z)
 $nextMissionCandidates = @()  # rebuilt after occupation so picks point at live camps
 $script:livingShellPayload = $null
@@ -2406,6 +2407,7 @@ function Add-StandingWar {
   # as its standing with them says.
   param($Theater)
   $camps = @($Theater.camps)
+  if ($Theater.PSObject.Properties["wrecks"] -and $Theater.wrecks) { $script:warWrecks = @($Theater.wrecks) }
   $sideAllies = @{}
   foreach ($camp in $camps) {
     $c = @([double]$camp.x, [double]$camp.z)
@@ -2925,6 +2927,22 @@ switch ($objectiveKind) {
     }
   }
 }
+}
+
+# Visit tier wardens (verdance.world.visit_tiers): on a living-shell field's second and later visits,
+# Armada BARbarians (va_warden) start on the shell's richest pockets and fortify them as the drop runs.
+$tierWardens = if ($intent.visitTier -and $intent.visitTier.PSObject.Properties["wardens"]) { @($intent.visitTier.wardens) } else { @() }
+if ($shellOccupied -and $tierWardens.Count -gt 0 -and -not $isFinale -and -not $theater) {
+  foreach ($wd in $tierWardens) {
+    $wc = @([double]$wd.x, [double]$wd.z)
+    $wt = New-WarTeam "armada" $wc ("warden " + [string]$wd.zoneId) 0.08
+    $script:ai[$script:ai.Count - 1].options = [ordered]@{ profile = "va_warden" }
+    $script:teams[$script:teams.Count - 1].handicap = [int]$wd.handicap
+    if ($null -ne $script:shellAllyId) {
+      $script:alliances += [ordered]@{ allyTeamA = $script:shellAllyId; allyTeamB = $wt.allyID; allied = $true }
+    }
+  }
+  Write-Host ("Visit tier {0}: {1} Armada warden(s) fortifying {2}" -f $intent.visitTier.tier, $tierWardens.Count, (($tierWardens | ForEach-Object { [string]$_.zoneId }) -join ", "))
 }
 
 # Drop 3 act-1 texture: roving warband packs on the approach axis.
@@ -3640,6 +3658,7 @@ $scenario = [ordered]@{
     nextMissionCandidates = @($nextMissionCandidates)
     mapOccupation = @($script:mapOccupation)
     livingShell = $(if ($script:livingShellPayload) { $script:livingShellPayload } else { $null })
+    warWrecks = @($script:warWrecks)
     occupationModel = "living_shell"
     sessionMode = if ($intent.sessionMode) { [string]$intent.sessionMode } else { "same_map" }
     capture = [ordered]@{
@@ -3806,7 +3825,13 @@ $installerArgs = @{
 # the installer's default 2.5 (~15 min) unless ExtraModOptions already sets it.
 $extraMods = @()
 if ($ExtraModOptions) { $extraMods += $ExtraModOptions }
-if ($isWildHomeFounding -or ($isRockJungle -and $againstFaction -eq "wild")) {
+# Visit tier (verdance.world.visit_tiers): raptor grace and how far into its clock the hive starts.
+$tierRaptor = if ($intent.visitTier -and $intent.visitTier.PSObject.Properties["raptor"]) { $intent.visitTier.raptor } else { $null }
+if ($tierRaptor) {
+  $extraMods += ("va_raptor_grace_seconds={0}" -f [int]$tierRaptor.graceSeconds)
+  $extraMods += ("va_raptor_clock_seconds={0}" -f [int]$tierRaptor.clockSeconds)
+  Write-Host ("Raptor pace (visit tier {0}): grace {1}s, clock +{2}s" -f $intent.visitTier.tier, $tierRaptor.graceSeconds, $tierRaptor.clockSeconds)
+} elseif ($isWildHomeFounding -or ($isRockJungle -and $againstFaction -eq "wild")) {
   if ($extraMods -notmatch "raptor_graceperiodmult=") {
     $extraMods += "raptor_graceperiodmult=0.85"
     Write-Host "Raptor grace: mult=0.85 (~5 min) for Rock Jungle wild home."

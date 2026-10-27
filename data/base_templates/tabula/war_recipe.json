@@ -6,8 +6,8 @@
     8192,
     7168
   ],
-  "character": "Tabula, the terrace war: Armada hold the east plateaus, Null Mercs the west, four seats a side, twenty minutes in. The Mercs' north-west seat is the company's.",
-  "minutes": 20,
+  "character": "Tabula, the entrenched terraces: Armada dug in on the east plateaus behind picket guns at the ramps, a main line of forts on the high terrace and a keep on the south-east muster; Null Mercs hold the west, twenty-five minutes in. The Mercs' north-west seat is the company's.",
+  "minutes": 25,
   "seed": 3312,
   "dry": true,
   "playerSeat": "nw",
@@ -72,7 +72,7 @@
     {
       "key": "ne",
       "ally": "east",
-      "profile": "hard",
+      "profile": "va_dig_in",
       "zoneId": "T_NE_CAUSEWAY",
       "startElmos": [
         6717,
@@ -84,7 +84,7 @@
     {
       "key": "e",
       "ally": "east",
-      "profile": "hard",
+      "profile": "va_dig_in",
       "zoneId": "T_SE_OUTER_RESERVE",
       "startElmos": [
         7307,
@@ -96,7 +96,7 @@
     {
       "key": "em",
       "ally": "east",
-      "profile": "hard",
+      "profile": "va_dig_in",
       "zoneId": "T_E_CAUSEWAY",
       "startElmos": [
         7860,
@@ -108,7 +108,7 @@
     {
       "key": "se",
       "ally": "east",
-      "profile": "hard",
+      "profile": "va_dig_in",
       "zoneId": "T_SE_RESERVE",
       "startElmos": [
         6441,
@@ -122,5 +122,68 @@
     "maxUnitsPerTeam": 900,
     "minBuilt": 0.5,
     "note": "Past the cap the cheapest mobile units go first; structures and commanders are kept."
+  },
+  "digIn": "Visit tiers (verdance.world.visit_tiers): tier 1 the Armada seats play va_dig_in (pickets at every cluster they hold); tier 2 adds two va_warden forts (the keep on the south-east muster, the south terrace's main line: beam lasers, heavy lasers, flak, radar, jammer, a Guardian, one Rattlesnake each) at +20%; tier 3 the same forts at +40%. Profiles: tools/barb_profiles_v1.py.",
+  "tiers": {
+    "2": {
+      "addTeams": [
+        {
+          "key": "fort_keep",
+          "ally": "east",
+          "profile": "va_warden",
+          "zoneId": "T_SE_MUSTER",
+          "startElmos": [
+            7536,
+            6523
+          ],
+          "label": "The keep (fort)",
+          "virtual": true,
+          "handicap": 20
+        },
+        {
+          "key": "fort_s",
+          "ally": "east",
+          "profile": "va_warden",
+          "zoneId": "T_SE_LANE",
+          "startElmos": [
+            6226,
+            5018
+          ],
+          "label": "South terrace fort",
+          "virtual": true,
+          "handicap": 20
+        }
+      ]
+    },
+    "3": {
+      "addTeams": [
+        {
+          "key": "fort_keep",
+          "ally": "east",
+          "profile": "va_warden",
+          "zoneId": "T_SE_MUSTER",
+          "startElmos": [
+            7536,
+            6523
+          ],
+          "label": "The keep (fort)",
+          "virtual": true,
+          "handicap": 40
+        },
+        {
+          "key": "fort_s",
+          "ally": "east",
+          "profile": "va_warden",
+          "zoneId": "T_SE_LANE",
+          "startElmos": [
+            6226,
+            5018
+          ],
+          "label": "South terrace fort",
+          "virtual": true,
+          "handicap": 40
+        }
+      ]
+    }
   }
 }

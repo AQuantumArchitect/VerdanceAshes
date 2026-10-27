@@ -85,5 +85,32 @@
     "maxUnitsPerTeam": 900,
     "minBuilt": 0.5,
     "note": "Past the cap the cheapest mobile units go first; structures and commanders are kept."
+  },
+  "tiers": {
+    "2": {
+      "profiles": {
+        "south": "va_dig_in"
+      }
+    },
+    "3": {
+      "profiles": {
+        "south": "va_dig_in"
+      },
+      "addTeams": [
+        {
+          "key": "fort_se",
+          "ally": "south",
+          "profile": "va_warden",
+          "zoneId": "EOH_SE_BASTION",
+          "startElmos": [
+            4977,
+            5878
+          ],
+          "label": "South-east bastion fort",
+          "virtual": true,
+          "handicap": 20
+        }
+      ]
+    }
   }
 }

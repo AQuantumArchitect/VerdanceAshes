@@ -96,5 +96,32 @@
     "maxUnitsPerTeam": 900,
     "minBuilt": 0.5,
     "note": "Past the cap the cheapest mobile units go first; structures and commanders are kept."
+  },
+  "tiers": {
+    "2": {
+      "profiles": {
+        "right": "va_dig_in"
+      }
+    },
+    "3": {
+      "profiles": {
+        "right": "va_dig_in"
+      },
+      "addTeams": [
+        {
+          "key": "fort_e",
+          "ally": "right",
+          "profile": "va_warden",
+          "zoneId": "KV_E_LOWER_LANE",
+          "startElmos": [
+            10936,
+            4424
+          ],
+          "label": "East high lane fort",
+          "virtual": true,
+          "handicap": 20
+        }
+      ]
+    }
   }
 }

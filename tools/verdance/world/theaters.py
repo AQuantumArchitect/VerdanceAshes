@@ -48,6 +48,7 @@ WARS = {
         {"key": "ne", "faction": "armada", "zoneId": "KV_NE_MUSTER"},
         {"key": "e", "faction": "armada", "zoneId": "KV_NE_SPILLWAY"},
         {"key": "se", "faction": "armada", "zoneId": "KV_SE_MUSTER"},
+        {"key": "fort_e", "faction": "armada", "zoneId": "KV_E_LOWER_LANE"},  # tier 3's fort (va_warden)
     ],
     # greenest_fields: retired 2026-10-25 (Luke): the old field, the living shell's many bases to
     # clear and harvest, is back. Its war is kept in data/base_templates/greenest_fields/retired_war/.
@@ -59,7 +60,11 @@ WARS = {
         {"key": "e", "faction": "armada", "zoneId": "T_SE_OUTER_RESERVE"},
         {"key": "em", "faction": "armada", "zoneId": "T_E_CAUSEWAY"},
         {"key": "se", "faction": "armada", "zoneId": "T_SE_RESERVE"},
-    ],    "ancient_bastion": [
+        # tier 2 and 3's forts (va_warden): the keep and the south high terrace's main line
+        {"key": "fort_keep", "faction": "armada", "zoneId": "T_SE_MUSTER"},
+        {"key": "fort_s", "faction": "armada", "zoneId": "T_SE_LANE"},
+    ],
+    "ancient_bastion": [
         {"key": "keep_s", "faction": "armada", "zoneId": "AB_SW_RAMPART"},
         {"key": "keep_n", "faction": "armada", "zoneId": "AB_W_KEEP"},
         {"key": "out_n", "faction": "armada", "zoneId": "AB_NW_RAMPART"},
@@ -72,6 +77,7 @@ WARS = {
         {"key": "sw", "faction": "cortex", "zoneId": "EOH_SW_CAUSEWAY"},
         {"key": "s", "faction": "cortex", "zoneId": "EOH_C_INNER_GATE"},
         {"key": "se", "faction": "cortex", "zoneId": "EOH_SE_MUSTER"},
+        {"key": "fort_se", "faction": "cortex", "zoneId": "EOH_SE_BASTION"},  # tier 3's fort (va_warden)
     ],
 }
 KOOM_WAR = WARS["koom_valley"]
@@ -79,7 +85,9 @@ KOOM_WAR = WARS["koom_valley"]
 # Who truly holds ground because a set piece stands there (the campaign's zone memory seeds it):
 # the seats each war holds.
 # The Eye's rim stays the raptors' whoever stands on it: its seats are the war's, its ground is wild.
-STANDING_CONTROL = {m: {s["zoneId"]: s["faction"] for s in seats if not (m == "eye_of_horus" and s["zoneId"] in EYE_RIM_ZONES)}
+# A tier's added fort (key fort_*) is not standing at the opening, so it holds nothing yet.
+STANDING_CONTROL = {m: {s["zoneId"]: s["faction"] for s in seats
+                        if not (m == "eye_of_horus" and s["zoneId"] in EYE_RIM_ZONES) and not s["key"].startswith("fort")}
                     for m, seats in WARS.items()}
 
 # All That Simmers' seats: the corners a king can start from. The company's seat is its pad; the
@@ -145,12 +153,14 @@ def wild_dens(state: Dict[str, Any], map_id: str, workspace: Optional[Path], pad
     return seats
 
 
-def standing_war(map_id: str, workspace: Optional[Path], pad_zone: Optional[str] = None) -> Optional[Dict[str, Any]]:
+def standing_war(map_id: str, workspace: Optional[Path], pad_zone: Optional[str] = None,
+                 tier: int = 1) -> Optional[Dict[str, Any]]:
     """A map's war: each seat's side, profile, bank and the units the baked field has standing on it,
     less any that stand where the company lands. A map whose war has not been baked yet is an
-    ordinary field (its living shell), not an empty war."""
+    ordinary field (its living shell), not an empty war. ``tier`` is the visit tier
+    (verdance.world.visit_tiers): a later visit meets the war baked harder, when that bake exists."""
     seats = WARS.get(map_id)
-    snap = _war.load_snapshot(workspace, map_id) if workspace is not None and seats else None
+    snap = _war.load_snapshot(workspace, map_id, tier) if workspace is not None and seats else None
     if not snap:
         return None
     zones = _zones(map_id, workspace)
@@ -163,13 +173,19 @@ def standing_war(map_id: str, workspace: Optional[Path], pad_zone: Optional[str]
             return None
         field = baked.get(c["key"])
         if not field:
+            if c["key"].startswith("fort"):
+                continue  # a tier's added fort: not in this tier's war
             return None
         seat.update(x=field["seat"][0], z=field["seat"][1], profile=field["profile"], bank=field["bank"])
         # the start commander is the engine's; every baked unit but a commander is placed
         seat["units"] = [u for u in field["units"]
                          if u[5] != "C" and not (pad and math.hypot(u[1] - pad[0], u[2] - pad[1]) < PAD_CLEARANCE)]
         camps.append(seat)
-    out = {"kind": "standing_war", "label": SET_PIECES[map_id]["label"], "minutes": snap.get("minutes"), "camps": camps}
+    out = {"kind": "standing_war", "label": SET_PIECES[map_id]["label"], "minutes": snap.get("minutes"), "camps": camps,
+           "tier": int(snap.get("tier") or 1)}
+    # the war's dead lie where they fell (metal to reclaim, hulls to raise), none where the company lands
+    out["wrecks"] = [w for w in snap.get("wrecks") or []
+                     if not (pad and math.hypot(w[1] - pad[0], w[2] - pad[1]) < PAD_CLEARANCE)]
     # A young war on a big field (Greenest Fields) keeps the map's living shell too: the shell's
     # little commander-grown works stand beside the war, allied to the war's seats of their faction.
     recipe = _war.load_recipe(workspace, map_id) if workspace is not None else None
@@ -238,9 +254,10 @@ def is_solo(intent: Optional[Dict[str, Any]]) -> bool:
     return bool(isinstance(intent, dict) and intent.get("soloCommand"))
 
 
-def theater_for(state: Dict[str, Any], map_id: str, workspace: Optional[Path], pad_zone: Optional[str]) -> Optional[Dict[str, Any]]:
+def theater_for(state: Dict[str, Any], map_id: str, workspace: Optional[Path], pad_zone: Optional[str],
+                tier: int = 1) -> Optional[Dict[str, Any]]:
     """The set piece this field stages, or None for an ordinary field."""
-    return standing_war(map_id, workspace, pad_zone) or kings_showdown(map_id, workspace, pad_zone)
+    return standing_war(map_id, workspace, pad_zone, tier) or kings_showdown(map_id, workspace, pad_zone)
 
 
 __all__ = [

@@ -116,7 +116,21 @@ local function dumpAllUnits()
       teamID, tostring(side or ""), allyTeam or -1, math.floor(metal or 0), math.floor(mStor or 0),
       math.floor(energy or 0), math.floor(eStor or 0)))
   end
-  Spring.Echo("VA_SHELL_DUMP_END count=" .. tostring(count))
+  -- Then one VA_SHELL_WRECK line per unit wreck or heap the war left lying (map trees and rocks are
+  -- not wrecks):  feature x z heading metal. The war snapshot keeps the field's dead.
+  local wrecks = 0
+  for _, featureID in ipairs(Spring.GetAllFeatures() or {}) do
+    local fd = FeatureDefs[Spring.GetFeatureDefID(featureID)]
+    local name = fd and fd.name or ""
+    if name:find("_dead$") or name:find("_heap$") then
+      local x, _, z = Spring.GetFeaturePosition(featureID)
+      local metal = Spring.GetFeatureResources(featureID)
+      Spring.Echo(string.format("VA_SHELL_WRECK %s %.1f %.1f %d %d", name, x or 0, z or 0,
+        math.floor(Spring.GetFeatureHeading(featureID) or 0), math.floor(metal or 0)))
+      wrecks = wrecks + 1
+    end
+  end
+  Spring.Echo("VA_SHELL_DUMP_END count=" .. tostring(count) .. " wrecks=" .. tostring(wrecks))
   return count
 end
 

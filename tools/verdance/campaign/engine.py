@@ -122,6 +122,7 @@ from verdance.world import (
     offscreen_clash as _clash,
     roads as _roads,
     theaters as _theaters,
+    visit_tiers as _vt,
     landing_zones as _lz_seed,
 )
 from verdance.belief import manifest as _mf, homecoming as _bh, intel_lua as _il
@@ -133,6 +134,19 @@ from verdance.readings import (
     story_dance as _dance,
     chronicle as _chron,
 )
+
+
+def _shell_pockets(map_id: str, workspace: Optional[Path]) -> List[Dict[str, Any]]:
+    """The map's living-shell pockets (for wardens), from the same template names the builder tries."""
+    if workspace is None:
+        return []
+    base = Path(workspace) / "data" / "base_templates" / canonical_map_id(map_id)
+    for name in ("armada_t15_v1.json", "living_shell_v1.json", "cortex_core_v1.json",
+                 "armada_placeholder_v1.json", "living_placeholder_v1.json"):
+        tpl = load_json(base / name, {}) if (base / name).is_file() else {}
+        if tpl.get("pockets"):
+            return list(tpl["pockets"])
+    return []
 
 def entry_zones_for(state: Dict[str, Any], map_id: str, workspace: Optional[Path] = None) -> Dict[str, List[str]]:
     """faction -> zone ids it controls on this map (zoneMemory truth, current zone ids)."""
@@ -481,7 +495,13 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
     wound = (intent.get("captureZoneIds") or [intent.get("targetZoneId")])[0]
     if wound and _roads.is_door(wound, workspace) and wound != pad:
         intent["exitDoorZoneId"] = wound
-    theater = _theaters.theater_for(state, map_id, workspace, pad)
+    # The field ranks up each visit (verdance.world.visit_tiers): a harder war bake, wardens on a shell
+    # field, a shorter raptor grace.
+    visit_tier = _vt.plan(state, map_id, _shell_pockets(map_id, workspace))
+    intent["visitTier"] = visit_tier
+    if visit_tier.get("label") and isinstance(intent.get("briefing"), dict):
+        intent["briefing"].setdefault("lines", []).append({"speaker": "ketha", "text": visit_tier["label"], "tag": "visit"})
+    theater = _theaters.theater_for(state, map_id, workspace, pad, visit_tier["tier"])
     if theater:
         intent["theater"] = theater
         if theater.get("kind") == "kings_showdown":

@@ -361,6 +361,12 @@ if gadgetHandler:IsSyncedCode() then
 	--
 	-- Difficulty
     --
+	-- Verdance visit tiers (verdance.world.visit_tiers): the grace in seconds, and how far into its own
+	-- clock the hive already is when the drop lands (a third visit meets raptors half an hour in).
+	if tonumber(modOptions.va_raptor_grace_seconds) then
+		config.gracePeriod = math.max(1, tonumber(modOptions.va_raptor_grace_seconds))
+	end
+	config.vaClock = tonumber(modOptions.va_raptor_clock_seconds) or 0
 	config.gracePeriodInitial = config.gracePeriod + 0
 	local maxBurrows = ((config.maxBurrows*(1-config.raptorPerPlayerMultiplier))+(config.maxBurrows*config.raptorPerPlayerMultiplier)*(math.min(SetCount(humanTeams), 8)))*config.raptorSpawnMultiplier
 	local queenTime = (config.queenTime + config.gracePeriod)
@@ -1963,7 +1969,7 @@ if gadgetHandler:IsSyncedCode() then
 	local announcedFirstWave = false
 	function gadget:GameFrame(n)
 
-		GetGameSeconds = n/30
+		GetGameSeconds = n/30 + config.vaClock
 		GetGameFrame = n
 
 		if announcedFirstWave == false and GetGameSeconds > config.gracePeriodInitial then

@@ -212,7 +212,7 @@ function Render-Team {
   $base = @($Team.base)
   $lines = @(
     "Side=$($Team.side);",
-    "Handicap=0;",
+    "Handicap=$(if ($Team.PSObject.Properties['handicap'] -and $Team.handicap) { [int]$Team.handicap } else { 0 });",
     "AllyTeam=$($Team.allyTeam);",
     "TeamLeader=0;",
     "StartPosX=$([int]($MapSizeX * [double]$base[0]));",

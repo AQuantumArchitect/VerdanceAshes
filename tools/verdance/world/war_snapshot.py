@@ -23,6 +23,7 @@ MAP_ID = "koom_valley"
 SCHEMA = "verdance-war-snapshot/1.0"
 DEFAULT_MAP_SIZE = (12288.0, 8192.0)
 MOBILE_KINDS = ("M", "A", "W")
+WRECK_SEAT_CLEARANCE = 0.08  # no war dead on the company's own seat
 
 
 def _json(path: Path) -> Dict[str, Any]:
@@ -36,17 +37,55 @@ def recipe_rel(map_id: str) -> str:
     return f"data/base_templates/{map_id}/war_recipe.json"
 
 
-def snapshot_rel(map_id: str) -> str:
-    return f"data/base_templates/{map_id}/war_snapshot_v1.json"
+def snapshot_rel(map_id: str, tier: int = 1) -> str:
+    """Tier 1 is the war as first met (war_snapshot_v1.json); tiers 2 and 3 are the same war baked
+    harder for a second and later visit (war_snapshot_t2.json, _t3.json; verdance.world.visit_tiers)."""
+    tier = int(tier or 1)
+    name = "war_snapshot_v1.json" if tier <= 1 else f"war_snapshot_t{tier}.json"
+    return f"data/base_templates/{map_id}/{name}"
 
 
 def load_recipe(workspace: Path, map_id: str = MAP_ID) -> Dict[str, Any]:
     return _json(Path(workspace) / recipe_rel(map_id))
 
 
-def load_snapshot(workspace: Path, map_id: str = MAP_ID) -> Optional[Dict[str, Any]]:
-    snap = _json(Path(workspace) / snapshot_rel(map_id))
-    return snap if snap.get("schemaVersion") == SCHEMA and snap.get("teams") else None
+def load_snapshot(workspace: Path, map_id: str = MAP_ID, tier: int = 1) -> Optional[Dict[str, Any]]:
+    """The war at this tier, or the nearest tier below it that has been baked."""
+    for t in range(int(tier or 1), 0, -1):
+        snap = _json(Path(workspace) / snapshot_rel(map_id, t))
+        if snap.get("schemaVersion") == SCHEMA and snap.get("teams"):
+            return snap
+    return None
+
+
+def recipe_for_tier(recipe: Dict[str, Any], tier: int) -> Dict[str, Any]:
+    """The recipe a tier bakes: the base recipe with its ``tiers[<n>]`` overrides applied.
+    ``minutes``; ``profiles`` {seat key or ally name: BARb profile}; ``handicap`` {seat key or ally: %};
+    ``addTeams`` [seat, ...] (extra seats, e.g. va_warden forts)."""
+    import copy
+    tier = int(tier or 1)
+    out = copy.deepcopy(recipe)
+    over = (recipe.get("tiers") or {}).get(str(tier)) or {}
+    if "minutes" in over:
+        out["minutes"] = over["minutes"]
+    for t in out["teams"]:
+        for key in (t["ally"], t["key"]):
+            if key in (over.get("profiles") or {}) and t["key"] != recipe.get("playerSeat"):
+                t["profile"] = over["profiles"][key]
+            if key in (over.get("handicap") or {}):
+                t["handicap"] = over["handicap"][key]
+    out["teams"] += copy.deepcopy(over.get("addTeams") or [])
+    out["tier"] = tier
+    out.pop("tiers", None)
+    return out
+
+
+def tier_seat_keys(recipe: Dict[str, Any]) -> List[str]:
+    """Every seat any tier of this war can field (the base seats and each tier's added ones)."""
+    keys = [t["key"] for t in recipe.get("teams") or []]
+    for over in (recipe.get("tiers") or {}).values():
+        keys += [t["key"] for t in over.get("addTeams") or [] if t["key"] not in keys]
+    return keys
 
 
 def war_maps(workspace: Path) -> List[str]:
@@ -111,13 +150,19 @@ def startscript(recipe: Dict[str, Any], *, game_type: str, frames: Optional[int]
 _UNIT = re.compile(r"VA_SHELL_UNIT\s+(\S+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(\d+)\s+(-?\d+)\s+([\d.]+)\s+([\d.]+)\s+([SMAWC])")
 _TEAM = re.compile(r"VA_SHELL_TEAM\s+(\d+)\s+(\S*)\s+(-?\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)")
 _MAP = re.compile(r"VA_SHELL_MAP\s+(\d+)\s+(\d+)")
+_WRECK = re.compile(r"VA_SHELL_WRECK\s+(\S+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?\d+)\s+(\d+)")
 _TICK = re.compile(r"VA_SHELL_BAKE_TICK\s+frame=(\d+)\s+target=(\d+)(?:\s+units=(\S+))?")
 
 
 def parse_dump(text: str) -> Dict[str, Any]:
     """Facts out of an infolog: the map size, every unit the dump listed and every team's bank."""
-    out: Dict[str, Any] = {"map": None, "units": [], "teams": {}}
+    out: Dict[str, Any] = {"map": None, "units": [], "teams": {}, "wrecks": []}
     for line in text.splitlines():
+        m = _WRECK.search(line)
+        if m:
+            name, x, z, heading, metal = m.groups()
+            out["wrecks"].append({"def": name, "x": float(x), "z": float(z), "heading": int(heading), "metal": int(metal)})
+            continue
         m = _UNIT.search(line)
         if m:
             d, x, z, face, team, hp, built, kind = m.groups()
@@ -194,18 +239,25 @@ def build_snapshot(recipe: Dict[str, Any], dump: Dict[str, Any], *, costs: Optio
             "units": [[u["def"], round(u["x"] / mx, 4), round(u["z"] / mz, 4), u["facing"], int(round(u["hp"] * 100)), u["kind"]]
                       for u in done],
         })
+    # The field's dead: the war's wrecks and heaps, richest first, none on the company's own seat.
+    max_wrecks = int(cfg.get("maxWrecks") or 240)
+    seat = next((t["startElmos"] for t in rec_teams if t["key"] == player_key), None)
+    lying = [w for w in dump.get("wrecks") or []
+             if not (seat and ((w["x"] - seat[0]) / mx) ** 2 + ((w["z"] - seat[1]) / mz) ** 2 < WRECK_SEAT_CLEARANCE ** 2)]
+    lying.sort(key=lambda w: -w["metal"])
+    wrecks = [[w["def"], round(w["x"] / mx, 4), round(w["z"] / mz, 4), w["heading"], w["metal"]] for w in lying[:max_wrecks]]
     return {
         "schemaVersion": SCHEMA, "mapId": recipe.get("mapId", MAP_ID), "mapName": recipe.get("mapName"),
         "bakedAt": baked_at, "minutes": minutes if minutes is not None else recipe.get("minutes"),
         "dry": bool(recipe.get("dry", True)), "seed": recipe.get("seed"),
         "character": recipe.get("character"), "mapSize": [mx, mz],
-        "pulled": pulled, "teams": teams,
+        "pulled": pulled, "teams": teams, "wrecks": wrecks, "tier": int(recipe.get("tier") or 1),
         "unitCount": sum(t["unitCount"] for t in teams),
     }
 
 
 def write_snapshot(workspace: Path, snapshot: Dict[str, Any]) -> Path:
-    path = Path(workspace) / snapshot_rel(str(snapshot.get("mapId") or MAP_ID))
+    path = Path(workspace) / snapshot_rel(str(snapshot.get("mapId") or MAP_ID), int(snapshot.get("tier") or 1))
     path.parent.mkdir(parents=True, exist_ok=True)
     # one line per unit would be big; keep each team's units on a line apiece
     head = {k: v for k, v in snapshot.items() if k != "teams"}

@@ -132,7 +132,9 @@ def test_every_map_has_a_sound_recipe():
         for t in rec["teams"]:
             x, z = t["startElmos"]
             assert 0 < x < mx and 0 < z < mz, (m, t["key"])
-            assert t["profile"] in ("hard", "hard_aggressive"), (m, t["key"])
+            # BAR's own profiles, or one of ours the mod ships (tools/barb_profiles_v1.py)
+            ours = ROOT / "mod" / "VerdanceAshes.sdd" / "luarules" / "configs" / "BARb" / "stable" / "config" / t["profile"]
+            assert t["profile"] in ("hard", "hard_aggressive") or (ours / "build_chain.json").is_file(), (m, t["key"])
         assert next(t for t in rec["teams"] if t["key"] == rec["playerSeat"])["profile"] == "hard_aggressive", m
         # the sides are stacked apart: their centroids are far across the map
         cen = {}
@@ -149,3 +151,20 @@ def test_every_map_has_a_sound_recipe():
         assert s.count("[TEAM") == len(rec["teams"]) and s.count("[ALLYTEAM") == 2, m
         assert f"va_shell_bake_mapid={m};" in s and f"MapName={rec['mapName']};" in s, m
 
+
+
+def test_the_war_dead_are_kept_richest_first_and_off_the_company_seat():
+    rec = W.load_recipe(ROOT, "tabula")
+    seat = next(t["startElmos"] for t in rec["teams"] if t["key"] == rec["playerSeat"])
+    mx, mz = rec["mapSize"]
+    log = "\n".join([
+        f"VA_SHELL_MAP {mx} {mz}",
+        f"VA_SHELL_WRECK armpw_dead 4000.0 3000.0 0 30",
+        f"VA_SHELL_WRECK armham_heap 4100.0 3100.0 1200 80",
+        f"VA_SHELL_WRECK legcen_dead {seat[0] + 10}.0 {seat[1]}.0 0 500",  # on the company's seat: left out
+    ])
+    dump = W.parse_dump(log)
+    assert len(dump["wrecks"]) == 3
+    snap = W.build_snapshot(rec, dump)
+    assert [w[0] for w in snap["wrecks"]] == ["armham_heap", "armpw_dead"]
+    assert snap["wrecks"][0][1] == round(4100.0 / mx, 4)
