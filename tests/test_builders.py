@@ -56,7 +56,21 @@ def test_no_company_constructor_raises_a_t2_lab():
     src = (MOD / "luarules" / "gadgets" / "game_verdance_lab_tier.lua").read_text(encoding="utf-8")
     for lab in ("armalab", "coralab", "legalab", "armavp", "coravp", "legavp", "armaap", "coraap", "legaap", "corgant"):
         assert f'"{lab}"' in src, lab
-    assert "techlevel" in src and "AllowUnitCreation" in src and "RemoveUnitCmdDesc" in src
+    assert "techlevel" in src and "AllowUnitCreation" in src
+    # greyed out with the reason, never cut from the menu; All That Simmers allows them
+    assert "EditUnitCmdDesc" in src and "disabled = true" in src and "RemoveUnitCmdDesc(" not in src
+    assert "all_that_simmers" in src and "all that simmers" in src
+
+
+def test_ketha_reaches_farther_with_two_zagreus():
+    p = PACKS["heroes"]["ketha"]
+    assert (p["unitDef"], p["packTotal"], p["extras"]) == ("legrezbot", 2, 1)
+    assert "packTotal = 2," in LUA.split("\n  ketha = {", 1)[1].split("\n  },", 1)[0]
+    craft = (MOD / "luarules" / "gadgets" / "game_verdance_craft_xp.lua").read_text(encoding="utf-8")
+    vals = {k: float(v) for k, v in re.findall(r"local (KETHA_RANGE_\w+) = ([0-9.]+)", craft)}
+    base = float(re.search(r"local RANGE_CAP = ([0-9.]+)", craft).group(1))
+    assert vals["KETHA_RANGE_BASE"] >= 2.0 and vals["KETHA_RANGE_CAP"] >= 2 * base
+    assert vals["KETHA_RANGE_BASE"] + vals["KETHA_RANGE_PER_XP"] * 2.4 >= 4.0     # full experience
 
 
 def test_the_scout_buildings_come_with_storage():

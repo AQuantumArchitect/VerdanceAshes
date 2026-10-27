@@ -51,6 +51,18 @@ local BP_PER_XP = 0.42
 local BP_CAP = 2.00
 local RANGE_PER_XP = 0.42
 local RANGE_CAP = 2.00
+-- Ketha and her Zagreus reach much farther (owner, 2026-10-26): double from the start, five times
+-- at full experience. A Zagreus's 96 elmos become ~190 green, ~480 at 2.4 XP.
+local KETHA_RANGE_BASE = 2.00
+local KETHA_RANGE_PER_XP = 1.25
+local KETHA_RANGE_CAP = 5.00
+
+local function isKetha(unitID)
+  for _, key in ipairs({ "va_hero_id", "va_pack_leader", "va_pack_id" }) do
+    if tostring(Spring.GetUnitRulesParam(unitID, key) or "") == "ketha" then return true end
+  end
+  return false
+end
 
 local enabled = true
 local playerTeam = 0
@@ -140,6 +152,9 @@ local function applyCraftRewards(unitID, rec)
   local xp = math.max(0, tonumber(rec.craftXp) or 0)
   local bpMult = math.min(BP_CAP, 1 + BP_PER_XP * xp)
   local rangeMult = math.min(RANGE_CAP, 1 + RANGE_PER_XP * xp)
+  if rec.ketha then
+    rangeMult = math.min(KETHA_RANGE_CAP, KETHA_RANGE_BASE + KETHA_RANGE_PER_XP * xp)
+  end
 
   Spring.SetUnitRulesParam(unitID, "va_craft_xp", xp, { public = true })
   Spring.SetUnitRulesParam(unitID, "va_craft_bp_mult", bpMult, { public = true })
@@ -233,6 +248,7 @@ GG.VA_CraftRefresh = function(unitID)
   craft[unitID] = nil
   local rec = ensureCraft(unitID)
   if rec then
+    rec.ketha = isKetha(unitID)
     applyCraftRewards(unitID, rec)
   end
 end
@@ -352,7 +368,13 @@ function gadget:GameFrame(frame)
   for i = 1, #units do
     local uid = units[i]
     if isPlayerConstructor(uid) then
-      ensureCraft(uid)
+      local rec = ensureCraft(uid)
+      -- Ketha's reach applies from the moment she (or a Zagreus of hers) stands on the field,
+      -- not only once she earns craft XP.
+      if rec and not rec.ketha and isKetha(uid) then
+        rec.ketha = true
+        applyCraftRewards(uid, rec)
+      end
       tickWorker(uid)
     end
   end

@@ -4,8 +4,8 @@ local gadget = gadget
 function gadget:GetInfo()
   return {
     name = "Verdance Lab Tier",
-    desc = "The company raises T1 labs only: every constructor on the player's side, hero or built, "
-        .. "loses its T2 and experimental factories (build menu and the creation itself).",
+    desc = "The company raises T1 labs only, except at All That Simmers: every constructor on the "
+        .. "player's side sees its T2 and experimental factories greyed out, and creating one is refused.",
     author = "Verdance",
     date = "2026-10-26",
     license = "GPL v2 or later",
@@ -45,36 +45,53 @@ local function playerTeam()
   return tonumber(opts.va_player_team or opts.playerteam) or 0
 end
 
--- Strip the blocked factories from one unit's build menu.
-local function strip(unitID, unitDefID)
+-- All That Simmers is where the company may raise T2 factories (owner, 2026-10-26).
+local T2_MAPS = { all_that_simmers = true }
+local T2_MAP_NAMES = { "all that simmers" }
+
+local function t2Allowed()
+  local mid = Spring.GetGameRulesParam and Spring.GetGameRulesParam("va_map_id")
+  if type(mid) == "string" and T2_MAPS[mid] then return true end
+  local name = string.lower(tostring((Game and Game.mapName) or ""))
+  for _, n in ipairs(T2_MAP_NAMES) do
+    if name:find(n, 1, true) then return true end
+  end
+  return false
+end
+
+local TOOLTIP = "Not on this ground: the company raises T2 factories only at All That Simmers."
+
+-- Grey the blocked factories out of one unit's build menu (they stay visible, with the reason).
+local function grey(unitID, unitDefID)
+  if t2Allowed() then return end
   local ud = UnitDefs[unitDefID]
   if not ud or not ud.buildOptions or #ud.buildOptions == 0 then return end
   for _, opt in ipairs(ud.buildOptions) do
     if blocked[opt] then
       local i = Spring.FindUnitCmdDesc(unitID, -opt)
-      if i then Spring.RemoveUnitCmdDesc(unitID, i) end
+      if i then Spring.EditUnitCmdDesc(unitID, i, { disabled = true, tooltip = TOOLTIP }) end
     end
   end
 end
 
 function gadget:AllowUnitCreation(unitDefID, builderID, builderTeam)
-  if blocked[unitDefID] and builderTeam == playerTeam() then
+  if blocked[unitDefID] and builderTeam == playerTeam() and not t2Allowed() then
     return false
   end
   return true
 end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
-  if unitTeam == playerTeam() then strip(unitID, unitDefID) end
+  if unitTeam == playerTeam() then grey(unitID, unitDefID) end
 end
 
 function gadget:UnitGiven(unitID, unitDefID, newTeam)
-  if newTeam == playerTeam() then strip(unitID, unitDefID) end
+  if newTeam == playerTeam() then grey(unitID, unitDefID) end
 end
 
 function gadget:Initialize()
   local team = playerTeam()
   for _, unitID in ipairs(Spring.GetTeamUnits(team) or {}) do
-    strip(unitID, Spring.GetUnitDefID(unitID))
+    grey(unitID, Spring.GetUnitDefID(unitID))
   end
 end

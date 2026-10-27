@@ -48,8 +48,6 @@ end
 '''
 
 SCENES = PRELUDE + r'''
--- defs: 1 armck (builds 2 armlab, 3 armalab, 4 armvp, 5 armnanotc), 2 armlab (T1), 3 armalab (T2),
--- 4 armvp (T1), 5 armnanotc, 6 a modded lab with techlevel 3 and an unlisted name, 7 va_mask
 UnitDefs = {
   [1] = { id = 1, name = "armck", buildOptions = { 2, 3, 4, 5, 6 }, customParams = {} },
   [2] = { id = 2, name = "armlab", isFactory = true, customParams = { techlevel = "1" } },
@@ -61,35 +59,37 @@ UnitDefs = {
 }
 UnitDefNames = {}
 for id, ud in pairs(UnitDefs) do UnitDefNames[ud.name] = ud end
-local menus = { [100] = { -2, -3, -4, -5, -6 }, [101] = { -2, -3, -4, -5, -6 }, [102] = { -2, -5 } }
-local team = { [100] = 0, [101] = 1, [102] = 0 }
-gadget = {}
-gadgetHandler = { IsSyncedCode = function() return true end }
-VFS = { Include = function(p) if p:find("va_active") then return true end error(p) end }
-Spring = {
-  GetGameRulesParam = function(k) if k == "va_player_team" then return 0 end end,
-  GetTeamInfo = function(t) return t end,
-  GetModOptions = function() return {} end,
-  GetTeamUnits = function(t) local o = {} for u, tt in pairs(team) do if tt == t then o[#o + 1] = u end end table.sort(o) return o end,
-  GetUnitDefID = function(u) return ({ [100] = 1, [101] = 1, [102] = 7 })[u] end,
-  FindUnitCmdDesc = function(u, cmd) for i, c in ipairs(menus[u] or {}) do if c == cmd then return i end end end,
-  RemoveUnitCmdDesc = function(u, i) table.remove(menus[u], i) end,
-}
-dofile(@GADGET@)
-gadget:Initialize()
-local out = {}
-out.playerMenu = menus[100]
-out.enemyMenu = { table.unpack(menus[101]) }
-out.maskMenu = menus[102]
-out.allowT2 = gadget:AllowUnitCreation(3, 100, 0)
-out.allowT1 = gadget:AllowUnitCreation(2, 100, 0)
-out.allowFuture = gadget:AllowUnitCreation(6, 100, 0)
-out.enemyT2 = gadget:AllowUnitCreation(3, 101, 1)
--- a constructor captured from the enemy loses its T2 labs on the way over
-team[101] = 0
-gadget:UnitGiven(101, 1, 0)
-out.capturedMenu = menus[101]
-return enc(out)
+local function scene(mapName)
+  local menus = { [100] = { -2, -3, -4, -5, -6 }, [101] = { -2, -3, -4, -5, -6 }, [102] = { -2, -5 } }
+  local grey = { [100] = {}, [101] = {}, [102] = {} }
+  local team = { [100] = 0, [101] = 1, [102] = 0 }
+  Game = { mapName = mapName }
+  gadget = {}
+  gadgetHandler = { IsSyncedCode = function() return true end }
+  VFS = { Include = function(p) if p:find("va_active") then return true end error(p) end }
+  Spring = {
+    GetGameRulesParam = function(k) if k == "va_player_team" then return 0 end end,
+    GetTeamInfo = function(t) return t end,
+    GetModOptions = function() return {} end,
+    GetTeamUnits = function(t) local o = {} for u, tt in pairs(team) do if tt == t then o[#o + 1] = u end end table.sort(o) return o end,
+    GetUnitDefID = function(u) return ({ [100] = 1, [101] = 1, [102] = 7 })[u] end,
+    FindUnitCmdDesc = function(u, cmd) for i, c in ipairs(menus[u] or {}) do if c == cmd then return i end end end,
+    EditUnitCmdDesc = function(u, i, p) if p.disabled then grey[u][#grey[u] + 1] = menus[u][i] end end,
+    RemoveUnitCmdDesc = function() error("the menu is never cut") end,
+  }
+  dofile(@GADGET@)
+  gadget:Initialize()
+  local out = { greyPlayer = grey[100], greyEnemy = { table.unpack(grey[101]) }, greyMask = grey[102], menuPlayer = #menus[100] }
+  out.allowT2 = gadget:AllowUnitCreation(3, 100, 0)
+  out.allowT1 = gadget:AllowUnitCreation(2, 100, 0)
+  out.allowFuture = gadget:AllowUnitCreation(6, 100, 0)
+  out.enemyT2 = gadget:AllowUnitCreation(3, 101, 1)
+  team[101] = 0
+  gadget:UnitGiven(101, 1, 0)
+  out.greyCaptured = grey[101]
+  return out
+end
+return enc({ elsewhere = scene("Koom Valley 1.2"), simmers = scene("All That Simmers v1.1.1") })
 '''.replace("@GADGET@", json.dumps(GADGET))
 
 ok = True
@@ -101,13 +101,16 @@ def check(label, cond, detail=""):
     ok = ok and cond
 
 
-s = run(SCENES)
-check("the player's constructor keeps T1 labs, nano and loses the T2 and later labs", s["playerMenu"] == [-2, -4, -5], s)
-check("an enemy constructor keeps everything", s["enemyMenu"] == [-2, -3, -4, -5, -6], s)
-check("Mask keeps his T1 bot lab", s["maskMenu"] == [-2, -5], s)
+r = run(SCENES)
+s, t = r["elsewhere"], r["simmers"]
+check("the player's constructor sees its T2 and later labs greyed out, nothing cut", s["greyPlayer"] == [-3, -6] and s["menuPlayer"] == 5, s)
+check("an enemy constructor keeps everything", not s["greyEnemy"], s)
+check("Mask's T1 bot lab is untouched", not s["greyMask"], s)
 check("creating a T2 lab is refused for the player", s["allowT2"] is False and s["allowFuture"] is False, s)
 check("a T1 lab is allowed", s["allowT1"] is True, s)
 check("the enemy may still raise T2 labs", s["enemyT2"] is True, s)
-check("a captured constructor is stripped", s["capturedMenu"] == [-2, -4, -5], s)
+check("a captured constructor is greyed too", s["greyCaptured"] == [-3, -6], s)
+check("at All That Simmers nothing is greyed and T2 labs are allowed",
+      not t["greyPlayer"] and t["allowT2"] is True and t["allowFuture"] is True, t)
 print("LAB TIER " + ("PASSED" if ok else "FAILED"))
 sys.exit(0 if ok else 1)
