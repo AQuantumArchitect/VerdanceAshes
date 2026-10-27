@@ -1,6 +1,6 @@
 {
   "schemaVersion": "verdance-commerce-catalog/1.4",
-  "notes": "Slim broker. Cortex arms merchant = Punch of Thugs + Grunt Stream + Crash of Brutes + one Constructor. No role-ladder duplicates, no fabs-as-shop, no Wheelie/Spoke SKUs (Spoke is muster/hero). Armada shelf = surplus pawns + constructor. Tnb for build rights; km$ for combat packs.",
+  "notes": "Slim broker. Cortex arms merchant = Punch of Thugs + Grunt Stream + Crash of Brutes + one Constructor. No role-ladder duplicates, no fabs-as-shop, no Wheelie/Spoke SKUs (Spoke is muster/hero). Armada shelf = constructor only (the surplus pawns were retired to keep the shop lean). Cortex also keeps one very dear mercenary flight: Wasps. Tnb for build rights; km$ for combat packs.",
   "resource": {
     "id": "tenebrium",
     "label": "Tenebrium",
@@ -52,7 +52,11 @@
       "metalCostK": 1,
       "repMin": {},
       "builds": false,
-      "tags": ["pawn", "cortex", "chaff"],
+      "tags": [
+        "pawn",
+        "cortex",
+        "chaff"
+      ],
       "delivery": {
         "mode": "pawn_launcher",
         "sourceSpaceId": "pawn_launcher",
@@ -72,9 +76,15 @@
       "loan": false,
       "tenebriumCost": 0,
       "metalCostK": 2,
-      "repMin": { "cortex": 10 },
+      "repMin": {
+        "cortex": 10
+      },
       "builds": false,
-      "tags": ["stream", "cortex", "chaff"],
+      "tags": [
+        "stream",
+        "cortex",
+        "chaff"
+      ],
       "delivery": {
         "mode": "map_web",
         "sourceMapId": "all_that_simmers",
@@ -95,15 +105,50 @@
       "loan": false,
       "tenebriumCost": 0,
       "metalCostK": 4,
-      "repMin": { "cortex": 25 },
+      "repMin": {
+        "cortex": 25
+      },
       "builds": false,
-      "tags": ["armor", "cortex"],
+      "tags": [
+        "armor",
+        "cortex"
+      ],
       "delivery": {
         "mode": "map_web",
         "sourceMapId": "eye_of_horus",
         "sourceSpaceId": "eye_of_horus",
         "landNear": "infil",
         "productLabel": "Cortex Brute column"
+      }
+    },
+    "wasp_flight": {
+      "kind": "purchase_package",
+      "shelf": "cortex",
+      "label": "Wasp Flight",
+      "blurb": "Cortex mercenary gunships: four Wasps, hired by the sortie and priced like it. They arrive from the Eye of Horus mid-sortie.",
+      "unitDef": "corape",
+      "count": 4,
+      "spawnHealthFracMin": 0.9,
+      "spawnHealthFracMax": 1.0,
+      "loan": false,
+      "tenebriumCost": 0,
+      "metalCostK": 9,
+      "repMin": {
+        "cortex": 40
+      },
+      "builds": false,
+      "tags": [
+        "air",
+        "gunship",
+        "cortex",
+        "merc"
+      ],
+      "delivery": {
+        "mode": "map_web",
+        "sourceMapId": "eye_of_horus",
+        "sourceSpaceId": "eye_of_horus",
+        "landNear": "infil",
+        "productLabel": "Wasp flight"
       }
     },
     "cortex_constructor": {
@@ -115,31 +160,14 @@
       "count": 1,
       "tenebriumCost": 1,
       "metalCostK": 2,
-      "repMin": { "cortex": 30 },
+      "repMin": {
+        "cortex": 30
+      },
       "builds": true,
-      "tags": ["constructor", "cortex"]
-    },
-    "armada_surplus_pawns": {
-      "kind": "purchase_package",
-      "shelf": "armada",
-      "label": "Armada Surplus Pawns",
-      "blurb": "Scavenged Armada pawns (armpw) from decoy-farm scrap. Cheap chaff, no Tnb.",
-      "unitDef": "armpw",
-      "count": 10,
-      "spawnHealthFracMin": 0.75,
-      "spawnHealthFracMax": 0.95,
-      "loan": false,
-      "tenebriumCost": 0,
-      "metalCostK": 1,
-      "repMin": {},
-      "builds": false,
-      "tags": ["pawn", "armada", "chaff"],
-      "delivery": {
-        "mode": "pawn_launcher",
-        "sourceSpaceId": "pawn_launcher",
-        "landNear": "infil",
-        "productLabel": "Armada Surplus Pawns"
-      }
+      "tags": [
+        "constructor",
+        "cortex"
+      ]
     },
     "armada_constructor": {
       "kind": "constructor",
@@ -150,20 +178,33 @@
       "count": 1,
       "tenebriumCost": 1,
       "metalCostK": 2,
-      "repMin": { "armada": 50 },
+      "repMin": {
+        "armada": 50
+      },
       "builds": true,
-      "tags": ["constructor", "armada"]
+      "tags": [
+        "constructor",
+        "armada"
+      ]
     }
   },
   "sortieRewards": {
-    "tenebriumOnVictory": { "min": 0, "max": 1, "chance": 0.35 },
+    "tenebriumOnVictory": {
+      "min": 0,
+      "max": 1,
+      "chance": 0.35
+    },
     "tenebriumOnZoneFlip": {
       "min": 0,
       "max": 0,
       "chance": 0.0,
       "notes": "No free Tnb mint on node claim / zone flip. Liquid Tnb only via reclaim or rare victory scavenge."
     },
-    "tenebriumOnCleanExtract": { "min": 0, "max": 1, "chance": 0.2 },
+    "tenebriumOnCleanExtract": {
+      "min": 0,
+      "max": 1,
+      "chance": 0.2
+    },
     "metalOnExtract": {
       "unitMetal": 1000,
       "formula": "floor(endMetal/1000)",

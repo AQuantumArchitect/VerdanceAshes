@@ -663,6 +663,60 @@ M.HEROES = {
     },
     blurb = "Four Ghost spy bots and two Gremlin stealth tanks, all cloaked, walking up to enemy units and turning them. Everything changes sides eventually.",
   },
+  phoenix = {
+    name = "Ondrea 'Phoenix' Vell",
+    role = "band",
+    unitDef = "legphoenix",
+    hireTnb = 0,
+    packTotal = 2,
+    extras = 1,
+    startXp = 0.321,
+    packMind = "solo",
+    tags = { "siege", "bomber", "sky" },
+    blurb = "A pair of Legion Phoenix bombers. Shot down is a schedule, not an outcome.",
+  },
+  tarn = {
+    name = "Tarn Ostrander",
+    role = "band",
+    unitDef = "corsala",
+    hireTnb = 0,
+    packTotal = 5,
+    extras = 4,
+    startXp = 0.125,
+    packMind = "solo",
+    tags = { "amphibious", "line", "push" },
+    blurb = "A pack of five Salamanders. They come up out of the river already firing.",
+  },
+  scylla = {
+    name = "Maren 'Scylla' Voss",
+    role = "band",
+    unitDef = "leganavybattleship",
+    hireTnb = 0,
+    packTotal = 1,
+    extras = 0,
+    startXp = 0.0,
+    packMind = "solo",
+    tags = { "siege", "naval", "line" },
+    blurb = "One Legion Scylla battleship. It needs water; the water had better be wide.",
+  },
+  tsunami = {
+    name = "Ines 'Tsunami' Harrow",
+    role = "band",
+    unitDef = "armsb",
+    hireTnb = 0,
+    packTotal = 4,
+    extras = 3,
+    startXp = 0.271,
+    packMind = "solo",
+    tags = { "siege", "bomber", "sky", "seaplane" },
+    escorts = {
+      {
+        unitDef = "armsehak",
+        count = 3,
+      },
+    },
+    blurb = "Four Tsunami seaplane bombers with three Horizon scouts out front. The flight finds the target, then drops on it.",
+  },
 }
 
 M.FACTORIES = {
@@ -708,6 +762,7 @@ M.BAND_ORDER = {
   "yeva", "auditor", "mira", "brakhov", "bro", "fatboy", "kettle", "warder", "commando",
   "infestor", "quill", "kit", "vale", "nox", "ceil", "lumen", "anvil", "volt",
   "thresh", "gale", "mask", "rumor",
+  "phoenix", "tarn", "scylla", "tsunami",
 }
 
 function M.isCore(heroId)

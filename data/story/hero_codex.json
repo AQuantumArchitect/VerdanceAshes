@@ -966,6 +966,98 @@
         "tagLine": "Cloaked spy bots that capture enemy units."
       },
       "notes": "eyes x fog; capture spy (va_ghost)"
+    },
+    {
+      "heroId": "phoenix",
+      "name": "Ondrea 'Phoenix' Vell",
+      "position": "siege",
+      "combatVerb": "push",
+      "temperament": [
+        "heat",
+        "sky"
+      ],
+      "doctrine": "sky_siege",
+      "preferDefenses": false,
+      "allowBail": false,
+      "allowKite": false,
+      "faction": "legion",
+      "unitDef": "legphoenix",
+      "voice": {
+        "hook": "Shot down is a schedule.",
+        "blurb": "A pair of Legion Phoenix bombers. Shot down is a schedule, not an outcome.",
+        "fiction": "Vell has been shot down three times and filed the paperwork once. Her Phoenixes come home on the fourth pass with the fire still on them, and the enemy learns to count to four.",
+        "tagLine": "Legion bombers that keep coming back: siege that flies."
+      },
+      "notes": "siege x sky; a bomber that takes the hit and returns"
+    },
+    {
+      "heroId": "tarn",
+      "name": "Tarn Ostrander",
+      "position": "line",
+      "combatVerb": "push",
+      "temperament": [
+        "swarm",
+        "mischief"
+      ],
+      "doctrine": "line",
+      "preferDefenses": false,
+      "allowBail": false,
+      "allowKite": false,
+      "faction": "cortex",
+      "unitDef": "corsala",
+      "voice": {
+        "hook": "Out of the river, already firing.",
+        "blurb": "A pack of five Salamanders. They come up out of the river already firing.",
+        "fiction": "Ostrander ferries a pack of Salamanders through water the rest of the company calls a wall. They surface under the enemy line, shake off, and fire. He has never once walked around a lake.",
+        "tagLine": "Amphibious tank pack: fords are shortcuts."
+      },
+      "notes": "line x swarm; the pack that treats water as a road"
+    },
+    {
+      "heroId": "scylla",
+      "name": "Maren 'Scylla' Voss",
+      "position": "siege",
+      "combatVerb": "plod",
+      "temperament": [
+        "plod",
+        "captain"
+      ],
+      "doctrine": "siege_plod",
+      "preferDefenses": false,
+      "allowBail": false,
+      "allowKite": false,
+      "faction": "legion",
+      "unitDef": "leganavybattleship",
+      "voice": {
+        "hook": "The water had better be wide.",
+        "blurb": "One Legion Scylla battleship. It needs water; the water had better be wide.",
+        "fiction": "Voss commands the Scylla the way a harbour commands a coast: from the middle of it, slowly, with every gun. On land she is a fortress that cannot leave. On water she is the reason there is a coast.",
+        "tagLine": "Battleship: siege that floats."
+      },
+      "notes": "siege x plod; a battleship needs a waterline; the flood is her friend"
+    },
+    {
+      "heroId": "tsunami",
+      "name": "Ines 'Tsunami' Harrow",
+      "position": "siege",
+      "combatVerb": "push",
+      "temperament": [
+        "sky",
+        "fog"
+      ],
+      "doctrine": "sky_siege",
+      "preferDefenses": false,
+      "allowBail": false,
+      "allowKite": false,
+      "faction": "armada",
+      "unitDef": "armsb",
+      "voice": {
+        "hook": "The flight finds the target, then drops on it.",
+        "blurb": "Four Tsunami seaplane bombers with three Horizon scouts out front. The flight finds the target, then drops on it.",
+        "fiction": "Harrow sends three Horizons out over the water to see, then brings the Tsunamis in on what they found. Her wing lands on any lake the company can name, and a few it cannot.",
+        "tagLine": "Seaplane bombers with scouts: siege that sees first."
+      },
+      "notes": "siege x sky x fog; scouts and bombers that live on water"
     }
   ]
 }

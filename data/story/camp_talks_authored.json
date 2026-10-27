@@ -4867,6 +4867,386 @@
           "line": "Our river."
         }
       ]
+    },
+    {
+      "id": "phoenix__thresh:C",
+      "pairId": "phoenix__thresh",
+      "a": "phoenix",
+      "b": "thresh",
+      "rank": "C",
+      "title": "Count the passes",
+      "polarity": "rivalry",
+      "motif": "two bombers, one sky",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Phoenix chalks a tally on her fuselage. Thresh has never kept one."
+        },
+        {
+          "speaker": "phoenix",
+          "line": "Third pass. Fourth is mine."
+        },
+        {
+          "speaker": "thresh",
+          "line": "I never look at what I hit."
+        },
+        {
+          "speaker": "phoenix",
+          "line": "I never look at what hit me. We're nearly the same."
+        }
+      ]
+    },
+    {
+      "id": "phoenix__thresh:B",
+      "pairId": "phoenix__thresh",
+      "a": "phoenix",
+      "b": "thresh",
+      "rank": "B",
+      "title": "Who landed",
+      "polarity": "rivalry",
+      "motif": "two bombers, one sky",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Both wings came home from the same raid. Phoenix's had smoke on them."
+        },
+        {
+          "speaker": "thresh",
+          "line": "You were hit."
+        },
+        {
+          "speaker": "phoenix",
+          "line": "Three times. That's a quiet day."
+        },
+        {
+          "speaker": "thresh",
+          "line": "Then you should have the better seat."
+        }
+      ]
+    },
+    {
+      "id": "phoenix__thresh:A",
+      "pairId": "phoenix__thresh",
+      "a": "phoenix",
+      "b": "thresh",
+      "rank": "A",
+      "title": "Fourth pass",
+      "polarity": "rivalry",
+      "motif": "two bombers, one sky",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 3,
+        "campLevelMin": 2,
+        "bondMin": 55
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Thresh dropped first and cleared the air. Phoenix came back through it with the fire still on her."
+        },
+        {
+          "speaker": "phoenix",
+          "line": "You made me a road."
+        },
+        {
+          "speaker": "thresh",
+          "line": "You made it burn. I think that's a partnership."
+        }
+      ]
+    },
+    {
+      "id": "odessa__tarn:C",
+      "pairId": "odessa__tarn",
+      "a": "tarn",
+      "b": "odessa",
+      "rank": "C",
+      "title": "Same river",
+      "polarity": "attract",
+      "motif": "fords are shortcuts",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Tarn's Salamanders and Odessa's amphibians share a ford. Neither gives way, and neither minds."
+        },
+        {
+          "speaker": "tarn",
+          "line": "The line goes round the lake."
+        },
+        {
+          "speaker": "odessa",
+          "line": "The line goes through it."
+        },
+        {
+          "speaker": "tarn",
+          "line": "Then we should talk."
+        }
+      ]
+    },
+    {
+      "id": "odessa__tarn:B",
+      "pairId": "odessa__tarn",
+      "a": "tarn",
+      "b": "odessa",
+      "rank": "B",
+      "title": "Wet company",
+      "polarity": "attract",
+      "motif": "fords are shortcuts",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "They cross the flood in formation, one pack on each side of the same current."
+        },
+        {
+          "speaker": "odessa",
+          "line": "Everyone else stopped at the bank."
+        },
+        {
+          "speaker": "tarn",
+          "line": "Everyone else has a map. We have a bank to leave."
+        }
+      ]
+    },
+    {
+      "id": "odessa__tarn:A",
+      "pairId": "odessa__tarn",
+      "a": "tarn",
+      "b": "odessa",
+      "rank": "A",
+      "title": "The far shore",
+      "polarity": "attract",
+      "motif": "fords are shortcuts",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 3,
+        "campLevelMin": 2,
+        "bondMin": 55
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Both packs surfaced under the enemy line at once. The line had been looking the other way."
+        },
+        {
+          "speaker": "tarn",
+          "line": "Out of the river."
+        },
+        {
+          "speaker": "odessa",
+          "line": "Already firing. I like your company."
+        }
+      ]
+    },
+    {
+      "id": "halq__scylla:C",
+      "pairId": "halq__scylla",
+      "a": "scylla",
+      "b": "halq",
+      "rank": "C",
+      "title": "Reach",
+      "polarity": "mirror",
+      "motif": "the long gun and the longer gun",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Voss measures her broadside against Halq's arc on a napkin. They disagree by one hill."
+        },
+        {
+          "speaker": "scylla",
+          "line": "My range comes with a waterline."
+        },
+        {
+          "speaker": "halq",
+          "line": "Mine comes with coordinates."
+        },
+        {
+          "speaker": "scylla",
+          "line": "Then you owe me a lake."
+        }
+      ]
+    },
+    {
+      "id": "halq__scylla:B",
+      "pairId": "halq__scylla",
+      "a": "scylla",
+      "b": "halq",
+      "rank": "B",
+      "title": "Salvo and arc",
+      "polarity": "mirror",
+      "motif": "the long gun and the longer gun",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "A battleship and a battery engaged the same target from opposite sides of a river."
+        },
+        {
+          "speaker": "halq",
+          "line": "You were early."
+        },
+        {
+          "speaker": "scylla",
+          "line": "I was on time. You were shy."
+        }
+      ]
+    },
+    {
+      "id": "halq__scylla:A",
+      "pairId": "halq__scylla",
+      "a": "scylla",
+      "b": "halq",
+      "rank": "A",
+      "title": "Crossfire",
+      "polarity": "mirror",
+      "motif": "the long gun and the longer gun",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 3,
+        "campLevelMin": 2,
+        "bondMin": 55
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "The target had nowhere to stand. It tried anyway."
+        },
+        {
+          "speaker": "scylla",
+          "line": "The shore was never going to be safe."
+        },
+        {
+          "speaker": "halq",
+          "line": "Neither was the lake. Nicely done."
+        }
+      ]
+    },
+    {
+      "id": "gale__tsunami:C",
+      "pairId": "gale__tsunami",
+      "a": "tsunami",
+      "b": "gale",
+      "rank": "C",
+      "title": "Who parks where",
+      "polarity": "rivalry",
+      "motif": "two wings that land on water",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Harrow's seaplanes and Gale's Cutlasses settle on the same pond, nose to tail."
+        },
+        {
+          "speaker": "tsunami",
+          "line": "We look first."
+        },
+        {
+          "speaker": "gale",
+          "line": "We shoot first."
+        },
+        {
+          "speaker": "tsunami",
+          "line": "That is the whole argument."
+        }
+      ]
+    },
+    {
+      "id": "gale__tsunami:B",
+      "pairId": "gale__tsunami",
+      "a": "tsunami",
+      "b": "gale",
+      "rank": "B",
+      "title": "Horizon",
+      "polarity": "rivalry",
+      "motif": "two wings that land on water",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "A Horizon found a column in the fog. Gale's wing was already turning before the report."
+        },
+        {
+          "speaker": "gale",
+          "line": "Your eyes, my guns."
+        },
+        {
+          "speaker": "tsunami",
+          "line": "My bombs. Your guns can have the leftovers."
+        }
+      ]
+    },
+    {
+      "id": "gale__tsunami:A",
+      "pairId": "gale__tsunami",
+      "a": "tsunami",
+      "b": "gale",
+      "rank": "A",
+      "title": "One pond",
+      "polarity": "rivalry",
+      "motif": "two wings that land on water",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 3,
+        "campLevelMin": 2,
+        "bondMin": 55
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Two wings took off together from the same flooded basin and landed on the same one."
+        },
+        {
+          "speaker": "tsunami",
+          "line": "No arguments."
+        },
+        {
+          "speaker": "gale",
+          "line": "Not until the next pond."
+        }
+      ]
     }
   ]
 }

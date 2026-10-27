@@ -527,6 +527,41 @@ window.CREW_PACKS = {
       "combined": 150,
       "label": "Blindfold",
       "hasBuildPower": false
+    },
+    "legphoenix": {
+      "metal": 450,
+      "energy": 25000,
+      "combined": 807,
+      "label": "Phoenix",
+      "hasBuildPower": false
+    },
+    "corsala": {
+      "metal": 350,
+      "energy": 7000,
+      "combined": 450,
+      "label": "Salamander",
+      "hasBuildPower": false
+    },
+    "leganavybattleship": {
+      "metal": 2900,
+      "energy": 21000,
+      "combined": 3200,
+      "label": "Scylla",
+      "hasBuildPower": false
+    },
+    "armsb": {
+      "metal": 240,
+      "energy": 7500,
+      "combined": 347,
+      "label": "Tsunami",
+      "hasBuildPower": false
+    },
+    "armsehak": {
+      "metal": 125,
+      "energy": 7000,
+      "combined": 225,
+      "label": "Horizon",
+      "hasBuildPower": false
     }
   },
   "heroes": {
@@ -1429,6 +1464,91 @@ window.CREW_PACKS = {
           "count": 2
         }
       ]
+    },
+    "phoenix": {
+      "role": "band",
+      "unitDef": "legphoenix",
+      "hireTnb": 0,
+      "packTotal": 2,
+      "extras": 1,
+      "blurb": "A pair of Legion Phoenix bombers. Shot down is a schedule, not an outcome.",
+      "name": "Ondrea 'Phoenix' Vell",
+      "sizing": "fixed",
+      "tags": [
+        "siege",
+        "bomber",
+        "sky"
+      ],
+      "startXp": 0.321,
+      "packMetal": 900,
+      "packEnergy": 50000,
+      "packCombined": 1614,
+      "packXpCombined": 1076
+    },
+    "tarn": {
+      "role": "band",
+      "unitDef": "corsala",
+      "hireTnb": 0,
+      "packTotal": 5,
+      "extras": 4,
+      "blurb": "A pack of five Salamanders. They come up out of the river already firing.",
+      "name": "Tarn Ostrander",
+      "sizing": "fixed",
+      "tags": [
+        "amphibious",
+        "line",
+        "push"
+      ],
+      "startXp": 0.125,
+      "packMetal": 1750,
+      "packEnergy": 35000,
+      "packCombined": 2250
+    },
+    "scylla": {
+      "role": "band",
+      "unitDef": "leganavybattleship",
+      "hireTnb": 0,
+      "packTotal": 1,
+      "extras": 0,
+      "blurb": "One Legion Scylla battleship. It needs water; the water had better be wide.",
+      "name": "Maren 'Scylla' Voss",
+      "sizing": "fixed",
+      "tags": [
+        "siege",
+        "naval",
+        "line"
+      ],
+      "startXp": 0.0,
+      "packMetal": 2900,
+      "packEnergy": 21000,
+      "packCombined": 3200
+    },
+    "tsunami": {
+      "role": "band",
+      "unitDef": "armsb",
+      "hireTnb": 0,
+      "packTotal": 4,
+      "extras": 3,
+      "blurb": "Four Tsunami seaplane bombers with three Horizon scouts out front. The flight finds the target, then drops on it.",
+      "name": "Ines 'Tsunami' Harrow",
+      "sizing": "fixed",
+      "tags": [
+        "siege",
+        "bomber",
+        "sky",
+        "seaplane"
+      ],
+      "startXp": 0.271,
+      "escorts": [
+        {
+          "unitDef": "armsehak",
+          "count": 3
+        }
+      ],
+      "packMetal": 1335,
+      "packEnergy": 51000,
+      "packCombined": 2064,
+      "packXpCombined": 1376
     }
   },
   "factories": {
@@ -1507,7 +1627,8 @@ window.CREW_PACKS = {
       "cauter",
       "halq",
       "quill",
-      "anvil"
+      "anvil",
+      "tarn"
     ],
     "skirmish": [
       "verse",
@@ -1522,7 +1643,10 @@ window.CREW_PACKS = {
       "bro",
       "fatboy",
       "mira",
-      "vale"
+      "vale",
+      "phoenix",
+      "scylla",
+      "tsunami"
     ],
     "shield": [
       "kettle",

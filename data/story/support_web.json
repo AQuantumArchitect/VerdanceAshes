@@ -6,9 +6,9 @@
     "maxDegree": 5,
     "topEdges": 64,
     "heroCount": 35,
-    "edgeCount": 96,
-    "talkCount": 239,
-    "authoredSeeds": 49,
+    "edgeCount": 100,
+    "talkCount": 251,
+    "authoredSeeds": 53,
     "umweltAxes": [
       "energy",
       "offense",
@@ -1706,7 +1706,7 @@
       ],
       "doctrine": "line",
       "hook": "Fords are doors.",
-      "degree": 6,
+      "degree": 7,
       "umweltGlyph": "+pad·+off·−mob",
       "umweltMarks": [
         {
@@ -1758,7 +1758,7 @@
       ],
       "doctrine": "line",
       "hook": "Shoots map coordinates.",
-      "degree": 6,
+      "degree": 7,
       "umweltGlyph": "+pad·+off·−mob·+led",
       "umweltMarks": [
         {
@@ -2587,7 +2587,7 @@
       ],
       "authored": true,
       "aName": "Marrow Gale",
-      "bName": "Anvil Mire",
+      "bName": "Anvil & Mire",
       "aHook": "Lands where nobody parks.",
       "bHook": "The river learns my weight.",
       "aGlyph": "+mob·−pad·+off·+sky",
@@ -2993,7 +2993,7 @@
         "authored seed"
       ],
       "authored": true,
-      "aName": "Verse Adder",
+      "aName": "Verse & Adder",
       "bName": "The Last Auditor",
       "aHook": "Counts missiles out loud.",
       "bHook": "Ledger with legs.",
@@ -3331,7 +3331,7 @@
       ],
       "authored": true,
       "aName": "Bro",
-      "bName": "Halbard",
+      "bName": "Ilse 'Halbard' Varn",
       "aHook": "Yeah. I'll take that wall.",
       "bHook": "Halberd's hungry.",
       "aGlyph": "+off·−mob·−ene·+led",
@@ -3893,7 +3893,7 @@
         "authored seed"
       ],
       "authored": true,
-      "aName": "Twitcher",
+      "aName": "Benno 'Twitcher' Sallow",
       "bName": "Cinder Hook",
       "aHook": "Grins with a welder.",
       "bHook": "Mines before the argument.",
@@ -3985,7 +3985,7 @@
       ],
       "authored": true,
       "aName": "Solarium",
-      "bName": "Armada Consul",
+      "bName": "Consul Aurel Weiss",
       "aHook": "Spreadsheets, then sunlight.",
       "bHook": "Builds like an apology.",
       "aGlyph": "+ene·+cra·+pad·−off",
@@ -4081,7 +4081,7 @@
         "authored seed"
       ],
       "authored": true,
-      "aName": "Fatboy Contract",
+      "aName": "Dorran 'Fatboy' Kell",
       "bName": "Saint Kettle",
       "aHook": "House learned to knock.",
       "bHook": "Sky-saint, chainsaw soul.",
@@ -4175,7 +4175,7 @@
       ],
       "authored": true,
       "aName": "Dama Thresh",
-      "bName": "Fatboy Contract",
+      "bName": "Dorran 'Fatboy' Kell",
       "aHook": "Weather comes from above.",
       "bHook": "House learned to knock.",
       "aGlyph": "+off·+sky·+mob·−pad",
@@ -4281,6 +4281,35 @@
         "C": "gale__odessa:C",
         "B": "gale__odessa:B",
         "A": "gale__odessa:A"
+      }
+    },
+    {
+      "id": "gale__tsunami",
+      "a": "tsunami",
+      "b": "gale",
+      "score": 1.0,
+      "polarity": "rivalry",
+      "motifs": [
+        "two wings that land on water",
+        "scouts first, guns first"
+      ],
+      "sharedTemperament": [
+        "sky"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Ines 'Tsunami' Harrow",
+      "bName": "Marrow Gale",
+      "aHook": "The flight finds the target, then drops on it.",
+      "bHook": "Lands where nobody parks.",
+      "aGlyph": "+sky·+off·+mob·−pad",
+      "bGlyph": "+mob·−pad·+off·+sky",
+      "talkIds": {
+        "C": "gale__tsunami:C",
+        "B": "gale__tsunami:B",
+        "A": "gale__tsunami:A"
       }
     },
     {
@@ -4561,6 +4590,33 @@
       }
     },
     {
+      "id": "halq__scylla",
+      "a": "scylla",
+      "b": "halq",
+      "score": 1.0,
+      "polarity": "mirror",
+      "motifs": [
+        "the long gun and the longer gun",
+        "range written on the water"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Maren 'Scylla' Voss",
+      "bName": "Sisu Halq",
+      "aHook": "The water had better be wide.",
+      "bHook": "Shoots map coordinates.",
+      "aGlyph": "+off·−pad·−mob·+hea",
+      "bGlyph": "+pad·+off·−mob·+led",
+      "talkIds": {
+        "C": "halq__scylla:C",
+        "B": "halq__scylla:B",
+        "A": "halq__scylla:A"
+      }
+    },
+    {
       "id": "halq__spoke",
       "a": "spoke",
       "b": "halq",
@@ -4724,7 +4780,7 @@
       ],
       "authored": true,
       "aName": "Sisu Halq",
-      "bName": "Verse Adder",
+      "bName": "Verse & Adder",
       "aHook": "Shoots map coordinates.",
       "bHook": "Counts missiles out loud.",
       "aGlyph": "+pad·+off·−mob·+led",
@@ -5064,7 +5120,7 @@
         "authored seed"
       ],
       "authored": true,
-      "aName": "Noctua Bay",
+      "aName": "Ada Noctua",
       "bName": "Saint Kettle",
       "aHook": "Dreams in flight paths.",
       "bHook": "Sky-saint, chainsaw soul.",
@@ -5541,7 +5597,7 @@
       ],
       "authored": true,
       "aName": "Sister Lumen",
-      "bName": "Twitcher",
+      "bName": "Benno 'Twitcher' Sallow",
       "aHook": "Tithe the grid.",
       "bHook": "Grins with a welder.",
       "aGlyph": "+ene·−off·−mob·+pad",
@@ -5717,8 +5773,8 @@
         "authored seed"
       ],
       "authored": true,
-      "aName": "Tick Stream",
-      "bName": "Noctua Bay",
+      "aName": "Tamsin 'Tick' Hollis",
+      "bName": "Ada Noctua",
       "aHook": "Speaks in plurals.",
       "bHook": "Dreams in flight paths.",
       "aGlyph": "+sig·+fog·+mob·−off",
@@ -5745,7 +5801,7 @@
       ],
       "authored": true,
       "aName": "Whisper-of-Ash Yeva",
-      "bName": "Noctua Bay",
+      "bName": "Ada Noctua",
       "aHook": "Ghosts already walked it.",
       "bHook": "Dreams in flight paths.",
       "aGlyph": "+mob·−pad·+sig·+fog",
@@ -5966,6 +6022,33 @@
       }
     },
     {
+      "id": "odessa__tarn",
+      "a": "tarn",
+      "b": "odessa",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "fords are shortcuts",
+        "wet boots, dry humour"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Tarn Ostrander",
+      "bName": "Odessa Krail",
+      "aHook": "Out of the river, already firing.",
+      "bHook": "Fords are doors.",
+      "aGlyph": "+mob·+off·−pad·+hea",
+      "bGlyph": "+pad·+off·−mob",
+      "talkIds": {
+        "C": "odessa__tarn:C",
+        "B": "odessa__tarn:B",
+        "A": "odessa__tarn:A"
+      }
+    },
+    {
       "id": "odessa__vane",
       "a": "vane",
       "b": "odessa",
@@ -6122,6 +6205,36 @@
         "C": "pavise__quill:C",
         "B": "pavise__quill:B",
         "A": "pavise__quill:A"
+      }
+    },
+    {
+      "id": "phoenix__thresh",
+      "a": "phoenix",
+      "b": "thresh",
+      "score": 1.0,
+      "polarity": "rivalry",
+      "motifs": [
+        "two bombers, one sky",
+        "who flew home"
+      ],
+      "sharedTemperament": [
+        "heat",
+        "sky"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Ondrea 'Phoenix' Vell",
+      "bName": "Dama Thresh",
+      "aHook": "Shot down is a schedule.",
+      "bHook": "Weather comes from above.",
+      "aGlyph": "+sky·+off·+mob·−pad",
+      "bGlyph": "+off·+sky·+mob·−pad",
+      "talkIds": {
+        "C": "phoenix__thresh:C",
+        "B": "phoenix__thresh:B",
+        "A": "phoenix__thresh:A"
       }
     },
     {
@@ -6557,7 +6670,7 @@
       ],
       "authored": true,
       "aName": "Saloon Stride",
-      "bName": "Spoke",
+      "bName": "Ivo 'Spoke' Rask",
       "aHook": "Baked speed, bad manners.",
       "bHook": "Only trusts wheels.",
       "aGlyph": "+mob·−pad·+off",

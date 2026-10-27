@@ -13,9 +13,15 @@
       "faction": "cortex",
       "role": "base_of_operations",
       "label": "Eye of Horus",
-      "blurb": "Sturdy T1 rings — Cortex base of operations. Brute columns ship from here.",
-      "products": ["corraid"],
-      "listings": ["crash_of_brutes"],
+      "blurb": "Sturdy T1 rings — Cortex base of operations. Brute columns and Wasp flights ship from here.",
+      "products": [
+        "corraid",
+        "corape"
+      ],
+      "listings": [
+        "crash_of_brutes",
+        "wasp_flight"
+      ],
       "mode": "map_web"
     },
     "all_that_simmers": {
@@ -24,8 +30,12 @@
       "role": "grunt_manufacture",
       "label": "All That Simmers",
       "blurb": "Geo vents feed grunt streams through the map gaps.",
-      "products": ["corak"],
-      "listings": ["grunt_stream"],
+      "products": [
+        "corak"
+      ],
+      "listings": [
+        "grunt_stream"
+      ],
       "mode": "map_web"
     },
     "pawn_launcher": {
@@ -34,8 +44,12 @@
       "role": "interterritory_launcher",
       "label": "Pawn launcher",
       "blurb": "Offscreen interterritory launcher — fires pawn salvos into your infil.",
-      "products": ["corthud", "armpw"],
-      "listings": ["punch_of_thugs", "armada_surplus_pawns"],
+      "products": [
+        "corthud"
+      ],
+      "listings": [
+        "punch_of_thugs"
+      ],
       "mode": "pawn_launcher"
     }
   },

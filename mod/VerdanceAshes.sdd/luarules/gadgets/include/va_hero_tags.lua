@@ -53,6 +53,10 @@ M.TAGS = {
   veil_eyes = { label = "Veil Eyes", vision = 1.20, fiction = "Jammer haze with a radar eye: the fog works for you." },
   burn_mark = { label = "Burn Mark", vision = 1.20, fiction = "Sees by hurting. Leaves a scar on the map." },
   payroll = { label = "Payroll", vision = 1.20, fiction = "Knows who is on whose books, and where they stand." },
+  rises_again = { label = "Rises Again", hp = 1.15, fiction = "Shot down three times; the fourth pass is the one that lands." },
+  wake_rush = { label = "Wake Rush", speed = 1.12, fiction = "The pack surfaces first and the fight is already there." },
+  broadside = { label = "Broadside", range = 1.12, fiction = "Writes range onto the water and dares the shore to cross it." },
+  tide_table = { label = "Tide Table", vision = 1.20, fiction = "The Horizons read the water; the bombers read the Horizons." },
   -- build power
   field_surgeon = { label = "Field Surgeon", build = 1.20, fiction = "Nobody stays dead near an honest chassis." },
   combat_engineer = { label = "Combat Engineer", build = 1.20, fiction = "Builds trouble in equal measure." },
@@ -83,6 +87,7 @@ M.HERO_DEFAULTS = {
   ketha = { "field_surgeon" }, twitch = { "combat_engineer" }, consul = { "field_office" },
   solarium = { "eco_lab" }, lumen = { "geo_tithe" }, infestor = { "hive_growth" },
   commando = { "trapper_pace" }, hearth = { "pad_heart" },
+  phoenix = { "rises_again" }, tarn = { "wake_rush" }, scylla = { "broadside" }, tsunami = { "tide_table" },
 }
 
 -- Rare dual-effect exceptions. Primary still comes from HERO_DEFAULTS;

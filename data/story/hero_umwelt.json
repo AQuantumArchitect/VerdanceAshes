@@ -1448,6 +1448,154 @@
       "glyph": "+fog·+cra·+sig·−pad",
       "position": "eyes",
       "doctrine": "eyes"
+    },
+    {
+      "heroId": "phoenix",
+      "name": "Ondrea 'Phoenix' Vell",
+      "axes": {
+        "energy": 0.0,
+        "offense": 0.9,
+        "mobility": 0.6,
+        "sight": 0.0,
+        "pad": -0.6,
+        "craft": 0.0,
+        "heat": 0.6,
+        "fog": 0.0,
+        "sky": 1.0,
+        "ledger": 0.0
+      },
+      "marks": [
+        {
+          "axis": "sky",
+          "value": 1.0
+        },
+        {
+          "axis": "offense",
+          "value": 0.9
+        },
+        {
+          "axis": "mobility",
+          "value": 0.6
+        },
+        {
+          "axis": "pad",
+          "value": -0.6
+        }
+      ],
+      "glyph": "+sky·+off·+mob·−pad",
+      "position": "siege",
+      "doctrine": "sky_siege"
+    },
+    {
+      "heroId": "tarn",
+      "name": "Tarn Ostrander",
+      "axes": {
+        "energy": 0.0,
+        "offense": 0.6,
+        "mobility": 0.8,
+        "sight": 0.0,
+        "pad": -0.4,
+        "craft": 0.0,
+        "heat": 0.2,
+        "fog": 0.0,
+        "sky": 0.0,
+        "ledger": 0.0
+      },
+      "marks": [
+        {
+          "axis": "mobility",
+          "value": 0.8
+        },
+        {
+          "axis": "offense",
+          "value": 0.6
+        },
+        {
+          "axis": "pad",
+          "value": -0.4
+        },
+        {
+          "axis": "heat",
+          "value": 0.2
+        }
+      ],
+      "glyph": "+mob·+off·−pad·+hea",
+      "position": "line",
+      "doctrine": "line"
+    },
+    {
+      "heroId": "scylla",
+      "name": "Maren 'Scylla' Voss",
+      "axes": {
+        "energy": 0.0,
+        "offense": 1.0,
+        "mobility": -0.4,
+        "sight": 0.0,
+        "pad": -0.6,
+        "craft": 0.0,
+        "heat": 0.4,
+        "fog": 0.0,
+        "sky": 0.0,
+        "ledger": 0.0
+      },
+      "marks": [
+        {
+          "axis": "offense",
+          "value": 1.0
+        },
+        {
+          "axis": "pad",
+          "value": -0.6
+        },
+        {
+          "axis": "mobility",
+          "value": -0.4
+        },
+        {
+          "axis": "heat",
+          "value": 0.4
+        }
+      ],
+      "glyph": "+off·−pad·−mob·+hea",
+      "position": "siege",
+      "doctrine": "siege_plod"
+    },
+    {
+      "heroId": "tsunami",
+      "name": "Ines 'Tsunami' Harrow",
+      "axes": {
+        "energy": 0.0,
+        "offense": 0.8,
+        "mobility": 0.8,
+        "sight": 0.4,
+        "pad": -0.6,
+        "craft": 0.0,
+        "heat": 0.0,
+        "fog": 0.3,
+        "sky": 1.0,
+        "ledger": 0.0
+      },
+      "marks": [
+        {
+          "axis": "sky",
+          "value": 1.0
+        },
+        {
+          "axis": "offense",
+          "value": 0.8
+        },
+        {
+          "axis": "mobility",
+          "value": 0.8
+        },
+        {
+          "axis": "pad",
+          "value": -0.6
+        }
+      ],
+      "glyph": "+sky·+off·+mob·−pad",
+      "position": "siege",
+      "doctrine": "sky_siege"
     }
   ]
 }

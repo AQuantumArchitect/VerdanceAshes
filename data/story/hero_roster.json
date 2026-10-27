@@ -859,6 +859,86 @@
         "type": "band_unlock",
         "blurb": "Everything changes sides eventually."
       }
+    },
+    {
+      "heroId": "phoenix",
+      "name": "Ondrea 'Phoenix' Vell",
+      "unitDef": "legphoenix",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.0,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "heat",
+      "traits": [
+        "heat",
+        "sky"
+      ],
+      "fiction": "Vell has been shot down three times and filed the paperwork once. Her Phoenixes come home on the fourth pass with the fire still on them, and the enemy learns to count to four.",
+      "recruit": {
+        "type": "band_unlock",
+        "blurb": "Shot down is a schedule."
+      }
+    },
+    {
+      "heroId": "tarn",
+      "name": "Tarn Ostrander",
+      "unitDef": "corsala",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.0,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "swarm",
+      "traits": [
+        "swarm",
+        "mischief"
+      ],
+      "fiction": "Ostrander ferries a pack of Salamanders through water the rest of the company calls a wall. They surface under the enemy line, shake off, and fire. He has never once walked around a lake.",
+      "recruit": {
+        "type": "band_unlock",
+        "blurb": "Out of the river, already firing."
+      }
+    },
+    {
+      "heroId": "scylla",
+      "name": "Maren 'Scylla' Voss",
+      "unitDef": "leganavybattleship",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.0,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "plod",
+      "traits": [
+        "plod",
+        "captain"
+      ],
+      "fiction": "Voss commands the Scylla the way a harbour commands a coast: from the middle of it, slowly, with every gun. On land she is a fortress that cannot leave. On water she is the reason there is a coast.",
+      "recruit": {
+        "type": "band_unlock",
+        "blurb": "The water had better be wide."
+      }
+    },
+    {
+      "heroId": "tsunami",
+      "name": "Ines 'Tsunami' Harrow",
+      "unitDef": "armsb",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.0,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "sky",
+      "traits": [
+        "sky",
+        "fog"
+      ],
+      "fiction": "Harrow sends three Horizons out over the water to see, then brings the Tsunamis in on what they found. Her wing lands on any lake the company can name, and a few it cannot.",
+      "recruit": {
+        "type": "band_unlock",
+        "blurb": "The flight finds the target, then drops on it."
+      }
     }
   ]
 }
