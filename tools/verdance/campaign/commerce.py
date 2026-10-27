@@ -260,6 +260,11 @@ def listing_available(
         from .suits import has_suit
         if has_suit(state):
             return False, "the company already wears a commander suit"
+    if kind == "hero_rental":
+        from verdance.company.rentals import can_rent
+        ok, why = can_rent(state, str(listing.get("heroId") or ""))
+        if not ok:
+            return False, why
     if kind in ("unit_printer", "loan_package") and listing_id in owned:
         return False, "already owned"
     if kind == "hero_contract":
@@ -315,7 +320,11 @@ def purchase_listing(
     commerce["tenebrium"] = int(commerce.get("tenebrium") or 0) - tcost
     commerce["metalK"] = int(commerce.get("metalK") or 0) - mcost
     kind = str(listing.get("kind") or "purchase_package")
-    if kind == "commander_suit":
+    if kind == "hero_rental":
+        # A hero for one drop (verdance.company.rentals); not in the bag, in the company.
+        from verdance.company.rentals import rent
+        rent(state, listing, workspace)
+    elif kind == "commander_suit":
         # Cortex's suit (verdance.campaign.suits): the walker is fielded from now on, in Cortex's body.
         from .suits import grant_suit
         grant_suit(state, listing.get("unitDef") or "corcom", "bought_cortex")
@@ -475,6 +484,25 @@ def purchase_listing(
     return receipt
 
 
+def _stream_waves(pending: List[Dict[str, Any]], listings: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """A listing with ``stream`` (the Grunt Stream) arrives as several waves, everySeconds apart,
+    each the listing's count (times what was bought), not as one delivery."""
+    out: List[Dict[str, Any]] = []
+    for p in pending:
+        listing = listings.get(str(p.get("listingId"))) or {}
+        st = listing.get("stream") if isinstance(listing.get("stream"), dict) else None
+        if not st or p.get("wave"):
+            out.append(p)
+            continue
+        waves = max(1, int(st.get("waves") or 1))
+        every = max(1, int(st.get("everySeconds") or 45))
+        for w in range(waves):
+            q = dict(p, wave=w + 1, waves=waves, id=f"{p.get('id') or p.get('listingId')}_w{w + 1}")
+            q["etaSeconds"] = int(p.get("etaSeconds") or 0) + w * every
+            out.append(q)
+    return out
+
+
 def build_commerce_intent(state: Dict[str, Any], workspace: Optional[Path] = None) -> Dict[str, Any]:
     """Serialize commerce bag + shop shelf + deploy specs for the mission compiler.
 
@@ -536,6 +564,7 @@ def build_commerce_intent(state: Dict[str, Any], workspace: Optional[Path] = Non
             pending.append(copy.deepcopy(item))
 
     pending_listing_ids = {str(p.get("listingId")) for p in pending}
+    # (streams are expanded into their waves once the queue is built: _stream_waves below)
 
     for lid, rec in owned.items():
         if not isinstance(rec, dict):
@@ -546,7 +575,8 @@ def build_commerce_intent(state: Dict[str, Any], workspace: Optional[Path] = Non
         deferred = bool(delivery.get("deferred")) and kind == "purchase_package"
 
         if kind in ("loan_package", "purchase_package") or (
-            listing.get("unitDef") and kind not in ("unit_printer", "constructor", "hero_contract")
+            listing.get("unitDef") and kind not in ("unit_printer", "constructor", "hero_contract",
+                                                    "hero_rental", "commander_suit")
         ):
             unit_def = rec.get("unitDef") or listing.get("unitDef")
             count = int(rec.get("loanCount") or rec.get("count") or listing.get("count") or 0)
@@ -650,6 +680,7 @@ def build_commerce_intent(state: Dict[str, Any], workspace: Optional[Path] = Non
     field_start_e = int(metal_meta.get("fieldStartEnergy") or 3000)
     if field_start_e < 0:
         field_start_e = 0
+    pending = _stream_waves(pending, listings)
     return {
         "tenebrium": int(commerce.get("tenebrium") or 0),
         "metalK": int(commerce.get("metalK") or 0),
@@ -974,6 +1005,12 @@ def settle_commerce_after_sortie(
                 "avgHpFrac": avg_hp,
                 "at": utc_now(),
             })
+
+    # Rented heroes go back to Cortex; who came home is remembered for the campaign-end unlock.
+    from verdance.company.rentals import settle as _settle_rentals
+    home = _settle_rentals(state, result)
+    if home:
+        notes.append("rentals home: " + ", ".join(home))
 
     # What the shop sells is for one drop (owner, 2026-10-26): a bought package or constructor came
     # down with this sortie and is spent. Anything of it that lifts home is the company's by then

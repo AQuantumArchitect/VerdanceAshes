@@ -3,7 +3,7 @@ import { state, BOARDS, commerce, companySealed, prettyMap, jobLabel, arcMax, de
 import { api } from "./api.js";
 import { $, esc, toast, logLine, downloadJson, renderHeroCard, crewHeroName } from "./render.js";
 import { defaultMarks, snapGroundRoute, isLegalLanding, padLegality, padExposed, renderBoard, renderMapPicker } from "./board.js";
-import { renderCompany, buildCompanyEntries, crewCoreIds, droppingPackIds, sealedDeployAces, livingCoreIds, heroIsDeployable, heroAway, heroWhereLabel, companyOwnedBand, showCompanyIntro, hideCompanyIntro } from "./company.js";
+import { rentedIds, renderShop, recomputeShopAvailability, storeWantsAttention, firstDrop, renderCompany, buildCompanyEntries, crewCoreIds, droppingPackIds, sealedDeployAces, livingCoreIds, heroIsDeployable, heroAway, heroWhereLabel, companyOwnedBand, showCompanyIntro, hideCompanyIntro } from "./company.js";
 import { renderBadges } from "./shell.js";
 import { hideCoach } from "./system.js";
 import { renderReserve, reserveBring, resetReserveBring } from "./reserve.js";
@@ -146,7 +146,13 @@ function setWarm(phase, text) {
   state.warm.locked = phase === "dropping" || phase === "up";
   paintWarmStatus(text);
   renderDropSquad();
+  renderShop();          // the store locks while the field loads
   updateDeployGate();
+}
+// The drop window's three windows: the party, the reserve kits, the Cortex mercenary store.
+export function showDropTab(name) {
+  document.querySelectorAll("[data-drop-tab]").forEach(b => b.classList.toggle("on", b.dataset.dropTab === name));
+  document.querySelectorAll("[data-drop-win]").forEach(w => w.classList.toggle("on", w.dataset.dropWin === name));
 }
 function paintWarmStatus(text) {
   const el = $("drop-warm-status");
@@ -172,7 +178,9 @@ export function renderDropSquad() {
   if (state.plan && soloCommand(state.plan.mapId)) {
     const squadEl = $("drop-squad"), kicker = $("drop-squad-kicker");
     if (kicker) kicker.textContent = "Who is dropping · the commander alone";
-    if (squadEl) squadEl.innerHTML = `<div class="theater-sub">The kings' showdown: Armada, Null Mercs and the company each start with one commander and nothing else. Last commander standing takes the throne. The packs and the reserve stay home.</div>`;
+    const t = (state.hub.theaters || {})[state.plan.mapId] || {};
+    const rivals = t.cortexSitsOut ? "Armada and the Null Mercs" : "Armada, Cortex and the Null Mercs";
+    if (squadEl) squadEl.innerHTML = `<div class="theater-sub">The kings' showdown: your commander against ${rivals}, one commander each and nothing else. Last commander standing takes the throne. The packs and the reserve stay home.</div>`;
     renderReserve(true);
     paintDropButton();
     return;
@@ -182,6 +190,7 @@ export function renderDropSquad() {
   const kicker = $("drop-squad-kicker");
   const go = $("drop-confirm-go");
   const coreIds = crewCoreIds();
+  const rented = new Set(rentedIds());
   const entries = buildCompanyEntries().filter(e => e.tier === "deployed" || e.tier === "base");
   const packN = droppingPackIds().length;
   const coreN = livingCoreIds().length;
@@ -194,7 +203,7 @@ export function renderDropSquad() {
       const canToggle = !isCore && !!e.pickable && !locked;
       return renderHeroCard({
         id: e.id, ace: e.ace,
-        tag: isCore ? "core · always" : (on ? "dropping" : "at base"),
+        tag: isCore ? "core · always" : (rented.has(e.id) ? (on ? "rented · dropping" : "rented · at base") : (on ? "dropping" : "at base")),
         classes: [isCore ? "core" : "", on ? "on" : "tier-base", canToggle ? "toggleable" : ""].filter(Boolean),
         compact: true, hideCost: true, dataCrew: canToggle ? e.id : null, disabled: !canToggle, type: "button",
       });
@@ -297,9 +306,11 @@ export function showDropConfirm() {
   if (el) el.classList.add("show");
   const phase = state.warm.phase;
   if (phase === "idle" || phase === "failed") {
+    // The field loads on Launch, not on opening: hire in the store first (owner call, 2026-10-27).
     resetReserveBring();
-    if (state.hostLive) launchField();
-    else setWarm("idle");
+    recomputeShopAvailability();
+    setWarm("idle");
+    showDropTab(firstDrop() && storeWantsAttention() ? "mercs" : "party");
   } else {
     renderDropSquad();
     paintWarmStatus();

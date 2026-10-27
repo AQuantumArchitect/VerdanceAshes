@@ -510,6 +510,19 @@ def build_theater(state: dict, map_id: str, capture_contracts: list | None = Non
     }
 
 
+def _theater_surface(state: dict) -> dict:
+    """Each field's set piece for the board; the duel notes whether Cortex sits it out
+    (in Cortex's own commander suit, verdance.campaign.suits)."""
+    out = {k: dict(v) for k, v in _theaters.SET_PIECES.items()}
+    try:
+        from verdance.campaign.suits import cortex_sits_out
+        if cortex_sits_out(state):
+            out["all_that_simmers"]["cortexSitsOut"] = True
+    except Exception:  # noqa: BLE001
+        pass
+    return out
+
+
 def _road_choices(state: dict, deploy_aces: list) -> tuple[list[dict], str | None]:
     """The road sorties: a crossing from a held door, or a door to take. At most three."""
     try:
@@ -863,6 +876,11 @@ def listing_available_ui(
         return False, "already owned (starter loan)"
     if kind == "commander_suit" and ((state.get("roster") or {}).get("commander") or {}).get("unlocked") is True:
         return False, "the company already wears a commander suit"
+    if kind == "hero_rental":
+        from verdance.company.rentals import can_rent
+        ok, why = can_rent(state, str(listing.get("heroId") or ""))
+        if not ok:
+            return False, why
     req = listing.get("requires")
     if req and req not in owned:
         return False, f"requires {req}"
@@ -992,6 +1010,9 @@ def build_commerce_surface(state: dict, mission_n: int) -> dict:
                 "arcMin": int(listing.get("arcMin") or 1),
                 "tags": list(listing.get("tags") or []),
                 "requires": listing.get("requires"),
+                "heroId": listing.get("heroId"),
+                "recommend": listing.get("recommend"),
+                "stream": listing.get("stream"),
                 "delivery": {
                     "mode": eta.get("mode"),
                     "deferred": bool(eta.get("deferred")),
@@ -1314,7 +1335,7 @@ def build_hub(state: dict, war: dict) -> dict:
         "storyState": _story_surface(state, mission_n),
         "world": _world_surface(state),
         "water": _water_surface(state),
-        "theaters": dict(_theaters.SET_PIECES),
+        "theaters": _theater_surface(state),
         # Bonds worth something on the field: the Drop dialog shows the rows whose pair both drop.
         "bondPerks": _bond_perks(state, aces),
         "regions": regions,

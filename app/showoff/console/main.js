@@ -5,7 +5,7 @@ import { state, H, commerce, prettyMap, availableMaps, ensureFocusMapAvailable, 
 import { probeKernel } from "./api.js";
 import { $, toast, logLine } from "./render.js";
 import { installOverlays } from "./board.js";
-import { refreshTheaterForFocus, showDropConfirm, hideDropConfirm, onDropConfirmGo, resetRoute, setMarkMode, onChoice } from "./operations.js";
+import { refreshTheaterForFocus, showDropConfirm, hideDropConfirm, onDropConfirmGo, resetRoute, setMarkMode, onChoice, showDropTab } from "./operations.js";
 import { renderCompany, renderShop, sealCompany, toggleCrew, tryBuy, recommendCompany, showCompanyIntro, companyMemberIds, fieldPeople } from "./company.js";
 import { raiseCamp, openFoundingSortie, confirmHearthTalk, cancelHearthTalk, refreshCamp, renderCampCard } from "./home.js";
 import { showHomecoming, hideHomecoming, pullHubState, pullBarResult, abandonSortie, startResultPoll } from "./homecoming.js";
@@ -34,6 +34,7 @@ function bindControls() {
   $("drop-confirm-cancel").onclick = hideDropConfirm;
   $("drop-confirm-go").onclick = onDropConfirmGo;
   installReserve();
+  $("drop-tabs").addEventListener("click", ev => { const b = ev.target.closest("[data-drop-tab]"); if (b) showDropTab(b.dataset.dropTab); });
   $("drop-confirm").addEventListener("click", ev => { if (ev.target === $("drop-confirm")) hideDropConfirm(); });
   document.addEventListener("keydown", ev => { if (ev.key === "Escape") hideDropConfirm(); });
   // Hero cards (intro grid, drop squad) toggle through one delegated handler.

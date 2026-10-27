@@ -79,8 +79,10 @@ function sortHeroGridIds(ids) {
 }
 export function companyOwnedBand() {
   const c = companySurface();
-  return list(c.band).concat(list(c.joinedLater));
+  // + heroes rented from the Cortex mercenary store for this drop (verdance.company.rentals)
+  return list(c.band).concat(list(c.joinedLater), list(c.rented));
 }
+export function rentedIds() { return list(companySurface().rented); }
 
 /* ---- where people are --------------------------------------------------------------- */
 function heroAwayRec(id) {
@@ -347,6 +349,7 @@ export function buildCompanyEntries() {
   const deployIds = new Set(sealedDeployAces());
   const ownedBand = companyOwnedBand();
   const laterIds = new Set(list(companySurface().joinedLater));
+  const rentIds = new Set(list(companySurface().rented));
   const aces = (state.hub.aces || []).slice();
   const aceMap = Object.fromEntries(aces.map(a => [a.id, a]));
   const seen = new Set();
@@ -366,13 +369,13 @@ export function buildCompanyEntries() {
     state.crewBand.forEach(id => push(id, "deployed", { tag: "picked", pickable: true, on: true }));
   } else {
     // Sealed: only this-run company. Dropping ↔ At base. Never dump unlocks.
-    deployIds.forEach(id => push(id, "deployed", { tag: coreIds.includes(id) ? "core · always" : (laterIds.has(id) ? "field join" : null), pickable: true, on: true }));
+    deployIds.forEach(id => push(id, "deployed", { tag: coreIds.includes(id) ? "core · always" : (rentIds.has(id) ? "rented · this drop" : (laterIds.has(id) ? "field join" : null)), pickable: true, on: true }));
     ownedBand.forEach(id => {
       if (deployIds.has(id)) return;
       const st = String((aceMap[id] && aceMap[id].status) || "active").toLowerCase();
       if (st === "dead" || st === "lost") return push(id, "dead", { pickable: false });
       if (heroAway(id)) return push(id, "away", { tag: heroWhereLabel(id), pickable: false, on: false });
-      push(id, "base", { tag: laterIds.has(id) ? "field join" : "at base", pickable: true, on: false });
+      push(id, "base", { tag: rentIds.has(id) ? "rented · this drop" : (laterIds.has(id) ? "field join" : "at base"), pickable: true, on: false });
     });
     coreIds.forEach(id => { if (!seen.has(id) && heroAway(id)) push(id, "away", { tag: "core · " + heroWhereLabel(id), pickable: false, on: false }); });
     aces.forEach(a => {
@@ -464,10 +467,37 @@ function shopShelfOf(item) {
   return "cortex";
 }
 function shopShelfLabel(id) {
-  return ({ cortex: "Cortex · arms merchant", armada: "Armada · surplus", nullmercs: "Null Mercs", camp: "Camp" })[id] || id;
+  return ({ mercs: "Mercenaries · one drop", heroes: "Heroes for hire · one drop", rights: "Build rights", specials: "Cortex specials",
+    cortex: "Cortex", armada: "Armada · surplus", nullmercs: "Null Mercs", camp: "Camp" })[id] || id;
+}
+// The store's sections (owner call, 2026-10-27): what you hire for this drop first.
+function storeSection(item) {
+  const k = item.kind || "";
+  if (k === "hero_rental") return "heroes";
+  if (k === "constructor") return "rights";
+  if (k === "commander_suit") return "specials";
+  if (k === "purchase_package" || k === "loan_package") return "mercs";
+  return shopShelfOf(item);
+}
+// The first drop: the Punch of Thugs is recommended (chaff in front of the heroes), two of them.
+export function firstDrop() {
+  return Number(state.hub.missionNumber || 1) <= 1;
+}
+function recommendation(item) {
+  const rec = item.recommend || {};
+  if (!rec.firstDrop || !firstDrop()) return null;
+  const want = Number(rec.firstDrop) || 1, have = Number(item.ownedQty || 0);
+  return { want, have, why: rec.why || "" };
+}
+export function storeWantsAttention() {
+  return ((commerce().shop) || []).some(item => { const r = recommendation(item); return r && r.have < r.want; });
+}
+function storeLocked() {
+  const phase = state.warm && state.warm.phase;
+  return phase === "loading" || phase === "ready" || phase === "dropping" || phase === "up";
 }
 function renderShopListing(item) {
-  const locked = !item.available;
+  const locked = !item.available || storeLocked();
   const owned = item.owned;
   const purchaseStack = item.kind === "purchase_package";
   const costs = [];
@@ -476,21 +506,24 @@ function renderShopListing(item) {
   if (mkCost) costs.push(`${(mkCost * 1000).toLocaleString()} metal`);
   if (!costs.length) costs.push("—");
   const d = item.delivery || {};
-  const etaLine = d.summary || d.etaText ? `<div class="cost">${esc(d.summary || d.etaText)}</div>` : "";
+  const etaLine = item.kind === "purchase_package" && (d.summary || d.etaText) ? `<div class="cost">${esc(d.summary || d.etaText)}</div>` : "";
+  const rec = recommendation(item);
+  const recLine = rec ? `<div class="rec">Recommended for your first drop: ${rec.want} (${rec.have} hired)${rec.why ? " · " + esc(rec.why) : ""}</div>` : "";
   const ownedLine = owned
-    ? (purchaseStack ? `<div class="block good">Owned ×${esc(item.ownedQty || 1)} — buy again to stack</div>` : `<div class="block good">In bag / installed</div>`)
+    ? (purchaseStack ? `<div class="block good">Hired ×${esc(item.ownedQty || 1)} for this drop</div>`
+      : item.kind === "hero_rental" ? `<div class="block good">Rented: in the party for this drop</div>` : `<div class="block good">Yours</div>`)
     : "";
   const showBuy = purchaseStack || !owned;
-  const tags = (item.tags || []).filter(t => !String(t).toLowerCase().startsWith("role:"));
-  return `<div class="listing ${owned ? "owned" : ""} ${locked ? "locked" : ""}" data-id="${esc(item.id)}">
+  const why = !item.available ? (item.blockedReason || "locked") : (storeLocked() ? "The field is loading: hire before you Launch" : "");
+  const verb = item.kind === "hero_rental" ? "Rent" : item.kind === "commander_suit" ? "Buy" : (purchaseStack && owned ? "Hire another" : "Hire");
+  return `<div class="listing ${owned ? "owned" : ""} ${locked ? "locked" : ""} ${rec && rec.have < rec.want ? "recommended" : ""}" data-id="${esc(item.id)}">
       <div class="title"><strong>${esc(item.label)}</strong><span class="cost">${esc(costs.join(" · "))}</span></div>
+      ${recLine}
       <div class="blurb">${esc(item.blurb)}</div>
-      <details><summary>Pack details</summary><div class="cost">${esc(item.kind.replaceAll("_", " "))}${item.unitDef ? " · " + esc(item.unitDef) : ""}${item.count ? " ×" + esc(item.count) : ""}${item.builds ? " · construction equipment" : ""}</div></details>
       ${etaLine}
-      ${locked ? `<div class="block">${esc(item.blockedReason || "locked")}</div>` : ""}
+      ${why ? `<div class="block">${esc(why)}</div>` : ""}
       ${ownedLine}
-      <div class="tags">${tags.map(t => `<span class="tag">${esc(t)}</span>`).join("")}</div>
-      ${showBuy ? `<button type="button" class="btn-buy" data-buy="${esc(item.id)}" ${locked ? "disabled" : ""}>${state.hostLive ? (purchaseStack && owned ? "Buy another" : "Buy") : "Preview buy"}</button>` : ""}
+      ${showBuy ? `<button type="button" class="btn-buy" data-buy="${esc(item.id)}" ${locked ? "disabled" : ""}>${state.hostLive ? verb : "Preview " + verb.toLowerCase()}</button>` : ""}
     </div>`;
 }
 export function renderShop() {
@@ -498,23 +531,26 @@ export function renderShop() {
   $("shop-balances").innerHTML = `
       <div class="bal tnb">Tenebrium<strong>${c.tenebrium ?? 0}</strong>∞ storage</div>
       <div class="bal cred">Metal<strong>${(metalKOf(c) * 1000).toLocaleString()} metal</strong>~${metalKOf(c) * 1000} banked</div>`;
-  $("shop-note").textContent = state.hostLive
-    ? "Each purchase shows its cost and delivery time. Construction equipment can require Tenebrium as well as metal."
-    : "Preview only. Start PLAY.bat and keep its window open to make campaign purchases.";
+  $("shop-note").textContent = !state.hostLive
+    ? "Preview only. Start PLAY.bat and keep its window open to make campaign purchases."
+    : storeLocked() ? "The field is loading. What you hired is aboard; the store opens again for the next drop."
+    : "Everything here is for this drop only. Hire, then Launch. Rented heroes join the party; win the campaign with one in the company to keep them.";
   const kit = c.deployKit || [];
   const inbound = c.inbound || c.pendingDeliveries || [];
   const kitHtml = kit.map(k => `<div class="kit-line"><b>${esc(k.label || k.listingId)}</b>${k.count ? " · ×" + esc(k.count) : ""}${k.loan ? " · loan" : ""}${k.factoryDef ? " · fabricator" : ""}</div>`).join("");
   const inboundHtml = inbound.map(k => {
     const d = k.delivery || {};
-    return `<div class="kit-line"><b>INBOUND</b> ${esc(k.label || k.listingId)}${k.count ? " · ×" + esc(k.count) : ""}${d.etaText ? " · " + esc(d.etaText) : ""}${d.sourceLabel ? " · from " + esc(d.sourceLabel) : ""}${d.summary ? `<div class="meta">${esc(d.summary)}</div>` : ""}</div>`;
+    return `<div class="kit-line"><b>INBOUND</b> ${esc(k.label || k.listingId)}${k.count ? " · ×" + esc(k.count) : ""}${d.etaText ? " · " + esc(d.etaText) : ""}${d.sourceLabel ? " · from " + esc(d.sourceLabel) : ""}</div>`;
   }).join("");
-  $("deploy-kit").innerHTML = (kitHtml || inboundHtml) ? (kitHtml + inboundHtml) : `<div class="kit-line">Empty bag — buy a Punch, stream, or fab before you Drop.</div>`;
-  const order = ["nullmercs", "cortex", "armada", "camp"];
+  $("deploy-kit").innerHTML = (kitHtml || inboundHtml) ? `<div class="drop-squad-kicker">Hired for this drop</div>${kitHtml}${inboundHtml}` : "";
+  const order = ["mercs", "heroes", "rights", "specials"];
   const groups = {};
-  (c.shop || []).forEach(item => { const shelf = shopShelfOf(item); (groups[shelf] || (groups[shelf] = [])).push(item); });
-  const shelfIds = order.filter(id => groups[id] && groups[id].length).concat(Object.keys(groups).filter(id => !order.includes(id)));
-  $("shop-list").innerHTML = shelfIds.map(shelf => `<div class="shop-shelf">${esc(shopShelfLabel(shelf))}</div>${groups[shelf].map(renderShopListing).join("")}`).join("")
-    || `<div class="panel-card meta">Broker is empty — re-export the campaign pack.</div>`;
+  (c.shop || []).forEach(item => { const sec = storeSection(item); (groups[sec] || (groups[sec] = [])).push(item); });
+  const ids = order.filter(id => groups[id] && groups[id].length).concat(Object.keys(groups).filter(id => !order.includes(id)));
+  $("shop-list").innerHTML = ids.map(sec => `<div class="shop-shelf">${esc(shopShelfLabel(sec))}</div>${groups[sec].map(renderShopListing).join("")}`).join("")
+    || `<div class="panel-card meta">The store is empty: re-export the campaign pack.</div>`;
+  const tab = $("drop-tab-mercs");
+  if (tab) tab.innerHTML = "Mercenaries" + (storeWantsAttention() && !storeLocked() ? `<span class="badge">recommended</span>` : "");
 }
 export function recomputeShopAvailability() {
   const c = commerce();
@@ -530,6 +566,9 @@ export function recomputeShopAvailability() {
     if ((kind === "unit_printer" || kind === "loan_package") && owned[item.id]) { ok = false; reason = "already owned"; }
     if (item.starterOwned && item.loan && owned[item.id]) { ok = false; reason = "already owned (starter loan)"; }
     if (item.requires && !owned[item.requires]) { ok = false; reason = "requires " + item.requires; }
+    if (kind === "hero_rental" && companyOwnedBand().concat(crewCoreIds()).includes(item.heroId) && !rentedIds().includes(item.heroId)) { ok = false; reason = "already in the company"; }
+    if (kind === "hero_rental" && rentedIds().includes(item.heroId)) { ok = false; reason = "rented for this drop"; }
+    if (kind === "commander_suit" && owned[item.id]) { ok = false; reason = "the company already wears a commander suit"; }
     if ((item.arcMin || 1) > arcN) { ok = false; reason = "arc " + item.arcMin + "+ only"; }
     const repMin = item.repMin || {};
     for (const f of Object.keys(repMin)) {
@@ -541,7 +580,8 @@ export function recomputeShopAvailability() {
     if (metalKOf(c) < mcost) { ok = false; reason = `need ${(mcost * 1000).toLocaleString()} metal`; }
     item.available = ok;
     item.blockedReason = ok ? null : reason;
-    item.owned = !!(owned[item.id] || upgrades[item.id]);
+    item.owned = !!(owned[item.id] || upgrades[item.id] || (kind === "hero_rental" && rentedIds().includes(item.heroId)));
+    item.ownedQty = Number((owned[item.id] || {}).qty || (owned[item.id] ? 1 : 0));
   });
   // rebuild deploy kit labels lightly
   const kit = [];
@@ -585,6 +625,7 @@ export async function tryBuy(listingId) {
       recomputeShopAvailability();
       renderShop();
       renderBadges();
+      noteRosterChanged();
       logLine(`Bought ${item.label} (−${tcost} Tnb, −${(mcost * 1000).toLocaleString()} metal) · campaign bag live`);
       toast(`Bought ${item.label}`, "ok");
       await pullHubState();

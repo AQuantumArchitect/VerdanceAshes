@@ -341,13 +341,13 @@ def main() -> int:
 
     ws = _workspace_root()
     demo = {
-        "label": "Crash of Brutes",
+        "label": "Wasp Flight",
         "count": 4,
-        "unitDef": "corraid",
+        "unitDef": "corape",
         "delivery": {"mode": "map_web", "sourceMapId": "eye_of_horus", "landNear": "infil"},
     }
-    pprint.pp(delivery_eta(listing=demo, listing_id="crash_of_brutes", dest_map_id="greenest_fields", workspace=ws))
-    pprint.pp(delivery_eta(listing=demo, listing_id="crash_of_brutes", dest_map_id="all_that_simmers", workspace=ws))
+    pprint.pp(delivery_eta(listing=demo, listing_id="wasp_flight", dest_map_id="greenest_fields", workspace=ws))
+    pprint.pp(delivery_eta(listing=demo, listing_id="wasp_flight", dest_map_id="all_that_simmers", workspace=ws))
     punch = {
         "label": "Punch of Thugs",
         "count": 7,
