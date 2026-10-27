@@ -115,3 +115,23 @@ def test_the_hub_preview_is_the_sortie_s_own_draw():
     fat_map = st["fieldPool"]["fatboy"]["roam"]["mapId"]
     real = [e["heroId"] for e in EN.encounters_for_map(st, fat_map, workspace=ROOT, limit=2, marked_zone_ids=[fat_zone])]
     assert real[0] == "fatboy" and real[1:] == [d["heroId"] for d in draws[fat_map] if d["heroId"] != "fatboy"][:1]
+
+
+def test_the_jungle_constructor_find_is_a_consul_or_a_twitcher():
+    _skip()
+    st = _state()
+    EN.refresh_whereabouts(st, ROOT)
+    consul_at = st["fieldPool"]["consul"]["roam"]["zoneId"]
+    assert st["fieldPool"]["twitch"]["roam"]["zoneId"] != consul_at        # the Consul is the find
+    st = _state(band=("vane", "brakhov", "consul"))
+    EN.refresh_whereabouts(st, ROOT)
+    tw = st["fieldPool"]["twitch"]["roam"]
+    assert tw["zoneId"] == consul_at and tw["anchored"] and "Consul is already with you" in tw["reasons"][0]
+
+
+def test_the_infestor_is_not_a_builder():
+    _skip()
+    st = _state()
+    EN.refresh_whereabouts(st, ROOT)
+    assert not st["fieldPool"]["infestor"]["roam"]["anchored"]
+    assert st["fieldPool"]["solarium"]["roam"]["anchored"]

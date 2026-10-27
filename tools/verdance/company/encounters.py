@@ -36,6 +36,12 @@ AXES = ["energy", "offense", "mobility", "sight", "pad", "craft", "heat", "fog",
 WATER_TAGS = {"amphibious", "hover", "seaplane", "naval"}
 ANCHOR_RECRUITS = {"retrieve_stash", "assist_fortify", "capture"}
 OUR_FACTION = "ashwalkers"
+# Chassis whose build power only makes more of themselves: not builders (the Infestor).
+ONLY_BUILDS_ITSELF = {"leginfestor"}
+# The constructor-gated jungle find (owner, 2026-10-26): a Consul, or, when the Consul is already
+# with the company, a Twitcher found in the same place.
+CONSTRUCTOR_FIND = ("consul", "twitch")
+
 # A hero's authored home map as a haunt: about half of their meetings happen there (measured over
 # 30 seeded sorties x 7 maps on a fresh campaign), the rest wherever the bond web and the ground
 # pull them. The authored home zone itself is a smaller prior on top.
@@ -95,7 +101,7 @@ def anchor_reason(hid: str, pack: Dict[str, Any], roster_row: Dict[str, Any], ch
     unit = str(pack.get("unitDef") or "")
     if unit in WRECK_SEED_PROXY:
         return "does not walk"
-    if (chassis.get(unit) or {}).get("hasBuildPower"):
+    if (chassis.get(unit) or {}).get("hasBuildPower") and unit not in ONLY_BUILDS_ITSELF:
         return "a builder"
     return None
 
@@ -227,11 +233,16 @@ def build(state: Dict[str, Any], workspace: Optional[Path] = None):
     place_ids = {p.id for p in places}
     entities, anchors = [], {}
     pool = state.get("fieldPool") or {}
+    present = present_heroes(state)
+    first, second = CONSTRUCTOR_FIND
+    find_at = _entry_home(pool.get(first)) or _home(first)
     for hid, pack in (packs.get("heroes") or {}).items():
         if str(pack.get("role") or "band") != "band":
             continue
         home = _entry_home(pool.get(hid)) or _home(hid)
         reason = anchor_reason(hid, pack, roster.get(hid) or {}, chassis)
+        if hid == second and first in present and find_at:
+            home, reason = find_at, f"found where a constructor is needed (the {first.capitalize()} is already with you)"
         anchored_at = None
         if reason:
             anchored_at = home[1] if home else None
@@ -247,7 +258,7 @@ def build(state: Dict[str, Any], workspace: Optional[Path] = None):
                                  label=str(pack.get("name") or hid)))
     field = E.EncounterField(entities, places, _relations(E, state, ws), weights=E.Weights(presence_relation=0.7))
     belief = state.get("encounterBelief") or {}
-    ctx = {"present": present_heroes(state), "draw": relative_draw(belief.get("draw") or {}, _wild_ids(state)),
+    ctx = {"present": present, "draw": relative_draw(belief.get("draw") or {}, _wild_ids(state)),
            "mood": dict(belief.get("mood") or {}),
            "anchors": anchors, "labels": {p.id: p.label for p in places}, "maps": {p.id: p.region for p in places}}
     return field, ctx
