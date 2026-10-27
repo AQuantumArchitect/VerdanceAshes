@@ -131,7 +131,13 @@ export function fieldPeople() {
   const camp = (state.hub && state.hub.camp) || {};
   return (Array.isArray(camp.people) ? camp.people : [])
     .filter(p => p && ["posted", "transit", "field"].includes(String(p.where || "").toLowerCase()))
-    .map(p => ({ heroId: p.heroId, name: p.name || heroNameAny(p.heroId), where: p.where, label: p.label || zoneLabelAny(p.zoneId, p.mapId), wounded: !!p.wounded }));
+    .map(p => {
+      // Someone on the pathway (a road door) is found by a drop on either field it joins.
+      const mapId = (state.plan && state.plan.mapId) || state.focusMap;
+      const joins = Array.isArray(p.joinsDropsOn) ? p.joinsDropsOn : [];
+      return { heroId: p.heroId, name: p.name || heroNameAny(p.heroId), where: p.where, label: p.label || zoneLabelAny(p.zoneId, p.mapId), wounded: !!p.wounded,
+        joinsThisDrop: !!mapId && joins.includes(mapId), joinsDropsOn: joins };
+    });
 }
 
 export function syncCrewFromHub() {
@@ -410,12 +416,16 @@ function renderCompanyRecruitSlot() {
   if (kicker) kicker.textContent = "Where you go decides who you can rescue";
   const rows = here.map(r => {
     const marked = (state.plan?.marks?.captureZoneIds || []).includes(r.zoneId) || state.plan?.marks?.deployZoneId === r.zoneId;
-    return `<li><b>${esc(r.name || crewHeroName(r.id))}</b> · wreck at ${esc(zoneLabelAny(r.zoneId, mapId) || r.zoneId || "somewhere here")}` +
+    // Tension with the party: they come in alive and against us (put them down, then raise them).
+    const hostile = r.stance && r.stance.kind === "hostile";
+    const how = hostile ? `<span class="bad">alive, against us</span> at` : "wreck at";
+    const why = hostile && r.stance.reasons && r.stance.reasons.length ? ` <span class="muted">(${esc(r.stance.reasons.slice(0, 2).join("; "))})</span>` : "";
+    return `<li><b>${esc(r.name || crewHeroName(r.id))}</b> · ${how} ${esc(zoneLabelAny(r.zoneId, mapId) || r.zoneId || "somewhere here")}${why}` +
       `${marked ? ` <span class="good">on your route</span>` : ""}</li>`;
   }).join("");
   const away = Object.entries(elsewhere).map(([m, n]) => `${esc(prettyMapShort(m))} (${n})`).join(", ");
   cardEl.innerHTML =
-    (rows ? `<ul class="cr-list">${rows}</ul><p class="cr-note">Rez the wreck with Ketha and they join for this campaign; bring them home alive at the end and they become a starter.</p>`
+    (rows ? `<ul class="cr-list">${rows}</ul><p class="cr-note">Rez the wreck with Ketha and they join for this campaign; someone who comes in against us has to be put down first. Bring them home alive at the end and they become a starter.</p>`
           : `<p class="cr-note">Nobody waits on ${esc(prettyMapShort(mapId) || "this map")} this drop.</p>`) +
     (away ? `<p class="cr-note">Waiting elsewhere: ${away}.</p>` : "");
   wrap.hidden = !companySealed();

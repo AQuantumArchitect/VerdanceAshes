@@ -94,6 +94,14 @@ has('"dropped":["pavise","solarium","ketha"]', "the manifest names who dropped (
 print("ok   manifest: pad is the landing zone; an immobile hero lifts from where it stands")
 has('"hiredUnits":{"corthud":1}', "a unit the shop sent lifts but is marked hired (kept out of the reserve)")
 print("ok   the shop's units are hired for this drop")
+-- safe ground: everything of ours standing in a zone the company holds lifts, not only the pad
+mission.safeZoneIds = { "FAR" }
+GG.VA_ExfilCmd("manifest")
+m = RULES.va_manifest_json
+has('"unitCount":4', "a unit standing in ground we hold (FAR) lifts with the pad's")
+has('"staying":{"heroes":[],"metal":0,"structureCount":0,"structures":[],"unitCount":0', "... and nothing of ours is left")
+mission.safeZoneIds = nil
+print("ok   safe ground: whatever stands on ground we hold lifts")
 -- taking a door: once the objective is done the extraction moves onto it, even when the objective was
 -- raising a hero in the wound (a territory mission with a rescue inside it, Greenest Fields 2026-10-26)
 mission.objective = { rezHeroId = "mask", targetZoneId = "FAR" }
@@ -104,7 +112,7 @@ for f = 62, 92 do gadget:GameFrame(f) end
 assert(RULES.va_pad_zone == "FAR" and RULES.va_pad_moved == 1, "the pad did not move to the exit door")
 GG.VA_ExfilCmd("manifest")
 m = RULES.va_manifest_json
-has('"units":{"corthud":1}', "on the exit door, the unit standing there goes")
+has('"unitCount":4', "on the exit door, the unit standing there goes, and the landing zone is still ours")
 print("ok   taking a door: the extraction moves onto it once the objective is done")
 -- two exits: the hero raised in the wound goes home from the landing zone, not from the door
 U[7] = { x = 1000, z = 600, def = 1, team = 0, hero = "mask" }

@@ -319,6 +319,26 @@ local function onPadAt(x, z)
   return dx * dx + dz * dz <= pad.r * pad.r
 end
 
+-- Safe ground (owner, 2026-10-27): everything of ours standing in a zone the company holds lifts on
+-- extract, not only what stands on the pad: the pad zone, where we landed, and the zones the engine
+-- names as ours (mission.safeZoneIds: held road doors and our own ground). Rescues still go home
+-- from the landing zone only.
+local function safeZone(zid)
+  if not zid or zid == "" or zid == "?" then return false end
+  if pad and zid == pad.zoneId then return true end
+  if homePad and zid == homePad.zoneId then return true end
+  local ids = mission and mission.safeZoneIds
+  if type(ids) == "table" then
+    for _, z in ipairs(ids) do if tostring(z) == zid then return true end end
+  end
+  return false
+end
+
+local function liftsFrom(x, z)
+  if onPadAt(x, z) then return true end
+  return safeZone(zoneOf(x, z))
+end
+
 local function enemiesOnPad()
   local n = 0
   for _, uid in ipairs(Spring.GetUnitsInCylinder(pad.x, pad.z, pad.reach) or {}) do
@@ -372,7 +392,7 @@ local function manifest()
       local metal = (ud and ud.metalCost) or 0
       local hid = Spring.GetUnitRulesParam(uid, "va_hero_id")
       local hname = Spring.GetUnitRulesParam(uid, "va_hero_name")
-      local onPad = onPadAt(x, z)
+      local onPad = liftsFrom(x, z)
       local zid = zoneOf(x, z) or "?"
       -- Two exits (owner, 2026-10-27): the company leaves from the ground it took, but a rescue
       -- always goes home from where it started: any hero raised or turned this sortie (va_recruited,
@@ -381,7 +401,7 @@ local function manifest()
       local hidNow = Spring.GetUnitRulesParam(uid, "va_hero_id")
       local rescued = hidNow and ((rez and tostring(hidNow) == tostring(rez))
         or (tonumber((Spring.GetUnitRulesParam(uid, "va_recruited"))) or 0) == 1)
-      if rescued and homePad and pad.zoneId ~= homePad.zoneId then
+      if rescued and homePad then
         onPad = (zid == homePad.zoneId)
         rescuedIds[#rescuedIds + 1] = tostring(hidNow)
       end
@@ -428,7 +448,7 @@ local function manifest()
   end
   -- who else is standing on our pad
   m.enemyOnPad = enemiesOnPad()
-  if homePad and pad.zoneId ~= homePad.zoneId and #rescuedIds > 0 then
+  if homePad and #rescuedIds > 0 then
     m.homePad = { zoneId = homePad.zoneId, label = homePad.label, rescue = table.concat(rescuedIds, ",") }
   end
   -- what we looked at (observe gadget), as a map zone -> eta
@@ -462,7 +482,10 @@ local function hudScan()
       local structure = ud and (ud.isBuilding or ud.isFactory or ((ud.speed or 1) == 0))
       local hid = Spring.GetUnitRulesParam(uid, "va_hero_id")
       local isHero = hid ~= nil and tostring(hid) ~= "" and tostring(hid) ~= "0"
-      local onPad = onPadAt(x, z)
+      local onPad = liftsFrom(x, z)
+      if isHero and homePad and (tonumber((Spring.GetUnitRulesParam(uid, "va_recruited"))) or 0) == 1 then
+        onPad = (zoneOf(x, z) == homePad.zoneId)   -- a rescue goes home from where we landed
+      end
       if isHero and structure then
         onPeople = onPeople + 1
         onPad = true            -- packed up where it stands: it lifts with the company

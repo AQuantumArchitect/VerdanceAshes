@@ -618,7 +618,7 @@ local function drawPad(x, y, right)
     local empty = (S.padPeople + S.padUnits) == 0
     local fill, labelCol, label, sub
     if empty then
-      fill, labelCol, label, sub = Ash.COL.bad, Ash.COL.bad, Ash.GLYPH.failed .. "  EXTRACT", "nobody on the pad"
+      fill, labelCol, label, sub = Ash.COL.bad, Ash.COL.bad, Ash.GLYPH.failed .. "  EXTRACT", "nobody on our ground"
     elseif #off > 0 then
       fill, labelCol = Ash.COL.warn, Ash.COL.warn
       label = "!  EXTRACT · " .. S.padPeople .. " ppl / " .. S.padUnits .. " u"

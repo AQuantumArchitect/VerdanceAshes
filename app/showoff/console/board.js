@@ -309,13 +309,13 @@ export function predictedFieldRecruits(mapId, plan) {
   const draws = (surface.encounterDraw && surface.encounterDraw[mid]) || null;
   const rows = draws
     ? draws.slice(0, n).map(d => ({ id: d.heroId, name: (byId[d.heroId] || {}).name || d.heroId, mapId: mid, zoneId: d.zoneId,
-        recruit: (byId[d.heroId] || {}).recruit || { type: "wreck_rez" }, beliefScore: 1, reasons: ((byId[d.heroId] || {}).whereabouts || {}).reasons || [] }))
+        recruit: (byId[d.heroId] || {}).recruit || { type: "wreck_rez" }, stance: (byId[d.heroId] || {}).stance || null, beliefScore: 1, reasons: ((byId[d.heroId] || {}).whereabouts || {}).reasons || [] }))
     : wildRecruitsForMap(mid).slice(0, n).map(w => ({ id: w.id || w.heroId, name: w.name, mapId: mid, zoneId: w.zoneId || null,
-        recruit: w.recruit || { type: "wreck_rez" }, beliefScore: 1, reasons: [] }));
+        recruit: w.recruit || { type: "wreck_rez" }, stance: w.stance || null, beliefScore: 1, reasons: [] }));
   const seen = new Set(rows.map(r => String(r.id)));
   for (const w of all) {
     if (!w || String(w.mapId || "") !== mid || !w.zoneId || !marked.has(String(w.zoneId)) || seen.has(String(w.id))) continue;
-    rows.push({ id: w.id, name: w.name, mapId: mid, zoneId: w.zoneId, recruit: w.recruit || { type: "wreck_rez" },
+    rows.push({ id: w.id, name: w.name, mapId: mid, zoneId: w.zoneId, recruit: w.recruit || { type: "wreck_rez" }, stance: w.stance || null,
                 beliefScore: 0.5, likelier: true, reasons: ["likelier: we marked this ground"] });
   }
   return rows;

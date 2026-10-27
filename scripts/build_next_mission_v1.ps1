@@ -3509,6 +3509,8 @@ if ($state -and $state.PSObject.Properties["fieldPool"] -and $state.fieldPool) {
         [Math]::Round($bs, 3)
       )
       spawnAsWreck = $asWreck
+      # Tension with the party: alive and against us (verdance.company.encounters.apply_meeting_stance).
+      stance = $(if ($row.PSObject.Properties["stance"] -and $row.stance) { [string]$row.stance.kind } else { $null })
       blurb = $(if ($row.blurb) { [string]$row.blurb } else { $null })
     }
     if ($wreckDef) { $entry["wreckUnitDef"] = $wreckDef }
@@ -3646,6 +3648,8 @@ $scenario = [ordered]@{
     you = $(if ($state -and $state.company -and $state.company.PSObject.Properties["you"] -and $state.company.you) { [string]$state.company.you } else { $null })
     fieldRecruits = @($fieldRecruits)
     fieldPeople = @($fieldPeople)
+    # Safe ground: everything of ours standing in these zones lifts on extract (game_verdance_exfil.lua).
+    safeZoneIds = @($(if ($intent.PSObject.Properties["safeZoneIds"] -and $intent.safeZoneIds) { @($intent.safeZoneIds | ForEach-Object { [string]$_ }) } else { @() }))
     # Taking a door: once it is ours the extraction moves onto it (game_verdance_exfil.lua).
     exitDoorZoneId = $(if ($intent.PSObject.Properties["exitDoorZoneId"] -and $intent.exitDoorZoneId) { [string]$intent.exitDoorZoneId } else { $null })
     economy = if ($state -and $state.economy) { $state.economy } else { [ordered]@{ metalIncome = 0; energyIncome = 0; buildPower = 0 } }

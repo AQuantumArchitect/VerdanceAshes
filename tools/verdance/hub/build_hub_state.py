@@ -1239,7 +1239,7 @@ def build_hub(state: dict, war: dict) -> dict:
         "theater": theater,
         # pass six: the interstitial faces the board and debrief draw from
         "belief": hub_belief.belief_surface(ROOT, state, None),
-        "camp": hub_belief.camp_surface(state),
+        "camp": hub_belief.camp_surface(state, ROOT),
         "exposure": hub_belief.exposure_surface(ROOT),
         "homeCamp": home_camp,
         "homeEval": home_eval if isinstance(home_eval, dict) else {},
