@@ -505,7 +505,7 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
     # The Eye of Horus: whoever thinks better of the company hires it (verdance.world.eye_story).
     if canonical_map_id(map_id) == _eye.MAP_ID and not intent.get("finale"):
         pad_xz = _theaters._point(_theaters._zones(map_id, workspace).get(str(pad), {})) if pad else None
-        eye = _eye.story(state, pad_xz)
+        eye = _eye.story(state, pad_xz, workspace)
         intent["eyeStory"] = eye
         intent["objectiveTarget"] = _eye.objective(eye)
         intent["objective"] = intent["objectiveTarget"]["kind"]

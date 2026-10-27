@@ -2481,6 +2481,21 @@ function Add-EyeScouts {
     if ([string]$Story.alliedWith -eq "armada") {
       $script:alliances += [ordered]@{ allyTeamA = 0; allyTeamB = $wt.allyID; allied = $true }
     }
+    # The camp the party built over five minutes (tools/eye_scouts_bake_v1.py), placed as it stood.
+    $camp = @($p.camp)
+    if ($camp.Count -gt 0) {
+      $byDef = [ordered]@{}
+      foreach ($u in $camp) {
+        $d = [string]$u[0]
+        if (-not $byDef.Contains($d)) { $byDef[$d] = New-Object System.Collections.Generic.List[double] }
+        $byDef[$d].Add([double]$u[1]); $byDef[$d].Add([double]$u[2]); $byDef[$d].Add([double]$u[3]); $byDef[$d].Add([double]$u[4])
+      }
+      $specs = @()
+      foreach ($d in $byDef.Keys) { $specs += (Spec $d ($byDef[$d].Count / 4) 0 0 0 $false $null $null $null $byDef[$d].ToArray()) }
+      $rid = "scout$($wt.teamID)_camp"
+      $script:baseRecipes[$rid] = $specs
+      $script:forces += [ordered]@{ id = $rid; label = "Armada scout camp $([string]$p.zoneId)"; teamID = $wt.teamID; side = "Armada"; faction = "armada"; role = "scout_camp"; zoneId = [string]$p.zoneId; base = [ordered]@{ x = $c[0]; z = $c[1] }; recipe = $rid }
+    }
     $script:scoutParties += [ordered]@{
       teamID = $wt.teamID; zoneId = [string]$p.zoneId; x = $c[0]; z = $c[1]
       arriveSeconds = [int]$p.arriveSeconds; units = @($p.units)

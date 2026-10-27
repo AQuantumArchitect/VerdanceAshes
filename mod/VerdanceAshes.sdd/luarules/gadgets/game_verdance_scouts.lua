@@ -1,8 +1,8 @@
 -- The Eye of Horus's Armada scouts (verdance.world.eye_story, mission.scoutParties): Simple AI teams in
--- the corners the company did not land in. They start empty: the engine's start commander is taken
--- away ("no commander suits"), and at its arrival time each party walks in from its corner with
--- constructors and light escorts, then builds as its AI likes. On a Cortex contract (hunt_scouts) the
--- job is done once every party has arrived and no scout constructor or scout-built structure remains.
+-- the corners the company did not land in, each with the camp it built in five minutes (placed by the
+-- mission builder). The engine's start commander is taken away ("no commander suits"), and at its
+-- arrival time (0: already there) each party stands at its camp, then builds as its AI likes. On a
+-- Cortex contract (hunt_scouts) the job is done once every party is in and no scout constructor lives.
 function gadget:GetInfo()
   return {
     name = "Verdance Eye Scouts",
@@ -73,17 +73,17 @@ local function arrive(p, mx, mz)
 end
 
 local function scoutsLeft()
-  local builders, works = 0, 0
+  -- constructors: mobile builders (con bots, con vehicles, con aircraft), not factories or nano towers
+  local builders = 0
   for teamID in pairs(scoutTeams) do
     for _, uid in ipairs(Spring.GetTeamUnits(teamID) or {}) do
       local ud = UnitDefs[Spring.GetUnitDefID(uid)]
-      if ud and not isCommander(ud) then
-        if ud.isBuilding or not ud.canMove then works = works + 1
-        elseif ud.isBuilder then builders = builders + 1 end
+      if ud and not isCommander(ud) and ud.isBuilder and ud.canMove and not ud.isBuilding then
+        builders = builders + 1
       end
     end
   end
-  return builders, works
+  return builders
 end
 
 function gadget:GameFrame(frame)
@@ -92,14 +92,13 @@ function gadget:GameFrame(frame)
   local allArrived = true
   for _, p in ipairs(parties) do
     if not p.arrived then
-      if frame >= (tonumber(p.arriveSeconds) or 180) * 30 then arrive(p, mx, mz) else allArrived = false end
+      if frame >= math.max(2, (tonumber(p.arriveSeconds) or 0) * 30) then arrive(p, mx, mz) else allArrived = false end
     end
   end
   if isHunt and allArrived and frame % CHECK_EVERY == 0 then
-    local builders, works = scoutsLeft()
+    local builders = scoutsLeft()
     Spring.SetGameRulesParam("va_scout_builders_left", builders, { public = true })
-    Spring.SetGameRulesParam("va_scout_works_left", works, { public = true })
-    if builders == 0 and works == 0 and GG.VA_ObjectiveComplete then
+    if builders == 0 and GG.VA_ObjectiveComplete then
       Spring.Echo("VA_EYE_SCOUTS_STOPPED frame=" .. frame)
       GG.VA_ObjectiveComplete("scouts_stopped")
       gadgetHandler:RemoveGadget(self)

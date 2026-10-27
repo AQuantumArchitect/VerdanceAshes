@@ -19,14 +19,15 @@ def test_whoever_thinks_better_of_the_company_hires_it():
 
 
 def test_scouts_come_from_the_corners_the_company_did_not_land_in():
-    nw = E.CORNERS[0]
-    parties = E.scout_parties((nw[1], nw[2]))
-    assert len(parties) == 3 and nw[0] not in {p["zoneId"] for p in parties}
-    assert [p["arriveSeconds"] for p in parties] == sorted(p["arriveSeconds"] for p in parties)
-    assert parties[0]["arriveSeconds"] >= 120
+    corners = E.corners(ROOT)
+    assert len(corners) == 4
+    nw = next(c for c in corners if c["key"] == "nw")
+    parties = E.scout_parties((nw["x"], nw["z"]), ROOT)
+    assert len(parties) == 3 and "nw" not in {p["corner"] for p in parties}
     for p in parties:
-        defs = {u["unitDefName"] for u in p["units"]}
-        assert "armck" in defs and not any("com" in d for d in defs)  # constructors, no commander suits
+        counts = {u["unitDefName"]: u["count"] for u in p["units"]}
+        assert counts == {"armflea": 13, "armpw": 8, "armham": 5, "armck": 3, "armjeth": 2}
+        assert not any("com" in d for d in counts)  # no commander suits
 
 
 def test_the_bake_is_armada_corners_round_a_cortex_crater_and_missions_keep_only_cortex():
