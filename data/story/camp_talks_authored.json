@@ -10265,6 +10265,308 @@
           "line": "You already switched sides. The Pawns just haven't noticed yet."
         }
       ]
+    },
+    {
+      "id": "consul__mason:C",
+      "pairId": "consul__mason",
+      "a": "mason",
+      "b": "consul",
+      "rank": "C",
+      "title": "Plans",
+      "polarity": "rivalry",
+      "motif": "Legion lines and Armada paperwork",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "The Consul unrolls a plan for a fort. Tarquin is already pacing it out in the dirt."
+        },
+        {
+          "speaker": "consul",
+          "line": "There's a form for this."
+        },
+        {
+          "speaker": "mason",
+          "line": "There's a fort for this. Yours can follow."
+        },
+        {
+          "speaker": "consul",
+          "line": "Mine usually does. Eventually."
+        }
+      ]
+    },
+    {
+      "id": "consul__mason:B",
+      "pairId": "consul__mason",
+      "a": "mason",
+      "b": "consul",
+      "rank": "B",
+      "title": "The same hill",
+      "polarity": "rivalry",
+      "motif": "Legion lines and Armada paperwork",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "They fortified opposite slopes of the same hill and met at the top, one wall short."
+        },
+        {
+          "speaker": "mason",
+          "line": "Your corner is off by a stride."
+        },
+        {
+          "speaker": "consul",
+          "line": "Your corner is off by a regulation."
+        },
+        {
+          "speaker": "mason",
+          "line": "Then we split the stride and burn the regulation."
+        }
+      ]
+    },
+    {
+      "id": "consul__mason:A",
+      "pairId": "consul__mason",
+      "a": "mason",
+      "b": "consul",
+      "rank": "A",
+      "title": "A wall with two names",
+      "polarity": "rivalry",
+      "motif": "Legion lines and Armada paperwork",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 3,
+        "campLevelMin": 2,
+        "bondMin": 55
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "The wall held through the whole night. Each of them has told the story with the other one in it."
+        },
+        {
+          "speaker": "consul",
+          "line": "I filed it under both of us."
+        },
+        {
+          "speaker": "mason",
+          "line": "I carved it under both of us. Stone outlasts paper."
+        },
+        {
+          "speaker": "consul",
+          "line": "Paper gets copied. We'll see."
+        }
+      ]
+    },
+    {
+      "id": "mason__rusk:C",
+      "pairId": "mason__rusk",
+      "a": "mason",
+      "b": "rusk",
+      "rank": "C",
+      "title": "Hinges",
+      "polarity": "bond",
+      "motif": "the door and the wall around it",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Rusk inspects Tarquin's new gate the way other men inspect horses."
+        },
+        {
+          "speaker": "rusk",
+          "line": "Good hinge."
+        },
+        {
+          "speaker": "mason",
+          "line": "Good door. It had better be, with you standing in it."
+        },
+        {
+          "speaker": "rusk",
+          "line": "I always stand in it."
+        }
+      ]
+    },
+    {
+      "id": "mason__rusk:B",
+      "pairId": "mason__rusk",
+      "a": "mason",
+      "b": "rusk",
+      "rank": "B",
+      "title": "Built to be held",
+      "polarity": "bond",
+      "motif": "the door and the wall around it",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "She built the gate a hand narrower than the plan, so one man could hold it."
+        },
+        {
+          "speaker": "rusk",
+          "line": "You built it for me."
+        },
+        {
+          "speaker": "mason",
+          "line": "I built it for whoever stands there. It's usually you."
+        }
+      ]
+    },
+    {
+      "id": "mason__rusk:A",
+      "pairId": "mason__rusk",
+      "a": "mason",
+      "b": "rusk",
+      "rank": "A",
+      "title": "The six-hour gate",
+      "polarity": "bond",
+      "motif": "the door and the wall around it",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 3,
+        "campLevelMin": 2,
+        "bondMin": 55
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Rusk held her gate for six hours. Not a stone moved."
+        },
+        {
+          "speaker": "rusk",
+          "line": "Your wall didn't give."
+        },
+        {
+          "speaker": "mason",
+          "line": "Your door didn't either. Legion work, both of us."
+        },
+        {
+          "speaker": "rusk",
+          "line": "Legion work."
+        }
+      ]
+    },
+    {
+      "id": "mason__twitch:C",
+      "pairId": "mason__twitch",
+      "a": "mason",
+      "b": "twitch",
+      "rank": "C",
+      "title": "Under the floor",
+      "polarity": "friction",
+      "motif": "straight lines and surprises in the dirt",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Tarquin finds a mine under the foundation she has just poured. Twitcher is whistling nearby."
+        },
+        {
+          "speaker": "mason",
+          "line": "This was not in the plan."
+        },
+        {
+          "speaker": "twitch",
+          "line": "That's what makes it work."
+        },
+        {
+          "speaker": "mason",
+          "line": "That is what makes it explode."
+        }
+      ]
+    },
+    {
+      "id": "mason__twitch:B",
+      "pairId": "mason__twitch",
+      "a": "mason",
+      "b": "twitch",
+      "rank": "B",
+      "title": "Shared ground",
+      "polarity": "friction",
+      "motif": "straight lines and surprises in the dirt",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 2,
+        "campLevelMin": 1,
+        "bondMin": 25
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "They agreed on a line in the dirt. Her side gets walls; his side gets whatever he finds funny."
+        },
+        {
+          "speaker": "twitch",
+          "line": "Your side's very tidy."
+        },
+        {
+          "speaker": "mason",
+          "line": "Yours is very loud."
+        },
+        {
+          "speaker": "twitch",
+          "line": "Both kept the enemy out."
+        }
+      ]
+    },
+    {
+      "id": "mason__twitch:A",
+      "pairId": "mason__twitch",
+      "a": "mason",
+      "b": "twitch",
+      "rank": "A",
+      "title": "The fort that bit",
+      "polarity": "friction",
+      "motif": "straight lines and surprises in the dirt",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 3,
+        "campLevelMin": 2,
+        "bondMin": 55
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "The enemy breached her wall and walked straight into his field. Nobody came through a second time."
+        },
+        {
+          "speaker": "mason",
+          "line": "I still do not approve."
+        },
+        {
+          "speaker": "twitch",
+          "line": "But you left me the gap."
+        },
+        {
+          "speaker": "mason",
+          "line": "I left you the gap."
+        }
+      ]
     }
   ]
 }

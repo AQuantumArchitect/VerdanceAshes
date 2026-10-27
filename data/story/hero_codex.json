@@ -935,10 +935,10 @@
       "allowBail": false,
       "allowKite": false,
       "faction": "armada",
-      "unitDef": "armdecom",
+      "unitDef": "va_mask",
       "voice": {
         "hook": "Every throne needs a spare.",
-        "blurb": "Decoy Commander and a pack of Pawns (x16). Can capture what walks too close. Every throne needs a spare.",
+        "blurb": "Decoy Commander and a pack of Pawns (x16). Can capture what walks too close, and raise a Bot Lab where the company needs one. Every throne needs a spare.",
         "fiction": "Mask was one of the decoy commanders on the Greenest farms, built to be shot instead of somebody important. He walked off the farm with sixteen Pawns who believed he was the real thing. He has started to believe it too.",
         "tagLine": "A decoy commander leading a crowd of Pawns. Wears a crown nobody gave him."
       },
@@ -1334,6 +1334,29 @@
         "tagLine": "Possum plussy: scouts, rockets, and a roof."
       },
       "notes": "skirmish x swarm; a cheap hover mass with eyes and anti-air"
+    },
+    {
+      "heroId": "mason",
+      "name": "Livia 'Mason' Tarquin",
+      "position": "eco",
+      "combatVerb": "craft",
+      "temperament": [
+        "captain",
+        "pad"
+      ],
+      "doctrine": "constructor",
+      "preferDefenses": false,
+      "allowBail": false,
+      "allowKite": false,
+      "faction": "legion",
+      "unitDef": "legck",
+      "voice": {
+        "hook": "Every wall is the first line of a fort.",
+        "blurb": "A Legion Construction Bot and a Construction Turret. She lays Legion-straight lines in country that has none.",
+        "fiction": "Tarquin laid half the walls of the Ancient Bastion and has opinions about the other half. She builds the way the Legion marches, in straight lines and on time, and her Construction Turret hums the cadence while it works.",
+        "tagLine": "Legion constructor: the company's own mason."
+      },
+      "notes": "eco x captain; the Legion builder, so every faction's ground has someone to raise it"
     }
   ]
 }

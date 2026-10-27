@@ -2040,6 +2040,43 @@
       "glyph": "+mob·+sig·−pad·+off",
       "position": "skirmish",
       "doctrine": "skirm"
+    },
+    {
+      "heroId": "mason",
+      "name": "Livia 'Mason' Tarquin",
+      "axes": {
+        "energy": 0.6,
+        "offense": -0.5,
+        "mobility": 0.0,
+        "sight": 0.0,
+        "pad": 0.6,
+        "craft": 1.0,
+        "heat": 0.0,
+        "fog": 0.0,
+        "sky": 0.0,
+        "ledger": 0.2
+      },
+      "marks": [
+        {
+          "axis": "craft",
+          "value": 1.0
+        },
+        {
+          "axis": "energy",
+          "value": 0.6
+        },
+        {
+          "axis": "pad",
+          "value": 0.6
+        },
+        {
+          "axis": "offense",
+          "value": -0.5
+        }
+      ],
+      "glyph": "+cra·+ene·+pad·−off",
+      "position": "eco",
+      "doctrine": "constructor"
     }
   ]
 }

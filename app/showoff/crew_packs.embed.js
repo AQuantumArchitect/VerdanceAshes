@@ -519,7 +519,8 @@ window.CREW_PACKS = {
       "label": "Pulsar"
     },
     "va_lumen": {
-      "label": "Adv. Construction Vehicle"
+      "label": "Adv. Construction Vehicle",
+      "hasBuildPower": true
     },
     "legcib": {
       "metal": 100,
@@ -695,6 +696,55 @@ window.CREW_PACKS = {
       "combined": 879,
       "label": "Thanatos",
       "hasBuildPower": false
+    },
+    "va_mask": {
+      "metal": 770,
+      "energy": 12000,
+      "combined": 941,
+      "label": "Decoy Commander",
+      "hasBuildPower": true
+    },
+    "armfark": {
+      "metal": 210,
+      "energy": 3000,
+      "combined": 253,
+      "label": "Butler",
+      "hasBuildPower": true
+    },
+    "va_printer": {
+      "metal": 370,
+      "energy": 5500,
+      "combined": 449,
+      "label": "Printer",
+      "hasBuildPower": true
+    },
+    "legestor": {
+      "metal": 175,
+      "energy": 1800,
+      "combined": 201,
+      "label": "Energy Storage",
+      "hasBuildPower": false
+    },
+    "legmstor": {
+      "metal": 340,
+      "energy": 590,
+      "combined": 348,
+      "label": "Metal Storage",
+      "hasBuildPower": false
+    },
+    "legck": {
+      "metal": 100,
+      "energy": 1600,
+      "combined": 123,
+      "label": "Legion Construction Bot",
+      "hasBuildPower": true
+    },
+    "legnanotc": {
+      "metal": 230,
+      "energy": 3200,
+      "combined": 276,
+      "label": "Construction Turret",
+      "hasBuildPower": true
     }
   },
   "heroes": {
@@ -880,10 +930,20 @@ window.CREW_PACKS = {
         "wheelie_mentor"
       ],
       "sizing": "fixed",
-      "packCombined": 448,
-      "packMetal": 368,
-      "packEnergy": 5600,
-      "startXp": 0.425
+      "packCombined": 997,
+      "packMetal": 883,
+      "packEnergy": 7990,
+      "startXp": 0.334,
+      "escorts": [
+        {
+          "unitDef": "legestor",
+          "count": 1
+        },
+        {
+          "unitDef": "legmstor",
+          "count": 1
+        }
+      ]
     },
     "auditor": {
       "role": "band",
@@ -1015,10 +1075,20 @@ window.CREW_PACKS = {
         "tick_eyes"
       ],
       "sizing": "fixed",
-      "packCombined": 506,
-      "packMetal": 420,
-      "packEnergy": 6000,
-      "startXp": 0.416
+      "packCombined": 1038,
+      "packMetal": 920,
+      "packEnergy": 8270,
+      "startXp": 0.327,
+      "escorts": [
+        {
+          "unitDef": "armestor",
+          "count": 1
+        },
+        {
+          "unitDef": "armmstor",
+          "count": 1
+        }
+      ]
     },
     "fatboy": {
       "role": "band",
@@ -1188,9 +1258,9 @@ window.CREW_PACKS = {
       "sizing": "fixed",
       "blurb": "Drone plant + Noctua wing + three Blindfold radar-killers. Dreams in flight paths.",
       "name": "Ada Noctua",
-      "packCombined": 2404,
-      "packMetal": 1690,
-      "packEnergy": 50000,
+      "packCombined": 2953,
+      "packMetal": 2205,
+      "packEnergy": 52390,
       "escorts": [
         {
           "unitDef": "legfig",
@@ -1199,11 +1269,19 @@ window.CREW_PACKS = {
         {
           "unitDef": "legcib",
           "count": 3
+        },
+        {
+          "unitDef": "legestor",
+          "count": 1
+        },
+        {
+          "unitDef": "legmstor",
+          "count": 1
         }
       ],
-      "startXp": 0.208,
+      "startXp": 0.117,
       "canLead": false,
-      "packXpCombined": 1751
+      "packXpCombined": 2301
     },
     "mira": {
       "role": "band",
@@ -1548,11 +1626,11 @@ window.CREW_PACKS = {
     },
     "mask": {
       "role": "band",
-      "unitDef": "armdecom",
+      "unitDef": "va_mask",
       "hireTnb": 0,
       "packTotal": 1,
       "extras": 0,
-      "blurb": "Decoy Commander and a pack of Pawns (x16). Can capture what walks too close. Every throne needs a spare.",
+      "blurb": "Decoy Commander and a pack of Pawns (x16). Can capture what walks too close, and raise a Bot Lab where the company needs one. Every throne needs a spare.",
       "name": "Mask",
       "sizing": "fixed",
       "tags": [
@@ -1966,6 +2044,31 @@ window.CREW_PACKS = {
       "packMetal": 2510,
       "packEnergy": 43250,
       "packCombined": 3128
+    },
+    "mason": {
+      "role": "band",
+      "unitDef": "legck",
+      "hireTnb": 0,
+      "packTotal": 1,
+      "extras": 0,
+      "blurb": "A Legion Construction Bot and a Construction Turret. She lays Legion-straight lines in country that has none.",
+      "name": "Livia 'Mason' Tarquin",
+      "sizing": "fixed",
+      "tags": [
+        "eco",
+        "constructor",
+        "legion"
+      ],
+      "startXp": 0.434,
+      "escorts": [
+        {
+          "unitDef": "legnanotc",
+          "count": 1
+        }
+      ],
+      "packMetal": 330,
+      "packEnergy": 4800,
+      "packCombined": 399
     }
   },
   "factories": {
@@ -2028,7 +2131,8 @@ window.CREW_PACKS = {
       "solarium",
       "consul",
       "twitch",
-      "lumen"
+      "lumen",
+      "mason"
     ],
     "eyes": [
       "spoke",

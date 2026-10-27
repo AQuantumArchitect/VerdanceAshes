@@ -69,6 +69,7 @@ M.TAGS = {
   old_scars = { label = "Old Scars", hp = 1.15, fiction = "Every dent is a lesson he did not have to learn twice." },
   hot_insertion = { label = "Hot Insertion", speed = 1.12, fiction = "Everyone arrives at once, which is the plan." },
   play_dead = { label = "Play Dead", vision = 1.20, fiction = "The Seekers see for the whole pack." },
+  legion_line = { label = "Legion Line", build = 1.20, fiction = "Every wall she lays is the first line of a fort." },
   -- build power
   field_surgeon = { label = "Field Surgeon", build = 1.20, fiction = "Nobody stays dead near an honest chassis." },
   combat_engineer = { label = "Combat Engineer", build = 1.20, fiction = "Builds trouble in equal measure." },
@@ -101,6 +102,7 @@ M.HERO_DEFAULTS = {
   commando = { "trapper_pace" }, hearth = { "pad_heart" },
   phoenix = { "rises_again" }, tarn = { "wake_rush" }, scylla = { "broadside" }, tsunami = { "tide_table" },
   starlight = { "long_light" }, banisher = { "scare_radius" }, arrow = { "venom_tempo" }, hornet = { "sting_tempo" }, charybdis = { "undertow" }, shiva = { "grunt_wall" }, tremor = { "tremor_table" }, stiletto = { "static_bloom" }, marauder = { "river_rush" }, lunkhead = { "old_scars" }, stronghold = { "hot_insertion" }, possum = { "play_dead" },
+  mason = { "legion_line" },
 }
 
 -- Rare dual-effect exceptions. Primary still comes from HERO_DEFAULTS;

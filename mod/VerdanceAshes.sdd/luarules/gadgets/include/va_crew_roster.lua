@@ -146,9 +146,19 @@ M.HEROES = {
     factory = "wheelie_bay",
     heroTrait = "wheelie_mentor",
     fieldEffect = "speed",
-    startXp = 0.425,
+    startXp = 0.334,
     packMind = "swarm",
     tags = { "scout", "wheelie_mentor" },
+    escorts = {
+      {
+        unitDef = "legestor",
+        count = 1,
+      },
+      {
+        unitDef = "legmstor",
+        count = 1,
+      },
+    },
     blurb = "Null Merc kid + Wheelie Bay (×16). Only trusts wheels.",
   },
   auditor = {
@@ -254,9 +264,19 @@ M.HEROES = {
     extras = 19,
     factory = "tick_stream_bay",
     fieldEffect = "vision",
-    startXp = 0.416,
+    startXp = 0.327,
     packMind = "swarm",
     tags = { "scout", "swarm", "tick_eyes" },
+    escorts = {
+      {
+        unitDef = "armestor",
+        count = 1,
+      },
+      {
+        unitDef = "armmstor",
+        count = 1,
+      },
+    },
     blurb = "Flea lab + Tick pack (×20). Speaks in plurals.",
   },
   fatboy = {
@@ -384,7 +404,7 @@ M.HEROES = {
     extras = 0,
     factory = "legion_drone_bay",
     fieldEffect = "vision",
-    startXp = 0.208,
+    startXp = 0.117,
     packMind = "solo",
     tags = { "scout", "air_scout", "drone_bay" },
     escorts = {
@@ -395,6 +415,14 @@ M.HEROES = {
       {
         unitDef = "legcib",
         count = 3,
+      },
+      {
+        unitDef = "legestor",
+        count = 1,
+      },
+      {
+        unitDef = "legmstor",
+        count = 1,
       },
     },
     blurb = "Drone plant + Noctua wing + three Blindfold radar-killers. Dreams in flight paths.",
@@ -630,7 +658,7 @@ M.HEROES = {
   mask = {
     name = "Mask",
     role = "band",
-    unitDef = "armdecom",
+    unitDef = "va_mask",
     hireTnb = 0,
     packTotal = 1,
     extras = 0,
@@ -643,7 +671,7 @@ M.HEROES = {
         count = 16,
       },
     },
-    blurb = "Decoy Commander and a pack of Pawns (x16). Can capture what walks too close. Every throne needs a spare.",
+    blurb = "Decoy Commander and a pack of Pawns (x16). Can capture what walks too close, and raise a Bot Lab where the company needs one. Every throne needs a spare.",
   },
   rumor = {
     name = "Rumor",
@@ -909,6 +937,24 @@ M.HEROES = {
     },
     blurb = "Seven Possums, seven Seekers, three Sweepers. Cheap, fast, rocket-happy hovers with a roof.",
   },
+  mason = {
+    name = "Livia 'Mason' Tarquin",
+    role = "band",
+    unitDef = "legck",
+    hireTnb = 0,
+    packTotal = 1,
+    extras = 0,
+    startXp = 0.434,
+    packMind = "solo",
+    tags = { "eco", "constructor", "legion" },
+    escorts = {
+      {
+        unitDef = "legnanotc",
+        count = 1,
+      },
+    },
+    blurb = "A Legion Construction Bot and a Construction Turret. She lays Legion-straight lines in country that has none.",
+  },
 }
 
 M.FACTORIES = {
@@ -956,6 +1002,7 @@ M.BAND_ORDER = {
   "thresh", "gale", "mask", "rumor",
   "phoenix", "tarn", "scylla", "tsunami",
   "starlight", "banisher", "arrow", "hornet", "charybdis", "shiva", "tremor", "stiletto", "marauder", "lunkhead", "stronghold", "possum",
+  "mason",
 }
 
 function M.isCore(heroId)

@@ -5,10 +5,10 @@
     "minScore": 0.42,
     "maxDegree": 5,
     "topEdges": 64,
-    "heroCount": 57,
-    "edgeCount": 149,
-    "talkCount": 398,
-    "authoredSeeds": 102,
+    "heroCount": 58,
+    "edgeCount": 152,
+    "talkCount": 407,
+    "authoredSeeds": 105,
     "umweltAxes": [
       "energy",
       "offense",
@@ -1452,7 +1452,7 @@
       ],
       "doctrine": "constructor",
       "hook": "Builds like an apology.",
-      "degree": 2,
+      "degree": 3,
       "umweltGlyph": "+cra·+ene·−off·+pad",
       "umweltMarks": [
         {
@@ -1486,7 +1486,7 @@
       ],
       "doctrine": "constructor",
       "hook": "Grins with a welder.",
-      "degree": 8,
+      "degree": 9,
       "umweltGlyph": "+cra·+ene·−off·+pad",
       "umweltMarks": [
         {
@@ -1680,7 +1680,7 @@
       ],
       "doctrine": "line",
       "hook": "Gate, jammed gat, a lie.",
-      "degree": 6,
+      "degree": 7,
       "umweltGlyph": "+pad·+off·−mob",
       "umweltMarks": [
         {
@@ -3027,6 +3027,37 @@
         {
           "axis": "offense",
           "value": 0.4
+        }
+      ]
+    },
+    {
+      "heroId": "mason",
+      "name": "Livia 'Mason' Tarquin",
+      "position": "eco",
+      "temperament": [
+        "captain",
+        "pad"
+      ],
+      "doctrine": "constructor",
+      "hook": "Every wall is the first line of a fort.",
+      "degree": 3,
+      "umweltGlyph": "+cra·+ene·+pad·−off",
+      "umweltMarks": [
+        {
+          "axis": "craft",
+          "value": 1.0
+        },
+        {
+          "axis": "energy",
+          "value": 0.6
+        },
+        {
+          "axis": "pad",
+          "value": 0.6
+        },
+        {
+          "axis": "offense",
+          "value": -0.5
         }
       ]
     }
@@ -5095,6 +5126,33 @@
         ],
         "spotterLocked": true,
         "siegeSpotStrength": 0.787
+      }
+    },
+    {
+      "id": "consul__mason",
+      "a": "mason",
+      "b": "consul",
+      "score": 1.0,
+      "polarity": "rivalry",
+      "motifs": [
+        "Legion lines and Armada paperwork",
+        "two ways to lay a wall"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Livia 'Mason' Tarquin",
+      "bName": "Consul Aurel Weiss",
+      "aHook": "Every wall is the first line of a fort.",
+      "bHook": "Builds like an apology.",
+      "aGlyph": "+cra·+ene·+pad·−off",
+      "bGlyph": "+cra·+ene·−off·+pad",
+      "talkIds": {
+        "C": "consul__mason:C",
+        "B": "consul__mason:B",
+        "A": "consul__mason:A"
       }
     },
     {
@@ -7218,6 +7276,60 @@
         "C": "mask__rumor:C",
         "B": "mask__rumor:B",
         "A": "mask__rumor:A"
+      }
+    },
+    {
+      "id": "mason__rusk",
+      "a": "mason",
+      "b": "rusk",
+      "score": 1.0,
+      "polarity": "bond",
+      "motifs": [
+        "the door and the wall around it",
+        "Legion straight lines"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Livia 'Mason' Tarquin",
+      "bName": "Rusk Halloway",
+      "aHook": "Every wall is the first line of a fort.",
+      "bHook": "Gate, jammed gat, a lie.",
+      "aGlyph": "+cra·+ene·+pad·−off",
+      "bGlyph": "+pad·+off·−mob",
+      "talkIds": {
+        "C": "mason__rusk:C",
+        "B": "mason__rusk:B",
+        "A": "mason__rusk:A"
+      }
+    },
+    {
+      "id": "mason__twitch",
+      "a": "mason",
+      "b": "twitch",
+      "score": 1.0,
+      "polarity": "friction",
+      "motifs": [
+        "straight lines and surprises in the dirt",
+        "the plan and the welder"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Livia 'Mason' Tarquin",
+      "bName": "Benno 'Twitcher' Sallow",
+      "aHook": "Every wall is the first line of a fort.",
+      "bHook": "Grins with a welder.",
+      "aGlyph": "+cra·+ene·+pad·−off",
+      "bGlyph": "+cra·+ene·−off·+pad",
+      "talkIds": {
+        "C": "mason__twitch:C",
+        "B": "mason__twitch:B",
+        "A": "mason__twitch:A"
       }
     },
     {

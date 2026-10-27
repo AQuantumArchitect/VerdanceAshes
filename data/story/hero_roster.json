@@ -823,7 +823,7 @@
     {
       "heroId": "mask",
       "name": "Mask",
-      "unitDef": "armdecom",
+      "unitDef": "va_mask",
       "missionCritical": false,
       "status": "locked",
       "xp": 0.0,
@@ -1178,6 +1178,26 @@
       "recruit": {
         "type": "band_unlock",
         "blurb": "Cheap, fast, rocket-happy."
+      }
+    },
+    {
+      "heroId": "mason",
+      "name": "Livia 'Mason' Tarquin",
+      "unitDef": "legck",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.0,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "pad",
+      "traits": [
+        "captain",
+        "pad"
+      ],
+      "fiction": "Tarquin laid half the walls of the Ancient Bastion and has opinions about the other half. She builds the way the Legion marches, in straight lines and on time, and her Construction Turret hums the cadence while it works.",
+      "recruit": {
+        "type": "band_unlock",
+        "blurb": "Every wall is the first line of a fort."
       }
     }
   ]

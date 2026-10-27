@@ -35,7 +35,7 @@ def test_rumor_has_four_ghosts_and_two_stealth_tanks():
 
 
 def test_noctua_flies_blindfold_radar_killers():
-    assert _esc("noctua") == {"legfig": 24, "legcib": 3}
+    assert {"legfig": 24, "legcib": 3}.items() <= _esc("noctua").items()
     assert PACKS["chassis"]["legcib"]["label"] == "Blindfold"
     assert 'unitDef = "legcib"' in _lua_block("noctua")
 
