@@ -66,15 +66,15 @@ def test_punch_is_pawn_launcher_t0():
     assert int(eta["etaSeconds"] or 0) == 0
 
 
-def test_grunt_stream_from_simmers():
-    listing = (load_commerce_catalog(ROOT).get("listings") or {})["grunt_stream"]
+def test_crash_of_brutes_from_the_eye():
+    listing = (load_commerce_catalog(ROOT).get("listings") or {})["crash_of_brutes"]
     eta = delivery_eta(
         listing=listing,
-        listing_id="grunt_stream",
+        listing_id="crash_of_brutes",
         dest_map_id="greenest_fields",
         workspace=ROOT,
     )
-    assert eta["sourceMapId"] == "all_that_simmers"
+    assert eta["sourceMapId"] == "eye_of_horus"
     assert eta["deferred"] is True
 
 
@@ -157,7 +157,7 @@ if __name__ == "__main__":
     test_eye_to_simmers_is_long_haul()
     test_crash_eta_from_eye()
     test_punch_is_pawn_launcher_t0()
-    test_grunt_stream_from_simmers()
+    test_crash_of_brutes_from_the_eye()
     test_loan_retire_and_deferred_intent()
     test_punch_available_when_owned()
     print("ok")

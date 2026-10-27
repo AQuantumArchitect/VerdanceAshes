@@ -16,7 +16,6 @@ from verdance.common import WORKSPACE_ROOT, canonical_map_id, load_json, utc_now
 from verdance.company.commerce_delivery import delivery_eta, make_pending_delivery, resolve_listing_delivery
 from .measure import bp_access
 from .roster import ensure_roster
-from verdance.company.capture_node_claims import free_tnb_mint_allowed
 
 METAL_UNIT = 1000  # 1km$ = 1000 BAR metal
 
@@ -481,25 +480,6 @@ def purchase_listing(
     return receipt
 
 
-def _stream_waves(pending: List[Dict[str, Any]], listings: Dict[str, Any]) -> List[Dict[str, Any]]:
-    """A listing with ``stream`` (the Grunt Stream) arrives as several waves, everySeconds apart,
-    each the listing's count (times what was bought), not as one delivery."""
-    out: List[Dict[str, Any]] = []
-    for p in pending:
-        listing = listings.get(str(p.get("listingId"))) or {}
-        st = listing.get("stream") if isinstance(listing.get("stream"), dict) else None
-        if not st or p.get("wave"):
-            out.append(p)
-            continue
-        waves = max(1, int(st.get("waves") or 1))
-        every = max(1, int(st.get("everySeconds") or 45))
-        for w in range(waves):
-            q = dict(p, wave=w + 1, waves=waves, id=f"{p.get('id') or p.get('listingId')}_w{w + 1}")
-            q["etaSeconds"] = int(p.get("etaSeconds") or 0) + w * every
-            out.append(q)
-    return out
-
-
 def build_commerce_intent(state: Dict[str, Any], workspace: Optional[Path] = None) -> Dict[str, Any]:
     """Serialize commerce bag + shop shelf + deploy specs for the mission compiler.
 
@@ -561,7 +541,6 @@ def build_commerce_intent(state: Dict[str, Any], workspace: Optional[Path] = Non
             pending.append(copy.deepcopy(item))
 
     pending_listing_ids = {str(p.get("listingId")) for p in pending}
-    # (streams are expanded into their waves once the queue is built: _stream_waves below)
 
     for lid, rec in owned.items():
         if not isinstance(rec, dict):
@@ -677,7 +656,6 @@ def build_commerce_intent(state: Dict[str, Any], workspace: Optional[Path] = Non
     field_start_e = int(metal_meta.get("fieldStartEnergy") or 3000)
     if field_start_e < 0:
         field_start_e = 0
-    pending = _stream_waves(pending, listings)
     return {
         "tenebrium": int(commerce.get("tenebrium") or 0),
         "metalK": int(commerce.get("metalK") or 0),
@@ -763,32 +741,20 @@ def settle_commerce_after_sortie(
         span = hi - lo + 1
         return lo + int(_roll(tag + ":v") * span) % span
 
-    # Capture / freeTnbMint=false: no free Tnb rolls (reclaim bank only).
-    free_tnb = True
-    try:
-
-        free_tnb = free_tnb_mint_allowed(result)
-    except Exception:
-        if (
-            result.get("freeTnbMint") is False
-            or result.get("nodeClaimed")
-            or result.get("captureMode") in (True, "clear_hold_shell")
-        ):
-            free_tnb = False
-
+    # Tenebrium is the hyper-rare build currency (owner call, 2026-10-27): it comes only from reclaiming
+    # what builders leave behind. A mission's reward is metal: a won sortie and a clean extract each pay
+    # a roll of campaign metal (sortieRewards.metalOnVictory / metalOnCleanExtract, in 1k units).
+    # Capturing ground pays nothing of either.
+    award_k = 0
     if success:
-        if free_tnb:
-            gained_t += _award_range(rewards.get("tenebriumOnVictory") or {}, "tv")
-    # Zone flip: catalog default chance=0; hard-block when free mint disallowed.
-    if zone_flipped and free_tnb:
-        flip_t = _award_range(rewards.get("tenebriumOnZoneFlip") or {"min": 0, "max": 0, "chance": 0}, "tz")
-        if flip_t > 0:
-            notes.append(f"zone-flip Tnb roll={flip_t} (prefer reclaim; free mint discouraged)")
-        gained_t += flip_t
-    if clean and free_tnb:
-        gained_t += _award_range(rewards.get("tenebriumOnCleanExtract") or {}, "tc")
-    if not free_tnb:
-        notes.append("node claim: no free Tnb mint (reclaim bank only)")
+        award_k += _award_range(rewards.get("metalOnVictory") or {}, "mv")
+    if clean:
+        award_k += _award_range(rewards.get("metalOnCleanExtract") or {}, "mc")
+    if award_k:
+        commerce["metalK"] = int(commerce.get("metalK") or 0) + award_k
+        notes.append(f"+{award_k}×1km$ metal (mission reward)")
+        commerce.setdefault("ledger", []).append({"op": "mission_reward", "metalK": award_k, "at": utc_now(),
+                                                  "missionNumber": int(state.get("missionNumber", 1) or 1)})
 
     # Campaign metal export: floor(end stockpile / 1000). Prefer metalKExtracted.
     # Bag stays HOME — export ADDS to faction totals (never replaces the bag).
@@ -844,7 +810,7 @@ def settle_commerce_after_sortie(
     if bank_end >= 0:
         # Live bank (incl. exfil stake refund) is authoritative; awards stack on top.
         prev = int(commerce.get("tenebrium") or 0)
-        award_extra = gained_t  # victory / flip / extract rolls already in gained_t
+        award_extra = gained_t  # nothing mints Tnb any more; kept 0 so the bank is the field's
         commerce["tenebrium"] = bank_end + award_extra
         if bank_end != prev:
             notes.append(f"Tenebrium bank {prev} → {bank_end} (field)")
@@ -1027,6 +993,7 @@ def settle_commerce_after_sortie(
             })
             notes.append(f"{lid}: spent on this drop")
 
+    gained_k += award_k     # the mission reward, on top of what the field exported
     commerce.setdefault("ledger", []).append({
         "op": "sortie_settle",
         "tenebriumGained": gained_t,

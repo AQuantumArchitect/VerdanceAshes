@@ -19,26 +19,26 @@ def _state():
     C.ensure_company(s, ROOT)
     ok, err, _ = C.seal_company(s, ["pavise", "halbard", "solarium"], workspace=ROOT)
     assert ok, err
-    s.setdefault("commerce", {}).update(tenebrium=5, metalK=30)
+    s.setdefault("commerce", {}).update(tenebrium=5, metalK=40)
     s["reputation"]["cortex"] = 45
     return s
 
 
 def test_the_cortex_shelf_is_pruned():
     L = load_commerce_catalog(ROOT)["listings"]
-    assert "crash_of_brutes" not in L
+    assert "grunt_stream" not in L and "crash_of_brutes" in L
+    assert L["wasp_flight"]["label"] == "Hive of Hornets"
     cortex = [k for k, v in L.items() if v.get("shelf") == "cortex"]
     assert len(cortex) <= 7
     assert L["punch_of_thugs"]["recommend"]["firstDrop"] == 2
 
 
-def test_the_grunt_stream_comes_in_waves():
-    s = _state()
-    assert purchase_listing(s, "grunt_stream", ROOT)["ok"]
-    waves = [p for p in build_commerce_intent(s, ROOT)["pendingDeliveries"] if p["listingId"] == "grunt_stream"]
-    assert len(waves) == 4 and sum(p["count"] for p in waves) == 20
-    etas = [p["etaSeconds"] for p in waves]
-    assert etas == sorted(etas) and etas[-1] - etas[0] == 3 * 45
+def test_mercenaries_and_heroes_for_hire_cost_metal_never_tenebrium():
+    L = load_commerce_catalog(ROOT)["listings"]
+    for k, v in L.items():
+        if v.get("kind") in ("purchase_package", "hero_rental"):
+            assert not v.get("tenebriumCost"), k
+    assert min(L["rent_gale"]["metalCostK"], L["rent_bro"]["metalCostK"]) > L["wasp_flight"]["metalCostK"]
 
 
 def test_a_bought_suit_or_rental_is_never_a_free_package():

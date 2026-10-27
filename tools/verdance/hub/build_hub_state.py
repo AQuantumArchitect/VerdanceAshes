@@ -1012,7 +1012,6 @@ def build_commerce_surface(state: dict, mission_n: int) -> dict:
                 "requires": listing.get("requires"),
                 "heroId": listing.get("heroId"),
                 "recommend": listing.get("recommend"),
-                "stream": listing.get("stream"),
                 "delivery": {
                     "mode": eta.get("mode"),
                     "deferred": bool(eta.get("deferred")),

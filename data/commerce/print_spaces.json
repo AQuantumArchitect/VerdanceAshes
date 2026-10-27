@@ -13,11 +13,13 @@
       "faction": "cortex",
       "role": "base_of_operations",
       "label": "Eye of Horus",
-      "blurb": "Sturdy T1 rings — Cortex base of operations. Wasp flights ship from here.",
+      "blurb": "Sturdy T1 rings — Cortex base of operations. Brute columns and the Hive of Hornets ship from here.",
       "products": [
+        "corraid",
         "corape"
       ],
       "listings": [
+        "crash_of_brutes",
         "wasp_flight"
       ],
       "mode": "map_web"
@@ -27,13 +29,9 @@
       "faction": "cortex",
       "role": "grunt_manufacture",
       "label": "All That Simmers",
-      "blurb": "Geo vents feed grunt streams through the map gaps.",
-      "products": [
-        "corak"
-      ],
-      "listings": [
-        "grunt_stream"
-      ],
+      "blurb": "Geo vents in the map gaps. The Grunt Stream was retired (2026-10-27); nothing ships from here.",
+      "products": [],
+      "listings": [],
       "mode": "map_web"
     },
     "pawn_launcher": {

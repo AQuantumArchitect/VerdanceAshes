@@ -213,9 +213,10 @@ class CaptureNodeClaimsTests(unittest.TestCase):
         cat = json.loads(
             (WS / "data" / "commerce" / "commerce_catalog.json").read_text(encoding="utf-8")
         )
-        flip = (cat.get("sortieRewards") or {}).get("tenebriumOnZoneFlip") or {}
-        self.assertEqual(float(flip.get("chance") or 0), 0.0)
-        self.assertEqual(int(flip.get("max") or 0), 0)
+        # Tenebrium comes only from reclaim: no sortie reward, zone or mission, mints it (2026-10-27).
+        rewards = cat.get("sortieRewards") or {}
+        self.assertFalse([k for k in rewards if k.lower().startswith("tenebrium")])
+        self.assertGreater(int((rewards.get("metalOnVictory") or {}).get("max") or 0), 0)
 
 
 class PlayerImpactClaimSeedingTests(unittest.TestCase):
