@@ -106,18 +106,6 @@ function Get-EnemySide {
   return "Armada"
 }
 
-function Get-EnemyRecipeName {
-  param([string]$Side)
-  if ($Side -eq "Cortex") { return "cortex_sortie_target" }
-  return "armada_sortie_target"
-}
-
-function Get-EnemyRgb {
-  param([string]$Side)
-  if ($Side -eq "Cortex") { return @(1.0, 0.20, 0.16) }
-  return @(0.25, 0.48, 1.0)
-}
-
 function Get-ObjectiveDescription {
   param($Intent)
   $ok = if ($Intent.objectiveTarget -and $Intent.objectiveTarget.kind) {
@@ -158,31 +146,37 @@ function Get-RequiredFrames {
   }
 }
 
-function Get-ArcProfile {
-  # WO-030: single knob table for Arc A/B/C fantasy. Compiler + gadget honor this.
-  param([int]$MissionNumber, [string]$ObjectiveKind)
+function Resolve-ArcProfile {
+  # The mission's shape, decided once (2026-10-27; it used to be set in six places, later ones
+  # silently overriding earlier ones). Inputs: the mission number, the act Python stamped, the map,
+  # whether this is the kings' showdown, whether the commander suit is worn, and the escalation
+  # ladder's waves. Read by the gadget: id, playerCommanders, enemyMode, sweepEnemyCommanders,
+  # escalation. Read here: unitPrinter, allyPower, enemyAI, allowEnemyProduction.
+  param([int]$MissionNumber, [int]$Act, [string]$MapId, [bool]$Kings, [bool]$CommanderWorn, [string]$Waves)
   $n = [Math]::Max(1, $MissionNumber)
-  $id = if ($n -le 3) { "raid_tactics" } elseif ($n -le 6) { "contested_front" } else { "strike_lead" }
-  # The sortie clock does not field a commander. Story sets that after this profile.
-  $playerCommanders = 0
+  $act1Id = if ($n -le 3) { "raid_tactics" } elseif ($n -le 6) { "contested_front" } else { "strike_lead" }
+  $id = if ($Act -ge 3) { "unbound_finale" } elseif ($Act -eq 2) { "constrained_rts" } else { $act1Id }
+  # Act 1 reads warband against warband (roving packs over a thinned shell); later acts a quick
+  # reaction force. Act 1 strips enemy start commanders (except Tabula, a BARbarian with its own).
+  $enemyMode = if ($Act -ge 2 -or $act1Id -eq "strike_lead") { "light_qrf" } else { "warband" }
+  $barbarian = $Kings -or $Act -ge 2 -or $MapId -eq "tabula"
+  $escalation = if ($Kings) { "off" }
+                elseif ($Waves) { $Waves }
+                elseif ($Act -ge 3) { "full" }
+                elseif ($Act -eq 2) { if ($n -le 7) { "light" } else { "full" } }
+                elseif ($act1Id -eq "raid_tactics") { "off" } elseif ($act1Id -eq "contested_front") { "light" } else { "full" }
   $allyPower = if ($n -le 1) { 0.95 } elseif ($n -eq 2) { 0.55 } elseif ($n -eq 3) { 0.35 } elseif ($n -le 5) { 0.25 } else { 0.15 }
-  $escalation = if ($id -eq "raid_tactics") { "off" } elseif ($id -eq "contested_front") { "light" } else { "full" }
-  $enemyMode = if ($id -eq "raid_tactics") { "static_bases" } elseif ($id -eq "contested_front") { "static_bases" } else { "light_qrf" }
-  # Arc A prints Phobos (legcen), not Ballistas. Later acts clear this printer.
-  $printer = [ordered]@{ def = "leglab"; product = "legcen"; count = 1; metalIncome = 10; energyIncome = 50 }
   return [ordered]@{
     id = $id
-    playerCommanders = $playerCommanders
-    playerEco = ($playerCommanders -gt 0)
-    unitPrinter = $printer
+    playerCommanders = $(if ($Kings -or $CommanderWorn) { 1 } else { 0 })
+    # Arc A prints Phobos (legcen) for the act-1 tactics kit; later acts build their own.
+    unitPrinter = $(if ($Act -ge 2) { $null } else { [ordered]@{ def = "leglab"; product = "legcen"; count = 1; metalIncome = 10; energyIncome = 50 } })
     enemyMode = $enemyMode
-    enemyAI = "simple"   # WO-036: "simple" | "barbarian" (hard)
+    enemyAI = $(if ($barbarian) { "barbarian" } else { "simple" })
     allyPower = [Math]::Round($allyPower, 2)
     escalation = $escalation
-    objectiveAdjacency = if ($id -eq "raid_tactics") { "required" } else { "preferred" }
-    sweepEnemyCommanders = ($enemyMode -eq "static_bases")
-    allowEnemyProduction = ($id -eq "strike_lead")
-    flavor = $null       # WO-037: "com_solar_farm" for GF sandbox
+    sweepEnemyCommanders = [bool](-not $barbarian -and $Act -le 1 -and $act1Id -ne "strike_lead")
+    allowEnemyProduction = [bool]($Kings -or $Act -ge 2 -or $act1Id -eq "strike_lead")
   }
 }
 
@@ -539,6 +533,21 @@ function Spec {
   return $s
 }
 
+function New-BakedSpecs {
+  # Baked units ([def, x, z, facing, hp, ...] rows from a war snapshot or a scout camp) as one exact
+  # spec per unit type: positions flat x z facing hp, placed where the bake left them.
+  param($Units)
+  $byDef = [ordered]@{}
+  foreach ($u in @($Units)) {
+    $d = [string]$u[0]
+    if (-not $byDef.Contains($d)) { $byDef[$d] = New-Object System.Collections.Generic.List[double] }
+    $byDef[$d].Add([double]$u[1]); $byDef[$d].Add([double]$u[2]); $byDef[$d].Add([double]$u[3]); $byDef[$d].Add([double]$u[4])
+  }
+  $specs = @()
+  foreach ($d in $byDef.Keys) { $specs += (Spec $d ($byDef[$d].Count / 4) 0 0 0 $false $null $null $null $byDef[$d].ToArray()) }
+  return $specs
+}
+
 function Add-ReserveToKit {
   # The company's reserve: roster.cadre is what the player chose to bring this drop (the hub's
   # Reserve panel, clamped to the lift limit in Python). Every kit gets it the same way, all of
@@ -870,19 +879,6 @@ function Ring-Jammers {
   )
 }
 
-# Surgical objectives are honest: exactly ONE structure is "the relay"/"the
-# gun" (role=objective_target); its support hardware defends the camp as
-# garrison instead of padding the kill counter.
-function Centerpiece-Relay {
-  param($T)
-  @((Spec $T.targ 1 0 0 100))
-}
-
-function Support-Relay {
-  param($T)
-  @((Spec $T.arad 1 120 60 100), (Spec $T.fus 1 -130 70 110))
-}
-
 function Centerpiece-LRPC {
   param($T)
   @((Spec $T.lrpc 1 0 0 100))
@@ -891,16 +887,6 @@ function Centerpiece-LRPC {
 function Support-LRPC {
   param($T)
   @((Spec $T.fus 1 140 80 110), (Spec $T.fort 6 -90 -120 42))
-}
-
-function Centerpiece-EcoWorks {
-  param($T, [double]$S)
-  @(
-    (Spec $T.fus 1 0 0 110),
-    (Spec $T.advsolar (Get-ScaledCount 3 $S) 150 60 100),
-    (Spec $T.conv (Get-ScaledCount 4 $S) -150 80 90),
-    (Spec $T.estor 1 40 180 100)
-  )
 }
 
 function Centerpiece-CommandPost {
@@ -994,159 +980,6 @@ function Scatter {
   return $specs
 }
 
-function Get-InfraCount {
-  param($Parsed, [string]$Key)
-  if ($Parsed -and $Parsed.PSObject.Properties[$Key] -and $null -ne $Parsed.$Key) { return [int]$Parsed.$Key }
-  return 0
-}
-
-function Build-EcoSprawl {
-  # The energy economy (objective_target). Counts come from the crafted per-map
-  # Armada composition, multiplied so the works read as established, and scaled
-  # by mission difficulty. On Greenest Fields the authored data has NO mex (a
-  # no-metal converter economy), so mex appear only where the crafted data lists
-  # them - the sprawl is solar, wind, and converters.
-  param($Parsed, [double]$Scale)
-  $T = $FACTION["Armada"]
-  $mul = 2.0
-  $solarN = [Math]::Max(4, [int][Math]::Round((Get-InfraCount $Parsed "solar") * $mul * $Scale))
-  $windN  = [Math]::Max(3, [int][Math]::Round((Get-InfraCount $Parsed "wind")  * $mul * $Scale))
-  $mexN   = [int][Math]::Round((Get-InfraCount $Parsed "mex") * $mul * $Scale)
-  $convN  = [Math]::Max(3, [int][Math]::Round(($solarN + $windN) * 0.4))
-  $advN   = [Math]::Max(2, [int][Math]::Round($solarN * 0.25))
-  $specs = @()
-  if ($mexN -gt 0) { $specs += (Spec $T.mex $mexN -120 120 120 $true) }
-  $specs += Scatter $T.solar    $solarN 560 3 0 60
-  $specs += Scatter $T.wind     $windN  620 2 3 70
-  $specs += Scatter $T.conv     $convN  440 2 6 70
-  $specs += Scatter $T.advsolar $advN   300 1 9 90
-  # No constructors (armck) -- static works only. SimpleAI + cons = commander soup.
-  $specs += @(
-    (Spec $T.fus 1 0 0 110),
-    (Spec $T.estor 2 90 -60 90),
-    (Spec $T.mstor 1 -80 70 90)
-  )
-  return $specs
-}
-
-function Build-EcoGuard {
-  # Beefier static ring so allied Javelins get stalled on the approach.
-  # Mobile screen is bots only -- leave Wheelies (legscout) for the player.
-  # NOT objective-tagged: killing the guard is not the raid win condition.
-  param($Parsed, [double]$Scale, [int]$FX, [int]$FZ)
-  $T = $FACTION["Armada"]
-  $s = [Math]::Max(0.9, $Scale)
-  $lltN = [Math]::Max(7, [int][Math]::Round((Get-InfraCount $Parsed "defense") * 3.0 * $s))
-  if ($lltN -lt 8) { $lltN = 8 }
-  $specs = @()
-  $specs += Scatter $T.llt $lltN 460 1 2 140
-  $specs += @(
-    (Spec $T.hlt 2 (160 * $FX) (130 * $FZ) 180),
-    (Spec $T.hlt 1 (-140 * $FX) (90 * $FZ) 180),
-    (Spec $T.wall (Get-ScaledCount 10 $s) (240 * $FX) (200 * $FZ) 38),
-    (Spec $T.wall (Get-ScaledCount 6 $s) (90 * $FX) (260 * $FZ) 38),
-    (Spec $T.aa 2 (-100 * $FX) (40 * $FZ) 160),
-    (Spec $T.radar 1 0 -80 100),
-    # Infantry screen only (no wheeled/scout vehicles for the enemy).
-    (Spec $T.raider (Get-ScaledCount 4 $s) (140 * $FX) (120 * $FZ) 80),
-    (Spec $T.skirm  (Get-ScaledCount 3 $s) (-120 * $FX) (100 * $FZ) 90),
-    (Spec $T.assault (Get-ScaledCount 2 $s) (20 * $FX) (160 * $FZ) 95)
-  )
-  return $specs
-}
-
-function Build-EcoSprawlLight {
-  # Secondary occupation pocket: mostly eco, thinner than the primary works.
-  param($Parsed, [double]$Scale, [string]$Flavor = "mixed")
-  $T = $FACTION["Armada"]
-  $s = [Math]::Max(0.45, [Math]::Min(0.85, $Scale))
-  $specs = @()
-  if ($Flavor -eq "wind") {
-    $specs += Scatter $T.wind ([Math]::Max(5, [int](8 * $s))) 480 2 1 70
-    $specs += Scatter $T.conv ([Math]::Max(2, [int](3 * $s))) 300 2 4 70
-    $specs += (Spec $T.estor 1 40 -40 90)
-  } elseif ($Flavor -eq "solar") {
-    $specs += Scatter $T.solar ([Math]::Max(5, [int](8 * $s))) 480 3 0 60
-    $specs += Scatter $T.advsolar ([Math]::Max(1, [int](2 * $s))) 280 1 5 90
-    $specs += Scatter $T.conv ([Math]::Max(2, [int](3 * $s))) 320 2 3 70
-  } else {
-    $specs += Scatter $T.solar ([Math]::Max(3, [int](5 * $s))) 420 2 0 60
-    $specs += Scatter $T.wind ([Math]::Max(3, [int](5 * $s))) 420 2 2 70
-    $specs += Scatter $T.conv ([Math]::Max(2, [int](3 * $s))) 300 2 4 70
-    $specs += (Spec $T.fus 1 0 0 110)
-  }
-  return $specs
-}
-
-function Build-EcoGuardLight {
-  param([double]$Scale, [int]$FX, [int]$FZ)
-  $T = $FACTION["Armada"]
-  $s = [Math]::Max(0.5, $Scale)
-  @(
-    (Spec $T.llt (Get-ScaledCount 4 $s) (150 * $FX) (120 * $FZ) 140),
-    (Spec $T.llt 2 (-120 * $FX) (80 * $FZ) 140),
-    (Spec $T.wall (Get-ScaledCount 6 $s) (220 * $FX) (180 * $FZ) 38),
-    (Spec $T.radar 1 0 -50 100),
-    (Spec $T.raider (Get-ScaledCount 2 $s) (100 * $FX) (90 * $FZ) 80),
-    (Spec $T.skirm  (Get-ScaledCount 2 $s) (-90 * $FX) (70 * $FZ) 90)
-  )
-}
-
-function Add-EcoSprawlCamp {
-  param(
-    [double[]]$Center, $Parsed, [double]$Scale, [int]$FX, [int]$FZ, [string]$Label,
-    [switch]$OccupationOnly,
-    [string]$ZoneId = "",
-    [string]$Flavor = "mixed"
-  )
-  $teamID = $script:nextTeam; $script:nextTeam += 1
-  $allyID = $script:nextAllyTeam; $script:nextAllyTeam += 1
-  $script:allyTeams += [ordered]@{ id = $allyID; startRect = New-StartRect $Center 0.22 }
-  $script:teams += [ordered]@{ id = $teamID; side = "Armada"; allyTeam = $allyID; base = @($Center[0], $Center[1]); rgb = $FACTION["Armada"].rgb; label = "Armada - $Label"; faction = "armada" }
-  # occupation = pre-placed world eco (not yet the active objective).
-  # objective_target = this sortie`s raid credit structures.
-  $worksRole = if ($OccupationOnly) { "occupation" } else { "objective_target" }
-  $worksRecipe = if ($OccupationOnly) { @(Build-EcoSprawlLight $Parsed $Scale $Flavor) } else { @(Build-EcoSprawl $Parsed $Scale) }
-  $guardRecipe = if ($OccupationOnly) { @(Build-EcoGuardLight $Scale $FX $FZ) } else { @(Build-EcoGuard $Parsed $Scale $FX $FZ) }
-  $script:baseRecipes["camp${teamID}_works"] = $worksRecipe
-  $script:forces += [ordered]@{
-    id = "camp${teamID}_works"
-    label = $Label
-    teamID = $teamID
-    side = "Armada"
-    faction = "armada"
-    role = $worksRole
-    zoneId = $ZoneId
-    occupationKind = $Flavor
-    base = [ordered]@{ x = $Center[0]; z = $Center[1] }
-    recipe = "camp${teamID}_works"
-  }
-  $script:baseRecipes["camp${teamID}_guard"] = $guardRecipe
-  $script:forces += [ordered]@{
-    id = "camp${teamID}_guard"
-    label = "$Label guard"
-    teamID = $teamID
-    side = "Armada"
-    faction = "armada"
-    role = "garrison"
-    zoneId = $ZoneId
-    base = [ordered]@{ x = $Center[0]; z = $Center[1] }
-    recipe = "camp${teamID}_guard"
-  }
-  # No AI on eco occupation: static world, not commander soup.
-  if (-not $OccupationOnly -and $null -eq $script:primaryEnemyTeamID) {
-    $script:primaryEnemyTeamID = $teamID; $script:primaryEnemySide = "Armada"
-  }
-  return [ordered]@{
-    zoneId = $ZoneId
-    label = $Label
-    kind = $Flavor
-    teamID = $teamID
-    preplaced = $true
-    primary = (-not $OccupationOnly)
-  }
-}
-
 if (-not $IntentPath) { $IntentPath = Join-Path $Workspace "outbox\next_mission_intent.json" }
 if (-not $StatePath) { $StatePath = Join-Path $Workspace "state\campaign_state.json" }
 if (!(Test-Path $IntentPath)) { throw "No next mission intent at $IntentPath. Drop from the hub (PLAY.bat), or run scripts\advance_campaign_v1.ps1 first." }
@@ -1168,66 +1001,16 @@ $zoneMap = Get-Content -Raw -LiteralPath $zoneMapPath | ConvertFrom-Json
 $missionNumber = if ($intent.missionNumber) { [int]$intent.missionNumber } elseif ($state -and $state.missionNumber) { [int]$state.missionNumber } else { 1 }
 $missionId = if ($intent.missionId) { [string]$intent.missionId } else { "va_$('{0:d3}' -f $missionNumber)" }
 $objectiveKind = if ($intent.objectiveTarget -and $intent.objectiveTarget.kind) { [string]$intent.objectiveTarget.kind } else { [string]$intent.objective }
-# Early arc profile so adjacency + kit can use it before camp assembly.
-$arcProfile = Get-ArcProfile -MissionNumber $missionNumber -ObjectiveKind $objectiveKind
 # Drop 2 act structure labels pacing. It does not field the command walker.
 #   Act 1 ground control keeps the existing profile.
 #   Act 2 is base building. The walker stays scrap until a story beat.
 #   Act 3 finale: full unconstrained BAR with massive starting conditions.
-$actNum = if ($intent.PSObject.Properties["act"] -and $intent.act -and $intent.act.act) { [int]$intent.act.act }
-          elseif ($missionNumber -le 5) { 1 } elseif ($missionNumber -le 10) { 2 } else { 3 }
-$actName = if ($intent.PSObject.Properties["act"] -and $intent.act -and $intent.act.name) { [string]$intent.act.name }
-           elseif ($actNum -eq 1) { "ground_control" } elseif ($actNum -eq 2) { "constrained_rts" } else { "unbound_finale" }
+# The act is Python's (verdance.campaign.acts, intent.act); no second threshold table here.
+$actNum = [int]$intent.act.act
+$actName = [string]$intent.act.name
 $isFinale = [bool]($intent.PSObject.Properties["finale"] -and $intent.finale)
 $finaleKind = if ($isFinale -and $intent.finale.kind) { [string]$intent.finale.kind } else { "" }
-if ($actNum -ge 3) {
-  $arcProfile.id = "unbound_finale"
-  $arcProfile.playerEco = $true
-  $arcProfile.unitPrinter = $null
-  $arcProfile.enemyMode = "light_qrf"
-  $arcProfile.escalation = "full"
-  $arcProfile.allowEnemyProduction = $true
-  $arcProfile.objectiveAdjacency = "forward"
-  $arcProfile.sweepEnemyCommanders = $false
-} elseif ($actNum -eq 2) {
-  $arcProfile.id = "constrained_rts"
-  $arcProfile.playerEco = $true
-  $arcProfile.unitPrinter = $null
-  $arcProfile.enemyMode = "light_qrf"
-  $arcProfile.escalation = if ($missionNumber -le 7) { "light" } else { "full" }
-  $arcProfile.allowEnemyProduction = $true
-  $arcProfile.objectiveAdjacency = "preferred"
-  $arcProfile.sweepEnemyCommanders = $false
-} elseif ([string]$arcProfile.enemyMode -eq "static_bases") {
-  # Drop 3: act-1 ground control reads warband-vs-warband — the enemy fields
-  # roving patrol packs over a thinned static shell, not a fortress. The
-  # com_solar_farm flavor still overrides this below, as before.
-  $arcProfile.enemyMode = "warband"
-}
 Write-Host ("Act structure: act={0} ({1}) finale={2}" -f $actNum, $actName, $finaleKind)
-# WO-037: sandbox flavor from intent or explicit greenest com-soup contracts.
-if ($intent.PSObject.Properties["flavor"] -and $intent.flavor) {
-  $arcProfile.flavor = [string]$intent.flavor
-} elseif ($intent.PSObject.Properties["storyTags"] -and ($intent.storyTags -contains "com_solar_farm")) {
-  $arcProfile.flavor = "com_solar_farm"
-}
-# WO-036 hard mode: intent.difficulty.enemyAI or environment.hardMode
-if ($intent.difficulty -and $intent.difficulty.enemyAI) {
-  $arcProfile.enemyAI = [string]$intent.difficulty.enemyAI
-} elseif ($intent.environment -and $intent.environment.hardMode) {
-  $arcProfile.enemyAI = "barbarian"
-} elseif ($actNum -ge 2 -or ([string]$intent.mapId) -eq "tabula") {
-  # Tabula and everything after: a BARbarian opponent with its real commander, so the map has
-  # threat and motion as the company's army grows.
-  $arcProfile.enemyAI = "barbarian"
-  $arcProfile.sweepEnemyCommanders = $false
-}
-if ($arcProfile.flavor -eq "com_solar_farm") {
-  $arcProfile.sweepEnemyCommanders = $false
-  $arcProfile.allowEnemyProduction = $true
-  $arcProfile.enemyMode = "com_solar_farm"
-  $arcProfile.unitPrinter = $null
-}
 # Story owns the walker. A missing or false flag is scrap. Level and perks do not field it.
 $commanderUnlocked = $false
 $commanderRow = $null
@@ -1236,7 +1019,6 @@ if (-not $commanderRow -and $intent.roster -and $intent.roster.commander) { $com
 if ($commanderRow -and $commanderRow.PSObject.Properties["unlocked"] -and $commanderRow.unlocked -eq $true) {
   $commanderUnlocked = $true
 }
-$arcProfile.playerCommanders = $(if ($commanderUnlocked) { 1 } else { 0 })
 Write-Host ("Command walker: {0}" -f $(if ($commanderUnlocked) { "unlocked" } else { "scrap" }))
 # The field's standing set piece (verdance.world.theaters, on the intent): Koom's standing war,
 # All That Simmers' kings' showdown. The engine decides it; this script only places it.
@@ -1249,11 +1031,6 @@ $script:shellAllyId = $null; $script:shellFaction = $null
 $script:kings = @()
 if ($isKings) {
   # A classic game of BAR: every king starts with its commander and nothing else, and keeps it.
-  $arcProfile.playerCommanders = 1
-  $arcProfile.sweepEnemyCommanders = $false
-  $arcProfile.enemyAI = "barbarian"
-  $arcProfile.allowEnemyProduction = $true
-  $arcProfile.escalation = "off"
   Write-Host "Kings' showdown: one commander each, last one standing takes the throne."
 }
 # Drop 4 escalation ladder: the engine's authored plan (scale window,
@@ -1262,7 +1039,8 @@ if ($isKings) {
 $escPlan = if ($intent.PSObject.Properties["escalationPlan"] -and $intent.escalationPlan) { $intent.escalationPlan } else { $null }
 $objectiveStrength = if ($escPlan -and $escPlan.objectiveStrength) { [string]$escPlan.objectiveStrength } else { "surgical" }
 if ($objectiveStrength -eq "finale") { $objectiveStrength = "surgical" }
-if ($escPlan -and $escPlan.wavesMode) { $arcProfile.escalation = [string]$escPlan.wavesMode }
+$arcProfile = Resolve-ArcProfile -MissionNumber $missionNumber -Act $actNum -MapId ([string]$intent.mapId) `
+  -Kings $isKings -CommanderWorn $commanderUnlocked -Waves $(if ($escPlan -and $escPlan.wavesMode) { [string]$escPlan.wavesMode } else { "" })
 $escSecondaries = @()
 if ($escPlan -and $escPlan.secondaries) { $escSecondaries = @($escPlan.secondaries) }
 if ($escPlan) {
@@ -1286,8 +1064,6 @@ $isContract = ($intent.PSObject.Properties["contractActive"] -and $intent.contra
 $frontBand = $isContract -or ($intent.objective -in @("seize_lane", "gate_control"))
 
 $enemySide = Get-EnemySide ([string]$intent.mapId) $intent
-$enemyRecipe = Get-EnemyRecipeName $enemySide
-$enemyRgb = Get-EnemyRgb $enemySide
 $hasWild = ($map.PSObject.Properties["wilds"] -and $map.wilds) -or ($map.PSObject.Properties["raptors"] -and $map.raptors) -or ($intent.hazardPolicy -and $intent.hazardPolicy -ne "none")
 # Rock Jungle is always a raptor shelf — even if map_pool forgot the wilds flag.
 if ([string]$intent.mapId -eq "the_rock_jungle") { $hasWild = $true }
@@ -1644,9 +1420,7 @@ function Build-LivingShellFromTemplate {
     $pkMeta = if ($uPocket -and $pocketMeta.ContainsKey($uPocket)) { $pocketMeta[$uPocket] } else { $null }
     $isOptional = $false
     if ($pkMeta) {
-      $isOptional = ($pkMeta.PSObject.Properties["optionalTarget"] -and $pkMeta.optionalTarget) `
-        -or ($pkMeta.PSObject.Properties["highValue"] -and $pkMeta.highValue) `
-        -or ([string]$pkMeta.kind -eq "fusion_fort")
+      $isOptional = (Test-LivingShellPocketOptional $pkMeta)
     }
     # Fusion vault continuity: only despawn when the vault itself died.
     # Ambient zone scars / player_bloc used to wipe the whole beamer ring —
@@ -1767,9 +1541,7 @@ function Build-LivingShellFromTemplate {
     $zid = [string]$pk.zoneId
     $pocketId = [string]$pk.pocketId
     $scarredPocket = ($ScarredZones -and $zid -and $ScarredZones.ContainsKey($zid))
-    $isOptionalPk = ($pk.PSObject.Properties["optionalTarget"] -and $pk.optionalTarget) `
-      -or ($pk.PSObject.Properties["highValue"] -and $pk.highValue) `
-      -or ([string]$pk.kind -eq "fusion_fort")
+    $isOptionalPk = (Test-LivingShellPocketOptional $pk)
     $hvDeadPocket = ($DestroyedHvPockets -and $pocketId -and $DestroyedHvPockets.ContainsKey($pocketId))
     # Drop optional fusion/HV marks only when the vault itself is dead — not
     # when a neighboring combat pad is scarred (that left blown vaults highlighted).
@@ -1911,9 +1683,7 @@ function Try-ApplyLivingShell {
         livingShell = $true
         commanderPolicy = if ($commanderPolicy) { $commanderPolicy } else { "normal" }
       }
-      $isOptional = ($pk.PSObject.Properties["optionalTarget"] -and $pk.optionalTarget) `
-        -or ($pk.PSObject.Properties["highValue"] -and $pk.highValue) `
-        -or ([string]$pk.kind -eq "fusion_fort")
+      $isOptional = (Test-LivingShellPocketOptional $pk)
       if ($isOptional) {
         $occ.optionalTarget = $true
         $occ.highValue = $true
@@ -2147,7 +1917,6 @@ if ($isRockJungle) { $wildCenter = $jungleHiveCenter }
 $roster = if ($intent.PSObject.Properties["roster"] -and $intent.roster) { $intent.roster } else { $null }
 $commerce = if ($intent.PSObject.Properties["commerce"] -and $intent.commerce) { $intent.commerce } else { $null }
 $resourceMod = if ($intent.economy -and $null -ne $intent.economy.resourceModifier) { [double]$intent.economy.resourceModifier } else { 1.0 }
-# arcProfile already computed early (adjacency + flavor). Kit follows it.
 $strikeDoctrine = ([int]$arcProfile.playerCommanders -le 0) -or ($objectiveKind -eq "eco_raid")
 # Drop 2: act 2+ is base-building doctrine even on raid contracts; act 3 is the
 # finale kit (massive start).
@@ -2235,20 +2004,16 @@ if ($intent.operationSummary) {
     $missionCard["situation"] = [string]$intent.narrativeContext.purpose
   }
 }
-Write-Host ("Arc profile: id={0} playerCommanders={1} enemyMode={2} allyPower={3} escalation={4} ai={5} flavor={6}" -f `
-  $arcProfile.id, $arcProfile.playerCommanders, $arcProfile.enemyMode, $arcProfile.allyPower, $arcProfile.escalation, $arcProfile.enemyAI, $arcProfile.flavor)
-# WO-036: enemy AI shortName for startscript
-# Greenest Fields Armada: SimpleDefenderAI — hold the works, don't roam-deathball.
+Write-Host ("Arc profile: id={0} playerCommanders={1} enemyMode={2} allyPower={3} escalation={4} ai={5}" -f `
+  $arcProfile.id, $arcProfile.playerCommanders, $arcProfile.enemyMode, $arcProfile.allyPower, $arcProfile.escalation, $arcProfile.enemyAI)
+# The enemy AI for the startscript: BARb, else SimpleAI. (A Greenest Fields SimpleDefenderAI branch
+# tested a $mapId that was never set, so it never ran; removed 2026-10-27 so Greenest plays as it does.)
 function Get-EnemyAiShortName {
   if ([string]$arcProfile.enemyAI -eq "barbarian") { return "BARb" }
-  if ([string]$arcProfile.enemyAI -in @("defender", "simple_defender", "SimpleDefenderAI")) {
-    return "SimpleDefenderAI"
-  }
-  if ($mapId -eq "greenest_fields") { return "SimpleDefenderAI" }
   return "SimpleAI"
 }
 $enemyAiShort = Get-EnemyAiShortName
-Write-Host ("Enemy AI shortName: {0} (map={1} profile={2})" -f $enemyAiShort, $mapId, $arcProfile.enemyAI)
+Write-Host ("Enemy AI shortName: {0} (map={1} profile={2})" -f $enemyAiShort, [string]$intent.mapId, $arcProfile.enemyAI)
 $allyTeams = @([ordered]@{ id = 0; startRect = New-StartRect $deployCenter 0.20 })
 $teams = @([ordered]@{ id = 0; side = "Legion"; allyTeam = 0; base = @($deployCenter[0], $deployCenter[1]); rgb = @(0.25, 0.85, 0.35); label = "Ashwalkers"; faction = "ashwalkers" })
 # The walker wears the company's commander suit (verdance.campaign.suits): its start commander is
@@ -2424,14 +2189,7 @@ function Add-StandingWar {
     if ($camp.PSObject.Properties["profile"] -and $camp.profile) {
       $script:ai[$script:ai.Count - 1].options = [ordered]@{ profile = [string]$camp.profile }
     }
-    $byDef = [ordered]@{}
-    foreach ($u in @($camp.units)) {
-      $d = [string]$u[0]
-      if (-not $byDef.Contains($d)) { $byDef[$d] = New-Object System.Collections.Generic.List[double] }
-      $byDef[$d].Add([double]$u[1]); $byDef[$d].Add([double]$u[2]); $byDef[$d].Add([double]$u[3]); $byDef[$d].Add([double]$u[4])
-    }
-    $specs = @()
-    foreach ($d in $byDef.Keys) { $specs += (Spec $d ($byDef[$d].Count / 4) 0 0 0 $false $null $null $null $byDef[$d].ToArray()) }
+    $specs = @(New-BakedSpecs @($camp.units))
     $field = "war$($wt.teamID)_field"
     $script:baseRecipes[$field] = $specs
     # The Eye (verdance.world.eye_story): Armada's job makes the Cortex camp the target; Cortex's job
@@ -2491,14 +2249,7 @@ function Add-EyeScouts {
     # The camp the party built over five minutes (tools/eye_scouts_bake_v1.py), placed as it stood.
     $camp = @($p.camp)
     if ($camp.Count -gt 0) {
-      $byDef = [ordered]@{}
-      foreach ($u in $camp) {
-        $d = [string]$u[0]
-        if (-not $byDef.Contains($d)) { $byDef[$d] = New-Object System.Collections.Generic.List[double] }
-        $byDef[$d].Add([double]$u[1]); $byDef[$d].Add([double]$u[2]); $byDef[$d].Add([double]$u[3]); $byDef[$d].Add([double]$u[4])
-      }
-      $specs = @()
-      foreach ($d in $byDef.Keys) { $specs += (Spec $d ($byDef[$d].Count / 4) 0 0 0 $false $null $null $null $byDef[$d].ToArray()) }
+      $specs = @(New-BakedSpecs $camp)
       $rid = "scout$($wt.teamID)_camp"
       $script:baseRecipes[$rid] = $specs
       $script:forces += [ordered]@{ id = $rid; label = "Armada scout camp $([string]$p.zoneId)"; teamID = $wt.teamID; side = "Armada"; faction = "armada"; role = "scout_camp"; zoneId = [string]$p.zoneId; base = [ordered]@{ x = $c[0]; z = $c[1] }; recipe = $rid }
@@ -2892,83 +2643,13 @@ if ($isKings) {
     }
   }
 } else {
+# Outside the finales Python sends seize_lane (every targeted job is territory: capture_node_claims.
+# as_territory_capture), hive_clear_or_bypass, fortify/home kinds and survive_wilds; the camps for the
+# old raid / relay / key-structure / choose kinds were retired 2026-10-27.
 switch ($objectiveKind) {
-  "strike_relay" {
-    if (-not $shellOccupied) {
-      # The dealer relay sits in a desolate Cortex hideout: jammers everywhere.
-      $T = $FACTION[$enemySide]
-      $jam = $enemySide -eq "Cortex"
-      Add-FactionCamp $enemySide $enemyCenter (Centerpiece-Relay $T) $description -WithEco $true -WithJammers $jam -SupportSpecs (Support-Relay $T) -FrontBand $frontBand
-    }
-  }
-  "destroy_key_structure" {
-    # The shell's works in the target zone are the structure to break; the LRPC fort is the
-    # fallback when no shell stands there.
-    if (-not $shellOccupied) {
-      $T = $FACTION[$enemySide]
-      Add-FactionCamp $enemySide $enemyCenter (Centerpiece-LRPC $T) $description -WithEco $true -WithProduction $true -SupportSpecs (Support-LRPC $T) -FrontBand $frontBand
-    }
-  }
-  "economy_disrupt" {
-    if (-not $shellOccupied) {
-      $T = $FACTION[$enemySide]
-      Add-FactionCamp $enemySide $enemyCenter (Centerpiece-EcoWorks $T $enemyScale) $description -WithEco $true -FrontBand $frontBand
-    }
-  }
-  "eco_raid" {
-    # Living-shell doctrine (outbound 37/44): frozen AI-grown template is required path.
-    # Fallback = hand-scattered occupation pockets (36) — DEPRECATED, log loudly.
-    if (-not $shellOccupied) {
-      Write-Warning "OCCUPATION FALLBACK: no living shell for $(([string]$intent.mapId))/$objectiveKind — using deprecated hand camps."
-      $parsed = if ($intent.enemyInfrastructure -and $intent.enemyInfrastructure.parsed) { $intent.enemyInfrastructure.parsed.armada } else { $null }
-      $primaryNode = Add-EcoSprawlCamp $enemyCenter $parsed $enemyScale $faceX $faceZ $description -ZoneId $targetZoneId -Flavor "mixed"
-      if ($primaryNode) { $script:mapOccupation += $primaryNode }
-
-      if ($missionNumber -le 8 -and $zoneMap -and $zoneMap.zones) {
-        $occupiedIds = @{ $targetZoneId = $true; $deployZoneId = $true }
-        $pocketFlavors = @("wind", "solar", "mixed")
-        $pi = 0
-        foreach ($z in @($zoneMap.zones)) {
-          $zid = [string]$z.zoneId
-          if (-not $zid -or $occupiedIds.ContainsKey($zid)) { continue }
-          $tags = @()
-          if ($z.tags) { $tags = @($z.tags | ForEach-Object { [string]$_ }) }
-          $role = if ($z.role) { [string]$z.role } else { "" }
-          $isEco = ($tags -contains "wind") -or ($tags -contains "solar") -or ($tags -contains "economy") -or ($tags -contains "energy") `
-            -or ($role -eq "energy_edge") -or ($role -eq "main_field")
-          $isStart = ($tags -contains "start") -or ($tags -contains "staging") -or ($role -eq "legion_start")
-          if ($isStart -or -not $isEco) { continue }
-          $zc = Get-ZoneCenter $z $null
-          if (-not $zc) { continue }
-          $ddx = $zc[0] - $deployCenter[0]; $ddz = $zc[1] - $deployCenter[1]
-          if (($ddx * $ddx + $ddz * $ddz) -lt (0.12 * 0.12)) { continue }
-          $flavor = $pocketFlavors[$pi % $pocketFlavors.Count]
-          $pi += 1
-          $pfx = [Math]::Sign($deployCenter[0] - $zc[0]); if ($pfx -eq 0) { $pfx = 1 }
-          $pfz = [Math]::Sign($deployCenter[1] - $zc[1]); if ($pfz -eq 0) { $pfz = 1 }
-          $label = if ($z.label) { [string]$z.label } else { $zid }
-          $node = Add-EcoSprawlCamp $zc $parsed ([Math]::Max(0.55, $enemyScale * 0.7)) $pfx $pfz $label -OccupationOnly -ZoneId $zid -Flavor $flavor
-          if ($node) {
-            $script:mapOccupation += $node
-            $occupiedIds[$zid] = $true
-          }
-          if ($script:mapOccupation.Count -ge 4) { break }
-        }
-        Write-Host ("Occupied map: {0} Armada eco nodes pre-placed (primary + pockets)." -f $script:mapOccupation.Count)
-      }
-    }
-  }
   "hive_clear_or_bypass" {
     # On the Rock Jungle the hive is the south-west nest, wherever the card aimed.
     Add-RaptorCamp $(if ($isRockJungle) { $jungleHiveCenter } else { $enemyCenter }) $true $description
-  }
-  "choose_target_then_extract" {
-    # Two rival faction camps flanking the contested center; they are on
-    # separate allyteams and will pressure each other while you choose.
-    $armadaCenter = @((Clamp01 ($enemyCenter[0] - 0.16)), (Clamp01 ($enemyCenter[1] - 0.05)))
-    $cortexCenter = @((Clamp01 ($enemyCenter[0] + 0.16)), (Clamp01 ($enemyCenter[1] + 0.08)))
-    Add-FactionCamp "Armada" $armadaCenter (Centerpiece-CommandPost $FACTION["Armada"]) "Armada command post" -WithEco $true
-    Add-FactionCamp "Cortex" $cortexCenter (Centerpiece-CommandPost $FACTION["Cortex"]) "Cortex forward works" -WithEco $true
   }
   default {
     if ($isWildHomeFounding -or $againstFaction -eq "wild") {
@@ -3057,9 +2738,7 @@ if ($script:livingShellPayload -and $script:livingShellPayload.pockets -and -not
   }
   foreach ($pk in @($script:livingShellPayload.pockets)) {
     if (-not $pk) { continue }
-    $isOptional = ($pk.PSObject.Properties["optionalTarget"] -and $pk.optionalTarget) `
-      -or ($pk.PSObject.Properties["highValue"] -and $pk.highValue) `
-      -or ([string]$pk.kind -eq "fusion_fort")
+    $isOptional = (Test-LivingShellPocketOptional $pk)
     if (-not $isOptional) { continue }
     $secZid = [string]$pk.zoneId
     if (-not $secZid -or $secZid -eq $targetZoneId -or $secZid -eq $deployZoneId) { continue }
@@ -3386,10 +3065,7 @@ elseif ($intent.objectiveTarget -and $intent.objectiveTarget.secondaryCaptureZon
   $hubSecondaryIds = @($intent.objectiveTarget.secondaryCaptureZoneIds)
 }
 $hubChoiceIdVal = if ($intent.hubChoiceId) { [string]$intent.hubChoiceId } else { $null }
-$hubDeployAces = if ($intent.deployAces) { @($intent.deployAces) } else { @() }
-# Preserve hub muster band for the gadget (sealed packet — no in-game select).
-if (-not $hubCrewBand) { $hubCrewBand = @() }
-if ($intent.PSObject.Properties["crewBand"] -and $intent.crewBand) { $hubCrewBand = @($intent.crewBand) }
+$hubDeployAces = @($hubDeployAcesEarly)   # the hub's sealed packet (read once, above)
 
 # Field recruits: the encounter field's draw for this sortie. Marked hub zones (target / infil)
 # make their hero likelier (encounter_rules markedGround), they do not seat them.
@@ -3525,21 +3201,7 @@ foreach ($fp in @($(if ($intent.PSObject.Properties["fieldPeople"]) { $intent.fi
 }
 # Rescues are never the job (2026-10-27): every job is territory, and a wreck waiting in the wound
 # is a bonus mark. A raised hero goes home from where the company landed (game_verdance_exfil).
-# Get-RezObjective stays for reference; the mission no longer calls it.
-function Get-RezObjective($Recruits, $WoundZoneIds) {
-  $wound = @(@($WoundZoneIds) | Where-Object { $_ } | ForEach-Object { [string]$_ })
-  foreach ($fr in @($Recruits)) {
-    if ($fr -and $fr.zoneId -and $fr.spawnAsWreck -and ($wound -contains [string]$fr.zoneId)) { return $fr }
-  }
-  return $null
-}
-$rezObjective = $null
-if ($rezObjective) {
-  $description = "Raise {0} from the wreck in the wound and bring them home." -f $rezObjective.heroName
-  Write-Host ("Rez objective: {0}@{1}" -f $rezObjective.heroId, $rezObjective.zoneId)
-  $missionCard["objective"] = "{0} lies wrecked in the wound. Raise them with a rez bot or constructor: that is the job. Then extract." -f $rezObjective.heroName
-  $missionCard["plainObjective"] = $description
-}
+# (Git history has the old Get-RezObjective.)
 if ($fieldRecruits.Count -gt 0) {
   Write-Host ("Field recruits on {0}: {1} (marks={2})" -f $intent.mapId, `
     (($fieldRecruits | ForEach-Object { "{0}@{1} b={2}" -f $_.heroId, $_.zoneId, $_.beliefScore }) -join ", "), `
@@ -3609,7 +3271,6 @@ $scenario = [ordered]@{
       description = $description
       targetZoneId = $targetZoneId
       # A field recruit lying in the wound: rezzing them is the objective (game_verdance_campaign.lua).
-      rezHeroId = $(if ($rezObjective) { [string]$rezObjective.heroId } else { $null })
       # The presence (metal in armed units and defences) a claim needs here (verdance.world.claim):
       # a zone-taking objective completes only once the company stands there with this much.
       claimValue = $(if ($intent.PSObject.Properties["claimValue"] -and $intent.claimValue) { [double]$intent.claimValue } else { 400 })
@@ -3697,7 +3358,6 @@ $scenario = [ordered]@{
       clearEnemyOnContinue = $false
       spawnInfrastructureOnContinue = $false
     }
-    flavor = $arcProfile.flavor
     escalation = $(
       # WO-035: Arc A off (hot extract wave only in gadget); light/full later.
       $escMode = [string]$arcProfile.escalation
@@ -3758,23 +3418,21 @@ $scenario = [ordered]@{
     graph = $graph
     reputation = $reputation
     companions = $companions
-    # WO-043c: Tenebrium bank + Armada crisis (continent of farming decoys).
+    # Tenebrium banks and the Armada crisis, as Python decided them (intent.factionBanks,
+    # intent.worldConflict.armadaTenebriumCrisis); no longer forced here.
     commerce = $(if ($commerce) { $commerce } else { [ordered]@{ tenebrium = 0; credits = 0 } })
-    tenebrium = [ordered]@{
-      playerBank = if ($commerce -and $null -ne $commerce.tenebrium) { [int]$commerce.tenebrium } else { 0 }
-      armadaBank = 0
-      cortexBank = 2
-      armadaCrisis = $true
-      notes = "Build-power units cost >=1 Tnb; wrecks keep Tnb until reclaimed or truly gone. Armada spent theirs on decoy wind/solar/converter farms."
-    }
-    worldConflict = $(
-      $wc = if ($intent.PSObject.Properties["worldConflict"] -and $intent.worldConflict) { $intent.worldConflict } else { [ordered]@{} }
-      # Ensure Armada crisis flag is visible to the gadget even on thin intents.
-      if ($wc -is [System.Collections.IDictionary] -or $wc -is [hashtable] -or $wc.GetType().Name -match 'OrderedDictionary|PSCustomObject') {
-        try { $wc | Add-Member -NotePropertyName armadaTenebriumCrisis -NotePropertyValue $true -Force } catch {}
+    tenebrium = $(
+      $fb = if ($intent.PSObject.Properties["factionBanks"] -and $intent.factionBanks) { $intent.factionBanks } else { $null }
+      $wcT = if ($intent.PSObject.Properties["worldConflict"] -and $intent.worldConflict) { $intent.worldConflict } else { $null }
+      [ordered]@{
+        playerBank = if ($commerce -and $null -ne $commerce.tenebrium) { [int]$commerce.tenebrium } else { 0 }
+        armadaBank = if ($fb -and $null -ne $fb.armada) { [int]$fb.armada } else { 0 }
+        cortexBank = if ($fb -and $null -ne $fb.cortex) { [int]$fb.cortex } else { 2 }
+        armadaCrisis = if ($wcT -and $null -ne $wcT.armadaTenebriumCrisis) { [bool]$wcT.armadaTenebriumCrisis } else { $true }
+        notes = "Build-power units cost >=1 Tnb; wrecks keep Tnb until reclaimed or truly gone."
       }
-      $wc
     )
+    worldConflict = $(if ($intent.PSObject.Properties["worldConflict"] -and $intent.worldConflict) { $intent.worldConflict } else { [ordered]@{} })
     storyIntent = $intent
   }
   baseRecipes = $baseRecipes
