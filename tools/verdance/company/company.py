@@ -148,6 +148,10 @@ def unlock_rescued_survivors(state: Dict[str, Any], workspace: Optional[Path] = 
     rescued |= {str(h) for h, e in field.items() if isinstance(e, dict) and str(e.get("status")) == "recruited"}
     alive = {str(h.get("heroId")) for h in ((state.get("roster") or {}).get("heroes") or [])
              if isinstance(h, dict) and str(h.get("status") or "") in ("active", "wounded")}
+    # A hero rented for the drop that won the campaign, home alive, is kept (verdance.company.rentals).
+    last = {str(h) for h in (company.get("rentedLastDrop") or [])}
+    rescued |= last
+    alive |= last
     new = sorted(rescued & alive)
     profile = load_profile(workspace)
     gained = [h for h in new if h not in profile["unlocked"]]
@@ -398,6 +402,7 @@ def ensure_company(state: Dict[str, Any], workspace: Optional[Path] = None) -> D
         owned = set(str(x) for x in (company.get("core") or []))
         owned.update(str(x) for x in (company.get("band") or []))
         owned.update(str(x) for x in (company.get("joinedLater") or []))
+        owned.update(str(x) for x in (company.get("rented") or []))   # rented for this drop: theirs until homecoming
         for hid in list(field.keys()):
             if hid in owned and isinstance(field.get(hid), dict):
                 if str(field[hid].get("status") or "") == "wild":
@@ -513,9 +518,10 @@ def company_deploy_band(state: Dict[str, Any]) -> List[str]:
         return []
     band = [str(x) for x in (company.get("band") or [])]
     later = [str(x) for x in (company.get("joinedLater") or [])]
+    rented = [str(x) for x in (company.get("rented") or [])]     # verdance.company.rentals: this drop only
     seen = set()
     out: List[str] = []
-    for hid in band + later:
+    for hid in band + later + rented:
         if not hid or hid in seen:
             continue
         if not hero_is_deployable(state, hid):
@@ -1331,6 +1337,8 @@ def hub_company_surface(state: Dict[str, Any], workspace: Optional[Path] = None)
         "band": list(company.get("band") or []),
         "you": company.get("you"),
         "joinedLater": list(company.get("joinedLater") or []),
+        # heroes rented from the Cortex mercenary store for the next drop (verdance.company.rentals)
+        "rented": list(company.get("rented") or []),
         "seatCap": int(company.get("seatCap") or seat_cap(packs)),
         # Preamble wallets: Tnb for build-power / reactor seats only.
         "formationWalletTnb": formation_wallet,

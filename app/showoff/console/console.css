@@ -720,3 +720,31 @@ details.advanced summary { color:var(--steam); }
 @media (prefers-reduced-motion:reduce) {
   .zone, .region, .map-chip { animation:none; transition:none; scroll-behavior:auto; }
 }
+
+/* Drop window: three windows (party, reserve kits, the Cortex mercenary store) */
+.drop-tabs { display:flex; gap:.3rem; margin:.8rem 0 .2rem; border-bottom:1px solid var(--line-soft); }
+.drop-tab { font:inherit; font-size:var(--fs-xs); letter-spacing:.14em; text-transform:uppercase; color:var(--ash); background:none; border:0; border-bottom:2px solid transparent; padding:.35rem .6rem; cursor:pointer; }
+.drop-tab.on { color:var(--gold); border-bottom-color:var(--gold); }
+.drop-tab .badge { margin-left:.35rem; font-size:var(--fs-xs); color:var(--bg); background:var(--gold); border-radius:var(--r-pill); padding:0 .35rem; letter-spacing:.04em; }
+.drop-win { display:none; flex:1 1 auto; min-height:0; overflow:auto; flex-direction:column; }
+.drop-win.on { display:flex; }
+.drop-win .drop-squad-kicker { margin-top:.5rem; }
+#shop-list { display:grid; grid-template-columns:repeat(auto-fill, minmax(14rem,1fr)); gap:.4rem; }
+#shop-list .shop-shelf { grid-column:1 / -1; margin:.4rem 0 0; font-size:var(--fs-xs); letter-spacing:.14em; text-transform:uppercase; color:var(--ash); }
+#shop-list .listing { margin:0; display:flex; flex-direction:column; }
+#shop-list .listing .btn-buy { margin-top:auto; }
+.listing.recommended { border-color:var(--gold); box-shadow:0 0 0 1px color-mix(in srgb, var(--gold) 35%, transparent); }
+.listing .rec { font-size:var(--fs-xs); color:var(--gold); margin:.15rem 0; }
+.rv-kits { display:grid; grid-template-columns:repeat(auto-fill, minmax(10.5rem,1fr)); gap:.4rem; overflow:auto; }
+.rv-kit { font:inherit; text-align:left; border-radius:var(--r-md); padding:.5rem .6rem; border:1px dashed color-mix(in srgb, var(--steam) 35%, transparent); background:var(--shade); color:var(--ink); cursor:pointer; }
+.rv-kit .rk-name { color:var(--gold); font-weight:600; font-size:var(--fs-md); }
+.rv-kit .rk-meta { color:var(--muted); font-size:var(--fs-xs); }
+.rv-kit.on { border-style:solid; border-color:color-mix(in srgb, var(--gold) 65%, transparent); background:color-mix(in srgb, var(--edge) 22%, var(--shade)); }
+.rv-kit:disabled { opacity:.45; cursor:not-allowed; }
+.drop-win#panel-shop { margin-top:0; }
+
+/* Operations rail: a lean pill instead of a "Lean ·" prefix; the brief's title at reading size */
+.cc-lean { display:inline-block; font-style:normal; font-size:var(--fs-xs); letter-spacing:.1em; text-transform:uppercase; color:var(--gold); border:1px solid color-mix(in srgb, var(--gold) 45%, transparent); border-radius:var(--r-pill); padding:0 .4rem; margin-bottom:.2rem; }
+.cc-op-title { font-size:var(--fs-lg); color:var(--gold); margin:.15rem 0 .5rem; line-height:1.3; letter-spacing:0; text-transform:none; }
+.cc-rules { margin-top:.5rem; }
+.cc-rules summary { cursor:pointer; font-size:var(--fs-xs); letter-spacing:.14em; text-transform:uppercase; color:var(--ash); }

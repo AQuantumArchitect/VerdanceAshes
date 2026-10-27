@@ -527,6 +527,13 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
         intent["theater"] = theater
         if theater.get("kind") == "kings_showdown":
             _theaters.solo_command(intent)
+            from verdance.campaign import suits as _suits
+            say = [_suits.line(state)]
+            if theater.get("cortexSitsOut"):
+                say.append("Cortex sees its own suit walking out to the duel and stays home. Two kings to beat, not three.")
+            if isinstance(intent.get("briefing"), dict):
+                for text in [t for t in say if t]:
+                    intent["briefing"].setdefault("lines", []).append({"speaker": "ketha", "text": text, "tag": "suit"})
     # Bonds that are worth something on the field: rank-B XP, rank-A gifts. The gadget applies a
     # row only when both heroes of the pair actually drop.
     intent.update(_synergy.bond_perks(state, [h.get("heroId") for h in (intent.get("roster") or {}).get("heroes") or []], workspace))

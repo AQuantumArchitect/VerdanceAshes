@@ -2251,6 +2251,13 @@ $enemyAiShort = Get-EnemyAiShortName
 Write-Host ("Enemy AI shortName: {0} (map={1} profile={2})" -f $enemyAiShort, $mapId, $arcProfile.enemyAI)
 $allyTeams = @([ordered]@{ id = 0; startRect = New-StartRect $deployCenter 0.20 })
 $teams = @([ordered]@{ id = 0; side = "Legion"; allyTeam = 0; base = @($deployCenter[0], $deployCenter[1]); rgb = @(0.25, 0.85, 0.35); label = "Ashwalkers"; faction = "ashwalkers" })
+# The walker wears the company's commander suit (verdance.campaign.suits): its start commander is
+# that suit's body. Buy Cortex's and the company starts in a corcom; Koom's Armada suit, an armcom.
+if ($commanderUnlocked -and $commanderRow -and $commanderRow.PSObject.Properties["unitDef"]) {
+  $suitDef = [string]$commanderRow.unitDef
+  if ($suitDef -like "armcom*") { $teams[0].side = "Armada" } elseif ($suitDef -like "corcom*") { $teams[0].side = "Cortex" }
+  Write-Host ("Commander suit: {0} ({1})" -f $suitDef, $teams[0].side)
+}
 $forces = @([ordered]@{ id = "player_deployment"; label = "Ashwalker drop - $($intent.deploymentZoneId)"; teamID = 0; side = "Legion"; faction = "ashwalkers"; role = "player_anchor"; base = [ordered]@{ x = $deployCenter[0]; z = $deployCenter[1] }; recipe = "ashwalker_player_kit" })
 $ai = @()
 $alliances = @()
@@ -3709,6 +3716,7 @@ $scenario = [ordered]@{
     warWrecks = @($script:warWrecks)
     scoutParties = @($script:scoutParties)
     jumpGate = $(if ($intent.PSObject.Properties["jumpGate"] -and $intent.jumpGate) { $intent.jumpGate } else { $null })
+    noCommanders = [bool]($theater -and $theater.PSObject.Properties["noCommanders"] -and $theater.noCommanders)
     occupationModel = "living_shell"
     sessionMode = if ($intent.sessionMode) { [string]$intent.sessionMode } else { "same_map" }
     capture = [ordered]@{

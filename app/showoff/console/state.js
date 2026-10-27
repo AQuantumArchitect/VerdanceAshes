@@ -97,6 +97,9 @@ export function jobLabel(kind) {
     fortify_zone: "Fortify and secure the zone",
     home_founding: "Found the camp — dig in",
     kings_showdown: "Take the throne — last commander standing",
+    hunt_scouts: "Stop the scouts",
+    raze_camp: "Wipe out the camp",
+    jump_gate: "The Spire Jump",
   })[kind] || String(kind || "Sortie").replace(/_/g, " ");
 }
 

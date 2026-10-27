@@ -1,6 +1,6 @@
 {
   "schemaVersion": "verdance-commerce-catalog/1.4",
-  "notes": "Slim broker. Cortex arms merchant = Punch of Thugs + Grunt Stream + Crash of Brutes + one Constructor. No role-ladder duplicates, no fabs-as-shop, no Wheelie/Spoke SKUs (Spoke is muster/hero). Armada shelf = constructor only (the surplus pawns were retired to keep the shop lean). Cortex also keeps one very dear mercenary flight: Wasps. Tnb for build rights; km$ for combat packs.",
+  "notes": "Slim broker, sold in the drop window (the Cortex mercenary store). Mercenaries for one drop: Punch of Thugs, Grunt Stream (four waves), Wasp Flight (very dear). Heroes for hire for one drop: Marrow Gale's Cutlasses and Bro's Tzar; win the campaign with one in the company and it is a starter from then on. Build rights: one Cortex constructor (and one Armada constructor at high Armada rep). The Cortex commander suit (verdance.campaign.suits). Crash of Brutes retired 2026-10-27 (pruned). Tnb for build rights and heroes; metal for everything.",
   "resource": {
     "id": "tenebrium",
     "label": "Tenebrium",
@@ -41,7 +41,7 @@
       "kind": "purchase_package",
       "shelf": "cortex",
       "label": "Punch of Thugs",
-      "blurb": "Pawn launcher salvo: 7 Cortex Thugs land with your infil. Buy again to stack.",
+      "blurb": "Pawn launcher salvo: 7 Cortex Thugs land with your infil. Chaff to throw in front of your heroes. Buy again to stack.",
       "unitDef": "corthud",
       "count": 7,
       "spawnHealthFracMin": 0.85,
@@ -62,15 +62,19 @@
         "sourceSpaceId": "pawn_launcher",
         "landNear": "infil",
         "productLabel": "Punch of Thugs"
+      },
+      "recommend": {
+        "firstDrop": 2,
+        "why": "Two Punches make the first raid on Greenest Fields far kinder."
       }
     },
     "grunt_stream": {
       "kind": "purchase_package",
       "shelf": "cortex",
       "label": "Grunt Stream",
-      "blurb": "Infantry chaff: Cortex Grunts spill from All That Simmers mid-fight.",
+      "blurb": "Infantry chaff that keeps coming: four waves of five Cortex Grunts spill from All That Simmers' geo-vents, 45 seconds apart.",
       "unitDef": "corak",
-      "count": 8,
+      "count": 5,
       "spawnHealthFracMin": 0.9,
       "spawnHealthFracMax": 1.0,
       "loan": false,
@@ -91,34 +95,10 @@
         "sourceSpaceId": "all_that_simmers",
         "landNear": "infil",
         "productLabel": "Geo-vent grunt stream"
-      }
-    },
-    "crash_of_brutes": {
-      "kind": "purchase_package",
-      "shelf": "cortex",
-      "label": "Crash of Brutes",
-      "blurb": "Armor column: Cortex Brutes from the Eye of Horus.",
-      "unitDef": "corraid",
-      "count": 4,
-      "spawnHealthFracMin": 0.9,
-      "spawnHealthFracMax": 1.0,
-      "loan": false,
-      "tenebriumCost": 0,
-      "metalCostK": 4,
-      "repMin": {
-        "cortex": 25
       },
-      "builds": false,
-      "tags": [
-        "armor",
-        "cortex"
-      ],
-      "delivery": {
-        "mode": "map_web",
-        "sourceMapId": "eye_of_horus",
-        "sourceSpaceId": "eye_of_horus",
-        "landNear": "infil",
-        "productLabel": "Cortex Brute column"
+      "stream": {
+        "waves": 4,
+        "everySeconds": 45
       }
     },
     "wasp_flight": {
@@ -151,6 +131,44 @@
         "productLabel": "Wasp flight"
       }
     },
+    "rent_gale": {
+      "kind": "hero_rental",
+      "shelf": "cortex",
+      "label": "Rent Marrow Gale · Cutlass wing",
+      "blurb": "Cortex lends you Marrow Gale and six Cutlass seaplanes for one drop. Expensive. Win the campaign with Gale in your company and Gale is yours to start with from then on.",
+      "heroId": "gale",
+      "unitDef": "corcut",
+      "count": 6,
+      "tenebriumCost": 1,
+      "metalCostK": 6,
+      "repMin": {
+        "cortex": 20
+      },
+      "tags": [
+        "hero_rental",
+        "cortex",
+        "sky"
+      ]
+    },
+    "rent_bro": {
+      "kind": "hero_rental",
+      "shelf": "cortex",
+      "label": "Rent Bro · the Tzar",
+      "blurb": "Cortex lends you Bro and his Tzar for one drop. Very expensive. Win the campaign with Bro in your company and Bro is yours to start with from then on.",
+      "heroId": "bro",
+      "unitDef": "corgol",
+      "count": 1,
+      "tenebriumCost": 2,
+      "metalCostK": 8,
+      "repMin": {
+        "cortex": 30
+      },
+      "tags": [
+        "hero_rental",
+        "cortex",
+        "heavy"
+      ]
+    },
     "cortex_constructor": {
       "kind": "constructor",
       "shelf": "cortex",
@@ -166,6 +184,23 @@
       "builds": true,
       "tags": [
         "constructor",
+        "cortex"
+      ]
+    },
+    "cortex_commander_suit": {
+      "kind": "commander_suit",
+      "shelf": "cortex",
+      "label": "Cortex Commander Suit",
+      "blurb": "Cortex will sell you a commander suit, and they want an outrageous price for it. You need a suit to duel in All That Simmers. Wear theirs and Cortex won't turn up for that fight.",
+      "unitDef": "corcom",
+      "count": 1,
+      "tenebriumCost": 15,
+      "metalCostK": 8,
+      "repMin": {
+        "cortex": 35
+      },
+      "tags": [
+        "commander_suit",
         "cortex"
       ]
     },

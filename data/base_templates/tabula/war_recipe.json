@@ -11,6 +11,8 @@
   "seed": 3312,
   "dry": true,
   "playerSeat": "nw",
+  "noCommanders": true,
+  "noCommandersNote": "Owner call 2026-10-26: no commanders on Tabula. The bake is unchanged (BARb plays its commander); on the field every start commander but the company's is taken away (game_verdance_suits.lua), so no suit can be stolen here. Koom Valley is where suits are stolen.",
   "notes": "The four west seats are the map's own start positions. The terrain's east start positions lie past its edge (x up to 8903 on an 8192-wide map), so the east seats are the west seats turned half a circle (the zone map measures the field at 0.98 half-turn symmetric): Armada's south-east seat is the Northwest door's opposite, the SE plateau their fortress. The company enters by the NW reserve door and takes the seat beside it.",
   "sides": {
     "west": {

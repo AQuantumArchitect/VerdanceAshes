@@ -1178,6 +1178,8 @@ local function resultJson()
     '"observedZones":' .. ((GG and GG.VA_ObservedZonesJson) and GG.VA_ObservedZonesJson() or 'null'),
     -- the kings' showdown, from game_verdance_kings.lua: who fell, when, to whom
     '"kings":' .. ((GG and GG.VA_KingsJson) and GG.VA_KingsJson() or 'null'),
+    -- a commander suit won in the field, from game_verdance_suits.lua (verdance.campaign.suits)
+    '"commanderSuit":' .. ((GG and GG.VA_SuitJson) and GG.VA_SuitJson() or 'null'),
     '"beliefExport":' .. ((GG and GG.VA_BeliefExportJson) and GG.VA_BeliefExportJson() or 'null'),
     '"purge":{"armed":' .. tostring(extraObj.purge == true)
       .. ',"done":' .. tostring(extraObj.purgeDone == true) .. '}',

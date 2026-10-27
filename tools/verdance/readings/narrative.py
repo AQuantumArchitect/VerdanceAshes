@@ -127,6 +127,11 @@ def operation_summary(choice):
     effect = choice.get("effect") or {}
     kind = effect.get("objectiveArchetype") or effect.get("contractKind") or choice.get("objectiveArchetype") or ""
     required = {
+        "kings_showdown": "Be the last commander standing. Your commander walks out alone.",
+        "fortify_zone": "Land on the far door and build it up until it is yours: army or defences outweighing everyone there.",
+        "hunt_scouts": "Kill every Armada scout constructor.",
+        "raze_camp": "Wreck the mercenary camp in the crater.",
+        "jump_gate": "Finish the Spire Gate, power it with four advanced fusions, get every named hero through.",
         "seize_lane": "Clear and hold the marked zone until the objective confirms completion.",
         "gate_control": "Clear and hold the marked gate until the objective confirms completion.",
         "hold_plateau": "Hold the marked plateau until the objective confirms completion.",
@@ -135,8 +140,16 @@ def operation_summary(choice):
         "strike_relay": "Destroy the marked relay targets.",
         "destroy_key_structure": "Destroy the marked key structures.",
     }.get(kind, "Complete the required marks shown in the battle briefing; optional marks do not replace them.")
-    return {"id": choice.get("id"), "title": choice.get("label", "Operation"),
-            "mapId": effect.get("mapId"), "purpose": choice.get("blurb") or "Secure an opportunity for the company.",
+    # The card's name without the lean prefix (the rail shows a pill), and the blurb without the
+    # board's closing lean/open line (the pill says it).
+    title = str(choice.get("label") or "Operation")
+    lean = bool(choice.get("recommended") or choice.get("lean") or title.startswith("Lean · "))
+    if title.startswith("Lean · "):
+        title = title[len("Lean · "):]
+    lines = [ln for ln in str(choice.get("blurb") or "").split("\n")
+             if ln.strip() and ln.strip() not in ("The world leans this way.", "Still open.")]
+    return {"id": choice.get("id"), "title": title, "lean": lean, "kind": kind,
+            "mapId": effect.get("mapId"), "purpose": "\n".join(lines) or "Secure an opportunity for the company.",
             "required": required,
             "bringHome": "Get what you want to keep onto the pad and press EXTRACT. The game pauses and shows the manifest: who goes, what stays, where to. What is off the pad stays on Verdance; what stays becomes a holding. The clock never ends the sortie — overtime only wakes the map.",
             "risks": "Enemy strength beyond observed ground is unknown. Optional targets add exposure.",
@@ -242,7 +255,7 @@ def project(state, choices=(), workspace=None):
         op["priority"] = (100 if commitments else 0) + (30 if scarce else 0)
         op["recommendation"] = ("Supports your commitment: " + commitments[0]["title"] if commitments else
                                 "Tenebrium reserves are low; a raid can fund construction." if scarce else
-                                "Available on this theater. Review the requirements and route.")
+                                "")
     operations.sort(key=lambda o: (o["disabled"], -o["priority"], str(o["id"])))
     intelligence = copy.deepcopy(n["intelligence"])
     for choice in choices:

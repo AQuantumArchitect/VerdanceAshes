@@ -13,13 +13,11 @@
       "faction": "cortex",
       "role": "base_of_operations",
       "label": "Eye of Horus",
-      "blurb": "Sturdy T1 rings — Cortex base of operations. Brute columns and Wasp flights ship from here.",
+      "blurb": "Sturdy T1 rings — Cortex base of operations. Wasp flights ship from here.",
       "products": [
-        "corraid",
         "corape"
       ],
       "listings": [
-        "crash_of_brutes",
         "wasp_flight"
       ],
       "mode": "map_web"
