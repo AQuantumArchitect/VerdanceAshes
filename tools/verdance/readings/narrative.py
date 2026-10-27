@@ -124,25 +124,22 @@ def reconcile(state, data, workspace=None):
 
 
 def what_it_pays(kind: str = "") -> str:
-    """What a sortie pays, read from the commerce catalog's sortieRewards (never written by hand)."""
+    """What a sortie pays, read from the commerce catalog's sortieRewards (never written by hand).
+    The stockpile you extract with comes first: it is the company's main income."""
     try:
         rewards = json.loads((ROOT / "data" / "commerce" / "commerce_catalog.json").read_text(encoding="utf-8-sig")).get("sortieRewards") or {}
     except Exception:  # noqa: BLE001
         rewards = {}
+    line = ("The metal in storage when you extract comes home (1k for every 1,000 above what the field gave you): "
+            "build metal storage and reclaim everything before you lift.")
     v = rewards.get("metalOnVictory") or {}
-    c = rewards.get("metalOnCleanExtract") or {}
-    parts = []
-    if v:
+    if v and int(v.get("max") or 0):
         lo, hi = int(v.get("min") or 0), int(v.get("max") or 0)
-        parts.append(f"A win pays {lo}-{hi}k metal" if hi > lo else f"A win pays {hi}k metal")
-    if c and int(c.get("max") or 0):
-        pct = int(round(float(c.get("chance", 1.0)) * 100))
-        parts.append(f"a clean extract {'a ' + str(pct) + '% chance of ' if pct < 100 else ''}{int(c.get('max'))}k more")
-    line = ", ".join(parts) + "." if parts else ""
+        line += f" A win adds {lo}-{hi}k." if hi > lo else f" A win adds {hi}k."
     line += " Tenebrium only from what fallen builders leave: reclaim it. Bonus marks earn Null Mercs standing."
     if kind == "kings_showdown":
         line = "The throne. " + line
-    return line.strip()
+    return line
 
 
 def operation_summary(choice):

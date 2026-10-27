@@ -742,14 +742,12 @@ def settle_commerce_after_sortie(
         return lo + int(_roll(tag + ":v") * span) % span
 
     # Tenebrium is the hyper-rare build currency (owner call, 2026-10-27): it comes only from reclaiming
-    # what builders leave behind. A mission's reward is metal: a won sortie and a clean extract each pay
-    # a roll of campaign metal (sortieRewards.metalOnVictory / metalOnCleanExtract, in 1k units).
+    # what builders leave behind. Metal comes mostly from the stockpile extracted below (build storage,
+    # reclaim everything); a won sortie only tops it up (sortieRewards.metalOnVictory, in 1k units).
     # Capturing ground pays nothing of either.
     award_k = 0
     if success:
         award_k += _award_range(rewards.get("metalOnVictory") or {}, "mv")
-    if clean:
-        award_k += _award_range(rewards.get("metalOnCleanExtract") or {}, "mc")
     if award_k:
         commerce["metalK"] = int(commerce.get("metalK") or 0) + award_k
         notes.append(f"+{award_k}×1km$ metal (mission reward)")

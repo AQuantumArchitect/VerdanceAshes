@@ -1,6 +1,6 @@
 {
   "schemaVersion": "verdance-commerce-catalog/1.4",
-  "notes": "Slim broker, sold in the drop window (the Cortex mercenary store). Mercenaries for one drop: Punch of Thugs, Crash of Brutes, Hive of Hornets (very dear). Heroes for hire for one drop, metal only: Marrow Gale's Cutlasses and Bro's Tzar; win the campaign with one in the company and it is a starter from then on. Build rights: one Cortex constructor (one Armada constructor at high Armada rep). The Cortex commander suit (verdance.campaign.suits). Tenebrium is the hyper-rare build currency: it buys build rights and the suit, never mercenaries. Grunt Stream retired 2026-10-27 (Crash of Brutes back in its place).",
+  "notes": "Slim broker, sold in the drop window (the Cortex mercenary store). Mercenaries for one drop: Punch of Thugs, Crash of Brutes, Hive of Wasps (very dear). Heroes for hire for one drop, metal only: Marrow Gale's Cutlasses and Bro's Tzar; win the campaign with one in the company and it is a starter from then on. Build rights: one Cortex constructor (one Armada constructor at high Armada rep). The Cortex commander suit (verdance.campaign.suits). Tenebrium is the hyper-rare build currency: it buys build rights and the suit, never mercenaries. Grunt Stream retired 2026-10-27 (Crash of Brutes back in its place).",
   "resource": {
     "id": "tenebrium",
     "label": "Tenebrium",
@@ -99,7 +99,7 @@
     "wasp_flight": {
       "kind": "purchase_package",
       "shelf": "cortex",
-      "label": "Hive of Hornets",
+      "label": "Hive of Wasps",
       "blurb": "Cortex mercenary gunships: four Wasp gunships flying as one hive, hired by the sortie and priced like it. They arrive from the Eye of Horus mid-sortie.",
       "unitDef": "corape",
       "count": 4,
@@ -222,19 +222,14 @@
   "sortieRewards": {
     "metalOnVictory": {
       "min": 1,
-      "max": 3,
-      "chance": 1.0,
-      "notes": "A won sortie pays 1-3k campaign metal. Tenebrium never comes from mission outcomes or captured ground; only from reclaim."
-    },
-    "metalOnCleanExtract": {
-      "min": 0,
       "max": 1,
-      "chance": 0.5
+      "chance": 1.0,
+      "notes": "A won sortie adds a flat 1k. Most campaign metal comes from the stockpile you extract with (metalOnExtract): build metal storage and reclaim everything before you lift. Tenebrium never comes from mission outcomes or captured ground; only from reclaim."
     },
     "metalOnExtract": {
       "unitMetal": 1000,
       "formula": "floor(endMetal/1000)",
-      "notes": "Campaign metal banked from player team end stockpile. Replaces retired scrap creditsOnVictory."
+      "notes": "The primary source of campaign metal (and so of the mercenary store): floor(end stockpile / 1000), less the field's starting allotment. Metal storage raises what you can carry out; reclaim fills it."
     },
     "loanReturnBonus": {
       "metalK": 1,

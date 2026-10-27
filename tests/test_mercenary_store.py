@@ -27,7 +27,7 @@ def _state():
 def test_the_cortex_shelf_is_pruned():
     L = load_commerce_catalog(ROOT)["listings"]
     assert "grunt_stream" not in L and "crash_of_brutes" in L
-    assert L["wasp_flight"]["label"] == "Hive of Hornets"
+    assert L["wasp_flight"]["label"] == "Hive of Wasps"
     cortex = [k for k, v in L.items() if v.get("shelf") == "cortex"]
     assert len(cortex) <= 7
     assert L["punch_of_thugs"]["recommend"]["firstDrop"] == 2
