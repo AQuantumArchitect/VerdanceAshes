@@ -43,13 +43,8 @@ local function jstr(s)
   return '"' .. s .. '"'
 end
 
-local function isCommander(defID)
-  local ud = defID and UnitDefs[defID]
-  if not ud then return false end
-  local cp = ud.customParams or {}
-  if cp.isdecoycommander or cp.decoyfor then return false end
-  return (cp.iscommander or cp.isCommander or cp.commander) and true or false
-end
+local COM = VFS.Include("luarules/gadgets/include/va_commanders.lua")
+local function isCommander(defID) return COM.isCommander(defID) end
 
 local function commanders(teamID)
   local n = 0

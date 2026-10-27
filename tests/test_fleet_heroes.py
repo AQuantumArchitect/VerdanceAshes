@@ -65,7 +65,9 @@ def test_wasp_is_a_dear_cortex_merc_and_pawns_are_gone():
     assert "armada_surplus_pawns" not in L
     w = L["wasp_flight"]
     assert w["unitDef"] == "corape" and w["shelf"] == "cortex" and w["metalCostK"] >= 9
-    assert w["metalCostK"] > max(v["metalCostK"] for k, v in L.items() if k != "wasp_flight")
+    # the dearest mercenary package (heroes for hire are dearer still, and metal-only)
+    assert w["metalCostK"] > max(v["metalCostK"] for k, v in L.items()
+                                 if k != "wasp_flight" and v.get("kind") == "purchase_package")
     sp = _j(ROOT / "data/commerce/print_spaces.json")["spaces"]
     assert "wasp_flight" in sp["eye_of_horus"]["listings"]
     assert "armada_surplus_pawns" not in sp["pawn_launcher"]["listings"]

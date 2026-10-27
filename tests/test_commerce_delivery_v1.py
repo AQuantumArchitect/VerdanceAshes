@@ -33,11 +33,11 @@ def test_greenest_to_simmers_is_long_haul():
     assert minutes >= 50.0
 
 
-def test_crash_eta_from_eye():
-    listing = (load_commerce_catalog(ROOT).get("listings") or {})["crash_of_brutes"]
+def test_wasp_eta_from_eye():
+    listing = (load_commerce_catalog(ROOT).get("listings") or {})["wasp_flight"]
     eta = delivery_eta(
         listing=listing,
-        listing_id="crash_of_brutes",
+        listing_id="wasp_flight",
         dest_map_id="greenest_fields",
         workspace=ROOT,
     )
@@ -66,15 +66,15 @@ def test_punch_is_pawn_launcher_t0():
     assert int(eta["etaSeconds"] or 0) == 0
 
 
-def test_grunt_stream_from_simmers():
-    listing = (load_commerce_catalog(ROOT).get("listings") or {})["grunt_stream"]
+def test_crash_of_brutes_from_the_eye():
+    listing = (load_commerce_catalog(ROOT).get("listings") or {})["crash_of_brutes"]
     eta = delivery_eta(
         listing=listing,
-        listing_id="grunt_stream",
+        listing_id="crash_of_brutes",
         dest_map_id="greenest_fields",
         workspace=ROOT,
     )
-    assert eta["sourceMapId"] == "all_that_simmers"
+    assert eta["sourceMapId"] == "eye_of_horus"
     assert eta["deferred"] is True
 
 
@@ -95,11 +95,11 @@ def test_loan_retire_and_deferred_intent():
                     "loanCount": 6,
                     "count": 6,
                 },
-                "crash_of_brutes": {
+                "wasp_flight": {
                     "qty": 1,
                     "loan": False,
                     "kind": "purchase_package",
-                    "unitDef": "corraid",
+                    "unitDef": "corape",
                     "count": 4,
                 },
             },
@@ -120,7 +120,7 @@ def test_loan_retire_and_deferred_intent():
     deploy_ids = {d.get("listingId") for d in packages}
     assert "punch_of_thugs" in deploy_ids  # pawn launcher = t=0
     pending_ids = {p["listingId"] for p in intent["pendingDeliveries"]}
-    assert "crash_of_brutes" in pending_ids  # map-web stays deferred
+    assert "wasp_flight" in pending_ids  # map-web stays deferred
     assert "punch_of_thugs" not in pending_ids
 
     # Repeat punch buy stacks qty onto the t=0 deploy bag.
@@ -157,7 +157,7 @@ if __name__ == "__main__":
     test_eye_to_simmers_is_long_haul()
     test_crash_eta_from_eye()
     test_punch_is_pawn_launcher_t0()
-    test_grunt_stream_from_simmers()
+    test_crash_of_brutes_from_the_eye()
     test_loan_retire_and_deferred_intent()
     test_punch_available_when_owned()
     print("ok")

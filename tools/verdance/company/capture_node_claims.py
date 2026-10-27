@@ -232,6 +232,35 @@ def stamp_objective_capture(objective: Dict[str, Any], order: Optional[Dict[str,
     return obj
 
 
+# Every contract is territory: the company takes a zone (2026-10-27). An empty zone is taken by
+# establishing presence there (the compiler turns it into fortify_zone); a zone with something in it
+# by clearing it and holding. Whatever the Null Mercs were hired to do there is the reason the zone
+# is worth taking; it rides along as contractKind. Rescues are never the job: they are bonus marks.
+# Kept as they are: the finales, the Rock Jungle's own home jobs, and ground already being fortified.
+KEEP_KINDS = frozenset({"kings_showdown", "jump_gate", "hive_clear_or_bypass", "home_founding",
+                        "fortify_zone", "survive_wilds", "seize_lane"})
+
+
+def as_territory_capture(objective: Dict[str, Any], zone_label: Optional[str] = None) -> Dict[str, Any]:
+    """The objective as a capture of its target zone (seize_lane), unless its kind is kept."""
+    obj = dict(objective or {})
+    kind = str(obj.get("kind") or "")
+    zid = obj.get("targetZoneId")
+    if not zid or kind in KEEP_KINDS:
+        return obj
+    from verdance.common import ARCHETYPE_VERB
+    label = str(obj.get("label") or "")
+    verb = ARCHETYPE_VERB.get(kind)
+    if verb and label.startswith(verb + " "):
+        label = label[len(verb) + 1:]
+    place = zone_label or label or str(zid)
+    obj["contractKind"] = kind
+    obj["kind"] = "seize_lane"
+    obj["label"] = place if place.startswith("Take ") else f"Take {place}"
+    obj.pop("description", None)
+    return stamp_objective_capture(obj, {"captureMode": CAPTURE_MODE})
+
+
 def apply_node_claim(
     state: Dict[str, Any],
     result: Dict[str, Any],

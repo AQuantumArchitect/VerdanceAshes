@@ -125,8 +125,12 @@ local function zoneOf(x, z)
 end
 
 -- The pad is the whole zone the company leaves from. Publishes it for the HUD.
+local homePad = nil   -- where the company landed: a rescue always goes home from here
+local rescuedIds = {}
+
 local function placePad(zid, x, z, r)
   pad = { zoneId = zid, label = zoneLabel[zid] or zid, x = x, z = z, r = r }
+  if not homePad then homePad = { zoneId = zid, label = zoneLabel[zid] or zid } end
   -- The pad is the whole zone the company landed in (the infil zone), not a circle inside it.
   -- reach: the farthest corner of the zone from the pad point, for the unit queries below.
   local cw, ch, reach, cells = mapX / cols, mapZ / rows, 0, 0
@@ -344,6 +348,7 @@ local function manifest()
     schema = "verdance-manifest/1",
     frame = Spring.GetGameFrame() or 0,
     pad = pad and { zoneId = pad.zoneId, label = pad.label, x = math.floor(pad.x), z = math.floor(pad.z), radius = pad.r } or nil,
+    homePad = nil,   -- filled below when the pad has moved and a rescue must still go home from the landing zone
     destinations = destinations(),
     going = { heroes = {}, units = {}, packUnits = {}, hiredUnits = {}, unitCount = 0, structures = 0, metal = 0 },
     staying = { heroes = {}, units = {}, unitCount = 0, structures = {}, structureCount = 0, metal = 0 },
@@ -355,6 +360,7 @@ local function manifest()
     for _, h in ipairs(GG.VA_JumpPorted() or {}) do m.going.heroes[#m.going.heroes + 1] = h end
   end
   if not pad then return m end
+  rescuedIds = {}
   local units = Spring.GetTeamUnits(playerTeamID) or {}
   for i = 1, #units do
     local uid = units[i]
@@ -368,6 +374,17 @@ local function manifest()
       local hname = Spring.GetUnitRulesParam(uid, "va_hero_name")
       local onPad = onPadAt(x, z)
       local zid = zoneOf(x, z) or "?"
+      -- Two exits (owner, 2026-10-27): the company leaves from the ground it took, but a rescue
+      -- always goes home from where it started: any hero raised or turned this sortie (va_recruited,
+      -- or an objective's rezHeroId) lifts only from the landing zone.
+      local rez = mission and mission.objective and mission.objective.rezHeroId
+      local hidNow = Spring.GetUnitRulesParam(uid, "va_hero_id")
+      local rescued = hidNow and ((rez and tostring(hidNow) == tostring(rez))
+        or (tonumber((Spring.GetUnitRulesParam(uid, "va_recruited"))) or 0) == 1)
+      if rescued and homePad and pad.zoneId ~= homePad.zoneId then
+        onPad = (zid == homePad.zoneId)
+        rescuedIds[#rescuedIds + 1] = tostring(hidNow)
+      end
       -- a pair's partner is named on the field but travels as its lead's pack
       local partner = Spring.GetUnitRulesParam(uid, "va_partner_of")
       local isHero = hid and hid ~= "" and hid ~= 0 and not (partner and partner ~= "")
@@ -411,6 +428,9 @@ local function manifest()
   end
   -- who else is standing on our pad
   m.enemyOnPad = enemiesOnPad()
+  if homePad and pad.zoneId ~= homePad.zoneId and #rescuedIds > 0 then
+    m.homePad = { zoneId = homePad.zoneId, label = homePad.label, rescue = table.concat(rescuedIds, ",") }
+  end
   -- what we looked at (observe gadget), as a map zone -> eta
   if GG and GG.VA_ObservedZonesTable then
     m.seen = GG.VA_ObservedZonesTable() or {}

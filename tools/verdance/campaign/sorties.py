@@ -18,7 +18,6 @@ from verdance.company.company import (
     company_deploy_band,
     ensure_company,
     sortie_roster,
-    peek_mission_call_ins,
 )
 from verdance.company.quest_generator import generate_quests, write_quest_batch
 from verdance.company.capture_node_claims import stamp_objective_capture
@@ -133,15 +132,6 @@ def apply_sealed_company_to_packet(
             packet["crewBand"] = list(band)
         if aces:
             packet["deployAces"] = list(aces)
-    # Prefer call-ins already stamped on the packet (commit_deploy); else peek state.
-    if not packet.get("missionCallIns"):
-        try:
-
-            calls = peek_mission_call_ins(state)
-            if calls:
-                packet["missionCallIns"] = list(calls)
-        except Exception:
-            pass
     return packet
 
 

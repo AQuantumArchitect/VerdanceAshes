@@ -1,6 +1,6 @@
 {
   "schemaVersion": "verdance-commerce-catalog/1.4",
-  "notes": "Slim broker. Cortex arms merchant = Punch of Thugs + Grunt Stream + Crash of Brutes + one Constructor. No role-ladder duplicates, no fabs-as-shop, no Wheelie/Spoke SKUs (Spoke is muster/hero). Armada shelf = constructor only (the surplus pawns were retired to keep the shop lean). Cortex also keeps one very dear mercenary flight: Wasps. Tnb for build rights; km$ for combat packs.",
+  "notes": "Slim broker, sold in the drop window (the Cortex mercenary store). Mercenaries for one drop: Punch of Thugs, Crash of Brutes, Hive of Wasps (very dear). Heroes for hire for one drop, metal only: Marrow Gale's Cutlasses and Bro's Tzar; win the campaign with one in the company and it is a starter from then on. Build rights: one Cortex constructor (one Armada constructor at high Armada rep). The Cortex commander suit (verdance.campaign.suits). Tenebrium is the hyper-rare build currency: it buys build rights and the suit, never mercenaries. Grunt Stream retired 2026-10-27 (Crash of Brutes back in its place).",
   "resource": {
     "id": "tenebrium",
     "label": "Tenebrium",
@@ -41,7 +41,7 @@
       "kind": "purchase_package",
       "shelf": "cortex",
       "label": "Punch of Thugs",
-      "blurb": "Pawn launcher salvo: 7 Cortex Thugs land with your infil. Buy again to stack.",
+      "blurb": "Pawn launcher salvo: 7 Cortex Thugs land with your infil. Chaff to throw in front of your heroes. Buy again to stack.",
       "unitDef": "corthud",
       "count": 7,
       "spawnHealthFracMin": 0.85,
@@ -62,42 +62,17 @@
         "sourceSpaceId": "pawn_launcher",
         "landNear": "infil",
         "productLabel": "Punch of Thugs"
-      }
-    },
-    "grunt_stream": {
-      "kind": "purchase_package",
-      "shelf": "cortex",
-      "label": "Grunt Stream",
-      "blurb": "Infantry chaff: Cortex Grunts spill from All That Simmers mid-fight.",
-      "unitDef": "corak",
-      "count": 8,
-      "spawnHealthFracMin": 0.9,
-      "spawnHealthFracMax": 1.0,
-      "loan": false,
-      "tenebriumCost": 0,
-      "metalCostK": 2,
-      "repMin": {
-        "cortex": 10
       },
-      "builds": false,
-      "tags": [
-        "stream",
-        "cortex",
-        "chaff"
-      ],
-      "delivery": {
-        "mode": "map_web",
-        "sourceMapId": "all_that_simmers",
-        "sourceSpaceId": "all_that_simmers",
-        "landNear": "infil",
-        "productLabel": "Geo-vent grunt stream"
+      "recommend": {
+        "firstDrop": 2,
+        "why": "Two Punches make the first raid on Greenest Fields far kinder."
       }
     },
     "crash_of_brutes": {
       "kind": "purchase_package",
       "shelf": "cortex",
       "label": "Crash of Brutes",
-      "blurb": "Armor column: Cortex Brutes from the Eye of Horus.",
+      "blurb": "Armor column: four Cortex Brutes roll in from the Eye of Horus mid-sortie.",
       "unitDef": "corraid",
       "count": 4,
       "spawnHealthFracMin": 0.9,
@@ -124,8 +99,8 @@
     "wasp_flight": {
       "kind": "purchase_package",
       "shelf": "cortex",
-      "label": "Wasp Flight",
-      "blurb": "Cortex mercenary gunships: four Wasps, hired by the sortie and priced like it. They arrive from the Eye of Horus mid-sortie.",
+      "label": "Hive of Wasps",
+      "blurb": "Cortex mercenary gunships: four Wasp gunships flying as one hive, hired by the sortie and priced like it. They arrive from the Eye of Horus mid-sortie.",
       "unitDef": "corape",
       "count": 4,
       "spawnHealthFracMin": 0.9,
@@ -151,6 +126,44 @@
         "productLabel": "Wasp flight"
       }
     },
+    "rent_gale": {
+      "kind": "hero_rental",
+      "shelf": "cortex",
+      "label": "Rent Marrow Gale · Cutlass wing",
+      "blurb": "Cortex lends you Marrow Gale and six Cutlass seaplanes for one drop, for a great deal of metal. Win the campaign with Gale in your company and Gale is yours to start with from then on.",
+      "heroId": "gale",
+      "unitDef": "corcut",
+      "count": 6,
+      "tenebriumCost": 0,
+      "metalCostK": 12,
+      "repMin": {
+        "cortex": 20
+      },
+      "tags": [
+        "hero_rental",
+        "cortex",
+        "sky"
+      ]
+    },
+    "rent_bro": {
+      "kind": "hero_rental",
+      "shelf": "cortex",
+      "label": "Rent Bro · the Tzar",
+      "blurb": "Cortex lends you Bro and his Tzar for one drop, for a fortune in metal. Win the campaign with Bro in your company and Bro is yours to start with from then on.",
+      "heroId": "bro",
+      "unitDef": "corgol",
+      "count": 1,
+      "tenebriumCost": 0,
+      "metalCostK": 16,
+      "repMin": {
+        "cortex": 30
+      },
+      "tags": [
+        "hero_rental",
+        "cortex",
+        "heavy"
+      ]
+    },
     "cortex_constructor": {
       "kind": "constructor",
       "shelf": "cortex",
@@ -172,8 +185,9 @@
     "cortex_commander_suit": {
       "kind": "commander_suit",
       "shelf": "cortex",
-      "label": "Cortex Commander Suit",
-      "blurb": "Cortex will sell you a commander suit, and they want an outrageous price for it. You need a suit to duel in All That Simmers. Wear theirs and Cortex won't turn up for that fight.",
+      "label": "Cortex Commander Suit (one fight)",
+      "blurb": "Cortex will loan you a commander suit for one fight, and they want an outrageous price for it. It goes back to them when you come home. You need a suit to duel in All That Simmers. Wear theirs and Cortex won't turn up for that fight.",
+      "oneDrop": true,
       "unitDef": "corcom",
       "count": 1,
       "tenebriumCost": 15,
@@ -206,26 +220,16 @@
     }
   },
   "sortieRewards": {
-    "tenebriumOnVictory": {
-      "min": 0,
+    "metalOnVictory": {
+      "min": 1,
       "max": 1,
-      "chance": 0.35
-    },
-    "tenebriumOnZoneFlip": {
-      "min": 0,
-      "max": 0,
-      "chance": 0.0,
-      "notes": "No free Tnb mint on node claim / zone flip. Liquid Tnb only via reclaim or rare victory scavenge."
-    },
-    "tenebriumOnCleanExtract": {
-      "min": 0,
-      "max": 1,
-      "chance": 0.2
+      "chance": 1.0,
+      "notes": "A won sortie adds a flat 1k. Most campaign metal comes from the stockpile you extract with (metalOnExtract): build metal storage and reclaim everything before you lift. Tenebrium never comes from mission outcomes or captured ground; only from reclaim."
     },
     "metalOnExtract": {
       "unitMetal": 1000,
       "formula": "floor(endMetal/1000)",
-      "notes": "Campaign metal banked from player team end stockpile. Replaces retired scrap creditsOnVictory."
+      "notes": "The primary source of campaign metal (and so of the mercenary store): floor(end stockpile / 1000), less the field's starting allotment. Metal storage raises what you can carry out; reclaim fills it."
     },
     "loanReturnBonus": {
       "metalK": 1,

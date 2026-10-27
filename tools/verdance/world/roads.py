@@ -383,12 +383,60 @@ def _card(job: Dict[str, Any], lean: bool) -> Dict[str, Any]:
             "kind": "deploy", "lean": lean, "recommended": lean, "score": job["score"], "effect": effect}
 
 
+def people_in_the_field(state: Dict[str, Any]) -> Dict[str, List[Dict[str, Any]]]:
+    """{mapId: [{heroId, name, zoneId, label}]} the named heroes the company left standing on each map."""
+    chars = state.get("characters") or {}
+    out: Dict[str, List[Dict[str, Any]]] = {}
+    for hid, rec in sorted(((state.get("camp") or {}).get("people") or {}).items()):
+        if not isinstance(rec, dict) or rec.get("where") != "field" or not rec.get("mapId") or not rec.get("zoneId"):
+            continue
+        if (chars.get(hid) or {}).get("status") == "dead":
+            continue
+        name = str((chars.get(hid) or {}).get("name") or hid)
+        out.setdefault(_canon_map(rec["mapId"]), []).append(
+            {"heroId": str(hid), "name": name, "zoneId": str(rec["zoneId"]), "label": str(rec.get("label") or rec["zoneId"])})
+    return out
+
+
+def fetch_jobs(state: Dict[str, Any], workspace: Path) -> List[Dict[str, Any]]:
+    """A field with a named hero standing on it always offers a job (owner, 2026-10-27): land where
+    they stand and take them on, home or across a road to where there is something to do."""
+    jobs = []
+    for map_id, people in sorted(people_in_the_field(state).items()):
+        if map_id == "all_that_simmers":
+            continue                     # the kings' field has its own rules
+        zone = people[0]["zoneId"]
+        jobs.append({"kind": "fetch", "mapId": map_id, "padZoneId": zone, "targetZoneId": zone, "people": people,
+                     "score": 0.0, "id": f"fetch_{map_id}"})
+    return jobs
+
+
+def _fetch_card(job: Dict[str, Any]) -> Dict[str, Any]:
+    map_name = MAP_NAMES.get(job["mapId"], job["mapId"])
+    people = job["people"]
+    names = ", ".join(p["name"] for p in people[:4]) + (f" and {len(people) - 4} more" if len(people) > 4 else "")
+    where = people[0]["label"]
+    lines = [f"{names} {'is' if len(people) == 1 else 'are'} still standing on {map_name}, at {where}.",
+             "Land where they stand. Bring them home, or take them on through a door you hold to where the work is."]
+    effect = {"mapId": job["mapId"], "contractKind": "fortify_zone", "preferredCaptureZoneId": job["targetZoneId"],
+              "preferredDeployZoneId": job["padZoneId"], "padLocked": True,
+              "sessionMode": "same_map" if job["mapId"] == HOME_MAP_ID else "map_travel",
+              "against": "wild" if job["mapId"] == HOME_MAP_ID else (MAP_FACTION.get(job["mapId"]) or "armada"),
+              "journey": "fetch", "fetchHeroIds": [p["heroId"] for p in people]}
+    return {"id": job["id"], "label": f"Fetch {names} from {map_name}", "blurb": "\n".join(lines), "kind": "deploy",
+            "lean": False, "recommended": False, "score": job["score"], "effect": effect}
+
+
 def road_sorties(state: Dict[str, Any], workspace: Path, *, seed: Optional[int] = None) -> Dict[str, Any]:
-    """One seeded lean plus the two strongest leftovers."""
+    """One seeded lean plus the two strongest leftovers, and a fetch job for every field where
+    someone of ours still stands."""
     jobs = legal_jobs(state, Path(workspace))
     used = collapse_seed(state) if seed is None else int(seed)
     lean, rest = _draw(jobs, used)
     cards = ([_card(lean, True)] if lean else []) + [_card(j, False) for j in rest]
+    fetches = fetch_jobs(state, Path(workspace))
+    cards += [_fetch_card(j) for j in fetches]
+    jobs = jobs + fetches
     voice = ""
     if cards:
         voice = ("Doors are the way between maps. Hold the door you leave by and the road is open; "

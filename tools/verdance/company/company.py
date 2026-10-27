@@ -148,6 +148,10 @@ def unlock_rescued_survivors(state: Dict[str, Any], workspace: Optional[Path] = 
     rescued |= {str(h) for h, e in field.items() if isinstance(e, dict) and str(e.get("status")) == "recruited"}
     alive = {str(h.get("heroId")) for h in ((state.get("roster") or {}).get("heroes") or [])
              if isinstance(h, dict) and str(h.get("status") or "") in ("active", "wounded")}
+    # A hero rented for the drop that won the campaign, home alive, is kept (verdance.company.rentals).
+    last = {str(h) for h in (company.get("rentedLastDrop") or [])}
+    rescued |= last
+    alive |= last
     new = sorted(rescued & alive)
     profile = load_profile(workspace)
     gained = [h for h in new if h not in profile["unlocked"]]
@@ -398,6 +402,7 @@ def ensure_company(state: Dict[str, Any], workspace: Optional[Path] = None) -> D
         owned = set(str(x) for x in (company.get("core") or []))
         owned.update(str(x) for x in (company.get("band") or []))
         owned.update(str(x) for x in (company.get("joinedLater") or []))
+        owned.update(str(x) for x in (company.get("rented") or []))   # rented for this drop: theirs until homecoming
         for hid in list(field.keys()):
             if hid in owned and isinstance(field.get(hid), dict):
                 if str(field[hid].get("status") or "") == "wild":
@@ -513,9 +518,10 @@ def company_deploy_band(state: Dict[str, Any]) -> List[str]:
         return []
     band = [str(x) for x in (company.get("band") or [])]
     later = [str(x) for x in (company.get("joinedLater") or [])]
+    rented = [str(x) for x in (company.get("rented") or [])]     # verdance.company.rentals: this drop only
     seen = set()
     out: List[str] = []
-    for hid in band + later:
+    for hid in band + later + rented:
         if not hid or hid in seen:
             continue
         if not hero_is_deployable(state, hid):
@@ -783,54 +789,6 @@ def seal_company(
     return True, "", company
 
 
-def order_bro_tzar(
-    state: Dict[str, Any],
-    *,
-    workspace: Optional[Path] = None,
-) -> Tuple[bool, str, Dict[str, Any]]:
-    """Legacy hook — Bro's pack seat *is* the Tzar now (no Tnb call-in).
-
-    Kept so old hub buttons / scripts fail soft instead of charging Tnb.
-    """
-    packs = load_crew_packs(workspace)
-    ensure_company(state, workspace)
-    company = state.get("company") or {}
-    if not company.get("sealed"):
-        return False, "Form the company first", {}
-
-    band = set(company_deploy_band(state))
-    if "bro" not in band and "bro" not in list(company.get("band") or []):
-        return False, "Hire Bro into the company — he *is* the Tzar", {}
-
-    commerce = state.get("commerce") or {}
-    return True, "", {
-        "missionCallIns": list(state.get("missionCallIns") or []),
-        "tenebrium": int(commerce.get("tenebrium") or 0),
-        "callIn": None,
-        "toast": "Bro is the Tzar — he drops with the company. No Tnb.",
-        "buttonLabel": "Bro is the Tzar",
-        "deprecated": True,
-        "unitDef": ((packs.get("heroes") or {}).get("bro") or {}).get("unitDef") or "corgol",
-    }
-
-
-def peek_mission_call_ins(state: Dict[str, Any]) -> List[Dict[str, Any]]:
-    raw = state.get("missionCallIns") or []
-    out: List[Dict[str, Any]] = []
-    if isinstance(raw, list):
-        for c in raw:
-            if isinstance(c, dict) and c.get("unitDef"):
-                out.append(dict(c))
-    return out
-
-
-def consume_mission_call_ins(state: Dict[str, Any]) -> List[Dict[str, Any]]:
-    """Return pending call-ins and clear them (one Drop per order)."""
-    calls = peek_mission_call_ins(state)
-    state["missionCallIns"] = []
-    return calls
-
-
 def join_from_field(
     state: Dict[str, Any],
     hero_id: str,
@@ -922,19 +880,23 @@ def score_field_recruit_belief(
     return round(score, 4)
 
 
+def _encounter_per_sortie(workspace: Optional[Path]) -> int:
+    from verdance.company import encounters as _enc
+    return _enc.per_sortie(workspace)
+
+
 def field_recruits_for_map(
     state: Dict[str, Any],
     map_id: str,
     *,
     workspace: Optional[Path] = None,
-    limit: int = 2,
+    limit: Optional[int] = None,
     marked_zone_ids: Optional[List[str]] = None,
     objective_archetype: Optional[str] = None,
 ) -> List[Dict[str, Any]]:
-    """Wild fieldPool heroes for this sortie, ranked by belief-field attention.
-
-    Marked hub zones (target / infil) always outrank ambient wild fills so a
-    Fatboy pad you clicked actually seeds Fatboy — not the first two alphabetically.
+    """Wild fieldPool heroes for this sortie: the encounter field's seeded draw, by the weights in
+    data/story/encounter_rules.json (how many a sortie meets, how much a marked zone draws, how hard a
+    home pulls). Nothing is guaranteed but the builder at the Rock Jungle's entrance.
 
     Dual-ledger law: on eco_raid / seize / etc., wild recruits default to
     **optional** (bonus). Destroying them must not fail the primary board.
@@ -992,8 +954,10 @@ def field_recruits_for_map(
     # The encounter field (umwelt.foresight.encounter): who the company meets here is drawn by the
     # bond web, the company's draw belief and the ground, not by a fixed home. Marked zones are the
     # company's attention. Falls through to the fixed homes when Umwelt lacks the module.
+    from verdance.company import encounters as _enc
+    if limit is None:
+        limit = _enc.per_sortie(workspace)
     try:
-        from verdance.company import encounters as _enc
         met = _enc.encounters_for_map(state, mid, workspace=workspace, limit=limit, marked_zone_ids=marked_zone_ids)
     except Exception as exc:  # noqa: BLE001 - never block a sortie on the encounter field
         print(f"VA_ENCOUNTER_FAIL {type(exc).__name__}: {exc}")
@@ -1025,21 +989,22 @@ def field_recruits_for_map(
             state, entry, map_id=mid, marked_zone_ids=marked_zone_ids
         )
         candidates.append(_row(hid, entry, rmap, zone, belief))
-    candidates.sort(key=lambda r: (-float(r.get("beliefScore") or 0), str(r.get("heroId") or "")))
-    # Attention collapse: marked-zone wild heroes always seat (up to 3).
-    # Soft floor = max(limit, marked_count) so Fatboy's pad never loses to ambient fill.
+    # Without the encounter field: the fixed homes, ranked by belief, a marked zone weighting its
+    # hero by the same drawBoost; the entrance builder rule holds here too.
+    boost = float((_enc.rules(workspace).get("markedGround") or {}).get("drawBoost", 1.0))
     marked = {str(z) for z in (marked_zone_ids or []) if z}
-    if marked:
-        must = [c for c in candidates if str(c.get("zoneId") or "") in marked][:3]
-        rest = [c for c in candidates if c not in must]
-        floor = max(int(limit), len(must))
-        out = list(must)
-        for c in rest:
-            if len(out) >= floor:
-                break
-            out.append(c)
-        return out if out else candidates[: max(1, int(limit))]
-    return candidates[: max(1, int(limit))]
+    for c in candidates:
+        if str(c.get("zoneId") or "") in marked:
+            c["beliefScore"] = round(float(c.get("beliefScore") or 0) * boost, 4)
+    out: List[Dict[str, Any]] = []
+    gate = _enc.entrance_builder(state, mid, workspace) if int(limit) > 0 else None
+    if gate:
+        entry = field.get(gate[0])
+        if isinstance(entry, dict):
+            out.append(dict(_row(gate[0], entry, mid, gate[1], 99.0), entrance=True))
+    candidates = [c for c in candidates if c["heroId"] not in {o["heroId"] for o in out}]
+    candidates.sort(key=lambda r: (-float(r.get("beliefScore") or 0), str(r.get("heroId") or "")))
+    return out + candidates[: max(0, int(limit) - len(out))]
 
 
 def _collect_lost_field_recruit_ids(result: Dict[str, Any]) -> List[str]:
@@ -1318,11 +1283,6 @@ def hub_company_surface(state: Dict[str, Any], workspace: Optional[Path] = None)
         formation_km = int(packs.get("startWalletKm") or 7)
 
     deploy_band = company_deploy_band(state) if sealed else []
-    bro_in = "bro" in deploy_band or "bro" in list(company.get("band") or []) or "bro" in list(
-        company.get("joinedLater") or []
-    )
-    bro_pack = (packs.get("heroes") or {}).get("bro") or {}
-    pending_calls = list(state.get("missionCallIns") or [])
 
     return {
         "sealed": sealed,
@@ -1331,6 +1291,8 @@ def hub_company_surface(state: Dict[str, Any], workspace: Optional[Path] = None)
         "band": list(company.get("band") or []),
         "you": company.get("you"),
         "joinedLater": list(company.get("joinedLater") or []),
+        # heroes rented from the Cortex mercenary store for the next drop (verdance.company.rentals)
+        "rented": list(company.get("rented") or []),
         "seatCap": int(company.get("seatCap") or seat_cap(packs)),
         # Preamble wallets: Tnb for build-power / reactor seats only.
         "formationWalletTnb": formation_wallet,
@@ -1340,20 +1302,7 @@ def hub_company_surface(state: Dict[str, Any], workspace: Optional[Path] = None)
         "wild": wild,
         # the seeded draw per map (who the company would meet there, unmarked); None = fixed homes
         "encounterDraw": encounter_draw,
+        "encounterPerSortie": _encounter_per_sortie(workspace),
         "deployAces": company_deploy_aces(state, packs) if sealed else core_hero_ids(packs),
         "deployBand": deploy_band,
-        "missionCallIns": pending_calls,
-        # Bro's company seat *is* the Tzar — no separate paid call-in.
-        "broTzar": {
-            "available": False,
-            "ordered": False,
-            "costTnb": 0,
-            "canAfford": True,
-            "inCompany": bool(bro_in),
-            "buttonLabel": "Bro is the Tzar",
-            "toastOrdered": "Bro drops with the company — no Tnb.",
-            "unitDef": bro_pack.get("unitDef") or "corgol",
-            "name": bro_pack.get("name") or "Bro",
-            "deprecated": True,
-        },
     }

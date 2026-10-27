@@ -136,15 +136,6 @@
       <h3>Standing</h3>
       <div id="rep"></div>
       <section id="cc-company-scenes"></section>
-      <div id="panel-shop">
-        <h2>Reinforcements and equipment</h2>
-        <div class="shop-balances" id="shop-balances"></div>
-        <p id="shop-note" class="shop-note"></p>
-        <h3>In the bag</h3>
-        <div id="deploy-kit"></div>
-        <h3>Shelves</h3>
-        <div id="shop-list"></div>
-      </div>
       <div class="hearth-block" id="hearth-block">
         <p class="hearth-label">Hearth · support talks</p>
         <div class="hearth-list" id="hearth-list"></div>
@@ -212,10 +203,26 @@
     <p class="epigraph">Before the match</p>
     <h2 id="drop-confirm-title">Into the field</h2>
     <p class="lede" id="drop-confirm-body">Launch loads this field in Beyond All Reason behind the hub.</p>
-    <div class="drop-squad-kicker" id="drop-squad-kicker">Who is dropping</div>
-    <div class="drop-squad" id="drop-squad" aria-label="Who is dropping"></div>
-    <div class="drop-reserve" id="drop-reserve" aria-label="What boards from the reserve"></div>
-    <p class="hint" id="drop-warm-status">Launch loads the field now. You pick who goes while it loads, then drop them in.</p>
+    <div class="drop-tabs" role="tablist" id="drop-tabs">
+      <button type="button" role="tab" class="drop-tab on" data-drop-tab="party">Party</button>
+      <button type="button" role="tab" class="drop-tab" data-drop-tab="reserve">Reserve</button>
+      <button type="button" role="tab" class="drop-tab" data-drop-tab="mercs" id="drop-tab-mercs">Mercenaries</button>
+    </div>
+    <section class="drop-win on" data-drop-win="party" aria-label="Who is dropping">
+      <div class="drop-squad-kicker" id="drop-squad-kicker">Who is dropping</div>
+      <div class="drop-squad" id="drop-squad"></div>
+    </section>
+    <section class="drop-win" data-drop-win="reserve" aria-label="What boards from the reserve">
+      <div class="drop-reserve" id="drop-reserve"></div>
+    </section>
+    <section class="drop-win" data-drop-win="mercs" aria-label="The Cortex mercenary store" id="panel-shop">
+      <div class="drop-squad-kicker">The Cortex mercenary store · for this drop</div>
+      <div class="shop-balances" id="shop-balances"></div>
+      <p id="shop-note" class="shop-note"></p>
+      <div id="deploy-kit"></div>
+      <div id="shop-list"></div>
+    </section>
+    <p class="hint" id="drop-warm-status">Hire mercenaries first, then Launch: the field loads while you finish the party and the reserve.</p>
     <div class="sheet-actions">
       <button type="button" class="btn-ghost" id="drop-confirm-cancel">Back to the map</button>
       <button type="button" class="btn-primary" id="drop-confirm-go">Launch</button>

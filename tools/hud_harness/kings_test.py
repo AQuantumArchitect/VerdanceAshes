@@ -32,6 +32,7 @@ def run(code):
 
 
 CODE = r'''
+MODROOT = %s
 local COM, TANK = 1, 2
 UnitDefs = { [COM] = { customParams = { iscommander = "1" } }, [TANK] = { customParams = {} } }
 UNITS = { [0] = {}, [1] = {}, [2] = {} }
@@ -46,6 +47,7 @@ VFS = { Include = function(p)
     { teamID = 0, faction = "ashwalkers", label = "The company" },
     { teamID = 1, faction = "armada", label = "Armada king" },
     { teamID = 2, faction = "nullmercs", label = "Null Mercs king" } } } end
+  if p:find("va_commanders") then return dofile(MODROOT .. "/" .. p) end
   error("no include " .. p) end }
 Spring = {
   Echo = function() end,
@@ -91,7 +93,7 @@ return (function(v)
   end
   return "{" .. table.concat(parts, ",") .. "}"
 end)(out)
-''' % json.dumps(GADGET)
+''' % (json.dumps(os.path.join(WS, "mod", "VerdanceAshes.sdd")), json.dumps(GADGET))
 
 ok = True
 

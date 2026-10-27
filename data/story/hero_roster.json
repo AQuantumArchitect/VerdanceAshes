@@ -528,7 +528,7 @@
       "timesWounded": 0,
       "campaignXp": 0.0,
       "name": "Infestor Hive",
-      "unitDef": "leginfestor",
+      "unitDef": "va_infestor",
       "xp": 0.045,
       "trait": "infestor",
       "traits": [

@@ -745,6 +745,28 @@
       "combined": 276,
       "label": "Construction Turret",
       "hasBuildPower": true
+    },
+    "armhvytrans": {
+      "metal": 190,
+      "energy": 4000,
+      "combined": 247,
+      "label": "Osprey",
+      "hasBuildPower": false
+    },
+    "va_infestor": {
+      "metal": 250,
+      "energy": 5200,
+      "combined": 324,
+      "label": "Infestor",
+      "hasBuildPower": true,
+      "massClass": "av"
+    },
+    "legah": {
+      "metal": 210,
+      "energy": 4300,
+      "combined": 271,
+      "label": "Alpheus",
+      "hasBuildPower": false
     }
   },
   "heroes": {
@@ -984,7 +1006,8 @@
       "packCombined": 540,
       "packMetal": 440,
       "packEnergy": 7000,
-      "startXp": 0.41
+      "startXp": 0.41,
+      "buildsEco": true
     },
     "consul": {
       "role": "band",
@@ -1008,7 +1031,8 @@
       "packCombined": 817,
       "packMetal": 670,
       "packEnergy": 10300,
-      "startXp": 0.364
+      "startXp": 0.364,
+      "buildsEco": true
     },
     "veil": {
       "role": "band",
@@ -1198,7 +1222,8 @@
       "packMetal": 2012,
       "packEnergy": 26170,
       "fieldEffect": "build",
-      "startXp": 0.102
+      "startXp": 0.102,
+      "buildsEco": true
     },
     "warder": {
       "role": "band",
@@ -1329,34 +1354,30 @@
       "extras": 0,
       "escorts": [
         {
-          "unitDef": "armferret",
-          "count": 1
-        },
-        {
-          "unitDef": "armatlas",
+          "unitDef": "armhvytrans",
           "count": 1
         }
       ],
-      "blurb": "Archangel + Ferret, and a Stork to carry the Archangel. Sky-saint so Mira can play. Chainsaw soul.",
+      "blurb": "Saint Kettle's Archangel and one heavy transport. The roof of the company, and the lift under it.",
       "name": "Saint Kettle",
       "sizing": "fixed",
       "tags": [
         "mobile_aa",
         "sky_saint"
       ],
-      "startXp": 0.317,
-      "packCombined": 1128,
-      "packMetal": 948,
-      "packEnergy": 12600,
-      "packXpCombined": 1099
+      "startXp": 0.373,
+      "packCombined": 847,
+      "packMetal": 710,
+      "packEnergy": 9600,
+      "packXpCombined": 765
     },
     "infestor": {
       "role": "band",
-      "unitDef": "leginfestor",
+      "unitDef": "va_infestor",
       "hireTnb": 0,
       "packTotal": 5,
       "extras": 4,
-      "blurb": "Infestor seed (×5). Stealth spiders that mint more spiders.",
+      "blurb": "Infestor seed (×5). Stealth spiders that mint more spiders, and Goblins.",
       "name": "Infestor Hive",
       "sizing": "fixed",
       "tags": [
@@ -1498,7 +1519,8 @@
           "unitDef": "va_printer",
           "count": 1
         }
-      ]
+      ],
+      "buildsEco": true
     },
     "anvil": {
       "role": "band",
@@ -2069,7 +2091,8 @@
       ],
       "packMetal": 330,
       "packEnergy": 4800,
-      "packCombined": 399
+      "packCombined": 399,
+      "buildsEco": true
     }
   },
   "factories": {
@@ -2100,20 +2123,6 @@
       "product": "legfig",
       "label": "Legion Drone Plant (hero is the bay)",
       "fiction": "T1 drone bay — Noctua fighter/scout line; hero unitDef is legap"
-    }
-  },
-  "callIns": {
-    "bro_tzar": {
-      "heroId": "tzar_loan",
-      "name": "Tzar",
-      "unitDef": "corgol",
-      "costTnb": 0,
-      "requiresHero": "bro",
-      "missionOnly": true,
-      "buttonLabel": "Bro, Pass me the Tzar",
-      "toastOrdered": "He's rolling.",
-      "blurb": "Legacy call-in — Bro's pack seat is the Tzar now",
-      "deprecated": true
     }
   },
   "starterUnlocks": [

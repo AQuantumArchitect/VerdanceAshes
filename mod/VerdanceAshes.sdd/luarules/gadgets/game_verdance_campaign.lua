@@ -1352,7 +1352,6 @@ local function stampPadToothIfNeeded(unitID, heroIdOrPkg)
   local id = hid:match("^crew_pack_(.+)$")
     or hid:match("^crew_escort_([^_]+)")
     or hid:match("^crew_mint_(.+)$")
-    or hid:match("^crew_callin_(.+)$")
     or hid:match("^crew_([^_]+)$")
     or hid
   if heroIsAreaControl(id) then
@@ -3091,37 +3090,6 @@ function VA_CREW_confirm(selectedIds)
     total = total + VA_BOND_apply(present, baseX, baseZ, 400 + #picks * 220)
   end
   -- No free pad M/E storage — Solarium (and bought eco) own that seat.
-  -- Mission-only call-ins (Bro's Tzar, etc.) — not permanent company seats.
-  local callIns = mission and mission.missionCallIns
-  if type(callIns) == "table" then
-    for ci, call in ipairs(callIns) do
-      if type(call) == "table" then
-        local cdef = tostring(call.unitDef or call.unitDefName or "")
-        local cid = tostring(call.heroId or call.id or ("callin_" .. tostring(ci)))
-        local cname = tostring(call.name or cid)
-        if cdef ~= "" and UnitDefNames and UnitDefNames[cdef] then
-          local callSpec = {
-            unitDefName = cdef,
-            count = 1,
-            dx = 400 + (#picks + ci) * 220,
-            dz = 40,
-            spacing = 120,
-            heroId = cid,
-            heroName = cname,
-            missionCritical = false,
-            packageTag = "crew_callin_" .. cid,
-          }
-          total = total + spawnUnitSpec(callSpec, playerTeamID, baseX, baseZ, 0, 0, {}, { role = "player_crew" })
-          Spring.Echo("VA_CREW_CALLIN hero=" .. cid .. " def=" .. cdef .. " source=" .. tostring(call.source or ""))
-          if SendToUnsynced then
-            SendToUnsynced("VERDANCE_BEAT", "bark", "Bro", "Pass me the Tzar — he's rolling.", 5)
-          end
-        else
-          Spring.Echo("VA_CREW_CALLIN_SKIP def=" .. cdef)
-        end
-      end
-    end
-  end
   cs.selected = picks
   cs.spent = spent
   cs.wallet = wallet - spent
@@ -5675,6 +5643,12 @@ end
 function claimOptionalHighValueSecondaries()
   local units = Spring.GetAllUnits() or {}
   local tagged = 0
+  -- One source of marks: the mission's secondaries (the builder declares every vault). A shell
+  -- building with no secondary id is booked only under a vault the mission declared.
+  local declared = {}
+  for _, sec in ipairs((mission and mission.secondaries) or {}) do
+    if type(sec) == "table" and sec.id then declared[tostring(sec.id)] = true end
+  end
   for i = 1, #units do
     local uid = units[i]
     if Spring.ValidUnitID(uid) and not Spring.GetUnitIsDead(uid) and not MarksLib.hasTarget(marks, uid) then
@@ -5691,15 +5665,16 @@ function claimOptionalHighValueSecondaries()
           if sid == "" then
             local pocket = tostring(Spring.GetUnitRulesParam(uid, "va_shell_pocket") or "mark")
             sid = "bonus_fus_" .. pocket:lower()
+            if not declared[sid] then sid = nil end
           end
           -- Fusion vaults are vaults; an escalation side mark on the shell's works is a
           -- structure mark (enrichFromMission flags it required from mission.secondaries).
-          MarksLib.bindTarget(marks, uid, sid, {
+          if sid then MarksLib.bindTarget(marks, uid, sid, {
             required = false,
             kind = highValue and MarksLib.KIND.vault or MarksLib.KIND.structure,
             label = sid,
           })
-          tagged = tagged + 1
+          tagged = tagged + 1 end
         end
       end
     end
@@ -6061,23 +6036,10 @@ function checkSoftClock(frame)
   Spring.SetGameRulesParam("va_phase", phase, { public = true })
 end
 
+-- What a commander is: include/va_commanders.lua, shared by every Verdance gadget.
+VA_COM = VFS.Include("luarules/gadgets/include/va_commanders.lua")
 function isCommanderUnitDef(ud)
-  if not ud then return false end
-  local cp = ud.customParams or {}
-  -- Decoy commanders (armdecom/cordecom/legdecom) look like coms but are occupation
-  -- swarm farmers — never treat as real commander (sweep / loss / soup).
-  if cp.isdecoycommander or cp.decoyfor then return false end
-  if cp.iscommander or cp.isCommander or cp.commander then return true end
-  local n = string.lower(tostring(ud.name or ud.humanName or ""))
-  -- BAR chassis names: armcom*, corcom*, legcom* (avoid "combat"/"comms" false positives).
-  if n:find("combat", 1, true) then return false end
-  if n:find("decom", 1, true) or n:find("decoy", 1, true) or n == "dummycom" then
-    return false
-  end
-  if n:match("com$") or n:match("^armcom") or n:match("^corcom") or n:match("^legcom") then
-    return true
-  end
-  return false
+  return VA_COM.isCommander(ud)
 end
 
 -- WO-043c handlers: physical split (include/va_tenebrium_handlers.lua).

@@ -25,6 +25,7 @@ what it looked at. This module is the only place those facts become campaign mea
 """
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any, Dict, Optional
 from verdance.readings import story_dance as dance
 
@@ -159,17 +160,34 @@ def vanished(result: Dict[str, Any]) -> set:
     return who - present
 
 
-def field_people(state: Dict[str, Any], map_id: str) -> list:
+def field_people(state: Dict[str, Any], map_id: str, workspace: Optional[Path] = None) -> list:
     """The people the company left standing on this map (camp.people where == "field"): the next
-    drop here finds them where they stood, so they can be brought home."""
+    drop here finds them where they stood, so they can be brought home.
+
+    The spearhead (owner, 2026-10-27): someone left standing on a door the company holds is at the
+    mouth of the road, so a drop on the far map finds them on its far door, ready to go on."""
     chars = state.get("characters") or {}
+    doors = {}
+    if workspace is not None:
+        try:
+            from verdance.world import roads
+            doors = roads.load_doors(Path(workspace))
+        except Exception:  # noqa: BLE001
+            doors = {}
     out = []
     for hid, rec in sorted(((state.get("camp") or {}).get("people") or {}).items()):
-        if not isinstance(rec, dict) or rec.get("where") != "field" or str(rec.get("mapId") or "") != str(map_id):
+        if not isinstance(rec, dict) or rec.get("where") != "field" or not rec.get("zoneId"):
             continue
-        if (chars.get(hid) or {}).get("status") == "dead" or not rec.get("zoneId"):
+        if (chars.get(hid) or {}).get("status") == "dead":
             continue
-        out.append({"heroId": str(hid), "zoneId": str(rec["zoneId"])})
+        zone, at_map = str(rec["zoneId"]), str(rec.get("mapId") or "")
+        if at_map == str(map_id):
+            out.append({"heroId": str(hid), "zoneId": zone})
+            continue
+        door = doors.get(zone)
+        held = isinstance((state.get("doors") or {}).get(zone), dict) and (state.get("doors") or {})[zone].get("held")
+        if door and held and str(door.get("farMapId")) == str(map_id):
+            out.append({"heroId": str(hid), "zoneId": str(door["farZoneId"]), "spearhead": True, "fromZoneId": zone})
     return out
 
 

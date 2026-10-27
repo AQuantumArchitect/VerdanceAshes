@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Wild heroes roam by the bond web (owner, 2026-10-26): umwelt.foresight.encounter places them,
-the Umwelt field carries the draw, anchored heroes (constructor-gated recruits, builders, factory
-heroes, buildings) keep their authored place."""
+the Umwelt field carries the draw. Since 2026-10-27 everything is a weight (data/story/encounter_rules.json):
+builders, factory heroes and stash/capture recruits lean on their authored home, only a hero who does not
+walk is pinned to it, and the one hard rule is a builder at the Rock Jungle's entrance."""
 from __future__ import annotations
 
 import copy
@@ -35,9 +36,11 @@ def test_every_wild_hero_is_placed_and_anchors_hold():
     r = EN.refresh_whereabouts(st, ROOT)
     assert r["placed"] == r["wild"] > 40
     consul = st["fieldPool"]["consul"]["roam"]
-    assert consul["zoneId"] == "TRJ_NW_GATE" and consul["anchored"] and "constructor" in consul["reasons"][0]
-    for hid in ("solarium", "spoke", "tick", "hearth"):
-        assert st["fieldPool"][hid]["roam"]["anchored"], hid
+    assert "constructor" in consul["reasons"][0] or "builder" in consul["reasons"][0]
+    field, ctx = EN.build(st, ROOT)
+    for hid, ent in field.entities.items():          # pinned only when they cannot walk
+        if ent.anchored_at:
+            assert ctx["anchors"].get(hid) == "does not walk", hid
 
 
 def test_bonds_draw_heroes_toward_the_company():
@@ -63,12 +66,16 @@ def test_a_sortie_draw_is_seeded_and_heroes_roam_off_their_home_map():
     assert away > 10                                     # not locked to one home each
 
 
-def test_marking_a_hero_s_ground_still_meets_them_there():
+def test_marking_a_hero_s_ground_makes_them_likelier():
     _skip()
     st = _state()
-    rows = C.field_recruits_for_map(st, "greenest_fields", workspace=ROOT, limit=2, marked_zone_ids=["GF_NE_PLATEAU"])
-    fat = next(r for r in rows if r["heroId"] == "fatboy")
-    assert fat["zoneId"] == "GF_NE_PLATEAU" and fat["encounter"]["reasons"] == ["we marked this ground"]
+    hits = plain = 0
+    for m in range(1, 31):
+        s = copy.deepcopy(st)
+        s["missionNumber"] = m
+        hits += any(r["heroId"] == "fatboy" for r in C.field_recruits_for_map(s, "greenest_fields", workspace=ROOT, marked_zone_ids=["GF_NE_PLATEAU"]))
+        plain += any(r["heroId"] == "fatboy" for r in C.field_recruits_for_map(s, "greenest_fields", workspace=ROOT))
+    assert hits > plain
 
 
 def test_word_of_the_wild_comes_home_with_the_company():
@@ -110,28 +117,22 @@ def test_the_hub_preview_is_the_sortie_s_own_draw():
     for mp in ("tabula", "greenest_fields"):
         real = [(e["heroId"], e["zoneId"]) for e in EN.encounters_for_map(st, mp, workspace=ROOT, limit=2)]
         assert real == [(d["heroId"], d["zoneId"]) for d in draws[mp][:2]]
-    # marked: who is believed on the marked zone first, then the same draw minus them
-    fat_zone = st["fieldPool"]["fatboy"]["roam"]["zoneId"]
-    fat_map = st["fieldPool"]["fatboy"]["roam"]["mapId"]
-    real = [e["heroId"] for e in EN.encounters_for_map(st, fat_map, workspace=ROOT, limit=2, marked_zone_ids=[fat_zone])]
-    assert real[0] == "fatboy" and real[1:] == [d["heroId"] for d in draws[fat_map] if d["heroId"] != "fatboy"][:1]
+    # the jungle's preview carries the entrance builder like the sortie does
+    assert draws["the_rock_jungle"][0]["zoneId"] == "TRJ_NW_GATE"
 
 
-def test_the_jungle_constructor_find_is_a_consul_or_a_twitcher():
+def test_a_builder_waits_at_the_jungle_entrance():
     _skip()
-    st = _state()
-    EN.refresh_whereabouts(st, ROOT)
-    consul_at = st["fieldPool"]["consul"]["roam"]["zoneId"]
-    assert st["fieldPool"]["twitch"]["roam"]["zoneId"] != consul_at        # the Consul is the find
-    st = _state(band=("vane", "brakhov", "consul"))
-    EN.refresh_whereabouts(st, ROOT)
-    tw = st["fieldPool"]["twitch"]["roam"]
-    assert tw["zoneId"] == consul_at and tw["anchored"] and "Consul is already with you" in tw["reasons"][0]
+    first = EN.encounters_for_map(_state(), "the_rock_jungle", workspace=ROOT)[0]
+    assert (first["heroId"], first["zoneId"]) == ("consul", "TRJ_NW_GATE")
+    other = EN.encounters_for_map(_state(band=("vane", "brakhov", "consul")), "the_rock_jungle", workspace=ROOT)[0]
+    assert other["zoneId"] == "TRJ_NW_GATE" and other["heroId"] in EN.eco_builders(ROOT) and other["heroId"] != "consul"
 
 
 def test_the_infestor_is_not_a_builder():
     _skip()
     st = _state()
     EN.refresh_whereabouts(st, ROOT)
-    assert not st["fieldPool"]["infestor"]["roam"]["anchored"]
-    assert st["fieldPool"]["solarium"]["roam"]["anchored"]
+    field, ctx = EN.build(st, ROOT)
+    assert "infestor" not in ctx["anchors"]
+    assert ctx["anchors"].get("solarium") == "a builder"

@@ -1,6 +1,6 @@
 // Templates and DOM primitives shared by every workspace. No fetches, no state writes
 // except the toast timer and the session log.
-import { state, CREW, companySurface } from "./state.js";
+import { state, CREW, companySurface, jobLabel } from "./state.js";
 
 export const $ = (id) => document.getElementById(id);
 export const escape = (value) => String(value ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -154,9 +154,14 @@ export function renderHeroCard(opts) {
 /* ---- narrative templates (rail, inspector, chronicle) ------------------------ */
 export function operation(op) {
   if (!op) return field("Choose an operation", "Select a sortie in the operations rail to see its requirements, risks, and route.");
-  return `<p class="cc-eyebrow">Operation / ${escape(pretty(op.mapId))}</p><h2>${escape(op.title)}</h2>` +
-    field("Purpose", op.purpose) + field("Required", op.required) + field("Bring home", op.bringHome) +
-    field("Known risks", op.risks) + field("Consequences", op.consequences);
+  // The job, how to win it, and the field's standing rules folded away (they read the same on every job).
+  const sub = [pretty(op.mapId), op.kind ? jobLabel(op.kind) : ""].filter(Boolean).join(" · ");
+  return `<p class="cc-eyebrow">${escape(sub)}${op.lean ? ` <span class="cc-lean">the world leans here</span>` : ""}</p>` +
+    `<h3 class="cc-op-title">${escape(op.title)}</h3>` +
+    field("The job", op.purpose) + field("To win", op.required) + (op.pays ? field("What it pays", op.pays) : "") +
+    `<details class="cc-rules"><summary>Field rules</summary>` +
+    field("Bringing it home", op.bringHome) + field("What you don't know", op.risks) + field("What changes", op.consequences) +
+    `</details>`;
 }
 
 // One line for the operations rail: people of ours who are not at camp.

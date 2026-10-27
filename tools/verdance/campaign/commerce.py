@@ -16,7 +16,6 @@ from verdance.common import WORKSPACE_ROOT, canonical_map_id, load_json, utc_now
 from verdance.company.commerce_delivery import delivery_eta, make_pending_delivery, resolve_listing_delivery
 from .measure import bp_access
 from .roster import ensure_roster
-from verdance.company.capture_node_claims import free_tnb_mint_allowed
 
 METAL_UNIT = 1000  # 1km$ = 1000 BAR metal
 
@@ -260,6 +259,11 @@ def listing_available(
         from .suits import has_suit
         if has_suit(state):
             return False, "the company already wears a commander suit"
+    if kind == "hero_rental":
+        from verdance.company.rentals import can_rent
+        ok, why = can_rent(state, str(listing.get("heroId") or ""))
+        if not ok:
+            return False, why
     if kind in ("unit_printer", "loan_package") and listing_id in owned:
         return False, "already owned"
     if kind == "hero_contract":
@@ -315,14 +319,15 @@ def purchase_listing(
     commerce["tenebrium"] = int(commerce.get("tenebrium") or 0) - tcost
     commerce["metalK"] = int(commerce.get("metalK") or 0) - mcost
     kind = str(listing.get("kind") or "purchase_package")
-    if kind == "commander_suit":
-        # Cortex's suit (verdance.campaign.suits): the walker is fielded from now on, in Cortex's body.
-        from .suits import grant_suit
-        grant_suit(state, listing.get("unitDef") or "corcom", "bought_cortex")
-        commerce.setdefault("owned", {})[listing_id] = {
-            "qty": 1, "kind": kind, "unitDef": listing.get("unitDef"),
-            "acquiredAtMission": int(state.get("missionNumber", 1) or 1), "source": "purchase",
-        }
+    if kind == "hero_rental":
+        # A hero for one drop (verdance.company.rentals); not in the bag, in the company.
+        from verdance.company.rentals import rent
+        rent(state, listing, workspace)
+    elif kind == "commander_suit":
+        # Cortex's suit, loaned for one fight (verdance.campaign.suits): the walker is fielded for the
+        # next drop in Cortex's body, and goes back to Cortex at homecoming (settle_commerce_after_sortie).
+        from .suits import grant_suit, LOAN
+        grant_suit(state, listing.get("unitDef") or "corcom", LOAN)
     elif kind == "hero_contract":
         roster = ensure_roster(state)
         heroes = roster.setdefault("heroes", [])
@@ -546,7 +551,8 @@ def build_commerce_intent(state: Dict[str, Any], workspace: Optional[Path] = Non
         deferred = bool(delivery.get("deferred")) and kind == "purchase_package"
 
         if kind in ("loan_package", "purchase_package") or (
-            listing.get("unitDef") and kind not in ("unit_printer", "constructor", "hero_contract")
+            listing.get("unitDef") and kind not in ("unit_printer", "constructor", "hero_contract",
+                                                    "hero_rental", "commander_suit")
         ):
             unit_def = rec.get("unitDef") or listing.get("unitDef")
             count = int(rec.get("loanCount") or rec.get("count") or listing.get("count") or 0)
@@ -735,32 +741,18 @@ def settle_commerce_after_sortie(
         span = hi - lo + 1
         return lo + int(_roll(tag + ":v") * span) % span
 
-    # Capture / freeTnbMint=false: no free Tnb rolls (reclaim bank only).
-    free_tnb = True
-    try:
-
-        free_tnb = free_tnb_mint_allowed(result)
-    except Exception:
-        if (
-            result.get("freeTnbMint") is False
-            or result.get("nodeClaimed")
-            or result.get("captureMode") in (True, "clear_hold_shell")
-        ):
-            free_tnb = False
-
+    # Tenebrium is the hyper-rare build currency (owner call, 2026-10-27): it comes only from reclaiming
+    # what builders leave behind. Metal comes mostly from the stockpile extracted below (build storage,
+    # reclaim everything); a won sortie only tops it up (sortieRewards.metalOnVictory, in 1k units).
+    # Capturing ground pays nothing of either.
+    award_k = 0
     if success:
-        if free_tnb:
-            gained_t += _award_range(rewards.get("tenebriumOnVictory") or {}, "tv")
-    # Zone flip: catalog default chance=0; hard-block when free mint disallowed.
-    if zone_flipped and free_tnb:
-        flip_t = _award_range(rewards.get("tenebriumOnZoneFlip") or {"min": 0, "max": 0, "chance": 0}, "tz")
-        if flip_t > 0:
-            notes.append(f"zone-flip Tnb roll={flip_t} (prefer reclaim; free mint discouraged)")
-        gained_t += flip_t
-    if clean and free_tnb:
-        gained_t += _award_range(rewards.get("tenebriumOnCleanExtract") or {}, "tc")
-    if not free_tnb:
-        notes.append("node claim: no free Tnb mint (reclaim bank only)")
+        award_k += _award_range(rewards.get("metalOnVictory") or {}, "mv")
+    if award_k:
+        commerce["metalK"] = int(commerce.get("metalK") or 0) + award_k
+        notes.append(f"+{award_k}×1km$ metal (mission reward)")
+        commerce.setdefault("ledger", []).append({"op": "mission_reward", "metalK": award_k, "at": utc_now(),
+                                                  "missionNumber": int(state.get("missionNumber", 1) or 1)})
 
     # Campaign metal export: floor(end stockpile / 1000). Prefer metalKExtracted.
     # Bag stays HOME — export ADDS to faction totals (never replaces the bag).
@@ -816,7 +808,7 @@ def settle_commerce_after_sortie(
     if bank_end >= 0:
         # Live bank (incl. exfil stake refund) is authoritative; awards stack on top.
         prev = int(commerce.get("tenebrium") or 0)
-        award_extra = gained_t  # victory / flip / extract rolls already in gained_t
+        award_extra = gained_t  # nothing mints Tnb any more; kept 0 so the bank is the field's
         commerce["tenebrium"] = bank_end + award_extra
         if bank_end != prev:
             notes.append(f"Tenebrium bank {prev} → {bank_end} (field)")
@@ -975,6 +967,16 @@ def settle_commerce_after_sortie(
                 "at": utc_now(),
             })
 
+    # Rented heroes go back to Cortex; who came home is remembered for the campaign-end unlock.
+    from verdance.company.rentals import settle as _settle_rentals
+    from .suits import return_loan as _return_suit
+    if _return_suit(state):
+        notes.append("the Cortex suit went back to Cortex")
+        commerce.setdefault("owned", {}).pop("cortex_commander_suit", None)
+    home = _settle_rentals(state, result)
+    if home:
+        notes.append("rentals home: " + ", ".join(home))
+
     # What the shop sells is for one drop (owner, 2026-10-26): a bought package or constructor came
     # down with this sortie and is spent. Anything of it that lifts home is the company's by then
     # only if it was not hired (the exfil manifest keeps hired units out of the reserve).
@@ -989,6 +991,7 @@ def settle_commerce_after_sortie(
             })
             notes.append(f"{lid}: spent on this drop")
 
+    gained_k += award_k     # the mission reward, on top of what the field exported
     commerce.setdefault("ledger", []).append({
         "op": "sortie_settle",
         "tenebriumGained": gained_t,

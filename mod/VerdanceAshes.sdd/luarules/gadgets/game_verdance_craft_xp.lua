@@ -49,14 +49,14 @@ local BONUS_BUILD_FINISH = RATE_BUILD * 3
 
 local BP_PER_XP = 0.42
 local BP_CAP = 2.00
-local RANGE_PER_XP = 0.42
-local RANGE_CAP = 2.00
--- Ketha and her Zagreus: the build-range bonus is doubled (owner, 2026-10-26): +0.84 per craft XP up
--- to triple, where everyone else gets +0.42 up to double. A Zagreus's 96 elmos become ~180 at
--- Ketha's starting experience and 288 at the cap.
+-- Build range (owner, 2026-10-27): ×1.8 at full experience (2.4) for every builder, ×2.2 for Ketha.
+local RANGE_PER_XP = 0.334
+local RANGE_CAP = 1.80
+-- Ketha and her Zagreus reach farther than other builders: ×2.2 at full experience (owner, 2026-10-27),
+-- ×1.5 at her starting 1.0 XP. A Zagreus's 96 elmos become 144 green, about 211 at the cap.
 local KETHA_RANGE_BASE = 1.00
-local KETHA_RANGE_PER_XP = 0.84
-local KETHA_RANGE_CAP = 3.00
+local KETHA_RANGE_PER_XP = 0.50
+local KETHA_RANGE_CAP = 2.20
 
 local function isKetha(unitID)
   for _, key in ipairs({ "va_hero_id", "va_pack_leader", "va_pack_id" }) do
