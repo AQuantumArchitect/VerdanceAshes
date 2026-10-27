@@ -37,7 +37,7 @@ WATER_TAGS = {"amphibious", "hover", "seaplane", "naval"}
 ANCHOR_RECRUITS = {"retrieve_stash", "assist_fortify", "capture"}
 OUR_FACTION = "ashwalkers"
 # Chassis whose build power only makes more of themselves: not builders (the Infestor).
-ONLY_BUILDS_ITSELF = {"leginfestor"}
+ONLY_BUILDS_ITSELF = {"leginfestor", "va_infestor"}   # prints Infestors (and Goblins): not a builder
 # The constructor-gated jungle find (owner, 2026-10-26): a Consul, or, when the Consul is already
 # with the company, a Twitcher found in the same place.
 CONSTRUCTOR_FIND = ("consul", "twitch")

@@ -595,7 +595,7 @@
       "unitDef": "va_kettle",
       "voice": {
         "hook": "Sky-saint, chainsaw soul.",
-        "blurb": "Archangel + Ferret. Sky-saint so Mira can play. Chainsaw soul.",
+        "blurb": "Saint Kettle's Archangel and one heavy transport. The roof of the company, and the lift under it.",
         "fiction": "Reborn from rez-saint to sky-saint. Keeps the air honest with Archangel hymns and a chainsaw temperament. No pawn blob — holiness is elite. Mira's fireworks need a clear ceiling.",
         "tagLine": "Sky saint — hold the air."
       },
@@ -659,10 +659,10 @@
       "allowBail": false,
       "allowKite": false,
       "faction": "legion",
-      "unitDef": "leginfestor",
+      "unitDef": "va_infestor",
       "voice": {
         "hook": "Company grows itself.",
-        "blurb": "Infestor seed (×5). Stealth spiders that mint more spiders.",
+        "blurb": "Infestor seed (×5) and two Alpheus hovers for the sky. Stealth spiders that mint more spiders, and Goblins.",
         "fiction": "Quiet gardener of legs. The hive does not recruit — it germinates. All-terrain, stealthed, patient. The company grows itself whether you are watching or not.",
         "tagLine": "Hive growth — craft, then creep."
       },

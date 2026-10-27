@@ -34,7 +34,7 @@ NAMES = {
 
 # the Halberd is now Halbard's own unit (heat ray) and the Archangel Saint Kettle's (radar-guided
 # missiles); a save made before that still says corhal / armaak
-UNITDEFS = {"halbard": ("corhal", "va_halberd"), "kettle": ("armaak", "va_kettle"), "mask": ("armdecom", "va_mask")}
+UNITDEFS = {"halbard": ("corhal", "va_halberd"), "kettle": ("armaak", "va_kettle"), "mask": ("armdecom", "va_mask"), "infestor": ("leginfestor", "va_infestor")}
 
 DATA = ["data/story/hero_roster.json", "data/story/hero_codex.json", "data/story/crew_packs.json",
         "data/story/hero_umwelt.json", "data/story/support_web.json", "app/showoff/crew_packs.embed.js"]

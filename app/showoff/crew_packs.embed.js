@@ -745,6 +745,28 @@ window.CREW_PACKS = {
       "combined": 276,
       "label": "Construction Turret",
       "hasBuildPower": true
+    },
+    "armhvytrans": {
+      "metal": 190,
+      "energy": 4000,
+      "combined": 247,
+      "label": "Osprey",
+      "hasBuildPower": false
+    },
+    "va_infestor": {
+      "metal": 250,
+      "energy": 5200,
+      "combined": 324,
+      "label": "Infestor",
+      "hasBuildPower": true,
+      "massClass": "av"
+    },
+    "legah": {
+      "metal": 210,
+      "energy": 4300,
+      "combined": 271,
+      "label": "Alpheus",
+      "hasBuildPower": false
     }
   },
   "heroes": {
@@ -1329,34 +1351,30 @@ window.CREW_PACKS = {
       "extras": 0,
       "escorts": [
         {
-          "unitDef": "armferret",
-          "count": 1
-        },
-        {
-          "unitDef": "armatlas",
+          "unitDef": "armhvytrans",
           "count": 1
         }
       ],
-      "blurb": "Archangel + Ferret, and a Stork to carry the Archangel. Sky-saint so Mira can play. Chainsaw soul.",
+      "blurb": "Saint Kettle's Archangel and one heavy transport. The roof of the company, and the lift under it.",
       "name": "Saint Kettle",
       "sizing": "fixed",
       "tags": [
         "mobile_aa",
         "sky_saint"
       ],
-      "startXp": 0.317,
-      "packCombined": 1128,
-      "packMetal": 948,
-      "packEnergy": 12600,
-      "packXpCombined": 1099
+      "startXp": 0.373,
+      "packCombined": 847,
+      "packMetal": 710,
+      "packEnergy": 9600,
+      "packXpCombined": 765
     },
     "infestor": {
       "role": "band",
-      "unitDef": "leginfestor",
+      "unitDef": "va_infestor",
       "hireTnb": 0,
       "packTotal": 5,
       "extras": 4,
-      "blurb": "Infestor seed (×5). Stealth spiders that mint more spiders.",
+      "blurb": "Infestor seed (×5) and two Alpheus hovers for the sky. Stealth spiders that mint more spiders, and Goblins.",
       "name": "Infestor Hive",
       "sizing": "fixed",
       "tags": [
@@ -1364,10 +1382,16 @@ window.CREW_PACKS = {
         "all_terrain",
         "self_replicate"
       ],
-      "startXp": 0.23,
-      "packCombined": 1621,
-      "packMetal": 1250,
-      "packEnergy": 26000
+      "startXp": 0.139,
+      "packCombined": 2164,
+      "packMetal": 1670,
+      "packEnergy": 34600,
+      "escorts": [
+        {
+          "unitDef": "legah",
+          "count": 2
+        }
+      ]
     },
     "quill": {
       "role": "band",

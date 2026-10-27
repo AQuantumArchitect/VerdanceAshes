@@ -125,8 +125,11 @@ local function zoneOf(x, z)
 end
 
 -- The pad is the whole zone the company leaves from. Publishes it for the HUD.
+local homePad = nil   -- where the company landed: a hero raised in a territory mission goes home from here
+
 local function placePad(zid, x, z, r)
   pad = { zoneId = zid, label = zoneLabel[zid] or zid, x = x, z = z, r = r }
+  if not homePad then homePad = { zoneId = zid, label = zoneLabel[zid] or zid } end
   -- The pad is the whole zone the company landed in (the infil zone), not a circle inside it.
   -- reach: the farthest corner of the zone from the pad point, for the unit queries below.
   local cw, ch, reach, cells = mapX / cols, mapZ / rows, 0, 0
@@ -344,6 +347,9 @@ local function manifest()
     schema = "verdance-manifest/1",
     frame = Spring.GetGameFrame() or 0,
     pad = pad and { zoneId = pad.zoneId, label = pad.label, x = math.floor(pad.x), z = math.floor(pad.z), radius = pad.r } or nil,
+    -- the landing zone, when the pad has moved and a raised hero must still go home from it
+    homePad = (homePad and pad and homePad.zoneId ~= pad.zoneId and mission and mission.objective and mission.objective.rezHeroId)
+      and { zoneId = homePad.zoneId, label = homePad.label, rescue = tostring(mission.objective.rezHeroId) } or nil,
     destinations = destinations(),
     going = { heroes = {}, units = {}, packUnits = {}, hiredUnits = {}, unitCount = 0, structures = 0, metal = 0 },
     staying = { heroes = {}, units = {}, unitCount = 0, structures = {}, structureCount = 0, metal = 0 },
@@ -368,6 +374,13 @@ local function manifest()
       local hname = Spring.GetUnitRulesParam(uid, "va_hero_name")
       local onPad = onPadAt(x, z)
       local zid = zoneOf(x, z) or "?"
+      -- Two exits (owner, 2026-10-27): on a territory mission the company leaves from the ground it
+      -- took, but the hero it raised there is a rescue and must be brought back to the landing zone.
+      local rez = mission and mission.objective and mission.objective.rezHeroId
+      local hidNow = Spring.GetUnitRulesParam(uid, "va_hero_id")
+      if rez and hidNow and tostring(hidNow) == tostring(rez) and homePad and pad.zoneId ~= homePad.zoneId then
+        onPad = (zid == homePad.zoneId)
+      end
       -- a pair's partner is named on the field but travels as its lead's pack
       local partner = Spring.GetUnitRulesParam(uid, "va_partner_of")
       local isHero = hid and hid ~= "" and hid ~= 0 and not (partner and partner ~= "")

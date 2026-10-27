@@ -106,6 +106,19 @@ GG.VA_ExfilCmd("manifest")
 m = RULES.va_manifest_json
 has('"units":{"corthud":1}', "on the exit door, the unit standing there goes")
 print("ok   taking a door: the extraction moves onto it once the objective is done")
+-- two exits: the hero raised in the wound goes home from the landing zone, not from the door
+U[7] = { x = 1000, z = 600, def = 1, team = 0, hero = "mask" }
+GG.VA_ExfilCmd("manifest")
+m = RULES.va_manifest_json
+has('"heroId":"mask"', "the raised hero on the landing zone is going home")
+has('"homePad":{"label":"Landing","rescue":"mask","zoneId":"PAD"}', "the manifest names the landing zone as the rescue's exit")
+U[7].z = 3500
+GG.VA_ExfilCmd("manifest")
+m = RULES.va_manifest_json
+assert(not m:find('"going":{"heroes":[^%%]]*"mask"'), "the raised hero standing on the door must not lift with the spearhead")
+has('"heroId":"mask","label":"Far Field"', "... he stays, to be brought home")
+U[7] = nil
+print("ok   two exits: the spearhead leaves by the door, the rescue goes home from the landing zone")
 GG.VA_ExfilCmd("extract:home")
 assert(ENDED[1] == "extracted", "extract did not end the sortie")
 print("ok   extract through the campaign hand-off ends the sortie")

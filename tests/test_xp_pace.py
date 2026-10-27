@@ -33,8 +33,9 @@ def test_a_field_effect_grows_its_bonus_not_the_stat():
     assert "out[stat] = 1 + ((tonumber(resolved[stat]) or 1) - 1) * scale" in src
 
 
-def test_full_craft_doubles_build_power_and_range():
+def test_full_craft_doubles_build_power_and_reaches_1_8_range():
+    # build power doubles at full experience; range is x1.8 (owner, 2026-10-27; Ketha x2.2)
     src = (GADGETS / "game_verdance_craft_xp.lua").read_text(encoding="utf-8")
     vals = dict(re.findall(r"local (BP_PER_XP|BP_CAP|RANGE_PER_XP|RANGE_CAP) = ([0-9.]+)", src))
-    assert float(vals["BP_CAP"]) == float(vals["RANGE_CAP"]) == 2.0
-    assert 1 + float(vals["BP_PER_XP"]) * 2.4 >= 2.0 and 1 + float(vals["RANGE_PER_XP"]) * 2.4 >= 2.0
+    assert float(vals["BP_CAP"]) == 2.0 and float(vals["RANGE_CAP"]) == 1.8
+    assert 1 + float(vals["BP_PER_XP"]) * 2.4 >= 2.0 and 1 + float(vals["RANGE_PER_XP"]) * 2.4 >= 1.8 - 1e-3

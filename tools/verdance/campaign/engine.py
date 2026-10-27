@@ -489,7 +489,7 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
     pad = intent.get("deploymentZoneId")
     intent["wildDens"] = _theaters.wild_dens(state, map_id, workspace, pad)
     # Whoever the company left here is still here: the gadget stands them where they stood.
-    intent["fieldPeople"] = _mf.field_people(state, map_id)
+    intent["fieldPeople"] = _mf.field_people(state, map_id, workspace)
     # Taking ground: the presence a claim needs here, and when the wound is a door, the exit the
     # extraction moves to once it is ours (verdance.world.claim, game_verdance_exfil.lua).
     intent["claimValue"] = claim_need(map_id, workspace)

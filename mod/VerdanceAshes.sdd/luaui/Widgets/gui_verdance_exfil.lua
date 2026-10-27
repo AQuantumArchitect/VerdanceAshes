@@ -319,6 +319,10 @@ local function drawManifest()
   local top = vsy - 56
   text("EXTRACT", x0, top, 10, Ash.COL.ash, "l")
   text("The company lifts from " .. tostring((m.pad and m.pad.label) or "the pad"), x0, top - 26, 22, Ash.COL.gold, "l")
+  if m.homePad then   -- two exits: the hero raised in the wound goes home from where we landed
+    text(tostring(m.homePad.rescue) .. " goes home from " .. tostring(m.homePad.label or m.homePad.zoneId) .. ", where we landed",
+      x0 + W, top - 26, 14, Ash.COL.steam, "r")
+  end
   drawDestinations(m, x0, top - 58, W)
   local colTop = top - 84
   local colBot = vsy * 0.14 + 56
