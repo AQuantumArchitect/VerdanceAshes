@@ -346,6 +346,10 @@ local function manifest()
     enemyOnPad = 0,
     seen = {},
   }
+  -- Heroes already through the Spire Gate (game_verdance_jump_gate.lua) are going home.
+  if GG.VA_JumpPorted then
+    for _, h in ipairs(GG.VA_JumpPorted() or {}) do m.going.heroes[#m.going.heroes + 1] = h end
+  end
   if not pad then return m end
   local units = Spring.GetTeamUnits(playerTeamID) or {}
   for i = 1, #units do

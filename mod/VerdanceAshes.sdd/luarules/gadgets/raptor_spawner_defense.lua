@@ -124,6 +124,13 @@ if gadgetHandler:IsSyncedCode() then
 	local playerAggressionLevel = 0
 	local playerAggressionEcoValue = 0
 	local queenAngerAggressionLevel = 0
+	-- Verdance: something on the field enrages the hive (the Spire Gate opening, heroes leaving through
+	-- it). aggression feeds the wave size and pace; anger is added straight onto the queen's anger.
+	GG.VA_RaptorRage = function(aggression, anger)
+		playerAggression = playerAggression + (tonumber(aggression) or 0)
+		queenAngerAggressionLevel = queenAngerAggressionLevel + (tonumber(anger) or 0)
+		Spring.Echo("VA_RAPTOR_RAGE aggression=" .. tostring(playerAggression) .. " anger+=" .. tostring(queenAngerAggressionLevel))
+	end
 	local difficultyCounter = config.difficulty
 	local waveParameters = {
 		waveCounter = 0,

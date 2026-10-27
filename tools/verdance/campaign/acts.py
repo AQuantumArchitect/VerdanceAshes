@@ -67,10 +67,14 @@ FINALE_PLANS = {
         "mapId": "the_rock_jungle",
         "deploymentZoneId": "TRJ_NW_OUTER_MUSTER",
         "title": "Finale — Spire Jump",
+        # The Spire Jump, expressed completely (owner call, 2026-10-26): finish the Spire Gate on the
+        # company's rock, power it from four advanced fusions, and port the named heroes off the jungle while
+        # the raptors come harder with every one (data/base_templates/the_rock_jungle/spire_gate.json,
+        # game_verdance_jump_gate.lua). The army that held the line stays as the garrison.
         "objective": {
             "id": "FINALE_SPIRE_JUMP",
-            "kind": "hive_clear_or_bypass",
-            "label": "Spire Jump — burn the hive heart and take the spires",
+            "kind": "jump_gate",
+            "label": "Spire Jump — finish the Spire Gate, power it with four advanced fusions, get every named hero through",
             "targetZoneId": "TRJ_C_INNER_SPILLWAY",
             "enemyFaction": "wild",
         },

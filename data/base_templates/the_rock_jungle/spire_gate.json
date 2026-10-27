@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "verdance-spire-gate/1.0",
+  "note": "Finale C, the Spire Jump (verdance.campaign.acts; game_verdance_jump_gate.lua). The Spire Gate (va_jump_gate, Armada's Experimental Gantry body) stands unfinished on zoneId (the company's rock above the drop, dry ground with room for the fusions; the hive holds the central spillways); finished, it charges while the company owns needAfus advanced fusions within radius; charged, a named hero holding on its pad for channelSeconds goes through. Each step enrages the raptors (rage*/anger*); the last hero through wakes the queen.",
+  "zoneId": "TRJ_NW_MUSTER",
+  "startBuilt": 0.05,
+  "needAfus": 4,
+  "radius": 2200,
+  "chargeSeconds": 120,
+  "padRadius": 220,
+  "channelSeconds": 8,
+  "rageOnline": 10,
+  "angerOnline": 10,
+  "ragePerHero": 6,
+  "angerPerHero": 8
+}

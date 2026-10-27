@@ -3708,6 +3708,7 @@ $scenario = [ordered]@{
     livingShell = $(if ($script:livingShellPayload) { $script:livingShellPayload } else { $null })
     warWrecks = @($script:warWrecks)
     scoutParties = @($script:scoutParties)
+    jumpGate = $(if ($intent.PSObject.Properties["jumpGate"] -and $intent.jumpGate) { $intent.jumpGate } else { $null })
     occupationModel = "living_shell"
     sessionMode = if ($intent.sessionMode) { [string]$intent.sessionMode } else { "same_map" }
     capture = [ordered]@{

@@ -206,6 +206,8 @@ VA_KINDS = {
   fortify = { fortify_zone = true, home_founding = true },
   choice = { choose_target_then_extract = true },
 }
+-- kind -> the one completion word its own gadget sends (onObjectiveComplete ignores any other)
+VA_GADGET_KINDS = { hunt_scouts = "scouts_stopped", jump_gate = "jumped" }
 
 local playerTeamID = 0
 local playerAllyTeamID = 0
@@ -4709,6 +4711,10 @@ function heroOnUnitDestroyed(unitID)
   if rec.promotingChassis then
     return
   end
+  -- Through the Spire Gate (game_verdance_jump_gate.lua): gone home, not down.
+  if rec.ported then
+    return
+  end
   if Spring.GetUnitExperience then
     local cur = Spring.GetUnitExperience(unitID) or 0
     rec.lastXp = cur
@@ -5409,6 +5415,10 @@ end
 function onObjectiveComplete(how)
   if objectiveComplete then return end
   if how == "scouts_stopped" and objectiveKind() ~= "hunt_scouts" then return end
+  -- Kinds a dedicated gadget decides take only that gadget's word: no zone hold, no burnt hive
+  -- (hunt_scouts: game_verdance_scouts.lua; jump_gate: game_verdance_jump_gate.lua).
+  local own = VA_GADGET_KINDS[objectiveKind()]
+  if own and how ~= own then return end
   -- A wreck in the wound makes raising that hero the job; nothing else stands in for it.
   local rezHero = mission and mission.objective and mission.objective.rezHeroId
   if rezHero and how ~= "rescued" then return end
@@ -5757,6 +5767,21 @@ function GG.VA_EndSortie(kind)
   setTerminal(kind, kind)
 end
 
+-- The Spire Gate calls this as a named hero goes through: survived, going home, no wreck.
+function GG.VA_HeroPorted(heroId)
+  local rec = heroes[tostring(heroId or "")]
+  if not rec then return false end
+  if rec.unitID and Spring.ValidUnitID(rec.unitID) and Spring.GetUnitExperience then
+    local cur = Spring.GetUnitExperience(rec.unitID) or 0
+    rec.lastXp = cur
+    rec.peakXp = math.max(tonumber(rec.peakXp) or 0, cur)
+  end
+  rec.ported = true
+  rec.result = "survived"
+  rec.state = "ported"
+  return true
+end
+
 -- The kings gadget calls this when every rival king has fallen and ours stands.
 function GG.VA_ObjectiveComplete(how)
   onObjectiveComplete(how)
@@ -5882,7 +5907,7 @@ end
 function checkPresenceObjective(frame)
   if objectiveComplete then return end
   local kind = objectiveKind()
-  if kind == "kings_showdown" then return end  -- the kings gadget decides; no zone hold stands in
+  if kind == "kings_showdown" or VA_GADGET_KINDS[kind] then return end  -- their own gadget decides; no zone hold stands in
   if VA_KINDS.fortify[kind] then
     checkFortifyObjective(frame)
     return
