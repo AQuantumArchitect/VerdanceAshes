@@ -72,7 +72,7 @@ local function leave(reason, f)
     return
   end
   extracted = true
-  Spring.Echo("VA_AUTOPILOT_EXTRACT reason=" .. reason .. " frame=" .. f .. " pad=" .. tostring(Spring.GetGameRulesParam("va_pad_zone")))
+  Spring.Echo("VA_AUTOPILOT_EXTRACT reason=" .. reason .. " frame=" .. f .. " pad=" .. tostring((Spring.GetGameRulesParam("va_pad_zone"))))
   GG.VA_ExfilCmd("extract:home")
 end
 
@@ -150,7 +150,7 @@ local function regroup()
   end
   if #mob > 0 then
     Spring.GiveOrderToUnitArray(mob, CMD.MOVE, { px, Spring.GetGroundHeight(px, pz) or 0, pz }, 0)
-    Spring.Echo("VA_AUTOPILOT regroup units=" .. #mob .. " pad=" .. tostring(Spring.GetGameRulesParam("va_pad_zone")))
+    Spring.Echo("VA_AUTOPILOT regroup units=" .. #mob .. " pad=" .. tostring((Spring.GetGameRulesParam("va_pad_zone"))))
   end
 end
 

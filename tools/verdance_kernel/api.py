@@ -32,10 +32,8 @@ from verdance.company import continuity_audit as audit
 from verdance.company.company import (
     company_deploy_aces,
     company_deploy_band,
-    consume_mission_call_ins,
     ensure_company,
     hub_company_surface,
-    peek_mission_call_ins,
     seal_company as _seal,
     sortie_roster,
 )
@@ -1291,15 +1289,6 @@ class CampaignKernel:
                                                else _reserve.default_bring(held, cap, self.ws))
                         plan["reserveBring"] = dict(roster["cadre"])
                         save_json(sp, st)
-                        # Bro Tzar (and future call-ins): stamp then consume so one order = one Drop.
-                        calls = peek_mission_call_ins(st)
-                        if calls:
-                            plan["missionCallIns"] = calls
-                            consume_mission_call_ins(st)
-                            try:
-                                save_json(sp, st)
-                            except Exception:  # noqa: BLE001
-                                pass
                 except Exception as e:  # noqa: BLE001
                     return {
                         "ok": False,

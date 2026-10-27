@@ -29,7 +29,7 @@ from typing import Any
 from verdance.common import load_json, save_json, utc_now
 from verdance.world import zone_graph as wzg, landing_zones as lz, roads as _roads
 from verdance.world.graph_collapse import snapshot_graph, pressure_brief
-from verdance.company.company import ensure_company, sortie_roster, peek_mission_call_ins
+from verdance.company.company import ensure_company, sortie_roster
 from verdance.belief import hub_belief
 
 SORTIE_SCHEMA = "verdance-sortie-order/1.0"
@@ -299,7 +299,6 @@ def plan_to_sortie(plan: dict, state: dict | None = None) -> dict:
         "hubChoiceId": plan.get("choiceId"),
         "deployAces": list(plan.get("deployAces") or []),
         "crewBand": list(plan.get("crewBand") or []),
-        "missionCallIns": list(plan.get("missionCallIns") or []),
         "repDelta": plan.get("repDelta") or {},
         "sessionMode": session_mode,
         "occupationModel": plan.get("occupationModel")
@@ -334,12 +333,6 @@ def stamp(plan_raw: dict, workspace: Path) -> dict:
             band, aces = sortie_roster(state, requested)
             plan["crewBand"] = band
             plan["deployAces"] = aces
-        # Prefer call-ins already on the plan (commit_deploy consumed them into plan).
-        if not plan.get("missionCallIns"):
-
-            pending = peek_mission_call_ins(state)
-            if pending:
-                plan["missionCallIns"] = pending
     except Exception:
         pass
     warns = soft_validate(plan, ws, state)

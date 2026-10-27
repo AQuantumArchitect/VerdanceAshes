@@ -554,32 +554,13 @@ export function renderShop() {
 }
 export function recomputeShopAvailability() {
   const c = commerce();
-  const rep = state.hub.reputation || {};
-  const mission = state.hub.missionNumber || 1;
-  const arcN = mission <= 5 ? 1 : mission <= 10 ? 2 : 3;
   const owned = c.owned || {};
   const upgrades = c.upgrades || {};
+  // Whether a listing can be bought is the kernel's answer (verdance.campaign.commerce.listing_available,
+  // shipped as item.available / item.blockedReason on the hub surface and again after every purchase).
+  // The page only keeps its own bookkeeping: what is owned, and how many.
   (c.shop || []).forEach(item => {
-    let ok = true, reason = null;
     const kind = item.kind || "";
-    if (kind === "printer_upgrade" && upgrades[item.id]) { ok = false; reason = "upgrade already installed"; }
-    if ((kind === "unit_printer" || kind === "loan_package") && owned[item.id]) { ok = false; reason = "already owned"; }
-    if (item.starterOwned && item.loan && owned[item.id]) { ok = false; reason = "already owned (starter loan)"; }
-    if (item.requires && !owned[item.requires]) { ok = false; reason = "requires " + item.requires; }
-    if (kind === "hero_rental" && companyOwnedBand().concat(crewCoreIds()).includes(item.heroId) && !rentedIds().includes(item.heroId)) { ok = false; reason = "already in the company"; }
-    if (kind === "hero_rental" && rentedIds().includes(item.heroId)) { ok = false; reason = "rented for this drop"; }
-    if (kind === "commander_suit" && owned[item.id]) { ok = false; reason = "the company already wears a commander suit"; }
-    if ((item.arcMin || 1) > arcN) { ok = false; reason = "arc " + item.arcMin + "+ only"; }
-    const repMin = item.repMin || {};
-    for (const f of Object.keys(repMin)) {
-      if (Number(rep[f] || 0) < Number(repMin[f])) { ok = false; reason = `need ${f} rep ≥ ${repMin[f]}`; }
-    }
-    const tcost = Number(item.tenebriumCost || 0);
-    const mcost = Number(item.metalCostK != null ? item.metalCostK : item.creditCost || 0);
-    if (Number(c.tenebrium || 0) < tcost) { ok = false; reason = `need ${tcost} Tenebrium`; }
-    if (metalKOf(c) < mcost) { ok = false; reason = `need ${(mcost * 1000).toLocaleString()} metal`; }
-    item.available = ok;
-    item.blockedReason = ok ? null : reason;
     item.owned = !!(owned[item.id] || upgrades[item.id] || (kind === "hero_rental" && rentedIds().includes(item.heroId)));
     item.ownedQty = Number((owned[item.id] || {}).qty || (owned[item.id] ? 1 : 0));
   });

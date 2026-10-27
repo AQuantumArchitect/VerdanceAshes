@@ -472,7 +472,6 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
         "hubChoiceId": (sortie or {}).get("hubChoiceId"),
         "deployAces": list((sortie or {}).get("deployAces") or []),
         "crewBand": list((sortie or {}).get("crewBand") or []),
-        "missionCallIns": list((sortie or {}).get("missionCallIns") or []),
         "captureZoneIds": list(
             objective.get("captureZoneIds")
             or (sortie or {}).get("captureZoneIds")

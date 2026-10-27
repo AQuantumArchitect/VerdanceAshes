@@ -840,71 +840,13 @@ def build_open_node(state: dict, regions: list[dict], aces: list[dict], rep: dic
     }
 
 
-def commerce_arc_number(mission_n: int) -> int:
-    n = max(1, int(mission_n or 1))
-    if n <= 5:
-        return 1
-    if n <= 10:
-        return 2
-    return 3
+from verdance.campaign.commerce import listing_available as _listing_available  # noqa: E402
 
 
 def load_catalog() -> dict:
     if not CATALOG_PATH.is_file():
         return {}
     return load_json(CATALOG_PATH)
-
-
-def listing_available_ui(
-    listing_id: str,
-    listing: dict,
-    state: dict,
-    commerce: dict,
-    mission_n: int,
-) -> tuple[bool, str]:
-    """Mirror story-engine shelf gates for hub paint (read-only)."""
-    if not listing:
-        return False, "unknown listing"
-    owned = commerce.get("owned") or {}
-    upgrades = commerce.get("upgrades") or {}
-    kind = str(listing.get("kind") or "")
-    if kind == "printer_upgrade" and listing_id in upgrades:
-        return False, "upgrade already installed"
-    if kind in ("unit_printer", "loan_package") and listing_id in owned:
-        return False, "already owned"
-    if listing.get("starterOwned") and listing.get("loan") and listing_id in owned:
-        return False, "already owned (starter loan)"
-    if kind == "commander_suit" and ((state.get("roster") or {}).get("commander") or {}).get("unlocked") is True:
-        return False, "the company already wears a commander suit"
-    if kind == "hero_rental":
-        from verdance.company.rentals import can_rent
-        ok, why = can_rent(state, str(listing.get("heroId") or ""))
-        if not ok:
-            return False, why
-    req = listing.get("requires")
-    if req and req not in owned:
-        return False, f"requires {req}"
-    arc_min = int(listing.get("arcMin") or 1)
-    if commerce_arc_number(mission_n) < arc_min:
-        return False, f"arc {arc_min}+ only"
-    rep = state.get("reputation") or {}
-    for faction, need in (listing.get("repMin") or {}).items():
-        have = float(rep.get(faction, 0) or 0)
-        if have < float(need):
-            return False, f"need {faction} rep ≥ {need} (have {have:.0f})"
-    tcost = int(listing.get("tenebriumCost") or 0)
-    if listing.get("builds") and tcost < 1:
-        tcost = 1
-    if listing.get("metalCostK") is not None:
-        mcost = int(listing.get("metalCostK") or 0)
-    else:
-        mcost = int(listing.get("creditCost") or 0)
-    if int(commerce.get("tenebrium") or 0) < tcost:
-        return False, f"need {tcost} Tenebrium (have {commerce.get('tenebrium', 0)})"
-    metal_have = int(commerce.get("metalK") if "metalK" in commerce else commerce.get("credits") or 0)
-    if metal_have < mcost:
-        return False, f"need {mcost}×1km$ metal (have {metal_have})"
-    return True, "ok"
 
 
 def build_commerce_surface(state: dict, mission_n: int) -> dict:
@@ -969,7 +911,8 @@ def build_commerce_surface(state: dict, mission_n: int) -> dict:
     for lid, listing in (catalog.get("listings") or {}).items():
         if not isinstance(listing, dict):
             continue
-        ok, reason = listing_available_ui(lid, listing, state, commerce_view, mission_n)
+        # One rule book: the store's own (verdance.campaign.commerce.listing_available); the page shows it.
+        ok, reason = _listing_available(lid, listing, state, commerce_view)
         tcost = int(listing.get("tenebriumCost") or 0)
         if listing.get("builds") and tcost < 1:
             tcost = 1

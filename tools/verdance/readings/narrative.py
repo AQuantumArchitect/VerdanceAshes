@@ -123,6 +123,28 @@ def reconcile(state, data, workspace=None):
             t.update(stage="Changed", explanation=spec["changed"])
 
 
+def what_it_pays(kind: str = "") -> str:
+    """What a sortie pays, read from the commerce catalog's sortieRewards (never written by hand)."""
+    try:
+        rewards = json.loads((ROOT / "data" / "commerce" / "commerce_catalog.json").read_text(encoding="utf-8-sig")).get("sortieRewards") or {}
+    except Exception:  # noqa: BLE001
+        rewards = {}
+    v = rewards.get("metalOnVictory") or {}
+    c = rewards.get("metalOnCleanExtract") or {}
+    parts = []
+    if v:
+        lo, hi = int(v.get("min") or 0), int(v.get("max") or 0)
+        parts.append(f"A win pays {lo}-{hi}k metal" if hi > lo else f"A win pays {hi}k metal")
+    if c and int(c.get("max") or 0):
+        pct = int(round(float(c.get("chance", 1.0)) * 100))
+        parts.append(f"a clean extract {'a ' + str(pct) + '% chance of ' if pct < 100 else ''}{int(c.get('max'))}k more")
+    line = ", ".join(parts) + "." if parts else ""
+    line += " Tenebrium only from what fallen builders leave: reclaim it. Bonus marks earn Null Mercs standing."
+    if kind == "kings_showdown":
+        line = "The throne. " + line
+    return line.strip()
+
+
 def operation_summary(choice):
     effect = choice.get("effect") or {}
     kind = effect.get("objectiveArchetype") or effect.get("contractKind") or choice.get("objectiveArchetype") or ""
@@ -151,6 +173,7 @@ def operation_summary(choice):
     return {"id": choice.get("id"), "title": title, "lean": lean, "kind": kind,
             "mapId": effect.get("mapId"), "purpose": "\n".join(lines) or "Secure an opportunity for the company.",
             "required": required,
+            "pays": what_it_pays(kind),
             "bringHome": "Get what you want to keep onto the pad and press EXTRACT. The game pauses and shows the manifest: who goes, what stays, where to. What is off the pad stays on Verdance; what stays becomes a holding. The clock never ends the sortie — overtime only wakes the map.",
             "risks": "Enemy strength beyond observed ground is unknown. Optional targets add exposure.",
             "consequences": "Territory changes require objective credit or a confirmed node claim. Capturing ground does not create Tenebrium.",

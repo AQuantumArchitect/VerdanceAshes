@@ -789,54 +789,6 @@ def seal_company(
     return True, "", company
 
 
-def order_bro_tzar(
-    state: Dict[str, Any],
-    *,
-    workspace: Optional[Path] = None,
-) -> Tuple[bool, str, Dict[str, Any]]:
-    """Legacy hook — Bro's pack seat *is* the Tzar now (no Tnb call-in).
-
-    Kept so old hub buttons / scripts fail soft instead of charging Tnb.
-    """
-    packs = load_crew_packs(workspace)
-    ensure_company(state, workspace)
-    company = state.get("company") or {}
-    if not company.get("sealed"):
-        return False, "Form the company first", {}
-
-    band = set(company_deploy_band(state))
-    if "bro" not in band and "bro" not in list(company.get("band") or []):
-        return False, "Hire Bro into the company — he *is* the Tzar", {}
-
-    commerce = state.get("commerce") or {}
-    return True, "", {
-        "missionCallIns": list(state.get("missionCallIns") or []),
-        "tenebrium": int(commerce.get("tenebrium") or 0),
-        "callIn": None,
-        "toast": "Bro is the Tzar — he drops with the company. No Tnb.",
-        "buttonLabel": "Bro is the Tzar",
-        "deprecated": True,
-        "unitDef": ((packs.get("heroes") or {}).get("bro") or {}).get("unitDef") or "corgol",
-    }
-
-
-def peek_mission_call_ins(state: Dict[str, Any]) -> List[Dict[str, Any]]:
-    raw = state.get("missionCallIns") or []
-    out: List[Dict[str, Any]] = []
-    if isinstance(raw, list):
-        for c in raw:
-            if isinstance(c, dict) and c.get("unitDef"):
-                out.append(dict(c))
-    return out
-
-
-def consume_mission_call_ins(state: Dict[str, Any]) -> List[Dict[str, Any]]:
-    """Return pending call-ins and clear them (one Drop per order)."""
-    calls = peek_mission_call_ins(state)
-    state["missionCallIns"] = []
-    return calls
-
-
 def join_from_field(
     state: Dict[str, Any],
     hero_id: str,
@@ -1331,11 +1283,6 @@ def hub_company_surface(state: Dict[str, Any], workspace: Optional[Path] = None)
         formation_km = int(packs.get("startWalletKm") or 7)
 
     deploy_band = company_deploy_band(state) if sealed else []
-    bro_in = "bro" in deploy_band or "bro" in list(company.get("band") or []) or "bro" in list(
-        company.get("joinedLater") or []
-    )
-    bro_pack = (packs.get("heroes") or {}).get("bro") or {}
-    pending_calls = list(state.get("missionCallIns") or [])
 
     return {
         "sealed": sealed,
@@ -1358,18 +1305,4 @@ def hub_company_surface(state: Dict[str, Any], workspace: Optional[Path] = None)
         "encounterPerSortie": _encounter_per_sortie(workspace),
         "deployAces": company_deploy_aces(state, packs) if sealed else core_hero_ids(packs),
         "deployBand": deploy_band,
-        "missionCallIns": pending_calls,
-        # Bro's company seat *is* the Tzar — no separate paid call-in.
-        "broTzar": {
-            "available": False,
-            "ordered": False,
-            "costTnb": 0,
-            "canAfford": True,
-            "inCompany": bool(bro_in),
-            "buttonLabel": "Bro is the Tzar",
-            "toastOrdered": "Bro drops with the company — no Tnb.",
-            "unitDef": bro_pack.get("unitDef") or "corgol",
-            "name": bro_pack.get("name") or "Bro",
-            "deprecated": True,
-        },
     }

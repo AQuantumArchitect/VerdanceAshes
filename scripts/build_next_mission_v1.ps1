@@ -3644,11 +3644,6 @@ $scenario = [ordered]@{
     crewBand = @($hubCrewBand)
     # The hero the player is (first company pick): mission-critical in the field.
     you = $(if ($state -and $state.company -and $state.company.PSObject.Properties["you"] -and $state.company.you) { [string]$state.company.you } else { $null })
-    missionCallIns = $(
-      if ($intent.PSObject.Properties["missionCallIns"] -and $intent.missionCallIns) {
-        @($intent.missionCallIns)
-      } else { @() }
-    )
     fieldRecruits = @($fieldRecruits)
     fieldPeople = @($fieldPeople)
     # Taking a door: once it is ours the extraction moves onto it (game_verdance_exfil.lua).

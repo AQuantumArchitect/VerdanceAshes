@@ -2125,20 +2125,6 @@
       "fiction": "T1 drone bay — Noctua fighter/scout line; hero unitDef is legap"
     }
   },
-  "callIns": {
-    "bro_tzar": {
-      "heroId": "tzar_loan",
-      "name": "Tzar",
-      "unitDef": "corgol",
-      "costTnb": 0,
-      "requiresHero": "bro",
-      "missionOnly": true,
-      "buttonLabel": "Bro, Pass me the Tzar",
-      "toastOrdered": "He's rolling.",
-      "blurb": "Legacy call-in — Bro's pack seat is the Tzar now",
-      "deprecated": true
-    }
-  },
   "starterUnlocks": [
     "pavise",
     "solarium",

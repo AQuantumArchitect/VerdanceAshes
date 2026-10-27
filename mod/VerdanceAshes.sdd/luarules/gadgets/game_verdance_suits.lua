@@ -47,13 +47,8 @@ function gadget:Initialize()
   end
 end
 
-local function isCommander(defID)
-  local ud = defID and UnitDefs[defID]
-  if not ud then return false end
-  local cp = ud.customParams or {}
-  if cp.isdecoycommander or cp.decoyfor then return false end
-  return (cp.iscommander or cp.isCommander or cp.commander) and true or false
-end
+local COM = VFS.Include("luarules/gadgets/include/va_commanders.lua")
+local function isCommander(defID) return COM.isCommander(defID) end
 
 local function suitDef(defID)
   local n = (UnitDefs[defID] and UnitDefs[defID].name) or ""
@@ -72,22 +67,15 @@ local function win(defID, how, uid)
   Spring.SetGameRulesParam("va_suit_how", how, { public = true })
   if uid then Spring.SetUnitRulesParam(uid, "va_label", "The company's suit", { public = true }) end
   Spring.Echo("VA_SUIT_WON def=" .. base .. " how=" .. how)
-  if SendToUnsynced then SendToUnsynced("VERDANCE_MISSION_EVENT", "suit_won", base .. ":" .. how) end
+  if SendToUnsynced then
+    SendToUnsynced("VERDANCE_MISSION_EVENT", "suit_won", base .. ":" .. how)
+    -- the HUD says so: the suit is the way into All That Simmers (verdance.campaign.suits)
+    SendToUnsynced("VERDANCE_BEAT", "bark", "Ketha", "That commander suit is ours. All That Simmers will let us duel now. Get it home.", 8)
+  end
 end
 
 local function sweepCommanders()
-  local removed = 0
-  for _, tid in ipairs(Spring.GetTeamList() or {}) do
-    if tid ~= playerTeam then
-      for _, uid in ipairs(Spring.GetTeamUnits(tid) or {}) do
-        if isCommander(Spring.GetUnitDefID(uid)) then
-          Spring.DestroyUnit(uid, false, true)
-          removed = removed + 1
-        end
-      end
-    end
-  end
-  if removed > 0 then Spring.Echo("VA_NO_COMMANDERS removed=" .. removed .. " map=" .. mapId) end
+  COM.sweep({ skipTeams = { [playerTeam] = true }, label = "no_commanders " .. mapId })
 end
 
 local function layQueenSuit(q)
@@ -104,6 +92,10 @@ local function layQueenSuit(q)
     if Spring.SetFeatureRulesParam then pcall(Spring.SetFeatureRulesParam, fid, "va_label", "A Legion commander suit", { public = true }) end
     queenSuits[#queenSuits + 1] = { x = q.x, z = q.z, fid = fid }
     Spring.Echo("VA_SUIT_UNDER_QUEEN at=" .. math.floor(q.x) .. "," .. math.floor(q.z) .. " feature=" .. fid)
+    if SendToUnsynced then
+      SendToUnsynced("VERDANCE_BEAT", "wave_warning", q.x, y, q.z, "A Legion commander suit under the queen's corpse")
+      SendToUnsynced("VERDANCE_BEAT", "bark", "Ketha", "The queen fell on a Legion commander suit. Raise it with a rez bot.", 8)
+    end
   end
 end
 

@@ -34,19 +34,16 @@ function gadget:Initialize()
   end
 end
 
+local COM = VFS.Include("luarules/gadgets/include/va_commanders.lua")
 local function isCommander(ud)
   local cp = ud and ud.customParams or {}
-  return cp.iscommander or cp.isdecoycommander
+  return COM.isCommander(ud) or cp.isdecoycommander     -- a scout party carries no commander suit, decoy or not
 end
 
 local function sweepCommanders()
-  for teamID in pairs(scoutTeams) do
-    for _, uid in ipairs(Spring.GetTeamUnits(teamID) or {}) do
-      if isCommander(UnitDefs[Spring.GetUnitDefID(uid)]) then
-        Spring.DestroyUnit(uid, false, true)
-      end
-    end
-  end
+  local teams = {}
+  for teamID in pairs(scoutTeams) do teams[#teams + 1] = teamID end
+  COM.sweep({ teams = teams, label = "eye_scouts" })
 end
 
 local function arrive(p, mx, mz)
