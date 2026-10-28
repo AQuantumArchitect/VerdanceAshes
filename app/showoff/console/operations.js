@@ -1,5 +1,5 @@
 // Operations: the drop plan, the confirm sheet, the warm (level loading) poll and the stamp.
-import { state, BOARDS, commerce, companySealed, prettyMap, jobLabel, arcMax, deployChoicesForMap, ensureFocusMapAvailable } from "./state.js";
+import { state, session, BOARDS, commerce, companySealed, prettyMap, jobLabel, arcMax, deployChoicesForMap, ensureFocusMapAvailable } from "./state.js";
 import { api } from "./api.js";
 import { $, esc, toast, logLine, downloadJson, renderHeroCard, crewHeroName } from "./render.js";
 import { defaultMarks, snapGroundRoute, isLegalLanding, padLegality, padExposed, renderBoard, renderMapPicker } from "./board.js";
@@ -60,7 +60,7 @@ export function openDeploy(choice) {
   renderMapPicker(); // the plan may have moved the focus map
   renderBoard();
   logLine(`Route briefing — ${prettyMap(state.plan.mapId)} · ${jobLabel(state.plan.contractKind)}`);
-  toast(`Mark the target on ${prettyMap(state.plan.mapId)}`, "ok");
+  toast(`${prettyMap(state.plan.mapId)}: mark the pad and the target, then Ready the drop`, "ok");
   const th = $("theater");
   if (th) th.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
@@ -83,45 +83,94 @@ export function refreshTheaterForFocus() {
   renderCompany();
 }
 
-/* ---- deploy gate --------------------------------------------------------------- */
+/* ---- deploy gate: the four steps to a drop ------------------------------------------ */
+// The footer shows where you are in the loop (company, job, pad, target, drop) and one button
+// that names the next thing to do. The button opens the drop window (step 5), never a match.
 function dropBlockReason() {
   if (!companySealed()) return "Form the company first";
   const plan = state.plan;
-  if (!plan) return "Pick a sortie on the map first";
+  if (!plan) return "Pick a job first";
   const m = plan.marks || {};
-  if (!(m.captureZoneIds && m.captureZoneIds.length)) return "Mark a target on the map first";
   if (!m.deployZoneId) return "Mark the pad first";
+  if (!(m.captureZoneIds && m.captureZoneIds.length)) return "Mark the target first";
   return "";
 }
+function planZoneName(id) {
+  const zones = (state.plan && (BOARDS[state.plan.mapId] || {}).zones) || [];
+  const z = zones.find(x => x.zoneId === id);
+  return (z && z.label) || id || "";
+}
+function dropSteps() {
+  const plan = state.plan;
+  const m = (plan && plan.marks) || {};
+  const sealed = companySealed();
+  const op = plan && ((session.narrative && session.narrative.operations) || []).find(o => o.id === plan.choiceId);
+  const targets = (m.captureZoneIds || []).map(planZoneName).join(", ");
+  const phase = state.warm && state.warm.phase !== "idle" ? state.warm.phase : "";
+  const steps = [
+    { key: "company", label: "Form the company", done: sealed, value: sealed ? sealedDeployAces().map(crewHeroName).join(", ") : "Pick who you are and two more" },
+    { key: "job", label: "Pick a job", done: sealed && !!plan, value: op ? op.title : (plan ? `${prettyMap(plan.mapId)}: ${jobLabel(plan.contractKind)}` : "From the list on the left") },
+    { key: "pad", label: "Mark the pad", done: !!m.deployZoneId, value: m.deployZoneId ? `Land and lift at ${planZoneName(m.deployZoneId)}` : "Where you land and lift (△)" },
+    { key: "target", label: "Mark the target", done: !!targets, value: targets ? `Take ${targets}` : "The zone to take (◎)" },
+    { key: "drop", label: "Ready the drop", done: phase === "up", value: phase === "up" ? "In the field" : (phase ? "The field is loading" : "Who goes, what they carry, mercenaries") },
+  ];
+  const next = steps.findIndex(st => !st.done);
+  steps.forEach((st, i) => { st.state = st.done ? "done" : (i === next ? "now" : "later"); });
+  return steps;
+}
+function renderDropSteps() {
+  const el = $("drop-steps");
+  if (!el) return;
+  el.innerHTML = dropSteps().map((st, i) =>
+    `<li class="ds-step ds-${st.state}"><button type="button" data-step="${st.key}" title="${esc(st.value)}">` +
+    `<span class="ds-n">${st.done ? "✓" : i + 1}</span><span class="ds-text"><span class="ds-label">${esc(st.label)}</span>` +
+    `<span class="ds-value">${esc(st.value)}</span></span></button></li>`).join("");
+  el.querySelectorAll("button[data-step]").forEach(b => { b.onclick = () => goToStep(b.dataset.step); });
+}
+function goToStep(key) {
+  if (key === "company") { if (!companySealed()) showCompanyIntro(); else document.querySelector('.cc-nav button[data-workspace="company"]')?.click(); return; }
+  if (key === "job") { document.querySelector('.cc-nav button[data-workspace="operations"]')?.click(); $("operations-rail")?.scrollIntoView({ behavior: "smooth", block: "start" }); return; }
+  if (key === "pad" || key === "target") {
+    const btn = document.querySelector(`.mode-btn[data-mode="${key === "pad" ? "pad" : "capture"}"]`);
+    if (btn) setMarkMode(btn);
+    $("board")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
+  }
+  showDropConfirm();
+}
 export function updateDeployGate() {
+  renderDropSteps();
   const btn = $("btn-deploy");
   if (!btn) return;
   const phase = state.warm && state.warm.phase;
   btn.classList.toggle("dropping", phase === "loading" || phase === "ready" || phase === "dropping" || phase === "up");
   btn.disabled = false;
   if (phase === "up") {
-    btn.title = "The company is in the field. This opens the drop sheet.";
+    btn.title = "The company is in the field. This opens the drop window.";
     btn.textContent = "In the field";
     return;
   }
   if (phase === "loading" || phase === "ready" || phase === "dropping") {
-    btn.title = "The field is loaded (or loading) behind this screen. Open the sheet to pick who goes and drop.";
-    btn.textContent = phase === "loading" ? "Field loading… pick who goes" : "Field ready · pick who goes";
+    btn.title = "The field is loaded (or loading) behind this screen. Open the drop window to pick who goes and drop.";
+    btn.textContent = phase === "loading" ? "Field loading: pick who goes" : "Field ready: pick who goes";
     return;
   }
   if (!companySealed()) {
-    btn.title = "Open the company picker — pick 3 packs, then Confirm";
-    btn.textContent = "Form company to Drop";
+    btn.title = "Open the company picker: choose who you are and two more, then Confirm";
+    btn.textContent = "Form the company";
     return;
   }
   const block = dropBlockReason();
+  btn.classList.toggle("blocked", !!block);
   if (block) {
     btn.title = block;
-    btn.textContent = block;
+    btn.textContent = block.replace(/ first$/, "");
     return;
   }
-  btn.title = "Load this field now. You pick who goes while it loads, then drop them in.";
-  btn.textContent = state.hostLive ? "Launch" : "Save plan";
+  btn.title = state.hostLive
+    ? "Opens the drop window: who goes, what they carry, the mercenary store. The field loads while you choose."
+    : "Map only: the drop window saves the plan. Start PLAY.bat to fight.";
+  btn.textContent = "Ready the drop";
 }
 
 /* ---- the drop sheet: the field loads while you pick who goes (hot drop) ------------ */
@@ -194,7 +243,9 @@ export function renderDropSquad() {
   const entries = buildCompanyEntries().filter(e => e.tier === "deployed" || e.tier === "base");
   const packN = droppingPackIds().length;
   const coreN = livingCoreIds().length;
-  if (kicker) kicker.textContent = entries.length ? `Who is dropping · ${packN} pack${packN === 1 ? "" : "s"} + ${coreN} core` : "Who is dropping · core only";
+  if (kicker) kicker.textContent = entries.length
+    ? `Who drops: ${packN} pack${packN === 1 ? "" : "s"} and ${coreIds.map(crewHeroName).join(", ")}. Click a card to bring someone or leave them home.`
+    : `Who drops: ${coreIds.map(crewHeroName).join(", ")} only`;
   if (squadEl) {
     const locked = dropRosterSealed();
     const cards = entries.map(e => {
@@ -203,7 +254,7 @@ export function renderDropSquad() {
       const canToggle = !isCore && !!e.pickable && !locked;
       return renderHeroCard({
         id: e.id, ace: e.ace,
-        tag: isCore ? "core · always" : (rented.has(e.id) ? (on ? "rented · dropping" : "rented · at base") : (on ? "dropping" : "at base")),
+        tag: isCore ? "always comes" : [rented.has(e.id) ? "rented" : "", on ? "" : "stays home"].filter(Boolean).join(", ") || null,
         classes: [isCore ? "core" : "", on ? "on" : "tier-base", canToggle ? "toggleable" : ""].filter(Boolean),
         compact: true, hideCost: true, dataCrew: canToggle ? e.id : null, disabled: !canToggle, type: "button",
       });
@@ -271,12 +322,12 @@ export function showDropConfirm() {
   hideCompanyIntro();
   if (!companySealed()) {
     showCompanyIntro();
-    return toast("Pick 3 packs and Confirm company first", "warn");
+    return toast("Form the company first: who you are, and two more", "warn");
   }
   const plan = state.plan;
   if (!plan) return toast("Mark a route on the theater first", "err");
-  if (!(plan.marks && plan.marks.captureZoneIds && plan.marks.captureZoneIds.length)) return toast("Mark a target (wound) on the map first", "err");
-  if (!plan.marks.deployZoneId) return toast("Mark an authored deployment zone", "err");
+  if (!(plan.marks && plan.marks.captureZoneIds && plan.marks.captureZoneIds.length)) return toast("Mark the target on the map first", "err");
+  if (!plan.marks.deployZoneId) return toast("Mark the pad on the map first", "err");
   const zones = (BOARDS[plan.mapId] || {}).zones || [];
   const zoneName = (id) => {
     if (!id) return "—";
@@ -295,7 +346,7 @@ export function showDropConfirm() {
     const eyes = padExposed(m.deployZoneId);
     body.innerHTML =
       `Drop on <b>${esc(prettyMap(plan.mapId))}</b> · <b>${esc(jobLabel(plan.contractKind))}</b><br>` +
-      `Pad <b>${esc(zoneName(m.deployZoneId))}</b> → wound <b>${esc(targets)}</b> → ` +
+      `Pad <b>${esc(zoneName(m.deployZoneId))}</b> → target <b>${esc(targets)}</b> → ` +
       (exitDoor ? `once it is yours, leave by the door itself, <b>${esc(zoneName(exitDoor))}</b>.`
                 : `back to <b>${esc(zoneName(m.deployZoneId))}</b>.`) +
       (eyes === "known" ? `<br><span class="bad">Armada has eyes on this pad.</span>` : "") +
