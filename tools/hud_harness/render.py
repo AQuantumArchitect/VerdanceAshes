@@ -140,7 +140,7 @@ local manifest = [[{"schema":"verdance-manifest/1","pad":{"zoneId":"TRJ_SW_LANE"
  "going":{"heroes":[{"heroId":"vane","name":"Vane"}],"units":{"corthud":4,"legrezbot":1},"unitCount":5},
  "staying":{"heroes":[{"heroId":"grath","name":"Grath","zoneId":"]] .. WG.vaBoard.objectiveId .. [["}],"units":{"TRJ_NW_MUSTER":3},"unitCount":3,"structures":{"TRJ_SW_LANE":{"count":2,"metal":400}},"structureCount":2},
  "enemyOnPad":1,"seen":{"TRJ_SW_LANE":0.9,"TRJ_NW_MUSTER":0.8,"]] .. WG.vaBoard.objectiveId .. [[":0.35},"tenebrium":3}]]
-GLOBALS.VerdanceManifest(manifest); ex:DrawScreen(); DUMP(OUT .. "/p7_exfil.json")
+RULES.va_manifest_json = manifest; RULES.va_manifest_seq = (RULES.va_manifest_seq or 0) + 1; ex:Update(); ex:DrawScreen(); DUMP(OUT .. "/p7_exfil.json")
 ex:KeyPress(13); RULES.va_terminal = 1; RULES.va_status = "extracted"; ex:Update(); ex:DrawScreen(); DUMP(OUT .. "/p7_over.json")
 '''
     H.run(st, "OUT = " + json.dumps(outdir) + "\n" + scenes, "scenes")

@@ -17,37 +17,21 @@ end
 -- manifest the synced exfil gadget built, drawn on the same board the minimap and the infil
 -- card use: ● going at the pad, ○ staying where they stand, ■ structures becoming holdings.
 -- Enter confirms, Esc goes back. Company belief only; the other minds stay hidden.
+-- Verbs (WG.vaVerbs): confirm, back, destination(i); keys, buttons and the rig's player press them.
+--
+--   field ──(va_manifest_seq rises)──▶ manifest ──confirm──▶ extracting ──(va_terminal)──▶ over
+--                                         └──back──▶ field
 
-local Ash, J, Board
-do
-  local ok, mod = pcall(VFS.Include, "luaui/Include/va_ash_tokens.lua")
-  if not ok or type(mod) ~= "table" then ok, mod = pcall(VFS.Include, "LuaUI/Include/va_ash_tokens.lua") end
-  Ash = (ok and type(mod) == "table") and mod or nil
-  ok, mod = pcall(VFS.Include, "luaui/Include/va_json.lua")
-  if not ok or type(mod) ~= "table" then ok, mod = pcall(VFS.Include, "LuaUI/Include/va_json.lua") end
-  J = (ok and type(mod) == "table") and mod or nil
-  ok, mod = pcall(VFS.Include, "luaui/Include/va_board.lua")
-  if not ok or type(mod) ~= "table" then ok, mod = pcall(VFS.Include, "LuaUI/Include/va_board.lua") end
-  Board = (ok and type(mod) == "table") and mod or nil
-end
+local Hud = VFS.Include("luaui/Include/va_hud.lua")
+local Ash, J = Hud.Ash, Hud.J
+local theBoard, setModal, setPaused, num = Hud.board, Hud.setModal, Hud.setPaused, Hud.num
 
 local manifest = nil
 local destIdx = 1
 local phase = "field"       -- field | manifest | extracting | over
 local overKind = nil
 local buttons = {}
-local ownBoard = nil
 local learned = nil         -- composed once per manifest
-
-local function theBoard()
-  if WG and WG.vaBoard then return WG.vaBoard end
-  if not ownBoard and Board then ownBoard = Board.new() end
-  return ownBoard
-end
-
-local function setModal(on) if WG then WG.vaExfilModal = on and true or false end end
-local function setPaused(on) pcall(Spring.SendCommands, on and "pause 1" or "pause 0") end
-local function num(name, default) return tonumber((Spring.GetGameRulesParam(name))) or default end
 
 local function sortedKeys(t)
   local ks = {}
@@ -80,7 +64,7 @@ local function composeLearned(m)
   return rows
 end
 
-function widget:VerdanceManifest(json)
+local function openManifest(json)
   local m = J and J.decode(json or "") or nil
   if type(m) ~= "table" then Spring.Echo("VA_EXFIL_UI bad manifest"); return end
   manifest = m
@@ -94,7 +78,7 @@ end
 
 local extractingSince = nil
 local function confirm()
-  if phase ~= "manifest" or not manifest then return end
+  if phase ~= "manifest" or not manifest then return false end
   local d = (manifest.destinations or {})[destIdx] or { id = "home" }
   phase = "extracting"
   extractingSince = os.clock()
@@ -104,8 +88,8 @@ local function confirm()
   Spring.Echo("VA_EXFIL_UI confirm dest=" .. tostring(d.id))
 end
 
-local function cancel()
-  if phase ~= "manifest" then return end
+local function back()
+  if phase ~= "manifest" then return false end
   phase = "field"
   manifest = nil
   setModal(false)
@@ -113,20 +97,27 @@ local function cancel()
   Spring.Echo("VA_EXFIL_UI back to the field")
 end
 
-function widget:VerdanceMissionEvent(eventStatus, reason)
-  if eventStatus == "sortie_over" then
-    phase = "over"
-    setModal(true)
-    overKind = tostring(reason or "extracted")
-    if not manifest then
-      manifest = { going = { heroes = {}, unitCount = 0 }, staying = { heroes = {}, unitCount = 0, structureCount = 0, structures = {}, units = {} }, pad = {}, seen = {} }
-      learned = composeLearned(manifest)
-    end
+local function destination(i)
+  if phase ~= "manifest" then return false end
+  destIdx = math.max(1, math.min(#(manifest.destinations or {}), i))
+end
+
+-- The sortie is over (va_terminal): the closing card, with whatever manifest we have.
+local function closeOut(kind)
+  phase = "over"
+  setModal(true)
+  overKind = tostring(kind or "extracted")
+  if not manifest then
+    manifest = { going = { heroes = {}, unitCount = 0 }, staying = { heroes = {}, unitCount = 0, structureCount = 0, structures = {}, units = {} }, pad = {}, seen = {} }
+    learned = composeLearned(manifest)
   end
 end
 
 function widget:Initialize()
   -- the infil card may already own the modal flag; never clear it here
+  Hud.verb("confirm", confirm)
+  Hud.verb("back", back)
+  Hud.verb("destination", destination)
 end
 
 function widget:Shutdown()
@@ -145,19 +136,17 @@ function widget:Update()
   local seq = num("va_manifest_seq", 0)
   if seq > lastManifestSeq then
     lastManifestSeq = seq
-    if phase == "field" then widget:VerdanceManifest(Spring.GetGameRulesParam("va_manifest_json")) end
+    if phase == "field" then openManifest(Spring.GetGameRulesParam("va_manifest_json")) end
   end
-  if num("va_terminal", 0) == 1 then
-    widget:VerdanceMissionEvent("sortie_over", tostring(Spring.GetGameRulesParam("va_status") or "extracted"))
-  end
+  if Hud.over() then closeOut(Hud.str("va_status") or "extracted") end
 end
 
 function widget:KeyPress(key)
   if phase == "manifest" then
-    if key == 13 or key == 271 then confirm(); return true end
-    if key == 27 then cancel(); return true end
-    if key == 276 or key == 97 then destIdx = math.max(1, destIdx - 1); return true end
-    if key == 275 or key == 100 then destIdx = math.min(#(manifest.destinations or {}), destIdx + 1); return true end
+    if key == 13 or key == 271 then Hud.press("confirm"); return true end
+    if key == 27 then Hud.press("back"); return true end
+    if key == 276 or key == 97 then destination(destIdx - 1); return true end
+    if key == 275 or key == 100 then destination(destIdx + 1); return true end
     return true
   elseif phase == "extracting" or phase == "over" then
     return true
@@ -169,9 +158,9 @@ function widget:MousePress(mx, my, button)
   if phase ~= "manifest" then return phase ~= "field" end
   for _, b in ipairs(buttons) do
     if Ash.inRect(mx, my, b) then
-      if b.action == "confirm" then confirm()
-      elseif b.action == "cancel" then cancel()
-      elseif b.action == "dest" then destIdx = b.idx end
+      if b.action == "confirm" then Hud.press("confirm")
+      elseif b.action == "back" then Hud.press("back")
+      elseif b.action == "dest" then destination(b.idx) end
       return true
     end
   end
@@ -179,14 +168,7 @@ function widget:MousePress(mx, my, button)
 end
 
 -- ---------------------------------------------------------------- draw
-local function text(s, x, y, size, col, align) Ash.text(s, x, y, size, col, align) end
-
-local function column(x1, y1, x2, y2, kicker, accent)
-  Ash.panel(x1, y1, x2, y2, { accent = accent })
-  text(kicker, x1 + 12, y2 - 18, 10, Ash.COL.ash, "l")
-  Ash.rule(x1 + 12, y2 - 23, x2 - 12, accent, 0.45)
-  return x1 + 12, y2 - 42, x2 - 12
-end
+local text, column = Ash.text, Hud.column
 
 local function rows(x, y, right, bottom, list)
   local shown = 0
@@ -264,8 +246,6 @@ local function drawBoardColumn(m, x1, y1, x2, y2)
   local bx1, by1, bx2, by2 = x, y1 + 12, right, y + 10
   Ash.rect(bx1, by1, bx2, by2, Ash.with(Ash.COL.bg, 0.9))
   if not b or #b.zones == 0 then text("no board", (bx1 + bx2) * 0.5, (by1 + by2) * 0.5, 12, Ash.COL.muted, "c"); return end
-  local proj, rect = b:fitProj(bx1 + 6, by1 + 6, bx2 - 6, by2 - 6)
-  Ash.rect(rect[1], rect[2], rect[3], rect[4], { 0.05, 0.09, 0.07, 1 })
   local people = {}
   local px, pz = b:pad()
   local g, s = m.going or {}, m.staying or {}
@@ -286,8 +266,7 @@ local function drawBoardColumn(m, x1, y1, x2, y2)
     local z = b.byId[tostring(zid)]
     if z then people[#people + 1] = { x = z.cx, z = z.cz + 90, glyph = Ash.GLYPH.holding, col = Ash.COL.gold, size = 11 } end
   end
-  b:paint(proj, { fade = true, seenNow = m.seen, labels = true, glyphSize = 12, contradicted = WG and WG.vaContradicted or nil, people = people })
-  Ash.outline(rect[1], rect[2], rect[3], rect[4], Ash.with(Ash.COL.edge, 0.4), 1)
+  Hud.boardBox(b, bx1 + 6, by1 + 6, bx2 - 6, by2 - 6, { fade = true, seenNow = m.seen, labels = true, glyphSize = 12, contradicted = WG and WG.vaContradicted or nil, people = people })
 end
 
 local function drawDestinations(m, x0, y, W)
@@ -342,7 +321,7 @@ local function drawManifest()
   buttons[#buttons + 1] = { x0, by, x0 + 300, by + 42, action = "confirm" }
   Ash.actionRow(x0 + 316, by, x0 + 556, by + 42, { fill = Ash.COL.muted, focused = false })
   text("BACK TO THE FIELD   [Esc]", x0 + 436, by + 15, 14, Ash.COL.muted, "c")
-  buttons[#buttons + 1] = { x0 + 316, by, x0 + 556, by + 42, action = "cancel" }
+  buttons[#buttons + 1] = { x0 + 316, by, x0 + 556, by + 42, action = "back" }
   text("Whatever stands on ground we hold lifts; the rest stays on Verdance. Structures become holdings.", x0, by - 18, 11, Ash.COL.muted, "l")
 end
 
@@ -357,7 +336,7 @@ local function drawOver()
     text("Everything on Verdance is Verdance's now.", vsx * 0.5, y - 34, 15, Ash.COL.muted, "c")
   else
     text("The company lifts from " .. tostring((m.pad and m.pad.label) or "the pad") .. ".", vsx * 0.5, y, 28, Ash.COL.gold, "c")
-    local function n(k, one, many) return tostring(k) .. " " .. ((k == 1) and one or many) end
+    local n = Hud.plural
     text(string.format("%s and %s going.  %s, %s and %s stay.", n(#(g.heroes or {}), "person", "people"), n(g.unitCount or 0, "unit", "units"), n(#(s.heroes or {}), "person", "people"), n(s.unitCount or 0, "unit", "units"), n(s.structureCount or 0, "structure", "structures")), vsx * 0.5, y - 34, 15, Ash.COL.ink, "c")
   end
   -- the board, frozen, small, under the headline
@@ -365,10 +344,7 @@ local function drawOver()
   if b and #b.zones > 0 then
     local bw = math.min(420, vsx * 0.35)
     local bx1, by1 = vsx * 0.5 - bw * 0.5, y - 70 - bw * (b.mapZ / b.mapX)
-    local proj, rect = b:fitProj(bx1, by1, bx1 + bw, y - 70)
-    Ash.rect(rect[1], rect[2], rect[3], rect[4], { 0.05, 0.09, 0.07, 1 })
-    b:paint(proj, { fade = true, seenNow = m.seen, glyphSize = 11, contradicted = WG and WG.vaContradicted or nil })
-    Ash.outline(rect[1], rect[2], rect[3], rect[4], Ash.with(Ash.COL.edge, 0.4), 1)
+    local rect = Hud.boardBox(b, bx1, by1, bx1 + bw, y - 70, { fade = true, seenNow = m.seen, glyphSize = 11, contradicted = WG and WG.vaContradicted or nil })
     text("Returning to camp…", vsx * 0.5, rect[2] - 22, 13, Ash.COL.muted, "c")
   else
     text("Returning to camp…", vsx * 0.5, y - 70, 13, Ash.COL.muted, "c")

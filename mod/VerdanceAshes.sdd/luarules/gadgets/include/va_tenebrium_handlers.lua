@@ -480,9 +480,6 @@ return function(tenebLoot, api)
       .. " source=" .. tostring(source or "reclaim")
       .. " bank=" .. tostring(tenebLoot.bank)
       .. " feature=" .. tostring(featureID))
-    if SendToUnsynced then
-      SendToUnsynced("VERDANCE_BEAT", "tenebrium_loot", rem, tenebLoot.bank, featureID, claimant)
-    end
     rec.looted = true
     return rem
   end

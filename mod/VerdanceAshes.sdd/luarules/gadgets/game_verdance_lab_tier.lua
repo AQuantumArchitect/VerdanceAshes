@@ -49,14 +49,18 @@ end
 local T2_MAPS = { all_that_simmers = true }
 local T2_MAP_NAMES = { "all that simmers" }
 
+-- The mission seed's map, else BAR's map name. Asked on every build order, so decided once.
+local t2Here = nil
 local function t2Allowed()
-  local mid = Spring.GetGameRulesParam and Spring.GetGameRulesParam("va_map_id")
-  if type(mid) == "string" and T2_MAPS[mid] then return true end
+  if t2Here ~= nil then return t2Here end
+  local ok, m = pcall(VFS.Include, "singleplayer/verdance_ashes/generated/va_current.lua")
+  local mid = ok and type(m) == "table" and tostring(m.deploymentMapId or m.mapId or "") or ""
+  t2Here = T2_MAPS[mid] == true
   local name = string.lower(tostring((Game and Game.mapName) or ""))
   for _, n in ipairs(T2_MAP_NAMES) do
-    if name:find(n, 1, true) then return true end
+    if name:find(n, 1, true) then t2Here = true end
   end
-  return false
+  return t2Here
 end
 
 local TOOLTIP = "Not on this ground: the company raises T2 factories only at All That Simmers."

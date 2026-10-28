@@ -74,9 +74,7 @@ end
 
 function M.sameZone(a, b)
   local za = Spring.GetUnitRulesParam(a, "va_shell_zone")
-    or Spring.GetUnitRulesParam(a, "va_zone_id")
   local zb = Spring.GetUnitRulesParam(b, "va_shell_zone")
-    or Spring.GetUnitRulesParam(b, "va_zone_id")
   if za and zb and tostring(za) ~= "" and tostring(za) == tostring(zb) then
     return true
   end

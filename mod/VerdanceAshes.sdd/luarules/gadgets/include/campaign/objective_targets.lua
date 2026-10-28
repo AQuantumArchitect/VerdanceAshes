@@ -293,16 +293,8 @@ function objectiveTargetDestroyed(unitID)
     if not objectiveComplete and status == "active" and not terminal then
       local kind = objectiveKind()
       if VA_KINDS.capture[kind] or capture.mode then
-        -- Capture: destruction only clears the pocket; hold under regrow is required.
-        -- Do not auto-complete on last structure kill.
-        if capture.mode and capture.phase == "clear" then
-          local need = math.max(1, math.ceil(math.max(1, objectiveTargetCount) * CLEAR_FRACTION))
-          if objectiveTargetsDestroyed >= need and not capture.pocketCleared then
-            -- Phase advance happens on next presence check; publish progress now.
-            Spring.SetGameRulesParam("va_pocket_clear_frac",
-              objectiveTargetsDestroyed / math.max(1, objectiveTargetCount), { public = true })
-          end
-        end
+        -- Capture: destruction only clears the pocket (the next presence check advances the
+        -- phase); the hold under regrow pressure is what completes it, never the last kill.
       elseif objectiveTargetsDestroyed >= objectiveTargetCount then
         onObjectiveComplete("target_destroyed")
       end

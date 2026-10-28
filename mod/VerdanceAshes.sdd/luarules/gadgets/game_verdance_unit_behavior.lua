@@ -28,7 +28,7 @@ end
   - Player combat orders pulse dissipative `orders` belief (tune γ in Intent).
   - Actuators reuse existing MOVE/REPAIR/REZ/kite helpers (belief is the bus,
     not a second mover). Inspired by GummyDynasty Umwelt host contract — no umweltd.
-  - Stage 4 molecule policy: modoption/GameRulesParam va_molecule_policy=
+  - Stage 4 molecule policy: modoption va_molecule_policy=
     off|shadow|soft. soft blends doctrine biases toward D(u) (α≈0.28); BeliefField
     + orders + Kiln hard gates unchanged. Default soft (vibe seal). Rollback=off.
 ]]

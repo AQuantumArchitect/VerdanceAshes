@@ -17,15 +17,8 @@ end
 -- Owns the one Board instance (WG.vaBoard) that the sidebar, infil and exfil screens share,
 -- and the live contradiction record (WG.vaContradicted). Draws the pad ring on the ground.
 
-local Board, Ash
-do
-  local ok, mod = pcall(VFS.Include, "luaui/Include/va_board.lua")
-  if not ok or type(mod) ~= "table" then ok, mod = pcall(VFS.Include, "LuaUI/Include/va_board.lua") end
-  Board = (ok and type(mod) == "table") and mod or nil
-  ok, mod = pcall(VFS.Include, "luaui/Include/va_ash_tokens.lua")
-  if not ok or type(mod) ~= "table" then ok, mod = pcall(VFS.Include, "LuaUI/Include/va_ash_tokens.lua") end
-  Ash = (ok and type(mod) == "table") and mod or nil
-end
+local Hud = VFS.Include("luaui/Include/va_hud.lua")
+local Board, Ash = Hud.Board, Hud.Ash
 
 local board = nil
 local enabled = true
@@ -78,7 +71,7 @@ end
 -- The live report: what this board shows, written beside BAR every observation tick so the
 -- hub can paint it on a second screen. Company view only (our sight, our people, the pad);
 -- the hub keeps it apart from belief, which still moves only at homecoming.
-local LIVE_PATH = "LuaUI/Config/verdance/live.json"
+local LIVE_PATH = "LuaUI/Config/verdance/live.json"   -- WG.vaLivePath: the HUD harness's redirect
 local function q(v) return '"' .. tostring(v):gsub('[%c"\\]', function(c) return string.format("\\u%04x", c:byte()) end) .. '"' end
 local function n(v)
   v = tonumber(v) or 0
@@ -96,7 +89,7 @@ local function writeLive()
         .. (contradicted[z.id] and (',"found":' .. q(contradicted[z.id])) or "") .. "}"
     end
   end
-  local function rule(name) return tonumber((Spring.GetGameRulesParam(name))) or 0 end
+  local function rule(name) return Hud.num(name, 0) end
   local heroes = Spring.GetGameRulesParam("va_hud_heroes_json")
   if type(heroes) ~= "string" or heroes:sub(1, 1) ~= "[" then heroes = "[]" end
   local body = '{"schema":"verdance-live/1","missionId":' .. q(m.missionId or "") .. ',"mapId":' .. q(m.deploymentMapId or "")
@@ -151,7 +144,7 @@ function widget:Update()
     lastRoleKey = key
     board:refreshRoles()
   end
-  local tick = tonumber((Spring.GetGameRulesParam("va_obs_tick"))) or -1
+  local tick = Hud.num("va_obs_tick", -1)
   if tick ~= lastTick then
     lastTick = tick
     checkSurprises()
@@ -183,7 +176,7 @@ local function peopleGlyphs()
       if h.state == "down" then
         out[#out + 1] = { x = h.x, z = h.z, glyph = Ash.GLYPH.down, col = Ash.COL.bad, size = 12 }
       elseif h.state == "alive" and not h.onPad then
-        out[#out + 1] = { x = h.x, z = h.z, glyph = Ash.GLYPH.offPad, col = h.critical and Ash.COL.gold or Ash.COL.ink, size = 10 }
+        out[#out + 1] = { x = h.x, z = h.z, glyph = Ash.GLYPH.offPad, col = h.crit and Ash.COL.gold or Ash.COL.ink, size = 10 }
       end
     end
   end
@@ -214,7 +207,7 @@ local function groundY(x, z) return (Spring.GetGroundHeight(x, z) or 0) end
 
 function widget:DrawWorld()
   if not board or Spring.IsGUIHidden() then return end
-  if (tonumber((Spring.GetGameRulesParam("va_terminal"))) or 0) == 1 then return end
+  if Hud.over() then return end
   local px, pz, pr = board:pad()
   if not px then return end
   local steam = Ash.COL.steam
@@ -222,7 +215,7 @@ function widget:DrawWorld()
   -- ground, the same edges the minimap draws. Warn colour, faster pulse, while enemies stand on it.
   local zone = board.padId and board.byId[board.padId]
   if zone and zone.edges and #zone.edges > 0 then
-    local hostile = (tonumber((Spring.GetGameRulesParam("va_pad_enemy_live"))) or 0) > 0
+    local hostile = Hud.num("va_pad_enemy_live", 0) > 0
     local c = hostile and Ash.COL.warn or steam
     local speed = hostile and 4 or 1.6
     gl.Color(c[1], c[2], c[3], 0.4 + 0.35 * math.abs(math.sin(os.clock() * speed)))
@@ -249,7 +242,7 @@ function widget:DrawWorld()
       gl.Vertex(x, groundY(x, z) + 10, z)
     end
   end)
-  local hostile = (tonumber((Spring.GetGameRulesParam("va_pad_enemy_live"))) or 0) > 0
+  local hostile = Hud.num("va_pad_enemy_live", 0) > 0
   local inner = math.max(60, pr - 40)
   local ic = hostile and Ash.COL.warn or steam
   local ia = hostile and (0.55 + 0.4 * math.abs(math.sin(os.clock() * 4))) or 0.3

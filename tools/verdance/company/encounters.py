@@ -45,7 +45,7 @@ RULES_REL = Path("data") / "story" / "encounter_rules.json"
 _RULES_DEFAULT = {"perSortie": 2, "markedGround": {"drawBoost": 4.0},
                   "homeZone": {"doesNotWalk": "fixed", "default": 1.0, "homeMapHaunt": 2.4}, "entranceBuilder": {},
                   "meetingStance": {"bias": 0.6, "biasLate": 0.2, "rampFrom": 2, "rampTo": 9, "softness": 0.25},
-                  "presence": {"relation": 0.7, "ally": 0.45, "adversary": 1.0}}
+                  "presence": {"relation": 2.5, "ally": 3.5, "adversary": 2.0}}
 ALLY_POLARITY = {"bond", "attract", "sibling", "mentor", "mirror"}
 ADVERSARY_POLARITY = {"rivalry", "tension", "friction"}
 # Recruit kinds that keep their own way of being met (the constructor-gated ones, a stash).
@@ -345,11 +345,11 @@ def present_heroes(state: Dict[str, Any]) -> List[str]:
 
 def _weights(E, workspace: Path):
     """The encounter field's weights. presence (encounter_rules.json): how much a relation to someone in
-    the company raises the chance of meeting, per side. Bonded heroes turn up more rarely than the ones
-    at odds with the party (ally < adversary). An older Umwelt without the per-side weights gets the
-    shared one."""
+    the company raises the chance of meeting, per side. Bonds are the default meeting, rivals the accent,
+    strangers uncommon (ally > adversary, both strong). An older Umwelt without the per-side weights
+    gets the shared one."""
     pr = rules(workspace).get("presence") or {}
-    rel = float(pr.get("relation", 0.7))
+    rel = float(pr.get("relation", 2.5))
     try:
         return E.Weights(presence_relation=rel, presence_ally=float(pr.get("ally", rel)),
                          presence_adversary=float(pr.get("adversary", rel)))

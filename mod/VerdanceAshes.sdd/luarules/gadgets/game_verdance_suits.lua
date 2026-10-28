@@ -68,7 +68,6 @@ local function win(defID, how, uid)
   if uid then Spring.SetUnitRulesParam(uid, "va_label", "The company's suit", { public = true }) end
   Spring.Echo("VA_SUIT_WON def=" .. base .. " how=" .. how)
   if SendToUnsynced then
-    SendToUnsynced("VERDANCE_MISSION_EVENT", "suit_won", base .. ":" .. how)
     -- the HUD says so: the suit is the way into All That Simmers (verdance.campaign.suits)
     SendToUnsynced("VERDANCE_BEAT", "bark", "Ketha", "That commander suit is ours. All That Simmers will let us duel now. Get it home.", 8)
   end

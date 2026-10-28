@@ -24,10 +24,10 @@ end
 
 local function vaCheckPurge(frame)
   if not extraObj.purge or extraObj.purgeDone then return end
-  for teamID in pairs(extraObj.purgeTeams) do
-    local n = Spring.GetTeamUnitCount(teamID)
-    if n and n > 0 then return end
-  end
+  local left = 0
+  for teamID in pairs(extraObj.purgeTeams) do left = left + (Spring.GetTeamUnitCount(teamID) or 0) end
+  Spring.SetGameRulesParam("va_purge_left", left, { public = true })   -- the HUD's "purge · n left"
+  if left > 0 then return end
   extraObj.purgeDone = true
   Spring.SetGameRulesParam("va_purge_done", 1, { public = true })
   Spring.Echo("VA_PURGE_COMPLETE frame=" .. tostring(frame))

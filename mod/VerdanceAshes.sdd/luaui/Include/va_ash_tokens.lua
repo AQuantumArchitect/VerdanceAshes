@@ -209,36 +209,6 @@ function Ash.hatchRect(x1, y1, x2, y2, col, step)
   end)
 end
 
---- Sparse dot grid inside a rect: "nobody looked". Distinct from hatch (exposure).
-function Ash.dotRect(x1, y1, x2, y2, col, step)
-  if x2 <= x1 or y2 <= y1 then return end
-  step = step or 5
-  Ash.setColor(col or Ash.COL.ash)
-  gl.PointSize(1.5)
-  gl.BeginEnd(GL.POINTS, function()
-    local yy = y1 + step * 0.5
-    while yy < y2 do
-      local xx = x1 + step * 0.5
-      while xx < x2 do gl.Vertex(xx, yy); xx = xx + step end
-      yy = yy + step
-    end
-  end)
-  gl.PointSize(1)
-end
-
---- Dashed rectangle outline (stale belief).
-function Ash.dashedOutline(x1, y1, x2, y2, col, dash)
-  dash = dash or 3
-  Ash.setColor(col)
-  gl.LineWidth(1)
-  gl.BeginEnd(GL.LINES, function()
-    local x = x1
-    while x < x2 do gl.Vertex(x, y1); gl.Vertex(math.min(x2, x + dash), y1); gl.Vertex(x, y2); gl.Vertex(math.min(x2, x + dash), y2); x = x + dash * 2 end
-    local y = y1
-    while y < y2 do gl.Vertex(x1, y); gl.Vertex(x1, math.min(y2, y + dash)); gl.Vertex(x2, y); gl.Vertex(x2, math.min(y2, y + dash)); y = y + dash * 2 end
-  end)
-end
-
 --- Soft vignette fill behind a modal card.
 function Ash.scrim(x1, y1, x2, y2, alpha)
   Ash.rect(x1, y1, x2, y2, Ash.with(Ash.COL.bg, alpha or 0.72))

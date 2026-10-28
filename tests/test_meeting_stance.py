@@ -54,9 +54,9 @@ def test_the_roll_is_seeded_and_stamps_the_row():
     assert (rows[0]["spawnAsWreck"] is False) == (rows[0]["recruitMode"] == "hostile")
 
 
-def test_bonded_heroes_turn_up_more_rarely_than_rivals():
+def test_bonds_are_the_default_meeting_rivals_the_accent():
     r = E.rules(ROOT)["presence"]
-    assert float(r["ally"]) < float(r["adversary"])
+    assert float(r["ally"]) > float(r["adversary"]) > 0
 
 
 def test_who_keeps_their_own_way():

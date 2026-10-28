@@ -13,49 +13,23 @@ function widget:GetInfo()
   }
 end
 
--- Pass seven. Replaces the 45-second briefing card and the pause hammer in the old
--- objectives HUD. Same chrome as the exfil manifest; same board as the minimap.
+-- The card the sortie opens on. Same chrome as the exfil manifest; same board as the minimap.
+-- "begin" (WG.vaVerbs) closes it: Enter, the button, BAR's own pause key, or the rig's player.
 
-local Ash, Board
-do
-  local ok, mod = pcall(VFS.Include, "luaui/Include/va_ash_tokens.lua")
-  if not ok or type(mod) ~= "table" then ok, mod = pcall(VFS.Include, "LuaUI/Include/va_ash_tokens.lua") end
-  Ash = (ok and type(mod) == "table") and mod or nil
-  ok, mod = pcall(VFS.Include, "luaui/Include/va_board.lua")
-  if not ok or type(mod) ~= "table" then ok, mod = pcall(VFS.Include, "LuaUI/Include/va_board.lua") end
-  Board = (ok and type(mod) == "table") and mod or nil
-end
+local Hud = VFS.Include("luaui/Include/va_hud.lua")
+local Ash = Hud.Ash
+local paused, theBoard = Hud.paused, Hud.board
 
 local phase = "infil"        -- infil | field
 local mission = nil
-local board = nil            -- own instance until the minimap publishes WG.vaBoard
 local sawPaused = false
 local lastPauseAt = -10
+local yevaHadBoard = false   -- Yeva's read is redone once the shared board exists
 local buttons = {}
 local C = {}                 -- composed copy: title, objective, threat, heroes, units, lines, yeva
 
-local function readLua(path)
-  local ok, data = pcall(VFS.Include, path)
-  if ok and type(data) == "table" then return data end
-  return nil
-end
-
-local function num(name, default) return tonumber((Spring.GetGameRulesParam(name))) or default end
-
-local function paused()
-  if Spring.IsGamePaused then return Spring.IsGamePaused() == true end
-  local _, _, p = Spring.GetGameSpeed()
-  return p == true
-end
-
-local function theBoard()
-  if WG and WG.vaBoard then return WG.vaBoard end
-  if not board and Board then board = Board.new() end
-  return board
-end
-
 local function compose()
-  mission = readLua("singleplayer/verdance_ashes/generated/va_current.lua")
+  mission = Hud.seed()
   C = { heroes = {}, units = {}, lines = {}, yeva = {}, marks = {} }
   if not mission then return end
   local intent = mission.storyIntent or {}
@@ -146,24 +120,21 @@ local function composeYeva()
   if #C.yeva == 0 then C.yeva[1] = "Nobody has looked at this ground. We land blind." end
 end
 
-local function setModal(on)
-  if WG then WG.vaExfilModal = on and true or false end
-end
-
 -- Closing the card does not start the clock: the field stays paused so the player can queue
 -- orders (builders first), then presses BAR's Pause key to begin. A sortie that ends while the
 -- card is up, or a player who unpauses with the card open, also closes it.
 local function begin()
+  if phase ~= "infil" then return false end
   phase = "field"
   if WG then WG.vaSortieBegan = true end
-  setModal(false)
+  Hud.setModal(false)
   Spring.Echo("VA_UI_SORTIE_BEGAN frame=" .. tostring(Spring.GetGameFrame() or 0) .. " paused=" .. tostring(paused()))
 end
 
 local function reopen()
   phase = "infil"
-  setModal(true)
-  pcall(Spring.SendCommands, "pause 1")
+  Hud.setModal(true)
+  Hud.setPaused(true)
   composeYeva()
 end
 
@@ -178,46 +149,48 @@ function widget:Initialize()
     return
   end
   composeYeva()
-  setModal(true)
+  yevaHadBoard = WG and WG.vaBoard ~= nil
+  Hud.setModal(true)
+  Hud.verb("begin", begin)
   if WG then WG.vaSortieBegan = false end
   Spring.Echo("VA_UI_INFIL armed mission=" .. tostring(mission.missionId or C.title))
 end
 
 function widget:Shutdown()
-  if phase == "infil" then setModal(false) end
+  if phase == "infil" then Hud.setModal(false) end
 end
 
 function widget:Update()
   if phase ~= "infil" then return end
-  if num("va_terminal", 0) == 1 then begin(); return end
+  if Hud.over() then begin(); return end
   if not sawPaused then
     if paused() then
       sawPaused = true
       Spring.Echo("VA_UI_PAUSE_HELD frame=" .. tostring(Spring.GetGameFrame() or 0))
     else
       local now = os.clock()
-      if now - lastPauseAt >= 0.15 then lastPauseAt = now; pcall(Spring.SendCommands, "pause 1") end
+      if now - lastPauseAt >= 0.15 then lastPauseAt = now; Hud.setPaused(true) end
     end
   elseif not paused() then
     -- the player used BAR's pause key instead of Enter: that is a begin too
     begin()
   end
-  if #C.yeva == 0 or (WG and WG.vaBoard and board) then
-    board = nil
+  if #C.yeva == 0 or (not yevaHadBoard and WG and WG.vaBoard) then
+    yevaHadBoard = WG and WG.vaBoard ~= nil
     composeYeva()
   end
 end
 
 function widget:KeyPress(key)
   if phase ~= "infil" then return false end
-  if key == 13 or key == 271 or key == 32 then begin(); return true end
+  if key == 13 or key == 271 or key == 32 then Hud.press("begin"); return true end
   return true
 end
 
 function widget:MousePress(x, y, button)
   if phase ~= "infil" then return false end
   for _, b in ipairs(buttons) do
-    if Ash.inRect(x, y, b) and b.action == "begin" then begin(); return true end
+    if Ash.inRect(x, y, b) and b.action == "begin" then Hud.press("begin"); return true end
   end
   return true
 end
@@ -228,29 +201,7 @@ function widget:TextCommand(cmd)
 end
 
 -- ---------------------------------------------------------------- draw
-local function text(s, x, y, size, col, align) Ash.text(s, x, y, size, col, align) end
-
-local function wrap(s, size, maxW, maxLines)
-  local lines, cur = {}, ""
-  for word in tostring(s or ""):gmatch("%S+") do
-    local try = (cur == "") and word or (cur .. " " .. word)
-    if Ash.textW(try, size) <= maxW then cur = try
-    else
-      if cur ~= "" then lines[#lines + 1] = cur end
-      cur = word
-      if #lines >= maxLines then break end
-    end
-  end
-  if cur ~= "" and #lines < maxLines then lines[#lines + 1] = cur end
-  return lines
-end
-
-local function column(x1, y1, x2, y2, kicker, accent)
-  Ash.panel(x1, y1, x2, y2, { accent = accent })
-  text(kicker, x1 + 12, y2 - 18, 10, Ash.COL.ash, "l")
-  Ash.rule(x1 + 12, y2 - 23, x2 - 12, accent, 0.45)
-  return x1 + 12, y2 - 42, x2 - 12
-end
+local text, wrap, column = Ash.text, Hud.wrap, Hud.column
 
 local function drawCompany(x1, y1, x2, y2)
   local x, y, right = column(x1, y1, x2, y2, "THE COMPANY  ·  " .. #C.heroes .. (#C.heroes == 1 and " person" or " people"), Ash.COL.edge)
@@ -280,10 +231,7 @@ local function drawBoard(x1, y1, x2, y2)
   local bx1, by1, bx2, by2 = x, y1 + 12 + legendH, right, y + 10
   Ash.rect(bx1, by1, bx2, by2, Ash.with(Ash.COL.bg, 0.9))
   if b and #b.zones > 0 then
-    local proj, rect = b:fitProj(bx1 + 6, by1 + 6, bx2 - 6, by2 - 6)
-    Ash.rect(rect[1], rect[2], rect[3], rect[4], { 0.05, 0.09, 0.07, 1 })
-    b:paint(proj, { fade = false, labels = true, glyphSize = 13, contradicted = WG and WG.vaContradicted or nil })
-    Ash.outline(rect[1], rect[2], rect[3], rect[4], Ash.with(Ash.COL.edge, 0.4), 1)
+    Hud.boardBox(b, bx1 + 6, by1 + 6, bx2 - 6, by2 - 6, { fade = false, labels = true, glyphSize = 13, contradicted = WG and WG.vaContradicted or nil })
   else
     text("no belief board for this map", (bx1 + bx2) * 0.5, (by1 + by2) * 0.5, 12, Ash.COL.muted, "c")
   end
@@ -331,8 +279,7 @@ local function drawJob(x1, y1, x2, y2)
   end
   y = y - 8
   text("THE CLOCK", x, y, 9, Ash.COL.ash, "l"); y = y - 16
-  local sec = math.floor((C.requiredFrames or 19800) / 30)
-  text(string.format("%d:%02d", math.floor(sec / 60), sec % 60), x, y - 4, 20, Ash.COL.ink, "l")
+  text(Hud.clock((C.requiredFrames or 19800) / 30), x, y - 4, 20, Ash.COL.ink, "l")
   y = y - 22
   text("then overtime — the map wakes, nothing ends", x, y, 9, Ash.COL.ash, "l")
   y = y - 20

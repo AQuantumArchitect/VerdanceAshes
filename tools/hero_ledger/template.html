@@ -229,7 +229,7 @@ td.num{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-n
 
   <section id="stance">
     <div class="sec-head"><h2>Who comes in hostile</h2><span class="eyebrow">continuous, no thresholds</span></div>
-    <p class="lede">Each wild hero's stance toward the party is the sum of their ties to it: bonds count up, tension, rivalry and friction count down. A seeded roll under the curve decides whether they turn up alive and on the enemy's side, like the Kiln (put them down, raise the wreck), or the way their entry says, a wreck for most. Bonded heroes also turn up less often: a tie to someone in the party pulls a bonded hero in at 0.45 of the strength it pulls a rival.</p>
+    <p class="lede">Each wild hero's stance toward the party is the sum of their ties to it: bonds count up, tension, rivalry and friction count down. A seeded roll under the curve decides whether they turn up alive and on the enemy's side, like the Kiln (put them down, raise the wreck), or the way their entry says, a wreck for most. Who you meet leans on the same ties: a bond to someone in the party pulls a hero in hardest, a rivalry less, and strangers turn up least.</p>
     <div class="stance">
       <div class="chart" id="chart"></div>
       <div class="knobs">
@@ -311,7 +311,7 @@ function pHostile(score, m, k = S.knobs) {
 function pull(h, party) { // how hard ties to the party draw them in (encounter presence, per side)
   const inP = new Set(party); let a = 0, x = 0;
   for (const l of h.links) if (inP.has(l.other)) { if (ALLY.has(l.polarity)) a += edgeWeight(l); else if (ADV.has(l.polarity)) x += edgeWeight(l); }
-  return { ally: a, adv: x, draw: a * (+PR.ally || 0.45) + x * (+PR.adversary || 1) };
+  return { ally: a, adv: x, draw: a * (+PR.ally || 3.5) + x * (+PR.adversary || 2) };
 }
 const KEEP = new Set(["retrieve_stash", "assist_fortify", "capture"]);
 function keepsOwnWay(h) { return h.status !== "recruit" || KEEP.has(h.recruit.type) || h.recruit.type === "sortie" || !!h.factory; }

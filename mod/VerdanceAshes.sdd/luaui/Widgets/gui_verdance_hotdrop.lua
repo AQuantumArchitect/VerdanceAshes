@@ -28,12 +28,8 @@ end
 local DROP_FILE = "LuaUI/Config/verdance/drop.txt"
 local POLL_SECONDS = 0.5
 
-local Ash
-do
-  local ok, mod = pcall(VFS.Include, "luaui/Include/va_ash_tokens.lua")
-  if not ok or type(mod) ~= "table" then ok, mod = pcall(VFS.Include, "LuaUI/Include/va_ash_tokens.lua") end
-  Ash = (ok and type(mod) == "table") and mod or nil
-end
+local Hud = VFS.Include("luaui/Include/va_hud.lua")
+local Ash = Hud.Ash
 
 local sent = false
 local sentAt = 0
@@ -44,11 +40,7 @@ local since = 0
 local clock = 0
 
 local function pending() return Spring.GetGameRulesParam("va_hotdrop_pending") == 1 end
-local function paused()
-  if Spring.IsGamePaused then return Spring.IsGamePaused() == true end
-  local _, _, p = Spring.GetGameSpeed()
-  return p == true
-end
+local paused = Hud.paused
 
 local function holdPause()
   if not paused() then Spring.SendCommands("pause 1") end
