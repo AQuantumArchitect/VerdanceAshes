@@ -1357,6 +1357,144 @@
         "tagLine": "Legion constructor: the company's own mason."
       },
       "notes": "eco x captain; the Legion builder, so every faction's ground has someone to raise it"
+    },
+    {
+      "heroId": "rookery",
+      "name": "Wynn 'Rookery' Atterby",
+      "position": "eco",
+      "combatVerb": "craft",
+      "temperament": [
+        "sky",
+        "garden"
+      ],
+      "doctrine": "constructor",
+      "preferDefenses": false,
+      "allowBail": false,
+      "allowKite": false,
+      "faction": "armada",
+      "unitDef": "armca",
+      "voice": {
+        "hook": "Builds where nobody can walk to.",
+        "blurb": "Three Construction Aircraft and twelve Falcons. She builds the base where nobody can walk to, and the Falcons keep the sky over it.",
+        "fiction": "Atterby nests. Give her a cliff shelf, an island, a crater rim nobody can climb, and by morning there is a solar field and a lab on it with twelve Falcons circling like rooks. She talks to the aircraft the way other people talk to birds, and she has never once built on easy ground.",
+        "tagLine": "Air constructors: a base on the high shelf, with its own sky."
+      },
+      "notes": "eco x sky; the only company builder that flies; base-seeder"
+    },
+    {
+      "heroId": "dam",
+      "name": "The Damwrights",
+      "position": "eco",
+      "combatVerb": "craft",
+      "temperament": [
+        "pad",
+        "door"
+      ],
+      "doctrine": "constructor",
+      "preferDefenses": false,
+      "allowBail": false,
+      "allowKite": false,
+      "faction": "armada",
+      "unitDef": "armbeaver",
+      "voice": {
+        "hook": "Water goes where we tell it.",
+        "blurb": "Four Beavers. Amphibious constructors who seed a base on the riverbed and the far bank before anyone has found the ford.",
+        "fiction": "Agathe Brisk and her three Damwrights came out of the drowned works under the Rock Jungle with mud to the shoulder and no intention of drying off. They build in the water first: a tidal generator, a mex on the shoal, a lab on the far bank. Brisk calls a river a foundation that hasn't been poured yet.",
+        "tagLine": "Beaver crew: the base starts on the riverbed."
+      },
+      "notes": "eco x door; amphibious constructors, four of them; base-seeder"
+    },
+    {
+      "heroId": "arc",
+      "name": "Corwin 'Arc' Vasse",
+      "position": "line",
+      "combatVerb": "push",
+      "temperament": [
+        "heat",
+        "swarm"
+      ],
+      "doctrine": "line",
+      "preferDefenses": false,
+      "allowBail": false,
+      "allowKite": false,
+      "faction": "armada",
+      "unitDef": "armzeus",
+      "voice": {
+        "hook": "Eight torches and one opinion.",
+        "blurb": "Eight Welders. Lightning assault bots that weld a line shut from the inside.",
+        "fiction": "Vasse was a shipyard foreman who welded hulls until the yard was shelled, then welded the shell holes, then welded the people who shelled it. His eight Welders walk in close order and argue in arcs. He does not shout orders; he points at a thing and it stops being joined to anything.",
+        "tagLine": "Welder octet: lightning at arm's length."
+      },
+      "notes": "line x heat; eight T2 lightning bots; electricity rival of Volt"
+    },
+    {
+      "heroId": "mammoth",
+      "name": "Old Mother Brandt",
+      "position": "line",
+      "combatVerb": "hold",
+      "temperament": [
+        "plod",
+        "pad"
+      ],
+      "doctrine": "line",
+      "preferDefenses": false,
+      "allowBail": false,
+      "allowKite": false,
+      "faction": "cortex",
+      "unitDef": "corsumo",
+      "voice": {
+        "hook": "Sit down. I'll handle it.",
+        "blurb": "One Mammoth. A Cortex heavy walker that sits down on a position and stays.",
+        "fiction": "Ulla Brandt has driven the Mammoth for longer than most of the company has been alive, and talks to everyone as if they were late for supper. Cortex retired her twice. She came back both times, because the Mammoth would not start for anyone else. Where she stands is where the line is, and she is very hard to move.",
+        "tagLine": "Mammoth: a grandmother with a plasma cannon."
+      },
+      "notes": "line x plod; one 2200-metal Cortex heavy; immovable anchor"
+    },
+    {
+      "heroId": "gladius",
+      "name": "Cassia 'Gladius' Ferro",
+      "position": "skirmish",
+      "combatVerb": "kite",
+      "temperament": [
+        "gleeful",
+        "glass"
+      ],
+      "doctrine": "skirm",
+      "preferDefenses": false,
+      "allowBail": false,
+      "allowKite": true,
+      "faction": "legion",
+      "unitDef": "legaskirmtank",
+      "voice": {
+        "hook": "Bow first. Then the fight.",
+        "blurb": "Six Gladiators. Legion skirmish tanks that fight like there is a crowd watching.",
+        "fiction": "Ferro fought in the Legion's exhibition pits before the war made the pits redundant. Her six Gladiators circle, feint and salute before they open fire, and she narrates every engagement as if for an audience. It is showmanship, and it works: the enemy watches the bow and misses the flank.",
+        "tagLine": "Gladiator troupe: every field is an arena."
+      },
+      "notes": "skirmish x gleeful; six Legion skirmish tanks; the show is the tactic"
+    },
+    {
+      "heroId": "triton",
+      "name": "Nerea 'Triton' Calder",
+      "position": "line",
+      "combatVerb": "push",
+      "temperament": [
+        "door",
+        "count"
+      ],
+      "doctrine": "line",
+      "preferDefenses": false,
+      "allowBail": false,
+      "allowKite": false,
+      "faction": "legion",
+      "unitDef": "legfloat",
+      "voice": {
+        "hook": "Low tide is a road.",
+        "blurb": "Four Tritons. Legion gauss hovers that come in over the water and hold the shoreline.",
+        "fiction": "Calder grew up on the tidal flats and reads water the way Halq reads coordinates: depth, drift, the hour it turns. Her four Tritons hold a shoreline in a line so straight the Legion uses it in training. She is courteous, precise and never once early.",
+        "tagLine": "Triton line: the shore is the front."
+      },
+      "notes": "line x door; four T2 Legion hovers; the company's shoreline"
     }
   ]
 }

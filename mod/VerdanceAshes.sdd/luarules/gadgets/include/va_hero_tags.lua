@@ -70,6 +70,12 @@ M.TAGS = {
   hot_insertion = { label = "Hot Insertion", speed = 1.12, fiction = "Everyone arrives at once, which is the plan." },
   play_dead = { label = "Play Dead", vision = 1.20, fiction = "The Seekers see for the whole pack." },
   legion_line = { label = "Legion Line", build = 1.20, fiction = "Every wall she lays is the first line of a fort." },
+  high_nest = { label = "High Nest", build = 1.20, fiction = "The base goes up where the enemy has to climb for it." },
+  dam_works = { label = "Dam Works", build = 1.20, fiction = "The river becomes the first wall of the base." },
+  arc_chain = { label = "Arc Chain", splash = 1.30, fiction = "The lightning jumps to whoever stood next to the first one." },
+  old_mother = { label = "Old Mother", hp = 1.15, fiction = "She has taken worse from her own side." },
+  crowd_roar = { label = "Crowd Roar", reload = 0.85, fiction = "The crowd counts the shots, and she likes them counting fast." },
+  low_tide = { label = "Low Tide", speed = 1.12, fiction = "In with the tide, out before it turns." },
   -- build power
   field_surgeon = { label = "Field Surgeon", build = 1.20, fiction = "Nobody stays dead near an honest chassis." },
   combat_engineer = { label = "Combat Engineer", build = 1.20, fiction = "Builds trouble in equal measure." },
@@ -103,6 +109,7 @@ M.HERO_DEFAULTS = {
   phoenix = { "rises_again" }, tarn = { "wake_rush" }, scylla = { "broadside" }, tsunami = { "tide_table" },
   starlight = { "long_light" }, banisher = { "scare_radius" }, arrow = { "venom_tempo" }, hornet = { "sting_tempo" }, charybdis = { "undertow" }, shiva = { "grunt_wall" }, tremor = { "tremor_table" }, stiletto = { "static_bloom" }, marauder = { "river_rush" }, lunkhead = { "old_scars" }, stronghold = { "hot_insertion" }, possum = { "play_dead" },
   mason = { "legion_line" },
+  rookery = { "high_nest" }, dam = { "dam_works" }, arc = { "arc_chain" }, mammoth = { "old_mother" }, gladius = { "crowd_roar" }, triton = { "low_tide" },
 }
 
 -- Rare dual-effect exceptions. Primary still comes from HERO_DEFAULTS;

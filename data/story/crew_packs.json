@@ -767,6 +767,55 @@
       "combined": 271,
       "label": "Alpheus",
       "hasBuildPower": false
+    },
+    "armca": {
+      "metal": 110,
+      "energy": 3000,
+      "combined": 153,
+      "label": "Construction Aircraft",
+      "hasBuildPower": true
+    },
+    "armfig": {
+      "metal": 73,
+      "energy": 2900,
+      "combined": 114,
+      "label": "Falcon",
+      "hasBuildPower": false
+    },
+    "armbeaver": {
+      "metal": 150,
+      "energy": 3100,
+      "combined": 194,
+      "label": "Beaver",
+      "hasBuildPower": true
+    },
+    "armzeus": {
+      "metal": 350,
+      "energy": 6100,
+      "combined": 437,
+      "label": "Welder",
+      "hasBuildPower": false
+    },
+    "corsumo": {
+      "metal": 2200,
+      "energy": 35000,
+      "combined": 2700,
+      "label": "Mammoth",
+      "hasBuildPower": false
+    },
+    "legaskirmtank": {
+      "metal": 450,
+      "energy": 6800,
+      "combined": 547,
+      "label": "Gladiator",
+      "hasBuildPower": false
+    },
+    "legfloat": {
+      "metal": 650,
+      "energy": 12000,
+      "combined": 821,
+      "label": "Triton",
+      "hasBuildPower": false
     }
   },
   "heroes": {
@@ -1007,7 +1056,8 @@
       "packMetal": 440,
       "packEnergy": 7000,
       "startXp": 0.41,
-      "buildsEco": true
+      "buildsEco": true,
+      "baseSeeder": true
     },
     "consul": {
       "role": "band",
@@ -1032,7 +1082,8 @@
       "packMetal": 670,
       "packEnergy": 10300,
       "startXp": 0.364,
-      "buildsEco": true
+      "buildsEco": true,
+      "baseSeeder": true
     },
     "veil": {
       "role": "band",
@@ -1223,7 +1274,8 @@
       "packEnergy": 26170,
       "fieldEffect": "build",
       "startXp": 0.102,
-      "buildsEco": true
+      "buildsEco": true,
+      "baseSeeder": true
     },
     "warder": {
       "role": "band",
@@ -1520,7 +1572,8 @@
           "count": 1
         }
       ],
-      "buildsEco": true
+      "buildsEco": false,
+      "baseSeeder": false
     },
     "anvil": {
       "role": "band",
@@ -1672,7 +1725,8 @@
       "packMetal": 1634,
       "packEnergy": 26400,
       "packCombined": 2011,
-      "buildsEco": true
+      "buildsEco": true,
+      "baseSeeder": true
     },
     "rumor": {
       "role": "band",
@@ -2093,7 +2147,136 @@
       "packMetal": 330,
       "packEnergy": 4800,
       "packCombined": 399,
-      "buildsEco": true
+      "buildsEco": true,
+      "baseSeeder": true
+    },
+    "rookery": {
+      "role": "band",
+      "unitDef": "armca",
+      "hireTnb": 0,
+      "packTotal": 3,
+      "extras": 2,
+      "blurb": "Three Construction Aircraft and twelve Falcons. She builds the base where nobody can walk to, and the Falcons keep the sky over it.",
+      "name": "Wynn 'Rookery' Atterby",
+      "sizing": "fixed",
+      "tags": [
+        "eco",
+        "constructor",
+        "air",
+        "base_seeder"
+      ],
+      "startXp": 0.296,
+      "escorts": [
+        {
+          "unitDef": "armfig",
+          "count": 12
+        }
+      ],
+      "buildsEco": true,
+      "baseSeeder": true,
+      "packMetal": 1206,
+      "packEnergy": 43800,
+      "packCombined": 1832,
+      "packXpCombined": 1221
+    },
+    "dam": {
+      "role": "band",
+      "unitDef": "armbeaver",
+      "hireTnb": 0,
+      "packTotal": 4,
+      "extras": 3,
+      "blurb": "Four Beavers. Amphibious constructors who seed a base on the riverbed and the far bank before anyone has found the ford.",
+      "name": "The Damwrights",
+      "sizing": "fixed",
+      "tags": [
+        "eco",
+        "constructor",
+        "amphibious",
+        "base_seeder"
+      ],
+      "startXp": 0.37,
+      "buildsEco": true,
+      "baseSeeder": true,
+      "packMetal": 600,
+      "packEnergy": 12400,
+      "packCombined": 777
+    },
+    "arc": {
+      "role": "band",
+      "unitDef": "armzeus",
+      "hireTnb": 0,
+      "packTotal": 8,
+      "extras": 7,
+      "blurb": "Eight Welders. Lightning assault bots that weld a line shut from the inside.",
+      "name": "Corwin 'Arc' Vasse",
+      "sizing": "fixed",
+      "tags": [
+        "line",
+        "assault",
+        "lightning"
+      ],
+      "startXp": 0.0,
+      "packMetal": 2800,
+      "packEnergy": 48800,
+      "packCombined": 3497
+    },
+    "mammoth": {
+      "role": "band",
+      "unitDef": "corsumo",
+      "hireTnb": 0,
+      "packTotal": 1,
+      "extras": 0,
+      "blurb": "One Mammoth. A Cortex heavy walker that sits down on a position and stays.",
+      "name": "Old Mother Brandt",
+      "sizing": "fixed",
+      "tags": [
+        "line",
+        "heavy",
+        "walker"
+      ],
+      "startXp": 0.05,
+      "packMetal": 2200,
+      "packEnergy": 35000,
+      "packCombined": 2700
+    },
+    "gladius": {
+      "role": "band",
+      "unitDef": "legaskirmtank",
+      "hireTnb": 0,
+      "packTotal": 6,
+      "extras": 5,
+      "blurb": "Six Gladiators. Legion skirmish tanks that fight like there is a crowd watching.",
+      "name": "Cassia 'Gladius' Ferro",
+      "sizing": "fixed",
+      "tags": [
+        "skirmish",
+        "tank",
+        "arena"
+      ],
+      "startXp": 0.0,
+      "packMetal": 2700,
+      "packEnergy": 40800,
+      "packCombined": 3283
+    },
+    "triton": {
+      "role": "band",
+      "unitDef": "legfloat",
+      "hireTnb": 0,
+      "packTotal": 4,
+      "extras": 3,
+      "blurb": "Four Tritons. Legion gauss hovers that come in over the water and hold the shoreline.",
+      "name": "Nerea 'Triton' Calder",
+      "sizing": "fixed",
+      "tags": [
+        "line",
+        "hover",
+        "amphibious",
+        "gauss"
+      ],
+      "startXp": 0.0,
+      "packMetal": 2600,
+      "packEnergy": 48000,
+      "packCombined": 3286
     }
   },
   "factories": {
@@ -2143,7 +2326,9 @@
       "consul",
       "twitch",
       "lumen",
-      "mason"
+      "mason",
+      "rookery",
+      "dam"
     ],
     "eyes": [
       "spoke",
@@ -2164,7 +2349,10 @@
       "banisher",
       "charybdis",
       "shiva",
-      "lunkhead"
+      "lunkhead",
+      "arc",
+      "mammoth",
+      "triton"
     ],
     "skirmish": [
       "verse",
@@ -2176,7 +2364,8 @@
       "arrow",
       "hornet",
       "marauder",
-      "possum"
+      "possum",
+      "gladius"
     ],
     "siege": [
       "brakhov",

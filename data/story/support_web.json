@@ -5,10 +5,10 @@
     "minScore": 0.42,
     "maxDegree": 5,
     "topEdges": 64,
-    "heroCount": 58,
-    "edgeCount": 152,
-    "talkCount": 407,
-    "authoredSeeds": 105,
+    "heroCount": 64,
+    "edgeCount": 177,
+    "talkCount": 432,
+    "authoredSeeds": 130,
     "umweltAxes": [
       "energy",
       "offense",
@@ -1422,7 +1422,7 @@
       ],
       "doctrine": "constructor",
       "hook": "Spreadsheets, then sunlight.",
-      "degree": 4,
+      "degree": 5,
       "umweltGlyph": "+ene·+cra·+pad·−off",
       "umweltMarks": [
         {
@@ -1452,7 +1452,7 @@
       ],
       "doctrine": "constructor",
       "hook": "Builds like an apology.",
-      "degree": 3,
+      "degree": 4,
       "umweltGlyph": "+cra·+ene·−off·+pad",
       "umweltMarks": [
         {
@@ -1486,7 +1486,7 @@
       ],
       "doctrine": "constructor",
       "hook": "Grins with a welder.",
-      "degree": 9,
+      "degree": 10,
       "umweltGlyph": "+cra·+ene·−off·+pad",
       "umweltMarks": [
         {
@@ -1581,7 +1581,7 @@
       ],
       "doctrine": "eyes",
       "hook": "Dreams in flight paths.",
-      "degree": 8,
+      "degree": 9,
       "umweltGlyph": "+mob·+sig·+fog·+sky",
       "umweltMarks": [
         {
@@ -1706,7 +1706,7 @@
       ],
       "doctrine": "line",
       "hook": "Fords are doors.",
-      "degree": 8,
+      "degree": 9,
       "umweltGlyph": "+pad·+off·−mob",
       "umweltMarks": [
         {
@@ -1732,7 +1732,7 @@
       ],
       "doctrine": "line",
       "hook": "Riot as punctuation.",
-      "degree": 3,
+      "degree": 4,
       "umweltGlyph": "+off·+pad·+hea",
       "umweltMarks": [
         {
@@ -1758,7 +1758,7 @@
       ],
       "doctrine": "line",
       "hook": "Shoots map coordinates.",
-      "degree": 8,
+      "degree": 9,
       "umweltGlyph": "+pad·+off·−mob·+led",
       "umweltMarks": [
         {
@@ -1819,7 +1819,7 @@
       ],
       "doctrine": "skirm",
       "hook": "Baked speed, bad manners.",
-      "degree": 3,
+      "degree": 5,
       "umweltGlyph": "+mob·−pad·+off",
       "umweltMarks": [
         {
@@ -1879,7 +1879,7 @@
       ],
       "doctrine": "skirm",
       "hook": "Ledger with legs.",
-      "degree": 8,
+      "degree": 9,
       "umweltGlyph": "+mob·+off·−pad·+led",
       "umweltMarks": [
         {
@@ -1910,7 +1910,7 @@
       ],
       "doctrine": "kiln",
       "hook": "Name gone. Forward heat.",
-      "degree": 7,
+      "degree": 8,
       "umweltGlyph": "−ene·+off·−mob·+hea",
       "umweltMarks": [
         {
@@ -1949,7 +1949,7 @@
       ],
       "doctrine": "siege_plod",
       "hook": "Yeah. I'll take that wall.",
-      "degree": 6,
+      "degree": 7,
       "umweltGlyph": "+off·−mob·−ene·+led",
       "umweltMarks": [
         {
@@ -2175,7 +2175,7 @@
       ],
       "doctrine": "skirm",
       "hook": "Fireworks at walking distance.",
-      "degree": 6,
+      "degree": 7,
       "umweltGlyph": "+mob·−pad·+off",
       "umweltMarks": [
         {
@@ -2330,7 +2330,7 @@
       ],
       "doctrine": "line",
       "hook": "The river learns my weight.",
-      "degree": 7,
+      "degree": 8,
       "umweltGlyph": "+off·−mob·+pad",
       "umweltMarks": [
         {
@@ -2357,7 +2357,7 @@
       ],
       "doctrine": "eyes",
       "hook": "Sight is a wound you give them.",
-      "degree": 8,
+      "degree": 9,
       "umweltGlyph": "+mob·+sig·+fog·−pad",
       "umweltMarks": [
         {
@@ -2406,7 +2406,7 @@
       ],
       "doctrine": "line",
       "hook": "Halberd's hungry.",
-      "degree": 2,
+      "degree": 3,
       "umweltGlyph": "",
       "umweltMarks": []
     },
@@ -2420,7 +2420,7 @@
       ],
       "doctrine": "sky_siege",
       "hook": "Weather comes from above.",
-      "degree": 4,
+      "degree": 5,
       "umweltGlyph": "+off·+sky·+mob·−pad",
       "umweltMarks": [
         {
@@ -2575,7 +2575,7 @@
       ],
       "doctrine": "line",
       "hook": "Out of the river, already firing.",
-      "degree": 4,
+      "degree": 6,
       "umweltGlyph": "+mob·+off·−pad·+hea",
       "umweltMarks": [
         {
@@ -2606,7 +2606,7 @@
       ],
       "doctrine": "siege_plod",
       "hook": "The water had better be wide.",
-      "degree": 4,
+      "degree": 5,
       "umweltGlyph": "+off·−pad·−mob·+hea",
       "umweltMarks": [
         {
@@ -2792,7 +2792,7 @@
       ],
       "doctrine": "line",
       "hook": "The river is a runway.",
-      "degree": 3,
+      "degree": 4,
       "umweltGlyph": "+off·+pad·+mob·+hea",
       "umweltMarks": [
         {
@@ -2916,7 +2916,7 @@
       ],
       "doctrine": "skirm",
       "hook": "Arrive before the warning.",
-      "degree": 3,
+      "degree": 4,
       "umweltGlyph": "+mob·−pad·+off·+fog",
       "umweltMarks": [
         {
@@ -3040,7 +3040,7 @@
       ],
       "doctrine": "constructor",
       "hook": "Every wall is the first line of a fort.",
-      "degree": 3,
+      "degree": 4,
       "umweltGlyph": "+cra·+ene·+pad·−off",
       "umweltMarks": [
         {
@@ -3060,9 +3060,220 @@
           "value": -0.5
         }
       ]
+    },
+    {
+      "heroId": "rookery",
+      "name": "Wynn 'Rookery' Atterby",
+      "position": "eco",
+      "temperament": [
+        "sky",
+        "garden"
+      ],
+      "doctrine": "constructor",
+      "hook": "Builds where nobody can walk to.",
+      "degree": 5,
+      "umweltGlyph": "+cra·+sky·+mob·+ene",
+      "umweltMarks": [
+        {
+          "axis": "craft",
+          "value": 1.0
+        },
+        {
+          "axis": "sky",
+          "value": 0.8
+        },
+        {
+          "axis": "mobility",
+          "value": 0.6
+        },
+        {
+          "axis": "energy",
+          "value": 0.4
+        }
+      ]
+    },
+    {
+      "heroId": "dam",
+      "name": "The Damwrights",
+      "position": "eco",
+      "temperament": [
+        "pad",
+        "door"
+      ],
+      "doctrine": "constructor",
+      "hook": "Water goes where we tell it.",
+      "degree": 5,
+      "umweltGlyph": "+cra·+pad·+ene·−off",
+      "umweltMarks": [
+        {
+          "axis": "craft",
+          "value": 1.0
+        },
+        {
+          "axis": "pad",
+          "value": 0.7
+        },
+        {
+          "axis": "energy",
+          "value": 0.5
+        },
+        {
+          "axis": "offense",
+          "value": -0.5
+        }
+      ]
+    },
+    {
+      "heroId": "arc",
+      "name": "Corwin 'Arc' Vasse",
+      "position": "line",
+      "temperament": [
+        "heat",
+        "swarm"
+      ],
+      "doctrine": "line",
+      "hook": "Eight torches and one opinion.",
+      "degree": 4,
+      "umweltGlyph": "+off·+hea·+pad·+ene",
+      "umweltMarks": [
+        {
+          "axis": "offense",
+          "value": 1.0
+        },
+        {
+          "axis": "heat",
+          "value": 0.7
+        },
+        {
+          "axis": "pad",
+          "value": 0.3
+        },
+        {
+          "axis": "energy",
+          "value": 0.2
+        }
+      ]
+    },
+    {
+      "heroId": "mammoth",
+      "name": "Old Mother Brandt",
+      "position": "line",
+      "temperament": [
+        "plod",
+        "pad"
+      ],
+      "doctrine": "line",
+      "hook": "Sit down. I'll handle it.",
+      "degree": 4,
+      "umweltGlyph": "+pad·+off·−mob·+hea",
+      "umweltMarks": [
+        {
+          "axis": "pad",
+          "value": 1.0
+        },
+        {
+          "axis": "offense",
+          "value": 0.8
+        },
+        {
+          "axis": "mobility",
+          "value": -0.8
+        },
+        {
+          "axis": "heat",
+          "value": 0.2
+        }
+      ]
+    },
+    {
+      "heroId": "gladius",
+      "name": "Cassia 'Gladius' Ferro",
+      "position": "skirmish",
+      "temperament": [
+        "gleeful",
+        "glass"
+      ],
+      "doctrine": "skirm",
+      "hook": "Bow first. Then the fight.",
+      "degree": 4,
+      "umweltGlyph": "+off·+mob·−pad·+hea",
+      "umweltMarks": [
+        {
+          "axis": "offense",
+          "value": 0.8
+        },
+        {
+          "axis": "mobility",
+          "value": 0.8
+        },
+        {
+          "axis": "pad",
+          "value": -0.5
+        },
+        {
+          "axis": "heat",
+          "value": 0.2
+        }
+      ]
+    },
+    {
+      "heroId": "triton",
+      "name": "Nerea 'Triton' Calder",
+      "position": "line",
+      "temperament": [
+        "door",
+        "count"
+      ],
+      "doctrine": "line",
+      "hook": "Low tide is a road.",
+      "degree": 5,
+      "umweltGlyph": "+off·+mob·+pad·+sig",
+      "umweltMarks": [
+        {
+          "axis": "offense",
+          "value": 0.7
+        },
+        {
+          "axis": "mobility",
+          "value": 0.5
+        },
+        {
+          "axis": "pad",
+          "value": 0.4
+        },
+        {
+          "axis": "sight",
+          "value": 0.2
+        }
+      ]
     }
   ],
   "edges": [
+    {
+      "id": "anvil__arc",
+      "a": "arc",
+      "b": "anvil",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "the hammer and the torch",
+        "weight and heat"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Corwin 'Arc' Vasse",
+      "bName": "Anvil & Mire",
+      "aHook": "Eight torches and one opinion.",
+      "bHook": "The river learns my weight.",
+      "aGlyph": "+off·+hea·+pad·+ene",
+      "bGlyph": "+off·−mob·+pad",
+      "talkIds": {
+        "C": "anvil__arc:C"
+      }
+    },
     {
       "id": "anvil__auditor",
       "a": "auditor",
@@ -3440,6 +3651,85 @@
       }
     },
     {
+      "id": "arc__cauter",
+      "a": "arc",
+      "b": "cauter",
+      "score": 1.0,
+      "polarity": "friction",
+      "motifs": [
+        "two kinds of burn",
+        "the riot and the shipyard"
+      ],
+      "sharedTemperament": [
+        "heat"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Corwin 'Arc' Vasse",
+      "bName": "Cauter Bel-Ansa",
+      "aHook": "Eight torches and one opinion.",
+      "bHook": "Riot as punctuation.",
+      "aGlyph": "+off·+hea·+pad·+ene",
+      "bGlyph": "+off·+pad·+hea",
+      "talkIds": {
+        "C": "arc__cauter:C"
+      }
+    },
+    {
+      "id": "arc__twitch",
+      "a": "arc",
+      "b": "twitch",
+      "score": 1.0,
+      "polarity": "mentor",
+      "motifs": [
+        "the welder's apprentice",
+        "a grin and a torch"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Corwin 'Arc' Vasse",
+      "bName": "Benno 'Twitcher' Sallow",
+      "aHook": "Eight torches and one opinion.",
+      "bHook": "Grins with a welder.",
+      "aGlyph": "+off·+hea·+pad·+ene",
+      "bGlyph": "+cra·+ene·−off·+pad",
+      "talkIds": {
+        "C": "arc__twitch:C"
+      }
+    },
+    {
+      "id": "arc__volt",
+      "a": "arc",
+      "b": "volt",
+      "score": 1.0,
+      "polarity": "rivalry",
+      "motifs": [
+        "two kinds of lightning",
+        "the wound you see and the wound you weld"
+      ],
+      "sharedTemperament": [
+        "heat"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Corwin 'Arc' Vasse",
+      "bName": "Volt Lash",
+      "aHook": "Eight torches and one opinion.",
+      "bHook": "Sight is a wound you give them.",
+      "aGlyph": "+off·+hea·+pad·+ene",
+      "bGlyph": "+mob·+sig·+fog·−pad",
+      "talkIds": {
+        "C": "arc__volt:C"
+      }
+    },
+    {
       "id": "arrow__kit",
       "a": "arrow",
       "b": "kit",
@@ -3522,6 +3812,31 @@
         "C": "arrow__yeva:C",
         "B": "arrow__yeva:B",
         "A": "arrow__yeva:A"
+      }
+    },
+    {
+      "id": "auditor__gladius",
+      "a": "gladius",
+      "b": "auditor",
+      "score": 1.0,
+      "polarity": "tension",
+      "motifs": [
+        "the show against the count",
+        "spectacle is waste"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Cassia 'Gladius' Ferro",
+      "bName": "The Last Auditor",
+      "aHook": "Bow first. Then the fight.",
+      "bHook": "Ledger with legs.",
+      "aGlyph": "+off·+mob·−pad·+hea",
+      "bGlyph": "+mob·+off·−pad·+led",
+      "talkIds": {
+        "C": "auditor__gladius:C"
       }
     },
     {
@@ -4112,6 +4427,33 @@
       }
     },
     {
+      "id": "brakhov__mammoth",
+      "a": "mammoth",
+      "b": "brakhov",
+      "score": 1.0,
+      "polarity": "rivalry",
+      "motifs": [
+        "the walk and the sit",
+        "forward heat against the anchor"
+      ],
+      "sharedTemperament": [
+        "plod"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Old Mother Brandt",
+      "bName": "Brakhov the Kiln",
+      "aHook": "Sit down. I'll handle it.",
+      "bHook": "Name gone. Forward heat.",
+      "aGlyph": "+pad·+off·−mob·+hea",
+      "bGlyph": "−ene·+off·−mob·+hea",
+      "talkIds": {
+        "C": "brakhov__mammoth:C"
+      }
+    },
+    {
       "id": "brakhov__phoenix",
       "a": "phoenix",
       "b": "brakhov",
@@ -4388,6 +4730,33 @@
         ],
         "spotterLocked": false,
         "siegeSpotStrength": 0.0
+      }
+    },
+    {
+      "id": "bro__mammoth",
+      "a": "mammoth",
+      "b": "bro",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "the slow and the sure",
+        "Cortex walls that walk"
+      ],
+      "sharedTemperament": [
+        "plod"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Old Mother Brandt",
+      "bName": "Bro",
+      "aHook": "Sit down. I'll handle it.",
+      "bHook": "Yeah. I'll take that wall.",
+      "aGlyph": "+pad·+off·−mob·+hea",
+      "bGlyph": "+off·−mob·−ene·+led",
+      "talkIds": {
+        "C": "bro__mammoth:C"
       }
     },
     {
@@ -4914,6 +5283,33 @@
       }
     },
     {
+      "id": "charybdis__triton",
+      "a": "triton",
+      "b": "charybdis",
+      "score": 1.0,
+      "polarity": "rivalry",
+      "motifs": [
+        "two tides",
+        "the straight line and the flood"
+      ],
+      "sharedTemperament": [
+        "door"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Nerea 'Triton' Calder",
+      "bName": "Orrin 'Charybdis' Tidewell",
+      "aHook": "Low tide is a road.",
+      "bHook": "The river is a runway.",
+      "aGlyph": "+off·+mob·+pad·+sig",
+      "bGlyph": "+off·+pad·+mob·+hea",
+      "talkIds": {
+        "C": "charybdis__triton:C"
+      }
+    },
+    {
       "id": "commando__marauder",
       "a": "marauder",
       "b": "commando",
@@ -5129,6 +5525,31 @@
       }
     },
     {
+      "id": "consul__dam",
+      "a": "dam",
+      "b": "consul",
+      "score": 1.0,
+      "polarity": "rivalry",
+      "motifs": [
+        "permits for a river",
+        "mud against paperwork"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "The Damwrights",
+      "bName": "Consul Aurel Weiss",
+      "aHook": "Water goes where we tell it.",
+      "bHook": "Builds like an apology.",
+      "aGlyph": "+cra·+pad·+ene·−off",
+      "bGlyph": "+cra·+ene·−off·+pad",
+      "talkIds": {
+        "C": "consul__dam:C"
+      }
+    },
+    {
       "id": "consul__mason",
       "a": "mason",
       "b": "consul",
@@ -5207,6 +5628,110 @@
         "C": "consul__solarium:C",
         "B": "consul__solarium:B",
         "A": "consul__solarium:A"
+      }
+    },
+    {
+      "id": "dam__odessa",
+      "a": "dam",
+      "b": "odessa",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "fords are doors, and somebody has to build the frame",
+        "the works beside the crossing"
+      ],
+      "sharedTemperament": [
+        "door"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "The Damwrights",
+      "bName": "Odessa Krail",
+      "aHook": "Water goes where we tell it.",
+      "bHook": "Fords are doors.",
+      "aGlyph": "+cra·+pad·+ene·−off",
+      "bGlyph": "+pad·+off·−mob",
+      "talkIds": {
+        "C": "dam__odessa:C"
+      }
+    },
+    {
+      "id": "dam__rookery",
+      "a": "dam",
+      "b": "rookery",
+      "score": 1.0,
+      "polarity": "sibling",
+      "motifs": [
+        "the base from both ends",
+        "the riverbed and the cliff shelf"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "The Damwrights",
+      "bName": "Wynn 'Rookery' Atterby",
+      "aHook": "Water goes where we tell it.",
+      "bHook": "Builds where nobody can walk to.",
+      "aGlyph": "+cra·+pad·+ene·−off",
+      "bGlyph": "+cra·+sky·+mob·+ene",
+      "talkIds": {
+        "C": "dam__rookery:C"
+      }
+    },
+    {
+      "id": "dam__tarn",
+      "a": "dam",
+      "b": "tarn",
+      "score": 1.0,
+      "polarity": "tension",
+      "motifs": [
+        "the river they both claim",
+        "builders and raiders in the same current"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "The Damwrights",
+      "bName": "Tarn Ostrander",
+      "aHook": "Water goes where we tell it.",
+      "bHook": "Out of the river, already firing.",
+      "aGlyph": "+cra·+pad·+ene·−off",
+      "bGlyph": "+mob·+off·−pad·+hea",
+      "talkIds": {
+        "C": "dam__tarn:C"
+      }
+    },
+    {
+      "id": "dam__triton",
+      "a": "triton",
+      "b": "dam",
+      "score": 1.0,
+      "polarity": "bond",
+      "motifs": [
+        "the works and the line that guards them",
+        "both of them standing in the water"
+      ],
+      "sharedTemperament": [
+        "door"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Nerea 'Triton' Calder",
+      "bName": "The Damwrights",
+      "aHook": "Low tide is a road.",
+      "bHook": "Water goes where we tell it.",
+      "aGlyph": "+off·+mob·+pad·+sig",
+      "bGlyph": "+cra·+pad·+ene·−off",
+      "talkIds": {
+        "C": "dam__triton:C"
       }
     },
     {
@@ -5614,6 +6139,87 @@
       }
     },
     {
+      "id": "gladius__kit",
+      "a": "gladius",
+      "b": "kit",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "a show needs fireworks",
+        "the bow and the bang"
+      ],
+      "sharedTemperament": [
+        "gleeful"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Cassia 'Gladius' Ferro",
+      "bName": "Kit Sparkler",
+      "aHook": "Bow first. Then the fight.",
+      "bHook": "Fireworks at walking distance.",
+      "aGlyph": "+off·+mob·−pad·+hea",
+      "bGlyph": "+mob·−pad·+off",
+      "talkIds": {
+        "C": "gladius__kit:C"
+      }
+    },
+    {
+      "id": "gladius__marauder",
+      "a": "gladius",
+      "b": "marauder",
+      "score": 1.0,
+      "polarity": "mirror",
+      "motifs": [
+        "arrive laughing",
+        "the raid as a performance"
+      ],
+      "sharedTemperament": [
+        "gleeful"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Cassia 'Gladius' Ferro",
+      "bName": "Marlow & Wren",
+      "aHook": "Bow first. Then the fight.",
+      "bHook": "Arrive before the warning.",
+      "aGlyph": "+off·+mob·−pad·+hea",
+      "bGlyph": "+mob·−pad·+off·+fog",
+      "talkIds": {
+        "C": "gladius__marauder:C"
+      }
+    },
+    {
+      "id": "gladius__stride",
+      "a": "gladius",
+      "b": "stride",
+      "score": 1.0,
+      "polarity": "rivalry",
+      "motifs": [
+        "two showoffs, one stage",
+        "speed against style"
+      ],
+      "sharedTemperament": [
+        "glass"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Cassia 'Gladius' Ferro",
+      "bName": "Saloon Stride",
+      "aHook": "Bow first. Then the fight.",
+      "bHook": "Baked speed, bad manners.",
+      "aGlyph": "+off·+mob·−pad·+hea",
+      "bGlyph": "+mob·−pad·+off",
+      "talkIds": {
+        "C": "gladius__stride:C"
+      }
+    },
+    {
       "id": "grath__spoke",
       "a": "spoke",
       "b": "grath",
@@ -5857,6 +6463,31 @@
       }
     },
     {
+      "id": "halbard__mammoth",
+      "a": "mammoth",
+      "b": "halbard",
+      "score": 1.0,
+      "polarity": "mentor",
+      "motifs": [
+        "the old Cortex guard",
+        "patience is the heaviest weapon"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Old Mother Brandt",
+      "bName": "Ilse 'Halbard' Varn",
+      "aHook": "Sit down. I'll handle it.",
+      "bHook": "Halberd's hungry.",
+      "aGlyph": "+pad·+off·−mob·+hea",
+      "bGlyph": "",
+      "talkIds": {
+        "C": "halbard__mammoth:C"
+      }
+    },
+    {
       "id": "halq__kit",
       "a": "halq",
       "b": "kit",
@@ -6048,6 +6679,33 @@
         "C": "halq__tremor:C",
         "B": "halq__tremor:B",
         "A": "halq__tremor:A"
+      }
+    },
+    {
+      "id": "halq__triton",
+      "a": "triton",
+      "b": "halq",
+      "score": 1.0,
+      "polarity": "mirror",
+      "motifs": [
+        "coordinates and tides",
+        "two who read the map in numbers"
+      ],
+      "sharedTemperament": [
+        "count"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Nerea 'Triton' Calder",
+      "bName": "Sisu Halq",
+      "aHook": "Low tide is a road.",
+      "bHook": "Shoots map coordinates.",
+      "aGlyph": "+off·+mob·+pad·+sig",
+      "bGlyph": "+pad·+off·−mob·+led",
+      "talkIds": {
+        "C": "halq__triton:C"
       }
     },
     {
@@ -7194,6 +7852,31 @@
       }
     },
     {
+      "id": "mammoth__stride",
+      "a": "mammoth",
+      "b": "stride",
+      "score": 1.0,
+      "polarity": "friction",
+      "motifs": [
+        "late for supper",
+        "bad manners at speed"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Old Mother Brandt",
+      "bName": "Saloon Stride",
+      "aHook": "Sit down. I'll handle it.",
+      "bHook": "Baked speed, bad manners.",
+      "aGlyph": "+pad·+off·−mob·+hea",
+      "bGlyph": "+mob·−pad·+off",
+      "talkIds": {
+        "C": "mammoth__stride:C"
+      }
+    },
+    {
       "id": "marauder__twitch",
       "a": "marauder",
       "b": "twitch",
@@ -7276,6 +7959,31 @@
         "C": "mask__rumor:C",
         "B": "mask__rumor:B",
         "A": "mask__rumor:A"
+      }
+    },
+    {
+      "id": "mason__rookery",
+      "a": "rookery",
+      "b": "mason",
+      "score": 1.0,
+      "polarity": "rivalry",
+      "motifs": [
+        "straight walls against high nests",
+        "the ground is a suggestion"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Wynn 'Rookery' Atterby",
+      "bName": "Livia 'Mason' Tarquin",
+      "aHook": "Builds where nobody can walk to.",
+      "bHook": "Every wall is the first line of a fort.",
+      "aGlyph": "+cra·+sky·+mob·+ene",
+      "bGlyph": "+cra·+ene·+pad·−off",
+      "talkIds": {
+        "C": "mason__rookery:C"
       }
     },
     {
@@ -7415,6 +8123,33 @@
         ],
         "spotterLocked": false,
         "siegeSpotStrength": 0.0
+      }
+    },
+    {
+      "id": "noctua__rookery",
+      "a": "rookery",
+      "b": "noctua",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "two who build in the air",
+        "flight paths and landing shelves"
+      ],
+      "sharedTemperament": [
+        "sky"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Wynn 'Rookery' Atterby",
+      "bName": "Ada Noctua",
+      "aHook": "Builds where nobody can walk to.",
+      "bHook": "Dreams in flight paths.",
+      "aGlyph": "+cra·+sky·+mob·+ene",
+      "bGlyph": "+mob·+sig·+fog·+sky",
+      "talkIds": {
+        "C": "noctua__rookery:C"
       }
     },
     {
@@ -8270,6 +9005,60 @@
       }
     },
     {
+      "id": "rookery__solarium",
+      "a": "rookery",
+      "b": "solarium",
+      "score": 1.0,
+      "polarity": "bond",
+      "motifs": [
+        "a garden from above",
+        "spreadsheets on the cliff shelf"
+      ],
+      "sharedTemperament": [
+        "garden"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Wynn 'Rookery' Atterby",
+      "bName": "Solarium",
+      "aHook": "Builds where nobody can walk to.",
+      "bHook": "Spreadsheets, then sunlight.",
+      "aGlyph": "+cra·+sky·+mob·+ene",
+      "bGlyph": "+ene·+cra·+pad·−off",
+      "talkIds": {
+        "C": "rookery__solarium:C"
+      }
+    },
+    {
+      "id": "rookery__thresh",
+      "a": "rookery",
+      "b": "thresh",
+      "score": 1.0,
+      "polarity": "tension",
+      "motifs": [
+        "nests and the weather that comes from above",
+        "who owns the high air"
+      ],
+      "sharedTemperament": [
+        "sky"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Wynn 'Rookery' Atterby",
+      "bName": "Dama Thresh",
+      "aHook": "Builds where nobody can walk to.",
+      "bHook": "Weather comes from above.",
+      "aGlyph": "+cra·+sky·+mob·+ene",
+      "bGlyph": "+off·+sky·+mob·−pad",
+      "talkIds": {
+        "C": "rookery__thresh:C"
+      }
+    },
+    {
       "id": "rumor__veil",
       "a": "rumor",
       "b": "veil",
@@ -8481,6 +9270,31 @@
         ],
         "spotterLocked": true,
         "siegeSpotStrength": 0.891
+      }
+    },
+    {
+      "id": "scylla__triton",
+      "a": "triton",
+      "b": "scylla",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "the shoreline and the ship",
+        "the water had better be wide"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Nerea 'Triton' Calder",
+      "bName": "Maren 'Scylla' Voss",
+      "aHook": "Low tide is a road.",
+      "bHook": "The water had better be wide.",
+      "aGlyph": "+off·+mob·+pad·+sig",
+      "bGlyph": "+off·−pad·−mob·+hea",
+      "talkIds": {
+        "C": "scylla__triton:C"
       }
     },
     {
@@ -8766,6 +9580,31 @@
         "C": "stronghold__vane:C",
         "B": "stronghold__vane:B",
         "A": "stronghold__vane:A"
+      }
+    },
+    {
+      "id": "tarn__triton",
+      "a": "triton",
+      "b": "tarn",
+      "score": 1.0,
+      "polarity": "tension",
+      "motifs": [
+        "whose shoreline",
+        "Legion line against Cortex raiders"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Nerea 'Triton' Calder",
+      "bName": "Tarn Ostrander",
+      "aHook": "Low tide is a road.",
+      "bHook": "Out of the river, already firing.",
+      "aGlyph": "+off·+mob·+pad·+sig",
+      "bGlyph": "+mob·+off·−pad·+hea",
+      "talkIds": {
+        "C": "tarn__triton:C"
       }
     },
     {

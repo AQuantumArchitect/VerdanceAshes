@@ -221,15 +221,18 @@ def anchor_reason(hid: str, pack: Dict[str, Any], roster_row: Dict[str, Any], ch
     return ANCHOR_LABELS.get(key) if key else None
 
 
-def is_builder(pack: Dict[str, Any], chassis: Dict[str, Any]) -> bool:
-    unit = str(pack.get("unitDef") or "")
-    return bool((chassis.get(unit) or {}).get("hasBuildPower")) and unit not in ONLY_BUILDS_ITSELF
+def is_builder(pack: Dict[str, Any], chassis: Dict[str, Any] = None) -> bool:
+    """A builder seeds a base: economy, factories, constructors (crew_packs baseSeeder). Owner call,
+    2026-10-28: build power alone is not a builder. Ketha's rez bots, nano towers, a defence-only
+    constructor (Sister Lumen) and the Infestor all have build power and are not builders."""
+    return bool(pack.get("baseSeeder"))
 
 
 def eco_builders(workspace: Optional[Path] = None) -> List[str]:
-    """Heroes who build economy (crew_packs heroes buildsEco): who can wait at the jungle's entrance."""
+    """The base-seeders (crew_packs baseSeeder: they can raise economy, factories and constructors): who can
+    wait at the jungle's entrance."""
     packs = _story(Path(workspace or ROOT), "crew_packs.json")
-    return sorted(h for h, p in (packs.get("heroes") or {}).items() if isinstance(p, dict) and p.get("buildsEco"))
+    return sorted(h for h, p in (packs.get("heroes") or {}).items() if isinstance(p, dict) and is_builder(p))
 
 
 def _traits(hid: str, umwelt_rows: Dict[str, Dict[str, Any]], pack: Dict[str, Any]) -> Dict[str, float]:
