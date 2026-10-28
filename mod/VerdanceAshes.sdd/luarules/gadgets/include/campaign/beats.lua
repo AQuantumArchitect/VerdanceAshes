@@ -1,7 +1,7 @@
 -- campaign/beats.lua: in-mission beats (authored triggers)
 -- Part of game_verdance_campaign.lua, loaded into that gadget's environment
 -- (VFS.Include with the gadget table), so its globals are the gadget's globals.
--- Provides: beatsEnabled, checkBeats, compileBeats
+-- Provides: beatsEnabled, checkBeats, configureBeats
 -- Uses: heroes, mission_data, objectives, reinforcements, state, waterline
 
 -- In-mission beats: data-driven WC3-style triggers authored into the seed.
@@ -191,4 +191,17 @@ function checkBeats(frame)
       table.remove(beats, i)
     end
   end
+end
+
+-- Called by gadget:Initialize.
+function configureBeats(modOptions, profiling)
+  -- In-mission beats ride the same profiling gate as escalation waves;
+  -- va_beats forces them either way.
+  local beatOpt = modOptions.va_beats
+  if beatOpt ~= nil and tostring(beatOpt) ~= "" then
+    beatsEnabled = truthy(beatOpt)
+  else
+    beatsEnabled = not profiling
+  end
+  if beatsEnabled then compileBeats() end
 end

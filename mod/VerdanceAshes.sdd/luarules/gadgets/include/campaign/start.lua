@@ -1,9 +1,10 @@
--- campaign/start.lua: start of the sortie: commanders, perks, start resources, Tenebrium handlers
+-- campaign/start.lua: start of the sortie: doctrine, commanders, perks, start resources, Tenebrium
 -- Part of game_verdance_campaign.lua, loaded into that gadget's environment
 -- (VFS.Include with the gadget table), so its globals are the gadget's globals.
 -- Provides: VA_FIELD_spawnPeople, applyCommanderPerks, applyCommerceStartResources,
--- applyFirstDropEcoSoftener, doctrine, isCommanderUnitDef, playerCommanders,
--- publishObjectiveMarker, sweepPlayerCommanders, tenebLoot, vaApplyWarBanks
+-- applyFirstDropEcoSoftener, configureDoctrine, doctrine, isCommanderUnitDef,
+-- playerCommanderDestroyed, playerCommanders, publishObjectiveMarker, sweepPlayerCommanders,
+-- tenebLoot, tickCommanderSweeps, tickTenebrium, trackPlayerCommanderCreated, vaApplyWarBanks
 -- Uses: crew, mission_data, objectives, state, terminal
 
 playerCommanders = {}             -- unitID -> true
@@ -248,4 +249,111 @@ function vaApplyWarBanks()
     Spring.Echo(string.format("VA_WAR_BANK team=%d metal=%d energy=%d", teamID, tonumber(bank.metal) or 0, tonumber(bank.energy) or 0))
   end
   vaWarBanks = nil
+end
+
+-- Called by gadget:GameFrame.
+function tickTenebrium(frame)
+  -- WO-043c: shard spawn + wreck-gone loss timeout.
+  if frame % 5 == 0 then
+    tenebLoot.tickPending(frame)
+  end
+  -- Tnb top bar feed (va_tenebrium_bank/looted/spent/wrecks_unclaimed).
+  if frame % 30 == 0 then
+    publishTenebriumRules()
+  end
+end
+
+-- Called by gadget:GameFrame.
+function tickCommanderSweeps(frame)
+  -- Re-sweep through frame 90. The engine can place its start commander
+  -- late; commander sorties keep one, strike sorties keep none.
+  if frame <= 90 then
+    if frame == 1 or frame == 2 or frame == 8 or frame == 30 or frame == 90 then
+      sweepPlayerCommanders("frame_" .. tostring(frame))
+      if frame >= 90 then doctrine.commanderSwept = true end
+    end
+  elseif not doctrine.commanderSwept and frame >= 2 then
+    doctrine.commanderSwept = true
+  end
+  -- Re-sweep a few times: engine free-com + late AI start units can appear
+  -- after frame 3. DestroyUnit(..., false, true) reclaims with no boom.
+  if doctrine.sweepEnemy and frame <= 90 then
+    if frame == 3 or frame == 8 or frame == 30 or frame == 90 then
+      local removed = 0
+      for _, tid in ipairs(Spring.GetTeamList() or {}) do
+        if tid ~= playerTeamID and tid ~= gaiaTeamID and not Spring.AreTeamsAllied(tid, playerTeamID) then
+          local units = Spring.GetTeamUnits(tid) or {}
+          for i = 1, #units do
+            local uID = units[i]
+            local dID = Spring.GetUnitDefID(uID)
+            local ud = dID and UnitDefs[dID]
+            if isCommanderUnitDef(ud) then
+              Spring.DestroyUnit(uID, false, true)
+              removed = removed + 1
+            end
+          end
+        end
+      end
+      if removed > 0 then
+        Spring.Echo("VA_SWEEP_ENEMY_COMMANDERS count=" .. tostring(removed)
+          .. " frame=" .. tostring(frame))
+      end
+      if frame >= 90 then doctrine.enemySwept = true end
+    end
+  end
+end
+
+-- Called by gadget:UnitCreated.
+function trackPlayerCommanderCreated(unitID, unitDefID, unitTeam)
+  -- Strike-team missions field no commander; do not track one (and never let a
+  -- transient auto-commander arm the commander-lost defeat before it is swept).
+  if unitTeam == playerTeamID and not doctrine.strikeTeam then
+    local ud = UnitDefs[unitDefID]
+    if isCommanderUnitDef(ud) then
+      playerCommanders[unitID] = true
+      doctrine.sawPlayerCom = true
+    end
+  end
+end
+
+-- A player commander is gone (a fact for the result; the sortie goes on). Called by gadget:UnitDestroyed.
+function playerCommanderDestroyed(unitID)
+  if playerCommanders[unitID] then
+    playerCommanders[unitID] = nil
+    if doctrine.sawPlayerCom and next(playerCommanders) == nil and status == "active" and not terminal then
+      Spring.Echo("VA_COMMANDER_LOST")  -- a fact for the result; the sortie goes on
+    end
+  end
+end
+
+-- The sortie's doctrine from its arc: commanders, sweeps, hot extraction, the act label. Called by gadget:Initialize.
+function configureDoctrine(arc)
+  doctrine.playerComsAllowed = tonumber(arc.playerCommanders)
+  if doctrine.playerComsAllowed == nil then
+    doctrine.playerComsAllowed = (mission.strikeTeam == true) and 0 or 1
+  end
+  doctrine.strikeTeam = (mission.strikeTeam == true) or (doctrine.playerComsAllowed <= 0)
+  doctrine.sweepEnemy = (arc.sweepEnemyCommanders == true) or (tostring(arc.enemyMode or "") == "static_bases")
+  -- Living shells already place armdecom/cordecom/legdecom eco nodes. The
+  -- engine still drops a free real commander for SimpleAI/BARb; leaving that
+  -- com alive is what produces "decoy" deaths with commanderExplosion + 1250 m
+  -- wrecks. Sweep whenever a living shell is in the mission, unless the arc keeps the enemy's
+  -- real commander (act II on: a commander is the threat that moves the map).
+  if not doctrine.sweepEnemy and arc.sweepEnemyCommanders ~= false then
+    local shell = mission.livingShell
+    if type(shell) == "table" and type(shell.units) == "table" and #shell.units > 0 then
+      doctrine.sweepEnemy = true
+      Spring.Echo("VA_SWEEP_ENEMY_COMMANDERS reason=living_shell_decoy_farm")
+    end
+  end
+  doctrine.hotExtractOnly = (mission.escalation and mission.escalation.hotExtractOnly == true)
+      or (tostring(arc.escalation or "") == "off")
+  -- Act label for the HUD and story (pacing only; nothing is gated on it).
+  do
+    local actInfo = mission.act
+    doctrine.actNumber = tonumber(type(actInfo) == "table" and actInfo.act) or 0
+    local actLabel = (type(actInfo) == "table" and actInfo.label) and tostring(actInfo.label) or ""
+    Spring.SetGameRulesParam("va_act", doctrine.actNumber, { public = true })
+    Spring.SetGameRulesParam("va_act_label", actLabel, { public = true })
+  end
 end

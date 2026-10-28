@@ -1,8 +1,8 @@
 -- campaign/mentors.lua: pack mentors (Spoke, the leads): subordinate XP and field effects
 -- Part of game_verdance_campaign.lua, loaded into that gadget's environment
 -- (VFS.Include with the gadget table), so its globals are the gadget's globals.
--- Provides: harvestMentorXp, heroIsPackMentor, isWheelieDef, mentorProductDefs, packMentors,
--- pollMentorSubordinateXp, registerPackMentor, stampMentorSubordinate
+-- Provides: heroIsPackMentor, isWheelieDef, mentorsOnUnitCreated, mentorsOnUnitDestroyed,
+-- packMentors, pollMentorSubordinateXp, registerPackMentor, stampMentorSubordinate
 -- Uses: crew, hero_spawn, heroes, state
 
 -- Register a named hero on its freshly spawned unit: identity rules params for
@@ -174,6 +174,42 @@ function pollMentorSubordinateXp(frame)
         Spring.Echo("VA_MENTOR_POLL mentor=" .. heroId .. " bank=" .. tostring(xp)
           .. " field=" .. tostring(rec.fieldStat or "?"))
       end
+    end
+  end
+end
+
+-- Called by gadget:UnitCreated.
+function mentorsOnUnitCreated(unitID, unitDefID, unitTeam)
+  -- Mentor factories / scout mints: new player units inherit banked XP + field.
+  if unitTeam == playerTeamID and next(packMentors) and not heroByUnitID[unitID] then
+    local ud = UnitDefs[unitDefID]
+    local defName = ud and ud.name
+    if defName then
+      for heroId, bag in pairs(packMentors) do
+        local products = bag.productDefs or mentorProductDefs()[heroId]
+        if products and products[defName] then
+          stampMentorSubordinate(unitID, heroId)
+          break
+        elseif heroId == "spoke" and isWheelieDef(defName) then
+          stampMentorSubordinate(unitID, "spoke")
+          break
+        end
+      end
+    end
+  end
+end
+
+-- Called by gadget:UnitDestroyed.
+function mentorsOnUnitDestroyed(unitID, unitDefID, unitTeam)
+  -- Pack mentors harvest subordinate XP *before* hero cleanup clears maps.
+  if unitTeam == playerTeamID and next(packMentors) then
+    local lead = Spring.GetUnitRulesParam(unitID, "va_pack_leader")
+      or Spring.GetUnitRulesParam(unitID, "va_pack_id")
+    lead = tostring(lead or "")
+    if lead ~= "" and packMentors[lead] then
+      harvestMentorXp(unitID, lead)
+    elseif isWheelieDef((UnitDefs[unitDefID] or {}).name) and packMentors["spoke"] then
+      harvestMentorXp(unitID, "spoke")
     end
   end
 end

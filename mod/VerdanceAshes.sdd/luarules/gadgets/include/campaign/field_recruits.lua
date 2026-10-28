@@ -1,8 +1,9 @@
--- campaign/field_recruits.lua: wild heroes: recruit wrecks, field factories, who waits where
+-- campaign/field_recruits.lua: wild heroes: recruit wrecks, field factories, unit printers
 -- Part of game_verdance_campaign.lua, loaded into that gadget's environment
 -- (VFS.Include with the gadget table), so its globals are the gadget's globals.
 -- Provides: VA_FIELD_RECRUIT, VA_FIELD_spawnRecruits, claimFieldFactoriesForHero,
--- enableFieldFactoryPrinter, tickFieldRecruitPendingDeath
+-- enableFieldFactoryPrinter, fieldFactoryOnFeatureCreated, tickFieldRecruitPendingDeath,
+-- tickPrinterUnits
 -- Uses: crew, hero_spawn, heroes, mission_data, reinforcements, spawn, state, units
 
 -- Field recruits: wild heroes seeded on this map; wreck+rez joins the company.
@@ -388,4 +389,34 @@ function VA_FIELD_spawnRecruits(enemyTeam)
   end
   Spring.Echo("VA_FIELD_RECRUIT spawned=" .. tostring(spawned))
   return spawned
+end
+
+-- Called by gadget:GameFrame.
+function tickPrinterUnits(frame)
+  -- WO-033 unit printer metal/energy trickle (per-frame).
+  if next(printerUnits) and frame % 30 == 0 then
+    for uID, rec in pairs(printerUnits) do
+      if not Spring.ValidUnitID(uID) then
+        printerUnits[uID] = nil
+      else
+        pcall(Spring.AddTeamResource, rec.team, "metal", rec.metal * 30)
+        pcall(Spring.AddTeamResource, rec.team, "energy", rec.energy * 30)
+      end
+    end
+  end
+end
+
+-- Called by gadget:FeatureCreated.
+function fieldFactoryOnFeatureCreated(featureID, sourceID)
+  -- Legion factory seeds: stamp the engine wreck so rez keeps the hero link.
+  if sourceID and VA_FIELD_RECRUIT.fabByUnit and VA_FIELD_RECRUIT.fabByUnit[sourceID] then
+    local hid = VA_FIELD_RECRUIT.fabByUnit[sourceID]
+    VA_FIELD_RECRUIT.fabByUnit[sourceID] = nil
+    VA_FIELD_RECRUIT.fabByFeature[featureID] = hid
+    if Spring.SetFeatureRulesParam then
+      Spring.SetFeatureRulesParam(featureID, "va_field_factory_for", hid, { public = true })
+    end
+    Spring.Echo("VA_FIELD_FACTORY_WRECK hero=" .. tostring(hid)
+      .. " feature=" .. tostring(featureID))
+  end
 end

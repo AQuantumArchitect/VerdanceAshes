@@ -1,9 +1,9 @@
--- campaign/devcmd.lua: the /luarules va* playtest commands
+-- campaign/devcmd.lua: the /luarules va* playtest commands, the headless start and debug auto-progress
 -- Part of game_verdance_campaign.lua, loaded into that gadget's environment
 -- (VFS.Include with the gadget table), so its globals are the gadget's globals.
--- Provides: runVerdanceCommand
+-- Provides: runVerdanceCommand, tickDebugAutoProgress, tickHeadlessStart
 -- Uses: core, logistics, mission_data, objectives, reinforcements, result, setup, start, state,
--- telemetry, translation
+-- telemetry, terminal, translation
 
 -- Playtest commands change the sortie (grant, spawn, end, reset): cheats only, so a player's
 -- typo can never freeze or end a real drop.
@@ -105,4 +105,33 @@ function runVerdanceCommand(cmd)
     end
   else return false end
   return true
+end
+
+-- A headless run starts the sortie itself on frame 1 (and a fast-win batch ends it). Called by gadget:GameFrame.
+function tickHeadlessStart(frame)
+  if headless.autoStart and not headless.started and frame >= 1 then
+    headless.started = true
+    startMission()
+    if VA_LOGISTICS and VA_LOGISTICS.spawnCommerceDeployKit then
+      VA_LOGISTICS.spawnCommerceDeployKit()
+    end
+    armPendingDeliveries()
+    if headless.fastWin then
+      finishHeadlessResult("victory")
+    end
+  end
+end
+
+-- Called by gadget:GameFrame.
+function tickDebugAutoProgress(frame)
+  -- Debug/fastwin auto-progress timer (only armed via modoption)
+  if status == "active" and debugAutoProgress == 1 and frame % 30 == 0 then
+    holdFrames = holdFrames + 30
+    Spring.SetGameRulesParam("va_hold_frames", holdFrames, { public = true })
+    local req = mission.objective and mission.objective.requiredFrames or 600
+    if holdFrames >= req then
+      Spring.Echo("VA_OBJECTIVE_COMPLETE mission=" .. tostring(mission.missionId))
+      setTerminal("extracted", "debug_autoprogress")
+    end
+  end
 end

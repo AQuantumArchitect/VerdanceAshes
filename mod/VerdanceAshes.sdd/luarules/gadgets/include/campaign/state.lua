@@ -3,7 +3,7 @@
 -- (VFS.Include with the gadget table), so its globals are the gadget's globals.
 -- Provides: MarksLib, balance, debugAutoProgress, debugAutoProgressAllowed, fib, gaiaTeamID,
 -- headless, holdFrames, jnum, jstr, marks, marksCommit, mission, playerAllyTeamID, playerTeamID,
--- printerUnits, sortieChapter, status, teamAllyTeam, teamFaction, truthy, zoneMap
+-- printerUnits, resolveTeams, sortieChapter, status, teamFaction, truthy, zoneMap
 
 mission = nil
 zoneMap = nil
@@ -95,4 +95,33 @@ function jnum(x, digits)
   x = tonumber(x) or 0
   if digits then return string.format("%." .. digits .. "f", x) end
   return tostring(math.floor(x + 0.5))
+end
+
+-- Team layout: Gaia, ally teams, and the player's team (clamped to one this match has). Called by gadget:Initialize.
+function resolveTeams()
+  gaiaTeamID = Spring.GetGaiaTeamID()
+  for _, tid in ipairs(Spring.GetTeamList()) do
+    local _, _, _, _, _, at = Spring.GetTeamInfo(tid, false)
+    teamAllyTeam[tid] = tonumber(at or -1) or -1
+  end
+  -- The installed seed outlives the startscript that produced it: headless
+  -- matrices and smoke runs reuse whatever va_current.lua is on disk against a
+  -- different team layout. A balance.playerTeamID naming a team this match does
+  -- not have turns every GetTeamUnits/GetTeamResources call into a hard "Bad
+  -- teamID" error inside UnitCreated/GameStart/GameFrame, which kills the run
+  -- with no result and no obvious cause. Clamp to a team that exists.
+  playerTeamID = tonumber(mission.balance and mission.balance.playerTeamID) or 0
+  if teamAllyTeam[playerTeamID] == nil then
+    local seeded = playerTeamID
+    local fallback = nil
+    for _, tid in ipairs(Spring.GetTeamList()) do
+      if tid ~= gaiaTeamID and (fallback == nil or tid < fallback) then
+        fallback = tid
+      end
+    end
+    playerTeamID = fallback or 0
+    Spring.Echo("VA_WARN_TEAM seed playerTeamID=" .. tostring(seeded)
+      .. " absent from this match; using team " .. tostring(playerTeamID))
+  end
+  playerAllyTeamID = teamAllyTeam[playerTeamID] or 0
 end

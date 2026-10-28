@@ -1,10 +1,10 @@
 -- campaign/waterline.lua: the waterline (hydrology) and zone flow
 -- Part of game_verdance_campaign.lua, loaded into that gadget's environment
 -- (VFS.Include with the gadget table), so its globals are the gadget's globals.
--- Provides: VA_TRANSLATION, VA_WATER_TICK, getZoneHydroType, vaBeginWaterline, vaInitWaterline,
--- vaRecordZonePresence, vaSampleZoneFlow, vaStepWaterline, vaWaterApplied, vaWaterElevation,
--- vaWaterLevel, vaWaterTarget, vaZoneAdjacency, vaZoneAdjacencyCache, vaZoneFlow, vaZoneFlowJson,
--- vaZoneFlowSample, vaZoneSubmerged
+-- Provides: VA_TRANSLATION, VA_WATER_TICK, configureZoneFlowSample, getZoneHydroType,
+-- vaBeginWaterline, vaInitWaterline, vaRecordZonePresence, vaSampleZoneFlow, vaStepWaterline,
+-- vaWaterApplied, vaWaterElevation, vaWaterLevel, vaWaterTarget, vaZoneAdjacency,
+-- vaZoneAdjacencyCache, vaZoneFlow, vaZoneFlowJson, vaZoneFlowSample, vaZoneSubmerged
 -- Uses: state, telemetry
 
 -- ============================================================
@@ -276,4 +276,24 @@ function vaBeginWaterline(target, seconds)
   vaWaterStep = (to - vaWaterLevel) / span
   Spring.Echo(string.format("VA_HYDRO_BEGIN from=%.3f to=%.3f seconds=%s",
     vaWaterLevel, to, tostring(seconds)))
+end
+
+-- Called by gadget:Initialize.
+function configureZoneFlowSample(modOptions)
+  -- Border-crossing sampler cadence. Defaults on only under profiling: a real
+  -- session gets it only if it explicitly asks.
+  vaZoneFlowSample = tonumber(modOptions.va_zone_flow_sample or "")
+    or ((headless.autoStart or balance.exportFrame or #fib.milestones > 0) and 150 or 0)
+  -- A tracked human session is asking. Without this the whole AI-duel measurement
+  -- -- which corridors carry traffic, which sit inert -- has no human counterpart:
+  -- the sampler stays at 0 and every crossing goes unrecorded.
+  --
+  -- Pinned to the same 150 the profiling runs used, NOT to devTel.period. A crossing
+  -- count is a function of how often you look: sample every 1800 frames instead of
+  -- every 150 and a unit that goes A->B->A between looks records nothing at all.
+  -- Human and AI crossing counts are only comparable at one shared rate, so the
+  -- emission cadence (devTel.period) and the observation cadence are separate knobs.
+  if vaZoneFlowSample <= 0 and devTel.enabled then
+    vaZoneFlowSample = 150
+  end
 end

@@ -1,8 +1,9 @@
--- campaign/hero_spawn.lua: a hero's unit on the field: modifiers, tags, registration
+-- campaign/hero_spawn.lua: a hero's unit on the field: modifiers, tags, registration, auras
 -- Part of game_verdance_campaign.lua, loaded into that gadget's environment
 -- (VFS.Include with the gadget table), so its globals are the gadget's globals.
--- Provides: HeroTags, VA_HERO_HP_MULT, applyHeroModifiers, registerHeroSpawn
--- Uses: crew, heroes, mentors, mission_data, units
+-- Provides: HeroTags, VA_HERO_HP_MULT, applyHeroModifiers, heroAurasOnUnitCreated,
+-- registerHeroSpawn
+-- Uses: crew, heroes, mentors, mission_data, state, units
 
 -- Procedural hero tags (Runner = speed perk, not a career rank).
 HeroTags = nil
@@ -216,4 +217,30 @@ function registerHeroSpawn(unitID, spec)
     .. " hpMult=" .. tostring(rec.hpMult or VA_HERO_HP_MULT)
     .. " L" .. tostring(rec.level or 1)
     .. " " .. tostring(rec.rank or ""))
+end
+
+-- Called by gadget:UnitCreated.
+function heroAurasOnUnitCreated(unitID, unitDefID, unitTeam)
+  -- Hearth: newly built sister fusions inherit the energy field.
+  if unitTeam == playerTeamID and heroes and heroes.hearth and HeroTags then
+    local hRec = heroes.hearth
+    if hRec and hRec.field and hRec.field.primaryStat == "energy"
+        and hRec.unitID and Spring.ValidUnitID(hRec.unitID) then
+      local ud = UnitDefs[unitDefID]
+      if HeroTags.isFusionDef and HeroTags.isFusionDef(ud) then
+        HeroTags.applyFusionEnergyAura(hRec.unitID, hRec.field, unitTeam)
+      end
+    end
+  end
+  -- Pavise: newly built Centurions inherit the HP ward (self + nearby armwar).
+  if unitTeam == playerTeamID and heroes and heroes.pavise and HeroTags then
+    local hRec = heroes.pavise
+    if hRec and hRec.field and hRec.field.primaryStat == "hp"
+        and hRec.unitID and Spring.ValidUnitID(hRec.unitID) then
+      local ud = UnitDefs[unitDefID]
+      if HeroTags.isCenturionDef and HeroTags.isCenturionDef(ud) then
+        HeroTags.applyCenturionHpAura(hRec.unitID, hRec.field, unitTeam)
+      end
+    end
+  end
 end

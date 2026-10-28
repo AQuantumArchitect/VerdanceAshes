@@ -1,9 +1,9 @@
 -- campaign/reinforcements.lua: enemy response waves and where they enter
 -- Part of game_verdance_campaign.lua, loaded into that gadget's environment
 -- (VFS.Include with the gadget table), so its globals are the gadget's globals.
--- Provides: enemyEntry, enemyResponseTarget, mercTeamID, mercWaveUsed, mercsAllied,
--- objectiveTeamID, scanZoneRect, spawnWave, teamUnitCentroid, waves
--- Uses: state, telemetry, units
+-- Provides: configureWaves, enemyEntry, enemyResponseTarget, mercTeamID, mercWaveUsed,
+-- mercsAllied, objectiveTeamID, scanZoneRect, spawnWave, teamUnitCentroid, tickWaves, waves
+-- Uses: objectives, state, telemetry, terminal, units
 
 -- Enemy reinforcements share one budget per sortie chapter (global: main-chunk local limit).
 VA_REINFORCE = { usedChapter = nil }
@@ -218,4 +218,40 @@ function spawnWave(fromTeamID, count, targetX, targetZ, label)
     end
   end
   return spawned
+end
+
+-- Called by gadget:GameFrame.
+function tickWaves(frame)
+  -- Pillar B: enemy reinforcements on a steady timer.
+  if waves.enabled and status == "active" and not terminal and not objectiveComplete and objectiveTeamID then
+    if frame >= waves.nextFrame and waves.spawned < waves.max then
+      local px, pz = enemyResponseTarget()
+      spawnWave(objectiveTeamID, waves.baseSize, px, pz, "escalation")
+      waves.spawned = waves.spawned + 1
+      waves.nextFrame = frame + waves.interval
+      Spring.SetGameRulesParam("va_waves_spawned", waves.spawned, { public = true })
+    end
+  end
+end
+
+-- Escalation waves from the seed and the modoptions; returns the escalation mode. Called by gadget:Initialize.
+function configureWaves(modOptions, arc, profiling)
+  local escOpt = modOptions.va_escalation
+  local escMode = tostring((mission.escalation and mission.escalation.mode) or arc.escalation or "")
+  local maxFromSeed = tonumber(mission.escalation and mission.escalation.maxWaves)
+  if escOpt ~= nil and tostring(escOpt) ~= "" then
+    waves.enabled = truthy(escOpt)
+  elseif escMode == "off" or (maxFromSeed ~= nil and maxFromSeed <= 0) then
+    waves.enabled = false
+  else
+    waves.enabled = not profiling
+  end
+  local escScale = tonumber(mission.difficulty and mission.difficulty.enemyScale) or 1.0
+  waves.baseSize = math.max(2, math.floor(4 * math.min(1.5, escScale) + 0.5))
+  waves.max = maxFromSeed or 4
+  waves.interval = tonumber(mission.escalation and mission.escalation.intervalFrames) or 2700
+  waves.nextFrame = tonumber(mission.escalation and mission.escalation.firstWaveFrame) or 1800
+  local wi = tonumber(modOptions.va_wave_interval or ""); if wi and wi > 0 then waves.interval = wi end
+  local wf = tonumber(modOptions.va_first_wave or ""); if wf and wf > 0 then waves.nextFrame = wf end
+  return escMode
 end

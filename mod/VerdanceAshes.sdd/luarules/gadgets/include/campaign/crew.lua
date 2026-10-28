@@ -3,7 +3,7 @@
 -- (VFS.Include with the gadget table), so its globals are the gadget's globals.
 -- Provides: VA_CREW_SELECT, VA_CREW_confirm, VA_CREW_isAnchorKeep, VA_CREW_isCommerceKitSpec,
 -- VA_CREW_loadRoster, VA_CREW_publish, VA_CREW_spawnHeroPack, VA_HOT, VA_HOT_drop,
--- VA_refreshPlayerStorageCaps
+-- VA_refreshPlayerStorageCaps, tickStorageRefresh
 -- Uses: hero_spawn, heroes, spawn, start, state
 
 -- Muster the Band: packed table (Lua 5.1 local budget). Fresh chapter only.
@@ -620,4 +620,22 @@ function VA_HOT_drop(line)
   Spring.SetGameRulesParam("va_hotdrop_pending", 0, { public = true })
   Spring.Echo("VA_HOTDROP_DONE packs=" .. table.concat(picks, ",") .. " reserve=" .. tostring(landed))
   return true
+end
+
+-- Called by gadget:GameFrame.
+function tickStorageRefresh(frame)
+  -- Re-apply M/E storage caps after BAR Team Resourcing's GameStart wipe.
+  do
+    local untilF = VA_CREW_SELECT and tonumber(VA_CREW_SELECT.storageRefreshUntil)
+    if untilF and frame >= 1 and frame <= untilF then
+      VA_refreshPlayerStorageCaps("frame_" .. tostring(frame))
+      if frame >= untilF then
+        VA_CREW_SELECT.storageRefreshUntil = nil
+        -- Drop temporary commerce floors; ongoing caps come from buildings.
+        VA_CREW_SELECT.wantMetal = nil
+        VA_CREW_SELECT.wantEnergy = nil
+        VA_refreshPlayerStorageCaps("post_commerce_settle")
+      end
+    end
+  end
 end

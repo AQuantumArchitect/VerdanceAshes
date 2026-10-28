@@ -1,9 +1,10 @@
--- campaign/telemetry.lua: zone cells, per-zone metrics and dev telemetry
+-- campaign/telemetry.lua: zone cells, per-zone metrics, dev telemetry and the headless/profiling options
 -- Part of game_verdance_campaign.lua, loaded into that gadget's environment
 -- (VFS.Include with the gadget table), so its globals are the gadget's globals.
--- Provides: addUnitToBucket, classifyCmd, devTel, emptyMetrics, logDevSample, logTelemetry,
--- makeTeamBucket, vaZoneCellIndex, zoneDvJson, zoneDvTable, zoneForPosition
--- Uses: mission_data, result, setup, state, units, waterline
+-- Provides: addUnitToBucket, armDevTelemetry, classifyCmd, configureHeadlessClient, devTel,
+-- emptyMetrics, logTelemetry, makeTeamBucket, readProfilingOptions, tickDevTelemetry,
+-- tickProfiling, vaZoneCellIndex, zoneDvJson, zoneDvTable, zoneForPosition
+-- Uses: mission_data, result, setup, state, terminal, translation, units, waterline
 
 -- Dev telemetry: one table so GameFrame stays under Lua 5.1's 60-upvalue cap.
 -- Armed by singleplayer/.../generated/dev_telemetry_flag.lua or mission.devTelemetry.
@@ -408,4 +409,152 @@ function logDevSample()
   end
   resetDevCmdCounts()
   devTel.lastSample = frame
+end
+
+-- Balance export, the Fibonacci milestones and the headless quit. Called by gadget:GameFrame.
+function tickProfiling(frame)
+  if balance.exportFrame and not balance.exported and frame >= balance.exportFrame then
+    balance.exported = true
+    logTelemetry()
+    Spring.Echo("VA_ZONE_FLOW_JSON " .. vaZoneFlowJson())
+    logAndBroadcastTranslation()
+    if balance.quitAfterExport then
+      headless.quitFrame = frame + 2
+    end
+  end
+
+  -- Fibonacci multi-milestone profiler
+  if #fib.milestones > 0 and fib.idx <= #fib.milestones then
+    local due = fib.milestones[fib.idx]
+    if frame >= due then
+      Spring.Echo("VA_FIB_MILESTONE idx=" .. tostring(fib.idx) .. " frame=" .. tostring(frame) .. " target=" .. tostring(due))
+      logTelemetry()
+      Spring.Echo("VA_ZONE_FLOW_JSON " .. vaZoneFlowJson())
+      logAndBroadcastTranslation()
+      fib.idx = fib.idx + 1
+      if fib.idx > #fib.milestones and fib.quitAfterLast then
+        headless.quitFrame = frame + 2
+      end
+    end
+  end
+
+  if headless.quitFrame and frame >= headless.quitFrame then
+    Spring.Echo("VA_HEADLESS_QUIT")
+    Spring.SendCommands("quitforce")
+    headless.quitFrame = nil
+  end
+end
+
+-- Called by gadget:GameFrame.
+function tickDevTelemetry(frame)
+  -- Dense human-player telemetry for dev launch learning loop.
+  if devTel.enabled and status == "active" and not terminal then
+    if (frame - devTel.lastSample) >= devTel.period then
+      logDevSample()
+    end
+  end
+end
+
+-- Called by gadget:Initialize.
+function armDevTelemetry(modOptions)
+  -- Dev telemetry arm: mission seed, modoption, or generated flag file.
+  do
+    local flag = nil
+    local okF, dataF = pcall(VFS.Include, "singleplayer/verdance_ashes/generated/dev_telemetry_flag.lua")
+    if okF and type(dataF) == "table" then flag = dataF end
+    local fromMission = mission and (mission.devTelemetry == true or (mission.dev and mission.dev.telemetry == true))
+    -- va_play_track is the player-facing name for the same arm. The playtest
+    -- launcher sets it; va_dev_telemetry stays for the dev_launch/flag-file path.
+    local fromOpt = truthy(modOptions.va_dev_telemetry) or truthy(modOptions.va_play_track)
+    local fromFlag = flag and truthy(flag.enabled)
+    devTel.enabled = fromMission or fromOpt or fromFlag
+    local period = tonumber(mission and mission.dev and mission.dev.samplePeriodFrames)
+      or tonumber(flag and flag.samplePeriodFrames)
+      or tonumber(modOptions.va_dev_sample_period)
+      or 150
+    if period and period >= 30 then devTel.period = math.floor(period) end
+    if devTel.enabled then
+      Spring.Echo("VA_DEV_TELEMETRY_ARMED period=" .. tostring(devTel.period)
+        .. " mission=" .. tostring(fromMission)
+        .. " opt=" .. tostring(fromOpt)
+        .. " flag=" .. tostring(fromFlag))
+    end
+  end
+end
+
+-- Headless, balance-export and Fibonacci-profiler options. Called by gadget:Initialize.
+function readProfilingOptions(modOptions)
+  headless.autoStart = truthy(modOptions.va_headless_autostart)
+  -- The absent modoption is nil, which matches none of the three false-y tests, so
+  -- this read "true" in EVERY human session -- not just headless ones. That set
+  -- debugAutoProgressAllowed, which ticks holdFrames up by 30 every 30 frames whether
+  -- or not the player is holding anything, stamps auto=1 on VA_STATUS, and puts
+  -- "debugAutoProgress":1 in the result JSON. It has not been stealing wins only
+  -- because checkSoftClock runs first and every authored requiredFrames divides by 30;
+  -- a seed missing requiredFrames falls through to 600 and fires a bogus victory.
+  -- fastWin is a headless-batch concept, so scope it to a headless batch.
+  headless.fastWin = headless.autoStart
+    and not (modOptions.va_headless_fastwin == false or modOptions.va_headless_fastwin == 0 or modOptions.va_headless_fastwin == "0")
+  headless.quit = truthy(modOptions.va_headless_quit)
+  balance.exportFrame = tonumber(modOptions.va_balance_export_frame or "")
+  balance.quitAfterExport = truthy(modOptions.va_balance_quit)
+
+  -- Parse Fibonacci milestone list: va_fib_export_frames=900,1800,2700,4500,...
+  local fibRaw = tostring(modOptions.va_fib_export_frames or "")
+  if fibRaw ~= "" then
+    for s in fibRaw:gmatch("[^,]+") do
+      local n = tonumber(s:match("^%s*(.-)%s*$"))
+      if n and n > 0 then fib.milestones[#fib.milestones+1] = math.floor(n) end
+    end
+    table.sort(fib.milestones)
+    fib.quitAfterLast = truthy(modOptions.va_fib_quit)
+  end
+end
+
+-- Called by gadget:Initialize.
+function configureHeadlessClient(modOptions)
+  -- Headless spins forever building the unit-icon texture atlas at frame 30.
+  -- The shell-bake and cartography gadgets both learned this the hard way and
+  -- carry the same guard; every va_* probe runs through THIS gadget, so it
+  -- belongs here too. Only under an explicitly headless/profiling run -- a real
+  -- session needs its icons.
+  --
+  -- va_no_ui exists to separate "this process has no screen" from "this is a
+  -- profiling run". They were the same predicate, which made the human code path
+  -- untestable: verifying it headlessly meant setting a profiling flag, and every
+  -- profiling flag also forces 20x sim, disables waves and beats, grants an
+  -- instant win and skips Spring.GameOver -- so the thing under test was never the
+  -- thing that would run. Without it, spring-headless builds the full widget set
+  -- and icon atlas and never reaches frame 0. Absent in a real session, so the
+  -- player keeps their UI.
+  local noUi = (headless.autoStart or balance.exportFrame or #fib.milestones > 0)
+    or truthy(modOptions.va_no_ui)
+  -- The third argument is useOverlay, and it is load-bearing, not a nicety. The
+  -- engine documents it as "the value will only be set in memory, and not be
+  -- restored for the next game" -- meaning WITHOUT it these three writes persist
+  -- into the player's real springsettings.cfg and outlive the process. That is
+  -- not hypothetical: an earlier headless probe on this machine left LuaUI = 0
+  -- and UnitIconDist = 99999 sitting in the live config, which would have opened
+  -- the next GUI session with no LuaUI at all -- no widgets, no HUD, and no
+  -- recorder -- with nothing in game to explain why.
+  if noUi and Spring.SetConfigInt then
+    Spring.SetConfigInt("UnitIconsAsUI", 0, true)
+    Spring.SetConfigInt("UnitIconDist", 99999, true)
+    Spring.SetConfigInt("LuaUI", 0, true)
+  end
+
+  -- Headless sims at 1x unless the host is told otherwise, so a 21-minute
+  -- profiling milestone costs 21 real minutes and an overnight matrix cannot
+  -- finish. The shell-bake and cartography gadgets already force the sim clock
+  -- up for their unattended batches; profiling runs come through this gadget and
+  -- need the same. Guarded by the profiling condition, so a real session is
+  -- untouched. va_headless_speed=0 opts out.
+  if (headless.autoStart or balance.exportFrame or #fib.milestones > 0)
+      and Spring.SendCommands then
+    local simSpeed = tonumber(modOptions.va_headless_speed or "") or 20
+    if simSpeed > 0 then
+      Spring.SendCommands("setmaxspeed " .. simSpeed)
+      Spring.SendCommands("setminspeed " .. simSpeed)
+    end
+  end
 end

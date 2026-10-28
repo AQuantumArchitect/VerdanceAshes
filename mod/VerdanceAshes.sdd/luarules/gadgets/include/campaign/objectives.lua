@@ -1,15 +1,13 @@
 -- campaign/objectives.lua: the objective: kind and mode, the pad, living-shell claims, presence / fortify / wipe / soft clock
 -- Part of game_verdance_campaign.lua, loaded into that gadget's environment
 -- (VFS.Include with the gadget table), so its globals are the gadget's globals.
--- Provides: CHECK_PERIOD, CLEAR_FRACTION, VA_KINDS, VA_padPoint, capture, checkPlayerWipe,
--- checkPresenceObjective, checkSoftClock, claimLivingShellObjectives,
--- claimOptionalHighValueSecondaries, extraObj, extractLoop, nodeClaimedFrame, objectiveComplete,
--- objectiveCompleteFrame, objectiveKind, objectiveTargetCount, objectiveTargets,
--- objectiveTargetsDestroyed, onObjectiveComplete, shellObjectivesClaimed, targetZoneRect,
--- vaAllObjectivesDone, vaCheckPurge, vaMaybeAnnounceAllDone, vaObjectiveMode, zoneHoldFrames,
--- zoneRectFor
--- Uses: crew, heroes, mission_data, reinforcements, result, start, state, telemetry, terminal,
--- units
+-- Provides: VA_KINDS, VA_padPoint, capture, extraObj, marksOnUnitDestroyed, nodeClaimedFrame,
+-- objectiveComplete, objectiveCompleteFrame, objectiveKind, objectiveTargetCount,
+-- objectiveTargetDestroyed, objectiveTargets, objectiveTargetsDestroyed, onObjectiveComplete,
+-- placeTargetAndPad, targetZoneRect, tickObjectiveChecks, tickShellClaims, vaAllObjectivesDone,
+-- vaObjectiveMode, zoneHoldFrames, zoneRectFor
+-- Uses: beats, crew, heroes, mentors, mission_data, reinforcements, result, start, state,
+-- telemetry, terminal, units
 
 -- Objective automation (gadget-env globals — Lua 5.1 main-chunk local budget).
 CHECK_PERIOD = 30                 -- frames between objective checks
@@ -702,4 +700,97 @@ function checkSoftClock(frame)
   end
   if left <= 0 then phase = "OVERTIME" end
   Spring.SetGameRulesParam("va_phase", phase, { public = true })
+end
+
+-- Called by gadget:GameFrame.
+function tickShellClaims(frame)
+  -- Living shell spawns ~frame 8; claim objective eco + optional high-value marks.
+  -- Retry past the first window when the primary pad still has no eco
+  -- (hub marks like GF_NE_PLATEAU with no pocket used to leave the pocket at 0).
+  if frame >= 20 and frame % 10 == 0 then
+    if not shellObjectivesClaimed and frame <= 180 then
+      claimLivingShellObjectives()
+      claimOptionalHighValueSecondaries()
+    elseif shellObjectivesClaimed and objectiveTargetCount <= 0 and frame <= 240 and frame % 30 == 0 then
+      shellObjectivesClaimed = false
+      claimLivingShellObjectives()
+      claimOptionalHighValueSecondaries()
+    end
+  end
+end
+
+-- Called by gadget:GameFrame.
+function tickObjectiveChecks(frame)
+  -- Objective automation checks (playable sessions)
+  if status == "active" and not terminal and frame % CHECK_PERIOD == 0 then
+    checkPresenceObjective(frame)
+    vaCheckPurge(frame)
+    checkPlayerWipe(frame)
+    checkHeroWreckTimeouts(frame)
+    checkSoftClock(frame)
+    if beatsEnabled then checkBeats(frame) end
+    pollMentorSubordinateXp(frame)
+  end
+end
+
+-- An objective target is down: count it, and complete or advance the objective. Called by gadget:UnitDestroyed.
+function objectiveTargetDestroyed(unitID)
+  local forceId = objectiveTargets[unitID]
+  if forceId then
+    objectiveTargets[unitID] = nil
+    objectiveTargetsDestroyed = objectiveTargetsDestroyed + 1
+    Spring.SetGameRulesParam("va_objective_destroyed", objectiveTargetsDestroyed, { public = true })
+    Spring.Echo("VA_OBJECTIVE_TARGET_DOWN force=" .. forceId .. " destroyed=" .. tostring(objectiveTargetsDestroyed) .. "/" .. tostring(objectiveTargetCount))
+    if not objectiveComplete and status == "active" and not terminal then
+      local kind = objectiveKind()
+      if VA_KINDS.capture[kind] or capture.mode then
+        -- Capture: destruction only clears the pocket; hold under regrow is required.
+        -- Do not auto-complete on last structure kill.
+        if capture.mode and capture.phase == "clear" then
+          local need = math.max(1, math.ceil(math.max(1, objectiveTargetCount) * CLEAR_FRACTION))
+          if objectiveTargetsDestroyed >= need and not capture.pocketCleared then
+            -- Phase advance happens on next presence check; publish progress now.
+            Spring.SetGameRulesParam("va_pocket_clear_frac",
+              objectiveTargetsDestroyed / math.max(1, objectiveTargetCount), { public = true })
+          end
+        end
+      elseif objectiveTargetsDestroyed >= objectiveTargetCount then
+        onObjectiveComplete("target_destroyed")
+      end
+    end
+  end
+end
+
+-- Called by gadget:UnitDestroyed.
+function marksOnUnitDestroyed(unitID)
+  -- Drop 4: structure/vault marks tick via the registry (never the primary pool).
+  local secId, g, newlyDone = MarksLib.onTargetDestroyed(marks, unitID)
+  if newlyDone and g then
+    local sx, _, sz = Spring.GetUnitPosition(unitID)
+    if sx then
+      Spring.SetGameRulesParam("va_secondary_last_x", sx, { public = true })
+      Spring.SetGameRulesParam("va_secondary_last_z", sz, { public = true })
+    end
+    marksCommit("secondary_complete", secId)
+    Spring.Echo("VA_SECONDARY_COMPLETE id=" .. tostring(secId)
+      .. " required=" .. tostring(g.required == true)
+      .. " left=" .. tostring(MarksLib.requiredLeft(marks)))
+    if SendToUnsynced and sx then
+      local label = tostring(g.label or g.description or secId)
+      SendToUnsynced("VERDANCE_BEAT", "narrative", sx, sz,
+        "SECONDARY|" .. label .. "|640|4.5|1", "")
+    end
+    vaMaybeAnnounceAllDone()
+  elseif secId then
+    marksCommit("secondary_changed", secId)
+  end
+end
+
+-- The target zone's rectangle, and the one pad the company lands and lifts from. Called by gadget:Initialize.
+function placeTargetAndPad()
+  local obj = mission.objective or {}
+  targetZoneRect = zoneRectFor(obj.targetZoneId)
+  -- One pad (pass five): the company lands and lifts from the same point — the deployment
+  -- zone's anchor. Deploy beacon, bought kit (infilAnchor) and extraction all read it.
+  extractLoop.applyPad(mission.deploymentZoneId or mission.extractionZoneId or obj.extractionZoneId)
 end
