@@ -80,14 +80,6 @@ def recipe_for_tier(recipe: Dict[str, Any], tier: int) -> Dict[str, Any]:
     return out
 
 
-def tier_seat_keys(recipe: Dict[str, Any]) -> List[str]:
-    """Every seat any tier of this war can field (the base seats and each tier's added ones)."""
-    keys = [t["key"] for t in recipe.get("teams") or []]
-    for over in (recipe.get("tiers") or {}).values():
-        keys += [t["key"] for t in over.get("addTeams") or [] if t["key"] not in keys]
-    return keys
-
-
 def war_maps(workspace: Path) -> List[str]:
     """Every map that has a war recipe, in name order."""
     base = Path(workspace) / "data" / "base_templates"

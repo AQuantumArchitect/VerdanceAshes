@@ -16,7 +16,6 @@ Usage:
 import argparse
 import json
 import re
-import sys
 from pathlib import Path
 
 # Allow `python tools/validate_sortie_contract.py` from workspace root.

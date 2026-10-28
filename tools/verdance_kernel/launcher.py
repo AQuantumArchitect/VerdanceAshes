@@ -13,7 +13,6 @@ import time
 import webbrowser
 from http.server import ThreadingHTTPServer
 from pathlib import Path
-from typing import Any
 
 from verdance_kernel.api import CampaignKernel
 from verdance_kernel.bar_bridge import BarBridge

@@ -22,7 +22,7 @@ from typing import Any, Dict, List, Set
 from verdance.common import WORKSPACE_ROOT
 
 ROOT = WORKSPACE_ROOT
-from verdance.readings import readings
+from verdance.readings import readings as projector  # the module; `readings` below is readings.json
 
 FIELD_RE = re.compile(r"{([a-zA-Z_][a-zA-Z0-9_]*)}")
 
@@ -228,8 +228,8 @@ def main() -> int:
 
     # Determinism of the projector on the live save.
     if state:
-        a = json.dumps(readings.project(json.loads(json.dumps(state)), ROOT), sort_keys=True)
-        b = json.dumps(readings.project(json.loads(json.dumps(state)), ROOT), sort_keys=True)
+        a = json.dumps(projector.project(json.loads(json.dumps(state)), ROOT), sort_keys=True)
+        b = json.dumps(projector.project(json.loads(json.dumps(state)), ROOT), sort_keys=True)
         if a != b:
             errors.append("projector is not deterministic on the live save")
 

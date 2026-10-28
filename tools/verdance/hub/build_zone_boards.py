@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 import sys
-from pathlib import Path
 
 from verdance.common import WORKSPACE_ROOT, edge_score
 

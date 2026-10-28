@@ -26,7 +26,6 @@ local DEFAULT_SIGHT = 320       -- elmos around the missile that the company see
 
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitAllyTeam = Spring.GetUnitAllyTeam
-local spGetUnitTeam = Spring.GetUnitTeam
 local spGetUnitDefID = Spring.GetUnitDefID
 local spGetUnitWeaponTarget = Spring.GetUnitWeaponTarget
 local spGetUnitsInSphere = Spring.GetUnitsInSphere

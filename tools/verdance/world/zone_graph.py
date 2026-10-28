@@ -12,9 +12,9 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Set
 
-from verdance.common import MAP_ALIASES, canonical_map_id, load_json
+from verdance.common import canonical_map_id, load_json
 
 GRAPH_REL = Path("data/zone_maps/world_zone_graph.v1.json")
 LEGACY_ADJ_REL = Path("data/zone_maps/authored/zone_adjacency.json")
@@ -164,23 +164,6 @@ def zone_node(workspace: Path, zone_id: str) -> Optional[Dict[str, Any]]:
     if not graph:
         return None
     return nodes_by_id(graph).get(str(zone_id))
-
-
-def strategic_link_edges(workspace: Path) -> List[Dict[str, Any]]:
-    """Raw strategic_link edges from the atlas (authored cross-map corridors)."""
-    graph = load_world_zone_graph(workspace)
-    if not graph:
-        return []
-    out: List[Dict[str, Any]] = []
-    for e in graph.get("edges") or []:
-        if (e.get("kind") or "") != "strategic_link":
-            continue
-        a = str(e.get("from") or "")
-        b = str(e.get("to") or "")
-        if not a or not b:
-            continue
-        out.append(dict(e))
-    return out
 
 
 def graph_stats(workspace: Path) -> Dict[str, Any]:

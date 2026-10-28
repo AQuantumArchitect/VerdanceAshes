@@ -40,7 +40,7 @@ local PHI3 = PHI2 * PHI              -- 4.236...
 local RATE_REPAIR = 0.015            -- /s while repairing (medium, bumped up)
 local RATE_BUILD = RATE_REPAIR * PHI
 local RATE_REZ_TICK = RATE_REPAIR * PHI2
-local RATE_RECLAIM = 0
+-- Reclaim earns no craft XP.
 
 -- Completion bonuses ≈ 6s of that tier's tick rate (rez slightly lean).
 local BONUS_REZ = RATE_REZ_TICK * 5.5

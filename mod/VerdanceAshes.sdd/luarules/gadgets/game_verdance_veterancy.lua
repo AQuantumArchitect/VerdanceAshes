@@ -74,9 +74,6 @@ local playerTeam = 0
 local EXP_GRADE = 0.02
 local POLL_PERIOD = 30 -- 1s @ 30fps; safety net if UnitExperience misses
 
-local spSetGroundMoveTypeData = Spring.MoveCtrl and Spring.MoveCtrl.SetGroundMoveTypeData
-local spSetGunshipMoveTypeData = Spring.MoveCtrl and Spring.MoveCtrl.SetGunshipMoveTypeData
-local spSetAirMoveTypeData = Spring.MoveCtrl and Spring.MoveCtrl.SetAirMoveTypeData
 local spMoveCtrlGetTag = Spring.MoveCtrl and Spring.MoveCtrl.GetTag
 
 -- unitID -> baseline + last applied mults

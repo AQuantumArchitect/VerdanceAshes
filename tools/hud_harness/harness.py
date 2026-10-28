@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Run the pass-7 widgets under a stubbed Spring/gl in liblua5.4 (ctypes). Catches runtime
 errors in draw/update paths that a syntax check cannot. Not BAR; a smoke test."""
-import ctypes, glob, json, sys, os
+import ctypes, glob, json, os
 HERE = os.path.dirname(os.path.abspath(__file__))
 # Fixtures: the repo's own (tools/hud_harness → workspace root), overridable with VA_FIXTURES / VA_WS.
 WS = os.environ.get("VA_WS") or os.path.abspath(os.path.join(HERE, "..", ".."))
