@@ -174,12 +174,15 @@ class DensityMatrixTests(unittest.TestCase):
         self.assertGreater(self.occ.get(flow.NEUTRAL, {}).get(
             sorted(self.occ[flow.NEUTRAL])[0], 0.0), 0.0,
             "unclaimed ground still has to exist in the occupation")
-        # ... and it is still counted honestly in the control readout: the largest single
-        # share of the opening (about 0.36 with the standing wars seated), not most of it.
+        # ... and it is still counted honestly in the control readout: a large share of the
+        # opening (about 0.37 with the standing wars seated), never most of it. Which power
+        # leads the opening is the content's business, not the model's: since the Eye of
+        # Horus was glassed (9149416, its rim's raptors gone to Armada's corners), Armada
+        # edges it, 0.38 to 0.37.
         obs = flow.observables(self.lattice, self.rho, self.occ)
         control = obs["control"]
         self.assertGreater(control.get(flow.NEUTRAL, 0.0), 0.25)
-        self.assertEqual(max(control, key=control.get), flow.NEUTRAL)
+        self.assertLess(control.get(flow.NEUTRAL, 0.0), 0.5)
 
     def test_coupling_needs_a_power_standing_in_both_places(self):
         """Every non-zero off-diagonal traces to some power with amplitude at
