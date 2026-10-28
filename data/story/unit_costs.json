@@ -1,1 +1,4922 @@
-{"schema": "verdance-unit-costs/2", "source": "BAR.sdd + VerdanceAshes.sdd unitdefs (metalcost, energycost) and BAR's English unit names, read from the player's install", "units": {"armaak": [520.0, 5600.0], "va_kettle": [520.0, 5600.0], "armaap": [2900.0, 29000.0], "armaas": [1000.0, 12000.0], "armaca": [340.0, 12000.0], "armack": [430.0, 6900.0], "armacsub": [700.0, 9000.0], "armacv": [550.0, 6800.0], "armadvsol": [350.0, 5000.0], "armafus": [9700.0, 69000.0], "armafust3": [90000.0, 550000.0], "armageo": [1600.0, 27000.0], "armah": [230.0, 4500.0], "armalab": [2600.0, 15000.0], "armamb": [2500.0, 17000.0], "armamd": [1500.0, 38000.0], "armamex": [200.0, 1500.0], "armamph": [260.0, 2700.0], "armamsub": [1200.0, 5500.0], "armanac": [270.0, 2400.0], "armanavaldefturret": [1750.0, 26000.0], "armanni": [3500.0, 74000.0], "armannit3": [13500.0, 450000.0], "armantiship": [1400.0, 12000.0], "armap": [650.0, 1100.0], "armapt3": [8500.0, 60000.0], "armarad": [400.0, 14000.0], "armart": [135.0, 2200.0], "armaser": [78.0, 1400.0], "armason": [170.0, 2600.0], "armassimilator": [2500.0, 49000.0], "armassistdrone": [1.0, 1.0], "armassistdrone_land": [1.0, 1.0], "armasy": [2900.0, 9700.0], "armatl": [1000.0, 8500.0], "armatlas": [68.0, 1300.0], "armavp": [2600.0, 14000.0], "armawac": [175.0, 8600.0], "armbanth": [13500.0, 286000.0], "armbats": [3300.0, 22000.0], "armbeamer": [190.0, 1500.0], "armbeaver": [150.0, 3100.0], "armblade": [1250.0, 22000.0], "armbotrail": [13500.0, 192000.0], "armbrawl": [310.0, 6200.0], "armbrtha": [4500.0, 64000.0], "armbull": [950.0, 13000.0], "armca": [110.0, 3000.0], "armcarry": [1400.0, 12000.0], "armch": [200.0, 2700.0], "armcir": [750.0, 7300.0], "armck": [110.0, 1600.0], "armckfus": [3550.0, 22000.0], "armclaw": [340.0, 1600.0], "armcom": [2700.0, 26000.0], "armcomboss": [10000000.0, 10000000.0], "armcomcon": [2700.0, 26000.0], "armcomlvl10": [11000.0, 110000.0], "armcomlvl2": [3000.0, 30000.0], "armcomlvl3": [4000.0, 40000.0], "armcomlvl4": [5000.0, 50000.0], "armcomlvl5": [6000.0, 60000.0], "armcomlvl6": [7000.0, 70000.0], "armcomlvl7": [8000.0, 80000.0], "armcomlvl8": [9000.0, 90000.0], "armcomlvl9": [10000.0, 100000.0], "armcomnew": [2700.0, 26000.0], "armconsul": [250.0, 4300.0], "armcroc": [750.0, 15000.0], "armcrus": [1000.0, 12000.0], "armcs": [200.0, 2000.0], "armcsa": [150.0, 7800.0], "armcv": [135.0, 1950.0], "armdecade": [175.0, 1500.0], "armdecadet3": [8000.0, 160000.0], "armdecom": [770.0, 12000.0], "armdecom_tenebrium": [770.0, 12000.0], "armdf": [270.0, 100.0], "armdfly": [320.0, 10000.0], "armdl": [240.0, 2200.0], "armdrag": [8.0, 0.0], "armdrone": [25.0, 600.0], "armdronecarry": [1700.0, 17000.0], "armdronecarryland": [1700.0, 17000.0], "armdroneold": [55.0, 1100.0], "armemp": [1600.0, 29000.0], "armepoch": [20000.0, 190000.0], "armestor": [170.0, 1700.0], "armeyes": [32.0, 850.0], "armfark": [210.0, 3000.0], "armfast": [160.0, 3800.0], "armfatf": [800.0, 7300.0], "armfav": [31.0, 370.0], "armfboy": [1400.0, 20000.0], "armfdrag": [15.0, 0.0], "armfepocht4": [25000.0, 250000.0], "armferret": [360.0, 5700.0], "armfflak": [850.0, 23000.0], "armfgate": [3900.0, 72000.0], "armfhlt": [470.0, 6200.0], "armfhp": [670.0, 2000.0], "armfido": [285.0, 6300.0], "armfify": [58.0, 2900.0], "armfig": [73.0, 2900.0], "armflak": [820.0, 13000.0], "armflash": [110.0, 900.0], "armflea": [21.0, 300.0], "armfmine3": [32.0, 1600.0], "armfmkr": [1.0, 1150.0], "armfort": [40.0, 500.0], "armfrad": [130.0, 1000.0], "armfrock": [360.0, 5700.0], "armfrt": [90.0, 1000.0], "armfus": [3350.0, 18000.0], "armgate": [3000.0, 54000.0], "armgatet3": [12000.0, 216000.0], "armgeo": [560.0, 13000.0], "armgmm": [1150.0, 25000.0], "armgplat": [110.0, 900.0], "armgremlin": [230.0, 3700.0], "armguard": [1250.0, 12500.0], "armhaap": [4600.0, 72000.0], "armhaapuw": [1900.0, 24000.0], "armhaca": [1000.0, 31200.0], "armhack": [1260.0, 18000.0], "armhacs": [1140.0, 25600.0], "armhacv": [1300.0, 18800.0], "armhalab": [4800.0, 58000.0], "armham": [130.0, 1300.0], "armhasy": [5000.0, 44000.0], "armhavp": [4900.0, 51000.0], "armhawk": [140.0, 5700.0], "armhlt": [440.0, 4700.0], "armhp": [670.0, 2000.0], "armhvytrans": [190.0, 4000.0], "armjam": [105.0, 1700.0], "armjamt": [240.0, 8500.0], "armjanus": [240.0, 2600.0], "armjeth": [125.0, 1100.0], "armjuno": [640.0, 17000.0], "armkam": [135.0, 2300.0], "armkraken": [1000.0, 13000.0], "armlab": [500.0, 950.0], "armlance": [400.0, 8000.0], "armlatnk": [330.0, 6400.0], "armliche": [2200.0, 46000.0], "armlichet4": [18000.0, 240000.0], "armllt": [85.0, 680.0], "armlship": [570.0, 11400.0], "armlun": [1150.0, 23000.0], "armlunchbox": [3300.0, 71000.0], "armlwall": [1020.0, 4800.0], "armmakr": [1.0, 1150.0], "armmanni": [1200.0, 18500.0], "armmar": [970.0, 21000.0], "armmark": [100.0, 1250.0], "armmart": [320.0, 4900.0], "armmav": [650.0, 11000.0], "armmeatball": [3000.0, 54000.0], "armmercury": [1600.0, 33000.0], "armmerl": [920.0, 6500.0], "armmex": [50.0, 500.0], "armmh": [175.0, 3000.0], "armmine1": [7.0, 270.0], "armmine2": [25.0, 1050.0], "armmine3": [50.0, 2800.0], "armminebomber": [145.0, 4200.0], "armminivulc": [2000.0, 60000.0], "armmls": [190.0, 3200.0], "armmlv": [57.0, 1100.0], "armmmkr": [380.0, 21000.0], "armmmkrt3": [9000.0, 550000.0], "armmoho": [620.0, 7700.0], "armmship": [2000.0, 10000.0], "armmstor": [330.0, 570.0], "armnanotc": [230.0, 3200.0], "armnanotc2plat": [840.0, 12800.0], "armnanotcplat": [230.0, 3200.0], "armnanotct2": [840.0, 12800.0], "armnavaldefturret": [750.0, 10000.0], "armpb": [680.0, 14000.0], "armpeep": [52.0, 1550.0], "armpincer": [200.0, 2000.0], "armplat": [1450.0, 5000.0], "armpnix": [230.0, 12500.0], "armprowl": [970.0, 21000.0], "armpship": [380.0, 2550.0], "armpshipt3": [6500.0, 200000.0], "armpt": [150.0, 1000.0], "armptt2": [2500.0, 15000.0], "armpw": [54.0, 900.0], "armpwt4": [8000.0, 150000.0], "armrad": [60.0, 630.0], "armrattet4": [25000.0, 250000.0], "armraz": [3800.0, 68000.0], "armrecl": [240.0, 3500.0], "armrectr": [130.0, 1400.0], "armrespawn": [1.0, 1.0], "armrl": [80.0, 900.0], "armrock": [120.0, 1000.0], "armroy": [880.0, 6600.0], "armsaap": [3500.0, 35000.0], "armsaber": [210.0, 6400.0], "armsack": [400.0, 6900.0], "armsacsub": [500.0, 9000.0], "armsacv": [450.0, 6800.0], "armsalab": [3500.0, 35000.0], "armsam": [150.0, 2100.0], "armsasy": [3500.0, 35000.0], "armsat": [4000.0, 40000.0], "armsavp": [3500.0, 35000.0], "armsb": [240.0, 7500.0], "armscab": [1150.0, 30000.0], "armscavengerbossv2": [500000.0, 5000000.0], "armsd": [710.0, 7100.0], "armseadragon": [8000.0, 85000.0], "armseap": [290.0, 6500.0], "armseer": [125.0, 2000.0], "armsehak": [125.0, 7000.0], "armserp": [1800.0, 27000.0], "armserpt3": [15000.0, 225000.0], "armsfig": [90.0, 4500.0], "armsfig2": [90.0, 4500.0], "armsh": [85.0, 1250.0], "armshltx": [7900.0, 58000.0], "armshltxuw": [7900.0, 58000.0], "armshockwave": [1200.0, 14000.0], "armsilo": [8100.0, 90000.0], "armsjam": [310.0, 5000.0], "armsnipe": [680.0, 20000.0], "armsolar": [155.0, 0.0], "armsonar": [20.0, 450.0], "armspid": [250.0, 5000.0], "armsptk": [400.0, 4500.0], "armsptkt4": [7500.0, 75000.0], "armspy": [135.0, 8800.0], "armstil": [460.0, 38000.0], "armstump": [225.0, 2000.0], "armsub": [440.0, 3100.0], "armsubk": [950.0, 17000.0], "armsy": [450.0, 950.0], "armtarg": [810.0, 7200.0], "armthor": [9000.0, 240000.0], "armthund": [150.0, 4400.0], "armthundt4": [15000.0, 150000.0], "armtide": [90.0, 200.0], "armtl": [170.0, 1500.0], "armtorps": [300.0, 3000.0], "armuwadves": [830.0, 10000.0], "armuwadvms": [750.0, 11500.0], "armuwes": [170.0, 1700.0], "armuwfus": [5200.0, 33500.0], "armuwmme": [620.0, 7700.0], "armuwmmm": [380.0, 21000.0], "armuwms": [330.0, 570.0], "armvader": [65.0, 5800.0], "armvadert4": [15000.0, 150000.0], "armvang": [3300.0, 71000.0], "armveil": [125.0, 19000.0], "armvp": [590.0, 1550.0], "armvulc": [70000.0, 830000.0], "armwar": [270.0, 3100.0], "armwin": [40.0, 175.0], "armwint2": [370.0, 1750.0], "armyork": [450.0, 9100.0], "armzapper": [80.0, 1200.0], "armzeus": [350.0, 6100.0], "babyscavbossunits": [1.0, 1.0], "chip": [0.0, 1.0], "comeffigy": [1000.0, 4000.0], "coraak": [650.0, 6200.0], "coraap": [2900.0, 28000.0], "coraca": [360.0, 11000.0], "corack": [470.0, 6900.0], "coracsub": [700.0, 9000.0], "coracv": [580.0, 7000.0], "coradvsol": [370.0, 4000.0], "corafus": [9700.0, 48000.0], "corafust3": [90000.0, 550000.0], "corageo": [1500.0, 27000.0], "corah": [250.0, 4700.0], "corak": [42.0, 820.0], "corakt4": [6000.0, 120000.0], "coralab": [2600.0, 16000.0], "coramph": [330.0, 9500.0], "coramsub": [1200.0, 5600.0], "coranavaldefturret": [2000.0, 22500.0], "corantiship": [1400.0, 12000.0], "corap": [630.0, 1100.0], "corape": [370.0, 6800.0], "corapt3": [8500.0, 60000.0], "corarad": [400.0, 14000.0], "corarch": [1000.0, 12000.0], "corason": [160.0, 2400.0], "corassistdrone": [1.0, 1.0], "corassistdrone_land": [1.0, 1.0], "corasy": [2800.0, 10000.0], "coratl": [1050.0, 8500.0], "coravp": [2600.0, 16000.0], "corawac": [180.0, 8300.0], "corban": [1000.0, 23000.0], "corbats": [3400.0, 23000.0], "corbhmth": [3100.0, 35000.0], "corblackhy": [21000.0, 190000.0], "corbuzz": [68000.0, 800000.0], "corbw": [58.0, 1300.0], "corca": [115.0, 3200.0], "corcan": [560.0, 9300.0], "corcarry": [1400.0, 17000.0], "corcat": [4900.0, 80000.0], "corch": [190.0, 3000.0], "corck": [120.0, 1750.0], "corcom": [2700.0, 26000.0], "corcomboss": [300000.0, 3000000.0], "corcomcon": [2700.0, 26000.0], "corcomlvl10": [11000.0, 110000.0], "corcomlvl2": [3000.0, 30000.0], "corcomlvl3": [4000.0, 40000.0], "corcomlvl4": [5000.0, 50000.0], "corcomlvl5": [6000.0, 60000.0], "corcomlvl6": [7000.0, 70000.0], "corcomlvl7": [8000.0, 80000.0], "corcomlvl8": [9000.0, 90000.0], "corcomlvl9": [10000.0, 100000.0], "corcrash": [125.0, 1100.0], "corcrus": [1000.0, 12000.0], "corcrw": [5100.0, 72000.0], "corcrwh": [5100.0, 72000.0], "corcrwt4": [15000.0, 150000.0], "corcs": [200.0, 2000.0], "corcsa": [140.0, 8200.0], "corcut": [230.0, 5400.0], "corcv": [145.0, 2100.0], "cordeadeye": [1050.0, 27500.0], "cordecom": [750.0, 13000.0], "cordemon": [6000.0, 90000.0], "cordesolator": [9000.0, 95000.0], "cordl": [250.0, 2200.0], "cordoom": [3000.0, 37000.0], "cordoomt3": [12000.0, 400000.0], "cordrag": [8.0, 0.0], "cordrone": [30.0, 750.0], "cordronecarry": [1700.0, 17000.0], "cordronecarryair": [1700.0, 17000.0], "cordroneold": [29.0, 650.0], "cords": [1000.0, 14600.0], "corenaa": [890.0, 25000.0], "corerad": [800.0, 7900.0], "corestor": [175.0, 1800.0], "coresupp": [100.0, 1000.0], "coresuppt3": [30000.0, 600000.0], "coreter": [105.0, 1900.0], "corexp": [240.0, 1900.0], "coreyes": [32.0, 850.0], "corfast": [210.0, 3800.0], "corfatf": [800.0, 7500.0], "corfav": [26.0, 270.0], "corfblackhyt4": [25000.0, 250000.0], "corfdoom": [1200.0, 15000.0], "corfdrag": [15.0, 0.0], "corfgate": [4100.0, 74000.0], "corfhlt": [480.0, 6200.0], "corfhp": [670.0, 2000.0], "corfink": [51.0, 1450.0], "corflak": [850.0, 14000.0], "corfmd": [1500.0, 40000.0], "corfmine3": [32.0, 1600.0], "corfmkr": [1.0, 1250.0], "corforge": [330.0, 4700.0], "corfort": [40.0, 500.0], "corfrad": [130.0, 1000.0], "corfrock": [315.0, 6100.0], "corfrt": [90.0, 1000.0], "corfship": [630.0, 9400.0], "corftiger": [665.0, 10000.0], "corfus": [3600.0, 22000.0], "corgant": [8400.0, 62000.0], "corgantuw": [8350.0, 62500.0], "corgarp": [220.0, 2600.0], "corgate": [3200.0, 55000.0], "corgatet3": [16000.0, 275000.0], "corgator": [120.0, 1100.0], "corgatreap": [1400.0, 17000.0], "corgeo": [540.0, 13000.0], "corgol": [1650.0, 28000.0], "corgolt4": [25000.0, 250000.0], "corgplat": [120.0, 950.0], "corhaap": [4700.0, 65000.0], "corhaapuw": [1900.0, 23000.0], "corhaca": [1040.0, 28800.0], "corhack": [1260.0, 22800.0], "corhacs": [1180.0, 23600.0], "corhacv": [1520.0, 17200.0], "corhal": [640.0, 13000.0], "va_halberd": [640.0, 13000.0], "corhalab": [4900.0, 52200.0], "corhasy": [5000.0, 40000.0], "corhavp": [4900.0, 46000.0], "corhllllt": [300.0, 7000.0], "corhllt": [195.0, 1750.0], "corhlt": [480.0, 4700.0], "corhp": [670.0, 2000.0], "corhrk": [600.0, 5800.0], "corhunt": [130.0, 6900.0], "corhurc": [310.0, 18500.0], "corhvytrans": [190.0, 4000.0], "corint": [4600.0, 67000.0], "corjamt": [100.0, 4500.0], "corjugg": [20000.0, 513000.0], "corjuno": [660.0, 16000.0], "corkarg": [2500.0, 57000.0], "corkarganetht4": [12000.0, 120000.0], "corkark": [280.0, 2400.0], "corkorg": [29000.0, 615000.0], "corlab": [470.0, 1050.0], "corlevlr": [220.0, 2600.0], "corllt": [90.0, 700.0], "cormabm": [1250.0, 32000.0], "cormadsam": [315.0, 6100.0], "cormakr": [1.0, 1250.0], "cormando": [1200.0, 15500.0], "cormandot4": [6700.0, 90000.0], "cormart": [400.0, 4400.0], "cormaw": [290.0, 1550.0], "cormex": [50.0, 500.0], "cormexp": [2400.0, 12000.0], "cormh": [200.0, 3300.0], "cormine1": [7.0, 270.0], "cormine2": [25.0, 1050.0], "cormine3": [50.0, 2800.0], "cormine4": [16.0, 1050.0], "corminibuzz": [2000.0, 60000.0], "cormist": [155.0, 2400.0], "cormls": [200.0, 3300.0], "cormlv": [65.0, 1300.0], "cormmkr": [370.0, 21000.0], "cormmkrt3": [9000.0, 550000.0], "cormoho": [640.0, 8100.0], "cormort": [400.0, 2800.0], "cormship": [2000.0, 10000.0], "cormstor": [340.0, 590.0], "cormuskrat": [170.0, 3500.0], "cormwall": [1020.0, 4800.0], "cornanotc": [230.0, 3200.0], "cornanotc2plat": [840.0, 12800.0], "cornanotcplat": [230.0, 3200.0], "cornanotct2": [840.0, 12800.0], "cornavaldefturret": [700.0, 9000.0], "cornecro": [130.0, 1400.0], "coronager": [950.0, 17000.0], "corparrow": [1050.0, 21000.0], "corphantom": [300.0, 4500.0], "corplat": [1400.0, 5500.0], "corprince": [13500.0, 115000.0], "corprinter": [330.0, 4700.0], "corpship": [420.0, 2800.0], "corpt": [210.0, 1400.0], "corpun": [1300.0, 13500.0], "corpyro": [200.0, 3000.0], "corrad": [60.0, 630.0], "corraid": [235.0, 2400.0], "correap": [690.0, 10000.0], "correcl": [240.0, 3500.0], "correspawn": [1.0, 1.0], "corrl": [80.0, 850.0], "corroach": [69.0, 5800.0], "corroy": [960.0, 7200.0], "corsaap": [3500.0, 35000.0], "corsack": [400.0, 6900.0], "corsacv": [450.0, 7000.0], "corsacvsub": [500.0, 9000.0], "corsala": [350.0, 7000.0], "corsalab": [3500.0, 35000.0], "corsasy": [3500.0, 35000.0], "corsat": [4000.0, 40000.0], "corsavp": [3500.0, 35000.0], "corsb": [200.0, 8200.0], "corscavdrag": [8.0, 0.0], "corscavdtf": [290.0, 1550.0], "corscavdtl": [340.0, 1600.0], "corscavdtm": [290.0, 1550.0], "corscavfort": [40.0, 500.0], "corscreamer": [1650.0, 32000.0], "corsd": [750.0, 6700.0], "corseah": [370.0, 9000.0], "corseal": [480.0, 9100.0], "corseap": [230.0, 5500.0], "corsent": [470.0, 10500.0], "corsfig": [90.0, 4600.0], "corsfig2": [90.0, 4600.0], "corsh": [75.0, 1500.0], "corshad": [150.0, 4600.0], "corshark": [730.0, 14000.0], "corshiva": [1600.0, 23000.0], "corshroud": [130.0, 20000.0], "corsilo": [7700.0, 82000.0], "corsjam": [280.0, 4200.0], "corsktl": [755.0, 27000.0], "corslrpc": [8000.0, 80000.0], "corsnap": [300.0, 3100.0], "corsok": [950.0, 19000.0], "corsolar": [150.0, 0.0], "corsonar": [20.0, 450.0], "corspec": [75.0, 1550.0], "corspy": [165.0, 12500.0], "corssub": [1900.0, 29000.0], "corstorm": [110.0, 1150.0], "corsub": [580.0, 4000.0], "corsumo": [2200.0, 35000.0], "corsy": [450.0, 950.0], "cortarg": [800.0, 7500.0], "cortermite": [540.0, 8100.0], "corthermite": [3500.0, 60000.0], "corthud": [140.0, 1150.0], "cortide": [85.0, 250.0], "cortitan": [410.0, 8200.0], "cortl": [170.0, 1800.0], "cortoast": [2500.0, 17000.0], "cortorch": [220.0, 4400.0], "cortrem": [1850.0, 49000.0], "cortron": [1200.0, 14000.0], "coruwadves": [840.0, 11000.0], "coruwadvms": [760.0, 11000.0], "coruwes": [175.0, 1800.0], "coruwfus": [5400.0, 34000.0], "coruwmme": [640.0, 8100.0], "coruwmmm": [370.0, 21000.0], "coruwms": [340.0, 590.0], "corvac": [370.0, 5500.0], "va_printer": [370.0, 5500.0], "corvacct": [1.0, 1.0], "corvalk": [74.0, 1450.0], "corvamp": [135.0, 4750.0], "corveng": [73.0, 2800.0], "corvipe": [730.0, 14000.0], "corvoyr": [99.0, 1350.0], "corvp": [570.0, 1550.0], "corvrad": [92.0, 1300.0], "corvroc": [880.0, 6700.0], "corwin": [43.0, 175.0], "corwint2": [450.0, 1750.0], "corwolv": [170.0, 2500.0], "critter_ant": [0.0, 1.0], "critter_crab": [0.0, 1.0], "critter_duck": [0.0, 1.0], "critter_goldfish": [0.0, 1.0], "critter_gull": [0.0, 1.0], "critter_penguin": [15.0, 200.0], "critter_penguinbro": [1500.0, 15000.0], "critter_penguinking": [20000.0, 400000.0], "dbg_sphere": [175.0, 3400.0], "dbg_sphere_fullmetal": [175.0, 3400.0], "dice": [0.0, 1.0], "freefusion": [40.0, 50.0], "hat_fightnight": [1000.0, 10000.0], "hat_hornet": [1000.0, 10000.0], "hat_hw": [1000.0, 10000.0], "hat_legfn": [1000.0, 10000.0], "hat_ptaq": [1000.0, 10000.0], "hat_viking_teamcolored": [1000.0, 10000.0], "leegmech": [10000.0, 200000.0], "legaabot": [120.0, 950.0], "legaap": [2900.0, 28000.0], "legabm": [1500.0, 40000.0], "legaca": [330.0, 11000.0], "legaceb": [310.0, 5600.0], "legack": [410.0, 6900.0], "legacluster": [2300.0, 15000.0], "legacv": [530.0, 6600.0], "legadvaabot": [750.0, 6650.0], "legadveconv": [370.0, 21000.0], "legadveconvt3": [9000.0, 550000.0], "legadvestore": [840.0, 11000.0], "legadvshipyard": [2800.0, 10000.0], "legadvsol": [465.0, 4080.0], "legafcv": [200.0, 2900.0], "legafigdef": [180.0, 6200.0], "legafus": [10500.0, 69000.0], "legafust3": [90000.0, 550000.0], "legageo": [1600.0, 27000.0], "legah": [210.0, 4300.0], "legaheattank": [1250.0, 19000.0], "legajam": [125.0, 19000.0], "legajamk": [75.0, 1550.0], "legalab": [2600.0, 16000.0], "legamcluster": [460.0, 5500.0], "legamph": [600.0, 13200.0], "legamphlab": [1200.0, 5600.0], "legamphtank": [200.0, 2000.0], "legamstor": [760.0, 11000.0], "leganavalaaturret": [890.0, 25000.0], "leganavaldefturret": [1250.0, 16500.0], "leganavaleconv": [370.0, 21000.0], "leganavalfusion": [5400.0, 34000.0], "leganavalmex": [640.0, 8100.0], "leganavalpinpointer": [800.0, 7500.0], "leganavalsonarstation": [160.0, 2400.0], "leganavaltorpturret": [1050.0, 8500.0], "leganavyaaship": [1000.0, 12000.0], "leganavyantinukecarrier": [1600.0, 13000.0], "leganavyantiswarm": [500.0, 8500.0], "leganavyartyship": [13000.0, 125000.0], "leganavybattleship": [2900.0, 21000.0], "leganavybattlesub": [1100.0, 16000.0], "leganavyconsub": [700.0, 9000.0], "leganavycruiser": [900.0, 10800.0], "leganavyengineer": [200.0, 3300.0], "leganavyflagship": [16000.0, 240000.0], "leganavyheavysub": [1900.0, 29000.0], "leganavymissileship": [2000.0, 10000.0], "leganavyradjamship": [450.0, 6000.0], "legap": [430.0, 1100.0], "legapopupdef": [750.0, 15000.0], "legapt3": [8500.0, 60000.0], "legarad": [400.0, 14000.0], "legaradk": [99.0, 1350.0], "legaskirmtank": [450.0, 6800.0], "legaspy": [125.0, 8500.0], "legassistdrone": [1.0, 1.0], "legassistdrone_land": [1.0, 1.0], "legatorpbomber": [480.0, 9480.0], "legatrans": [190.0, 4000.0], "legavantinuke": [1100.0, 36000.0], "legavjam": [105.0, 1900.0], "legavp": [2500.0, 16000.0], "legavrad": [125.0, 2000.0], "legavroc": [920.0, 6500.0], "legbal": [160.0, 1920.0], "legbar": [250.0, 3200.0], "legbart": [550.0, 5500.0], "legbastion": [4200.0, 58000.0], "legbombard": [750.0, 15000.0], "legbunk": [1850.0, 42000.0], "legca": [105.0, 3200.0], "legcar": [550.0, 11000.0], "legcen": [140.0, 2200.0], "legch": [185.0, 2600.0], "legcib": [100.0, 3500.0], "legck": [100.0, 1600.0], "legcluster": [850.0, 11000.0], "legcom": [2700.0, 26000.0], "legcombabyunits": [0.0, 0.0], "legcomecon": [2700.0, 26000.0], "legcomlvl10": [11000.0, 110000.0], "legcomlvl2": [3000.0, 30000.0], "legcomlvl3": [4000.0, 40000.0], "legcomlvl4": [5000.0, 50000.0], "legcomlvl5": [6000.0, 60000.0], "legcomlvl6": [7000.0, 70000.0], "legcomlvl7": [8000.0, 80000.0], "legcomlvl8": [9000.0, 90000.0], "legcomlvl9": [10000.0, 100000.0], "legcomoff": [2700.0, 26000.0], "legcomt2com": [2700.0, 26000.0], "legcomt2def": [2700.0, 26000.0], "legcomt2off": [2700.0, 26000.0], "legctl": [240.0, 2200.0], "legcv": [125.0, 2100.0], "legdecom": [750.0, 13000.0], "legdeflector": [3200.0, 55000.0], "legdrag": [8.0, 0.0], "legdrone": [15.0, 500.0], "legdtf": [290.0, 1550.0], "legdtl": [340.0, 1600.0], "legdtm": [290.0, 1550.0], "legdtr": [290.0, 1550.0], "legeallterrainmech": [3950.0, 78000.0], "legeconv": [1.0, 1150.0], "legeheatraymech": [23500.0, 615000.0], "legeheatraymech_old": [27000.0, 705000.0], "legehovertank": [1350.0, 25000.0], "legelrpcmech": [11000.0, 150000.0], "legeshotgunmech": [7000.0, 120000.0], "legestor": [175.0, 1800.0], "legeyes": [32.0, 850.0], "legfdrag": [15.0, 0.0], "legfeconv": [1.0, 1250.0], "legfhive": [350.0, 9000.0], "legfhp": [670.0, 2000.0], "legfig": [40.0, 1600.0], "legflak": [820.0, 13000.0], "legfmg": [450.0, 5500.0], "legfort": [5600.0, 79000.0], "legforti": [40.0, 500.0], "legfortt4": [56000.0, 790000.0], "legfrad": [130.0, 1000.0], "legfrl": [90.0, 1000.0], "legfus": [4000.0, 25000.0], "leggant": [8400.0, 62000.0], "leggantuw": [8400.0, 62000.0], "leggat": [300.0, 3600.0], "leggatet3": [14500.0, 216000.0], "leggeo": [560.0, 13000.0], "leggob": [25.0, 500.0], "leggobt3": [6000.0, 120000.0], "leghaap": [4700.0, 62000.0], "leghaca": [960.0, 32800.0], "leghack": [1240.0, 22400.0], "leghacv": [800.0, 9400.0], "leghades": [65.0, 850.0], "leghalab": [4900.0, 62000.0], "leghavp": [4900.0, 46000.0], "legheavydrone": [90.0, 1000.0], "legheavydronesmall": [90.0, 1000.0], "leghelios": [160.0, 2400.0], "leghive": [350.0, 9000.0], "leghp": [670.0, 2000.0], "leghrk": [750.0, 9000.0], "leginc": [2300.0, 46000.0], "leginf": [1700.0, 30000.0], "leginfestor": [250.0, 5200.0], "legionnaire": [180.0, 6200.0], "legjam": [140.0, 7200.0], "legjav": [1200.0, 21000.0], "legjuno": [660.0, 16000.0], "legkam": [65.0, 2000.0], "legkark": [330.0, 2600.0], "leglab": [470.0, 1050.0], "leglht": [70.0, 550.0], "leglob": [60.0, 400.0], "leglraa": [1600.0, 36000.0], "leglrpc": [5200.0, 76000.0], "leglts": [68.0, 1300.0], "leglupara": [900.0, 8200.0], "legmed": [1500.0, 22500.0], "legmex": [50.0, 500.0], "legmext15": [250.0, 5000.0], "legmg": [380.0, 5500.0], "legmh": [190.0, 3100.0], "legmine1": [7.0, 270.0], "legmine2": [25.0, 1050.0], "legmine3": [50.0, 2800.0], "legmineb": [300.0, 21000.0], "legmlv": [52.0, 900.0], "legmoho": [640.0, 8100.0], "legmohobp": [640.0, 8100.0], "legmohobpct": [1.0, 1.0], "legmohocon": [1060.0, 14500.0], "legmohoconct": [1060.0, 14500.0], "legmohoconin": [1060.0, 14500.0], "legmos": [110.0, 2000.0], "legmost3": [3000.0, 42000.0], "legmrv": [250.0, 4100.0], "legmstor": [340.0, 590.0], "legnanotc": [230.0, 3200.0], "legnanotcbase": [1.0, 1.0], "legnanotcplat": [230.0, 3200.0], "legnanotct2": [840.0, 12800.0], "legnanotct2plat": [840.0, 12800.0], "legnap": [420.0, 21000.0], "legnavaldefturret": [600.0, 7500.0], "legnavyaaship": [250.0, 3600.0], "legnavyartyship": [1450.0, 15000.0], "legnavyconship": [180.0, 2000.0], "legnavydestro": [875.0, 9500.0], "legnavyfrigate": [370.0, 3700.0], "legnavyrezsub": [240.0, 3500.0], "legnavyscout": [120.0, 1600.0], "legnavysub": [320.0, 2400.0], "legner": [220.0, 2000.0], "legotter": [150.0, 3100.0], "legpede": [5500.0, 80000.0], "legperdition": [1250.0, 15000.0], "legphoenix": [450.0, 25000.0], "legrad": [60.0, 630.0], "legrail": [240.0, 3800.0], "legrampart": [2600.0, 38000.0], "legrezbot": [130.0, 1400.0], "legrhapsis": [280.0, 6500.0], "legrl": [80.0, 850.0], "legrwall": [1250.0, 6000.0], "legscout": [23.0, 350.0], "legsd": [710.0, 7100.0], "legsh": [60.0, 1200.0], "legshot": [470.0, 5000.0], "legsilo": [7700.0, 82000.0], "legsnapper": [60.0, 5600.0], "legsolar": [155.0, 0.0], "legspbomber": [240.0, 7500.0], "legspcarrier": [250.0, 5000.0], "legspcon": [150.0, 7800.0], "legspfighter": [90.0, 4500.0], "legsplab": [1400.0, 5500.0], "legspradarsonarplane": [125.0, 7000.0], "legspsurfacegunship": [270.0, 6700.0], "legsptorpgunship": [190.0, 5000.0], "legsrail": [750.0, 15000.0], "legsrailt4": [15000.0, 300000.0], "legstarfall": [63000.0, 720000.0], "legstr": [355.0, 5250.0], "legstronghold": [550.0, 13000.0], "legsy": [450.0, 950.0], "legtarg": [810.0, 7200.0], "legtide": [85.0, 250.0], "legtl": [170.0, 1500.0], "leguwestore": [175.0, 1800.0], "leguwmstore": [340.0, 590.0], "legvcarry": [450.0, 9000.0], "legvenator": [110.0, 3200.0], "legvflak": [470.0, 10500.0], "legvision": [1.0, 1.0], "legvp": [570.0, 1650.0], "legwhisper": [210.0, 9000.0], "legwin": [45.0, 175.0], "legwint2": [450.0, 1750.0], "lootboxbronze": [375.0, 25000.0], "lootboxgold": [1500.0, 25000.0], "lootboxplatinum": [2500.0, 25000.0], "lootboxsilver": [750.0, 25000.0], "lootdroppod_gold": [400.0, 25000.0], "lootdroppod_printer": [400.0, 25000.0], "meteor": [1.0, 1.0], "mission_command_tower": [10000.0, 100000.0], "nuketest": [400.0, 25000.0], "nuketestcor": [400.0, 25000.0], "nuketestorg": [400.0, 25000.0], "pbr_cube": [175.0, 3400.0], "raptor_6legged_l": [99.0, 5280.0], "raptor_air_bomber_acid_t2_v1": [50.0, 50.0], "raptor_air_bomber_basic_t1_v1": [212.0, 4550.0], "raptor_air_bomber_basic_t2_v1": [212.0, 4550.0], "raptor_air_bomber_basic_t2_v2": [212.0, 4550.0], "raptor_air_bomber_basic_t4_v1": [212.0, 4550.0], "raptor_air_bomber_basic_t4_v2": [212.0, 4550.0], "raptor_air_bomber_brood_t4_v2": [212.0, 4550.0], "raptor_air_bomber_brood_t4_v3": [212.0, 4550.0], "raptor_air_bomber_brood_t4_v4": [212.0, 4550.0], "raptor_air_bomber_emp_t2_v1": [50.0, 50.0], "raptor_air_fighter_basic_t1_v1": [72.0, 2200.0], "raptor_air_fighter_basic_t2_v1": [72.0, 2200.0], "raptor_air_fighter_basic_t2_v2": [72.0, 2200.0], "raptor_air_fighter_basic_t2_v3": [72.0, 2200.0], "raptor_air_fighter_basic_t2_v4": [72.0, 2200.0], "raptor_air_fighter_basic_t4_v1": [72.0, 2200.0], "raptor_air_gunship_acid_t2_v1": [212.0, 4550.0], "raptor_air_gunship_antiair_t2_v1": [212.0, 4550.0], "raptor_air_gunship_basic_t2_v1": [212.0, 4550.0], "raptor_air_gunship_emp_t2_v1": [212.0, 4550.0], "raptor_air_gunship_fire_t2_v1": [212.0, 4550.0], "raptor_air_kamikaze_basic_t2_v1": [212.0, 4550.0], "raptor_air_scout_basic_t2_v1": [50.0, 50.0], "raptor_air_scout_basic_t3_v1": [50.0, 50.0], "raptor_air_scout_basic_t4_v1": [50.0, 50.0], "raptor_allterrain_arty_acid_t2_v1": [396.0, 12320.0], "raptor_allterrain_arty_acid_t4_v1": [396.0, 12320.0], "raptor_allterrain_arty_basic_t2_v1": [396.0, 12320.0], "raptor_allterrain_arty_basic_t4_v1": [396.0, 12320.0], "raptor_allterrain_arty_brood_t2_v1": [396.0, 12320.0], "raptor_allterrain_arty_brood_t4_v1": [396.0, 12320.0], "raptor_allterrain_arty_emp_t2_v1": [396.0, 12320.0], "raptor_allterrain_arty_emp_t4_v1": [396.0, 12320.0], "raptor_allterrain_assault_acid_t2_v1": [152.0, 3520.0], "raptor_allterrain_assault_basic_t2_v1": [152.0, 3520.0], "raptor_allterrain_assault_basic_t2_v2": [152.0, 3520.0], "raptor_allterrain_assault_basic_t2_v3": [152.0, 3520.0], "raptor_allterrain_assault_basic_t4_v1": [302.0, 3520.0], "raptor_allterrain_assault_basic_t4_v2": [302.0, 3520.0], "raptor_allterrain_assault_emp_t2_v1": [152.0, 3520.0], "raptor_allterrain_swarmer_acid_t2_v1": [99.0, 5280.0], "raptor_allterrain_swarmer_basic_t2_v1": [99.0, 5280.0], "raptor_allterrain_swarmer_basic_t3_v1": [99.0, 5280.0], "raptor_allterrain_swarmer_basic_t4_v1": [99.0, 5280.0], "raptor_allterrain_swarmer_emp_t2_v1": [99.0, 5280.0], "raptor_allterrain_swarmer_fire_t2_v1": [99.0, 5280.0], "raptor_antinuke": [1500.0, 40000.0], "raptor_hive": [400.0, 25000.0], "va_queen_nest": [400.0, 25000.0], "raptor_land_assault_acid_t2_v1": [152.0, 3520.0], "raptor_land_assault_basic_t2_v1": [152.0, 3520.0], "raptor_land_assault_basic_t2_v2": [152.0, 3520.0], "raptor_land_assault_basic_t2_v3": [152.0, 3520.0], "raptor_land_assault_basic_t4_v1": [302.0, 3520.0], "raptor_land_assault_basic_t4_v2": [302.0, 3520.0], "raptor_land_assault_emp_t2_v1": [152.0, 3520.0], "raptor_land_assault_spectre_t2_v1": [152.0, 3520.0], "raptor_land_assault_spectre_t4_v1": [302.0, 3520.0], "raptor_land_kamikaze_basic_t2_v1": [128.0, 3000.0], "raptor_land_kamikaze_basic_t4_v1": [350.0, 9000.0], "raptor_land_kamikaze_emp_t2_v1": [128.0, 3000.0], "raptor_land_kamikaze_emp_t4_v1": [350.0, 9000.0], "raptor_land_spiker_basic_t2_v1": [174.0, 174.0], "raptor_land_spiker_basic_t4_v1": [174.0, 174.0], "raptor_land_spiker_spectre_t4_v1": [174.0, 174.0], "raptor_land_swarmer_acids_t2_v1": [25.0, 53.0], "raptor_land_swarmer_basic_t1_v1": [25.0, 53.0], "raptor_land_swarmer_basic_t2_v1": [25.0, 53.0], "raptor_land_swarmer_basic_t2_v2": [25.0, 53.0], "raptor_land_swarmer_basic_t2_v3": [25.0, 53.0], "raptor_land_swarmer_basic_t2_v4": [25.0, 53.0], "raptor_land_swarmer_basic_t3_v1": [79.0, 79.0], "raptor_land_swarmer_basic_t3_v2": [79.0, 79.0], "raptor_land_swarmer_basic_t3_v3": [79.0, 79.0], "raptor_land_swarmer_basic_t4_v1": [100.0, 1000.0], "raptor_land_swarmer_basic_t4_v2": [150.0, 1000.0], "raptor_land_swarmer_brood_t2_v1": [20.0, 250.0], "raptor_land_swarmer_brood_t3_v1": [123.0, 2326.0], "raptor_land_swarmer_brood_t4_v1": [251.0, 5201.0], "raptor_land_swarmer_emp_t2_v1": [25.0, 53.0], "raptor_land_swarmer_fire_t2_v1": [250.0, 15000.0], "raptor_land_swarmer_fire_t4_v1": [200.0, 6000.0], "raptor_land_swarmer_heal_t1_v1": [40.0, 600.0], "raptor_land_swarmer_heal_t2_v1": [40.0, 600.0], "raptor_land_swarmer_heal_t3_v1": [40.0, 600.0], "raptor_land_swarmer_heal_t4_v1": [40.0, 600.0], "raptor_land_swarmer_spectre_t3_v1": [79.0, 79.0], "raptor_land_swarmer_spectre_t4_v1": [100.0, 1000.0], "raptor_matriarch_acid": [50000.0, 2000000.0], "raptor_matriarch_basic": [50000.0, 2000000.0], "raptor_matriarch_electric": [50000.0, 2000000.0], "raptor_matriarch_fire": [50000.0, 2000000.0], "raptor_matriarch_healer": [50000.0, 2000000.0], "raptor_matriarch_spectre": [50000.0, 2000000.0], "raptor_queen_easy": [50000.0, 2000000.0], "raptor_queen_epic": [50000.0, 2000000.0], "raptor_queen_hard": [50000.0, 2000000.0], "raptor_queen_normal": [50000.0, 2000000.0], "raptor_queen_veryeasy": [50000.0, 2000000.0], "raptor_queen_veryhard": [50000.0, 2000000.0], "raptor_turret_acid_t2_v1": [120.0, 3000.0], "raptor_turret_acid_t3_v1": [240.0, 6000.0], "raptor_turret_acid_t4_v1": [240.0, 6000.0], "raptor_turret_antiair_t2_v1": [120.0, 3000.0], "raptor_turret_antiair_t3_v1": [240.0, 6000.0], "raptor_turret_antiair_t4_v1": [240.0, 6000.0], "raptor_turret_antinuke_t2_v1": [120.0, 3000.0], "raptor_turret_antinuke_t3_v1": [240.0, 6000.0], "raptor_turret_basic_t2_v1": [120.0, 3000.0], "raptor_turret_basic_t3_v1": [240.0, 6000.0], "raptor_turret_basic_t4_v1": [240.0, 6000.0], "raptor_turret_burrow_t2_v1": [120.0, 3000.0], "raptor_turret_emp_t2_v1": [120.0, 3000.0], "raptor_turret_emp_t3_v1": [240.0, 6000.0], "raptor_turret_emp_t4_v1": [240.0, 6000.0], "raptor_turret_meteor_t4_v1": [240.0, 6000.0], "raptor_worm_green": [240.0, 6000.0], "raptorartillery": [396.0, 12320.0], "raptorh1b": [40.0, 600.0], "raptorh5": [251.0, 5201.0], "resourcecheat": [1.0, 1.0], "scavbeacon_t1": [500.0, 5000.0], "scavbeacon_t2": [2500.0, 25000.0], "scavbeacon_t3": [5000.0, 50000.0], "scavbeacon_t4": [10000.0, 100000.0], "scavempspawner": [10.0, 10.0], "scavengerbossv4": [500000.0, 5000000.0], "scavengerdroppod": [10.0, 10.0], "scavengerdroppodfriendly": [10.0, 10.0], "scavmists": [1.0, 1.0], "scavsafeareabeacon": [10000.0, 100000.0], "scavtacnukespawner": [10.0, 10.0], "va_cormando": [1450.0, 18500.0], "va_cormlv_fast": [70.0, 1450.0], "va_lumen": [550.0, 6800.0], "va_mav_stride": [650.0, 11000.0], "volcano_projectile_unit": [100.0, 100.0], "xmasball1_1": [0.0, 1.0], "xmasball1_2": [0.0, 1.0], "xmasball1_3": [0.0, 1.0], "xmasball1_4": [0.0, 1.0], "xmasball1_5": [0.0, 1.0], "xmasball1_6": [0.0, 1.0], "xmasball2_1": [0.0, 1.0], "xmasball2_2": [0.0, 1.0], "xmasball2_3": [0.0, 1.0], "xmasball2_4": [0.0, 1.0], "xmasball2_5": [0.0, 1.0], "xmasball2_6": [0.0, 1.0], "va_ghost": [135.0, 8800.0], "va_mask": [770.0, 12000.0], "va_infestor": [250.0, 5200.0]}, "names": {"armaak": "Archangel", "va_kettle": "Archangel", "armaap": "Advanced Aircraft Plant", "armaas": "Dragonslayer", "armaca": "Advanced Construction Aircraft", "armack": "Advanced Construction Bot", "armacsub": "Advanced Construction Sub", "armacv": "Advanced Construction Vehicle", "armadvsol": "Advanced Solar Collector", "armafus": "Advanced Fusion Reactor", "armafust3": "Epic Fusion Reactor", "armageo": "Advanced Geothermal Powerplant", "armah": "Sweeper", "armalab": "Advanced Bot Lab", "armamb": "Rattlesnake", "armamd": "Citadel", "armamex": "Twilight", "armamph": "Platypus", "armamsub": "Amphibious Complex", "armanac": "Crocodile", "armanavaldefturret": "Liquifier", "armanni": "Pulsar", "armannit3": "Epic Pulsar", "armantiship": "Haven", "armap": "Aircraft Plant", "armapt3": "Experimental Aircraft Plant", "armarad": "Advanced Radar Tower", "armart": "Shellshocker", "armaser": "Smuggler", "armason": "Advanced Sonar Station", "armassimilator": "Assimilator", "armassistdrone": "Assist Drone", "armassistdrone_land": "Assist Vehicle", "armasy": "Advanced Shipyard", "armatl": "Moray", "armatlas": "Stork", "armavp": "Advanced Vehicle Plant", "armawac": "Oracle", "armbanth": "Titan", "armbats": "Dreadnought", "armbeamer": "Beamer", "armbeaver": "Beaver", "armblade": "Hornet", "armbotrail": "Pawn Launcher", "armbrawl": "Roughneck", "armbrtha": "Basilica", "armbull": "Bull", "armca": "Construction Aircraft", "armcarry": "Haven", "armch": "Construction Hovercraft", "armcir": "Chainsaw", "armck": "Construction Bot", "armckfus": "Cloakable Fusion Reactor", "armclaw": "Dragon's Claw", "armcom": "Armada Commander", "armcomboss": "Epic Commander - Final Boss", "armcomlvl10": "Armada Commander Level 10", "armcomlvl2": "Armada Commander Level 2", "armcomlvl3": "Armada Commander Level 3", "armcomlvl4": "Armada Commander Level 4", "armcomlvl5": "Armada Commander Level 5", "armcomlvl6": "Armada Commander Level 6", "armcomlvl7": "Armada Commander Level 7", "armcomlvl8": "Armada Commander Level 8", "armcomlvl9": "Armada Commander Level 9", "armconsul": "Consul", "armcroc": "Turtle", "armcrus": "Paladin", "armcs": "Construction Ship", "armcsa": "Construction Seaplane", "armcv": "Construction Vehicle", "armdecade": "Dolphin", "armdecadet3": "Epic Dolphin", "armdecom": "Commander", "armdf": "Decoy Fusion Reactor", "armdfly": "Abductor", "armdl": "Anemone", "armdrag": "Dragon's Teeth", "armdrone": "Attack Drone", "armdronecarry": "Nexus", "armdronecarryland": "Nexus Terra", "armdroneold": "Attack Drone", "armemp": "Paralyzer", "armepoch": "Epoch", "armestor": "Energy Storage", "armeyes": "Beholder", "armfark": "Butler", "armfast": "Sprinter", "armfatf": "Naval Pinpointer", "armfav": "Rover", "armfboy": "Fatboy", "armfdrag": "Shark's Teeth", "armfepocht4": "Flying Epoch", "armferret": "Ferret", "armfflak": "Naval Arbalest", "armfgate": "Aurora", "armfhlt": "Manta", "armfhp": "Naval Hovercraft Platform", "armfido": "Hound", "armfify": "Firefly", "armfig": "Falcon", "armflak": "Arbalest", "armflash": "Blitz", "armflea": "Tick", "armfmine3": "Heavy Mine", "armfmkr": "Naval Energy Converter", "armfort": "Fortification Wall", "armfrad": "Naval Radar / Sonar Tower", "armfrock": "Scumbag", "armfrt": "Naval Nettle", "armfus": "Fusion Reactor", "armgate": "Keeper", "armgatet3": "Asylum", "armgeo": "Geothermal Powerplant", "armgmm": "Prude", "armgplat": "Gun Platform", "armgremlin": "Gremlin", "armguard": "Gauntlet", "armhaap": "Experimental Aircraft Plant", "armhaapuw": "Advanced Aircraft Plant", "armhaca": "Experimental Construction Aircraft", "armhack": "Butler", "armhacs": "Voyager", "armhacv": "Consul", "armhalab": "Experimental Bot Lab", "armham": "Mace", "armhasy": "Experimental Shipyard", "armhavp": "Experimental Vehicle Plant", "armhawk": "Highwind", "armhlt": "Overwatch", "armhp": "Hovercraft Platform", "armhvytrans": "Osprey", "armjam": "Umbra", "armjamt": "Sneaky Pete", "armjanus": "Janus", "armjeth": "Crossbow", "armjuno": "Juno", "armkam": "Banshee", "armkraken": "Gorgon", "armlab": "Bot Lab", "armlance": "Cormorant", "armlatnk": "Jaguar", "armliche": "Liche", "armlichet4": "Epic Liche", "armllt": "Sentry", "armlship": "Maelstrom", "armlun": "Lunkhead", "armlunchbox": "Lunchbox", "armlwall": "Dragon's Fury", "armmakr": "Energy Converter", "armmanni": "Starlight", "armmar": "Marauder", "armmark": "Compass", "armmart": "Mauser", "armmav": "Gunslinger", "armmeatball": "Meatball", "armmercury": "Mercury", "armmerl": "Ambassador", "armmex": "Metal Extractor", "armmh": "Possum", "armmine1": "Light Mine", "armmine2": "Medium Mine", "armmine3": "Heavy Mine", "armminivulc": "Mini Ragnarok", "armmls": "Voyager", "armmlv": "Groundhog", "armmmkr": "Advanced Energy Converter", "armmmkrt3": "Epic Energy Converter", "armmoho": "Advanced Metal Extractor", "armmship": "Longbow", "armmstor": "Metal Storage", "armnanotc": "Construction Turret", "armnanotc2plat": "Advanced Construction Turret", "armnanotcplat": "Naval Construction Turret", "armnanotct2": "Advanced Construction Turret", "armnavaldefturret": "Cauteriser", "armpb": "Pit Bull", "armpeep": "Blink", "armpincer": "Pincer", "armplat": "Seaplane Platform", "armpnix": "Blizzard", "armpship": "Ellysaw", "armpshipt3": "Epic Ellysaw", "armpt": "Skater", "armptt2": "Epic Skater", "armpw": "Pawn", "armpwt4": "Epic Pawn", "armrad": "Radar Tower", "armrattet4": "Ratte", "armraz": "Razorback", "armrecl": "Grim Reaper", "armrectr": "Lazarus", "armrespawn": "Base Builder", "armrl": "Nettle", "armrock": "Rocketeer", "armroy": "Corsair", "armsaber": "Sabre", "armsam": "Whistler", "armsat": "Satellite", "armsb": "Tsunami", "armscab": "Umbrella", "armscavengerbossv2": "Epic Commander - Final Boss", "armsd": "Tracer", "armseadragon": "Seadragon", "armseap": "Puffin", "armseer": "Prophet", "armsehak": "Horizon", "armserp": "Serpent", "armserpt3": "Epic Serpent", "armsfig": "Cyclone", "armsfig2": "Cyclone", "armsh": "Seeker", "armshltx": "Experimental Gantry", "armshltxuw": "Experimental Gantry", "armshockwave": "Shockwave", "armsilo": "Armageddon", "armsjam": "Bermuda", "armsnipe": "Sharpshooter", "armsolar": "Solar Collector", "armsonar": "Sonar Station", "armspid": "Webber", "armsptk": "Recluse", "armsptkt4": "Epic Recluse", "armspy": "Ghost", "armstil": "Stiletto", "armstump": "Stout", "armsub": "Eel", "armsubk": "Barracuda", "armsy": "Shipyard", "armtarg": "Pinpointer", "armthor": "Thor", "armthund": "Stormbringer", "armthundt4": "Epic Stormbringer", "armtide": "Tidal Generator", "armtl": "Harpoon", "armtorps": "Torpedo Ship", "armuwadves": "Hardened Energy Storage", "armuwadvms": "Hardened Metal Storage", "armuwes": "Naval Energy Storage", "armuwfus": "Naval Fusion Reactor", "armuwmme": "Naval Advanced Metal Extractor", "armuwmmm": "Naval Advanced Energy Converter", "armuwms": "Naval Metal Storage", "armvader": "Tumbleweed", "armvadert4": "Epic Tumbleweed", "armvang": "Vanguard", "armveil": "Veil", "armvp": "Vehicle Plant", "armvulc": "Ragnarok", "armwar": "Centurion", "armwin": "Wind Turbine", "armwint2": "Advanced Wind Turbine", "armyork": "Shredder", "armzapper": "Zapper", "armzeus": "Welder", "chip": "Chip", "comeffigy": "Commander Effigy", "coraak": "Manticore", "coraap": "Advanced Aircraft Plant", "coraca": "Advanced Construction Aircraft", "corack": "Advanced Construction Bot", "coracsub": "Advanced Construction Sub", "coracv": "Advanced Construction Vehicle", "coradvsol": "Advanced Solar Collector", "corafus": "Advanced Fusion Reactor", "corafust3": "Epic Fusion Reactor", "corageo": "Advanced Geothermal Powerplant", "corah": "Birdeater", "corak": "Grunt", "corakt4": "Epic Grunt", "coralab": "Advanced Bot Lab", "coramph": "Duck", "coramsub": "Amphibious Complex", "coranavaldefturret": "Orthrus", "corantiship": "Oasis", "corap": "Aircraft Plant", "corape": "Wasp", "corapt3": "Experimental Aircraft Plant", "corarad": "Advanced Radar Tower", "corarch": "Arrow Storm", "corason": "Advanced Sonar Station", "corassistdrone": "Assist Drone", "corassistdrone_land": "Assist Vehicle", "corasy": "Advanced Shipyard", "coratl": "Lamprey", "coravp": "Advanced Vehicle Plant", "corawac": "Condor", "corban": "Banisher", "corbats": "Despot", "corbhmth": "Cerberus", "corblackhy": "Black Hydra", "corbuzz": "Calamity", "corbw": "Shuriken", "corca": "Construction Aircraft", "corcan": "Sumo", "corcarry": "Oasis", "corcat": "Catapult", "corch": "Construction Hovercraft", "corck": "Construction Bot", "corcom": "Cortex Commander", "corcomboss": "Epic Commander - Final Boss", "corcomlvl10": "Cortex Commander Level 10", "corcomlvl2": "Cortex Commander Level 2", "corcomlvl3": "Cortex Commander Level 3", "corcomlvl4": "Cortex Commander Level 4", "corcomlvl5": "Cortex Commander Level 5", "corcomlvl6": "Cortex Commander Level 6", "corcomlvl7": "Cortex Commander Level 7", "corcomlvl8": "Cortex Commander Level 8", "corcomlvl9": "Cortex Commander Level 9", "corcrash": "Trasher", "corcrus": "Buccaneer", "corcrw": "Archaic Dragon", "corcrwh": "Dragon", "corcrwt4": "Epic Dragon", "corcs": "Construction Ship", "corcsa": "Construction Seaplane", "corcut": "Cutlass", "corcv": "Construction Vehicle", "cordeadeye": "Deadeye", "cordecom": "Commander", "cordemon": "Demon", "cordesolator": "Desolator", "cordl": "Jellyfish", "cordoom": "Bulwark", "cordoomt3": "Epic Bulwark", "cordrag": "Dragon's Teeth", "cordrone": "Attack Drone", "cordronecarry": "Disperser", "cordronecarryair": "Disperser Omni", "cordroneold": "Attack Drone", "cords": "Disgruntler", "corenaa": "Naval Birdshot", "corerad": "Eradicator", "corestor": "Energy Storage", "coresupp": "Supporter", "coresuppt3": "Adjudicator", "coreter": "Obscurer", "corexp": "Exploiter", "coreyes": "Beholder", "corfast": "Twitcher", "corfatf": "Naval Pinpointer", "corfav": "Rascal", "corfblackhyt4": "Flying Black Hydra", "corfdoom": "Devastator", "corfdrag": "Shark's Teeth", "corfgate": "Atoll", "corfhlt": "Coral", "corfhp": "Naval Hovercraft Platform", "corfink": "Finch", "corflak": "Birdshot", "corfmd": "Prevailer", "corfmine3": "Heavy Mine", "corfmkr": "Naval Energy Converter", "corforge": "Forge", "corfort": "Fortification Wall", "corfrad": "Naval Radar / Sonar Tower", "corfrock": "Janitor", "corfrt": "Slingshot", "corfship": "Brimstone", "corftiger": "Heat Tiger", "corfus": "Fusion Reactor", "corgant": "Experimental Gantry", "corgantuw": "Experimental Gantry", "corgarp": "Garpike", "corgate": "Overseer", "corgatet3": "Sanctuary", "corgator": "Incisor", "corgatreap": "Laser Tiger", "corgeo": "Geothermal Powerplant", "corgol": "Tzar", "corgolt4": "Epic Tzar", "corgplat": "Gun Platform", "corhaap": "Experimental Aircraft Plant", "corhaapuw": "Advanced Aircraft Plant", "corhaca": "Experimental Construction Aircraft", "corhack": "Twitcher", "corhacs": "Pathfinder", "corhacv": "Printer", "corhal": "Halberd", "va_halberd": "Halberd", "corhalab": "Experimental Bot Lab", "corhasy": "Experimental Shipyard", "corhavp": "Experimental Vehicle Plant", "corhllllt": "Quad Guard", "corhllt": "Twin Guard", "corhlt": "Warden", "corhp": "Hovercraft Platform", "corhrk": "Arbiter", "corhunt": "Watcher", "corhurc": "Hailstorm", "corhvytrans": "Hephaestus", "corint": "Basilisk", "corjamt": "Castro", "corjugg": "Behemoth", "corjuno": "Juno", "corkarg": "Karganeth", "corkarganetht4": "Epic Karganeth", "corkark": "Archaic Karkinos", "corkorg": "Juggernaut", "corlab": "Bot Lab", "corlevlr": "Pounder", "corllt": "Guard", "cormabm": "Saviour", "cormadsam": "SAM", "cormakr": "Energy Converter", "cormando": "Commando", "cormandot4": "Epic Commando", "cormart": "Quaker", "cormaw": "Dragon's Maw", "cormex": "Metal Extractor", "cormexp": "Advanced Exploiter", "cormh": "Mangonel", "cormine1": "Light Mine", "cormine2": "Medium Mine", "cormine3": "Heavy Mine", "cormine4": "Medium Mine", "corminibuzz": "Mini Calamity", "cormist": "Lasher", "cormls": "Pathfinder", "cormlv": "Trapper", "cormmkr": "Advanced Energy Converter", "cormmkrt3": "Epic Energy Converter", "cormoho": "Advanced Metal Extractor", "cormort": "Sheldon", "cormship": "Messenger", "cormstor": "Metal Storage", "cormuskrat": "Muskrat", "cormwall": "Dragon's Rage", "cornanotc": "Construction Turret", "cornanotc2plat": "Advanced Construction Turret", "cornanotcplat": "Naval Construction Turret", "cornanotct2": "Advanced Construction Turret", "cornavaldefturret": "Cyclops", "cornecro": "Graverobber", "coronager": "Onager", "corparrow": "Poison Arrow", "corphantom": "Phantom", "corplat": "Seaplane Platform", "corprince": "Black Prince", "corprinter": "Printer", "corpship": "Riptide", "corpt": "Herring", "corpun": "Agitator", "corpyro": "Fiend", "corrad": "Radar Tower", "corraid": "Brute", "correap": "Tiger", "correcl": "Death Cavalry", "correspawn": "Base Builder", "corrl": "Thistle", "corroach": "Bedbug", "corroy": "Oppressor", "corsala": "Salamander", "corsat": "Satellite", "corsb": "Dam Buster", "corscavdrag": "Dragon's Teeth", "corscavdtf": "Dragon's Maw", "corscavdtl": "Dragon's Claw", "corscavdtm": "Missile Wall", "corscavfort": "Fortification Wall", "corscreamer": "Screamer", "corsd": "Nemesis", "corseah": "Skyhook", "corseal": "Alligator", "corseap": "Monsoon", "corsent": "Fury", "corsfig": "Bat", "corsfig2": "Bat", "corsh": "Goon", "corshad": "Whirlwind", "corshark": "Predator", "corshiva": "Shiva", "corshroud": "Shroud", "corsilo": "Apocalypse", "corsjam": "Phantasm", "corsktl": "Skuttle", "corslrpc": "Leviathan", "corsnap": "Cayman", "corsok": "Cataphract", "corsolar": "Solar Collector", "corsonar": "Sonar Station", "corspec": "Deceiver", "corspy": "Spectre", "corssub": "Kraken", "corstorm": "Aggravator", "corsub": "Orca", "corsumo": "Mammoth", "corsy": "Shipyard", "cortarg": "Pinpointer", "cortermite": "Termite", "corthermite": "Thermite", "corthud": "Thug", "cortide": "Tidal Generator", "cortitan": "Angler", "cortl": "Urchin", "cortoast": "Persecutor", "cortorch": "Torch", "cortrem": "Tremor", "cortron": "Catalyst", "coruwadves": "Hardened Energy Storage", "coruwadvms": "Hardened Metal Storage", "coruwes": "Naval Energy Storage", "coruwfus": "Naval Fusion Reactor", "coruwmme": "Naval Advanced Metal Extractor", "coruwmmm": "Naval Advanced Energy Converter", "coruwms": "Naval Metal Storage", "corvac": "Printer", "va_printer": "Printer", "corvalk": "Hercules", "corvamp": "Nighthawk", "corveng": "Valiant", "corvipe": "Scorpion", "corvoyr": "Augur", "corvp": "Vehicle Plant", "corvrad": "Omen", "corvroc": "Negotiator", "corwin": "Wind Turbine", "corwint2": "Advanced Wind Turbine", "corwolv": "Wolverine", "critter_ant": "Ant", "critter_crab": "Crab", "critter_duck": "Duck", "critter_goldfish": "Goldfish", "critter_gull": "Seagull", "critter_penguin": "Penguin", "critter_penguinbro": "Penguin Bro", "critter_penguinking": "Penguin King", "dbg_sphere": "dbg_sphere", "dbg_sphere_fullmetal": "dbg_sphere", "dice": "Dice", "freefusion": "Free Fusion Reactor", "leegmech": "Praetorian", "legaabot": "Toxotai", "legaap": "Legion Advanced Aircraft Plant", "legabm": "Aegis", "legaca": "Advanced Construction Aircraft", "legaceb": "Proteus", "legack": "Advanced Construction Bot", "legacluster": "Eviscerator", "legacv": "Advanced Construction Vehicle", "legadvaabot": "Aquilon", "legadveconv": "Advanced Energy Converter", "legadveconvt3": "Epic Energy Converter", "legadvestore": "Hardened Energy Storage", "legadvshipyard": "Advanced Shipyard", "legadvsol": "Advanced Solar Collector", "legafcv": "Aceso", "legafigdef": "Ajax", "legafus": "Advanced Fusion Reactor", "legafust3": "Epic Fusion Reactor", "legageo": "Advanced Geothermal Powerplant", "legah": "Alpheus", "legaheattank": "Prometheus", "legajam": "Erebus", "legajamk": "Tiresias", "legalab": "Legion Advanced Bot Lab", "legamcluster": "Cleaver", "legamph": "Telchine", "legamphlab": "Amphibious Complex", "legamphtank": "Cetus", "legamstor": "Hardened Metal Storage", "leganavalaaturret": "Fulmen", "leganavaldefturret": "Ionia", "leganavaleconv": "Naval Advanced Energy Converter", "leganavalfusion": "Naval Fusion Reactor", "leganavalmex": "Advanced Underwater Metal Extractor", "leganavalpinpointer": "Naval Pinpointer", "leganavalsonarstation": "Auscultor", "leganavaltorpturret": "Delphinus", "leganavyaaship": "Notus", "leganavyantinukecarrier": "Hecate", "leganavyantiswarm": "Leocampus", "leganavyartyship": "Corinth", "leganavybattleship": "Scylla", "leganavybattlesub": "Architeuthis", "leganavyconsub": "Advanced Construction Submarine", "leganavycruiser": "Thalassa", "leganavyengineer": "Artifex", "leganavyflagship": "Neptune", "leganavyheavysub": "Sphyrna", "leganavymissileship": "Ultor", "leganavyradjamship": "Dolus", "legap": "Legion Drone Plant", "legapopupdef": "Chimera", "legapt3": "Experimental Aircraft Gantry", "legarad": "Advanced Radar Tower", "legaradk": "Euclid", "legaskirmtank": "Gladiator", "legaspy": "Eidolon", "legassistdrone": "Assist Drone", "legassistdrone_land": "Assist Vehicle", "legatorpbomber": "Aesacus", "legatrans": "Hippotes", "legavantinuke": "Hera", "legavjam": "Cicero", "legavp": "Advanced Vehicle Plant", "legavrad": "Pheme", "legavroc": "Boreas", "legbal": "Ballista", "legbar": "Barrage", "legbart": "Belcher", "legbastion": "Bastion", "legbombard": "Bombardier", "legbunk": "Pilum", "legca": "Legion Construction Aircraft", "legcar": "Cardea", "legcen": "Phobos", "legch": "Construction Hovercraft", "legcib": "Blindfold", "legck": "Legion Construction Bot", "legcluster": "Amputator", "legcom": "Legion Commander", "legcomecon": "Economy Commander", "legcomlvl10": "Legion Commander Level 10", "legcomlvl2": "Legion Commander Level 2", "legcomlvl3": "Legion Commander Level 3", "legcomlvl4": "Legion Commander Level 4", "legcomlvl5": "Legion Commander Level 5", "legcomlvl6": "Legion Commander Level 6", "legcomlvl7": "Legion Commander Level 7", "legcomlvl8": "Legion Commander Level 8", "legcomlvl9": "Legion Commander Level 9", "legcomoff": "Offensive Commander", "legcomt2com": "Combat Commander", "legcomt2def": "Tactical Defense Commander", "legcomt2off": "Tactical Offense Commander", "legctl": "Euryale", "legcv": "Legion Construction Vehicle", "legdecom": "Legion Commander", "legdeflector": "Soteria", "legdrag": "Dragon's Teeth", "legdrone": "Legion Drone", "legdtf": "Dragon's Maw", "legdtl": "Dragon's Claw", "legdtm": "Dragon's Tail", "legdtr": "Dragon's Jaw", "legeallterrainmech": "Myrmidon", "legeconv": "Energy Converter", "legeheatraymech": "Sol Invictus", "legeheatraymech_old": "Archaic Sol Invictus", "legehovertank": "Charybdis", "legelrpcmech": "Astraeus", "legeshotgunmech": "Praetorian", "legestor": "Energy Storage", "legeyes": "Argus", "legfdrag": "Shark's Teeth", "legfeconv": "Naval Energy Converter", "legfhive": "Naval Hive", "legfhp": "Offshore Hovercraft Platform", "legfig": "Noctua", "legflak": "Pluto", "legfmg": "Gelasma", "legfort": "Tyrannus", "legforti": "Fortification Wall", "legfortt4": "Epic Tyrannus", "legfrad": "Naval Radar / Sonar Tower", "legfrl": "Polybolos", "legfus": "Fusion Reactor", "leggant": "Experimental Gantry", "leggantuw": "Experimental Gantry", "leggat": "Decurion", "leggatet3": "Elysium", "leggeo": "Geothermal Powerplant", "leggob": "Goblin", "leggobt3": "Epic Goblin", "leghaap": "Legion Experimental Aircraft Plant", "leghaca": "Experimental Construction Aircraft", "leghack": "Prometheus", "leghacv": "Aceso", "leghades": "Alaris", "leghalab": "Experimental Bot Lab", "leghavp": "Experimental Vehicle Plant", "legheavydrone": "Legion Heavy Drone", "legheavydronesmall": "Legion Heavy Drone", "leghelios": "Helios", "leghive": "Hive", "leghp": "Hovercraft Platform", "leghrk": "Thanatos", "leginc": "Incinerator", "leginf": "Inferno", "leginfestor": "Infestor", "legionnaire": "Legionnaire", "legjam": "Nyx", "legjav": "Javelin", "legjuno": "Juno", "legkam": "Martyr", "legkark": "Karkinos", "leglab": "Legion Bot Lab", "leglht": "Pharos", "leglob": "Satyr", "leglraa": "Xyston", "leglrpc": "Olympus", "leglts": "Aeolus", "leglupara": "Lupara", "legmed": "Medusa", "legmex": "Metal Extractor", "legmext15": "Overcharged Metal Extractor", "legmg": "Cacophony", "legmh": "Salacia", "legmine1": "Light Mine", "legmine2": "Medium Mine", "legmine3": "Heavy Mine", "legmineb": "Harbinger", "legmlv": "Sapper", "legmoho": "Advanced Metal Extractor", "legmohobp": "Fortifier", "legmohocon": "Advanced Metal Fortifier", "legmohoconct": "Advanced Metal Fortifier", "legmohoconin": "Advanced Metal Fortifier", "legmos": "Mosquito", "legmost3": "Epic Mosquito", "legmrv": "Quickshot", "legmstor": "Metal Storage", "legnanotc": "Construction Turret", "legnanotcbase": "Base Builder", "legnanotcplat": "Naval Construction Turret", "legnanotct2": "Advanced Construction Turret", "legnanotct2plat": "Advanced Construction Turret", "legnap": "Wildfire", "legnavaldefturret": "Phorcys", "legnavyaaship": "Iapetus", "legnavyartyship": "Octeres", "legnavyconship": "Construction Ship", "legnavydestro": "Syracusia", "legnavyfrigate": "Argonaut", "legnavyrezsub": "Dionysus", "legnavyscout": "Hippocampus", "legnavysub": "Ketea", "legner": "Nereus", "legotter": "Otter", "legpede": "Mukade", "legperdition": "Perdition", "legphoenix": "Phoenix", "legrad": "Radar Tower", "legrail": "Lance", "legrampart": "Rampart", "legrezbot": "Zagreus", "legrhapsis": "Rhapsis", "legrl": "Bramble", "legrwall": "Dragon's Constitution", "legscout": "Wheelie", "legsd": "Ichnaea", "legsh": "Glaucus", "legshot": "Phalanx", "legsilo": "Supernova", "legsnapper": "Snapper", "legsolar": "Solar Collector", "legspbomber": "Pyrphoros", "legspcarrier": "Hecatoncheir", "legspcon": "Construction Seaplane", "legspfighter": "Astrapios", "legsplab": "Offshore Seaplane Platform", "legspradarsonarplane": "Okeanos", "legspsurfacegunship": "Enyo", "legsptorpgunship": "Ladon", "legsrail": "Arquebus", "legsrailt4": "Epic Arquebus", "legstarfall": "Starfall", "legstr": "Hoplite", "legstronghold": "Stronghold", "legsy": "Shipyard", "legtarg": "Pinpointer", "legtide": "Tidal Generator", "legtl": "Stheno", "leguwestore": "Naval Energy Storage", "leguwmstore": "Naval Metal Storage", "legvcarry": "Mantis", "legvenator": "Venator", "legvflak": "Charon", "legvision": "Vision", "legvp": "Legion Vehicle Plant", "legwhisper": "Whisper", "legwin": "Wind Turbine", "legwint2": "Advanced Wind Turbine", "lootboxbronze": "Bronze Resource Generator", "lootboxgold": "Gold Resource Generator", "lootboxplatinum": "Platinum Resource Generator", "lootboxsilver": "Silver Resource Generator", "lootdroppod_gold": "Lootbox Droppod", "lootdroppod_printer": "Lootbox Droppod", "meteor": "Meteor", "mission_command_tower": "Command Tower", "nuketest": "New Nuke Spawner", "nuketestcor": "New Nuke Spawner", "nuketestorg": "Original Arm Nuke Spawner", "pbr_cube": "PBR Test Cube Thing", "raptor_air_bomber_acid_t2_v1": "Acid Bombardier", "raptor_air_bomber_basic_t1_v1": "Juvenile Bombardier", "raptor_air_bomber_basic_t2_v1": "Bombardier", "raptor_air_bomber_basic_t2_v2": "Bombardier", "raptor_air_bomber_basic_t4_v1": "Apex Bombardier", "raptor_air_bomber_basic_t4_v2": "Apex Bombardier", "raptor_air_bomber_brood_t4_v2": "Hatchling Bomber", "raptor_air_bomber_brood_t4_v3": "Hatchling Bomber", "raptor_air_bomber_brood_t4_v4": "Hatchling Bomber", "raptor_air_bomber_emp_t2_v1": "Paralyzing Bombardier", "raptor_air_fighter_basic_t1_v1": "Juvenile Airfighter", "raptor_air_fighter_basic_t2_v1": "Airfighter", "raptor_air_fighter_basic_t2_v2": "Airfighter", "raptor_air_fighter_basic_t2_v3": "Airfighter", "raptor_air_fighter_basic_t2_v4": "Airfighter", "raptor_air_fighter_basic_t4_v1": "Apex Airfighter", "raptor_air_kamikaze_basic_t2_v1": "Flying Kamikaze", "raptor_air_scout_basic_t2_v1": "Observer", "raptor_air_scout_basic_t3_v1": "Mature Observer", "raptor_air_scout_basic_t4_v1": "Apex Observer", "raptor_allterrain_arty_acid_t2_v1": "Acid Mortar", "raptor_allterrain_arty_acid_t4_v1": "Apex Acid Mortar", "raptor_allterrain_arty_basic_t2_v1": "Mortar", "raptor_allterrain_arty_basic_t4_v1": "Apex Mortar", "raptor_allterrain_arty_brood_t2_v1": "Hatchling Artillery", "raptor_allterrain_arty_brood_t4_v1": "Apex Hatchling Artillery", "raptor_allterrain_arty_emp_t2_v1": "Paralyzing Mortar", "raptor_allterrain_arty_emp_t4_v1": "Apex Paralyzing Mortar", "raptor_allterrain_assault_acid_t2_v1": "All-Terrain Acid Brawler", "raptor_allterrain_assault_basic_t2_v1": "All-Terrain Brawler", "raptor_allterrain_assault_basic_t2_v2": "All-Terrain Brawler", "raptor_allterrain_assault_basic_t2_v3": "All-Terrain Brawler", "raptor_allterrain_assault_basic_t4_v1": "Apex All-Terrain Brawler", "raptor_allterrain_assault_basic_t4_v2": "Apex All-Terrain Brawler", "raptor_allterrain_assault_emp_t2_v1": "All-Terrain Paralyzing Brawler", "raptor_allterrain_swarmer_acid_t2_v1": "All-Terrain Acid Spitter", "raptor_allterrain_swarmer_basic_t2_v1": "All-Terrain Swarmer", "raptor_allterrain_swarmer_basic_t3_v1": "Mature All-Terrain Swarmer", "raptor_allterrain_swarmer_basic_t4_v1": "Apex All-Terrain Swarmer", "raptor_allterrain_swarmer_emp_t2_v1": "All-Terrain Paralyzer", "raptor_allterrain_swarmer_fire_t2_v1": "All-Terrain Pyro", "raptor_antinuke": "Raptor Antinuke", "raptor_hive": "Raptor Hive", "va_queen_nest": "Queen's Nest", "raptor_land_assault_acid_t2_v1": "Apex Acid Spitter", "raptor_land_assault_basic_t2_v1": "Brawler", "raptor_land_assault_basic_t2_v2": "Brawler", "raptor_land_assault_basic_t2_v3": "Brawler", "raptor_land_assault_basic_t4_v1": "Apex Brawler", "raptor_land_assault_basic_t4_v2": "Apex Brawler", "raptor_land_assault_emp_t2_v1": "Paralyzing Brawler", "raptor_land_assault_spectre_t2_v1": "Spectre Brawler", "raptor_land_assault_spectre_t4_v1": "Apex Spectre Brawler", "raptor_land_kamikaze_basic_t2_v1": "Kamikaze", "raptor_land_kamikaze_basic_t4_v1": "Apex Kamikaze", "raptor_land_kamikaze_emp_t2_v1": "Paralyzing Kamikaze", "raptor_land_kamikaze_emp_t4_v1": "Apex Paralyzing Kamikaze", "raptor_land_spiker_basic_t2_v1": "Spiker", "raptor_land_spiker_basic_t4_v1": "Apex Spiker", "raptor_land_spiker_spectre_t4_v1": "Apex Spectre Spiker", "raptor_land_swarmer_acids_t2_v1": "Acid Spitter", "raptor_land_swarmer_basic_t1_v1": "Juvenile Swarmer", "raptor_land_swarmer_basic_t2_v1": "Swarmer", "raptor_land_swarmer_basic_t2_v2": "Swarmer", "raptor_land_swarmer_basic_t2_v3": "Swarmer", "raptor_land_swarmer_basic_t2_v4": "Swarmer", "raptor_land_swarmer_basic_t3_v1": "Mature Swarmer", "raptor_land_swarmer_basic_t3_v2": "Mature Swarmer", "raptor_land_swarmer_basic_t3_v3": "Mature Swarmer", "raptor_land_swarmer_basic_t4_v1": "Apex Swarmer", "raptor_land_swarmer_basic_t4_v2": "Apex Swarmer", "raptor_land_swarmer_brood_t2_v1": "Hatchling", "raptor_land_swarmer_brood_t3_v1": "Mature Hatchling", "raptor_land_swarmer_brood_t4_v1": "Apex Hatchling", "raptor_land_swarmer_emp_t2_v1": "Paralyzing Swarmer", "raptor_land_swarmer_fire_t2_v1": "Pyro", "raptor_land_swarmer_fire_t4_v1": "Apex Pyro", "raptor_land_swarmer_heal_t1_v1": "Juvenile Healer", "raptor_land_swarmer_heal_t2_v1": "Healer", "raptor_land_swarmer_heal_t3_v1": "Mature Healer", "raptor_land_swarmer_heal_t4_v1": "Apex Healer", "raptor_land_swarmer_spectre_t3_v1": "Spectre Swarmer", "raptor_land_swarmer_spectre_t4_v1": "Apex Spectre Swarmer", "raptor_matriarch_acid": "Acid Matriarch", "raptor_matriarch_basic": "Matriarch", "raptor_matriarch_electric": "Paralyzer Matriarch", "raptor_matriarch_fire": "Pyro Matriarch", "raptor_matriarch_healer": "Healer Matriarch", "raptor_matriarch_spectre": "Spectre Matriarch", "raptor_queen_easy": "Raptor Queen - Final Boss", "raptor_queen_epic": "Raptor Queen - Final Boss", "raptor_queen_hard": "Raptor Queen - Final Boss", "raptor_queen_normal": "Raptor Queen - Final Boss", "raptor_queen_veryeasy": "Raptor Queen - Final Boss", "raptor_queen_veryhard": "Raptor Queen - Final Boss", "raptor_turret_acid_t2_v1": "Acid Tentacle", "raptor_turret_acid_t3_v1": "Mature Acid Tentacle", "raptor_turret_acid_t4_v1": "Apex Acid Tentacle", "raptor_turret_antiair_t2_v1": "Anti-Air Tentacle", "raptor_turret_antiair_t3_v1": "Mature Anti-Air Tentacle", "raptor_turret_antiair_t4_v1": "Apex Anti-Air Tentacle", "raptor_turret_antinuke_t2_v1": "Anti-Nuke Tentacle", "raptor_turret_antinuke_t3_v1": "Mature Anti-Nuke Tentacle", "raptor_turret_basic_t2_v1": "Tentacle", "raptor_turret_basic_t3_v1": "Mature Tentacle", "raptor_turret_basic_t4_v1": "Apex Tentacle", "raptor_turret_burrow_t2_v1": "Tentacle", "raptor_turret_emp_t2_v1": "Paralyzer Tentacle", "raptor_turret_emp_t3_v1": "Mature Paralyzer Tentacle", "raptor_turret_emp_t4_v1": "Apex Paralyzer Tentacle", "raptor_turret_meteor_t4_v1": "Meteor Tentacle", "raptorh1b": "Cleaner", "raptorh5": "Overseer", "resourcecheat": "INFINITE RESOURCES", "scavbeacon_t1": "Teleport Beacon Level 1", "scavbeacon_t2": "Teleport Beacon Level 2", "scavbeacon_t3": "Teleport Beacon Level 3", "scavbeacon_t4": "Teleport Beacon Level 4", "scavempspawner": "New Nuke Spawner", "scavengerbossv4": "Epic Commander - Final Boss", "scavengerdroppod": "Scavenger Droppod", "scavengerdroppodfriendly": "Friendly Droppod", "scavsafeareabeacon": "Spreader", "scavtacnukespawner": "Tactical Nuke Drop", "xmasball1_1": "Xmas ball", "xmasball1_2": "Xmas ball", "xmasball1_3": "Xmas ball", "xmasball1_4": "Xmas ball", "xmasball1_5": "Xmas ball", "xmasball1_6": "Xmas ball", "xmasball2_1": "Xmas ball", "xmasball2_2": "Xmas ball", "xmasball2_3": "Xmas ball", "xmasball2_4": "Xmas ball", "xmasball2_5": "Xmas ball", "xmasball2_6": "Xmas ball", "va_ghost": "Ghost (captures)", "va_mask": "Decoy Commander", "va_infestor": "Infestor"}, "air": ["armaca", "armassistdrone", "armatlas", "armawac", "armblade", "armbrawl", "armca", "armcsa", "armdfly", "armdrone", "armdroneold", "armfepocht4", "armfify", "armfig", "armhaca", "armhawk", "armhvytrans", "armkam", "armlance", "armliche", "armlichet4", "armminebomber", "armpeep", "armpnix", "armsaber", "armsat", "armsb", "armseap", "armsehak", "armsfig", "armsfig2", "armstil", "armtdrone", "armthund", "armthundt4", "coraca", "corape", "corassistdrone", "corawac", "corbw", "corca", "corcrw", "corcrwh", "corcrwt4", "corcsa", "corcut", "cordrone", "cordronecarryair", "cordroneold", "cords", "corfblackhyt4", "corfink", "corhaca", "corhunt", "corhurc", "corhvytrans", "corsat", "corsb", "corseah", "corseap", "corsfig", "corsfig2", "corshad", "cortdrone", "cortitan", "corvalk", "corvamp", "corveng", "legaca", "legafigdef", "legassistdrone", "legatorpbomber", "legatrans", "legca", "legcib", "legdrone", "legfig", "legfort", "legfortt4", "leghaca", "legheavydrone", "legheavydronesmall", "legionnaire", "legkam", "leglts", "legmineb", "legmos", "legmost3", "legnap", "legphoenix", "legspbomber", "legspcarrier", "legspcon", "legspfighter", "legspradarsonarplane", "legspsurfacegunship", "legsptorpgunship", "legstronghold", "legvenator", "legwhisper"], "airNote": "Unit types that fly (canfly in BAR.sdd / VerdanceAshes.sdd). Aircraft count at a third off their cost toward a pack's starting XP, and earn half again as much XP in the field."}
+{
+  "schema": "verdance-unit-costs/2",
+  "source": "BAR.sdd + VerdanceAshes.sdd unitdefs (metalcost, energycost) and BAR's English unit names, read from the player's install",
+  "units": {
+    "armaak": [
+      520.0,
+      5600.0
+    ],
+    "va_kettle": [
+      520.0,
+      5600.0
+    ],
+    "armaap": [
+      2900.0,
+      29000.0
+    ],
+    "armaas": [
+      1000.0,
+      12000.0
+    ],
+    "armaca": [
+      340.0,
+      12000.0
+    ],
+    "armack": [
+      430.0,
+      6900.0
+    ],
+    "armacsub": [
+      700.0,
+      9000.0
+    ],
+    "armacv": [
+      550.0,
+      6800.0
+    ],
+    "armadvsol": [
+      350.0,
+      5000.0
+    ],
+    "armafus": [
+      9700.0,
+      69000.0
+    ],
+    "armafust3": [
+      90000.0,
+      550000.0
+    ],
+    "armageo": [
+      1600.0,
+      27000.0
+    ],
+    "armah": [
+      230.0,
+      4500.0
+    ],
+    "armalab": [
+      2600.0,
+      15000.0
+    ],
+    "armamb": [
+      2500.0,
+      17000.0
+    ],
+    "armamd": [
+      1500.0,
+      38000.0
+    ],
+    "armamex": [
+      200.0,
+      1500.0
+    ],
+    "armamph": [
+      260.0,
+      2700.0
+    ],
+    "armamsub": [
+      1200.0,
+      5500.0
+    ],
+    "armanac": [
+      270.0,
+      2400.0
+    ],
+    "armanavaldefturret": [
+      1750.0,
+      26000.0
+    ],
+    "armanni": [
+      3500.0,
+      74000.0
+    ],
+    "armannit3": [
+      13500.0,
+      450000.0
+    ],
+    "armantiship": [
+      1400.0,
+      12000.0
+    ],
+    "armap": [
+      650.0,
+      1100.0
+    ],
+    "armapt3": [
+      8500.0,
+      60000.0
+    ],
+    "armarad": [
+      400.0,
+      14000.0
+    ],
+    "armart": [
+      135.0,
+      2200.0
+    ],
+    "armaser": [
+      78.0,
+      1400.0
+    ],
+    "armason": [
+      170.0,
+      2600.0
+    ],
+    "armassimilator": [
+      2500.0,
+      49000.0
+    ],
+    "armassistdrone": [
+      1.0,
+      1.0
+    ],
+    "armassistdrone_land": [
+      1.0,
+      1.0
+    ],
+    "armasy": [
+      2900.0,
+      9700.0
+    ],
+    "armatl": [
+      1000.0,
+      8500.0
+    ],
+    "armatlas": [
+      68.0,
+      1300.0
+    ],
+    "armavp": [
+      2600.0,
+      14000.0
+    ],
+    "armawac": [
+      175.0,
+      8600.0
+    ],
+    "armbanth": [
+      13500.0,
+      286000.0
+    ],
+    "armbats": [
+      3300.0,
+      22000.0
+    ],
+    "armbeamer": [
+      190.0,
+      1500.0
+    ],
+    "armbeaver": [
+      150.0,
+      3100.0
+    ],
+    "armblade": [
+      1250.0,
+      22000.0
+    ],
+    "armbotrail": [
+      13500.0,
+      192000.0
+    ],
+    "armbrawl": [
+      310.0,
+      6200.0
+    ],
+    "armbrtha": [
+      4500.0,
+      64000.0
+    ],
+    "armbull": [
+      950.0,
+      13000.0
+    ],
+    "armca": [
+      110.0,
+      3000.0
+    ],
+    "armcarry": [
+      1400.0,
+      12000.0
+    ],
+    "armch": [
+      200.0,
+      2700.0
+    ],
+    "armcir": [
+      750.0,
+      7300.0
+    ],
+    "armck": [
+      110.0,
+      1600.0
+    ],
+    "armckfus": [
+      3550.0,
+      22000.0
+    ],
+    "armclaw": [
+      340.0,
+      1600.0
+    ],
+    "armcom": [
+      2700.0,
+      26000.0
+    ],
+    "armcomboss": [
+      10000000.0,
+      10000000.0
+    ],
+    "armcomcon": [
+      2700.0,
+      26000.0
+    ],
+    "armcomlvl10": [
+      11000.0,
+      110000.0
+    ],
+    "armcomlvl2": [
+      3000.0,
+      30000.0
+    ],
+    "armcomlvl3": [
+      4000.0,
+      40000.0
+    ],
+    "armcomlvl4": [
+      5000.0,
+      50000.0
+    ],
+    "armcomlvl5": [
+      6000.0,
+      60000.0
+    ],
+    "armcomlvl6": [
+      7000.0,
+      70000.0
+    ],
+    "armcomlvl7": [
+      8000.0,
+      80000.0
+    ],
+    "armcomlvl8": [
+      9000.0,
+      90000.0
+    ],
+    "armcomlvl9": [
+      10000.0,
+      100000.0
+    ],
+    "armcomnew": [
+      2700.0,
+      26000.0
+    ],
+    "armconsul": [
+      250.0,
+      4300.0
+    ],
+    "armcroc": [
+      750.0,
+      15000.0
+    ],
+    "armcrus": [
+      1000.0,
+      12000.0
+    ],
+    "armcs": [
+      200.0,
+      2000.0
+    ],
+    "armcsa": [
+      150.0,
+      7800.0
+    ],
+    "armcv": [
+      135.0,
+      1950.0
+    ],
+    "armdecade": [
+      175.0,
+      1500.0
+    ],
+    "armdecadet3": [
+      8000.0,
+      160000.0
+    ],
+    "armdecom": [
+      770.0,
+      12000.0
+    ],
+    "armdecom_tenebrium": [
+      770.0,
+      12000.0
+    ],
+    "armdf": [
+      270.0,
+      100.0
+    ],
+    "armdfly": [
+      320.0,
+      10000.0
+    ],
+    "armdl": [
+      240.0,
+      2200.0
+    ],
+    "armdrag": [
+      8.0,
+      0.0
+    ],
+    "armdrone": [
+      25.0,
+      600.0
+    ],
+    "armdronecarry": [
+      1700.0,
+      17000.0
+    ],
+    "armdronecarryland": [
+      1700.0,
+      17000.0
+    ],
+    "armdroneold": [
+      55.0,
+      1100.0
+    ],
+    "armemp": [
+      1600.0,
+      29000.0
+    ],
+    "armepoch": [
+      20000.0,
+      190000.0
+    ],
+    "armestor": [
+      170.0,
+      1700.0
+    ],
+    "armeyes": [
+      32.0,
+      850.0
+    ],
+    "armfark": [
+      210.0,
+      3000.0
+    ],
+    "armfast": [
+      160.0,
+      3800.0
+    ],
+    "armfatf": [
+      800.0,
+      7300.0
+    ],
+    "armfav": [
+      31.0,
+      370.0
+    ],
+    "armfboy": [
+      1400.0,
+      20000.0
+    ],
+    "armfdrag": [
+      15.0,
+      0.0
+    ],
+    "armfepocht4": [
+      25000.0,
+      250000.0
+    ],
+    "armferret": [
+      360.0,
+      5700.0
+    ],
+    "armfflak": [
+      850.0,
+      23000.0
+    ],
+    "armfgate": [
+      3900.0,
+      72000.0
+    ],
+    "armfhlt": [
+      470.0,
+      6200.0
+    ],
+    "armfhp": [
+      670.0,
+      2000.0
+    ],
+    "armfido": [
+      285.0,
+      6300.0
+    ],
+    "armfify": [
+      58.0,
+      2900.0
+    ],
+    "armfig": [
+      73.0,
+      2900.0
+    ],
+    "armflak": [
+      820.0,
+      13000.0
+    ],
+    "armflash": [
+      110.0,
+      900.0
+    ],
+    "armflea": [
+      21.0,
+      300.0
+    ],
+    "armfmine3": [
+      32.0,
+      1600.0
+    ],
+    "armfmkr": [
+      1.0,
+      1150.0
+    ],
+    "armfort": [
+      40.0,
+      500.0
+    ],
+    "armfrad": [
+      130.0,
+      1000.0
+    ],
+    "armfrock": [
+      360.0,
+      5700.0
+    ],
+    "armfrt": [
+      90.0,
+      1000.0
+    ],
+    "armfus": [
+      3350.0,
+      18000.0
+    ],
+    "armgate": [
+      3000.0,
+      54000.0
+    ],
+    "armgatet3": [
+      12000.0,
+      216000.0
+    ],
+    "armgeo": [
+      560.0,
+      13000.0
+    ],
+    "armgmm": [
+      1150.0,
+      25000.0
+    ],
+    "armgplat": [
+      110.0,
+      900.0
+    ],
+    "armgremlin": [
+      230.0,
+      3700.0
+    ],
+    "armguard": [
+      1250.0,
+      12500.0
+    ],
+    "armhaap": [
+      4600.0,
+      72000.0
+    ],
+    "armhaapuw": [
+      1900.0,
+      24000.0
+    ],
+    "armhaca": [
+      1000.0,
+      31200.0
+    ],
+    "armhack": [
+      1260.0,
+      18000.0
+    ],
+    "armhacs": [
+      1140.0,
+      25600.0
+    ],
+    "armhacv": [
+      1300.0,
+      18800.0
+    ],
+    "armhalab": [
+      4800.0,
+      58000.0
+    ],
+    "armham": [
+      130.0,
+      1300.0
+    ],
+    "armhasy": [
+      5000.0,
+      44000.0
+    ],
+    "armhavp": [
+      4900.0,
+      51000.0
+    ],
+    "armhawk": [
+      140.0,
+      5700.0
+    ],
+    "armhlt": [
+      440.0,
+      4700.0
+    ],
+    "armhp": [
+      670.0,
+      2000.0
+    ],
+    "armhvytrans": [
+      190.0,
+      4000.0
+    ],
+    "armjam": [
+      105.0,
+      1700.0
+    ],
+    "armjamt": [
+      240.0,
+      8500.0
+    ],
+    "armjanus": [
+      240.0,
+      2600.0
+    ],
+    "armjeth": [
+      125.0,
+      1100.0
+    ],
+    "armjuno": [
+      640.0,
+      17000.0
+    ],
+    "armkam": [
+      135.0,
+      2300.0
+    ],
+    "armkraken": [
+      1000.0,
+      13000.0
+    ],
+    "armlab": [
+      500.0,
+      950.0
+    ],
+    "armlance": [
+      400.0,
+      8000.0
+    ],
+    "armlatnk": [
+      330.0,
+      6400.0
+    ],
+    "armliche": [
+      2200.0,
+      46000.0
+    ],
+    "armlichet4": [
+      18000.0,
+      240000.0
+    ],
+    "armllt": [
+      85.0,
+      680.0
+    ],
+    "armlship": [
+      570.0,
+      11400.0
+    ],
+    "armlun": [
+      1150.0,
+      23000.0
+    ],
+    "armlunchbox": [
+      3300.0,
+      71000.0
+    ],
+    "armlwall": [
+      1020.0,
+      4800.0
+    ],
+    "armmakr": [
+      1.0,
+      1150.0
+    ],
+    "armmanni": [
+      1200.0,
+      18500.0
+    ],
+    "armmar": [
+      970.0,
+      21000.0
+    ],
+    "armmark": [
+      100.0,
+      1250.0
+    ],
+    "armmart": [
+      320.0,
+      4900.0
+    ],
+    "armmav": [
+      650.0,
+      11000.0
+    ],
+    "armmeatball": [
+      3000.0,
+      54000.0
+    ],
+    "armmercury": [
+      1600.0,
+      33000.0
+    ],
+    "armmerl": [
+      920.0,
+      6500.0
+    ],
+    "armmex": [
+      50.0,
+      500.0
+    ],
+    "armmh": [
+      175.0,
+      3000.0
+    ],
+    "armmine1": [
+      7.0,
+      270.0
+    ],
+    "armmine2": [
+      25.0,
+      1050.0
+    ],
+    "armmine3": [
+      50.0,
+      2800.0
+    ],
+    "armminebomber": [
+      145.0,
+      4200.0
+    ],
+    "armminivulc": [
+      2000.0,
+      60000.0
+    ],
+    "armmls": [
+      190.0,
+      3200.0
+    ],
+    "armmlv": [
+      57.0,
+      1100.0
+    ],
+    "armmmkr": [
+      380.0,
+      21000.0
+    ],
+    "armmmkrt3": [
+      9000.0,
+      550000.0
+    ],
+    "armmoho": [
+      620.0,
+      7700.0
+    ],
+    "armmship": [
+      2000.0,
+      10000.0
+    ],
+    "armmstor": [
+      330.0,
+      570.0
+    ],
+    "armnanotc": [
+      230.0,
+      3200.0
+    ],
+    "armnanotc2plat": [
+      840.0,
+      12800.0
+    ],
+    "armnanotcplat": [
+      230.0,
+      3200.0
+    ],
+    "armnanotct2": [
+      840.0,
+      12800.0
+    ],
+    "armnavaldefturret": [
+      750.0,
+      10000.0
+    ],
+    "armpb": [
+      680.0,
+      14000.0
+    ],
+    "armpeep": [
+      52.0,
+      1550.0
+    ],
+    "armpincer": [
+      200.0,
+      2000.0
+    ],
+    "armplat": [
+      1450.0,
+      5000.0
+    ],
+    "armpnix": [
+      230.0,
+      12500.0
+    ],
+    "armprowl": [
+      970.0,
+      21000.0
+    ],
+    "armpship": [
+      380.0,
+      2550.0
+    ],
+    "armpshipt3": [
+      6500.0,
+      200000.0
+    ],
+    "armpt": [
+      150.0,
+      1000.0
+    ],
+    "armptt2": [
+      2500.0,
+      15000.0
+    ],
+    "armpw": [
+      54.0,
+      900.0
+    ],
+    "armpwt4": [
+      8000.0,
+      150000.0
+    ],
+    "armrad": [
+      60.0,
+      630.0
+    ],
+    "armrattet4": [
+      25000.0,
+      250000.0
+    ],
+    "armraz": [
+      3800.0,
+      68000.0
+    ],
+    "armrecl": [
+      240.0,
+      3500.0
+    ],
+    "armrectr": [
+      130.0,
+      1400.0
+    ],
+    "armrespawn": [
+      1.0,
+      1.0
+    ],
+    "armrl": [
+      80.0,
+      900.0
+    ],
+    "armrock": [
+      120.0,
+      1000.0
+    ],
+    "armroy": [
+      880.0,
+      6600.0
+    ],
+    "armsaap": [
+      3500.0,
+      35000.0
+    ],
+    "armsaber": [
+      210.0,
+      6400.0
+    ],
+    "armsack": [
+      400.0,
+      6900.0
+    ],
+    "armsacsub": [
+      500.0,
+      9000.0
+    ],
+    "armsacv": [
+      450.0,
+      6800.0
+    ],
+    "armsalab": [
+      3500.0,
+      35000.0
+    ],
+    "armsam": [
+      150.0,
+      2100.0
+    ],
+    "armsasy": [
+      3500.0,
+      35000.0
+    ],
+    "armsat": [
+      4000.0,
+      40000.0
+    ],
+    "armsavp": [
+      3500.0,
+      35000.0
+    ],
+    "armsb": [
+      240.0,
+      7500.0
+    ],
+    "armscab": [
+      1150.0,
+      30000.0
+    ],
+    "armscavengerbossv2": [
+      500000.0,
+      5000000.0
+    ],
+    "armsd": [
+      710.0,
+      7100.0
+    ],
+    "armseadragon": [
+      8000.0,
+      85000.0
+    ],
+    "armseap": [
+      290.0,
+      6500.0
+    ],
+    "armseer": [
+      125.0,
+      2000.0
+    ],
+    "armsehak": [
+      125.0,
+      7000.0
+    ],
+    "armserp": [
+      1800.0,
+      27000.0
+    ],
+    "armserpt3": [
+      15000.0,
+      225000.0
+    ],
+    "armsfig": [
+      90.0,
+      4500.0
+    ],
+    "armsfig2": [
+      90.0,
+      4500.0
+    ],
+    "armsh": [
+      85.0,
+      1250.0
+    ],
+    "armshltx": [
+      7900.0,
+      58000.0
+    ],
+    "armshltxuw": [
+      7900.0,
+      58000.0
+    ],
+    "armshockwave": [
+      1200.0,
+      14000.0
+    ],
+    "armsilo": [
+      8100.0,
+      90000.0
+    ],
+    "armsjam": [
+      310.0,
+      5000.0
+    ],
+    "armsnipe": [
+      680.0,
+      20000.0
+    ],
+    "armsolar": [
+      155.0,
+      0.0
+    ],
+    "armsonar": [
+      20.0,
+      450.0
+    ],
+    "armspid": [
+      250.0,
+      5000.0
+    ],
+    "armsptk": [
+      400.0,
+      4500.0
+    ],
+    "armsptkt4": [
+      7500.0,
+      75000.0
+    ],
+    "armspy": [
+      135.0,
+      8800.0
+    ],
+    "armstil": [
+      460.0,
+      38000.0
+    ],
+    "armstump": [
+      225.0,
+      2000.0
+    ],
+    "armsub": [
+      440.0,
+      3100.0
+    ],
+    "armsubk": [
+      950.0,
+      17000.0
+    ],
+    "armsy": [
+      450.0,
+      950.0
+    ],
+    "armtarg": [
+      810.0,
+      7200.0
+    ],
+    "armthor": [
+      9000.0,
+      240000.0
+    ],
+    "armthund": [
+      150.0,
+      4400.0
+    ],
+    "armthundt4": [
+      15000.0,
+      150000.0
+    ],
+    "armtide": [
+      90.0,
+      200.0
+    ],
+    "armtl": [
+      170.0,
+      1500.0
+    ],
+    "armtorps": [
+      300.0,
+      3000.0
+    ],
+    "armuwadves": [
+      830.0,
+      10000.0
+    ],
+    "armuwadvms": [
+      750.0,
+      11500.0
+    ],
+    "armuwes": [
+      170.0,
+      1700.0
+    ],
+    "armuwfus": [
+      5200.0,
+      33500.0
+    ],
+    "armuwmme": [
+      620.0,
+      7700.0
+    ],
+    "armuwmmm": [
+      380.0,
+      21000.0
+    ],
+    "armuwms": [
+      330.0,
+      570.0
+    ],
+    "armvader": [
+      65.0,
+      5800.0
+    ],
+    "armvadert4": [
+      15000.0,
+      150000.0
+    ],
+    "armvang": [
+      3300.0,
+      71000.0
+    ],
+    "armveil": [
+      125.0,
+      19000.0
+    ],
+    "armvp": [
+      590.0,
+      1550.0
+    ],
+    "armvulc": [
+      70000.0,
+      830000.0
+    ],
+    "armwar": [
+      270.0,
+      3100.0
+    ],
+    "armwin": [
+      40.0,
+      175.0
+    ],
+    "armwint2": [
+      370.0,
+      1750.0
+    ],
+    "armyork": [
+      450.0,
+      9100.0
+    ],
+    "armzapper": [
+      80.0,
+      1200.0
+    ],
+    "armzeus": [
+      350.0,
+      6100.0
+    ],
+    "babyscavbossunits": [
+      1.0,
+      1.0
+    ],
+    "chip": [
+      0.0,
+      1.0
+    ],
+    "comeffigy": [
+      1000.0,
+      4000.0
+    ],
+    "coraak": [
+      650.0,
+      6200.0
+    ],
+    "coraap": [
+      2900.0,
+      28000.0
+    ],
+    "coraca": [
+      360.0,
+      11000.0
+    ],
+    "corack": [
+      470.0,
+      6900.0
+    ],
+    "coracsub": [
+      700.0,
+      9000.0
+    ],
+    "coracv": [
+      580.0,
+      7000.0
+    ],
+    "coradvsol": [
+      370.0,
+      4000.0
+    ],
+    "corafus": [
+      9700.0,
+      48000.0
+    ],
+    "corafust3": [
+      90000.0,
+      550000.0
+    ],
+    "corageo": [
+      1500.0,
+      27000.0
+    ],
+    "corah": [
+      250.0,
+      4700.0
+    ],
+    "corak": [
+      42.0,
+      820.0
+    ],
+    "corakt4": [
+      6000.0,
+      120000.0
+    ],
+    "coralab": [
+      2600.0,
+      16000.0
+    ],
+    "coramph": [
+      330.0,
+      9500.0
+    ],
+    "coramsub": [
+      1200.0,
+      5600.0
+    ],
+    "coranavaldefturret": [
+      2000.0,
+      22500.0
+    ],
+    "corantiship": [
+      1400.0,
+      12000.0
+    ],
+    "corap": [
+      630.0,
+      1100.0
+    ],
+    "corape": [
+      370.0,
+      6800.0
+    ],
+    "corapt3": [
+      8500.0,
+      60000.0
+    ],
+    "corarad": [
+      400.0,
+      14000.0
+    ],
+    "corarch": [
+      1000.0,
+      12000.0
+    ],
+    "corason": [
+      160.0,
+      2400.0
+    ],
+    "corassistdrone": [
+      1.0,
+      1.0
+    ],
+    "corassistdrone_land": [
+      1.0,
+      1.0
+    ],
+    "corasy": [
+      2800.0,
+      10000.0
+    ],
+    "coratl": [
+      1050.0,
+      8500.0
+    ],
+    "coravp": [
+      2600.0,
+      16000.0
+    ],
+    "corawac": [
+      180.0,
+      8300.0
+    ],
+    "corban": [
+      1000.0,
+      23000.0
+    ],
+    "corbats": [
+      3400.0,
+      23000.0
+    ],
+    "corbhmth": [
+      3100.0,
+      35000.0
+    ],
+    "corblackhy": [
+      21000.0,
+      190000.0
+    ],
+    "corbuzz": [
+      68000.0,
+      800000.0
+    ],
+    "corbw": [
+      58.0,
+      1300.0
+    ],
+    "corca": [
+      115.0,
+      3200.0
+    ],
+    "corcan": [
+      560.0,
+      9300.0
+    ],
+    "corcarry": [
+      1400.0,
+      17000.0
+    ],
+    "corcat": [
+      4900.0,
+      80000.0
+    ],
+    "corch": [
+      190.0,
+      3000.0
+    ],
+    "corck": [
+      120.0,
+      1750.0
+    ],
+    "corcom": [
+      2700.0,
+      26000.0
+    ],
+    "corcomboss": [
+      300000.0,
+      3000000.0
+    ],
+    "corcomcon": [
+      2700.0,
+      26000.0
+    ],
+    "corcomlvl10": [
+      11000.0,
+      110000.0
+    ],
+    "corcomlvl2": [
+      3000.0,
+      30000.0
+    ],
+    "corcomlvl3": [
+      4000.0,
+      40000.0
+    ],
+    "corcomlvl4": [
+      5000.0,
+      50000.0
+    ],
+    "corcomlvl5": [
+      6000.0,
+      60000.0
+    ],
+    "corcomlvl6": [
+      7000.0,
+      70000.0
+    ],
+    "corcomlvl7": [
+      8000.0,
+      80000.0
+    ],
+    "corcomlvl8": [
+      9000.0,
+      90000.0
+    ],
+    "corcomlvl9": [
+      10000.0,
+      100000.0
+    ],
+    "corcrash": [
+      125.0,
+      1100.0
+    ],
+    "corcrus": [
+      1000.0,
+      12000.0
+    ],
+    "corcrw": [
+      5100.0,
+      72000.0
+    ],
+    "corcrwh": [
+      5100.0,
+      72000.0
+    ],
+    "corcrwt4": [
+      15000.0,
+      150000.0
+    ],
+    "corcs": [
+      200.0,
+      2000.0
+    ],
+    "corcsa": [
+      140.0,
+      8200.0
+    ],
+    "corcut": [
+      230.0,
+      5400.0
+    ],
+    "corcv": [
+      145.0,
+      2100.0
+    ],
+    "cordeadeye": [
+      1050.0,
+      27500.0
+    ],
+    "cordecom": [
+      750.0,
+      13000.0
+    ],
+    "cordemon": [
+      6000.0,
+      90000.0
+    ],
+    "cordesolator": [
+      9000.0,
+      95000.0
+    ],
+    "cordl": [
+      250.0,
+      2200.0
+    ],
+    "cordoom": [
+      3000.0,
+      37000.0
+    ],
+    "cordoomt3": [
+      12000.0,
+      400000.0
+    ],
+    "cordrag": [
+      8.0,
+      0.0
+    ],
+    "cordrone": [
+      30.0,
+      750.0
+    ],
+    "cordronecarry": [
+      1700.0,
+      17000.0
+    ],
+    "cordronecarryair": [
+      1700.0,
+      17000.0
+    ],
+    "cordroneold": [
+      29.0,
+      650.0
+    ],
+    "cords": [
+      1000.0,
+      14600.0
+    ],
+    "corenaa": [
+      890.0,
+      25000.0
+    ],
+    "corerad": [
+      800.0,
+      7900.0
+    ],
+    "corestor": [
+      175.0,
+      1800.0
+    ],
+    "coresupp": [
+      100.0,
+      1000.0
+    ],
+    "coresuppt3": [
+      30000.0,
+      600000.0
+    ],
+    "coreter": [
+      105.0,
+      1900.0
+    ],
+    "corexp": [
+      240.0,
+      1900.0
+    ],
+    "coreyes": [
+      32.0,
+      850.0
+    ],
+    "corfast": [
+      210.0,
+      3800.0
+    ],
+    "corfatf": [
+      800.0,
+      7500.0
+    ],
+    "corfav": [
+      26.0,
+      270.0
+    ],
+    "corfblackhyt4": [
+      25000.0,
+      250000.0
+    ],
+    "corfdoom": [
+      1200.0,
+      15000.0
+    ],
+    "corfdrag": [
+      15.0,
+      0.0
+    ],
+    "corfgate": [
+      4100.0,
+      74000.0
+    ],
+    "corfhlt": [
+      480.0,
+      6200.0
+    ],
+    "corfhp": [
+      670.0,
+      2000.0
+    ],
+    "corfink": [
+      51.0,
+      1450.0
+    ],
+    "corflak": [
+      850.0,
+      14000.0
+    ],
+    "corfmd": [
+      1500.0,
+      40000.0
+    ],
+    "corfmine3": [
+      32.0,
+      1600.0
+    ],
+    "corfmkr": [
+      1.0,
+      1250.0
+    ],
+    "corforge": [
+      330.0,
+      4700.0
+    ],
+    "corfort": [
+      40.0,
+      500.0
+    ],
+    "corfrad": [
+      130.0,
+      1000.0
+    ],
+    "corfrock": [
+      315.0,
+      6100.0
+    ],
+    "corfrt": [
+      90.0,
+      1000.0
+    ],
+    "corfship": [
+      630.0,
+      9400.0
+    ],
+    "corftiger": [
+      665.0,
+      10000.0
+    ],
+    "corfus": [
+      3600.0,
+      22000.0
+    ],
+    "corgant": [
+      8400.0,
+      62000.0
+    ],
+    "corgantuw": [
+      8350.0,
+      62500.0
+    ],
+    "corgarp": [
+      220.0,
+      2600.0
+    ],
+    "corgate": [
+      3200.0,
+      55000.0
+    ],
+    "corgatet3": [
+      16000.0,
+      275000.0
+    ],
+    "corgator": [
+      120.0,
+      1100.0
+    ],
+    "corgatreap": [
+      1400.0,
+      17000.0
+    ],
+    "corgeo": [
+      540.0,
+      13000.0
+    ],
+    "corgol": [
+      1650.0,
+      28000.0
+    ],
+    "corgolt4": [
+      25000.0,
+      250000.0
+    ],
+    "corgplat": [
+      120.0,
+      950.0
+    ],
+    "corhaap": [
+      4700.0,
+      65000.0
+    ],
+    "corhaapuw": [
+      1900.0,
+      23000.0
+    ],
+    "corhaca": [
+      1040.0,
+      28800.0
+    ],
+    "corhack": [
+      1260.0,
+      22800.0
+    ],
+    "corhacs": [
+      1180.0,
+      23600.0
+    ],
+    "corhacv": [
+      1520.0,
+      17200.0
+    ],
+    "corhal": [
+      640.0,
+      13000.0
+    ],
+    "va_halberd": [
+      640.0,
+      13000.0
+    ],
+    "corhalab": [
+      4900.0,
+      52200.0
+    ],
+    "corhasy": [
+      5000.0,
+      40000.0
+    ],
+    "corhavp": [
+      4900.0,
+      46000.0
+    ],
+    "corhllllt": [
+      300.0,
+      7000.0
+    ],
+    "corhllt": [
+      195.0,
+      1750.0
+    ],
+    "corhlt": [
+      480.0,
+      4700.0
+    ],
+    "corhp": [
+      670.0,
+      2000.0
+    ],
+    "corhrk": [
+      600.0,
+      5800.0
+    ],
+    "corhunt": [
+      130.0,
+      6900.0
+    ],
+    "corhurc": [
+      310.0,
+      18500.0
+    ],
+    "corhvytrans": [
+      190.0,
+      4000.0
+    ],
+    "corint": [
+      4600.0,
+      67000.0
+    ],
+    "corjamt": [
+      100.0,
+      4500.0
+    ],
+    "corjugg": [
+      20000.0,
+      513000.0
+    ],
+    "corjuno": [
+      660.0,
+      16000.0
+    ],
+    "corkarg": [
+      2500.0,
+      57000.0
+    ],
+    "corkarganetht4": [
+      12000.0,
+      120000.0
+    ],
+    "corkark": [
+      280.0,
+      2400.0
+    ],
+    "corkorg": [
+      29000.0,
+      615000.0
+    ],
+    "corlab": [
+      470.0,
+      1050.0
+    ],
+    "corlevlr": [
+      220.0,
+      2600.0
+    ],
+    "corllt": [
+      90.0,
+      700.0
+    ],
+    "cormabm": [
+      1250.0,
+      32000.0
+    ],
+    "cormadsam": [
+      315.0,
+      6100.0
+    ],
+    "cormakr": [
+      1.0,
+      1250.0
+    ],
+    "cormando": [
+      1200.0,
+      15500.0
+    ],
+    "cormandot4": [
+      6700.0,
+      90000.0
+    ],
+    "cormart": [
+      400.0,
+      4400.0
+    ],
+    "cormaw": [
+      290.0,
+      1550.0
+    ],
+    "cormex": [
+      50.0,
+      500.0
+    ],
+    "cormexp": [
+      2400.0,
+      12000.0
+    ],
+    "cormh": [
+      200.0,
+      3300.0
+    ],
+    "cormine1": [
+      7.0,
+      270.0
+    ],
+    "cormine2": [
+      25.0,
+      1050.0
+    ],
+    "cormine3": [
+      50.0,
+      2800.0
+    ],
+    "cormine4": [
+      16.0,
+      1050.0
+    ],
+    "corminibuzz": [
+      2000.0,
+      60000.0
+    ],
+    "cormist": [
+      155.0,
+      2400.0
+    ],
+    "cormls": [
+      200.0,
+      3300.0
+    ],
+    "cormlv": [
+      65.0,
+      1300.0
+    ],
+    "cormmkr": [
+      370.0,
+      21000.0
+    ],
+    "cormmkrt3": [
+      9000.0,
+      550000.0
+    ],
+    "cormoho": [
+      640.0,
+      8100.0
+    ],
+    "cormort": [
+      400.0,
+      2800.0
+    ],
+    "cormship": [
+      2000.0,
+      10000.0
+    ],
+    "cormstor": [
+      340.0,
+      590.0
+    ],
+    "cormuskrat": [
+      170.0,
+      3500.0
+    ],
+    "cormwall": [
+      1020.0,
+      4800.0
+    ],
+    "cornanotc": [
+      230.0,
+      3200.0
+    ],
+    "cornanotc2plat": [
+      840.0,
+      12800.0
+    ],
+    "cornanotcplat": [
+      230.0,
+      3200.0
+    ],
+    "cornanotct2": [
+      840.0,
+      12800.0
+    ],
+    "cornavaldefturret": [
+      700.0,
+      9000.0
+    ],
+    "cornecro": [
+      130.0,
+      1400.0
+    ],
+    "coronager": [
+      950.0,
+      17000.0
+    ],
+    "corparrow": [
+      1050.0,
+      21000.0
+    ],
+    "corphantom": [
+      300.0,
+      4500.0
+    ],
+    "corplat": [
+      1400.0,
+      5500.0
+    ],
+    "corprince": [
+      13500.0,
+      115000.0
+    ],
+    "corprinter": [
+      330.0,
+      4700.0
+    ],
+    "corpship": [
+      420.0,
+      2800.0
+    ],
+    "corpt": [
+      210.0,
+      1400.0
+    ],
+    "corpun": [
+      1300.0,
+      13500.0
+    ],
+    "corpyro": [
+      200.0,
+      3000.0
+    ],
+    "corrad": [
+      60.0,
+      630.0
+    ],
+    "corraid": [
+      235.0,
+      2400.0
+    ],
+    "correap": [
+      690.0,
+      10000.0
+    ],
+    "correcl": [
+      240.0,
+      3500.0
+    ],
+    "correspawn": [
+      1.0,
+      1.0
+    ],
+    "corrl": [
+      80.0,
+      850.0
+    ],
+    "corroach": [
+      69.0,
+      5800.0
+    ],
+    "corroy": [
+      960.0,
+      7200.0
+    ],
+    "corsaap": [
+      3500.0,
+      35000.0
+    ],
+    "corsack": [
+      400.0,
+      6900.0
+    ],
+    "corsacv": [
+      450.0,
+      7000.0
+    ],
+    "corsacvsub": [
+      500.0,
+      9000.0
+    ],
+    "corsala": [
+      350.0,
+      7000.0
+    ],
+    "corsalab": [
+      3500.0,
+      35000.0
+    ],
+    "corsasy": [
+      3500.0,
+      35000.0
+    ],
+    "corsat": [
+      4000.0,
+      40000.0
+    ],
+    "corsavp": [
+      3500.0,
+      35000.0
+    ],
+    "corsb": [
+      200.0,
+      8200.0
+    ],
+    "corscavdrag": [
+      8.0,
+      0.0
+    ],
+    "corscavdtf": [
+      290.0,
+      1550.0
+    ],
+    "corscavdtl": [
+      340.0,
+      1600.0
+    ],
+    "corscavdtm": [
+      290.0,
+      1550.0
+    ],
+    "corscavfort": [
+      40.0,
+      500.0
+    ],
+    "corscreamer": [
+      1650.0,
+      32000.0
+    ],
+    "corsd": [
+      750.0,
+      6700.0
+    ],
+    "corseah": [
+      370.0,
+      9000.0
+    ],
+    "corseal": [
+      480.0,
+      9100.0
+    ],
+    "corseap": [
+      230.0,
+      5500.0
+    ],
+    "corsent": [
+      470.0,
+      10500.0
+    ],
+    "corsfig": [
+      90.0,
+      4600.0
+    ],
+    "corsfig2": [
+      90.0,
+      4600.0
+    ],
+    "corsh": [
+      75.0,
+      1500.0
+    ],
+    "corshad": [
+      150.0,
+      4600.0
+    ],
+    "corshark": [
+      730.0,
+      14000.0
+    ],
+    "corshiva": [
+      1600.0,
+      23000.0
+    ],
+    "corshroud": [
+      130.0,
+      20000.0
+    ],
+    "corsilo": [
+      7700.0,
+      82000.0
+    ],
+    "corsjam": [
+      280.0,
+      4200.0
+    ],
+    "corsktl": [
+      755.0,
+      27000.0
+    ],
+    "corslrpc": [
+      8000.0,
+      80000.0
+    ],
+    "corsnap": [
+      300.0,
+      3100.0
+    ],
+    "corsok": [
+      950.0,
+      19000.0
+    ],
+    "corsolar": [
+      150.0,
+      0.0
+    ],
+    "corsonar": [
+      20.0,
+      450.0
+    ],
+    "corspec": [
+      75.0,
+      1550.0
+    ],
+    "corspy": [
+      165.0,
+      12500.0
+    ],
+    "corssub": [
+      1900.0,
+      29000.0
+    ],
+    "corstorm": [
+      110.0,
+      1150.0
+    ],
+    "corsub": [
+      580.0,
+      4000.0
+    ],
+    "corsumo": [
+      2200.0,
+      35000.0
+    ],
+    "corsy": [
+      450.0,
+      950.0
+    ],
+    "cortarg": [
+      800.0,
+      7500.0
+    ],
+    "cortermite": [
+      540.0,
+      8100.0
+    ],
+    "corthermite": [
+      3500.0,
+      60000.0
+    ],
+    "corthud": [
+      140.0,
+      1150.0
+    ],
+    "cortide": [
+      85.0,
+      250.0
+    ],
+    "cortitan": [
+      410.0,
+      8200.0
+    ],
+    "cortl": [
+      170.0,
+      1800.0
+    ],
+    "cortoast": [
+      2500.0,
+      17000.0
+    ],
+    "cortorch": [
+      220.0,
+      4400.0
+    ],
+    "cortrem": [
+      1850.0,
+      49000.0
+    ],
+    "cortron": [
+      1200.0,
+      14000.0
+    ],
+    "coruwadves": [
+      840.0,
+      11000.0
+    ],
+    "coruwadvms": [
+      760.0,
+      11000.0
+    ],
+    "coruwes": [
+      175.0,
+      1800.0
+    ],
+    "coruwfus": [
+      5400.0,
+      34000.0
+    ],
+    "coruwmme": [
+      640.0,
+      8100.0
+    ],
+    "coruwmmm": [
+      370.0,
+      21000.0
+    ],
+    "coruwms": [
+      340.0,
+      590.0
+    ],
+    "corvac": [
+      370.0,
+      5500.0
+    ],
+    "va_printer": [
+      370.0,
+      5500.0
+    ],
+    "corvacct": [
+      1.0,
+      1.0
+    ],
+    "corvalk": [
+      74.0,
+      1450.0
+    ],
+    "corvamp": [
+      135.0,
+      4750.0
+    ],
+    "corveng": [
+      73.0,
+      2800.0
+    ],
+    "corvipe": [
+      730.0,
+      14000.0
+    ],
+    "corvoyr": [
+      99.0,
+      1350.0
+    ],
+    "corvp": [
+      570.0,
+      1550.0
+    ],
+    "corvrad": [
+      92.0,
+      1300.0
+    ],
+    "corvroc": [
+      880.0,
+      6700.0
+    ],
+    "corwin": [
+      43.0,
+      175.0
+    ],
+    "corwint2": [
+      450.0,
+      1750.0
+    ],
+    "corwolv": [
+      170.0,
+      2500.0
+    ],
+    "critter_ant": [
+      0.0,
+      1.0
+    ],
+    "critter_crab": [
+      0.0,
+      1.0
+    ],
+    "critter_duck": [
+      0.0,
+      1.0
+    ],
+    "critter_goldfish": [
+      0.0,
+      1.0
+    ],
+    "critter_gull": [
+      0.0,
+      1.0
+    ],
+    "critter_penguin": [
+      15.0,
+      200.0
+    ],
+    "critter_penguinbro": [
+      1500.0,
+      15000.0
+    ],
+    "critter_penguinking": [
+      20000.0,
+      400000.0
+    ],
+    "dbg_sphere": [
+      175.0,
+      3400.0
+    ],
+    "dbg_sphere_fullmetal": [
+      175.0,
+      3400.0
+    ],
+    "dice": [
+      0.0,
+      1.0
+    ],
+    "freefusion": [
+      40.0,
+      50.0
+    ],
+    "hat_fightnight": [
+      1000.0,
+      10000.0
+    ],
+    "hat_hornet": [
+      1000.0,
+      10000.0
+    ],
+    "hat_hw": [
+      1000.0,
+      10000.0
+    ],
+    "hat_legfn": [
+      1000.0,
+      10000.0
+    ],
+    "hat_ptaq": [
+      1000.0,
+      10000.0
+    ],
+    "hat_viking_teamcolored": [
+      1000.0,
+      10000.0
+    ],
+    "leegmech": [
+      10000.0,
+      200000.0
+    ],
+    "legaabot": [
+      120.0,
+      950.0
+    ],
+    "legaap": [
+      2900.0,
+      28000.0
+    ],
+    "legabm": [
+      1500.0,
+      40000.0
+    ],
+    "legaca": [
+      330.0,
+      11000.0
+    ],
+    "legaceb": [
+      310.0,
+      5600.0
+    ],
+    "legack": [
+      410.0,
+      6900.0
+    ],
+    "legacluster": [
+      2300.0,
+      15000.0
+    ],
+    "legacv": [
+      530.0,
+      6600.0
+    ],
+    "legadvaabot": [
+      750.0,
+      6650.0
+    ],
+    "legadveconv": [
+      370.0,
+      21000.0
+    ],
+    "legadveconvt3": [
+      9000.0,
+      550000.0
+    ],
+    "legadvestore": [
+      840.0,
+      11000.0
+    ],
+    "legadvshipyard": [
+      2800.0,
+      10000.0
+    ],
+    "legadvsol": [
+      465.0,
+      4080.0
+    ],
+    "legafcv": [
+      200.0,
+      2900.0
+    ],
+    "legafigdef": [
+      180.0,
+      6200.0
+    ],
+    "legafus": [
+      10500.0,
+      69000.0
+    ],
+    "legafust3": [
+      90000.0,
+      550000.0
+    ],
+    "legageo": [
+      1600.0,
+      27000.0
+    ],
+    "legah": [
+      210.0,
+      4300.0
+    ],
+    "legaheattank": [
+      1250.0,
+      19000.0
+    ],
+    "legajam": [
+      125.0,
+      19000.0
+    ],
+    "legajamk": [
+      75.0,
+      1550.0
+    ],
+    "legalab": [
+      2600.0,
+      16000.0
+    ],
+    "legamcluster": [
+      460.0,
+      5500.0
+    ],
+    "legamph": [
+      600.0,
+      13200.0
+    ],
+    "legamphlab": [
+      1200.0,
+      5600.0
+    ],
+    "legamphtank": [
+      200.0,
+      2000.0
+    ],
+    "legamstor": [
+      760.0,
+      11000.0
+    ],
+    "leganavalaaturret": [
+      890.0,
+      25000.0
+    ],
+    "leganavaldefturret": [
+      1250.0,
+      16500.0
+    ],
+    "leganavaleconv": [
+      370.0,
+      21000.0
+    ],
+    "leganavalfusion": [
+      5400.0,
+      34000.0
+    ],
+    "leganavalmex": [
+      640.0,
+      8100.0
+    ],
+    "leganavalpinpointer": [
+      800.0,
+      7500.0
+    ],
+    "leganavalsonarstation": [
+      160.0,
+      2400.0
+    ],
+    "leganavaltorpturret": [
+      1050.0,
+      8500.0
+    ],
+    "leganavyaaship": [
+      1000.0,
+      12000.0
+    ],
+    "leganavyantinukecarrier": [
+      1600.0,
+      13000.0
+    ],
+    "leganavyantiswarm": [
+      500.0,
+      8500.0
+    ],
+    "leganavyartyship": [
+      13000.0,
+      125000.0
+    ],
+    "leganavybattleship": [
+      2900.0,
+      21000.0
+    ],
+    "leganavybattlesub": [
+      1100.0,
+      16000.0
+    ],
+    "leganavyconsub": [
+      700.0,
+      9000.0
+    ],
+    "leganavycruiser": [
+      900.0,
+      10800.0
+    ],
+    "leganavyengineer": [
+      200.0,
+      3300.0
+    ],
+    "leganavyflagship": [
+      16000.0,
+      240000.0
+    ],
+    "leganavyheavysub": [
+      1900.0,
+      29000.0
+    ],
+    "leganavymissileship": [
+      2000.0,
+      10000.0
+    ],
+    "leganavyradjamship": [
+      450.0,
+      6000.0
+    ],
+    "legap": [
+      430.0,
+      1100.0
+    ],
+    "legapopupdef": [
+      750.0,
+      15000.0
+    ],
+    "legapt3": [
+      8500.0,
+      60000.0
+    ],
+    "legarad": [
+      400.0,
+      14000.0
+    ],
+    "legaradk": [
+      99.0,
+      1350.0
+    ],
+    "legaskirmtank": [
+      450.0,
+      6800.0
+    ],
+    "legaspy": [
+      125.0,
+      8500.0
+    ],
+    "legassistdrone": [
+      1.0,
+      1.0
+    ],
+    "legassistdrone_land": [
+      1.0,
+      1.0
+    ],
+    "legatorpbomber": [
+      480.0,
+      9480.0
+    ],
+    "legatrans": [
+      190.0,
+      4000.0
+    ],
+    "legavantinuke": [
+      1100.0,
+      36000.0
+    ],
+    "legavjam": [
+      105.0,
+      1900.0
+    ],
+    "legavp": [
+      2500.0,
+      16000.0
+    ],
+    "legavrad": [
+      125.0,
+      2000.0
+    ],
+    "legavroc": [
+      920.0,
+      6500.0
+    ],
+    "legbal": [
+      160.0,
+      1920.0
+    ],
+    "legbar": [
+      250.0,
+      3200.0
+    ],
+    "legbart": [
+      550.0,
+      5500.0
+    ],
+    "legbastion": [
+      4200.0,
+      58000.0
+    ],
+    "legbombard": [
+      750.0,
+      15000.0
+    ],
+    "legbunk": [
+      1850.0,
+      42000.0
+    ],
+    "legca": [
+      105.0,
+      3200.0
+    ],
+    "legcar": [
+      550.0,
+      11000.0
+    ],
+    "legcen": [
+      140.0,
+      2200.0
+    ],
+    "legch": [
+      185.0,
+      2600.0
+    ],
+    "legcib": [
+      100.0,
+      3500.0
+    ],
+    "legck": [
+      100.0,
+      1600.0
+    ],
+    "legcluster": [
+      850.0,
+      11000.0
+    ],
+    "legcom": [
+      2700.0,
+      26000.0
+    ],
+    "legcombabyunits": [
+      0.0,
+      0.0
+    ],
+    "legcomecon": [
+      2700.0,
+      26000.0
+    ],
+    "legcomlvl10": [
+      11000.0,
+      110000.0
+    ],
+    "legcomlvl2": [
+      3000.0,
+      30000.0
+    ],
+    "legcomlvl3": [
+      4000.0,
+      40000.0
+    ],
+    "legcomlvl4": [
+      5000.0,
+      50000.0
+    ],
+    "legcomlvl5": [
+      6000.0,
+      60000.0
+    ],
+    "legcomlvl6": [
+      7000.0,
+      70000.0
+    ],
+    "legcomlvl7": [
+      8000.0,
+      80000.0
+    ],
+    "legcomlvl8": [
+      9000.0,
+      90000.0
+    ],
+    "legcomlvl9": [
+      10000.0,
+      100000.0
+    ],
+    "legcomoff": [
+      2700.0,
+      26000.0
+    ],
+    "legcomt2com": [
+      2700.0,
+      26000.0
+    ],
+    "legcomt2def": [
+      2700.0,
+      26000.0
+    ],
+    "legcomt2off": [
+      2700.0,
+      26000.0
+    ],
+    "legctl": [
+      240.0,
+      2200.0
+    ],
+    "legcv": [
+      125.0,
+      2100.0
+    ],
+    "legdecom": [
+      750.0,
+      13000.0
+    ],
+    "legdeflector": [
+      3200.0,
+      55000.0
+    ],
+    "legdrag": [
+      8.0,
+      0.0
+    ],
+    "legdrone": [
+      15.0,
+      500.0
+    ],
+    "legdtf": [
+      290.0,
+      1550.0
+    ],
+    "legdtl": [
+      340.0,
+      1600.0
+    ],
+    "legdtm": [
+      290.0,
+      1550.0
+    ],
+    "legdtr": [
+      290.0,
+      1550.0
+    ],
+    "legeallterrainmech": [
+      3950.0,
+      78000.0
+    ],
+    "legeconv": [
+      1.0,
+      1150.0
+    ],
+    "legeheatraymech": [
+      23500.0,
+      615000.0
+    ],
+    "legeheatraymech_old": [
+      27000.0,
+      705000.0
+    ],
+    "legehovertank": [
+      1350.0,
+      25000.0
+    ],
+    "legelrpcmech": [
+      11000.0,
+      150000.0
+    ],
+    "legeshotgunmech": [
+      7000.0,
+      120000.0
+    ],
+    "legestor": [
+      175.0,
+      1800.0
+    ],
+    "legeyes": [
+      32.0,
+      850.0
+    ],
+    "legfdrag": [
+      15.0,
+      0.0
+    ],
+    "legfeconv": [
+      1.0,
+      1250.0
+    ],
+    "legfhive": [
+      350.0,
+      9000.0
+    ],
+    "legfhp": [
+      670.0,
+      2000.0
+    ],
+    "legfig": [
+      40.0,
+      1600.0
+    ],
+    "legflak": [
+      820.0,
+      13000.0
+    ],
+    "legfmg": [
+      450.0,
+      5500.0
+    ],
+    "legfort": [
+      5600.0,
+      79000.0
+    ],
+    "legforti": [
+      40.0,
+      500.0
+    ],
+    "legfortt4": [
+      56000.0,
+      790000.0
+    ],
+    "legfrad": [
+      130.0,
+      1000.0
+    ],
+    "legfrl": [
+      90.0,
+      1000.0
+    ],
+    "legfus": [
+      4000.0,
+      25000.0
+    ],
+    "leggant": [
+      8400.0,
+      62000.0
+    ],
+    "leggantuw": [
+      8400.0,
+      62000.0
+    ],
+    "leggat": [
+      300.0,
+      3600.0
+    ],
+    "leggatet3": [
+      14500.0,
+      216000.0
+    ],
+    "leggeo": [
+      560.0,
+      13000.0
+    ],
+    "leggob": [
+      25.0,
+      500.0
+    ],
+    "leggobt3": [
+      6000.0,
+      120000.0
+    ],
+    "leghaap": [
+      4700.0,
+      62000.0
+    ],
+    "leghaca": [
+      960.0,
+      32800.0
+    ],
+    "leghack": [
+      1240.0,
+      22400.0
+    ],
+    "leghacv": [
+      800.0,
+      9400.0
+    ],
+    "leghades": [
+      65.0,
+      850.0
+    ],
+    "leghalab": [
+      4900.0,
+      62000.0
+    ],
+    "leghavp": [
+      4900.0,
+      46000.0
+    ],
+    "legheavydrone": [
+      90.0,
+      1000.0
+    ],
+    "legheavydronesmall": [
+      90.0,
+      1000.0
+    ],
+    "leghelios": [
+      160.0,
+      2400.0
+    ],
+    "leghive": [
+      350.0,
+      9000.0
+    ],
+    "leghp": [
+      670.0,
+      2000.0
+    ],
+    "leghrk": [
+      750.0,
+      9000.0
+    ],
+    "leginc": [
+      2300.0,
+      46000.0
+    ],
+    "leginf": [
+      1700.0,
+      30000.0
+    ],
+    "leginfestor": [
+      250.0,
+      5200.0
+    ],
+    "legionnaire": [
+      180.0,
+      6200.0
+    ],
+    "legjam": [
+      140.0,
+      7200.0
+    ],
+    "legjav": [
+      1200.0,
+      21000.0
+    ],
+    "legjuno": [
+      660.0,
+      16000.0
+    ],
+    "legkam": [
+      65.0,
+      2000.0
+    ],
+    "legkark": [
+      330.0,
+      2600.0
+    ],
+    "leglab": [
+      470.0,
+      1050.0
+    ],
+    "leglht": [
+      70.0,
+      550.0
+    ],
+    "leglob": [
+      60.0,
+      400.0
+    ],
+    "leglraa": [
+      1600.0,
+      36000.0
+    ],
+    "leglrpc": [
+      5200.0,
+      76000.0
+    ],
+    "leglts": [
+      68.0,
+      1300.0
+    ],
+    "leglupara": [
+      900.0,
+      8200.0
+    ],
+    "legmed": [
+      1500.0,
+      22500.0
+    ],
+    "legmex": [
+      50.0,
+      500.0
+    ],
+    "legmext15": [
+      250.0,
+      5000.0
+    ],
+    "legmg": [
+      380.0,
+      5500.0
+    ],
+    "legmh": [
+      190.0,
+      3100.0
+    ],
+    "legmine1": [
+      7.0,
+      270.0
+    ],
+    "legmine2": [
+      25.0,
+      1050.0
+    ],
+    "legmine3": [
+      50.0,
+      2800.0
+    ],
+    "legmineb": [
+      300.0,
+      21000.0
+    ],
+    "legmlv": [
+      52.0,
+      900.0
+    ],
+    "legmoho": [
+      640.0,
+      8100.0
+    ],
+    "legmohobp": [
+      640.0,
+      8100.0
+    ],
+    "legmohobpct": [
+      1.0,
+      1.0
+    ],
+    "legmohocon": [
+      1060.0,
+      14500.0
+    ],
+    "legmohoconct": [
+      1060.0,
+      14500.0
+    ],
+    "legmohoconin": [
+      1060.0,
+      14500.0
+    ],
+    "legmos": [
+      110.0,
+      2000.0
+    ],
+    "legmost3": [
+      3000.0,
+      42000.0
+    ],
+    "legmrv": [
+      250.0,
+      4100.0
+    ],
+    "legmstor": [
+      340.0,
+      590.0
+    ],
+    "legnanotc": [
+      230.0,
+      3200.0
+    ],
+    "legnanotcbase": [
+      1.0,
+      1.0
+    ],
+    "legnanotcplat": [
+      230.0,
+      3200.0
+    ],
+    "legnanotct2": [
+      840.0,
+      12800.0
+    ],
+    "legnanotct2plat": [
+      840.0,
+      12800.0
+    ],
+    "legnap": [
+      420.0,
+      21000.0
+    ],
+    "legnavaldefturret": [
+      600.0,
+      7500.0
+    ],
+    "legnavyaaship": [
+      250.0,
+      3600.0
+    ],
+    "legnavyartyship": [
+      1450.0,
+      15000.0
+    ],
+    "legnavyconship": [
+      180.0,
+      2000.0
+    ],
+    "legnavydestro": [
+      875.0,
+      9500.0
+    ],
+    "legnavyfrigate": [
+      370.0,
+      3700.0
+    ],
+    "legnavyrezsub": [
+      240.0,
+      3500.0
+    ],
+    "legnavyscout": [
+      120.0,
+      1600.0
+    ],
+    "legnavysub": [
+      320.0,
+      2400.0
+    ],
+    "legner": [
+      220.0,
+      2000.0
+    ],
+    "legotter": [
+      150.0,
+      3100.0
+    ],
+    "legpede": [
+      5500.0,
+      80000.0
+    ],
+    "legperdition": [
+      1250.0,
+      15000.0
+    ],
+    "legphoenix": [
+      450.0,
+      25000.0
+    ],
+    "legrad": [
+      60.0,
+      630.0
+    ],
+    "legrail": [
+      240.0,
+      3800.0
+    ],
+    "legrampart": [
+      2600.0,
+      38000.0
+    ],
+    "legrezbot": [
+      130.0,
+      1400.0
+    ],
+    "legrhapsis": [
+      280.0,
+      6500.0
+    ],
+    "legrl": [
+      80.0,
+      850.0
+    ],
+    "legrwall": [
+      1250.0,
+      6000.0
+    ],
+    "legscout": [
+      23.0,
+      350.0
+    ],
+    "legsd": [
+      710.0,
+      7100.0
+    ],
+    "legsh": [
+      60.0,
+      1200.0
+    ],
+    "legshot": [
+      470.0,
+      5000.0
+    ],
+    "legsilo": [
+      7700.0,
+      82000.0
+    ],
+    "legsnapper": [
+      60.0,
+      5600.0
+    ],
+    "legsolar": [
+      155.0,
+      0.0
+    ],
+    "legspbomber": [
+      240.0,
+      7500.0
+    ],
+    "legspcarrier": [
+      250.0,
+      5000.0
+    ],
+    "legspcon": [
+      150.0,
+      7800.0
+    ],
+    "legspfighter": [
+      90.0,
+      4500.0
+    ],
+    "legsplab": [
+      1400.0,
+      5500.0
+    ],
+    "legspradarsonarplane": [
+      125.0,
+      7000.0
+    ],
+    "legspsurfacegunship": [
+      270.0,
+      6700.0
+    ],
+    "legsptorpgunship": [
+      190.0,
+      5000.0
+    ],
+    "legsrail": [
+      750.0,
+      15000.0
+    ],
+    "legsrailt4": [
+      15000.0,
+      300000.0
+    ],
+    "legstarfall": [
+      63000.0,
+      720000.0
+    ],
+    "legstr": [
+      355.0,
+      5250.0
+    ],
+    "legstronghold": [
+      550.0,
+      13000.0
+    ],
+    "legsy": [
+      450.0,
+      950.0
+    ],
+    "legtarg": [
+      810.0,
+      7200.0
+    ],
+    "legtide": [
+      85.0,
+      250.0
+    ],
+    "legtl": [
+      170.0,
+      1500.0
+    ],
+    "leguwestore": [
+      175.0,
+      1800.0
+    ],
+    "leguwmstore": [
+      340.0,
+      590.0
+    ],
+    "legvcarry": [
+      450.0,
+      9000.0
+    ],
+    "legvenator": [
+      110.0,
+      3200.0
+    ],
+    "legvflak": [
+      470.0,
+      10500.0
+    ],
+    "legvision": [
+      1.0,
+      1.0
+    ],
+    "legvp": [
+      570.0,
+      1650.0
+    ],
+    "legwhisper": [
+      210.0,
+      9000.0
+    ],
+    "legwin": [
+      45.0,
+      175.0
+    ],
+    "legwint2": [
+      450.0,
+      1750.0
+    ],
+    "lootboxbronze": [
+      375.0,
+      25000.0
+    ],
+    "lootboxgold": [
+      1500.0,
+      25000.0
+    ],
+    "lootboxplatinum": [
+      2500.0,
+      25000.0
+    ],
+    "lootboxsilver": [
+      750.0,
+      25000.0
+    ],
+    "lootdroppod_gold": [
+      400.0,
+      25000.0
+    ],
+    "lootdroppod_printer": [
+      400.0,
+      25000.0
+    ],
+    "meteor": [
+      1.0,
+      1.0
+    ],
+    "mission_command_tower": [
+      10000.0,
+      100000.0
+    ],
+    "nuketest": [
+      400.0,
+      25000.0
+    ],
+    "nuketestcor": [
+      400.0,
+      25000.0
+    ],
+    "nuketestorg": [
+      400.0,
+      25000.0
+    ],
+    "pbr_cube": [
+      175.0,
+      3400.0
+    ],
+    "raptor_6legged_l": [
+      99.0,
+      5280.0
+    ],
+    "raptor_air_bomber_acid_t2_v1": [
+      50.0,
+      50.0
+    ],
+    "raptor_air_bomber_basic_t1_v1": [
+      212.0,
+      4550.0
+    ],
+    "raptor_air_bomber_basic_t2_v1": [
+      212.0,
+      4550.0
+    ],
+    "raptor_air_bomber_basic_t2_v2": [
+      212.0,
+      4550.0
+    ],
+    "raptor_air_bomber_basic_t4_v1": [
+      212.0,
+      4550.0
+    ],
+    "raptor_air_bomber_basic_t4_v2": [
+      212.0,
+      4550.0
+    ],
+    "raptor_air_bomber_brood_t4_v2": [
+      212.0,
+      4550.0
+    ],
+    "raptor_air_bomber_brood_t4_v3": [
+      212.0,
+      4550.0
+    ],
+    "raptor_air_bomber_brood_t4_v4": [
+      212.0,
+      4550.0
+    ],
+    "raptor_air_bomber_emp_t2_v1": [
+      50.0,
+      50.0
+    ],
+    "raptor_air_fighter_basic_t1_v1": [
+      72.0,
+      2200.0
+    ],
+    "raptor_air_fighter_basic_t2_v1": [
+      72.0,
+      2200.0
+    ],
+    "raptor_air_fighter_basic_t2_v2": [
+      72.0,
+      2200.0
+    ],
+    "raptor_air_fighter_basic_t2_v3": [
+      72.0,
+      2200.0
+    ],
+    "raptor_air_fighter_basic_t2_v4": [
+      72.0,
+      2200.0
+    ],
+    "raptor_air_fighter_basic_t4_v1": [
+      72.0,
+      2200.0
+    ],
+    "raptor_air_gunship_acid_t2_v1": [
+      212.0,
+      4550.0
+    ],
+    "raptor_air_gunship_antiair_t2_v1": [
+      212.0,
+      4550.0
+    ],
+    "raptor_air_gunship_basic_t2_v1": [
+      212.0,
+      4550.0
+    ],
+    "raptor_air_gunship_emp_t2_v1": [
+      212.0,
+      4550.0
+    ],
+    "raptor_air_gunship_fire_t2_v1": [
+      212.0,
+      4550.0
+    ],
+    "raptor_air_kamikaze_basic_t2_v1": [
+      212.0,
+      4550.0
+    ],
+    "raptor_air_scout_basic_t2_v1": [
+      50.0,
+      50.0
+    ],
+    "raptor_air_scout_basic_t3_v1": [
+      50.0,
+      50.0
+    ],
+    "raptor_air_scout_basic_t4_v1": [
+      50.0,
+      50.0
+    ],
+    "raptor_allterrain_arty_acid_t2_v1": [
+      396.0,
+      12320.0
+    ],
+    "raptor_allterrain_arty_acid_t4_v1": [
+      396.0,
+      12320.0
+    ],
+    "raptor_allterrain_arty_basic_t2_v1": [
+      396.0,
+      12320.0
+    ],
+    "raptor_allterrain_arty_basic_t4_v1": [
+      396.0,
+      12320.0
+    ],
+    "raptor_allterrain_arty_brood_t2_v1": [
+      396.0,
+      12320.0
+    ],
+    "raptor_allterrain_arty_brood_t4_v1": [
+      396.0,
+      12320.0
+    ],
+    "raptor_allterrain_arty_emp_t2_v1": [
+      396.0,
+      12320.0
+    ],
+    "raptor_allterrain_arty_emp_t4_v1": [
+      396.0,
+      12320.0
+    ],
+    "raptor_allterrain_assault_acid_t2_v1": [
+      152.0,
+      3520.0
+    ],
+    "raptor_allterrain_assault_basic_t2_v1": [
+      152.0,
+      3520.0
+    ],
+    "raptor_allterrain_assault_basic_t2_v2": [
+      152.0,
+      3520.0
+    ],
+    "raptor_allterrain_assault_basic_t2_v3": [
+      152.0,
+      3520.0
+    ],
+    "raptor_allterrain_assault_basic_t4_v1": [
+      302.0,
+      3520.0
+    ],
+    "raptor_allterrain_assault_basic_t4_v2": [
+      302.0,
+      3520.0
+    ],
+    "raptor_allterrain_assault_emp_t2_v1": [
+      152.0,
+      3520.0
+    ],
+    "raptor_allterrain_swarmer_acid_t2_v1": [
+      99.0,
+      5280.0
+    ],
+    "raptor_allterrain_swarmer_basic_t2_v1": [
+      99.0,
+      5280.0
+    ],
+    "raptor_allterrain_swarmer_basic_t3_v1": [
+      99.0,
+      5280.0
+    ],
+    "raptor_allterrain_swarmer_basic_t4_v1": [
+      99.0,
+      5280.0
+    ],
+    "raptor_allterrain_swarmer_emp_t2_v1": [
+      99.0,
+      5280.0
+    ],
+    "raptor_allterrain_swarmer_fire_t2_v1": [
+      99.0,
+      5280.0
+    ],
+    "raptor_antinuke": [
+      1500.0,
+      40000.0
+    ],
+    "raptor_hive": [
+      400.0,
+      25000.0
+    ],
+    "va_queen_nest": [
+      400.0,
+      25000.0
+    ],
+    "raptor_land_assault_acid_t2_v1": [
+      152.0,
+      3520.0
+    ],
+    "raptor_land_assault_basic_t2_v1": [
+      152.0,
+      3520.0
+    ],
+    "raptor_land_assault_basic_t2_v2": [
+      152.0,
+      3520.0
+    ],
+    "raptor_land_assault_basic_t2_v3": [
+      152.0,
+      3520.0
+    ],
+    "raptor_land_assault_basic_t4_v1": [
+      302.0,
+      3520.0
+    ],
+    "raptor_land_assault_basic_t4_v2": [
+      302.0,
+      3520.0
+    ],
+    "raptor_land_assault_emp_t2_v1": [
+      152.0,
+      3520.0
+    ],
+    "raptor_land_assault_spectre_t2_v1": [
+      152.0,
+      3520.0
+    ],
+    "raptor_land_assault_spectre_t4_v1": [
+      302.0,
+      3520.0
+    ],
+    "raptor_land_kamikaze_basic_t2_v1": [
+      128.0,
+      3000.0
+    ],
+    "raptor_land_kamikaze_basic_t4_v1": [
+      350.0,
+      9000.0
+    ],
+    "raptor_land_kamikaze_emp_t2_v1": [
+      128.0,
+      3000.0
+    ],
+    "raptor_land_kamikaze_emp_t4_v1": [
+      350.0,
+      9000.0
+    ],
+    "raptor_land_spiker_basic_t2_v1": [
+      174.0,
+      174.0
+    ],
+    "raptor_land_spiker_basic_t4_v1": [
+      174.0,
+      174.0
+    ],
+    "raptor_land_spiker_spectre_t4_v1": [
+      174.0,
+      174.0
+    ],
+    "raptor_land_swarmer_acids_t2_v1": [
+      25.0,
+      53.0
+    ],
+    "raptor_land_swarmer_basic_t1_v1": [
+      25.0,
+      53.0
+    ],
+    "raptor_land_swarmer_basic_t2_v1": [
+      25.0,
+      53.0
+    ],
+    "raptor_land_swarmer_basic_t2_v2": [
+      25.0,
+      53.0
+    ],
+    "raptor_land_swarmer_basic_t2_v3": [
+      25.0,
+      53.0
+    ],
+    "raptor_land_swarmer_basic_t2_v4": [
+      25.0,
+      53.0
+    ],
+    "raptor_land_swarmer_basic_t3_v1": [
+      79.0,
+      79.0
+    ],
+    "raptor_land_swarmer_basic_t3_v2": [
+      79.0,
+      79.0
+    ],
+    "raptor_land_swarmer_basic_t3_v3": [
+      79.0,
+      79.0
+    ],
+    "raptor_land_swarmer_basic_t4_v1": [
+      100.0,
+      1000.0
+    ],
+    "raptor_land_swarmer_basic_t4_v2": [
+      150.0,
+      1000.0
+    ],
+    "raptor_land_swarmer_brood_t2_v1": [
+      20.0,
+      250.0
+    ],
+    "raptor_land_swarmer_brood_t3_v1": [
+      123.0,
+      2326.0
+    ],
+    "raptor_land_swarmer_brood_t4_v1": [
+      251.0,
+      5201.0
+    ],
+    "raptor_land_swarmer_emp_t2_v1": [
+      25.0,
+      53.0
+    ],
+    "raptor_land_swarmer_fire_t2_v1": [
+      250.0,
+      15000.0
+    ],
+    "raptor_land_swarmer_fire_t4_v1": [
+      200.0,
+      6000.0
+    ],
+    "raptor_land_swarmer_heal_t1_v1": [
+      40.0,
+      600.0
+    ],
+    "raptor_land_swarmer_heal_t2_v1": [
+      40.0,
+      600.0
+    ],
+    "raptor_land_swarmer_heal_t3_v1": [
+      40.0,
+      600.0
+    ],
+    "raptor_land_swarmer_heal_t4_v1": [
+      40.0,
+      600.0
+    ],
+    "raptor_land_swarmer_spectre_t3_v1": [
+      79.0,
+      79.0
+    ],
+    "raptor_land_swarmer_spectre_t4_v1": [
+      100.0,
+      1000.0
+    ],
+    "raptor_matriarch_acid": [
+      50000.0,
+      2000000.0
+    ],
+    "raptor_matriarch_basic": [
+      50000.0,
+      2000000.0
+    ],
+    "raptor_matriarch_electric": [
+      50000.0,
+      2000000.0
+    ],
+    "raptor_matriarch_fire": [
+      50000.0,
+      2000000.0
+    ],
+    "raptor_matriarch_healer": [
+      50000.0,
+      2000000.0
+    ],
+    "raptor_matriarch_spectre": [
+      50000.0,
+      2000000.0
+    ],
+    "raptor_queen_easy": [
+      50000.0,
+      2000000.0
+    ],
+    "raptor_queen_epic": [
+      50000.0,
+      2000000.0
+    ],
+    "raptor_queen_hard": [
+      50000.0,
+      2000000.0
+    ],
+    "raptor_queen_normal": [
+      50000.0,
+      2000000.0
+    ],
+    "raptor_queen_veryeasy": [
+      50000.0,
+      2000000.0
+    ],
+    "raptor_queen_veryhard": [
+      50000.0,
+      2000000.0
+    ],
+    "raptor_turret_acid_t2_v1": [
+      120.0,
+      3000.0
+    ],
+    "raptor_turret_acid_t3_v1": [
+      240.0,
+      6000.0
+    ],
+    "raptor_turret_acid_t4_v1": [
+      240.0,
+      6000.0
+    ],
+    "raptor_turret_antiair_t2_v1": [
+      120.0,
+      3000.0
+    ],
+    "raptor_turret_antiair_t3_v1": [
+      240.0,
+      6000.0
+    ],
+    "raptor_turret_antiair_t4_v1": [
+      240.0,
+      6000.0
+    ],
+    "raptor_turret_antinuke_t2_v1": [
+      120.0,
+      3000.0
+    ],
+    "raptor_turret_antinuke_t3_v1": [
+      240.0,
+      6000.0
+    ],
+    "raptor_turret_basic_t2_v1": [
+      120.0,
+      3000.0
+    ],
+    "raptor_turret_basic_t3_v1": [
+      240.0,
+      6000.0
+    ],
+    "raptor_turret_basic_t4_v1": [
+      240.0,
+      6000.0
+    ],
+    "raptor_turret_burrow_t2_v1": [
+      120.0,
+      3000.0
+    ],
+    "raptor_turret_emp_t2_v1": [
+      120.0,
+      3000.0
+    ],
+    "raptor_turret_emp_t3_v1": [
+      240.0,
+      6000.0
+    ],
+    "raptor_turret_emp_t4_v1": [
+      240.0,
+      6000.0
+    ],
+    "raptor_turret_meteor_t4_v1": [
+      240.0,
+      6000.0
+    ],
+    "raptor_worm_green": [
+      240.0,
+      6000.0
+    ],
+    "raptorartillery": [
+      396.0,
+      12320.0
+    ],
+    "raptorh1b": [
+      40.0,
+      600.0
+    ],
+    "raptorh5": [
+      251.0,
+      5201.0
+    ],
+    "resourcecheat": [
+      1.0,
+      1.0
+    ],
+    "scavbeacon_t1": [
+      500.0,
+      5000.0
+    ],
+    "scavbeacon_t2": [
+      2500.0,
+      25000.0
+    ],
+    "scavbeacon_t3": [
+      5000.0,
+      50000.0
+    ],
+    "scavbeacon_t4": [
+      10000.0,
+      100000.0
+    ],
+    "scavempspawner": [
+      10.0,
+      10.0
+    ],
+    "scavengerbossv4": [
+      500000.0,
+      5000000.0
+    ],
+    "scavengerdroppod": [
+      10.0,
+      10.0
+    ],
+    "scavengerdroppodfriendly": [
+      10.0,
+      10.0
+    ],
+    "scavmists": [
+      1.0,
+      1.0
+    ],
+    "scavsafeareabeacon": [
+      10000.0,
+      100000.0
+    ],
+    "scavtacnukespawner": [
+      10.0,
+      10.0
+    ],
+    "va_cormando": [
+      1450.0,
+      18500.0
+    ],
+    "va_cormlv_fast": [
+      70.0,
+      1450.0
+    ],
+    "va_lumen": [
+      550.0,
+      6800.0
+    ],
+    "va_mav_stride": [
+      650.0,
+      11000.0
+    ],
+    "volcano_projectile_unit": [
+      100.0,
+      100.0
+    ],
+    "xmasball1_1": [
+      0.0,
+      1.0
+    ],
+    "xmasball1_2": [
+      0.0,
+      1.0
+    ],
+    "xmasball1_3": [
+      0.0,
+      1.0
+    ],
+    "xmasball1_4": [
+      0.0,
+      1.0
+    ],
+    "xmasball1_5": [
+      0.0,
+      1.0
+    ],
+    "xmasball1_6": [
+      0.0,
+      1.0
+    ],
+    "xmasball2_1": [
+      0.0,
+      1.0
+    ],
+    "xmasball2_2": [
+      0.0,
+      1.0
+    ],
+    "xmasball2_3": [
+      0.0,
+      1.0
+    ],
+    "xmasball2_4": [
+      0.0,
+      1.0
+    ],
+    "xmasball2_5": [
+      0.0,
+      1.0
+    ],
+    "xmasball2_6": [
+      0.0,
+      1.0
+    ],
+    "va_ghost": [
+      135.0,
+      8800.0
+    ],
+    "va_mask": [
+      770.0,
+      12000.0
+    ],
+    "va_infestor": [
+      250.0,
+      5200.0
+    ],
+    "legfloat": [
+      650.0,
+      12000.0
+    ]
+  },
+  "names": {
+    "armaak": "Archangel",
+    "va_kettle": "Archangel",
+    "armaap": "Advanced Aircraft Plant",
+    "armaas": "Dragonslayer",
+    "armaca": "Advanced Construction Aircraft",
+    "armack": "Advanced Construction Bot",
+    "armacsub": "Advanced Construction Sub",
+    "armacv": "Advanced Construction Vehicle",
+    "armadvsol": "Advanced Solar Collector",
+    "armafus": "Advanced Fusion Reactor",
+    "armafust3": "Epic Fusion Reactor",
+    "armageo": "Advanced Geothermal Powerplant",
+    "armah": "Sweeper",
+    "armalab": "Advanced Bot Lab",
+    "armamb": "Rattlesnake",
+    "armamd": "Citadel",
+    "armamex": "Twilight",
+    "armamph": "Platypus",
+    "armamsub": "Amphibious Complex",
+    "armanac": "Crocodile",
+    "armanavaldefturret": "Liquifier",
+    "armanni": "Pulsar",
+    "armannit3": "Epic Pulsar",
+    "armantiship": "Haven",
+    "armap": "Aircraft Plant",
+    "armapt3": "Experimental Aircraft Plant",
+    "armarad": "Advanced Radar Tower",
+    "armart": "Shellshocker",
+    "armaser": "Smuggler",
+    "armason": "Advanced Sonar Station",
+    "armassimilator": "Assimilator",
+    "armassistdrone": "Assist Drone",
+    "armassistdrone_land": "Assist Vehicle",
+    "armasy": "Advanced Shipyard",
+    "armatl": "Moray",
+    "armatlas": "Stork",
+    "armavp": "Advanced Vehicle Plant",
+    "armawac": "Oracle",
+    "armbanth": "Titan",
+    "armbats": "Dreadnought",
+    "armbeamer": "Beamer",
+    "armbeaver": "Beaver",
+    "armblade": "Hornet",
+    "armbotrail": "Pawn Launcher",
+    "armbrawl": "Roughneck",
+    "armbrtha": "Basilica",
+    "armbull": "Bull",
+    "armca": "Construction Aircraft",
+    "armcarry": "Haven",
+    "armch": "Construction Hovercraft",
+    "armcir": "Chainsaw",
+    "armck": "Construction Bot",
+    "armckfus": "Cloakable Fusion Reactor",
+    "armclaw": "Dragon's Claw",
+    "armcom": "Armada Commander",
+    "armcomboss": "Epic Commander - Final Boss",
+    "armcomlvl10": "Armada Commander Level 10",
+    "armcomlvl2": "Armada Commander Level 2",
+    "armcomlvl3": "Armada Commander Level 3",
+    "armcomlvl4": "Armada Commander Level 4",
+    "armcomlvl5": "Armada Commander Level 5",
+    "armcomlvl6": "Armada Commander Level 6",
+    "armcomlvl7": "Armada Commander Level 7",
+    "armcomlvl8": "Armada Commander Level 8",
+    "armcomlvl9": "Armada Commander Level 9",
+    "armconsul": "Consul",
+    "armcroc": "Turtle",
+    "armcrus": "Paladin",
+    "armcs": "Construction Ship",
+    "armcsa": "Construction Seaplane",
+    "armcv": "Construction Vehicle",
+    "armdecade": "Dolphin",
+    "armdecadet3": "Epic Dolphin",
+    "armdecom": "Commander",
+    "armdf": "Decoy Fusion Reactor",
+    "armdfly": "Abductor",
+    "armdl": "Anemone",
+    "armdrag": "Dragon's Teeth",
+    "armdrone": "Attack Drone",
+    "armdronecarry": "Nexus",
+    "armdronecarryland": "Nexus Terra",
+    "armdroneold": "Attack Drone",
+    "armemp": "Paralyzer",
+    "armepoch": "Epoch",
+    "armestor": "Energy Storage",
+    "armeyes": "Beholder",
+    "armfark": "Butler",
+    "armfast": "Sprinter",
+    "armfatf": "Naval Pinpointer",
+    "armfav": "Rover",
+    "armfboy": "Fatboy",
+    "armfdrag": "Shark's Teeth",
+    "armfepocht4": "Flying Epoch",
+    "armferret": "Ferret",
+    "armfflak": "Naval Arbalest",
+    "armfgate": "Aurora",
+    "armfhlt": "Manta",
+    "armfhp": "Naval Hovercraft Platform",
+    "armfido": "Hound",
+    "armfify": "Firefly",
+    "armfig": "Falcon",
+    "armflak": "Arbalest",
+    "armflash": "Blitz",
+    "armflea": "Tick",
+    "armfmine3": "Heavy Mine",
+    "armfmkr": "Naval Energy Converter",
+    "armfort": "Fortification Wall",
+    "armfrad": "Naval Radar / Sonar Tower",
+    "armfrock": "Scumbag",
+    "armfrt": "Naval Nettle",
+    "armfus": "Fusion Reactor",
+    "armgate": "Keeper",
+    "armgatet3": "Asylum",
+    "armgeo": "Geothermal Powerplant",
+    "armgmm": "Prude",
+    "armgplat": "Gun Platform",
+    "armgremlin": "Gremlin",
+    "armguard": "Gauntlet",
+    "armhaap": "Experimental Aircraft Plant",
+    "armhaapuw": "Advanced Aircraft Plant",
+    "armhaca": "Experimental Construction Aircraft",
+    "armhack": "Butler",
+    "armhacs": "Voyager",
+    "armhacv": "Consul",
+    "armhalab": "Experimental Bot Lab",
+    "armham": "Mace",
+    "armhasy": "Experimental Shipyard",
+    "armhavp": "Experimental Vehicle Plant",
+    "armhawk": "Highwind",
+    "armhlt": "Overwatch",
+    "armhp": "Hovercraft Platform",
+    "armhvytrans": "Osprey",
+    "armjam": "Umbra",
+    "armjamt": "Sneaky Pete",
+    "armjanus": "Janus",
+    "armjeth": "Crossbow",
+    "armjuno": "Juno",
+    "armkam": "Banshee",
+    "armkraken": "Gorgon",
+    "armlab": "Bot Lab",
+    "armlance": "Cormorant",
+    "armlatnk": "Jaguar",
+    "armliche": "Liche",
+    "armlichet4": "Epic Liche",
+    "armllt": "Sentry",
+    "armlship": "Maelstrom",
+    "armlun": "Lunkhead",
+    "armlunchbox": "Lunchbox",
+    "armlwall": "Dragon's Fury",
+    "armmakr": "Energy Converter",
+    "armmanni": "Starlight",
+    "armmar": "Marauder",
+    "armmark": "Compass",
+    "armmart": "Mauser",
+    "armmav": "Gunslinger",
+    "armmeatball": "Meatball",
+    "armmercury": "Mercury",
+    "armmerl": "Ambassador",
+    "armmex": "Metal Extractor",
+    "armmh": "Possum",
+    "armmine1": "Light Mine",
+    "armmine2": "Medium Mine",
+    "armmine3": "Heavy Mine",
+    "armminivulc": "Mini Ragnarok",
+    "armmls": "Voyager",
+    "armmlv": "Groundhog",
+    "armmmkr": "Advanced Energy Converter",
+    "armmmkrt3": "Epic Energy Converter",
+    "armmoho": "Advanced Metal Extractor",
+    "armmship": "Longbow",
+    "armmstor": "Metal Storage",
+    "armnanotc": "Construction Turret",
+    "armnanotc2plat": "Advanced Construction Turret",
+    "armnanotcplat": "Naval Construction Turret",
+    "armnanotct2": "Advanced Construction Turret",
+    "armnavaldefturret": "Cauteriser",
+    "armpb": "Pit Bull",
+    "armpeep": "Blink",
+    "armpincer": "Pincer",
+    "armplat": "Seaplane Platform",
+    "armpnix": "Blizzard",
+    "armpship": "Ellysaw",
+    "armpshipt3": "Epic Ellysaw",
+    "armpt": "Skater",
+    "armptt2": "Epic Skater",
+    "armpw": "Pawn",
+    "armpwt4": "Epic Pawn",
+    "armrad": "Radar Tower",
+    "armrattet4": "Ratte",
+    "armraz": "Razorback",
+    "armrecl": "Grim Reaper",
+    "armrectr": "Lazarus",
+    "armrespawn": "Base Builder",
+    "armrl": "Nettle",
+    "armrock": "Rocketeer",
+    "armroy": "Corsair",
+    "armsaber": "Sabre",
+    "armsam": "Whistler",
+    "armsat": "Satellite",
+    "armsb": "Tsunami",
+    "armscab": "Umbrella",
+    "armscavengerbossv2": "Epic Commander - Final Boss",
+    "armsd": "Tracer",
+    "armseadragon": "Seadragon",
+    "armseap": "Puffin",
+    "armseer": "Prophet",
+    "armsehak": "Horizon",
+    "armserp": "Serpent",
+    "armserpt3": "Epic Serpent",
+    "armsfig": "Cyclone",
+    "armsfig2": "Cyclone",
+    "armsh": "Seeker",
+    "armshltx": "Experimental Gantry",
+    "armshltxuw": "Experimental Gantry",
+    "armshockwave": "Shockwave",
+    "armsilo": "Armageddon",
+    "armsjam": "Bermuda",
+    "armsnipe": "Sharpshooter",
+    "armsolar": "Solar Collector",
+    "armsonar": "Sonar Station",
+    "armspid": "Webber",
+    "armsptk": "Recluse",
+    "armsptkt4": "Epic Recluse",
+    "armspy": "Ghost",
+    "armstil": "Stiletto",
+    "armstump": "Stout",
+    "armsub": "Eel",
+    "armsubk": "Barracuda",
+    "armsy": "Shipyard",
+    "armtarg": "Pinpointer",
+    "armthor": "Thor",
+    "armthund": "Stormbringer",
+    "armthundt4": "Epic Stormbringer",
+    "armtide": "Tidal Generator",
+    "armtl": "Harpoon",
+    "armtorps": "Torpedo Ship",
+    "armuwadves": "Hardened Energy Storage",
+    "armuwadvms": "Hardened Metal Storage",
+    "armuwes": "Naval Energy Storage",
+    "armuwfus": "Naval Fusion Reactor",
+    "armuwmme": "Naval Advanced Metal Extractor",
+    "armuwmmm": "Naval Advanced Energy Converter",
+    "armuwms": "Naval Metal Storage",
+    "armvader": "Tumbleweed",
+    "armvadert4": "Epic Tumbleweed",
+    "armvang": "Vanguard",
+    "armveil": "Veil",
+    "armvp": "Vehicle Plant",
+    "armvulc": "Ragnarok",
+    "armwar": "Centurion",
+    "armwin": "Wind Turbine",
+    "armwint2": "Advanced Wind Turbine",
+    "armyork": "Shredder",
+    "armzapper": "Zapper",
+    "armzeus": "Welder",
+    "chip": "Chip",
+    "comeffigy": "Commander Effigy",
+    "coraak": "Manticore",
+    "coraap": "Advanced Aircraft Plant",
+    "coraca": "Advanced Construction Aircraft",
+    "corack": "Advanced Construction Bot",
+    "coracsub": "Advanced Construction Sub",
+    "coracv": "Advanced Construction Vehicle",
+    "coradvsol": "Advanced Solar Collector",
+    "corafus": "Advanced Fusion Reactor",
+    "corafust3": "Epic Fusion Reactor",
+    "corageo": "Advanced Geothermal Powerplant",
+    "corah": "Birdeater",
+    "corak": "Grunt",
+    "corakt4": "Epic Grunt",
+    "coralab": "Advanced Bot Lab",
+    "coramph": "Duck",
+    "coramsub": "Amphibious Complex",
+    "coranavaldefturret": "Orthrus",
+    "corantiship": "Oasis",
+    "corap": "Aircraft Plant",
+    "corape": "Wasp",
+    "corapt3": "Experimental Aircraft Plant",
+    "corarad": "Advanced Radar Tower",
+    "corarch": "Arrow Storm",
+    "corason": "Advanced Sonar Station",
+    "corassistdrone": "Assist Drone",
+    "corassistdrone_land": "Assist Vehicle",
+    "corasy": "Advanced Shipyard",
+    "coratl": "Lamprey",
+    "coravp": "Advanced Vehicle Plant",
+    "corawac": "Condor",
+    "corban": "Banisher",
+    "corbats": "Despot",
+    "corbhmth": "Cerberus",
+    "corblackhy": "Black Hydra",
+    "corbuzz": "Calamity",
+    "corbw": "Shuriken",
+    "corca": "Construction Aircraft",
+    "corcan": "Sumo",
+    "corcarry": "Oasis",
+    "corcat": "Catapult",
+    "corch": "Construction Hovercraft",
+    "corck": "Construction Bot",
+    "corcom": "Cortex Commander",
+    "corcomboss": "Epic Commander - Final Boss",
+    "corcomlvl10": "Cortex Commander Level 10",
+    "corcomlvl2": "Cortex Commander Level 2",
+    "corcomlvl3": "Cortex Commander Level 3",
+    "corcomlvl4": "Cortex Commander Level 4",
+    "corcomlvl5": "Cortex Commander Level 5",
+    "corcomlvl6": "Cortex Commander Level 6",
+    "corcomlvl7": "Cortex Commander Level 7",
+    "corcomlvl8": "Cortex Commander Level 8",
+    "corcomlvl9": "Cortex Commander Level 9",
+    "corcrash": "Trasher",
+    "corcrus": "Buccaneer",
+    "corcrw": "Archaic Dragon",
+    "corcrwh": "Dragon",
+    "corcrwt4": "Epic Dragon",
+    "corcs": "Construction Ship",
+    "corcsa": "Construction Seaplane",
+    "corcut": "Cutlass",
+    "corcv": "Construction Vehicle",
+    "cordeadeye": "Deadeye",
+    "cordecom": "Commander",
+    "cordemon": "Demon",
+    "cordesolator": "Desolator",
+    "cordl": "Jellyfish",
+    "cordoom": "Bulwark",
+    "cordoomt3": "Epic Bulwark",
+    "cordrag": "Dragon's Teeth",
+    "cordrone": "Attack Drone",
+    "cordronecarry": "Disperser",
+    "cordronecarryair": "Disperser Omni",
+    "cordroneold": "Attack Drone",
+    "cords": "Disgruntler",
+    "corenaa": "Naval Birdshot",
+    "corerad": "Eradicator",
+    "corestor": "Energy Storage",
+    "coresupp": "Supporter",
+    "coresuppt3": "Adjudicator",
+    "coreter": "Obscurer",
+    "corexp": "Exploiter",
+    "coreyes": "Beholder",
+    "corfast": "Twitcher",
+    "corfatf": "Naval Pinpointer",
+    "corfav": "Rascal",
+    "corfblackhyt4": "Flying Black Hydra",
+    "corfdoom": "Devastator",
+    "corfdrag": "Shark's Teeth",
+    "corfgate": "Atoll",
+    "corfhlt": "Coral",
+    "corfhp": "Naval Hovercraft Platform",
+    "corfink": "Finch",
+    "corflak": "Birdshot",
+    "corfmd": "Prevailer",
+    "corfmine3": "Heavy Mine",
+    "corfmkr": "Naval Energy Converter",
+    "corforge": "Forge",
+    "corfort": "Fortification Wall",
+    "corfrad": "Naval Radar / Sonar Tower",
+    "corfrock": "Janitor",
+    "corfrt": "Slingshot",
+    "corfship": "Brimstone",
+    "corftiger": "Heat Tiger",
+    "corfus": "Fusion Reactor",
+    "corgant": "Experimental Gantry",
+    "corgantuw": "Experimental Gantry",
+    "corgarp": "Garpike",
+    "corgate": "Overseer",
+    "corgatet3": "Sanctuary",
+    "corgator": "Incisor",
+    "corgatreap": "Laser Tiger",
+    "corgeo": "Geothermal Powerplant",
+    "corgol": "Tzar",
+    "corgolt4": "Epic Tzar",
+    "corgplat": "Gun Platform",
+    "corhaap": "Experimental Aircraft Plant",
+    "corhaapuw": "Advanced Aircraft Plant",
+    "corhaca": "Experimental Construction Aircraft",
+    "corhack": "Twitcher",
+    "corhacs": "Pathfinder",
+    "corhacv": "Printer",
+    "corhal": "Halberd",
+    "va_halberd": "Halberd",
+    "corhalab": "Experimental Bot Lab",
+    "corhasy": "Experimental Shipyard",
+    "corhavp": "Experimental Vehicle Plant",
+    "corhllllt": "Quad Guard",
+    "corhllt": "Twin Guard",
+    "corhlt": "Warden",
+    "corhp": "Hovercraft Platform",
+    "corhrk": "Arbiter",
+    "corhunt": "Watcher",
+    "corhurc": "Hailstorm",
+    "corhvytrans": "Hephaestus",
+    "corint": "Basilisk",
+    "corjamt": "Castro",
+    "corjugg": "Behemoth",
+    "corjuno": "Juno",
+    "corkarg": "Karganeth",
+    "corkarganetht4": "Epic Karganeth",
+    "corkark": "Archaic Karkinos",
+    "corkorg": "Juggernaut",
+    "corlab": "Bot Lab",
+    "corlevlr": "Pounder",
+    "corllt": "Guard",
+    "cormabm": "Saviour",
+    "cormadsam": "SAM",
+    "cormakr": "Energy Converter",
+    "cormando": "Commando",
+    "cormandot4": "Epic Commando",
+    "cormart": "Quaker",
+    "cormaw": "Dragon's Maw",
+    "cormex": "Metal Extractor",
+    "cormexp": "Advanced Exploiter",
+    "cormh": "Mangonel",
+    "cormine1": "Light Mine",
+    "cormine2": "Medium Mine",
+    "cormine3": "Heavy Mine",
+    "cormine4": "Medium Mine",
+    "corminibuzz": "Mini Calamity",
+    "cormist": "Lasher",
+    "cormls": "Pathfinder",
+    "cormlv": "Trapper",
+    "cormmkr": "Advanced Energy Converter",
+    "cormmkrt3": "Epic Energy Converter",
+    "cormoho": "Advanced Metal Extractor",
+    "cormort": "Sheldon",
+    "cormship": "Messenger",
+    "cormstor": "Metal Storage",
+    "cormuskrat": "Muskrat",
+    "cormwall": "Dragon's Rage",
+    "cornanotc": "Construction Turret",
+    "cornanotc2plat": "Advanced Construction Turret",
+    "cornanotcplat": "Naval Construction Turret",
+    "cornanotct2": "Advanced Construction Turret",
+    "cornavaldefturret": "Cyclops",
+    "cornecro": "Graverobber",
+    "coronager": "Onager",
+    "corparrow": "Poison Arrow",
+    "corphantom": "Phantom",
+    "corplat": "Seaplane Platform",
+    "corprince": "Black Prince",
+    "corprinter": "Printer",
+    "corpship": "Riptide",
+    "corpt": "Herring",
+    "corpun": "Agitator",
+    "corpyro": "Fiend",
+    "corrad": "Radar Tower",
+    "corraid": "Brute",
+    "correap": "Tiger",
+    "correcl": "Death Cavalry",
+    "correspawn": "Base Builder",
+    "corrl": "Thistle",
+    "corroach": "Bedbug",
+    "corroy": "Oppressor",
+    "corsala": "Salamander",
+    "corsat": "Satellite",
+    "corsb": "Dam Buster",
+    "corscavdrag": "Dragon's Teeth",
+    "corscavdtf": "Dragon's Maw",
+    "corscavdtl": "Dragon's Claw",
+    "corscavdtm": "Missile Wall",
+    "corscavfort": "Fortification Wall",
+    "corscreamer": "Screamer",
+    "corsd": "Nemesis",
+    "corseah": "Skyhook",
+    "corseal": "Alligator",
+    "corseap": "Monsoon",
+    "corsent": "Fury",
+    "corsfig": "Bat",
+    "corsfig2": "Bat",
+    "corsh": "Goon",
+    "corshad": "Whirlwind",
+    "corshark": "Predator",
+    "corshiva": "Shiva",
+    "corshroud": "Shroud",
+    "corsilo": "Apocalypse",
+    "corsjam": "Phantasm",
+    "corsktl": "Skuttle",
+    "corslrpc": "Leviathan",
+    "corsnap": "Cayman",
+    "corsok": "Cataphract",
+    "corsolar": "Solar Collector",
+    "corsonar": "Sonar Station",
+    "corspec": "Deceiver",
+    "corspy": "Spectre",
+    "corssub": "Kraken",
+    "corstorm": "Aggravator",
+    "corsub": "Orca",
+    "corsumo": "Mammoth",
+    "corsy": "Shipyard",
+    "cortarg": "Pinpointer",
+    "cortermite": "Termite",
+    "corthermite": "Thermite",
+    "corthud": "Thug",
+    "cortide": "Tidal Generator",
+    "cortitan": "Angler",
+    "cortl": "Urchin",
+    "cortoast": "Persecutor",
+    "cortorch": "Torch",
+    "cortrem": "Tremor",
+    "cortron": "Catalyst",
+    "coruwadves": "Hardened Energy Storage",
+    "coruwadvms": "Hardened Metal Storage",
+    "coruwes": "Naval Energy Storage",
+    "coruwfus": "Naval Fusion Reactor",
+    "coruwmme": "Naval Advanced Metal Extractor",
+    "coruwmmm": "Naval Advanced Energy Converter",
+    "coruwms": "Naval Metal Storage",
+    "corvac": "Printer",
+    "va_printer": "Printer",
+    "corvalk": "Hercules",
+    "corvamp": "Nighthawk",
+    "corveng": "Valiant",
+    "corvipe": "Scorpion",
+    "corvoyr": "Augur",
+    "corvp": "Vehicle Plant",
+    "corvrad": "Omen",
+    "corvroc": "Negotiator",
+    "corwin": "Wind Turbine",
+    "corwint2": "Advanced Wind Turbine",
+    "corwolv": "Wolverine",
+    "critter_ant": "Ant",
+    "critter_crab": "Crab",
+    "critter_duck": "Duck",
+    "critter_goldfish": "Goldfish",
+    "critter_gull": "Seagull",
+    "critter_penguin": "Penguin",
+    "critter_penguinbro": "Penguin Bro",
+    "critter_penguinking": "Penguin King",
+    "dbg_sphere": "dbg_sphere",
+    "dbg_sphere_fullmetal": "dbg_sphere",
+    "dice": "Dice",
+    "freefusion": "Free Fusion Reactor",
+    "leegmech": "Praetorian",
+    "legaabot": "Toxotai",
+    "legaap": "Legion Advanced Aircraft Plant",
+    "legabm": "Aegis",
+    "legaca": "Advanced Construction Aircraft",
+    "legaceb": "Proteus",
+    "legack": "Advanced Construction Bot",
+    "legacluster": "Eviscerator",
+    "legacv": "Advanced Construction Vehicle",
+    "legadvaabot": "Aquilon",
+    "legadveconv": "Advanced Energy Converter",
+    "legadveconvt3": "Epic Energy Converter",
+    "legadvestore": "Hardened Energy Storage",
+    "legadvshipyard": "Advanced Shipyard",
+    "legadvsol": "Advanced Solar Collector",
+    "legafcv": "Aceso",
+    "legafigdef": "Ajax",
+    "legafus": "Advanced Fusion Reactor",
+    "legafust3": "Epic Fusion Reactor",
+    "legageo": "Advanced Geothermal Powerplant",
+    "legah": "Alpheus",
+    "legaheattank": "Prometheus",
+    "legajam": "Erebus",
+    "legajamk": "Tiresias",
+    "legalab": "Legion Advanced Bot Lab",
+    "legamcluster": "Cleaver",
+    "legamph": "Telchine",
+    "legamphlab": "Amphibious Complex",
+    "legamphtank": "Cetus",
+    "legamstor": "Hardened Metal Storage",
+    "leganavalaaturret": "Fulmen",
+    "leganavaldefturret": "Ionia",
+    "leganavaleconv": "Naval Advanced Energy Converter",
+    "leganavalfusion": "Naval Fusion Reactor",
+    "leganavalmex": "Advanced Underwater Metal Extractor",
+    "leganavalpinpointer": "Naval Pinpointer",
+    "leganavalsonarstation": "Auscultor",
+    "leganavaltorpturret": "Delphinus",
+    "leganavyaaship": "Notus",
+    "leganavyantinukecarrier": "Hecate",
+    "leganavyantiswarm": "Leocampus",
+    "leganavyartyship": "Corinth",
+    "leganavybattleship": "Scylla",
+    "leganavybattlesub": "Architeuthis",
+    "leganavyconsub": "Advanced Construction Submarine",
+    "leganavycruiser": "Thalassa",
+    "leganavyengineer": "Artifex",
+    "leganavyflagship": "Neptune",
+    "leganavyheavysub": "Sphyrna",
+    "leganavymissileship": "Ultor",
+    "leganavyradjamship": "Dolus",
+    "legap": "Legion Drone Plant",
+    "legapopupdef": "Chimera",
+    "legapt3": "Experimental Aircraft Gantry",
+    "legarad": "Advanced Radar Tower",
+    "legaradk": "Euclid",
+    "legaskirmtank": "Gladiator",
+    "legaspy": "Eidolon",
+    "legassistdrone": "Assist Drone",
+    "legassistdrone_land": "Assist Vehicle",
+    "legatorpbomber": "Aesacus",
+    "legatrans": "Hippotes",
+    "legavantinuke": "Hera",
+    "legavjam": "Cicero",
+    "legavp": "Advanced Vehicle Plant",
+    "legavrad": "Pheme",
+    "legavroc": "Boreas",
+    "legbal": "Ballista",
+    "legbar": "Barrage",
+    "legbart": "Belcher",
+    "legbastion": "Bastion",
+    "legbombard": "Bombardier",
+    "legbunk": "Pilum",
+    "legca": "Legion Construction Aircraft",
+    "legcar": "Cardea",
+    "legcen": "Phobos",
+    "legch": "Construction Hovercraft",
+    "legcib": "Blindfold",
+    "legck": "Legion Construction Bot",
+    "legcluster": "Amputator",
+    "legcom": "Legion Commander",
+    "legcomecon": "Economy Commander",
+    "legcomlvl10": "Legion Commander Level 10",
+    "legcomlvl2": "Legion Commander Level 2",
+    "legcomlvl3": "Legion Commander Level 3",
+    "legcomlvl4": "Legion Commander Level 4",
+    "legcomlvl5": "Legion Commander Level 5",
+    "legcomlvl6": "Legion Commander Level 6",
+    "legcomlvl7": "Legion Commander Level 7",
+    "legcomlvl8": "Legion Commander Level 8",
+    "legcomlvl9": "Legion Commander Level 9",
+    "legcomoff": "Offensive Commander",
+    "legcomt2com": "Combat Commander",
+    "legcomt2def": "Tactical Defense Commander",
+    "legcomt2off": "Tactical Offense Commander",
+    "legctl": "Euryale",
+    "legcv": "Legion Construction Vehicle",
+    "legdecom": "Legion Commander",
+    "legdeflector": "Soteria",
+    "legdrag": "Dragon's Teeth",
+    "legdrone": "Legion Drone",
+    "legdtf": "Dragon's Maw",
+    "legdtl": "Dragon's Claw",
+    "legdtm": "Dragon's Tail",
+    "legdtr": "Dragon's Jaw",
+    "legeallterrainmech": "Myrmidon",
+    "legeconv": "Energy Converter",
+    "legeheatraymech": "Sol Invictus",
+    "legeheatraymech_old": "Archaic Sol Invictus",
+    "legehovertank": "Charybdis",
+    "legelrpcmech": "Astraeus",
+    "legeshotgunmech": "Praetorian",
+    "legestor": "Energy Storage",
+    "legeyes": "Argus",
+    "legfdrag": "Shark's Teeth",
+    "legfeconv": "Naval Energy Converter",
+    "legfhive": "Naval Hive",
+    "legfhp": "Offshore Hovercraft Platform",
+    "legfig": "Noctua",
+    "legflak": "Pluto",
+    "legfmg": "Gelasma",
+    "legfort": "Tyrannus",
+    "legforti": "Fortification Wall",
+    "legfortt4": "Epic Tyrannus",
+    "legfrad": "Naval Radar / Sonar Tower",
+    "legfrl": "Polybolos",
+    "legfus": "Fusion Reactor",
+    "leggant": "Experimental Gantry",
+    "leggantuw": "Experimental Gantry",
+    "leggat": "Decurion",
+    "leggatet3": "Elysium",
+    "leggeo": "Geothermal Powerplant",
+    "leggob": "Goblin",
+    "leggobt3": "Epic Goblin",
+    "leghaap": "Legion Experimental Aircraft Plant",
+    "leghaca": "Experimental Construction Aircraft",
+    "leghack": "Prometheus",
+    "leghacv": "Aceso",
+    "leghades": "Alaris",
+    "leghalab": "Experimental Bot Lab",
+    "leghavp": "Experimental Vehicle Plant",
+    "legheavydrone": "Legion Heavy Drone",
+    "legheavydronesmall": "Legion Heavy Drone",
+    "leghelios": "Helios",
+    "leghive": "Hive",
+    "leghp": "Hovercraft Platform",
+    "leghrk": "Thanatos",
+    "leginc": "Incinerator",
+    "leginf": "Inferno",
+    "leginfestor": "Infestor",
+    "legionnaire": "Legionnaire",
+    "legjam": "Nyx",
+    "legjav": "Javelin",
+    "legjuno": "Juno",
+    "legkam": "Martyr",
+    "legkark": "Karkinos",
+    "leglab": "Legion Bot Lab",
+    "leglht": "Pharos",
+    "leglob": "Satyr",
+    "leglraa": "Xyston",
+    "leglrpc": "Olympus",
+    "leglts": "Aeolus",
+    "leglupara": "Lupara",
+    "legmed": "Medusa",
+    "legmex": "Metal Extractor",
+    "legmext15": "Overcharged Metal Extractor",
+    "legmg": "Cacophony",
+    "legmh": "Salacia",
+    "legmine1": "Light Mine",
+    "legmine2": "Medium Mine",
+    "legmine3": "Heavy Mine",
+    "legmineb": "Harbinger",
+    "legmlv": "Sapper",
+    "legmoho": "Advanced Metal Extractor",
+    "legmohobp": "Fortifier",
+    "legmohocon": "Advanced Metal Fortifier",
+    "legmohoconct": "Advanced Metal Fortifier",
+    "legmohoconin": "Advanced Metal Fortifier",
+    "legmos": "Mosquito",
+    "legmost3": "Epic Mosquito",
+    "legmrv": "Quickshot",
+    "legmstor": "Metal Storage",
+    "legnanotc": "Construction Turret",
+    "legnanotcbase": "Base Builder",
+    "legnanotcplat": "Naval Construction Turret",
+    "legnanotct2": "Advanced Construction Turret",
+    "legnanotct2plat": "Advanced Construction Turret",
+    "legnap": "Wildfire",
+    "legnavaldefturret": "Phorcys",
+    "legnavyaaship": "Iapetus",
+    "legnavyartyship": "Octeres",
+    "legnavyconship": "Construction Ship",
+    "legnavydestro": "Syracusia",
+    "legnavyfrigate": "Argonaut",
+    "legnavyrezsub": "Dionysus",
+    "legnavyscout": "Hippocampus",
+    "legnavysub": "Ketea",
+    "legner": "Nereus",
+    "legotter": "Otter",
+    "legpede": "Mukade",
+    "legperdition": "Perdition",
+    "legphoenix": "Phoenix",
+    "legrad": "Radar Tower",
+    "legrail": "Lance",
+    "legrampart": "Rampart",
+    "legrezbot": "Zagreus",
+    "legrhapsis": "Rhapsis",
+    "legrl": "Bramble",
+    "legrwall": "Dragon's Constitution",
+    "legscout": "Wheelie",
+    "legsd": "Ichnaea",
+    "legsh": "Glaucus",
+    "legshot": "Phalanx",
+    "legsilo": "Supernova",
+    "legsnapper": "Snapper",
+    "legsolar": "Solar Collector",
+    "legspbomber": "Pyrphoros",
+    "legspcarrier": "Hecatoncheir",
+    "legspcon": "Construction Seaplane",
+    "legspfighter": "Astrapios",
+    "legsplab": "Offshore Seaplane Platform",
+    "legspradarsonarplane": "Okeanos",
+    "legspsurfacegunship": "Enyo",
+    "legsptorpgunship": "Ladon",
+    "legsrail": "Arquebus",
+    "legsrailt4": "Epic Arquebus",
+    "legstarfall": "Starfall",
+    "legstr": "Hoplite",
+    "legstronghold": "Stronghold",
+    "legsy": "Shipyard",
+    "legtarg": "Pinpointer",
+    "legtide": "Tidal Generator",
+    "legtl": "Stheno",
+    "leguwestore": "Naval Energy Storage",
+    "leguwmstore": "Naval Metal Storage",
+    "legvcarry": "Mantis",
+    "legvenator": "Venator",
+    "legvflak": "Charon",
+    "legvision": "Vision",
+    "legvp": "Legion Vehicle Plant",
+    "legwhisper": "Whisper",
+    "legwin": "Wind Turbine",
+    "legwint2": "Advanced Wind Turbine",
+    "lootboxbronze": "Bronze Resource Generator",
+    "lootboxgold": "Gold Resource Generator",
+    "lootboxplatinum": "Platinum Resource Generator",
+    "lootboxsilver": "Silver Resource Generator",
+    "lootdroppod_gold": "Lootbox Droppod",
+    "lootdroppod_printer": "Lootbox Droppod",
+    "meteor": "Meteor",
+    "mission_command_tower": "Command Tower",
+    "nuketest": "New Nuke Spawner",
+    "nuketestcor": "New Nuke Spawner",
+    "nuketestorg": "Original Arm Nuke Spawner",
+    "pbr_cube": "PBR Test Cube Thing",
+    "raptor_air_bomber_acid_t2_v1": "Acid Bombardier",
+    "raptor_air_bomber_basic_t1_v1": "Juvenile Bombardier",
+    "raptor_air_bomber_basic_t2_v1": "Bombardier",
+    "raptor_air_bomber_basic_t2_v2": "Bombardier",
+    "raptor_air_bomber_basic_t4_v1": "Apex Bombardier",
+    "raptor_air_bomber_basic_t4_v2": "Apex Bombardier",
+    "raptor_air_bomber_brood_t4_v2": "Hatchling Bomber",
+    "raptor_air_bomber_brood_t4_v3": "Hatchling Bomber",
+    "raptor_air_bomber_brood_t4_v4": "Hatchling Bomber",
+    "raptor_air_bomber_emp_t2_v1": "Paralyzing Bombardier",
+    "raptor_air_fighter_basic_t1_v1": "Juvenile Airfighter",
+    "raptor_air_fighter_basic_t2_v1": "Airfighter",
+    "raptor_air_fighter_basic_t2_v2": "Airfighter",
+    "raptor_air_fighter_basic_t2_v3": "Airfighter",
+    "raptor_air_fighter_basic_t2_v4": "Airfighter",
+    "raptor_air_fighter_basic_t4_v1": "Apex Airfighter",
+    "raptor_air_kamikaze_basic_t2_v1": "Flying Kamikaze",
+    "raptor_air_scout_basic_t2_v1": "Observer",
+    "raptor_air_scout_basic_t3_v1": "Mature Observer",
+    "raptor_air_scout_basic_t4_v1": "Apex Observer",
+    "raptor_allterrain_arty_acid_t2_v1": "Acid Mortar",
+    "raptor_allterrain_arty_acid_t4_v1": "Apex Acid Mortar",
+    "raptor_allterrain_arty_basic_t2_v1": "Mortar",
+    "raptor_allterrain_arty_basic_t4_v1": "Apex Mortar",
+    "raptor_allterrain_arty_brood_t2_v1": "Hatchling Artillery",
+    "raptor_allterrain_arty_brood_t4_v1": "Apex Hatchling Artillery",
+    "raptor_allterrain_arty_emp_t2_v1": "Paralyzing Mortar",
+    "raptor_allterrain_arty_emp_t4_v1": "Apex Paralyzing Mortar",
+    "raptor_allterrain_assault_acid_t2_v1": "All-Terrain Acid Brawler",
+    "raptor_allterrain_assault_basic_t2_v1": "All-Terrain Brawler",
+    "raptor_allterrain_assault_basic_t2_v2": "All-Terrain Brawler",
+    "raptor_allterrain_assault_basic_t2_v3": "All-Terrain Brawler",
+    "raptor_allterrain_assault_basic_t4_v1": "Apex All-Terrain Brawler",
+    "raptor_allterrain_assault_basic_t4_v2": "Apex All-Terrain Brawler",
+    "raptor_allterrain_assault_emp_t2_v1": "All-Terrain Paralyzing Brawler",
+    "raptor_allterrain_swarmer_acid_t2_v1": "All-Terrain Acid Spitter",
+    "raptor_allterrain_swarmer_basic_t2_v1": "All-Terrain Swarmer",
+    "raptor_allterrain_swarmer_basic_t3_v1": "Mature All-Terrain Swarmer",
+    "raptor_allterrain_swarmer_basic_t4_v1": "Apex All-Terrain Swarmer",
+    "raptor_allterrain_swarmer_emp_t2_v1": "All-Terrain Paralyzer",
+    "raptor_allterrain_swarmer_fire_t2_v1": "All-Terrain Pyro",
+    "raptor_antinuke": "Raptor Antinuke",
+    "raptor_hive": "Raptor Hive",
+    "va_queen_nest": "Queen's Nest",
+    "raptor_land_assault_acid_t2_v1": "Apex Acid Spitter",
+    "raptor_land_assault_basic_t2_v1": "Brawler",
+    "raptor_land_assault_basic_t2_v2": "Brawler",
+    "raptor_land_assault_basic_t2_v3": "Brawler",
+    "raptor_land_assault_basic_t4_v1": "Apex Brawler",
+    "raptor_land_assault_basic_t4_v2": "Apex Brawler",
+    "raptor_land_assault_emp_t2_v1": "Paralyzing Brawler",
+    "raptor_land_assault_spectre_t2_v1": "Spectre Brawler",
+    "raptor_land_assault_spectre_t4_v1": "Apex Spectre Brawler",
+    "raptor_land_kamikaze_basic_t2_v1": "Kamikaze",
+    "raptor_land_kamikaze_basic_t4_v1": "Apex Kamikaze",
+    "raptor_land_kamikaze_emp_t2_v1": "Paralyzing Kamikaze",
+    "raptor_land_kamikaze_emp_t4_v1": "Apex Paralyzing Kamikaze",
+    "raptor_land_spiker_basic_t2_v1": "Spiker",
+    "raptor_land_spiker_basic_t4_v1": "Apex Spiker",
+    "raptor_land_spiker_spectre_t4_v1": "Apex Spectre Spiker",
+    "raptor_land_swarmer_acids_t2_v1": "Acid Spitter",
+    "raptor_land_swarmer_basic_t1_v1": "Juvenile Swarmer",
+    "raptor_land_swarmer_basic_t2_v1": "Swarmer",
+    "raptor_land_swarmer_basic_t2_v2": "Swarmer",
+    "raptor_land_swarmer_basic_t2_v3": "Swarmer",
+    "raptor_land_swarmer_basic_t2_v4": "Swarmer",
+    "raptor_land_swarmer_basic_t3_v1": "Mature Swarmer",
+    "raptor_land_swarmer_basic_t3_v2": "Mature Swarmer",
+    "raptor_land_swarmer_basic_t3_v3": "Mature Swarmer",
+    "raptor_land_swarmer_basic_t4_v1": "Apex Swarmer",
+    "raptor_land_swarmer_basic_t4_v2": "Apex Swarmer",
+    "raptor_land_swarmer_brood_t2_v1": "Hatchling",
+    "raptor_land_swarmer_brood_t3_v1": "Mature Hatchling",
+    "raptor_land_swarmer_brood_t4_v1": "Apex Hatchling",
+    "raptor_land_swarmer_emp_t2_v1": "Paralyzing Swarmer",
+    "raptor_land_swarmer_fire_t2_v1": "Pyro",
+    "raptor_land_swarmer_fire_t4_v1": "Apex Pyro",
+    "raptor_land_swarmer_heal_t1_v1": "Juvenile Healer",
+    "raptor_land_swarmer_heal_t2_v1": "Healer",
+    "raptor_land_swarmer_heal_t3_v1": "Mature Healer",
+    "raptor_land_swarmer_heal_t4_v1": "Apex Healer",
+    "raptor_land_swarmer_spectre_t3_v1": "Spectre Swarmer",
+    "raptor_land_swarmer_spectre_t4_v1": "Apex Spectre Swarmer",
+    "raptor_matriarch_acid": "Acid Matriarch",
+    "raptor_matriarch_basic": "Matriarch",
+    "raptor_matriarch_electric": "Paralyzer Matriarch",
+    "raptor_matriarch_fire": "Pyro Matriarch",
+    "raptor_matriarch_healer": "Healer Matriarch",
+    "raptor_matriarch_spectre": "Spectre Matriarch",
+    "raptor_queen_easy": "Raptor Queen - Final Boss",
+    "raptor_queen_epic": "Raptor Queen - Final Boss",
+    "raptor_queen_hard": "Raptor Queen - Final Boss",
+    "raptor_queen_normal": "Raptor Queen - Final Boss",
+    "raptor_queen_veryeasy": "Raptor Queen - Final Boss",
+    "raptor_queen_veryhard": "Raptor Queen - Final Boss",
+    "raptor_turret_acid_t2_v1": "Acid Tentacle",
+    "raptor_turret_acid_t3_v1": "Mature Acid Tentacle",
+    "raptor_turret_acid_t4_v1": "Apex Acid Tentacle",
+    "raptor_turret_antiair_t2_v1": "Anti-Air Tentacle",
+    "raptor_turret_antiair_t3_v1": "Mature Anti-Air Tentacle",
+    "raptor_turret_antiair_t4_v1": "Apex Anti-Air Tentacle",
+    "raptor_turret_antinuke_t2_v1": "Anti-Nuke Tentacle",
+    "raptor_turret_antinuke_t3_v1": "Mature Anti-Nuke Tentacle",
+    "raptor_turret_basic_t2_v1": "Tentacle",
+    "raptor_turret_basic_t3_v1": "Mature Tentacle",
+    "raptor_turret_basic_t4_v1": "Apex Tentacle",
+    "raptor_turret_burrow_t2_v1": "Tentacle",
+    "raptor_turret_emp_t2_v1": "Paralyzer Tentacle",
+    "raptor_turret_emp_t3_v1": "Mature Paralyzer Tentacle",
+    "raptor_turret_emp_t4_v1": "Apex Paralyzer Tentacle",
+    "raptor_turret_meteor_t4_v1": "Meteor Tentacle",
+    "raptorh1b": "Cleaner",
+    "raptorh5": "Overseer",
+    "resourcecheat": "INFINITE RESOURCES",
+    "scavbeacon_t1": "Teleport Beacon Level 1",
+    "scavbeacon_t2": "Teleport Beacon Level 2",
+    "scavbeacon_t3": "Teleport Beacon Level 3",
+    "scavbeacon_t4": "Teleport Beacon Level 4",
+    "scavempspawner": "New Nuke Spawner",
+    "scavengerbossv4": "Epic Commander - Final Boss",
+    "scavengerdroppod": "Scavenger Droppod",
+    "scavengerdroppodfriendly": "Friendly Droppod",
+    "scavsafeareabeacon": "Spreader",
+    "scavtacnukespawner": "Tactical Nuke Drop",
+    "xmasball1_1": "Xmas ball",
+    "xmasball1_2": "Xmas ball",
+    "xmasball1_3": "Xmas ball",
+    "xmasball1_4": "Xmas ball",
+    "xmasball1_5": "Xmas ball",
+    "xmasball1_6": "Xmas ball",
+    "xmasball2_1": "Xmas ball",
+    "xmasball2_2": "Xmas ball",
+    "xmasball2_3": "Xmas ball",
+    "xmasball2_4": "Xmas ball",
+    "xmasball2_5": "Xmas ball",
+    "xmasball2_6": "Xmas ball",
+    "va_ghost": "Ghost (captures)",
+    "va_mask": "Decoy Commander",
+    "va_infestor": "Infestor",
+    "legfloat": "Triton"
+  },
+  "air": [
+    "armaca",
+    "armassistdrone",
+    "armatlas",
+    "armawac",
+    "armblade",
+    "armbrawl",
+    "armca",
+    "armcsa",
+    "armdfly",
+    "armdrone",
+    "armdroneold",
+    "armfepocht4",
+    "armfify",
+    "armfig",
+    "armhaca",
+    "armhawk",
+    "armhvytrans",
+    "armkam",
+    "armlance",
+    "armliche",
+    "armlichet4",
+    "armminebomber",
+    "armpeep",
+    "armpnix",
+    "armsaber",
+    "armsat",
+    "armsb",
+    "armseap",
+    "armsehak",
+    "armsfig",
+    "armsfig2",
+    "armstil",
+    "armtdrone",
+    "armthund",
+    "armthundt4",
+    "coraca",
+    "corape",
+    "corassistdrone",
+    "corawac",
+    "corbw",
+    "corca",
+    "corcrw",
+    "corcrwh",
+    "corcrwt4",
+    "corcsa",
+    "corcut",
+    "cordrone",
+    "cordronecarryair",
+    "cordroneold",
+    "cords",
+    "corfblackhyt4",
+    "corfink",
+    "corhaca",
+    "corhunt",
+    "corhurc",
+    "corhvytrans",
+    "corsat",
+    "corsb",
+    "corseah",
+    "corseap",
+    "corsfig",
+    "corsfig2",
+    "corshad",
+    "cortdrone",
+    "cortitan",
+    "corvalk",
+    "corvamp",
+    "corveng",
+    "legaca",
+    "legafigdef",
+    "legassistdrone",
+    "legatorpbomber",
+    "legatrans",
+    "legca",
+    "legcib",
+    "legdrone",
+    "legfig",
+    "legfort",
+    "legfortt4",
+    "leghaca",
+    "legheavydrone",
+    "legheavydronesmall",
+    "legionnaire",
+    "legkam",
+    "leglts",
+    "legmineb",
+    "legmos",
+    "legmost3",
+    "legnap",
+    "legphoenix",
+    "legspbomber",
+    "legspcarrier",
+    "legspcon",
+    "legspfighter",
+    "legspradarsonarplane",
+    "legspsurfacegunship",
+    "legsptorpgunship",
+    "legstronghold",
+    "legvenator",
+    "legwhisper"
+  ],
+  "airNote": "Unit types that fly (canfly in BAR.sdd / VerdanceAshes.sdd). Aircraft count at a third off their cost toward a pack's starting XP, and earn half again as much XP in the field."
+}

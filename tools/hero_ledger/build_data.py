@@ -116,6 +116,7 @@ def main(out_path: str) -> None:
             "packTags": pack.get("tags") or [],
             "fieldEffect": ({"key": hero_tag.get(hid), **tag} if tag else None),
             "buildsEco": bool(pack.get("buildsEco")),
+            "baseSeeder": bool(pack.get("baseSeeder")),
             "factory": pack.get("factory"),
             "canLead": pack.get("canLead") is not False,
             "hireTnb": pack.get("hireTnb") or 0,

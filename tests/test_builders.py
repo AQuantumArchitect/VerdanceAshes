@@ -71,3 +71,35 @@ def test_the_scout_buildings_come_with_storage():
 def test_no_xp_unlocks_a_build():
     craft = (MOD / "luarules" / "gadgets" / "game_verdance_craft_xp.lua").read_text(encoding="utf-8")
     assert "InsertUnitCmdDesc" not in craft and "buildoptions" not in craft.lower()
+
+
+def test_a_builder_seeds_a_base_build_power_is_not_enough():
+    """Owner call 2026-10-28: builders are the heroes who can raise a base (economy, factories,
+    constructors), flagged baseSeeder. Build power alone (Ketha's rez bots, nano towers, Sister Lumen's
+    defences, the Infestor) is not a builder."""
+    import sys
+    sys.path.insert(0, str(ROOT / "tools"))
+    from verdance.company import encounters as EN
+    seeders = {h for h, p in PACKS["heroes"].items() if p.get("baseSeeder")}
+    assert seeders == {"twitch", "consul", "solarium", "mason", "mask", "rookery", "dam"}
+    assert all(PACKS["heroes"][h].get("buildsEco") for h in seeders)
+    assert not PACKS["heroes"]["lumen"].get("buildsEco") and not PACKS["heroes"]["lumen"].get("baseSeeder")
+    assert set(EN.eco_builders(ROOT)) == seeders
+    for h in ("ketha", "lumen", "infestor", "commando", "noctua"):
+        assert not EN.is_builder(PACKS["heroes"][h]), h
+
+
+def test_the_six_packs_of_2026_10_28():
+    want = {"rookery": ("armca", 3, {"armfig": 12}), "dam": ("armbeaver", 4, {}), "arc": ("armzeus", 8, {}),
+            "mammoth": ("corsumo", 1, {}), "gladius": ("legaskirmtank", 6, {}), "triton": ("legfloat", 4, {})}
+    for h, (unit, n, esc) in want.items():
+        p = PACKS["heroes"][h]
+        assert p["unitDef"] == unit and p["packTotal"] == n and _esc(h) == esc, h
+    assert len(PACKS["heroes"]) == 64
+    web = json.loads((S / "support_web.json").read_text(encoding="utf-8"))
+    for h in want:
+        ties = [e for e in web["edges"] if h in (e["a"], e["b"]) and e.get("authored")]
+        pols = {e["polarity"] for e in ties}
+        assert len(ties) >= 4 and pols & {"bond", "attract", "sibling", "mentor", "mirror"} and pols & {"rivalry", "tension", "friction"}, h
+    lua = (MOD / "luarules/gadgets/include/va_crew_roster.lua").read_text(encoding="utf-8")
+    assert all(f"  {h} = {{" in lua for h in want)

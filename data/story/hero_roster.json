@@ -1199,6 +1199,126 @@
         "type": "band_unlock",
         "blurb": "Every wall is the first line of a fort."
       }
+    },
+    {
+      "heroId": "rookery",
+      "name": "Wynn 'Rookery' Atterby",
+      "unitDef": "armca",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.0,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "garden",
+      "traits": [
+        "sky",
+        "garden"
+      ],
+      "fiction": "Atterby nests. Give her a cliff shelf, an island, a crater rim nobody can climb, and by morning there is a solar field and a lab on it with twelve Falcons circling like rooks. She talks to the aircraft the way other people talk to birds, and she has never once built on easy ground.",
+      "recruit": {
+        "type": "band_unlock",
+        "blurb": "Builds where nobody can walk to."
+      }
+    },
+    {
+      "heroId": "dam",
+      "name": "The Damwrights",
+      "unitDef": "armbeaver",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.0,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "door",
+      "traits": [
+        "pad",
+        "door"
+      ],
+      "fiction": "Agathe Brisk and her three Damwrights came out of the drowned works under the Rock Jungle with mud to the shoulder and no intention of drying off. They build in the water first: a tidal generator, a mex on the shoal, a lab on the far bank. Brisk calls a river a foundation that hasn't been poured yet.",
+      "recruit": {
+        "type": "band_unlock",
+        "blurb": "Water goes where we tell it."
+      }
+    },
+    {
+      "heroId": "arc",
+      "name": "Corwin 'Arc' Vasse",
+      "unitDef": "armzeus",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.0,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "heat",
+      "traits": [
+        "heat",
+        "swarm"
+      ],
+      "fiction": "Vasse was a shipyard foreman who welded hulls until the yard was shelled, then welded the shell holes, then welded the people who shelled it. His eight Welders walk in close order and argue in arcs. He does not shout orders; he points at a thing and it stops being joined to anything.",
+      "recruit": {
+        "type": "band_unlock",
+        "blurb": "Eight torches and one opinion."
+      }
+    },
+    {
+      "heroId": "mammoth",
+      "name": "Old Mother Brandt",
+      "unitDef": "corsumo",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.0,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "pad",
+      "traits": [
+        "plod",
+        "pad"
+      ],
+      "fiction": "Ulla Brandt has driven the Mammoth for longer than most of the company has been alive, and talks to everyone as if they were late for supper. Cortex retired her twice. She came back both times, because the Mammoth would not start for anyone else. Where she stands is where the line is, and she is very hard to move.",
+      "recruit": {
+        "type": "band_unlock",
+        "blurb": "Sit down. I'll handle it."
+      }
+    },
+    {
+      "heroId": "gladius",
+      "name": "Cassia 'Gladius' Ferro",
+      "unitDef": "legaskirmtank",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.0,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "gleeful",
+      "traits": [
+        "gleeful",
+        "glass"
+      ],
+      "fiction": "Ferro fought in the Legion's exhibition pits before the war made the pits redundant. Her six Gladiators circle, feint and salute before they open fire, and she narrates every engagement as if for an audience. It is showmanship, and it works: the enemy watches the bow and misses the flank.",
+      "recruit": {
+        "type": "band_unlock",
+        "blurb": "Bow first. Then the fight."
+      }
+    },
+    {
+      "heroId": "triton",
+      "name": "Nerea 'Triton' Calder",
+      "unitDef": "legfloat",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.0,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "door",
+      "traits": [
+        "door",
+        "count"
+      ],
+      "fiction": "Calder grew up on the tidal flats and reads water the way Halq reads coordinates: depth, drift, the hour it turns. Her four Tritons hold a shoreline in a line so straight the Legion uses it in training. She is courteous, precise and never once early.",
+      "recruit": {
+        "type": "band_unlock",
+        "blurb": "Low tide is a road."
+      }
     }
   ]
 }

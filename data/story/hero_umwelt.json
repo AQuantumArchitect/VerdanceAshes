@@ -2077,6 +2077,228 @@
       "glyph": "+cra·+ene·+pad·−off",
       "position": "eco",
       "doctrine": "constructor"
+    },
+    {
+      "heroId": "rookery",
+      "name": "Wynn 'Rookery' Atterby",
+      "axes": {
+        "energy": 0.4,
+        "offense": -0.4,
+        "mobility": 0.6,
+        "sight": 0.0,
+        "pad": -0.2,
+        "craft": 1.0,
+        "heat": 0.0,
+        "fog": 0.0,
+        "sky": 0.8,
+        "ledger": 0.0
+      },
+      "marks": [
+        {
+          "axis": "craft",
+          "value": 1.0
+        },
+        {
+          "axis": "sky",
+          "value": 0.8
+        },
+        {
+          "axis": "mobility",
+          "value": 0.6
+        },
+        {
+          "axis": "energy",
+          "value": 0.4
+        }
+      ],
+      "glyph": "+cra·+sky·+mob·+ene",
+      "position": "eco",
+      "doctrine": "constructor"
+    },
+    {
+      "heroId": "dam",
+      "name": "The Damwrights",
+      "axes": {
+        "energy": 0.5,
+        "offense": -0.5,
+        "mobility": 0.2,
+        "sight": 0.0,
+        "pad": 0.7,
+        "craft": 1.0,
+        "heat": 0.0,
+        "fog": 0.0,
+        "sky": 0.0,
+        "ledger": 0.0
+      },
+      "marks": [
+        {
+          "axis": "craft",
+          "value": 1.0
+        },
+        {
+          "axis": "pad",
+          "value": 0.7
+        },
+        {
+          "axis": "energy",
+          "value": 0.5
+        },
+        {
+          "axis": "offense",
+          "value": -0.5
+        }
+      ],
+      "glyph": "+cra·+pad·+ene·−off",
+      "position": "eco",
+      "doctrine": "constructor"
+    },
+    {
+      "heroId": "arc",
+      "name": "Corwin 'Arc' Vasse",
+      "axes": {
+        "energy": 0.2,
+        "offense": 1.0,
+        "mobility": -0.1,
+        "sight": 0.0,
+        "pad": 0.3,
+        "craft": 0.0,
+        "heat": 0.7,
+        "fog": 0.0,
+        "sky": 0.0,
+        "ledger": 0.0
+      },
+      "marks": [
+        {
+          "axis": "offense",
+          "value": 1.0
+        },
+        {
+          "axis": "heat",
+          "value": 0.7
+        },
+        {
+          "axis": "pad",
+          "value": 0.3
+        },
+        {
+          "axis": "energy",
+          "value": 0.2
+        }
+      ],
+      "glyph": "+off·+hea·+pad·+ene",
+      "position": "line",
+      "doctrine": "line"
+    },
+    {
+      "heroId": "mammoth",
+      "name": "Old Mother Brandt",
+      "axes": {
+        "energy": 0.0,
+        "offense": 0.8,
+        "mobility": -0.8,
+        "sight": 0.0,
+        "pad": 1.0,
+        "craft": 0.0,
+        "heat": 0.2,
+        "fog": 0.0,
+        "sky": 0.0,
+        "ledger": 0.1
+      },
+      "marks": [
+        {
+          "axis": "pad",
+          "value": 1.0
+        },
+        {
+          "axis": "offense",
+          "value": 0.8
+        },
+        {
+          "axis": "mobility",
+          "value": -0.8
+        },
+        {
+          "axis": "heat",
+          "value": 0.2
+        }
+      ],
+      "glyph": "+pad·+off·−mob·+hea",
+      "position": "line",
+      "doctrine": "line"
+    },
+    {
+      "heroId": "gladius",
+      "name": "Cassia 'Gladius' Ferro",
+      "axes": {
+        "energy": 0.0,
+        "offense": 0.8,
+        "mobility": 0.8,
+        "sight": 0.0,
+        "pad": -0.5,
+        "craft": 0.0,
+        "heat": 0.2,
+        "fog": 0.0,
+        "sky": 0.0,
+        "ledger": 0.2
+      },
+      "marks": [
+        {
+          "axis": "offense",
+          "value": 0.8
+        },
+        {
+          "axis": "mobility",
+          "value": 0.8
+        },
+        {
+          "axis": "pad",
+          "value": -0.5
+        },
+        {
+          "axis": "heat",
+          "value": 0.2
+        }
+      ],
+      "glyph": "+off·+mob·−pad·+hea",
+      "position": "skirmish",
+      "doctrine": "skirm"
+    },
+    {
+      "heroId": "triton",
+      "name": "Nerea 'Triton' Calder",
+      "axes": {
+        "energy": 0.0,
+        "offense": 0.7,
+        "mobility": 0.5,
+        "sight": 0.2,
+        "pad": 0.4,
+        "craft": 0.0,
+        "heat": 0.0,
+        "fog": 0.0,
+        "sky": 0.0,
+        "ledger": 0.2
+      },
+      "marks": [
+        {
+          "axis": "offense",
+          "value": 0.7
+        },
+        {
+          "axis": "mobility",
+          "value": 0.5
+        },
+        {
+          "axis": "pad",
+          "value": 0.4
+        },
+        {
+          "axis": "sight",
+          "value": 0.2
+        }
+      ],
+      "glyph": "+off·+mob·+pad·+sig",
+      "position": "line",
+      "doctrine": "line"
     }
   ]
 }

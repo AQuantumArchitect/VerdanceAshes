@@ -10567,6 +10567,924 @@
           "line": "I left you the gap."
         }
       ]
+    },
+    {
+      "id": "noctua__rookery:C",
+      "pairId": "noctua__rookery",
+      "a": "rookery",
+      "b": "noctua",
+      "rank": "C",
+      "title": "Holding pattern",
+      "polarity": "attract",
+      "motif": "two who build in the air",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Noctua's fighters and Atterby's Falcons share a sky for the first time. Nobody collides, which surprises both of them."
+        },
+        {
+          "speaker": "noctua",
+          "line": "You fly them like they're coming home."
+        },
+        {
+          "speaker": "rookery",
+          "line": "They are. I build the home first, then I teach them where it is."
+        },
+        {
+          "speaker": "noctua",
+          "line": "I dream the routes. You pour the runway at the end of them. That's a good night's work."
+        }
+      ]
+    },
+    {
+      "id": "rookery__solarium:C",
+      "pairId": "rookery__solarium",
+      "a": "rookery",
+      "b": "solarium",
+      "rank": "C",
+      "title": "Panels on the ridge",
+      "polarity": "bond",
+      "motif": "a garden from above",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Atterby drops solar collectors on a ridge nobody can reach. Solarium is already working out the yield."
+        },
+        {
+          "speaker": "solarium",
+          "line": "South-facing, no shade, nobody to steal the cables. You picked that for the light."
+        },
+        {
+          "speaker": "rookery",
+          "line": "I picked it because it's hard to get to. The light was a bonus."
+        },
+        {
+          "speaker": "solarium",
+          "line": "Then we want the same ground for different reasons. That's the best kind of partnership."
+        }
+      ]
+    },
+    {
+      "id": "mason__rookery:C",
+      "pairId": "mason__rookery",
+      "a": "rookery",
+      "b": "mason",
+      "rank": "C",
+      "title": "Foundations",
+      "polarity": "rivalry",
+      "motif": "straight walls against high nests",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Tarquin paces out a fort on the flat. Atterby is building one on the crag above it."
+        },
+        {
+          "speaker": "mason",
+          "line": "You can't wall a cliff."
+        },
+        {
+          "speaker": "rookery",
+          "line": "I don't have to. The cliff is the wall."
+        },
+        {
+          "speaker": "mason",
+          "line": "And when they bring aircraft?"
+        },
+        {
+          "speaker": "rookery",
+          "line": "Then they'll meet mine first. Yours will hear about it later."
+        }
+      ]
+    },
+    {
+      "id": "rookery__thresh:C",
+      "pairId": "rookery__thresh",
+      "a": "rookery",
+      "b": "thresh",
+      "rank": "C",
+      "title": "Weather report",
+      "polarity": "tension",
+      "motif": "nests and the weather that comes from above",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Thresh's Hailstorm passes over Atterby's shelf base on the way out. The Falcons scramble before anyone has said a word."
+        },
+        {
+          "speaker": "thresh",
+          "line": "Easy. I'm on your side this week."
+        },
+        {
+          "speaker": "rookery",
+          "line": "My birds don't read the contract. They read the bomb bay."
+        },
+        {
+          "speaker": "thresh",
+          "line": "Then keep them on a short leash. Weather doesn't apologise."
+        }
+      ]
+    },
+    {
+      "id": "dam__odessa:C",
+      "pairId": "dam__odessa",
+      "a": "dam",
+      "b": "odessa",
+      "rank": "C",
+      "title": "The far bank",
+      "polarity": "attract",
+      "motif": "fords are doors, and somebody has to build the frame",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Odessa holds a ford. On the far bank, four Beavers are already laying a metal extractor."
+        },
+        {
+          "speaker": "odessa",
+          "line": "I take the crossing, you take the bank?"
+        },
+        {
+          "speaker": "dam",
+          "line": "We take the bank, the bed, and the next bank. You keep the door shut while we pour."
+        },
+        {
+          "speaker": "odessa",
+          "line": "Deal. Don't build a lock on my door."
+        },
+        {
+          "speaker": "dam",
+          "line": "Only a small one."
+        }
+      ]
+    },
+    {
+      "id": "consul__dam:C",
+      "pairId": "consul__dam",
+      "a": "dam",
+      "b": "consul",
+      "rank": "C",
+      "title": "Planning permission",
+      "polarity": "rivalry",
+      "motif": "permits for a river",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Weiss arrives with a survey of the river. Brisk is standing in it."
+        },
+        {
+          "speaker": "consul",
+          "line": "I need to log where you're building."
+        },
+        {
+          "speaker": "dam",
+          "line": "Under the water, mostly. You're welcome to come and measure."
+        },
+        {
+          "speaker": "consul",
+          "line": "There is a form for submerged works."
+        },
+        {
+          "speaker": "dam",
+          "line": "Then it'll be the first form that gets wet."
+        }
+      ]
+    },
+    {
+      "id": "dam__tarn:C",
+      "pairId": "dam__tarn",
+      "a": "dam",
+      "b": "tarn",
+      "rank": "C",
+      "title": "Same river",
+      "polarity": "tension",
+      "motif": "the river they both claim",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Tarn's Salamanders come up through the shallows straight into Brisk's half-built dam."
+        },
+        {
+          "speaker": "tarn",
+          "line": "You've blocked my road."
+        },
+        {
+          "speaker": "dam",
+          "line": "I've built on your road. There's a difference, and it's the difference between us."
+        },
+        {
+          "speaker": "tarn",
+          "line": "Rivers move, Brisk."
+        },
+        {
+          "speaker": "dam",
+          "line": "Not once we're done with them."
+        }
+      ]
+    },
+    {
+      "id": "dam__rookery:C",
+      "pairId": "dam__rookery",
+      "a": "dam",
+      "b": "rookery",
+      "rank": "C",
+      "title": "Top and bottom",
+      "polarity": "sibling",
+      "motif": "the base from both ends",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "The company's two newest builders compare notes over a map with water at the bottom and cliffs at the top."
+        },
+        {
+          "speaker": "rookery",
+          "line": "You take everything below the waterline."
+        },
+        {
+          "speaker": "dam",
+          "line": "You take everything above the treeline."
+        },
+        {
+          "speaker": "rookery",
+          "line": "And the middle?"
+        },
+        {
+          "speaker": "dam",
+          "line": "The middle is where everyone else fights. We just hand them the ground."
+        }
+      ]
+    },
+    {
+      "id": "arc__volt:C",
+      "pairId": "arc__volt",
+      "a": "arc",
+      "b": "volt",
+      "rank": "C",
+      "title": "Static",
+      "polarity": "rivalry",
+      "motif": "two kinds of lightning",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Volt's spotters light up a position. Vasse's Welders are already walking into it."
+        },
+        {
+          "speaker": "volt",
+          "line": "I marked that for the artillery."
+        },
+        {
+          "speaker": "arc",
+          "line": "Artillery's slow. I'm here."
+        },
+        {
+          "speaker": "volt",
+          "line": "Sight is a wound you give them. You just make it bigger."
+        },
+        {
+          "speaker": "arc",
+          "line": "Bigger is the point."
+        }
+      ]
+    },
+    {
+      "id": "arc__twitch:C",
+      "pairId": "arc__twitch",
+      "a": "arc",
+      "b": "twitch",
+      "rank": "C",
+      "title": "Seams",
+      "polarity": "mentor",
+      "motif": "the welder's apprentice",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Sallow is patching a lab with his welder, badly. Vasse watches for a whole minute before he speaks."
+        },
+        {
+          "speaker": "arc",
+          "line": "You're running the bead too hot."
+        },
+        {
+          "speaker": "twitch",
+          "line": "Hot's how I like it."
+        },
+        {
+          "speaker": "arc",
+          "line": "Hot's how it fails. Slow your hand. Let the metal ask."
+        },
+        {
+          "speaker": "twitch",
+          "line": "Huh. It holds. Don't tell anyone you were nice to me."
+        }
+      ]
+    },
+    {
+      "id": "anvil__arc:C",
+      "pairId": "anvil__arc",
+      "a": "arc",
+      "b": "anvil",
+      "rank": "C",
+      "title": "Forge",
+      "polarity": "attract",
+      "motif": "the hammer and the torch",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Anvil & Mire hold the line. Eight Welders pass through it and set the far side on fire."
+        },
+        {
+          "speaker": "anvil",
+          "line": "You walk through my wall."
+        },
+        {
+          "speaker": "arc",
+          "line": "I walk out of your wall. You're the anvil; I'm what hits the other thing."
+        },
+        {
+          "speaker": "anvil",
+          "line": "Then hit it hard. I'll still be here."
+        }
+      ]
+    },
+    {
+      "id": "arc__cauter:C",
+      "pairId": "arc__cauter",
+      "a": "arc",
+      "b": "cauter",
+      "rank": "C",
+      "title": "Punctuation",
+      "polarity": "friction",
+      "motif": "two kinds of burn",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Cauter's riot and Vasse's Welders reach the same breach from opposite ends."
+        },
+        {
+          "speaker": "cauter",
+          "line": "This is my sentence. You're interrupting it."
+        },
+        {
+          "speaker": "arc",
+          "line": "I don't write sentences. I join things and unjoin things."
+        },
+        {
+          "speaker": "cauter",
+          "line": "Then unjoin yourself from my breach."
+        }
+      ]
+    },
+    {
+      "id": "halbard__mammoth:C",
+      "pairId": "halbard__mammoth",
+      "a": "mammoth",
+      "b": "halbard",
+      "rank": "C",
+      "title": "Sit",
+      "polarity": "mentor",
+      "motif": "the old Cortex guard",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Varn is pacing the line, hungry for the push. Brandt has not moved the Mammoth all hour."
+        },
+        {
+          "speaker": "halbard",
+          "line": "We should go. Now."
+        },
+        {
+          "speaker": "mammoth",
+          "line": "Sit down, dear. They're coming to us. They always do."
+        },
+        {
+          "speaker": "halbard",
+          "line": "And if they don't?"
+        },
+        {
+          "speaker": "mammoth",
+          "line": "Then you'll have had a nice rest, and you can go hungry later."
+        }
+      ]
+    },
+    {
+      "id": "bro__mammoth:C",
+      "pairId": "bro__mammoth",
+      "a": "mammoth",
+      "b": "bro",
+      "rank": "C",
+      "title": "Supper",
+      "polarity": "attract",
+      "motif": "the slow and the sure",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Bro parks next to the Mammoth and says nothing for a while. Brandt seems to like that."
+        },
+        {
+          "speaker": "bro",
+          "line": "Yeah. Good spot."
+        },
+        {
+          "speaker": "mammoth",
+          "line": "It's the only spot. Have you eaten?"
+        },
+        {
+          "speaker": "bro",
+          "line": "Yeah."
+        },
+        {
+          "speaker": "mammoth",
+          "line": "Have some more anyway."
+        }
+      ]
+    },
+    {
+      "id": "brakhov__mammoth:C",
+      "pairId": "brakhov__mammoth",
+      "a": "mammoth",
+      "b": "brakhov",
+      "rank": "C",
+      "title": "Forward",
+      "polarity": "rivalry",
+      "motif": "the walk and the sit",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "The Kiln walks past the Mammoth toward the turrets. Brandt does not follow."
+        },
+        {
+          "speaker": "brakhov",
+          "line": "Forward."
+        },
+        {
+          "speaker": "mammoth",
+          "line": "Forward is where the turrets are, Brakhov. They'll still be there tomorrow."
+        },
+        {
+          "speaker": "brakhov",
+          "line": "So will I."
+        },
+        {
+          "speaker": "mammoth",
+          "line": "That's what you said last time, and I had to come and fetch you."
+        }
+      ]
+    },
+    {
+      "id": "mammoth__stride:C",
+      "pairId": "mammoth__stride",
+      "a": "mammoth",
+      "b": "stride",
+      "rank": "C",
+      "title": "Manners",
+      "polarity": "friction",
+      "motif": "late for supper",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Stride's Gunslingers tear past the Mammoth's feet, kicking ash over its armour."
+        },
+        {
+          "speaker": "mammoth",
+          "line": "Young man. Slow down and say good evening."
+        },
+        {
+          "speaker": "stride",
+          "line": "Good evening, ma'am. Bye now."
+        },
+        {
+          "speaker": "mammoth",
+          "line": "I'll remember that, and so will the Mammoth."
+        }
+      ]
+    },
+    {
+      "id": "gladius__kit:C",
+      "pairId": "gladius__kit",
+      "a": "gladius",
+      "b": "kit",
+      "rank": "C",
+      "title": "Encore",
+      "polarity": "attract",
+      "motif": "a show needs fireworks",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Ferro's Gladiators salute an enemy line. Kit Sparkler lights the sky behind them on cue."
+        },
+        {
+          "speaker": "gladius",
+          "line": "Perfect timing."
+        },
+        {
+          "speaker": "kit",
+          "line": "I always light up when someone bows."
+        },
+        {
+          "speaker": "gladius",
+          "line": "Then we'll do the whole tour. Every field an arena, every arena a finale."
+        }
+      ]
+    },
+    {
+      "id": "gladius__stride:C",
+      "pairId": "gladius__stride",
+      "a": "gladius",
+      "b": "stride",
+      "rank": "C",
+      "title": "Top billing",
+      "polarity": "rivalry",
+      "motif": "two showoffs, one stage",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Stride overtakes the Gladiators mid-feint and steals the kill."
+        },
+        {
+          "speaker": "gladius",
+          "line": "That was my bow."
+        },
+        {
+          "speaker": "stride",
+          "line": "That was my target. Bowing's slow."
+        },
+        {
+          "speaker": "gladius",
+          "line": "Bowing's how the crowd knows who won. Nobody saw you, Stride."
+        },
+        {
+          "speaker": "stride",
+          "line": "Exactly."
+        }
+      ]
+    },
+    {
+      "id": "auditor__gladius:C",
+      "pairId": "auditor__gladius",
+      "a": "gladius",
+      "b": "auditor",
+      "rank": "C",
+      "title": "Expenses",
+      "polarity": "tension",
+      "motif": "the show against the count",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "The Auditor reviews the ammunition Ferro's troupe spent on flourishes."
+        },
+        {
+          "speaker": "auditor",
+          "line": "Thirty percent of your shots were theatre."
+        },
+        {
+          "speaker": "gladius",
+          "line": "And a hundred percent of the enemy watched it. What's that worth?"
+        },
+        {
+          "speaker": "auditor",
+          "line": "Nothing I can enter in a column."
+        },
+        {
+          "speaker": "gladius",
+          "line": "Then your columns are missing the best part."
+        }
+      ]
+    },
+    {
+      "id": "gladius__marauder:C",
+      "pairId": "gladius__marauder",
+      "a": "gladius",
+      "b": "marauder",
+      "rank": "C",
+      "title": "Applause",
+      "polarity": "mirror",
+      "motif": "arrive laughing",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Marlow and Wren come out of the river laughing, straight into the middle of Ferro's salute."
+        },
+        {
+          "speaker": "marauder",
+          "line": "Are you bowing at us?"
+        },
+        {
+          "speaker": "gladius",
+          "line": "At whoever makes the best entrance. Tonight, that's you."
+        },
+        {
+          "speaker": "marauder",
+          "line": "We'll take it. Wren's never been applauded."
+        }
+      ]
+    },
+    {
+      "id": "halq__triton:C",
+      "pairId": "halq__triton",
+      "a": "triton",
+      "b": "halq",
+      "rank": "C",
+      "title": "Readings",
+      "polarity": "mirror",
+      "motif": "coordinates and tides",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Halq calls a grid square. Calder answers with the hour the water turns over it."
+        },
+        {
+          "speaker": "halq",
+          "line": "Four-seven, four-nine."
+        },
+        {
+          "speaker": "triton",
+          "line": "Dry for forty minutes after the second bell."
+        },
+        {
+          "speaker": "halq",
+          "line": "Then that's when we shoot."
+        },
+        {
+          "speaker": "triton",
+          "line": "And that's when I'm already there."
+        }
+      ]
+    },
+    {
+      "id": "charybdis__triton:C",
+      "pairId": "charybdis__triton",
+      "a": "triton",
+      "b": "charybdis",
+      "rank": "C",
+      "title": "Sides",
+      "polarity": "rivalry",
+      "motif": "two tides",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Calder's Tritons hold a perfect line along the shore. The Charybdis comes in wide and floods through it."
+        },
+        {
+          "speaker": "triton",
+          "line": "You broke my line."
+        },
+        {
+          "speaker": "charybdis",
+          "line": "I don't believe in lines. Or sides."
+        },
+        {
+          "speaker": "triton",
+          "line": "The Legion does. I'll be here when you need one to retreat behind."
+        },
+        {
+          "speaker": "charybdis",
+          "line": "I never retreat. I recede."
+        }
+      ]
+    },
+    {
+      "id": "scylla__triton:C",
+      "pairId": "scylla__triton",
+      "a": "triton",
+      "b": "scylla",
+      "rank": "C",
+      "title": "Shallows",
+      "polarity": "attract",
+      "motif": "the shoreline and the ship",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "The Scylla walks out of the sea onto Calder's beach."
+        },
+        {
+          "speaker": "scylla",
+          "line": "You've kept the shore clear."
+        },
+        {
+          "speaker": "triton",
+          "line": "For you. The channel is wide enough as far as the second sandbar."
+        },
+        {
+          "speaker": "scylla",
+          "line": "Then I'll stop at the second sandbar."
+        },
+        {
+          "speaker": "triton",
+          "line": "You won't. But I'll be there when you get stuck."
+        }
+      ]
+    },
+    {
+      "id": "tarn__triton:C",
+      "pairId": "tarn__triton",
+      "a": "triton",
+      "b": "tarn",
+      "rank": "C",
+      "title": "Tide tables",
+      "polarity": "tension",
+      "motif": "whose shoreline",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Tarn's Salamanders surface just behind Calder's line."
+        },
+        {
+          "speaker": "tarn",
+          "line": "Your line faces the wrong way."
+        },
+        {
+          "speaker": "triton",
+          "line": "My line faces the sea. You came from the river. I'll correct for it next time."
+        },
+        {
+          "speaker": "tarn",
+          "line": "There won't be a next time."
+        },
+        {
+          "speaker": "triton",
+          "line": "There's always a next tide."
+        }
+      ]
+    },
+    {
+      "id": "dam__triton:C",
+      "pairId": "dam__triton",
+      "a": "triton",
+      "b": "dam",
+      "rank": "C",
+      "title": "Breakwater",
+      "polarity": "bond",
+      "motif": "the works and the line that guards them",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Brisk's Beavers build on the shoal while Calder's Tritons sit in a line in front of them."
+        },
+        {
+          "speaker": "dam",
+          "line": "You make a good breakwater."
+        },
+        {
+          "speaker": "triton",
+          "line": "You make a good reason to be one."
+        },
+        {
+          "speaker": "dam",
+          "line": "Hold till the tide turns and the base is up."
+        },
+        {
+          "speaker": "triton",
+          "line": "I always know when the tide turns."
+        }
+      ]
     }
   ]
 }
