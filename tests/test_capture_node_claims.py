@@ -42,7 +42,7 @@ class CaptureNodeClaimsTests(unittest.TestCase):
             map_id="koom_valley",
         )
         self.assertTrue(r["nodeClaimed"])
-        self.assertFalse(r["freeTnbMint"])
+        self.assertNotIn("freeTnbMint", r)
         self.assertEqual(r["tenebriumFromClaim"], 0)
         self.assertEqual(r["captureMode"], "clear_hold_shell")
 
@@ -77,7 +77,7 @@ class CaptureNodeClaimsTests(unittest.TestCase):
         contracts = cnc.hub_capture_contracts(WS, state, map_id="koom_valley", limit=4)
         self.assertTrue(contracts, "expected hub capture contracts on koom")
         for c in contracts:
-            self.assertEqual(c.get("freeTnbMint"), False)
+            self.assertIsNone(c.get("freeTnbMint"))
             self.assertIn(
                 c.get("captureMode"),
                 ("clear_hold_shell", "raid_scar", "other", cnc.CAPTURE_MODE),
@@ -110,7 +110,6 @@ class CaptureNodeClaimsTests(unittest.TestCase):
         complete = {**incomplete, "nodeClaimed": True, "capturePhase": "claimed"}
         rep2 = cnc.apply_node_claim(state, complete, success=True)
         self.assertTrue(rep2["claimed"])
-        self.assertFalse(cnc.free_tnb_mint_allowed(complete))
 
     def test_quest_generator_stamps_capture_mode(self):
         state = engine.load_json(WS / "state" / "campaign_state.json")
@@ -120,7 +119,7 @@ class CaptureNodeClaimsTests(unittest.TestCase):
         seize = [c for c in cands if c.get("objectiveArchetype") in cnc.CAPTURE_KINDS]
         if seize:
             self.assertEqual(seize[0].get("captureMode"), "clear_hold_shell")
-            self.assertEqual(seize[0].get("freeTnbMint"), False)
+            self.assertIsNone(seize[0].get("freeTnbMint"))
 
     def test_contract_v2_capture_mode(self):
         s2 = c2.normalize_sortie(
@@ -132,7 +131,7 @@ class CaptureNodeClaimsTests(unittest.TestCase):
             }
         )
         self.assertEqual(s2.get("captureMode"), "clear_hold_shell")
-        self.assertEqual(s2.get("freeTnbMint"), False)
+        self.assertIsNone(s2.get("freeTnbMint"))
 
     def test_process_result_claim_no_free_tnb(self):
         state = engine.default_v1_state()
@@ -199,7 +198,7 @@ class CaptureNodeClaimsTests(unittest.TestCase):
                     shutil.copy(src, dst)
             state2, report, intent, events = engine.process_result(state, result, None, tw)
             self.assertTrue(report.get("zoneFlipped") or report.get("nodeClaimed"))
-            self.assertEqual(report.get("freeTnbMint"), False)
+            self.assertIsNone(report.get("freeTnbMint"))
             zm = state2["zoneMemory"]["koom_valley"]["KOOM_CENTRAL_FLUID_SCAR"]
             self.assertEqual(zm.get("controllingFaction"), "nullmercs")
             # claimedNodes ledger from apply_node_claim

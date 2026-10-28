@@ -3291,7 +3291,6 @@ $scenario = [ordered]@{
       )
       requiredHoldFrames = $(if ($presenceKind) { 900 } else { $null })
       clearFraction = $(if ($presenceKind) { 0.6 } else { $null })
-      freeTnbMint = $false
       # Fortify / secure foothold: defensive value = "secured" signal.
       fortifyDefensiveValue = $(if ($fortifyKind) { $(if ($intent.PSObject.Properties["claimValue"] -and $intent.claimValue) { [double]$intent.claimValue } else { 400 }) } else { $null })
       fortifyBuildPower = $(if ($fortifyKind) { 90 } else { $null })
@@ -3350,7 +3349,6 @@ $scenario = [ordered]@{
       clearFraction = 0.6
       holdFrames = 900
       regrowPressure = [bool]$presenceKind
-      freeTnbMint = $false
       livingShell = [bool]($null -ne $script:livingShellPayload)
     }
     # Honest flags only — unread carry*/snap*/metal* keys removed (Mode A is

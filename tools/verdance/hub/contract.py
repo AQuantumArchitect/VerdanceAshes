@@ -117,7 +117,6 @@ def normalize_sortie(raw: Dict[str, Any], *, campaign_id: str = "verdance_ashes"
         "occupationModel": _s(raw.get("occupationModel") or "living_shell"),
         "captureMode": capture_mode,
         # Law: never free-mint Tnb on capture claims (reclaim / rare victory only).
-        "freeTnbMint": False,
         "difficulty": raw.get("difficulty") or raw.get("contractDifficulty"),
         "contractXp": raw.get("contractXp"),
         "namedDefender": raw.get("namedDefender"),
@@ -181,7 +180,6 @@ def sortie_v2_to_v1_order(s: Dict[str, Any]) -> Dict[str, Any]:
         "sessionMode": s.get("sessionMode"),
         "occupationModel": s.get("occupationModel"),
         "captureMode": s.get("captureMode"),
-        "freeTnbMint": s.get("freeTnbMint"),
         # Provenance — hub stamp vs opening vs debrief (materialize priority).
         "source": s.get("source"),
         "derived": s.get("derived") if isinstance(s.get("derived"), dict) else None,
@@ -192,8 +190,7 @@ def sortie_v2_to_v1_order(s: Dict[str, Any]) -> Dict[str, Any]:
 def normalize_result(raw: Dict[str, Any], *, campaign_id: str = "verdance_ashes") -> Dict[str, Any]:
     """Normalize gadget/infolog result JSON → result contract v2 (authoritative).
 
-    freeTnbMint is always False (capture claim law). Credits + verdict come from
-    match_credit_v1 when available.
+    Credits + verdict come from match_credit_v1 when available.
     """
     if not isinstance(raw, dict):
         raw = {}
@@ -241,7 +238,7 @@ def normalize_result(raw: Dict[str, Any], *, campaign_id: str = "verdance_ashes"
         else (raw.get("captureMode") if raw.get("captureMode") else None)
     )
     node_claimed = _b(raw.get("nodeClaimed"), False) or _s(raw.get("capturePhase")) == "claimed"
-    # Credit table is law for verdict / success / freeTnbMint / resultKey
+    # Credit table is law for verdict / success / resultKey
     credit: Dict[str, Any] = {}
     try:
 
@@ -415,7 +412,6 @@ def normalize_result(raw: Dict[str, Any], *, campaign_id: str = "verdance_ashes"
         "captureMode": capture_mode,
         "regrowWaves": _i(raw.get("regrowWaves"), 0),
         # Law: never free-mint Tnb on claim
-        "freeTnbMint": False,
         "occupationModel": _s(raw.get("occupationModel") or "living_shell"),
         "sessionMode": _s(raw.get("sessionMode") or "same_map"),
         "softContinueArmed": _b(raw.get("softContinueArmed"), False),
@@ -511,7 +507,6 @@ def result_v2_to_v1_fields(r: Dict[str, Any]) -> Dict[str, Any]:
         "capturePhase": r.get("capturePhase"),
         "captureMode": r.get("captureMode"),
         "regrowWaves": r.get("regrowWaves"),
-        "freeTnbMint": False,
         "occupationModel": r.get("occupationModel"),
         "sessionMode": r.get("sessionMode"),
         "softContinueArmed": r.get("softContinueArmed"),
@@ -548,7 +543,6 @@ def intent_from_sortie_v2(s: Dict[str, Any], base_intent: Optional[Dict[str, Any
     intent["occupationModel"] = s.get("occupationModel") or "living_shell"
     if s.get("captureMode"):
         intent["captureMode"] = s.get("captureMode")
-        intent["freeTnbMint"] = False
     intent["sortieContractV2"] = s
     return intent
 

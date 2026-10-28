@@ -5968,8 +5968,7 @@ function checkPresenceObjective(frame)
         capture.phase = "claimed"
         Spring.SetGameRulesParam("va_node_claimed", 1, { public = true })
         Spring.SetGameRulesParam("va_capture_phase", "claimed", { public = true })
-        Spring.Echo("VA_NODE_CLAIMED zone=" .. tostring(mission.objective and mission.objective.targetZoneId or "")
-          .. " freeTnbMint=false")
+        Spring.Echo("VA_NODE_CLAIMED zone=" .. tostring(mission.objective and mission.objective.targetZoneId or ""))
         onObjectiveComplete("node_claimed")
       end
       return

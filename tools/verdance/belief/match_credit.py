@@ -239,7 +239,6 @@ def credit_from_result(result: Dict[str, Any]) -> Dict[str, Any]:
       advanceMission: bool,
       applyState: bool,          # run process_result credit paths
       zoneFlip: bool,
-      freeTnbMint: always False,
       headline, reasonHint, changed (list[str])
     """
     if not isinstance(result, dict):
@@ -306,8 +305,6 @@ def credit_from_result(result: Dict[str, Any]) -> Dict[str, Any]:
     else:
         changed.append("mission advances")
 
-    changed.append("freeTnbMint=false")
-
     headline = _HEADLINES.get(verdict, _HEADLINES["incomplete"])
     if reason and reason in _REASON_HINTS:
         # Keep headline short; hint separate
@@ -336,7 +333,6 @@ def credit_from_result(result: Dict[str, Any]) -> Dict[str, Any]:
         "fullSuccess": full_success,
         "anyPositive": any_positive,
         "objectiveFailed": objective_failed,
-        "freeTnbMint": False,
         "banner": _BANNERS.get(verdict, _BANNERS["incomplete"]),
         "headline": headline,
         "reasonHint": reason_hint,
@@ -385,7 +381,6 @@ def presentable_debrief(
         "duplicate": False,
         "zoneFlip": credit.get("zoneFlip"),
         "xpTier": credit.get("xpTier"),
-        "freeTnbMint": False,
     }
 
 

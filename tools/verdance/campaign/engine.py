@@ -395,10 +395,6 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
             (sortie or {}).get("captureMode")
             or (objective.get("captureMode") if isinstance(objective, dict) else None)
         ),
-        "freeTnbMint": False if (
-            (sortie or {}).get("captureMode")
-            or (isinstance(objective, dict) and objective.get("captureMode"))
-        ) else None,
         "shellScars": ((state.get("shellScars") or {}).get(map_id) or {}),
         # The waterline this mission inherits from the planet's water cycle.
         "hydrology": map_waterline(state, map_id, workspace),
@@ -608,7 +604,6 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
         result["resultKey"] = credit.get("resultKey") or result.get("resultKey")
         result["status"] = credit.get("verdict") or result.get("status")
         result["verdict"] = credit.get("verdict")
-        result["freeTnbMint"] = False
     except Exception:
         try:
 
@@ -624,7 +619,6 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
                 "advanceMission": result.get("status") in ("victory", "partial", "defeat"),
                 "applyState": True,
                 "credits": {},
-                "freeTnbMint": False,
                 "headline": "Result",
                 "changed": [],
                 "nextAction": "mark_board",
@@ -701,7 +695,6 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
             "verdict": "abandon",
             "zoneFlipped": False,
             "nodeClaimed": False,
-            "freeTnbMint": False,
             "advanceMission": False,
             "bead": bead,
             "debrief": debrief,
@@ -891,7 +884,6 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
                                 "zoneId": target_zone_id,
                                 "patron": patron_bloc,
                                 "pocketCleared": bool(result.get("pocketCleared") or node_claimed),
-                                "freeTnbMint": False,
                                 "resultKey": result.get("resultKey"),
                                 "at": utc_now(),
                             }
@@ -902,8 +894,6 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
     settle = settle_commerce_after_sortie(
         state, result, success or any_positive, clean_extract, zone_flipped, workspace
     )
-    if (node_claimed or (capture_claim_report or {}).get("claimed")) and isinstance(settle, dict):
-        settle.setdefault("notes", []).append("capture claim settled with freeTnbMint=false")
     attachment_delta = None
     try:
 
@@ -1267,7 +1257,6 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
         "spectral": spectral,
         "zoneFlipped": zone_flipped,
         "nodeClaimed": node_claimed,
-        "freeTnbMint": False,
         "captureClaim": capture_claim_report,
         "regrow": regrow_report,
         "bead": bead,

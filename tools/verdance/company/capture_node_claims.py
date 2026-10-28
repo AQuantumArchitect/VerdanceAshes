@@ -8,8 +8,7 @@ Rules
 - Capture is **not** empty-grass stand. Pocket must be cleared (shell eco/teeth
   wrecked to CLEAR_FRACTION), then held while regrow pressure pulses.
 - Zone flip / hub claim only when ``nodeClaimed`` (clear+hold finished).
-- **No free Tnb mint** on capture: liquid Tnb is reclaim bank only; victory /
-  zone-flip catalog rolls are suppressed when freeTnbMint is false.
+- Capture never pays Tenebrium; the company's metal comes home in storage (commerce.py).
 - Occupation model remains ``living_shell`` (one model, seven shells).
 
 Surfaces
@@ -98,15 +97,6 @@ def is_capture_result(result: Dict[str, Any]) -> bool:
     return is_capture_kind(kind)
 
 
-def free_tnb_mint_allowed(result: Dict[str, Any]) -> bool:
-    """Capture never free-mints Tnb. Explicit freeTnbMint=false also blocks."""
-    if is_capture_result(result):
-        return False
-    v = result.get("freeTnbMint")
-    if v is False or v == 0 or str(v).lower() in ("false", "0", "no"):
-        return False
-    return True
-
 
 def pocket_cleared(destroyed: int, total: int, fraction: float = CLEAR_FRACTION) -> bool:
     """True when enough shell pocket units are wrecked to enter hold phase."""
@@ -165,7 +155,6 @@ def node_claim_result(
         "targetZoneId": target_zone_id,
         "mapId": map_id,
         "patron": patron,
-        "freeTnbMint": False,
         "tenebriumFromClaim": 0,
         "clearFraction": CLEAR_FRACTION,
         "holdFrames": hold_frames,
@@ -201,14 +190,11 @@ def stamp_sortie_capture(order: Dict[str, Any]) -> Dict[str, Any]:
         out["captureMode"] = CAPTURE_MODE
         out["occupationModel"] = out.get("occupationModel") or OCCUPATION_MODEL
         out["sessionMode"] = out.get("sessionMode") or "same_map"
-        # No free Tnb on capture contracts (reclaim only).
-        out["freeTnbMint"] = False
         out.setdefault("captureRules", {
             "model": CAPTURE_MODE,
             "clearFraction": CLEAR_FRACTION,
             "holdUnderRegrow": True,
             "emptyGrassClaim": False,
-            "freeTnbMint": False,
         })
     return out
 
@@ -222,7 +208,6 @@ def stamp_objective_capture(objective: Dict[str, Any], order: Optional[Dict[str,
         zid = obj.get("targetZoneId") or order.get("targetZoneId") or ""
         obj["captureMode"] = CAPTURE_MODE
         obj["kind"] = kind or obj.get("kind")
-        obj["freeTnbMint"] = False
         obj["description"] = (
             obj.get("description")
             or f"Clear pocket + hold under regrow to claim {zid}"
@@ -271,7 +256,7 @@ def apply_node_claim(
     """Apply capture claim to campaign state.
 
     Returns report:
-      claimed, zoneFlipped, freeTnbMint, reason, zoneId, mapId
+      claimed, zoneFlipped, reason, zoneId, mapId
     """
     mid = str(
         map_id
@@ -287,7 +272,6 @@ def apply_node_claim(
     report: Dict[str, Any] = {
         "claimed": False,
         "zoneFlipped": False,
-        "freeTnbMint": False,
         "reason": "idle",
         "zoneId": zid,
         "mapId": mid,
@@ -368,7 +352,6 @@ def apply_node_claim(
         "regrowWaves": int(result.get("regrowWaves") or 0),
         "pocketCleared": True,
         "nodeClaimed": True,
-        "freeTnbMint": False,
         "patron": patron_bloc,
         "resultKey": result.get("resultKey"),
         "previousControl": prev,
@@ -408,7 +391,6 @@ def hub_claim_surface(state: Dict[str, Any], map_id: Optional[str] = None) -> Di
     return {
         "occupationModel": state.get("occupationModel") or OCCUPATION_MODEL,
         "captureMode": CAPTURE_MODE,
-        "freeTnbMint": False,
         "clearFraction": CLEAR_FRACTION,
         "nodes": rows,
         "count": len(rows),
@@ -435,7 +417,7 @@ def hub_capture_contracts(
     holder or "unknown"; the engine re-derives the real opponent when it builds the match.
 
     Prefer quest_generator same_map candidates when available; else a belief scan of known zones.
-    Each contract stamps clear_hold_shell + freeTnbMint=false for deploy compile.
+    Each contract stamps clear_hold_shell for deploy compile.
     """
     from pathlib import Path as _Path
 
@@ -488,7 +470,6 @@ def hub_capture_contracts(
                     "captureMode": mode if mode != "other" else CAPTURE_MODE,
                     "occupationModel": OCCUPATION_MODEL,
                     "sessionMode": "same_map",
-                    "freeTnbMint": False,
                     "clearFraction": CLEAR_FRACTION,
                     "holdUnderRegrow": True,
                     "emptyGrassClaim": False,
@@ -544,7 +525,6 @@ def hub_capture_contracts(
                 "objectiveArchetype": "seize_lane",
                 "captureMode": CAPTURE_MODE,
                 "occupationModel": OCCUPATION_MODEL,
-                "freeTnbMint": False,
                 "clearFraction": CLEAR_FRACTION,
                 "holdUnderRegrow": True,
                 "emptyGrassClaim": False,
@@ -567,7 +547,6 @@ def hub_capture_contracts(
             "objectiveArchetype": "seize_lane",
             "captureMode": CAPTURE_MODE,
             "occupationModel": OCCUPATION_MODEL,
-            "freeTnbMint": False,
             "clearFraction": CLEAR_FRACTION,
             "holdUnderRegrow": True,
             "emptyGrassClaim": False,
@@ -641,7 +620,6 @@ def main() -> int:
     result = load_json(ws / args.result, {})
     state = load_json(ws / args.state, {})
     report = apply_node_claim(state, result)
-    report["freeTnbMintAllowed"] = free_tnb_mint_allowed(result)
     report["hub"] = hub_claim_surface(state, report.get("mapId") or None)
     if args.write_state and report.get("claimed"):
         out = ws / args.state
@@ -676,7 +654,6 @@ def _self_test() -> int:
         "pocketCleared": True,
         "nodeClaimed": False,
         "patron": "nullmercs",
-        "freeTnbMint": False,
     }
     rep1 = apply_node_claim(state, r1, success=True)
     if rep1["claimed"]:
@@ -696,8 +673,6 @@ def _self_test() -> int:
     ctrl = state["zoneMemory"]["koom_valley"]["KOOM_CENTRAL_FLUID_SCAR"]["controllingFaction"]
     if ctrl != "nullmercs":
         fails.append(f"control should flip to nullmercs, got {ctrl}")
-    if free_tnb_mint_allowed(r2):
-        fails.append("capture must block free Tnb mint")
     if "KOOM_CENTRAL_FLUID_SCAR" not in (state.get("claimedNodes") or {}).get("koom_valley", {}):
         fails.append("claimedNodes ledger missing")
 
@@ -707,7 +682,7 @@ def _self_test() -> int:
         "targetZoneId": "KOOM_CENTRAL_FLUID_SCAR",
         "objectiveArchetype": "seize_lane",
     })
-    if s.get("captureMode") != CAPTURE_MODE or s.get("freeTnbMint") is not False:
+    if s.get("captureMode") != CAPTURE_MODE:
         fails.append(f"sortie stamp failed: {s}")
 
     # 4) eco_raid is not capture path
@@ -730,7 +705,7 @@ def _self_test() -> int:
     if capture_phase(destroyed=6, total=10, hold_frames=900) != "claimed":
         fails.append("phase should be claimed after hold")
     nr = node_claim_result(destroyed=6, total=10, hold_frames=900)
-    if nr.get("tenebriumFromClaim") != 0 or nr.get("freeTnbMint") is not False:
+    if nr.get("tenebriumFromClaim") != 0:
         fails.append("claim must not mint Tnb")
 
     # 6) abstract regrow
@@ -757,7 +732,7 @@ def _self_test() -> int:
             print(" -", f)
         return 1
     print("SELFTEST OK capture_node_claims")
-    print(json.dumps({"claimed": True, "freeTnbMint": False, "mode": CAPTURE_MODE}, indent=2))
+    print(json.dumps({"claimed": True, "mode": CAPTURE_MODE}, indent=2))
     return 0
 
 

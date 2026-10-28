@@ -442,7 +442,6 @@ def objective_from_sortie(order: Dict[str, Any], state: Dict[str, Any], workspac
     except Exception:
         if archetype in ("seize_lane", "gate_control", "hold_plateau"):
             obj["captureMode"] = "clear_hold_shell"
-            obj["freeTnbMint"] = False
             obj["description"] = f"Clear pocket + hold under regrow to claim {zone_id}"
     return obj
 

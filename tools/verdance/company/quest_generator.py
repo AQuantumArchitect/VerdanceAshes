@@ -273,7 +273,6 @@ def generate_quests(
                 "against": against,
                 "objectiveArchetype": arch,
                 "captureMode": capture_mode,
-                "freeTnbMint": False,
                 "occupationModel": "living_shell",
                 "sessionMode": "same_map",
                 "label": node.get("label") or zid,

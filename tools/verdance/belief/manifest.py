@@ -8,7 +8,7 @@ what it looked at. This module is the only place those facts become campaign mea
                result.manifest      {kind, destination, going, staying, enemyOnPad, objectiveComplete, seen}
                result.objectiveComplete / objectiveCompleteHow / allObjectivesDone / requiredMarksLeft
                (pass nine: the gadget no longer writes verdict, zoneFlipped, cleanExtract,
-               extractionStatus, credits or freeTnbMint — those are computed here and in
+               extractionStatus or credits — those are computed here and in
                match_credit_v1 from the facts above)
   verdict      wiped → defeat · closed (engine ended without a manifest) → abandon ·
                extracted → victory if the job was done and nobody was stranded, else partial

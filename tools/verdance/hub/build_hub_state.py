@@ -1177,7 +1177,6 @@ def build_hub(state: dict, war: dict) -> dict:
     claim_surface: dict = {
         "occupationModel": occupation_model,
         "captureMode": "clear_hold_shell",
-        "freeTnbMint": False,
         "nodes": [],
         "count": 0,
     }
@@ -1245,7 +1244,6 @@ def build_hub(state: dict, war: dict) -> dict:
         "homeEval": home_eval if isinstance(home_eval, dict) else {},
         "occupationModel": occupation_model,
         "captureMode": "clear_hold_shell",
-        "freeTnbMint": False,
         "captureContracts": capture_contracts,
         "claimedNodes": claim_surface,
         "nodeClaims": state.get("nodeClaims") or state.get("claimedNodes") or {},
