@@ -569,6 +569,150 @@
           ]
         }
       }
+    },
+    {
+      "a": "gorgon",
+      "b": "halq",
+      "polarity": "attract",
+      "motifs": [
+        "coordinates and salvos",
+        "two who argue with math"
+      ],
+      "talks": {
+        "C": {
+          "title": "Range table",
+          "beats": [
+            [
+              "narrator",
+              "Halq reads out a grid square. Maelis's Medusa is already turning toward it."
+            ],
+            [
+              "halq",
+              "Six-two, four-zero. Eleven hundred out."
+            ],
+            [
+              "gorgon",
+              "Twelve. You always round down."
+            ],
+            [
+              "halq",
+              "I round to what the rockets can reach."
+            ],
+            [
+              "gorgon",
+              "Mine reach twelve."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "gorgon",
+      "b": "arc",
+      "polarity": "bond",
+      "motifs": [
+        "the flak and the choir",
+        "a clean sky over the guns"
+      ],
+      "talks": {
+        "C": {
+          "title": "Roof",
+          "beats": [
+            [
+              "narrator",
+              "The Shredders and Halloran's Whistlers clear the same patch of sky over the Medusa."
+            ],
+            [
+              "arc",
+              "Your trucks sing flat."
+            ],
+            [
+              "gorgon",
+              "My trucks don't sing. They shred. Yours can do the hymn."
+            ],
+            [
+              "arc",
+              "Then we'll call it a duet."
+            ],
+            [
+              "gorgon",
+              "Call it what you like. Just keep the sky off me."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "gorgon",
+      "b": "tremor",
+      "polarity": "rivalry",
+      "motifs": [
+        "two long guns, two factions",
+        "who sees it first"
+      ],
+      "talks": {
+        "C": {
+          "title": "Spotting",
+          "beats": [
+            [
+              "narrator",
+              "Lund's Rascals and Maelis's Medusa find the same target at the same moment."
+            ],
+            [
+              "tremor",
+              "Somebody has to see it first. That was me."
+            ],
+            [
+              "gorgon",
+              "Seeing isn't hitting. That was me."
+            ],
+            [
+              "tremor",
+              "You hit the crater I made."
+            ],
+            [
+              "gorgon",
+              "Then make better craters."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "gorgon",
+      "b": "hornet",
+      "polarity": "tension",
+      "motifs": [
+        "gunships and flak",
+        "the sisters and the Shredders"
+      ],
+      "talks": {
+        "C": {
+          "title": "Low pass",
+          "beats": [
+            [
+              "narrator",
+              "The Marsh sisters come home low over the Medusa. Both Shredders swing toward them."
+            ],
+            [
+              "hornet",
+              "Friendly! Friendly!"
+            ],
+            [
+              "gorgon",
+              "My crews pay for their own ammunition. They don't waste it on friends who fly properly."
+            ],
+            [
+              "hornet",
+              "Saffi says that wasn't a no."
+            ],
+            [
+              "gorgon",
+              "Saffi is very perceptive."
+            ]
+          ]
+        }
+      }
     }
   ]
 }

@@ -2262,6 +2262,43 @@
       "glyph": "+sky·+off·+mob·+sig",
       "position": "siege",
       "doctrine": "sky_siege"
+    },
+    {
+      "heroId": "gorgon",
+      "name": "Ivra 'Gorgon' Maelis",
+      "axes": {
+        "energy": 0.0,
+        "offense": 0.9,
+        "mobility": -0.4,
+        "sight": 0.3,
+        "pad": 0.4,
+        "craft": 0.0,
+        "heat": 0.0,
+        "fog": 0.0,
+        "sky": -0.2,
+        "ledger": 0.0
+      },
+      "marks": [
+        {
+          "axis": "offense",
+          "value": 0.9
+        },
+        {
+          "axis": "mobility",
+          "value": -0.4
+        },
+        {
+          "axis": "pad",
+          "value": 0.4
+        },
+        {
+          "axis": "sight",
+          "value": 0.3
+        }
+      ],
+      "glyph": "+off·−mob·+pad·+sig",
+      "position": "siege",
+      "doctrine": "arty"
     }
   ]
 }

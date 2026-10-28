@@ -5,10 +5,10 @@
     "minScore": 0.42,
     "maxDegree": 5,
     "topEdges": 64,
-    "heroCount": 63,
-    "edgeCount": 169,
-    "talkCount": 390,
-    "authoredSeeds": 125,
+    "heroCount": 64,
+    "edgeCount": 173,
+    "talkCount": 394,
+    "authoredSeeds": 129,
     "umweltAxes": [
       "energy",
       "offense",
@@ -1721,7 +1721,7 @@
       ],
       "doctrine": "line",
       "hook": "Shoots map coordinates.",
-      "degree": 10,
+      "degree": 11,
       "umweltGlyph": "+pad·+off·−mob·+led",
       "umweltMarks": [
         {
@@ -2662,7 +2662,7 @@
       ],
       "doctrine": "skirm",
       "hook": "Stings, then returns for the nest.",
-      "degree": 3,
+      "degree": 4,
       "umweltGlyph": "+mob·+sky·−pad·+off",
       "umweltMarks": [
         {
@@ -2755,7 +2755,7 @@
       ],
       "doctrine": "arty",
       "hook": "Somebody has to see it first.",
-      "degree": 4,
+      "degree": 5,
       "umweltGlyph": "+off·−mob·+pad·+led",
       "umweltMarks": [
         {
@@ -3003,7 +3003,7 @@
       ],
       "doctrine": "line",
       "hook": "Eight torches and one opinion.",
-      "degree": 7,
+      "degree": 8,
       "umweltGlyph": "+off·+hea·+pad·+ene",
       "umweltMarks": [
         {
@@ -3176,6 +3176,37 @@
         {
           "axis": "sight",
           "value": 0.4
+        }
+      ]
+    },
+    {
+      "heroId": "gorgon",
+      "name": "Ivra 'Gorgon' Maelis",
+      "position": "siege",
+      "temperament": [
+        "count",
+        "plod"
+      ],
+      "doctrine": "arty",
+      "hook": "Whatever I look at stops moving.",
+      "degree": 4,
+      "umweltGlyph": "+off·−mob·+pad·+sig",
+      "umweltMarks": [
+        {
+          "axis": "offense",
+          "value": 0.9
+        },
+        {
+          "axis": "mobility",
+          "value": -0.4
+        },
+        {
+          "axis": "pad",
+          "value": 0.4
+        },
+        {
+          "axis": "sight",
+          "value": 0.3
         }
       ]
     }
@@ -3546,6 +3577,31 @@
       "bGlyph": "+off·+pad·+hea",
       "talkIds": {
         "C": "arc__cauter:C"
+      }
+    },
+    {
+      "id": "arc__gorgon",
+      "a": "gorgon",
+      "b": "arc",
+      "score": 1.0,
+      "polarity": "bond",
+      "motifs": [
+        "the flak and the choir",
+        "a clean sky over the guns"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Ivra 'Gorgon' Maelis",
+      "bName": "Ambrose 'Choir' Halloran",
+      "aHook": "Whatever I look at stops moving.",
+      "bHook": "Hear that? That's the choir.",
+      "aGlyph": "+off·−mob·+pad·+sig",
+      "bGlyph": "+sky·+off·+pad·+hea",
+      "talkIds": {
+        "C": "arc__gorgon:C"
       }
     },
     {
@@ -5796,6 +5852,86 @@
       "bGlyph": "+mob·−pad·+off",
       "talkIds": {
         "C": "gladius__stride:C"
+      }
+    },
+    {
+      "id": "gorgon__halq",
+      "a": "gorgon",
+      "b": "halq",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "coordinates and salvos",
+        "two who argue with math"
+      ],
+      "sharedTemperament": [
+        "count"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Ivra 'Gorgon' Maelis",
+      "bName": "Sisu Halq",
+      "aHook": "Whatever I look at stops moving.",
+      "bHook": "Calls the coordinates; the rockets answer.",
+      "aGlyph": "+off·−mob·+pad·+sig",
+      "bGlyph": "+pad·+sig·+off·−mob",
+      "talkIds": {
+        "C": "gorgon__halq:C"
+      }
+    },
+    {
+      "id": "gorgon__hornet",
+      "a": "gorgon",
+      "b": "hornet",
+      "score": 1.0,
+      "polarity": "tension",
+      "motifs": [
+        "gunships and flak",
+        "the sisters and the Shredders"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Ivra 'Gorgon' Maelis",
+      "bName": "Teague & Saffi Marsh",
+      "aHook": "Whatever I look at stops moving.",
+      "bHook": "Sting, climb, come back for the nest.",
+      "aGlyph": "+off·−mob·+pad·+sig",
+      "bGlyph": "+mob·+sky·−pad·+off",
+      "talkIds": {
+        "C": "gorgon__hornet:C"
+      }
+    },
+    {
+      "id": "gorgon__tremor",
+      "a": "gorgon",
+      "b": "tremor",
+      "score": 1.0,
+      "polarity": "rivalry",
+      "motifs": [
+        "two long guns, two factions",
+        "who sees it first"
+      ],
+      "sharedTemperament": [
+        "count",
+        "plod"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Ivra 'Gorgon' Maelis",
+      "bName": "Edda 'Tremor' Lund",
+      "aHook": "Whatever I look at stops moving.",
+      "bHook": "Somebody has to see it first.",
+      "aGlyph": "+off·−mob·+pad·+sig",
+      "bGlyph": "+off·−mob·+pad·+led",
+      "talkIds": {
+        "C": "gorgon__tremor:C"
       }
     },
     {
