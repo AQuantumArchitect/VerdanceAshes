@@ -48,7 +48,7 @@
         }
       ],
       "glyph": "+mob·−pad·+off·+sig",
-      "position": "core_skirm",
+      "position": "band_swarm",
       "doctrine": "phobos"
     },
     {
@@ -410,7 +410,7 @@
         "sight": 0.0,
         "pad": 0.8,
         "craft": 0.0,
-        "heat": 0.0,
+        "heat": 0.6,
         "fog": 0.0,
         "sky": 0.0,
         "ledger": 0.45
@@ -421,19 +421,19 @@
           "value": 0.8
         },
         {
+          "axis": "heat",
+          "value": 0.6
+        },
+        {
           "axis": "offense",
           "value": 0.55
         },
         {
           "axis": "mobility",
           "value": -0.5
-        },
-        {
-          "axis": "ledger",
-          "value": 0.45
         }
       ],
-      "glyph": "+pad·+off·−mob·+led",
+      "glyph": "+pad·+hea·+off·−mob",
       "position": "line",
       "doctrine": "line"
     },
@@ -543,7 +543,7 @@
         "energy": 0.0,
         "offense": 0.55,
         "mobility": -0.5,
-        "sight": 0.1,
+        "sight": 0.6,
         "pad": 0.8,
         "craft": 0.0,
         "heat": 0.0,
@@ -557,19 +557,19 @@
           "value": 0.8
         },
         {
+          "axis": "sight",
+          "value": 0.6
+        },
+        {
           "axis": "offense",
           "value": 0.55
         },
         {
           "axis": "mobility",
           "value": -0.5
-        },
-        {
-          "axis": "ledger",
-          "value": 0.45
         }
       ],
-      "glyph": "+pad·+off·−mob·+led",
+      "glyph": "+pad·+sig·+off·−mob",
       "position": "line",
       "doctrine": "line"
     },
@@ -1072,8 +1072,8 @@
         }
       ],
       "glyph": "+mob·−pad·+off",
-      "position": "skirmish",
-      "doctrine": "skirm"
+      "position": "siege",
+      "doctrine": "arty"
     },
     {
       "heroId": "vale",
@@ -1148,43 +1148,6 @@
       "glyph": "−mob·+pad·+led·−off",
       "position": "shield",
       "doctrine": "pad"
-    },
-    {
-      "heroId": "ceil",
-      "name": "Ceil Rat",
-      "axes": {
-        "energy": 0.0,
-        "offense": 0.35,
-        "mobility": 1.0,
-        "sight": 0.0,
-        "pad": -1.0,
-        "craft": 0.0,
-        "heat": 0.0,
-        "fog": 0.0,
-        "sky": 0.5,
-        "ledger": 0.0
-      },
-      "marks": [
-        {
-          "axis": "mobility",
-          "value": 1.0
-        },
-        {
-          "axis": "pad",
-          "value": -1.0
-        },
-        {
-          "axis": "sky",
-          "value": 0.5
-        },
-        {
-          "axis": "offense",
-          "value": 0.35
-        }
-      ],
-      "glyph": "+mob·−pad·+sky·+off",
-      "position": "skirmish",
-      "doctrine": "skirm"
     },
     {
       "heroId": "lumen",
@@ -1487,43 +1450,6 @@
       "doctrine": "sky_siege"
     },
     {
-      "heroId": "tarn",
-      "name": "Tarn Ostrander",
-      "axes": {
-        "energy": 0.0,
-        "offense": 0.6,
-        "mobility": 0.8,
-        "sight": 0.0,
-        "pad": -0.4,
-        "craft": 0.0,
-        "heat": 0.2,
-        "fog": 0.0,
-        "sky": 0.0,
-        "ledger": 0.0
-      },
-      "marks": [
-        {
-          "axis": "mobility",
-          "value": 0.8
-        },
-        {
-          "axis": "offense",
-          "value": 0.6
-        },
-        {
-          "axis": "pad",
-          "value": -0.4
-        },
-        {
-          "axis": "heat",
-          "value": 0.2
-        }
-      ],
-      "glyph": "+mob·+off·−pad·+hea",
-      "position": "line",
-      "doctrine": "line"
-    },
-    {
       "heroId": "scylla",
       "name": "Maren 'Scylla' Voss",
       "axes": {
@@ -1710,7 +1636,7 @@
     },
     {
       "heroId": "hornet",
-      "name": "Teague 'Hornet' Marsh",
+      "name": "Teague & Saffi Marsh",
       "axes": {
         "energy": 0.0,
         "offense": 0.7,
@@ -1892,43 +1818,6 @@
       "glyph": "+sky·+off·+mob·+ene",
       "position": "siege",
       "doctrine": "sky_siege"
-    },
-    {
-      "heroId": "marauder",
-      "name": "Marlow & Wren",
-      "axes": {
-        "energy": 0.0,
-        "offense": 0.6,
-        "mobility": 1.0,
-        "sight": 0.0,
-        "pad": -0.8,
-        "craft": 0.0,
-        "heat": 0.0,
-        "fog": 0.2,
-        "sky": 0.0,
-        "ledger": 0.0
-      },
-      "marks": [
-        {
-          "axis": "mobility",
-          "value": 1.0
-        },
-        {
-          "axis": "pad",
-          "value": -0.8
-        },
-        {
-          "axis": "offense",
-          "value": 0.6
-        },
-        {
-          "axis": "fog",
-          "value": 0.2
-        }
-      ],
-      "glyph": "+mob·−pad·+off·+fog",
-      "position": "skirmish",
-      "doctrine": "skirm"
     },
     {
       "heroId": "lunkhead",
@@ -2154,40 +2043,40 @@
     },
     {
       "heroId": "arc",
-      "name": "Corwin 'Arc' Vasse",
+      "name": "Ambrose 'Choir' Halloran",
       "axes": {
-        "energy": 0.2,
-        "offense": 1.0,
+        "energy": 0.0,
+        "offense": 0.5,
         "mobility": -0.1,
         "sight": 0.0,
-        "pad": 0.3,
+        "pad": 0.5,
         "craft": 0.0,
-        "heat": 0.7,
+        "heat": 0.2,
         "fog": 0.0,
-        "sky": 0.0,
+        "sky": 0.9,
         "ledger": 0.0
       },
       "marks": [
         {
-          "axis": "offense",
-          "value": 1.0
+          "axis": "sky",
+          "value": 0.9
         },
         {
-          "axis": "heat",
-          "value": 0.7
+          "axis": "offense",
+          "value": 0.5
         },
         {
           "axis": "pad",
-          "value": 0.3
+          "value": 0.5
         },
         {
-          "axis": "energy",
+          "axis": "heat",
           "value": 0.2
         }
       ],
-      "glyph": "+off·+hea·+pad·+ene",
-      "position": "line",
-      "doctrine": "line"
+      "glyph": "+sky·+off·+pad·+hea",
+      "position": "shield",
+      "doctrine": "aa_saint"
     },
     {
       "heroId": "mammoth",
@@ -2299,6 +2188,80 @@
       "glyph": "+off·+mob·+pad·+sig",
       "position": "line",
       "doctrine": "line"
+    },
+    {
+      "heroId": "loom",
+      "name": "Orla 'Loom' Vey",
+      "axes": {
+        "energy": 0.0,
+        "offense": 0.5,
+        "mobility": 0.2,
+        "sight": 0.0,
+        "pad": 0.8,
+        "craft": 0.3,
+        "heat": 0.0,
+        "fog": 0.0,
+        "sky": 0.0,
+        "ledger": 0.3
+      },
+      "marks": [
+        {
+          "axis": "pad",
+          "value": 0.8
+        },
+        {
+          "axis": "offense",
+          "value": 0.5
+        },
+        {
+          "axis": "craft",
+          "value": 0.3
+        },
+        {
+          "axis": "ledger",
+          "value": 0.3
+        }
+      ],
+      "glyph": "+pad·+off·+cra·+led",
+      "position": "line",
+      "doctrine": "line"
+    },
+    {
+      "heroId": "hundred",
+      "name": "Thessaly 'Hundred' Orne",
+      "axes": {
+        "energy": 0.0,
+        "offense": 0.7,
+        "mobility": 0.6,
+        "sight": 0.4,
+        "pad": -0.4,
+        "craft": 0.0,
+        "heat": 0.0,
+        "fog": 0.0,
+        "sky": 0.9,
+        "ledger": 0.0
+      },
+      "marks": [
+        {
+          "axis": "sky",
+          "value": 0.9
+        },
+        {
+          "axis": "offense",
+          "value": 0.7
+        },
+        {
+          "axis": "mobility",
+          "value": 0.6
+        },
+        {
+          "axis": "sight",
+          "value": 0.4
+        }
+      ],
+      "glyph": "+sky·+off·+mob·+sig",
+      "position": "siege",
+      "doctrine": "sky_siege"
     }
   ]
 }

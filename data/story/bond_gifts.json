@@ -7,20 +7,6 @@
   },
   "poolDraw": 5,
   "recommended": {
-    "ceil__kettle": [
-      {
-        "unitDef": "armhawk",
-        "count": 2,
-        "why": "Highwinds fly top cover: the saint's roof gets wings"
-      }
-    ],
-    "ceil__nox": [
-      {
-        "unitDef": "armawac",
-        "count": 1,
-        "why": "An Oracle radar plane watches the sky Nox still owes"
-      }
-    ],
     "fatboy__kettle": [
       {
         "unitDef": "armrl",
@@ -40,34 +26,6 @@
         "unitDef": "armpeep",
         "count": 2,
         "why": "Blink scouts fly the cold lanes ahead of the swarm"
-      }
-    ],
-    "ceil__mira": [
-      {
-        "unitDef": "armseer",
-        "count": 1,
-        "why": "A Prophet radar truck turns the gunship's calls into firing solutions"
-      }
-    ],
-    "ceil__volt": [
-      {
-        "unitDef": "armflash",
-        "count": 4,
-        "why": "Blitz raiders join the race for the tally"
-      }
-    ],
-    "ceil__commando": [
-      {
-        "unitDef": "armmlv",
-        "count": 1,
-        "why": "A Groundhog lays the mines before the argument, where the gunship points"
-      }
-    ],
-    "ceil__vane": [
-      {
-        "unitDef": "armkam",
-        "count": 2,
-        "why": "Banshees learn to come in on four"
       }
     ],
     "noctua__yeva": [
@@ -138,13 +96,6 @@
         "unitDef": "armamph",
         "count": 2,
         "why": "Platypus bots to hold the ford between the Turtles and the floats"
-      }
-    ],
-    "ceil__gale": [
-      {
-        "unitDef": "corvamp",
-        "count": 2,
-        "why": "Nighthawks fly top cover over both wings"
       }
     ],
     "mask__pavise": [

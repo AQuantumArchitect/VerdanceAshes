@@ -22,13 +22,13 @@ def _state(points):
 
 
 def test_ranks_give_xp_and_only_rank_a_gives_a_gift():
-    s = _state({("ceil", "kettle"): 60, ("fatboy", "kettle"): 30, ("mira", "ceil"): 10})
-    out = synergy.bond_perks(s, ["ceil", "kettle", "fatboy", "mira"], ROOT)
+    s = _state({("fatboy", "kettle"): 60, ("kettle", "mira"): 30, ("fatboy", "mira"): 10})
+    out = synergy.bond_perks(s, ["kettle", "fatboy", "mira"], ROOT)
     xp = {(r["a"], r["b"]): r for r in out["bondXp"]}
-    assert xp[("ceil", "kettle")]["rank"] == "A" and xp[("fatboy", "kettle")]["rank"] == "B"
-    assert ("ceil", "mira") not in xp
-    assert [(g["a"], g["b"]) for g in out["bondGifts"]] == [("ceil", "kettle")]
-    assert out["bondGifts"][0]["unitDef"] == "armhawk" and out["bondGifts"][0]["source"] == "recommended"
+    assert xp[("fatboy", "kettle")]["rank"] == "A" and xp[("kettle", "mira")]["rank"] == "B"
+    assert ("fatboy", "mira") not in xp
+    assert [(g["a"], g["b"]) for g in out["bondGifts"]] == [("fatboy", "kettle")]
+    assert out["bondGifts"][0]["unitDef"] == "armrl" and out["bondGifts"][0]["source"] == "recommended"
 
 
 def test_a_gift_is_never_a_unit_either_pack_has():
@@ -43,10 +43,10 @@ def test_a_gift_is_never_a_unit_either_pack_has():
 
 def test_the_draw_is_seeded_and_falls_back_to_the_pool():
     packs = dict(PACKS["heroes"])
-    packs["kettle"] = dict(packs["kettle"], escorts=[{"unitDef": "armhawk", "count": 2}])  # recommendation taken
-    one = synergy.choose_gift("ceil", "kettle", gifts=GIFTS, packs=packs, umwelt={}, seed="x")
-    two = synergy.choose_gift("ceil", "kettle", gifts=GIFTS, packs=packs, umwelt={}, seed="x")
-    assert one == two and one["source"] == "pool" and one["unitDef"] != "armhawk"
+    packs["kettle"] = dict(packs["kettle"], escorts=[{"unitDef": "armrl", "count": 3}])  # recommendation taken
+    one = synergy.choose_gift("fatboy", "kettle", gifts=GIFTS, packs=packs, umwelt={}, seed="x")
+    two = synergy.choose_gift("fatboy", "kettle", gifts=GIFTS, packs=packs, umwelt={}, seed="x")
+    assert one == two and one["source"] == "pool" and one["unitDef"] != "armrl"
 
 
 def test_every_gift_unit_is_a_real_unit():

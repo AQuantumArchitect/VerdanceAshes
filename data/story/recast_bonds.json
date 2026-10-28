@@ -1,0 +1,574 @@
+{
+  "schemaVersion": "verdance-authored-bonds/1.0",
+  "notes": "The roster recast of 2026-10-28: Ambrose 'Choir' Halloran (one Welder and six Whistlers; was Arc's Welder octet), Orla 'Loom' Vey (Webbers and Legion Ballistas; replaces Ceil Rat), Thessaly 'Hundred' Orne (Hecatoncheir and Cleavers; replaces the Marauder pair). Merged by tools/author_bonds_v1.py.",
+  "pairs": [
+    {
+      "a": "arc",
+      "b": "twitch",
+      "polarity": "mentor",
+      "motifs": [
+        "the welder's apprentice",
+        "keep time with your hands"
+      ],
+      "talks": {
+        "C": {
+          "title": "Tempo",
+          "beats": [
+            [
+              "narrator",
+              "Sallow is patching a lab with his welder, fast and badly. Halloran watches for a whole minute, then taps the beat on the Welder's hull."
+            ],
+            [
+              "arc",
+              "You're rushing the bar."
+            ],
+            [
+              "twitch",
+              "It's a weld, not a hymn."
+            ],
+            [
+              "arc",
+              "Everything is a hymn if you count it. Slow your hand. Let the metal come in on the beat."
+            ],
+            [
+              "twitch",
+              "Huh. It holds. Don't tell anyone you were nice to me."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "arc",
+      "b": "volt",
+      "polarity": "rivalry",
+      "motifs": [
+        "the downbeat and the flash",
+        "two ways to own the air"
+      ],
+      "talks": {
+        "C": {
+          "title": "Out of time",
+          "beats": [
+            [
+              "narrator",
+              "Volt's Jaguars light up a gunship a half-second before the Whistlers are ready. The Blitz pile in after it."
+            ],
+            [
+              "arc",
+              "You came in early."
+            ],
+            [
+              "volt",
+              "I came in first. Sight is a wound you give them."
+            ],
+            [
+              "arc",
+              "A wound is a solo. I'm running a choir."
+            ],
+            [
+              "volt",
+              "Then sing faster."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "arc",
+      "b": "kettle",
+      "polarity": "attract",
+      "motifs": [
+        "two who hold the air",
+        "hymns from the ground"
+      ],
+      "talks": {
+        "C": {
+          "title": "Evensong",
+          "beats": [
+            [
+              "narrator",
+              "The Archangel's missiles and the Whistlers' go up together at dusk. The sky over the company is very quiet afterwards."
+            ],
+            [
+              "kettle",
+              "You sing the low part."
+            ],
+            [
+              "arc",
+              "Someone has to. You take the high notes."
+            ],
+            [
+              "kettle",
+              "Holiness is elite."
+            ],
+            [
+              "arc",
+              "So is timing. Same time tomorrow."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "arc",
+      "b": "thresh",
+      "polarity": "tension",
+      "motifs": [
+        "weather from above against the choir below",
+        "who gets the last word in the sky"
+      ],
+      "talks": {
+        "C": {
+          "title": "Overhead",
+          "beats": [
+            [
+              "narrator",
+              "Thresh's Hailstorm comes home low over the company. Six Whistlers track it all the way in."
+            ],
+            [
+              "thresh",
+              "I'm on your side, choirmaster."
+            ],
+            [
+              "arc",
+              "The choir sings at anything that flies over without a hymn sheet."
+            ],
+            [
+              "thresh",
+              "Weather doesn't read music."
+            ],
+            [
+              "arc",
+              "Then weather gets the loud part."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "arc",
+      "b": "hornet",
+      "polarity": "friction",
+      "motifs": [
+        "gunships the choir keeps singing at",
+        "low passes over a nervous battery"
+      ],
+      "talks": {
+        "C": {
+          "title": "Low pass",
+          "beats": [
+            [
+              "narrator",
+              "The Marsh sisters buzz the Whistler park on their way home. Twice."
+            ],
+            [
+              "hornet",
+              "Just saying hello."
+            ],
+            [
+              "arc",
+              "Say it higher. The sopranos don't know you yet."
+            ],
+            [
+              "hornet",
+              "Saffi says your sopranos need glasses."
+            ],
+            [
+              "arc",
+              "Saffi has never said anything."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "loom",
+      "b": "halq",
+      "polarity": "attract",
+      "motifs": [
+        "the net and the coordinates",
+        "holding still is a number"
+      ],
+      "talks": {
+        "C": {
+          "title": "Fix",
+          "beats": [
+            [
+              "narrator",
+              "Vey's Webbers pin a column in place. Halq is already reading out its grid square."
+            ],
+            [
+              "halq",
+              "Four-one, six-three. Holding."
+            ],
+            [
+              "loom",
+              "They'll hold as long as you need. Nothing in the net moves."
+            ],
+            [
+              "halq",
+              "Then the rockets have all night."
+            ],
+            [
+              "loom",
+              "Don't take all night. I want the wrecks."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "loom",
+      "b": "auditor",
+      "polarity": "attract",
+      "motifs": [
+        "reclaim is bookkeeping",
+        "nothing wasted"
+      ],
+      "talks": {
+        "C": {
+          "title": "Salvage",
+          "beats": [
+            [
+              "narrator",
+              "The Webbers strip a field of wrecks down to bare ash. The Auditor counts the metal as it comes in."
+            ],
+            [
+              "auditor",
+              "Four hundred and twelve, reclaimed. You leave nothing on the ground."
+            ],
+            [
+              "loom",
+              "A net that leaves things behind has a hole in it."
+            ],
+            [
+              "auditor",
+              "I would like that sentence on the ledger."
+            ],
+            [
+              "loom",
+              "Put it in the margin. That's where the mending goes."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "loom",
+      "b": "infestor",
+      "polarity": "rivalry",
+      "motifs": [
+        "two kinds of spider",
+        "the net and the nest"
+      ],
+      "talks": {
+        "C": {
+          "title": "Webs",
+          "beats": [
+            [
+              "narrator",
+              "A Recluse and a Webber meet on the same cliff face and stop."
+            ],
+            [
+              "loom",
+              "Your spiders breed."
+            ],
+            [
+              "infestor",
+              "The hive grows. Yours only catch."
+            ],
+            [
+              "loom",
+              "Mine catch yours, if they wander into my line."
+            ],
+            [
+              "infestor",
+              "Then the hive will grow around your line."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "loom",
+      "b": "stride",
+      "polarity": "tension",
+      "motifs": [
+        "speed against the net",
+        "bad manners, held still"
+      ],
+      "talks": {
+        "C": {
+          "title": "Caught",
+          "beats": [
+            [
+              "narrator",
+              "Stride's Gunslingers tear through the line at full speed and run straight into an EMP pulse."
+            ],
+            [
+              "stride",
+              "Let me out."
+            ],
+            [
+              "loom",
+              "You were in a hurry. Now you're not. That's the whole lesson."
+            ],
+            [
+              "stride",
+              "I'm on your side!"
+            ],
+            [
+              "loom",
+              "The net doesn't know that. Slow down where it can see you."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "loom",
+      "b": "vane",
+      "polarity": "friction",
+      "motifs": [
+        "the flock and the net",
+        "rhythm against stillness"
+      ],
+      "talks": {
+        "C": {
+          "title": "Holding pattern",
+          "beats": [
+            [
+              "narrator",
+              "Vane's Phobos reform behind the line, fidgeting, while the Webbers hold the enemy still."
+            ],
+            [
+              "vane",
+              "Release them. We have a rhythm."
+            ],
+            [
+              "loom",
+              "And I have a net. Your rhythm can wait four seconds."
+            ],
+            [
+              "vane",
+              "Four seconds is a whole song."
+            ],
+            [
+              "loom",
+              "Then it's a short song. Go when I open it."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "hundred",
+      "b": "noctua",
+      "polarity": "attract",
+      "motifs": [
+        "two who command drones",
+        "the plant and the carrier"
+      ],
+      "talks": {
+        "C": {
+          "title": "Shared sky",
+          "beats": [
+            [
+              "narrator",
+              "Noctua's fighters and Orne's drones share the same patch of sky without a single collision."
+            ],
+            [
+              "noctua",
+              "You fly them like a hand."
+            ],
+            [
+              "hundred",
+              "We are a hand. You fly yours like a dream."
+            ],
+            [
+              "noctua",
+              "Then we sleep in the same sky."
+            ],
+            [
+              "hundred",
+              "We don't sleep. We count."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "hundred",
+      "b": "auditor",
+      "polarity": "rivalry",
+      "motifs": [
+        "whose drones",
+        "a carrier on legs and a carrier on wings"
+      ],
+      "talks": {
+        "C": {
+          "title": "Inventory",
+          "beats": [
+            [
+              "narrator",
+              "The Myrmidon and the Hecatoncheir launch their drones over the same ridge."
+            ],
+            [
+              "auditor",
+              "I count fourteen of yours and sixteen of mine."
+            ],
+            [
+              "hundred",
+              "We count thirty of ours. They are all ours, from up here."
+            ],
+            [
+              "auditor",
+              "That is not how ownership works."
+            ],
+            [
+              "hundred",
+              "It is how the sky works."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "hundred",
+      "b": "tick",
+      "polarity": "mirror",
+      "motifs": [
+        "speaks in plurals",
+        "we are the eyes, we are the hands"
+      ],
+      "talks": {
+        "C": {
+          "title": "We",
+          "beats": [
+            [
+              "narrator",
+              "Tick's bay prints another wave of fleas. Orne's drones fly over them in formation."
+            ],
+            [
+              "tick",
+              "We see you."
+            ],
+            [
+              "hundred",
+              "We see you too."
+            ],
+            [
+              "tick",
+              "Finally, someone who talks properly."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "hundred",
+      "b": "gale",
+      "polarity": "tension",
+      "motifs": [
+        "seaplanes over the same water",
+        "a merchant wing and a carrier"
+      ],
+      "talks": {
+        "C": {
+          "title": "Airspace",
+          "beats": [
+            [
+              "narrator",
+              "Marrow Gale's Cutlasses and Orne's drones arrive over the same shoreline from opposite directions."
+            ],
+            [
+              "gale",
+              "This stretch of water is spoken for."
+            ],
+            [
+              "hundred",
+              "We don't speak. We land."
+            ],
+            [
+              "gale",
+              "Mercenaries have contracts. What do drones have?"
+            ],
+            [
+              "hundred",
+              "Numbers."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "hundred",
+      "b": "gladius",
+      "polarity": "attract",
+      "motifs": [
+        "an audience of a hundred",
+        "the show and the swarm"
+      ],
+      "talks": {
+        "C": {
+          "title": "Audience",
+          "beats": [
+            [
+              "narrator",
+              "Ferro's Gladiators bow to an enemy line. Above them, Orne's drones hold perfectly still in the air."
+            ],
+            [
+              "gladius",
+              "Finally, an audience that pays attention."
+            ],
+            [
+              "hundred",
+              "We watch everything. You are the best part."
+            ],
+            [
+              "gladius",
+              "Then stay for the encore."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "commando",
+      "b": "loom",
+      "polarity": "attract",
+      "motifs": [
+        "two who lay traps",
+        "mines and nets"
+      ],
+      "talks": {
+        "C": {
+          "title": "Traps",
+          "beats": [
+            [
+              "narrator",
+              "Cinder Hook seeds the approach with mines. Vey's Webbers stand just behind the minefield, waiting."
+            ],
+            [
+              "commando",
+              "Mines before the argument."
+            ],
+            [
+              "loom",
+              "Nets after it. Whatever steps around your mines walks into my line."
+            ],
+            [
+              "commando",
+              "And whatever you catch, I can blow up at leisure."
+            ],
+            [
+              "loom",
+              "Leave me the wrecks."
+            ]
+          ]
+        }
+      }
+    }
+  ]
+}

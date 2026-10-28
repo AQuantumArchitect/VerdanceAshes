@@ -187,7 +187,9 @@ function applyCommerceStartResources()
   local com = (mission and mission.commerce) or {}
   local fieldK = math.floor(tonumber(com.fieldStartMetalK or com.metalKFieldStart or 1) or 1)
   if fieldK < 0 then fieldK = 0 end
-  local metal = fieldK * 1000
+  local metal = fieldK * 1000 + (tonumber(VA_SCOUT_BONUS_METAL) or 0)   -- the scout bays' own thousand
+  VA_SCOUT_BONUS_METAL = 0
+  VA_COMMERCE_APPLIED = true
   -- Flat energy seed (not scaled from campaign bag — bag no longer enters).
   local energy = math.floor(tonumber(com.fieldStartEnergy or 3000) or 3000)
   if energy < 0 then energy = 0 end

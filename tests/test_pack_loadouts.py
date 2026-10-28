@@ -28,16 +28,18 @@ def test_yeva_is_one_sharpshooter_and_six_ticks():
 
 
 def test_rumor_has_four_ghosts_and_two_stealth_tanks():
-    assert H["rumor"]["packTotal"] == 4 and H["rumor"]["extras"] == 3
-    assert _esc("rumor") == {"armgremlin": 2}
+    # recast 2026-10-28: one Ghost, two Legion Eidolons, the two Gremlins
+    assert H["rumor"]["packTotal"] == 1 and H["rumor"]["extras"] == 0
+    assert _esc("rumor") == {"legaspy": 2, "armgremlin": 2}
     b = _lua_block("rumor")
-    assert "packTotal = 4" in b and 'unitDef = "armgremlin"' in b
+    assert "packTotal = 1" in b and 'unitDef = "armgremlin"' in b and 'unitDef = "legaspy"' in b
 
 
 def test_noctua_flies_blindfold_radar_killers():
-    assert {"legfig": 24, "legcib": 3}.items() <= _esc("noctua").items()
+    # recast 2026-10-28: the scout paradigm, the bay prints its fighters; no starting wing
+    assert _esc("noctua") == {"legmstor": 1}
     assert PACKS["chassis"]["legcib"]["label"] == "Blindfold"
-    assert 'unitDef = "legcib"' in _lua_block("noctua")
+    assert 'unitDef = "legmstor"' in _lua_block("noctua")
 
 
 def test_twitcher_hires_for_one_tnb_not_a_thousand_metal():

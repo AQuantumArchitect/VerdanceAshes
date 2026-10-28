@@ -3,236 +3,361 @@
   "notes": "The sky pairs (2026-10-23): gunships, anti-air and the eyes that fly. Authored relationships with C/B/A camp talks; tools/author_bonds_v1.py merges them into support_web.json (authored edges) and camp_talks.json / camp_talks_authored.json (generated=false). Edit here, then run the tool.",
   "pairs": [
     {
-      "a": "ceil", "b": "kettle", "polarity": "rivalry",
-      "motifs": ["the gunship and the saint who shoots gunships", "altitude meets the roof"],
+      "a": "fatboy",
+      "b": "kettle",
+      "polarity": "attract",
+      "motifs": [
+        "house and roof",
+        "plod meets hold"
+      ],
       "talks": {
-        "C": {"title": "Silhouette", "beats": [
-          ["narrator", "The Archangel's barrels track the Roughneck all the way in to land. Nobody asked them to."],
-          ["ceil", "You can stop aiming at me. I'm parked."],
-          ["kettle", "Everything with rotors is a prayer I haven't answered yet."],
-          ["ceil", "Altitude is an opinion, saint."],
-          ["kettle", "Then keep yours low over my pad."]]},
-        "B": {"title": "Learning the shape", "beats": [
-          ["narrator", "Kettle has chalked a Roughneck's outline on the Archangel's hull. Crossed through, then uncrossed."],
-          ["ceil", "Is that me?"],
-          ["kettle", "It's the shape I don't shoot. I keep practising not shooting it."],
-          ["ceil", "Romantic."],
-          ["kettle", "It's harder than shooting. Fly where I can see you and it gets easier."]]},
-        "A": {"title": "Under the roof", "beats": [
-          ["narrator", "After the drop, the Roughneck sat out the enemy flak inside Kettle's umbrella for a whole minute."],
-          ["ceil", "Their fighters peeled off when they saw who was under me."],
-          ["kettle", "They saw a chainsaw with wings over a gunship. Nobody argues with that."],
-          ["ceil", "So the sky's ours."],
-          ["kettle", "The sky is nobody's. The little bit over you is mine."]]}
+        "C": {
+          "title": "A house with no roof",
+          "beats": [
+            [
+              "narrator",
+              "Fatboy's crew watches the sky the way people watch weather."
+            ],
+            [
+              "fatboy",
+              "House learned to knock. Never learned to duck."
+            ],
+            [
+              "kettle",
+              "Bombers love a slow house."
+            ],
+            [
+              "fatboy",
+              "Then be the roof."
+            ]
+          ]
+        },
+        "B": {
+          "title": "Shingles",
+          "beats": [
+            [
+              "narrator",
+              "The Archangel now parks a little behind the Fatboy, always on the bombers' side."
+            ],
+            [
+              "kettle",
+              "Your shells are loud. They bring company."
+            ],
+            [
+              "fatboy",
+              "Company's why I knock."
+            ],
+            [
+              "kettle",
+              "Then I'll keep answering the door upstairs."
+            ]
+          ]
+        },
+        "A": {
+          "title": "The whole house",
+          "beats": [
+            [
+              "narrator",
+              "Three bombing runs, three burning wrecks, one Fatboy still knocking."
+            ],
+            [
+              "fatboy",
+              "Didn't look up once."
+            ],
+            [
+              "kettle",
+              "That's the point of a roof."
+            ],
+            [
+              "fatboy",
+              "House has a roof now. Feels like a home."
+            ]
+          ]
+        }
       }
     },
     {
-      "a": "nox", "b": "ceil", "polarity": "tension",
-      "motifs": ["the debt of the last sky", "the pilot who was there"],
+      "a": "kettle",
+      "b": "warder",
+      "polarity": "friction",
+      "motifs": [
+        "who owns the sky over the pad",
+        "the circle and the saint who wanders"
+      ],
       "talks": {
-        "C": {"title": "The bill", "beats": [
-          ["narrator", "Nox will not sit where Ceil's shadow falls."],
-          ["nox", "Still paying for the last sky."],
-          ["ceil", "I flew that sortie. I know what it cost."],
-          ["nox", "You know what it cost you. I hold the rest of the invoice."]]},
-        "B": {"title": "Instalments", "beats": [
-          ["narrator", "Ceil has started landing beside the Umbrella and saying nothing, which is the most Ceil has ever said."],
-          ["ceil", "Tell me what's still owed."],
-          ["nox", "Forty-one names and a launch I didn't stop."],
-          ["ceil", "Then I'll fly cover over every launch you're near. Count it as an instalment."],
-          ["nox", "Debt doesn't take instalments. It takes years."]]},
-        "A": {"title": "Paid in sky", "beats": [
-          ["narrator", "The missile came in high. The Umbrella took it. The Roughneck had already cleared the bombers that would have followed."],
-          ["nox", "That was the shape of the last sky. Except we won it."],
-          ["ceil", "Is the bill smaller?"],
-          ["nox", "It's still there. It's just not mine alone anymore."]]}
+        "C": {
+          "title": "Whose sky",
+          "beats": [
+            [
+              "narrator",
+              "Warder has drawn the pad's circle in the dirt again. Kettle has driven through it again."
+            ],
+            [
+              "warder",
+              "Owns a circle of dirt. And the air above it."
+            ],
+            [
+              "kettle",
+              "The air goes where the fight goes. So do I."
+            ],
+            [
+              "warder",
+              "Then the pad is naked every time you wander."
+            ]
+          ]
+        },
+        "B": {
+          "title": "Shifts",
+          "beats": [
+            [
+              "narrator",
+              "They have started taking the sky in shifts, and arguing about the handover."
+            ],
+            [
+              "kettle",
+              "Your ferrets cover the pad. I cover the march."
+            ],
+            [
+              "warder",
+              "My ferrets don't chase. They stay."
+            ],
+            [
+              "kettle",
+              "That's why I trust them with what I leave behind."
+            ]
+          ]
+        },
+        "A": {
+          "title": "Two roofs",
+          "beats": [
+            [
+              "narrator",
+              "A bomber wing came for the pad while the Archangel was out on the line. It never reached the circle."
+            ],
+            [
+              "warder",
+              "Told you the dirt holds."
+            ],
+            [
+              "kettle",
+              "You did. I came back because I wanted to see it hold."
+            ],
+            [
+              "warder",
+              "Go wander. The circle will be here."
+            ]
+          ]
+        }
       }
     },
     {
-      "a": "fatboy", "b": "kettle", "polarity": "attract",
-      "motifs": ["house and roof", "plod meets hold"],
+      "a": "noctua",
+      "b": "kettle",
+      "polarity": "mentor",
+      "motifs": [
+        "flight paths and friendly flak",
+        "the saint teaches the swarm"
+      ],
       "talks": {
-        "C": {"title": "A house with no roof", "beats": [
-          ["narrator", "Fatboy's crew watches the sky the way people watch weather."],
-          ["fatboy", "House learned to knock. Never learned to duck."],
-          ["kettle", "Bombers love a slow house."],
-          ["fatboy", "Then be the roof."]]},
-        "B": {"title": "Shingles", "beats": [
-          ["narrator", "The Archangel now parks a little behind the Fatboy, always on the bombers' side."],
-          ["kettle", "Your shells are loud. They bring company."],
-          ["fatboy", "Company's why I knock."],
-          ["kettle", "Then I'll keep answering the door upstairs."]]},
-        "A": {"title": "The whole house", "beats": [
-          ["narrator", "Three bombing runs, three burning wrecks, one Fatboy still knocking."],
-          ["fatboy", "Didn't look up once."],
-          ["kettle", "That's the point of a roof."],
-          ["fatboy", "House has a roof now. Feels like a home."]]}
+        "C": {
+          "title": "Through the flak",
+          "beats": [
+            [
+              "narrator",
+              "Two of Noctua's drones came home with Archangel burns."
+            ],
+            [
+              "noctua",
+              "Dreams in flight paths. Yours went through mine."
+            ],
+            [
+              "kettle",
+              "Mine go where the enemy is. Yours were in the way."
+            ],
+            [
+              "noctua",
+              "Then teach them where the way is."
+            ]
+          ]
+        },
+        "B": {
+          "title": "Lanes",
+          "beats": [
+            [
+              "narrator",
+              "Kettle has painted the drone lanes on Noctua's bay wall: where the flak goes, and where it never goes."
+            ],
+            [
+              "kettle",
+              "Fly the cold lanes. I'll keep them cold."
+            ],
+            [
+              "noctua",
+              "They're learning. They hum when they pass you now."
+            ],
+            [
+              "kettle",
+              "That's the right sound."
+            ]
+          ]
+        },
+        "A": {
+          "title": "Swarm hymn",
+          "beats": [
+            [
+              "narrator",
+              "Twenty-four drones and an Archangel fought one sky together and did not touch once."
+            ],
+            [
+              "noctua",
+              "They fly around your fire like it's weather."
+            ],
+            [
+              "kettle",
+              "It is weather. You taught them to read it."
+            ],
+            [
+              "noctua",
+              "You taught me first."
+            ]
+          ]
+        }
       }
     },
     {
-      "a": "kettle", "b": "warder", "polarity": "friction",
-      "motifs": ["who owns the sky over the pad", "the circle and the saint who wanders"],
+      "a": "yeva",
+      "b": "noctua",
+      "polarity": "attract",
+      "motifs": [
+        "the sniper and the eyes that fly",
+        "fog meets sky"
+      ],
       "talks": {
-        "C": {"title": "Whose sky", "beats": [
-          ["narrator", "Warder has drawn the pad's circle in the dirt again. Kettle has driven through it again."],
-          ["warder", "Owns a circle of dirt. And the air above it."],
-          ["kettle", "The air goes where the fight goes. So do I."],
-          ["warder", "Then the pad is naked every time you wander."]]},
-        "B": {"title": "Shifts", "beats": [
-          ["narrator", "They have started taking the sky in shifts, and arguing about the handover."],
-          ["kettle", "Your ferrets cover the pad. I cover the march."],
-          ["warder", "My ferrets don't chase. They stay."],
-          ["kettle", "That's why I trust them with what I leave behind."]]},
-        "A": {"title": "Two roofs", "beats": [
-          ["narrator", "A bomber wing came for the pad while the Archangel was out on the line. It never reached the circle."],
-          ["warder", "Told you the dirt holds."],
-          ["kettle", "You did. I came back because I wanted to see it hold."],
-          ["warder", "Go wander. The circle will be here."]]}
+        "C": {
+          "title": "Ghosts and drones",
+          "beats": [
+            [
+              "narrator",
+              "Yeva lies in the grass. A drone hums overhead and does not give her away."
+            ],
+            [
+              "yeva",
+              "Ghosts already walked it."
+            ],
+            [
+              "noctua",
+              "Drones already flew it. Your ghosts were where I said."
+            ],
+            [
+              "yeva",
+              "Then we agree."
+            ]
+          ]
+        },
+        "B": {
+          "title": "Spotting",
+          "beats": [
+            [
+              "narrator",
+              "Noctua's drones mark, Yeva's rifle answers. It has become a conversation."
+            ],
+            [
+              "noctua",
+              "Two hundred metres, behind the wall, the one with the antenna."
+            ],
+            [
+              "yeva",
+              "I see the antenna. I'll leave the wall standing. It's pretty."
+            ]
+          ]
+        },
+        "A": {
+          "title": "Quiet sky",
+          "beats": [
+            [
+              "narrator",
+              "A whole enemy relay went silent and nobody on their side heard a shot."
+            ],
+            [
+              "yeva",
+              "Your drones are the only noise I like."
+            ],
+            [
+              "noctua",
+              "Your rifle is the only quiet I trust."
+            ]
+          ]
+        }
       }
     },
     {
-      "a": "noctua", "b": "kettle", "polarity": "mentor",
-      "motifs": ["flight paths and friendly flak", "the saint teaches the swarm"],
+      "a": "tick",
+      "b": "noctua",
+      "polarity": "rivalry",
+      "motifs": [
+        "two swarms of eyes",
+        "plurals against flight paths"
+      ],
       "talks": {
-        "C": {"title": "Through the flak", "beats": [
-          ["narrator", "Two of Noctua's drones came home with Archangel burns."],
-          ["noctua", "Dreams in flight paths. Yours went through mine."],
-          ["kettle", "Mine go where the enemy is. Yours were in the way."],
-          ["noctua", "Then teach them where the way is."]]},
-        "B": {"title": "Lanes", "beats": [
-          ["narrator", "Kettle has painted the drone lanes on Noctua's bay wall: where the flak goes, and where it never goes."],
-          ["kettle", "Fly the cold lanes. I'll keep them cold."],
-          ["noctua", "They're learning. They hum when they pass you now."],
-          ["kettle", "That's the right sound."]]},
-        "A": {"title": "Swarm hymn", "beats": [
-          ["narrator", "Twenty-four drones and an Archangel fought one sky together and did not touch once."],
-          ["noctua", "They fly around your fire like it's weather."],
-          ["kettle", "It is weather. You taught them to read it."],
-          ["noctua", "You taught me first."]]}
-      }
-    },
-    {
-      "a": "mira", "b": "ceil", "polarity": "attract",
-      "motifs": ["spot meets siege, from the sky", "gleeful meets glass"],
-      "talks": {
-        "C": {"title": "From up there", "beats": [
-          ["narrator", "Mira wants to know what napalm looks like from altitude."],
-          ["mira", "Napalm is confetti. Tell me it's prettier from up there."],
-          ["ceil", "It's a map. You colour it in."],
-          ["mira", "Then call me the colours."]]},
-        "B": {"title": "Spotting", "beats": [
-          ["narrator", "The Roughneck now flies a lazy circle over Mira's targets before the Barrage speaks."],
-          ["ceil", "Left of the ridge, two depots, one gun."],
-          ["mira", "You're the best spotter I've ever had. You never ask me to stop."],
-          ["ceil", "I'm a gunship. I don't know the word."]]},
-        "A": {"title": "Fireworks", "beats": [
-          ["narrator", "The barrage walked exactly where the Roughneck's tracers pointed, and then a little further for joy."],
-          ["mira", "Did you see it?"],
-          ["ceil", "From up here it looked like a festival."],
-          ["mira", "It was. You were the guest of honour."]]}
-      }
-    },
-    {
-      "a": "volt", "b": "ceil", "polarity": "mirror",
-      "motifs": ["two kites and one tally", "glass meets glass"],
-      "talks": {
-        "C": {"title": "The tally", "beats": [
-          ["narrator", "Volt and Ceil keep score on the same board. Neither agreed to it."],
-          ["volt", "Sight is a wound you give them. I gave seven today."],
-          ["ceil", "Six of those were already burning when I flew off them."],
-          ["volt", "Burning is not dead."]]},
-        "B": {"title": "Same burnout", "beats": [
-          ["narrator", "Both came back with redlined engines and nothing left in the tank."],
-          ["ceil", "You fly like me."],
-          ["volt", "You drive like me. With rotors."],
-          ["ceil", "One of us should learn to stop."],
-          ["volt", "Not today."]]},
-        "A": {"title": "Shared kills", "beats": [
-          ["narrator", "The board says fourteen. It doesn't say whose."],
-          ["volt", "I stopped counting which were mine."],
-          ["ceil", "Me too. Turns out it's faster when you don't."],
-          ["volt", "Don't tell anyone we're friends."]]}
-      }
-    },
-    {
-      "a": "commando", "b": "ceil", "polarity": "sibling",
-      "motifs": ["siblings of the hangar", "mischief meets glass"],
-      "talks": {
-        "C": {"title": "Hangar kids", "beats": [
-          ["narrator", "Commando's Hercules pilot and Ceil came up in the same hangar. It shows."],
-          ["commando", "Mines before the argument."],
-          ["ceil", "You mined the hangar door once. Before the argument."],
-          ["commando", "You started the argument."]]},
-        "B": {"title": "The drop", "beats": [
-          ["narrator", "The Hercules dropped Commando's crew behind a line the Roughneck had just emptied."],
-          ["ceil", "You were late."],
-          ["commando", "You were early. That's the same as being late, but louder."],
-          ["ceil", "Like old times."]]},
-        "A": {"title": "Family business", "beats": [
-          ["narrator", "Mines, a drop, a gunship pass. Nobody on the other side ever saw the whole of it."],
-          ["commando", "We should do this for money."],
-          ["ceil", "We do."],
-          ["commando", "Then we should do it for fun. It's better for fun."]]}
-      }
-    },
-    {
-      "a": "vane", "b": "ceil", "polarity": "tension",
-      "motifs": ["rhythm and the thing that breaks it", "the pack's kill, taken from above"],
-      "talks": {
-        "C": {"title": "Off the beat", "beats": [
-          ["narrator", "Vane's Phobos had the line peeled and ready. Then the Roughneck took it."],
-          ["vane", "Pack is one thought. You're a second one."],
-          ["ceil", "It was a free kill."],
-          ["vane", "Nothing in my rhythm is free. You broke it."]]},
-        "B": {"title": "Counting in", "beats": [
-          ["narrator", "Ceil has started waiting for the pack's beat before diving. Most of the time."],
-          ["ceil", "I'm counting your rhythm now. Three, then the peel, then me."],
-          ["vane", "Four. You come in on four."],
-          ["ceil", "Four, then."]]},
-        "A": {"title": "In time", "beats": [
-          ["narrator", "The pack peeled, the Roughneck came in on four, and the line folded like a door."],
-          ["vane", "That was one thought."],
-          ["ceil", "With rotors."],
-          ["vane", "Don't spoil it."]]}
-      }
-    },
-    {
-      "a": "yeva", "b": "noctua", "polarity": "attract",
-      "motifs": ["the sniper and the eyes that fly", "fog meets sky"],
-      "talks": {
-        "C": {"title": "Ghosts and drones", "beats": [
-          ["narrator", "Yeva lies in the grass. A drone hums overhead and does not give her away."],
-          ["yeva", "Ghosts already walked it."],
-          ["noctua", "Drones already flew it. Your ghosts were where I said."],
-          ["yeva", "Then we agree."]]},
-        "B": {"title": "Spotting", "beats": [
-          ["narrator", "Noctua's drones mark, Yeva's rifle answers. It has become a conversation."],
-          ["noctua", "Two hundred metres, behind the wall, the one with the antenna."],
-          ["yeva", "I see the antenna. I'll leave the wall standing. It's pretty."]]},
-        "A": {"title": "Quiet sky", "beats": [
-          ["narrator", "A whole enemy relay went silent and nobody on their side heard a shot."],
-          ["yeva", "Your drones are the only noise I like."],
-          ["noctua", "Your rifle is the only quiet I trust."]]}
-      }
-    },
-    {
-      "a": "tick", "b": "noctua", "polarity": "rivalry",
-      "motifs": ["two swarms of eyes", "plurals against flight paths"],
-      "talks": {
-        "C": {"title": "Whose map", "beats": [
-          ["narrator", "Twenty fleas and twenty-four drones reported the same ridge in the same second."],
-          ["tick", "We saw it first."],
-          ["noctua", "From the ground. I saw it from the sky."],
-          ["tick", "We speak in plurals. Plurals win."]]},
-        "B": {"title": "Splitting the map", "beats": [
-          ["narrator", "They have divided the map: ground to Tick, sky to Noctua. The border is disputed."],
-          ["noctua", "The ridge line is mine. It's high."],
-          ["tick", "The ridge is dirt. Dirt is ours."],
-          ["noctua", "Then we both watch it. Twice the eyes."]]},
-        "A": {"title": "Every eye", "beats": [
-          ["narrator", "Nothing moved on the map that the company did not see from two directions."],
-          ["tick", "We counted you in our plurals."],
-          ["noctua", "I'll put you in a flight path. It's the nicest thing I know."]]}
+        "C": {
+          "title": "Whose map",
+          "beats": [
+            [
+              "narrator",
+              "Twenty fleas and twenty-four drones reported the same ridge in the same second."
+            ],
+            [
+              "tick",
+              "We saw it first."
+            ],
+            [
+              "noctua",
+              "From the ground. I saw it from the sky."
+            ],
+            [
+              "tick",
+              "We speak in plurals. Plurals win."
+            ]
+          ]
+        },
+        "B": {
+          "title": "Splitting the map",
+          "beats": [
+            [
+              "narrator",
+              "They have divided the map: ground to Tick, sky to Noctua. The border is disputed."
+            ],
+            [
+              "noctua",
+              "The ridge line is mine. It's high."
+            ],
+            [
+              "tick",
+              "The ridge is dirt. Dirt is ours."
+            ],
+            [
+              "noctua",
+              "Then we both watch it. Twice the eyes."
+            ]
+          ]
+        },
+        "A": {
+          "title": "Every eye",
+          "beats": [
+            [
+              "narrator",
+              "Nothing moved on the map that the company did not see from two directions."
+            ],
+            [
+              "tick",
+              "We counted you in our plurals."
+            ],
+            [
+              "noctua",
+              "I'll put you in a flight path. It's the nicest thing I know."
+            ]
+          ]
+        }
       }
     }
   ]

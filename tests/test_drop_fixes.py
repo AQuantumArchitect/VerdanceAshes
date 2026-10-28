@@ -44,7 +44,7 @@ def test_ketha_reach_is_toned_back_and_never_compounds():
     assert abs(1 + k["KETHA_RANGE_PER_XP"] * 2.4 - 2.2) < 0.01 and abs(1 + per * 2.4 - 1.8) < 0.01
     assert 'GetUnitBuildParams(unitID, "buildDistance")' not in craft     # the base is the unit type's
     packs = json.loads((ROOT / "data/story/crew_packs.json").read_text(encoding="utf-8"))
-    assert packs["heroes"]["ketha"]["startXpFixed"] >= 1.0 and packs["heroes"]["ketha"]["packTotal"] == 2
+    assert packs["heroes"]["ketha"]["startXpFixed"] >= 1.0 and packs["heroes"]["ketha"]["packTotal"] == 5   # a pile of Zagreus (2026-10-28)
 
 
 def test_the_infil_card_lists_what_drops():
@@ -61,10 +61,10 @@ def test_a_rez_in_a_territory_wound_keeps_the_territory_extraction():
 
 def test_kettle_is_an_archangel_and_a_heavy_transport():
     packs = json.loads((ROOT / "data/story/crew_packs.json").read_text(encoding="utf-8"))
-    assert packs["heroes"]["kettle"]["escorts"] == [{"unitDef": "armhvytrans", "count": 1}]
+    assert packs["heroes"]["kettle"]["escorts"] == [{"unitDef": "legatrans", "count": 2}]   # two Hippotes (2026-10-28)
     lua = (MOD / "luarules/gadgets/include/va_crew_roster.lua").read_text(encoding="utf-8")
     block = lua.split("\n  kettle = {", 1)[1].split("\n  },", 1)[0]
-    assert "armhvytrans" in block and "armferret" not in block and "armatlas" not in block
+    assert "legatrans" in block and "armhvytrans" not in block and "armferret" not in block
 
 
 def test_the_infestor_is_spiders_and_goblins():
@@ -72,7 +72,7 @@ def test_the_infestor_is_spiders_and_goblins():
     assert '"leggob"' in src and '"va_infestor"' in src and "T2 Bots/leginfestor.lua" in src
     packs = json.loads((ROOT / "data/story/crew_packs.json").read_text(encoding="utf-8"))
     h = packs["heroes"]["infestor"]
-    assert h["unitDef"] == "va_infestor" and not h.get("escorts")
+    assert h["unitDef"] == "va_infestor" and h["packTotal"] == 4 and h["escorts"] == [{"unitDef": "armsptk", "count": 2}]   # + two Recluse
     import rename_heroes_v1 as r
     assert r.UNITDEFS["infestor"] == ("leginfestor", "va_infestor")
 

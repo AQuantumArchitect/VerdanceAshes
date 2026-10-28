@@ -254,6 +254,25 @@ function VA_CREW_spawnHeroPack(heroId, baseX, baseZ, dx0, heroOnly)
           end
           printerUnits = printerUnits or {}
           printerUnits[heroUID] = { metal = 6 / 30, energy = 40 / 30, team = playerTeamID }
+          -- The scout paradigm (owner, 2026-10-28): the bay lands already printing, on repeat.
+          local pdef = UnitDefNames and UnitDefNames[product]
+          if pdef then
+            pcall(Spring.GiveOrderToUnit, heroUID, CMD.REPEAT, { 1 }, 0)
+            for _ = 1, math.max(1, tonumber(fab.repeatQueue) or 4) do
+              pcall(Spring.GiveOrderToUnit, heroUID, -pdef.id, {}, 0)
+            end
+          end
+        end
+        -- ...and with an extra thousand metal in the storage that came with it. Before the
+        -- commerce allotment lands it rides on it (so the storage refresh keeps it); after a hot
+        -- drop it is added straight away.
+        local bonus = tonumber(fab.startMetal) or 0
+        if bonus > 0 then
+          if VA_COMMERCE_APPLIED then
+            pcall(Spring.AddTeamResource, playerTeamID, "metal", bonus)
+          else
+            VA_SCOUT_BONUS_METAL = (VA_SCOUT_BONUS_METAL or 0) + bonus
+          end
         end
         Spring.Echo("VA_CREW_FACTORY_HERO_IS_BAY hero=" .. tostring(heroId)
           .. " fab=" .. tostring(h.factory) .. " unit=" .. tostring(heroUID)

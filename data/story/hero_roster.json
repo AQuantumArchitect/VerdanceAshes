@@ -132,7 +132,7 @@
     {
       "heroId": "grath",
       "name": "Grath Arrears",
-      "unitDef": "legkark",
+      "unitDef": "legaheattank",
       "missionCritical": false,
       "status": "locked",
       "xp": 0.06,
@@ -143,7 +143,7 @@
         "merc_debt",
         "kark_line"
       ],
-      "fiction": "Not unpaid — arrears. Three wars on the ledger. He holds the middle because credit finally beat the Mercs, and debt makes a man hard to move.",
+      "fiction": "Not unpaid: arrears. Three wars on the ledger. Grath took his last payment in hardware, a Prometheus heat-ray tank, and he collects the rest in person with three Helios skirmishers riding his flanks. Debt makes a man hard to move; heat makes him hard to argue with.",
       "recruit": {
         "type": "rep",
         "faction": "nullmercs",
@@ -153,7 +153,7 @@
     {
       "heroId": "halq",
       "name": "Sisu Halq",
-      "unitDef": "legbal",
+      "unitDef": "legaradk",
       "missionCritical": false,
       "status": "locked",
       "xp": 0.06,
@@ -164,7 +164,7 @@
         "long_arc",
         "ballistic_savant"
       ],
-      "fiction": "Halq does not see units — he sees grid refs. The rockets land where the map said they would. Line support that argues with math.",
+      "fiction": "Halq does not see units; he sees grid refs. These days he does not fire at all. His Euclid radar bot reads the map, he reads the numbers out loud, and eight Armada Rocketeers put their rockets exactly where he said. Line support that argues with math.",
       "recruit": {
         "type": "mission_victory",
         "mission": 9
@@ -238,7 +238,7 @@
     {
       "heroId": "spoke",
       "name": "Ivo 'Spoke' Rask",
-      "unitDef": "legscout",
+      "unitDef": "legvp",
       "missionCritical": false,
       "status": "locked",
       "xp": 0.06,
@@ -250,7 +250,7 @@
         "scout_tech",
         "scout_pack"
       ],
-      "fiction": "Spoke does not trust boots, bots, or promises — only wheels. The bay mints scouts like nervous habits. Live to see; die and the bank remembers.",
+      "fiction": "Spoke does not trust boots, bots or promises, only wheels, so he became the place wheels come from. The Wheelie Bay lands with its own metal and starts printing scouts the moment it settles, on repeat, like a nervous habit. Live to see; die and the bank remembers.",
       "recruit": {
         "type": "wreck_rez",
         "mapId": "greenest_fields",
@@ -260,7 +260,7 @@
     {
       "heroId": "hearth",
       "name": "Hearth",
-      "unitDef": "armfus",
+      "unitDef": "armckfus",
       "missionCritical": false,
       "status": "locked",
       "xp": 0.0,
@@ -272,7 +272,7 @@
         "hero_fusion",
         "eco_anchor"
       ],
-      "fiction": "Hearth does not tour the map. The pad is a hearth; she is the coal. Keep her alive and the lights stay on. Wanderlust is for captains; she is furniture with a pulse.",
+      "fiction": "Hearth does not tour the map. The pad is a hearth; she is the coal, and now the coal can hide. A cloakable fusion reactor keeps the lights on where no scout can count them. Wanderlust is for captains; she is furniture with a pulse.",
       "recruit": {
         "type": "rep",
         "faction": "armada",
@@ -304,7 +304,7 @@
     {
       "heroId": "warder",
       "name": "Warder",
-      "unitDef": "armbeamer",
+      "unitDef": "cordoom",
       "missionCritical": false,
       "status": "locked",
       "xp": 0.06,
@@ -316,7 +316,7 @@
         "pad_tooth",
         "radar_eye"
       ],
-      "fiction": "The Warder does not chase. A circle of dirt is enough empire. Ferrets wait cloaked; beamers argue with trespassers. Pad tooth with patience.",
+      "fiction": "The Warder does not chase. A circle of dirt is enough empire, and these days the circle has a Bulwark in the middle of it: a Cortex heat-ray emplacement that turns trespass into a smell. Patient, stubborn, and very hard to walk past.",
       "recruit": {
         "type": "objective_kind",
         "kinds": [
@@ -373,7 +373,7 @@
     {
       "heroId": "tick",
       "name": "Tamsin 'Tick' Hollis",
-      "unitDef": "armflea",
+      "unitDef": "armlab",
       "missionCritical": false,
       "status": "locked",
       "xp": 0.06,
@@ -384,7 +384,7 @@
         "scout_pack",
         "swarm"
       ],
-      "fiction": "We are the eyes. Tick is a pronoun with a factory. Carpet the fog, die cheap, mint again. Singular is a failure mode.",
+      "fiction": "We are the eyes. Tick is a pronoun with a factory, and now Tick is the factory. The Stream Bay lands with its own metal and prints Ticks on repeat from the first second. Carpet the fog, die cheap, mint again. Singular is a failure mode.",
       "recruit": {
         "type": "wreck_rez",
         "mapId": "greenest_fields",
@@ -470,7 +470,7 @@
         "drone_bay",
         "scout"
       ],
-      "fiction": "The bay is the hero. It dreams in flight paths and wakes as a cloud of eyes. Ground captains argue lanes; Noctua argues altitude.",
+      "fiction": "The bay is the hero. It lands with its own metal, dreams in flight paths and wakes as a cloud of eyes, printing Noctua fighters on repeat. Ground captains argue lanes; Noctua argues altitude.",
       "recruit": {
         "type": "wreck_rez",
         "mapId": "greenest_fields",
@@ -484,7 +484,7 @@
       "timesWounded": 0,
       "campaignXp": 0.0,
       "name": "Mira Barrage",
-      "unitDef": "legbar",
+      "unitDef": "armmart",
       "xp": 0.04,
       "trait": "sparkle_battery",
       "traits": [
@@ -492,7 +492,7 @@
         "siege",
         "tone_break"
       ],
-      "fiction": "Hyper-optimistic artillery girl in an ash war. Impacts sparkle; she cheers. Napalm is confetti. She never walks into the argument — she *is* the fireworks from the back of the parade.",
+      "fiction": "Hyper-optimistic artillery girl in an ash war. She traded the napalm park for a disciplined firing line of five Mausers and a Pheme to show her where to aim, and she cheers every impact anyway. She never walks into the argument. She is the fireworks from the back of the parade, now in neat rows.",
       "recruit": {
         "type": "wreck_rez",
         "mapId": "the_rock_jungle",
@@ -546,7 +546,7 @@
     {
       "heroId": "vane",
       "name": "Ash-Captain Vane",
-      "unitDef": "legcen",
+      "unitDef": "legstr",
       "missionCritical": false,
       "status": "active",
       "xp": 0.06,
@@ -557,7 +557,7 @@
         "captain",
         "glass"
       ],
-      "fiction": "She does not hold a line; she holds a rhythm. Phobos peel when the lasers paint, reform when the beat returns. Captain means the pack is one thought under fire.",
+      "fiction": "She does not hold a line; she holds a rhythm. Vane rides a Hoplite out in front of ten Phobos; they peel when the lasers paint and reform when the beat returns. Captain means the pack is one thought under fire, and she is the thought.",
       "recruit": {
         "type": "core"
       }
@@ -614,7 +614,7 @@
         "gleeful",
         "mischief"
       ],
-      "fiction": "Mira throws confetti from the parade. Kit brings the fireworks to handshake range and laughs when something catches. Gleeful mischief — burn, bail, burn again.",
+      "fiction": "Mira used to own the napalm park. Kit inherited it: a Barrage, a Cleaver, a Lance, an Arquebus and a Thanatos rolling behind her Belcher. Mira threw confetti from the back; Kit brings the whole parade to handshake range and laughs when something catches. Gleeful mischief: burn, bail, burn again.",
       "recruit": {
         "type": "band_unlock",
         "blurb": "Fireworks at walking distance."
@@ -658,26 +658,6 @@
       "recruit": {
         "type": "band_unlock",
         "blurb": "Still paying for the last sky."
-      }
-    },
-    {
-      "heroId": "ceil",
-      "name": "Ceil Rat",
-      "unitDef": "armbrawl",
-      "missionCritical": false,
-      "status": "locked",
-      "xp": 0.045,
-      "timesWounded": 0,
-      "campaignXp": 0.0,
-      "trait": "sky",
-      "traits": [
-        "sky",
-        "glass"
-      ],
-      "fiction": "Noctua dreams flight paths for eyes. Ceil Rat argues with roofs. Five Roughnecks that treat the ceiling like a suggestion and glass like a lifestyle.",
-      "recruit": {
-        "type": "band_unlock",
-        "blurb": "Altitude is an opinion."
       }
     },
     {
@@ -881,26 +861,6 @@
       }
     },
     {
-      "heroId": "tarn",
-      "name": "Tarn Ostrander",
-      "unitDef": "corsala",
-      "missionCritical": false,
-      "status": "locked",
-      "xp": 0.0,
-      "timesWounded": 0,
-      "campaignXp": 0.0,
-      "trait": "swarm",
-      "traits": [
-        "swarm",
-        "mischief"
-      ],
-      "fiction": "Ostrander ferries a pack of Salamanders through water the rest of the company calls a wall. They surface under the enemy line, shake off, and fire. He has never once walked around a lake.",
-      "recruit": {
-        "type": "band_unlock",
-        "blurb": "Out of the river, already firing."
-      }
-    },
-    {
       "heroId": "scylla",
       "name": "Maren 'Scylla' Voss",
       "unitDef": "leganavybattleship",
@@ -1002,7 +962,7 @@
     },
     {
       "heroId": "hornet",
-      "name": "Teague 'Hornet' Marsh",
+      "name": "Teague & Saffi Marsh",
       "unitDef": "armblade",
       "missionCritical": false,
       "status": "locked",
@@ -1014,10 +974,10 @@
         "sky",
         "mischief"
       ],
-      "fiction": "Marsh trained on crop-dusters and has never forgiven the war for being flat. Her Hornets come in low, sting, climb, and come in again. She calls it farming.",
+      "fiction": "The Marsh sisters trained on their father's crop-dusters and have never forgiven the war for being flat. Teague flies lead and talks the whole way; Saffi flies wing and says nothing until the second pass. Their Hornets come in low, sting, climb and come in again. They call it farming.",
       "recruit": {
         "type": "band_unlock",
-        "blurb": "Stings, then returns for the nest."
+        "blurb": "Sting, climb, come back for the nest."
       }
     },
     {
@@ -1054,10 +1014,10 @@
         "captain",
         "swarm"
       ],
-      "fiction": "Ruhl feeds her Grunts into the front on purpose, so the enemy can count them and feel safe. Then the Shiva walks through the middle of the count.",
+      "fiction": "Ruhl used to feed Grunts into the front so the enemy could count them and feel safe. She stopped needing the bait. Now the Shiva walks out alone, and the counting is somebody else's problem.",
       "recruit": {
         "type": "band_unlock",
-        "blurb": "Eight Grunts and a decision."
+        "blurb": "A decision, alone."
       }
     },
     {
@@ -1098,26 +1058,6 @@
       "recruit": {
         "type": "band_unlock",
         "blurb": "Nothing moves; then it is quiet."
-      }
-    },
-    {
-      "heroId": "marauder",
-      "name": "Marlow & Wren",
-      "unitDef": "armmar",
-      "missionCritical": false,
-      "status": "locked",
-      "xp": 0.0,
-      "timesWounded": 0,
-      "campaignXp": 0.0,
-      "trait": "mischief",
-      "traits": [
-        "gleeful",
-        "mischief"
-      ],
-      "fiction": "Marlow and Wren have crossed every river in the valley and apologised to none of them. They come out of the water already laughing and leave through the front gate.",
-      "recruit": {
-        "type": "band_unlock",
-        "blurb": "Arrive before the warning."
       }
     },
     {
@@ -1242,22 +1182,22 @@
     },
     {
       "heroId": "arc",
-      "name": "Corwin 'Arc' Vasse",
+      "name": "Ambrose 'Choir' Halloran",
       "unitDef": "armzeus",
       "missionCritical": false,
       "status": "locked",
       "xp": 0.0,
       "timesWounded": 0,
       "campaignXp": 0.0,
-      "trait": "heat",
+      "trait": "sky",
       "traits": [
-        "heat",
-        "swarm"
+        "captain",
+        "sky"
       ],
-      "fiction": "Vasse was a shipyard foreman who welded hulls until the yard was shelled, then welded the shell holes, then welded the people who shelled it. His eight Welders walk in close order and argue in arcs. He does not shout orders; he points at a thing and it stops being joined to anything.",
+      "fiction": "Halloran ran a cathedral choir before the war and runs a battery of missile trucks the same way: one Welder up front to keep time, six Whistlers behind singing on his downbeat. Anything that flies over the company gets a hymn. He is gentle and exacting, and he has never once let the sopranos come in late.",
       "recruit": {
         "type": "band_unlock",
-        "blurb": "Eight torches and one opinion."
+        "blurb": "Hear that? That's the choir."
       }
     },
     {
@@ -1318,6 +1258,46 @@
       "recruit": {
         "type": "band_unlock",
         "blurb": "Low tide is a road."
+      }
+    },
+    {
+      "heroId": "loom",
+      "name": "Orla 'Loom' Vey",
+      "unitDef": "armspid",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.0,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "count",
+      "traits": [
+        "count",
+        "garden"
+      ],
+      "fiction": "Vey mended nets on a trawler fleet before the war drained the sea. She still mends. Six Webbers walk her line, pinning anything that moves with EMP and stripping the wrecks for metal, while a rank of Legion Ballistas behind her fires into whatever the net is holding. She talks softly and never raises a hand; she just closes the net.",
+      "recruit": {
+        "type": "band_unlock",
+        "blurb": "Hold still. You're already caught."
+      }
+    },
+    {
+      "heroId": "hundred",
+      "name": "Thessaly 'Hundred' Orne",
+      "unitDef": "legspcarrier",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.0,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "swarm",
+      "traits": [
+        "swarm",
+        "sky"
+      ],
+      "fiction": "Orne never fights alone, because she never is. The Hecatoncheir carries her drones in its belly and sends them out like a hand opening. She says 'we' and means the drones. Two Cleavers follow on the ground to finish what the hands have pinned, and after every sortie she thanks each drone by its number.",
+      "recruit": {
+        "type": "band_unlock",
+        "blurb": "A hundred hands, one grip."
       }
     }
   ]
