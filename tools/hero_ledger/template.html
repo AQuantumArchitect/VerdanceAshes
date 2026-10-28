@@ -365,7 +365,7 @@ function cardHtml(h) {
   return `<article class="hcard ${facClass(h)} ${S.open === h.id ? "sel" : ""}" data-id="${h.id}">
     <div class="top"><div><div class="nm">${esc(h.name)}</div><div class="who"><span class="dot fac"></span> ${esc(cap(h.faction))} · ${esc(cap(h.position))} · ${esc(h.verb)}s</div></div><span class="status ${h.status}">${h.status === "recruit" ? "field" : h.status}</span></div>
     <p class="hook">${esc(h.hook)}</p>
-    <div class="temper">${h.temperament.map(t => `<span class="chip">${esc(cap(t))}</span>`).join("")}${h.packMind ? `<span class="chip">${esc(h.packMind)} mind</span>` : ""}</div>
+    <div class="temper">${h.baseSeeder ? `<span class="chip" style="background:var(--verd-soft)">builder</span>` : ""}${h.temperament.map(t => `<span class="chip">${esc(cap(t))}</span>`).join("")}${h.packMind ? `<span class="chip">${esc(h.packMind)} mind</span>` : ""}</div>
     <p class="brings"><b>Brings</b> ${esc(brings(h))}</p>
     ${h.fieldEffect ? `<p class="fx"><b>${esc(h.fieldEffect.label)}</b> · ${esc(h.fieldEffect.fiction)}</p>` : ""}
     <div class="ties">${pick(a, "ally")}${pick(x, "adv")}</div>
@@ -410,7 +410,7 @@ function dossierHtml(h) {
       ${h.tagLine ? `<div class="field"><span class="eyebrow">In a line</span><p>${esc(h.tagLine)}</p></div>` : ""}
       ${v ? `<div class="field"><span class="eyebrow">How they talk</span><p>${esc(v.register)}</p>${v.lines.map(l => `<p class="quote">${esc(l)}</p>`).join("")}</div>` : ""}
       ${h.talk ? `<div class="field"><span class="eyebrow">At camp, with ${esc(BY[h.talk.with]?.name || h.talk.with)} · ${esc(h.talk.title)}</span><p class="quote">${esc(h.talk.line)}</p></div>` : ""}
-      <div class="field"><span class="eyebrow">What they bring</span><p>${esc(brings(h))}. ${esc(h.blurb)}</p>${h.fieldEffect ? `<p class="fx" style="margin-top:6px"><b>${esc(h.fieldEffect.label)}</b> · ${esc(h.fieldEffect.fiction)} <span class="mono muted">${h.fieldEffect.stats.map(([k, x]) => `${k} ×${x}`).join(", ")}</span></p>` : ""}${h.buildsEco ? `<p class="muted" style="font-size:var(--fs-sm)">Builds economy: can be the builder at the jungle's entrance.</p>` : ""}${h.factory ? `<p class="muted" style="font-size:var(--fs-sm)">Bound factory: ${esc(h.factory)}</p>` : ""}</div>
+      <div class="field"><span class="eyebrow">What they bring</span><p>${esc(brings(h))}. ${esc(h.blurb)}</p>${h.fieldEffect ? `<p class="fx" style="margin-top:6px"><b>${esc(h.fieldEffect.label)}</b> · ${esc(h.fieldEffect.fiction)} <span class="mono muted">${h.fieldEffect.stats.map(([k, x]) => `${k} ×${x}`).join(", ")}</span></p>` : ""}${h.baseSeeder ? `<p class="muted" style="font-size:var(--fs-sm)">Seeds a base (economy, factories, constructors): one of the company's builders, and can be the one waiting at the jungle's entrance.</p>` : ""}${h.factory ? `<p class="muted" style="font-size:var(--fs-sm)">Bound factory: ${esc(h.factory)}</p>` : ""}</div>
     </div>
     <div class="col">
       <div class="field"><span class="eyebrow">Ties · ${h.links.length}</span><div class="links">${links || `<p class="muted">No ties yet.</p>`}</div><p class="muted" style="font-size:var(--fs-xs)">A dot after the kind marks a derived tie (half weight); the rest are authored.</p></div>
@@ -559,7 +559,8 @@ function markdown() {
   out.push(`## How the company works`, `- The company is Ketha (always) plus ${DATA.company.seatCap} picks; the first pick is "you" (must be able to walk). Fighters are free; builders cost Tenebrium (start wallet ${DATA.company.startWalletTnb}).`,
     `- Heroes not at the start are met in the field. Who is met is drawn by the bond web (Umwelt encounter field): ties to someone in the party raise the chance of meeting (bonded ×${PR.ally}, at odds ×${PR.adversary}).`,
     `- How they turn up: stance = sum over ties to the party (bond/attract/sibling/mentor/mirror +, rivalry/tension/friction −; authored 1.0, derived half its score). p(hostile) = 1/(1+exp((stance+bias)/softness)), bias ${RS.bias} early → ${RS.biasLate} late (missions ${RS.rampFrom}–${RS.rampTo}), softness ${RS.softness}. Hostile = spawns alive on the enemy team; kill and raise the wreck to recruit. Otherwise a wreck to raise.`,
-    `- Field effect = the hero's kit tag (multipliers applied to the hero and pack in the field).`, ``);
+    `- Field effect = the hero's kit tag (multipliers applied to the hero and pack in the field).`,
+    `- Builder = a hero who can seed a base (economy, factories, constructors): ${H.filter(h => h.baseSeeder).map(h => h.name).join(", ")}. Build power alone (rez bots, nano towers, defence-only constructors) is not a builder.`, ``);
   for (const h of H) {
     out.push(`## ${h.name} (${h.id})`);
     out.push(`*${h.hook}* — ${cap(h.faction)} · ${cap(h.position)} · ${h.verb} · temperament ${h.temperament.join(", ")} · ${recruitWord(h)}`);
@@ -572,7 +573,7 @@ function markdown() {
     if (h.links.length) { out.push(`- Ties:`); h.links.forEach(l => out.push(`  - ${l.polarity}${l.authored ? "" : " (derived)"} with ${BY[l.other]?.name || l.other}${l.motifs.length ? `: ${l.motifs.join("; ")}` : ""}`)); }
     if (h.gifts.length) out.push(`- Bond gifts (rank A): ${h.gifts.map(g => `with ${BY[g.with]?.name || g.with}: ${g.count}× ${g.unitDef} (${g.why})`).join("; ")}`);
     out.push(`- Met: ${h.recruit.type || h.status}${h.recruit.home ? ` around ${h.recruit.home.join(" / ")}` : ""}${h.recruit.blurb ? ` — ${h.recruit.blurb}` : ""}`);
-    out.push(`- Books: unit ${h.chassis}; pack ${h.packTotal}${h.sizing ? ` (${h.sizing})` : ""}; cost ${h.cost.combined} (${h.cost.metal} m, ${h.cost.energy} e); start xp ${h.startXp}${h.startXpFixed ? " fixed" : ""}; hire ${h.hireTnb} Tnb${h.hireKm ? ` + ${h.hireKm}k` : ""}; can lead ${h.canLead}; pack tags ${h.packTags.join(", ") || "none"}; builds eco ${h.buildsEco}${h.factory ? `; factory ${h.factory}` : ""}; codex ${Object.entries(h.codexFlags).map(([k, x]) => `${k}=${x}`).join(" ")}; axes ${DATA.axes.map(k => `${k} ${(+h.axes[k] || 0).toFixed(2)}`).join(", ")}`);
+    out.push(`- Books: unit ${h.chassis}; pack ${h.packTotal}${h.sizing ? ` (${h.sizing})` : ""}; cost ${h.cost.combined} (${h.cost.metal} m, ${h.cost.energy} e); start xp ${h.startXp}${h.startXpFixed ? " fixed" : ""}; hire ${h.hireTnb} Tnb${h.hireKm ? ` + ${h.hireKm}k` : ""}; can lead ${h.canLead}; pack tags ${h.packTags.join(", ") || "none"}; builder (seeds a base) ${h.baseSeeder}${h.factory ? `; factory ${h.factory}` : ""}; codex ${Object.entries(h.codexFlags).map(([k, x]) => `${k}=${x}`).join(" ")}; axes ${DATA.axes.map(k => `${k} ${(+h.axes[k] || 0).toFixed(2)}`).join(", ")}`);
     out.push(``);
   }
   out.push(`## Glossary`, `- Positions: line (holds the front), skirmish (hits and moves), siege (range), shield (protects), eco (economy), eyes (scouting), core_skirm / core_rez (Ketha's roles).`,
