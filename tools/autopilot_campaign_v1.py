@@ -8,11 +8,15 @@ kernel's own SortieWatch bring the result home. The autopilot gadget raises a re
 extraction, and walks the company to the pad (territory missions: the ground taken; rescues: the drop).
 
 It runs on a COPY of the workspace (autopilot_runs/<stamp>/ws), so your own campaign is untouched.
-BAR's data\\games\\VerdanceAshes.sdd and infolog.txt are shared: don't play while it runs.
+Each run has its own BAR data directory, mod, seeds, settings and logs. Installed engine and
+map content are linked into that directory; the player's BAR install is not written.
 
     python tools\\autopilot_campaign_v1.py --sorties 20
     python tools\\autopilot_campaign_v1.py --band verse,vane,halbard --boost verse=4.0 --prefer simmers --speed 10
     python tools\\autopilot_campaign_v1.py --windowed          (watch it in spring.exe)
+    python tools\\autopilot_campaign_v1.py --hud               (headless with LuaUI: the rig player
+                                                              widget presses EXTRACT and confirms, so
+                                                              the sortie leaves through the HUD)
 
 Writes autopilot_runs/<stamp>/log.jsonl (one row per sortie), sortie_<n>.infolog.txt (this sortie's
 slice of the infolog), and summary.json. Exit 0 = the campaign completed.
@@ -42,6 +46,30 @@ def jload(p: Path):
 
 # ----------------------------------------------------------------------------- workspace copy
 
+def link_content(source: Path, dest: Path) -> None:
+    if source.is_dir() and os.name == "nt":
+        quote = lambda p: "'" + str(p).replace("'", "''") + "'"
+        subprocess.run(["powershell", "-NoProfile", "-NonInteractive", "-Command",
+                        f"$ErrorActionPreference='Stop'; New-Item -ItemType Junction -Path {quote(dest)} -Target {quote(source)} | Out-Null"],
+                       check=True, capture_output=True, timeout=30)
+    elif source.is_dir():
+        dest.symlink_to(source, target_is_directory=True)
+    else:
+        shutil.copy2(source, dest)
+
+
+def isolate_bar(dest: Path, source: Path) -> Path:
+    bar = dest / "bar_data"
+    (bar / "games").mkdir(parents=True)
+    for name in ("engine", "maps", "pool", "packages"):
+        if (source / name).exists():
+            link_content(source / name, bar / name)
+    for game in (source / "games").iterdir():
+        if game.name.lower() != "verdanceashes.sdd":
+            link_content(game, bar / "games" / game.name)
+    return bar
+
+
 def copy_workspace(dest: Path, bar_root: str) -> Path:
     ws = dest / "ws"
     for name in ("tools", "data", "app", "mod", "scripts", "docs", "VERSION"):
@@ -53,14 +81,18 @@ def copy_workspace(dest: Path, bar_root: str) -> Path:
     for d in ("state", "inbox", "outbox", "ledger", "export", "playable_runs"):
         (ws / d).mkdir(parents=True, exist_ok=True)
     cfg = jload(ROOT / "verdance_config.json")
-    cfg.update({"barDataRoot": bar_root, "workspace": str(ws), "devMode": False})
+    # Do not inherit absolute destinations pointing into the player's install.
+    for key in ("infolog", "modSdd", "seedDestination", "seedOutbox", "barSdd", "engineDir"):
+        cfg.pop(key, None)
+    cfg.update({"barDataRoot": str(isolate_bar(dest, Path(bar_root))), "workspace": str(ws), "devMode": False})
     (ws / "verdance_config.json").write_text(json.dumps(cfg, indent=2), encoding="utf-8")
     return ws
 
 
 # ----------------------------------------------------------------------------- the startscript
 
-def patch_startscript(text: str, *, profile: str, speed: int, minutes: float, settle: int) -> tuple[str, int]:
+def patch_startscript(text: str, *, profile: str, speed: int, minutes: float, settle: int,
+                      hud: bool = False) -> tuple[str, int]:
     """Company team -> BARb; the human becomes a spectator; autopilot modoptions in."""
     m = re.search(r"\[PLAYER0\]\s*\{(.*?)\}", text, re.S)
     if not m:
@@ -71,22 +103,30 @@ def patch_startscript(text: str, *, profile: str, speed: int, minutes: float, se
     if "Spectator=" not in body2:
         body2 += "    Spectator=1;\n"
     text = text[:m.start(1)] + body2 + text[m.end(1):]
-    n_ai = len(re.findall(r"\[AI\d+\]", text))
+    n_ai = max((int(i) for i in re.findall(r"\[AI(\d+)\]", text)), default=-1) + 1
     ai = (f"  [AI{n_ai}]\n  {{\n    Host=0;\n    IsFromDemo=0;\n    Name=Autopilot(BARb {profile});\n    ShortName=BARb;\n"
           f"    Team={team};\n    Version=stable;\n    [Options]\n    {{\n      profile={profile};\n    }}\n  }}\n\n")
     i = text.index("[PLAYER0]")
     text = text[:i] + ai[2:] + "  " + text[i:]
     text = re.sub(r"NumUsers=(\d+);", lambda mm: f"NumUsers={int(mm.group(1)) + 1};", text, count=1)
     text = re.sub(r"RecordDemo=\d+;", "RecordDemo=0;", text, count=1)
-    mods = (f"va_autopilot=1;\n    va_headless_autostart=1;\n    va_headless_fastwin=0;\n    va_headless_quit=1;\n    va_headless_speed={speed};\n    va_autopilot_speed={speed};\n"
+    no_ui = "" if hud else "va_no_ui=1;\n    "
+    mods = (f"va_autopilot=1;\n    {no_ui}va_headless_autostart=1;\n    va_headless_fastwin=0;\n    va_headless_quit=1;\n    va_headless_speed={speed};\n    va_autopilot_speed={speed};\n"
             f"    va_autopilot_minutes={minutes};\n    va_autopilot_settle={settle};\n    ")
     text = text.replace("va_campaign=1;", "va_campaign=1;\n    " + mods.rstrip(), 1)
     return text, team
 
 
+def archive_log(run_dir: Path, n: int) -> Path:
+    """Stdout belongs to this process; BAR's shared infolog may be truncated or replaced."""
+    dest = run_dir / f"sortie_{n:02d}.infolog.txt"
+    shutil.copyfile(run_dir / f"sortie_{n:02d}.engine.txt", dest)
+    return dest
+
+
 # ----------------------------------------------------------------------------- launch + watch
 
-def launch(ws: Path, *, headless: bool, run_dir: Path, n: int):
+def launch(ws: Path, *, headless: bool, run_dir: Path, n: int, hud: bool = False):
     from verdance_kernel import sortie as S  # type: ignore
     cfg = S.bar_config(ws)
     script = S.startscript_from_manifest(ws)
@@ -111,13 +151,20 @@ def launch(ws: Path, *, headless: bool, run_dir: Path, n: int):
             except Exception:  # noqa: BLE001
                 pass
     exe = S.engine_exe(cfg, "spring-headless.exe" if headless else "spring.exe")
-    infolog = Path(cfg["infolog"])
-    baseline = infolog.stat().st_size if infolog.is_file() else 0
-    out = open(run_dir / f"sortie_{n:02d}.engine.txt", "wb")
+    infolog = run_dir / f"sortie_{n:02d}.engine.txt"
     args = [str(exe), "--write-dir", cfg["barDataRoot"], "--only-local", str(script)]
-    proc = subprocess.Popen(args, cwd=cfg["barDataRoot"], stdin=subprocess.DEVNULL, stdout=out, stderr=subprocess.STDOUT)
+    if headless:
+        settings = run_dir / "headless.cfg"
+        if not settings.exists():
+            # --hud keeps LuaUI (the widgets run, nothing draws); without it the headless engine
+            # skips the widget set, which on Windows otherwise never reaches frame 0
+            settings.write_text("TextureMemPoolSize = 0\nUseLuaMemPools = 0\n" + ("" if hud else "LuaUI = 0\n") +
+                                "UnitIconsAsUI = 0\nUnitIconDist = 99999\nSplashScreenDir =\n", encoding="utf-8")
+        args[1:1] = ["--safemode", "--isolation", "--config", str(settings)]
+    with infolog.open("wb") as out:
+        proc = subprocess.Popen(args, cwd=cfg["barDataRoot"], stdin=subprocess.DEVNULL, stdout=out, stderr=subprocess.STDOUT)
     return {"ok": True, "pid": proc.pid, "proc": proc, "engine": str(exe), "startScriptPath": str(script),
-            "infologPath": str(infolog), "infologBaseline": baseline, "mapName": map_name}
+            "infologPath": str(infolog), "infologBaseline": 0, "mapName": map_name}
 
 
 def main() -> int:
@@ -130,9 +177,16 @@ def main() -> int:
     ap.add_argument("--minutes", type=float, default=15.0, help="game minutes before the company leaves regardless")
     ap.add_argument("--settle", type=int, default=40, help="game seconds held after the objective completes")
     ap.add_argument("--windowed", action="store_true", help="spring.exe instead of spring-headless.exe")
-    ap.add_argument("--prefer", default="simmers", help="take a deploy card whose map id contains this when the node offers one ('' = recommended)")
+    ap.add_argument("--hud", action="store_true", help="headless with LuaUI on: the company leaves through the HUD (EXTRACT, the manifest, confirm)")
+    ap.add_argument("--prefer", default="", help="prefer a map id substring; default follows the hub's recommended choice")
     ap.add_argument("--max-stalls", type=int, default=3, help="stop after this many sorties in a row that did not advance")
+    ap.add_argument("--startup-timeout", type=int, default=600, help="wall seconds allowed before game frame 0 (cold map caches can be slow)")
+    ap.add_argument("--wall-timeout", type=int, default=1800, help="maximum wall seconds per engine process")
+    ap.add_argument("--allow-no-belief", action="store_true", help="allow a diagnostic run without the Umwelt belief system")
+    ap.add_argument("--resume", type=Path, help="continue an existing run directory and its isolated campaign state")
     args = ap.parse_args()
+    if min(args.sorties, args.speed, args.startup_timeout, args.wall_timeout) <= 0:
+        ap.error("sorties, speed, and timeouts must be positive")
 
     os.environ.setdefault("VA_PERSPECTIVES_SYNC", "1")
     os.environ.setdefault("VA_PERSPECTIVES_NOSPAWN", "1")
@@ -140,22 +194,33 @@ def main() -> int:
     from playthrough_campaign import pick_choice, plan_for  # noqa: E402
 
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    run_dir = ROOT / "autopilot_runs" / stamp
+    run_dir = args.resume.resolve() if args.resume else ROOT / "autopilot_runs" / stamp
+    if args.resume and not (run_dir / "ws" / "state" / "campaign_state.json").is_file():
+        ap.error("resume directory has no ws/state/campaign_state.json")
+    if args.resume:
+        resumed_bar = jload(run_dir / "ws" / "verdance_config.json").get("barDataRoot")
+        if not resumed_bar or Path(resumed_bar).resolve() != (run_dir / "bar_data").resolve():
+            ap.error("resume requires a run with its own isolated bar_data directory")
     run_dir.mkdir(parents=True, exist_ok=True)
     sys.path.insert(0, str(ROOT / "tools"))
     from verdance_kernel import sortie as S  # type: ignore
+    from verdance.belief.world import umwelt_available
+    belief = umwelt_available()
+    if not belief and not args.allow_no_belief:
+        ap.error("Umwelt belief system unavailable: use a Python environment with NumPy and a compatible UMWELT_SRC; --allow-no-belief is diagnostic only")
     bar_root = S.bar_config(ROOT)["barDataRoot"]
     print(f"[autopilot] run {run_dir}")
-    print(f"[autopilot] copying the workspace (your campaign is untouched)")
-    ws = copy_workspace(run_dir, bar_root)
+    print(f"[autopilot] {'resuming isolated campaign' if args.resume else 'copying the workspace and isolating BAR'} (your campaign is untouched)")
+    ws = run_dir / "ws" if args.resume else copy_workspace(run_dir, bar_root)
     sys.path.insert(0, str(ws / "tools"))
     os.chdir(ws)
     env = dict(os.environ, PYTHONPATH=os.pathsep.join([str(ws / "tools"), os.environ.get("PYTHONPATH", "")]).rstrip(os.pathsep))
-    r = subprocess.run([sys.executable, "-m", "verdance.campaign.engine", "init-state", "--workspace", str(ws), "--write-state"],
-                       capture_output=True, text=True, timeout=600, cwd=str(ws), env=env)
-    if r.returncode:
-        print("[autopilot] init-state failed:", (r.stderr or r.stdout)[-800:])
-        return 2
+    if not args.resume:
+        r = subprocess.run([sys.executable, "-m", "verdance.campaign.engine", "init-state", "--workspace", str(ws), "--write-state"],
+                           capture_output=True, text=True, timeout=600, cwd=str(ws), env=env)
+        if r.returncode:
+            print("[autopilot] init-state failed:", (r.stderr or r.stdout)[-800:])
+            return 2
     for mod in [k for k in sys.modules if k.startswith(("verdance_kernel", "verdance"))]:
         del sys.modules[mod]  # import from the copy from here on
     from verdance_kernel.api import CampaignKernel  # type: ignore
@@ -173,26 +238,37 @@ def main() -> int:
     for part in filter(None, (args.boost or "").split(",")):
         h, _, x = part.partition("=")
         boosts[h.strip()] = float(x or 4.0)
+    previous = jload(run_dir / "summary.json") if args.resume else {}
+    if previous:
+        band, boosts = previous.get("band", band), previous.get("boost", boosts)
     k.rebuild_hub(skip_apply=True)
     st = jload(sp)
     sys.path.insert(0, str(ws / "tools"))
     from verdance.company.company import unlock_pool_ids, load_crew_packs  # type: ignore
     pool = set(unlock_pool_ids(st, load_crew_packs(ws)))
-    if not set(band) <= pool or boosts:
+    if not args.resume and (not set(band) <= pool or boosts):
         # the autopilot's company: put its band (and anyone boosted) on the hire board
         st["unlockPool"] = sorted(pool | set(band) | set(boosts))
     for h in (st.get("roster") or {}).get("heroes") or []:
-        if h.get("heroId") in boosts:
+        if not args.resume and h.get("heroId") in boosts:
             h["xp"] = h["peakBarXp"] = boosts[h["heroId"]]
-    sp.write_text(json.dumps(st, indent=2), encoding="utf-8")
-    seal = k.seal_company(band=band)
-    print(f"[autopilot] company {band} boost {boosts} -> {'sealed' if seal.get('ok') else seal}")
+    if not args.resume:
+        sp.write_text(json.dumps(st, indent=2), encoding="utf-8")
+    seal = {"ok": True} if args.resume else k.seal_company(band=band)
+    print(f"[autopilot] company {band} boost {boosts} -> {'preserved' if args.resume else 'sealed' if seal.get('ok') else seal}")
     if not seal.get("ok"):
         return 2
 
     log_path = run_dir / "log.jsonl"
-    stalls, rows = 0, []
-    for n in range(1, args.sorties + 1):
+    rows = []
+    if args.resume and log_path.is_file():
+        rows = [json.loads(line) for line in log_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    stalls = 0
+    first = max((int(r.get("n") or 0) for r in rows), default=0) + 1
+    # An interrupted engine may have left a log before the row was committed.
+    first = max(first, max((int(p.stem.split('_')[1].split('.')[0]) + 1
+                           for p in run_dir.glob('sortie_*.engine.txt')), default=1))
+    for n in range(first, first + args.sorties):
         k.rebuild_hub(skip_apply=True)
         hs, st = jload(hp), jload(sp)
         if st.get("campaignComplete"):
@@ -223,10 +299,10 @@ def main() -> int:
             break
         script = S.startscript_from_manifest(ws)
         text, team = patch_startscript(script.read_text(encoding="utf-8", errors="replace"), profile=args.profile,
-                                       speed=args.speed, minutes=args.minutes, settle=args.settle)
+                                       speed=args.speed, minutes=args.minutes, settle=args.settle, hud=args.hud or args.windowed)
         script.write_text(text, encoding="utf-8")
         shutil.copy2(script, run_dir / f"sortie_{n:02d}.startscript.txt")
-        rep = launch(ws, headless=not args.windowed, run_dir=run_dir, n=n)
+        rep = launch(ws, headless=not args.windowed, run_dir=run_dir, n=n, hud=args.hud)
         if not rep.get("ok"):
             row["stall"] = "launch failed: " + str(rep.get("reason"))
             rows.append(row)
@@ -236,25 +312,26 @@ def main() -> int:
         proc = rep.pop("proc")
         watch = S.SortieWatch(ws, k.bring_home, k._incomplete_home)
         watch.watch(rep)
-        wall_cap = 60 * 60
-        while watch.phase not in ("home", "closed-without-result") and time.time() - t0 < wall_cap:
+        engine_start = time.time()
+        while watch.phase not in ("home", "closed-without-result") and time.time() - engine_start < args.wall_timeout:
+            txt = Path(rep["infologPath"]).read_text(encoding="utf-8", errors="replace")
+            if "VA_SEED_MISSING" in txt:
+                row["stall"] = "engine did not load the campaign seed"
+                break
+            if time.time() - engine_start > args.startup_timeout:
+                if not re.search(r"\[f=0*\d+\]", txt):
+                    row["stall"] = "engine startup timeout before game frame 0"
+                    break
             time.sleep(3)
         if proc.poll() is None:
             proc.kill()
+            proc.wait(timeout=15)
             row["killed"] = True
+            row.setdefault("stall", "engine wall timeout")
         time.sleep(1)
         watch.stop()
         try:
-            # BAR truncates infolog.txt at each start, so the baseline offset can point past its end;
-            # the engine's own stdout carries the same lines and is never rewritten.
-            data = b""
-            with open(rep["infologPath"], "rb") as fh:
-                size = fh.seek(0, 2)
-                fh.seek(int(rep["infologBaseline"]) if int(rep["infologBaseline"]) <= size else 0)
-                data = fh.read()
-            if not data.strip():
-                data = (run_dir / f"sortie_{n:02d}.engine.txt").read_bytes()
-            (run_dir / f"sortie_{n:02d}.infolog.txt").write_bytes(data)
+            archive_log(run_dir, n)
         except Exception:  # noqa: BLE001
             pass
         crash = None
@@ -266,13 +343,21 @@ def main() -> int:
         except Exception:  # noqa: BLE001
             pass
         st2 = jload(sp)
-        bead = (st2.get("history") or [{}])[-1]
+        result = jload(ws / "inbox" / "latest_va_result.json")
+        if result.get("resultKey") in watch.applied:
+            manifest = result.get("manifest") or {}
+            row.update(objectiveComplete=result.get("objectiveComplete"), objectiveResults=result.get("objectiveResults"),
+                       extractedHeroes=(manifest.get("going") or {}).get("heroes"),
+                       leftHeroes=(manifest.get("staying") or {}).get("heroes"))
+        bead = (st2.get("history") or [{}])[-1] if watch.applied else {}
         heroes = {h.get("heroId"): h.get("status") for h in ((st2.get("roster") or {}).get("heroes") or [])
                   if h.get("heroId") in set(band) | {"ketha"} | set(boosts)}
         row.update(watch=watch.phase, wallSeconds=round(time.time() - t0), verdict=bead.get("verdict"),
                    extraction=bead.get("extractionStatus"), after=st2.get("missionNumber"), heroes=heroes,
                    doors=sorted(z for z, d in (st2.get("doors") or {}).items() if d.get("held")),
                    complete=bool(st2.get("campaignComplete")))
+        row["engineExitCode"] = proc.returncode
+        row["watchStatus"] = watch.status()
         advanced = int(st2.get("missionNumber") or 0) > int(st.get("missionNumber") or 0) or st2.get("campaignComplete")
         stalls = 0 if advanced else stalls + 1
         rows.append(row)
@@ -285,12 +370,14 @@ def main() -> int:
             with log_path.open("a", encoding="utf-8") as fh:
                 fh.write(json.dumps({"n": n, "crashed": crash}) + "\n")
             break
-        if st2.get("campaignComplete") or stalls >= args.max_stalls:
+        if row.get("killed") or st2.get("campaignComplete") or stalls >= args.max_stalls:
             break
 
     st = jload(sp)
     summary = {"complete": bool(st.get("campaignComplete")), "outcome": st.get("campaignComplete"), "sorties": rows,
-               "band": band, "boost": boosts, "profile": args.profile, "workspace": str(ws)}
+               "band": band, "boost": boosts, "profile": args.profile, "workspace": str(ws), "beliefEnabled": belief,
+               "rig": {"hud": bool(args.hud or args.windowed), "forceComplete": False, "fastWin": False, "extractAnywhere": False,
+                       "speed": args.speed, "minutes": args.minutes, "settle": args.settle}}
     (run_dir / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
     print("[autopilot]", "COMPLETE " + json.dumps(st.get("campaignComplete")) if summary["complete"] else "NOT COMPLETE", "·", run_dir)
     return 0 if summary["complete"] else 1

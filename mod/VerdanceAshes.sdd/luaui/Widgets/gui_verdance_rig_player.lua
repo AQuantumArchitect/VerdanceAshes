@@ -14,7 +14,8 @@ function widget:GetInfo()
 end
 
 -- The autopilot gadget (game_verdance_autopilot.lua) fights with an AI and decides when the company
--- leaves; it says so with va_autopilot_leave and waits. This widget is the hands on the HUD:
+-- leaves. This widget says VA_RIG:hud once the game runs; from then on the autopilot says leave with
+-- va_autopilot_leave and waits for the HUD. This widget is the hands on the HUD:
 --   the infil card up        → begin    (gui_verdance_infil)
 --   the autopilot says leave → extract  (gui_verdance_sidebar: asks the exfil gadget for the manifest)
 --   the manifest is open     → confirm  (gui_verdance_exfil: the lift, to the first destination)
@@ -42,7 +43,14 @@ function widget:Initialize()
   Spring.Echo("VA_RIG armed")
 end
 
+local announced = false
+
 function widget:Update()
+  -- tell the autopilot the HUD is here, so the company leaves through it (once the game runs)
+  if not announced and (Spring.GetGameFrame() or 0) > 0 then
+    announced = true
+    Spring.SendLuaRulesMsg("VA_RIG:hud")
+  end
   if Hud.over() then
     if not pressed.over then
       pressed.over = os.clock()
