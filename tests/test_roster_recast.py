@@ -94,7 +94,7 @@ def test_every_pack_is_as_called():
 
 
 def test_the_retired_are_gone_everywhere():
-    for f in list(S.glob("*.json")) + [MOD / "luarules/gadgets/include/va_crew_roster.lua",
+    for f in list(S.rglob("*.json")) + [MOD / "luarules/gadgets/include/va_crew_roster.lua",
                                        MOD / "luarules/gadgets/include/va_hero_tags.lua", ROOT / "tools/verdance/company/company.py"]:
         txt = f.read_text(encoding="utf-8-sig")
         for r in RETIRED:
