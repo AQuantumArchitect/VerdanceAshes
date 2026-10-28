@@ -569,20 +569,20 @@ M.HEROES = {
     hireTnb = 0,
     packTotal = 1,
     extras = 0,
-    startXp = 0.319,
+    startXp = 0.345,
     packMind = "solo",
     tags = { "eco", "geo", "saint" },
     escorts = {
       {
-        unitDef = "armjam",
+        unitDef = "armseer",
         count = 1,
       },
       {
-        unitDef = "armseer",
-        count = 2,
+        unitDef = "armjam",
+        count = 1,
       },
     },
-    blurb = "Sister Lumen with an Umbra jammer and two Prophet radar vehicles. She sees the whole grid, and the grid can't see her.",
+    blurb = "Sister Lumen's construction vehicle, which raises only Prudes and Pulsars, with a Prophet radar and an Umbra jammer. She tithes the grid and guards it.",
   },
   anvil = {
     name = "Anvil & Mire",
@@ -1131,6 +1131,24 @@ M.HEROES = {
     },
     blurb = "A Hecatoncheir drone carrier and two Cleavers on the ground. The hands pin it; the Cleavers finish it.",
   },
+  gorgon = {
+    name = "Ivra 'Gorgon' Maelis",
+    role = "band",
+    unitDef = "legmed",
+    hireTnb = 0,
+    packTotal = 1,
+    extras = 0,
+    startXp = 0.003,
+    packMind = "solo",
+    tags = { "siege", "rockets", "flak" },
+    escorts = {
+      {
+        unitDef = "armyork",
+        count = 2,
+      },
+    },
+    blurb = "One Legion Medusa and two Armada Shredder flak trucks. The Medusa looks; the Shredders keep the sky off her.",
+  },
 }
 
 M.FACTORIES = {
@@ -1183,7 +1201,7 @@ M.BAND_ORDER = {
   "lumen", "anvil", "volt", "pavise", "halbard", "thresh", "gale", "mask", "rumor", "phoenix",
   "scylla", "tsunami", "starlight", "banisher", "arrow", "hornet", "charybdis", "shiva", "tremor", "stiletto",
   "lunkhead", "stronghold", "possum", "mason", "rookery", "dam", "arc", "mammoth", "gladius", "triton",
-  "loom", "hundred",
+  "loom", "hundred", "gorgon",
 }
 
 function M.isCore(heroId)

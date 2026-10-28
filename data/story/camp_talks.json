@@ -8689,6 +8689,158 @@
       ]
     },
     {
+      "id": "gorgon__halq:C",
+      "pairId": "gorgon__halq",
+      "a": "gorgon",
+      "b": "halq",
+      "rank": "C",
+      "title": "Range table",
+      "polarity": "attract",
+      "motif": "coordinates and salvos",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Halq reads out a grid square. Maelis's Medusa is already turning toward it."
+        },
+        {
+          "speaker": "halq",
+          "line": "Six-two, four-zero. Eleven hundred out."
+        },
+        {
+          "speaker": "gorgon",
+          "line": "Twelve. You always round down."
+        },
+        {
+          "speaker": "halq",
+          "line": "I round to what the rockets can reach."
+        },
+        {
+          "speaker": "gorgon",
+          "line": "Mine reach twelve."
+        }
+      ]
+    },
+    {
+      "id": "arc__gorgon:C",
+      "pairId": "arc__gorgon",
+      "a": "gorgon",
+      "b": "arc",
+      "rank": "C",
+      "title": "Roof",
+      "polarity": "bond",
+      "motif": "the flak and the choir",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "The Shredders and Halloran's Whistlers clear the same patch of sky over the Medusa."
+        },
+        {
+          "speaker": "arc",
+          "line": "Your trucks sing flat."
+        },
+        {
+          "speaker": "gorgon",
+          "line": "My trucks don't sing. They shred. Yours can do the hymn."
+        },
+        {
+          "speaker": "arc",
+          "line": "Then we'll call it a duet."
+        },
+        {
+          "speaker": "gorgon",
+          "line": "Call it what you like. Just keep the sky off me."
+        }
+      ]
+    },
+    {
+      "id": "gorgon__tremor:C",
+      "pairId": "gorgon__tremor",
+      "a": "gorgon",
+      "b": "tremor",
+      "rank": "C",
+      "title": "Spotting",
+      "polarity": "rivalry",
+      "motif": "two long guns, two factions",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Lund's Rascals and Maelis's Medusa find the same target at the same moment."
+        },
+        {
+          "speaker": "tremor",
+          "line": "Somebody has to see it first. That was me."
+        },
+        {
+          "speaker": "gorgon",
+          "line": "Seeing isn't hitting. That was me."
+        },
+        {
+          "speaker": "tremor",
+          "line": "You hit the crater I made."
+        },
+        {
+          "speaker": "gorgon",
+          "line": "Then make better craters."
+        }
+      ]
+    },
+    {
+      "id": "gorgon__hornet:C",
+      "pairId": "gorgon__hornet",
+      "a": "gorgon",
+      "b": "hornet",
+      "rank": "C",
+      "title": "Low pass",
+      "polarity": "tension",
+      "motif": "gunships and flak",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "The Marsh sisters come home low over the Medusa. Both Shredders swing toward them."
+        },
+        {
+          "speaker": "hornet",
+          "line": "Friendly! Friendly!"
+        },
+        {
+          "speaker": "gorgon",
+          "line": "My crews pay for their own ammunition. They don't waste it on friends who fly properly."
+        },
+        {
+          "speaker": "hornet",
+          "line": "Saffi says that wasn't a no."
+        },
+        {
+          "speaker": "gorgon",
+          "line": "Saffi is very perceptive."
+        }
+      ]
+    },
+    {
       "id": "fatboy__kettle:C",
       "pairId": "fatboy__kettle",
       "a": "fatboy",
@@ -14063,5 +14215,5 @@
       ]
     }
   ],
-  "authoredCount": 297
+  "authoredCount": 301
 }

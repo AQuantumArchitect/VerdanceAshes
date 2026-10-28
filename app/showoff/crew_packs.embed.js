@@ -1117,6 +1117,20 @@ window.CREW_PACKS = {
       "combined": 321,
       "label": "Hecatoncheir",
       "hasBuildPower": false
+    },
+    "legmed": {
+      "metal": 1500,
+      "energy": 22500,
+      "combined": 1821,
+      "label": "Medusa",
+      "hasBuildPower": false
+    },
+    "armyork": {
+      "metal": 450,
+      "energy": 9100,
+      "combined": 580,
+      "label": "Shredder",
+      "hasBuildPower": false
     }
   },
   "heroes": {
@@ -1877,13 +1891,13 @@ window.CREW_PACKS = {
       "hireTnb": 0,
       "packTotal": 1,
       "extras": 0,
-      "blurb": "Sister Lumen with an Umbra jammer and two Prophet radar vehicles. She sees the whole grid, and the grid can't see her.",
+      "blurb": "Sister Lumen's construction vehicle, which raises only Prudes and Pulsars, with a Prophet radar and an Umbra jammer. She tithes the grid and guards it.",
       "name": "Sister Lumen",
       "sizing": "fixed",
-      "startXp": 0.319,
-      "packCombined": 1084,
-      "packMetal": 905,
-      "packEnergy": 12500,
+      "startXp": 0.345,
+      "packCombined": 930,
+      "packMetal": 780,
+      "packEnergy": 10500,
       "tags": [
         "eco",
         "geo",
@@ -1891,12 +1905,12 @@ window.CREW_PACKS = {
       ],
       "escorts": [
         {
-          "unitDef": "armjam",
+          "unitDef": "armseer",
           "count": 1
         },
         {
-          "unitDef": "armseer",
-          "count": 2
+          "unitDef": "armjam",
+          "count": 1
         }
       ],
       "buildsEco": false,
@@ -2727,6 +2741,32 @@ window.CREW_PACKS = {
       "packEnergy": 16000,
       "packCombined": 1399,
       "packXpCombined": 1291
+    },
+    "gorgon": {
+      "role": "band",
+      "unitDef": "legmed",
+      "hireTnb": 0,
+      "packTotal": 1,
+      "extras": 0,
+      "blurb": "One Legion Medusa and two Armada Shredder flak trucks. The Medusa looks; the Shredders keep the sky off her.",
+      "name": "Ivra 'Gorgon' Maelis",
+      "sizing": "fixed",
+      "tags": [
+        "siege",
+        "rockets",
+        "flak"
+      ],
+      "startXp": 0.003,
+      "packMind": "solo",
+      "escorts": [
+        {
+          "unitDef": "armyork",
+          "count": 2
+        }
+      ],
+      "packMetal": 2400,
+      "packEnergy": 40700,
+      "packCombined": 2981
     }
   },
   "factories": {
@@ -2834,7 +2874,8 @@ window.CREW_PACKS = {
       "tremor",
       "stiletto",
       "stronghold",
-      "hundred"
+      "hundred",
+      "gorgon"
     ],
     "shield": [
       "kettle",

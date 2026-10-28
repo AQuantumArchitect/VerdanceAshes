@@ -777,7 +777,7 @@
       "unitDef": "va_lumen",
       "voice": {
         "hook": "Tithe the grid.",
-        "blurb": "Sister Lumen with an Umbra jammer and two Prophet radar vehicles. She sees the whole grid, and the grid can't see her.",
+        "blurb": "Sister Lumen's construction vehicle, which raises only Prudes and Pulsars, with a Prophet radar and an Umbra jammer. She tithes the grid and guards it.",
         "fiction": "Hearth is coal furniture. Lumen is faith with a geothermal throat. She does not tour. She tithes heat into the pad and calls the surplus holy. Eco saint — stay and feed.",
         "tagLine": "Grid saint — garden the power."
       },
@@ -1472,6 +1472,29 @@
         "tagLine": "Drone carrier and Cleavers: the hand and the hammer."
       },
       "notes": "siege x swarm; Legion airborne drone carrier with a cluster-artillery accent (replaces the Marauder pair)"
+    },
+    {
+      "heroId": "gorgon",
+      "name": "Ivra 'Gorgon' Maelis",
+      "position": "siege",
+      "combatVerb": "snipe",
+      "temperament": [
+        "count",
+        "plod"
+      ],
+      "doctrine": "arty",
+      "preferDefenses": false,
+      "allowBail": false,
+      "allowKite": false,
+      "faction": "legion",
+      "unitDef": "legmed",
+      "voice": {
+        "hook": "Whatever I look at stops moving.",
+        "blurb": "One Legion Medusa and two Armada Shredder flak trucks. The Medusa looks; the Shredders keep the sky off her.",
+        "fiction": "Maelis learned gunnery on the Legion's long ranges and never learned to hurry. Her Medusa sits back, finds something, and looks at it until a salvo of rockets makes it stop. She cannot see the sky from inside the Medusa and does not try to: two Armada Shredder flak trucks ride with her and keep it clean. She pays their crews in Legion coin and pretends not to like them.",
+        "tagLine": "Medusa and Shredders: the stare, and a clean sky to stare from."
+      },
+      "notes": "siege x count; a T2 Legion long-range rocket tank with Armada flak for a roof"
     }
   ]
 }

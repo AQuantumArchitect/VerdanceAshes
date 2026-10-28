@@ -32,7 +32,8 @@ WANT = {  # hero: (lead unit, packTotal, escorts)
     "mask": ("va_mask", 1, {"armpw": 10, "armfify": 3}),
     "rookery": ("armca", 3, {"armfig": 4, "corveng": 2, "legionnaire": 2, "legvenator": 2}),
     "dam": ("armbeaver", 4, {}),
-    "lumen": ("va_lumen", 1, {"armjam": 1, "armseer": 2}),
+    "lumen": ("va_lumen", 1, {"armseer": 1, "armjam": 1}),   # builds only Prudes and Pulsars; a radar and a jammer
+    "gorgon": ("legmed", 1, {"armyork": 2}),
     "pavise": ("armwar", 1, {"leglob": 5}),
     "yeva": ("armsnipe", 1, {"armflea": 6}),
     "spoke": ("legvp", 1, {"legmstor": 1}),
@@ -104,10 +105,10 @@ def test_the_new_people_have_a_voice_and_ties():
     codex = {h["heroId"]: h for h in _j(S / "hero_codex.json")["heroes"]}
     web = _j(S / "support_web.json")
     for h, name in (("loom", "Orla 'Loom' Vey"), ("hundred", "Thessaly 'Hundred' Orne"), ("arc", "Ambrose 'Choir' Halloran"),
-                    ("hornet", "Teague & Saffi Marsh")):
+                    ("hornet", "Teague & Saffi Marsh"), ("gorgon", "Ivra 'Gorgon' Maelis")):
         assert codex[h]["name"] == name and codex[h]["voice"]["hook"] and codex[h]["voice"]["fiction"], h
         assert H[h]["name"] == name, h
-    for h in ("loom", "hundred", "arc"):
+    for h in ("loom", "hundred", "arc", "gorgon"):
         ties = {e["polarity"] for e in web["edges"] if h in (e["a"], e["b"]) and e.get("authored")}
         assert ties & {"bond", "attract", "sibling", "mentor", "mirror"} and ties & {"rivalry", "tension", "friction"}, h
 
@@ -123,3 +124,8 @@ def test_the_lua_roster_is_generated_from_the_json():
 def test_nox_keeps_its_umbrella():
     # The Traveler is BAR's Umbrella mobile anti-nuke: it builds nothing, so no fighters and no Storks.
     assert H["nox"]["unitDef"] == "armscab" and _esc("nox") == {"armferret": 1}
+
+
+def test_lumen_raises_only_prudes_and_pulsars():
+    src = (MOD / "units/va_lumen.lua").read_text(encoding="utf-8")
+    assert 'def.buildoptions = { "armgmm", "armanni" }' in src

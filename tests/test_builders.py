@@ -104,7 +104,7 @@ def test_the_six_packs_of_2026_10_28():
     for h, (unit, n, esc) in want.items():
         p = PACKS["heroes"][h]
         assert p["unitDef"] == unit and p["packTotal"] == n and _esc(h) == esc, h
-    assert len(PACKS["heroes"]) == 63   # 64, then the recast retired three and added two
+    assert len(PACKS["heroes"]) == 64   # 64, recast to 63, then Gorgon
     web = json.loads((S / "support_web.json").read_text(encoding="utf-8"))
     for h in want:
         ties = [e for e in web["edges"] if h in (e["a"], e["b"]) and e.get("authored")]
