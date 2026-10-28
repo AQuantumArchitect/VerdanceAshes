@@ -5,7 +5,7 @@ Reads campaign_state + war_map + commerce catalog, writes app/showoff/hub_state.
 and a JS embed snippet app/showoff/hub_state.embed.js for file:// open.
 
 Shop surface is a read-only projection of the commerce catalog + campaign bag
-(no story-engine mutation). Deploy wire lives in the HTML host (POST /api/deploy).
+(no story-engine mutation). The drop goes through the kernel server (POST /api/preload, /api/drop).
 """
 from __future__ import annotations
 

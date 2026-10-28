@@ -737,9 +737,7 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
     # The Eye's contracts name their enemy (verdance.world.eye_story); the result only names the job.
     if not result.get("against"):
         _ek = str(result.get("objectiveKind") or result.get("objectiveArchetype") or "")
-        if _ek in ("hunt_scouts", "raze_camp"):
-            result = {**result, "against": "armada" if _ek == "hunt_scouts" else "cortex"}
-        elif canonical_map_id(result.get("mapId") or "") == _eye.MAP_ID and _ek == "seize_lane":
+        if canonical_map_id(result.get("mapId") or "") == _eye.MAP_ID and _ek == "seize_lane":
             # A capture on the Eye is against whoever didn't hire us.
             result = {**result, "against": "armada" if _eye.patron(state) == "cortex" else "cortex"}
     apply_reputation_companion(state, result, elapsed)

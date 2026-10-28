@@ -55,8 +55,7 @@ zids = [z['zoneId'] for z in auth['zones']]
 mission_lua = "return " + lua({
     "missionId": "test_m1", "missionNumber": 1, "title": "Test", "deploymentMapId": auth['mapId'], "deploymentZoneId": "TRJ_SW_LANE",
     "pad": {"zoneId": "TRJ_SW_LANE"},
-    "objective": {"description": "Wreck the fuel works at Central Gate and hold the gate until the clock.", "kind": "eco_raid", "targetZoneId": zids[3], "requiredFrames": 19800, "secondaryCaptureZoneIds": [zids[5]]},
-    "missionCard": {"plainObjective": "Wreck the works at the gate. Hold until the clock, then lift from the pad.", "threats": "Expected opposition: reinforced"},
+    "objective": {"description": "Take Central Gate and hold it until the clock.", "kind": "seize_lane", "targetZoneId": zids[3], "requiredFrames": 19800, "secondaryCaptureZoneIds": [zids[5]]},
     "storyIntent": {"title": "Ash on the Gate", "storyReason": "The gate feeds the jungle.", "briefing": {"lines": ["Land quiet. Wreck loud. Lift with everyone.", "Second line."]}},
     "difficulty": {"label": "Expected opposition: reinforced, fortified"},
     "heroes": [{"id": "vane", "name": "Vane", "missionCritical": True, "level": 5, "rank": "Captain"}, {"id": "grath", "name": "Grath", "missionCritical": False, "level": 2, "rank": "Runner"}],

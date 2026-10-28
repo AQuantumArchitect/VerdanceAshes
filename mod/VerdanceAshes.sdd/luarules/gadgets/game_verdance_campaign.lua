@@ -195,19 +195,17 @@ local devTel = {
 --   survive  stand in the target zone for requiredHoldFrames. No targets are
 --            booked for it even when a shell is loaded (survive ≠ raze).
 --   fortify  raise defensive value in the target zone (fortifyDefensiveValue).
---   choice   several target forces; wrecking any one of them completes.
---   targets  destruction kinds (strike_relay, destroy_key_structure,
---            economy_disrupt, hive_clear_or_bypass, sortie, anything unlisted):
---            every booked target must die. eco_raid credits at
---            RAID_CREDIT_FRACTION instead (see UnitDestroyed).
+--   targets  anything else (hive_clear_or_bypass, kings_showdown, jump_gate): every booked
+--            target must die, unless a dedicated gadget decides the kind (VA_GADGET_KINDS).
+-- Every job is territory (2026-10-27): Python turns raids, strikes and the Eye's contracts into
+-- seize_lane and keeps the old kind as contractKind, the reason the zone is worth taking.
 VA_KINDS = {
   capture = { seize_lane = true, gate_control = true, hold_plateau = true, siege = true, multipressure = true },
   survive = { survive_wilds = true },
   fortify = { fortify_zone = true, home_founding = true },
-  choice = { choose_target_then_extract = true },
 }
 -- kind -> the one completion word its own gadget sends (onObjectiveComplete ignores any other)
-VA_GADGET_KINDS = { hunt_scouts = "scouts_stopped", jump_gate = "jumped" }
+VA_GADGET_KINDS = { jump_gate = "jumped" }
 
 local playerTeamID = 0
 local playerAllyTeamID = 0
@@ -217,7 +215,6 @@ local teamFaction = {}                  -- teamID -> world faction (nullmercs/ar
 local objectiveTargets = {}             -- unitID -> forceId (objective_target structures)
 local objectiveTargetCount = 0
 local objectiveTargetsDestroyed = 0
-local targetForceStructures = {}        -- forceId -> live structure count
 local objectiveComplete = false
 local objectiveBypassed = false
 -- Sortie-linked field recruit wreck destroyed → fail contract, open partial extract.
@@ -225,7 +222,6 @@ local objectiveBypassed = false
 local rescueContractFailed = false
 local rescueContractFailReason = ""
 local rescueContractFailHero = ""
-local chosenTargetForceId = nil
 local zoneHoldFrames = 0
 -- Frames at which the objective facts latched (0 = never). Exported in the result.
 local objectiveCompleteFrame = 0
@@ -383,9 +379,7 @@ local extraObj = {
   purgeTeams = {},     -- teamID -> true
   announced = false,   -- all-objectives-done broadcast latch
 }
-local RAID_CREDIT_FRACTION = 0.6        -- wreck this share of the works to credit the raid
 local CLEAR_FRACTION = 0.6              -- pocket clear threshold for capture claims
-local raidWaveThresholds = { 0.15, 0.35, 0.55, 0.8 }  -- damage % that summons each QRF wave
 -- Capture claim state (one table — Lua 5.1 local budget).
 -- Fantasy: clear living-shell pocket, then hold it while regrow pressure tries to retake.
 local capture = {
@@ -1161,7 +1155,6 @@ local function resultJson()
     '"objectiveFailHero":' .. jstr(rescueContractFailHero or ""),
     '"rescueContractFailed":' .. tostring(rescueContractFailed == true),
     '"extractionZoneId":' .. jstr(mission.extractionZoneId or obj.extractionZoneId or ""),
-    '"chosenTargetForceId":' .. jstr(chosenTargetForceId or ""),
     '"playerSurvivors":' .. playerSurvivorsJson(facts),
     '"playerSurvivorXp":' .. playerSurvivorXpJson(facts),
     '"loanUnitHp":' .. loanUnitHpJson(facts),
@@ -1186,7 +1179,6 @@ local function resultJson()
     '"companionsAlive":' .. jnum(alive),
     '"companionsTotal":' .. jnum(total),
     '"debugAutoProgress":' .. jnum(debugAutoProgress),
-    '"farmSortie":' .. tostring((mission.difficulty and mission.difficulty.farmSortie) or (mission.progression and mission.progression.farmSortie) or false),
     '"sessionMode":' .. jstr(mission.sessionMode or "same_map"),
     '"occupationModel":' .. jstr(mission.occupationModel or "living_shell"),
     '"map":{"name":' .. jstr(Game.mapName or "") .. ',"sizeX":' .. jnum(Game.mapSizeX or 0) .. ',"sizeZ":' .. jnum(Game.mapSizeZ or 0) .. '}',
@@ -1945,7 +1937,6 @@ local function spawnOneUnit(defName, x, z, facing, teamID, spec, force, hpPct)
           local forceId = tostring(force.id or "objective")
           objectiveTargets[unitID] = forceId
           objectiveTargetCount = objectiveTargetCount + 1
-          targetForceStructures[forceId] = (targetForceStructures[forceId] or 0) + 1
         end
       elseif force.role == "objective_secondary" then
         -- Drop 4: secondary marks keep their own ledger, never the primary
@@ -4288,8 +4279,6 @@ function vaObjectiveMode(kind)
   if VA_KINDS.capture[kind] then return "capture" end
   if VA_KINDS.survive[kind] then return "presence" end
   if VA_KINDS.fortify[kind] then return "fortify" end
-  if VA_KINDS.choice[kind] then return "targets_choice" end
-  if kind == "eco_raid" then return "targets_raid" end
   return "targets_all"
 end
 
@@ -4965,9 +4954,6 @@ function tryRecruitFieldHero(rec, unitID, reason)
   claimFieldFactoriesForHero(rec.id, rx, rz)
   resolveHeroDownObjective(rec, "recruited")
   broadcastHeroEvent("recruited", rec, rx, rz)
-  if mission and mission.objective and tostring(mission.objective.rezHeroId or "") == tostring(rec.id) then
-    onObjectiveComplete("rescued")
-  end
   Spring.Echo("VA_FIELD_RECRUITED id=" .. tostring(rec.id)
     .. " unit=" .. tostring(unitID)
     .. " reason=" .. tostring(rec.recruitReason))
@@ -5384,14 +5370,10 @@ end
 
 function onObjectiveComplete(how)
   if objectiveComplete then return end
-  if how == "scouts_stopped" and objectiveKind() ~= "hunt_scouts" then return end
   -- Kinds a dedicated gadget decides take only that gadget's word: no zone hold, no burnt hive
-  -- (hunt_scouts: game_verdance_scouts.lua; jump_gate: game_verdance_jump_gate.lua).
+  -- (jump_gate: game_verdance_jump_gate.lua).
   local own = VA_GADGET_KINDS[objectiveKind()]
   if own and how ~= own then return end
-  -- A wreck in the wound makes raising that hero the job; nothing else stands in for it.
-  local rezHero = mission and mission.objective and mission.objective.rezHeroId
-  if rezHero and how ~= "rescued" then return end
   objectiveComplete = true
   objectiveCompleteHow = how or "complete"
   objectiveCompleteFrame = Spring.GetGameFrame() or 0
@@ -5431,24 +5413,6 @@ end
 
 function currentMapId()
   return tostring((mission and mission.deploymentMapId) or (zoneMap and zoneMap.mapId) or "")
-end
-
-function candidateIsSameMap(cand)
-  if type(cand) ~= "table" then return false end
-  local mapId = currentMapId()
-  if mapId == "" then return false end
-  return tostring(cand.mapId or "") == mapId
-end
-
-function sameMapContinueAvailable()
-  local rules = mission and mission.continueRules
-  if rules and rules.sameMapContinue == false then return false end
-  local cands = mission and mission.nextMissionCandidates
-  if type(cands) ~= "table" then return false end
-  for i = 1, #cands do
-    if candidateIsSameMap(cands[i]) then return true end
-  end
-  return false
 end
 
 function findEnemyCampTeam()
@@ -5552,7 +5516,6 @@ function claimLivingShellObjectives()
         if claimable and inPrimary and team and team ~= playerTeamID and team ~= gaiaTeamID then
           objectiveTargets[uid] = forceId
           objectiveTargetCount = objectiveTargetCount + 1
-          targetForceStructures[forceId] = (targetForceStructures[forceId] or 0) + 1
           tagged = tagged + 1
           if not teamID then teamID = team end
         end
@@ -5611,7 +5574,6 @@ function claimLivingShellObjectives()
               and team and team ~= playerTeamID and team ~= gaiaTeamID then
             objectiveTargets[uid] = forceId
             objectiveTargetCount = objectiveTargetCount + 1
-            targetForceStructures[forceId] = (targetForceStructures[forceId] or 0) + 1
             tagged = tagged + 1
             if not teamID then teamID = team end
             Spring.SetUnitRulesParam(uid, "va_force_role", "objective_target", { public = true })
@@ -6313,7 +6275,6 @@ function gadget:Initialize()
     .. " arc=" .. tostring(arc.id or "?")
     .. " playerComs=" .. tostring(doctrine.playerComsAllowed)
     .. " esc=" .. tostring(escMode ~= "" and escMode or (waves.enabled and "on" or "off"))
-    .. " sameMapContinue=" .. tostring(sameMapContinueAvailable())
     .. " schema=" .. tostring(mission.schemaVersion or "unknown"))
   if headless.autoStart then Spring.Echo("VA_HEADLESS_AUTOSTART enabled") end
   if balance.exportFrame then Spring.Echo("VA_BALANCE_AUTORUN exportFrame=" .. tostring(balance.exportFrame) .. " quit=" .. tostring(balance.quitAfterExport)) end
@@ -6650,7 +6611,7 @@ function gadget:GameFrame(frame)
 
   -- Living shell spawns ~frame 8; claim objective eco + optional high-value marks.
   -- Retry past the first window when the primary pad still has no eco
-  -- (hub marks like GF_NE_PLATEAU with no pocket used to leave eco_raid at 0).
+  -- (hub marks like GF_NE_PLATEAU with no pocket used to leave the pocket at 0).
   if frame >= 20 and frame % 10 == 0 then
     if not shellObjectivesClaimed and frame <= 180 then
       claimLivingShellObjectives()
@@ -6673,23 +6634,9 @@ function gadget:GameFrame(frame)
     pollMentorSubordinateXp(frame)
   end
 
-  -- Pillar B / raid pressure: enemy reinforcements. For a raid the Armada QRF
-  -- answers as the works are wrecked (damage thresholds) so the pressure reads
-  -- as cause-and-effect; other missions use the steady timer.
+  -- Pillar B: enemy reinforcements on a steady timer.
   if waves.enabled and status == "active" and not terminal and not objectiveComplete and objectiveTeamID then
-    if objectiveKind() == "eco_raid" then
-      if waves.spawned < waves.max then
-        local dmg = (objectiveTargetCount > 0) and (objectiveTargetsDestroyed / objectiveTargetCount) or 0
-        local threshold = raidWaveThresholds[waves.spawned + 1] or 1.1
-        if dmg >= threshold then
-          local px, pz = enemyResponseTarget()
-          spawnWave(objectiveTeamID, waves.baseSize, px, pz, "armada_qrf")
-          waves.spawned = waves.spawned + 1
-          waves.nextFrame = frame + waves.interval
-          Spring.SetGameRulesParam("va_waves_spawned", waves.spawned, { public = true })
-        end
-      end
-    elseif frame >= waves.nextFrame and waves.spawned < waves.max then
+    if frame >= waves.nextFrame and waves.spawned < waves.max then
       local px, pz = enemyResponseTarget()
       spawnWave(objectiveTeamID, waves.baseSize, px, pz, "escalation")
       waves.spawned = waves.spawned + 1
@@ -6854,29 +6801,11 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
   if forceId then
     objectiveTargets[unitID] = nil
     objectiveTargetsDestroyed = objectiveTargetsDestroyed + 1
-    targetForceStructures[forceId] = math.max(0, (targetForceStructures[forceId] or 1) - 1)
     Spring.SetGameRulesParam("va_objective_destroyed", objectiveTargetsDestroyed, { public = true })
     Spring.Echo("VA_OBJECTIVE_TARGET_DOWN force=" .. forceId .. " destroyed=" .. tostring(objectiveTargetsDestroyed) .. "/" .. tostring(objectiveTargetCount))
     if not objectiveComplete and status == "active" and not terminal then
       local kind = objectiveKind()
-      if VA_KINDS.choice[kind] then
-        if (targetForceStructures[forceId] or 0) <= 0 then
-          chosenTargetForceId = forceId
-          onObjectiveComplete("target_destroyed")
-        end
-      elseif kind == "raze_camp" then
-        -- The Eye's camp (verdance.world.eye_story): razed once nearly all its works are down.
-        local need = math.max(1, math.ceil(objectiveTargetCount * 0.85))
-        if objectiveTargetsDestroyed >= need then
-          onObjectiveComplete("camp_razed")
-        end
-      elseif kind == "eco_raid" then
-        -- A raid credits once ENOUGH of the works are wrecked, not all of them.
-        local need = math.max(1, math.ceil(objectiveTargetCount * RAID_CREDIT_FRACTION))
-        if objectiveTargetsDestroyed >= need then
-          onObjectiveComplete("works_crippled")
-        end
-      elseif VA_KINDS.capture[kind] or capture.mode then
+      if VA_KINDS.capture[kind] or capture.mode then
         -- Capture: destruction only clears the pocket; hold under regrow is required.
         -- Do not auto-complete on last structure kill.
         if capture.mode and capture.phase == "clear" then

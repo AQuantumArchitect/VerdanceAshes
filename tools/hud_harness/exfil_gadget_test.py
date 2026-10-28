@@ -102,9 +102,9 @@ has('"unitCount":4', "a unit standing in ground we hold (FAR) lifts with the pad
 has('"staying":{"heroes":[],"metal":0,"structureCount":0,"structures":[],"unitCount":0', "... and nothing of ours is left")
 mission.safeZoneIds = nil
 print("ok   safe ground: whatever stands on ground we hold lifts")
--- taking a door: once the objective is done the extraction moves onto it, even when the objective was
--- raising a hero in the wound (a territory mission with a rescue inside it, Greenest Fields 2026-10-26)
-mission.objective = { rezHeroId = "mask", targetZoneId = "FAR" }
+-- taking a door: once the objective is done the extraction moves onto it, even with a hero raised in
+-- the wound (a territory mission with a rescue inside it, Greenest Fields 2026-10-26)
+mission.objective = { targetZoneId = "FAR" }
 GG.VA_ExtractRule = function() return "territory", "FAR" end
 assert(RULES.va_pad_zone == "PAD", "the pad starts on the landing zone")
 RULES.va_objective_complete = 1
@@ -115,7 +115,7 @@ m = RULES.va_manifest_json
 has('"unitCount":4', "on the exit door, the unit standing there goes, and the landing zone is still ours")
 print("ok   taking a door: the extraction moves onto it once the objective is done")
 -- two exits: the hero raised in the wound goes home from the landing zone, not from the door
-U[7] = { x = 1000, z = 600, def = 1, team = 0, hero = "mask" }
+U[7] = { x = 1000, z = 600, def = 1, team = 0, hero = "mask", recruited = 1 }
 GG.VA_ExfilCmd("manifest")
 m = RULES.va_manifest_json
 has('"heroId":"mask"', "the raised hero on the landing zone is going home")
@@ -126,8 +126,7 @@ m = RULES.va_manifest_json
 assert(not m:find('"going":{"heroes":[^%%]]*"mask"'), "the raised hero standing on the door must not lift with the spearhead")
 has('"heroId":"mask","label":"Far Field"', "... he stays, to be brought home")
 U[7] = nil
--- any hero turned or raised this sortie is a rescue, objective or not
-mission.objective = { targetZoneId = "FAR" }
+-- any hero turned or raised this sortie is a rescue
 U[8] = { x = 2048, z = 3500, def = 1, team = 0, hero = "rumor", recruited = 1 }
 GG.VA_ExfilCmd("manifest")
 m = RULES.va_manifest_json

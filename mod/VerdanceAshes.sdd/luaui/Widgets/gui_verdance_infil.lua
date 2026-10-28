@@ -60,14 +60,12 @@ local function compose()
   if not mission then return end
   local intent = mission.storyIntent or {}
   local obj = mission.objective or {}
-  local card = mission.missionCard or intent.missionCard or {}
   C.title = intent.title or mission.title or "Verdance's Ashes"
   C.missionNumber = tonumber(mission.missionNumber) or 1
-  C.objective = card.plainObjective or card.objective or obj.description or "Complete the marked objective."
+  C.objective = obj.description or "Complete the marked objective."
   C.reason = intent.storyReason
   local diff = mission.difficulty
-  if type(diff) == "table" and type(diff.label) == "string" and diff.label ~= "" then C.threat = diff.label
-  elseif type(card.threats) == "string" then C.threat = card.threats end
+  if type(diff) == "table" and type(diff.label) == "string" and diff.label ~= "" then C.threat = diff.label end
   C.requiredFrames = tonumber(obj.requiredFrames) or 19800
   for _, h in ipairs(mission.heroes or {}) do
     if h.id then C.heroes[#C.heroes + 1] = { name = tostring(h.name or h.id), crit = h.missionCritical == true, level = tonumber(h.level) or 1, rank = tostring(h.rank or "Runner") } end

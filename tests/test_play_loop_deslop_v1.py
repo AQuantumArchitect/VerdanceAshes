@@ -29,10 +29,9 @@ class PlayLoopDeslopTests(unittest.TestCase):
         self.assertIn('"$defKey|$pocketId"', self.compiler)
 
     def test_dead_continue_rules_stripped(self):
-        self.assertIn("Honest flags only", self.compiler)
+        self.assertNotIn("continueRules", self.compiler)
         self.assertNotIn("carryHeroes = $true", self.compiler)
         self.assertNotIn("metalCarryFraction = 0.5", self.compiler)
-        self.assertIn("promoteOccupationOnContinue = $true", self.compiler)
 
     def test_dead_widgets_quarantined(self):
         self.assertFalse(CREW_WIDGET.exists(), "crew select must stay out of Widgets/")

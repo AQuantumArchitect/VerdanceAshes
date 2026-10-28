@@ -209,7 +209,6 @@ function zoneInOps(mapId, z) {
   if ((m.captureZoneIds || []).includes(z.zoneId)) return true;
   return false;
 }
-function isBelievedOurs(mapId, zoneId) { return beliefOf(mapId, zoneId).believed === "ours"; }
 // A road door on this map, and whether the company's ledger says it holds it.
 function doorOf(mapId, zoneId) {
   for (const r of ((state.hub.world || {}).roads || [])) {

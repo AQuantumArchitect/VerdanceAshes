@@ -395,7 +395,7 @@ def stamp(plan_raw: dict, workspace: Path) -> dict:
         "next": [
             "python -m verdance.campaign.engine intent --workspace .",
             "powershell -File scripts/build_next_mission_v1.ps1",
-            "Or: python -m verdance_kernel serve  (POST /api/deploy with launch=true)",
+            "Or: python -m verdance_kernel serve  (POST /api/preload, then /api/drop)",
         ],
     }
     save_json(report_path, report)

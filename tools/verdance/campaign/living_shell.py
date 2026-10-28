@@ -276,7 +276,6 @@ def apply_surviving_installs(state: Dict[str, Any], result: Dict[str, Any], map_
         map_held = {}
         held[mid] = map_held
     kept = 0
-    threats = 0
     standing_pockets = set()
     for item in incoming:
         if not isinstance(item, dict):
@@ -303,22 +302,6 @@ def apply_surviving_installs(state: Dict[str, Any], result: Dict[str, Any], map_
             "updatedAt": utc_now(),
             "resultKey": result.get("resultKey"),
         }
-        if owner == "player":
-            # Justified aggression: next hub pass can offer defend_install.
-            pending = state.setdefault("pendingDefendThreats", {})
-            map_threats = pending.setdefault(mid, {})
-            if not isinstance(map_threats, dict):
-                map_threats = {}
-                pending[mid] = map_threats
-            map_threats[pocket] = {
-                "pocketId": pocket,
-                "zoneId": zone,
-                "installationId": rec["installationId"],
-                "reason": "territory_aggression",
-                "scheduledAt": utc_now(),
-                "severity": "defend_install",
-            }
-            threats += 1
         map_held[pocket] = rec
         kept += 1
     # Mark held installs absent from this snapshot as destroyed if we fought
@@ -370,9 +353,6 @@ def apply_surviving_installs(state: Dict[str, Any], result: Dict[str, Any], map_
         rec["destroyedAt"] = utc_now()
         rec["highValue"] = True
         map_held[pid] = rec
-        pending = (state.get("pendingDefendThreats") or {}).get(mid) or {}
-        if isinstance(pending, dict):
-            pending.pop(pid, None)
     for pid, rec in list(map_held.items()):
         if not isinstance(rec, dict):
             continue
@@ -381,7 +361,7 @@ def apply_surviving_installs(state: Dict[str, Any], result: Dict[str, Any], map_
         if pid not in standing_pockets and str(rec.get("status") or "") == "standing":
             # Still believed standing if we simply weren't on that pad this sortie.
             pass
-    return {"kept": kept, "threats": threats, "mapId": mid, "destroyedHv": sorted(dead_hv)}
+    return {"kept": kept, "mapId": mid, "destroyedHv": sorted(dead_hv)}
 
 
 def apply_abstract_regrow(state: Dict[str, Any], map_id: str, elapsed_minutes: float) -> Dict[str, Any]:

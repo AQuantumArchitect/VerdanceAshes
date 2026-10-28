@@ -42,7 +42,6 @@ export const api = {
   campAct: (body) => post("/api/camp-act", body),
   campTalk: (body) => post("/api/camp-talk", body),
   sealCompany: (band) => post("/api/seal-company", { band }),
-  deploy: (plan, launch) => post("/api/deploy" + (launch ? "?launch=1" : ""), plan),
   // Hot drop: load the field on sortie pick, then drop the chosen packs into the running game.
   preload: (plan) => post("/api/preload", plan),
   drop: (body) => post("/api/drop", body),

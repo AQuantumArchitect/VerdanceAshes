@@ -158,12 +158,6 @@ end
 local function maybeMoveToExit()
   if not pad then return end
   if (tonumber((Spring.GetGameRulesParam("va_objective_complete"))) or 0) ~= 1 then return end
-  -- A rescue goes home the way it came: back to the deployment pad. But a hero raised in the wound
-  -- of a territory mission does not turn it into a rescue: the company leaves by the door, or from
-  -- the ground, it took.
-  local rule = "deployment"
-  if GG.VA_ExtractRule then rule = GG.VA_ExtractRule() end
-  if mission and mission.objective and mission.objective.rezHeroId and rule ~= "territory" then return end
   local exit = mission and mission.exitDoorZoneId and tostring(mission.exitDoorZoneId)
   if exit and pad.zoneId ~= exit and anchorOf[exit] then
     placePad(exit, anchorOf[exit][1], anchorOf[exit][2], PAD_RADIUS)
@@ -259,8 +253,7 @@ local function extractAnywhere()
   local o = Spring.GetModOptions and Spring.GetModOptions() or {}
   if tostring(o.va_extract_anywhere) ~= "1" then return false end
   local rule = GG.VA_ExtractRule and GG.VA_ExtractRule() or "deployment"
-  local obj = mission and mission.objective or {}
-  return rule ~= "territory" and not obj.rezHeroId
+  return rule ~= "territory"
 end
 
 local function padToCompany()
@@ -395,12 +388,10 @@ local function manifest()
       local onPad = liftsFrom(x, z)
       local zid = zoneOf(x, z) or "?"
       -- Two exits (owner, 2026-10-27): the company leaves from the ground it took, but a rescue
-      -- always goes home from where it started: any hero raised or turned this sortie (va_recruited,
-      -- or an objective's rezHeroId) lifts only from the landing zone.
-      local rez = mission and mission.objective and mission.objective.rezHeroId
+      -- always goes home from where it started: any hero raised or turned this sortie (va_recruited)
+      -- lifts only from the landing zone.
       local hidNow = Spring.GetUnitRulesParam(uid, "va_hero_id")
-      local rescued = hidNow and ((rez and tostring(hidNow) == tostring(rez))
-        or (tonumber((Spring.GetUnitRulesParam(uid, "va_recruited"))) or 0) == 1)
+      local rescued = hidNow and (tonumber((Spring.GetUnitRulesParam(uid, "va_recruited"))) or 0) == 1
       if rescued and homePad then
         onPad = (zid == homePad.zoneId)
         rescuedIds[#rescuedIds + 1] = tostring(hidNow)

@@ -94,52 +94,6 @@ local function nudge()
   Spring.Echo("VA_AUTOPILOT nudge idle=" .. #idle)
 end
 
--- The objective's named hero (mission.objective.rezHeroId): raise that wreck with whoever can rez.
-local function rezWreck()
-  local hid = mission and mission.objective and mission.objective.rezHeroId
-  if not hid then return end
-  local fid
-  for _, f in ipairs(Spring.GetAllFeatures() or {}) do
-    if tostring(Spring.GetFeatureRulesParam(f, "va_hero_wreck") or "") == tostring(hid) then fid = f; break end
-  end
-  if not fid then return end
-  -- only once the ground is clear: armed enemies near the wreck turn a rescue into a feeding
-  local wx, _, wz = Spring.GetFeaturePosition(fid)
-  local myAlly = select(6, Spring.GetTeamInfo(playerTeam, false))
-  local threats = 0
-  for _, u in ipairs(Spring.GetUnitsInCylinder(wx, wz, 700) or {}) do
-    local t = Spring.GetUnitTeam(u)
-    local ud = UnitDefs[Spring.GetUnitDefID(u) or -1]
-    if t and select(6, Spring.GetTeamInfo(t, false)) ~= myAlly and t ~= Spring.GetGaiaTeamID()
-        and ud and ud.weapons and #ud.weapons > 0 and not Spring.GetUnitIsDead(u) then
-      threats = threats + 1
-    end
-  end
-  local total, down = rp("va_objective_total"), rp("va_objective_destroyed")
-  local crippled = total > 0 and down / total >= 0.6
-  if threats > 0 and not (crippled and threats <= 12) then
-    Spring.Echo("VA_AUTOPILOT rez waiting hero=" .. tostring(hid) .. " threats=" .. threats)
-    return
-  end
-  local rez, crit = {}, {}
-  for _, uid in ipairs(Spring.GetTeamUnits(playerTeam) or {}) do
-    local ud = UnitDefs[Spring.GetUnitDefID(uid) or -1]
-    if ud and ud.canResurrect then
-      local q = Spring.GetUnitCommands(uid, 1)
-      local busy = q and q[1] and q[1].id == CMD.RESURRECT and q[1].params and q[1].params[1] == fid + Game.maxUnits
-      if not busy then
-        if (tonumber((Spring.GetUnitRulesParam(uid, "va_hero_critical"))) or 0) == 1 then crit[#crit + 1] = uid
-        else rez[#rez + 1] = uid end
-      end
-    end
-  end
-  if #rez == 0 then rez = crit end
-  if #rez == 0 then return end
-  Spring.GiveOrderToUnitArray(rez, CMD.RESURRECT, { fid + Game.maxUnits }, 0)
-  Spring.Echo("VA_AUTOPILOT rez hero=" .. tostring(hid) .. " feature=" .. fid .. " builders=" .. #rez)
-end
-
--- Once the job is done: everyone mobile walks to the pad (the company's zone, extract anywhere).
 local function regroup()
   local px, pz = tonumber((Spring.GetGameRulesParam("va_pad_x"))), tonumber((Spring.GetGameRulesParam("va_pad_z")))
   if not px then return end
@@ -184,7 +138,6 @@ function gadget:GameFrame(f)
     Spring.Echo("VA_AUTOPILOT objective complete frame=" .. f)
     regroup()
   end
-  if not doneAt and f % 600 == 311 then rezWreck() end
   if doneAt and (f - doneAt) % 450 == 0 and f > doneAt then regroup() end
   if doneAt and f - doneAt >= SETTLE_FRAMES then
     -- leave once most of the company stands on the pad, or after three settles regardless

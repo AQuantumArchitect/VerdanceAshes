@@ -130,10 +130,9 @@ function Get-RequiredFrames {
   # WO-004: contracts target ~10 minutes (18000 frames @ 30fps), not 20.
   $td = if ($Intent.environment -and $Intent.environment.targetDuration) { [string]$Intent.environment.targetDuration } else { "" }
   # Soft clocks are REAL mission ends (gadget checkSoftClock). Keep them tight.
-  $ok = if ($Intent.objectiveTarget -and $Intent.objectiveTarget.kind) { [string]$Intent.objectiveTarget.kind } else { [string]$Intent.objective }
   $missionNum = if ($Intent.missionNumber) { [int]$Intent.missionNumber } else { 1 }
-  # Arc A raids: ~7.5 min walk-up + blow eco + extract. Not 11 min of "chilling".
-  if ($ok -eq "eco_raid" -or $missionNum -le 3) { return 13500 }
+  # Early sorties: ~7.5 min walk-up, take the ground, extract.
+  if ($missionNum -le 3) { return 13500 }
   if ($td -match '10\s*min' -or $td -eq "10min") { return 18000 }  # ~10 min soft clock
   # Contract missions (any with contractActive or targetDuration) stay front-band.
   if ($Intent.PSObject.Properties["contractActive"] -and $Intent.contractActive) { return 19800 }
@@ -301,177 +300,6 @@ function New-TacticsPlayerKit {
   }
   # Heroes sealed by hub muster / gadget packs — do not bake roster into seed.
   return $kit
-}
-
-function Get-ZoneAdjacencyMap {
-  param([string]$Workspace, [string]$MapId)
-  $path = Join-Path $Workspace "data\zone_maps\authored\zone_adjacency.json"
-  if (!(Test-Path $path)) { return $null }
-  $all = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json
-  if ($all.PSObject.Properties[$MapId]) { return $all.$MapId }
-  return $null
-}
-
-function New-NextMissionCandidates {
-  # WO-042 / occupied-map doctrine: debrief picks should point at LIVE camps
-  # already on the field (preplaced occupation), not empty grass mock-contracts.
-  param($ZoneMap, $AdjForMap, [string]$MapId, [string]$CurrentTarget, [int]$MissionNumber, $Occupation = $null, [string]$ExtractZone = "")
-  $cands = @()
-  $from = if ($CurrentTarget) { @($CurrentTarget) } else { @() }
-
-  # 1) Pre-placed occupation nodes (raid the next eco scar that is already built).
-  if ($Occupation) {
-    foreach ($node in @($Occupation)) {
-      if ($cands.Count -ge 3) { break }
-      $zid = [string]$node.zoneId
-      if (-not $zid -or $zid -eq $CurrentTarget) { continue }
-      $label = if ($node.label) { [string]$node.label } else { $zid }
-      $flavor = if ($node.kind) { [string]$node.kind } else { "eco_pocket" }
-      $installationId = if ($node.installationId) { [string]$node.installationId } else { "$($MapId)::$zid" }
-      $candidateSlug = $installationId -replace '[^A-Za-z0-9_-]', '_'
-      $cands += [ordered]@{
-        id = "cand_occ_$candidateSlug"
-        # Hub language (G4): theater verbs, not raw candidate ids
-        title = "Push $label"
-        plain = "Same map. Raid the $flavor already on the field at $label, then extract."
-        mapId = $MapId
-        targetZoneId = $zid
-        fromZoneIds = $from
-        objectiveArchetype = "eco_raid"
-        patron = "nullmercs"
-        against = "armada"
-        preplaced = $true
-        occupationKind = $flavor
-        installationId = $installationId
-        pocketId = if ($node.pocketId) { [string]$node.pocketId } else { "" }
-        hubLabel = "Push $label"
-      }
-    }
-  }
-
-  # 2) Adjacent zone contracts (fallback when occupation list is thin).
-  $neighbors = @()
-  if (-not $Occupation) {
-  if ($AdjForMap -and $CurrentTarget -and $AdjForMap.PSObject.Properties[$CurrentTarget]) {
-    $neighbors = @($AdjForMap.$CurrentTarget)
-  }
-  $kinds = @("eco_raid", "seize_lane", "strike_relay")
-  $i = 0
-  foreach ($n in $neighbors) {
-    if ($cands.Count -ge 3) { break }
-    if ($cands | Where-Object { $_.targetZoneId -eq $n }) { continue }
-    $z = Get-ZoneById $ZoneMap $n
-    if (-not $z) { continue }
-    $kind = $kinds[$i % $kinds.Count]
-    $i += 1
-    $label = if ($z.label) { [string]$z.label } else { $n }
-    $verb = switch ($kind) {
-      "eco_raid" { "Raid" }
-      "seize_lane" { "Seize" }
-      "strike_relay" { "Strike" }
-      default { "Mark" }
-    }
-    $cands += [ordered]@{
-      id = "cand_$($cands.Count + 1)_$n"
-      title = "$verb $label"
-      plain = "Legacy adjacent contract: $verb $label ($kind)."
-      mapId = $MapId
-      targetZoneId = $n
-      fromZoneIds = $from
-      objectiveArchetype = $kind
-      patron = "nullmercs"
-      against = "armada"
-      preplaced = $false
-      hubLabel = "$verb $label"
-    }
-  }
-  }
-
-  # 3) Extract / leave the map (always offer when we have occupation doctrine).
-  if ($ExtractZone -or $CurrentTarget) {
-    $ex = if ($ExtractZone) { $ExtractZone } else { $CurrentTarget }
-    $cands += [ordered]@{
-      id = "cand_extract_$ex"
-      title = "EXIT - bank and close"
-      plain = "Bank the raid. Pull the warband out. Hub reopens for the next board mark."
-      mapId = $MapId
-      targetZoneId = $ex
-      fromZoneIds = $from
-      objectiveArchetype = "extract_leave"
-      kind = "extract"
-      accent = "exit"
-      quitPrompt = $true
-      patron = "nullmercs"
-      against = "armada"
-      preplaced = $true
-      extractOnly = $true
-      hubLabel = "EXIT - bank and close"
-    }
-  }
-
-  return @($cands | Select-Object -First 4)
-}
-
-function New-MissionCard {
-  # WO-031: plain-English mission card (not Ketha flavor dump).
-  # Difficulty + XP lines stay explicit so tuning never hides behind fog.
-  param($Intent, $ArcProfile, [string]$MapTitle, [string]$Description, [string]$DeployZone, [string]$TargetZone, [string]$DifficultyLine = "", [string]$XpLine = "", [string]$HeroLine = "")
-  $kind = if ($Intent.objectiveTarget -and $Intent.objectiveTarget.kind) { [string]$Intent.objectiveTarget.kind } else { [string]$Intent.objective }
-  $objLine = switch ($kind) {
-    "seize_lane" { "Clear the living-shell pocket (~60% eco+teeth), hold under regrow pressure to claim the node, then extract. Claim does not mint free Tnb." }
-    "gate_control" { "Clear the gate pocket on the living shell, hold under regrow pressure to claim, then extract. No free Tnb mint." }
-    "hold_plateau" { "Clear the plateau shell pocket, hold under regrow pressure to claim the step, then extract. No free Tnb mint." }
-    "eco_raid" { "Raid the marked energy works (wreck ~60%), then extract before Armada's answer arrives. The rest of the map is already occupied -- pick another scar later if you want." }
-    "economy_disrupt" { "Destroy the enemy economy centerpiece, then extract." }
-    "strike_relay" { "Destroy the key relay structure, then extract." }
-    "destroy_key_structure" { "Destroy the marked key structure, then extract." }
-    "farm_patrol" { "Farm sortie: clear the patrol camp for XP, then extract. Campaign clock barely moves." }
-    "fortify_zone" { "Nobody holds $TargetZone. Establish presence: build defences there until its defensive value reaches the goal, then extract." }
-    default { "Complete the marked objective, then extract." }
-  }
-  if ($Intent.openingMission) {
-    $objLine = "Raid Armada decoy farms in Greenest Fields. Damage the works, then leave before the response builds."
-  }
-  $enemyLine = switch ([string]$ArcProfile.enemyMode) {
-    "static_bases" { "Pre-built enemy energy works and guns. Static defenders -- not endless off-map waves." }
-    "warband" { "Enemy warbands rove this ground -- mobile patrol packs over a thin static shell, not a fortress." }
-    "light_qrf" { "Pre-built bases plus light reaction forces." }
-    default { "Enemy pressure scales with the front." }
-  }
-  if ($DifficultyLine) { $enemyLine = "$DifficultyLine  |  $enemyLine" }
-  $allyPct = [int]([double]$ArcProfile.allyPower * 100)
-  $allyLine = if ($allyPct -ge 80) {
-    "Allies are strong this sortie - you are the adjunct. Help the push."
-  } elseif ($allyPct -ge 40) {
-    "Allies help, but will not win it alone. Stay in the fight."
-  } elseif ($allyPct -ge 20) {
-    "Light ally support only. You are the main effort."
-  } else {
-    "You are the strike force. Allies, if any, are secondary."
-  }
-  $tools = if ([int]$ArcProfile.playerCommanders -le 0) {
-    "The command walker is scrap. Lead with the company."
-  } else {
-    "The command walker walks with you. Still take the objective."
-  }
-  if ($Intent.openingMission) {
-    $tools = "Mercenary pre-buy: Punch of Thugs (6 damaged Cortex Thugs). Support: 2 Legion Karkinos and 6 rez bots."
-  }
-  if ($XpLine) { $tools = "$tools  |  $XpLine" }
-  if ($HeroLine) { $tools = "$tools  |  $HeroLine" }
-  $timerLine = "No clock. Get who and what you want onto the pad, then press EXTRACT. What is off the pad stays."
-  return [ordered]@{
-    situation = "Map: $MapTitle. Land on $DeployZone. Target $TargetZone. Leave from the same pad."
-    objective = $objLine
-    howToWin = $tools
-    howItEnds = $timerLine
-    threats = $enemyLine
-    allies = $allyLine
-    plainObjective = $Description
-    difficulty = $DifficultyLine
-    xp = $XpLine
-    heroes = $HeroLine
-  }
 }
 
 # ============================================================================
@@ -761,27 +589,6 @@ function New-FinaleKitFromRoster {
   return (Add-HeroSpecs $kit $heroes)
 }
 
-function New-StrikeTeam {
-  # Arc A raid pack (player feedback):
-  #   - Wheelies (legscout) for the player
-  #   - Army of Phobos (legcen) -- NOT Ballistas (legbal / missile bots)
-  #   - Pack of Zagreus rez bots (legrezbot)
-  #   - Ash-Captain Vane as the named Phobos hero
-  #   - No commander suit, no base economy
-  #   - WO-043: commerce packs (Punch of Thugs, grunt fab if bought) ride along
-  param($Roster, [double]$ResourceMod = 1.0, $Commerce = $null)
-  $kit = @(
-    (Spec "legscout"  4 -60 130 90),
-    (Spec "legcen"   12 40 -40 80),
-    (Spec "legkark"   1 170 30 100),
-    (Spec "legrezbot" 6 -150 70 80)
-  )
-  $kit = Add-CommerceDeployToKit $kit $Commerce
-  # Heroes + balance packs are sealed by the HTML hub muster and spawned by the
-  # campaign gadget from mission.crewBand / deployAces — never bake the roster here.
-  return $kit
-}
-
 function New-OpeningStrikeTeam {
   # Mission one is a mercenary pre-bought punch, not a persistent commander
   # deployment. Keep this explicit so progressed/stale campaign state cannot
@@ -1050,7 +857,6 @@ if ($escPlan) {
 
 $deployZoneId = [string]$intent.deploymentZoneId
 $targetZoneId = if ($intent.objectiveTarget -and $intent.objectiveTarget.targetZoneId) { [string]$intent.objectiveTarget.targetZoneId } else { "" }
-$adjForMap = Get-ZoneAdjacencyMap -Workspace $Workspace -MapId ([string]$intent.mapId)
 # The pad is the zone the player chose on the hub (legality is judged there, from belief). The
 # builder never moves it: no route snap, no slide toward the target. Infil, pad, radar and
 # extraction are one place.
@@ -1075,7 +881,7 @@ $title = if ($intent.PSObject.Properties["title"] -and $intent.title) {
 }
 $requiredFrames = Get-RequiredFrames $intent
 $description = Get-ObjectiveDescription $intent
-# Occupation list filled during camp assembly (eco_raid Arc A fills the map).
+# Occupation list filled during camp assembly.
 $script:mapOccupation = @()
 $script:primaryEnemyTeamID = $null
 $script:wildTeamID = $null   # the raptor team the Rock Jungle dens ride (Add-RaptorCamp)
@@ -1084,7 +890,6 @@ $script:warWrecks = @()
 $script:scoutParties = @()   # the Eye's Armada scout parties (game_verdance_scouts.lua)
 $script:eyeStory = if ($intent.PSObject.Properties["eyeStory"] -and $intent.eyeStory) { $intent.eyeStory } else { $null }   # the standing war's dead (wrecks and heaps), laid by game_verdance_war_wrecks.lua
 $script:secondaryMeta = @()  # Drop 4: placed secondary-objective camps (id/zone/required/x/z)
-$nextMissionCandidates = @()  # rebuilt after occupation so picks point at live camps
 $script:livingShellPayload = $null
 
 function Resolve-LivingShellTemplatePath {
@@ -1588,9 +1393,7 @@ function Build-LivingShellFromTemplate {
 
 # Kinds that load living-shell occupation when a template exists (outbound 38).
 $script:shellCapableKinds = @(
-  "eco_raid", "eco_expand", "economy_disrupt", "destroy_key_structure",
-  "seize_lane", "strike_relay", "hold_plateau",
-  "siege", "multipressure", "gate_control", "survive_wilds"
+  "seize_lane", "hold_plateau", "siege", "multipressure", "gate_control", "survive_wilds"
 )
 
 function Try-ApplyLivingShell {
@@ -1737,14 +1540,6 @@ if (Test-Path $difficultyPath) {
 }
 $devTelemetry = $false
 $devPeriod = 150
-# Farm sorties (optional XP grind) intentionally run light so power fantasy is clear.
-$isFarmSortie = $false
-if ($intent.PSObject.Properties["flavor"] -and [string]$intent.flavor -eq "farm_patrol") { $isFarmSortie = $true }
-if ($intent.storyTags -and (@($intent.storyTags) -contains "farm")) { $isFarmSortie = $true }
-if ($objectiveKind -eq "farm_patrol") { $isFarmSortie = $true }
-if ($isFarmSortie) {
-  $enemyScale = [Math]::Round([Math]::Max(0.65, $enemyScale * 0.72), 3)
-}
 # Drop 2 Act 3: massive starting conditions on BOTH sides of the field.
 if ($isFinale) {
   $enemyScale = [Math]::Round([Math]::Min(2.6, [Math]::Max(1.35, $enemyScale * 1.6)), 3)
@@ -1815,24 +1610,10 @@ if ($isWildHomeFounding) {
   Write-Host "Rock Jungle wild home: empty shelf (raptors only; no empire camps / living-shell scrap)."
 }
 
-# XP / mode strings (band label recomputed after merc scale just before card).
+# XP mode (the gadget reads progression.mode).
 $xpMode = if ($intent.progression -and $intent.progression.mode) { [string]$intent.progression.mode }
           elseif ($state -and $state.progression -and $state.progression.mode) { [string]$state.progression.mode }
           else { "cracked_farm" }
-$xpLine = if ($xpMode -eq "cracked_farm") {
-  "XP farm ON - death keeps XP; heroes snowball hard"
-} else {
-  "XP persists on death (standard rates)"
-}
-$heroBits = @()
-if ($intent.roster -and $intent.roster.heroes) {
-  foreach ($hh in @($intent.roster.heroes)) {
-    $lvl = if ($null -ne $hh.level) { [int]$hh.level } else { 1 }
-    $rnk = if ($hh.rank) { [string]$hh.rank } else { "Runner" }
-    $heroBits += ("{0} L{1} {2}" -f [string]$hh.name, $lvl, $rnk)
-  }
-}
-$heroLine = if ($heroBits.Count -gt 0) { "Heroes: " + ($heroBits -join " | ") } else { "" }
 
 # --- The standing war: Null Mercs vs Armada ---------------------------------
 # The mercs keep a foothold on every faction-war mission. Reputation decides
@@ -1917,7 +1698,7 @@ if ($isRockJungle) { $wildCenter = $jungleHiveCenter }
 $roster = if ($intent.PSObject.Properties["roster"] -and $intent.roster) { $intent.roster } else { $null }
 $commerce = if ($intent.PSObject.Properties["commerce"] -and $intent.commerce) { $intent.commerce } else { $null }
 $resourceMod = if ($intent.economy -and $null -ne $intent.economy.resourceModifier) { [double]$intent.economy.resourceModifier } else { 1.0 }
-$strikeDoctrine = ([int]$arcProfile.playerCommanders -le 0) -or ($objectiveKind -eq "eco_raid")
+$strikeDoctrine = ([int]$arcProfile.playerCommanders -le 0)
 # Drop 2: act 2+ is base-building doctrine even on raid contracts; act 3 is the
 # finale kit (massive start).
 if ($actNum -ge 2) { $strikeDoctrine = $false }
@@ -1930,8 +1711,6 @@ if ($isKings) {
   $playerKit = New-FinaleKitFromRoster $mapFamily $roster $resourceMod $commerce
 } elseif ($actNum -ge 2 -and $roster) {
   $playerKit = New-PlayerKitFromRoster $mapFamily $roster $resourceMod $commerce
-} elseif ($objectiveKind -eq "eco_raid" -and $actNum -le 1) {
-  $playerKit = New-StrikeTeam $roster $resourceMod $commerce
 } elseif ($strikeDoctrine) {
   $playerKit = New-TacticsPlayerKit $mapFamily $roster $resourceMod $arcProfile.unitPrinter $commerce
 } elseif ($roster) {
@@ -1963,47 +1742,6 @@ $baseRecipes = [ordered]@{ ashwalker_player_kit = @($playerKit); legion_player_k
 # Final band after merc / farm modifiers so the card matches the field.
 $diffBand = if ($enemyScale -ge 1.6) { "heavy" } elseif ($enemyScale -ge 1.2) { "reinforced" } elseif ($enemyScale -le 0.85) { "light" } else { "standard" }
 $difficultyLine = "Expected opposition: $diffBand (scale $enemyScale) | dial $([Math]::Round($difficultyDial, 2))"
-if ($isFarmSortie) { $difficultyLine = "$difficultyLine | FARM SORTIE (bonus XP, lighter camp)" }
-$extractZone = Get-ZoneById $zoneMap ([string]$intent.extractionZoneId)
-$deployLabel = if ($deployZone -and $deployZone.label) { [string]$deployZone.label } else { [string]$intent.deploymentZoneId }
-$targetLabel = if ($targetZone -and $targetZone.label) { [string]$targetZone.label } else { [string]$targetZoneId }
-$missionCard = New-MissionCard $intent $arcProfile $map.title $description `
-  $deployLabel $targetLabel `
-  -DifficultyLine $difficultyLine -XpLine $xpLine -HeroLine $heroLine
-# G4: stamp hub C&C language onto the in-BAR briefing card
-if ($intent.hubChoiceId -or $intent.captureZoneIds -or $intent.deployAces) {
-  $capBits = @()
-  if ($intent.captureZoneIds) { $capBits = @($intent.captureZoneIds) }
-  $secBits = @()
-  if ($intent.secondaryCaptureZoneIds) { $secBits = @($intent.secondaryCaptureZoneIds) }
-  $aceBits = @()
-  if ($intent.deployAces) { $aceBits = @($intent.deployAces) }
-  $hubLine = "Required target: $($targetZoneId)"
-  if ($secBits.Count -gt 0) { $hubLine = "$hubLine · secondary $($secBits -join ', ')" }
-  if ($aceBits.Count -gt 0) { $hubLine = "$hubLine · aces $($aceBits -join '+')" }
-  if ($missionCard -is [hashtable] -or $missionCard -is [System.Collections.IDictionary] -or $missionCard.PSObject) {
-    try {
-      if ($missionCard.situation) {
-        $missionCard.situation = "$($missionCard.situation)  |  $hubLine"
-      } else {
-        $missionCard | Add-Member -NotePropertyName situation -NotePropertyValue $hubLine -Force
-      }
-      $missionCard | Add-Member -NotePropertyName hubLine -NotePropertyValue $hubLine -Force
-    } catch {
-      # OrderedDictionary path
-      $missionCard["hubLine"] = $hubLine
-      if ($missionCard.Contains("situation")) {
-        $missionCard["situation"] = "$($missionCard['situation'])  |  $hubLine"
-      }
-    }
-  }
-}
-if ($intent.operationSummary) {
-  $missionCard["howItEnds"] = "$($missionCard['howItEnds']) $($intent.operationSummary.bringHome)"
-  if ($intent.narrativeContext) {
-    $missionCard["situation"] = [string]$intent.narrativeContext.purpose
-  }
-}
 Write-Host ("Arc profile: id={0} playerCommanders={1} enemyMode={2} allyPower={3} escalation={4} ai={5}" -f `
   $arcProfile.id, $arcProfile.playerCommanders, $arcProfile.enemyMode, $arcProfile.allyPower, $arcProfile.escalation, $arcProfile.enemyAI)
 # The enemy AI for the startscript: BARb, else SimpleAI. (A Greenest Fields SimpleDefenderAI branch
@@ -2603,9 +2341,7 @@ if ($isWildHomeFounding) {
 } elseif (($script:shellCapableKinds -contains $objectiveKind) -or $script:presenceFrom) {
   # The enemy's bases stand whatever the job is; a presence job still has the world around it.
   $anchorSide = $enemySide
-  if ($objectiveKind -eq "eco_raid" -or $objectiveKind -eq "eco_expand") { $anchorSide = "Armada" }
   if ($objectiveKind -eq "survive_wilds") { $anchorSide = "Legion" }
-  if (([string]$intent.mapId) -eq "eye_of_horus" -and $objectiveKind -eq "strike_relay") { $anchorSide = "Cortex" }
   if (([string]$intent.mapId) -eq "ancient_bastion") { $anchorSide = "Armada" }
   $usedShell = Try-ApplyLivingShell -Ws $Workspace -MapId ([string]$intent.mapId) `
     -PrimaryZoneId $targetZoneId -Description $description -EnemyCenter $enemyCenter -AnchorSide $anchorSide
@@ -2902,49 +2638,6 @@ foreach ($node in @($script:mapOccupation)) {
   }
 }
 
-# Debrief picks after occupation is known -- point at live camps / extract.
-$occupationForPicks = @($script:mapOccupation | Where-Object { -not $_.primary })
-$nextMissionCandidates = New-NextMissionCandidates -ZoneMap $zoneMap -AdjForMap $adjForMap `
-  -MapId ([string]$intent.mapId) -CurrentTarget $targetZoneId -MissionNumber $missionNumber `
-  -Occupation $occupationForPicks -ExtractZone ([string]$intent.extractionZoneId)
-
-# Held fusion vaults under pending aggression → defend sorties first.
-# Taking territory generates these: a justified wave that would wipe the pad
-# becomes a playable defend contract instead of a silent offscreen delete.
-$defendCands = @()
-if ($state -and $state.PSObject.Properties["pendingDefendThreats"] -and $state.pendingDefendThreats) {
-  $mapThreats = $state.pendingDefendThreats.([string]$intent.mapId)
-  if ($mapThreats) {
-    foreach ($tp in @($mapThreats.PSObject.Properties)) {
-      $threat = $tp.Value
-      if (-not $threat) { continue }
-      $tz = [string]$(if ($threat.zoneId) { $threat.zoneId } else { "" })
-      $tpocket = [string]$(if ($threat.pocketId) { $threat.pocketId } else { $tp.Name })
-      if (-not $tz) { continue }
-      $defendCands += [ordered]@{
-        id = "cand_defend_$tpocket"
-        title = "Defend fusion vault — $tz"
-        plain = "A response wave is coming for your vault at $tz. Hold the beamer ring — if it falls, the pad is gone."
-        mapId = [string]$intent.mapId
-        targetZoneId = $tz
-        fromZoneIds = @($targetZoneId)
-        objectiveArchetype = "defend_install"
-        pocketId = $tpocket
-        highValue = $true
-        defendInstall = $true
-        preplaced = $true
-        patron = "nullmercs"
-        against = "armada"
-        hubLabel = "Defend $tz"
-      }
-    }
-  }
-}
-if ($defendCands.Count -gt 0) {
-  $nextMissionCandidates = @($defendCands) + @($nextMissionCandidates)
-  Write-Host ("Defend threats armed: {0}" -f (($defendCands | ForEach-Object { $_.pocketId }) -join ", "))
-}
-
 # Hero manifest for the HUD/name tags — the hub dropping list only.
 # deployAces is core + the packs on this sheet. Do not union crewBand on top
 # of it, and do not invent Vane/Ketha when the sheet left them home.
@@ -3037,21 +2730,6 @@ if ($state -and $state.companion) {
     autonomy = $state.companion.autonomy
     commandMode = $state.companion.commandMode
   })
-}
-
-# Drop 4: escalation lines land on the card after camps are placed (the card
-# itself is assembled pre-camp, so mutate it here).
-if ($script:secondaryMeta.Count -gt 0) {
-  $secBits = @()
-  foreach ($sm in $script:secondaryMeta) {
-    $secBits += ("{0}{1}" -f $sm.label, $(if ($sm.required) { " (REQUIRED)" } else { " (bonus)" }))
-  }
-  $missionCard.secondaryLine = "Secondary marks: " + ($secBits -join " | ")
-}
-if ($objectiveStrength -eq "raze") {
-  $missionCard.strengthLine = "RAZE ORDER: the entire camp is the objective -- leave nothing standing."
-} elseif ($objectiveStrength -eq "purge") {
-  $missionCard.strengthLine = "PURGE ORDER: clear the board -- every enemy faction unit dies before this ends."
 }
 
 # Hub multi-capture (arc 2+): primary is targetZoneId; rest are secondary marks
@@ -3203,7 +2881,6 @@ foreach ($fp in @($(if ($intent.PSObject.Properties["fieldPeople"]) { $intent.fi
 }
 # Rescues are never the job (2026-10-27): every job is territory, and a wreck waiting in the wound
 # is a bonus mark. A raised hero goes home from where the company landed (game_verdance_exfil).
-# (Git history has the old Get-RezObjective.)
 if ($fieldRecruits.Count -gt 0) {
   Write-Host ("Field recruits on {0}: {1} (marks={2})" -f $intent.mapId, `
     (($fieldRecruits | ForEach-Object { "{0}@{1} b={2}" -f $_.heroId, $_.zoneId, $_.beliefScore }) -join ", "), `
@@ -3256,13 +2933,6 @@ $scenario = [ordered]@{
     # when both heroes of the pair drop.
     bondXp = @($(if ($intent.PSObject.Properties["bondXp"] -and $intent.bondXp) { $intent.bondXp } else { @() }))
     bondGifts = @($(if ($intent.PSObject.Properties["bondGifts"] -and $intent.bondGifts) { $intent.bondGifts } else { @() }))
-    battlefieldManifest = [ordered]@{
-      schemaVersion = "verdance-battlefield-manifest/1.0"
-      initializationEndsFrame = 90
-      installations = @($script:mapOccupation)
-      staticAfterInitialization = $true
-    }
-    missionCard = $missionCard
     pathSignal = if ($state -and $state.pathSignal) { $state.pathSignal } else { "B" }
     title = $title
     zone = $map.title
@@ -3272,7 +2942,6 @@ $scenario = [ordered]@{
       requiredFrames = $requiredFrames
       description = $description
       targetZoneId = $targetZoneId
-      # A field recruit lying in the wound: rezzing them is the objective (game_verdance_campaign.lua).
       # The presence (metal in armed units and defences) a claim needs here (verdance.world.claim):
       # a zone-taking objective completes only once the company stands there with this much.
       claimValue = $(if ($intent.PSObject.Properties["claimValue"] -and $intent.claimValue) { [double]$intent.claimValue } else { 400 })
@@ -3290,12 +2959,8 @@ $scenario = [ordered]@{
         } else { $null }
       )
       requiredHoldFrames = $(if ($presenceKind) { 900 } else { $null })
-      clearFraction = $(if ($presenceKind) { 0.6 } else { $null })
       # Fortify / secure foothold: defensive value = "secured" signal.
       fortifyDefensiveValue = $(if ($fortifyKind) { $(if ($intent.PSObject.Properties["claimValue"] -and $intent.claimValue) { [double]$intent.claimValue } else { 400 }) } else { $null })
-      fortifyBuildPower = $(if ($fortifyKind) { 90 } else { $null })
-      fortifyArmyValue = $(if ($fortifyKind) { 500 } else { $null })
-      fortifyStorageStructures = $(if ($fortifyKind) { 1 } else { $null })
       # Drop 4: surgical | raze (whole camp tagged) | purge (clear the board).
       strength = $objectiveStrength
     }
@@ -3321,13 +2986,11 @@ $scenario = [ordered]@{
       hazardLevel = [Math]::Round($maxHazard, 3)
       fortified = $fortify
       enemyAI = [string]$arcProfile.enemyAI
-      farmSortie = [bool]$isFarmSortie
       label = $difficultyLine
     }
     progression = [ordered]@{
       mode = $xpMode
       xpPersistOnDeath = $true
-      farmSortie = [bool]$isFarmSortie
     }
     devTelemetry = [bool]$devTelemetry
     dev = [ordered]@{
@@ -3335,7 +2998,6 @@ $scenario = [ordered]@{
       samplePeriodFrames = [int]$devPeriod
       learnFaster = [bool]$devTelemetry
     }
-    nextMissionCandidates = @($nextMissionCandidates)
     mapOccupation = @($script:mapOccupation)
     livingShell = $(if ($script:livingShellPayload) { $script:livingShellPayload } else { $null })
     warWrecks = @($script:warWrecks)
@@ -3344,22 +3006,6 @@ $scenario = [ordered]@{
     noCommanders = [bool]($theater -and $theater.PSObject.Properties["noCommanders"] -and $theater.noCommanders)
     occupationModel = "living_shell"
     sessionMode = if ($intent.sessionMode) { [string]$intent.sessionMode } else { "same_map" }
-    capture = [ordered]@{
-      mode = $(if ($presenceKind) { "clear_hold_shell" } else { "none" })
-      clearFraction = 0.6
-      holdFrames = 900
-      regrowPressure = [bool]$presenceKind
-      livingShell = [bool]($null -ne $script:livingShellPayload)
-    }
-    # Honest flags only — unread carry*/snap*/metal* keys removed (Mode A is
-    # soft-continue in-seat, not a restart carry bag).
-    continueRules = [ordered]@{
-      sameMapContinue = $true
-      # Occupied-map / living shell: promote standing pads; never spawnContinueCamp.
-      promoteOccupationOnContinue = $true
-      clearEnemyOnContinue = $false
-      spawnInfrastructureOnContinue = $false
-    }
     escalation = $(
       # WO-035: Arc A off (hot extract wave only in gadget); light/full later.
       $escMode = [string]$arcProfile.escalation

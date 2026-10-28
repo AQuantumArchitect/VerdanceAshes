@@ -48,10 +48,6 @@ def latest_result_path(ws: Path) -> Path:
     return inbox(ws) / "latest_va_result.json"
 
 
-def session_status_path(ws: Path) -> Path:
-    return outbox(ws) / "play_session.status.json"
-
-
 def steam_dir(ws: Path) -> Path:
     return ws / "state" / "steam"
 
@@ -61,24 +57,3 @@ def campaign_surface_path(ws: Path) -> Path:
     return outbox(ws) / "campaign_surface.latest.json"
 
 
-def field_state_path(ws: Path) -> Path:
-    """Live soft-terminal snapshot written by the BAR widget for the hub."""
-    return outbox(ws) / "va_field.latest.json"
-
-
-def live_command_path(ws: Path) -> Path:
-    """Hub → BAR continue / extract-leave command (outbox mirror)."""
-    return outbox(ws) / "va_live_command.latest.json"
-
-
-def live_command_mod_path(ws: Path) -> Path:
-    """Same command inside the mutator SDD so BAR can VFS.LoadFile it while paused."""
-    return (
-        ws
-        / "mod"
-        / "VerdanceAshes.sdd"
-        / "singleplayer"
-        / "verdance_ashes"
-        / "generated"
-        / "va_live_command.json"
-    )

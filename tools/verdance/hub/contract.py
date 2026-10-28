@@ -116,7 +116,6 @@ def normalize_sortie(raw: Dict[str, Any], *, campaign_id: str = "verdance_ashes"
         "sessionMode": _s(raw.get("sessionMode") or "same_map"),  # Mode A default
         "occupationModel": _s(raw.get("occupationModel") or "living_shell"),
         "captureMode": capture_mode,
-        # Law: never free-mint Tnb on capture claims (reclaim / rare victory only).
         "difficulty": raw.get("difficulty") or raw.get("contractDifficulty"),
         "contractXp": raw.get("contractXp"),
         "namedDefender": raw.get("namedDefender"),
@@ -130,16 +129,6 @@ def normalize_sortie(raw: Dict[str, Any], *, campaign_id: str = "verdance_ashes"
                 else raw.get("armadaTenebriumCrisis"),
                 True,
             ),
-        },
-        "continue": {
-            "promoteOccupation": _b(
-                (raw.get("continueRules") or {}).get("promoteOccupationOnContinue")
-                if isinstance(raw.get("continueRules"), dict)
-                else raw.get("promoteOccupation"),
-                False,
-            ),
-            "softClock": True,
-            "chapterIndex": _i(raw.get("chapterIndex"), 0),
         },
         "valid": _b(raw.get("valid"), True),
         "sourceSchemas": [raw.get("schemaVersion")] if raw.get("schemaVersion") else [],

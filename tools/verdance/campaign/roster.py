@@ -134,11 +134,10 @@ CAMPAIGN_XP_PACE = 0.5
 
 
 def _sortie_xp_gains(state: Dict[str, Any], result: Dict[str, Any], success: bool, clean: bool) -> Dict[str, float]:
-    """Commander + hero campaign XP for this sortie (mode-aware, farm-boosted)."""
+    """Commander + hero campaign XP for this sortie (mode-aware)."""
     prog = ensure_progression(state)
     cracked = str(prog.get("mode", "cracked_farm")).lower() == "cracked_farm"
     mult = float(prog.get("xpMultiplier", 1.0) or 1.0)
-    farm = bool(result.get("farmSortie")) or "farm" in (result.get("storyTags") or [])
     # Base gains: cracked_farm is generous so end-of-campaign heroes are monsters.
     if success:
         cmd = 52.0 + (12.0 if clean else 0.0)
@@ -151,9 +150,6 @@ def _sortie_xp_gains(state: Dict[str, Any], result: Dict[str, Any], success: boo
     else:
         cmd = 22.0 if cracked else 16.0
         hero = 40.0 if cracked else 20.0
-    if farm:
-        hero *= 1.85
-        cmd *= 1.35
     pace = CAMPAIGN_XP_PACE
     return {
         "commander": round(cmd * mult * pace, 2),
@@ -765,7 +761,6 @@ def build_roster_intent(state: Dict[str, Any]) -> Dict[str, Any]:
             "mode": prog.get("mode"),
             "difficultyDial": prog.get("difficultyDial"),
             "xpMultiplier": prog.get("xpMultiplier"),
-            "farmSortiesEnabled": bool(prog.get("farmSortiesEnabled")),
             "xpPersistOnDeath": True,
         },
     }
