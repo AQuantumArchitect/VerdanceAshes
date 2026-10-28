@@ -1,0 +1,942 @@
+{
+  "schemaVersion": "verdance-authored-bonds/1.0",
+  "notes": "Enrichment round, 2026-10-28 evening: every hero gets a friend and a rival in the company, the thinnest webs first, more ties across factions, and the stale Consul/Shiva tie rewritten for the solo Shiva. Merged by tools/author_bonds_v1.py.",
+  "pairs": [
+    {
+      "a": "grath",
+      "b": "cauter",
+      "polarity": "attract",
+      "motifs": [
+        "two kinds of heat on the Legion line",
+        "debt and riot"
+      ],
+      "talks": {
+        "C": {
+          "title": "Interest",
+          "beats": [
+            [
+              "narrator",
+              "Bel-Ansa's Phalanx holds the breach while Grath's Prometheus burns the far side of it."
+            ],
+            [
+              "cauter",
+              "You set my sentence on fire."
+            ],
+            [
+              "grath",
+              "Your sentence owed me. Everything owes me."
+            ],
+            [
+              "cauter",
+              "Then we're square. Same time tomorrow?"
+            ],
+            [
+              "grath",
+              "With interest."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "grath",
+      "b": "bro",
+      "polarity": "rivalry",
+      "motifs": [
+        "two mercenaries, one paymaster",
+        "arrears against 'yeah'"
+      ],
+      "talks": {
+        "C": {
+          "title": "Payroll",
+          "beats": [
+            [
+              "narrator",
+              "The Null Mercs paymaster comes through camp. Grath and Bro end up in the same queue."
+            ],
+            [
+              "grath",
+              "Three wars. I'm first."
+            ],
+            [
+              "bro",
+              "Yeah. I'm here though."
+            ],
+            [
+              "grath",
+              "Being here isn't a claim."
+            ],
+            [
+              "bro",
+              "Is to them. Yeah."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "vale",
+      "b": "rumor",
+      "polarity": "attract",
+      "motifs": [
+        "fog and the contract",
+        "two who are never where the invoice says"
+      ],
+      "talks": {
+        "C": {
+          "title": "Terms",
+          "beats": [
+            [
+              "narrator",
+              "Vale's three launchers and Rumor's Ghost share a hiding place nobody else knows about."
+            ],
+            [
+              "rumor",
+              "Whose contract are we on tonight?"
+            ],
+            [
+              "vale",
+              "Mine. The wall's going to pay it."
+            ],
+            [
+              "rumor",
+              "And if the wall changes sides?"
+            ],
+            [
+              "vale",
+              "Then you'll have told me first. You always do."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "vale",
+      "b": "gorgon",
+      "polarity": "friction",
+      "motifs": [
+        "quiet invoices and loud stares",
+        "two kinds of long range"
+      ],
+      "talks": {
+        "C": {
+          "title": "Discretion",
+          "beats": [
+            [
+              "narrator",
+              "Maelis's Medusa fires a full salvo from the open. Vale's launchers, hidden in the treeline, wince."
+            ],
+            [
+              "vale",
+              "They'll know where we are now."
+            ],
+            [
+              "gorgon",
+              "They'll know where I am. You're still invisible. You're welcome."
+            ],
+            [
+              "vale",
+              "Subtlety is a courtesy."
+            ],
+            [
+              "gorgon",
+              "So is winning."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "commando",
+      "b": "mason",
+      "polarity": "rivalry",
+      "motifs": [
+        "she builds it, he mines it",
+        "walls and what's under them"
+      ],
+      "talks": {
+        "C": {
+          "title": "Foundations",
+          "beats": [
+            [
+              "narrator",
+              "Tarquin lays a line of Dragon's Teeth. Cinder Hook follows behind her, planting mines between them."
+            ],
+            [
+              "mason",
+              "Those are my walls."
+            ],
+            [
+              "commando",
+              "And those are my mines. Your walls are the argument; my mines are the punchline."
+            ],
+            [
+              "mason",
+              "My Sappers can sweep those."
+            ],
+            [
+              "commando",
+              "Your Sappers can try."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "commando",
+      "b": "lunkhead",
+      "polarity": "tension",
+      "motifs": [
+        "the veteran who has stepped on every mine",
+        "receipts and surprises"
+      ],
+      "talks": {
+        "C": {
+          "title": "Receipts",
+          "beats": [
+            [
+              "narrator",
+              "Ferrow's Lunkhead stops dead at the edge of a field. Cinder Hook is grinning from the far side."
+            ],
+            [
+              "lunkhead",
+              "Mines. Three rows, staggered."
+            ],
+            [
+              "commando",
+              "How'd you know?"
+            ],
+            [
+              "lunkhead",
+              "I've been hit by everything the war makes. I kept the receipts. You're on page forty."
+            ],
+            [
+              "commando",
+              "Only forty? I'll try harder."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "nox",
+      "b": "tremor",
+      "polarity": "tension",
+      "motifs": [
+        "the shells he cannot stop",
+        "a shield for the sky and a hammer from it"
+      ],
+      "talks": {
+        "C": {
+          "title": "Coverage",
+          "beats": [
+            [
+              "narrator",
+              "Lund's Tremor shells a position Nox's Umbrella was guarding."
+            ],
+            [
+              "nox",
+              "That was under my cover."
+            ],
+            [
+              "tremor",
+              "Your cover stops nukes. I'm not a nuke."
+            ],
+            [
+              "nox",
+              "I still pay for every shell that lands near me."
+            ],
+            [
+              "tremor",
+              "Then you'll be paying a while."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "nox",
+      "b": "stiletto",
+      "polarity": "friction",
+      "motifs": [
+        "debts in the sky",
+        "the pulse that stops everything, including his"
+      ],
+      "talks": {
+        "C": {
+          "title": "Static",
+          "beats": [
+            [
+              "narrator",
+              "Cole's Stilettos pass over the camp. Nox's Umbrella flickers and goes quiet for ten seconds."
+            ],
+            [
+              "nox",
+              "You stopped my reactor."
+            ],
+            [
+              "stiletto",
+              "I stopped everything. That's the point of a pulse."
+            ],
+            [
+              "nox",
+              "Ten seconds of no shield is ten seconds of debt."
+            ],
+            [
+              "stiletto",
+              "Then I'll owe you ten seconds."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "charybdis",
+      "b": "scylla",
+      "polarity": "sibling",
+      "motifs": [
+        "the monster pair",
+        "the strait between them"
+      ],
+      "talks": {
+        "C": {
+          "title": "The strait",
+          "beats": [
+            [
+              "narrator",
+              "The Scylla walks up one bank and the Charybdis floods up the other. Whatever was in the river between them is not there any more."
+            ],
+            [
+              "scylla",
+              "You always take the left."
+            ],
+            [
+              "charybdis",
+              "I take whichever side you aren't on. Sailors have been complaining about it for a thousand years."
+            ],
+            [
+              "scylla",
+              "Let them complain."
+            ],
+            [
+              "charybdis",
+              "They do. Briefly."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "charybdis",
+      "b": "possum",
+      "polarity": "attract",
+      "motifs": [
+        "hovers on the same water",
+        "a flood and its fry"
+      ],
+      "talks": {
+        "C": {
+          "title": "Wake",
+          "beats": [
+            [
+              "narrator",
+              "Calloway's hover pack rides the Charybdis's wake across the river, all eleven of them whooping."
+            ],
+            [
+              "possum",
+              "Best ride on the map!"
+            ],
+            [
+              "charybdis",
+              "You're not supposed to ride it. You're supposed to get out of the way."
+            ],
+            [
+              "possum",
+              "We are out of the way. We're just right behind you."
+            ],
+            [
+              "charybdis",
+              "Hm. Stay there."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "mask",
+      "b": "ketha",
+      "polarity": "bond",
+      "motifs": [
+        "two who raise the fallen",
+        "the spare king and the field surgeon"
+      ],
+      "talks": {
+        "C": {
+          "title": "Second chances",
+          "beats": [
+            [
+              "narrator",
+              "Mask's Fireflies and Ketha's Zagreus work the same wreck field after a hard drop."
+            ],
+            [
+              "ketha",
+              "You raise them too."
+            ],
+            [
+              "mask",
+              "I raise Pawns. You raise people."
+            ],
+            [
+              "ketha",
+              "A wreck is a wreck. Every one is an unfinished sentence."
+            ],
+            [
+              "mask",
+              "Then I'm a spare sentence. Thank you for finishing me, the first time."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "stronghold",
+      "b": "rookery",
+      "polarity": "attract",
+      "motifs": [
+        "the airlift and the nest",
+        "who lands where nobody can walk"
+      ],
+      "talks": {
+        "C": {
+          "title": "Landing",
+          "beats": [
+            [
+              "narrator",
+              "The Stronghold sets down on Atterby's cliff shelf, the only flat ground for a mile."
+            ],
+            [
+              "rookery",
+              "You're on my lab."
+            ],
+            [
+              "stronghold",
+              "I'm next to your lab. It's a big ship. It's a small cliff."
+            ],
+            [
+              "rookery",
+              "Then I'll build you a bigger one."
+            ],
+            [
+              "stronghold",
+              "Do. I'll bring the company to it."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "verse",
+      "b": "starlight",
+      "polarity": "attract",
+      "motifs": [
+        "counting and the beam",
+        "one shot that arrives, many that are counted"
+      ],
+      "talks": {
+        "C": {
+          "title": "Count",
+          "beats": [
+            [
+              "narrator",
+              "Verse counts the Javelins' missiles out loud. Dray's Starlight fires once, slowly, and the count stops."
+            ],
+            [
+              "verse",
+              "Twelve, thirteen... you finished my sentence."
+            ],
+            [
+              "starlight",
+              "The beam arrives before the argument. I'm sorry about your count."
+            ],
+            [
+              "verse",
+              "Don't be. One is my favourite number when it's yours."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "lumen",
+      "b": "warder",
+      "polarity": "attract",
+      "motifs": [
+        "Pulsars and the Bulwark",
+        "two who hold a circle"
+      ],
+      "talks": {
+        "C": {
+          "title": "The circle",
+          "beats": [
+            [
+              "narrator",
+              "Sister Lumen raises a Pulsar on the edge of the Warder's circle of dirt."
+            ],
+            [
+              "warder",
+              "That's my circle."
+            ],
+            [
+              "lumen",
+              "And this is a tithe to it. The Bulwark burns the near edge; the Pulsar reaches the far one."
+            ],
+            [
+              "warder",
+              "Then the circle got bigger."
+            ],
+            [
+              "lumen",
+              "Circles do, when you tend them."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "lumen",
+      "b": "solarium",
+      "polarity": "sibling",
+      "motifs": [
+        "two who tithe the grid",
+        "spreadsheets and sermons"
+      ],
+      "talks": {
+        "C": {
+          "title": "The grid",
+          "beats": [
+            [
+              "narrator",
+              "Solarium's spreadsheet and Sister Lumen's ledger of Prudes cover the same table."
+            ],
+            [
+              "solarium",
+              "Your geothermals are running at ninety-one percent."
+            ],
+            [
+              "lumen",
+              "And your solars at sixty. The sun is a fickle tithe."
+            ],
+            [
+              "solarium",
+              "Then between us we never go dark."
+            ],
+            [
+              "lumen",
+              "That's the whole of my faith, in one line."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "quill",
+      "b": "rusk",
+      "polarity": "attract",
+      "motifs": [
+        "the tread marshal and the tank stack",
+        "orders that walk and doors that hold"
+      ],
+      "talks": {
+        "C": {
+          "title": "Column",
+          "beats": [
+            [
+              "narrator",
+              "Quill's Bulls lead Rusk's five Decurions up the road in perfect column."
+            ],
+            [
+              "quill",
+              "Now that is a line."
+            ],
+            [
+              "rusk",
+              "It's a door that walks. Gate, jammed gat, a lie."
+            ],
+            [
+              "quill",
+              "I don't care what you call it. It salutes."
+            ],
+            [
+              "rusk",
+              "It doesn't."
+            ],
+            [
+              "quill",
+              "It does when I'm watching."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "arrow",
+      "b": "mammoth",
+      "polarity": "attract",
+      "motifs": [
+        "the old mother and the Salamander crews",
+        "patience at both ends"
+      ],
+      "talks": {
+        "C": {
+          "title": "Supper",
+          "beats": [
+            [
+              "narrator",
+              "Brandt feeds Venn's six Salamander crews before the sortie. Venn eats standing up."
+            ],
+            [
+              "mammoth",
+              "Sit down, dear. The target will still be there."
+            ],
+            [
+              "arrow",
+              "It might walk away."
+            ],
+            [
+              "mammoth",
+              "Then you'll get it with the second shot. You always do."
+            ],
+            [
+              "arrow",
+              "...Fine. One bowl."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "shiva",
+      "b": "halbard",
+      "polarity": "attract",
+      "motifs": [
+        "two Cortex walkers",
+        "a decision and an appetite"
+      ],
+      "talks": {
+        "C": {
+          "title": "Alone together",
+          "beats": [
+            [
+              "narrator",
+              "The Shiva and Varn's Halberd walk the same ridge without a word."
+            ],
+            [
+              "halbard",
+              "You don't take an escort any more."
+            ],
+            [
+              "shiva",
+              "I stopped needing the bait. You've got hovers all over you."
+            ],
+            [
+              "halbard",
+              "They're company. You should try some."
+            ],
+            [
+              "shiva",
+              "I have. That's why I walk alone."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "consul",
+      "b": "shiva",
+      "polarity": "attract",
+      "motifs": [
+        "the paperwork for one walker",
+        "she stopped needing the Grunts; he kept the forms"
+      ],
+      "talks": {
+        "C": {
+          "title": "Forms",
+          "beats": [
+            [
+              "narrator",
+              "Weiss hands Ruhl a thick folder. She weighs it in one hand."
+            ],
+            [
+              "consul",
+              "The decommission forms. For the eight Grunts."
+            ],
+            [
+              "shiva",
+              "I sent them home."
+            ],
+            [
+              "consul",
+              "There is a form for sending them home."
+            ],
+            [
+              "shiva",
+              "Then file it. I'll walk."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "hearth",
+      "b": "dam",
+      "polarity": "bond",
+      "motifs": [
+        "the quiet sun and the riverworks",
+        "a reactor nobody finds beside a dam everybody sees"
+      ],
+      "talks": {
+        "C": {
+          "title": "Cooling",
+          "beats": [
+            [
+              "narrator",
+              "The Damwrights route a river channel past Hearth's cloaked reactor."
+            ],
+            [
+              "dam",
+              "You run hot. We brought you water."
+            ],
+            [
+              "hearth",
+              "Nobody brings me anything. Nobody can find me."
+            ],
+            [
+              "dam",
+              "We found you by the steam. Don't worry, nobody else reads steam."
+            ],
+            [
+              "hearth",
+              "Then stay. The river's nice company."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "mira",
+      "b": "starlight",
+      "polarity": "attract",
+      "motifs": [
+        "two who shoot from far back",
+        "one beam, five shells"
+      ],
+      "talks": {
+        "C": {
+          "title": "Backline",
+          "beats": [
+            [
+              "narrator",
+              "Mira's Mausers fire by line. Dray's beam sweeps the same ridge a heartbeat later."
+            ],
+            [
+              "mira",
+              "That was beautiful! Did you see the sparks?"
+            ],
+            [
+              "starlight",
+              "I saw the ridge stop being a problem."
+            ],
+            [
+              "mira",
+              "Same thing!"
+            ],
+            [
+              "starlight",
+              "To you, perhaps. I'll allow it."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "veil",
+      "b": "spoke",
+      "polarity": "friction",
+      "motifs": [
+        "fog against wheels",
+        "who sees first, and who gets paid for it"
+      ],
+      "talks": {
+        "C": {
+          "title": "Visibility",
+          "beats": [
+            [
+              "narrator",
+              "Spoke's Wheelies tear through the fog Veil's Obscurer has spent an hour laying."
+            ],
+            [
+              "veil",
+              "That fog was on contract."
+            ],
+            [
+              "spoke",
+              "My wheels aren't. They go where they like."
+            ],
+            [
+              "veil",
+              "Then the enemy saw where they like."
+            ],
+            [
+              "spoke",
+              "Then I'll print more."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "halbard",
+      "b": "gladius",
+      "polarity": "rivalry",
+      "motifs": [
+        "the appetite and the show",
+        "who gets the crowd"
+      ],
+      "talks": {
+        "C": {
+          "title": "Applause",
+          "beats": [
+            [
+              "narrator",
+              "Ferro's Gladiators salute the enemy line just as Varn's Halberd walks through it."
+            ],
+            [
+              "gladius",
+              "You walked through my bow."
+            ],
+            [
+              "halbard",
+              "Halberd's hungry. It doesn't wait for bows."
+            ],
+            [
+              "gladius",
+              "The crowd waits."
+            ],
+            [
+              "halbard",
+              "The crowd's on fire."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "fatboy",
+      "b": "mammoth",
+      "polarity": "rivalry",
+      "motifs": [
+        "two houses that walk",
+        "who is the biggest thing on the line"
+      ],
+      "talks": {
+        "C": {
+          "title": "Size",
+          "beats": [
+            [
+              "narrator",
+              "Kell's Fatboy and Brandt's Mammoth end up standing side by side. Neither will move first."
+            ],
+            [
+              "fatboy",
+              "House learned to knock."
+            ],
+            [
+              "mammoth",
+              "And a grandmother learned to sit. Move over, dear. I was here first."
+            ],
+            [
+              "fatboy",
+              "I've got Lances on the roof."
+            ],
+            [
+              "mammoth",
+              "I've got a plasma cannon on mine. Move over."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "yeva",
+      "b": "tick",
+      "polarity": "friction",
+      "motifs": [
+        "the sniper who borrows a carpet",
+        "unseen, among a hundred seen things"
+      ],
+      "talks": {
+        "C": {
+          "title": "Borrowed eyes",
+          "beats": [
+            [
+              "narrator",
+              "Yeva's six Ticks wander off to join Tick's carpet. She calls them back. Twice."
+            ],
+            [
+              "tick",
+              "They want to be with us."
+            ],
+            [
+              "yeva",
+              "They're mine. Ghosts already walked it; your Ticks are walking it again, loudly."
+            ],
+            [
+              "tick",
+              "We are never loud. We are many."
+            ],
+            [
+              "yeva",
+              "Same thing, to a sniper."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "hearth",
+      "b": "ketha",
+      "polarity": "attract",
+      "motifs": [
+        "the two who keep the company alive",
+        "the coal and the field surgeon"
+      ],
+      "talks": {
+        "C": {
+          "title": "Night shift",
+          "beats": [
+            [
+              "narrator",
+              "After a hard drop, the only lights in camp are Hearth's reactor and Ketha's rez bots working the wreck field."
+            ],
+            [
+              "ketha",
+              "You're the only other one awake."
+            ],
+            [
+              "hearth",
+              "I'm always awake. That's what a coal is for."
+            ],
+            [
+              "ketha",
+              "And I'm always finishing sentences. Keep the lights on for me?"
+            ],
+            [
+              "hearth",
+              "Always. You bring them home; I keep them warm."
+            ]
+          ]
+        }
+      }
+    }
+  ]
+}
