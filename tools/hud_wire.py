@@ -150,6 +150,8 @@ def scan():
                 k = key_of(m, 1)
                 if k.startswith("VA_CMD:"):
                     cmds[re.split(r"[ :*]", k[7:])[0] or "*"]["send"].add(line(m.start()))
+                else:   # any other message to the gadgets is matched whole ("VA_RIG:hud")
+                    cmds["=" + k.rstrip("*")]["send"].add(line(m.start()))
         for m in re.finditer(r"\bWG\.(\w+)\s*=(?!=)", src):
             wg[m.group(1)]["set"].add(line(m.start()))
         for m in re.finditer(r"\bWG\.(\w+)\b(?!\s*=(?!=))", src):
@@ -158,6 +160,10 @@ def scan():
     # ("^vahotdrop ", "VA_CMD:manifest", "extract:", or a table key / == compare).
     gsrc = "\n".join(strip_comments(p.read_text(errors="replace")) for side, p in lua_files() if side == "gadget")
     for c, e in cmds.items():
+        if c.startswith("="):
+            if re.search(r"[\"']%s[\"']" % re.escape(c[1:]), gsrc):
+                e["handle"].add("gadgets")
+            continue
         pat = r"""["'](?:\^|VA_CMD:)?%s(?:["' :%%]|\b)|\b%s\s*=\s*(?:true|function)""" % (re.escape(c), re.escape(c))
         if c == "*" or re.search(pat, gsrc):
             e["handle"].add("gadgets")
