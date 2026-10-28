@@ -23,21 +23,33 @@ order these parts load in.
 |---|---|
 | `unsynced.lua` | the unsynced half: forwards the synced events to LuaUI and holds the start pause |
 | `state.lua` | the sortie itself (mission, zone map, status, teams), the marks registry and the JSON helpers |
-| `result.lua` | the sortie result: every JSON part, chunked logging, the headless finish |
+| `result.lua` | the sortie result: resultJson writes the result_* sections in order (RESULT_SECTIONS); chunked logging, logResult, the headless finish |
+| `result_heroes.lua` | the result's hero parts: hero states and outcomes, who was recruited, the named dead and wounded, companions |
+| `result_world.lua` | the result's world parts: the zone graph, reputation, the economy, beliefs and kings |
+| `result_objective.lua` | the result's objective parts: how it completed, targets destroyed, secondaries, surviving installs, shell scars |
+| `result_company.lua` | the result's company parts: what of ours is on the field, survivors and their XP, loan units, metal and Tenebrium |
 | `mission_data.lua` | reading the mission seed and the zone map |
 | `units.lua` | unit-def helpers and metal spots |
 | `mentors.lua` | pack mentors (Spoke, the leads): subordinate XP and field effects |
 | `hero_spawn.lua` | a hero's unit on the field: modifiers, tags, registration, auras |
 | `spawn.lua` | placing units: dry landing, standable ground, spawnOneUnit / spawnUnitSpec |
-| `crew.lua` | the company on the field: roster, hero packs, bonds, crew confirm, the hot drop |
+| `crew.lua` | the company on the field: the roster, who drops (crew confirm, the hot drop), anchor keeps, what was dropped |
+| `crew_storage.lua` | the company's metal and energy storage caps, re-applied after BAR's own start reset |
+| `crew_packs.lua` | a hero's pack on the field (VA_CREW_spawnHeroPack) and the bonds between heroes who drop together |
 | `field_recruits.lua` | wild heroes: recruit wrecks, field factories, unit printers |
 | `setup.lua` | the playable setup: camps, forces and the player's start |
 | `telemetry.lua` | zone cells, per-zone metrics, dev telemetry and the headless/profiling options |
 | `waterline.lua` | the waterline (hydrology) and zone flow |
 | `translation.lua` | the translation matrix packet |
-| `objectives.lua` | the objective: kind and mode, the pad, living-shell claims, presence / fortify / wipe / soft clock |
+| `objectives.lua` | the objective: its kinds and modes, its state (targets, completion, capture), the target zone |
+| `objective_pad.lua` | the pad: the one zone the company lands and lifts from |
+| `objective_checks.lua` | the periodic checks and completion: onObjectiveComplete, all marks done, purge, wipe, the soft clock |
+| `objective_targets.lua` | what the objective's targets are: the living shell's eco and teeth, high-value marks, and a target going down |
+| `objective_presence.lua` | holding ground: the capture pocket and regrow pressure, presence and fortify checks, claim strength |
 | `reinforcements.lua` | enemy response waves and where they enter |
-| `heroes.lua` | hero lifecycle: down, wreck, rez, lost, recovered, field joins |
+| `heroes.lua` | the named heroes: their table, the down marks, lost and recovered, the rescue contract, end-of-sortie states |
+| `hero_wrecks.lua` | a hero's wreck: death to wreck, the rez that brings them back, a wreck that is destroyed or times out |
+| `hero_joins.lua` | a wild hero joins: raised, captured or a field factory taken; recruited ids kept across reloads |
 | `beats.lua` | in-mission beats (authored triggers) |
 | `terminal.lua` | ending the sortie: the terminal crunch and the GG entry points |
 | `start.lua` | start of the sortie: doctrine, commanders, perks, start resources, Tenebrium |
@@ -58,3 +70,10 @@ reads another part's state at load.
 - Tests and harnesses that read the gadget's source use `tools/campaign_lua.py` (`source()`), not
   the core file alone.
 - `tests/test_campaign_local_budget_v1.py` keeps each part under Lua 5.1's 200-local limit.
+
+## The sortie result
+`resultJson` (in `result.lua`) builds one context (`resultContext`) and then runs the sections in
+`RESULT_SECTIONS` order. Each section is a `result*Fields(c)` function in the part that knows its
+facts: sortie, objective, capture, company, heroes, metal, Tenebrium, world. Python reads these
+keys (`verdance.hub.contract`). `tests/test_result_contract.py` lists every section's keys in
+order, so adding, dropping or moving a key is a change you make there on purpose.

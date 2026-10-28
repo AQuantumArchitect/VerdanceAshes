@@ -318,7 +318,6 @@ def normalize_result(raw: Dict[str, Any], *, campaign_id: str = "verdance_ashes"
         "nodeClaimedFrame": _i(raw.get("nodeClaimedFrame"), 0),
         "requiredMarksLeft": _i(raw.get("requiredMarksLeft"), 0),
         "allObjectivesDone": _b(raw.get("allObjectivesDone"), False),
-        "objectiveBypassed": _b(raw.get("objectiveBypassed"), False),
         # Rescue-contract fail latch from gadget (partial RTB path).
         "objectiveFailed": _b(
             raw.get("objectiveFailed") or raw.get("rescueContractFailed"), False
@@ -451,7 +450,6 @@ def result_v2_to_v1_fields(r: Dict[str, Any]) -> Dict[str, Any]:
         "requiredMarksLeft": r.get("requiredMarksLeft"),
         "allObjectivesDone": r.get("allObjectivesDone"),
         "terminalKind": r.get("terminalKind"),
-        "objectiveBypassed": r.get("objectiveBypassed"),
         "objectiveFailed": r.get("objectiveFailed"),
         "objectiveFailReason": r.get("objectiveFailReason"),
         "objectiveFailHero": r.get("objectiveFailHero"),

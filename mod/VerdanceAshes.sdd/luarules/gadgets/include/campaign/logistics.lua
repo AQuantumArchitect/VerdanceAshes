@@ -2,7 +2,7 @@
 -- Part of game_verdance_campaign.lua, loaded into that gadget's environment
 -- (VFS.Include with the gadget table), so its globals are the gadget's globals.
 -- Provides: VA_LOGISTICS, armPendingDeliveries, spawnBruteCrashFromEdge, tickPendingDeliveries
--- Uses: objectives, reinforcements, spawn, state
+-- Uses: objective_pad, reinforcements, spawn, state
 
 -- Living logistics: deferred combat packs arrive mid-sortie from map-web / launcher.
 -- Packed into one gadget-env table so this file stays under Lua 5.1's 200-local limit

@@ -3,7 +3,7 @@
 -- (VFS.Include with the gadget table), so its globals are the gadget's globals.
 -- Provides: echoZones, normalizedToElmos, publishHeroRules, readMission, readZoneMap, zoneCount,
 -- zoneMapJson
--- Uses: result, state, telemetry, waterline
+-- Uses: result_heroes, state, telemetry, waterline
 
 function publishHeroRules()
   Spring.SetGameRulesParam("va_heroes_json", heroStatesJson(), { public = true })

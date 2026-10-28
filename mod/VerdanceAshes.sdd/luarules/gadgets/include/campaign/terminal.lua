@@ -2,7 +2,7 @@
 -- Part of game_verdance_campaign.lua, loaded into that gadget's environment
 -- (VFS.Include with the gadget table), so its globals are the gadget's globals.
 -- Provides: lastResultJson, publishTenebriumRules, setTerminal, terminal, terminalReason
--- Uses: heroes, mission_data, objectives, result, start, state, telemetry
+-- Uses: heroes, mission_data, objective_checks, objectives, result, start, state, telemetry
 
 terminal = false
 terminalReason = ""

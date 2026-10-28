@@ -5,7 +5,7 @@
 -- applyFirstDropEcoSoftener, configureDoctrine, doctrine, isCommanderUnitDef,
 -- playerCommanderDestroyed, playerCommanders, publishObjectiveMarker, sweepPlayerCommanders,
 -- tenebLoot, tickCommanderSweeps, tickTenebrium, trackPlayerCommanderCreated, vaApplyWarBanks
--- Uses: crew, mission_data, objectives, state, terminal
+-- Uses: crew, crew_packs, crew_storage, mission_data, objectives, state, terminal
 
 playerCommanders = {}             -- unitID -> true
 

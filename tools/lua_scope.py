@@ -83,7 +83,8 @@ def items(src):
             if after_decl:
                 starts = False
             elif t == 'kw' and v in ('local', 'function', 'if', 'for', 'while', 'do', 'repeat', 'return'):
-                starts = True
+                # `x = function() ... end` is one statement: a function after `=` or `,` is a value
+                starts = not (v == 'function' and prevt is not None and prevt[1] in ('=', ',', '(', '{', 'return', 'and', 'or'))
             elif t == 'name' and not after_decl:
                 prev = toks[k - 1] if k else None
                 if not prev or not (prev[0] == 'op' and prev[1] in ('.', ':', ',', '=', '(', '[', '..', '+', '-', '*', '/', 'and', 'or')) and not (prev[0] in ('name', 'str', 'num') or (prev[0] == 'op' and prev[1] in (')', ']', '}'))):

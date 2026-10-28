@@ -33,44 +33,68 @@ end
 -- code; everything else runs from the call-ins below, after every part is in. The call-ins are
 -- short on purpose: each step is a named function in its part ("Called by gadget:GameFrame.").
 --
---   state           the sortie itself (mission, zone map, status, teams), the marks registry and the JSON helpers
---   result          the sortie result: every JSON part, chunked logging, the headless finish
---   mission_data    reading the mission seed and the zone map
---   units           unit-def helpers and metal spots
---   mentors         pack mentors (Spoke, the leads): subordinate XP and field effects
---   hero_spawn      a hero's unit on the field: modifiers, tags, registration, auras
---   spawn           placing units: dry landing, standable ground, spawnOneUnit / spawnUnitSpec
---   crew            the company on the field: roster, hero packs, bonds, crew confirm, the hot drop
---   field_recruits  wild heroes: recruit wrecks, field factories, unit printers
---   setup           the playable setup: camps, forces and the player's start
---   telemetry       zone cells, per-zone metrics, dev telemetry and the headless/profiling options
---   waterline       the waterline (hydrology) and zone flow
---   translation     the translation matrix packet
---   objectives      the objective: kind and mode, the pad, living-shell claims, presence / fortify / wipe / soft clock
---   reinforcements  enemy response waves and where they enter
---   heroes          hero lifecycle: down, wreck, rez, lost, recovered, field joins
---   beats           in-mission beats (authored triggers)
---   terminal        ending the sortie: the terminal crunch and the GG entry points
---   start           start of the sortie: doctrine, commanders, perks, start resources, Tenebrium
---   logistics       mercenary logistics: the deploy kit, pending deliveries, the brute crash
---   devcmd          the /luarules va* playtest commands, the headless start and debug auto-progress
+--   state               the sortie itself (mission, zone map, status, teams), the marks registry and the JSON helpers
+--   result              the sortie result: resultJson writes the result_* sections in order (RESULT_SECTIONS); chunked logging, logResult, the headless finish
+--   result_heroes       the result's hero parts: hero states and outcomes, who was recruited, the named dead and wounded, companions
+--   result_world        the result's world parts: the zone graph, reputation, the economy, beliefs and kings
+--   result_objective    the result's objective parts: how it completed, targets destroyed, secondaries, surviving installs, shell scars
+--   result_company      the result's company parts: what of ours is on the field, survivors and their XP, loan units, metal and Tenebrium
+--   mission_data        reading the mission seed and the zone map
+--   units               unit-def helpers and metal spots
+--   mentors             pack mentors (Spoke, the leads): subordinate XP and field effects
+--   hero_spawn          a hero's unit on the field: modifiers, tags, registration, auras
+--   spawn               placing units: dry landing, standable ground, spawnOneUnit / spawnUnitSpec
+--   crew                the company on the field: the roster, who drops (crew confirm, the hot drop), anchor keeps, what was dropped
+--   crew_storage        the company's metal and energy storage caps, re-applied after BAR's own start reset
+--   crew_packs          a hero's pack on the field (VA_CREW_spawnHeroPack) and the bonds between heroes who drop together
+--   field_recruits      wild heroes: recruit wrecks, field factories, unit printers
+--   setup               the playable setup: camps, forces and the player's start
+--   telemetry           zone cells, per-zone metrics, dev telemetry and the headless/profiling options
+--   waterline           the waterline (hydrology) and zone flow
+--   translation         the translation matrix packet
+--   objectives          the objective: its kinds and modes, its state (targets, completion, capture), the target zone
+--   objective_pad       the pad: the one zone the company lands and lifts from
+--   objective_checks    the periodic checks and completion: onObjectiveComplete, all marks done, purge, wipe, the soft clock
+--   objective_targets   what the objective's targets are: the living shell's eco and teeth, high-value marks, and a target going down
+--   objective_presence  holding ground: the capture pocket and regrow pressure, presence and fortify checks, claim strength
+--   reinforcements      enemy response waves and where they enter
+--   heroes              the named heroes: their table, the down marks, lost and recovered, the rescue contract, end-of-sortie states
+--   hero_wrecks         a hero's wreck: death to wreck, the rez that brings them back, a wreck that is destroyed or times out
+--   hero_joins          a wild hero joins: raised, captured or a field factory taken; recruited ids kept across reloads
+--   beats               in-mission beats (authored triggers)
+--   terminal            ending the sortie: the terminal crunch and the GG entry points
+--   start               start of the sortie: doctrine, commanders, perks, start resources, Tenebrium
+--   logistics           mercenary logistics: the deploy kit, pending deliveries, the brute crash
+--   devcmd              the /luarules va* playtest commands, the headless start and debug auto-progress
 -- ---------------------------------------------------------------------------
 VFS.Include("luarules/gadgets/include/campaign/state.lua", gadget)
 VFS.Include("luarules/gadgets/include/campaign/result.lua", gadget)
+VFS.Include("luarules/gadgets/include/campaign/result_heroes.lua", gadget)
+VFS.Include("luarules/gadgets/include/campaign/result_world.lua", gadget)
+VFS.Include("luarules/gadgets/include/campaign/result_objective.lua", gadget)
+VFS.Include("luarules/gadgets/include/campaign/result_company.lua", gadget)
 VFS.Include("luarules/gadgets/include/campaign/mission_data.lua", gadget)
 VFS.Include("luarules/gadgets/include/campaign/units.lua", gadget)
 VFS.Include("luarules/gadgets/include/campaign/mentors.lua", gadget)
 VFS.Include("luarules/gadgets/include/campaign/hero_spawn.lua", gadget)
 VFS.Include("luarules/gadgets/include/campaign/spawn.lua", gadget)
 VFS.Include("luarules/gadgets/include/campaign/crew.lua", gadget)
+VFS.Include("luarules/gadgets/include/campaign/crew_storage.lua", gadget)
+VFS.Include("luarules/gadgets/include/campaign/crew_packs.lua", gadget)
 VFS.Include("luarules/gadgets/include/campaign/field_recruits.lua", gadget)
 VFS.Include("luarules/gadgets/include/campaign/setup.lua", gadget)
 VFS.Include("luarules/gadgets/include/campaign/telemetry.lua", gadget)
 VFS.Include("luarules/gadgets/include/campaign/waterline.lua", gadget)
 VFS.Include("luarules/gadgets/include/campaign/translation.lua", gadget)
 VFS.Include("luarules/gadgets/include/campaign/objectives.lua", gadget)
+VFS.Include("luarules/gadgets/include/campaign/objective_pad.lua", gadget)
+VFS.Include("luarules/gadgets/include/campaign/objective_checks.lua", gadget)
+VFS.Include("luarules/gadgets/include/campaign/objective_targets.lua", gadget)
+VFS.Include("luarules/gadgets/include/campaign/objective_presence.lua", gadget)
 VFS.Include("luarules/gadgets/include/campaign/reinforcements.lua", gadget)
 VFS.Include("luarules/gadgets/include/campaign/heroes.lua", gadget)
+VFS.Include("luarules/gadgets/include/campaign/hero_wrecks.lua", gadget)
+VFS.Include("luarules/gadgets/include/campaign/hero_joins.lua", gadget)
 VFS.Include("luarules/gadgets/include/campaign/beats.lua", gadget)
 VFS.Include("luarules/gadgets/include/campaign/terminal.lua", gadget)
 VFS.Include("luarules/gadgets/include/campaign/start.lua", gadget)
