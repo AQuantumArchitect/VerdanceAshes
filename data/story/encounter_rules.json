@@ -32,9 +32,9 @@
     "softness": 0.25
   },
   "presence": {
-    "notes": "How much a relation to someone in the company raises the chance of meeting a wild hero, per side (umwelt.foresight.encounter Weights presence_ally / presence_adversary). Owner call 2026-10-28: the bonded turn up more rarely than the ones at odds with the party. 'relation' is the shared weight an older Umwelt uses.",
-    "relation": 0.7,
-    "ally": 0.45,
-    "adversary": 1.0
+    "notes": "How much a relation to someone in the company raises the chance of meeting a wild hero, per side (umwelt.foresight.encounter Weights presence_ally / presence_adversary). Owner call 2026-10-28: bonds are the default meeting, rivals the accent, strangers uncommon. Measured (6 maps x 20 seeds, 2 met per map): Pavise/Solarium/Halbard met 59% bonded, 9% rivals (only 2 in the pool), 32% strangers; Vane/Quill/Kettle 65% bonded, 21% rivals, 15% strangers. 'relation' is the shared weight an older Umwelt uses (no per-side weights).",
+    "relation": 2.5,
+    "ally": 3.5,
+    "adversary": 2.0
   }
 }
