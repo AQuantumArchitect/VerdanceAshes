@@ -68,7 +68,15 @@ return enc(out)
 WIDGET_RUN = ENC + r'''
 RULES, SAID, PAINT, TEXTS = {}, {}, 0, {}
 UnitDefNames = { va_queen_nest = { id = 42 } }
-VFS = { Include = function(p) if p:find("va_active") then return true end error("no include " .. p) end }
+local uiOpen, UI_DIR = io.open, %s   -- the HUD's own libraries come from disk
+VFS = { Include = function(p)
+  if p:find("va_active") then return true end
+  local name = p:match("[Ii]nclude/(va_[%%w_]+%%.lua)$")
+  local fh = name and uiOpen(UI_DIR .. "/" .. name, "rb")
+  if not fh then error("no include " .. p) end
+  local src = fh:read("a"); fh:close()
+  return assert(load(src, p))()
+end }
 local units = { [7] = { def = 42, x = 1000, z = 2000 } }
 Spring = {
   GetGameRulesParam = function(k) return RULES[k] end, GetUnitDefID = function(u) return units[u] and units[u].def end,
@@ -82,6 +90,10 @@ WG = { vaVoice = { say = function(who, text) SAID[#SAID + 1] = text end } }
 GL = { LINE_LOOP = 2 }
 gl = { Color = function() end, LineWidth = function() end, DepthTest = function() end, Text = function(s) TEXTS[#TEXTS + 1] = s end,
        BeginEnd = function(_, fn) PAINT = PAINT + 1; fn() end, Vertex = function() end }
+for _, k in ipairs({ "Color", "Rect", "Text", "GetTextWidth", "LineWidth", "PointSize", "BeginEnd", "Vertex", "Texture", "TexCoord", "Shape", "Scissor", "DepthTest", "Blending", "PushMatrix", "PopMatrix", "Translate", "Scale", "Rotate" }) do
+  gl[k] = gl[k] or function(s) if k == "GetTextWidth" then return #tostring(s) * 0.6 end end
+end
+GL = GL or { LINES = 1, LINE_LOOP = 2, QUADS = 7, POINTS = 0, TRIANGLES = 4, TRIANGLE_FAN = 6, LINE_STRIP = 3 }
 widget = {}
 local chunk = assert(loadfile(%s, "t", setmetatable({}, { __index = _G, __newindex = _G })))
 chunk()
@@ -99,7 +111,7 @@ widget:GameFrame(11)
 out.fallCalls = #SAID
 out.fallLine = SAID[#SAID]
 return enc(out)
-''' % json.dumps(WIDGET)
+''' % (json.dumps(os.path.join(MOD, 'luaui', 'Include')), json.dumps(WIDGET))
 
 ok = True
 

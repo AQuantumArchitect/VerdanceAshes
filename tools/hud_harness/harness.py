@@ -67,7 +67,7 @@ files = {
     "singleplayer/verdance_ashes/generated/va_intel_current.lua": intel_lua,
     "singleplayer/verdance_ashes/generated/va_pad_current.lua": pad_lua,
 }
-for inc in ('va_ash_tokens.lua', 'va_json.lua', 'va_board.lua'):
+for inc in sorted(os.listdir(INCLUDE)):   # every UI library (va_hud, va_ash_tokens, va_board, va_json, ...)
     files["luaui/Include/" + inc] = open(os.path.join(INCLUDE, inc), encoding='utf-8').read()
     files["LuaUI/Include/" + inc] = files["luaui/Include/" + inc]
 files["LuaRules/Configs/va_active.lua"] = open(os.path.join(WS, "mod", "VerdanceAshes.sdd", "luarules", "configs", "va_active.lua"), encoding='utf-8').read()
@@ -236,6 +236,43 @@ step("exfil manifest open (rules params)", function() postManifest(); assert(WG.
 step("exfil draw", function() CALLS.text = 0; ex:DrawScreen(); assert(CALLS.text > 20, "little drawn " .. CALLS.text) end)
 step("exfil dest keys", function() ex:KeyPress(275); ex:DrawScreen(); ex:KeyPress(276) end)
 step("exfil esc then enter", function() ex:KeyPress(27); assert(not WG.vaExfilModal); postManifest(); ex:KeyPress(13); assert(SENT[#SENT] == "VA_CMD:extract:home", SENT[#SENT]); assert(PAUSED, "confirming the lift unpaused the game"); ex:DrawScreen() end)
+step("the job's gauge, per kind of job", function()
+  WG.vaExfilModal = false
+  local function gauge() FRAME = FRAME + 60; sb:GameFrame(FRAME); return WG.vaRail.gauges[1] and WG.vaRail.gauges[1].label or "" end
+  RULES.va_objective_complete = 0; RULES.va_objective_failed = 0
+  RULES.va_capture_mode = 1; RULES.va_capture_phase = "clear"; RULES.va_pocket_clear_need = 3
+  assert(gauge() == "clear 2 / 3", gauge())
+  RULES.va_capture_phase = "hold"; RULES.va_zone_hold = 300; RULES.va_zone_hold_need = 900; RULES.va_zone_hold_contested = 1
+  assert(gauge() == "hold 10s / 30s · contested", gauge()); RULES.va_zone_hold_contested = 0
+  RULES.va_capture_mode = 0; RULES.va_zone_hold = 0
+  RULES.va_gate_state = "frame"; RULES.va_gate_built = 0.4
+  assert(gauge() == "build the gate 40%", gauge())
+  RULES.va_gate_state = "unpowered"; RULES.va_gate_afus = 2; RULES.va_gate_afus_need = 4
+  assert(gauge() == "power 2 / 4 fusions", gauge())
+  RULES.va_gate_state = "charging"; RULES.va_gate_charge = 0.5
+  assert(gauge() == "charging 50%", gauge())
+  RULES.va_gate_state = "open"; RULES.va_gate_ported = 1
+  assert(gauge():find("1 through"), gauge())
+  RULES.va_gate_state = nil
+  assert(gauge() == "targets 2 / 5", gauge())
+  RULES.va_purge_armed = 1; RULES.va_purge_left = 7
+  gauge()
+  local side = WG.vaRail.gauges[#WG.vaRail.gauges].label
+  assert(side == "purge · 7 enemies left", side)
+  RULES.va_purge_armed = 0
+  CALLS.text = 0; sb:DrawScreen(); assert(CALLS.text > 15, "rail not drawn")
+end)
+step("the rail says itself in one line", function()
+  local s = WG.vaRail.sentence
+  print("    " .. s)
+  assert(s:find("targets 2 / 5", 1, true) and s:find("EXTRACT", 1, true), s)
+end)
+step("verbs: one name for a key, a click and the rig", function()
+  assert(WG.vaVerbs.extract and WG.vaVerbs.begin and WG.vaVerbs.confirm and WG.vaVerbs.back, "missing verbs")
+  WG.vaExfilModal = false; WG.vaSortieBegan = true
+  local before = #SENT
+  assert(sb:TextCommand("vaextract")); assert(SENT[#SENT] == "VA_CMD:manifest" and #SENT == before + 1, tostring(SENT[#SENT]))
+end)
 step("sortie over", function() RULES.va_terminal = 1; RULES.va_status = "extracted"; ex:Update(); ex:DrawScreen(); GLOBALS.VerdanceMissionEvent("sortie_over", "extracted"); sb:DrawScreen(); mm:DrawWorld() end)
 step("mission events", function() RULES.va_terminal = 0; GLOBALS.VerdanceMissionEvent("objective_complete", "x"); GLOBALS.VerdanceHeroEvent("down", "grath", "Grath", 0, 1, 2); GLOBALS.VerdanceBeat("bark", "Ketha", "ambient line", 5); GLOBALS.VerdanceBeat("wave_warning", 1, 2, 3, "north"); GLOBALS.VerdanceVetRank(101, "green", "hardened", 1, 2, 3, "m"); vo:DrawScreen() end)
 step("infil reopen", function() inf:TextCommand("vabrief"); inf:DrawScreen(); inf:KeyPress(13) end)

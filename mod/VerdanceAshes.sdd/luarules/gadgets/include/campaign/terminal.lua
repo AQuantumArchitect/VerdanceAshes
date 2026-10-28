@@ -21,7 +21,7 @@ function runTerminalCrunch(opts)
   if devTel.enabled and SendToUnsynced then
     SendToUnsynced("VERDANCE_TRACK", "result", lastResultJson or "")
   end
-  if SendToUnsynced then SendToUnsynced("VERDANCE_SORTIE_OVER", kind) end
+  if SendToUnsynced then SendToUnsynced("VERDANCE_MISSION_EVENT", "sortie_over", kind) end
   local profilingRun = headless.autoStart or balance.exportFrame or (#fib.milestones > 0)
   if profilingRun and headless.quit then
     headless.quitFrame = Spring.GetGameFrame() + 60
@@ -113,9 +113,11 @@ function publishTenebriumRules()
   local bank = tonumber(readField("bank")) or 0
   local looted = tonumber(readField("looted")) or tonumber(readField("total")) or 0
   local spent = tonumber(readField("spent")) or 0
+  local lost = tonumber(readField("lost")) or 0
   local field = asCount(readField("unclaimedWrecks"))
   pcall(Spring.SetGameRulesParam, "va_tenebrium_bank", bank, { public = true })
   pcall(Spring.SetGameRulesParam, "va_tenebrium_looted", looted, { public = true })
   pcall(Spring.SetGameRulesParam, "va_tenebrium_spent", spent, { public = true })
+  pcall(Spring.SetGameRulesParam, "va_tenebrium_lost", lost, { public = true })   -- a reload restores all four
   pcall(Spring.SetGameRulesParam, "va_tenebrium_wrecks_unclaimed", field, { public = true })
 end

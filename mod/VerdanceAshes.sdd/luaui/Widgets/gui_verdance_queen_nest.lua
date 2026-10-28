@@ -21,12 +21,8 @@ if not NEST_DEF then return false end
 local BANNER_SECONDS = 7
 local COLOURS = { { 1.00, 0.25, 0.85 }, { 0.20, 1.00, 0.85 }, { 1.00, 0.80, 0.20 } }
 
-local Ash
-do
-  local ok, mod = pcall(VFS.Include, "luaui/Include/va_ash_tokens.lua")
-  if not ok or type(mod) ~= "table" then ok, mod = pcall(VFS.Include, "LuaUI/Include/va_ash_tokens.lua") end
-  Ash = (ok and type(mod) == "table") and mod or nil
-end
+local Hud = VFS.Include("luaui/Include/va_hud.lua")
+local Ash = Hud.Ash
 
 local nest = nil          -- unitID, once seen
 local seen = false
@@ -47,7 +43,7 @@ local function discover(unitID)
   seen = true
   show("The Queen's Nest", "Burn the roosts if you like. Burn this, and the queen wakes.")
   say("That's her nest. Leave it standing unless you want the queen up.")
-  if not Spring.PlaySoundFile("beep4", 1.0, "ui") then Spring.PlaySoundFile("sounds/ui/beep4.wav", 1.0, "ui") end
+  Hud.sound("beep4", 1.0)
 end
 
 function widget:UnitEnteredLos(unitID)
@@ -63,7 +59,7 @@ end
 
 function widget:GameFrame(f)
   if f % 30 ~= 11 or fallenSaid then return end
-  if (tonumber((Spring.GetGameRulesParam("va_queen_nest_fallen"))) or 0) == 1 then
+  if Hud.on("va_queen_nest_fallen") then
     fallenSaid = true
     nest = nil
     show("The nest is burning", "The queen is awake.")

@@ -1,6 +1,6 @@
 -- Verdance molecule policy (Stage 4) — soft blend hand doctrine toward D(u).
--- Modoption / GameRulesParam: va_molecule_policy = off | shadow | soft
--- Default: off. Soft α from va_molecule_doctrine.lua (SOFT_ALPHA ≈ 0.28).
+-- Modoption: va_molecule_policy = off | shadow | soft
+-- Default: soft. Soft α from va_molecule_doctrine.lua (SOFT_ALPHA ≈ 0.28).
 -- BeliefField + player orders unchanged. Kiln/hive hard gates stay hand overrides.
 
 local M = {}
@@ -53,16 +53,9 @@ function M.normalizeMode(raw)
   return M.MODE_OFF
 end
 
---- Resolve mode: GameRulesParam overrides modoption when set.
---- Default soft (vibe seal / YOLO play path). Rollback: va_molecule_policy=off.
+--- Resolve mode from the modoption. Default soft (vibe seal / YOLO play path).
+--- Rollback: modoption va_molecule_policy=off.
 function M.resolveMode(modOptions)
-  local fromRules = nil
-  if Spring and Spring.GetGameRulesParam then
-    fromRules = Spring.GetGameRulesParam("va_molecule_policy")
-  end
-  if fromRules ~= nil and tostring(fromRules) ~= "" then
-    return M.normalizeMode(fromRules)
-  end
   local opts = modOptions or (Spring and Spring.GetModOptions and Spring.GetModOptions()) or {}
   local raw = opts.va_molecule_policy or opts.va_moleculepolicy
   if raw == nil or tostring(raw) == "" then

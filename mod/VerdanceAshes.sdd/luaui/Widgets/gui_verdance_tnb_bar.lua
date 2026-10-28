@@ -40,24 +40,12 @@ local COL = {
   panel = { 0.031, 0.063, 0.047, 0.90 },
   edge = { 0.239, 0.561, 0.333, 1.0 },
 }
-local Ash
-do
-  local ok, mod = pcall(VFS.Include, "luaui/Include/va_ash_tokens.lua")
-  if not ok or type(mod) ~= "table" then
-    ok, mod = pcall(VFS.Include, "LuaUI/Include/va_ash_tokens.lua")
-  end
-  Ash = (ok and type(mod) == "table") and mod or nil
-  if Ash and Ash.COL then
-    for k in pairs(COL) do
-      if Ash.COL[k] then COL[k] = Ash.COL[k] end
-    end
-  end
+local Hud = VFS.Include("luaui/Include/va_hud.lua")
+local Ash = Hud.Ash
+for k in pairs(COL) do
+  if Ash and Ash.COL[k] then COL[k] = Ash.COL[k] end
 end
-
-local function numParam(name, default)
-  local v = Spring.GetGameRulesParam(name)
-  return tonumber(v) or default
-end
+local numParam = Hud.num
 
 local function text(str, x, y, size, col, align)
   if Ash and Ash.text then

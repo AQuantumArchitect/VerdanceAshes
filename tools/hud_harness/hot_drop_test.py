@@ -87,7 +87,15 @@ WIDGET_RUN = ENC + r'''
 local DROPPATH = %s
 RULES = { va_hotdrop_pending = 1, va_hotdrop_token = "abc123", va_pad_x = 1200, va_pad_z = 3400 }
 PAUSED, SENT, CMDS, CAMERA, REMOVED = false, {}, {}, nil, false
-VFS = { Include = function(p) if p:find("va_active") then return true end error("no include " .. p) end, LoadFile = function() return nil end, RAW = 1 }
+local uiOpen, UI_DIR = io.open, %s   -- the HUD's own libraries come from disk
+VFS = { Include = function(p)
+  if p:find("va_active") then return true end
+  local name = p:match("[Ii]nclude/(va_[%%w_]+%%.lua)$")
+  local fh = name and uiOpen(UI_DIR .. "/" .. name, "rb")
+  if not fh then error("no include " .. p) end
+  local src = fh:read("a"); fh:close()
+  return assert(load(src, p))()
+end, LoadFile = function() return nil end, RAW = 1 }
 local realOpen = io.open
 io.open = function(p, mode) if p == "LuaUI/Config/verdance/drop.txt" then return realOpen(DROPPATH, mode) end return nil end
 Spring = {
@@ -101,6 +109,10 @@ Spring = {
   Echo = function() end,
 }
 gl = { Color = function() end, Text = function() end }
+for _, k in ipairs({ "Color", "Rect", "Text", "GetTextWidth", "LineWidth", "PointSize", "BeginEnd", "Vertex", "Texture", "TexCoord", "Shape", "Scissor", "DepthTest", "Blending", "PushMatrix", "PopMatrix", "Translate", "Scale", "Rotate" }) do
+  gl[k] = gl[k] or function(s) if k == "GetTextWidth" then return #tostring(s) * 0.6 end end
+end
+GL = GL or { LINES = 1, LINE_LOOP = 2, QUADS = 7, POINTS = 0, TRIANGLES = 4, TRIANGLE_FAN = 6, LINE_STRIP = 3 }
 widget = {}
 widgetHandler = { RemoveWidget = function() REMOVED = true end }
 local chunk = assert(loadfile(%s, "t", setmetatable({}, { __index = _G, __newindex = _G })))
@@ -136,7 +148,7 @@ step(1)
 out.playerUnpaused = not PAUSED
 out.removed = REMOVED
 return enc(out)
-''' % (json.dumps(DROP), json.dumps(WIDGET))
+''' % (json.dumps(DROP), json.dumps(os.path.join(MOD, 'luaui', 'Include')), json.dumps(WIDGET))
 
 ok = True
 

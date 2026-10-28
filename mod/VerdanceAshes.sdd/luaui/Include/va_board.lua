@@ -135,11 +135,12 @@ function Board:reload()
   Spring.Echo("VA_BOARD zones=" .. #self.zones .. " intel=" .. tostring(self.intel ~= nil) .. " asOfMinute=" .. tostring(self.intel and self.intel.asOfMinute))
 end
 
--- Roles from rules params first, seed second. Called cheaply whenever the key changes.
+-- Roles: the objective is the seed's target zone; the pad is wherever the exfil gadget says it is
+-- now (va_pad_zone: it moves onto taken ground), else the seed's. Called whenever the key changes.
 function Board:refreshRoles()
   local m = self.mission or {}
   local obj = m.objective or {}
-  self.objectiveId = str("va_target_zone") or (obj.targetZoneId and tostring(obj.targetZoneId)) or nil
+  self.objectiveId = obj.targetZoneId and tostring(obj.targetZoneId) or nil
   self.padId = str("va_pad_zone") or (m.pad and m.pad.zoneId and tostring(m.pad.zoneId)) or (self.padFile and self.padFile.zoneId and tostring(self.padFile.zoneId)) or (m.deploymentZoneId and tostring(m.deploymentZoneId)) or nil
   self.markIds = {}
   local lists = { obj.secondaryCaptureZoneIds, m.secondaryCaptureZoneIds, obj.captureZoneIds, m.captureZoneIds }
@@ -157,7 +158,7 @@ function Board:refreshRoles()
 end
 
 function Board:roleKeyNow()
-  return tostring(str("va_target_zone") or (self.mission and self.mission.objective and self.mission.objective.targetZoneId)) .. ":" .. tostring(str("va_pad_zone") or self.padId)
+  return tostring(self.objectiveId) .. ":" .. tostring(str("va_pad_zone") or self.padId)
 end
 
 -- The pad point: va_pad_x/z/r, then the pad file, then the pad zone's anchor.
@@ -181,21 +182,6 @@ function Board:objectivePoint()
   local z = self.objectiveId and self.byId[self.objectiveId]
   if z then return z.ax or z.cx, z.az or z.cz end
   return nil
-end
-
-function Board:zoneAt(x, z)
-  if not x or not z then return nil end
-  -- smallest zone containing the point (zones sorted big → small)
-  local hit = nil
-  for _, zr in ipairs(self.zones) do
-    if x >= zr.x1 and x <= zr.x2 and z >= zr.z1 and z <= zr.z2 then
-      for i = 1, #zr.cells do
-        local c = zr.cells[i]
-        if x >= c[1] and x <= c[3] and z >= c[2] and z <= c[4] then hit = zr; break end
-      end
-    end
-  end
-  return hit and hit.id or nil
 end
 
 function Board:label(id)
