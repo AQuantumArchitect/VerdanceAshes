@@ -973,7 +973,7 @@ def field_recruits_for_map(
             if m["reasons"] and "builder waits" in str(m["reasons"][0]):
                 row["entrance"] = True
             rows.append(row)
-        return _enc.apply_meeting_stance(rows, state, workspace)
+        return _enc.apply_meeting_stance(rows, state, workspace, mid)
 
     candidates: List[Dict[str, Any]] = []
     for hid, entry in field.items():
@@ -1006,7 +1006,7 @@ def field_recruits_for_map(
             out.append(dict(_row(gate[0], entry, mid, gate[1], 99.0), entrance=True))
     candidates = [c for c in candidates if c["heroId"] not in {o["heroId"] for o in out}]
     candidates.sort(key=lambda r: (-float(r.get("beliefScore") or 0), str(r.get("heroId") or "")))
-    return _enc.apply_meeting_stance(out + candidates[: max(0, int(limit) - len(out))], state, workspace)
+    return _enc.apply_meeting_stance(out + candidates[: max(0, int(limit) - len(out))], state, workspace, mid)
 
 
 def _collect_lost_field_recruit_ids(result: Dict[str, Any]) -> List[str]:
@@ -1273,8 +1273,7 @@ def hub_company_surface(state: Dict[str, Any], workspace: Optional[Path] = None)
             rec = w["recruit"] if isinstance(w["recruit"], dict) else {}
             if str(rec.get("type") or "wreck_rez") in _enc_st.KEEP_MEETING or rec.get("requiresVictory"):
                 continue
-            sc, why = _enc_st.stance_toward(str(w["id"]), state, workspace)
-            w["stance"] = {"score": sc, "kind": _enc_st.meeting_kind(sc, state, workspace), "reasons": why[:4]}
+            w["stance"] = _enc_st.meeting(str(w["id"]), state, workspace, w.get("mapId") or "")
     except Exception as exc:  # noqa: BLE001
         print(f"VA_STANCE_FAIL {type(exc).__name__}: {exc}")
     try:

@@ -1,5 +1,6 @@
-"""How a met hero turns up (owner, 2026-10-27): tension with the party = alive and against us, like the
-Kiln (put them down, raise the wreck); bonded = a wreck to raise; later it takes less tension."""
+"""How a met hero turns up (owner, 2026-10-27; continuous 2026-10-28): the chance they come in alive and
+against us, like the Kiln, is a logistic in their stance toward the party; it rises over the campaign.
+No thresholds."""
 import sys
 from pathlib import Path
 
@@ -19,30 +20,43 @@ def _edge(polarity):
     return next(e for e in web["edges"] if e.get("polarity") == polarity and e.get("authored"))
 
 
-def test_tension_with_someone_in_the_company_comes_in_hostile():
+def test_tension_makes_hostility_likely_and_a_bond_makes_it_rare():
     e = _edge("tension")
     st = _state([e["a"], "ketha"] if e["a"] != "ketha" else ["ketha", "vane"])
     other = e["b"] if e["a"] in st["company"]["core"] else e["a"]
     score, why = E.stance_toward(other, st, ROOT)
-    assert score <= -0.8 and any("tension" in w for w in why)
-    rows = E.apply_meeting_stance([{"heroId": other, "recruitMode": "wreck_rez", "spawnAsWreck": True}], st, ROOT)
-    assert rows[0]["recruitMode"] == "hostile" and rows[0]["spawnAsWreck"] is False
-    assert rows[0]["stance"]["kind"] == "hostile"
+    assert score < 0 and any("tension" in w for w in why)
+    assert E.p_hostile(score, st, ROOT) > 0.7
+    assert E.p_hostile(+1.0, st, ROOT) < 0.01
+    assert 0.02 < E.p_hostile(0.0, st, ROOT) < 0.2          # a stranger, now and then
 
 
-def test_a_bond_with_the_company_lies_as_a_wreck_to_raise():
-    e = _edge("bond")
+def test_the_curve_is_smooth_and_rises_over_the_campaign():
+    early, late = _state(["vane", "ketha"], 2), _state(["vane", "ketha"], 9)
+    xs = [x / 10.0 for x in range(-20, 21)]
+    ps = [E.p_hostile(x, early, ROOT) for x in xs]
+    assert all(a >= b for a, b in zip(ps, ps[1:]))            # monotone: the worse the stance, the likelier
+    assert max(abs(a - b) for a, b in zip(ps, ps[1:])) < 0.2  # no cliff anywhere
+    assert E.p_hostile(0.0, late, ROOT) > E.p_hostile(0.0, early, ROOT)
+    mid = _state(["vane", "ketha"], 5)
+    assert E.p_hostile(0.0, early, ROOT) < E.p_hostile(0.0, mid, ROOT) < E.p_hostile(0.0, late, ROOT)
+
+
+def test_the_roll_is_seeded_and_stamps_the_row():
+    e = _edge("tension")
     st = _state([e["a"], "ketha"] if e["a"] != "ketha" else ["ketha", "vane"])
     other = e["b"] if e["a"] in st["company"]["core"] else e["a"]
-    rows = E.apply_meeting_stance([{"heroId": other, "recruitMode": "wreck_rez", "spawnAsWreck": True}], st, ROOT)
-    assert rows[0]["stance"]["kind"] == "wreck" and rows[0]["spawnAsWreck"] is True
+    a = E.meeting(other, st, ROOT, "greenest_fields")
+    assert a == E.meeting(other, st, ROOT, "greenest_fields")
+    rows = E.apply_meeting_stance([{"heroId": other, "recruitMode": "wreck_rez", "spawnAsWreck": True}], st, ROOT, "greenest_fields")
+    assert rows[0]["stance"]["pHostile"] == a["pHostile"]
+    assert (rows[0]["recruitMode"] == "hostile") == (a["roll"] < a["pHostile"])
+    assert (rows[0]["spawnAsWreck"] is False) == (rows[0]["recruitMode"] == "hostile")
 
 
-def test_later_it_takes_less_tension():
-    early, late = _state(["vane", "ketha"], 2), _state(["vane", "ketha"], 9)
-    assert E.meeting_kind(-0.5, early, ROOT) == "authored"
-    assert E.meeting_kind(-0.5, late, ROOT) == "hostile"
-    assert E.meeting_kind(0.0, late, ROOT) == "authored"
+def test_bonded_heroes_turn_up_more_rarely_than_rivals():
+    r = E.rules(ROOT)["presence"]
+    assert float(r["ally"]) < float(r["adversary"])
 
 
 def test_who_keeps_their_own_way():
