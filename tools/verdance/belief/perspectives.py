@@ -25,7 +25,7 @@ from __future__ import annotations
 import json
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 from verdance.common import WORKSPACE_ROOT, clamp, load_json, tools_env
 from verdance.belief import world as W

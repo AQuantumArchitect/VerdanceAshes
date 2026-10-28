@@ -774,13 +774,6 @@ def merge_regions(grid: CellGrid, owner: List[int], seed_count: int,
     return owner
 
 
-COMPASS = [
-    ("Northwest", 0.33, 0.33), ("North", 0.5, 0.2), ("Northeast", 0.67, 0.33),
-    ("West", 0.2, 0.5), ("Central", 0.5, 0.5), ("East", 0.8, 0.5),
-    ("Southwest", 0.33, 0.67), ("South", 0.5, 0.8), ("Southeast", 0.67, 0.67),
-]
-
-
 def compass_name(nx: float, nz: float) -> str:
     """Where this sits, by bearing from the map centre.
 
@@ -795,10 +788,6 @@ def compass_name(nx: float, nz: float) -> str:
     sector = int((angle + 22.5) // 45) % 8
     return ["East", "Northeast", "North", "Northwest",
             "West", "Southwest", "South", "Southeast"][sector]
-
-
-def _compass_name_boxes(nx: float, nz: float) -> str:
-    return min(COMPASS, key=lambda c: (nx - c[1]) ** 2 + (nz - c[2]) ** 2)[0]
 
 
 def assign_role(sig: Dict[str, float]) -> Tuple[str, str]:

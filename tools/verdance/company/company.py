@@ -5,7 +5,6 @@ Unpicked heroes go into fieldPool (wild) for mid-run wreck/rez or sortie joins.
 """
 from __future__ import annotations
 
-import copy
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -102,19 +101,6 @@ WRECK_SEED_PROXY: Dict[str, str] = {
     "legvp": "legck",
     "cordoom": "corck",
 }
-
-# Archetypes where wild field recruits are bonus picks (not hard fail contracts).
-# Dedicated rescue/recruit contracts opt in via recruit.optionalJoin=false.
-RAID_OPTIONAL_RECRUIT_ARCHETYPES = frozenset(
-    {
-        "eco_raid",
-        "economy_disrupt",
-        "seize_lane",
-        "strike_relay",
-        "hold_plateau",
-        "gate_control",
-    }
-)
 
 CORE_DEFAULT = ["ketha"]
 SEAT_CAP_DEFAULT = 3

@@ -7,7 +7,7 @@ reinforcements enter only on the map edge, only inside a zone their faction trul
 
     VA_WS=$PWD python3 tools/hud_harness/enemy_entry_test.py
 """
-import ctypes, glob, json, os, re, sys
+import ctypes, glob, json, os, sys
 
 WS = os.environ.get("VA_WS") or os.getcwd()
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))

@@ -53,7 +53,7 @@ from verdance_kernel.paths import (
     showoff_dir,
     state_path,
 )
-from verdance_kernel.runtime import run_cmd, run_module, run_ps1
+from verdance_kernel.runtime import run_module, run_ps1
 
 KERNEL_SCHEMA = "verdance-campaign-kernel/1.0"
 

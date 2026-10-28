@@ -25,8 +25,6 @@ from verdance.world.map_umwelt import pressure_for
 
 ROOT = WORKSPACE_ROOT
 SCHEMA = "verdance-hero-observe/0.1"
-DEFAULT_TAPE = ROOT / "outbox" / "hero_observe_tape.jsonl"
-DEFAULT_FACE = ROOT / "outbox" / "hero_observe.latest.json"
 
 # recent-key window for cheap idempotency (proxy/sim double settle)
 _RECENT_SCAN = 40

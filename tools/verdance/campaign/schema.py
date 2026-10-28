@@ -469,7 +469,7 @@ def template_holdings(workspace: Path) -> Dict[str, Dict[str, str]]:
             held.setdefault(zid, max(sorted(by), key=lambda f: by[f]))
     _HOLDINGS[key] = out
     return out
-from verdance.world.theaters import EYE_RIM_ZONES, STANDING_CONTROL  # noqa: E402
+from verdance.world.theaters import STANDING_CONTROL  # noqa: E402
 
 
 def ensure_zone_memory(state: Dict[str, Any], workspace: Path) -> None:

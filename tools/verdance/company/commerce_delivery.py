@@ -8,7 +8,6 @@ Pawn-launcher packs use a fixed spool (no map hops).
 from __future__ import annotations
 
 import json
-import math
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 

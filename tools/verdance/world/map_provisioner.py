@@ -35,10 +35,8 @@ from __future__ import annotations
 
 import argparse
 import hashlib
-import io
 import json
 import os
-import sys
 import time
 import urllib.parse
 import urllib.request

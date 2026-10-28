@@ -5,9 +5,8 @@ Offscreen war drifts; player power draws pushback. Does not run BAR.
 """
 from __future__ import annotations
 
-import copy
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 from verdance.common import clamp
 
@@ -307,30 +306,6 @@ def _drift_zone_pressure(state: Dict[str, Any], map_id: str, hours: float) -> Li
         absr["pressure"] = round(mil, 4)
         out.append({"zoneId": zid, "faction": fac, "militaryPressure": absr["militaryPressure"]})
     return out
-
-
-def apply_power_to_intent(intent: Dict[str, Any], state: Dict[str, Any]) -> Dict[str, Any]:
-    """Stamp worldResponse onto mission intent for compiler / seat fair card."""
-    wr = state.get("worldResponse") or power_response(state)
-    intent = dict(intent or {})
-    intent["worldResponse"] = {
-        "denseTeeth": wr.get("denseTeeth"),
-        "loanScrutiny": wr.get("loanScrutiny"),
-        "regrowPressureBoost": wr.get("regrowPressureBoost"),
-        "multipressureContracts": wr.get("multipressureContracts"),
-        "armadaGarrisonScale": wr.get("armadaGarrisonScale"),
-        "pathWidthBoost": wr.get("pathWidthBoost"),
-        "softContracts": wr.get("softContracts"),
-        "pushbackEvents": list(wr.get("pushbackEvents") or []),
-        "phi": wr.get("phi"),
-        "playerStrengthComposite": (wr.get("playerStrength") or {}).get("composite"),
-    }
-    # Crisis flag path used by commerce / gadgets
-    wf = intent.setdefault("worldFlags", {})
-    if isinstance(wf, dict):
-        wf["armadaTenebriumCrisis"] = bool(wr.get("armadaTenebriumCrisis", True))
-        wf["loanScrutiny"] = bool(wr.get("loanScrutiny"))
-    return intent
 
 
 def self_test() -> Dict[str, Any]:

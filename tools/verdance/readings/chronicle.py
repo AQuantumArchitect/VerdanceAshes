@@ -23,7 +23,7 @@ from verdance.common import WORKSPACE_ROOT, load_json
 
 ROOT = WORKSPACE_ROOT
 SCHEMA = "verdance-chronicle/0.1"
-KEEP_VERBS = {"creation", "fission", "null", "fusion"}
+from verdance.readings.story_dance import FOLD_NEVER as KEEP_VERBS  # named events never fold
 KEEP_ICONS = {"❗", "📍", "🤝", "💔", "🪦", "🫱", "➕"}
 
 

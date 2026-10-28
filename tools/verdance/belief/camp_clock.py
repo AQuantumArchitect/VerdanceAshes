@@ -32,8 +32,6 @@ Nothing here writes outbox faces except camp.latest.json and intel.latest.json.
 from __future__ import annotations
 
 import json
-import math
-import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 

@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict
 
 from verdance.common import load_json
 from verdance.belief import manifest as _mf
@@ -20,7 +20,6 @@ from verdance.belief.match_credit import credit_from_result, resolve_verdict
 
 SORTIE_V2 = "verdance-sortie-contract/2.0"
 RESULT_V2 = "verdance-match-result/2.0"
-INTENT_V1 = "verdance-mission-intent/1.0"
 SORTIE_V1 = "verdance-sortie-order/1.0"
 RESULT_V1 = "verdance-match-result/1.0"
 
@@ -503,36 +502,6 @@ def result_v2_to_v1_fields(r: Dict[str, Any]) -> Dict[str, Any]:
         "credits": r.get("credits"),
         "credit": r.get("credit"),
     }
-
-
-def intent_from_sortie_v2(s: Dict[str, Any], base_intent: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-    """Stamp sortie v2 fields onto a mission intent dict."""
-    intent = dict(base_intent or {})
-    intent.setdefault("schemaVersion", INTENT_V1)
-    intent["mapId"] = s.get("mapId") or intent.get("mapId")
-    intent["targetZoneId"] = s.get("targetZoneId")
-    intent["deploymentZoneId"] = s.get("deploymentZoneId") or intent.get("deploymentZoneId")
-    intent["extractionZoneId"] = s.get("extractionZoneId") or intent.get("extractionZoneId")
-    intent["fromZoneIds"] = list(s.get("fromZoneIds") or [])
-    intent["captureZoneIds"] = list(s.get("captureZoneIds") or intent.get("captureZoneIds") or [])
-    intent["secondaryCaptureZoneIds"] = list(
-        s.get("secondaryCaptureZoneIds") or intent.get("secondaryCaptureZoneIds") or []
-    )
-    if s.get("hubChoiceId"):
-        intent["hubChoiceId"] = s.get("hubChoiceId")
-    if s.get("deployAces"):
-        intent["deployAces"] = list(s.get("deployAces") or [])
-    if s.get("crewBand"):
-        intent["crewBand"] = list(s.get("crewBand") or [])
-    intent["objective"] = s.get("objectiveArchetype") or intent.get("objective")
-    intent["patron"] = s.get("patron")
-    intent["sessionMode"] = s.get("sessionMode") or "same_map"
-    intent["occupationModel"] = s.get("occupationModel") or "living_shell"
-    if s.get("captureMode"):
-        intent["captureMode"] = s.get("captureMode")
-    intent["sortieContractV2"] = s
-    return intent
-
 
 
 def main() -> int:
