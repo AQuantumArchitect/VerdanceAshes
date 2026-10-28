@@ -27,11 +27,8 @@ local HERO_COL = { 0.490, 1.000, 0.541, 1.0 }  -- good
 local CRIT_COL = { 0.831, 0.769, 0.604, 1.0 }  -- gold
 local WRECK_COL = { 1.000, 0.490, 0.490, 1.0 } -- bad
 do
-  local ok, Ash = pcall(VFS.Include, "luaui/Include/va_ash_tokens.lua")
-  if not ok or type(Ash) ~= "table" then
-    ok, Ash = pcall(VFS.Include, "LuaUI/Include/va_ash_tokens.lua")
-  end
-  if ok and type(Ash) == "table" and Ash.COL then
+  local Ash = VFS.Include("luaui/Include/va_hud.lua").Ash
+  if Ash and Ash.COL then
     HERO_COL = { Ash.COL.good[1], Ash.COL.good[2], Ash.COL.good[3], 1 }
     CRIT_COL = { Ash.COL.gold[1], Ash.COL.gold[2], Ash.COL.gold[3], 1 }
     WRECK_COL = { Ash.COL.bad[1], Ash.COL.bad[2], Ash.COL.bad[3], 1 }

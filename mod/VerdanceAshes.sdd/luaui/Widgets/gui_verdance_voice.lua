@@ -16,12 +16,9 @@ end
 -- Pass seven. Other widgets call WG.vaVoice.say(speaker, text, seconds, accentColour).
 -- Synced beats arrive through VerdanceBeat / VerdanceVetRank. /valog prints the field log.
 
-local Ash
-do
-  local ok, mod = pcall(VFS.Include, "luaui/Include/va_ash_tokens.lua")
-  if not ok or type(mod) ~= "table" then ok, mod = pcall(VFS.Include, "LuaUI/Include/va_ash_tokens.lua") end
-  Ash = (ok and type(mod) == "table") and mod or nil
-end
+local Hud = VFS.Include("luaui/Include/va_hud.lua")
+local Ash = Hud.Ash
+local playUi = Hud.sound
 
 local vsx, vsy = Spring.GetViewGeometry()
 local BASE_Y = 150
@@ -32,17 +29,12 @@ local live = {}       -- showing { ..., until_ }
 local log = {}
 local lastAmbient = -999
 
-local function playUi(file, vol)
-  if not Spring.PlaySoundFile then return end
-  local ok = Spring.PlaySoundFile(tostring(file), vol or 1.0, "ui")
-  if not ok then Spring.PlaySoundFile("sounds/ui/" .. tostring(file) .. ".wav", vol or 1.0, "ui") end
-end
-
 local function say(speaker, text, seconds, accent, ambient)
   text = tostring(text or "")
   if text == "" then return end
   speaker = tostring(speaker or "")
   log[#log + 1] = { speaker = speaker, text = text }
+  Spring.Echo("VA_UI_SAY " .. (speaker ~= "" and (speaker .. ": ") or "") .. text)
   if #log > 80 then table.remove(log, 1) end
   local now = Spring.GetGameSeconds() or 0
   if ambient and (now - lastAmbient < 15 or #queue > 0 or #live >= SLOTS) then return end
@@ -88,6 +80,10 @@ end
 
 function widget:ViewResize(x, y) vsx, vsy = x, y end
 
+-- Beats from the synced side (beats.lua and the gadgets' barks), by kind:
+--   bark (speaker, text, seconds) · sound (file, volume) · wave_warning (.., .., .., where)
+--   narrative (x, z, "title|body|radius|seconds") · marker (x, y, z, text): said, never pinged
+--   crew_ready / field_recruit (.., .., line)
 function widget:VerdanceBeat(kind, a, b, c, d)
   if kind == "bark" then
     say(a, b, c, nil, true)
@@ -96,8 +92,7 @@ function widget:VerdanceBeat(kind, a, b, c, d)
   elseif kind == "wave_warning" then
     say("", "Inbound: " .. tostring(d or "enemy reinforcements"), 6, Ash and Ash.COL.warn)
     playUi("warning2", 0.7)
-  elseif kind == "narrative" or kind == "cam" then
-    -- a=x b=z c="title|body|radius|seconds|highlight" or c=title d=body
+  elseif kind == "narrative" then
     local title, body, seconds = tostring(c or ""), tostring(d or ""), 6
     if type(c) == "string" and c:find("|", 1, true) then
       local parts = {}
@@ -107,10 +102,11 @@ function widget:VerdanceBeat(kind, a, b, c, d)
       seconds = tonumber(parts[4]) or seconds
     end
     if body ~= "" then say(title, body, seconds) end
+  elseif kind == "marker" then
+    if type(d) == "string" and d ~= "" then say("", d, 6, Ash and Ash.COL.gold) end
   elseif kind == "crew_ready" or kind == "field_recruit" then
     if type(d) == "string" and d ~= "" then say("", d, 6) elseif type(c) == "string" and c ~= "" then say("", c, 6) end
   end
-  -- "marker" beats draw nothing: no pings.
 end
 
 local function unitLabel(unitID)

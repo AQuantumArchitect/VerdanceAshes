@@ -64,11 +64,9 @@ local function jsonString(key, s)
 end
 
 local function sessionStamp()
-  -- Spring.GetGameRulesParam is not reliable this early; the engine's own game id
-  -- is stable across the match and unique per match, which is exactly the key a
-  -- session file wants.
-  local gid = nil
-  if Spring.GetGameRulesParam then gid = Spring.GetGameRulesParam("va_mission_id") end
+  -- the time plus the mission's id: unique per match, readable in a directory listing
+  local ok, m = pcall(VFS.Include, "singleplayer/verdance_ashes/generated/va_current.lua")
+  local gid = ok and type(m) == "table" and m.missionId or nil
   local t = os.date("%Y%m%d_%H%M%S")
   if gid and gid ~= "" then return t .. "_" .. tostring(gid) end
   return t
@@ -123,6 +121,8 @@ function widget:Initialize()
     return
   end
   sessionPath = SESSION_DIR .. "/session_" .. sessionStamp() .. ".json"
+  -- BAR links only its own call-in names; ours has to be registered to be heard.
+  widgetHandler:RegisterGlobal(widget, "VerdanceTrack", function(kind, jsonStr) widget:VerdanceTrack(kind, jsonStr) end)
   Spring.Echo("[Verdance Recorder] Armed. Recording to " .. sessionPath)
 end
 
@@ -180,6 +180,7 @@ function widget:GameOver()
 end
 
 function widget:Shutdown()
+  if armed then pcall(function() widgetHandler:DeregisterGlobal(widget, "VerdanceTrack") end) end
   -- Catches the alt-F4 / quit-to-menu path, where no terminal ever fires. The
   -- movement record is still valid; only the outcome is missing.
   commit("shutdown")

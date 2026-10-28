@@ -19,7 +19,10 @@ end
 --   va_autopilot_minutes=M    game minutes before the company leaves regardless (default 15)
 --   va_autopilot_settle=S     game seconds to hold after the objective completes (default 40)
 -- The AI fights; it knows nothing of the campaign. This rig only: unpauses, nudges idle units
--- toward the wound, and calls the extraction (pad moves to the company: extract anywhere).
+-- toward the wound, and decides when the company leaves. Leaving goes through the HUD: this
+-- publishes va_autopilot_leave and the rig player widget (gui_verdance_rig_player.lua) presses
+-- EXTRACT and confirms the manifest, as a player would. If the HUD has not ended the sortie
+-- HUD_WAIT later, the autopilot extracts by itself and says VA_AUTOPILOT_HUD_SILENT: the loop broke.
 
 local opts = (Spring.GetModOptions and Spring.GetModOptions()) or {}
 if tostring(opts.va_autopilot) ~= "1" then return false end
@@ -29,6 +32,7 @@ local SPEED = num("va_autopilot_speed", 8)
 local CAP_FRAMES = math.floor(num("va_autopilot_minutes", 15) * 60 * 30)
 local SETTLE_FRAMES = math.floor(num("va_autopilot_settle", 40) * 30)
 local NUDGE_EVERY = 600
+local HUD_WAIT = 20 * 30
 -- test rig only: va_autopilot_force_complete=M marks the objective done at game minute M
 local FORCE_AT = num("va_autopilot_force_complete", 0) > 0 and math.floor(num("va_autopilot_force_complete", 0) * 1800) or nil
 
@@ -54,6 +58,7 @@ end
 local mission = nil
 local playerTeam = 0
 local doneAt, extracted = nil, false
+local leaveAt, leaveWhy = nil, nil  -- when, and why, the company was told to leave (the HUD's turn)
 local tx, tz = nil, nil
 
 local function rp(k) return tonumber((Spring.GetGameRulesParam(k))) or 0 end
@@ -67,12 +72,19 @@ end
 
 local function leave(reason, f)
   if extracted then return end
+  if not leaveAt then
+    leaveAt, leaveWhy = f, reason
+    Spring.SetGameRulesParam("va_autopilot_leave", reason, { public = true })
+    Spring.Echo("VA_AUTOPILOT_LEAVE reason=" .. reason .. " frame=" .. f .. " pad=" .. tostring((Spring.GetGameRulesParam("va_pad_zone"))))
+    return
+  end
+  if f - leaveAt < HUD_WAIT then return end
   if not GG.VA_ExfilCmd then
     if f % 300 == 0 then Spring.Echo("VA_AUTOPILOT waiting: exfil gadget has no command hook") end
     return
   end
   extracted = true
-  Spring.Echo("VA_AUTOPILOT_EXTRACT reason=" .. reason .. " frame=" .. f .. " pad=" .. tostring((Spring.GetGameRulesParam("va_pad_zone"))))
+  Spring.Echo("VA_AUTOPILOT_HUD_SILENT reason=" .. reason .. " frame=" .. f .. " (the HUD did not extract; extracting directly)")
   GG.VA_ExfilCmd("extract:home")
 end
 
@@ -129,6 +141,7 @@ function gadget:GameFrame(f)
   end
   if extracted or f % 30 ~= 11 then return end
   if rp("va_terminal") == 1 then extracted = true; return end
+  if leaveAt then return leave(leaveWhy, f) end   -- told to leave: the HUD's turn, then the fallback
   if FORCE_AT and f >= FORCE_AT and rp("va_objective_complete") ~= 1 and GG.VA_ObjectiveComplete then
     Spring.Echo("VA_AUTOPILOT test: forcing objective complete frame=" .. f)
     GG.VA_ObjectiveComplete("test_forced")

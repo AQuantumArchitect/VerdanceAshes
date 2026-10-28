@@ -178,11 +178,7 @@ function recordShellScar(unitID, unitDefID)
   if not unitID then return end
   local role = Spring.GetUnitRulesParam and Spring.GetUnitRulesParam(unitID, "va_force_role")
   local pocket = Spring.GetUnitRulesParam and Spring.GetUnitRulesParam(unitID, "va_shell_pocket")
-  -- Living shell stamps va_shell_zone; accept legacy va_zone_id if present.
-  local zone = Spring.GetUnitRulesParam and (
-    Spring.GetUnitRulesParam(unitID, "va_shell_zone")
-    or Spring.GetUnitRulesParam(unitID, "va_zone_id")
-  )
+  local zone = Spring.GetUnitRulesParam and Spring.GetUnitRulesParam(unitID, "va_shell_zone")
   local shell = Spring.GetUnitRulesParam and Spring.GetUnitRulesParam(unitID, "va_living_shell")
   if not (shell == 1 or shell == true or shell == "1" or pocket or role == "occupation" or role == "shell") then
     return

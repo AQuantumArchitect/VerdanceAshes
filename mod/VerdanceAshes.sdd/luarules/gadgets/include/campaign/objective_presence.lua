@@ -4,10 +4,10 @@
 -- Provides: checkPresenceObjective
 -- Uses: objective_checks, objectives, reinforcements, state, telemetry
 
+-- How much of the booked pocket is wrecked, and how much has to be (CLEAR_FRACTION of it).
 local function pocketClearProgress()
-  if objectiveTargetCount <= 0 then return 1.0, 0, 0 end
-  local need = math.max(1, math.ceil(objectiveTargetCount * CLEAR_FRACTION))
-  return objectiveTargetsDestroyed / objectiveTargetCount, objectiveTargetsDestroyed, need
+  if objectiveTargetCount <= 0 then return 0, 0 end
+  return objectiveTargetsDestroyed, math.max(1, math.ceil(objectiveTargetCount * CLEAR_FRACTION))
 end
 
 local function fireRegrowPressure(frame)
@@ -177,8 +177,8 @@ function checkPresenceObjective(frame)
     if tickZoneHold() then onObjectiveComplete("zone_held") end
     return
   end
-  local frac, destroyed, need = pocketClearProgress()
-  Spring.SetGameRulesParam("va_pocket_clear_frac", math.floor(frac * 1000 + 0.5) / 1000, { public = true })
+  local destroyed, need = pocketClearProgress()
+  Spring.SetGameRulesParam("va_pocket_clear_need", need, { public = true })   -- the HUD's "clear n / need"
   Spring.SetGameRulesParam("va_capture_phase", capture.phase, { public = true })
   if capture.phase == "clear" or capture.phase == "idle" then
     captureClearStep(frame, destroyed, need)
