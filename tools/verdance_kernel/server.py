@@ -201,23 +201,6 @@ def make_handler(kernel: CampaignKernel, showoff: Path):
                 code, body, ct = _json_bytes(result, code)
                 return self._send(code, body, ct)
 
-            if path == "/api/deploy":
-                try:
-                    plan = _read_json_body(self)
-                except Exception as e:  # noqa: BLE001
-                    code, body, ct = _json_bytes({"ok": False, "error": f"bad json: {e}"}, 400)
-                    return self._send(code, body, ct)
-                launch = qs.get("launch", ["0"])[0] in ("1", "true", "yes")
-                if isinstance(plan.get("launch"), bool):
-                    launch = plan.pop("launch")
-                result = kernel.commit_deploy(plan, launch=launch)
-                if result.get("accepted"):
-                    code = 202
-                else:
-                    code = 200 if result.get("ok") else 502
-                code, body, ct = _json_bytes(result, code)
-                return self._send(code, body, ct)
-
             if path in ("/api/preload", "/api/drop", "/api/cancel-preload"):
                 # Hot drop (verdance_kernel.hot_drop): load the field on sortie pick, drop the
                 # chosen packs into the running game, or close the loaded field.

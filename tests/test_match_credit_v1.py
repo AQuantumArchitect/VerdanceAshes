@@ -23,7 +23,7 @@ def _base(**kwargs):
         "mapId": "greenest_fields",
         "targetZoneId": "GF_C_INNER_GATE",
         "frame": 9000,
-        "freeTnbMint": True,  # raw may lie — normalize must force false
+        "freeTnbMint": True,  # a legacy raw key: normalize drops it
     }
     r.update(kwargs)
     return r
@@ -46,7 +46,7 @@ class TestCreditTable(unittest.TestCase):
         self.assertTrue(c["zoneFlip"])
         self.assertEqual(c["xpTier"], "full")
         self.assertTrue(c["advanceMission"])
-        self.assertFalse(c["freeTnbMint"])
+        self.assertNotIn("freeTnbMint", c)
         self.assertIn("ch1", c["resultKey"])
 
     def test_victory_no_claim_no_capture_flip(self):
@@ -131,10 +131,10 @@ class TestCreditTable(unittest.TestCase):
         self.assertEqual(c["verdict"], "partial")
         self.assertFalse(c["fullSuccess"])
 
-    def test_free_tnb_always_false(self):
+    def test_no_tenebrium_flag_on_credit(self):
         r = _base(status="victory", nodeClaimed=True, freeTnbMint=True)
         c = mc.credit_from_result(r)
-        self.assertFalse(c["freeTnbMint"])
+        self.assertNotIn("freeTnbMint", c)
 
     def test_mode_a_chapter_keys_differ(self):
         r1 = _base(chapterIndex=1, frame=1000, status="victory", terminalReason="extracted")
@@ -153,10 +153,10 @@ class TestCreditTable(unittest.TestCase):
 
 
 class TestNormalizeLaw(unittest.TestCase):
-    def test_normalize_forces_free_tnb_false(self):
+    def test_normalize_drops_legacy_mint_flag(self):
         raw = _base(status="victory", freeTnbMint=True, nodeClaimed=True)
         n = normalize_result(raw)
-        self.assertFalse(n["freeTnbMint"])
+        self.assertNotIn("freeTnbMint", n)
         self.assertEqual(n["verdict"], "victory")
         self.assertFalse(n["success"] is False and n["verdict"] == "victory")
 
@@ -259,7 +259,7 @@ class TestProcessResultCredit(unittest.TestCase):
         state, report, _, _ = process_result(state, result, None, self.ws, None)
         self.assertTrue(report.get("processed"))
         self.assertTrue(report.get("zoneFlipped") or report.get("nodeClaimed"))
-        self.assertFalse(report.get("freeTnbMint", True))
+        self.assertIsNone(report.get("freeTnbMint"))
 
     def test_duplicate_noop(self):
         from verdance.campaign import process_result

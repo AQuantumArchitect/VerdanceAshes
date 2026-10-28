@@ -271,25 +271,25 @@ function renderCompanyIntro() {
   const pool = crewBandOrder().filter(id => !coreIds.includes(id));
   if (metaEl) {
     const spent = formationSpent(), wallet = crewWallet();
+    const anyCost = pool.some(id => crewHireCost(id) > 0);
     metaEl.innerHTML =
-      `<span class="chip">${coreIds.map(crewHeroName).join(", ")} always comes</span>` +
-      `<span class="chip">${picks.length}/${cap} chosen</span>` +
-      (spent > 0 ? `<span class="chip">${wallet - spent}/${wallet} Tnb left (builders)</span>` : `<span class="chip">Combat seats free</span>`);
+      `<span class="chip">${picks.length} of ${cap} chosen</span>` +
+      (anyCost ? `<span class="chip">${spent > 0 ? `${wallet - spent} of ${wallet} Tnb left` : `${wallet} Tnb`}: fighters are free, builders cost Tenebrium</span>` : "");
   }
   // Slots: you (void-touched, top), then the companions.
   if (slotsEl) {
     const youCard = state.crewYou
-      ? renderHeroCard({ id: state.crewYou, tag: "you", classes: ["on", "toggleable"], panel: true, compact: true, hideCost: true, dataCrew: state.crewYou, type: "button" })
+      ? renderHeroCard({ id: state.crewYou, classes: ["on", "toggleable"], panel: true, compact: true, hideCost: true, formation: true, dataCrew: state.crewYou, type: "button" })
       : `<div class="slot-empty">Choose who you are. Anyone who can walk.</div>`;
     const companions = [];
     for (let k = 0; k < cap - 1; k++) {
       const id = state.crewBand[k];
       companions.push(id
-        ? renderHeroCard({ id, classes: ["on", "toggleable"], panel: true, compact: true, hideCost: true, dataCrew: id, type: "button" })
-        : `<div class="slot-empty">Companion</div>`);
+        ? renderHeroCard({ id, classes: ["on", "toggleable"], panel: true, compact: true, hideCost: true, formation: true, dataCrew: id, type: "button" })
+        : `<div class="slot-empty">${state.crewYou ? "Pick someone below" : "Then two who come with you"}</div>`);
     }
     slotsEl.innerHTML =
-      `<div class="slot-you"><div class="slot-label">You · void-touched</div>${youCard}</div>` +
+      `<div class="slot-you"><div class="slot-label">You (void-touched)</div>${youCard}</div>` +
       `<div class="slot-companions"><div class="slot-label">Who comes with you</div><div class="slot-row">${companions.join("")}</div></div>`;
   }
   const full = picks.length >= cap;
@@ -302,20 +302,20 @@ function renderCompanyIntro() {
     const locked = full || broke || noLead;
     return renderHeroCard({
       id,
-      tag: heroCanLead(id) ? null : "cannot lead",
+      tag: heroCanLead(id) ? null : "can't be you",
       classes: [locked ? "locked" : "toggleable"].filter(Boolean),
-      costTnb: cost, costKm, pickable: true, showFreeCost: true, panel: true, compact: true,
+      costTnb: cost, costKm, pickable: true, showFreeCost: false, panel: true, compact: true, formation: true,
       dataCrew: locked ? null : id, disabled: locked, type: "button",
     });
   }).join("");
   if (countEl) {
     countEl.innerHTML = picks.length === cap
-      ? `Ready · <b>${crewHeroName(state.crewYou)}</b> (you) · ${state.crewBand.map(crewHeroName).join(" · ")} · ${coreIds.map(crewHeroName).join(" · ")}`
-      : (needYou ? "Choose who you are" : `Pick <b>${cap - picks.length}</b> more`);
+      ? `Ready: you are <b>${crewHeroName(state.crewYou)}</b>, with ${state.crewBand.concat(coreIds).map(crewHeroName).join(", ")}`
+      : (needYou ? "Click a card below to choose who you are" : `Pick <b>${cap - picks.length}</b> more`);
   }
   if (sealBtn) {
     sealBtn.disabled = picks.length !== cap || needYou;
-    sealBtn.textContent = picks.length === cap ? "Confirm company" : `Confirm (${picks.length}/${cap})`;
+    sealBtn.textContent = picks.length === cap ? "Confirm company" : `Confirm (${picks.length} of ${cap})`;
   }
 }
 
@@ -447,19 +447,19 @@ export function renderCompany() {
     if (sealed) {
       const later = list(companySurface().joinedLater);
       const bag = `${crewWallet()} Tnb · ${(crewMetalK() * 1000).toLocaleString()} metal`;
-      walletEl.textContent = later.length ? `Sealed · ${bag} · +${later.length} join${later.length === 1 ? "" : "s"}` : `Sealed · ${bag}`;
+      walletEl.textContent = later.length ? `${bag} · ${later.length} joined in the field` : bag;
     } else {
       const spentTnb = crewSpent(), wallet = crewWallet();
       walletEl.textContent = spentTnb > 0
-        ? `${wallet - spentTnb}/${wallet} Tnb (builders/reactors) · ${state.crewBand.length}/${cap}`
-        : `Combat seats free · ${state.crewBand.length}/${cap}`;
+        ? `${wallet - spentTnb} of ${wallet} Tnb left · ${state.crewBand.length} of ${cap} chosen`
+        : `${state.crewBand.length} of ${cap} chosen`;
     }
   }
   renderCompanyRecruitSlot();
   const rep = state.hub.reputation || {};
   if ($("rep")) {
     $("rep").innerHTML = Object.entries(rep).map(([k, v]) =>
-      `<div class="panel-card"><div class="row"><span class="rep-name">${esc(repLabel(k))}</span><strong>${esc(v)}</strong></div></div>`
+      `<div class="panel-card"><div class="row"><span class="rep-name">${esc(repLabel(k))}</span><strong title="How they regard the company, 0 to 100">${esc(v)}</strong></div></div>`
     ).join("");
   }
   updateDeployGate();
@@ -539,18 +539,18 @@ function renderShopListing(item) {
 export function renderShop() {
   const c = commerce();
   $("shop-balances").innerHTML = `
-      <div class="bal tnb">Tenebrium<strong>${c.tenebrium ?? 0}</strong>∞ storage</div>
-      <div class="bal cred">Metal<strong>${(metalKOf(c) * 1000).toLocaleString()} metal</strong>~${metalKOf(c) * 1000} banked</div>`;
+      <div class="bal cred">Metal to spend<strong>${(metalKOf(c) * 1000).toLocaleString()}</strong>from what you brought home</div>
+      <div class="bal tnb">Tenebrium<strong>${c.tenebrium ?? 0}</strong>for builders and the suit</div>`;
   $("shop-note").textContent = !state.hostLive
     ? "Preview only. Start PLAY.bat and keep its window open to make campaign purchases."
     : storeLocked() ? "The field is loading. What you hired is aboard; the store opens again for the next drop."
-    : "Everything here is for this drop only. Hire, then Launch. Rented heroes join the party; win the campaign with one in the company to keep them.";
+    : "Everything here is for this drop only. Hire, then Launch. A rented hero joins the party; win the campaign with them in the company and they are yours.";
   const kit = c.deployKit || [];
   const inbound = c.inbound || c.pendingDeliveries || [];
   const kitHtml = kit.map(k => `<div class="kit-line"><b>${esc(k.label || k.listingId)}</b>${k.count ? " · ×" + esc(k.count) : ""}${k.loan ? " · loan" : ""}${k.factoryDef ? " · fabricator" : ""}</div>`).join("");
   const inboundHtml = inbound.map(k => {
     const d = k.delivery || {};
-    return `<div class="kit-line"><b>INBOUND</b> ${esc(k.label || k.listingId)}${k.count ? " · ×" + esc(k.count) : ""}${d.etaText ? " · " + esc(d.etaText) : ""}${d.sourceLabel ? " · from " + esc(d.sourceLabel) : ""}</div>`;
+    return `<div class="kit-line"><b>On the way:</b> ${esc(k.label || k.listingId)}${k.count ? " · ×" + esc(k.count) : ""}${d.etaText ? " · " + esc(d.etaText) : ""}${d.sourceLabel ? " · from " + esc(d.sourceLabel) : ""}</div>`;
   }).join("");
   $("deploy-kit").innerHTML = (kitHtml || inboundHtml) ? `<div class="drop-squad-kicker">Hired for this drop</div>${kitHtml}${inboundHtml}` : "";
   const order = ["mercs", "heroes", "rights", "specials"];

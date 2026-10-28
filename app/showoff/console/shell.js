@@ -3,7 +3,7 @@
 import { state, session, CREW, commerce, metalKOf, prettyMap, sessionLabel, jobLabel } from "./state.js";
 import { api } from "./api.js";
 import { $, esc, escape, pretty, field, operation, thread, reactions, scene, fieldLine, toast } from "./render.js";
-import { updateIntelligence, zoneInspector } from "./board.js";
+import { updateIntelligence, zoneInspector, predictedFieldRecruits } from "./board.js";
 import { onChoice } from "./operations.js";
 import { companyMemberIds, fieldPeople } from "./company.js";
 import { renderCampCard } from "./home.js";
@@ -19,15 +19,16 @@ export function renderBadges() {
   $("hud-title").textContent = `${(arc.title) || "First Scar"} · sortie ${h.missionNumber || 1}`;
   const home = h.sessionHomeMap || "the_rock_jungle";
   const sortie = (h.node && (h.node.sortieMapId || h.node.regionHint)) || state.focusMap || home;
+  // Three chips: whether the campaign is connected, where the next sortie is, and the bag.
+  const metal = (metalKOf(commerce()) * 1000).toLocaleString();
+  const tnb = h.tenebrium ?? commerce().tenebrium ?? 0;
   $("hud-badges").innerHTML = [
-    `<span class="badge ${live ? "live" : "warn"}">${live ? "Campaign connected" : "Map only"}</span>`,
-    `<span class="badge steam" title="Home you are founding">${esc(prettyMap(home))} home</span>`,
-    `<span class="badge gold" title="Briefing / Drop theater">${esc(prettyMap(sortie))} sortie</span>`,
-    `<span class="badge">${esc(sessionLabel(h.sessionMode))}</span>`,
-    `<span class="badge tnb">Tenebrium ${h.tenebrium ?? commerce().tenebrium ?? 0}</span>`,
-    `<span class="badge gold" title="Campaign metal available between sorties">${(metalKOf(commerce()) * 1000).toLocaleString()} metal</span>`,
+    live ? `<span class="badge live" title="PLAY.bat is running: results come home on their own">Connected</span>`
+         : `<span class="badge warn" title="Start PLAY.bat and keep its window open to fight">Map only</span>`,
+    `<span class="badge steam" title="${esc(sessionLabel(h.sessionMode))} · home: ${esc(prettyMap(home))}">Next: ${esc(prettyMap(sortie))}</span>`,
+    `<span class="badge gold" title="Campaign metal and Tenebrium, spent in the mercenary store and at home">${metal} metal · <span class="tnb">${tnb} Tnb</span></span>`,
   ].join("");
-  $("foot-left").textContent = live ? `Campaign connected · sortie ${h.missionNumber || 1}` : `Map only · start PLAY.bat and keep its window open`;
+  $("foot-left").textContent = "";  // the header chip says whether the campaign is connected
 }
 // Kicker + title over the theater.
 export function renderHeadline() {
@@ -81,8 +82,16 @@ function opCard(c, op, snap) {
   const title = raw.replace(/^Lean · /, "");
   const kind = (c.effect && (c.effect.objectiveArchetype || c.effect.contractKind)) || "";
   const sub = (op && op.recommendation) || [prettyMap(c.effect && c.effect.mapId), kind ? jobLabel(kind) : ""].filter(Boolean).join(" · ");
+  // Who the company may meet on this job's field (the kernel's draw; nobody is promised).
+  const eff = c.effect || {};
+  let meet = [];
+  try {
+    meet = predictedFieldRecruits(eff.mapId, { mapId: eff.mapId, marks: { captureZoneIds: eff.captureZoneIds || (eff.preferredCaptureZoneId ? [eff.preferredCaptureZoneId] : []), deployZoneId: eff.preferredDeployZoneId || null } })
+      .map(r => `${r.name || r.id}${r.stance && r.stance.kind === "hostile" ? " (against us)" : ""}`);
+  } catch (err) { meet = []; }
   return `<button class="cc-operation" type="button" data-operation="${escape(c.id)}" ${c.disabled ? "disabled" : ""} aria-pressed="${c.id === snap.plan?.choiceId}">` +
-    `${lean ? `<em class="cc-lean">lean</em>` : ""}<strong>${escape(title)}</strong><span>${escape(sub)}</span></button>`;
+    `${lean ? `<em class="cc-lean" title="The war is moving this way">the world leans here</em>` : ""}<strong>${escape(title)}</strong><span>${escape(sub)}</span>` +
+    `${meet.length ? `<span class="cc-meet">May meet: ${escape(meet.join(", "))}</span>` : ""}</button>`;
 }
 export function paint() {
   const n = session.narrative;
@@ -115,14 +124,21 @@ export function paint() {
   $("cc-home-status").innerHTML = field("Established", camp.cleared ? "Home ground secured" : `Camp level ${camp.level || 0}`) +
     field("Next milestone", camp.cleared ? "Hold what the company has built." : camp.clearReady ? "The home-clear operation is ready. Review its route and requirements." : "Raise the camp to prepare for clearing the surrounding wilds.") +
     field("Next improvement", camp.cleared ? "Home clear achieved." : `1 Tenebrium + 1,000 campaign metal. ${camp.canRaise ? "Available now." : "Gather the required resources before raising camp."}`);
-  $("cc-company-members").innerHTML = "<h2>Know your company</h2><div class=\"cc-members\">" + (snap.hub.aces || []).filter(a => companyMemberIds().includes(a.id)).map(a => {
+  const condition = st => ({ active: "Ready", wounded: "Wounded: sits out until healed", dead: "Fallen", lost: "Lost" })[String(st || "active").toLowerCase()] || pretty(st);
+  $("cc-company-members").innerHTML = "<div class=\"cc-members\">" + (snap.hub.aces || []).filter(a => companyMemberIds().includes(a.id)).map(a => {
     const p = CREW.heroes?.[a.id] || {};
-    return `<button type="button" data-hero="${escape(a.id)}"><strong>${escape(a.name || pretty(a.id))}</strong><span>${escape(a.status || "Condition unknown")}</span><p>${escape(p.blurb || a.role || "Company specialist")}</p></button>`;
+    return `<button type="button" data-hero="${escape(a.id)}"><strong>${escape(a.name || pretty(a.id))}</strong><span>${escape(condition(a.status))}</span><p>${escape(p.blurb || a.role || "Company specialist")}</p></button>`;
   }).join("") + "</div>";
   const scenes = $("cc-company-scenes");
   const openScenes = new Set([...scenes.querySelectorAll("details[open][data-scene]")].map(el => el.dataset.scene));
-  scenes.innerHTML = "<h2>The promises we live by</h2>" + (n?.leadership?.length ? n.leadership.slice(-6).reverse().map(c => `<blockquote><strong>${escape(c.stance)}</strong><p>${escape(c.words)}</p><small>Chosen after sortie ${escape(c.turn)}</small></blockquote>`).join("") : "<p>Your responses to company matters will be remembered here. A promise shows what you value; your returns show how you lived up to it.</p>") +
-    "<h2>Between sorties</h2>" + (n?.scenes || []).map(s => scene(s, snap.live)).join("") + "<h2>How they see your command</h2>" + reactions(n?.reactions);
+  // Each section shows only once it has something in it; before the first answer, one line says where answers go.
+  const promises = (n?.leadership || []).slice(-6).reverse().map(c => `<blockquote><strong>${escape(c.stance)}</strong><p>${escape(c.words)}</p><small>Chosen after sortie ${escape(c.turn)}</small></blockquote>`).join("");
+  const between = (n?.scenes || []).map(s => scene(s, snap.live)).join("");
+  const seen = reactions(n?.reactions);
+  scenes.innerHTML =
+    (promises ? "<h2>The promises we live by</h2>" + promises : `<p class="cc-empty">Answer a company matter (right) and your words are kept here.</p>`) +
+    (between ? "<h2>Between sorties</h2>" + between : "") +
+    (seen ? "<h2>How they see your command</h2>" + seen : "");
   scenes.querySelectorAll("[data-scene]").forEach(el => el.open = openScenes.has(el.dataset.scene));
   renderInspector();
 }

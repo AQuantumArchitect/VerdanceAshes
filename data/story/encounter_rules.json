@@ -24,12 +24,17 @@
     "prefer": "consul"
   },
   "meetingStance": {
-    "notes": "How a met hero turns up (owner call, 2026-10-27). Stance = the bond web's edges between them and the company (allies +, rivalry/tension/friction -; an authored edge 1.0, deepened by bond points earned together). At or below -hostileAt they come in alive, on the enemy's side, like the Kiln: put them down and raise the wreck to sign them on. At or above bondedAt they lie as a wreck to raise. From lateFromMission on it takes only hostileAtLate. 'neutral' / 'neutralLate' say what everyone else does: 'authored' (their recruit entry's way), 'hostile' or 'wreck'.",
-    "hostileAt": 0.8,
-    "bondedAt": 0.8,
-    "lateFromMission": 6,
-    "hostileAtLate": 0.4,
-    "neutral": "authored",
-    "neutralLate": "authored"
+    "notes": "How a met hero turns up (owner calls 2026-10-27/28; continuous, no thresholds). stance = the bond web's edges between the hero and everyone in the company (allies +, rivalry/tension/friction -; an authored edge 1.0, a derived one half its score; deepened by bond points earned together). pHostile = 1 / (1 + exp((stance + bias) / softness)); a seeded roll under it spawns the hero alive on the enemy's side, like the Kiln (put them down, raise the wreck); otherwise they come their authored way (a wreck, for most). bias slides from 'bias' to 'biasLate' between missions rampFrom and rampTo. Lower bias = more hostility everywhere; smaller softness = sharper.",
+    "bias": 0.6,
+    "biasLate": 0.2,
+    "rampFrom": 2,
+    "rampTo": 9,
+    "softness": 0.25
+  },
+  "presence": {
+    "notes": "How much a relation to someone in the company raises the chance of meeting a wild hero, per side (umwelt.foresight.encounter Weights presence_ally / presence_adversary). Owner call 2026-10-28: the bonded turn up more rarely than the ones at odds with the party. 'relation' is the shared weight an older Umwelt uses.",
+    "relation": 0.7,
+    "ally": 0.45,
+    "adversary": 1.0
   }
 }

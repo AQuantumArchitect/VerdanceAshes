@@ -1,0 +1,629 @@
+<title>Verdance Hero Ledger</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=Public+Sans:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a field dossier. Character first (voice, temper, ties), then what they bring, then the books.
+   Paper is ash-grey with a green cast (regrowth over char); verdigris marks allies, ember marks tension. */
+:root{
+  --paper:#eceee7; --sheet:#f7f8f3; --ink:#1a201b; --dim:#566158; --rule:#cdd3c9;
+  --verd:#2b7656; --verd-soft:#d6e8dc; --ember:#b1492a; --ember-soft:#f3ddd3; --gold:#8a6d22;
+  --armada:#3a6fb8; --cortex:#b83b3f; --legion:#2f8a4f; --mixed:#7a6a9a;
+  --f-display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  --f-body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+  --fs-xs:.75rem; --fs-sm:.84rem; --fs-md:.95rem; --fs-lg:1.15rem; --fs-xl:1.6rem; --fs-xxl:clamp(2.2rem,6vw,3.6rem);
+  --r:6px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#111512; --sheet:#181d19; --ink:#e3e9e2; --dim:#94a197; --rule:#2c342e;
+  --verd:#6cc297; --verd-soft:#1d3428; --ember:#e98a66; --ember-soft:#3a2219; --gold:#d6b866;
+  --armada:#78a6ea; --cortex:#ec7a7d; --legion:#6cc98d; --mixed:#b3a2d6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#111512; --sheet:#181d19; --ink:#e3e9e2; --dim:#94a197; --rule:#2c342e;
+  --verd:#6cc297; --verd-soft:#1d3428; --ember:#e98a66; --ember-soft:#3a2219; --gold:#d6b866;
+  --armada:#78a6ea; --cortex:#ec7a7d; --legion:#6cc98d; --mixed:#b3a2d6; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 60px}
+.wrap{max-width:1240px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+h1,h2,h3{font-family:var(--f-display);font-weight:800;letter-spacing:.01em;text-wrap:balance;margin:0;line-height:1.05}
+h1{font-size:var(--fs-xxl);text-transform:uppercase}
+h2{font-size:var(--fs-xl);text-transform:uppercase}
+h3{font-size:var(--fs-lg);font-weight:600}
+p{margin:0}
+.eyebrow{font-family:var(--f-mono);font-size:var(--fs-xs);letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.muted{color:var(--dim)}
+button,select,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--verd);outline-offset:2px}
+.btn{border:1px solid var(--rule);background:var(--sheet);border-radius:var(--r);padding:.35rem .7rem;font-size:var(--fs-sm)}
+.btn:hover{border-color:var(--verd)}
+.btn.primary{background:var(--verd);border-color:var(--verd);color:var(--sheet);font-weight:600}
+.chip{display:inline-flex;align-items:center;gap:.3em;font-size:var(--fs-xs);padding:.08rem .45rem;border-radius:99px;border:1px solid var(--rule);white-space:nowrap}
+.dot{width:.55em;height:.55em;border-radius:50%;display:inline-block;background:var(--dim)}
+.f-armada{--fc:var(--armada)} .f-cortex{--fc:var(--cortex)} .f-legion{--fc:var(--legion)} .f-mixed{--fc:var(--mixed)}
+.dot.fac{background:var(--fc)}
+section{display:flex;flex-direction:column;gap:14px}
+.sec-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px;border-bottom:2px solid var(--ink);padding-bottom:6px}
+.lede{max-width:68ch;color:var(--dim)}
+
+/* masthead */
+.mast{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:24px;align-items:end}
+@media (max-width:820px){.mast{grid-template-columns:1fr}}
+.mast .counts{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.lens{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:12px;display:flex;flex-direction:column;gap:8px}
+.lens-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.lens select{border:1px solid var(--rule);background:var(--paper);border-radius:var(--r);padding:.25rem .4rem;max-width:11rem;font-size:var(--fs-sm)}
+.lens input[type=range]{flex:1;min-width:120px;accent-color:var(--verd)}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+
+/* toolbar */
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tools input[type=search]{flex:1;min-width:180px;border:1px solid var(--rule);background:var(--sheet);border-radius:var(--r);padding:.4rem .6rem}
+.tools select{border:1px solid var(--rule);background:var(--sheet);border-radius:var(--r);padding:.35rem .4rem;font-size:var(--fs-sm)}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:var(--r);overflow:hidden}
+.seg button{border:0;background:var(--sheet);padding:.32rem .6rem;font-size:var(--fs-sm)}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--paper)}
+
+/* roster cards */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,290px),1fr));gap:12px}
+.hcard{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:12px 12px 10px;display:flex;flex-direction:column;gap:7px;text-align:left;min-width:0;position:relative}
+.hcard:hover{border-color:var(--dim)}
+.hcard.sel{border-color:var(--verd);box-shadow:0 0 0 1px var(--verd)}
+.hcard .top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.hcard .nm{font-family:var(--f-display);font-weight:800;font-size:1.3rem;line-height:1;text-transform:uppercase;letter-spacing:.01em}
+.hcard .who{font-size:var(--fs-xs);color:var(--dim);margin-top:3px}
+.hook{font-style:italic;font-size:var(--fs-md);line-height:1.35}
+.hook::before{content:"“"} .hook::after{content:"”"}
+.temper{display:flex;flex-wrap:wrap;gap:4px}
+.temper .chip{border-color:transparent;background:var(--paper)}
+.brings{font-size:var(--fs-sm)}
+.brings b{font-weight:600}
+.fx{font-size:var(--fs-sm);border-left:3px solid var(--gold);padding-left:8px}
+.fx b{color:var(--gold);font-weight:600}
+.ties{display:flex;flex-wrap:wrap;gap:4px;font-size:var(--fs-xs)}
+.tie{padding:.05rem .4rem;border-radius:99px;border:1px solid var(--rule)}
+.tie.ally{background:var(--verd-soft);border-color:transparent}
+.tie.adv{background:var(--ember-soft);border-color:transparent}
+.tie.inparty{font-weight:600;outline:1px solid currentColor}
+.meet{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;font-size:var(--fs-xs);border-top:1px dashed var(--rule);padding-top:7px}
+.bar{height:6px;background:var(--paper);border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ember)}
+.status{font-family:var(--f-mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;padding:.05rem .35rem;border-radius:3px;border:1px solid var(--rule);color:var(--dim)}
+.status.core,.status.starter{color:var(--verd);border-color:var(--verd)}
+.open{align-self:flex-start;border:0;background:none;padding:0;color:var(--verd);font-size:var(--fs-sm);font-weight:600}
+
+/* dossier */
+.dossier{background:var(--sheet);border:1px solid var(--ink);border-radius:var(--r);padding:18px;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:22px}
+@media (max-width:860px){.dossier{grid-template-columns:1fr}}
+.dossier .col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.dossier .fiction{font-size:var(--fs-md);max-width:65ch}
+.field{display:flex;flex-direction:column;gap:3px}
+.field>.eyebrow{margin-bottom:1px}
+.quote{border-left:3px solid var(--verd);padding:2px 0 2px 10px;font-size:var(--fs-sm)}
+.links{display:flex;flex-direction:column;gap:5px;font-size:var(--fs-sm)}
+.link{display:grid;grid-template-columns:7.5rem minmax(0,1fr);gap:8px}
+.link .p{font-family:var(--f-mono);font-size:var(--fs-xs);text-transform:uppercase;letter-spacing:.06em;padding-top:2px}
+.link .p.ally{color:var(--verd)} .link .p.adv{color:var(--ember)}
+details.books{border-top:1px solid var(--rule);padding-top:8px}
+details.books summary{cursor:pointer;font-family:var(--f-mono);font-size:var(--fs-xs);letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.kv{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:3px 14px;font-size:var(--fs-sm);margin-top:8px}
+.kv dt{color:var(--dim)} .kv dd{margin:0;font-family:var(--f-mono);font-size:var(--fs-xs);padding-top:2px;overflow-wrap:anywhere}
+.axes{display:grid;grid-template-columns:4.6rem minmax(0,1fr) 2.6rem;gap:3px 8px;align-items:center;font-size:var(--fs-xs);margin-top:8px}
+.axis{position:relative;height:8px;background:var(--paper);border-radius:2px}
+.axis::before{content:"";position:absolute;left:50%;top:-2px;bottom:-2px;width:1px;background:var(--rule)}
+.axis i{position:absolute;top:0;bottom:0;background:var(--verd);border-radius:2px}
+.axis i.neg{background:var(--ember)}
+.closebar{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+
+/* card studio: the hub's own look, one fixed dark world on purpose (it is the in-game UI) */
+.studio{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:18px}
+@media (max-width:900px){.studio{grid-template-columns:1fr}}
+.controls{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:12px;display:flex;flex-direction:column;gap:12px}
+.controls fieldset{border:0;padding:0;margin:0;display:flex;flex-direction:column;gap:4px}
+.controls legend{font-family:var(--f-mono);font-size:var(--fs-xs);letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-bottom:4px}
+.controls label{display:flex;gap:6px;align-items:baseline;font-size:var(--fs-sm)}
+.controls textarea{width:100%;min-height:3.2rem;border:1px solid var(--rule);border-radius:var(--r);background:var(--paper);padding:.35rem .5rem;font-size:var(--fs-sm);resize:vertical}
+.controls .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.hub{--h-bg:#040907;--h-ink:#eef6ee;--h-muted:#7d9584;--h-gold:#d4c49a;--h-steam:#7ec8ff;--h-ash:#9a8b72;--h-warn:#e0a060;--h-bad:#ff7d7d;--h-good:#7dff8a;--h-tnb:#c9a0ff;--h-line:rgba(125,149,132,.28);--h-shade:rgba(0,0,0,.3);--h-edge:#3d8f55;--h-void:#020103;--h-voidrim:#3a1f5c;
+  background:radial-gradient(120% 90% at 20% 0%,#0b1a12 0%,var(--h-bg) 60%);color:var(--h-ink);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:16px;font-size:14px;color-scheme:dark;min-width:0}
+.hub .frame-label{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--h-ash)}
+.hub .slots{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:10px}
+.hc{display:grid;grid-template-columns:minmax(0,1fr) auto;row-gap:3px;column-gap:8px;text-align:left;border-radius:8px;padding:9px 10px 10px;border:1px solid var(--h-line);background:var(--h-shade);color:var(--h-ink);min-width:0}
+.hc.on{border-color:rgba(212,196,154,.65);background:color-mix(in srgb,var(--h-edge) 22%,#000 40%);box-shadow:0 0 0 1px rgba(212,196,154,.25)}
+.hc.you{background:var(--h-void);border-color:var(--h-voidrim);box-shadow:0 0 0 1px var(--h-voidrim),0 0 18px rgba(90,40,140,.35)}
+.hc.home{border-style:dashed;opacity:.92}
+.hc .n{grid-column:1;font-weight:600;color:var(--h-gold);line-height:1.25}
+.hc .lv{grid-column:2;grid-row:1;justify-self:end;font-weight:700;color:var(--h-gold)}
+.hc .m{grid-column:1/-1;font-size:.82rem;color:var(--h-ink);opacity:.85;line-height:1.3}
+.hc .t{grid-column:1/-1;font-size:.74rem;color:var(--h-steam);line-height:1.35}
+.hc .k{grid-column:1/-1;font-size:.8rem;font-style:italic;color:var(--h-ink)}
+.hc .fx2{grid-column:1/-1;font-size:.74rem;color:var(--h-gold)}
+.hc .ty{grid-column:1/-1;font-size:.72rem;line-height:1.35}
+.hc .ty .a{color:var(--h-good)} .hc .ty .x{color:var(--h-bad)}
+.hc .st{grid-column:1/-1;font-size:.72rem;color:var(--h-bad)}
+.hc .b{grid-column:1/-1;font-size:.75rem;color:var(--h-ash);line-height:1.4;margin-top:2px}
+.hc .flag{display:inline-block;margin-right:.35rem;padding:0 .35rem;border-radius:99px;border:1px solid rgba(224,160,96,.45);color:var(--h-warn)}
+.hc .cost{grid-column:1/-1;display:flex;gap:4px;flex-wrap:wrap}
+.hc .cost span{font-size:.7rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:.1rem .4rem;border-radius:99px;border:1px solid rgba(201,160,255,.45);color:var(--h-tnb)}
+.hc .cost span.free{color:var(--h-steam);border-color:rgba(125,149,132,.35)}
+.hc [contenteditable="true"]{outline:1px dashed rgba(126,200,255,.45);outline-offset:2px;border-radius:2px}
+.hub .note{font-size:.78rem;color:var(--h-muted)}
+.diffnote{font-size:var(--fs-xs);color:var(--dim)}
+
+/* stance chart */
+.stance{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:860px){.stance{grid-template-columns:1fr}}
+.chart{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:10px;overflow-x:auto}
+.chart svg{display:block;width:100%;min-width:320px;height:auto}
+.knobs{display:flex;flex-direction:column;gap:10px;font-size:var(--fs-sm)}
+.knob{display:grid;grid-template-columns:7rem minmax(0,1fr) 3rem;gap:8px;align-items:center}
+.knob input{accent-color:var(--verd)}
+.formula{font-family:var(--f-mono);font-size:var(--fs-xs);background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:8px 10px;overflow-x:auto;white-space:nowrap}
+
+/* export + reference */
+.export{display:flex;flex-direction:column;gap:10px}
+.export textarea{width:100%;min-height:9rem;font-family:var(--f-mono);font-size:.72rem;border:1px solid var(--rule);border-radius:var(--r);background:var(--sheet);padding:8px}
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:var(--r);background:var(--sheet)}
+table{border-collapse:collapse;width:100%;font-size:var(--fs-sm);min-width:860px}
+th,td{padding:5px 8px;border-bottom:1px solid var(--rule);text-align:left;vertical-align:top}
+th{font-family:var(--f-mono);font-size:var(--fs-xs);letter-spacing:.08em;text-transform:uppercase;color:var(--dim);font-weight:600;position:sticky;top:0;background:var(--sheet)}
+td.num{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.gloss{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px;font-size:var(--fs-sm)}
+.gloss div{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--r);padding:10px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--paper);padding:.45rem .9rem;border-radius:var(--r);font-size:var(--fs-sm);z-index:20}
+@media (prefers-reduced-motion:no-preference){.hcard{transition:border-color .15s}}
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div>
+      <p class="eyebrow">Verdance's Ashes · the company's books</p>
+      <h1>Hero Ledger</h1>
+      <p class="lede" style="margin-top:8px">Every hero in the campaign, character first. Cards show how each one talks, fights and gets along with the others. Open one for the full dossier; costs and engine fields sit at the bottom of it.</p>
+      <div class="counts" id="counts"></div>
+    </div>
+    <div class="lens" aria-label="Party lens">
+      <p class="eyebrow">Party lens · who is in the company</p>
+      <div class="lens-row" id="party"></div>
+      <div class="lens-row"><label for="mission" class="muted">Mission</label><input type="range" id="mission" min="1" max="12" value="2"><span class="mono" id="missionOut">2</span></div>
+      <p class="muted" style="font-size:var(--fs-xs)">Cards read ties and the chance of meeting someone hostile against this party. Ketha always comes.</p>
+    </div>
+  </header>
+
+  <section id="roster">
+    <div class="sec-head"><h2>The roster</h2><span class="eyebrow" id="shown"></span></div>
+    <div class="tools">
+      <input type="search" id="q" placeholder="Search names, temperaments, units, ties…" aria-label="Search heroes">
+      <div class="seg" id="fac" role="group" aria-label="Faction"></div>
+      <select id="status" aria-label="Status"><option value="">Everyone</option><option value="starter">Starters and core</option><option value="recruit">Found in the field</option></select>
+      <select id="sort" aria-label="Sort"><option value="roster">Roster order</option><option value="name">Name</option><option value="hostile">Likeliest hostile</option><option value="cost">Pack cost</option><option value="ties">Most ties</option></select>
+    </div>
+    <div id="dossierSlot"></div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <section id="cards">
+    <div class="sec-head"><h2>Card drafts</h2><span class="eyebrow">formation · drop party</span></div>
+    <p class="lede">The two cards the hub shows: picking the company at the start, and choosing who drops. Toggle what each card carries and edit the text in place, then copy the spec back to Claude. Edits stay in this browser.</p>
+    <div class="studio">
+      <div class="controls">
+        <div class="row"><label for="studioHero" class="muted" style="display:inline">Hero</label><select id="studioHero" class="btn"></select></div>
+        <fieldset id="showFields"><legend>Card carries</legend></fieldset>
+        <fieldset><legend>Text, as shown (edit here or on the card)</legend>
+          <label for="edHook" class="muted" style="display:block">Hook</label><textarea id="edHook"></textarea>
+          <label for="edBlurb" class="muted" style="display:block">Blurb</label><textarea id="edBlurb"></textarea>
+        </fieldset>
+        <div class="row">
+          <button class="btn primary" id="copySpec" type="button">Copy card spec</button>
+          <button class="btn" id="copyAllSpecs" type="button">Copy every edited card</button>
+          <button class="btn" id="resetHero" type="button">Reset this hero</button>
+        </div>
+        <p class="diffnote" id="editedNote"></p>
+      </div>
+      <div class="hub" id="hubFrame"></div>
+    </div>
+  </section>
+
+  <section id="stance">
+    <div class="sec-head"><h2>Who comes in hostile</h2><span class="eyebrow">continuous, no thresholds</span></div>
+    <p class="lede">Each wild hero's stance toward the party is the sum of their ties to it: bonds count up, tension, rivalry and friction count down. A seeded roll under the curve decides whether they turn up alive and on the enemy's side, like the Kiln (put them down, raise the wreck), or the way their entry says, a wreck for most. Bonded heroes also turn up less often: a tie to someone in the party pulls a bonded hero in at 0.45 of the strength it pulls a rival.</p>
+    <div class="stance">
+      <div class="chart" id="chart"></div>
+      <div class="knobs">
+        <div class="formula">p(hostile) = 1 / (1 + e<sup>(stance + bias) / softness</sup>)</div>
+        <div class="knob"><label for="kBias">bias, early</label><input type="range" id="kBias" min="-1" max="2" step="0.05"><span class="mono" id="kBiasOut"></span></div>
+        <div class="knob"><label for="kBiasLate">bias, late</label><input type="range" id="kBiasLate" min="-1" max="2" step="0.05"><span class="mono" id="kBiasLateOut"></span></div>
+        <div class="knob"><label for="kSoft">softness</label><input type="range" id="kSoft" min="0.05" max="1" step="0.05"><span class="mono" id="kSoftOut"></span></div>
+        <p class="muted" style="font-size:var(--fs-xs)">Bias slides from early to late between missions <span class="mono" id="ramp"></span>. The sliders preview here only; the game reads <span class="mono">data/story/encounter_rules.json</span>. <button class="open" id="copyKnobs" type="button">Copy these values</button></p>
+        <div id="hostileList" style="font-size:var(--fs-sm)"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="export">
+    <div class="sec-head"><h2>Export for review</h2><span class="eyebrow">everything on this page, as text</span></div>
+    <p class="lede">A dossier per hero with every field, the bond web, the meeting rules and a glossary, ready to paste into another assistant for review. The JSON is the same data the page is built from.</p>
+    <div class="export">
+      <div class="row tools"><button class="btn primary" id="copyMd" type="button">Copy Markdown dossier</button><button class="btn" id="copyJson" type="button">Copy JSON</button><span class="muted" id="exportSize" style="font-size:var(--fs-xs)"></span></div>
+      <textarea id="exportBox" readonly aria-label="Export text"></textarea>
+    </div>
+  </section>
+
+  <section id="books">
+    <div class="sec-head"><h2>The books</h2><span class="eyebrow">costs, start xp, engine fields</span></div>
+    <div class="tablewrap"><table id="booksTable"></table></div>
+    <div class="gloss" id="gloss"></div>
+  </section>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const DATA = __DATA__;
+</script>
+<script>
+(() => {
+const H = DATA.heroes, BY = Object.fromEntries(H.map(h => [h.id, h]));
+const ALLY = new Set(DATA.polarity.ally), ADV = new Set(DATA.polarity.adversary);
+const RS = DATA.rules.meetingStance || {}, PR = DATA.rules.presence || {};
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const cap = s => String(s || "").replace(/_/g, " ");
+const store = { get(k, d) { try { const v = localStorage.getItem("vhl:" + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+                set(k, v) { try { localStorage.setItem("vhl:" + k, JSON.stringify(v)); } catch {} } };
+function toast(msg) { const t = $("toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, 1800); }
+async function copy(text, label, fallbackBox) {
+  try { await navigator.clipboard.writeText(text); toast(label + " copied"); }
+  catch { if (fallbackBox) { fallbackBox.value = text; fallbackBox.focus(); fallbackBox.select(); } toast("Copy blocked here: the text is selected, press Ctrl+C"); }
+}
+
+/* ---------- state ---------- */
+const S = {
+  party: store.get("party", DATA.company.recommended.slice()),
+  mission: store.get("mission", 2),
+  q: "", fac: "", status: "", sort: "roster", open: null,
+  knobs: { bias: +RS.bias, biasLate: +RS.biasLate, softness: +RS.softness },
+  studio: store.get("studioHero", "halbard"),
+  edits: store.get("edits", {}),
+  show: store.get("show", { chassis: true, tags: true, temper: true, hook: true, fx: true, ties: true, stance: true, cost: true, blurb: true }),
+};
+const partyIds = () => [...new Set((DATA.company.core || []).concat(S.party).filter(Boolean))];
+
+/* ---------- the game's own sums ---------- */
+function edgeWeight(l) { return l.authored ? 1 : 0.5 * (Number(l.score) || 0.5); }
+function stance(h, party) {
+  const inP = new Set(party); let s = 0; const why = [];
+  for (const l of h.links) {
+    if (!inP.has(l.other) || l.other === h.id) continue;
+    const sign = ALLY.has(l.polarity) ? 1 : ADV.has(l.polarity) ? -1 : 0;
+    if (!sign) continue;
+    s += sign * edgeWeight(l); why.push(l);
+  }
+  return { score: Math.round(s * 100) / 100, why };
+}
+function lateness(m) { const lo = +RS.rampFrom, hi = +RS.rampTo; return hi <= lo ? 0 : Math.min(1, Math.max(0, (m - lo) / (hi - lo))); }
+function pHostile(score, m, k = S.knobs) {
+  const t = lateness(m), bias = (1 - t) * k.bias + t * k.biasLate, x = (score + bias) / Math.max(1e-3, k.softness);
+  return 1 / (1 + Math.exp(Math.max(-60, Math.min(60, x))));
+}
+function pull(h, party) { // how hard ties to the party draw them in (encounter presence, per side)
+  const inP = new Set(party); let a = 0, x = 0;
+  for (const l of h.links) if (inP.has(l.other)) { if (ALLY.has(l.polarity)) a += edgeWeight(l); else if (ADV.has(l.polarity)) x += edgeWeight(l); }
+  return { ally: a, adv: x, draw: a * (+PR.ally || 0.45) + x * (+PR.adversary || 1) };
+}
+const KEEP = new Set(["retrieve_stash", "assist_fortify", "capture"]);
+function keepsOwnWay(h) { return h.status !== "recruit" || KEEP.has(h.recruit.type) || h.recruit.type === "sortie" || !!h.factory; }
+
+/* ---------- helpers for text ---------- */
+function brings(h) {
+  const lead = h.packTotal > 1 ? `${h.chassisName} ×${h.packTotal}` : h.chassisName;
+  const esc2 = h.escorts.map(e => `${e.count}× ${e.name}`);
+  return [lead].concat(esc2).join(" + ");
+}
+function facClass(h) { return "f-" + (h.faction || "mixed"); }
+function tiesSplit(h) {
+  const a = h.links.filter(l => ALLY.has(l.polarity)), x = h.links.filter(l => ADV.has(l.polarity));
+  return { a, x };
+}
+function homeLabel(h) { const r = h.recruit.home; return r ? `${cap(r[0])} · ${r[1]}` : ""; }
+function recruitWord(h) {
+  if (h.status === "core") return "Always with the company";
+  if (h.status === "starter") return "Can be picked at the start";
+  const t = h.recruit.type;
+  return ({ wreck_rez: "Found as a wreck to raise", sortie: "Joins when you win the fight", retrieve_stash: "Retrieve the stash", assist_fortify: "Helps you fortify, then joins", capture: "Capture to recruit", band_unlock: "Unlocks with the band", hostile: "Comes in hostile" })[t] || cap(t || "Found in the field");
+}
+
+/* ---------- masthead ---------- */
+function renderCounts() {
+  const c = { armada: 0, cortex: 0, legion: 0, mixed: 0 }; H.forEach(h => c[h.faction || "mixed"]++);
+  const st = H.filter(h => h.status !== "recruit").length;
+  $("counts").innerHTML = `<span class="chip"><b>${H.length}</b> heroes</span><span class="chip">${st} at the start</span>` +
+    Object.entries(c).filter(([, n]) => n).map(([f, n]) => `<span class="chip f-${f}"><span class="dot fac"></span>${cap(f)} ${n}</span>`).join("");
+}
+function renderParty() {
+  const opts = H.filter(h => h.status !== "core");
+  const slot = i => `<select id="party${i}" aria-label="Party seat ${i + 1}"><option value="">(empty)</option>${opts.map(h => `<option value="${h.id}" ${S.party[i] === h.id ? "selected" : ""}>${esc(h.name)}</option>`).join("")}</select>`;
+  $("party").innerHTML = `<span class="chip"><span class="dot" style="background:var(--verd)"></span>${esc(BY[(DATA.company.core || [])[0]]?.name || "Ketha")}</span>` +
+    [0, 1, 2].map(slot).join("") + `<button class="btn" id="partyRec" type="button">Recommended</button>`;
+  [0, 1, 2].forEach(i => $("party" + i).onchange = e => { S.party[i] = e.target.value; store.set("party", S.party); renderAll(); });
+  $("partyRec").onclick = () => { S.party = DATA.company.recommended.slice(); store.set("party", S.party); renderParty(); renderAll(); };
+}
+
+/* ---------- roster ---------- */
+function cardHtml(h) {
+  const P = partyIds(), inP = new Set(P);
+  const { a, x } = tiesSplit(h);
+  const pick = (arr, cls) => arr.slice().sort((p, q) => (inP.has(q.other) - inP.has(p.other)) || (q.authored - p.authored)).slice(0, 4)
+    .map(l => `<span class="tie ${cls} ${inP.has(l.other) ? "inparty" : ""}" title="${esc(l.polarity)}${l.motifs.length ? ": " + esc(l.motifs.join("; ")) : ""}">${esc(BY[l.other]?.name.split(" ").slice(-1)[0] || l.other)}</span>`).join("");
+  const st = stance(h, P), ph = pHostile(st.score, S.mission);
+  const inParty = inP.has(h.id);
+  const meet = inParty ? `<span class="muted">In the party</span><span></span><span></span>`
+    : keepsOwnWay(h) ? `<span class="muted">Meets you</span><span class="muted">${esc(recruitWord(h))}</span><span></span>`
+    : `<span>Hostile</span><div class="bar" title="chance they come in alive and against this party"><i style="width:${(ph * 100).toFixed(0)}%"></i></div><span class="mono">${Math.round(ph * 100)}%</span>`;
+  return `<article class="hcard ${facClass(h)} ${S.open === h.id ? "sel" : ""}" data-id="${h.id}">
+    <div class="top"><div><div class="nm">${esc(h.name)}</div><div class="who"><span class="dot fac"></span> ${esc(cap(h.faction))} · ${esc(cap(h.position))} · ${esc(h.verb)}s</div></div><span class="status ${h.status}">${h.status === "recruit" ? "field" : h.status}</span></div>
+    <p class="hook">${esc(h.hook)}</p>
+    <div class="temper">${h.temperament.map(t => `<span class="chip">${esc(cap(t))}</span>`).join("")}${h.packMind ? `<span class="chip">${esc(h.packMind)} mind</span>` : ""}</div>
+    <p class="brings"><b>Brings</b> ${esc(brings(h))}</p>
+    ${h.fieldEffect ? `<p class="fx"><b>${esc(h.fieldEffect.label)}</b> · ${esc(h.fieldEffect.fiction)}</p>` : ""}
+    <div class="ties">${pick(a, "ally")}${pick(x, "adv")}</div>
+    <div class="meet">${meet}</div>
+    <button class="open" type="button" data-open="${h.id}">${S.open === h.id ? "Close dossier" : "Open dossier"}</button>
+  </article>`;
+}
+function filtered() {
+  const q = S.q.trim().toLowerCase(), P = partyIds();
+  let rows = H.filter(h => (!S.fac || (h.faction || "mixed") === S.fac) &&
+    (!S.status || (S.status === "starter" ? h.status !== "recruit" : h.status === "recruit")) &&
+    (!q || [h.name, h.id, h.hook, h.tagLine, h.fiction, h.blurb, h.chassisName, h.position, h.verb, h.temperament.join(" "), h.escorts.map(e => e.name).join(" "), h.fieldEffect?.label, h.links.map(l => (BY[l.other]?.name || l.other) + " " + l.polarity).join(" ")].join(" ").toLowerCase().includes(q)));
+  const by = {
+    roster: () => 0,
+    name: (p, q2) => p.name.localeCompare(q2.name),
+    hostile: (p, q2) => pHostile(stance(q2, P).score, S.mission) * !keepsOwnWay(q2) - pHostile(stance(p, P).score, S.mission) * !keepsOwnWay(p),
+    cost: (p, q2) => (q2.cost.combined || 0) - (p.cost.combined || 0),
+    ties: (p, q2) => q2.links.length - p.links.length,
+  }[S.sort];
+  return S.sort === "roster" ? rows : rows.slice().sort(by);
+}
+function renderGrid() {
+  const rows = filtered();
+  $("shown").textContent = `${rows.length} of ${H.length} shown`;
+  $("grid").innerHTML = rows.map(cardHtml).join("") || `<p class="muted">Nobody matches. Clear the search or the filters.</p>`;
+  $("dossierSlot").innerHTML = S.open ? dossierHtml(BY[S.open]) : "";
+}
+function axesHtml(h) {
+  return `<div class="axes">${DATA.axes.map(k => { const v = +(h.axes[k] || 0); const w = Math.min(50, Math.abs(v) * 50);
+    return `<span class="muted">${k}</span><span class="axis"><i class="${v < 0 ? "neg" : ""}" style="left:${v < 0 ? 50 - w : 50}%;width:${w}%"></i></span><span class="mono">${v ? v.toFixed(2) : "·"}</span>`; }).join("")}</div>`;
+}
+function dossierHtml(h) {
+  const P = partyIds(), st = stance(h, P), ph = pHostile(st.score, S.mission), pl = pull(h, P);
+  const links = h.links.map(l => `<div class="link"><span class="p ${ALLY.has(l.polarity) ? "ally" : "adv"}">${esc(l.polarity)}${l.authored ? "" : " ·"}</span><span><b>${esc(BY[l.other]?.name || l.other)}</b>${l.motifs.length ? ` <span class="muted">— ${esc(l.motifs.join("; "))}</span>` : ""}</span></div>`).join("");
+  const v = h.voice;
+  return `<article class="dossier ${facClass(h)}" aria-label="${esc(h.name)} dossier">
+    <div class="closebar"><div><p class="eyebrow"><span class="dot fac"></span> ${esc(cap(h.faction))} · ${esc(cap(h.position))} · ${esc(h.doctrine)} doctrine</p><h2 style="margin-top:4px">${esc(h.name)}</h2></div>
+      <div class="row tools"><button class="btn" type="button" data-studio="${h.id}">Draft their cards</button><button class="btn" type="button" data-open="${h.id}">Close</button></div></div>
+    <div class="col">
+      <p class="hook" style="font-size:var(--fs-lg)">${esc(h.hook)}</p>
+      <p class="fiction">${esc(h.fiction)}</p>
+      ${h.tagLine ? `<div class="field"><span class="eyebrow">In a line</span><p>${esc(h.tagLine)}</p></div>` : ""}
+      ${v ? `<div class="field"><span class="eyebrow">How they talk</span><p>${esc(v.register)}</p>${v.lines.map(l => `<p class="quote">${esc(l)}</p>`).join("")}</div>` : ""}
+      ${h.talk ? `<div class="field"><span class="eyebrow">At camp, with ${esc(BY[h.talk.with]?.name || h.talk.with)} · ${esc(h.talk.title)}</span><p class="quote">${esc(h.talk.line)}</p></div>` : ""}
+      <div class="field"><span class="eyebrow">What they bring</span><p>${esc(brings(h))}. ${esc(h.blurb)}</p>${h.fieldEffect ? `<p class="fx" style="margin-top:6px"><b>${esc(h.fieldEffect.label)}</b> · ${esc(h.fieldEffect.fiction)} <span class="mono muted">${h.fieldEffect.stats.map(([k, x]) => `${k} ×${x}`).join(", ")}</span></p>` : ""}${h.buildsEco ? `<p class="muted" style="font-size:var(--fs-sm)">Builds economy: can be the builder at the jungle's entrance.</p>` : ""}${h.factory ? `<p class="muted" style="font-size:var(--fs-sm)">Bound factory: ${esc(h.factory)}</p>` : ""}</div>
+    </div>
+    <div class="col">
+      <div class="field"><span class="eyebrow">Ties · ${h.links.length}</span><div class="links">${links || `<p class="muted">No ties yet.</p>`}</div><p class="muted" style="font-size:var(--fs-xs)">A dot after the kind marks a derived tie (half weight); the rest are authored.</p></div>
+      ${h.gifts.length ? `<div class="field"><span class="eyebrow">Bond gifts at rank A</span>${h.gifts.map(g => `<p style="font-size:var(--fs-sm)">With <b>${esc(BY[g.with]?.name || g.with)}</b>: ${g.count}× ${esc(g.unitDef)} <span class="muted">— ${esc(g.why)}</span></p>`).join("")}</div>` : ""}
+      <div class="field"><span class="eyebrow">Meeting them</span>
+        <p style="font-size:var(--fs-sm)">${esc(recruitWord(h))}${homeLabel(h) ? `, usually around ${esc(homeLabel(h))}` : ""}.${h.recruit.blurb ? ` <span class="muted">${esc(h.recruit.blurb)}</span>` : ""}</p>
+        ${keepsOwnWay(h) || P.includes(h.id) ? "" : `<p style="font-size:var(--fs-sm)">Against this party at mission ${S.mission}: stance <span class="mono">${st.score >= 0 ? "+" : ""}${st.score.toFixed(2)}</span>, <b>${Math.round(ph * 100)}%</b> they come in hostile. Pull from ties <span class="mono">${pl.draw.toFixed(2)}</span> <span class="muted">(bonded ×${PR.ally}, at odds ×${PR.adversary})</span>.</p>`}
+      </div>
+      <details class="books"><summary>The books</summary>
+        <dl class="kv">
+          <dt>Ids</dt><dd>${esc(h.id)} · ${esc(h.chassis)}</dd>
+          <dt>Pack cost</dt><dd>${h.cost.combined ?? "—"} combined · ${h.cost.metal ?? "—"} m · ${h.cost.energy ?? "—"} e</dd>
+          <dt>Start xp</dt><dd>${h.startXp}${h.startXpFixed ? " (fixed)" : ""}</dd>
+          <dt>Hire</dt><dd>${h.hireTnb} Tnb${h.hireKm ? ` + ${h.hireKm}k metal` : ""}</dd>
+          <dt>Pack</dt><dd>${h.packTotal} lead${h.sizing ? ` · ${h.sizing}` : ""}${h.packMind ? ` · ${h.packMind}` : ""}${h.partners.length ? ` · partners ${esc(JSON.stringify(h.partners))}` : ""}</dd>
+          <dt>Pack tags</dt><dd>${esc(h.packTags.join(", ") || "—")}</dd>
+          <dt>Can lead</dt><dd>${h.canLead ? "yes" : "no (a building)"}</dd>
+          <dt>Codex</dt><dd>${esc(Object.entries(h.codexFlags).map(([k, x]) => `${k} ${x}`).join(" · "))}${h.notes ? ` · ${esc(h.notes)}` : ""}</dd>
+          <dt>Recruit</dt><dd>${esc(h.recruit.type || "—")}${h.recruit.home ? ` @ ${esc(h.recruit.home.join(" / "))}` : ""}</dd>
+          <dt>Glyph</dt><dd>${esc(h.glyph)}</dd>
+        </dl>
+        ${axesHtml(h)}
+      </details>
+    </div>
+  </article>`;
+}
+
+/* ---------- card studio ---------- */
+const SHOW = [["chassis", "What the pack is"], ["tags", "Pack tags"], ["temper", "Temperament"], ["hook", "Hook line"], ["fx", "Field effect"], ["ties", "Ties to the party"], ["stance", "Hostile warning (field cards)"], ["cost", "Cost badges"], ["blurb", "Blurb"]];
+function edited(h) { return S.edits[h.id] || {}; }
+function txt(h, k) { const e = edited(h); return e[k] != null ? e[k] : (k === "hook" ? h.hook : h.blurb); }
+function hubCard(h, mode) {
+  const sh = S.show, P = partyIds(), inP = new Set(P);
+  const meta = [h.chassisName, h.packTotal > 1 ? `pack ×${h.packTotal}` : null, ...h.escorts.map(e => `+${e.count} ${e.name}`)].filter(Boolean).join(" · ");
+  const ties = h.links.filter(l => inP.has(l.other) && l.other !== h.id);
+  const tag = mode === "formation" ? (h.canLead ? "" : `<span class="flag">can't be you</span>`)
+    : mode === "you" ? "" : (h.status === "core" ? `<span class="flag">always comes</span>` : "");
+  const cls = mode === "you" ? "hc you" : mode === "home" ? "hc home" : "hc on";
+  const cost = h.hireTnb > 0 ? `<span>${h.hireTnb} Tnb</span>` : (mode === "formation" ? `<span class="free">free</span>` : "");
+  const tagsLine = [...new Set([].concat(sh.tags ? h.packTags.map(cap) : [], sh.temper ? h.temperament.map(cap) : []))].join(" · ");
+  return `<div class="${cls}">
+    <div class="n">${esc(h.name)}</div>${mode === "drop" || mode === "home" ? `<div class="lv">L1</div>` : ""}
+    ${sh.chassis ? `<div class="m">${esc(meta)}</div>` : ""}
+    ${tagsLine || tag ? `<div class="t">${tag}${esc(tagsLine)}</div>` : ""}
+    ${sh.hook ? `<div class="k" contenteditable="true" data-edit="hook" data-hero="${h.id}" spellcheck="false">${esc(txt(h, "hook"))}</div>` : ""}
+    ${sh.fx && h.fieldEffect ? `<div class="fx2">${esc(h.fieldEffect.label)}: ${esc(h.fieldEffect.fiction)}</div>` : ""}
+    ${sh.ties && ties.length ? `<div class="ty">${ties.map(l => `<span class="${ALLY.has(l.polarity) ? "a" : "x"}">${esc(l.polarity)} with ${esc(BY[l.other]?.name.split(" ").slice(-1)[0])}</span>`).join(" · ")}</div>` : ""}
+    ${sh.cost && cost ? `<div class="cost">${cost}</div>` : ""}
+    ${sh.blurb ? `<div class="b" contenteditable="true" data-edit="blurb" data-hero="${h.id}" spellcheck="false">${esc(txt(h, "blurb"))}</div>` : ""}
+  </div>`;
+}
+function fieldCard(h) { // how a wild hero is listed on the drop: wreck, or alive against us
+  const P = partyIds(), st = stance(h, P), ph = pHostile(st.score, S.mission);
+  const hostile = !keepsOwnWay(h) && ph >= 0.5;
+  const why = st.why.filter(l => ADV.has(l.polarity)).slice(0, 2).map(l => `${l.polarity} with ${BY[l.other]?.name.split(" ").slice(-1)[0]}`).join("; ");
+  return `<div class="hc home" style="border-color:${hostile ? "rgba(255,125,125,.5)" : "rgba(224,160,96,.45)"}">
+    <div class="n">${esc(h.name)}</div>
+    <div class="m">${hostile ? "likely alive, against us" : "likely a wreck"} · ${esc(homeLabel(h) || "somewhere here")}</div>
+    ${S.show.stance && !keepsOwnWay(h) ? `<div class="st">${Math.round(ph * 100)}% hostile with this party${why ? ` (${esc(why)})` : ""}</div>` : ""}
+    ${S.show.hook ? `<div class="k">${esc(txt(h, "hook"))}</div>` : ""}
+  </div>`;
+}
+function renderStudio() {
+  const sel = $("studioHero");
+  if (!sel.options.length) sel.innerHTML = H.map(h => `<option value="${h.id}">${esc(h.name)}</option>`).join("");
+  sel.value = S.studio;
+  const h = BY[S.studio] || H[0];
+  $("showFields").innerHTML = `<legend>Card carries</legend>` + SHOW.map(([k, label]) => `<label><input type="checkbox" id="show_${k}" ${S.show[k] ? "checked" : ""}> ${esc(label)}</label>`).join("");
+  SHOW.forEach(([k]) => $("show_" + k).onchange = e => { S.show[k] = e.target.checked; store.set("show", S.show); renderStudio(); });
+  $("edHook").value = txt(h, "hook"); $("edBlurb").value = txt(h, "blurb");
+  const core = new Set(DATA.company.core || []);
+  const mates = partyIds().filter(id => id !== h.id && BY[id] && !core.has(id)).slice(0, 2).map(id => BY[id]);
+  $("hubFrame").innerHTML = `
+    <div class="frame-label">Formation · pick the company</div>
+    <div class="slots">${hubCard(h, "you")}${mates.map(m => hubCard(m, "formation")).join("")}</div>
+    <p class="note">The first card is “you” (void-touched). The others are pool cards as they sit in the grid.</p>
+    <div class="frame-label">Drop party · who drops</div>
+    <div class="slots">${hubCard(h, "drop")}${mates.slice(0, 1).map(m => hubCard(m, "home")).join("")}</div>
+    <p class="note">Gold rim = dropping. Dashed = stays home.</p>
+    <div class="frame-label">Field recruit · who you may meet</div>
+    <div class="slots">${fieldCard(h)}</div>`;
+  $("hubFrame").querySelectorAll("[data-edit]").forEach(el => el.addEventListener("input", () => {
+    const k = el.dataset.edit, who = BY[el.dataset.hero]; setEdit(who, k, el.textContent);
+    if (who.id === h.id) { $(k === "hook" ? "edHook" : "edBlurb").value = el.textContent;
+      $("hubFrame").querySelectorAll(`[data-edit="${k}"][data-hero="${h.id}"]`).forEach(o => { if (o !== el) o.textContent = el.textContent; }); }
+  }));
+  const n = Object.keys(S.edits).length;
+  $("editedNote").textContent = n ? `${n} hero${n === 1 ? "" : "es"} edited in this browser: ${Object.keys(S.edits).map(id => BY[id]?.name || id).join(", ")}.` : "No edits yet. Changes save in this browser as you type.";
+}
+function setEdit(h, k, v) {
+  const base = k === "hook" ? h.hook : h.blurb;
+  const e = Object.assign({}, S.edits[h.id]);
+  if (v === base) delete e[k]; else e[k] = v;
+  if (Object.keys(e).length) S.edits[h.id] = e; else delete S.edits[h.id];
+  store.set("edits", S.edits);
+  const n = Object.keys(S.edits).length;
+  $("editedNote").textContent = n ? `${n} hero${n === 1 ? "" : "es"} edited in this browser: ${Object.keys(S.edits).map(id => BY[id]?.name || id).join(", ")}.` : "No edits yet.";
+}
+function spec(ids) {
+  return JSON.stringify({ kind: "verdance-card-spec/1", cards: ["formation", "drop", "fieldRecruit"],
+    carries: Object.fromEntries(SHOW.map(([k]) => [k, !!S.show[k]])),
+    party: partyIds(), mission: S.mission,
+    heroes: ids.map(id => ({ id, name: BY[id].name, hook: txt(BY[id], "hook"), blurb: txt(BY[id], "blurb"),
+      changed: Object.keys(S.edits[id] || {}), was: Object.fromEntries(Object.keys(S.edits[id] || {}).map(k => [k, k === "hook" ? BY[id].hook : BY[id].blurb])) })) }, null, 2);
+}
+
+/* ---------- stance chart ---------- */
+function renderChart() {
+  const W = 560, Hh = 260, L = 44, R = 14, T = 16, B = 38, xs = [-3, 3];
+  const X = v => L + (v - xs[0]) / (xs[1] - xs[0]) * (W - L - R), Y = p => T + (1 - p) * (Hh - T - B);
+  const curve = m => { let d = ""; for (let i = 0; i <= 120; i++) { const s = xs[0] + i / 120 * (xs[1] - xs[0]); d += (i ? "L" : "M") + X(s).toFixed(1) + "," + Y(pHostile(s, m)).toFixed(1); } return d; };
+  const lo = +RS.rampFrom, hi = +RS.rampTo;
+  let g = "";
+  for (let p = 0; p <= 1.001; p += 0.25) g += `<line x1="${L}" x2="${W - R}" y1="${Y(p)}" y2="${Y(p)}" stroke="var(--rule)"/><text x="${L - 6}" y="${Y(p) + 4}" text-anchor="end" font-size="11" fill="var(--dim)">${Math.round(p * 100)}%</text>`;
+  for (let s = -3; s <= 3; s++) g += `<line x1="${X(s)}" x2="${X(s)}" y1="${T}" y2="${Hh - B}" stroke="var(--rule)" stroke-dasharray="${s ? "2 4" : ""}"/><text x="${X(s)}" y="${Hh - B + 15}" text-anchor="middle" font-size="11" fill="var(--dim)">${s > 0 ? "+" + s : s}</text>`;
+  g += `<text x="${X(-2.6)}" y="${Hh - 6}" font-size="11" fill="var(--ember)">◂ tension</text><text x="${X(2.6)}" y="${Hh - 6}" text-anchor="end" font-size="11" fill="var(--verd)">bonded ▸</text>`;
+  const P = partyIds();
+  const dots = H.filter(h => !keepsOwnWay(h) && !P.includes(h.id)).map(h => { const s = Math.max(-3, Math.min(3, stance(h, P).score)); return { h, s, p: pHostile(s, S.mission) }; });
+  const seen = {};
+  const dotSvg = dots.map(d => { const key = d.s.toFixed(2); const k = seen[key] = (seen[key] || 0) + 1;
+    return `<circle cx="${X(d.s)}" cy="${Y(d.p) - (k - 1) * 0}" r="${3 + Math.min(4, k)}" fill="var(--ink)" fill-opacity=".18" stroke="var(--ink)" stroke-opacity=".5"><title>${esc(d.h.name)}: stance ${d.s}, ${Math.round(d.p * 100)}%</title></circle>`; }).join("");
+  $("chart").innerHTML = `<svg viewBox="0 0 ${W} ${Hh}" role="img" aria-label="Chance a hero comes in hostile, by stance">
+    ${g}
+    <path d="${curve(lo)}" fill="none" stroke="var(--dim)" stroke-width="1.5" stroke-dasharray="5 4"/>
+    <path d="${curve(hi)}" fill="none" stroke="var(--ember)" stroke-width="1.5" stroke-dasharray="5 4"/>
+    <path d="${curve(S.mission)}" fill="none" stroke="var(--ink)" stroke-width="2.5"/>
+    ${dotSvg}
+    <text x="${W - R}" y="${T + 4}" text-anchor="end" font-size="11" fill="var(--dim)">dashed grey: mission ${lo} · dashed ember: mission ${hi}+ · solid: mission ${S.mission}</text>
+  </svg>`;
+  $("ramp").textContent = `${lo}–${hi}`;
+  const ranked = dots.sort((a, b) => b.p - a.p).slice(0, 8);
+  $("hostileList").innerHTML = `<p class="eyebrow" style="margin-bottom:4px">Likeliest hostile with this party, mission ${S.mission}</p>` +
+    ranked.map(d => `<div style="display:grid;grid-template-columns:minmax(0,1fr) 3rem;gap:6px"><span>${esc(d.h.name)}</span><span class="mono" style="text-align:right">${Math.round(d.p * 100)}%</span></div>`).join("");
+}
+function renderKnobs() {
+  [["kBias", "bias"], ["kBiasLate", "biasLate"], ["kSoft", "softness"]].forEach(([id, k]) => {
+    const el = $(id); el.value = S.knobs[k]; $(id + "Out").textContent = (+S.knobs[k]).toFixed(2);
+    el.oninput = () => { S.knobs[k] = +el.value; $(id + "Out").textContent = (+el.value).toFixed(2); renderChart(); renderGrid(); };
+  });
+}
+
+/* ---------- export ---------- */
+function markdown() {
+  const out = [];
+  out.push(`# Verdance's Ashes: Hero Ledger`, ``, `${H.length} heroes. Source: ${DATA.builtFrom}.`, ``);
+  out.push(`## How the company works`, `- The company is Ketha (always) plus ${DATA.company.seatCap} picks; the first pick is "you" (must be able to walk). Fighters are free; builders cost Tenebrium (start wallet ${DATA.company.startWalletTnb}).`,
+    `- Heroes not at the start are met in the field. Who is met is drawn by the bond web (Umwelt encounter field): ties to someone in the party raise the chance of meeting (bonded ×${PR.ally}, at odds ×${PR.adversary}).`,
+    `- How they turn up: stance = sum over ties to the party (bond/attract/sibling/mentor/mirror +, rivalry/tension/friction −; authored 1.0, derived half its score). p(hostile) = 1/(1+exp((stance+bias)/softness)), bias ${RS.bias} early → ${RS.biasLate} late (missions ${RS.rampFrom}–${RS.rampTo}), softness ${RS.softness}. Hostile = spawns alive on the enemy team; kill and raise the wreck to recruit. Otherwise a wreck to raise.`,
+    `- Field effect = the hero's kit tag (multipliers applied to the hero and pack in the field).`, ``);
+  for (const h of H) {
+    out.push(`## ${h.name} (${h.id})`);
+    out.push(`*${h.hook}* — ${cap(h.faction)} · ${cap(h.position)} · ${h.verb} · temperament ${h.temperament.join(", ")} · ${recruitWord(h)}`);
+    out.push(``, h.fiction, ``);
+    if (h.tagLine) out.push(`- In a line: ${h.tagLine}`);
+    out.push(`- Brings: ${brings(h)}. ${h.blurb}`);
+    if (h.fieldEffect) out.push(`- Field effect: ${h.fieldEffect.label} (${h.fieldEffect.stats.map(([k, x]) => `${k} ×${x}`).join(", ")}): ${h.fieldEffect.fiction}`);
+    if (h.voice) out.push(`- Voice: ${h.voice.register}`, ...h.voice.lines.map(l => `  - "${l}"`));
+    if (h.talk) out.push(`- Camp talk with ${BY[h.talk.with]?.name || h.talk.with} ("${h.talk.title}"): "${h.talk.line}"`);
+    if (h.links.length) { out.push(`- Ties:`); h.links.forEach(l => out.push(`  - ${l.polarity}${l.authored ? "" : " (derived)"} with ${BY[l.other]?.name || l.other}${l.motifs.length ? `: ${l.motifs.join("; ")}` : ""}`)); }
+    if (h.gifts.length) out.push(`- Bond gifts (rank A): ${h.gifts.map(g => `with ${BY[g.with]?.name || g.with}: ${g.count}× ${g.unitDef} (${g.why})`).join("; ")}`);
+    out.push(`- Met: ${h.recruit.type || h.status}${h.recruit.home ? ` around ${h.recruit.home.join(" / ")}` : ""}${h.recruit.blurb ? ` — ${h.recruit.blurb}` : ""}`);
+    out.push(`- Books: unit ${h.chassis}; pack ${h.packTotal}${h.sizing ? ` (${h.sizing})` : ""}; cost ${h.cost.combined} (${h.cost.metal} m, ${h.cost.energy} e); start xp ${h.startXp}${h.startXpFixed ? " fixed" : ""}; hire ${h.hireTnb} Tnb${h.hireKm ? ` + ${h.hireKm}k` : ""}; can lead ${h.canLead}; pack tags ${h.packTags.join(", ") || "none"}; builds eco ${h.buildsEco}${h.factory ? `; factory ${h.factory}` : ""}; codex ${Object.entries(h.codexFlags).map(([k, x]) => `${k}=${x}`).join(" ")}; axes ${DATA.axes.map(k => `${k} ${(+h.axes[k] || 0).toFixed(2)}`).join(", ")}`);
+    out.push(``);
+  }
+  out.push(`## Glossary`, `- Positions: line (holds the front), skirmish (hits and moves), siege (range), shield (protects), eco (economy), eyes (scouting), core_skirm / core_rez (Ketha's roles).`,
+    `- Axes (−1..1): energy, offense, mobility, sight, pad (holding ground), craft (building), heat, fog (stealth), sky (air), ledger (money/deals).`,
+    `- Tie kinds: allies ${DATA.polarity.ally.join(", ")}; adversaries ${DATA.polarity.adversary.join(", ")}.`);
+  return out.join("\n");
+}
+
+/* ---------- books ---------- */
+function renderBooks() {
+  $("booksTable").innerHTML = `<thead><tr><th>Hero</th><th>Unit</th><th>Pack</th><th class="num">Cost</th><th class="num">Metal</th><th class="num">Energy</th><th class="num">Start xp</th><th class="num">Hire Tnb</th><th>Met</th><th>Pack tags</th><th class="num">Ties</th></tr></thead><tbody>` +
+    H.map(h => `<tr><td><b>${esc(h.name)}</b></td><td class="mono" style="font-size:var(--fs-xs)">${esc(h.chassis)}</td><td>${esc(brings(h))}</td><td class="num">${h.cost.combined ?? ""}</td><td class="num">${h.cost.metal ?? ""}</td><td class="num">${h.cost.energy ?? ""}</td><td class="num">${h.startXp ?? ""}${h.startXpFixed ? "*" : ""}</td><td class="num">${h.hireTnb || ""}</td><td>${esc(h.recruit.type || h.status)}</td><td style="font-size:var(--fs-xs)">${esc(h.packTags.join(", "))}</td><td class="num">${h.links.length}</td></tr>`).join("") + `</tbody>`;
+  $("gloss").innerHTML = `<div><h3>Positions</h3><p class="muted">line holds the front · skirmish hits and moves · siege works at range · shield protects · eco builds the economy · eyes scout.</p></div>
+    <div><h3>Axes</h3><p class="muted">Each hero's character on −1 to 1: energy, offense, mobility, sight, pad (holding ground), craft (building), heat, fog (stealth), sky (air), ledger (deals). The encounter field matches them to ground with the same axes.</p></div>
+    <div><h3>Ties</h3><p class="muted">Allies: ${DATA.polarity.ally.join(", ")}. At odds: ${DATA.polarity.adversary.join(", ")}. Authored ties count 1.0; derived ties count half their score, and bond points earned together deepen both.</p></div>
+    <div><h3>Start xp</h3><p class="muted">Cheaper packs start with more experience so they survive (* = fixed by hand). Recomputed from pack cost by pack_xp.py.</p></div>`;
+}
+
+/* ---------- wiring ---------- */
+function renderAll() { renderGrid(); renderStudio(); renderChart(); }
+function init() {
+  renderCounts(); renderParty();
+  $("fac").innerHTML = [["", "All"], ["armada", "Armada"], ["cortex", "Cortex"], ["legion", "Legion"]].map(([v, l]) => `<button type="button" data-fac="${v}" aria-pressed="${S.fac === v}">${l}</button>`).join("");
+  $("fac").onclick = e => { const b = e.target.closest("button"); if (!b) return; S.fac = b.dataset.fac; [...$("fac").children].forEach(x => x.setAttribute("aria-pressed", x === b)); renderGrid(); };
+  $("q").oninput = e => { S.q = e.target.value; renderGrid(); };
+  $("status").onchange = e => { S.status = e.target.value; renderGrid(); };
+  $("sort").onchange = e => { S.sort = e.target.value; renderGrid(); };
+  $("mission").value = S.mission; $("missionOut").textContent = S.mission;
+  $("mission").oninput = e => { S.mission = +e.target.value; $("missionOut").textContent = S.mission; store.set("mission", S.mission); renderAll(); };
+  document.addEventListener("click", e => {
+    const o = e.target.closest("[data-open]");
+    if (o) { const id = o.dataset.open; S.open = S.open === id ? null : id; renderGrid(); if (S.open) $("dossierSlot").scrollIntoView({ behavior: "smooth", block: "start" }); return; }
+    const st = e.target.closest("[data-studio]");
+    if (st) { S.studio = st.dataset.studio; store.set("studioHero", S.studio); renderStudio(); $("cards").scrollIntoView({ behavior: "smooth" }); return; }
+    const card = e.target.closest(".hcard");
+    if (card && !e.target.closest("button")) { const id = card.dataset.id; S.open = S.open === id ? null : id; renderGrid(); if (S.open) $("dossierSlot").scrollIntoView({ behavior: "smooth", block: "start" }); }
+  });
+  $("studioHero").onchange = e => { S.studio = e.target.value; store.set("studioHero", S.studio); renderStudio(); };
+  $("edHook").oninput = e => { setEdit(BY[S.studio], "hook", e.target.value); $("hubFrame").querySelectorAll(`[data-edit="hook"][data-hero="${S.studio}"]`).forEach(el => el.textContent = e.target.value); };
+  $("edBlurb").oninput = e => { setEdit(BY[S.studio], "blurb", e.target.value); $("hubFrame").querySelectorAll(`[data-edit="blurb"][data-hero="${S.studio}"]`).forEach(el => el.textContent = e.target.value); };
+  $("copySpec").onclick = () => copy(spec([S.studio]), "Card spec", $("exportBox"));
+  $("copyAllSpecs").onclick = () => { const ids = Object.keys(S.edits); copy(spec(ids.length ? ids : [S.studio]), ids.length ? `${ids.length} edited cards` : "Card spec", $("exportBox")); };
+  $("resetHero").onclick = () => { delete S.edits[S.studio]; store.set("edits", S.edits); renderStudio(); toast("Back to the game's text"); };
+  $("copyKnobs").onclick = () => copy(JSON.stringify({ meetingStance: { bias: S.knobs.bias, biasLate: S.knobs.biasLate, rampFrom: RS.rampFrom, rampTo: RS.rampTo, softness: S.knobs.softness } }, null, 2), "Values", $("exportBox"));
+  const md = markdown(), js = JSON.stringify(DATA, null, 1);
+  $("exportBox").value = md;
+  $("exportSize").textContent = `Markdown ${Math.round(md.length / 1024)} KB · JSON ${Math.round(js.length / 1024)} KB`;
+  $("copyMd").onclick = () => { $("exportBox").value = md; copy(md, "Markdown dossier", $("exportBox")); };
+  $("copyJson").onclick = () => { $("exportBox").value = js; copy(js, "JSON", $("exportBox")); };
+  renderKnobs(); renderBooks(); renderAll();
+}
+init();
+})();
+</script>

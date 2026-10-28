@@ -209,7 +209,6 @@ function zoneInOps(mapId, z) {
   if ((m.captureZoneIds || []).includes(z.zoneId)) return true;
   return false;
 }
-function isBelievedOurs(mapId, zoneId) { return beliefOf(mapId, zoneId).believed === "ours"; }
 // A road door on this map, and whether the company's ledger says it holds it.
 function doorOf(mapId, zoneId) {
   for (const r of ((state.hub.world || {}).roads || [])) {
@@ -510,20 +509,27 @@ export function renderBoard() {
     const z = zones.find(x => x.zoneId === id);
     return (z && z.label) || id;
   };
-  const modeLabel = ({ capture: "wound", pad: "pad" })[state.markMode] || state.markMode;
-  const opsLit = zones.filter(z => zoneInOps(plan.mapId, z)).length;
+  // One plain sentence for the route; the step strip above it carries the checklist.
+  const pad = m.deployZoneId ? zoneName(m.deployZoneId) : "";
+  const targets = (m.captureZoneIds || []).map(zoneName).join(", ");
   const legalN = zones.filter(z => isLegalLanding(plan.mapId, z)).length;
   const padEyes = padExposed(m.deployZoneId);
-  const padNote = state.padNote && state.padNote.mapId === plan.mapId ? `<br><span class="warn">${esc(state.padNote.text)}</span>` : "";
-  $("marks-sum").innerHTML =
-    `<b>Pad</b> ${esc(zoneName(m.deployZoneId))} → <b>wound</b> ${(m.captureZoneIds || []).map(z => esc(zoneName(z))).join(", ") || "—"} → back to <b>${esc(zoneName(m.deployZoneId))}</b><br>` +
-    `marking <b>${esc(modeLabel)}</b> · ${legalN} legal pad${legalN === 1 ? "" : "s"} (△) · ops ${opsLit}/${zones.length || 0} zones · a door we hold, or ground believed ours` +
-    (padEyes === "known" ? `<br><span class="bad">◉ Armada has eyes on this pad.</span>` : "") +
-    padNote;
+  const padNote = state.padNote && state.padNote.mapId === plan.mapId ? ` <span class="warn">${esc(state.padNote.text)}</span>` : "";
+  const clicking = state.markMode === "pad"
+    ? `Clicking a zone sets the pad (${legalN} zone${legalN === 1 ? "" : "s"} can take one, marked △).`
+    : "Clicking a zone sets the target.";
+  const route = pad && targets ? `Land at <b>${esc(pad)}</b>, take <b>${esc(targets)}</b>, lift from <b>${esc(pad)}</b>. `
+    : (pad ? `Land at <b>${esc(pad)}</b>. ` : "");
+  $("marks-sum").innerHTML = route + `<span class="muted">${esc(clicking)}</span>` +
+    (padEyes === "known" ? ` <span class="bad">◉ Armada has eyes on this pad.</span>` : "") + padNote;
   updateIntelligence(session.narrative, plan.mapId);
   updateDeployGate();
 }
 
+function setModeQuiet(mode) {
+  state.markMode = mode;
+  document.querySelectorAll(".mode-btn").forEach(b => b.classList.toggle("active", b.dataset.mode === mode));
+}
 export function markZone(zoneId) {
   const plan = state.plan;
   if (!plan) return;
@@ -541,6 +547,7 @@ export function markZone(zoneId) {
     state.padNote = null;
     m.deployZoneId = zoneId; // ONE pad: in and out share the zone; the stamp schema is unchanged.
     m.extractZoneId = zoneId;
+    if (!(m.captureZoneIds && m.captureZoneIds.length)) setModeQuiet("capture");
   } else {
     const caps = m.captureZoneIds || [];
     const i = caps.indexOf(zoneId);
@@ -555,7 +562,7 @@ export function markZone(zoneId) {
   renderBoard();
   renderCompany();
   const seeded = wildRecruitAtZone(plan.mapId, zoneId);
-  if (seeded) toast(`This Drop seeds wreck · ${seeded.name || seeded.id}`, "ok");
+  if (seeded) toast(`${seeded.name || seeded.id} waits here: raise the wreck and they join`, "ok");
 }
 
 /* ---- map picker ---------------------------------------------------------------- */

@@ -75,7 +75,7 @@ local function loadSeed()
   local intent = m.storyIntent or {}
   M.title = intent.title or m.title or "Verdance's Ashes"
   local obj = m.objective or {}
-  M.objective = (m.missionCard and (m.missionCard.plainObjective or m.missionCard.objective)) or obj.description or "Complete the marked objective."
+  M.objective = obj.description or "Complete the marked objective."
   M.kind = tostring(obj.kind or "")
   M.requiredFrames = tonumber(obj.requiredFrames) or 19800
   M.roster = {}
@@ -469,7 +469,7 @@ local function drawMission(x, y, right)
       col = (S.fortifyDef >= need) and Ash.COL.good or Ash.COL.steam
     elseif S.objectiveTotal > 0 then
       frac = S.objectiveDestroyed / math.max(1, S.objectiveTotal)
-      label = string.format("%s %d / %d", (M.kind == "eco_raid") and "wrecked" or "targets", S.objectiveDestroyed, S.objectiveTotal)
+      label = string.format("%s %d / %d", "targets", S.objectiveDestroyed, S.objectiveTotal)
     end
   end
   if frac then

@@ -69,7 +69,7 @@ export function showHomecoming(opts) {
   const chips = $("hc-chips");
   if (chips) {
     chips.innerHTML = "";
-    const list = ((opts && opts.chips) || []).filter(c => !/^(collapse |freeTnbMint|H:)/.test(String(c)));
+    const list = ((opts && opts.chips) || []).filter(c => !/^(collapse |H:)/.test(String(c)));
     if (man && Number(man.enemyOnPad) > 0) list.push("contested — enemies on the pad");
     list.forEach((c) => {
       if (!c) return;

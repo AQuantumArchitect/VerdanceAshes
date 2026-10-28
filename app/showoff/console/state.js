@@ -18,7 +18,6 @@ export const state = {
   lastResultAt: null,
   crewBand: [], // preamble companions; after seal = who drops (at-base = owned − this)
   crewYou: null, // preamble: the first pick, the hero the player is
-  dropping: false, // true while /api/deploy is in flight
   buyBusy: false,
   warm: { phase: "idle", locked: false, timer: null, poll: null, startedAt: 0 },
   selectedZoneId: null, // last marked / clicked theater zone (recruit tease)

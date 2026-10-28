@@ -24,7 +24,8 @@ def test_the_gate_stands_on_dry_company_ground_with_four_fusions_to_power_it():
 
 
 def test_the_campaign_gadget_takes_only_the_gates_word_for_it():
-    lua = (ROOT / "mod/VerdanceAshes.sdd/luarules/gadgets/game_verdance_campaign.lua").read_text(encoding="utf-8")
-    assert 'jump_gate = "jumped"' in lua and 'hunt_scouts = "scouts_stopped"' in lua
+    import campaign_lua
+    lua = campaign_lua.source()
+    assert 'VA_GADGET_KINDS = { jump_gate = "jumped" }' in lua
     gate = (ROOT / "mod/VerdanceAshes.sdd/luarules/gadgets/game_verdance_jump_gate.lua").read_text(encoding="utf-8")
     assert 'GG.VA_ObjectiveComplete("jumped")' in gate

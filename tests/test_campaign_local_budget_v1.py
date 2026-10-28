@@ -1,4 +1,7 @@
-"""Guard: game_verdance_campaign.lua must stay under Lua 5.1's 200-local limit.
+"""Guard: every part of the campaign gadget must stay under Lua 5.1's 200-local limit.
+
+The gadget is game_verdance_campaign.lua plus include/campaign/*.lua; each part is its own chunk
+with its own 200-local budget (tools/campaign_lua.py).
 
 If the main chunk exceeds 200 locals, BAR refuses to load the gadget and
 Initial Spawn leaves a stock Legion commander at a random start position.
@@ -95,32 +98,31 @@ def count_main_chunk_locals(src: str) -> list[tuple[int, str, str]]:
     return found
 
 
+import sys  # noqa: E402
+sys.path.insert(0, str(ROOT / "tools"))
+import campaign_lua  # noqa: E402
+
+
 class CampaignLocalBudgetTests(unittest.TestCase):
     def test_gadget_exists(self):
         self.assertTrue(GADGET.is_file(), f"missing {GADGET}")
+        for name, path in campaign_lua.parts():
+            self.assertTrue(path.is_file(), f"missing part {name}: {path}")
 
     def test_under_hard_limit(self):
-        locals_ = count_main_chunk_locals(GADGET.read_text(encoding="utf-8"))
-        n = len(locals_)
-        self.assertLessEqual(
-            n,
-            HARD_MAX,
-            f"main-chunk locals={n} exceeds Lua 5.1 hard limit {HARD_MAX}; "
-            f"last={locals_[-5:]}. Promote helpers to gadget-env globals or IIFE includes.",
-        )
+        for name, path in campaign_lua.parts():
+            locals_ = count_main_chunk_locals(path.read_text(encoding="utf-8"))
+            self.assertLessEqual(len(locals_), HARD_MAX,
+                                 f"{name}: main-chunk locals={len(locals_)} exceeds {HARD_MAX}; last={locals_[-5:]}")
 
     def test_soft_headroom(self):
-        locals_ = count_main_chunk_locals(GADGET.read_text(encoding="utf-8"))
-        n = len(locals_)
-        self.assertLessEqual(
-            n,
-            SOFT_MAX,
-            f"main-chunk locals={n} above soft ceiling {SOFT_MAX} "
-            f"(hard={HARD_MAX}). Free headroom before the next feature.",
-        )
+        for name, path in campaign_lua.parts():
+            locals_ = count_main_chunk_locals(path.read_text(encoding="utf-8"))
+            self.assertLessEqual(len(locals_), SOFT_MAX,
+                                 f"{name}: main-chunk locals={len(locals_)} above soft ceiling {SOFT_MAX}")
 
     def test_includes_use_iife_not_main_locals(self):
-        text = GADGET.read_text(encoding="utf-8")
+        text = campaign_lua.source()
         self.assertIn("WorkerFeature = (function()", text)
         self.assertNotIn("local WorkerFeature", text)
         # Tenebrium attach pack must not be a main-chunk local.

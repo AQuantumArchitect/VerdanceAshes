@@ -86,18 +86,18 @@
         <div class="theater-head">
           <div>
             <h2 id="theater-title">Theater</h2>
-            <p class="theater-sub" id="theater-sub">Click a wound (target). The pad is one zone — you land there and you lift from there: a road door we hold, a zone we believe is ours, or the camp's next pad (△). The board shows what the company believes, not the ground.</p>
+            <p class="theater-sub" id="theater-sub">Mark the target (◎), the zone to take, and the pad (△), where you land and lift: a road door we hold, ground we believe is ours, or the camp's next pad. The board shows what the company believes, not the ground.</p>
           </div>
           <div class="waterline" id="waterline" aria-live="polite"></div>
           <div class="mode-bar">
             <span class="label">Mark</span>
-            <button type="button" class="mode-btn active" data-mode="capture">Wound</button>
-            <button type="button" class="mode-btn" data-mode="pad">Pad</button>
+            <button type="button" class="mode-btn active" data-mode="capture" title="Click a zone to make it the target">◎ Target</button>
+            <button type="button" class="mode-btn" data-mode="pad" title="Click a zone to land and lift there">△ Pad</button>
           </div>
         </div>
         <div class="legend-row">
           <span class="lg-infil">△ Pad — land and lift</span>
-          <span class="lg-target">◎ Wound</span>
+          <span class="lg-target">◎ Target</span>
           <span class="lg-open">Available objective</span>
           <span class="lg-stale">Stale belief</span>
           <span class="lg-dark">? Nobody looked</span>
@@ -133,7 +133,7 @@
         <div class="company-wallet" id="company-wallet">—</div>
       </div>
       <section id="cc-company-members"></section>
-      <h3>Standing</h3>
+      <h3>Standing <span class="cc-hint">how each side regards the company (0 to 100)</span></h3>
       <div id="rep"></div>
       <section id="cc-company-scenes"></section>
       <div class="hearth-block" id="hearth-block">
@@ -184,11 +184,12 @@
 
   <footer class="foot">
     <div class="theater-actions" id="theater-actions">
-      <div class="marks-sum" id="marks-sum">Pick a wound on the map.</div>
+      <ol class="drop-steps" id="drop-steps" aria-label="Steps to a drop"></ol>
       <div class="actions">
-        <button type="button" class="btn-ghost" id="btn-clear-marks" title="Reset marks to defaults">Reset route</button>
-        <button type="button" class="btn-primary" id="btn-deploy">Launch</button>
+        <button type="button" class="btn-ghost" id="btn-clear-marks" title="Put the pad and the target back where the job starts them">Reset marks</button>
+        <button type="button" class="btn-primary" id="btn-deploy">Ready the drop</button>
       </div>
+      <div class="marks-sum" id="marks-sum"></div>
     </div>
     <span id="foot-left">Verdance's Ashes</span>
     <div class="foot-actions">
@@ -200,7 +201,7 @@
 
 <div class="scrim drop-confirm" id="drop-confirm" role="dialog" aria-modal="true" aria-labelledby="drop-confirm-title">
   <div class="sheet-card drop-confirm-card">
-    <p class="epigraph">Before the match</p>
+    <p class="epigraph">Step 5 of 5 · ready the drop</p>
     <h2 id="drop-confirm-title">Into the field</h2>
     <p class="lede" id="drop-confirm-body">Launch loads this field in Beyond All Reason behind the hub.</p>
     <div class="drop-tabs" role="tablist" id="drop-tabs">
@@ -240,7 +241,7 @@
     </p>
     <div class="company-intro-meta" id="company-intro-meta"></div>
     <div class="company-intro-slots" id="company-intro-slots"></div>
-    <div class="company-intro-kicker">Roster · eco → XP · buildings cannot lead</div>
+    <div class="company-intro-kicker">Who can come: builders first</div>
     <div class="company-intro-grid" id="company-intro-grid" aria-label="Hero packs (eco first, then XP)"></div>
     <div class="sheet-actions company-intro-actions">
       <button type="button" class="btn-ghost" id="recommend-company">Recommend a team</button>
@@ -262,7 +263,7 @@
     </p>
     <ol class="steps">
       <li><span class="n">1</span><span><b>Form the Company</b> on first open — core always ships; pick <b>3 unlocked packs</b>. Unpicked heroes stay off your board until a field recruit.</span></li>
-      <li><span class="n">2</span><span>Pick a <b>field</b> on the planet and a <b>sortie</b> on it, mark the <b>wound</b> and the <b>pad</b> (you lift from where you landed), then <b>Launch</b>. The field loads behind the hub while you pick who goes; <b>Drop</b> sends them in.</span></li>
+      <li><span class="n">2</span><span>Pick a <b>field</b> on the planet and a <b>sortie</b> on it, mark the <b>target</b> and the <b>pad</b> (you lift from where you landed), then <b>Ready the drop</b>. The field loads behind the hub while you pick who goes; <b>Drop</b> sends them in.</span></li>
       <li><span class="n">3</span><span>In BAR, take the objective, get what you want to keep onto the pad and press <b>EXTRACT</b> (the fight also ends if the company is wiped). The clock never ends a sortie — overtime only wakes the map. The kernel brings the result home to this screen.</span></li>
       <li><span class="n">4</span><span><b>Home</b> is the camp — raise the jungle shelf there. The <b>Broker</b> is in <b>Company</b> and shows each available purchase and its exact cost.</span></li>
       <li><span class="n">5</span><span><b>Save / Load / Reset</b> live under <b>System</b> in the top bar.</span></li>

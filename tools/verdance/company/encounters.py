@@ -44,8 +44,8 @@ ONLY_BUILDS_ITSELF = {"leginfestor", "va_infestor"}   # prints Infestors (and Go
 RULES_REL = Path("data") / "story" / "encounter_rules.json"
 _RULES_DEFAULT = {"perSortie": 2, "markedGround": {"drawBoost": 4.0},
                   "homeZone": {"doesNotWalk": "fixed", "default": 1.0, "homeMapHaunt": 2.4}, "entranceBuilder": {},
-                  "meetingStance": {"hostileAt": 0.8, "bondedAt": 0.8, "lateFromMission": 6, "hostileAtLate": 0.4,
-                                    "neutral": "authored", "neutralLate": "authored"}}
+                  "meetingStance": {"bias": 0.6, "biasLate": 0.2, "rampFrom": 2, "rampTo": 9, "softness": 0.25},
+                  "presence": {"relation": 0.7, "ally": 0.45, "adversary": 1.0}}
 ALLY_POLARITY = {"bond", "attract", "sibling", "mentor", "mirror"}
 ADVERSARY_POLARITY = {"rivalry", "tension", "friction"}
 # Recruit kinds that keep their own way of being met (the constructor-gated ones, a stash).
@@ -87,42 +87,65 @@ def stance_toward(hid: str, state: Dict[str, Any], workspace: Optional[Path] = N
     return round(score, 3), why
 
 
-def meeting_kind(score: float, state: Dict[str, Any], workspace: Optional[Path] = None) -> str:
-    """'hostile' (alive, on the enemy's side: beat them, then raise the wreck), 'wreck' (down, waiting
-    to be raised), or 'authored' (the way their recruit entry says). Owner call, 2026-10-27: high
-    tension with the party comes in alive and against you, like the Kiln; bonded comes in as a wreck.
-    Later in the campaign it takes less tension (meetingStance in encounter_rules.json)."""
+def lateness(state: Dict[str, Any], workspace: Optional[Path] = None) -> float:
+    """0 early in the campaign, 1 late: a straight ramp over the missions, no step."""
     st = rules(workspace).get("meetingStance") or {}
-    late = int(state.get("missionNumber", 1) or 1) >= int(st.get("lateFromMission", 6) or 6)
-    hostile_at = float(st.get("hostileAtLate" if late else "hostileAt", 0.8))
-    if score <= -hostile_at:
-        return "hostile"
-    if score >= float(st.get("bondedAt", 0.8)):
-        return "wreck"
-    neutral = str(st.get("neutralLate" if late else "neutral") or "authored")
-    return neutral if neutral in ("hostile", "wreck") else "authored"
+    lo, hi = float(st.get("rampFrom", 2)), float(st.get("rampTo", 9))
+    m = float(state.get("missionNumber", 1) or 1)
+    return 0.0 if hi <= lo else clamp((m - lo) / (hi - lo), 0.0, 1.0)
 
 
-def apply_meeting_stance(rows: List[Dict[str, Any]], state: Dict[str, Any], workspace: Optional[Path] = None) -> List[Dict[str, Any]]:
-    """Stamp each met hero with how they turn up. A hostile hero spawns alive on the enemy team
-    (recruitMode 'hostile', spawnAsWreck False): put them down and raise the wreck to sign them on.
-    A bonded one is a wreck to raise. Constructor-gated recruits, the entrance builder, the heroes who
-    join by winning (requiresVictory) and heroes who are buildings keep their own way."""
+def p_hostile(score: float, state: Dict[str, Any], workspace: Optional[Path] = None) -> float:
+    """The chance a met hero turns up alive and against us: a logistic in their stance toward the
+    party, no thresholds. Owner call, 2026-10-28: Umwelt-style continuous parameters.
+
+        p = 1 / (1 + exp((stance + bias) / softness))
+
+    bias slides from meetingStance.bias to biasLate as the campaign goes on (lateness). With the
+    defaults a hero with one authored tension in the party is ~83% hostile early and ~96% late; a
+    stranger ~8% early and ~31% late; a bonded hero almost never."""
+    import math
+    st = rules(workspace).get("meetingStance") or {}
+    t = lateness(state, workspace)
+    bias = (1.0 - t) * float(st.get("bias", 0.6)) + t * float(st.get("biasLate", 0.2))
+    soft = max(1e-3, float(st.get("softness", 0.25)))
+    x = (float(score) + bias) / soft
+    return 1.0 / (1.0 + math.exp(max(-60.0, min(60.0, x))))
+
+
+def roll(state: Dict[str, Any], *parts: Any) -> float:
+    """A seeded uniform in [0, 1) for this campaign, mission and parts: the same sortie rolls the same."""
+    import hashlib
+    return int(hashlib.md5(seed_for(state, *parts).encode()).hexdigest()[:8], 16) / float(0x100000000)
+
+
+def meeting(hid: str, state: Dict[str, Any], workspace: Optional[Path] = None, map_id: Any = "") -> Dict[str, Any]:
+    """How this hero would turn up on this map this sortie: {score, pHostile, roll, kind, reasons}."""
+    score, why = stance_toward(hid, state, workspace)
+    p = p_hostile(score, state, workspace)
+    u = roll(state, map_id, hid, "stance")
+    return {"score": score, "pHostile": round(p, 3), "roll": round(u, 3), "kind": "hostile" if u < p else "authored",
+            "reasons": why[:4]}
+
+
+def apply_meeting_stance(rows: List[Dict[str, Any]], state: Dict[str, Any], workspace: Optional[Path] = None,
+                         map_id: Any = "") -> List[Dict[str, Any]]:
+    """Stamp each met hero with how they turn up. A seeded roll under pHostile (the logistic in their
+    stance, p_hostile) spawns them alive on the enemy team (recruitMode 'hostile', spawnAsWreck False):
+    put them down and raise the wreck to sign them on. Otherwise they come the way their recruit entry
+    says (a wreck, for most). Constructor-gated recruits, the entrance builder, the heroes who join by
+    winning (requiresVictory) and heroes who are buildings keep their own way."""
     for row in rows:
         mode = str(row.get("recruitMode") or "wreck_rez")
         if mode in KEEP_MEETING or row.get("entrance") or row.get("requiresVictory") or row.get("wreckUnitDef"):
             continue
         if (row.get("encounter") or {}).get("anchored"):
             continue
-        score, why = stance_toward(str(row.get("heroId")), state, workspace)
-        kind = meeting_kind(score, state, workspace)
-        row["stance"] = {"score": score, "kind": kind, "reasons": why[:4]}
-        if kind == "hostile":
+        m = meeting(str(row.get("heroId")), state, workspace, map_id or row.get("mapId") or "")
+        row["stance"] = m
+        if m["kind"] == "hostile":
             row["recruitMode"] = "hostile"
             row["spawnAsWreck"] = False
-        elif kind == "wreck":
-            row["recruitMode"] = "wreck_rez"
-            row["spawnAsWreck"] = True
     return rows
 
 
@@ -320,6 +343,20 @@ def present_heroes(state: Dict[str, Any]) -> List[str]:
     return sorted({h for h in ids if h and h not in dead})
 
 
+def _weights(E, workspace: Path):
+    """The encounter field's weights. presence (encounter_rules.json): how much a relation to someone in
+    the company raises the chance of meeting, per side. Bonded heroes turn up more rarely than the ones
+    at odds with the party (ally < adversary). An older Umwelt without the per-side weights gets the
+    shared one."""
+    pr = rules(workspace).get("presence") or {}
+    rel = float(pr.get("relation", 0.7))
+    try:
+        return E.Weights(presence_relation=rel, presence_ally=float(pr.get("ally", rel)),
+                         presence_adversary=float(pr.get("adversary", rel)))
+    except TypeError:
+        return E.Weights(presence_relation=rel)
+
+
 def build(state: Dict[str, Any], workspace: Optional[Path] = None):
     """(EncounterField, context) or None when Umwelt lacks the module."""
     E = _module()
@@ -355,7 +392,7 @@ def build(state: Dict[str, Any], workspace: Optional[Path] = None):
             haunts[home[0]] = float(home_w.get("homeMapHaunt", 2.4))
         entities.append(E.Entity(hid, traits=_traits(hid, um, pack), haunts=haunts, anchored_at=anchored_at,
                                  label=str(pack.get("name") or hid)))
-    field = E.EncounterField(entities, places, _relations(E, state, ws), weights=E.Weights(presence_relation=0.7))
+    field = E.EncounterField(entities, places, _relations(E, state, ws), weights=_weights(E, ws))
     belief = state.get("encounterBelief") or {}
     ctx = {"present": present, "draw": relative_draw(belief.get("draw") or {}, _wild_ids(state)),
            "mood": dict(belief.get("mood") or {}),

@@ -827,7 +827,6 @@ class HeroRosterTests(unittest.TestCase):
                 "mode": "cracked_farm",
                 "difficultyDial": 1.0,
                 "xpMultiplier": 1.0,
-                "farmSortiesEnabled": True,
                 "xpPersistOnDeath": True,
             }
             roster = engine.ensure_roster(state)

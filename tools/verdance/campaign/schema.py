@@ -337,7 +337,6 @@ def default_v1_state() -> Dict[str, Any]:
             "mode": "cracked_farm",
             "difficultyDial": 1.0,
             "xpMultiplier": 1.0,
-            "farmSortiesEnabled": True,
             "xpPersistOnDeath": True,
         },
         # WO-043/metal: broker commerce — Tenebrium (build floor), campaign

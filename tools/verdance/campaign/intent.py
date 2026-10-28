@@ -314,11 +314,6 @@ def _difficulty_presentation(state: Dict[str, Any], map_id: str) -> Dict[str, An
         "label": f"Expected opposition: {band} (scale {preview:.2f})",
         "dialLine": f"Difficulty dial {eco['difficultyDial']:.2f} | ramp M{mission_n}",
         "mode": prog.get("mode"),
-        "xpLine": (
-            "XP farm ON - death keeps XP; farm sorties pay extra"
-            if str(prog.get("mode")) == "cracked_farm"
-            else "Standard XP - death still keeps XP"
-        ),
     }
 
 

@@ -164,7 +164,6 @@ def ensure_progression(state: Dict[str, Any]) -> Dict[str, Any]:
     prog.setdefault("mode", "cracked_farm")
     prog.setdefault("difficultyDial", 1.0)
     prog.setdefault("xpMultiplier", 1.0)
-    prog.setdefault("farmSortiesEnabled", True)
     prog.setdefault("xpPersistOnDeath", True)  # always honored; flag is documentary
     # Soft clamp so bad saves cannot invent absurd dials.
     try:

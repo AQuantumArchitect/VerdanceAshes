@@ -1581,7 +1581,6 @@ class CampaignKernel:
                         f"{state.get('currentMissionId') or 'va_unknown'}|"
                         f"{state.get('missionNumber') or 0}|ch1|abandon|{reason}|f0"
                     ),
-                    "freeTnbMint": False,
                 }
                 state, report, _intent, _events = process_result(
                     state, fake, None, self.ws, None

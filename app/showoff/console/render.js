@@ -120,9 +120,8 @@ export function renderHeroCard(opts) {
     .concat(o.panel ? ["panel"] : [])
     .concat(stats.wounds ? ["wounded"] : [])
     .filter(Boolean).join(" ");
-  // Earned campaign XP once there is some; before that, the start XP the pack's cost buys.
-  const startXp = Number(h.startXp) || 0;
-  const xpLine = stats.xp ? `xp ${stats.xp}` : (startXp > 0 ? `start xp ${startXp.toFixed(2)}` : (o.xpLabel || "green"));
+  // Earned campaign XP only: the start xp a pack is bought at is bookkeeping, not something to read.
+  const xpLine = stats.xp ? `xp ${stats.xp}` : (o.xpLabel || "");
   const levelLine = `L${stats.level}`;
   // Sticky peak: career rank (Green/Proven/…). "Runner" is a SPEED tag, not a rank.
   // Legacy "Blooded" read as wounded — display as Proven.
@@ -139,12 +138,25 @@ export function renderHeroCard(opts) {
     o.type === "button" || o.dataCrew ? `type="button"` : "",
   ].filter(Boolean).join(" ");
   const tagName = (o.type === "button" || o.dataCrew) ? "button" : "div";
+  // Formation: everyone starts green, so level, rank and start xp say nothing yet. Show what the
+  // pack brings, what it costs (only when it costs), and whether it can be you.
+  if (o.formation) {
+    const lead = o.tag ? `<span class="hc-flag">${esc(o.tag)}</span>` : "";
+    const lvl = stats.level > 1 ? `<div class="hc-level" title="Carried over from an earlier campaign">L${esc(stats.level)}</div>` : "";
+    return `<${tagName} class="${classes} formation" ${attrs}>
+      <div class="hc-name">${esc(name)}</div>${lvl}
+      <div class="hc-meta">${esc(meta)}</div>
+      ${tagLine || lead ? `<div class="hc-tags">${lead}${esc(tagLine)}</div>` : ""}
+      ${costHtml}
+      <div class="hc-blurb">${esc(blurb)}</div>
+    </${tagName}>`;
+  }
   return `<${tagName} class="${classes}" ${attrs}>
       <div class="hc-name">${esc(name)}${esc(tag)}</div>
       <div class="hc-level" title="${esc(peakRaw)}">${esc(levelLine)}</div>
-      <div class="${peakClass}" title="Career rank — not a movement perk">${esc(peakRaw)}</div>
+      ${peakNorm === "green" ? "" : `<div class="${peakClass}" title="Career rank">${esc(peakRaw)}</div>`}
       <div class="hc-meta">${esc(meta)}</div>
-      <div class="hc-xp">${esc(xpLine)}</div>
+      ${xpLine ? `<div class="hc-xp">${esc(xpLine)}</div>` : ""}
       ${tagLine ? `<div class="hc-tags" title="Procedural tags (boost / nerf)">${esc(tagLine)}</div>` : ""}
       ${costHtml}
       <div class="hc-blurb">${esc(blurb)}</div>

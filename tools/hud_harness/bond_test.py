@@ -7,7 +7,9 @@ pair's XP and gift land only when both heroes are on the drop.
 import ctypes, glob, json, os, sys
 
 WS = os.environ.get("VA_WS") or os.getcwd()
-SRC = open(os.path.join(WS, "mod", "VerdanceAshes.sdd", "luarules", "gadgets", "game_verdance_campaign.lua"), encoding="utf-8").read()
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+import campaign_lua  # noqa: E402
+SRC = campaign_lua.source()
 start = SRC.index("function VA_BOND_apply(")
 FN = SRC[start:SRC.index("\nend\n", start) + 5]
 L = ctypes.CDLL(glob.glob('/usr/lib/x86_64-linux-gnu/liblua5.4.so*')[0])

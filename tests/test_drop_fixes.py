@@ -53,7 +53,8 @@ def test_the_infil_card_lists_what_drops():
 
 
 def test_a_rez_in_a_territory_wound_keeps_the_territory_extraction():
-    camp = (MOD / "luarules" / "gadgets" / "game_verdance_campaign.lua").read_text(encoding="utf-8")
+    import campaign_lua
+    camp = campaign_lua.source()
     rule = camp.split("function GG.VA_ExtractRule()", 1)[1].split("\nend", 1)[0]
     assert "rezHeroId" not in rule
 
