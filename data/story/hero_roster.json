@@ -1299,6 +1299,26 @@
         "type": "band_unlock",
         "blurb": "A hundred hands, one grip."
       }
+    },
+    {
+      "heroId": "gorgon",
+      "name": "Ivra 'Gorgon' Maelis",
+      "unitDef": "legmed",
+      "missionCritical": false,
+      "status": "locked",
+      "xp": 0.0,
+      "timesWounded": 0,
+      "campaignXp": 0.0,
+      "trait": "count",
+      "traits": [
+        "count",
+        "plod"
+      ],
+      "fiction": "Maelis learned gunnery on the Legion's long ranges and never learned to hurry. Her Medusa sits back, finds something, and looks at it until a salvo of rockets makes it stop. She cannot see the sky from inside the Medusa and does not try to: two Armada Shredder flak trucks ride with her and keep it clean. She pays their crews in Legion coin and pretends not to like them.",
+      "recruit": {
+        "type": "band_unlock",
+        "blurb": "Whatever I look at stops moving."
+      }
     }
   ]
 }

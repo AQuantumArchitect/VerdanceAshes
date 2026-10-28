@@ -22,6 +22,7 @@ DEFAULT_HOMES: Dict[str, List[str]] = {
     "mason": ["ancient_bastion", "AB_NW_TOR"],
     "loom": ["tabula", "T_NE_CAUSEWAY"],
     "hundred": ["tabula", "T_E_CAUSEWAY"],
+    "gorgon": ["koom_valley", "KV_E_LOWER_LANE"],
     "rookery": ["koom_valley", "KV_NE_SPILLWAY"],
     "dam": ["the_rock_jungle", "TRJ_NE_SHALLOWS"],
     "arc": ["ancient_bastion", "AB_SE_HEIGHTS"],

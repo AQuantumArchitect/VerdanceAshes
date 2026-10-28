@@ -79,6 +79,7 @@ M.TAGS = {
   web_line = { label = "Web Line", range = 1.12, fiction = "The net reaches further than it looks." },
   hundred_hands = { label = "Hundred Hands", reload = 0.85, fiction = "The drones relaunch before the last ones land." },
   choir = { label = "Choir", range = 1.12, fiction = "Every truck fires on the same downbeat." },
+  stone_gaze = { label = "Stone Gaze", range = 1.12, fiction = "She looks a little further than anyone thinks she can." },
   -- build power
   field_surgeon = { label = "Field Surgeon", build = 1.20, fiction = "Nobody stays dead near an honest chassis." },
   combat_engineer = { label = "Combat Engineer", build = 1.20, fiction = "Builds trouble in equal measure." },
@@ -111,7 +112,7 @@ M.HERO_DEFAULTS = {
   phoenix = { "rises_again" }, scylla = { "broadside" }, tsunami = { "tide_table" },
   starlight = { "long_light" }, banisher = { "scare_radius" }, arrow = { "venom_tempo" }, hornet = { "sting_tempo" }, charybdis = { "undertow" }, shiva = { "grunt_wall" }, tremor = { "tremor_table" }, stiletto = { "static_bloom" }, lunkhead = { "old_scars" }, stronghold = { "hot_insertion" }, possum = { "play_dead" },
   mason = { "legion_line" },
-  rookery = { "high_nest" }, dam = { "dam_works" }, arc = { "choir" }, mammoth = { "old_mother" }, gladius = { "crowd_roar" }, triton = { "low_tide" }, loom = { "web_line" }, hundred = { "hundred_hands" },
+  rookery = { "high_nest" }, dam = { "dam_works" }, arc = { "choir" }, mammoth = { "old_mother" }, gladius = { "crowd_roar" }, triton = { "low_tide" }, loom = { "web_line" }, hundred = { "hundred_hands" }, gorgon = { "stone_gaze" },
 }
 
 -- Rare dual-effect exceptions. Primary still comes from HERO_DEFAULTS;
