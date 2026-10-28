@@ -55,11 +55,11 @@
       "allowBail": true,
       "allowKite": true,
       "faction": "legion",
-      "unitDef": "legcen",
+      "unitDef": "legstr",
       "voice": {
         "hook": "Pack is one thought.",
-        "blurb": "Ash-Captain + Phobos (×12). Swarm mind — hire the flock when you want it.",
-        "fiction": "She does not hold a line; she holds a rhythm. Phobos peel when the lasers paint, reform when the beat returns. Captain means the pack is one thought under fire.",
+        "blurb": "Ash-Captain Vane on a Hoplite, with ten Phobos. Swarm mind, and she is the one out front.",
+        "fiction": "She does not hold a line; she holds a rhythm. Vane rides a Hoplite out in front of ten Phobos; they peel when the lasers paint and reform when the beat returns. Captain means the pack is one thought under fire, and she is the thought.",
         "tagLine": "The pack thinks with her — when you hire her."
       },
       "notes": "band flock captain; packMind=swarm; no longer core left hand"
@@ -81,7 +81,7 @@
       "unitDef": "armwar",
       "voice": {
         "hook": "I still walk your left.",
-        "blurb": "War buddy Centurion — solo, high XP, Centurion HP aura.",
+        "blurb": "Pavise and five Legion Satyrs. An Armada shield captain walking a Legion line.",
         "fiction": "Back when you wore a real Armada suit, this was the counterpart who kept the shield side honest. One Centurion. No flock. The aura still remembers every Warrior that stood in the same dirt.",
         "tagLine": "Left hand. Standing shield."
       },
@@ -103,7 +103,7 @@
       "unitDef": "legrezbot",
       "voice": {
         "hook": "Wrecks are unfinished sentences.",
-        "blurb": "Only rez captain — life-line of the kettles. Wrecks come home.",
+        "blurb": "Ketha and a pile of Zagreus. Only rez captain. Wrecks come home.",
         "fiction": "Every wreck is an unfinished sentence. Ketha finishes them. She will walk into fire for a name in the mud; she will not chase a kill. The company's memory has one pair of hands.",
         "tagLine": "Field surgeon — craft over glory."
       },
@@ -122,12 +122,12 @@
       "allowBail": true,
       "allowKite": false,
       "faction": "armada",
-      "unitDef": "armfus",
+      "unitDef": "armckfus",
       "voice": {
-        "hook": "Quiet sun. Won't go out.",
-        "blurb": "Quiet sun that refuses to go out — hero fusion, ENERGY field.",
-        "fiction": "Hearth does not tour the map. The pad is a hearth; she is the coal. Keep her alive and the lights stay on. Wanderlust is for captains; she is furniture with a pulse.",
-        "tagLine": "Pad heart — stay and burn."
+        "hook": "Quiet sun. Won't go out, and you won't find it.",
+        "blurb": "One Cloakable Fusion Reactor. A quiet sun nobody can find.",
+        "fiction": "Hearth does not tour the map. The pad is a hearth; she is the coal, and now the coal can hide. A cloakable fusion reactor keeps the lights on where no scout can count them. Wanderlust is for captains; she is furniture with a pulse.",
+        "tagLine": "Cloaked pad heart: stay and burn, unseen."
       },
       "notes": "immobile fantasy even if unit can move"
     },
@@ -191,7 +191,7 @@
       "unitDef": "corfast",
       "voice": {
         "hook": "Grins with a welder.",
-        "blurb": "Trouble fabricator — Twitcher + Cortex nano. Mines and mischief.",
+        "blurb": "Twitcher and a Printer. He welds the front together; the Printer builds whatever he grins at.",
         "fiction": "Build power with bad intentions. Twitcher grins with a welder and leaves surprises in the dirt. Eco seat that bites.",
         "tagLine": "Combat engineer — craft with teeth."
       },
@@ -211,12 +211,12 @@
       "allowBail": true,
       "allowKite": true,
       "faction": "legion",
-      "unitDef": "legscout",
+      "unitDef": "legvp",
       "voice": {
-        "hook": "Only trusts wheels.",
-        "blurb": "Null Merc kid + Wheelie Bay (×16). Only trusts wheels.",
-        "fiction": "Spoke does not trust boots, bots, or promises — only wheels. The bay mints scouts like nervous habits. Live to see; die and the bank remembers.",
-        "tagLine": "Wheelie mentor — speed is sight."
+        "hook": "Only trusts wheels. Builds his own.",
+        "blurb": "The Wheelie Bay itself, with a metal storage and an extra thousand metal in it. Prints Wheelies on repeat the moment it lands.",
+        "fiction": "Spoke does not trust boots, bots or promises, only wheels, so he became the place wheels come from. The Wheelie Bay lands with its own metal and starts printing scouts the moment it settles, on repeat, like a nervous habit. Live to see; die and the bank remembers.",
+        "tagLine": "Wheelie Bay: speed is sight, on repeat."
       },
       "notes": "swarm=wheels not fleas"
     },
@@ -233,12 +233,12 @@
       "allowBail": true,
       "allowKite": true,
       "faction": "armada",
-      "unitDef": "armflea",
+      "unitDef": "armlab",
       "voice": {
-        "hook": "Speaks in plurals.",
-        "blurb": "Flea lab + Tick pack (×20). Speaks in plurals.",
-        "fiction": "We are the eyes. Tick is a pronoun with a factory. Carpet the fog, die cheap, mint again. Singular is a failure mode.",
-        "tagLine": "Tick eyes — vision from the carpet."
+        "hook": "Speaks in plurals. Prints them too.",
+        "blurb": "The Tick Stream Bay, with a metal storage and an extra thousand metal. Prints Ticks on repeat from the first second.",
+        "fiction": "We are the eyes. Tick is a pronoun with a factory, and now Tick is the factory. The Stream Bay lands with its own metal and prints Ticks on repeat from the first second. Carpet the fog, die cheap, mint again. Singular is a failure mode.",
+        "tagLine": "Tick Stream Bay: the carpet prints itself."
       },
       "notes": "true swarm vs spoke wheels"
     },
@@ -258,8 +258,8 @@
       "unitDef": "legap",
       "voice": {
         "hook": "Dreams in flight paths.",
-        "blurb": "Drone plant + Noctua wing. Dreams in flight paths.",
-        "fiction": "The bay is the hero. It dreams in flight paths and wakes as a cloud of eyes. Ground captains argue lanes; Noctua argues altitude.",
+        "blurb": "The Legion Drone Plant, with a metal storage and an extra thousand metal. Prints Noctua fighters on repeat.",
+        "fiction": "The bay is the hero. It lands with its own metal, dreams in flight paths and wakes as a cloud of eyes, printing Noctua fighters on repeat. Ground captains argue lanes; Noctua argues altitude.",
         "tagLine": "Air eyes — sky is a map."
       },
       "notes": "sky eyes not swarm"
@@ -300,12 +300,12 @@
       "allowBail": true,
       "allowKite": true,
       "faction": "legion",
-      "unitDef": "legkark",
+      "unitDef": "legaheattank",
       "voice": {
-        "hook": "Three wars unpaid.",
-        "blurb": "Six Karkinos — mid-line. Three wars of arrears.",
-        "fiction": "Not unpaid — arrears. Three wars on the ledger. He holds the middle because credit finally beat the Mercs, and debt makes a man hard to move.",
-        "tagLine": "Merc debt — hold what you're owed."
+        "hook": "Three wars unpaid. The interest is heat.",
+        "blurb": "One Prometheus heat-ray tank and three Helios skirmishers. Three wars unpaid, and the interest is heat.",
+        "fiction": "Not unpaid: arrears. Three wars on the ledger. Grath took his last payment in hardware, a Prometheus heat-ray tank, and he collects the rest in person with three Helios skirmishers riding his flanks. Debt makes a man hard to move; heat makes him hard to argue with.",
+        "tagLine": "Merc debt, collected in heat."
       },
       "notes": "debt line anchor"
     },
@@ -325,7 +325,7 @@
       "unitDef": "leggat",
       "voice": {
         "hook": "Gate, jammed gat, a lie.",
-        "blurb": "Shieldline six. Held a gate with a jammed gat and a lie.",
+        "blurb": "Five Decurions. Gate, jammed gat, a lie.",
         "fiction": "Six hours at a scrap-gate with a jammed gatling and a fiction about reinforcements. Doors are Rusk's religion. He does not kite a threshold.",
         "tagLine": "Shieldline — the door stays shut."
       },
@@ -347,7 +347,7 @@
       "unitDef": "legamph",
       "voice": {
         "hook": "Fords are doors.",
-        "blurb": "Telchine trio — amph line. Fords are doors.",
+        "blurb": "One Telchine and five Armada Pincers. Fords are doors, and the Pincers hold them open.",
         "fiction": "Oddly line, not gimmick. Water is just another door. Odessa refuses to dry out and treats every ford like a hinge she owns.",
         "tagLine": "Fordbreaker — hold the wet door."
       },
@@ -369,7 +369,7 @@
       "unitDef": "legshot",
       "voice": {
         "hook": "Riot as punctuation.",
-        "blurb": "Shotgun foursome. Closes distance; riot is punctuation.",
+        "blurb": "One Phalanx and three Karkinos. Riot as punctuation.",
         "fiction": "She has already won the argument. The riot cannon is the period. Line heat — close, boom, no poetry about kiting.",
         "tagLine": "Riot breaker — push the period."
       },
@@ -388,12 +388,12 @@
       "allowBail": true,
       "allowKite": true,
       "faction": "legion",
-      "unitDef": "legbal",
+      "unitDef": "legaradk",
       "voice": {
-        "hook": "Shoots map coordinates.",
-        "blurb": "Ballista battery. Shoots coordinates, not targets.",
-        "fiction": "Halq does not see units — he sees grid refs. The rockets land where the map said they would. Line support that argues with math.",
-        "tagLine": "Long arc — count the dirt."
+        "hook": "Calls the coordinates; the rockets answer.",
+        "blurb": "A Euclid radar bot and eight Armada Rocketeers. She calls the coordinates; they answer.",
+        "fiction": "Halq does not see units; he sees grid refs. These days he does not fire at all. His Euclid radar bot reads the map, he reads the numbers out loud, and eight Armada Rocketeers put their rockets exactly where he said. Line support that argues with math.",
+        "tagLine": "Euclid and Rocketeers: the map shoots back."
       },
       "notes": "count on line; soft preferDefenses for static poke"
     },
@@ -549,7 +549,7 @@
       "unitDef": "armfboy",
       "voice": {
         "hook": "House learned to knock.",
-        "blurb": "One Fatboy — plasma house that learned to walk so it could knock.",
+        "blurb": "One Fatboy and two Legion Lances on the roof. The house learned to knock, and to look up.",
         "fiction": "A pad that got legs. The Fatboy Contract is real estate with a plasma greeting. It plods to the door and knocks until there is no door.",
         "tagLine": "Plasma house — mobile pad violence."
       },
@@ -568,13 +568,13 @@
       "preferDefenses": true,
       "allowBail": true,
       "allowKite": true,
-      "faction": "legion",
-      "unitDef": "legbar",
+      "faction": "armada",
+      "unitDef": "armmart",
       "voice": {
-        "hook": "Napalm is confetti.",
-        "blurb": "Parade battery — Barrage, Cleaver, Lance, Arquebus, Mausers. Confetti!",
-        "fiction": "Hyper-optimistic artillery girl in an ash war. Impacts sparkle; she cheers. Napalm is confetti. She never walks into the argument — she *is* the fireworks from the back of the parade.",
-        "tagLine": "Sparkle battery — backline joy, soft kite."
+        "hook": "Every shell is confetti.",
+        "blurb": "A firing line of five Mausers and a Pheme radar vehicle. Every shell is confetti.",
+        "fiction": "Hyper-optimistic artillery girl in an ash war. She traded the napalm park for a disciplined firing line of five Mausers and a Pheme to show her where to aim, and she cheers every impact anyway. She never walks into the argument. She is the fireworks from the back of the parade, now in neat rows.",
+        "tagLine": "Mauser firing line: joy at long range."
       },
       "notes": "gleeful unique in siege"
     },
@@ -595,7 +595,7 @@
       "unitDef": "va_kettle",
       "voice": {
         "hook": "Sky-saint, chainsaw soul.",
-        "blurb": "Saint Kettle's Archangel and one heavy transport. The roof of the company, and the lift under it.",
+        "blurb": "Saint Kettle's Archangel and two Legion Hippotes heavy transports. The roof of the company, and the lift under it.",
         "fiction": "Reborn from rez-saint to sky-saint. Keeps the air honest with Archangel hymns and a chainsaw temperament. No pawn blob — holiness is elite. Mira's fireworks need a clear ceiling.",
         "tagLine": "Sky saint — hold the air."
       },
@@ -613,13 +613,13 @@
       "preferDefenses": true,
       "allowBail": true,
       "allowKite": false,
-      "faction": "armada",
-      "unitDef": "armbeamer",
+      "faction": "cortex",
+      "unitDef": "cordoom",
       "voice": {
-        "hook": "Owns a circle of dirt.",
-        "blurb": "Beamer ring + Ferrets + Thistles + LLTs. Owns a circle of dirt.",
-        "fiction": "The Warder does not chase. A circle of dirt is enough empire. Ferrets wait cloaked; beamers argue with trespassers. Pad tooth with patience.",
-        "tagLine": "Area control — the circle holds."
+        "hook": "Owns a circle of dirt. Burns the edge.",
+        "blurb": "One Bulwark. A heat-ray turret that owns a circle of dirt and burns whatever steps into it.",
+        "fiction": "The Warder does not chase. A circle of dirt is enough empire, and these days the circle has a Bulwark in the middle of it: a Cortex heat-ray emplacement that turns trespass into a smell. Patient, stubborn, and very hard to walk past.",
+        "tagLine": "Bulwark: the circle holds, and glows."
       },
       "notes": "pad shield vs kettle sky"
     },
@@ -662,7 +662,7 @@
       "unitDef": "va_infestor",
       "voice": {
         "hook": "Company grows itself.",
-        "blurb": "Infestor seed (×5). Stealth spiders that mint more spiders, and Goblins.",
+        "blurb": "Four Infestor seeds and two Recluse spiders. Stealth spiders that mint more spiders, and Goblins.",
         "fiction": "Quiet gardener of legs. The hive does not recruit — it germinates. All-terrain, stealthed, patient. The company grows itself whether you are watching or not.",
         "tagLine": "Hive growth — craft, then creep."
       },
@@ -694,13 +694,13 @@
     {
       "heroId": "kit",
       "name": "Kit Sparkler",
-      "position": "skirmish",
+      "position": "siege",
       "combatVerb": "kite",
       "temperament": [
         "gleeful",
         "mischief"
       ],
-      "doctrine": "skirm",
+      "doctrine": "arty",
       "preferDefenses": false,
       "allowBail": true,
       "allowKite": true,
@@ -708,9 +708,9 @@
       "unitDef": "legbart",
       "voice": {
         "hook": "Fireworks at walking distance.",
-        "blurb": "Belcher trio — napalm skirm. Mira's sister energy, but she walks it in.",
-        "fiction": "Mira throws confetti from the parade. Kit brings the fireworks to handshake range and laughs when something catches. Gleeful mischief — burn, bail, burn again.",
-        "tagLine": "Close confetti — kite with a grin."
+        "blurb": "Kit's Belcher with a whole napalm park behind her: a Barrage, a Cleaver, a Lance, an Arquebus and a Thanatos. Fireworks at walking distance.",
+        "fiction": "Mira used to own the napalm park. Kit inherited it: a Barrage, a Cleaver, a Lance, an Arquebus and a Thanatos rolling behind her Belcher. Mira threw confetti from the back; Kit brings the whole parade to handshake range and laughs when something catches. Gleeful mischief: burn, bail, burn again.",
+        "tagLine": "The napalm park, walked in close."
       },
       "notes": "skirmish x gleeful; Mira's walking cousin"
     },
@@ -731,7 +731,7 @@
       "unitDef": "armmerl",
       "voice": {
         "hook": "The wall never saw the invoice.",
-        "blurb": "Ambassador pair — stealth rockets. Soft breach; the wall never saw the bill.",
+        "blurb": "One stealth rocket launcher from each faction: an Ambassador, a Negotiator and a Boreas. The wall never saw the invoice.",
         "fiction": "Kiln announces himself with heat. Vale invoices in fog. Two Ambassadors on a quiet contract: prefer the static, never the brawl, leave before the argument learns your name.",
         "tagLine": "Soft siege — fog writes the receipt."
       },
@@ -761,29 +761,6 @@
       "notes": "shield x debt; Grath's sky cousin"
     },
     {
-      "heroId": "ceil",
-      "name": "Ceil Rat",
-      "position": "skirmish",
-      "combatVerb": "kite",
-      "temperament": [
-        "sky",
-        "glass"
-      ],
-      "doctrine": "skirm",
-      "preferDefenses": false,
-      "allowBail": true,
-      "allowKite": true,
-      "faction": "armada",
-      "unitDef": "armbrawl",
-      "voice": {
-        "hook": "Altitude is an opinion.",
-        "blurb": "Roughneck wing (x5). Gunship manners. Altitude is an opinion.",
-        "fiction": "Noctua dreams flight paths for eyes. Ceil Rat argues with roofs. Five Roughnecks that treat the ceiling like a suggestion and glass like a lifestyle.",
-        "tagLine": "Gunship skirm — sky with teeth."
-      },
-      "notes": "skirmish x sky; combat sky vs Noctua eyes-factory"
-    },
-    {
       "heroId": "lumen",
       "name": "Sister Lumen",
       "position": "eco",
@@ -800,7 +777,7 @@
       "unitDef": "va_lumen",
       "voice": {
         "hook": "Tithe the grid.",
-        "blurb": "Advanced geo — saint garden. Tithe the grid; keep the lights devout.",
+        "blurb": "Sister Lumen with an Umbra jammer and two Prophet radar vehicles. She sees the whole grid, and the grid can't see her.",
         "fiction": "Hearth is coal furniture. Lumen is faith with a geothermal throat. She does not tour. She tithes heat into the pad and calls the surplus holy. Eco saint — stay and feed.",
         "tagLine": "Grid saint — garden the power."
       },
@@ -846,7 +823,7 @@
       "unitDef": "armlatnk",
       "voice": {
         "hook": "Sight is a wound you give them.",
-        "blurb": "Jaguar pack (x5). Lightning eyes. Sight is a wound you give them.",
+        "blurb": "One Jaguar and a pack of six Blitz. The lightning first, then everyone else.",
         "fiction": "Most eyes hide. Volt Lash paints. Five Jaguars that turn reconnaissance into a burn mark — heat glass, see by hurting, leave a scar on the map.",
         "tagLine": "Lightning eyes — kite the wound."
       },
@@ -869,7 +846,7 @@
       "unitDef": "va_halberd",
       "voice": {
         "hook": "Halberd's hungry.",
-        "blurb": "Drives the Cortex Halberd with a heat ray in place of its cannon. The ray runs on the company's energy bank, so she wants Solarium behind her.",
+        "blurb": "Ilse Varn's Halberd with three Alpheus and four Nereus. Legion hovers on her flanks and over her head.",
         "fiction": "Not Pavise. Different spelling, different manners. The Halberd is a door that learned to hover.",
         "tagLine": "Hovertank with a name like a weapon."
       },
@@ -938,7 +915,7 @@
       "unitDef": "va_mask",
       "voice": {
         "hook": "Every throne needs a spare.",
-        "blurb": "Decoy Commander and a pack of Pawns (x16). Can capture what walks too close, and raise a Bot Lab where the company needs one. Every throne needs a spare.",
+        "blurb": "Mask, ten Pawns and three Firefly rez planes. Every throne needs a spare, and the spares get back up.",
         "fiction": "Mask was one of the decoy commanders on the Greenest farms, built to be shot instead of somebody important. He walked off the farm with sixteen Pawns who believed he was the real thing. He has started to believe it too.",
         "tagLine": "A decoy commander leading a crowd of Pawns. Wears a crown nobody gave him."
       },
@@ -961,7 +938,7 @@
       "unitDef": "va_ghost",
       "voice": {
         "hook": "Everything changes sides eventually.",
-        "blurb": "Two Ghost spy bots, cloaked, that walk up to enemy units and turn them. Everything changes sides eventually.",
+        "blurb": "Rumor's Ghost, two Legion Eidolons and two Gremlins. Everything changes sides eventually.",
         "fiction": "Nobody hired Rumor. Rumor was simply on the payroll one morning, with four Ghosts, two Gremlins and a list of units that used to belong to someone else.",
         "tagLine": "Cloaked spy bots that capture enemy units."
       },
@@ -989,29 +966,6 @@
         "tagLine": "Legion bombers that keep coming back: siege that flies."
       },
       "notes": "siege x sky; a bomber that takes the hit and returns"
-    },
-    {
-      "heroId": "tarn",
-      "name": "Tarn Ostrander",
-      "position": "line",
-      "combatVerb": "push",
-      "temperament": [
-        "swarm",
-        "mischief"
-      ],
-      "doctrine": "line",
-      "preferDefenses": false,
-      "allowBail": false,
-      "allowKite": false,
-      "faction": "cortex",
-      "unitDef": "corsala",
-      "voice": {
-        "hook": "Out of the river, already firing.",
-        "blurb": "A pack of five Salamanders. They come up out of the river already firing.",
-        "fiction": "Ostrander ferries a pack of Salamanders through water the rest of the company calls a wall. They surface under the enemy line, shake off, and fire. He has never once walked around a lake.",
-        "tagLine": "Amphibious tank pack: fords are shortcuts."
-      },
-      "notes": "line x swarm; the pack that treats water as a road"
     },
     {
       "heroId": "scylla",
@@ -1053,7 +1007,7 @@
       "unitDef": "armsb",
       "voice": {
         "hook": "The flight finds the target, then drops on it.",
-        "blurb": "Four Tsunami seaplane bombers with three Horizon scouts out front. The flight finds the target, then drops on it.",
+        "blurb": "One Tsunami, two Legion Pyrphoros seaplane bombers and five Blink scouts. The flight finds the target, then drops on it.",
         "fiction": "Harrow sends three Horizons out over the water to see, then brings the Tsunamis in on what they found. Her wing lands on any lake the company can name, and a few it cannot.",
         "tagLine": "Seaplane bombers with scouts: siege that sees first."
       },
@@ -1076,7 +1030,7 @@
       "unitDef": "armmanni",
       "voice": {
         "hook": "The beam arrives before the argument.",
-        "blurb": "One Starlight. A beam that does not so much fire as arrive.",
+        "blurb": "One Starlight and four Sprinters. The beam arrives; the Sprinters make sure nobody gets close to it.",
         "fiction": "Dray was a lighthouse keeper before the war and never stopped. The Starlight sweeps the ridge line at the speed of a slow thought, and whatever it rests on is no longer a problem.",
         "tagLine": "Starlight: siege by light."
       },
@@ -1122,7 +1076,7 @@
       "unitDef": "corparrow",
       "voice": {
         "hook": "Never misses twice.",
-        "blurb": "Three Poison Arrows. They never miss twice.",
+        "blurb": "One Poison Arrow and 6 Salamanders. The Salamanders hold them still; she never misses twice.",
         "fiction": "Venn keeps a list of every target that walked away. It is a short list and getting shorter. Her Poison Arrows trade range for patience: the first shot is a question and the second is the answer.",
         "tagLine": "Poison Arrow trio: the second shot is the answer."
       },
@@ -1130,7 +1084,7 @@
     },
     {
       "heroId": "hornet",
-      "name": "Teague 'Hornet' Marsh",
+      "name": "Teague & Saffi Marsh",
       "position": "skirmish",
       "combatVerb": "kite",
       "temperament": [
@@ -1144,10 +1098,10 @@
       "faction": "armada",
       "unitDef": "armblade",
       "voice": {
-        "hook": "Stings, then returns for the nest.",
-        "blurb": "Two Hornet gunships. A sting that comes back for the rest of the nest.",
-        "fiction": "Marsh trained on crop-dusters and has never forgiven the war for being flat. Her Hornets come in low, sting, climb, and come in again. She calls it farming.",
-        "tagLine": "Hornet pair: gunships that do not leave."
+        "hook": "Sting, climb, come back for the nest.",
+        "blurb": "Two Hornet gunships, flown by the Marsh sisters, Teague and Saffi.",
+        "fiction": "The Marsh sisters trained on their father's crop-dusters and have never forgiven the war for being flat. Teague flies lead and talks the whole way; Saffi flies wing and says nothing until the second pass. Their Hornets come in low, sting, climb and come in again. They call it farming.",
+        "tagLine": "The Marsh sisters: two gunships that do not leave."
       },
       "notes": "skirmish x sky; two gunships working one target until it stops"
     },
@@ -1190,10 +1144,10 @@
       "faction": "cortex",
       "unitDef": "corshiva",
       "voice": {
-        "hook": "Eight Grunts and a decision.",
-        "blurb": "One Shiva with eight Grunts at her heels. The Grunts lead; the Shiva decides.",
-        "fiction": "Ruhl feeds her Grunts into the front on purpose, so the enemy can count them and feel safe. Then the Shiva walks through the middle of the count.",
-        "tagLine": "Shiva and Grunts: bait with a bite."
+        "hook": "A decision, alone.",
+        "blurb": "One Shiva. She decides alone now.",
+        "fiction": "Ruhl used to feed Grunts into the front so the enemy could count them and feel safe. She stopped needing the bait. Now the Shiva walks out alone, and the counting is somebody else's problem.",
+        "tagLine": "Shiva: the walker that decides."
       },
       "notes": "line x swarm; the escort is the bait"
     },
@@ -1214,7 +1168,7 @@
       "unitDef": "cortrem",
       "voice": {
         "hook": "Somebody has to see it first.",
-        "blurb": "One Tremor with two Rascal scouts and an Augur. Somebody has to see what she is about to flatten.",
+        "blurb": "One Tremor, a Deceiver jammer and five Rascals. Somebody has to see it first, and nobody sees her.",
         "fiction": "Lund shells things she has been shown and never things she has not. Her two Rascals ride ahead to find them and her Augur paints them for the Tremor, which then rearranges the map with her signature.",
         "tagLine": "Tremor and spotters: siege that is introduced first."
       },
@@ -1237,34 +1191,11 @@
       "unitDef": "armstil",
       "voice": {
         "hook": "Nothing moves; then it is quiet.",
-        "blurb": "Four Stiletto EMP bombers and a small power plant to feed them. Nothing moves; then everything is quiet.",
+        "blurb": "Three Stilettos and a Legion Whisper radar plane. Nothing moves; then it is quiet.",
         "fiction": "Cole carries her own little power house to every sortie, because Stilettos eat energy and she does not trust the company's grid. When the four of them pass over a position its guns stop mid-sentence.",
         "tagLine": "Stiletto wing: EMP siege from the sky."
       },
       "notes": "siege x sky; an EMP wing with a small power plant"
-    },
-    {
-      "heroId": "marauder",
-      "name": "Marlow & Wren",
-      "position": "skirmish",
-      "combatVerb": "push",
-      "temperament": [
-        "gleeful",
-        "mischief"
-      ],
-      "doctrine": "skirm",
-      "preferDefenses": false,
-      "allowBail": false,
-      "allowKite": false,
-      "faction": "armada",
-      "unitDef": "armmar",
-      "voice": {
-        "hook": "Arrive before the warning.",
-        "blurb": "Marauder pair. Fast amphibious raiders that arrive before the warning.",
-        "fiction": "Marlow and Wren have crossed every river in the valley and apologised to none of them. They come out of the water already laughing and leave through the front gate.",
-        "tagLine": "Marauder pair: raid with the river at their backs."
-      },
-      "notes": "skirmish x mischief; a fast amphibious pair"
     },
     {
       "heroId": "lunkhead",
@@ -1283,7 +1214,7 @@
       "unitDef": "armlun",
       "voice": {
         "hook": "Already knows where it hurts.",
-        "blurb": "One Lunkhead who has seen it all. He starts the sortie already knowing where it will hurt.",
+        "blurb": "One Lunkhead and two Legion Cardea shotgun hovers he is teaching the hard way.",
         "fiction": "Ferrow has been hit by everything the war makes and kept the receipts. Nobody remembers hiring the Lunkhead; the company just woke up with an experienced one parked by the gate.",
         "tagLine": "Lunkhead: the veteran who starts the sortie ahead."
       },
@@ -1329,7 +1260,7 @@
       "unitDef": "armmh",
       "voice": {
         "hook": "Cheap, fast, rocket-happy.",
-        "blurb": "Seven Possums, seven Seekers, three Sweepers. Cheap, fast, rocket-happy hovers with a roof.",
+        "blurb": "One Possum leading four Glaucus, five Salacia rocket hovers and two Alpheus. Cheap, fast, rocket-happy, with a Legion roof.",
         "fiction": "Calloway plays dead on every map until the Seekers have found something worth the rockets. Then seven Possums stand up at once and the sky above them is already covered.",
         "tagLine": "Possum plussy: scouts, rockets, and a roof."
       },
@@ -1352,7 +1283,7 @@
       "unitDef": "legck",
       "voice": {
         "hook": "Every wall is the first line of a fort.",
-        "blurb": "A Legion Construction Bot and a Construction Turret. She lays Legion-straight lines in country that has none.",
+        "blurb": "A Legion Construction Bot with two Sappers and a cart of walls: ten Dragon's Teeth and four Fortification Walls. The fort arrives before she does.",
         "fiction": "Tarquin laid half the walls of the Ancient Bastion and has opinions about the other half. She builds the way the Legion marches, in straight lines and on time, and her Construction Turret hums the cadence while it works.",
         "tagLine": "Legion constructor: the company's own mason."
       },
@@ -1375,7 +1306,7 @@
       "unitDef": "armca",
       "voice": {
         "hook": "Builds where nobody can walk to.",
-        "blurb": "Three Construction Aircraft and twelve Falcons. She builds the base where nobody can walk to, and the Falcons keep the sky over it.",
+        "blurb": "Three Armada Construction Aircraft under a mixed sky: four Falcons, two Cortex Valiants, two Legion Legionnaires and two Venators.",
         "fiction": "Atterby nests. Give her a cliff shelf, an island, a crater rim nobody can climb, and by morning there is a solar field and a lab on it with twelve Falcons circling like rooks. She talks to the aircraft the way other people talk to birds, and she has never once built on easy ground.",
         "tagLine": "Air constructors: a base on the high shelf, with its own sky."
       },
@@ -1406,26 +1337,26 @@
     },
     {
       "heroId": "arc",
-      "name": "Corwin 'Arc' Vasse",
-      "position": "line",
-      "combatVerb": "push",
+      "name": "Ambrose 'Choir' Halloran",
+      "position": "shield",
+      "combatVerb": "hold",
       "temperament": [
-        "heat",
-        "swarm"
+        "captain",
+        "sky"
       ],
-      "doctrine": "line",
+      "doctrine": "aa_saint",
       "preferDefenses": false,
       "allowBail": false,
       "allowKite": false,
       "faction": "armada",
       "unitDef": "armzeus",
       "voice": {
-        "hook": "Eight torches and one opinion.",
-        "blurb": "Eight Welders. Lightning assault bots that weld a line shut from the inside.",
-        "fiction": "Vasse was a shipyard foreman who welded hulls until the yard was shelled, then welded the shell holes, then welded the people who shelled it. His eight Welders walk in close order and argue in arcs. He does not shout orders; he points at a thing and it stops being joined to anything.",
-        "tagLine": "Welder octet: lightning at arm's length."
+        "hook": "Hear that? That's the choir.",
+        "blurb": "One Welder and a pile of six Whistler missile trucks. He keeps time; the Whistlers sing.",
+        "fiction": "Halloran ran a cathedral choir before the war and runs a battery of missile trucks the same way: one Welder up front to keep time, six Whistlers behind singing on his downbeat. Anything that flies over the company gets a hymn. He is gentle and exacting, and he has never once let the sopranos come in late.",
+        "tagLine": "Welder and Whistlers: the company's choir."
       },
-      "notes": "line x heat; eight T2 lightning bots; electricity rival of Volt"
+      "notes": "shield x sky; one Welder conducting six Whistler missile trucks; the company's anti-air choir"
     },
     {
       "heroId": "mammoth",
@@ -1490,11 +1421,57 @@
       "unitDef": "legfloat",
       "voice": {
         "hook": "Low tide is a road.",
-        "blurb": "Four Tritons. Legion gauss hovers that come in over the water and hold the shoreline.",
+        "blurb": "One Triton and eight Crocodile hovertanks. The shore is the front.",
         "fiction": "Calder grew up on the tidal flats and reads water the way Halq reads coordinates: depth, drift, the hour it turns. Her four Tritons hold a shoreline in a line so straight the Legion uses it in training. She is courteous, precise and never once early.",
         "tagLine": "Triton line: the shore is the front."
       },
       "notes": "line x door; four T2 Legion hovers; the company's shoreline"
+    },
+    {
+      "heroId": "loom",
+      "name": "Orla 'Loom' Vey",
+      "position": "line",
+      "combatVerb": "hold",
+      "temperament": [
+        "count",
+        "garden"
+      ],
+      "doctrine": "line",
+      "preferDefenses": false,
+      "allowBail": false,
+      "allowKite": false,
+      "faction": "armada",
+      "unitDef": "armspid",
+      "voice": {
+        "hook": "Hold still. You're already caught.",
+        "blurb": "Six Webbers and a rank of six Legion Ballistas. The Webbers pin it with EMP; the Ballistas finish it; the Webbers eat the wreck.",
+        "fiction": "Vey mended nets on a trawler fleet before the war drained the sea. She still mends. Six Webbers walk her line, pinning anything that moves with EMP and stripping the wrecks for metal, while a rank of Legion Ballistas behind her fires into whatever the net is holding. She talks softly and never raises a hand; she just closes the net.",
+        "tagLine": "Webbers and Ballistas: the net and the harpoons."
+      },
+      "notes": "line x count; Armada EMP spiders backed by a Legion rocket line (replaces Ceil Rat's Roughnecks)"
+    },
+    {
+      "heroId": "hundred",
+      "name": "Thessaly 'Hundred' Orne",
+      "position": "siege",
+      "combatVerb": "kite",
+      "temperament": [
+        "swarm",
+        "sky"
+      ],
+      "doctrine": "sky_siege",
+      "preferDefenses": false,
+      "allowBail": false,
+      "allowKite": true,
+      "faction": "legion",
+      "unitDef": "legspcarrier",
+      "voice": {
+        "hook": "A hundred hands, one grip.",
+        "blurb": "A Hecatoncheir drone carrier and two Cleavers on the ground. The hands pin it; the Cleavers finish it.",
+        "fiction": "Orne never fights alone, because she never is. The Hecatoncheir carries her drones in its belly and sends them out like a hand opening. She says 'we' and means the drones. Two Cleavers follow on the ground to finish what the hands have pinned, and after every sortie she thanks each drone by its number.",
+        "tagLine": "Drone carrier and Cleavers: the hand and the hammer."
+      },
+      "notes": "siege x swarm; Legion airborne drone carrier with a cluster-artillery accent (replaces the Marauder pair)"
     }
   ]
 }

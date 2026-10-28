@@ -5,10 +5,10 @@
     "minScore": 0.42,
     "maxDegree": 5,
     "topEdges": 64,
-    "heroCount": 64,
-    "edgeCount": 177,
-    "talkCount": 432,
-    "authoredSeeds": 130,
+    "heroCount": 63,
+    "edgeCount": 169,
+    "talkCount": 390,
+    "authoredSeeds": 125,
     "umweltAxes": [
       "energy",
       "offense",
@@ -1169,43 +1169,6 @@
       "doctrine": "pad"
     },
     {
-      "heroId": "ceil",
-      "name": "Ceil Rat",
-      "axes": {
-        "energy": 0.0,
-        "offense": 0.35,
-        "mobility": 1.0,
-        "sight": 0.0,
-        "pad": -1.0,
-        "craft": 0.0,
-        "heat": 0.0,
-        "fog": 0.0,
-        "sky": 0.5,
-        "ledger": 0.0
-      },
-      "marks": [
-        {
-          "axis": "mobility",
-          "value": 1.0
-        },
-        {
-          "axis": "pad",
-          "value": -1.0
-        },
-        {
-          "axis": "sky",
-          "value": 0.5
-        },
-        {
-          "axis": "offense",
-          "value": 0.35
-        }
-      ],
-      "glyph": "+mob·−pad·+sky·+off",
-      "position": "skirmish",
-      "doctrine": "skirm"
-    },
-    {
       "heroId": "lumen",
       "name": "Sister Lumen",
       "axes": {
@@ -1486,7 +1449,7 @@
       ],
       "doctrine": "constructor",
       "hook": "Grins with a welder.",
-      "degree": 10,
+      "degree": 8,
       "umweltGlyph": "+cra·+ene·−off·+pad",
       "umweltMarks": [
         {
@@ -1551,7 +1514,7 @@
       ],
       "doctrine": "eyes",
       "hook": "Speaks in plurals.",
-      "degree": 5,
+      "degree": 6,
       "umweltGlyph": "+sig·+fog·+mob·−off",
       "umweltMarks": [
         {
@@ -1706,7 +1669,7 @@
       ],
       "doctrine": "line",
       "hook": "Fords are doors.",
-      "degree": 9,
+      "degree": 8,
       "umweltGlyph": "+pad·+off·−mob",
       "umweltMarks": [
         {
@@ -1732,7 +1695,7 @@
       ],
       "doctrine": "line",
       "hook": "Riot as punctuation.",
-      "degree": 4,
+      "degree": 3,
       "umweltGlyph": "+off·+pad·+hea",
       "umweltMarks": [
         {
@@ -1758,7 +1721,7 @@
       ],
       "doctrine": "line",
       "hook": "Shoots map coordinates.",
-      "degree": 9,
+      "degree": 10,
       "umweltGlyph": "+pad·+off·−mob·+led",
       "umweltMarks": [
         {
@@ -1819,7 +1782,7 @@
       ],
       "doctrine": "skirm",
       "hook": "Baked speed, bad manners.",
-      "degree": 5,
+      "degree": 6,
       "umweltGlyph": "+mob·−pad·+off",
       "umweltMarks": [
         {
@@ -1879,7 +1842,7 @@
       ],
       "doctrine": "skirm",
       "hook": "Ledger with legs.",
-      "degree": 9,
+      "degree": 11,
       "umweltGlyph": "+mob·+off·−pad·+led",
       "umweltMarks": [
         {
@@ -2011,7 +1974,7 @@
       ],
       "doctrine": "arty",
       "hook": "Napalm is confetti.",
-      "degree": 5,
+      "degree": 4,
       "umweltGlyph": "+off·+hea·−ene·−pad",
       "umweltMarks": [
         {
@@ -2094,7 +2057,7 @@
       ],
       "doctrine": "dirty",
       "hook": "Mines before the argument.",
-      "degree": 6,
+      "degree": 4,
       "umweltGlyph": "+fog·+mob·+cra·+pad",
       "umweltMarks": [
         {
@@ -2125,7 +2088,7 @@
       ],
       "doctrine": "hive",
       "hook": "Company grows itself.",
-      "degree": 4,
+      "degree": 5,
       "umweltGlyph": "+pad·+cra",
       "umweltMarks": [
         {
@@ -2148,7 +2111,7 @@
       ],
       "doctrine": "line",
       "hook": "Orders walk on treads.",
-      "degree": 7,
+      "degree": 6,
       "umweltGlyph": "+off·+pad·+hea",
       "umweltMarks": [
         {
@@ -2233,7 +2196,7 @@
       ],
       "doctrine": "pad",
       "hook": "Still paying for the last sky.",
-      "degree": 7,
+      "degree": 6,
       "umweltGlyph": "−mob·+pad·+led·−off",
       "umweltMarks": [
         {
@@ -2251,37 +2214,6 @@
         {
           "axis": "offense",
           "value": -0.35
-        }
-      ]
-    },
-    {
-      "heroId": "ceil",
-      "name": "Ceil Rat",
-      "position": "skirmish",
-      "temperament": [
-        "sky",
-        "glass"
-      ],
-      "doctrine": "skirm",
-      "hook": "Altitude is an opinion.",
-      "degree": 12,
-      "umweltGlyph": "+mob·−pad·+sky·+off",
-      "umweltMarks": [
-        {
-          "axis": "mobility",
-          "value": 1.0
-        },
-        {
-          "axis": "pad",
-          "value": -1.0
-        },
-        {
-          "axis": "sky",
-          "value": 0.5
-        },
-        {
-          "axis": "offense",
-          "value": 0.35
         }
       ]
     },
@@ -2330,7 +2262,7 @@
       ],
       "doctrine": "line",
       "hook": "The river learns my weight.",
-      "degree": 8,
+      "degree": 7,
       "umweltGlyph": "+off·−mob·+pad",
       "umweltMarks": [
         {
@@ -2357,7 +2289,7 @@
       ],
       "doctrine": "eyes",
       "hook": "Sight is a wound you give them.",
-      "degree": 9,
+      "degree": 8,
       "umweltGlyph": "+mob·+sig·+fog·−pad",
       "umweltMarks": [
         {
@@ -2420,7 +2352,7 @@
       ],
       "doctrine": "sky_siege",
       "hook": "Weather comes from above.",
-      "degree": 5,
+      "degree": 6,
       "umweltGlyph": "+off·+sky·+mob·−pad",
       "umweltMarks": [
         {
@@ -2451,7 +2383,7 @@
       ],
       "doctrine": "skirm",
       "hook": "Lands where nobody parks.",
-      "degree": 6,
+      "degree": 5,
       "umweltGlyph": "+mob·−pad·+off·+sky",
       "umweltMarks": [
         {
@@ -2562,37 +2494,6 @@
         {
           "axis": "pad",
           "value": -0.6
-        }
-      ]
-    },
-    {
-      "heroId": "tarn",
-      "name": "Tarn Ostrander",
-      "position": "line",
-      "temperament": [
-        "swarm",
-        "mischief"
-      ],
-      "doctrine": "line",
-      "hook": "Out of the river, already firing.",
-      "degree": 6,
-      "umweltGlyph": "+mob·+off·−pad·+hea",
-      "umweltMarks": [
-        {
-          "axis": "mobility",
-          "value": 0.8
-        },
-        {
-          "axis": "offense",
-          "value": 0.6
-        },
-        {
-          "axis": "pad",
-          "value": -0.4
-        },
-        {
-          "axis": "heat",
-          "value": 0.2
         }
       ]
     },
@@ -2792,7 +2693,7 @@
       ],
       "doctrine": "line",
       "hook": "The river is a runway.",
-      "degree": 4,
+      "degree": 3,
       "umweltGlyph": "+off·+pad·+mob·+hea",
       "umweltMarks": [
         {
@@ -2903,37 +2804,6 @@
         {
           "axis": "energy",
           "value": 0.5
-        }
-      ]
-    },
-    {
-      "heroId": "marauder",
-      "name": "Marlow & Wren",
-      "position": "skirmish",
-      "temperament": [
-        "gleeful",
-        "mischief"
-      ],
-      "doctrine": "skirm",
-      "hook": "Arrive before the warning.",
-      "degree": 4,
-      "umweltGlyph": "+mob·−pad·+off·+fog",
-      "umweltMarks": [
-        {
-          "axis": "mobility",
-          "value": 1.0
-        },
-        {
-          "axis": "pad",
-          "value": -0.8
-        },
-        {
-          "axis": "offense",
-          "value": 0.6
-        },
-        {
-          "axis": "fog",
-          "value": 0.2
         }
       ]
     },
@@ -3102,7 +2972,7 @@
       ],
       "doctrine": "constructor",
       "hook": "Water goes where we tell it.",
-      "degree": 5,
+      "degree": 4,
       "umweltGlyph": "+cra·+pad·+ene·−off",
       "umweltMarks": [
         {
@@ -3133,7 +3003,7 @@
       ],
       "doctrine": "line",
       "hook": "Eight torches and one opinion.",
-      "degree": 4,
+      "degree": 7,
       "umweltGlyph": "+off·+hea·+pad·+ene",
       "umweltMarks": [
         {
@@ -3226,7 +3096,7 @@
       ],
       "doctrine": "line",
       "hook": "Low tide is a road.",
-      "degree": 5,
+      "degree": 4,
       "umweltGlyph": "+off·+mob·+pad·+sig",
       "umweltMarks": [
         {
@@ -3244,6 +3114,68 @@
         {
           "axis": "sight",
           "value": 0.2
+        }
+      ]
+    },
+    {
+      "heroId": "loom",
+      "name": "Orla 'Loom' Vey",
+      "position": "line",
+      "temperament": [
+        "count",
+        "garden"
+      ],
+      "doctrine": "line",
+      "hook": "Hold still. You're already caught.",
+      "degree": 6,
+      "umweltGlyph": "+pad·+off·+cra·+led",
+      "umweltMarks": [
+        {
+          "axis": "pad",
+          "value": 0.8
+        },
+        {
+          "axis": "offense",
+          "value": 0.5
+        },
+        {
+          "axis": "craft",
+          "value": 0.3
+        },
+        {
+          "axis": "ledger",
+          "value": 0.3
+        }
+      ]
+    },
+    {
+      "heroId": "hundred",
+      "name": "Thessaly 'Hundred' Orne",
+      "position": "siege",
+      "temperament": [
+        "swarm",
+        "sky"
+      ],
+      "doctrine": "sky_siege",
+      "hook": "A hundred hands, one grip.",
+      "degree": 5,
+      "umweltGlyph": "+sky·+off·+mob·+sig",
+      "umweltMarks": [
+        {
+          "axis": "sky",
+          "value": 0.9
+        },
+        {
+          "axis": "offense",
+          "value": 0.7
+        },
+        {
+          "axis": "mobility",
+          "value": 0.6
+        },
+        {
+          "axis": "sight",
+          "value": 0.4
         }
       ]
     }
@@ -3394,67 +3326,6 @@
             "a": -0.4,
             "b": 1.0,
             "strength": 0.4
-          }
-        ],
-        "spotterLocked": false,
-        "siegeSpotStrength": 0.0
-      }
-    },
-    {
-      "id": "anvil__ceil",
-      "a": "ceil",
-      "b": "anvil",
-      "score": 1.0,
-      "polarity": "tension",
-      "motifs": [
-        "kite vs hold",
-        "anvil vs kite",
-        "stay meets stride"
-      ],
-      "sharedTemperament": [],
-      "reasons": [
-        "umwelt stay meets stride (complement=2.0)",
-        "complement (anvil vs kite)",
-        "adjacent columns skirmish/line",
-        "doctrine drama skirm/line",
-        "same faction armada"
-      ],
-      "authored": false,
-      "aName": "Ceil Rat",
-      "bName": "Anvil Mire",
-      "aHook": "Altitude is an opinion.",
-      "bHook": "The river learns my weight.",
-      "aGlyph": "+mob·−pad·+sky·+off",
-      "bGlyph": "+off·−mob·+pad",
-      "talkIds": {
-        "C": "anvil__ceil:C",
-        "B": "anvil__ceil:B",
-        "A": "anvil__ceil:A"
-      },
-      "umwelt": {
-        "motif": "stay meets stride",
-        "boost": 0.55,
-        "couples": [
-          {
-            "axis": "mobility",
-            "kind": "complement",
-            "a": 1.0,
-            "b": -1.0,
-            "strength": 1.0
-          },
-          {
-            "axis": "pad",
-            "kind": "complement",
-            "a": -1.0,
-            "b": 1.0,
-            "strength": 1.0
-          },
-          {
-            "axis": "offense",
-            "kind": "mirror",
-            "a": 0.35,
-            "b": 1.0,
-            "strength": 0.193
           }
         ],
         "spotterLocked": false,
@@ -3678,6 +3549,87 @@
       }
     },
     {
+      "id": "arc__hornet",
+      "a": "arc",
+      "b": "hornet",
+      "score": 1.0,
+      "polarity": "friction",
+      "motifs": [
+        "gunships the choir keeps singing at",
+        "low passes over a nervous battery"
+      ],
+      "sharedTemperament": [
+        "sky"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Ambrose 'Choir' Halloran",
+      "bName": "Teague & Saffi Marsh",
+      "aHook": "Hear that? That's the choir.",
+      "bHook": "Sting, climb, come back for the nest.",
+      "aGlyph": "+sky·+off·+pad·+hea",
+      "bGlyph": "+mob·+sky·−pad·+off",
+      "talkIds": {
+        "C": "arc__hornet:C"
+      }
+    },
+    {
+      "id": "arc__kettle",
+      "a": "arc",
+      "b": "kettle",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "two who hold the air",
+        "hymns from the ground"
+      ],
+      "sharedTemperament": [
+        "sky"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Ambrose 'Choir' Halloran",
+      "bName": "Saint Kettle",
+      "aHook": "Hear that? That's the choir.",
+      "bHook": "Sky-saint, chainsaw soul.",
+      "aGlyph": "+sky·+off·+pad·+hea",
+      "bGlyph": "+pad·+sky·−off",
+      "talkIds": {
+        "C": "arc__kettle:C"
+      }
+    },
+    {
+      "id": "arc__thresh",
+      "a": "arc",
+      "b": "thresh",
+      "score": 1.0,
+      "polarity": "tension",
+      "motifs": [
+        "weather from above against the choir below",
+        "who gets the last word in the sky"
+      ],
+      "sharedTemperament": [
+        "sky"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Ambrose 'Choir' Halloran",
+      "bName": "Dama Thresh",
+      "aHook": "Hear that? That's the choir.",
+      "bHook": "Weather comes from above.",
+      "aGlyph": "+sky·+off·+pad·+hea",
+      "bGlyph": "+off·+sky·+mob·−pad",
+      "talkIds": {
+        "C": "arc__thresh:C"
+      }
+    },
+    {
       "id": "arc__twitch",
       "a": "arc",
       "b": "twitch",
@@ -3685,18 +3637,18 @@
       "polarity": "mentor",
       "motifs": [
         "the welder's apprentice",
-        "a grin and a torch"
+        "keep time with your hands"
       ],
       "sharedTemperament": [],
       "reasons": [
         "authored seed"
       ],
       "authored": true,
-      "aName": "Corwin 'Arc' Vasse",
+      "aName": "Ambrose 'Choir' Halloran",
       "bName": "Benno 'Twitcher' Sallow",
-      "aHook": "Eight torches and one opinion.",
+      "aHook": "Hear that? That's the choir.",
       "bHook": "Grins with a welder.",
-      "aGlyph": "+off·+hea·+pad·+ene",
+      "aGlyph": "+sky·+off·+pad·+hea",
       "bGlyph": "+cra·+ene·−off·+pad",
       "talkIds": {
         "C": "arc__twitch:C"
@@ -3709,21 +3661,19 @@
       "score": 1.0,
       "polarity": "rivalry",
       "motifs": [
-        "two kinds of lightning",
-        "the wound you see and the wound you weld"
+        "the downbeat and the flash",
+        "two ways to own the air"
       ],
-      "sharedTemperament": [
-        "heat"
-      ],
+      "sharedTemperament": [],
       "reasons": [
         "authored seed"
       ],
       "authored": true,
-      "aName": "Corwin 'Arc' Vasse",
+      "aName": "Ambrose 'Choir' Halloran",
       "bName": "Volt Lash",
-      "aHook": "Eight torches and one opinion.",
+      "aHook": "Hear that? That's the choir.",
       "bHook": "Sight is a wound you give them.",
-      "aGlyph": "+off·+hea·+pad·+ene",
+      "aGlyph": "+sky·+off·+pad·+hea",
       "bGlyph": "+mob·+sig·+fog·−pad",
       "talkIds": {
         "C": "arc__volt:C"
@@ -3856,9 +3806,9 @@
       "authored": true,
       "aName": "Grath Arrears",
       "bName": "The Last Auditor",
-      "aHook": "Three wars unpaid.",
+      "aHook": "Three wars unpaid. The interest is heat.",
       "bHook": "Ledger with legs.",
-      "aGlyph": "+pad·+off·−mob·+led",
+      "aGlyph": "+pad·+hea·+off·−mob",
       "bGlyph": "+mob·+off·−pad·+led",
       "talkIds": {
         "C": "auditor__grath:C",
@@ -3935,6 +3885,58 @@
         ],
         "spotterLocked": false,
         "siegeSpotStrength": 0.0
+      }
+    },
+    {
+      "id": "auditor__hundred",
+      "a": "hundred",
+      "b": "auditor",
+      "score": 1.0,
+      "polarity": "rivalry",
+      "motifs": [
+        "whose drones",
+        "a carrier on legs and a carrier on wings"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Thessaly 'Hundred' Orne",
+      "bName": "The Last Auditor",
+      "aHook": "A hundred hands, one grip.",
+      "bHook": "Ledger with legs.",
+      "aGlyph": "+sky·+off·+mob·+sig",
+      "bGlyph": "+mob·+off·−pad·+led",
+      "talkIds": {
+        "C": "auditor__hundred:C"
+      }
+    },
+    {
+      "id": "auditor__loom",
+      "a": "loom",
+      "b": "auditor",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "reclaim is bookkeeping",
+        "nothing wasted"
+      ],
+      "sharedTemperament": [
+        "count"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Orla 'Loom' Vey",
+      "bName": "The Last Auditor",
+      "aHook": "Hold still. You're already caught.",
+      "bHook": "Ledger with legs.",
+      "aGlyph": "+pad·+off·+cra·+led",
+      "bGlyph": "+mob·+off·−pad·+led",
+      "talkIds": {
+        "C": "auditor__loom:C"
       }
     },
     {
@@ -4839,60 +4841,6 @@
       }
     },
     {
-      "id": "cauter__ceil",
-      "a": "cauter",
-      "b": "ceil",
-      "score": 1.0,
-      "polarity": "tension",
-      "motifs": [
-        "kite vs hold",
-        "burn the ceiling",
-        "pad functional circle"
-      ],
-      "sharedTemperament": [],
-      "reasons": [
-        "umwelt pad functional circle (complement=0.45)",
-        "complement (burn the ceiling)",
-        "adjacent columns line/skirmish",
-        "doctrine drama line/skirm",
-        "cross-faction contract tension"
-      ],
-      "authored": false,
-      "aName": "Cauter Bel-Ansa",
-      "bName": "Ceil Rat",
-      "aHook": "Riot as punctuation.",
-      "bHook": "Altitude is an opinion.",
-      "aGlyph": "+off·+pad·+hea",
-      "bGlyph": "+mob·−pad·+sky·+off",
-      "talkIds": {
-        "C": "cauter__ceil:C",
-        "B": "cauter__ceil:B",
-        "A": "cauter__ceil:A"
-      },
-      "umwelt": {
-        "motif": "pad functional circle",
-        "boost": 0.296,
-        "couples": [
-          {
-            "axis": "pad",
-            "kind": "complement",
-            "a": 0.45,
-            "b": -1.0,
-            "strength": 0.45
-          },
-          {
-            "axis": "offense",
-            "kind": "mirror",
-            "a": 1.0,
-            "b": 0.35,
-            "strength": 0.193
-          }
-        ],
-        "spotterLocked": false,
-        "siegeSpotStrength": 0.0
-      }
-    },
-    {
       "id": "cauter__kit",
       "a": "cauter",
       "b": "kit",
@@ -4936,7 +4884,7 @@
       "authored": true,
       "aName": "Sivan 'Shiva' Ruhl",
       "bName": "Cauter Bel-Ansa",
-      "aHook": "Eight Grunts and a decision.",
+      "aHook": "A decision, alone.",
       "bHook": "Riot as punctuation.",
       "aGlyph": "+off·+pad·+hea·−mob",
       "bGlyph": "+off·+pad·+hea",
@@ -4944,286 +4892,6 @@
         "C": "cauter__shiva:C",
         "B": "cauter__shiva:B",
         "A": "cauter__shiva:A"
-      }
-    },
-    {
-      "id": "ceil__commando",
-      "a": "commando",
-      "b": "ceil",
-      "score": 1.0,
-      "polarity": "sibling",
-      "motifs": [
-        "siblings of the hangar",
-        "mischief meets glass"
-      ],
-      "sharedTemperament": [],
-      "reasons": [
-        "authored seed"
-      ],
-      "authored": true,
-      "aName": "Cinder Hook",
-      "bName": "Ceil Rat",
-      "aHook": "Mines before the argument.",
-      "bHook": "Altitude is an opinion.",
-      "aGlyph": "+fog·+mob·+cra·+pad",
-      "bGlyph": "+mob·−pad·+sky·+off",
-      "talkIds": {
-        "C": "ceil__commando:C",
-        "B": "ceil__commando:B",
-        "A": "ceil__commando:A"
-      }
-    },
-    {
-      "id": "ceil__gale",
-      "a": "gale",
-      "b": "ceil",
-      "score": 1.0,
-      "polarity": "mirror",
-      "motifs": [
-        "two gunship wings, one sky",
-        "rotors and floats"
-      ],
-      "sharedTemperament": [
-        "sky"
-      ],
-      "reasons": [
-        "authored seed"
-      ],
-      "authored": true,
-      "aName": "Marrow Gale",
-      "bName": "Ceil Rat",
-      "aHook": "Lands where nobody parks.",
-      "bHook": "Altitude is an opinion.",
-      "aGlyph": "+mob·−pad·+off·+sky",
-      "bGlyph": "+mob·−pad·+sky·+off",
-      "talkIds": {
-        "C": "ceil__gale:C",
-        "B": "ceil__gale:B",
-        "A": "ceil__gale:A"
-      }
-    },
-    {
-      "id": "ceil__hornet",
-      "a": "hornet",
-      "b": "ceil",
-      "score": 1.0,
-      "polarity": "rivalry",
-      "motifs": [
-        "two gunship pilots",
-        "farming against roughnecks on the roof"
-      ],
-      "sharedTemperament": [
-        "sky"
-      ],
-      "reasons": [
-        "authored seed"
-      ],
-      "authored": true,
-      "aName": "Teague 'Hornet' Marsh",
-      "bName": "Ceil Rat",
-      "aHook": "Stings, then returns for the nest.",
-      "bHook": "Altitude is an opinion.",
-      "aGlyph": "+mob·+sky·−pad·+off",
-      "bGlyph": "+mob·−pad·+sky·+off",
-      "talkIds": {
-        "C": "ceil__hornet:C",
-        "B": "ceil__hornet:B",
-        "A": "ceil__hornet:A"
-      }
-    },
-    {
-      "id": "ceil__kettle",
-      "a": "ceil",
-      "b": "kettle",
-      "score": 1.0,
-      "polarity": "rivalry",
-      "motifs": [
-        "the gunship and the saint who shoots gunships",
-        "altitude meets the roof"
-      ],
-      "sharedTemperament": [
-        "sky"
-      ],
-      "reasons": [
-        "authored seed"
-      ],
-      "authored": true,
-      "aName": "Ceil Rat",
-      "bName": "Saint Kettle",
-      "aHook": "Altitude is an opinion.",
-      "bHook": "Sky-saint, chainsaw soul.",
-      "aGlyph": "+mob·−pad·+sky·+off",
-      "bGlyph": "+pad·+sky·−off",
-      "talkIds": {
-        "C": "ceil__kettle:C",
-        "B": "ceil__kettle:B",
-        "A": "ceil__kettle:A"
-      }
-    },
-    {
-      "id": "ceil__mira",
-      "a": "mira",
-      "b": "ceil",
-      "score": 1.0,
-      "polarity": "attract",
-      "motifs": [
-        "spot meets siege, from the sky",
-        "gleeful meets glass"
-      ],
-      "sharedTemperament": [],
-      "reasons": [
-        "authored seed"
-      ],
-      "authored": true,
-      "aName": "Mira Barrage",
-      "bName": "Ceil Rat",
-      "aHook": "Napalm is confetti.",
-      "bHook": "Altitude is an opinion.",
-      "aGlyph": "+off·+hea·−ene·−pad",
-      "bGlyph": "+mob·−pad·+sky·+off",
-      "talkIds": {
-        "C": "ceil__mira:C",
-        "B": "ceil__mira:B",
-        "A": "ceil__mira:A"
-      }
-    },
-    {
-      "id": "ceil__nox",
-      "a": "nox",
-      "b": "ceil",
-      "score": 1.0,
-      "polarity": "tension",
-      "motifs": [
-        "the debt of the last sky",
-        "the pilot who was there"
-      ],
-      "sharedTemperament": [],
-      "reasons": [
-        "authored seed"
-      ],
-      "authored": true,
-      "aName": "Nox Tithe",
-      "bName": "Ceil Rat",
-      "aHook": "Still paying for the last sky.",
-      "bHook": "Altitude is an opinion.",
-      "aGlyph": "−mob·+pad·+led·−off",
-      "bGlyph": "+mob·−pad·+sky·+off",
-      "talkIds": {
-        "C": "ceil__nox:C",
-        "B": "ceil__nox:B",
-        "A": "ceil__nox:A"
-      }
-    },
-    {
-      "id": "ceil__quill",
-      "a": "quill",
-      "b": "ceil",
-      "score": 1.0,
-      "polarity": "tension",
-      "motifs": [
-        "kite vs hold",
-        "burn the ceiling",
-        "pad functional circle"
-      ],
-      "sharedTemperament": [],
-      "reasons": [
-        "umwelt pad functional circle (complement=0.45)",
-        "complement (burn the ceiling)",
-        "adjacent columns line/skirmish",
-        "doctrine drama line/skirm",
-        "same faction armada"
-      ],
-      "authored": false,
-      "aName": "Ash-Marshal Quill",
-      "bName": "Ceil Rat",
-      "aHook": "Orders walk on treads.",
-      "bHook": "Altitude is an opinion.",
-      "aGlyph": "+off·+pad·+hea",
-      "bGlyph": "+mob·−pad·+sky·+off",
-      "talkIds": {
-        "C": "ceil__quill:C",
-        "B": "ceil__quill:B",
-        "A": "ceil__quill:A"
-      },
-      "umwelt": {
-        "motif": "pad functional circle",
-        "boost": 0.296,
-        "couples": [
-          {
-            "axis": "pad",
-            "kind": "complement",
-            "a": 0.45,
-            "b": -1.0,
-            "strength": 0.45
-          },
-          {
-            "axis": "offense",
-            "kind": "mirror",
-            "a": 1.0,
-            "b": 0.35,
-            "strength": 0.193
-          }
-        ],
-        "spotterLocked": false,
-        "siegeSpotStrength": 0.0
-      }
-    },
-    {
-      "id": "ceil__vane",
-      "a": "vane",
-      "b": "ceil",
-      "score": 1.0,
-      "polarity": "tension",
-      "motifs": [
-        "rhythm and the thing that breaks it",
-        "the pack's kill, taken from above"
-      ],
-      "sharedTemperament": [
-        "glass"
-      ],
-      "reasons": [
-        "authored seed"
-      ],
-      "authored": true,
-      "aName": "Ash-Captain Vane",
-      "bName": "Ceil Rat",
-      "aHook": "Pack is one thought.",
-      "bHook": "Altitude is an opinion.",
-      "aGlyph": "+mob·−pad·+off·+sig",
-      "bGlyph": "+mob·−pad·+sky·+off",
-      "talkIds": {
-        "C": "ceil__vane:C",
-        "B": "ceil__vane:B",
-        "A": "ceil__vane:A"
-      }
-    },
-    {
-      "id": "ceil__volt",
-      "a": "volt",
-      "b": "ceil",
-      "score": 1.0,
-      "polarity": "mirror",
-      "motifs": [
-        "two kites and one tally",
-        "glass meets glass"
-      ],
-      "sharedTemperament": [
-        "glass"
-      ],
-      "reasons": [
-        "authored seed"
-      ],
-      "authored": true,
-      "aName": "Volt Lash",
-      "bName": "Ceil Rat",
-      "aHook": "Sight is a wound you give them.",
-      "bHook": "Altitude is an opinion.",
-      "aGlyph": "+mob·+sig·+fog·−pad",
-      "bGlyph": "+mob·−pad·+sky·+off",
-      "talkIds": {
-        "C": "ceil__volt:C",
-        "B": "ceil__volt:B",
-        "A": "ceil__volt:A"
       }
     },
     {
@@ -5256,33 +4924,6 @@
       }
     },
     {
-      "id": "charybdis__tarn",
-      "a": "charybdis",
-      "b": "tarn",
-      "score": 1.0,
-      "polarity": "mirror",
-      "motifs": [
-        "rivers as roads",
-        "hover and Salamanders"
-      ],
-      "sharedTemperament": [],
-      "reasons": [
-        "authored seed"
-      ],
-      "authored": true,
-      "aName": "Orrin 'Charybdis' Tidewell",
-      "bName": "Tarn Ostrander",
-      "aHook": "The river is a runway.",
-      "bHook": "Out of the river, already firing.",
-      "aGlyph": "+off·+pad·+mob·+hea",
-      "bGlyph": "+mob·+off·−pad·+hea",
-      "talkIds": {
-        "C": "charybdis__tarn:C",
-        "B": "charybdis__tarn:B",
-        "A": "charybdis__tarn:A"
-      }
-    },
-    {
       "id": "charybdis__triton",
       "a": "triton",
       "b": "charybdis",
@@ -5310,32 +4951,28 @@
       }
     },
     {
-      "id": "commando__marauder",
-      "a": "marauder",
-      "b": "commando",
+      "id": "commando__loom",
+      "a": "commando",
+      "b": "loom",
       "score": 1.0,
-      "polarity": "sibling",
+      "polarity": "attract",
       "motifs": [
-        "family of troublemakers",
-        "mines on the doorstep"
+        "two who lay traps",
+        "mines and nets"
       ],
-      "sharedTemperament": [
-        "mischief"
-      ],
+      "sharedTemperament": [],
       "reasons": [
         "authored seed"
       ],
       "authored": true,
-      "aName": "Marlow & Wren",
-      "bName": "Cinder Hook",
-      "aHook": "Arrive before the warning.",
-      "bHook": "Mines before the argument.",
-      "aGlyph": "+mob·−pad·+off·+fog",
-      "bGlyph": "+fog·+mob·+cra·+pad",
+      "aName": "Cinder Hook",
+      "bName": "Orla 'Loom' Vey",
+      "aHook": "Mines before the argument.",
+      "bHook": "Hold still. You're already caught.",
+      "aGlyph": "+fog·+mob·+cra·+pad",
+      "bGlyph": "+pad·+off·+cra·+led",
       "talkIds": {
-        "C": "commando__marauder:C",
-        "B": "commando__marauder:B",
-        "A": "commando__marauder:A"
+        "C": "commando__loom:C"
       }
     },
     {
@@ -5400,35 +5037,6 @@
         ],
         "spotterLocked": true,
         "siegeSpotStrength": 0.787
-      }
-    },
-    {
-      "id": "commando__tarn",
-      "a": "tarn",
-      "b": "commando",
-      "score": 1.0,
-      "polarity": "mirror",
-      "motifs": [
-        "obstacles as invitations",
-        "the wall that was a door"
-      ],
-      "sharedTemperament": [
-        "mischief"
-      ],
-      "reasons": [
-        "authored seed"
-      ],
-      "authored": true,
-      "aName": "Tarn Ostrander",
-      "bName": "Cinder Hook",
-      "aHook": "Out of the river, already firing.",
-      "bHook": "Mines before the argument.",
-      "aGlyph": "+mob·+off·−pad·+hea",
-      "bGlyph": "+fog·+mob·+cra·+pad",
-      "talkIds": {
-        "C": "commando__tarn:C",
-        "B": "commando__tarn:B",
-        "A": "commando__tarn:A"
       }
     },
     {
@@ -5593,7 +5201,7 @@
       "authored": true,
       "aName": "Sivan 'Shiva' Ruhl",
       "bName": "Consul Aurel Weiss",
-      "aHook": "Eight Grunts and a decision.",
+      "aHook": "A decision, alone.",
       "bHook": "Builds like an apology.",
       "aGlyph": "+off·+pad·+hea·−mob",
       "bGlyph": "+cra·+ene·−off·+pad",
@@ -5680,31 +5288,6 @@
       "bGlyph": "+cra·+sky·+mob·+ene",
       "talkIds": {
         "C": "dam__rookery:C"
-      }
-    },
-    {
-      "id": "dam__tarn",
-      "a": "dam",
-      "b": "tarn",
-      "score": 1.0,
-      "polarity": "tension",
-      "motifs": [
-        "the river they both claim",
-        "builders and raiders in the same current"
-      ],
-      "sharedTemperament": [],
-      "reasons": [
-        "authored seed"
-      ],
-      "authored": true,
-      "aName": "The Damwrights",
-      "bName": "Tarn Ostrander",
-      "aHook": "Water goes where we tell it.",
-      "bHook": "Out of the river, already firing.",
-      "aGlyph": "+cra·+pad·+ene·−off",
-      "bGlyph": "+mob·+off·−pad·+hea",
-      "talkIds": {
-        "C": "dam__tarn:C"
       }
     },
     {
@@ -6041,9 +5624,9 @@
         "authored seed"
       ],
       "authored": true,
-      "aName": "Teague 'Hornet' Marsh",
+      "aName": "Teague & Saffi Marsh",
       "bName": "Marrow Gale",
-      "aHook": "Stings, then returns for the nest.",
+      "aHook": "Sting, climb, come back for the nest.",
       "bHook": "Lands where nobody parks.",
       "aGlyph": "+mob·+sky·−pad·+off",
       "bGlyph": "+mob·−pad·+off·+sky",
@@ -6054,32 +5637,30 @@
       }
     },
     {
-      "id": "gale__marauder",
-      "a": "marauder",
+      "id": "gale__hundred",
+      "a": "hundred",
       "b": "gale",
       "score": 1.0,
-      "polarity": "rivalry",
+      "polarity": "tension",
       "motifs": [
-        "who owns the river",
-        "ducks with rotors"
+        "seaplanes over the same water",
+        "a merchant wing and a carrier"
       ],
       "sharedTemperament": [
-        "mischief"
+        "sky"
       ],
       "reasons": [
         "authored seed"
       ],
       "authored": true,
-      "aName": "Marlow & Wren",
+      "aName": "Thessaly 'Hundred' Orne",
       "bName": "Marrow Gale",
-      "aHook": "Arrive before the warning.",
+      "aHook": "A hundred hands, one grip.",
       "bHook": "Lands where nobody parks.",
-      "aGlyph": "+mob·−pad·+off·+fog",
+      "aGlyph": "+sky·+off·+mob·+sig",
       "bGlyph": "+mob·−pad·+off·+sky",
       "talkIds": {
-        "C": "gale__marauder:C",
-        "B": "gale__marauder:B",
-        "A": "gale__marauder:A"
+        "C": "gale__hundred:C"
       }
     },
     {
@@ -6139,6 +5720,31 @@
       }
     },
     {
+      "id": "gladius__hundred",
+      "a": "hundred",
+      "b": "gladius",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "an audience of a hundred",
+        "the show and the swarm"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Thessaly 'Hundred' Orne",
+      "bName": "Cassia 'Gladius' Ferro",
+      "aHook": "A hundred hands, one grip.",
+      "bHook": "Bow first. Then the fight.",
+      "aGlyph": "+sky·+off·+mob·+sig",
+      "bGlyph": "+off·+mob·−pad·+hea",
+      "talkIds": {
+        "C": "gladius__hundred:C"
+      }
+    },
+    {
       "id": "gladius__kit",
       "a": "gladius",
       "b": "kit",
@@ -6163,33 +5769,6 @@
       "bGlyph": "+mob·−pad·+off",
       "talkIds": {
         "C": "gladius__kit:C"
-      }
-    },
-    {
-      "id": "gladius__marauder",
-      "a": "gladius",
-      "b": "marauder",
-      "score": 1.0,
-      "polarity": "mirror",
-      "motifs": [
-        "arrive laughing",
-        "the raid as a performance"
-      ],
-      "sharedTemperament": [
-        "gleeful"
-      ],
-      "reasons": [
-        "authored seed"
-      ],
-      "authored": true,
-      "aName": "Cassia 'Gladius' Ferro",
-      "bName": "Marlow & Wren",
-      "aHook": "Bow first. Then the fight.",
-      "bHook": "Arrive before the warning.",
-      "aGlyph": "+off·+mob·−pad·+hea",
-      "bGlyph": "+mob·−pad·+off·+fog",
-      "talkIds": {
-        "C": "gladius__marauder:C"
       }
     },
     {
@@ -6549,6 +6128,33 @@
       }
     },
     {
+      "id": "halq__loom",
+      "a": "loom",
+      "b": "halq",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "the net and the coordinates",
+        "holding still is a number"
+      ],
+      "sharedTemperament": [
+        "count"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Orla 'Loom' Vey",
+      "bName": "Sisu Halq",
+      "aHook": "Hold still. You're already caught.",
+      "bHook": "Calls the coordinates; the rockets answer.",
+      "aGlyph": "+pad·+off·+cra·+led",
+      "bGlyph": "+pad·+sig·+off·−mob",
+      "talkIds": {
+        "C": "halq__loom:C"
+      }
+    },
+    {
       "id": "halq__scylla",
       "a": "scylla",
       "b": "halq",
@@ -6566,9 +6172,9 @@
       "aName": "Maren 'Scylla' Voss",
       "bName": "Sisu Halq",
       "aHook": "The water had better be wide.",
-      "bHook": "Shoots map coordinates.",
+      "bHook": "Calls the coordinates; the rockets answer.",
       "aGlyph": "+off·−pad·−mob·+hea",
-      "bGlyph": "+pad·+off·−mob·+led",
+      "bGlyph": "+pad·+sig·+off·−mob",
       "talkIds": {
         "C": "halq__scylla:C",
         "B": "halq__scylla:B",
@@ -6672,9 +6278,9 @@
       "aName": "Edda 'Tremor' Lund",
       "bName": "Sisu Halq",
       "aHook": "Somebody has to see it first.",
-      "bHook": "Shoots map coordinates.",
+      "bHook": "Calls the coordinates; the rockets answer.",
       "aGlyph": "+off·−mob·+pad·+led",
-      "bGlyph": "+pad·+off·−mob·+led",
+      "bGlyph": "+pad·+sig·+off·−mob",
       "talkIds": {
         "C": "halq__tremor:C",
         "B": "halq__tremor:B",
@@ -6701,9 +6307,9 @@
       "aName": "Nerea 'Triton' Calder",
       "bName": "Sisu Halq",
       "aHook": "Low tide is a road.",
-      "bHook": "Shoots map coordinates.",
+      "bHook": "Calls the coordinates; the rockets answer.",
       "aGlyph": "+off·+mob·+pad·+sig",
-      "bGlyph": "+pad·+off·−mob·+led",
+      "bGlyph": "+pad·+sig·+off·−mob",
       "talkIds": {
         "C": "halq__triton:C"
       }
@@ -6796,9 +6402,9 @@
       "authored": true,
       "aName": "Sisu Halq",
       "bName": "Verse & Adder",
-      "aHook": "Shoots map coordinates.",
+      "aHook": "Calls the coordinates; the rockets answer.",
       "bHook": "Counts missiles out loud.",
-      "aGlyph": "+pad·+off·−mob·+led",
+      "aGlyph": "+pad·+sig·+off·−mob",
       "bGlyph": "+mob·−pad·+led·+off",
       "talkIds": {
         "C": "halq__verse:C",
@@ -6971,7 +6577,7 @@
       "aName": "Nadia 'Stiletto' Cole",
       "bName": "Hearth",
       "aHook": "Nothing moves; then it is quiet.",
-      "bHook": "Quiet sun. Won't go out.",
+      "bHook": "Quiet sun. Won't go out, and you won't find it.",
       "aGlyph": "+sky·+off·+mob·+ene",
       "bGlyph": "+ene·−mob·+pad·−off",
       "talkIds": {
@@ -6997,7 +6603,7 @@
       "authored": true,
       "aName": "Hearth",
       "bName": "Saloon Stride",
-      "aHook": "Quiet sun. Won't go out.",
+      "aHook": "Quiet sun. Won't go out, and you won't find it.",
       "bHook": "Baked speed, bad manners.",
       "aGlyph": "+ene·−mob·+pad·−off",
       "bGlyph": "+mob·−pad·+off",
@@ -7022,9 +6628,9 @@
         "authored seed"
       ],
       "authored": true,
-      "aName": "Teague 'Hornet' Marsh",
+      "aName": "Teague & Saffi Marsh",
       "bName": "Volt Lash",
-      "aHook": "Stings, then returns for the nest.",
+      "aHook": "Sting, climb, come back for the nest.",
       "bHook": "Sight is a wound you give them.",
       "aGlyph": "+mob·+sky·−pad·+off",
       "bGlyph": "+mob·+sig·+fog·−pad",
@@ -7032,6 +6638,60 @@
         "C": "hornet__volt:C",
         "B": "hornet__volt:B",
         "A": "hornet__volt:A"
+      }
+    },
+    {
+      "id": "hundred__noctua",
+      "a": "hundred",
+      "b": "noctua",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "two who command drones",
+        "the plant and the carrier"
+      ],
+      "sharedTemperament": [
+        "sky"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Thessaly 'Hundred' Orne",
+      "bName": "Ada Noctua",
+      "aHook": "A hundred hands, one grip.",
+      "bHook": "Dreams in flight paths.",
+      "aGlyph": "+sky·+off·+mob·+sig",
+      "bGlyph": "+mob·+sig·+fog·+sky",
+      "talkIds": {
+        "C": "hundred__noctua:C"
+      }
+    },
+    {
+      "id": "hundred__tick",
+      "a": "hundred",
+      "b": "tick",
+      "score": 1.0,
+      "polarity": "mirror",
+      "motifs": [
+        "speaks in plurals",
+        "we are the eyes, we are the hands"
+      ],
+      "sharedTemperament": [
+        "swarm"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Thessaly 'Hundred' Orne",
+      "bName": "Tamsin 'Tick' Hollis",
+      "aHook": "A hundred hands, one grip.",
+      "bHook": "Speaks in plurals. Prints them too.",
+      "aGlyph": "+sky·+off·+mob·+sig",
+      "bGlyph": "+sig·+fog·+mob·−off",
+      "talkIds": {
+        "C": "hundred__tick:C"
       }
     },
     {
@@ -7059,6 +6719,33 @@
         "C": "infestor__ketha:C",
         "B": "infestor__ketha:B",
         "A": "infestor__ketha:A"
+      }
+    },
+    {
+      "id": "infestor__loom",
+      "a": "loom",
+      "b": "infestor",
+      "score": 1.0,
+      "polarity": "rivalry",
+      "motifs": [
+        "two kinds of spider",
+        "the net and the nest"
+      ],
+      "sharedTemperament": [
+        "garden"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Orla 'Loom' Vey",
+      "bName": "Infestor Hive",
+      "aHook": "Hold still. You're already caught.",
+      "bHook": "Company grows itself.",
+      "aGlyph": "+pad·+off·+cra·+led",
+      "bGlyph": "+pad·+cra",
+      "talkIds": {
+        "C": "infestor__loom:C"
       }
     },
     {
@@ -7364,7 +7051,7 @@
       "aName": "Saint Kettle",
       "bName": "Warder",
       "aHook": "Sky-saint, chainsaw soul.",
-      "bHook": "Owns a circle of dirt.",
+      "bHook": "Owns a circle of dirt. Burns the edge.",
       "aGlyph": "+pad·+sky·−off",
       "bGlyph": "−mob·+pad·−off",
       "talkIds": {
@@ -7568,6 +7255,56 @@
         ],
         "spotterLocked": false,
         "siegeSpotStrength": 0.0
+      }
+    },
+    {
+      "id": "loom__stride",
+      "a": "loom",
+      "b": "stride",
+      "score": 1.0,
+      "polarity": "tension",
+      "motifs": [
+        "speed against the net",
+        "bad manners, held still"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Orla 'Loom' Vey",
+      "bName": "Saloon Stride",
+      "aHook": "Hold still. You're already caught.",
+      "bHook": "Baked speed, bad manners.",
+      "aGlyph": "+pad·+off·+cra·+led",
+      "bGlyph": "+mob·−pad·+off",
+      "talkIds": {
+        "C": "loom__stride:C"
+      }
+    },
+    {
+      "id": "loom__vane",
+      "a": "loom",
+      "b": "vane",
+      "score": 1.0,
+      "polarity": "friction",
+      "motifs": [
+        "the flock and the net",
+        "rhythm against stillness"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Orla 'Loom' Vey",
+      "bName": "Ash-Captain Vane",
+      "aHook": "Hold still. You're already caught.",
+      "bHook": "Pack is one thought.",
+      "aGlyph": "+pad·+off·+cra·+led",
+      "bGlyph": "+mob·−pad·+off·+sig",
+      "talkIds": {
+        "C": "loom__vane:C"
       }
     },
     {
@@ -7877,35 +7614,6 @@
       }
     },
     {
-      "id": "marauder__twitch",
-      "a": "marauder",
-      "b": "twitch",
-      "score": 1.0,
-      "polarity": "attract",
-      "motifs": [
-        "two grins",
-        "welder and wet boots"
-      ],
-      "sharedTemperament": [
-        "mischief"
-      ],
-      "reasons": [
-        "authored seed"
-      ],
-      "authored": true,
-      "aName": "Marlow & Wren",
-      "bName": "Benno 'Twitcher' Sallow",
-      "aHook": "Arrive before the warning.",
-      "bHook": "Grins with a welder.",
-      "aGlyph": "+mob·−pad·+off·+fog",
-      "bGlyph": "+cra·+ene·−off·+pad",
-      "talkIds": {
-        "C": "marauder__twitch:C",
-        "B": "marauder__twitch:B",
-        "A": "marauder__twitch:A"
-      }
-    },
-    {
       "id": "mask__pavise",
       "a": "mask",
       "b": "pavise",
@@ -8058,7 +7766,7 @@
       "aName": "Edda 'Tremor' Lund",
       "bName": "Mira Barrage",
       "aHook": "Somebody has to see it first.",
-      "bHook": "Napalm is confetti.",
+      "bHook": "Every shell is confetti.",
       "aGlyph": "+off·−mob·+pad·+led",
       "bGlyph": "+off·+hea·−ene·−pad",
       "talkIds": {
@@ -8261,7 +7969,7 @@
       "authored": true,
       "aName": "Tamsin 'Tick' Hollis",
       "bName": "Ada Noctua",
-      "aHook": "Speaks in plurals.",
+      "aHook": "Speaks in plurals. Prints them too.",
       "bHook": "Dreams in flight paths.",
       "aGlyph": "+sig·+fog·+mob·−off",
       "bGlyph": "+mob·+sig·+fog·+sky",
@@ -8564,33 +8272,6 @@
       }
     },
     {
-      "id": "odessa__tarn",
-      "a": "tarn",
-      "b": "odessa",
-      "score": 1.0,
-      "polarity": "attract",
-      "motifs": [
-        "fords are shortcuts",
-        "wet boots, dry humour"
-      ],
-      "sharedTemperament": [],
-      "reasons": [
-        "authored seed"
-      ],
-      "authored": true,
-      "aName": "Tarn Ostrander",
-      "bName": "Odessa Krail",
-      "aHook": "Out of the river, already firing.",
-      "bHook": "Fords are doors.",
-      "aGlyph": "+mob·+off·−pad·+hea",
-      "bGlyph": "+pad·+off·−mob",
-      "talkIds": {
-        "C": "odessa__tarn:C",
-        "B": "odessa__tarn:B",
-        "A": "odessa__tarn:A"
-      }
-    },
-    {
       "id": "odessa__vane",
       "a": "vane",
       "b": "odessa",
@@ -8799,7 +8480,7 @@
       "aName": "Pip 'Possum' Calloway",
       "bName": "Ivo 'Spoke' Rask",
       "aHook": "Cheap, fast, rocket-happy.",
-      "bHook": "Only trusts wheels.",
+      "bHook": "Only trusts wheels. Builds his own.",
       "aGlyph": "+mob·+sig·−pad·+off",
       "bGlyph": "+mob·+sig·+fog·+led",
       "talkIds": {
@@ -8828,7 +8509,7 @@
       "aName": "Pip 'Possum' Calloway",
       "bName": "Tamsin 'Tick' Hollis",
       "aHook": "Cheap, fast, rocket-happy.",
-      "bHook": "Speaks in plurals.",
+      "bHook": "Speaks in plurals. Prints them too.",
       "aGlyph": "+mob·+sig·−pad·+off",
       "bGlyph": "+sig·+fog·+mob·−off",
       "talkIds": {
@@ -9105,7 +8786,7 @@
       "authored": true,
       "aName": "Sivan 'Shiva' Ruhl",
       "bName": "Rusk Halloway",
-      "aHook": "Eight Grunts and a decision.",
+      "aHook": "A decision, alone.",
       "bHook": "Gate, jammed gat, a lie.",
       "aGlyph": "+off·+pad·+hea·−mob",
       "bGlyph": "+pad·+off·−mob",
@@ -9193,7 +8874,7 @@
       "aName": "Rusk Halloway",
       "bName": "Warder",
       "aHook": "Gate, jammed gat, a lie.",
-      "bHook": "Owns a circle of dirt.",
+      "bHook": "Owns a circle of dirt. Burns the edge.",
       "aGlyph": "+pad·+off·−mob",
       "bGlyph": "−mob·+pad·−off",
       "talkIds": {
@@ -9315,7 +8996,7 @@
       "aName": "Maren 'Scylla' Voss",
       "bName": "Warder",
       "aHook": "The water had better be wide.",
-      "bHook": "Owns a circle of dirt.",
+      "bHook": "Owns a circle of dirt. Burns the edge.",
       "aGlyph": "+off·−pad·−mob·+hea",
       "bGlyph": "−mob·+pad·−off",
       "talkIds": {
@@ -9405,7 +9086,7 @@
       "aName": "Saloon Stride",
       "bName": "Ivo 'Spoke' Rask",
       "aHook": "Baked speed, bad manners.",
-      "bHook": "Only trusts wheels.",
+      "bHook": "Only trusts wheels. Builds his own.",
       "aGlyph": "+mob·−pad·+off",
       "bGlyph": "+mob·+sig·+fog·+led",
       "talkIds": {
@@ -9432,7 +9113,7 @@
       "aName": "Edda 'Tremor' Lund",
       "bName": "Ivo 'Spoke' Rask",
       "aHook": "Somebody has to see it first.",
-      "bHook": "Only trusts wheels.",
+      "bHook": "Only trusts wheels. Builds his own.",
       "aGlyph": "+off·−mob·+pad·+led",
       "bGlyph": "+mob·+sig·+fog·+led",
       "talkIds": {
@@ -9459,7 +9140,7 @@
       "aName": "Halcyon Dray",
       "bName": "Warder",
       "aHook": "The beam arrives before the argument.",
-      "bHook": "Owns a circle of dirt.",
+      "bHook": "Owns a circle of dirt. Burns the edge.",
       "aGlyph": "+off·−mob·+sig·+ene",
       "bGlyph": "−mob·+pad·−off",
       "talkIds": {
@@ -9515,7 +9196,7 @@
       "aName": "Nadia 'Stiletto' Cole",
       "bName": "Warder",
       "aHook": "Nothing moves; then it is quiet.",
-      "bHook": "Owns a circle of dirt.",
+      "bHook": "Owns a circle of dirt. Burns the edge.",
       "aGlyph": "+sky·+off·+mob·+ene",
       "bGlyph": "−mob·+pad·−off",
       "talkIds": {
@@ -9580,60 +9261,6 @@
         "C": "stronghold__vane:C",
         "B": "stronghold__vane:B",
         "A": "stronghold__vane:A"
-      }
-    },
-    {
-      "id": "tarn__triton",
-      "a": "triton",
-      "b": "tarn",
-      "score": 1.0,
-      "polarity": "tension",
-      "motifs": [
-        "whose shoreline",
-        "Legion line against Cortex raiders"
-      ],
-      "sharedTemperament": [],
-      "reasons": [
-        "authored seed"
-      ],
-      "authored": true,
-      "aName": "Nerea 'Triton' Calder",
-      "bName": "Tarn Ostrander",
-      "aHook": "Low tide is a road.",
-      "bHook": "Out of the river, already firing.",
-      "aGlyph": "+off·+mob·+pad·+sig",
-      "bGlyph": "+mob·+off·−pad·+hea",
-      "talkIds": {
-        "C": "tarn__triton:C"
-      }
-    },
-    {
-      "id": "tarn__twitch",
-      "a": "tarn",
-      "b": "twitch",
-      "score": 1.0,
-      "polarity": "attract",
-      "motifs": [
-        "out of the river, onto the mine",
-        "a welder who leaves surprises"
-      ],
-      "sharedTemperament": [
-        "mischief"
-      ],
-      "reasons": [
-        "authored seed"
-      ],
-      "authored": true,
-      "aName": "Tarn Ostrander",
-      "bName": "Benno 'Twitcher' Sallow",
-      "aHook": "Out of the river, already firing.",
-      "bHook": "Grins with a welder.",
-      "aGlyph": "+mob·+off·−pad·+hea",
-      "bGlyph": "+cra·+ene·−off·+pad",
-      "talkIds": {
-        "C": "tarn__twitch:C",
-        "B": "tarn__twitch:B",
-        "A": "tarn__twitch:A"
       }
     },
     {
@@ -10187,70 +9814,6 @@
             "a": -0.35,
             "b": -0.35,
             "strength": 0.067
-          }
-        ],
-        "spotterLocked": false,
-        "siegeSpotStrength": 0.0
-      }
-    },
-    {
-      "id": "ceil__noctua",
-      "a": "noctua",
-      "b": "ceil",
-      "score": 0.74,
-      "polarity": "tension",
-      "motifs": [
-        "flight paths vs gunship manners",
-        "shared mobility mark",
-        "shared:sky"
-      ],
-      "sharedTemperament": [
-        "sky"
-      ],
-      "reasons": [
-        "authored seed",
-        "umwelt shared mobility mark (complement=0.141)",
-        "shared temperament ['sky']",
-        "adjacent columns eyes/skirmish",
-        "soft-edge verbs",
-        "cross-faction contract tension"
-      ],
-      "authored": true,
-      "aName": "Noctua Bay",
-      "bName": "Ceil Rat",
-      "aHook": "Dreams in flight paths.",
-      "bHook": "Altitude is an opinion.",
-      "aGlyph": "+mob·+sig·+fog·+sky",
-      "bGlyph": "+mob·−pad·+sky·+off",
-      "talkIds": {
-        "C": "ceil__noctua:C",
-        "B": "ceil__noctua:B",
-        "A": "ceil__noctua:A"
-      },
-      "umwelt": {
-        "motif": "shared mobility mark",
-        "boost": 0.249,
-        "couples": [
-          {
-            "axis": "mobility",
-            "kind": "mirror",
-            "a": 1.0,
-            "b": 1.0,
-            "strength": 0.55
-          },
-          {
-            "axis": "offense",
-            "kind": "complement",
-            "a": -0.35,
-            "b": 0.35,
-            "strength": 0.141
-          },
-          {
-            "axis": "sky",
-            "kind": "mirror",
-            "a": 0.5,
-            "b": 0.5,
-            "strength": 0.138
           }
         ],
         "spotterLocked": false,

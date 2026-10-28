@@ -816,42 +816,347 @@ window.CREW_PACKS = {
       "combined": 821,
       "label": "Triton",
       "hasBuildPower": false
+    },
+    "legstr": {
+      "metal": 355,
+      "energy": 5250,
+      "combined": 430,
+      "label": "Hoplite",
+      "hasBuildPower": false
+    },
+    "armpincer": {
+      "metal": 200,
+      "energy": 2000,
+      "combined": 229,
+      "label": "Pincer",
+      "hasBuildPower": false
+    },
+    "legaheattank": {
+      "metal": 1250,
+      "energy": 19000,
+      "combined": 1521,
+      "label": "Prometheus",
+      "hasBuildPower": false
+    },
+    "leghelios": {
+      "metal": 160,
+      "energy": 2400,
+      "combined": 194,
+      "label": "Helios",
+      "hasBuildPower": false
+    },
+    "legaradk": {
+      "metal": 99,
+      "energy": 1350,
+      "combined": 118,
+      "label": "Euclid",
+      "hasBuildPower": false
+    },
+    "armrock": {
+      "metal": 120,
+      "energy": 1000,
+      "combined": 134,
+      "label": "Rocketeer",
+      "hasBuildPower": false
+    },
+    "legvp": {
+      "metal": 570,
+      "energy": 1650,
+      "combined": 594,
+      "label": "Legion Vehicle Plant",
+      "hasBuildPower": false
+    },
+    "armlab": {
+      "metal": 500,
+      "energy": 950,
+      "combined": 514,
+      "label": "Bot Lab",
+      "hasBuildPower": false
+    },
+    "armckfus": {
+      "metal": 3550,
+      "energy": 22000,
+      "combined": 3864,
+      "label": "Cloakable Fusion Reactor",
+      "hasBuildPower": false
+    },
+    "cordoom": {
+      "metal": 3000,
+      "energy": 37000,
+      "combined": 3529,
+      "label": "Bulwark",
+      "hasBuildPower": false
+    },
+    "legavrad": {
+      "metal": 125,
+      "energy": 2000,
+      "combined": 154,
+      "label": "Pheme",
+      "hasBuildPower": false
+    },
+    "legatrans": {
+      "metal": 190,
+      "energy": 4000,
+      "combined": 247,
+      "label": "Hippotes",
+      "hasBuildPower": false
+    },
+    "armsptk": {
+      "metal": 400,
+      "energy": 4500,
+      "combined": 464,
+      "label": "Recluse",
+      "hasBuildPower": false
+    },
+    "corvroc": {
+      "metal": 880,
+      "energy": 6700,
+      "combined": 976,
+      "label": "Negotiator",
+      "hasBuildPower": false
+    },
+    "legavroc": {
+      "metal": 920,
+      "energy": 6500,
+      "combined": 1013,
+      "label": "Boreas",
+      "hasBuildPower": false
+    },
+    "armjam": {
+      "metal": 105,
+      "energy": 1700,
+      "combined": 129,
+      "label": "Umbra",
+      "hasBuildPower": false
+    },
+    "armseer": {
+      "metal": 125,
+      "energy": 2000,
+      "combined": 154,
+      "label": "Prophet",
+      "hasBuildPower": false
+    },
+    "armflash": {
+      "metal": 110,
+      "energy": 900,
+      "combined": 123,
+      "label": "Blitz",
+      "hasBuildPower": false
+    },
+    "leglob": {
+      "metal": 60,
+      "energy": 400,
+      "combined": 66,
+      "label": "Satyr",
+      "hasBuildPower": false
+    },
+    "legner": {
+      "metal": 220,
+      "energy": 2000,
+      "combined": 249,
+      "label": "Nereus",
+      "hasBuildPower": false
+    },
+    "corhurc": {
+      "metal": 310,
+      "energy": 18500,
+      "combined": 574,
+      "label": "Hailstorm",
+      "hasBuildPower": false
+    },
+    "legafigdef": {
+      "metal": 180,
+      "energy": 6200,
+      "combined": 269,
+      "label": "Ajax",
+      "hasBuildPower": false
+    },
+    "corcut": {
+      "metal": 230,
+      "energy": 5400,
+      "combined": 307,
+      "label": "Cutlass",
+      "hasBuildPower": false
+    },
+    "armpw": {
+      "metal": 54,
+      "energy": 900,
+      "combined": 67,
+      "label": "Pawn",
+      "hasBuildPower": false
+    },
+    "armfify": {
+      "metal": 58,
+      "energy": 2900,
+      "combined": 99,
+      "label": "Firefly",
+      "hasBuildPower": false
+    },
+    "legspbomber": {
+      "metal": 240,
+      "energy": 7500,
+      "combined": 347,
+      "label": "Pyrphoros",
+      "hasBuildPower": false
+    },
+    "armpeep": {
+      "metal": 52,
+      "energy": 1550,
+      "combined": 74,
+      "label": "Blink",
+      "hasBuildPower": false
+    },
+    "armfast": {
+      "metal": 160,
+      "energy": 3800,
+      "combined": 214,
+      "label": "Sprinter",
+      "hasBuildPower": false
+    },
+    "corspec": {
+      "metal": 75,
+      "energy": 1550,
+      "combined": 97,
+      "label": "Deceiver",
+      "hasBuildPower": false
+    },
+    "legwhisper": {
+      "metal": 210,
+      "energy": 9000,
+      "combined": 339,
+      "label": "Whisper",
+      "hasBuildPower": false
+    },
+    "legcar": {
+      "metal": 550,
+      "energy": 11000,
+      "combined": 707,
+      "label": "Cardea",
+      "hasBuildPower": false
+    },
+    "legsh": {
+      "metal": 60,
+      "energy": 1200,
+      "combined": 77,
+      "label": "Glaucus",
+      "hasBuildPower": false
+    },
+    "legmh": {
+      "metal": 190,
+      "energy": 3100,
+      "combined": 234,
+      "label": "Salacia",
+      "hasBuildPower": false
+    },
+    "legmlv": {
+      "metal": 52,
+      "energy": 900,
+      "combined": 65,
+      "label": "Sapper",
+      "hasBuildPower": false
+    },
+    "legdrag": {
+      "metal": 8,
+      "energy": 0,
+      "combined": 8,
+      "label": "Dragon's Teeth",
+      "hasBuildPower": false
+    },
+    "legforti": {
+      "metal": 40,
+      "energy": 500,
+      "combined": 47,
+      "label": "Fortification Wall",
+      "hasBuildPower": false
+    },
+    "corveng": {
+      "metal": 73,
+      "energy": 2800,
+      "combined": 113,
+      "label": "Valiant",
+      "hasBuildPower": false
+    },
+    "legionnaire": {
+      "metal": 180,
+      "energy": 6200,
+      "combined": 269,
+      "label": "Legionnaire",
+      "hasBuildPower": false
+    },
+    "legvenator": {
+      "metal": 110,
+      "energy": 3200,
+      "combined": 156,
+      "label": "Venator",
+      "hasBuildPower": false
+    },
+    "armsam": {
+      "metal": 150,
+      "energy": 2100,
+      "combined": 180,
+      "label": "Whistler",
+      "hasBuildPower": false
+    },
+    "armanac": {
+      "metal": 270,
+      "energy": 2400,
+      "combined": 304,
+      "label": "Crocodile",
+      "hasBuildPower": false
+    },
+    "armspid": {
+      "metal": 250,
+      "energy": 5000,
+      "combined": 321,
+      "label": "Webber",
+      "hasBuildPower": false
+    },
+    "legspcarrier": {
+      "metal": 250,
+      "energy": 5000,
+      "combined": 321,
+      "label": "Hecatoncheir",
+      "hasBuildPower": false
     }
   },
   "heroes": {
     "vane": {
       "role": "band",
-      "unitDef": "legcen",
+      "unitDef": "legstr",
       "hireTnb": 0,
-      "packTotal": 12,
-      "extras": 11,
+      "packTotal": 1,
+      "extras": 0,
       "noTnbStake": false,
       "packMind": "swarm",
-      "blurb": "Ash-Captain + Phobos (×12). Swarm mind — hire the flock when you want it.",
+      "blurb": "Ash-Captain Vane on a Hoplite, with ten Phobos. Swarm mind, and she is the one out front.",
       "name": "Ash-Captain Vane",
-      "sizing": "leadFill",
-      "massBand": "mid",
-      "packCombined": 2057,
-      "packMetal": 1680,
-      "packEnergy": 26400,
-      "massTarget": 2064,
-      "startXp": 0.157
+      "sizing": "fixed",
+      "packCombined": 2144,
+      "packMetal": 1755,
+      "packEnergy": 27250,
+      "startXp": 0.143,
+      "escorts": [
+        {
+          "unitDef": "legcen",
+          "count": 10
+        }
+      ]
     },
     "ketha": {
       "role": "core",
       "unitDef": "legrezbot",
       "hireTnb": 0,
-      "packTotal": 2,
-      "extras": 1,
+      "packTotal": 5,
+      "extras": 4,
       "noTnbStake": true,
       "missionCritical": true,
       "packMind": "solo",
-      "blurb": "Only rez captain — life-line of the kettles. Wrecks come home.",
+      "blurb": "Ketha and a pile of Zagreus. Only rez captain. Wrecks come home.",
       "name": "Ketha",
       "sizing": "fixed",
-      "packCombined": 300,
-      "packMetal": 260,
-      "packEnergy": 2800,
+      "packCombined": 750,
+      "packMetal": 650,
+      "packEnergy": 7000,
       "startXp": 1.0,
       "startXpFixed": 1.0
     },
@@ -867,7 +1172,8 @@ window.CREW_PACKS = {
       "packCombined": 2957,
       "packMetal": 2300,
       "packEnergy": 46000,
-      "startXp": 0.007
+      "startXp": 0.007,
+      "packMind": "solo"
     },
     "verse": {
       "role": "band",
@@ -892,79 +1198,108 @@ window.CREW_PACKS = {
       "role": "band",
       "unitDef": "legamph",
       "hireTnb": 0,
-      "packTotal": 3,
-      "extras": 2,
-      "blurb": "Telchine trio — amph line. Fords are doors.",
+      "packTotal": 1,
+      "extras": 0,
+      "blurb": "One Telchine and five Armada Pincers. Fords are doors, and the Pincers hold them open.",
       "name": "Odessa Krail",
-      "sizing": "leadFill",
+      "sizing": "fixed",
       "massBand": "mid",
-      "packCombined": 2366,
-      "packMetal": 1800,
-      "packEnergy": 39600,
+      "packCombined": 1931,
+      "packMetal": 1600,
+      "packEnergy": 23200,
       "massTarget": 2064,
-      "startXp": 0.106
+      "startXp": 0.178,
+      "packMind": "solo",
+      "escorts": [
+        {
+          "unitDef": "armpincer",
+          "count": 5
+        }
+      ]
     },
     "cauter": {
       "role": "band",
       "unitDef": "legshot",
       "hireTnb": 0,
-      "packTotal": 4,
-      "extras": 3,
-      "blurb": "Shotgun foursome. Closes distance; riot is punctuation.",
+      "packTotal": 1,
+      "extras": 0,
+      "blurb": "One Phalanx and three Karkinos. Riot as punctuation.",
       "name": "Cauter Bel-Ansa",
-      "sizing": "leadFill",
+      "sizing": "fixed",
       "massBand": "mid",
-      "packCombined": 2166,
-      "packMetal": 1880,
-      "packEnergy": 20000,
+      "packCombined": 1643,
+      "packMetal": 1460,
+      "packEnergy": 12800,
       "massTarget": 2064,
-      "startXp": 0.139
+      "startXp": 0.226,
+      "packMind": "solo",
+      "escorts": [
+        {
+          "unitDef": "legkark",
+          "count": 3
+        }
+      ]
     },
     "rusk": {
       "role": "band",
       "unitDef": "leggat",
       "hireTnb": 0,
-      "packTotal": 6,
-      "extras": 5,
-      "blurb": "Shieldline six. Held a gate with a jammed gat and a lie.",
+      "packTotal": 5,
+      "extras": 4,
+      "blurb": "Five Decurions. Gate, jammed gat, a lie.",
       "name": "Rusk Halloway",
-      "sizing": "leadFill",
+      "sizing": "fixed",
       "massBand": "mid",
-      "packCombined": 2109,
-      "packMetal": 1800,
-      "packEnergy": 21600,
+      "packCombined": 1757,
+      "packMetal": 1500,
+      "packEnergy": 18000,
       "massTarget": 2064,
-      "startXp": 0.149
+      "startXp": 0.207,
+      "packMind": "swarm"
     },
     "grath": {
       "role": "band",
-      "unitDef": "legkark",
+      "unitDef": "legaheattank",
       "hireTnb": 0,
-      "packTotal": 6,
-      "extras": 5,
-      "blurb": "Six Karkinos — mid-line. Three wars of arrears.",
+      "packTotal": 1,
+      "extras": 0,
+      "blurb": "One Prometheus heat-ray tank and three Helios skirmishers. Three wars unpaid, and the interest is heat.",
       "name": "Grath Arrears",
       "sizing": "fixed",
-      "packCombined": 2203,
-      "packMetal": 1980,
-      "packEnergy": 15600,
-      "startXp": 0.133
+      "packCombined": 2104,
+      "packMetal": 1730,
+      "packEnergy": 26200,
+      "startXp": 0.149,
+      "packMind": "solo",
+      "escorts": [
+        {
+          "unitDef": "leghelios",
+          "count": 3
+        }
+      ]
     },
     "halq": {
       "role": "band",
-      "unitDef": "legbal",
+      "unitDef": "legaradk",
       "hireTnb": 0,
-      "packTotal": 11,
-      "extras": 10,
-      "blurb": "Ballista battery. Shoots coordinates, not targets.",
+      "packTotal": 1,
+      "extras": 0,
+      "blurb": "A Euclid radar bot and eight Armada Rocketeers. She calls the coordinates; they answer.",
       "name": "Sisu Halq",
-      "sizing": "leadFill",
+      "sizing": "fixed",
       "massBand": "mid",
-      "packCombined": 2062,
-      "packMetal": 1760,
-      "packEnergy": 21120,
+      "packCombined": 1193,
+      "packMetal": 1059,
+      "packEnergy": 9350,
       "massTarget": 2064,
-      "startXp": 0.156
+      "startXp": 0.301,
+      "packMind": "swarm",
+      "escorts": [
+        {
+          "unitDef": "armrock",
+          "count": 8
+        }
+      ]
     },
     "yeva": {
       "role": "band",
@@ -984,38 +1319,37 @@ window.CREW_PACKS = {
       "packCombined": 1117,
       "packMetal": 806,
       "packEnergy": 21800,
-      "startXp": 0.314
+      "startXp": 0.314,
+      "packMind": "solo"
     },
     "spoke": {
       "role": "band",
-      "unitDef": "legscout",
+      "unitDef": "legvp",
       "hireTnb": 0,
-      "packTotal": 16,
-      "extras": 15,
+      "packTotal": 1,
+      "extras": 0,
       "heroTrait": "wheelie_mentor",
       "fieldEffect": "speed",
       "factory": "wheelie_bay",
-      "blurb": "Null Merc kid + Wheelie Bay (×16). Only trusts wheels.",
+      "blurb": "The Wheelie Bay itself, with a metal storage and an extra thousand metal in it. Prints Wheelies on repeat the moment it lands.",
       "name": "Ivo 'Spoke' Rask",
       "tags": [
         "scout",
         "wheelie_mentor"
       ],
       "sizing": "fixed",
-      "packCombined": 997,
-      "packMetal": 883,
-      "packEnergy": 7990,
-      "startXp": 0.334,
+      "packCombined": 942,
+      "packMetal": 910,
+      "packEnergy": 2240,
+      "startXp": 0.343,
       "escorts": [
-        {
-          "unitDef": "legestor",
-          "count": 1
-        },
         {
           "unitDef": "legmstor",
           "count": 1
         }
-      ]
+      ],
+      "packMind": "solo",
+      "canLead": false
     },
     "auditor": {
       "role": "band",
@@ -1030,7 +1364,8 @@ window.CREW_PACKS = {
       "packCombined": 5064,
       "packMetal": 3950,
       "packEnergy": 78000,
-      "startXp": 0.0
+      "startXp": 0.0,
+      "packMind": "solo"
     },
     "twitch": {
       "role": "band",
@@ -1043,21 +1378,22 @@ window.CREW_PACKS = {
       "tags": [
         "combat_engineer"
       ],
-      "blurb": "Trouble fabricator — Twitcher + Cortex nano. Mines and mischief.",
+      "blurb": "Twitcher and a Printer. He welds the front together; the Printer builds whatever he grins at.",
       "name": "Benno 'Twitcher' Sallow",
       "sizing": "fixed",
       "escorts": [
         {
-          "unitDef": "cornanotc",
+          "unitDef": "va_printer",
           "count": 1
         }
       ],
-      "packCombined": 540,
-      "packMetal": 440,
-      "packEnergy": 7000,
-      "startXp": 0.41,
+      "packCombined": 713,
+      "packMetal": 580,
+      "packEnergy": 9300,
+      "startXp": 0.381,
       "buildsEco": true,
-      "baseSeeder": true
+      "baseSeeder": true,
+      "packMind": "solo"
     },
     "consul": {
       "role": "band",
@@ -1083,7 +1419,8 @@ window.CREW_PACKS = {
       "packEnergy": 10300,
       "startXp": 0.364,
       "buildsEco": true,
-      "baseSeeder": true
+      "baseSeeder": true,
+      "packMind": "solo"
     },
     "veil": {
       "role": "band",
@@ -1108,7 +1445,8 @@ window.CREW_PACKS = {
       "packCombined": 1900,
       "packMetal": 1555,
       "packEnergy": 24150,
-      "startXp": 0.183
+      "startXp": 0.183,
+      "packMind": "solo"
     },
     "commando": {
       "role": "band",
@@ -1133,17 +1471,18 @@ window.CREW_PACKS = {
       "packMetal": 1804,
       "packEnergy": 25750,
       "startXp": 0.143,
-      "packXpCombined": 2140
+      "packXpCombined": 2140,
+      "packMind": "solo"
     },
     "tick": {
       "role": "band",
-      "unitDef": "armflea",
+      "unitDef": "armlab",
       "hireTnb": 0,
-      "packTotal": 20,
-      "extras": 19,
+      "packTotal": 1,
+      "extras": 0,
       "fieldEffect": "vision",
       "factory": "tick_stream_bay",
-      "blurb": "Flea lab + Tick pack (×20). Speaks in plurals.",
+      "blurb": "The Tick Stream Bay, with a metal storage and an extra thousand metal. Prints Ticks on repeat from the first second.",
       "name": "Tamsin 'Tick' Hollis",
       "tags": [
         "scout",
@@ -1151,20 +1490,18 @@ window.CREW_PACKS = {
         "tick_eyes"
       ],
       "sizing": "fixed",
-      "packCombined": 1038,
-      "packMetal": 920,
-      "packEnergy": 8270,
-      "startXp": 0.327,
+      "packCombined": 852,
+      "packMetal": 830,
+      "packEnergy": 1520,
+      "startXp": 0.358,
       "escorts": [
-        {
-          "unitDef": "armestor",
-          "count": 1
-        },
         {
           "unitDef": "armmstor",
           "count": 1
         }
-      ]
+      ],
+      "packMind": "solo",
+      "canLead": false
     },
     "fatboy": {
       "role": "band",
@@ -1173,13 +1510,20 @@ window.CREW_PACKS = {
       "packTotal": 1,
       "extras": 0,
       "premium": true,
-      "blurb": "One Fatboy — plasma house that learned to walk so it could knock.",
+      "blurb": "One Fatboy and two Legion Lances on the roof. The house learned to knock, and to look up.",
       "name": "Dorran 'Fatboy' Kell",
       "sizing": "fixed",
-      "packCombined": 1686,
-      "packMetal": 1400,
-      "packEnergy": 20000,
-      "startXp": 0.219
+      "packCombined": 2274,
+      "packMetal": 1880,
+      "packEnergy": 27600,
+      "startXp": 0.121,
+      "packMind": "solo",
+      "escorts": [
+        {
+          "unitDef": "legrail",
+          "count": 2
+        }
+      ]
     },
     "bro": {
       "role": "band",
@@ -1198,7 +1542,8 @@ window.CREW_PACKS = {
       "packCombined": 2050,
       "packMetal": 1650,
       "packEnergy": 28000,
-      "startXp": 0.158
+      "startXp": 0.158,
+      "packMind": "solo"
     },
     "stride": {
       "role": "band",
@@ -1218,11 +1563,12 @@ window.CREW_PACKS = {
       "packMetal": 1950,
       "packEnergy": 33000,
       "massTarget": 2064,
-      "startXp": 0.096
+      "startXp": 0.096,
+      "packMind": "solo"
     },
     "hearth": {
       "role": "band",
-      "unitDef": "armfus",
+      "unitDef": "armckfus",
       "hireTnb": 1,
       "packTotal": 1,
       "extras": 0,
@@ -1230,14 +1576,15 @@ window.CREW_PACKS = {
       "tags": [
         "pad_heart"
       ],
-      "blurb": "Quiet sun that refuses to go out — hero fusion, ENERGY field.",
+      "blurb": "One Cloakable Fusion Reactor. A quiet sun nobody can find.",
       "name": "Hearth",
       "sizing": "fixed",
-      "packCombined": 3607,
-      "packMetal": 3350,
-      "packEnergy": 18000,
+      "packCombined": 3864,
+      "packMetal": 3550,
+      "packEnergy": 22000,
       "startXp": 0.0,
-      "canLead": false
+      "canLead": false,
+      "packMind": "solo"
     },
     "solarium": {
       "role": "band",
@@ -1275,37 +1622,16 @@ window.CREW_PACKS = {
       "fieldEffect": "build",
       "startXp": 0.102,
       "buildsEco": true,
-      "baseSeeder": true
+      "baseSeeder": true,
+      "packMind": "solo"
     },
     "warder": {
       "role": "band",
-      "unitDef": "armbeamer",
+      "unitDef": "cordoom",
       "hireTnb": 0,
-      "packTotal": 4,
-      "extras": 3,
-      "escorts": [
-        {
-          "unitDef": "armferret",
-          "count": 2
-        },
-        {
-          "unitDef": "corrl",
-          "count": 4
-        },
-        {
-          "unitDef": "armllt",
-          "count": 2
-        },
-        {
-          "unitDef": "armrad",
-          "count": 1
-        },
-        {
-          "unitDef": "armcir",
-          "count": 1
-        }
-      ],
-      "blurb": "Beamer ring + Ferrets + Thistles + LLTs + a Chainsaw. Owns a circle of dirt.",
+      "packTotal": 1,
+      "extras": 0,
+      "blurb": "One Bulwark. A heat-ray turret that owns a circle of dirt and burns whatever steps into it.",
       "name": "Warder",
       "tags": [
         "area_control",
@@ -1313,12 +1639,12 @@ window.CREW_PACKS = {
         "pad_tooth"
       ],
       "sizing": "fixed",
-      "packCombined": 3210,
-      "packMetal": 2780,
-      "packEnergy": 30090,
-      "formation": "triangle",
+      "packCombined": 3529,
+      "packMetal": 3000,
+      "packEnergy": 37000,
       "startXp": 0.0,
-      "canLead": false
+      "canLead": false,
+      "packMind": "solo"
     },
     "noctua": {
       "role": "band",
@@ -1334,69 +1660,46 @@ window.CREW_PACKS = {
         "drone_bay"
       ],
       "sizing": "fixed",
-      "blurb": "Drone plant + Noctua wing + three Blindfold radar-killers. Dreams in flight paths.",
+      "blurb": "The Legion Drone Plant, with a metal storage and an extra thousand metal. Prints Noctua fighters on repeat.",
       "name": "Ada Noctua",
-      "packCombined": 2953,
-      "packMetal": 2205,
-      "packEnergy": 52390,
+      "packCombined": 794,
+      "packMetal": 770,
+      "packEnergy": 1690,
       "escorts": [
-        {
-          "unitDef": "legfig",
-          "count": 24
-        },
-        {
-          "unitDef": "legcib",
-          "count": 3
-        },
-        {
-          "unitDef": "legestor",
-          "count": 1
-        },
         {
           "unitDef": "legmstor",
           "count": 1
         }
       ],
-      "startXp": 0.117,
+      "startXp": 0.368,
       "canLead": false,
-      "packXpCombined": 2301
+      "packMind": "solo"
     },
     "mira": {
       "role": "band",
-      "unitDef": "legbar",
+      "unitDef": "armmart",
       "hireTnb": 0,
-      "packTotal": 1,
-      "extras": 0,
+      "packTotal": 5,
+      "extras": 4,
       "escorts": [
         {
-          "unitDef": "legamcluster",
-          "count": 1
-        },
-        {
-          "unitDef": "legrail",
-          "count": 1
-        },
-        {
-          "unitDef": "legsrail",
-          "count": 1
-        },
-        {
-          "unitDef": "leghrk",
+          "unitDef": "legavrad",
           "count": 1
         }
       ],
-      "blurb": "Parade battery — Barrage, Cleaver, Lance, Arquebus, Mausers. Confetti!",
+      "blurb": "A firing line of five Mausers and a Pheme radar vehicle. Every shell is confetti.",
       "name": "Mira Barrage",
       "sizing": "fixed",
       "tags": [
         "siege",
         "sparkle_battery",
-        "tone_break"
+        "firing_line"
       ],
-      "startXp": 0.005,
-      "packCombined": 2971,
-      "packMetal": 2450,
-      "packEnergy": 36500
+      "startXp": 0.149,
+      "packCombined": 2104,
+      "packMetal": 1725,
+      "packEnergy": 26500,
+      "packMind": "swarm"
     },
     "kettle": {
       "role": "band",
@@ -1406,30 +1709,31 @@ window.CREW_PACKS = {
       "extras": 0,
       "escorts": [
         {
-          "unitDef": "armhvytrans",
-          "count": 1
+          "unitDef": "legatrans",
+          "count": 2
         }
       ],
-      "blurb": "Saint Kettle's Archangel and one heavy transport. The roof of the company, and the lift under it.",
+      "blurb": "Saint Kettle's Archangel and two Legion Hippotes heavy transports. The roof of the company, and the lift under it.",
       "name": "Saint Kettle",
       "sizing": "fixed",
       "tags": [
         "mobile_aa",
         "sky_saint"
       ],
-      "startXp": 0.373,
-      "packCombined": 847,
-      "packMetal": 710,
-      "packEnergy": 9600,
-      "packXpCombined": 765
+      "startXp": 0.345,
+      "packCombined": 1094,
+      "packMetal": 900,
+      "packEnergy": 13600,
+      "packXpCombined": 930,
+      "packMind": "solo"
     },
     "infestor": {
       "role": "band",
       "unitDef": "va_infestor",
       "hireTnb": 0,
-      "packTotal": 5,
-      "extras": 4,
-      "blurb": "Infestor seed (×5). Stealth spiders that mint more spiders, and Goblins.",
+      "packTotal": 4,
+      "extras": 3,
+      "blurb": "Four Infestor seeds and two Recluse spiders. Stealth spiders that mint more spiders, and Goblins.",
       "name": "Infestor Hive",
       "sizing": "fixed",
       "tags": [
@@ -1437,10 +1741,17 @@ window.CREW_PACKS = {
         "all_terrain",
         "self_replicate"
       ],
-      "startXp": 0.23,
-      "packCombined": 1621,
-      "packMetal": 1250,
-      "packEnergy": 26000
+      "startXp": 0.129,
+      "packCombined": 2226,
+      "packMetal": 1800,
+      "packEnergy": 29800,
+      "packMind": "solo",
+      "escorts": [
+        {
+          "unitDef": "armsptk",
+          "count": 2
+        }
+      ]
     },
     "quill": {
       "role": "band",
@@ -1459,46 +1770,79 @@ window.CREW_PACKS = {
         "line",
         "captain",
         "assault"
-      ]
+      ],
+      "packMind": "pair"
     },
     "kit": {
       "role": "band",
       "unitDef": "legbart",
       "hireTnb": 0,
-      "packTotal": 3,
-      "extras": 2,
-      "blurb": "Belcher trio — napalm skirm. Mira's sister energy, but she walks it in.",
+      "packTotal": 1,
+      "extras": 0,
+      "blurb": "Kit's Belcher with a whole napalm park behind her: a Barrage, a Cleaver, a Lance, an Arquebus and a Thanatos. Fireworks at walking distance.",
       "name": "Kit Sparkler",
-      "sizing": "leadFill",
-      "startXp": 0.186,
-      "packCombined": 1886,
-      "packMetal": 1650,
-      "packEnergy": 16500,
+      "sizing": "fixed",
+      "startXp": 0.0,
+      "packCombined": 3600,
+      "packMetal": 3000,
+      "packEnergy": 42000,
       "tags": [
         "skirmish",
         "gleeful",
         "napalm"
       ],
-      "massBand": "mid",
-      "massTarget": 2064
+      "packMind": "solo",
+      "escorts": [
+        {
+          "unitDef": "legbar",
+          "count": 1
+        },
+        {
+          "unitDef": "legamcluster",
+          "count": 1
+        },
+        {
+          "unitDef": "legrail",
+          "count": 1
+        },
+        {
+          "unitDef": "legsrail",
+          "count": 1
+        },
+        {
+          "unitDef": "leghrk",
+          "count": 1
+        }
+      ]
     },
     "vale": {
       "role": "band",
       "unitDef": "armmerl",
       "hireTnb": 0,
-      "packTotal": 2,
-      "extras": 1,
-      "blurb": "Ambassador pair — stealth rockets. Soft breach; the wall never saw the bill.",
+      "packTotal": 1,
+      "extras": 0,
+      "blurb": "One stealth rocket launcher from each faction: an Ambassador, a Negotiator and a Boreas. The wall never saw the invoice.",
       "name": "Vale Soft",
       "sizing": "fixed",
-      "startXp": 0.162,
-      "packCombined": 2026,
-      "packMetal": 1840,
-      "packEnergy": 13000,
+      "startXp": 0.0,
+      "packCombined": 3001,
+      "packMetal": 2720,
+      "packEnergy": 19700,
       "tags": [
         "siege",
         "stealth",
         "fog"
+      ],
+      "packMind": "solo",
+      "escorts": [
+        {
+          "unitDef": "corvroc",
+          "count": 1
+        },
+        {
+          "unitDef": "legavroc",
+          "count": 1
+        }
       ]
     },
     "nox": {
@@ -1524,29 +1868,8 @@ window.CREW_PACKS = {
           "unitDef": "armferret",
           "count": 1
         }
-      ]
-    },
-    "ceil": {
-      "role": "band",
-      "unitDef": "armbrawl",
-      "hireTnb": 0,
-      "packTotal": 5,
-      "extras": 4,
-      "blurb": "Roughneck wing (x5). Gunship manners. Altitude is an opinion.",
-      "name": "Ceil Rat",
-      "sizing": "leadFill",
-      "startXp": 0.279,
-      "packCombined": 1993,
-      "packMetal": 1550,
-      "packEnergy": 31000,
-      "tags": [
-        "skirmish",
-        "gunship",
-        "sky"
       ],
-      "massBand": "mid",
-      "massTarget": 2064,
-      "packXpCombined": 1329
+      "packMind": "solo"
     },
     "lumen": {
       "role": "band",
@@ -1554,13 +1877,13 @@ window.CREW_PACKS = {
       "hireTnb": 0,
       "packTotal": 1,
       "extras": 0,
-      "blurb": "T2 construction vehicle of the saint garden. Raises Prudes and Pulsars, and nothing else; a Cortex Printer keeps her patched.",
+      "blurb": "Sister Lumen with an Umbra jammer and two Prophet radar vehicles. She sees the whole grid, and the grid can't see her.",
       "name": "Sister Lumen",
       "sizing": "fixed",
-      "startXp": 0.317,
-      "packCombined": 1096,
-      "packMetal": 920,
-      "packEnergy": 12300,
+      "startXp": 0.319,
+      "packCombined": 1084,
+      "packMetal": 905,
+      "packEnergy": 12500,
       "tags": [
         "eco",
         "geo",
@@ -1568,12 +1891,17 @@ window.CREW_PACKS = {
       ],
       "escorts": [
         {
-          "unitDef": "va_printer",
+          "unitDef": "armjam",
           "count": 1
+        },
+        {
+          "unitDef": "armseer",
+          "count": 2
         }
       ],
       "buildsEco": false,
-      "baseSeeder": false
+      "baseSeeder": false,
+      "packMind": "solo"
     },
     "anvil": {
       "role": "band",
@@ -1596,28 +1924,36 @@ window.CREW_PACKS = {
         "line",
         "amph",
         "plod"
-      ]
+      ],
+      "packMind": "pair"
     },
     "volt": {
       "role": "band",
       "unitDef": "armlatnk",
       "hireTnb": 0,
-      "packTotal": 5,
-      "extras": 4,
-      "blurb": "Jaguar pack (x5). Lightning eyes. Sight is a wound you give them.",
+      "packTotal": 1,
+      "extras": 0,
+      "blurb": "One Jaguar and a pack of six Blitz. The lightning first, then everyone else.",
       "name": "Volt Lash",
-      "sizing": "leadFill",
-      "startXp": 0.149,
-      "packCombined": 2107,
-      "packMetal": 1650,
-      "packEnergy": 32000,
+      "sizing": "fixed",
+      "startXp": 0.307,
+      "packCombined": 1159,
+      "packMetal": 990,
+      "packEnergy": 11800,
       "tags": [
         "eyes",
         "lightning",
         "heat"
       ],
       "massBand": "mid",
-      "massTarget": 2064
+      "massTarget": 2064,
+      "packMind": "solo",
+      "escorts": [
+        {
+          "unitDef": "armflash",
+          "count": 6
+        }
+      ]
     },
     "pavise": {
       "role": "band",
@@ -1627,14 +1963,20 @@ window.CREW_PACKS = {
       "extras": 0,
       "packMind": "solo",
       "noTnbStake": false,
-      "blurb": "Grey-haired shield captain. One Centurion; her ward steadies everyone near her. Temperate, until you touch her people.",
+      "blurb": "Pavise and five Legion Satyrs. An Armada shield captain walking a Legion line.",
       "name": "Pavise",
       "sizing": "fixed",
-      "packCombined": 314,
-      "packMetal": 270,
-      "packEnergy": 3100,
-      "startXp": 0.448,
-      "fieldEffect": "pavise_ward"
+      "packCombined": 643,
+      "packMetal": 570,
+      "packEnergy": 5100,
+      "startXp": 0.393,
+      "fieldEffect": "pavise_ward",
+      "escorts": [
+        {
+          "unitDef": "leglob",
+          "count": 5
+        }
+      ]
     },
     "halbard": {
       "role": "band",
@@ -1643,13 +1985,23 @@ window.CREW_PACKS = {
       "packTotal": 1,
       "extras": 0,
       "packMind": "solo",
-      "blurb": "Drives the Cortex Halberd with a heat ray in place of its cannon. The ray runs on the company's energy bank, so she wants Solarium behind her.",
+      "blurb": "Ilse Varn's Halberd with three Alpheus and four Nereus. Legion hovers on her flanks and over her head.",
       "name": "Ilse 'Halbard' Varn",
       "sizing": "fixed",
-      "packCombined": 826,
-      "packMetal": 640,
-      "packEnergy": 13000,
-      "startXp": 0.362
+      "packCombined": 2634,
+      "packMetal": 2150,
+      "packEnergy": 33900,
+      "startXp": 0.061,
+      "escorts": [
+        {
+          "unitDef": "legah",
+          "count": 3
+        },
+        {
+          "unitDef": "legner",
+          "count": 4
+        }
+      ]
     },
     "thresh": {
       "role": "band",
@@ -1675,7 +2027,8 @@ window.CREW_PACKS = {
       "packMetal": 670,
       "packEnergy": 30900,
       "packCombined": 1111,
-      "packXpCombined": 741
+      "packXpCombined": 741,
+      "packMind": "solo"
     },
     "gale": {
       "role": "band",
@@ -1698,7 +2051,8 @@ window.CREW_PACKS = {
       "packMetal": 1380,
       "packEnergy": 32400,
       "packCombined": 1843,
-      "packXpCombined": 1229
+      "packXpCombined": 1229,
+      "packMind": "solo"
     },
     "mask": {
       "role": "band",
@@ -1706,7 +2060,7 @@ window.CREW_PACKS = {
       "hireTnb": 0,
       "packTotal": 1,
       "extras": 0,
-      "blurb": "Decoy Commander and a pack of Pawns (x16). Can capture what walks too close, and raise a Bot Lab where the company needs one. Every throne needs a spare.",
+      "blurb": "Mask, ten Pawns and three Firefly rez planes. Every throne needs a spare, and the spares get back up.",
       "name": "Mask",
       "sizing": "fixed",
       "tags": [
@@ -1718,23 +2072,29 @@ window.CREW_PACKS = {
       "escorts": [
         {
           "unitDef": "armpw",
-          "count": 16
+          "count": 10
+        },
+        {
+          "unitDef": "armfify",
+          "count": 3
         }
       ],
-      "startXp": 0.165,
-      "packMetal": 1634,
-      "packEnergy": 26400,
-      "packCombined": 2011,
+      "startXp": 0.199,
+      "packMetal": 1484,
+      "packEnergy": 29700,
+      "packCombined": 1908,
       "buildsEco": true,
-      "baseSeeder": true
+      "baseSeeder": true,
+      "packMind": "solo",
+      "packXpCombined": 1809
     },
     "rumor": {
       "role": "band",
       "unitDef": "va_ghost",
       "hireTnb": 0,
-      "packTotal": 4,
-      "extras": 3,
-      "blurb": "Four Ghost spy bots and two Gremlin stealth tanks, all cloaked, walking up to enemy units and turning them. Everything changes sides eventually.",
+      "packTotal": 1,
+      "extras": 0,
+      "blurb": "Rumor's Ghost, two Legion Eidolons and two Gremlins. Everything changes sides eventually.",
       "name": "Rumor",
       "sizing": "fixed",
       "tags": [
@@ -1743,16 +2103,21 @@ window.CREW_PACKS = {
         "capture",
         "fog"
       ],
-      "startXp": 0.232,
-      "packMetal": 1000,
-      "packEnergy": 42600,
-      "packCombined": 1609,
+      "startXp": 0.28,
+      "packMetal": 845,
+      "packEnergy": 33200,
+      "packCombined": 1319,
       "escorts": [
+        {
+          "unitDef": "legaspy",
+          "count": 2
+        },
         {
           "unitDef": "armgremlin",
           "count": 2
         }
-      ]
+      ],
+      "packMind": "solo"
     },
     "phoenix": {
       "role": "band",
@@ -1772,26 +2137,8 @@ window.CREW_PACKS = {
       "packMetal": 900,
       "packEnergy": 50000,
       "packCombined": 1614,
-      "packXpCombined": 1076
-    },
-    "tarn": {
-      "role": "band",
-      "unitDef": "corsala",
-      "hireTnb": 0,
-      "packTotal": 5,
-      "extras": 4,
-      "blurb": "A pack of five Salamanders. They come up out of the river already firing.",
-      "name": "Tarn Ostrander",
-      "sizing": "fixed",
-      "tags": [
-        "amphibious",
-        "line",
-        "push"
-      ],
-      "startXp": 0.125,
-      "packMetal": 1750,
-      "packEnergy": 35000,
-      "packCombined": 2250
+      "packXpCombined": 1076,
+      "packMind": "solo"
     },
     "scylla": {
       "role": "band",
@@ -1810,15 +2157,16 @@ window.CREW_PACKS = {
       "startXp": 0.0,
       "packMetal": 2900,
       "packEnergy": 21000,
-      "packCombined": 3200
+      "packCombined": 3200,
+      "packMind": "solo"
     },
     "tsunami": {
       "role": "band",
       "unitDef": "armsb",
       "hireTnb": 0,
-      "packTotal": 4,
-      "extras": 3,
-      "blurb": "Four Tsunami seaplane bombers with three Horizon scouts out front. The flight finds the target, then drops on it.",
+      "packTotal": 1,
+      "extras": 0,
+      "blurb": "One Tsunami, two Legion Pyrphoros seaplane bombers and five Blink scouts. The flight finds the target, then drops on it.",
       "name": "Ines 'Tsunami' Harrow",
       "sizing": "fixed",
       "tags": [
@@ -1827,17 +2175,22 @@ window.CREW_PACKS = {
         "sky",
         "seaplane"
       ],
-      "startXp": 0.271,
+      "startXp": 0.343,
       "escorts": [
         {
-          "unitDef": "armsehak",
-          "count": 3
+          "unitDef": "legspbomber",
+          "count": 2
+        },
+        {
+          "unitDef": "armpeep",
+          "count": 5
         }
       ],
-      "packMetal": 1335,
-      "packEnergy": 51000,
-      "packCombined": 2064,
-      "packXpCombined": 1376
+      "packMetal": 980,
+      "packEnergy": 30250,
+      "packCombined": 1412,
+      "packXpCombined": 941,
+      "packMind": "solo"
     },
     "starlight": {
       "role": "band",
@@ -1845,7 +2198,7 @@ window.CREW_PACKS = {
       "hireTnb": 0,
       "packTotal": 1,
       "extras": 0,
-      "blurb": "One Starlight. A beam that does not so much fire as arrive.",
+      "blurb": "One Starlight and four Sprinters. The beam arrives; the Sprinters make sure nobody gets close to it.",
       "name": "Halcyon Dray",
       "sizing": "fixed",
       "tags": [
@@ -1853,10 +2206,17 @@ window.CREW_PACKS = {
         "beam",
         "long"
       ],
-      "startXp": 0.256,
-      "packMetal": 1200,
-      "packEnergy": 18500,
-      "packCombined": 1464
+      "startXp": 0.113,
+      "packMetal": 1840,
+      "packEnergy": 33700,
+      "packCombined": 2321,
+      "packMind": "solo",
+      "escorts": [
+        {
+          "unitDef": "armfast",
+          "count": 4
+        }
+      ]
     },
     "banisher": {
       "role": "band",
@@ -1875,15 +2235,16 @@ window.CREW_PACKS = {
       "startXp": 0.0,
       "packMetal": 3000,
       "packEnergy": 69000,
-      "packCombined": 3986
+      "packCombined": 3986,
+      "packMind": "solo"
     },
     "arrow": {
       "role": "band",
       "unitDef": "corparrow",
       "hireTnb": 0,
-      "packTotal": 3,
-      "extras": 2,
-      "blurb": "Three Poison Arrows. They never miss twice.",
+      "packTotal": 1,
+      "extras": 0,
+      "blurb": "One Poison Arrow and 6 Salamanders. The Salamanders hold them still; she never misses twice.",
       "name": "Ysolde 'Arrow' Venn",
       "sizing": "fixed",
       "tags": [
@@ -1894,7 +2255,14 @@ window.CREW_PACKS = {
       "startXp": 0.0,
       "packMetal": 3150,
       "packEnergy": 63000,
-      "packCombined": 4050
+      "packCombined": 4050,
+      "packMind": "solo",
+      "escorts": [
+        {
+          "unitDef": "corsala",
+          "count": 6
+        }
+      ]
     },
     "hornet": {
       "role": "band",
@@ -1902,8 +2270,8 @@ window.CREW_PACKS = {
       "hireTnb": 0,
       "packTotal": 2,
       "extras": 1,
-      "blurb": "Two Hornet gunships. A sting that comes back for the rest of the nest.",
-      "name": "Teague 'Hornet' Marsh",
+      "blurb": "Two Hornet gunships, flown by the Marsh sisters, Teague and Saffi.",
+      "name": "Teague & Saffi Marsh",
       "sizing": "fixed",
       "tags": [
         "skirmish",
@@ -1914,7 +2282,12 @@ window.CREW_PACKS = {
       "packMetal": 2500,
       "packEnergy": 44000,
       "packCombined": 3129,
-      "packXpCombined": 2086
+      "packXpCombined": 2086,
+      "packMind": "pair",
+      "fieldName": "Teague",
+      "partners": [
+        "Saffi"
+      ]
     },
     "charybdis": {
       "role": "band",
@@ -1933,7 +2306,8 @@ window.CREW_PACKS = {
       "startXp": 0.215,
       "packMetal": 1350,
       "packEnergy": 25000,
-      "packCombined": 1707
+      "packCombined": 1707,
+      "packMind": "solo"
     },
     "shiva": {
       "role": "band",
@@ -1941,7 +2315,7 @@ window.CREW_PACKS = {
       "hireTnb": 0,
       "packTotal": 1,
       "extras": 0,
-      "blurb": "One Shiva with eight Grunts at her heels. The Grunts lead; the Shiva decides.",
+      "blurb": "One Shiva. She decides alone now.",
       "name": "Sivan 'Shiva' Ruhl",
       "sizing": "fixed",
       "tags": [
@@ -1949,16 +2323,11 @@ window.CREW_PACKS = {
         "walker",
         "escort"
       ],
-      "startXp": 0.107,
-      "escorts": [
-        {
-          "unitDef": "corak",
-          "count": 8
-        }
-      ],
-      "packMetal": 1936,
-      "packEnergy": 29560,
-      "packCombined": 2358
+      "startXp": 0.179,
+      "packMetal": 1600,
+      "packEnergy": 23000,
+      "packCombined": 1929,
+      "packMind": "solo"
     },
     "tremor": {
       "role": "band",
@@ -1966,7 +2335,7 @@ window.CREW_PACKS = {
       "hireTnb": 0,
       "packTotal": 1,
       "extras": 0,
-      "blurb": "One Tremor with two Rascal scouts and an Augur. Somebody has to see what she is about to flatten.",
+      "blurb": "One Tremor, a Deceiver jammer and five Rascals. Somebody has to see it first, and nobody sees her.",
       "name": "Edda 'Tremor' Lund",
       "sizing": "fixed",
       "tags": [
@@ -1974,28 +2343,29 @@ window.CREW_PACKS = {
         "arty",
         "spotters"
       ],
-      "startXp": 0.045,
+      "startXp": 0.034,
       "escorts": [
         {
-          "unitDef": "corfav",
-          "count": 2
+          "unitDef": "corspec",
+          "count": 1
         },
         {
-          "unitDef": "corvoyr",
-          "count": 1
+          "unitDef": "corfav",
+          "count": 5
         }
       ],
-      "packMetal": 2001,
-      "packEnergy": 50890,
-      "packCombined": 2728
+      "packMetal": 2055,
+      "packEnergy": 51900,
+      "packCombined": 2796,
+      "packMind": "solo"
     },
     "stiletto": {
       "role": "band",
       "unitDef": "armstil",
       "hireTnb": 0,
-      "packTotal": 4,
-      "extras": 3,
-      "blurb": "Four Stiletto EMP bombers and a small power plant to feed them. Nothing moves; then everything is quiet.",
+      "packTotal": 3,
+      "extras": 2,
+      "blurb": "Three Stilettos and a Legion Whisper radar plane. Nothing moves; then it is quiet.",
       "name": "Nadia 'Stiletto' Cole",
       "sizing": "fixed",
       "tags": [
@@ -2004,45 +2374,18 @@ window.CREW_PACKS = {
         "emp",
         "eco"
       ],
-      "startXp": 0.016,
+      "startXp": 0.128,
       "escorts": [
         {
-          "unitDef": "armmakr",
-          "count": 2
-        },
-        {
-          "unitDef": "armestor",
+          "unitDef": "legwhisper",
           "count": 1
         }
       ],
-      "packMetal": 2012,
-      "packEnergy": 156000,
-      "packCombined": 4241,
-      "packXpCombined": 2903
-    },
-    "marauder": {
-      "role": "band",
-      "unitDef": "armmar",
-      "hireTnb": 0,
-      "packTotal": 2,
-      "extras": 1,
-      "blurb": "Marauder pair. Fast amphibious raiders that arrive before the warning.",
-      "name": "Marlow & Wren",
-      "sizing": "fixed",
-      "tags": [
-        "skirmish",
-        "amphibious",
-        "raider"
-      ],
-      "startXp": 0.077,
-      "packMind": "pair",
-      "fieldName": "Marlow",
-      "partners": [
-        "Wren"
-      ],
-      "packMetal": 1940,
-      "packEnergy": 42000,
-      "packCombined": 2540
+      "packMetal": 1590,
+      "packEnergy": 123000,
+      "packCombined": 3347,
+      "packXpCombined": 2231,
+      "packMind": "solo"
     },
     "lunkhead": {
       "role": "band",
@@ -2050,7 +2393,7 @@ window.CREW_PACKS = {
       "hireTnb": 0,
       "packTotal": 1,
       "extras": 0,
-      "blurb": "One Lunkhead who has seen it all. He starts the sortie already knowing where it will hurt.",
+      "blurb": "One Lunkhead and two Legion Cardea shotgun hovers he is teaching the hard way.",
       "name": "Tobias 'Lunkhead' Ferrow",
       "sizing": "fixed",
       "tags": [
@@ -2060,9 +2403,16 @@ window.CREW_PACKS = {
       ],
       "startXp": 0.45,
       "startXpFixed": 0.45,
-      "packMetal": 1150,
-      "packEnergy": 23000,
-      "packCombined": 1479
+      "packMetal": 2250,
+      "packEnergy": 45000,
+      "packCombined": 2893,
+      "packMind": "solo",
+      "escorts": [
+        {
+          "unitDef": "legcar",
+          "count": 2
+        }
+      ]
     },
     "stronghold": {
       "role": "band",
@@ -2092,15 +2442,16 @@ window.CREW_PACKS = {
       "packMetal": 1785,
       "packEnergy": 47300,
       "packCombined": 2461,
-      "packXpCombined": 1640
+      "packXpCombined": 1640,
+      "packMind": "solo"
     },
     "possum": {
       "role": "band",
       "unitDef": "armmh",
       "hireTnb": 0,
-      "packTotal": 7,
-      "extras": 6,
-      "blurb": "Seven Possums, seven Seekers, three Sweepers. Cheap, fast, rocket-happy hovers with a roof.",
+      "packTotal": 1,
+      "extras": 0,
+      "blurb": "One Possum leading four Glaucus, five Salacia rocket hovers and two Alpheus. Cheap, fast, rocket-happy, with a Legion roof.",
       "name": "Pip 'Possum' Calloway",
       "sizing": "fixed",
       "tags": [
@@ -2108,20 +2459,25 @@ window.CREW_PACKS = {
         "hover",
         "swarm"
       ],
-      "startXp": 0.0,
+      "startXp": 0.127,
       "escorts": [
         {
-          "unitDef": "armsh",
-          "count": 7
+          "unitDef": "legsh",
+          "count": 4
         },
         {
-          "unitDef": "armah",
-          "count": 3
+          "unitDef": "legmh",
+          "count": 5
+        },
+        {
+          "unitDef": "legah",
+          "count": 2
         }
       ],
-      "packMetal": 2510,
-      "packEnergy": 43250,
-      "packCombined": 3128
+      "packMetal": 1785,
+      "packEnergy": 31900,
+      "packCombined": 2241,
+      "packMind": "solo"
     },
     "mason": {
       "role": "band",
@@ -2129,7 +2485,7 @@ window.CREW_PACKS = {
       "hireTnb": 0,
       "packTotal": 1,
       "extras": 0,
-      "blurb": "A Legion Construction Bot and a Construction Turret. She lays Legion-straight lines in country that has none.",
+      "blurb": "A Legion Construction Bot with two Sappers and a cart of walls: ten Dragon's Teeth and four Fortification Walls. The fort arrives before she does.",
       "name": "Livia 'Mason' Tarquin",
       "sizing": "fixed",
       "tags": [
@@ -2137,18 +2493,27 @@ window.CREW_PACKS = {
         "constructor",
         "legion"
       ],
-      "startXp": 0.434,
+      "startXp": 0.413,
       "escorts": [
         {
-          "unitDef": "legnanotc",
-          "count": 1
+          "unitDef": "legmlv",
+          "count": 2
+        },
+        {
+          "unitDef": "legdrag",
+          "count": 10
+        },
+        {
+          "unitDef": "legforti",
+          "count": 4
         }
       ],
-      "packMetal": 330,
-      "packEnergy": 4800,
-      "packCombined": 399,
+      "packMetal": 444,
+      "packEnergy": 5400,
+      "packCombined": 521,
       "buildsEco": true,
-      "baseSeeder": true
+      "baseSeeder": true,
+      "packMind": "solo"
     },
     "rookery": {
       "role": "band",
@@ -2156,7 +2521,7 @@ window.CREW_PACKS = {
       "hireTnb": 0,
       "packTotal": 3,
       "extras": 2,
-      "blurb": "Three Construction Aircraft and twelve Falcons. She builds the base where nobody can walk to, and the Falcons keep the sky over it.",
+      "blurb": "Three Armada Construction Aircraft under a mixed sky: four Falcons, two Cortex Valiants, two Legion Legionnaires and two Venators.",
       "name": "Wynn 'Rookery' Atterby",
       "sizing": "fixed",
       "tags": [
@@ -2165,19 +2530,32 @@ window.CREW_PACKS = {
         "air",
         "base_seeder"
       ],
-      "startXp": 0.296,
+      "startXp": 0.279,
       "escorts": [
         {
           "unitDef": "armfig",
-          "count": 12
+          "count": 4
+        },
+        {
+          "unitDef": "corveng",
+          "count": 2
+        },
+        {
+          "unitDef": "legionnaire",
+          "count": 2
+        },
+        {
+          "unitDef": "legvenator",
+          "count": 2
         }
       ],
       "buildsEco": true,
       "baseSeeder": true,
-      "packMetal": 1206,
-      "packEnergy": 43800,
-      "packCombined": 1832,
-      "packXpCombined": 1221
+      "packMetal": 1348,
+      "packEnergy": 45000,
+      "packCombined": 1991,
+      "packXpCombined": 1327,
+      "packMind": "swarm"
     },
     "dam": {
       "role": "band",
@@ -2199,26 +2577,34 @@ window.CREW_PACKS = {
       "baseSeeder": true,
       "packMetal": 600,
       "packEnergy": 12400,
-      "packCombined": 777
+      "packCombined": 777,
+      "packMind": "swarm"
     },
     "arc": {
       "role": "band",
       "unitDef": "armzeus",
       "hireTnb": 0,
-      "packTotal": 8,
-      "extras": 7,
-      "blurb": "Eight Welders. Lightning assault bots that weld a line shut from the inside.",
-      "name": "Corwin 'Arc' Vasse",
+      "packTotal": 1,
+      "extras": 0,
+      "blurb": "One Welder and a pile of six Whistler missile trucks. He keeps time; the Whistlers sing.",
+      "name": "Ambrose 'Choir' Halloran",
       "sizing": "fixed",
       "tags": [
-        "line",
-        "assault",
-        "lightning"
+        "shield",
+        "anti_air",
+        "choir"
       ],
-      "startXp": 0.0,
-      "packMetal": 2800,
-      "packEnergy": 48800,
-      "packCombined": 3497
+      "startXp": 0.247,
+      "packMetal": 1250,
+      "packEnergy": 18700,
+      "packCombined": 1517,
+      "packMind": "solo",
+      "escorts": [
+        {
+          "unitDef": "armsam",
+          "count": 6
+        }
+      ]
     },
     "mammoth": {
       "role": "band",
@@ -2237,7 +2623,8 @@ window.CREW_PACKS = {
       "startXp": 0.05,
       "packMetal": 2200,
       "packEnergy": 35000,
-      "packCombined": 2700
+      "packCombined": 2700,
+      "packMind": "solo"
     },
     "gladius": {
       "role": "band",
@@ -2256,15 +2643,16 @@ window.CREW_PACKS = {
       "startXp": 0.0,
       "packMetal": 2700,
       "packEnergy": 40800,
-      "packCombined": 3283
+      "packCombined": 3283,
+      "packMind": "swarm"
     },
     "triton": {
       "role": "band",
       "unitDef": "legfloat",
       "hireTnb": 0,
-      "packTotal": 4,
-      "extras": 3,
-      "blurb": "Four Tritons. Legion gauss hovers that come in over the water and hold the shoreline.",
+      "packTotal": 1,
+      "extras": 0,
+      "blurb": "One Triton and eight Crocodile hovertanks. The shore is the front.",
       "name": "Nerea 'Triton' Calder",
       "sizing": "fixed",
       "tags": [
@@ -2274,25 +2662,91 @@ window.CREW_PACKS = {
         "gauss"
       ],
       "startXp": 0.0,
-      "packMetal": 2600,
-      "packEnergy": 48000,
-      "packCombined": 3286
+      "packMetal": 2810,
+      "packEnergy": 31200,
+      "packCombined": 3256,
+      "packMind": "swarm",
+      "escorts": [
+        {
+          "unitDef": "armanac",
+          "count": 8
+        }
+      ]
+    },
+    "loom": {
+      "role": "band",
+      "unitDef": "armspid",
+      "hireTnb": 0,
+      "packTotal": 6,
+      "extras": 5,
+      "blurb": "Six Webbers and a rank of six Legion Ballistas. The Webbers pin it with EMP; the Ballistas finish it; the Webbers eat the wreck.",
+      "name": "Orla 'Loom' Vey",
+      "sizing": "fixed",
+      "tags": [
+        "line",
+        "emp",
+        "reclaim",
+        "web"
+      ],
+      "startXp": 0.0,
+      "packMind": "swarm",
+      "escorts": [
+        {
+          "unitDef": "legbal",
+          "count": 6
+        }
+      ],
+      "packMetal": 2460,
+      "packEnergy": 41520,
+      "packCombined": 3053
+    },
+    "hundred": {
+      "role": "band",
+      "unitDef": "legspcarrier",
+      "hireTnb": 0,
+      "packTotal": 1,
+      "extras": 0,
+      "blurb": "A Hecatoncheir drone carrier and two Cleavers on the ground. The hands pin it; the Cleavers finish it.",
+      "name": "Thessaly 'Hundred' Orne",
+      "sizing": "fixed",
+      "tags": [
+        "siege",
+        "carrier",
+        "drones",
+        "seaplane"
+      ],
+      "startXp": 0.285,
+      "packMind": "solo",
+      "escorts": [
+        {
+          "unitDef": "legamcluster",
+          "count": 2
+        }
+      ],
+      "packMetal": 1170,
+      "packEnergy": 16000,
+      "packCombined": 1399,
+      "packXpCombined": 1291
     }
   },
   "factories": {
     "wheelie_bay": {
-      "structureDef": "legvp",
+      "structureDef": null,
       "boundHero": "spoke",
       "product": "legscout",
-      "label": "Wheelie Bay",
-      "fiction": "Legion vehicle lab locked to Wheelies — Spoke's scout mint"
+      "label": "Wheelie Bay (hero is the bay)",
+      "fiction": "Legion vehicle lab locked to Wheelies — Spoke's scout mint",
+      "startMetal": 1000,
+      "repeatQueue": 4
     },
     "tick_stream_bay": {
-      "structureDef": "armlab",
+      "structureDef": null,
       "boundHero": "tick",
       "product": "armflea",
-      "label": "Tick Stream Bay",
-      "fiction": "Armada bot lab locked to fleas — live capture on field, hire-drop at LZ"
+      "label": "Tick Stream Bay (hero is the bay)",
+      "fiction": "Armada bot lab locked to fleas — live capture on field, hire-drop at LZ",
+      "startMetal": 1000,
+      "repeatQueue": 4
     },
     "twitch_kit": {
       "structureDef": null,
@@ -2306,7 +2760,9 @@ window.CREW_PACKS = {
       "boundHero": "noctua",
       "product": "legfig",
       "label": "Legion Drone Plant (hero is the bay)",
-      "fiction": "T1 drone bay — Noctua fighter/scout line; hero unitDef is legap"
+      "fiction": "T1 drone bay — Noctua fighter/scout line; hero unitDef is legap",
+      "startMetal": 1000,
+      "repeatQueue": 4
     }
   },
   "starterUnlocks": [
@@ -2345,14 +2801,14 @@ window.CREW_PACKS = {
       "halq",
       "quill",
       "anvil",
-      "tarn",
       "banisher",
       "charybdis",
       "shiva",
       "lunkhead",
       "arc",
       "mammoth",
-      "triton"
+      "triton",
+      "loom"
     ],
     "skirmish": [
       "verse",
@@ -2360,10 +2816,8 @@ window.CREW_PACKS = {
       "yeva",
       "auditor",
       "kit",
-      "ceil",
       "arrow",
       "hornet",
-      "marauder",
       "possum",
       "gladius"
     ],
@@ -2379,7 +2833,8 @@ window.CREW_PACKS = {
       "starlight",
       "tremor",
       "stiletto",
-      "stronghold"
+      "stronghold",
+      "hundred"
     ],
     "shield": [
       "kettle",
@@ -2471,7 +2926,6 @@ window.CREW_PACKS = {
     "kit",
     "vale",
     "nox",
-    "ceil",
     "lumen",
     "anvil",
     "volt"

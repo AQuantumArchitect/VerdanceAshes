@@ -36,7 +36,7 @@ def test_mask_has_his_own_decoy_that_raises_a_bot_lab():
 
 def test_a_legion_constructor_joins_the_cast():
     p = PACKS["heroes"]["mason"]
-    assert p["unitDef"] == "legck" and _esc("mason") == {"legnanotc": 1}
+    assert p["unitDef"] == "legck" and _esc("mason") == {"legmlv": 2, "legdrag": 10, "legforti": 4}   # walls and Sappers (2026-10-28)
     assert PACKS["chassis"]["legck"]["hasBuildPower"]
     codex = {h["heroId"]: h for h in json.loads((S / "hero_codex.json").read_text(encoding="utf-8"))["heroes"]}
     assert codex["mason"]["faction"] == "legion" and codex["mason"]["doctrine"] == "constructor"
@@ -62,10 +62,18 @@ def test_no_company_constructor_raises_a_t2_lab():
     assert "all_that_simmers" in src and "all that simmers" in src
 
 
-def test_the_scout_buildings_come_with_storage():
-    assert {"legestor": 1, "legmstor": 1}.items() <= _esc("spoke").items()
-    assert {"armestor": 1, "armmstor": 1}.items() <= _esc("tick").items()
-    assert {"legestor": 1, "legmstor": 1}.items() <= _esc("noctua").items()
+def test_the_scout_heroes_are_their_bays():
+    """Owner call 2026-10-28: the scout hero is the factory, lands with a metal storage and an extra
+    1k metal, and starts printing scouts on repeat; no starting scouts."""
+    for hid, bay, stor in (("spoke", "legvp", "legmstor"), ("tick", "armlab", "armmstor"), ("noctua", "legap", "legmstor")):
+        p = PACKS["heroes"][hid]
+        assert p["unitDef"] == bay and p["packTotal"] == 1 and _esc(hid) == {stor: 1} and p["canLead"] is False, hid
+        fab = PACKS["factories"][p["factory"]]
+        assert fab["structureDef"] is None and fab["startMetal"] == 1000 and fab["repeatQueue"] >= 1, hid
+    src = (MOD / "luarules/gadgets/include/campaign/crew_packs.lua").read_text(encoding="utf-8")
+    assert "CMD.REPEAT" in src and "VA_SCOUT_BONUS_METAL" in src and "fab.startMetal" in src
+    start = (MOD / "luarules/gadgets/include/campaign/start.lua").read_text(encoding="utf-8")
+    assert "VA_SCOUT_BONUS_METAL" in start and "VA_COMMERCE_APPLIED = true" in start
 
 
 def test_no_xp_unlocks_a_build():
@@ -90,12 +98,13 @@ def test_a_builder_seeds_a_base_build_power_is_not_enough():
 
 
 def test_the_six_packs_of_2026_10_28():
-    want = {"rookery": ("armca", 3, {"armfig": 12}), "dam": ("armbeaver", 4, {}), "arc": ("armzeus", 8, {}),
-            "mammoth": ("corsumo", 1, {}), "gladius": ("legaskirmtank", 6, {}), "triton": ("legfloat", 4, {})}
+    want = {"rookery": ("armca", 3, {"armfig": 4, "corveng": 2, "legionnaire": 2, "legvenator": 2}), "dam": ("armbeaver", 4, {}),
+            "arc": ("armzeus", 1, {"armsam": 6}), "mammoth": ("corsumo", 1, {}), "gladius": ("legaskirmtank", 6, {}),
+            "triton": ("legfloat", 1, {"armanac": 8})}   # as recast on 2026-10-28
     for h, (unit, n, esc) in want.items():
         p = PACKS["heroes"][h]
         assert p["unitDef"] == unit and p["packTotal"] == n and _esc(h) == esc, h
-    assert len(PACKS["heroes"]) == 64
+    assert len(PACKS["heroes"]) == 63   # 64, then the recast retired three and added two
     web = json.loads((S / "support_web.json").read_text(encoding="utf-8"))
     for h in want:
         ties = [e for e in web["edges"] if h in (e["a"], e["b"]) and e.get("authored")]

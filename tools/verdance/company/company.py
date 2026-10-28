@@ -20,6 +20,8 @@ DEFAULT_HOMES: Dict[str, List[str]] = {
     "mask": ["greenest_fields", "GF_SE_PLATEAU"],
     "gale": ["tabula", "T_C_SPILLWAY"],
     "mason": ["ancient_bastion", "AB_NW_TOR"],
+    "loom": ["tabula", "T_NE_CAUSEWAY"],
+    "hundred": ["tabula", "T_E_CAUSEWAY"],
     "rookery": ["koom_valley", "KV_NE_SPILLWAY"],
     "dam": ["the_rock_jungle", "TRJ_NE_SHALLOWS"],
     "arc": ["ancient_bastion", "AB_SE_HEIGHTS"],
@@ -34,12 +36,10 @@ DEFAULT_HOMES: Dict[str, List[str]] = {
     "shiva": ["koom_valley", "KV_W_OUTER_LANE"],
     "tremor": ["ancient_bastion", "AB_C_WALL"],
     "stiletto": ["the_rock_jungle", "TRJ_NE_RIM"],
-    "marauder": ["tabula", "T_E_CAUSEWAY"],
     "lunkhead": ["eye_of_horus", "EOH_C_INNER_GATE"],
     "stronghold": ["all_that_simmers", "ATS_NE_OUTER_PLATEAU"],
     "possum": ["tabula", "T_SE_RESERVE"],
     "phoenix": ["eye_of_horus", "EOH_NW_BASTION"],
-    "tarn": ["koom_valley", "KV_SW_SPILLWAY"],
     "scylla": ["the_rock_jungle", "TRJ_SW_SHALLOWS"],
     "tsunami": ["all_that_simmers", "ATS_NW_SHORE"],
     "thresh": ["all_that_simmers", "ATS_NE_PLATEAU"],
@@ -69,7 +69,6 @@ DEFAULT_HOMES: Dict[str, List[str]] = {
     "kit": ["the_rock_jungle", "TRJ_C_SPILLWAY"],
     "vale": ["ancient_bastion", "AB_NE_CRATERS"],
     "nox": ["greenest_fields", "GF_N_PLATEAU"],
-    "ceil": ["eye_of_horus", "EOH_SE_BASTION"],
     "lumen": ["greenest_fields", "GF_S_PLATEAU"],
     "anvil": ["greenest_fields", "GF_C_GATE"],
     "volt": ["koom_valley", "KV_W_LANE"],
@@ -96,6 +95,11 @@ WRECK_SEED_PROXY: Dict[str, str] = {
     "corfus": "corck",
     "corageo": "corck",
     "cormex": "corck",
+    # Building heroes met in the field (2026-10-28): the bays, the cloaked fusion, the Bulwark.
+    "armckfus": "armck",
+    "armlab": "armck",
+    "legvp": "legck",
+    "cordoom": "corck",
 }
 
 # Archetypes where wild field recruits are bonus picks (not hard fail contracts).

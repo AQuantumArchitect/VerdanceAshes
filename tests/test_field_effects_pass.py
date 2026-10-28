@@ -60,7 +60,7 @@ def test_field_effects_match_the_hero():
     f = {hid: row[1] for hid, row in _fields().items()}
     for hid in ("halq", "mira", "vale"):                # artillery reaches farther
         assert f[hid] == "range", hid
-    for hid in ("ceil", "gale", "yeva"):                # Roughnecks, Cutlasses, Whisper fire faster
+    for hid in ("gale", "yeva", "hundred"):             # Cutlasses, Whisper, the drone carrier fire faster
         assert f[hid] == "reload", hid
     for hid in ("spoke", "tick", "noctua", "veil", "volt", "rumor"):   # scouts see farther
         assert f[hid] == "vision", hid

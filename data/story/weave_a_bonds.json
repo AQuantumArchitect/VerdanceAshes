@@ -3,274 +3,883 @@
   "notes": "Thirteen pairs around the Starlight keeper, the Banisher monk, Arrow, and Hornet, tying the quiet heavy hitters and the low-flying farmers into the existing company.",
   "pairs": [
     {
-      "a": "starlight", "b": "kettle", "polarity": "attract",
-      "motifs": ["two who watch overhead", "beam and missile"],
+      "a": "starlight",
+      "b": "kettle",
+      "polarity": "attract",
+      "motifs": [
+        "two who watch overhead",
+        "beam and missile"
+      ],
       "talks": {
-        "C": {"title": "Night watch", "beats": [
-          ["narrator", "Dray lights the Starlight at dusk out of habit. Kettle is sitting under it with a thermos and a flak chart."],
-          ["kettle", "That beam is a lamp with opinions."],
-          ["starlight", "It was a lamp. I kept the habit and lost the ships."],
-          ["kettle", "Then we're in the same trade. Keeping the dark honest."]]},
-        "B": {"title": "Two shifts", "beats": [
-          ["narrator", "They split the night. Dray sweeps the ridge, Kettle sweeps the cloud deck, and neither wakes the other."],
-          ["starlight", "Anything up there?"],
-          ["kettle", "Three crows and a rumour. You?"],
-          ["starlight", "A fox. It's a better class of company than the rumour."]]},
-        "A": {"title": "The long sweep", "beats": [
-          ["narrator", "A raider came in under the cloud and ran straight into the beam, and the Archangel finished what the light began."],
-          ["kettle", "You held it still for me."],
-          ["starlight", "I held it still for forty years. Nobody ever thanked the ship for crashing elsewhere."],
-          ["kettle", "I'll say it for the ship."]]}
+        "C": {
+          "title": "Night watch",
+          "beats": [
+            [
+              "narrator",
+              "Dray lights the Starlight at dusk out of habit. Kettle is sitting under it with a thermos and a flak chart."
+            ],
+            [
+              "kettle",
+              "That beam is a lamp with opinions."
+            ],
+            [
+              "starlight",
+              "It was a lamp. I kept the habit and lost the ships."
+            ],
+            [
+              "kettle",
+              "Then we're in the same trade. Keeping the dark honest."
+            ]
+          ]
+        },
+        "B": {
+          "title": "Two shifts",
+          "beats": [
+            [
+              "narrator",
+              "They split the night. Dray sweeps the ridge, Kettle sweeps the cloud deck, and neither wakes the other."
+            ],
+            [
+              "starlight",
+              "Anything up there?"
+            ],
+            [
+              "kettle",
+              "Three crows and a rumour. You?"
+            ],
+            [
+              "starlight",
+              "A fox. It's a better class of company than the rumour."
+            ]
+          ]
+        },
+        "A": {
+          "title": "The long sweep",
+          "beats": [
+            [
+              "narrator",
+              "A raider came in under the cloud and ran straight into the beam, and the Archangel finished what the light began."
+            ],
+            [
+              "kettle",
+              "You held it still for me."
+            ],
+            [
+              "starlight",
+              "I held it still for forty years. Nobody ever thanked the ship for crashing elsewhere."
+            ],
+            [
+              "kettle",
+              "I'll say it for the ship."
+            ]
+          ]
+        }
       }
     },
     {
-      "a": "starlight", "b": "brakhov", "polarity": "rivalry",
-      "motifs": ["the lamp that arrives", "the furnace that walks"],
+      "a": "starlight",
+      "b": "brakhov",
+      "polarity": "rivalry",
+      "motifs": [
+        "the lamp that arrives",
+        "the furnace that walks"
+      ],
       "talks": {
-        "C": {"title": "Lamp and kiln", "beats": [
-          ["narrator", "The Kiln walks past the Starlight at the pace of a funeral. Dray turns the beam to follow him and thinks better of it."],
-          ["brakhov", "Pretty light. It warms nothing."],
-          ["starlight", "It was never meant to. It was meant to be seen from far away."],
-          ["brakhov", "I'd rather be felt from near."]]},
-        "B": {"title": "Slow against slow", "beats": [
-          ["narrator", "Both are plodders, and both resent being passed by anything with wheels."],
-          ["starlight", "I arrive in my own time."],
-          ["brakhov", "I arrive in yours. The turret you're aiming at has already stopped existing."],
-          ["starlight", "Then we'll agree on one thing. Nobody asked it to stay."]]},
-        "A": {"title": "Heat and clearance", "beats": [
-          ["narrator", "The beam pinned the bunker's gun crew. The Kiln walked in afterwards and had nothing left to argue with."],
-          ["brakhov", "You softened the door."],
-          ["starlight", "I lit the door. You are the one who went through."],
-          ["brakhov", "Keep your lamp. I'll keep my walk."]]}
+        "C": {
+          "title": "Lamp and kiln",
+          "beats": [
+            [
+              "narrator",
+              "The Kiln walks past the Starlight at the pace of a funeral. Dray turns the beam to follow him and thinks better of it."
+            ],
+            [
+              "brakhov",
+              "Pretty light. It warms nothing."
+            ],
+            [
+              "starlight",
+              "It was never meant to. It was meant to be seen from far away."
+            ],
+            [
+              "brakhov",
+              "I'd rather be felt from near."
+            ]
+          ]
+        },
+        "B": {
+          "title": "Slow against slow",
+          "beats": [
+            [
+              "narrator",
+              "Both are plodders, and both resent being passed by anything with wheels."
+            ],
+            [
+              "starlight",
+              "I arrive in my own time."
+            ],
+            [
+              "brakhov",
+              "I arrive in yours. The turret you're aiming at has already stopped existing."
+            ],
+            [
+              "starlight",
+              "Then we'll agree on one thing. Nobody asked it to stay."
+            ]
+          ]
+        },
+        "A": {
+          "title": "Heat and clearance",
+          "beats": [
+            [
+              "narrator",
+              "The beam pinned the bunker's gun crew. The Kiln walked in afterwards and had nothing left to argue with."
+            ],
+            [
+              "brakhov",
+              "You softened the door."
+            ],
+            [
+              "starlight",
+              "I lit the door. You are the one who went through."
+            ],
+            [
+              "brakhov",
+              "Keep your lamp. I'll keep my walk."
+            ]
+          ]
+        }
       }
     },
     {
-      "a": "starlight", "b": "warder", "polarity": "friction",
-      "motifs": ["a circle of ground", "reach of light against a turret ring"],
+      "a": "starlight",
+      "b": "warder",
+      "polarity": "friction",
+      "motifs": [
+        "a circle of ground",
+        "reach of light against a turret ring"
+      ],
       "talks": {
-        "C": {"title": "Whose circle", "beats": [
-          ["narrator", "Warder's chalk ring and the Starlight's sweep overlap by about a hundred paces of nothing."],
-          ["warder", "That ground is mine."],
-          ["starlight", "That ground is where the light lands."],
-          ["warder", "Light isn't a deed."]]},
-        "B": {"title": "Overlap", "beats": [
-          ["narrator", "A scout crossed into the overlap. Both of them fired, and the scout's apology reached no one."],
-          ["starlight", "Mine."],
-          ["warder", "My Thistles were already tracking it."],
-          ["starlight", "Then it died of too much supervision."]]},
-        "A": {"title": "Shared boundary", "beats": [
-          ["narrator", "Warder moved a marker stone ten paces. Dray didn't mention it, and swept a little wider to cover the gap."],
-          ["warder", "You're lighting my edge."],
-          ["starlight", "A circle needs something to be outside of."],
-          ["warder", "Fine. Visit. Don't stay."]]}
+        "C": {
+          "title": "Whose circle",
+          "beats": [
+            [
+              "narrator",
+              "Warder's chalk ring and the Starlight's sweep overlap by about a hundred paces of nothing."
+            ],
+            [
+              "warder",
+              "That ground is mine."
+            ],
+            [
+              "starlight",
+              "That ground is where the light lands."
+            ],
+            [
+              "warder",
+              "Light isn't a deed."
+            ]
+          ]
+        },
+        "B": {
+          "title": "Overlap",
+          "beats": [
+            [
+              "narrator",
+              "A scout crossed into the overlap. Both of them fired, and the scout's apology reached no one."
+            ],
+            [
+              "starlight",
+              "Mine."
+            ],
+            [
+              "warder",
+              "My Thistles were already tracking it."
+            ],
+            [
+              "starlight",
+              "Then it died of too much supervision."
+            ]
+          ]
+        },
+        "A": {
+          "title": "Shared boundary",
+          "beats": [
+            [
+              "narrator",
+              "Warder moved a marker stone ten paces. Dray didn't mention it, and swept a little wider to cover the gap."
+            ],
+            [
+              "warder",
+              "You're lighting my edge."
+            ],
+            [
+              "starlight",
+              "A circle needs something to be outside of."
+            ],
+            [
+              "warder",
+              "Fine. Visit. Don't stay."
+            ]
+          ]
+        }
       }
     },
     {
-      "a": "starlight", "b": "banisher", "polarity": "mirror",
-      "motifs": ["the beam and the volley", "waiting before the verse"],
+      "a": "starlight",
+      "b": "banisher",
+      "polarity": "mirror",
+      "motifs": [
+        "the beam and the volley",
+        "waiting before the verse"
+      ],
       "talks": {
-        "C": {"title": "The same hush", "beats": [
-          ["narrator", "Two heavy hitters sit on the same ridge for an hour. Neither has said a word and both consider it a good conversation."],
-          ["banisher", "You also wait."],
-          ["starlight", "Some things aren't ready until they're quiet."],
-          ["banisher", "Then we're ready together."]]},
-        "B": {"title": "Before the verse", "beats": [
-          ["narrator", "The Banishers are loaded. The Starlight is warming. Neither side will go first, out of courtesy."],
-          ["banisher", "The verse is mine to begin."],
-          ["starlight", "The light is mine to end."],
-          ["banisher", "A monastery would have called that a liturgy."]]},
-        "A": {"title": "Amen", "beats": [
-          ["narrator", "The volley fell, the beam swept after, and the ridge was left very still."],
-          ["banisher", "Nobody will speak of that."],
-          ["starlight", "I'll speak of it. In about thirty years, to a fox."],
-          ["banisher", "Then it will be told correctly."]]}
+        "C": {
+          "title": "The same hush",
+          "beats": [
+            [
+              "narrator",
+              "Two heavy hitters sit on the same ridge for an hour. Neither has said a word and both consider it a good conversation."
+            ],
+            [
+              "banisher",
+              "You also wait."
+            ],
+            [
+              "starlight",
+              "Some things aren't ready until they're quiet."
+            ],
+            [
+              "banisher",
+              "Then we're ready together."
+            ]
+          ]
+        },
+        "B": {
+          "title": "Before the verse",
+          "beats": [
+            [
+              "narrator",
+              "The Banishers are loaded. The Starlight is warming. Neither side will go first, out of courtesy."
+            ],
+            [
+              "banisher",
+              "The verse is mine to begin."
+            ],
+            [
+              "starlight",
+              "The light is mine to end."
+            ],
+            [
+              "banisher",
+              "A monastery would have called that a liturgy."
+            ]
+          ]
+        },
+        "A": {
+          "title": "Amen",
+          "beats": [
+            [
+              "narrator",
+              "The volley fell, the beam swept after, and the ridge was left very still."
+            ],
+            [
+              "banisher",
+              "Nobody will speak of that."
+            ],
+            [
+              "starlight",
+              "I'll speak of it. In about thirty years, to a fox."
+            ],
+            [
+              "banisher",
+              "Then it will be told correctly."
+            ]
+          ]
+        }
       }
     },
     {
-      "a": "banisher", "b": "lumen", "polarity": "friction",
-      "motifs": ["his sermon, her garden", "faith that lands and faith that grows"],
+      "a": "banisher",
+      "b": "lumen",
+      "polarity": "friction",
+      "motifs": [
+        "his sermon, her garden",
+        "faith that lands and faith that grows"
+      ],
       "talks": {
-        "C": {"title": "Two faiths", "beats": [
-          ["narrator", "Lumen tithes heat into the pad. Brother Ansel watches the Prudes bloom and says nothing, loudly."],
-          ["lumen", "You disapprove of gardens."],
-          ["banisher", "I disapprove of faith that needs watering."],
-          ["lumen", "Mine is geothermal. It waters itself."]]},
-        "B": {"title": "Harvest and verse", "beats": [
-          ["narrator", "Ansel's volley cleared a hillside. Lumen's garden had already planted a Pulsar on the crater's lip."],
-          ["lumen", "You leave room. I fill it."],
-          ["banisher", "I leave silence. You fill that, too."],
-          ["lumen", "It's a very efficient silence."]]},
-        "A": {"title": "Grace, both kinds", "beats": [
-          ["narrator", "The garden held the line until the Banishers found their range. Neither pretended afterwards to have won alone."],
-          ["banisher", "Your faith stayed where it stood."],
-          ["lumen", "Yours never stays anywhere. It only arrives."],
-          ["banisher", "I will not call it holy. I will say it was needed."]]}
+        "C": {
+          "title": "Two faiths",
+          "beats": [
+            [
+              "narrator",
+              "Lumen tithes heat into the pad. Brother Ansel watches the Prudes bloom and says nothing, loudly."
+            ],
+            [
+              "lumen",
+              "You disapprove of gardens."
+            ],
+            [
+              "banisher",
+              "I disapprove of faith that needs watering."
+            ],
+            [
+              "lumen",
+              "Mine is geothermal. It waters itself."
+            ]
+          ]
+        },
+        "B": {
+          "title": "Harvest and verse",
+          "beats": [
+            [
+              "narrator",
+              "Ansel's volley cleared a hillside. Lumen's garden had already planted a Pulsar on the crater's lip."
+            ],
+            [
+              "lumen",
+              "You leave room. I fill it."
+            ],
+            [
+              "banisher",
+              "I leave silence. You fill that, too."
+            ],
+            [
+              "lumen",
+              "It's a very efficient silence."
+            ]
+          ]
+        },
+        "A": {
+          "title": "Grace, both kinds",
+          "beats": [
+            [
+              "narrator",
+              "The garden held the line until the Banishers found their range. Neither pretended afterwards to have won alone."
+            ],
+            [
+              "banisher",
+              "Your faith stayed where it stood."
+            ],
+            [
+              "lumen",
+              "Yours never stays anywhere. It only arrives."
+            ],
+            [
+              "banisher",
+              "I will not call it holy. I will say it was needed."
+            ]
+          ]
+        }
       }
     },
     {
-      "a": "banisher", "b": "quill", "polarity": "tension",
-      "motifs": ["captain-minded", "the volley against the parade"],
+      "a": "banisher",
+      "b": "quill",
+      "polarity": "tension",
+      "motifs": [
+        "captain-minded",
+        "the volley against the parade"
+      ],
       "talks": {
-        "C": {"title": "Two captains", "beats": [
-          ["narrator", "Quill marches the Bulls past the Banishers at inspection. Ansel does not look up from his rosary."],
-          ["quill", "A captain faces the line."],
-          ["banisher", "A captain faces the target. The line learns by watching the target vanish."],
-          ["quill", "Parade works better."]]},
-        "B": {"title": "Order of fire", "beats": [
-          ["narrator", "Quill wants the Bulls forward before the volley. Ansel wants the volley before anyone moves."],
-          ["quill", "My order walks."],
-          ["banisher", "My order lands. Yours would walk into it."],
-          ["quill", "Then you go first. Once."]]},
-        "A": {"title": "Chain of command", "beats": [
-          ["narrator", "The battery fired and the Bulls advanced into the silence it left. The timing was exact, and neither of them admitted it was agreed."],
-          ["quill", "Do not mistake that for approval."],
-          ["banisher", "Never, Marshal. It was punctuality."]]}
+        "C": {
+          "title": "Two captains",
+          "beats": [
+            [
+              "narrator",
+              "Quill marches the Bulls past the Banishers at inspection. Ansel does not look up from his rosary."
+            ],
+            [
+              "quill",
+              "A captain faces the line."
+            ],
+            [
+              "banisher",
+              "A captain faces the target. The line learns by watching the target vanish."
+            ],
+            [
+              "quill",
+              "Parade works better."
+            ]
+          ]
+        },
+        "B": {
+          "title": "Order of fire",
+          "beats": [
+            [
+              "narrator",
+              "Quill wants the Bulls forward before the volley. Ansel wants the volley before anyone moves."
+            ],
+            [
+              "quill",
+              "My order walks."
+            ],
+            [
+              "banisher",
+              "My order lands. Yours would walk into it."
+            ],
+            [
+              "quill",
+              "Then you go first. Once."
+            ]
+          ]
+        },
+        "A": {
+          "title": "Chain of command",
+          "beats": [
+            [
+              "narrator",
+              "The battery fired and the Bulls advanced into the silence it left. The timing was exact, and neither of them admitted it was agreed."
+            ],
+            [
+              "quill",
+              "Do not mistake that for approval."
+            ],
+            [
+              "banisher",
+              "Never, Marshal. It was punctuality."
+            ]
+          ]
+        }
       }
     },
     {
-      "a": "banisher", "b": "tremor", "polarity": "mirror",
-      "motifs": ["silence before the shot", "coordinates before the shot"],
+      "a": "banisher",
+      "b": "tremor",
+      "polarity": "mirror",
+      "motifs": [
+        "silence before the shot",
+        "coordinates before the shot"
+      ],
       "talks": {
-        "C": {"title": "Before the shot", "beats": [
-          ["narrator", "Two heavy artillery heroes stand ten paces apart, both waiting. One is praying and one is waiting for a scout."],
-          ["tremor", "I need to be shown it first."],
-          ["banisher", "I need the quiet first."],
-          ["tremor", "So we both wait on something we can't order."]]},
-        "B": {"title": "Reading the map", "beats": [
-          ["narrator", "The Augur paints a target. Ansel bows his head. Lund checks the Rascals' report for the third time."],
-          ["tremor", "You shoot without seeing."],
-          ["banisher", "Only because someone else saw for me. You know the arrangement."],
-          ["tremor", "It's my arrangement too. I just keep it in writing."]]},
-        "A": {"title": "Signature and verse", "beats": [
-          ["narrator", "The Tremor rearranged the valley with her signature. The Banishers added the afterword."],
-          ["tremor", "A single flat plain."],
-          ["banisher", "A single quiet one."],
-          ["tremor", "Someone should tell the maps."]]}
+        "C": {
+          "title": "Before the shot",
+          "beats": [
+            [
+              "narrator",
+              "Two heavy artillery heroes stand ten paces apart, both waiting. One is praying and one is waiting for a scout."
+            ],
+            [
+              "tremor",
+              "I need to be shown it first."
+            ],
+            [
+              "banisher",
+              "I need the quiet first."
+            ],
+            [
+              "tremor",
+              "So we both wait on something we can't order."
+            ]
+          ]
+        },
+        "B": {
+          "title": "Reading the map",
+          "beats": [
+            [
+              "narrator",
+              "The Augur paints a target. Ansel bows his head. Lund checks the Rascals' report for the third time."
+            ],
+            [
+              "tremor",
+              "You shoot without seeing."
+            ],
+            [
+              "banisher",
+              "Only because someone else saw for me. You know the arrangement."
+            ],
+            [
+              "tremor",
+              "It's my arrangement too. I just keep it in writing."
+            ]
+          ]
+        },
+        "A": {
+          "title": "Signature and verse",
+          "beats": [
+            [
+              "narrator",
+              "The Tremor rearranged the valley with her signature. The Banishers added the afterword."
+            ],
+            [
+              "tremor",
+              "A single flat plain."
+            ],
+            [
+              "banisher",
+              "A single quiet one."
+            ],
+            [
+              "tremor",
+              "Someone should tell the maps."
+            ]
+          ]
+        }
       }
     },
     {
-      "a": "arrow", "b": "yeva", "polarity": "mirror",
-      "motifs": ["the list of those who walked away", "the shot that is a fact"],
+      "a": "arrow",
+      "b": "yeva",
+      "polarity": "mirror",
+      "motifs": [
+        "the list of those who walked away",
+        "the shot that is a fact"
+      ],
       "talks": {
-        "C": {"title": "Short lists", "beats": [
-          ["narrator", "Venn's list is pinned inside the Arrow hatch. Yeva's ghosts are somewhere out in the fog, leaving no list at all."],
-          ["arrow", "Everyone I've missed is on that paper."],
-          ["yeva", "Everyone I've missed was never there."],
-          ["arrow", "That's either a lie or a very good shot."]]},
-        "B": {"title": "Patience compared", "beats": [
-          ["narrator", "They lay up on the same ridge for six hours. At hour five, both of them noticed the same wolf."],
-          ["yeva", "You didn't shoot."],
-          ["arrow", "It wasn't on my list."],
-          ["yeva", "Mine either. We have a lot of standards."]]},
-        "A": {"title": "Fact and question", "beats": [
-          ["narrator", "The first Arrow shot asked. The second shot, from Yeva's lane, answered."],
-          ["arrow", "I asked."],
-          ["yeva", "I told. Shall we split the credit?"],
-          ["arrow", "I'll take the list. You can have the silence."]]}
+        "C": {
+          "title": "Short lists",
+          "beats": [
+            [
+              "narrator",
+              "Venn's list is pinned inside the Arrow hatch. Yeva's ghosts are somewhere out in the fog, leaving no list at all."
+            ],
+            [
+              "arrow",
+              "Everyone I've missed is on that paper."
+            ],
+            [
+              "yeva",
+              "Everyone I've missed was never there."
+            ],
+            [
+              "arrow",
+              "That's either a lie or a very good shot."
+            ]
+          ]
+        },
+        "B": {
+          "title": "Patience compared",
+          "beats": [
+            [
+              "narrator",
+              "They lay up on the same ridge for six hours. At hour five, both of them noticed the same wolf."
+            ],
+            [
+              "yeva",
+              "You didn't shoot."
+            ],
+            [
+              "arrow",
+              "It wasn't on my list."
+            ],
+            [
+              "yeva",
+              "Mine either. We have a lot of standards."
+            ]
+          ]
+        },
+        "A": {
+          "title": "Fact and question",
+          "beats": [
+            [
+              "narrator",
+              "The first Arrow shot asked. The second shot, from Yeva's lane, answered."
+            ],
+            [
+              "arrow",
+              "I asked."
+            ],
+            [
+              "yeva",
+              "I told. Shall we split the credit?"
+            ],
+            [
+              "arrow",
+              "I'll take the list. You can have the silence."
+            ]
+          ]
+        }
       }
     },
     {
-      "a": "arrow", "b": "verse", "polarity": "rivalry",
-      "motifs": ["never misses twice", "counting out loud"],
+      "a": "arrow",
+      "b": "verse",
+      "polarity": "rivalry",
+      "motifs": [
+        "never misses twice",
+        "counting out loud"
+      ],
       "talks": {
-        "C": {"title": "Out loud", "beats": [
-          ["narrator", "Verse counts her Javelins from twelve to one. Venn counts nothing, and has opinions about people who do."],
-          ["arrow", "You announce it."],
-          ["verse", "Each missile is a word. I say them all."],
-          ["arrow", "I only need two."]]},
-        "B": {"title": "Zero", "beats": [
-          ["narrator", "Verse reached zero. Something died. Venn wrote nothing down."],
-          ["verse", "Zero, again. You don't want to say it?"],
-          ["arrow", "I don't count the ones that don't walk away."],
-          ["verse", "That's the cruellest thing anyone's said about my arithmetic."]]},
-        "A": {"title": "Sums", "beats": [
-          ["narrator", "Verse's last missile and Venn's second arrow hit the same man. He had been on the list for two weeks."],
-          ["arrow", "Strike him out."],
-          ["verse", "Counting is my job. I'll strike him in the ledger and you can keep the paper."],
-          ["arrow", "Good. I'm not sure which of us was first."]]}
+        "C": {
+          "title": "Out loud",
+          "beats": [
+            [
+              "narrator",
+              "Verse counts her Javelins from twelve to one. Venn counts nothing, and has opinions about people who do."
+            ],
+            [
+              "arrow",
+              "You announce it."
+            ],
+            [
+              "verse",
+              "Each missile is a word. I say them all."
+            ],
+            [
+              "arrow",
+              "I only need two."
+            ]
+          ]
+        },
+        "B": {
+          "title": "Zero",
+          "beats": [
+            [
+              "narrator",
+              "Verse reached zero. Something died. Venn wrote nothing down."
+            ],
+            [
+              "verse",
+              "Zero, again. You don't want to say it?"
+            ],
+            [
+              "arrow",
+              "I don't count the ones that don't walk away."
+            ],
+            [
+              "verse",
+              "That's the cruellest thing anyone's said about my arithmetic."
+            ]
+          ]
+        },
+        "A": {
+          "title": "Sums",
+          "beats": [
+            [
+              "narrator",
+              "Verse's last missile and Venn's second arrow hit the same man. He had been on the list for two weeks."
+            ],
+            [
+              "arrow",
+              "Strike him out."
+            ],
+            [
+              "verse",
+              "Counting is my job. I'll strike him in the ledger and you can keep the paper."
+            ],
+            [
+              "arrow",
+              "Good. I'm not sure which of us was first."
+            ]
+          ]
+        }
       }
     },
     {
-      "a": "arrow", "b": "kit", "polarity": "friction",
-      "motifs": ["patience against fireworks", "one question, many answers"],
+      "a": "arrow",
+      "b": "kit",
+      "polarity": "friction",
+      "motifs": [
+        "patience against fireworks",
+        "one question, many answers"
+      ],
       "talks": {
-        "C": {"title": "No hurry", "beats": [
-          ["narrator", "Kit has already set fire to the target. Venn is still lining up the first shot."],
-          ["kit", "It's burning! You can relax."],
-          ["arrow", "It's burning in the wrong place."],
-          ["kit", "Then it's a very pretty wrong place."]]},
-        "B": {"title": "Wait for it", "beats": [
-          ["narrator", "Venn made Kit sit for forty minutes on the same ridge. Kit's Belchers did not ignite once."],
-          ["kit", "I think my hands are asleep."],
-          ["arrow", "That's the first thing you've held still."],
-          ["kit", "Is this what it's like inside your head? Dull?"]]},
-        "A": {"title": "Question and flame", "beats": [
-          ["narrator", "The first Arrow shot pinned the commander. Kit walked in and gave him something worth looking at."],
-          ["arrow", "You waited for the question."],
-          ["kit", "I waited for the question. I'm so proud I could burst."],
-          ["arrow", "Please don't. Not near me."]]}
+        "C": {
+          "title": "No hurry",
+          "beats": [
+            [
+              "narrator",
+              "Kit has already set fire to the target. Venn is still lining up the first shot."
+            ],
+            [
+              "kit",
+              "It's burning! You can relax."
+            ],
+            [
+              "arrow",
+              "It's burning in the wrong place."
+            ],
+            [
+              "kit",
+              "Then it's a very pretty wrong place."
+            ]
+          ]
+        },
+        "B": {
+          "title": "Wait for it",
+          "beats": [
+            [
+              "narrator",
+              "Venn made Kit sit for forty minutes on the same ridge. Kit's Belchers did not ignite once."
+            ],
+            [
+              "kit",
+              "I think my hands are asleep."
+            ],
+            [
+              "arrow",
+              "That's the first thing you've held still."
+            ],
+            [
+              "kit",
+              "Is this what it's like inside your head? Dull?"
+            ]
+          ]
+        },
+        "A": {
+          "title": "Question and flame",
+          "beats": [
+            [
+              "narrator",
+              "The first Arrow shot pinned the commander. Kit walked in and gave him something worth looking at."
+            ],
+            [
+              "arrow",
+              "You waited for the question."
+            ],
+            [
+              "kit",
+              "I waited for the question. I'm so proud I could burst."
+            ],
+            [
+              "arrow",
+              "Please don't. Not near me."
+            ]
+          ]
+        }
       }
     },
     {
-      "a": "hornet", "b": "ceil", "polarity": "rivalry",
-      "motifs": ["two gunship pilots", "farming against roughnecks on the roof"],
+      "a": "hornet",
+      "b": "gale",
+      "polarity": "mirror",
+      "motifs": [
+        "low over flat ground, low over water",
+        "both come back for the rest"
+      ],
       "talks": {
-        "C": {"title": "Low and high", "beats": [
-          ["narrator", "Marsh flies the hedgerows. Ceil flies the ridgeline. They meet at the pad and neither gets out first."],
-          ["hornet", "You fly like you're afraid of the ground."],
-          ["ceil", "You fly like you're a crop-duster."],
-          ["hornet", "I was. We call it farming."]]},
-        "B": {"title": "Harvest", "beats": [
-          ["narrator", "Hornets came in low, stung, climbed. Roughnecks held the roof. The enemy had nowhere to put a hand."],
-          ["ceil", "You left something."],
-          ["hornet", "I always leave the nest. Come back for it."],
-          ["ceil", "Fine. I'll eat what's left."]]},
-        "A": {"title": "Two sides of a field", "beats": [
-          ["narrator", "Two gunship wings worked the same valley from opposite ends and met in the middle with nothing standing between them."],
-          ["hornet", "That was a clean field."],
-          ["ceil", "You'd call it a pass. I'd call it a sweep."],
-          ["hornet", "We'll argue it in the mess."]]}
+        "C": {
+          "title": "Flat things",
+          "beats": [
+            [
+              "narrator",
+              "Marsh complains that the war is flat. Gale points out that, at least, hers is wet."
+            ],
+            [
+              "hornet",
+              "Nothing to hide behind."
+            ],
+            [
+              "gale",
+              "Nothing to land on, except water."
+            ],
+            [
+              "hornet",
+              "That's the opposite problem, and it's yours."
+            ]
+          ]
+        },
+        "B": {
+          "title": "Second pass",
+          "beats": [
+            [
+              "narrator",
+              "Both wings took the same road: sting on the first pass, wait for the dust, return on the second."
+            ],
+            [
+              "gale",
+              "You come back."
+            ],
+            [
+              "hornet",
+              "I always come back. You do too."
+            ],
+            [
+              "gale",
+              "Have to. It's rude to leave a nest half-eaten."
+            ]
+          ]
+        },
+        "A": {
+          "title": "Rain on the field",
+          "beats": [
+            [
+              "narrator",
+              "A storm flooded the flat ground Marsh hated. Her Hornets lifted off the fields while the Cutlasses settled on the new lake."
+            ],
+            [
+              "hornet",
+              "You made the war less flat."
+            ],
+            [
+              "gale",
+              "I made a pond. Come and see what it grows."
+            ]
+          ]
+        }
       }
     },
     {
-      "a": "hornet", "b": "gale", "polarity": "mirror",
-      "motifs": ["low over flat ground, low over water", "both come back for the rest"],
+      "a": "hornet",
+      "b": "volt",
+      "polarity": "attract",
+      "motifs": [
+        "a pilot who stings",
+        "a scout who sees by hurting"
+      ],
       "talks": {
-        "C": {"title": "Flat things", "beats": [
-          ["narrator", "Marsh complains that the war is flat. Gale points out that, at least, hers is wet."],
-          ["hornet", "Nothing to hide behind."],
-          ["gale", "Nothing to land on, except water."],
-          ["hornet", "That's the opposite problem, and it's yours."]]},
-        "B": {"title": "Second pass", "beats": [
-          ["narrator", "Both wings took the same road: sting on the first pass, wait for the dust, return on the second."],
-          ["gale", "You come back."],
-          ["hornet", "I always come back. You do too."],
-          ["gale", "Have to. It's rude to leave a nest half-eaten."]]},
-        "A": {"title": "Rain on the field", "beats": [
-          ["narrator", "A storm flooded the flat ground Marsh hated. Her Hornets lifted off the fields while the Cutlasses settled on the new lake."],
-          ["hornet", "You made the war less flat."],
-          ["gale", "I made a pond. Come and see what it grows."]]}
-      }
-    },
-    {
-      "a": "hornet", "b": "volt", "polarity": "attract",
-      "motifs": ["a pilot who stings", "a scout who sees by hurting"],
-      "talks": {
-        "C": {"title": "Scars on the map", "beats": [
-          ["narrator", "Volt's Jaguars have burned a line across the ridge. Marsh flies along it the way you'd follow a furrow."],
-          ["hornet", "Neat rows."],
-          ["volt", "That's a scouting report."],
-          ["hornet", "That's a plough line. Thank you."]]},
-        "B": {"title": "Stung and scarred", "beats": [
-          ["narrator", "Volt lights a column. Marsh dives on the burning end. Neither asked for the other's permission."],
-          ["volt", "You came in the moment I lit it."],
-          ["hornet", "You made it easy to find the corner of the field."],
-          ["volt", "I'm not used to being useful and fast."]]},
-        "A": {"title": "Eyes and sting", "beats": [
-          ["narrator", "The Jaguars painted the target and the Hornets did the rest. The enemy regrouped around nothing."],
-          ["volt", "Sight, then wound."],
-          ["hornet", "Wound, then harvest."],
-          ["volt", "I'll take the trade."]]}
+        "C": {
+          "title": "Scars on the map",
+          "beats": [
+            [
+              "narrator",
+              "Volt's Jaguars have burned a line across the ridge. Marsh flies along it the way you'd follow a furrow."
+            ],
+            [
+              "hornet",
+              "Neat rows."
+            ],
+            [
+              "volt",
+              "That's a scouting report."
+            ],
+            [
+              "hornet",
+              "That's a plough line. Thank you."
+            ]
+          ]
+        },
+        "B": {
+          "title": "Stung and scarred",
+          "beats": [
+            [
+              "narrator",
+              "Volt lights a column. Marsh dives on the burning end. Neither asked for the other's permission."
+            ],
+            [
+              "volt",
+              "You came in the moment I lit it."
+            ],
+            [
+              "hornet",
+              "You made it easy to find the corner of the field."
+            ],
+            [
+              "volt",
+              "I'm not used to being useful and fast."
+            ]
+          ]
+        },
+        "A": {
+          "title": "Eyes and sting",
+          "beats": [
+            [
+              "narrator",
+              "The Jaguars painted the target and the Hornets did the rest. The enemy regrouped around nothing."
+            ],
+            [
+              "volt",
+              "Sight, then wound."
+            ],
+            [
+              "hornet",
+              "Wound, then harvest."
+            ],
+            [
+              "volt",
+              "I'll take the trade."
+            ]
+          ]
+        }
       }
     }
   ]

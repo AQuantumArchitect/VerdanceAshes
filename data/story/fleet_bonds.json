@@ -3,80 +3,205 @@
   "notes": "The second wave of new heroes (2026-10-26): Phoenix's bomber pair, Tarn's Salamanders, Scylla the battleship, Tsunami's seaplane wing. Merged by tools/author_bonds_v1.py.",
   "pairs": [
     {
-      "a": "phoenix", "b": "thresh", "polarity": "rivalry",
-      "motifs": ["two bombers, one sky", "who flew home"],
+      "a": "phoenix",
+      "b": "thresh",
+      "polarity": "rivalry",
+      "motifs": [
+        "two bombers, one sky",
+        "who flew home"
+      ],
       "talks": {
-        "C": {"title": "Count the passes", "beats": [
-          ["narrator", "Phoenix chalks a tally on her fuselage. Thresh has never kept one."],
-          ["phoenix", "Third pass. Fourth is mine."],
-          ["thresh", "I never look at what I hit."],
-          ["phoenix", "I never look at what hit me. We're nearly the same."]]},
-        "B": {"title": "Who landed", "beats": [
-          ["narrator", "Both wings came home from the same raid. Phoenix's had smoke on them."],
-          ["thresh", "You were hit."],
-          ["phoenix", "Three times. That's a quiet day."],
-          ["thresh", "Then you should have the better seat."]]},
-        "A": {"title": "Fourth pass", "beats": [
-          ["narrator", "Thresh dropped first and cleared the air. Phoenix came back through it with the fire still on her."],
-          ["phoenix", "You made me a road."],
-          ["thresh", "You made it burn. I think that's a partnership."]]}
+        "C": {
+          "title": "Count the passes",
+          "beats": [
+            [
+              "narrator",
+              "Phoenix chalks a tally on her fuselage. Thresh has never kept one."
+            ],
+            [
+              "phoenix",
+              "Third pass. Fourth is mine."
+            ],
+            [
+              "thresh",
+              "I never look at what I hit."
+            ],
+            [
+              "phoenix",
+              "I never look at what hit me. We're nearly the same."
+            ]
+          ]
+        },
+        "B": {
+          "title": "Who landed",
+          "beats": [
+            [
+              "narrator",
+              "Both wings came home from the same raid. Phoenix's had smoke on them."
+            ],
+            [
+              "thresh",
+              "You were hit."
+            ],
+            [
+              "phoenix",
+              "Three times. That's a quiet day."
+            ],
+            [
+              "thresh",
+              "Then you should have the better seat."
+            ]
+          ]
+        },
+        "A": {
+          "title": "Fourth pass",
+          "beats": [
+            [
+              "narrator",
+              "Thresh dropped first and cleared the air. Phoenix came back through it with the fire still on her."
+            ],
+            [
+              "phoenix",
+              "You made me a road."
+            ],
+            [
+              "thresh",
+              "You made it burn. I think that's a partnership."
+            ]
+          ]
+        }
       }
     },
     {
-      "a": "tarn", "b": "odessa", "polarity": "attract",
-      "motifs": ["fords are shortcuts", "wet boots, dry humour"],
+      "a": "scylla",
+      "b": "halq",
+      "polarity": "mirror",
+      "motifs": [
+        "the long gun and the longer gun",
+        "range written on the water"
+      ],
       "talks": {
-        "C": {"title": "Same river", "beats": [
-          ["narrator", "Tarn's Salamanders and Odessa's amphibians share a ford. Neither gives way, and neither minds."],
-          ["tarn", "The line goes round the lake."],
-          ["odessa", "The line goes through it."],
-          ["tarn", "Then we should talk."]]},
-        "B": {"title": "Wet company", "beats": [
-          ["narrator", "They cross the flood in formation, one pack on each side of the same current."],
-          ["odessa", "Everyone else stopped at the bank."],
-          ["tarn", "Everyone else has a map. We have a bank to leave."]]},
-        "A": {"title": "The far shore", "beats": [
-          ["narrator", "Both packs surfaced under the enemy line at once. The line had been looking the other way."],
-          ["tarn", "Out of the river."],
-          ["odessa", "Already firing. I like your company."]]}
+        "C": {
+          "title": "Reach",
+          "beats": [
+            [
+              "narrator",
+              "Voss measures her broadside against Halq's arc on a napkin. They disagree by one hill."
+            ],
+            [
+              "scylla",
+              "My range comes with a waterline."
+            ],
+            [
+              "halq",
+              "Mine comes with coordinates."
+            ],
+            [
+              "scylla",
+              "Then you owe me a lake."
+            ]
+          ]
+        },
+        "B": {
+          "title": "Salvo and arc",
+          "beats": [
+            [
+              "narrator",
+              "A battleship and a battery engaged the same target from opposite sides of a river."
+            ],
+            [
+              "halq",
+              "You were early."
+            ],
+            [
+              "scylla",
+              "I was on time. You were shy."
+            ]
+          ]
+        },
+        "A": {
+          "title": "Crossfire",
+          "beats": [
+            [
+              "narrator",
+              "The target had nowhere to stand. It tried anyway."
+            ],
+            [
+              "scylla",
+              "The shore was never going to be safe."
+            ],
+            [
+              "halq",
+              "Neither was the lake. Nicely done."
+            ]
+          ]
+        }
       }
     },
     {
-      "a": "scylla", "b": "halq", "polarity": "mirror",
-      "motifs": ["the long gun and the longer gun", "range written on the water"],
+      "a": "tsunami",
+      "b": "gale",
+      "polarity": "rivalry",
+      "motifs": [
+        "two wings that land on water",
+        "scouts first, guns first"
+      ],
       "talks": {
-        "C": {"title": "Reach", "beats": [
-          ["narrator", "Voss measures her broadside against Halq's arc on a napkin. They disagree by one hill."],
-          ["scylla", "My range comes with a waterline."],
-          ["halq", "Mine comes with coordinates."],
-          ["scylla", "Then you owe me a lake."]]},
-        "B": {"title": "Salvo and arc", "beats": [
-          ["narrator", "A battleship and a battery engaged the same target from opposite sides of a river."],
-          ["halq", "You were early."],
-          ["scylla", "I was on time. You were shy."]]},
-        "A": {"title": "Crossfire", "beats": [
-          ["narrator", "The target had nowhere to stand. It tried anyway."],
-          ["scylla", "The shore was never going to be safe."],
-          ["halq", "Neither was the lake. Nicely done."]]}
-      }
-    },
-    {
-      "a": "tsunami", "b": "gale", "polarity": "rivalry",
-      "motifs": ["two wings that land on water", "scouts first, guns first"],
-      "talks": {
-        "C": {"title": "Who parks where", "beats": [
-          ["narrator", "Harrow's seaplanes and Gale's Cutlasses settle on the same pond, nose to tail."],
-          ["tsunami", "We look first."],
-          ["gale", "We shoot first."],
-          ["tsunami", "That is the whole argument."]]},
-        "B": {"title": "Horizon", "beats": [
-          ["narrator", "A Horizon found a column in the fog. Gale's wing was already turning before the report."],
-          ["gale", "Your eyes, my guns."],
-          ["tsunami", "My bombs. Your guns can have the leftovers."]]},
-        "A": {"title": "One pond", "beats": [
-          ["narrator", "Two wings took off together from the same flooded basin and landed on the same one."],
-          ["tsunami", "No arguments."],
-          ["gale", "Not until the next pond."]]}
+        "C": {
+          "title": "Who parks where",
+          "beats": [
+            [
+              "narrator",
+              "Harrow's seaplanes and Gale's Cutlasses settle on the same pond, nose to tail."
+            ],
+            [
+              "tsunami",
+              "We look first."
+            ],
+            [
+              "gale",
+              "We shoot first."
+            ],
+            [
+              "tsunami",
+              "That is the whole argument."
+            ]
+          ]
+        },
+        "B": {
+          "title": "Horizon",
+          "beats": [
+            [
+              "narrator",
+              "A Horizon found a column in the fog. Gale's wing was already turning before the report."
+            ],
+            [
+              "gale",
+              "Your eyes, my guns."
+            ],
+            [
+              "tsunami",
+              "My bombs. Your guns can have the leftovers."
+            ]
+          ]
+        },
+        "A": {
+          "title": "One pond",
+          "beats": [
+            [
+              "narrator",
+              "Two wings took off together from the same flooded basin and landed on the same one."
+            ],
+            [
+              "tsunami",
+              "No arguments."
+            ],
+            [
+              "gale",
+              "Not until the next pond."
+            ]
+          ]
+        }
       }
     }
   ]

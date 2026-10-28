@@ -76,6 +76,9 @@ M.TAGS = {
   old_mother = { label = "Old Mother", hp = 1.15, fiction = "She has taken worse from her own side." },
   crowd_roar = { label = "Crowd Roar", reload = 0.85, fiction = "The crowd counts the shots, and she likes them counting fast." },
   low_tide = { label = "Low Tide", speed = 1.12, fiction = "In with the tide, out before it turns." },
+  web_line = { label = "Web Line", range = 1.12, fiction = "The net reaches further than it looks." },
+  hundred_hands = { label = "Hundred Hands", reload = 0.85, fiction = "The drones relaunch before the last ones land." },
+  choir = { label = "Choir", range = 1.12, fiction = "Every truck fires on the same downbeat." },
   -- build power
   field_surgeon = { label = "Field Surgeon", build = 1.20, fiction = "Nobody stays dead near an honest chassis." },
   combat_engineer = { label = "Combat Engineer", build = 1.20, fiction = "Builds trouble in equal measure." },
@@ -97,8 +100,7 @@ M.HERO_DEFAULTS = {
   mask = { "believer" }, anvil = { "shell_game" },
   halq = { "long_arc" }, mira = { "sparkle_battery" }, vale = { "fog_invoice" },
   brakhov = { "kiln_doctrine" }, warder = { "area_control" }, auditor = { "ledger_reach" },
-  kettle = { "sky_saint" },
-  ceil = { "roof_brawl" }, gale = { "rotor_ducks" }, yeva = { "ghost_shot" },
+  kettle = { "sky_saint" }, gale = { "rotor_ducks" }, yeva = { "ghost_shot" },
   verse = { "razorback_twins" }, stride = { "glass_cadence" }, kit = { "fuse" },
   fatboy = { "house_call" }, bro = { "wrecking_ball" }, thresh = { "hailstorm" },
   tick = { "tick_eyes" }, spoke = { "wheelie_eyes" }, noctua = { "night_bay" },
@@ -106,10 +108,10 @@ M.HERO_DEFAULTS = {
   ketha = { "field_surgeon" }, twitch = { "combat_engineer" }, consul = { "field_office" },
   solarium = { "eco_lab" }, lumen = { "geo_tithe" }, infestor = { "hive_growth" },
   commando = { "trapper_pace" }, hearth = { "pad_heart" },
-  phoenix = { "rises_again" }, tarn = { "wake_rush" }, scylla = { "broadside" }, tsunami = { "tide_table" },
-  starlight = { "long_light" }, banisher = { "scare_radius" }, arrow = { "venom_tempo" }, hornet = { "sting_tempo" }, charybdis = { "undertow" }, shiva = { "grunt_wall" }, tremor = { "tremor_table" }, stiletto = { "static_bloom" }, marauder = { "river_rush" }, lunkhead = { "old_scars" }, stronghold = { "hot_insertion" }, possum = { "play_dead" },
+  phoenix = { "rises_again" }, scylla = { "broadside" }, tsunami = { "tide_table" },
+  starlight = { "long_light" }, banisher = { "scare_radius" }, arrow = { "venom_tempo" }, hornet = { "sting_tempo" }, charybdis = { "undertow" }, shiva = { "grunt_wall" }, tremor = { "tremor_table" }, stiletto = { "static_bloom" }, lunkhead = { "old_scars" }, stronghold = { "hot_insertion" }, possum = { "play_dead" },
   mason = { "legion_line" },
-  rookery = { "high_nest" }, dam = { "dam_works" }, arc = { "arc_chain" }, mammoth = { "old_mother" }, gladius = { "crowd_roar" }, triton = { "low_tide" },
+  rookery = { "high_nest" }, dam = { "dam_works" }, arc = { "choir" }, mammoth = { "old_mother" }, gladius = { "crowd_roar" }, triton = { "low_tide" }, loom = { "web_line" }, hundred = { "hundred_hands" },
 }
 
 -- Rare dual-effect exceptions. Primary still comes from HERO_DEFAULTS;

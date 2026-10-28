@@ -22,22 +22,22 @@ TAGS = (ROOT / "mod/VerdanceAshes.sdd/luarules/gadgets/include/va_hero_tags.lua"
 CO = ROOT / "tools/verdance/company/company.py"
 WANT = {  # hero: (unit, packTotal, escorts)
     "phoenix": ("legphoenix", 2, {}),
-    "tarn": ("corsala", 5, {}),
     "scylla": ("leganavybattleship", 1, {}),
-    "tsunami": ("armsb", 4, {"armsehak": 3}),
-    # the kit export (2026-10-26)
-    "starlight": ("armmanni", 1, {}),
+    "tsunami": ("armsb", 1, {"legspbomber": 2, "armpeep": 5}),
+    # the kit export (2026-10-26), as recast on 2026-10-28
+    "starlight": ("armmanni", 1, {"armfast": 4}),
     "banisher": ("corban", 3, {}),
-    "arrow": ("corparrow", 3, {}),
+    "arrow": ("corparrow", 1, {"corsala": 6}),
     "hornet": ("armblade", 2, {}),
     "charybdis": ("legehovertank", 1, {}),
-    "shiva": ("corshiva", 1, {"corak": 8}),
-    "tremor": ("cortrem", 1, {"corfav": 2, "corvoyr": 1}),
-    "stiletto": ("armstil", 4, {"armmakr": 2, "armestor": 1}),
-    "marauder": ("armmar", 2, {}),
-    "lunkhead": ("armlun", 1, {}),
+    "shiva": ("corshiva", 1, {}),
+    "tremor": ("cortrem", 1, {"corspec": 1, "corfav": 5}),
+    "stiletto": ("armstil", 3, {"legwhisper": 1}),
+    "lunkhead": ("armlun", 1, {"legcar": 2}),
     "stronghold": ("legstronghold", 1, {"armhawk": 4, "armkam": 5}),
-    "possum": ("armmh", 7, {"armsh": 7, "armah": 3}),
+    "possum": ("armmh", 1, {"legsh": 4, "legmh": 5, "legah": 2}),
+    "loom": ("armspid", 6, {"legbal": 6}),
+    "hundred": ("legspcarrier", 1, {"legamcluster": 2}),
 }
 
 
@@ -77,18 +77,19 @@ def test_wasp_is_a_dear_cortex_merc_and_pawns_are_gone():
 def test_the_new_pairs_are_authored():
     web = _j(S / "support_web.json")
     ids = {frozenset((e["a"], e["b"])) for e in web["edges"]}
-    for a, b in (("phoenix", "thresh"), ("tarn", "odessa"), ("scylla", "halq"), ("tsunami", "gale")):
+    for a, b in (("phoenix", "thresh"), ("hundred", "noctua"), ("scylla", "halq"), ("tsunami", "gale")):
         assert frozenset((a, b)) in ids
 
 
 def test_kit_export_particulars():
     h = PACKS["heroes"]
     assert h["lunkhead"]["startXpFixed"] == 0.45 and h["lunkhead"]["startXp"] == 0.45   # the showcase high-XP hero
-    assert h["marauder"]["packMind"] == "pair" and h["marauder"]["partners"] == ["Wren"]
-    mira = {e["unitDef"]: e["count"] for e in h["mira"]["escorts"]}
-    assert "armmart" not in mira and mira["leghrk"] == 1                                  # Mousers out, Thanatos in
-    block = re.search(r"\n  mira = \{\n(.*?)\n  \},", LUA, re.S).group(1)
-    assert "armmart" not in block and 'unitDef = "leghrk"' in block
+    assert h["hornet"]["packMind"] == "pair" and h["hornet"]["partners"] == ["Saffi"]       # the Marsh sisters
+    kit = {e["unitDef"]: e["count"] for e in h["kit"]["escorts"]}
+    assert kit["leghrk"] == 1 and kit["legbar"] == 1                                    # Kit took the napalm park
+    assert h["mira"]["unitDef"] == "armmart" and h["mira"]["packTotal"] == 5            # Mira: a Mauser firing line
+    block = re.search(r"\n  kit = \{\n(.*?)\n  \},", LUA, re.S).group(1)
+    assert 'unitDef = "leghrk"' in block
 
 
 def test_every_hero_has_authored_ties_and_a_node():

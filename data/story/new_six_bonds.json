@@ -2,172 +2,633 @@
   "schemaVersion": "verdance-authored-bonds/1.0",
   "notes": "The six packs of 2026-10-28 (Rookery's air constructors, the Damwrights' Beavers, Arc's Welders, Old Mother Brandt's Mammoth, Gladius's Gladiators, Triton's hovers), woven into the roster. Merged by tools/author_bonds_v1.py.",
   "pairs": [
-    {"a": "rookery", "b": "noctua", "polarity": "attract", "motifs": ["two who build in the air", "flight paths and landing shelves"],
-     "talks": {"C": {"title": "Holding pattern", "beats": [
-       ["narrator", "Noctua's fighters and Atterby's Falcons share a sky for the first time. Nobody collides, which surprises both of them."],
-       ["noctua", "You fly them like they're coming home."],
-       ["rookery", "They are. I build the home first, then I teach them where it is."],
-       ["noctua", "I dream the routes. You pour the runway at the end of them. That's a good night's work."]]}}},
-    {"a": "rookery", "b": "solarium", "polarity": "bond", "motifs": ["a garden from above", "spreadsheets on the cliff shelf"],
-     "talks": {"C": {"title": "Panels on the ridge", "beats": [
-       ["narrator", "Atterby drops solar collectors on a ridge nobody can reach. Solarium is already working out the yield."],
-       ["solarium", "South-facing, no shade, nobody to steal the cables. You picked that for the light."],
-       ["rookery", "I picked it because it's hard to get to. The light was a bonus."],
-       ["solarium", "Then we want the same ground for different reasons. That's the best kind of partnership."]]}}},
-    {"a": "rookery", "b": "mason", "polarity": "rivalry", "motifs": ["straight walls against high nests", "the ground is a suggestion"],
-     "talks": {"C": {"title": "Foundations", "beats": [
-       ["narrator", "Tarquin paces out a fort on the flat. Atterby is building one on the crag above it."],
-       ["mason", "You can't wall a cliff."],
-       ["rookery", "I don't have to. The cliff is the wall."],
-       ["mason", "And when they bring aircraft?"],
-       ["rookery", "Then they'll meet mine first. Yours will hear about it later."]]}}},
-    {"a": "rookery", "b": "thresh", "polarity": "tension", "motifs": ["nests and the weather that comes from above", "who owns the high air"],
-     "talks": {"C": {"title": "Weather report", "beats": [
-       ["narrator", "Thresh's Hailstorm passes over Atterby's shelf base on the way out. The Falcons scramble before anyone has said a word."],
-       ["thresh", "Easy. I'm on your side this week."],
-       ["rookery", "My birds don't read the contract. They read the bomb bay."],
-       ["thresh", "Then keep them on a short leash. Weather doesn't apologise."]]}}},
-    {"a": "dam", "b": "odessa", "polarity": "attract", "motifs": ["fords are doors, and somebody has to build the frame", "the works beside the crossing"],
-     "talks": {"C": {"title": "The far bank", "beats": [
-       ["narrator", "Odessa holds a ford. On the far bank, four Beavers are already laying a metal extractor."],
-       ["odessa", "I take the crossing, you take the bank?"],
-       ["dam", "We take the bank, the bed, and the next bank. You keep the door shut while we pour."],
-       ["odessa", "Deal. Don't build a lock on my door."],
-       ["dam", "Only a small one."]]}}},
-    {"a": "dam", "b": "consul", "polarity": "rivalry", "motifs": ["permits for a river", "mud against paperwork"],
-     "talks": {"C": {"title": "Planning permission", "beats": [
-       ["narrator", "Weiss arrives with a survey of the river. Brisk is standing in it."],
-       ["consul", "I need to log where you're building."],
-       ["dam", "Under the water, mostly. You're welcome to come and measure."],
-       ["consul", "There is a form for submerged works."],
-       ["dam", "Then it'll be the first form that gets wet."]]}}},
-    {"a": "dam", "b": "tarn", "polarity": "tension", "motifs": ["the river they both claim", "builders and raiders in the same current"],
-     "talks": {"C": {"title": "Same river", "beats": [
-       ["narrator", "Tarn's Salamanders come up through the shallows straight into Brisk's half-built dam."],
-       ["tarn", "You've blocked my road."],
-       ["dam", "I've built on your road. There's a difference, and it's the difference between us."],
-       ["tarn", "Rivers move, Brisk."],
-       ["dam", "Not once we're done with them."]]}}},
-    {"a": "dam", "b": "rookery", "polarity": "sibling", "motifs": ["the base from both ends", "the riverbed and the cliff shelf"],
-     "talks": {"C": {"title": "Top and bottom", "beats": [
-       ["narrator", "The company's two newest builders compare notes over a map with water at the bottom and cliffs at the top."],
-       ["rookery", "You take everything below the waterline."],
-       ["dam", "You take everything above the treeline."],
-       ["rookery", "And the middle?"],
-       ["dam", "The middle is where everyone else fights. We just hand them the ground."]]}}},
-    {"a": "arc", "b": "volt", "polarity": "rivalry", "motifs": ["two kinds of lightning", "the wound you see and the wound you weld"],
-     "talks": {"C": {"title": "Static", "beats": [
-       ["narrator", "Volt's spotters light up a position. Vasse's Welders are already walking into it."],
-       ["volt", "I marked that for the artillery."],
-       ["arc", "Artillery's slow. I'm here."],
-       ["volt", "Sight is a wound you give them. You just make it bigger."],
-       ["arc", "Bigger is the point."]]}}},
-    {"a": "arc", "b": "twitch", "polarity": "mentor", "motifs": ["the welder's apprentice", "a grin and a torch"],
-     "talks": {"C": {"title": "Seams", "beats": [
-       ["narrator", "Sallow is patching a lab with his welder, badly. Vasse watches for a whole minute before he speaks."],
-       ["arc", "You're running the bead too hot."],
-       ["twitch", "Hot's how I like it."],
-       ["arc", "Hot's how it fails. Slow your hand. Let the metal ask."],
-       ["twitch", "Huh. It holds. Don't tell anyone you were nice to me."]]}}},
-    {"a": "arc", "b": "anvil", "polarity": "attract", "motifs": ["the hammer and the torch", "weight and heat"],
-     "talks": {"C": {"title": "Forge", "beats": [
-       ["narrator", "Anvil & Mire hold the line. Eight Welders pass through it and set the far side on fire."],
-       ["anvil", "You walk through my wall."],
-       ["arc", "I walk out of your wall. You're the anvil; I'm what hits the other thing."],
-       ["anvil", "Then hit it hard. I'll still be here."]]}}},
-    {"a": "arc", "b": "cauter", "polarity": "friction", "motifs": ["two kinds of burn", "the riot and the shipyard"],
-     "talks": {"C": {"title": "Punctuation", "beats": [
-       ["narrator", "Cauter's riot and Vasse's Welders reach the same breach from opposite ends."],
-       ["cauter", "This is my sentence. You're interrupting it."],
-       ["arc", "I don't write sentences. I join things and unjoin things."],
-       ["cauter", "Then unjoin yourself from my breach."]]}}},
-    {"a": "mammoth", "b": "halbard", "polarity": "mentor", "motifs": ["the old Cortex guard", "patience is the heaviest weapon"],
-     "talks": {"C": {"title": "Sit", "beats": [
-       ["narrator", "Varn is pacing the line, hungry for the push. Brandt has not moved the Mammoth all hour."],
-       ["halbard", "We should go. Now."],
-       ["mammoth", "Sit down, dear. They're coming to us. They always do."],
-       ["halbard", "And if they don't?"],
-       ["mammoth", "Then you'll have had a nice rest, and you can go hungry later."]]}}},
-    {"a": "mammoth", "b": "bro", "polarity": "attract", "motifs": ["the slow and the sure", "Cortex walls that walk"],
-     "talks": {"C": {"title": "Supper", "beats": [
-       ["narrator", "Bro parks next to the Mammoth and says nothing for a while. Brandt seems to like that."],
-       ["bro", "Yeah. Good spot."],
-       ["mammoth", "It's the only spot. Have you eaten?"],
-       ["bro", "Yeah."],
-       ["mammoth", "Have some more anyway."]]}}},
-    {"a": "mammoth", "b": "brakhov", "polarity": "rivalry", "motifs": ["the walk and the sit", "forward heat against the anchor"],
-     "talks": {"C": {"title": "Forward", "beats": [
-       ["narrator", "The Kiln walks past the Mammoth toward the turrets. Brandt does not follow."],
-       ["brakhov", "Forward."],
-       ["mammoth", "Forward is where the turrets are, Brakhov. They'll still be there tomorrow."],
-       ["brakhov", "So will I."],
-       ["mammoth", "That's what you said last time, and I had to come and fetch you."]]}}},
-    {"a": "mammoth", "b": "stride", "polarity": "friction", "motifs": ["late for supper", "bad manners at speed"],
-     "talks": {"C": {"title": "Manners", "beats": [
-       ["narrator", "Stride's Gunslingers tear past the Mammoth's feet, kicking ash over its armour."],
-       ["mammoth", "Young man. Slow down and say good evening."],
-       ["stride", "Good evening, ma'am. Bye now."],
-       ["mammoth", "I'll remember that, and so will the Mammoth."]]}}},
-    {"a": "gladius", "b": "kit", "polarity": "attract", "motifs": ["a show needs fireworks", "the bow and the bang"],
-     "talks": {"C": {"title": "Encore", "beats": [
-       ["narrator", "Ferro's Gladiators salute an enemy line. Kit Sparkler lights the sky behind them on cue."],
-       ["gladius", "Perfect timing."],
-       ["kit", "I always light up when someone bows."],
-       ["gladius", "Then we'll do the whole tour. Every field an arena, every arena a finale."]]}}},
-    {"a": "gladius", "b": "stride", "polarity": "rivalry", "motifs": ["two showoffs, one stage", "speed against style"],
-     "talks": {"C": {"title": "Top billing", "beats": [
-       ["narrator", "Stride overtakes the Gladiators mid-feint and steals the kill."],
-       ["gladius", "That was my bow."],
-       ["stride", "That was my target. Bowing's slow."],
-       ["gladius", "Bowing's how the crowd knows who won. Nobody saw you, Stride."],
-       ["stride", "Exactly."]]}}},
-    {"a": "gladius", "b": "auditor", "polarity": "tension", "motifs": ["the show against the count", "spectacle is waste"],
-     "talks": {"C": {"title": "Expenses", "beats": [
-       ["narrator", "The Auditor reviews the ammunition Ferro's troupe spent on flourishes."],
-       ["auditor", "Thirty percent of your shots were theatre."],
-       ["gladius", "And a hundred percent of the enemy watched it. What's that worth?"],
-       ["auditor", "Nothing I can enter in a column."],
-       ["gladius", "Then your columns are missing the best part."]]}}},
-    {"a": "gladius", "b": "marauder", "polarity": "mirror", "motifs": ["arrive laughing", "the raid as a performance"],
-     "talks": {"C": {"title": "Applause", "beats": [
-       ["narrator", "Marlow and Wren come out of the river laughing, straight into the middle of Ferro's salute."],
-       ["marauder", "Are you bowing at us?"],
-       ["gladius", "At whoever makes the best entrance. Tonight, that's you."],
-       ["marauder", "We'll take it. Wren's never been applauded."]]}}},
-    {"a": "triton", "b": "halq", "polarity": "mirror", "motifs": ["coordinates and tides", "two who read the map in numbers"],
-     "talks": {"C": {"title": "Readings", "beats": [
-       ["narrator", "Halq calls a grid square. Calder answers with the hour the water turns over it."],
-       ["halq", "Four-seven, four-nine."],
-       ["triton", "Dry for forty minutes after the second bell."],
-       ["halq", "Then that's when we shoot."],
-       ["triton", "And that's when I'm already there."]]}}},
-    {"a": "triton", "b": "charybdis", "polarity": "rivalry", "motifs": ["two tides", "the straight line and the flood"],
-     "talks": {"C": {"title": "Sides", "beats": [
-       ["narrator", "Calder's Tritons hold a perfect line along the shore. The Charybdis comes in wide and floods through it."],
-       ["triton", "You broke my line."],
-       ["charybdis", "I don't believe in lines. Or sides."],
-       ["triton", "The Legion does. I'll be here when you need one to retreat behind."],
-       ["charybdis", "I never retreat. I recede."]]}}},
-    {"a": "triton", "b": "scylla", "polarity": "attract", "motifs": ["the shoreline and the ship", "the water had better be wide"],
-     "talks": {"C": {"title": "Shallows", "beats": [
-       ["narrator", "The Scylla walks out of the sea onto Calder's beach."],
-       ["scylla", "You've kept the shore clear."],
-       ["triton", "For you. The channel is wide enough as far as the second sandbar."],
-       ["scylla", "Then I'll stop at the second sandbar."],
-       ["triton", "You won't. But I'll be there when you get stuck."]]}}},
-    {"a": "triton", "b": "tarn", "polarity": "tension", "motifs": ["whose shoreline", "Legion line against Cortex raiders"],
-     "talks": {"C": {"title": "Tide tables", "beats": [
-       ["narrator", "Tarn's Salamanders surface just behind Calder's line."],
-       ["tarn", "Your line faces the wrong way."],
-       ["triton", "My line faces the sea. You came from the river. I'll correct for it next time."],
-       ["tarn", "There won't be a next time."],
-       ["triton", "There's always a next tide."]]}}},
-    {"a": "triton", "b": "dam", "polarity": "bond", "motifs": ["the works and the line that guards them", "both of them standing in the water"],
-     "talks": {"C": {"title": "Breakwater", "beats": [
-       ["narrator", "Brisk's Beavers build on the shoal while Calder's Tritons sit in a line in front of them."],
-       ["dam", "You make a good breakwater."],
-       ["triton", "You make a good reason to be one."],
-       ["dam", "Hold till the tide turns and the base is up."],
-       ["triton", "I always know when the tide turns."]]}}}
+    {
+      "a": "rookery",
+      "b": "noctua",
+      "polarity": "attract",
+      "motifs": [
+        "two who build in the air",
+        "flight paths and landing shelves"
+      ],
+      "talks": {
+        "C": {
+          "title": "Holding pattern",
+          "beats": [
+            [
+              "narrator",
+              "Noctua's fighters and Atterby's Falcons share a sky for the first time. Nobody collides, which surprises both of them."
+            ],
+            [
+              "noctua",
+              "You fly them like they're coming home."
+            ],
+            [
+              "rookery",
+              "They are. I build the home first, then I teach them where it is."
+            ],
+            [
+              "noctua",
+              "I dream the routes. You pour the runway at the end of them. That's a good night's work."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "rookery",
+      "b": "solarium",
+      "polarity": "bond",
+      "motifs": [
+        "a garden from above",
+        "spreadsheets on the cliff shelf"
+      ],
+      "talks": {
+        "C": {
+          "title": "Panels on the ridge",
+          "beats": [
+            [
+              "narrator",
+              "Atterby drops solar collectors on a ridge nobody can reach. Solarium is already working out the yield."
+            ],
+            [
+              "solarium",
+              "South-facing, no shade, nobody to steal the cables. You picked that for the light."
+            ],
+            [
+              "rookery",
+              "I picked it because it's hard to get to. The light was a bonus."
+            ],
+            [
+              "solarium",
+              "Then we want the same ground for different reasons. That's the best kind of partnership."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "rookery",
+      "b": "mason",
+      "polarity": "rivalry",
+      "motifs": [
+        "straight walls against high nests",
+        "the ground is a suggestion"
+      ],
+      "talks": {
+        "C": {
+          "title": "Foundations",
+          "beats": [
+            [
+              "narrator",
+              "Tarquin paces out a fort on the flat. Atterby is building one on the crag above it."
+            ],
+            [
+              "mason",
+              "You can't wall a cliff."
+            ],
+            [
+              "rookery",
+              "I don't have to. The cliff is the wall."
+            ],
+            [
+              "mason",
+              "And when they bring aircraft?"
+            ],
+            [
+              "rookery",
+              "Then they'll meet mine first. Yours will hear about it later."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "rookery",
+      "b": "thresh",
+      "polarity": "tension",
+      "motifs": [
+        "nests and the weather that comes from above",
+        "who owns the high air"
+      ],
+      "talks": {
+        "C": {
+          "title": "Weather report",
+          "beats": [
+            [
+              "narrator",
+              "Thresh's Hailstorm passes over Atterby's shelf base on the way out. The Falcons scramble before anyone has said a word."
+            ],
+            [
+              "thresh",
+              "Easy. I'm on your side this week."
+            ],
+            [
+              "rookery",
+              "My birds don't read the contract. They read the bomb bay."
+            ],
+            [
+              "thresh",
+              "Then keep them on a short leash. Weather doesn't apologise."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "dam",
+      "b": "odessa",
+      "polarity": "attract",
+      "motifs": [
+        "fords are doors, and somebody has to build the frame",
+        "the works beside the crossing"
+      ],
+      "talks": {
+        "C": {
+          "title": "The far bank",
+          "beats": [
+            [
+              "narrator",
+              "Odessa holds a ford. On the far bank, four Beavers are already laying a metal extractor."
+            ],
+            [
+              "odessa",
+              "I take the crossing, you take the bank?"
+            ],
+            [
+              "dam",
+              "We take the bank, the bed, and the next bank. You keep the door shut while we pour."
+            ],
+            [
+              "odessa",
+              "Deal. Don't build a lock on my door."
+            ],
+            [
+              "dam",
+              "Only a small one."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "dam",
+      "b": "consul",
+      "polarity": "rivalry",
+      "motifs": [
+        "permits for a river",
+        "mud against paperwork"
+      ],
+      "talks": {
+        "C": {
+          "title": "Planning permission",
+          "beats": [
+            [
+              "narrator",
+              "Weiss arrives with a survey of the river. Brisk is standing in it."
+            ],
+            [
+              "consul",
+              "I need to log where you're building."
+            ],
+            [
+              "dam",
+              "Under the water, mostly. You're welcome to come and measure."
+            ],
+            [
+              "consul",
+              "There is a form for submerged works."
+            ],
+            [
+              "dam",
+              "Then it'll be the first form that gets wet."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "dam",
+      "b": "rookery",
+      "polarity": "sibling",
+      "motifs": [
+        "the base from both ends",
+        "the riverbed and the cliff shelf"
+      ],
+      "talks": {
+        "C": {
+          "title": "Top and bottom",
+          "beats": [
+            [
+              "narrator",
+              "The company's two newest builders compare notes over a map with water at the bottom and cliffs at the top."
+            ],
+            [
+              "rookery",
+              "You take everything below the waterline."
+            ],
+            [
+              "dam",
+              "You take everything above the treeline."
+            ],
+            [
+              "rookery",
+              "And the middle?"
+            ],
+            [
+              "dam",
+              "The middle is where everyone else fights. We just hand them the ground."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "mammoth",
+      "b": "halbard",
+      "polarity": "mentor",
+      "motifs": [
+        "the old Cortex guard",
+        "patience is the heaviest weapon"
+      ],
+      "talks": {
+        "C": {
+          "title": "Sit",
+          "beats": [
+            [
+              "narrator",
+              "Varn is pacing the line, hungry for the push. Brandt has not moved the Mammoth all hour."
+            ],
+            [
+              "halbard",
+              "We should go. Now."
+            ],
+            [
+              "mammoth",
+              "Sit down, dear. They're coming to us. They always do."
+            ],
+            [
+              "halbard",
+              "And if they don't?"
+            ],
+            [
+              "mammoth",
+              "Then you'll have had a nice rest, and you can go hungry later."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "mammoth",
+      "b": "bro",
+      "polarity": "attract",
+      "motifs": [
+        "the slow and the sure",
+        "Cortex walls that walk"
+      ],
+      "talks": {
+        "C": {
+          "title": "Supper",
+          "beats": [
+            [
+              "narrator",
+              "Bro parks next to the Mammoth and says nothing for a while. Brandt seems to like that."
+            ],
+            [
+              "bro",
+              "Yeah. Good spot."
+            ],
+            [
+              "mammoth",
+              "It's the only spot. Have you eaten?"
+            ],
+            [
+              "bro",
+              "Yeah."
+            ],
+            [
+              "mammoth",
+              "Have some more anyway."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "mammoth",
+      "b": "brakhov",
+      "polarity": "rivalry",
+      "motifs": [
+        "the walk and the sit",
+        "forward heat against the anchor"
+      ],
+      "talks": {
+        "C": {
+          "title": "Forward",
+          "beats": [
+            [
+              "narrator",
+              "The Kiln walks past the Mammoth toward the turrets. Brandt does not follow."
+            ],
+            [
+              "brakhov",
+              "Forward."
+            ],
+            [
+              "mammoth",
+              "Forward is where the turrets are, Brakhov. They'll still be there tomorrow."
+            ],
+            [
+              "brakhov",
+              "So will I."
+            ],
+            [
+              "mammoth",
+              "That's what you said last time, and I had to come and fetch you."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "mammoth",
+      "b": "stride",
+      "polarity": "friction",
+      "motifs": [
+        "late for supper",
+        "bad manners at speed"
+      ],
+      "talks": {
+        "C": {
+          "title": "Manners",
+          "beats": [
+            [
+              "narrator",
+              "Stride's Gunslingers tear past the Mammoth's feet, kicking ash over its armour."
+            ],
+            [
+              "mammoth",
+              "Young man. Slow down and say good evening."
+            ],
+            [
+              "stride",
+              "Good evening, ma'am. Bye now."
+            ],
+            [
+              "mammoth",
+              "I'll remember that, and so will the Mammoth."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "gladius",
+      "b": "kit",
+      "polarity": "attract",
+      "motifs": [
+        "a show needs fireworks",
+        "the bow and the bang"
+      ],
+      "talks": {
+        "C": {
+          "title": "Encore",
+          "beats": [
+            [
+              "narrator",
+              "Ferro's Gladiators salute an enemy line. Kit Sparkler lights the sky behind them on cue."
+            ],
+            [
+              "gladius",
+              "Perfect timing."
+            ],
+            [
+              "kit",
+              "I always light up when someone bows."
+            ],
+            [
+              "gladius",
+              "Then we'll do the whole tour. Every field an arena, every arena a finale."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "gladius",
+      "b": "stride",
+      "polarity": "rivalry",
+      "motifs": [
+        "two showoffs, one stage",
+        "speed against style"
+      ],
+      "talks": {
+        "C": {
+          "title": "Top billing",
+          "beats": [
+            [
+              "narrator",
+              "Stride overtakes the Gladiators mid-feint and steals the kill."
+            ],
+            [
+              "gladius",
+              "That was my bow."
+            ],
+            [
+              "stride",
+              "That was my target. Bowing's slow."
+            ],
+            [
+              "gladius",
+              "Bowing's how the crowd knows who won. Nobody saw you, Stride."
+            ],
+            [
+              "stride",
+              "Exactly."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "gladius",
+      "b": "auditor",
+      "polarity": "tension",
+      "motifs": [
+        "the show against the count",
+        "spectacle is waste"
+      ],
+      "talks": {
+        "C": {
+          "title": "Expenses",
+          "beats": [
+            [
+              "narrator",
+              "The Auditor reviews the ammunition Ferro's troupe spent on flourishes."
+            ],
+            [
+              "auditor",
+              "Thirty percent of your shots were theatre."
+            ],
+            [
+              "gladius",
+              "And a hundred percent of the enemy watched it. What's that worth?"
+            ],
+            [
+              "auditor",
+              "Nothing I can enter in a column."
+            ],
+            [
+              "gladius",
+              "Then your columns are missing the best part."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "triton",
+      "b": "halq",
+      "polarity": "mirror",
+      "motifs": [
+        "coordinates and tides",
+        "two who read the map in numbers"
+      ],
+      "talks": {
+        "C": {
+          "title": "Readings",
+          "beats": [
+            [
+              "narrator",
+              "Halq calls a grid square. Calder answers with the hour the water turns over it."
+            ],
+            [
+              "halq",
+              "Four-seven, four-nine."
+            ],
+            [
+              "triton",
+              "Dry for forty minutes after the second bell."
+            ],
+            [
+              "halq",
+              "Then that's when we shoot."
+            ],
+            [
+              "triton",
+              "And that's when I'm already there."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "triton",
+      "b": "charybdis",
+      "polarity": "rivalry",
+      "motifs": [
+        "two tides",
+        "the straight line and the flood"
+      ],
+      "talks": {
+        "C": {
+          "title": "Sides",
+          "beats": [
+            [
+              "narrator",
+              "Calder's Tritons hold a perfect line along the shore. The Charybdis comes in wide and floods through it."
+            ],
+            [
+              "triton",
+              "You broke my line."
+            ],
+            [
+              "charybdis",
+              "I don't believe in lines. Or sides."
+            ],
+            [
+              "triton",
+              "The Legion does. I'll be here when you need one to retreat behind."
+            ],
+            [
+              "charybdis",
+              "I never retreat. I recede."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "triton",
+      "b": "scylla",
+      "polarity": "attract",
+      "motifs": [
+        "the shoreline and the ship",
+        "the water had better be wide"
+      ],
+      "talks": {
+        "C": {
+          "title": "Shallows",
+          "beats": [
+            [
+              "narrator",
+              "The Scylla walks out of the sea onto Calder's beach."
+            ],
+            [
+              "scylla",
+              "You've kept the shore clear."
+            ],
+            [
+              "triton",
+              "For you. The channel is wide enough as far as the second sandbar."
+            ],
+            [
+              "scylla",
+              "Then I'll stop at the second sandbar."
+            ],
+            [
+              "triton",
+              "You won't. But I'll be there when you get stuck."
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "a": "triton",
+      "b": "dam",
+      "polarity": "bond",
+      "motifs": [
+        "the works and the line that guards them",
+        "both of them standing in the water"
+      ],
+      "talks": {
+        "C": {
+          "title": "Breakwater",
+          "beats": [
+            [
+              "narrator",
+              "Brisk's Beavers build on the shoal while Calder's Tritons sit in a line in front of them."
+            ],
+            [
+              "dam",
+              "You make a good breakwater."
+            ],
+            [
+              "triton",
+              "You make a good reason to be one."
+            ],
+            [
+              "dam",
+              "Hold till the tide turns and the base is up."
+            ],
+            [
+              "triton",
+              "I always know when the tide turns."
+            ]
+          ]
+        }
+      }
+    }
   ]
 }
