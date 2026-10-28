@@ -5,7 +5,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 TAGS = ROOT / "mod" / "VerdanceAshes.sdd" / "luarules" / "gadgets" / "include" / "va_hero_tags.lua"
-CAMPAIGN = ROOT / "mod" / "VerdanceAshes.sdd" / "luarules" / "gadgets" / "game_verdance_campaign.lua"
+CAMPAIGN = ROOT / "mod" / "VerdanceAshes.sdd" / "luarules" / "gadgets" / "game_verdance_campaign.lua"  # the core; campaign_lua.source() is the whole gadget
+import campaign_lua  # noqa: E402
 CREW = ROOT / "data" / "story" / "crew_packs.json"
 
 
@@ -13,7 +14,7 @@ class HeroFieldEffectTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.tags = TAGS.read_text(encoding="utf-8")
-        cls.campaign = CAMPAIGN.read_text(encoding="utf-8")
+        cls.campaign = campaign_lua.source()
         cls.crew = CREW.read_text(encoding="utf-8")
 
     def test_each_hero_default_is_single_tag(self):

@@ -56,6 +56,7 @@ def test_who_keeps_their_own_way():
 
 
 def test_the_gadget_spawns_a_non_wreck_recruit_alive_on_the_enemy_team():
-    lua = (ROOT / "mod/VerdanceAshes.sdd/luarules/gadgets/game_verdance_campaign.lua").read_text(encoding="utf-8")
+    import campaign_lua
+    lua = campaign_lua.source()
     assert 'or mode == "wreck_rez" or mode == "retrieve_stash")' in lua      # 'hostile' is neither: alive
     assert 'tryRecruitFieldHero(rec, unitID, "wreck_rez")' in lua               # put down, raised: signs on

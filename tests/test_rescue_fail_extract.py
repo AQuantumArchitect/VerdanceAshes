@@ -15,7 +15,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 MARKS = ROOT / "mod" / "VerdanceAshes.sdd" / "luarules" / "gadgets" / "include" / "va_marks_registry.lua"
-CAMPAIGN = ROOT / "mod" / "VerdanceAshes.sdd" / "luarules" / "gadgets" / "game_verdance_campaign.lua"
+CAMPAIGN = ROOT / "mod" / "VerdanceAshes.sdd" / "luarules" / "gadgets" / "game_verdance_campaign.lua"  # the core; campaign_lua.source() is the whole gadget
+import campaign_lua  # noqa: E402
 
 
 def _live_lines(src: str, needle: str) -> list[str]:
@@ -35,7 +36,7 @@ def test_marks_fail_does_not_credit_required_left(marks_src: str | None = None):
 
 
 def test_blast_uses_short_rez_grace(campaign_src: str | None = None):
-    campaign_src = campaign_src or CAMPAIGN.read_text(encoding="utf-8")
+    campaign_src = campaign_src or campaign_lua.source()
     assert "rezBuilderWorkingFeature" in campaign_src
     assert "wreck_gone" in campaign_src
     assert "math.min(HERO_REZ_GRACE, 15)" in campaign_src
@@ -43,7 +44,7 @@ def test_blast_uses_short_rez_grace(campaign_src: str | None = None):
 
 def test_sortie_link_is_optional_only(campaign_src: str | None = None):
     """Contracted unless optionalJoin — no belief/zone side paths."""
-    campaign_src = campaign_src or CAMPAIGN.read_text(encoding="utf-8")
+    campaign_src = campaign_src or campaign_lua.source()
     block = campaign_src.split("function fieldRecruitIsSortieLinked", 1)[1].split("\nend", 1)[0]
     assert "optionalJoin" in block
     assert "beliefScore" not in block
@@ -192,7 +193,7 @@ def test_field_pool_marks_lost_recruit():
 
 
 def test_campaign_emits_fail_hero(campaign_src: str | None = None):
-    campaign_src = campaign_src or CAMPAIGN.read_text(encoding="utf-8")
+    campaign_src = campaign_src or campaign_lua.source()
     assert "objectiveFailHero" in campaign_src
     assert "rescueContractFailHero" in campaign_src
     marks = MARKS.read_text(encoding="utf-8")

@@ -69,7 +69,8 @@ def test_field_effects_match_the_hero():
 
 
 def test_named_heroes_are_twice_as_tough():
-    src = (ROOT / "mod" / "VerdanceAshes.sdd" / "luarules" / "gadgets" / "game_verdance_campaign.lua").read_text(encoding="utf-8")
+    import campaign_lua
+    src = campaign_lua.source()
     assert re.search(r"^VA_HERO_HP_MULT = 2\.0$", src, re.M)
     assert "VA_HERO_HP_MULT or 3.0" not in src
 
