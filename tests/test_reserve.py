@@ -37,8 +37,8 @@ def test_an_old_save_starts_its_reserve_from_the_cadre():
 def test_presence_is_defensive_value():
     from verdance.campaign.measure import apply_zone_dv
     state = {"zoneMemory": {"tabula": {"T_C_SPILLWAY": {"controllingFaction": "neutral", "abstract": {"control": "neutral"}}}}}
-    result = {"deploymentMapId": "tabula", "zoneDv": {"T_C_SPILLWAY": {"ashwalkers": 900, "armada": 300},
-                                                      "T_C_INNER_SPILLWAY": {"armada": 1200}}}
+    result = {"deploymentMapId": "tabula", "zoneDv": {"T_C_SPILLWAY": {"ashwalkers": 1900, "armada": 300},
+                                                      "T_C_INNER_SPILLWAY": {"armada": 1600}}}
     changed = apply_zone_dv(state, result)
     zm = state["zoneMemory"]["tabula"]
     assert zm["T_C_SPILLWAY"]["controllingFaction"] == "ashwalkers"

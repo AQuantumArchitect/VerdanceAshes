@@ -78,6 +78,23 @@ def test_a_suit_won_in_the_field_comes_home():
         assert out["event"] == "unlocked" and suits.suit(s)["unitDef"] == d and suits.suit(s)["how"] == how
 
 
+def test_a_commander_raised_anywhere_is_the_suit_once_it_lifts_home():
+    """Owner (2026-10-29): the Legion commander rezzed on the first drop did not come home. A raised
+    commander that lifts off with the company is its suit; one left on the field is not."""
+    won = {"unitDef": "legcom", "how": "raised"}
+    s = _state()
+    home = {"status": "extracted", "commanderSuit": won,
+            "manifest": {"going": {"units": {"legcom": 1, "legrezbot": 3}}}}
+    assert apply_commander_story(s, home, [], ROOT)["event"] == "unlocked"
+    assert suits.suit(s)["unitDef"] == "legcom" and suits.suit(s)["how"] == "raised"
+    s = _state()
+    left = {"status": "extracted", "commanderSuit": won, "manifest": {"going": {"units": {"legrezbot": 3}}}}
+    apply_commander_story(s, left, [], ROOT)
+    assert not suits.has_suit(s)
+    lua = (ROOT / "mod/VerdanceAshes.sdd/luarules/gadgets/game_verdance_suits.lua").read_text(encoding="utf-8")
+    assert 'win(unitDefID, "raised", unitID)' in lua
+
+
 def test_in_cortexs_own_suit_cortex_stays_home():
     s = _state()
     suits.grant_suit(s, "armcom", "stolen_koom")

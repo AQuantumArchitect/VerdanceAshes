@@ -6,6 +6,9 @@ if not VFS.Include("LuaRules/Configs/va_active.lua") then return false end -- pl
 --                her corpse; raise it with a rez bot and the suit is the company's
 --   stolen_koom  on Koom Valley, a war commander raised from its wreck (or captured) onto the company
 --                is its suit
+--   raised       anywhere else, a commander the company raises from its wreck is its suit too
+--                (owner, 2026-10-29: the Legion commander rezzed on the first drop did not come
+--                home); it counts once it lifts off with the company (verdance.campaign.roster)
 --
 -- (The third, buying Cortex's, is a hub purchase.) The won suit goes home in the result as
 -- commanderSuit = { unitDef, how } (GG.VA_SuitJson, read by game_verdance_campaign.lua).
@@ -132,6 +135,8 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
     win(unitDefID, "queen_rez", unitID)
   elseif mapId == "koom_valley" then
     win(unitDefID, "stolen_koom", unitID)
+  else
+    win(unitDefID, "raised", unitID)
   end
 end
 

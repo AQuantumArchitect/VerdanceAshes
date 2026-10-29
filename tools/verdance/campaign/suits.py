@@ -11,6 +11,7 @@ start (roster.commander is scrap); there are three ways to get one (owner call, 
     stolen_koom     on Koom Valley, a fallen war commander's wreck raised (or a commander captured)
                     onto the company is its suit (game_verdance_suits.lua)
     queen_rez       a Legion suit lies under the hive queen's corpse wherever she falls; raise it
+    raised          any commander the company raises from its wreck and brings home (owner, 2026-10-29)
 
 Without one, the roads do not run onto All That Simmers (verdance.world.roads) and the Sovereignty
 finale gives way to the next path. Losing the walker in the field scraps the suit again.
@@ -35,6 +36,7 @@ HOW = {
     "bought_cortex": "bought from Cortex",
     "stolen_koom": "stolen off Koom Valley",
     "queen_rez": "raised from under the hive queen",
+    "raised": "raised from its wreck in the field",
 }
 
 
@@ -76,6 +78,20 @@ def grant_suit(state: Dict[str, Any], unit_def: Any, how: str) -> bool:
     c["unitDef"] = d
     c["suitFrom"] = str(how or "story")[:40]
     return grant_commander(state, "suit:" + c["suitFrom"])
+
+
+def came_home(result: Dict[str, Any], unit_def: Any) -> bool:
+    """A suit won in the field is the company's only if it lifted off with the company: the exfil
+    manifest's going units name its body. A result without a manifest (an old or headless one)
+    is taken at its word."""
+    d = base_def(unit_def)
+    manifest = result.get("manifest") if isinstance(result, dict) else None
+    if not d or not isinstance(manifest, dict):
+        return bool(d)
+    going = (manifest.get("going") or {}).get("units") or {}
+    if not isinstance(going, dict):
+        return True
+    return any(base_def(k) == d and int(n or 0) > 0 for k, n in going.items())
 
 
 def on_loan(state: Dict[str, Any]) -> bool:

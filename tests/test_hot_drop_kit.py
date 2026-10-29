@@ -40,17 +40,23 @@ def test_drop_line_fields():
     assert hd.drop_line("t", ["a", "b"], {"x": 0}, "kind=package") == "t|a,b||kind=package"
 
 
-def test_plan_key_reloads_only_for_who_lands():
+def test_drop_line_walker():
+    assert hd.drop_line("t", ["pavise"], {}, None, "corcom") == "t|pavise|||corcom"   # an empty kit stays a field
+    assert hd.drop_line("t", [], {}, "kind=package", "") == "t|||kind=package|"
+    assert hd.drop_line("t", [], {}, "", "cor|com;x") == "t||||corcomx"
+
+
+def test_plan_key_never_reloads_for_a_hire():
+    """Hires ride the drop: a rented hero spawns from the mod's own roster, the suit's walker is
+    fielded by the drop (crew.lua fieldWalker). Only the field itself is in the key."""
     plan = {"mapId": "greenest_fields", "contractKind": "raid", "marks": {"deployZoneId": "pad", "captureZoneIds": ["b", "a"]}}
     base = _plan_key(plan, {"commerce": {"owned": {}}})
-    shop = {"commerce": {"owned": {"punch_of_thugs": {"kind": "purchase_package"}}}}
-    assert _plan_key(plan, shop) == base, "a package rides the drop line: no reload"
-    suit = {"commerce": {"owned": {"cortex_commander_suit": {"kind": "commander_suit"}}}}
-    rent = {"commerce": {"owned": {"some_hero": {"kind": "hero_rental"}}}}
-    assert _plan_key(plan, suit) != base
-    assert _plan_key(plan, rent) != base
-    assert _plan_key(plan, suit) != _plan_key(plan, rent)
+    for owned in ({"punch_of_thugs": {"kind": "purchase_package"}},
+                  {"cortex_commander_suit": {"kind": "commander_suit"}},
+                  {"some_hero": {"kind": "hero_rental"}}):
+        assert _plan_key(plan, {"commerce": {"owned": owned}}) == base, owned
+    assert _plan_key(dict(plan, mapId="eye_of_horus")) != base
 
 
 if __name__ == "__main__":
-    test_kit_round_trip(); test_drop_line_fields(); test_plan_key_reloads_only_for_who_lands(); print("ok")
+    test_kit_round_trip(); test_drop_line_fields(); test_drop_line_walker(); test_plan_key_never_reloads_for_a_hire(); print("ok")

@@ -12,6 +12,7 @@ import ctypes, glob, json, os, sys
 WS = os.environ.get("VA_WS") or os.getcwd()
 GADGET = os.path.join(WS, "mod", "VerdanceAshes.sdd", "luarules", "gadgets", "game_verdance_exfil.lua")
 ACTIVE = os.path.join(WS, "mod", "VerdanceAshes.sdd", "luarules", "configs", "va_active.lua")
+CLAIM = os.path.join(WS, "mod", "VerdanceAshes.sdd", "luarules", "gadgets", "include", "va_claim.lua")
 L = ctypes.CDLL(glob.glob('/usr/lib/x86_64-linux-gnu/liblua5.4.so*')[0])
 L.luaL_newstate.restype = ctypes.c_void_p
 L.luaL_openlibs.argtypes = [ctypes.c_void_p]
@@ -20,7 +21,7 @@ L.lua_pcallk.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_int, ctypes.c_i
 L.lua_tolstring.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_void_p]; L.lua_tolstring.restype = ctypes.c_char_p
 
 LUA = r'''
-local GADGET, ACTIVE = %s, %s
+local GADGET, ACTIVE, CLAIM = %s, %s, %s
 -- 4x4 grid on a 4096 map: zone PAD = top two rows (cells 0..7), zone FAR = the rest.
 local zoneMap = { mapId = "t", zones = {
   { zoneId = "PAD", label = "Landing", shape = "cells", cellGrid = { cols = 4, rows = 4 }, cells = { { 0, 8 } }, anchor = { x = 0.5, z = 0.25 } },
@@ -47,6 +48,7 @@ GG.VA_EndSortie = function(kind) ENDED[#ENDED + 1] = kind end
 VFS = { Include = function(p)
   if p:find("va_active") then return dofile(ACTIVE) end
   if p:find("va_current") then return mission end
+  if p:find("va_claim") then return dofile(CLAIM) end
   return nil
 end }
 Spring = {
@@ -101,7 +103,19 @@ m = RULES.va_manifest_json
 has('"unitCount":4', "a unit standing in ground we hold (FAR) lifts with the pad's")
 has('"staying":{"heroes":[],"metal":0,"structureCount":0,"structures":[],"unitCount":0', "... and nothing of ours is left")
 mission.safeZoneIds = nil
-print("ok   safe ground: whatever stands on ground we hold lifts")
+-- ground the company owns right now lifts too, though the ledger never named it (taken this
+-- sortie): AV+DV over 1500 and over three times everyone else's (include/va_claim.lua)
+GG.VA_ZoneDv = function() return { FAR = { ashwalkers = 2000, armada = 700 } } end
+GG.VA_ExfilCmd("manifest")
+m = RULES.va_manifest_json
+has('"unitCount":3', "not owned (2000 is not over 3 x 700): the unit on FAR stays")
+GG.VA_ZoneDv = function() return { FAR = { ashwalkers = 2000, armada = 100 } } end
+GG.VA_ExfilCmd("manifest")
+m = RULES.va_manifest_json
+has('"unitCount":4', "owned now: the unit on FAR lifts")
+has('"liftZones":["Far Field"]', "... and FAR is named an extraction point")
+GG.VA_ZoneDv = nil
+print("ok   safe ground: whatever stands on ground we hold lifts, ground owned right now included")
 -- taking a door: once the objective is done the extraction moves onto it, even with a hero raised in
 -- the wound (a territory mission with a rescue inside it, Greenest Fields 2026-10-26)
 mission.objective = { targetZoneId = "FAR" }
@@ -114,26 +128,20 @@ GG.VA_ExfilCmd("manifest")
 m = RULES.va_manifest_json
 has('"unitCount":4', "on the exit door, the unit standing there goes, and the landing zone is still ours")
 print("ok   taking a door: the extraction moves onto it once the objective is done")
--- two exits: the hero raised in the wound goes home from the landing zone, not from the door
+-- every owned zone is an extraction point (owner call, 2026-10-29): a rescue lifts from the
+-- landing zone or from the door the company took, like everyone else
 U[7] = { x = 1000, z = 600, def = 1, team = 0, hero = "mask", recruited = 1 }
 GG.VA_ExfilCmd("manifest")
 m = RULES.va_manifest_json
 has('"heroId":"mask"', "the raised hero on the landing zone is going home")
-has('"homePad":{"label":"Landing","rescue":"mask","zoneId":"PAD"}', "the manifest names the landing zone as the rescue's exit")
+has('"liftZones":["Landing"]', "the manifest names the other extraction points")
 U[7].z = 3500
 GG.VA_ExfilCmd("manifest")
 m = RULES.va_manifest_json
-assert(not m:find('"going":{"heroes":[^%%]]*"mask"'), "the raised hero standing on the door must not lift with the spearhead")
-has('"heroId":"mask","label":"Far Field"', "... he stays, to be brought home")
+has('"going":{"heroes":[{"heroId":"pavise"', "the spearhead lifts from the door")
+assert(m:find('"heroId":"mask","name":"mask"'), "the raised hero standing on the door lifts with the spearhead")
 U[7] = nil
--- any hero turned or raised this sortie is a rescue
-U[8] = { x = 2048, z = 3500, def = 1, team = 0, hero = "rumor", recruited = 1 }
-GG.VA_ExfilCmd("manifest")
-m = RULES.va_manifest_json
-has('"heroId":"rumor","label":"Far Field"', "a hero recruited this sortie, standing on the door, stays to be brought home")
-has('"rescue":"rumor"', "... and the manifest names the rescue")
-U[8] = nil
-print("ok   two exits: the spearhead leaves by the door, the rescue goes home from the landing zone")
+print("ok   every zone we own lifts: the landing zone, the door, a rescue anywhere on them")
 GG.VA_ExfilCmd("extract:home")
 assert(ENDED[1] == "extracted", "extract did not end the sortie")
 print("ok   extract through the campaign hand-off ends the sortie")
@@ -142,7 +150,7 @@ print("ok   extract through the campaign hand-off ends the sortie")
 def main():
     st = L.luaL_newstate(); L.luaL_openlibs(st)
     out = []
-    src = LUA % (json.dumps(GADGET), json.dumps(ACTIVE))
+    src = LUA % (json.dumps(GADGET), json.dumps(ACTIVE), json.dumps(CLAIM))
     # capture print
     src = "local __p = print; print = function(...) __p(...) end\n" + src
     rc = L.luaL_loadstring(st, src.encode()) or L.lua_pcallk(st, 0, 0, 0, None, None)

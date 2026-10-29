@@ -61,6 +61,18 @@ function spawnUnitSpec(spec, teamID) SPAWNED[spec.unitDefName] = (SPAWNED[spec.u
 function VA_CREW_confirm(picks) PICKS = picks end
 function sweepPlayerCommanders() SWEEPS = SWEEPS + 1 end
 KIT, INBOUND = "unset", "unset"
+doctrine = { playerComsAllowed = 0, strikeTeam = true }
+playerTeamID = 0
+VA_CREW_SELECT = { anchorX = 1200, anchorZ = 3400 }
+UnitDefNames = { corcom = { id = 5 } }
+Game = { mapSizeX = 8192, mapSizeZ = 8192 }
+CREATED = {}
+Spring.CreateUnit = function(def, x, y, z, facing, team)
+  CREATED[#CREATED + 1] = { def = def, x = x, z = z, team = team, strike = doctrine.strikeTeam }
+  return 900 + #CREATED
+end
+Spring.GetGroundHeight = function() return 0 end
+Spring.SetUnitRulesParam = function() end
 VA_LOGISTICS = { spawnCommerceDeployKit = function(list) KIT = list or "seed" end }
 function armPendingDeliveries(list) INBOUND = list or "seed" end
 VA_HOT = { token = "abc123", pending = true, reserve = {
@@ -87,6 +99,16 @@ VA_HOT.pending = true
 out.withKit = VA_HOT_drop("abc123|pavise||kind=package,listingId=punch_of_thugs,unitDef=corthud,count=6;kind=pending,listingId=wasp_flight,unitDef=corape,count=4,etaSeconds=98")
 out.kit = KIT
 out.inbound = INBOUND
+out.noWalker = #CREATED
+-- the suit was rented while the field loaded without one: its body lands on the pad with the drop
+VA_HOT.pending = true
+out.withWalker = VA_HOT_drop("abc123|pavise|||corcom")
+out.created = CREATED[1]
+out.allowed = doctrine.playerComsAllowed
+-- a field that loaded with its walker already: no second body
+VA_HOT.pending = true
+out.again2 = VA_HOT_drop("abc123|pavise|||corcom")
+out.createdAfter = #CREATED
 return enc(out)
 '''
 
@@ -178,6 +200,11 @@ check("a drop line without a shop field spawns the seed's kit", g["kitFromSeed"]
 check("a drop with the shop lands what was bought up to the drop", g["withKit"] is True
       and g["kit"] == [{"kind": "package", "listingId": "punch_of_thugs", "unitDef": "corthud", "count": 6}]
       and g["inbound"] == [{"listingId": "wasp_flight", "unitDef": "corape", "count": 4, "etaSeconds": 98}], g)
+check("no walker field, no walker", g["noWalker"] == 0, g)
+check("a suit rented while the field loaded: its walker lands on the pad, tracked as the commander",
+      g["withWalker"] is True and g["created"] == {"def": "corcom", "x": 1200, "z": 3400, "team": 0, "strike": False}
+      and g["allowed"] == 1, g)
+check("a field that loaded with its walker gets no second one", g["createdAfter"] == 1, g)
 
 w = run(WIDGET_RUN)
 check("the widget holds the pause while the field waits", w["heldPause"] is True and w["sentEarly"] == 0, w)

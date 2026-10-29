@@ -89,10 +89,18 @@ def kit_field(deploy: Iterable[dict], pending: Iterable[dict]) -> str:
     return ";".join(r for r in rows if r)
 
 
-def drop_line(token: str, band: Iterable[str], reserve: dict[str, int], kit: str | None = None) -> str:
+def drop_line(token: str, band: Iterable[str], reserve: dict[str, int], kit: str | None = None,
+              walker: str | None = None) -> str:
+    """token|packs|units[|kit[|walker]]. walker is the suit's body when the company wears one: a
+    field loaded without a commander fields it at the drop (crew.lua fieldWalker)."""
     packs = ",".join(str(h) for h in band if str(h))
     units = ",".join(f"{d}:{int(n)}" for d, n in sorted(reserve.items()) if int(n or 0) > 0)
-    return f"{token}|{packs}|{units}" + (f"|{kit}" if kit is not None else "")
+    line = f"{token}|{packs}|{units}"
+    if kit is not None or walker is not None:
+        line += f"|{kit or ''}"
+    if walker is not None:
+        line += f"|{''.join(ch for ch in str(walker) if ch.isalnum() or ch == '_')}"
+    return line
 
 
 def write_drop(bar_root: str | Path, line: str) -> Path:

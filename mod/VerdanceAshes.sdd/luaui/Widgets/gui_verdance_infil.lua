@@ -90,6 +90,31 @@ local function compose()
 end
 
 -- Yeva's read of the ground: the pad, the objective, the loudest other belief, who is posted.
+-- A hot-drop field is built with every pack the company could send; once the drop lands, the card
+-- names who actually came (va_dropped_heroes, crew.lua vaNoteDropped), a hero rented while the
+-- field loaded included (named from the crew roster, not on the seed's list).
+local droppedSeen = ""
+local crewRoster = nil
+local function composeDropped()
+  local ids = tostring(Spring.GetGameRulesParam("va_dropped_heroes") or "")
+  if ids == droppedSeen or ids == "" or not mission then return end
+  droppedSeen = ids
+  local known = {}
+  for _, h in ipairs(mission.heroes or {}) do if h.id then known[tostring(h.id)] = h end end
+  if crewRoster == nil then
+    local ok, mod = pcall(VFS.Include, "luarules/gadgets/include/va_crew_roster.lua")
+    crewRoster = (ok and type(mod) == "table") and mod or false
+  end
+  C.heroes = {}
+  for id in ids:gmatch("[^,]+") do
+    local h = known[id]
+    local r = (not h) and crewRoster and crewRoster.get and crewRoster.get(id)
+    C.heroes[#C.heroes + 1] = h and { name = tostring(h.name or id), crit = h.missionCritical == true,
+        level = tonumber(h.level) or 1, rank = tostring(h.rank or "Runner") }
+      or { name = tostring((r and r.name) or id), crit = false, level = 1, rank = "Runner" }
+  end
+end
+
 local function composeYeva()
   local b = theBoard()
   C.yeva = {}
@@ -162,6 +187,7 @@ end
 
 function widget:Update()
   if phase ~= "infil" then return end
+  composeDropped()
   if Hud.over() then begin(); return end
   if not sawPaused then
     if paused() then

@@ -151,14 +151,18 @@ function Board:refreshRoles()
       end
     end
   end
+  -- every zone we own is an extraction point too (game_verdance_exfil.lua va_lift_zones)
+  self.liftIds = {}
+  for zid in tostring(str("va_lift_zones") or ""):gmatch("[^,]+") do self.liftIds[zid] = true end
   for _, z in ipairs(self.zones) do
-    z.role = (z.id == self.objectiveId and "objective") or (z.id == self.padId and "pad") or (self.markIds[z.id] and "mark") or nil
+    z.role = (z.id == self.objectiveId and "objective") or (z.id == self.padId and "pad") or (self.markIds[z.id] and "mark")
+      or (self.liftIds[z.id] and "exit") or nil
   end
-  self.roleKey = tostring(self.objectiveId) .. ":" .. tostring(self.padId)
+  self.roleKey = self:roleKeyNow()
 end
 
 function Board:roleKeyNow()
-  return tostring(self.objectiveId) .. ":" .. tostring(str("va_pad_zone") or self.padId)
+  return tostring(self.objectiveId) .. ":" .. tostring(str("va_pad_zone") or self.padId) .. ":" .. tostring(str("va_lift_zones") or "")
 end
 
 -- The pad point: va_pad_x/z/r, then the pad file, then the pad zone's anchor.
@@ -318,6 +322,7 @@ function Board:paint(proj, opts)
   -- 3. role borders on top (pad steam, objective warn, marks gold)
   for _, z in ipairs(self.zones) do
     if z.role == "pad" then borderCells(z, Ash.COL.steam, 0.7, false, 1.5)
+    elseif z.role == "exit" then borderCells(z, Ash.COL.steam, 0.4, false, 1)
     elseif z.role == "objective" then borderCells(z, Ash.COL.warn, 0.75, false, 1.5)
     elseif z.role == "mark" then borderCells(z, Ash.COL.gold, 0.55, false, 1.5) end
   end

@@ -49,11 +49,11 @@ def test_a_door_you_do_not_hold_is_a_job_not_a_road():
 
 def test_holding_a_door_opens_its_road_and_losing_it_shuts_it():
     s = _state("greenest_fields")
-    taken = roads.record_homecoming(s, {"mapId": "greenest_fields", "zoneDv": {"GF_SE_PLATEAU": {"ashwalkers": 800, "armada": 100}}}, ROOT)
+    taken = roads.record_homecoming(s, {"mapId": "greenest_fields", "zoneDv": {"GF_SE_PLATEAU": {"ashwalkers": 1800, "armada": 100}}}, ROOT)
     assert [d["zoneId"] for d in taken] == ["GF_SE_PLATEAU"] and taken[0]["held"]
     card = next(j for j in roads.legal_jobs(s, ROOT) if j["id"] == "road_GF_SE_PLATEAU")
     assert card["mapId"] == "koom_valley" and card["padZoneId"] == "KV_NW_MUSTER"  # land on the far door
-    lost = roads.record_homecoming(s, {"mapId": "greenest_fields", "zoneDv": {"GF_SE_PLATEAU": {"armada": 900, "ashwalkers": 200}}}, ROOT)
+    lost = roads.record_homecoming(s, {"mapId": "greenest_fields", "zoneDv": {"GF_SE_PLATEAU": {"armada": 1900, "ashwalkers": 200}}}, ROOT)
     assert lost and not lost[0]["held"]
     assert "road_GF_SE_PLATEAU" not in _ids(s) and "door_GF_SE_PLATEAU" in _ids(s)
 
@@ -80,3 +80,23 @@ def test_the_hub_gets_at_most_three_cards_lean_first():
         e = c["effect"]
         if e.get("preferredDeployZoneId"):
             assert e["padLocked"]
+
+
+def test_the_first_sortie_on_a_map_founds_a_base():
+    """Owner call (2026-10-29): like Koom's crossing, the Rock Jungle's first sortie digs in on the
+    door the company holds; it is not a march across the map to the Eye's door."""
+    from verdance.campaign import engine
+    state = engine.default_v1_state()
+    state["history"] = [{"mapId": "greenest_fields"}]          # the opener walked Greenest Fields
+    jobs = roads.legal_jobs(state, ROOT)
+    jungle = [j for j in jobs if j["mapId"] == "the_rock_jungle"]
+    assert [j["kind"] for j in jungle] == ["found"], jungle
+    card = roads._card(jungle[0], False)
+    assert card["effect"]["contractKind"] == "fortify_zone"
+    assert card["effect"]["preferredDeployZoneId"] == "TRJ_NW_OUTER_MUSTER"
+    assert card["effect"]["preferredCaptureZoneId"] == "TRJ_NW_GATE"
+    assert card["effect"]["journey"] == "home_founding"
+    # walked: its doors are the work
+    state["history"].append({"mapId": "the_rock_jungle"})
+    kinds = {j["kind"] for j in roads.legal_jobs(state, ROOT) if j["mapId"] == "the_rock_jungle"}
+    assert "found" not in kinds and "take" in kinds

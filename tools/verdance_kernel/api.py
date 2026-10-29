@@ -91,16 +91,14 @@ def _first_error_line(*reports: dict[str, Any]) -> str:
 
 
 def _plan_key(plan: dict[str, Any] | None, state: dict[str, Any] | None = None) -> str:
-    """What fixes the loaded field: the map, the pad, the targets and the job, and the hires that
-    change who lands (a rented hero, the commander suit). Not the company, not the rest of the shop:
-    the drop carries those."""
+    """What fixes the loaded field: the map, the pad, the targets and the job. Not the company and
+    not the shop: the drop carries who goes, what was bought, a rented hero (every pack is in the
+    mod) and the commander suit (crew.lua fieldWalker), so hiring while it loads never reloads it
+    (owner call, 2026-10-28)."""
     p = plan or {}
     m = p.get("marks") or {}
-    owned = ((state or {}).get("commerce") or {}).get("owned") or {}
-    lands = sorted(lid for lid, rec in owned.items()
-                   if isinstance(rec, dict) and rec.get("kind") in ("hero_rental", "commander_suit"))
     return json.dumps([p.get("mapId"), p.get("contractKind"), m.get("deployZoneId"),
-                       sorted(m.get("captureZoneIds") or []), lands], sort_keys=True)
+                       sorted(m.get("captureZoneIds") or [])], sort_keys=True)
 
 
 def _spring_already_open() -> str | None:
@@ -1146,7 +1144,11 @@ class CampaignKernel:
             bag = build_commerce_intent(st, self.ws)
             save_json(sp, st)
             kit = _hot.kit_field(bag.get("deploy") or [], bag.get("pendingDeliveries") or [])
-            path = _hot.write_drop(root, _hot.drop_line(hot["token"], band, roster["cadre"], kit))
+            # the walker: a suit rented while the field loaded lands with the drop
+            from verdance.campaign.suits import suit as _suit
+            worn = _suit(st)
+            walker = str(worn.get("unitDef") or "") if worn else ""
+            path = _hot.write_drop(root, _hot.drop_line(hot["token"], band, roster["cadre"], kit, walker))
             hot["dropped"] = True
             hot["droppedAt"] = utc_now()
             if self._hot_behind is not None:

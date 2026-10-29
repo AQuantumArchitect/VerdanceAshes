@@ -284,10 +284,10 @@ def update_measured_zone_memory(state: Dict[str, Any], result: Dict[str, Any], t
 
 
 def apply_zone_dv(state: Dict[str, Any], result: Dict[str, Any], workspace: Optional[Path] = None) -> List[str]:
-    """Presence at extraction (result.zoneDv): the metal in each faction's armed structures, and
-    the company's armed units too. Whoever leads holds the zone, except that the company needs the
-    claim presence (verdance.world.claim) to take it. Only zones it reports change hands: a zone
-    with nothing standing, or one we lead without the presence to claim, stays as it was believed."""
+    """Presence at extraction (result.zoneDv): each faction's AV + DV in the zone. A side owns it
+    with more than 1500 and more than three times everyone else together (verdance.world.claim).
+    Only zones it reports change hands: a zone with nothing standing, or one nobody dominates,
+    stays as it was believed."""
     from verdance.world.claim import claim_need, holder
     dv = result.get("zoneDv")
     if not isinstance(dv, dict) or not dv:

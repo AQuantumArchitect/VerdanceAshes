@@ -160,17 +160,17 @@ function makeTeamBucket(teamID)
   }
 end
 
--- Presence per zone per faction, right now: metal in armed structures and pad teeth, and for the
--- company its armed units as well (an army standing on ground is enough to claim it when you
--- lift; verdance.world.claim). The live answer to "who holds this zone": reinforcements read it,
--- the objective's claim check reads it, and so does Python at home.
+-- Presence per zone per faction, right now: AV + DV, the metal in every side's armed units and
+-- armed structures (and pad teeth), the company's and everyone else's alike (owner call,
+-- 2026-10-29; include/va_claim.lua has the ownership rule). The live answer to "who holds this
+-- zone": reinforcements read it, the objective's claim check and the extraction points read it
+-- (GG.VA_ZoneDv), and so does Python at home.
 function zoneDvTable()
   local byZone = {}
   for _, unitID in ipairs(Spring.GetAllUnits() or {}) do
     local teamID = Spring.GetUnitTeam(unitID)
     local defID = Spring.GetUnitDefID(unitID)
-    if teamID and teamID ~= gaiaTeamID and defID and canFight(defID)
-        and (isStructure(defID) or unitIsPadTooth(unitID) or teamID == playerTeamID) then
+    if teamID and teamID ~= gaiaTeamID and defID and (canFight(defID) or unitIsPadTooth(unitID)) then
       local x, _, z = Spring.GetUnitPosition(unitID)
       local zone = x and zoneForPosition(x, z)
       if zone and zone.zoneId then
@@ -195,6 +195,7 @@ function zoneDvJson()
   table.sort(parts)
   return "{" .. table.concat(parts, ",") .. "}"
 end
+GG.VA_ZoneDv = zoneDvTable   -- the exfil gadget's extraction points (game_verdance_exfil.lua)
 
 local function teamBucketJson(bucket)
   return '{' .. table.concat({

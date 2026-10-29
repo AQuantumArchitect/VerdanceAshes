@@ -54,7 +54,8 @@ def test_koom_is_a_standing_war_three_a_side_with_the_company_seat_left_empty():
     assert "KV_NW_MUSTER" not in {c["zoneId"] for c in camps}            # the company's seat
     west, east = [c for c in camps if c["faction"] == "nullmercs"], [c for c in camps if c["faction"] == "armada"]
     assert max(c["x"] for c in west) < 0.5 < min(c["x"] for c in east)   # Armada on the far side
-    assert all(c["profile"] == "hard" and c["bank"] and c["units"] for c in camps)
+    # live, every seat is a medium BARbarian, the Mercs' Legion and Armada alike (owner call, 2026-10-29)
+    assert all(c["profile"] == "medium" and c["bank"] and c["units"] for c in camps)
     for c in camps:                                                      # the engine gives each start commander
         assert all(u[5] != "C" for u in c["units"])
     # the seats are the recipe's
@@ -127,7 +128,7 @@ def test_the_builder_fields_every_baked_war_unit_for_unit():
         assert all(s["exact"] and len(s["at"]) == 4 * s["count"] for f in fields for s in war["recipes"][f["recipe"]]), map_id
         assert all(f["bank"]["energy"] > 0 for f in fields), map_id
         # va_dig_in: the entrenched BARb (Tabula's eastern seats, "Tabula entrenched", eb2ab54)
-        assert {a["options"]["profile"] for a in war["ai"]} <= {"hard", "hard_aggressive", "va_dig_in"}, map_id
+        assert {a["options"]["profile"] for a in war["ai"]} <= {"hard", "hard_aggressive", "va_dig_in", "medium"}, map_id
 
 
 def test_simmers_is_a_kings_showdown_from_any_door():
@@ -199,7 +200,7 @@ def _probe(intent):
 def test_the_builder_fields_the_war_the_kings_and_the_dens():
     war = _probe({"theater": theaters.standing_war("koom_valley", ROOT, "KV_NW_MUSTER"), "wildDens": []})
     assert sorted(t["faction"] for t in war["teams"]) == ["armada"] * 3 + ["nullmercs"] * 2
-    assert {a["shortName"] for a in war["ai"]} == {"BARb"} and {a["options"]["profile"] for a in war["ai"]} == {"hard"}
+    assert {a["shortName"] for a in war["ai"]} == {"BARb"} and {a["options"]["profile"] for a in war["ai"]} == {"medium"}
     fields = [f for f in war["forces"] if f["role"] == "standing_war"]
     assert len(fields) == 5 and all(f["bank"]["energy"] > 0 for f in fields)
     # every baked unit (a commander never) is placed: one spec per unit type, positions flat x z facing hp

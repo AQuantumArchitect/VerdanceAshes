@@ -196,7 +196,8 @@ function VA_CREW_confirm(selectedIds)
 end
 
 -- The drop: the packs and reserve the player chose on the hub, into the field that is
--- already loaded. Message: "vahotdrop token|pack,pack|unitdef:n,unitdef:n".
+-- already loaded. Message: "vahotdrop token|pack,pack|unitdef:n,unitdef:n|kit|walker" (kit and
+-- walker optional: hot_drop.drop_line).
 -- The shop's part of a drop line: items split by ";", fields "k=v" split by "," (the kernel's
 -- hot_drop.kit_field). kind=pending is a delivery in transit; anything else is t=0 kit.
 local function decodeKit(field)
@@ -210,13 +211,41 @@ local function decodeKit(field)
   return deploy, pending
 end
 
+-- The walker on a field that loaded without one: the suit was rented while the field loaded
+-- (owner call, 2026-10-28: load once, never reload for a hire). A field built with the walker
+-- already has the engine's start commander, so this does nothing there.
+local function fieldWalker(def)
+  def = tostring(def or "")
+  if def == "" or (tonumber(doctrine.playerComsAllowed) or 0) > 0 then return nil end
+  if not (UnitDefNames and UnitDefNames[def]) then
+    Spring.Echo("VA_HOTDROP_WALKER_UNKNOWN " .. def)
+    return nil
+  end
+  doctrine.playerComsAllowed = 1
+  doctrine.strikeTeam = false            -- before CreateUnit: UnitCreated tracks it as the walker
+  Spring.SetGameRulesParam("va_player_commanders", 1, { public = true })
+  local x = VA_CREW_SELECT.anchorX or ((Game.mapSizeX or 0) * 0.23)
+  local z = VA_CREW_SELECT.anchorZ or ((Game.mapSizeZ or 0) * 0.24)
+  local uid = Spring.CreateUnit(def, x, Spring.GetGroundHeight(x, z), z, "s", playerTeamID)
+  if uid then
+    local si = mission and mission.storyIntent
+    local c = si and si.roster and si.roster.commander
+    local level = tonumber(c and c.level) or 1
+    if Spring.SetUnitExperience then pcall(Spring.SetUnitExperience, uid, math.max(0, (level - 1) * 0.25)) end
+    Spring.SetUnitRulesParam(uid, "va_commander_level", level, { public = true })
+  end
+  Spring.Echo("VA_HOTDROP_WALKER " .. def .. " unit=" .. tostring(uid))
+  return uid
+end
+
 function VA_HOT_drop(line)
   if not VA_HOT.pending then
     Spring.Echo("VA_HOTDROP_IGNORED not_pending")
     return false
   end
-  local token, packs, rest = tostring(line or ""):match("^([^|]*)|([^|]*)|?(.*)$")
-  local units, kit = tostring(rest or ""):match("^([^|]*)|?(.*)$")
+  local f = {}
+  for part in (tostring(line or "") .. "|"):gmatch("([^|]*)|") do f[#f + 1] = part end
+  local token, packs, units, kit, walker = f[1], f[2], f[3], f[4], f[5]
   if token ~= VA_HOT.token then
     Spring.Echo("VA_HOTDROP_IGNORED stale_token " .. tostring(token))
     return false
@@ -240,10 +269,11 @@ function VA_HOT_drop(line)
   VA_HOT.pending = false
   VA_CREW_confirm(picks)
   -- the shop: what was bought up to the drop (a line without a kit field: the seed's own)
-  local hasKit = kit ~= nil and rest:find("|", 1, true) ~= nil
+  local hasKit = kit ~= nil
   local deploy, inbound = decodeKit(kit)
   VA_LOGISTICS.spawnCommerceDeployKit(hasKit and deploy or nil)
   armPendingDeliveries(hasKit and inbound or nil)
+  fieldWalker(walker)
   sweepPlayerCommanders("hotdrop")
   Spring.SetGameRulesParam("va_hotdrop_pending", 0, { public = true })
   Spring.Echo("VA_HOTDROP_DONE packs=" .. table.concat(picks, ",") .. " reserve=" .. tostring(landed))
