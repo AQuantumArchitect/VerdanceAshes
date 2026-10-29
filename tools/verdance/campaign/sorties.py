@@ -200,7 +200,7 @@ def opening_sortie_order(state: Dict[str, Any], workspace: Optional[Path] = None
         "label": "Raid Greenest Fields for Tenebrium",
         "hubBlurb": (
             "Cross the start road to Greenest Fields: land on its north-west muster, break the "
-            "Armada decoy farms on the southeast plateau for Tenebrium, and lift from the same pad. "
+            "Armada's decoy's farms on the southeast plateau for Tenebrium, and lift from the same pad. "
             "Hold the plateau too and the road to Koom Valley opens."
         ),
         "notes": (

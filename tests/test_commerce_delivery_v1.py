@@ -44,7 +44,7 @@ def test_wasp_eta_from_eye():
     assert eta["mode"] == "map_web"
     assert eta["sourceMapId"] == "eye_of_horus"
     assert eta["deferred"] is True
-    assert eta["etaSeconds"] == 360
+    assert eta["etaSeconds"] == 98      # by air at Wasp speed: the Brutes take 360 on the same roads
     assert "Eye of Horus" in (eta["summary"] or "")
 
 

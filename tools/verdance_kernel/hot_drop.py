@@ -63,10 +63,36 @@ def disarm(ws: Path) -> None:
         pass
 
 
-def drop_line(token: str, band: Iterable[str], reserve: dict[str, int]) -> str:
+# The shop's fields the gadget reads (logistics.lua spawnCommerceDeployKit / armPendingDeliveries).
+_KIT_FIELDS = ("kind", "listingId", "label", "unitDef", "count", "packageTag", "healthFracMin", "healthFracMax",
+               "loan", "factoryDef", "product", "seedCount", "metalIncome", "energyIncome",
+               "id", "mode", "sourceMapId", "sourceLabel", "etaSeconds", "status")
+
+
+def kit_field(deploy: Iterable[dict], pending: Iterable[dict]) -> str:
+    """What the shop sends with the drop: items split by ';', fields 'k=v' split by ','.
+    The field loaded while the player was still shopping, so the drop, not the seed, carries
+    the kit; a delivery in transit is kind=pending (crew.lua decodeKit)."""
+    def item(rec: dict, kind: str | None = None) -> str:
+        out = []
+        for k in _KIT_FIELDS:
+            v = kind if (k == "kind" and kind) else rec.get(k)
+            if v is None or v == "":
+                continue
+            if isinstance(v, bool):
+                v = int(v)
+            out.append(f"{k}={str(v).translate(str.maketrans('', '', ',;|='))}")
+        return ",".join(out)
+    rows = [item(d) for d in deploy if isinstance(d, dict)]
+    rows += [item(p, "pending") for p in pending if isinstance(p, dict)
+             and str(p.get("status") or "in_transit") == "in_transit"]
+    return ";".join(r for r in rows if r)
+
+
+def drop_line(token: str, band: Iterable[str], reserve: dict[str, int], kit: str | None = None) -> str:
     packs = ",".join(str(h) for h in band if str(h))
     units = ",".join(f"{d}:{int(n)}" for d, n in sorted(reserve.items()) if int(n or 0) > 0)
-    return f"{token}|{packs}|{units}"
+    return f"{token}|{packs}|{units}" + (f"|{kit}" if kit is not None else "")
 
 
 def write_drop(bar_root: str | Path, line: str) -> Path:

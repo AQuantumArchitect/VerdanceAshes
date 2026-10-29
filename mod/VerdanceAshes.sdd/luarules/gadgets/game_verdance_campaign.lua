@@ -198,11 +198,12 @@ function gadget:GameStart()
     -- Playable session: the mission is live immediately, no /vastart needed.
     startMission()
   end
-  -- Paid hub kit first (punch / constructors / fabs), then arm mid-sortie inbound.
-  if VA_LOGISTICS and VA_LOGISTICS.spawnCommerceDeployKit then
+  -- Paid hub kit first (punch / constructors / fabs), then arm mid-sortie inbound. A hot drop
+  -- waits: the field loaded while the player was still shopping, so the drop brings the kit.
+  if not VA_HOT.pending then
     VA_LOGISTICS.spawnCommerceDeployKit()
+    armPendingDeliveries()
   end
-  armPendingDeliveries()
   publishTenebriumRules()
 end
 

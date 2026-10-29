@@ -5,7 +5,10 @@
     "etaSecondsPerCampaignMinute": 10,
     "sameMapSpoolSeconds": 75,
     "pawnLauncherSpoolSecondsMin": 60,
-    "pawnLauncherSpoolSecondsMax": 120
+    "pawnLauncherSpoolSecondsMax": 120,
+    "roadPaceSpeed": 72,
+    "airRouteFactor": 0.6,
+    "_pace": "Road travel times are a ground column's at roadPaceSpeed (a Brute). A pack's travel scales by roadPaceSpeed / its delivery.speed; one that flies takes airRouteFactor of that, since the roads' terrain detours don't apply to it. Spools don't scale."
   },
   "spaces": {
     "eye_of_horus": {

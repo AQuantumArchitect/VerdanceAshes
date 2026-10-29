@@ -93,7 +93,8 @@
         "sourceMapId": "eye_of_horus",
         "sourceSpaceId": "eye_of_horus",
         "landNear": "infil",
-        "productLabel": "Cortex Brute column"
+        "productLabel": "Cortex Brute column",
+        "speed": 72
       }
     },
     "wasp_flight": {
@@ -123,7 +124,9 @@
         "sourceMapId": "eye_of_horus",
         "sourceSpaceId": "eye_of_horus",
         "landNear": "infil",
-        "productLabel": "Wasp flight"
+        "productLabel": "Wasp flight",
+        "speed": 159,
+        "flies": true
       }
     },
     "rent_gale": {
@@ -190,8 +193,8 @@
       "oneDrop": true,
       "unitDef": "corcom",
       "count": 1,
-      "tenebriumCost": 15,
-      "metalCostK": 8,
+      "tenebriumCost": 10,
+      "metalCostK": 10,
       "repMin": {
         "cortex": 35
       },

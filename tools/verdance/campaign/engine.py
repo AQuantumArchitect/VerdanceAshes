@@ -470,7 +470,7 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
             f"Path {finale_plan['pathKey']} finale ({finale_plan['kind']}): the campaign's closing battle on {map_id}."
             if finale_plan
             else (
-                "Opening raid: hit Armada decoy farms in Greenest Fields with Thugs and Legion Karkinos, then extract."
+                "Opening raid: hit Armada's decoy's farms in Greenest Fields with Thugs and Legion Karkinos, then extract."
                 if (sortie or {}).get("openingMission")
                 else f"Contract for {patron} against {against} on {map_id}/{objective.get('targetZoneId')}"
             )
