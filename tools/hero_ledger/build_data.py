@@ -49,6 +49,22 @@ def main(out_path: str) -> None:
     dflt = src.split("M.HERO_DEFAULTS = {", 1)[1].split("\n}\n", 1)[0]
     hero_tag = {h: t for h, t in re.findall(r'(\w+) = \{ "(\w+)" \}', dflt)}
 
+    # field effects v2: the self effect and the auras (data/story/field_effects.json)
+    fx2 = jl(S / "field_effects.json")
+    fxh = fx2.get("heroes") or {}
+
+    def fx_for(hid, tag):
+        f = fxh.get(hid)
+        if not tag and not f:
+            return None
+        out = {"key": hero_tag.get(hid), **(tag or {})}
+        if f:
+            out["stats"] = [[f["self"]["stat"], round(1 / (1 + f["self"]["bonus"]), 3) if f["self"]["stat"] == "reload" else round(1 + f["self"]["bonus"], 3)]]
+            out["self"] = f["self"]
+            out["auras"] = f["auras"]
+            out["mechTags"] = f["tags"]
+        return out
+
     names = dict(costs.get("names") or {})
     names.update({u: c.get("label") for u, c in (packs.get("chassis") or {}).items() if c.get("label")})
 
@@ -114,7 +130,7 @@ def main(out_path: str) -> None:
             "escorts": [dict(e, name=names.get(e.get("unitDef")) or e.get("unitDef")) for e in pack.get("escorts") or []],
             "partners": pack.get("partners") or [],
             "packTags": pack.get("tags") or [],
-            "fieldEffect": ({"key": hero_tag.get(hid), **tag} if tag else None),
+            "fieldEffect": fx_for(hid, tag),
             "buildsEco": bool(pack.get("buildsEco")),
             "baseSeeder": bool(pack.get("baseSeeder")),
             "factory": pack.get("factory"),
@@ -138,7 +154,7 @@ def main(out_path: str) -> None:
         })
     heroes.sort(key=lambda h: (order.index(h["id"]) if h["id"] in order else 999, h["name"]))
     data = {
-        "builtFrom": "data/story/*.json + va_hero_tags.lua (Verdance's Ashes)",
+        "builtFrom": "data/story/*.json (field_effects.json for the effects) + va_hero_tags.lua labels (Verdance's Ashes)",
         "company": {"core": packs.get("core"), "seatCap": packs.get("seatCap"), "startWalletTnb": packs.get("startWalletTnb"),
                     "recommended": ["pavise", "solarium", "halbard"]},
         "rules": {"meetingStance": rules.get("meetingStance"), "presence": rules.get("presence")},

@@ -480,7 +480,7 @@ end
 
 -- ---------------------------------------------------------------- HUD truth (pass seven)
 -- The one scan the HUD reads instead of guessing from its own unit loops, every 30 frames:
---   va_hud_heroes_json  [{id,name,unit,hp,x,z,onPad,zone,crit,level,rank,vet,state}] + down wrecks
+--   va_hud_heroes_json  [{id,name,unit,hp,x,z,onPad,zone,crit,level,rank,vet,fx,fxOn,state}] + down wrecks
 --   va_pad_people / va_pad_units      what is inside the ring right now (would lift)
 --   va_pad_off_units / va_pad_off_structures   what would stay
 --   va_pad_enemy_live                 who else stands on our pad (visible to us)
@@ -518,6 +518,8 @@ local function hudScan()
           onPad = onPad, zone = zoneOf(x, z) or "", crit = (tonumber((Spring.GetUnitRulesParam(uid, "va_hero_critical"))) or 0) == 1,
           level = tonumber((Spring.GetUnitRulesParam(uid, "va_hero_level"))) or 1, rank = tostring(Spring.GetUnitRulesParam(uid, "va_hero_rank") or ""),
           vet = tostring(Spring.GetUnitRulesParam(uid, "va_vet_rank") or ""), state = "alive",
+          fx = tostring(Spring.GetUnitRulesParam(uid, "va_hero_tag_labels") or ""),
+          fxOn = (tonumber((Spring.GetUnitRulesParam(uid, "va_fx_self_on"))) or 0) == 1,
           dist = math.floor(math.sqrt(((x or 0) - pad.x) ^ 2 + ((z or 0) - pad.z) ^ 2)),
         }
       end

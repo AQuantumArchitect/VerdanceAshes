@@ -98,7 +98,7 @@ local function pollHeroes()
     -- a live unit wins over a wreck with the same id (recovered)
     if h.state == "alive" or rec.state ~= "alive" then
       rec.state = h.state or "alive"; rec.unit = h.unit; rec.hp = tonumber(h.hp); rec.x, rec.z = tonumber(h.x), tonumber(h.z)
-      rec.onPad = h.onPad == true; rec.zone = h.zone; rec.dist = tonumber(h.dist); rec.vet = h.vet; rec.feature = h.feature
+      rec.onPad = h.onPad == true; rec.zone = h.zone; rec.dist = tonumber(h.dist); rec.vet = h.vet; rec.feature = h.feature; rec.fx = h.fx; rec.fxOn = h.fxOn == true
       if h.crit ~= nil then rec.crit = h.crit == true end
       if tonumber(h.level) then rec.level = tonumber(h.level) end
       if h.rank and h.rank ~= "" then rec.rank = h.rank end
@@ -643,6 +643,8 @@ local function drawCompany(x, y, right)
     Ash.rect(x, y1 + 2, x + 3, y2 - 2, Ash.with(strip, 0.95))
     text(Ash.fit(rec.name, 11, 120), x + 10, y2 - 13, 11, (rec.state == "alive") and Ash.COL.ink or Ash.COL.muted, "l")
     local chip = (rec.rank ~= "" and rec.rank or "Runner") .. " L" .. tostring(rec.level or 1)
+    -- the field effect, and "on" while its condition holds (field effects v2)
+    if rec.state == "alive" and rec.fx and rec.fx ~= "" then chip = chip .. " · " .. rec.fx .. (rec.fxOn and " on" or "") end
     if rec.vet and rec.vet ~= "" and rec.vet ~= "green" then chip = chip .. " · " .. rec.vet end
     text(Ash.fit(chip, 8, 120), x + 10, y2 - 25, 8, Ash.COL.ash, "l")
     if rec.state == "alive" then

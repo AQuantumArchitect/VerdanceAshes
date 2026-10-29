@@ -70,8 +70,8 @@
       "position": "core_line",
       "combatVerb": "hold",
       "temperament": [
-        "shield",
-        "captain"
+        "captain",
+        "pad"
       ],
       "doctrine": "line",
       "preferDefenses": false,
@@ -835,8 +835,8 @@
       "position": "band_siege",
       "combatVerb": "push",
       "temperament": [
-        "heavy",
-        "sparkle"
+        "captain",
+        "gleeful"
       ],
       "doctrine": "line",
       "preferDefenses": true,

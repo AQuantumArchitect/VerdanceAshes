@@ -317,6 +317,18 @@ const KEEP = new Set(["retrieve_stash", "assist_fortify", "capture"]);
 function keepsOwnWay(h) { return h.status !== "recruit" || KEEP.has(h.recruit.type) || h.recruit.type === "sortie" || !!h.factory; }
 
 /* ---------- helpers for text ---------- */
+// field effects v2: self effect + auras, in words
+const WHEN = { moving: "while moving", still: "while still", hurt: "below half health", enemy_near: "with the enemy close", unseen: "while unseen", on_water: "on water", crowd: "with three or more allies close" };
+const STATW = { hp: "health", speed: "speed", range: "range", reload: "fire rate", build: "build power", vision: "sight", energy: "energy", splash: "splash" };
+function fxSelf(h) {
+  const s = h.fieldEffect && h.fieldEffect.self;
+  if (!s) return "";
+  const sc = s.scale ? (s.scale.by === "allies_near" ? ", more with allies close" : ", more with matching allies") : "";
+  return `${STATW[s.stat] || s.stat} +${Math.round(s.bonus * 100)}%${s.when ? " " + WHEN[s.when] : ""}${sc}, for the hero and the pack`;
+}
+function fxAuras(h) {
+  return ((h.fieldEffect && h.fieldEffect.auras) || []).map(a => a.note);
+}
 function brings(h) {
   const lead = h.packTotal > 1 ? `${h.chassisName} ×${h.packTotal}` : h.chassisName;
   const esc2 = h.escorts.map(e => `${e.count}× ${e.name}`);
@@ -367,7 +379,7 @@ function cardHtml(h) {
     <p class="hook">${esc(h.hook)}</p>
     <div class="temper">${h.baseSeeder ? `<span class="chip" style="background:var(--verd-soft)">builder</span>` : ""}${h.temperament.map(t => `<span class="chip">${esc(cap(t))}</span>`).join("")}${h.packMind ? `<span class="chip">${esc(h.packMind)} mind</span>` : ""}</div>
     <p class="brings"><b>Brings</b> ${esc(brings(h))}</p>
-    ${h.fieldEffect ? `<p class="fx"><b>${esc(h.fieldEffect.label)}</b> · ${esc(h.fieldEffect.fiction)}</p>` : ""}
+    ${h.fieldEffect ? `<p class="fx"><b>${esc(h.fieldEffect.label)}</b> · ${esc(fxSelf(h) || h.fieldEffect.fiction)}</p>` : ""}
     <div class="ties">${pick(a, "ally")}${pick(x, "adv")}</div>
     <div class="meet">${meet}</div>
     <button class="open" type="button" data-open="${h.id}">${S.open === h.id ? "Close dossier" : "Open dossier"}</button>
@@ -410,7 +422,7 @@ function dossierHtml(h) {
       ${h.tagLine ? `<div class="field"><span class="eyebrow">In a line</span><p>${esc(h.tagLine)}</p></div>` : ""}
       ${v ? `<div class="field"><span class="eyebrow">How they talk</span><p>${esc(v.register)}</p>${v.lines.map(l => `<p class="quote">${esc(l)}</p>`).join("")}</div>` : ""}
       ${h.talk ? `<div class="field"><span class="eyebrow">At camp, with ${esc(BY[h.talk.with]?.name || h.talk.with)} · ${esc(h.talk.title)}</span><p class="quote">${esc(h.talk.line)}</p></div>` : ""}
-      <div class="field"><span class="eyebrow">What they bring</span><p>${esc(brings(h))}. ${esc(h.blurb)}</p>${h.fieldEffect ? `<p class="fx" style="margin-top:6px"><b>${esc(h.fieldEffect.label)}</b> · ${esc(h.fieldEffect.fiction)} <span class="mono muted">${h.fieldEffect.stats.map(([k, x]) => `${k} ×${x}`).join(", ")}</span></p>` : ""}${h.baseSeeder ? `<p class="muted" style="font-size:var(--fs-sm)">Seeds a base (economy, factories, constructors): one of the company's builders, and can be the one waiting at the jungle's entrance.</p>` : ""}${h.factory ? `<p class="muted" style="font-size:var(--fs-sm)">Bound factory: ${esc(h.factory)}</p>` : ""}</div>
+      <div class="field"><span class="eyebrow">What they bring</span><p>${esc(brings(h))}. ${esc(h.blurb)}</p>${h.fieldEffect ? `<p class="fx" style="margin-top:6px"><b>${esc(h.fieldEffect.label)}</b> · ${esc(h.fieldEffect.fiction)}</p><p class="fx" style="margin-top:4px"><span class="eyebrow">Self</span> ${esc(fxSelf(h))}</p>${fxAuras(h).map(n => `<p class="fx" style="margin-top:4px"><span class="eyebrow">Aura</span> ${esc(n)}</p>`).join("")}${(h.fieldEffect.mechTags || []).length ? `<p class="muted" style="font-size:var(--fs-sm)">Matches auras as: ${h.fieldEffect.mechTags.map(esc).join(", ")}</p>` : ""}` : ""}${h.baseSeeder ? `<p class="muted" style="font-size:var(--fs-sm)">Seeds a base (economy, factories, constructors): one of the company's builders, and can be the one waiting at the jungle's entrance.</p>` : ""}${h.factory ? `<p class="muted" style="font-size:var(--fs-sm)">Bound factory: ${esc(h.factory)}</p>` : ""}</div>
     </div>
     <div class="col">
       <div class="field"><span class="eyebrow">Ties · ${h.links.length}</span><div class="links">${links || `<p class="muted">No ties yet.</p>`}</div><p class="muted" style="font-size:var(--fs-xs)">A dot after the kind marks a derived tie (half weight); the rest are authored.</p></div>
@@ -456,7 +468,7 @@ function hubCard(h, mode) {
     ${sh.chassis ? `<div class="m">${esc(meta)}</div>` : ""}
     ${tagsLine || tag ? `<div class="t">${tag}${esc(tagsLine)}</div>` : ""}
     ${sh.hook ? `<div class="k" contenteditable="true" data-edit="hook" data-hero="${h.id}" spellcheck="false">${esc(txt(h, "hook"))}</div>` : ""}
-    ${sh.fx && h.fieldEffect ? `<div class="fx2">${esc(h.fieldEffect.label)}: ${esc(h.fieldEffect.fiction)}</div>` : ""}
+    ${sh.fx && h.fieldEffect ? `<div class="fx2">${esc(h.fieldEffect.label)}: ${esc(fxSelf(h) || h.fieldEffect.fiction)}</div>` : ""}
     ${sh.ties && ties.length ? `<div class="ty">${ties.map(l => `<span class="${ALLY.has(l.polarity) ? "a" : "x"}">${esc(l.polarity)} with ${esc(BY[l.other]?.name.split(" ").slice(-1)[0])}</span>`).join(" · ")}</div>` : ""}
     ${sh.cost && cost ? `<div class="cost">${cost}</div>` : ""}
     ${sh.blurb ? `<div class="b" contenteditable="true" data-edit="blurb" data-hero="${h.id}" spellcheck="false">${esc(txt(h, "blurb"))}</div>` : ""}
@@ -559,7 +571,7 @@ function markdown() {
   out.push(`## How the company works`, `- The company is Ketha (always) plus ${DATA.company.seatCap} picks; the first pick is "you" (must be able to walk). Fighters are free; builders cost Tenebrium (start wallet ${DATA.company.startWalletTnb}).`,
     `- Heroes not at the start are met in the field. Who is met is drawn by the bond web (Umwelt encounter field): ties to someone in the party raise the chance of meeting (bonded ×${PR.ally}, at odds ×${PR.adversary}).`,
     `- How they turn up: stance = sum over ties to the party (bond/attract/sibling/mentor/mirror +, rivalry/tension/friction −; authored 1.0, derived half its score). p(hostile) = 1/(1+exp((stance+bias)/softness)), bias ${RS.bias} early → ${RS.biasLate} late (missions ${RS.rampFrom}–${RS.rampTo}), softness ${RS.softness}. Hostile = spawns alive on the enemy team; kill and raise the wreck to recruit. Otherwise a wreck to raise.`,
-    `- Field effect = the hero's kit tag (multipliers applied to the hero and pack in the field).`,
+    `- Field effect = a self effect (20-40% on the hero and its pack, sometimes only in a condition) plus one or two auras that reach the company members who match them, at most +15% per stat in total. A bonded hero always takes the aura, ×1.5; a rival never does, and feels friction inside it. Both grow with the hero's XP; the self effect also grows on home ground (a map whose pressure matches the hero's strong axes).`,
     `- Builder = a hero who can seed a base (economy, factories, constructors): ${H.filter(h => h.baseSeeder).map(h => h.name).join(", ")}. Build power alone (rez bots, nano towers, defence-only constructors) is not a builder.`, ``);
   for (const h of H) {
     out.push(`## ${h.name} (${h.id})`);
@@ -567,7 +579,7 @@ function markdown() {
     out.push(``, h.fiction, ``);
     if (h.tagLine) out.push(`- In a line: ${h.tagLine}`);
     out.push(`- Brings: ${brings(h)}. ${h.blurb}`);
-    if (h.fieldEffect) out.push(`- Field effect: ${h.fieldEffect.label} (${h.fieldEffect.stats.map(([k, x]) => `${k} ×${x}`).join(", ")}): ${h.fieldEffect.fiction}`);
+    if (h.fieldEffect) out.push(`- Field effect: ${h.fieldEffect.label}: ${h.fieldEffect.fiction}`, `  - Self: ${fxSelf(h)}`, ...fxAuras(h).map(n => `  - Aura: ${n}`), ...((h.fieldEffect.mechTags || []).length ? [`  - Matches auras as: ${h.fieldEffect.mechTags.join(", ")}`] : []));
     if (h.voice) out.push(`- Voice: ${h.voice.register}`, ...h.voice.lines.map(l => `  - "${l}"`));
     if (h.talk) out.push(`- Camp talk with ${BY[h.talk.with]?.name || h.talk.with} ("${h.talk.title}"): "${h.talk.line}"`);
     if (h.links.length) { out.push(`- Ties:`); h.links.forEach(l => out.push(`  - ${l.polarity}${l.authored ? "" : " (derived)"} with ${BY[l.other]?.name || l.other}${l.motifs.length ? `: ${l.motifs.join("; ")}` : ""}`)); }

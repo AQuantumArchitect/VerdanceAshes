@@ -317,6 +317,12 @@ local function applyVeterancy(unitID, rec, xp, reason)
   Spring.SetUnitRulesParam(unitID, "va_vet_a_hp", aHp, PUBLIC)
   Spring.SetUnitRulesParam(unitID, "va_vet_a_as", aAs, PUBLIC)
 
+  -- Field effects v2 compose here (va_field_engine sets va_fx_*): veterancy owns these stats, so a
+  -- field bonus rides on top of the veteran curve instead of being overwritten by it.
+  hpMult = hpMult * (tonumber((Spring.GetUnitRulesParam(unitID, "va_fx_hp"))) or 1)
+  reloadMult = reloadMult * (tonumber((Spring.GetUnitRulesParam(unitID, "va_fx_reload"))) or 1)
+  rangeMult = rangeMult * (tonumber((Spring.GetUnitRulesParam(unitID, "va_fx_range"))) or 1)
+
   local hpChanged = math.abs(hpMult - rec.lastHpMult) > 0.002
   local asChanged = math.abs(reloadMult - rec.lastReloadMult) > 0.002
   local spdChanged = math.abs(speedMult - rec.lastSpeedMult) > 0.002
@@ -399,12 +405,15 @@ local function refreshUnit(unitID, reason)
     local _, liveMax = Spring.GetUnitHealth(unitID)
     if liveMax and rec.baseMaxH > 0 then
       local projected = rec.baseMaxH * (rec.lastHpMult or 1)
-      if (rec.sawXp or 0) < 0.05 and liveMax > rec.baseMaxH * 1.02 then
-        rec.baseMaxH = liveMax
+      if (rec.sawXp or 0) < 0.05 and liveMax > projected * 1.02 then  -- projected carries the field mult: never re-baseline onto it
+        rec.baseMaxH = liveMax / math.max(rec.lastHpMult or 1, 1e-6)
         local dID = Spring.GetUnitDefID(unitID)
         local ud = dID and UnitDefs[dID]
         if ud then
           rec.baseReload, rec.baseRange = captureWeaponStats(unitID, ud)
+          -- live weapon values carry the last applied mults (veteran x field): take them back out
+          for w, v in pairs(rec.baseReload) do rec.baseReload[w] = v / math.max(rec.lastReloadMult or 1, 1e-6) end
+          for w, v in pairs(rec.baseRange) do rec.baseRange[w] = v / math.max(rec.lastRangeMult or 1, 1e-6) end
           rec.move = captureMoveBaseline(unitID, ud)
           rec.hasWeapons = unitHasWeapons(ud)
         end
@@ -427,6 +436,18 @@ GG.VA_VetRefresh = function(unitID)
   -- Drop cached baseline so we re-capture after hero HP mult.
   vet[unitID] = nil
   refreshUnit(unitID, "force")
+end
+
+-- The field engine changed a va_fx_* param: re-apply on the same baseline. False when veterancy
+-- does not own this unit (the engine then applies it itself).
+GG.VA_VetFieldRefresh = function(unitID)
+  if not enabled or not unitID or not Spring.ValidUnitID(unitID) then return false end
+  local rec = ensureVet(unitID)
+  if not rec then return false end
+  local xp = 0
+  if Spring.GetUnitExperience then xp = Spring.GetUnitExperience(unitID) or 0 end
+  applyVeterancy(unitID, rec, xp, "field")
+  return true
 end
 
 GG.VA_VetRebaseline = function(unitID)

@@ -151,6 +151,8 @@ local function applyCraftRewards(unitID, rec)
   if not rec then return end
   local xp = math.max(0, tonumber(rec.craftXp) or 0)
   local bpMult = math.min(BP_CAP, 1 + BP_PER_XP * xp)
+  -- Field effects v2 (va_fx_build) ride on top of craft, not under it.
+  bpMult = bpMult * (tonumber((Spring.GetUnitRulesParam(unitID, "va_fx_build"))) or 1)
   local rangeMult = math.min(RANGE_CAP, 1 + RANGE_PER_XP * xp)
   if rec.ketha then
     rangeMult = math.min(KETHA_RANGE_CAP, KETHA_RANGE_BASE + KETHA_RANGE_PER_XP * xp)
@@ -251,6 +253,16 @@ GG.VA_CraftRefresh = function(unitID)
     rec.ketha = isKetha(unitID)
     applyCraftRewards(unitID, rec)
   end
+end
+
+-- The field engine changed va_fx_build: re-apply. False when craft does not own this unit.
+GG.VA_CraftFieldRefresh = function(unitID)
+  if not enabled or not unitID or not Spring.ValidUnitID(unitID) then return false end
+  if not isPlayerConstructor(unitID) then return false end
+  local rec = ensureCraft(unitID)
+  if not rec then return false end
+  applyCraftRewards(unitID, rec)
+  return true
 end
 
 function gadget:Initialize()

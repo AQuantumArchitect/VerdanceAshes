@@ -2299,6 +2299,80 @@
       "glyph": "+off·−mob·+pad·+sig",
       "position": "siege",
       "doctrine": "arty"
+    },
+    {
+      "heroId": "pavise",
+      "name": "Pavise",
+      "axes": {
+        "energy": 0.0,
+        "offense": 0.5,
+        "mobility": -0.4,
+        "sight": 0.0,
+        "pad": 1.0,
+        "craft": 0.1,
+        "heat": 0.0,
+        "fog": 0.0,
+        "sky": 0.0,
+        "ledger": 0.0
+      },
+      "marks": [
+        {
+          "axis": "pad",
+          "value": 1.0
+        },
+        {
+          "axis": "offense",
+          "value": 0.5
+        },
+        {
+          "axis": "mobility",
+          "value": -0.4
+        },
+        {
+          "axis": "craft",
+          "value": 0.1
+        }
+      ],
+      "glyph": "+pad·+off·−mob·+cra",
+      "position": "core_line",
+      "doctrine": "line"
+    },
+    {
+      "heroId": "halbard",
+      "name": "Ilse 'Halbard' Varn",
+      "axes": {
+        "energy": 0.0,
+        "offense": 0.8,
+        "mobility": 0.4,
+        "sight": 0.2,
+        "pad": 0.3,
+        "craft": 0.0,
+        "heat": 0.2,
+        "fog": 0.0,
+        "sky": 0.0,
+        "ledger": 0.0
+      },
+      "marks": [
+        {
+          "axis": "offense",
+          "value": 0.8
+        },
+        {
+          "axis": "mobility",
+          "value": 0.4
+        },
+        {
+          "axis": "pad",
+          "value": 0.3
+        },
+        {
+          "axis": "sight",
+          "value": 0.2
+        }
+      ],
+      "glyph": "+off·+mob·+pad·+sig",
+      "position": "band_siege",
+      "doctrine": "line"
     }
   ]
 }

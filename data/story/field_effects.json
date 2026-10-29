@@ -1,0 +1,1897 @@
+{
+ "schemaVersion": "verdance-field-effects/2.0",
+ "notes": "Field effects v2 (2026-10-29): a stronger self effect plus a weaker conditional aura that reaches the company members who match it. Source of truth; tools/sync_field_effects.py generates va_field_effects.lua.",
+ "rules": {
+  "auraCap": 0.15,
+  "frictionFloor": -0.06,
+  "bondBoost": 1.5,
+  "frictionFrac": 0.4,
+  "auraRadius": 650,
+  "nearRadius": 600,
+  "crowd": 3,
+  "hurt": 0.5,
+  "tickFrames": 30,
+  "terrainGain": 0.35,
+  "terrainFloor": -0.15,
+  "selfBonus": [
+   0.2,
+   0.4
+  ],
+  "notes": [
+   "Self effect: the hero and its own pack, 20-40%, with an optional condition. Grows with XP like before (nothing green, all of it at 2.4 XP).",
+   "Aura: other company units that match its tags/axes/units, at most +15% per stat in total, recomputed every second.",
+   "Bonds: a bonded hero's pack always takes the aura and takes it x1.5. A rival's pack never takes it; near the aura it suffers friction instead (-40% of the aura, floor -6%).",
+   "Home ground: the self effect grows up to +35% on a map whose pressure matches the hero's strong axes, and shrinks up to -15% on one that fights them.",
+   "Units without a hero (built armies, structures) match by what they are: air = sky, boats/hovers/amphibians = water, builders = craft, structures = pad and hold, fusions = kind fusion."
+  ]
+ },
+ "tagVocab": [
+  "hold",
+  "kite",
+  "push",
+  "plod",
+  "craft",
+  "snipe",
+  "fog",
+  "sky",
+  "heat",
+  "pad",
+  "eyes",
+  "ledger",
+  "swarm",
+  "water",
+  "glass",
+  "captain",
+  "garden"
+ ],
+ "conditions": [
+  "moving",
+  "still",
+  "hurt",
+  "enemy_near",
+  "unseen",
+  "on_water",
+  "crowd"
+ ],
+ "heroes": {
+  "vane": {
+   "tags": [
+    "captain",
+    "kite",
+    "swarm",
+    "glass"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "speed",
+    "bonus": 0.25,
+    "when": "moving",
+    "note": "Out front at a run; the pack follows the rhythm."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "reload",
+     "bonus": 0.1,
+     "match": {
+      "tags": [
+       "kite",
+       "swarm"
+      ]
+     },
+     "radius": 700,
+     "scale": {
+      "by": "matching",
+      "per": 4
+     },
+     "note": "Kiting and swarm allies near her fire on her beat; stronger the more of them there are."
+    }
+   ]
+  },
+  "pavise": {
+   "tags": [
+    "captain",
+    "hold",
+    "pad"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "hp",
+    "bonus": 0.3,
+    "note": "The standing shield."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "hp",
+     "bonus": 0.15,
+     "match": {
+      "units": [
+       "armwar"
+      ],
+      "tags": [
+       "hold"
+      ]
+     },
+     "radius": 520,
+     "note": "Centurions and holding allies inside the ward take the war together."
+    }
+   ]
+  },
+  "rusk": {
+   "tags": [
+    "hold",
+    "pad",
+    "swarm"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "reload",
+    "bonus": 0.3,
+    "when": "still",
+    "note": "Five Decurions planted: the gatlings spin up when the line stops moving."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "hp",
+     "bonus": 0.1,
+     "match": {
+      "tags": [
+       "hold"
+      ]
+     },
+     "when": "still",
+     "radius": 500,
+     "note": "Holding allies beside the Decurions stand a little longer."
+    }
+   ]
+  },
+  "odessa": {
+   "tags": [
+    "hold",
+    "water",
+    "pad"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "hp",
+    "bonus": 0.3,
+    "when": "on_water",
+    "note": "The ford is hers: tougher in the water."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "hp",
+     "bonus": 0.1,
+     "match": {
+      "tags": [
+       "water"
+      ]
+     },
+     "radius": 650,
+     "note": "Amphibious and naval allies near her refuse to dry out."
+    }
+   ]
+  },
+  "cauter": {
+   "tags": [
+    "push",
+    "heat"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "hp",
+    "bonus": 0.3,
+    "when": "enemy_near",
+    "note": "Closes distance like an argument already won: tougher at contact."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "speed",
+     "bonus": 0.1,
+     "match": {
+      "tags": [
+       "push"
+      ]
+     },
+     "when": "enemy_near",
+     "radius": 600,
+     "note": "Pushing allies near him close the gap faster once the enemy is in reach."
+    }
+   ]
+  },
+  "grath": {
+   "tags": [
+    "hold",
+    "heat",
+    "ledger"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "hp",
+    "bonus": 0.35,
+    "when": "hurt",
+    "note": "Unpaid for three wars: below half health he will not fall over."
+   },
+   "auras": [
+    {
+     "kind": "income",
+     "bonus": 0.6,
+     "match": {
+      "tags": [
+       "ledger"
+      ]
+     },
+     "scope": "company",
+     "resource": "metal",
+     "note": "Merc debt: every ledger hero in the company pays 0.6 metal a second into the war chest while he lives."
+    }
+   ]
+  },
+  "quill": {
+   "tags": [
+    "captain",
+    "push",
+    "heat"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "hp",
+    "bonus": 0.25,
+    "note": "Two Bulls that take the hit so the order arrives."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "reload",
+     "bonus": 0.1,
+     "match": {
+      "tags": [
+       "push"
+      ]
+     },
+     "when": "enemy_near",
+     "radius": 600,
+     "note": "Pushing allies near the Bulls fire faster in the charge."
+    }
+   ]
+  },
+  "nox": {
+   "tags": [
+    "hold",
+    "pad",
+    "ledger"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "hp",
+    "bonus": 0.3,
+    "when": "still",
+    "note": "The umbrella opens when the Traveler parks."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "hp",
+     "bonus": 0.1,
+     "match": {
+      "tags": [
+       "pad",
+       "hold"
+      ]
+     },
+     "when": "still",
+     "radius": 700,
+     "note": "Allies dug in near the umbrella hold the circle."
+    }
+   ]
+  },
+  "mask": {
+   "tags": [
+    "captain",
+    "push",
+    "fog"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "hp",
+    "bonus": 0.25,
+    "note": "Sixteen Pawns who think he is the real thing."
+   },
+   "auras": [
+    {
+     "kind": "xp",
+     "bonus": 0.004,
+     "match": {
+      "any": true
+     },
+     "radius": 600,
+     "note": "Believers: allies near him earn veterancy faster, a little every second, as if he were the real thing."
+    }
+   ]
+  },
+  "anvil": {
+   "tags": [
+    "plod",
+    "water",
+    "pad"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "hp",
+    "bonus": 0.3,
+    "when": "still",
+    "note": "Two Turtles, one floor, no door: shells close when they stop."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "hp",
+     "bonus": 0.1,
+     "match": {
+      "tags": [
+       "plod"
+      ]
+     },
+     "radius": 500,
+     "note": "Slow, heavy allies near the Turtles share the shell."
+    }
+   ]
+  },
+  "charybdis": {
+   "tags": [
+    "push",
+    "water",
+    "hold"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "hp",
+    "bonus": 0.3,
+    "when": "enemy_near",
+    "note": "Undertow: drags the line toward him and holds it there."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "hp",
+     "bonus": 0.1,
+     "match": {
+      "tags": [
+       "hold"
+      ]
+     },
+     "when": "enemy_near",
+     "radius": 600,
+     "note": "Holding allies caught in the undertow stand firmer."
+    }
+   ]
+  },
+  "shiva": {
+   "tags": [
+    "captain",
+    "push",
+    "swarm"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "hp",
+    "bonus": 0.25,
+    "note": "Eight small reasons not to look at the big one."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "reload",
+     "bonus": 0.1,
+     "match": {
+      "tags": [
+       "swarm"
+      ]
+     },
+     "radius": 650,
+     "scale": {
+      "by": "matching",
+      "per": 5
+     },
+     "note": "Swarm allies near the Shiva fire faster; the more of them, the more she counts."
+    }
+   ]
+  },
+  "lunkhead": {
+   "tags": [
+    "captain",
+    "hold",
+    "plod"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "hp",
+    "bonus": 0.35,
+    "when": "hurt",
+    "note": "Every dent is a lesson: tougher once he is hurt."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "hp",
+     "bonus": 0.1,
+     "match": {
+      "tags": [
+       "plod"
+      ]
+     },
+     "radius": 600,
+     "note": "Slow allies near him have learned the same lessons."
+    }
+   ]
+  },
+  "mammoth": {
+   "tags": [
+    "hold",
+    "pad",
+    "plod"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "hp",
+    "bonus": 0.35,
+    "when": "hurt",
+    "note": "She has taken worse from her own side."
+   },
+   "auras": [
+    {
+     "kind": "xp",
+     "bonus": 0.003,
+     "match": {
+      "tags": [
+       "plod",
+       "pad"
+      ]
+     },
+     "radius": 600,
+     "note": "Old Mother teaches: slow and dug-in allies near her earn veterancy every second."
+    }
+   ]
+  },
+  "banisher": {
+   "tags": [
+    "captain",
+    "push",
+    "heat"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "splash",
+    "bonus": 0.3,
+    "note": "The volley hits where the target would have run."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "hp",
+     "bonus": 0.08,
+     "match": {
+      "tags": [
+       "push"
+      ]
+     },
+     "when": "enemy_near",
+     "radius": 650,
+     "note": "Pushing allies inside the scare radius take the charge better."
+    }
+   ]
+  },
+  "triton": {
+   "tags": [
+    "push",
+    "water",
+    "ledger"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "speed",
+    "bonus": 0.3,
+    "when": "on_water",
+    "note": "Low tide: in with it, out before it turns."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "speed",
+     "bonus": 0.12,
+     "match": {
+      "tags": [
+       "water"
+      ]
+     },
+     "radius": 700,
+     "note": "Water allies near the float ride the same tide."
+    }
+   ]
+  },
+  "halbard": {
+   "tags": [
+    "captain",
+    "push",
+    "water"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "hp",
+    "bonus": 0.25,
+    "when": "on_water",
+    "note": "Stubborn on the water: will not be moved."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "range",
+     "bonus": 0.1,
+     "match": {
+      "tags": [
+       "water"
+      ]
+     },
+     "radius": 700,
+     "note": "Naval and hover allies near Halbard reach farther."
+    }
+   ]
+  },
+  "loom": {
+   "tags": [
+    "hold",
+    "garden",
+    "ledger"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "range",
+    "bonus": 0.25,
+    "when": "still",
+    "note": "The web is set: the net reaches further than it looks."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "range",
+     "bonus": 0.08,
+     "match": {
+      "tags": [
+       "hold"
+      ]
+     },
+     "when": "still",
+     "radius": 600,
+     "note": "Holding allies inside the web reach a little farther."
+    }
+   ]
+  },
+  "warder": {
+   "tags": [
+    "hold",
+    "pad"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "hp",
+    "bonus": 0.3,
+    "when": "still",
+    "note": "The Bulwark owns a circle of dirt."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "range",
+     "bonus": 0.1,
+     "match": {
+      "tags": [
+       "hold",
+       "pad"
+      ]
+     },
+     "when": "still",
+     "radius": 700,
+     "note": "Dug-in allies inside the circle argue with anything that crosses it."
+    }
+   ]
+  },
+  "halq": {
+   "tags": [
+    "hold",
+    "snipe",
+    "eyes",
+    "ledger"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "range",
+    "bonus": 0.25,
+    "note": "Shoots map coordinates."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "range",
+     "bonus": 0.08,
+     "match": {
+      "tags": [
+       "snipe",
+       "plod",
+       "heat"
+      ]
+     },
+     "radius": 900,
+     "note": "Spotter: siege allies under the Euclid's radar reach farther."
+    }
+   ]
+  },
+  "brakhov": {
+   "tags": [
+    "plod",
+    "heat"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "range",
+    "bonus": 0.25,
+    "when": "still",
+    "note": "Kiln doctrine: planted, the fire reaches farther."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "range",
+     "bonus": 0.08,
+     "match": {
+      "tags": [
+       "heat"
+      ]
+     },
+     "radius": 650,
+     "note": "Heat allies near the Kiln burn a little farther."
+    }
+   ]
+  },
+  "fatboy": {
+   "tags": [
+    "plod",
+    "pad",
+    "heat"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "splash",
+    "bonus": 0.4,
+    "note": "Knocks until there is no door, and the walls next to it."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "splash",
+     "bonus": 0.12,
+     "match": {
+      "tags": [
+       "plod"
+      ]
+     },
+     "radius": 650,
+     "note": "Slow siege allies near him knock wider too."
+    }
+   ]
+  },
+  "bro": {
+   "tags": [
+    "plod",
+    "ledger",
+    "push"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "splash",
+    "bonus": 0.35,
+    "note": "Point at a wall; the wall and its neighbours reconsider."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "reload",
+     "bonus": 0.08,
+     "match": {
+      "tags": [
+       "push"
+      ]
+     },
+     "when": "enemy_near",
+     "radius": 500,
+     "note": "Pushing allies behind the Goliath fire faster through the gap."
+    }
+   ]
+  },
+  "mira": {
+   "tags": [
+    "heat",
+    "snipe"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "range",
+    "bonus": 0.25,
+    "scale": {
+     "by": "allies_near",
+     "per": 4
+    },
+    "note": "Confetti doctrine: the parade hits farther the bigger the crowd."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "splash",
+     "bonus": 0.1,
+     "match": {
+      "tags": [
+       "heat"
+      ]
+     },
+     "radius": 700,
+     "note": "Heat allies near the battery hit a wider circle."
+    }
+   ]
+  },
+  "kit": {
+   "tags": [
+    "kite",
+    "heat",
+    "fog"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "reload",
+    "bonus": 0.3,
+    "when": "moving",
+    "note": "Burn, bail, burn again: faster on the move."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "range",
+     "bonus": 0.08,
+     "match": {
+      "tags": [
+       "heat"
+      ]
+     },
+     "radius": 650,
+     "note": "Heat allies near the odd battery reach farther."
+    }
+   ]
+  },
+  "vale": {
+   "tags": [
+    "fog",
+    "snipe",
+    "ledger"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "range",
+    "bonus": 0.3,
+    "when": "unseen",
+    "note": "Fog invoice: rockets from the static reach farther while unseen."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "range",
+     "bonus": 0.08,
+     "match": {
+      "tags": [
+       "snipe",
+       "plod"
+      ]
+     },
+     "radius": 900,
+     "scale": {
+      "by": "company_tag",
+      "tag": "eyes",
+      "per": 2
+     },
+     "note": "Siege allies reach farther for every eyes hero in the company."
+    }
+   ]
+  },
+  "starlight": {
+   "tags": [
+    "plod",
+    "snipe",
+    "hold"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "range",
+    "bonus": 0.3,
+    "when": "still",
+    "note": "Long light: planted, the lamp throws farther."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "vision",
+     "bonus": 0.12,
+     "match": {
+      "tags": [
+       "snipe",
+       "plod"
+      ]
+     },
+     "radius": 900,
+     "note": "Siege allies near the Starlight see by its lamp."
+    }
+   ]
+  },
+  "tremor": {
+   "tags": [
+    "plod",
+    "ledger",
+    "snipe"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "range",
+    "bonus": 0.25,
+    "note": "The map comes with coordinates, and she has all of them."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "range",
+     "bonus": 0.08,
+     "match": {
+      "tags": [
+       "ledger",
+       "snipe"
+      ]
+     },
+     "radius": 1100,
+     "note": "Counting allies across the field share her coordinate table."
+    }
+   ]
+  },
+  "scylla": {
+   "tags": [
+    "captain",
+    "plod",
+    "water"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "range",
+    "bonus": 0.25,
+    "when": "on_water",
+    "note": "Broadside: range written onto the water."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "hp",
+     "bonus": 0.1,
+     "match": {
+      "tags": [
+       "water"
+      ]
+     },
+     "radius": 700,
+     "note": "Ships and hovers near the battleship ride out the shore guns."
+    }
+   ]
+  },
+  "gorgon": {
+   "tags": [
+    "snipe",
+    "plod",
+    "hold",
+    "sky"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "range",
+    "bonus": 0.3,
+    "when": "still",
+    "note": "Stone gaze: she looks a little further than anyone thinks."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "hp",
+     "bonus": 0.1,
+     "match": {
+      "tags": [
+       "sky"
+      ]
+     },
+     "radius": 700,
+     "note": "Air allies under the Shredders' flak cover hold together."
+    }
+   ]
+  },
+  "hundred": {
+   "tags": [
+    "sky",
+    "swarm",
+    "kite"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "reload",
+    "bonus": 0.3,
+    "note": "The drones relaunch before the last ones land."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "reload",
+     "bonus": 0.08,
+     "match": {
+      "tags": [
+       "swarm"
+      ]
+     },
+     "radius": 700,
+     "scale": {
+      "by": "matching",
+      "per": 4
+     },
+     "note": "Swarm allies near the carrier relaunch faster too."
+    }
+   ]
+  },
+  "verse": {
+   "tags": [
+    "kite",
+    "glass",
+    "ledger"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "reload",
+    "bonus": 0.3,
+    "when": "moving",
+    "note": "Two Javelins, one count: faster on the move."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "speed",
+     "bonus": 0.08,
+     "match": {
+      "tags": [
+       "kite"
+      ]
+     },
+     "radius": 600,
+     "note": "Kiting allies near the pair keep the count."
+    }
+   ]
+  },
+  "yeva": {
+   "tags": [
+    "snipe",
+    "fog"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "reload",
+    "bonus": 0.35,
+    "when": "unseen",
+    "note": "The shot is a fact, and the next one is sooner while nobody sees her."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "vision",
+     "bonus": 0.1,
+     "match": {
+      "tags": [
+       "fog"
+      ]
+     },
+     "radius": 700,
+     "note": "Fog allies near her see what she sees."
+    }
+   ]
+  },
+  "auditor": {
+   "tags": [
+    "push",
+    "ledger"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "range",
+    "bonus": 0.25,
+    "note": "Writes range into the dirt."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "reload",
+     "bonus": 0.08,
+     "match": {
+      "tags": [
+       "ledger"
+      ]
+     },
+     "radius": 700,
+     "scale": {
+      "by": "matching",
+      "per": 3
+     },
+     "note": "Ledger allies near the auditor fire on the count; stronger the more ledger heroes there are."
+    }
+   ]
+  },
+  "stride": {
+   "tags": [
+    "kite",
+    "glass"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "reload",
+    "bonus": 0.3,
+    "when": "moving",
+    "note": "Glass cadence: hits on the beat while moving."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "speed",
+     "bonus": 0.1,
+     "match": {
+      "tags": [
+       "glass"
+      ]
+     },
+     "radius": 600,
+     "note": "Glass allies near the Mavericks keep the beat."
+    }
+   ]
+  },
+  "volt": {
+   "tags": [
+    "kite",
+    "eyes",
+    "heat",
+    "glass"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "vision",
+    "bonus": 0.35,
+    "when": "enemy_near",
+    "note": "Burn mark: sees by hurting."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "reload",
+     "bonus": 0.08,
+     "match": {
+      "tags": [
+       "kite"
+      ]
+     },
+     "when": "moving",
+     "radius": 600,
+     "note": "Kiting allies near the Jaguar fire faster while they run."
+    }
+   ]
+  },
+  "arrow": {
+   "tags": [
+    "kite",
+    "glass",
+    "water"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "reload",
+    "bonus": 0.3,
+    "note": "The second arrow is already on the string."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "reload",
+     "bonus": 0.1,
+     "match": {
+      "tags": [
+       "water"
+      ]
+     },
+     "radius": 600,
+     "note": "Amphibious allies near her fire faster."
+    }
+   ]
+  },
+  "gladius": {
+   "tags": [
+    "kite",
+    "glass",
+    "heat"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "reload",
+    "bonus": 0.3,
+    "when": "enemy_near",
+    "note": "The crowd counts the shots, and she likes them fast."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "reload",
+     "bonus": 0.08,
+     "match": {
+      "tags": [
+       "glass"
+      ]
+     },
+     "radius": 600,
+     "scale": {
+      "by": "matching",
+      "per": 3
+     },
+     "note": "Glass allies near the Gladiators fire faster for the crowd."
+    }
+   ]
+  },
+  "possum": {
+   "tags": [
+    "kite",
+    "swarm",
+    "water",
+    "eyes"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "vision",
+    "bonus": 0.3,
+    "note": "Play dead: the Seekers see for the whole pack."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "vision",
+     "bonus": 0.12,
+     "match": {
+      "tags": [
+       "water",
+       "swarm"
+      ]
+     },
+     "radius": 700,
+     "note": "Hover and swarm allies near her see farther."
+    }
+   ]
+  },
+  "commando": {
+   "tags": [
+    "fog",
+    "kite"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "speed",
+    "bonus": 0.3,
+    "note": "Trapper pace."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "speed",
+     "bonus": 0.1,
+     "match": {
+      "tags": [
+       "fog",
+       "kite"
+      ]
+     },
+     "when": "moving",
+     "radius": 650,
+     "note": "Fog and kiting allies keep up with Cinder Hook."
+    }
+   ]
+  },
+  "gale": {
+   "tags": [
+    "sky",
+    "kite",
+    "water"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "reload",
+    "bonus": 0.3,
+    "when": "moving",
+    "note": "Cutlasses off the water, guns already turning."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "speed",
+     "bonus": 0.1,
+     "match": {
+      "tags": [
+       "water"
+      ]
+     },
+     "radius": 700,
+     "note": "Water allies near the Cutlasses move faster."
+    }
+   ]
+  },
+  "thresh": {
+   "tags": [
+    "sky",
+    "heat",
+    "push"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "splash",
+    "bonus": 0.35,
+    "note": "She has never looked at what she hits, so she hits all of it."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "reload",
+     "bonus": 0.08,
+     "match": {
+      "tags": [
+       "sky"
+      ]
+     },
+     "radius": 800,
+     "note": "Air allies near the Hurricane rearm faster."
+    }
+   ]
+  },
+  "phoenix": {
+   "tags": [
+    "sky",
+    "heat",
+    "push"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "hp",
+    "bonus": 0.35,
+    "when": "hurt",
+    "note": "Rises again: below half health the airframe holds."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "hp",
+     "bonus": 0.08,
+     "match": {
+      "tags": [
+       "sky"
+      ]
+     },
+     "radius": 800,
+     "note": "Air allies near the Phoenixes come home more often."
+    }
+   ]
+  },
+  "tsunami": {
+   "tags": [
+    "sky",
+    "water",
+    "fog",
+    "push"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "splash",
+    "bonus": 0.3,
+    "note": "The bombers read the Horizons."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "vision",
+     "bonus": 0.12,
+     "match": {
+      "tags": [
+       "sky",
+       "water"
+      ]
+     },
+     "radius": 900,
+     "note": "Air and water allies near the Tsunami read the tide table."
+    }
+   ]
+  },
+  "hornet": {
+   "tags": [
+    "sky",
+    "kite"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "reload",
+    "bonus": 0.3,
+    "when": "moving",
+    "note": "Every pass is faster than the last."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "reload",
+     "bonus": 0.08,
+     "match": {
+      "tags": [
+       "sky"
+      ]
+     },
+     "radius": 800,
+     "scale": {
+      "by": "matching",
+      "per": 3
+     },
+     "note": "Air allies near the Marsh sisters sting faster; stronger in a bigger wing."
+    }
+   ]
+  },
+  "stiletto": {
+   "tags": [
+    "sky",
+    "glass",
+    "push"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "splash",
+    "bonus": 0.35,
+    "note": "The pulse covers more ground than the bomb did."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "speed",
+     "bonus": 0.1,
+     "match": {
+      "tags": [
+       "glass"
+      ]
+     },
+     "radius": 700,
+     "note": "Glass allies near the Stilettos move faster."
+    }
+   ]
+  },
+  "stronghold": {
+   "tags": [
+    "sky",
+    "captain",
+    "push"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "speed",
+    "bonus": 0.3,
+    "note": "Hot insertion: everyone arrives at once."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "speed",
+     "bonus": 0.12,
+     "match": {
+      "tags": [
+       "push"
+      ]
+     },
+     "when": "moving",
+     "radius": 800,
+     "note": "Pushing allies near the transport arrive together."
+    }
+   ]
+  },
+  "kettle": {
+   "tags": [
+    "sky",
+    "hold",
+    "pad"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "range",
+    "bonus": 0.25,
+    "note": "Sky saint: keeps the air honest."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "hp",
+     "bonus": 0.1,
+     "match": {
+      "any": true
+     },
+     "radius": 600,
+     "note": "Everyone under the Kettle's umbrella holds a little longer."
+    }
+   ]
+  },
+  "arc": {
+   "tags": [
+    "captain",
+    "sky",
+    "hold"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "range",
+    "bonus": 0.25,
+    "scale": {
+     "by": "allies_near",
+     "per": 4
+    },
+    "note": "Choir: every truck on the same downbeat; the louder the choir, the farther."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "reload",
+     "bonus": 0.1,
+     "match": {
+      "any": true
+     },
+     "when": "crowd",
+     "radius": 650,
+     "note": "Allies near the choir fire on its downbeat once three or more are close."
+    }
+   ]
+  },
+  "spoke": {
+   "tags": [
+    "eyes",
+    "kite",
+    "swarm"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "vision",
+    "bonus": 0.3,
+    "note": "Wheelie eyes: banks XP from every wheelie."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "speed",
+     "bonus": 0.1,
+     "match": {
+      "tags": [
+       "kite"
+      ]
+     },
+     "scope": "company",
+     "note": "Every kiting unit in the company rolls a little faster."
+    }
+   ]
+  },
+  "tick": {
+   "tags": [
+    "eyes",
+    "swarm",
+    "fog"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "vision",
+    "bonus": 0.3,
+    "note": "The company's eyes."
+   },
+   "auras": [
+    {
+     "kind": "xp",
+     "bonus": 0.003,
+     "match": {
+      "tags": [
+       "swarm"
+      ]
+     },
+     "scope": "company",
+     "note": "Swarm allies across the company earn veterancy every second off the Ticks' harvest."
+    }
+   ]
+  },
+  "noctua": {
+   "tags": [
+    "eyes",
+    "sky",
+    "fog"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "vision",
+    "bonus": 0.3,
+    "note": "Night bay: wakes as a cloud of eyes."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "speed",
+     "bonus": 0.1,
+     "match": {
+      "tags": [
+       "sky"
+      ]
+     },
+     "radius": 900,
+     "note": "Air allies near the bay fly faster."
+    }
+   ]
+  },
+  "veil": {
+   "tags": [
+    "eyes",
+    "fog",
+    "ledger"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "vision",
+    "bonus": 0.3,
+    "note": "Jammer haze with a radar eye."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "reload",
+     "bonus": 0.1,
+     "match": {
+      "tags": [
+       "fog"
+      ]
+     },
+     "when": "unseen",
+     "radius": 700,
+     "note": "Fog allies near the haze fire faster while unseen."
+    }
+   ]
+  },
+  "rumor": {
+   "tags": [
+    "eyes",
+    "fog",
+    "ledger"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "vision",
+    "bonus": 0.35,
+    "when": "unseen",
+    "note": "Payroll: knows who is on whose books, while nobody watches."
+   },
+   "auras": [
+    {
+     "kind": "income",
+     "bonus": 0.5,
+     "match": {
+      "tags": [
+       "fog"
+      ]
+     },
+     "scope": "company",
+     "resource": "metal",
+     "note": "Every fog hero in the company pays 0.5 metal a second while Rumor lives."
+    }
+   ]
+  },
+  "ketha": {
+   "tags": [
+    "craft",
+    "pad",
+    "garden"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "build",
+    "bonus": 0.35,
+    "note": "Nobody stays dead near an honest chassis."
+   },
+   "auras": [
+    {
+     "kind": "repair",
+     "bonus": 0.015,
+     "match": {
+      "any": true
+     },
+     "radius": 550,
+     "below": 0.5,
+     "note": "Field surgeon: allies near the Zagreus below half health heal 1.5% a second."
+    }
+   ]
+  },
+  "twitch": {
+   "tags": [
+    "craft",
+    "fog"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "build",
+    "bonus": 0.35,
+    "note": "Builds trouble in equal measure."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "build",
+     "bonus": 0.1,
+     "match": {
+      "tags": [
+       "craft"
+      ]
+     },
+     "radius": 800,
+     "note": "Builders near the Twitcher build faster."
+    }
+   ]
+  },
+  "consul": {
+   "tags": [
+    "craft",
+    "ledger"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "build",
+    "bonus": 0.3,
+    "note": "Armada paperwork that digs trenches."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "build",
+     "bonus": 0.08,
+     "match": {
+      "tags": [
+       "craft",
+       "ledger"
+      ]
+     },
+     "radius": 800,
+     "note": "Builders and ledger allies near the Consul build faster."
+    },
+    {
+     "kind": "income",
+     "bonus": 1.0,
+     "match": {
+      "self": true
+     },
+     "when": "still",
+     "scope": "company",
+     "resource": "metal",
+     "note": "Field office: 1 metal a second while the Consul stands still."
+    }
+   ]
+  },
+  "solarium": {
+   "tags": [
+    "craft",
+    "garden",
+    "pad"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "build",
+    "bonus": 0.3,
+    "note": "Nano, sun, converter, Butlers: wind like wheat."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "build",
+     "bonus": 0.1,
+     "match": {
+      "tags": [
+       "craft",
+       "garden"
+      ]
+     },
+     "radius": 800,
+     "note": "Builders and gardeners near Solarium grow the base faster."
+    },
+    {
+     "kind": "income",
+     "bonus": 3.0,
+     "match": {
+      "self": true
+     },
+     "scope": "company",
+     "resource": "energy",
+     "note": "Eco lab: 3 energy a second for the company."
+    }
+   ]
+  },
+  "lumen": {
+   "tags": [
+    "craft",
+    "garden",
+    "pad",
+    "hold"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "build",
+    "bonus": 0.3,
+    "note": "Raises what the garden needs."
+   },
+   "auras": [
+    {
+     "kind": "repair",
+     "bonus": 0.01,
+     "match": {
+      "tags": [
+       "garden",
+       "pad"
+      ]
+     },
+     "radius": 600,
+     "below": 0.9,
+     "note": "Geo tithe: gardeners and dug-in allies near Lumen heal 1% a second."
+    }
+   ]
+  },
+  "infestor": {
+   "tags": [
+    "craft",
+    "garden",
+    "swarm"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "build",
+    "bonus": 0.35,
+    "note": "Infestors mint Infestors."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "hp",
+     "bonus": 0.1,
+     "match": {
+      "tags": [
+       "swarm"
+      ]
+     },
+     "radius": 650,
+     "scale": {
+      "by": "matching",
+      "per": 5
+     },
+     "note": "Swarm allies near the hive are tougher; the bigger the swarm, the tougher."
+    }
+   ]
+  },
+  "hearth": {
+   "tags": [
+    "craft",
+    "pad",
+    "hold"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "energy",
+    "bonus": 0.4,
+    "note": "Hearth feeds the pad."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "energy",
+     "bonus": 0.15,
+     "match": {
+      "kinds": [
+       "fusion"
+      ]
+     },
+     "scope": "company",
+     "note": "Every friendly fusion burns hotter."
+    }
+   ]
+  },
+  "mason": {
+   "tags": [
+    "craft",
+    "captain",
+    "pad"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "build",
+    "bonus": 0.35,
+    "note": "Every wall she lays is the first line of a fort."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "hp",
+     "bonus": 0.1,
+     "match": {
+      "tags": [
+       "hold",
+       "pad"
+      ]
+     },
+     "when": "still",
+     "radius": 700,
+     "note": "Holding allies inside Mason's works stand firmer while they hold."
+    }
+   ]
+  },
+  "rookery": {
+   "tags": [
+    "craft",
+    "sky",
+    "garden"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "build",
+    "bonus": 0.3,
+    "note": "The base goes up where the enemy has to climb."
+   },
+   "auras": [
+    {
+     "kind": "stat",
+     "stat": "hp",
+     "bonus": 0.1,
+     "match": {
+      "tags": [
+       "sky"
+      ]
+     },
+     "radius": 900,
+     "note": "Air allies near the Rookery's nest are tougher."
+    }
+   ]
+  },
+  "dam": {
+   "tags": [
+    "craft",
+    "water",
+    "pad"
+   ],
+   "self": {
+    "kind": "stat",
+    "stat": "build",
+    "bonus": 0.35,
+    "when": "on_water",
+    "note": "The river becomes the first wall."
+   },
+   "auras": [
+    {
+     "kind": "income",
+     "bonus": 0.6,
+     "match": {
+      "tags": [
+       "water"
+      ]
+     },
+     "scope": "company",
+     "resource": "energy",
+     "note": "Every water hero in the company pays 0.6 energy a second off the dam."
+    }
+   ]
+  }
+ }
+}

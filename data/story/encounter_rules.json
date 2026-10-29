@@ -36,5 +36,9 @@
     "relation": 2.5,
     "ally": 3.5,
     "adversary": 2.0
+  },
+  "fieldFit": {
+    "notes": "Field effects v2 (2026-10-29): a wild hero with no written tie to the company is drawn by each party hero whose aura would reach them, or whose aura would reach that party hero (field_effects.json tags and axes; auras that reach everyone do not count). The relation is an ally-side link at weight x hits (umwelt reads an unknown polarity as ally x0.5). It decides which strangers turn up, not how many. Measured at 0.2 (6 maps x 20 seeds, mission 3, 2 met per map): Pavise/Solarium/Halbard 79% bonded, 9% rivals, 12% strangers (8 points of it fitting; was 82/10/8); Vane/Quill/Kettle 78/5/17 (8 fitting; was 79/5/16); Yeva/Veil/Vale 59/3/38 (27 fitting; was 62/5/32).",
+    "weight": 0.2
   }
 }

@@ -45,7 +45,7 @@ RULES_REL = Path("data") / "story" / "encounter_rules.json"
 _RULES_DEFAULT = {"perSortie": 2, "markedGround": {"drawBoost": 4.0},
                   "homeZone": {"doesNotWalk": "fixed", "default": 1.0, "homeMapHaunt": 2.4}, "entranceBuilder": {},
                   "meetingStance": {"bias": 0.6, "biasLate": 0.2, "rampFrom": 2, "rampTo": 9, "softness": 0.25},
-                  "presence": {"relation": 2.5, "ally": 3.5, "adversary": 2.0}}
+                  "presence": {"relation": 2.5, "ally": 3.5, "adversary": 2.0}, "fieldFit": {"weight": 0.0}}
 ALLY_POLARITY = {"bond", "attract", "sibling", "mentor", "mirror"}
 ADVERSARY_POLARITY = {"rivalry", "tension", "friction"}
 # Recruit kinds that keep their own way of being met (the constructor-gated ones, a stash).
@@ -320,10 +320,51 @@ def mood_from_frame(frame: Dict[str, Any]) -> Dict[str, float]:
 
 # ----------------------------------------------------------------------------- the field
 
+def _aura_reaches(aura: Dict[str, Any], tags: Iterable[str], axes: Dict[str, float]) -> bool:
+    """Would this aura reach a hero with these tags and axes? Only targeted auras count: one that
+    reaches everyone (match.any), a unit kind or the hero alone says nothing about who fits."""
+    m = aura.get("match") or {}
+    if not m.get("tags") and not m.get("axes"):
+        return False
+    if m.get("tags") and not set(m["tags"]) & set(tags):
+        return False
+    return all(float(axes.get(a, 0.0)) >= float(v) for a, v in (m.get("axes") or {}).items())
+
+
+def field_fit(a: str, b: str, fx: Dict[str, Any], axes: Dict[str, Dict[str, float]]) -> int:
+    """How many of the two heroes' auras reach the other (0, 1 or 2): field effects v2 tags and axes."""
+    n = 0
+    for x, y in ((a, b), (b, a)):
+        hx, hy = fx.get(x) or {}, fx.get(y) or {}
+        if any(_aura_reaches(au, hy.get("tags") or [], axes.get(y) or {}) for au in hx.get("auras") or []):
+            n += 1
+    return n
+
+
 def _relations(E, state: Dict[str, Any], workspace: Path) -> List[Any]:
     web = _story(workspace, "support_web.json")
     bonds = (state.get("attachments") or {}).get("pairBonds") or {}
     out = []
+    authored = set()
+    for e in web.get("edges") or []:
+        if e.get("authored"):
+            authored.add(frozenset((str(e.get("a")), str(e.get("b")))))
+    # Field fit (2026-10-29): a wild hero the company's auras would reach, or whose aura would reach
+    # the company, is a little likelier to turn up. Weak next to a written tie, so bonds stay the
+    # default meeting; it decides which strangers come, not how many. Only for pairs with no
+    # written tie, and only toward who is with the company now.
+    fit_w = float((rules(workspace).get("fieldFit") or {}).get("weight", 0.0))
+    if fit_w > 0:
+        fx = _story(workspace, "field_effects.json").get("heroes") or {}
+        axes = {str(h.get("heroId")): h.get("axes") or {} for h in _story(workspace, "hero_umwelt.json").get("heroes") or []}
+        present = set(present_heroes(state))
+        for p in sorted(present):
+            for c in sorted(fx):
+                if c in present or frozenset((p, c)) in authored:
+                    continue
+                n = field_fit(p, c, fx, axes)
+                if n:
+                    out.append(E.Relation(p, c, "field_fit", weight=fit_w * n))
     for e in web.get("edges") or []:
         a, b, pol = str(e.get("a") or ""), str(e.get("b") or ""), str(e.get("polarity") or "")
         if not a or not b or a == b:

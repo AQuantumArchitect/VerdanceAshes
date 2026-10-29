@@ -1,4 +1,4 @@
--- Procedural hero tags + ONE field-effect stat per hero.
+-- Procedural hero tags + ONE field-effect stat per hero (its self effect; auras: va_field_engine.lua).
 -- Career rank stays separate ("Green" / "Proven" / …). Legacy "Blooded" → Proven.
 -- Mobility cohesion (pack +50% / drag) lives in va_pack_overlay — NOT here.
 -- Field effects scale with mentor XP (scout/factory heroes bank subordinate XP).
@@ -114,6 +114,42 @@ M.HERO_DEFAULTS = {
   mason = { "legion_line" },
   rookery = { "high_nest" }, dam = { "dam_works" }, arc = { "choir" }, mammoth = { "old_mother" }, gladius = { "crowd_roar" }, triton = { "low_tide" }, loom = { "web_line" }, hundred = { "hundred_hands" }, gorgon = { "stone_gaze" },
 }
+
+-- Field effects v2 (2026-10-29): the self effect in data/story/field_effects.json sets each hero's
+-- tag strength (20-40%; reload as the reload-time factor). Labels and fiction stay as written here.
+-- The auras, conditions, bonds and home ground live in va_field_engine.lua.
+M.FX = nil
+do
+  local FX = nil
+  if VFS and VFS.Include then
+    local ok, mod = pcall(VFS.Include, "luarules/gadgets/include/va_field_effects.lua")
+    if ok and type(mod) == "table" then FX = mod end
+  end
+  if not FX then
+    local here = debug and debug.getinfo and debug.getinfo(1, "S")
+    local dir = here and here.source and here.source:match("^@(.*[/\\])") or ""
+    local ok, mod = pcall(dofile, dir .. "va_field_effects.lua")
+    if ok and type(mod) == "table" then FX = mod end
+  end
+  M.FX = FX
+  if FX and FX.HEROES then
+    for hid, h in pairs(FX.HEROES) do
+      local tag = M.HERO_DEFAULTS[hid] and M.HERO_DEFAULTS[hid][1]
+      local def = tag and M.TAGS[tag]
+      local s = h.self
+      if def and s and s.stat then
+        for _, k in ipairs({ "hp", "speed", "range", "reload", "build", "vision", "energy", "splash" }) do def[k] = nil end
+        local b = tonumber(s.bonus) or 0
+        def[s.stat] = (s.stat == "reload") and (1 / (1 + b)) or (1 + b)
+        def.when = s.when
+      end
+    end
+  end
+end
+
+-- When the field engine runs (the campaign gadget), it owns every stat: the spawn-time path below
+-- only names the effect and stamps the HUD params.
+M.engineOwnsStats = false
 
 -- Rare dual-effect exceptions. Primary still comes from HERO_DEFAULTS;
 -- these extra stats also XP-scale and push to the pack.
@@ -478,6 +514,11 @@ function M.applyFieldToUnit(unitID, field, rec)
   if not unitID or not Spring.ValidUnitID(unitID) or not field then return end
   local primary = field.primaryStat
   if not primary then return end
+  if M.engineOwnsStats then
+    Spring.SetUnitRulesParam(unitID, "va_field_stat", tostring(primary), { public = true })
+    Spring.SetUnitRulesParam(unitID, "va_field_mult", tonumber(field[primary]) or 1, { public = true })
+    return
+  end
   applyOneStat(unitID, primary, tonumber(field[primary]) or 1, rec)
   if type(field.secondaryStats) == "table" then
     for stat, on in pairs(field.secondaryStats) do
@@ -496,6 +537,7 @@ end
 -- Hearth: push energy field onto every friendly fusion (self included).
 function M.applyFusionEnergyAura(heroUnitID, field, teamID)
   if not field or field.primaryStat ~= "energy" then return 0 end
+  if M.engineOwnsStats then return 0 end
   if not Spring.GetTeamUnits then return 0 end
   teamID = teamID or (heroUnitID and Spring.GetUnitTeam(heroUnitID))
   if teamID == nil then return 0 end
@@ -526,6 +568,7 @@ end
 M.CENTURION_AURA_RADIUS = 520
 function M.applyCenturionHpAura(heroUnitID, field, teamID)
   if not field or field.primaryStat ~= "hp" then return 0 end
+  if M.engineOwnsStats then return 0 end
   if not heroUnitID or not Spring.ValidUnitID(heroUnitID) then return 0 end
   -- Only the Pavise ward tag owns this aura (avoid every HP-tag hero radiating).
   local tags = field.tags or {}
@@ -580,12 +623,12 @@ function M.applyToHero(unitID, rec, tagList, xp)
     rec.baseBuildPowerMult = tonumber(rec.buildPowerMult) or 1.0
   end
   -- Hero personal toughness: only fold HP/build when that IS the field effect.
-  if field.primaryStat == "hp" then
+  if field.primaryStat == "hp" and not M.engineOwnsStats then
     rec.hpMult = mul(rec.baseHpMult, field.hp)
   else
     rec.hpMult = rec.baseHpMult
   end
-  if field.primaryStat == "build" then
+  if field.primaryStat == "build" and not M.engineOwnsStats then
     rec.buildPowerMult = mul(rec.baseBuildPowerMult, field.build)
   else
     rec.buildPowerMult = rec.baseBuildPowerMult
