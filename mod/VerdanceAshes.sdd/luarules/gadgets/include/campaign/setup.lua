@@ -87,9 +87,11 @@ function spawnPlayableSetup()
           -- Commerce deploy bag: spawned ONCE by VA_LOGISTICS.spawnCommerceDeployKit at
           -- GameStart from mission.commerce.deploy. Never from the layout force
           -- (see VA_CREW_isCommerceKitSpec for the rule).
-        elseif useCrewKit and isPlayer and not spec.reserve and not VA_CREW_isAnchorKeep(spec) then
-          -- Heroes come from the sealed hub packet (spawn below). The reserve the player
-          -- chose (spec.reserve, Add-ReserveToKit) lands with the company.
+        elseif useCrewKit and isPlayer and not spec.reserve then
+          -- The company is what the hub sealed: the heroes' packs (spawn below), the reserve the
+          -- player chose (spec.reserve, Add-ReserveToKit) and the shop's kit. Nothing else from the
+          -- layout lands with it: no spare rez bots, no starter mex, winds or radar (the pad's own
+          -- radar, placed below, marks the drop).
         elseif VA_HOT.pending and isPlayer and spec.reserve then
           -- Hot drop: the reserve waits with the company; the drop says how many board.
           VA_HOT.reserve[#VA_HOT.reserve + 1] = { spec = spec, teamID = teamID, baseX = baseX, baseZ = baseZ,

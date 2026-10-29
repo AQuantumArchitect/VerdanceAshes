@@ -90,12 +90,17 @@ def _first_error_line(*reports: dict[str, Any]) -> str:
     return "deploy pipeline failed -- see build.stderr_tail"
 
 
-def _plan_key(plan: dict[str, Any] | None) -> str:
-    """What fixes the loaded field: the map, the pad, the targets and the job. Not the company."""
+def _plan_key(plan: dict[str, Any] | None, state: dict[str, Any] | None = None) -> str:
+    """What fixes the loaded field: the map, the pad, the targets and the job, and the hires that
+    change who lands (a rented hero, the commander suit). Not the company, not the rest of the shop:
+    the drop carries those."""
     p = plan or {}
     m = p.get("marks") or {}
+    owned = ((state or {}).get("commerce") or {}).get("owned") or {}
+    lands = sorted(lid for lid, rec in owned.items()
+                   if isinstance(rec, dict) and rec.get("kind") in ("hero_rental", "commander_suit"))
     return json.dumps([p.get("mapId"), p.get("contractKind"), m.get("deployZoneId"),
-                       sorted(m.get("captureZoneIds") or [])], sort_keys=True)
+                       sorted(m.get("captureZoneIds") or []), lands], sort_keys=True)
 
 
 def _spring_already_open() -> str | None:
@@ -1062,7 +1067,7 @@ class CampaignKernel:
         from verdance_kernel import hot_drop as _hot
         self._clear_hot()
         self._hot = {"token": token, "pid": launch_report.get("pid"), "mapId": plan.get("mapId"),
-                     "plan": _plan_key(plan), "at": utc_now(), "dropped": False}
+                     "plan": _plan_key(plan, load_json(state_path(self.ws), {})), "at": utc_now(), "dropped": False}
         if launch_report.get("pid"):
             self._hot_behind = threading.Event()
             _hot.keep_behind(int(launch_report["pid"]), self._hot_behind)
@@ -1080,7 +1085,7 @@ class CampaignKernel:
         hot = self._hot
         if hot and not hot.get("dropped"):
             if pid_alive(hot.get("pid")) and hot.get("mapId") == (plan or {}).get("mapId") \
-                    and hot.get("plan") == _plan_key(plan):
+                    and hot.get("plan") == _plan_key(plan, load_json(state_path(self.ws), {})):
                 return {"ok": True, "accepted": True, "already": True, "phase": self.hot_drop_status().get("phase")}
             self.cancel_preload()
             for _ in range(40):                  # let the old field close before the new one starts
@@ -1136,7 +1141,12 @@ class CampaignKernel:
                 band, aces, roster["cadre"] = [], [], {}     # the kings' showdown: the commander alone
             save_json(sp, st)
             _hot.record_roster(self.ws, band, aces)
-            path = _hot.write_drop(root, _hot.drop_line(hot["token"], band, roster["cadre"]))
+            # the shop as it stands now: the field loaded while the player was still hiring
+            from verdance.campaign.commerce import build_commerce_intent
+            bag = build_commerce_intent(st, self.ws)
+            save_json(sp, st)
+            kit = _hot.kit_field(bag.get("deploy") or [], bag.get("pendingDeliveries") or [])
+            path = _hot.write_drop(root, _hot.drop_line(hot["token"], band, roster["cadre"], kit))
             hot["dropped"] = True
             hot["droppedAt"] = utc_now()
             if self._hot_behind is not None:

@@ -20,6 +20,18 @@ DEFAULT_SEC_PER_MIN = 10.0
 DEFAULT_SAME_MAP_SPOOL = 75
 DEFAULT_LAUNCHER_MIN = 60
 DEFAULT_LAUNCHER_MAX = 120
+DEFAULT_ROAD_PACE_SPEED = 72.0   # the roads' travel minutes are a ground column at Brute speed
+DEFAULT_AIR_ROUTE_FACTOR = 0.6   # flyers skip the roads' terrain detours
+
+
+def travel_pace(delivery: Dict[str, Any], craft: Dict[str, Any]) -> float:
+    """How much of the roads' travel time this pack needs: road speed over its own speed, and less
+    again if it flies (straight over the terrain the roads wind through). 1.0 when it gives no speed."""
+    speed = float(delivery.get("speed") or 0)
+    pace = (float(craft.get("roadPaceSpeed") or DEFAULT_ROAD_PACE_SPEED) / speed) if speed > 0 else 1.0
+    if delivery.get("flies"):
+        pace *= float(craft.get("airRouteFactor") or DEFAULT_AIR_ROUTE_FACTOR)
+    return pace
 
 
 def _workspace_root(workspace: Optional[Path] = None) -> Path:
@@ -270,10 +282,11 @@ def delivery_eta(
         summary = f"Local from {info['sourceLabel']} · spool ~{eta_s}s"
         eta_text = f"~{eta_s}s spool"
     else:
-        eta_s = max(30, int(round(minutes * sec_per_min)))
+        delivery = listing.get("delivery") if isinstance(listing.get("delivery"), dict) else {}
+        eta_s = max(30, int(round(minutes * sec_per_min * travel_pace(delivery, craft))))
         labels = [map_label(m, workspace) for m in route]
         crumb = " → ".join(labels)
-        summary = f"Via {crumb} · field ETA {eta_s // 60}:{eta_s % 60:02d}"
+        summary = f"{'By air from ' + labels[0] if delivery.get('flies') else 'Via ' + crumb} · field ETA {eta_s // 60}:{eta_s % 60:02d}"
         eta_text = f"~{eta_s // 60}:{eta_s % 60:02d} via {info['sourceLabel']}"
 
     return {

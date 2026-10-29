@@ -462,6 +462,9 @@ details.advanced summary { color:var(--steam); }
 #cc-matters .cc-thread strong { color:var(--matter-ink); margin:.3rem 0; font-size:var(--fs-lg); }
 #cc-matters .cc-thread span, #cc-matters .cc-thread small { font-size:var(--fs-sm); line-height:1.5; color:var(--matter-dim); }
 #cc-matters .cc-thread[aria-pressed=true] { border-color:color-mix(in srgb, var(--tnb) 80%, var(--ink)); border-left-color:var(--edge); background:var(--matter-bg-on); }
+/* a matter the company has talked through (answered: Committed) wears gold, so the open ones stand out */
+#cc-matters .cc-thread[data-stage=Committed] { background:color-mix(in srgb, var(--gold) 12%, var(--matter-bg)); border-color:color-mix(in srgb, var(--gold) 45%, var(--matter-line)); border-left-color:var(--gold); }
+#cc-matters .cc-thread[data-stage=Committed] strong { color:var(--gold); }
 #cc-inspector { font-size:var(--fs-md); line-height:1.6; border-top:1px solid var(--matter-line); margin-top:1.1rem; padding-top:1rem; }
 #cc-inspector h2 { font-size:var(--fs-xl); line-height:1.3; text-transform:none; letter-spacing:0; color:var(--matter-ink); }
 #cc-inspector .cc-choice button { background:color-mix(in srgb, var(--tnb) 14%, var(--bg)); border-color:color-mix(in srgb, var(--tnb) 50%, var(--bg)); width:100%; }

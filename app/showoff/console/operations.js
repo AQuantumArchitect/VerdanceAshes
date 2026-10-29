@@ -357,15 +357,24 @@ export function showDropConfirm() {
   if (el) el.classList.add("show");
   const phase = state.warm.phase;
   if (phase === "idle" || phase === "failed") {
-    // The field loads on Launch, not on opening: hire in the store first (owner call, 2026-10-27).
+    // The field starts loading as the menu opens (owner call, 2026-10-28): pick heroes and hire
+    // mercenaries while it loads. The drop carries the shop as it stands then; only a rented hero
+    // or the commander suit reloads the field (fieldHiresChanged).
     resetReserveBring();
     recomputeShopAvailability();
     setWarm("idle");
     showDropTab(firstDrop() && storeWantsAttention() ? "mercs" : "party");
+    if (state.hostLive) launchField();
   } else {
     renderDropSquad();
     paintWarmStatus();
   }
+}
+// A hire that changes who lands (a rented hero, the commander suit) after the field started
+// loading: ask again; the kernel reloads only if the field no longer fits (api.py _plan_key).
+export function fieldHiresChanged() {
+  const phase = state.warm && state.warm.phase;
+  if (state.hostLive && (phase === "loading" || phase === "ready")) launchField();
 }
 // Launch: build the mission and start BAR now, with every pack the company could send compiled in.
 async function launchField() {

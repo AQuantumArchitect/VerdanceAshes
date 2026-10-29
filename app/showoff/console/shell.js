@@ -108,14 +108,18 @@ export function paint() {
   session.signature = signature;
   const actionable = n?.threads?.filter(t => ["Available", "Committed", "Changed"].includes(t.stage)) || [];
   const shown = session.allThreads ? actionable : actionable.filter(t => n.recommended.includes(t.id));
+  // Who this drop can rescue rides with the operations: under the cards, above the sortie text.
+  // The node is kept and moved (company.js fills it), never rebuilt with the rail.
+  const recruit = $("company-recruit");
   $("operations-rail").innerHTML = '<p class="cc-eyebrow">Company operations</p><h2>Where do we go next?</h2>' + fieldLine(fieldPeople()) +
     choices.slice(0, 3).map(c => opCard(c, ranking.find(o => o.id === c.id), snap)).join("") +
     (choices.length > 3 ? `<details><summary>All ${choices.length} operations</summary>${choices.slice(3).map(c => opCard(c, ranking.find(o => o.id === c.id), snap)).join("")}</details>` : "") +
     (over ? `<p class="cc-epilogue">${escape(snap.hub.node.text)}</p><p>The campaign is complete. The chronicle and the company remain.</p>`
       : !choices.length ? "<p>No operation on this theater. Select another map or refresh after your return.</p>" : "") +
     '<section id="cc-operation-details" aria-label="Selected operation"></section>';
+  if (recruit) $("operations-rail").insertBefore(recruit, $("cc-operation-details"));
   $("cc-matters").innerHTML = '<p class="cc-eyebrow">Around the company table</p><h2>Company matters</h2><p class="cc-matters-intro">People, principles, and promises.</p>' +
-    shown.map(t => `<button class="cc-thread" type="button" data-thread="${escape(t.id)}" aria-pressed="${t.id === session.selectedThread}"><small>${escape(t.stage)}${t.remaining !== null ? ` · ${t.remaining} sorties left` : ""}</small><strong>${escape(t.title)}</strong><span>${escape(t.reason)}</span></button>`).join("") +
+    shown.map(t => `<button class="cc-thread" type="button" data-thread="${escape(t.id)}" data-stage="${escape(t.stage)}" aria-pressed="${t.id === session.selectedThread}"><small>${escape(t.stage)}${t.remaining !== null ? ` · ${t.remaining} sorties left` : ""}</small><strong>${escape(t.title)}</strong><span>${escape(t.reason)}</span></button>`).join("") +
     (actionable.length > 3 ? `<button type="button" id="cc-more">${session.allThreads ? "Show recommended" : "Show all matters"}</button>` : "") +
     (session.error ? `<p role="status" class="cc-error">${escape(session.error)}</p>` : "");
   renderChronicle(n);

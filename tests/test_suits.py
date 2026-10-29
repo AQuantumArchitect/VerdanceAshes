@@ -58,11 +58,11 @@ def test_the_cortex_suit_is_a_loan_for_one_fight():
     s.setdefault("reputation", {})["cortex"] = 50
     s.setdefault("commerce", {}).update(tenebrium=30, metalK=40)
     assert purchase_listing(s, "cortex_commander_suit", ROOT)["ok"]
-    assert s["commerce"]["tenebrium"] == 15 and suits.has_suit(s)
+    assert s["commerce"]["tenebrium"] == 20 and s["commerce"]["metalK"] == 30 and suits.has_suit(s)   # 10 Tnb + 10k
     settle_commerce_after_sortie(s, {"resultKey": "k1", "status": "extracted"}, True, True, False, ROOT)
     assert not suits.has_suit(s) and not suits.on_loan(s)                     # back to Cortex
     assert purchase_listing(s, "cortex_commander_suit", ROOT)["ok"]           # same fee, next fight
-    assert s["commerce"]["tenebrium"] == 0
+    assert s["commerce"]["tenebrium"] == 10
 
 
 def test_a_suit_won_for_good_is_not_returned():

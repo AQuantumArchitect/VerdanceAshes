@@ -17,8 +17,8 @@ MOD = os.path.join(WS, "mod", "VerdanceAshes.sdd")
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 import campaign_lua  # noqa: E402
 SRC = campaign_lua.source()
-start = SRC.index("function VA_HOT_drop(line)")
-end = SRC.index("\nend\n", start) + len("\nend\n")
+start = SRC.index("local function decodeKit(field)")   # the kit decoder, then the drop
+end = SRC.index("\nend\n", SRC.index("function VA_HOT_drop(line)", start)) + len("\nend\n")
 DROP_FN = SRC[start:end]
 WIDGET = os.path.join(MOD, "luaui", "Widgets", "gui_verdance_hotdrop.lua")
 
@@ -60,6 +60,9 @@ SPAWNED, PICKS, SWEEPS = {}, nil, 0
 function spawnUnitSpec(spec, teamID) SPAWNED[spec.unitDefName] = (SPAWNED[spec.unitDefName] or 0) + spec.count; return spec.count end
 function VA_CREW_confirm(picks) PICKS = picks end
 function sweepPlayerCommanders() SWEEPS = SWEEPS + 1 end
+KIT, INBOUND = "unset", "unset"
+VA_LOGISTICS = { spawnCommerceDeployKit = function(list) KIT = list or "seed" end }
+function armPendingDeliveries(list) INBOUND = list or "seed" end
 VA_HOT = { token = "abc123", pending = true, reserve = {
   { spec = { unitDefName = "corthud", count = 5, reserve = true }, teamID = 0, baseX = 0, baseZ = 0, groupX = 0, groupZ = 0 },
   { spec = { unitDefName = "armwar", count = 2, reserve = true }, teamID = 0, baseX = 0, baseZ = 0, groupX = 0, groupZ = 0 },
@@ -76,8 +79,14 @@ out.legbar = SPAWNED.legbar or 0
 out.sweeps = SWEEPS
 out.pending = VA_HOT.pending
 out.rule = RULES.va_hotdrop_pending
+out.kitFromSeed = KIT == "seed" and INBOUND == "seed"   -- an old line: the seed's own kit
 out.again = VA_HOT_drop("abc123|pavise|corthud:1")
 out.corthudAfter = SPAWNED.corthud or 0
+-- a line with the shop: bought while the field loaded
+VA_HOT.pending = true
+out.withKit = VA_HOT_drop("abc123|pavise||kind=package,listingId=punch_of_thugs,unitDef=corthud,count=6;kind=pending,listingId=wasp_flight,unitDef=corape,count=4,etaSeconds=98")
+out.kit = KIT
+out.inbound = INBOUND
 return enc(out)
 '''
 
@@ -165,6 +174,10 @@ check("the right drop lands the chosen packs", g["ok"] is True and g["picks"] ==
 check("... and only the reserve asked for, never more than compiled in", g["corthud"] == 3 and g["armwar"] == 2 and g["legbar"] == 0, g)
 check("... and clears the wait for the board", g["pending"] is False and g["rule"] == 0 and g["sweeps"] == 1, g)
 check("a second drop is ignored", g["again"] is False and g["corthudAfter"] == 3, g)
+check("a drop line without a shop field spawns the seed's kit", g["kitFromSeed"] is True, g)
+check("a drop with the shop lands what was bought up to the drop", g["withKit"] is True
+      and g["kit"] == [{"kind": "package", "listingId": "punch_of_thugs", "unitDef": "corthud", "count": 6}]
+      and g["inbound"] == [{"listingId": "wasp_flight", "unitDef": "corape", "count": 4, "etaSeconds": 98}], g)
 
 w = run(WIDGET_RUN)
 check("the widget holds the pause while the field waits", w["heldPause"] is True and w["sentEarly"] == 0, w)

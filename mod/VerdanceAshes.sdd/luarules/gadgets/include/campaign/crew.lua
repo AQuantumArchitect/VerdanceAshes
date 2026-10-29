@@ -1,9 +1,9 @@
 -- campaign/crew.lua: the company on the field: the roster, who drops (crew confirm, the hot drop), anchor keeps, what was dropped
 -- Part of game_verdance_campaign.lua, loaded into that gadget's environment
 -- (VFS.Include with the gadget table), so its globals are the gadget's globals.
--- Provides: VA_CREW_SELECT, VA_CREW_confirm, VA_CREW_isAnchorKeep, VA_CREW_isCommerceKitSpec,
--- VA_CREW_loadRoster, VA_CREW_publish, VA_HOT, VA_HOT_drop, vaNoteDropped
--- Uses: crew_packs, crew_storage, spawn, start, state
+-- Provides: VA_CREW_SELECT, VA_CREW_confirm, VA_CREW_isCommerceKitSpec, VA_CREW_loadRoster,
+-- VA_CREW_publish, VA_HOT, VA_HOT_drop, vaNoteDropped
+-- Uses: crew_packs, crew_storage, logistics, spawn, start, state
 
 -- Muster the Band: packed table (Lua 5.1 local budget). Fresh chapter only.
 VA_CREW_SELECT = {
@@ -51,28 +51,6 @@ function VA_CREW_loadRoster()
   local km = com and tonumber(com.metalK)
   VA_CREW_SELECT.walletKm = (km ~= nil) and math.max(0, math.floor(km)) or 7
   return VA_CREW_SELECT.roster
-end
-
--- Eco / support defs that still drop with the hub crew kit (not replaced by heroes).
--- Mex + storage + nano matter for Consul / Twitcher dig-in sorties.
-local VA_CREW_ANCHOR_KEEP = {
-  legmex = true, armmex = true, cormex = true,
-  legwin = true, legsolar = true, armsolar = true, corsolar = true,
-  legrad = true, armrad = true, corrad = true,
-  legestor = true, legmstor = true, armestor = true, armmstor = true, corestor = true, cormstor = true,
-  legck = true, legcv = true, legca = true, corck = true, armck = true,
-  legnanotc = true, armnanotc = true, cornanotc = true,
-}
-
-function VA_CREW_isAnchorKeep(spec)
-  if not spec then return false end
-  if spec.heroId or spec.hero then return false end -- heroes wait for muster
-  local defName = tostring(spec.unitDefName or spec.def or spec[1] or "")
-  if VA_CREW_ANCHOR_KEEP[defName] then return true end
-  if spec.atMetalSpots or spec.nearestMetalSpots then return true end
-  -- Generic rez still allowed as a spare until Ketha drops (no hero tag).
-  if defName == "legrezbot" then return true end
-  return false
 end
 
 -- Bought broker kit (punch / fabs / constructors / nanos from mission.commerce.deploy).
@@ -219,12 +197,26 @@ end
 
 -- The drop: the packs and reserve the player chose on the hub, into the field that is
 -- already loaded. Message: "vahotdrop token|pack,pack|unitdef:n,unitdef:n".
+-- The shop's part of a drop line: items split by ";", fields "k=v" split by "," (the kernel's
+-- hot_drop.kit_field). kind=pending is a delivery in transit; anything else is t=0 kit.
+local function decodeKit(field)
+  local deploy, pending = {}, {}
+  for item in string.gmatch(field or "", "[^;]+") do
+    local rec = {}
+    for k, v in string.gmatch(item, "([%w_]+)=([^,]*)") do rec[k] = tonumber(v) or v end
+    if rec.kind == "pending" then rec.kind = nil; pending[#pending + 1] = rec
+    elseif rec.kind then deploy[#deploy + 1] = rec end
+  end
+  return deploy, pending
+end
+
 function VA_HOT_drop(line)
   if not VA_HOT.pending then
     Spring.Echo("VA_HOTDROP_IGNORED not_pending")
     return false
   end
-  local token, packs, units = tostring(line or ""):match("^([^|]*)|([^|]*)|?(.*)$")
+  local token, packs, rest = tostring(line or ""):match("^([^|]*)|([^|]*)|?(.*)$")
+  local units, kit = tostring(rest or ""):match("^([^|]*)|?(.*)$")
   if token ~= VA_HOT.token then
     Spring.Echo("VA_HOTDROP_IGNORED stale_token " .. tostring(token))
     return false
@@ -247,6 +239,11 @@ function VA_HOT_drop(line)
   end
   VA_HOT.pending = false
   VA_CREW_confirm(picks)
+  -- the shop: what was bought up to the drop (a line without a kit field: the seed's own)
+  local hasKit = kit ~= nil and rest:find("|", 1, true) ~= nil
+  local deploy, inbound = decodeKit(kit)
+  VA_LOGISTICS.spawnCommerceDeployKit(hasKit and deploy or nil)
+  armPendingDeliveries(hasKit and inbound or nil)
   sweepPlayerCommanders("hotdrop")
   Spring.SetGameRulesParam("va_hotdrop_pending", 0, { public = true })
   Spring.Echo("VA_HOTDROP_DONE packs=" .. table.concat(picks, ",") .. " reserve=" .. tostring(landed))

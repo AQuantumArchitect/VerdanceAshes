@@ -4,7 +4,7 @@ import { state, CREW, list, companySurface, companySealed, commerce, metalKOf, p
 import { api } from "./api.js";
 import { $, esc, toast, logLine, downloadJson, renderHeroCard, crewPack, crewHeroName, aceById, heroNameAny } from "./render.js";
 import { wildRecruitAtZone, predictedFieldRecruits, renderBoard } from "./board.js";
-import { updateDeployGate, noteRosterChanged, dropRosterSealed, refreshTheaterForFocus } from "./operations.js";
+import { updateDeployGate, noteRosterChanged, dropRosterSealed, refreshTheaterForFocus, fieldHiresChanged } from "./operations.js";
 import { renderBadges, renderHeadline } from "./shell.js";
 import { showCoach } from "./system.js";
 import { pullHubState } from "./homecoming.js";
@@ -620,6 +620,7 @@ export async function tryBuy(listingId) {
       logLine(`Bought ${item.label} (−${tcost} Tnb, −${(mcost * 1000).toLocaleString()} metal) · campaign bag live`);
       toast(`Bought ${item.label}`, "ok");
       await pullHubState();
+      if (item.kind === "hero_rental" || item.kind === "commander_suit") fieldHiresChanged();
       return;
     } catch (e) {
       return toast("Purchase error: " + e.message, "err");

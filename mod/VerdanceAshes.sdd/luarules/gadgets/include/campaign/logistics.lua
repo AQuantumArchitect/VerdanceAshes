@@ -109,10 +109,11 @@ function VA_LOGISTICS.spawnPackageDelivery(spec)
   return spawned
 end
 
-function VA_LOGISTICS.armPendingDeliveries()
+-- list: what is in transit (default: the seed's; a hot drop brings its own, see VA_HOT_drop).
+function VA_LOGISTICS.armPendingDeliveries(list)
   VA_LOGISTICS.pending = {}
   local bag = mission and mission.commerce or {}
-  local list = bag.pendingDeliveries or mission.pendingDeliveries or {}
+  list = list or bag.pendingDeliveries or mission.pendingDeliveries or {}
   local frame = Spring.GetGameFrame() or 0
   for _, raw in ipairs(list) do
     if type(raw) == "table" and tostring(raw.status or "in_transit") == "in_transit" then
@@ -149,14 +150,15 @@ end
 -- in playableSetup carries preview copies of the same items (stamped commerceDeploy=true by
 -- scripts/build_next_mission_v1.ps1 Add-CommerceDeployToKit) and spawnPlayableSetup skips
 -- them via VA_CREW_isCommerceKitSpec. Spawning here AND there is the double-spawn bug.
-function VA_LOGISTICS.spawnCommerceDeployKit()
+-- list: the kit (default: the seed's; a hot drop brings what was bought up to the drop).
+function VA_LOGISTICS.spawnCommerceDeployKit(list)
   if VA_LOGISTICS.deployKitSpawned then
     Spring.Echo("VA_COMMERCE_DEPLOY already_spawned")
     return 0
   end
   VA_LOGISTICS.deployKitSpawned = true
   local bag = mission and mission.commerce or {}
-  local list = bag.deploy or {}
+  list = list or bag.deploy or {}
   if type(list) ~= "table" or #list == 0 then
     Spring.Echo("VA_COMMERCE_DEPLOY empty")
     return 0
