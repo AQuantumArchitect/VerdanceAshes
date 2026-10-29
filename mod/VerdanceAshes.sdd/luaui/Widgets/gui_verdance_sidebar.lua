@@ -33,7 +33,16 @@ local M = {}                -- the mission seed: title, objective, kind, require
 local S = { status = "active" }  -- polled facts
 local H = { list = {}, byId = {} } -- heroes (live json merged with the seed roster)
 local R = {}                -- the rail
-local UI = { rects = {} }   -- click targets: { x1,y1,x2,y2, kind, data }
+local UI = { rects = {}, n = 0 }   -- click targets: { x1,y1,x2,y2, kind, data }; the first n are live
+
+-- Click targets are laid out every frame; the tables are reused, not made.
+local function addRect(x1, y1, x2, y2, kind, data)
+  local i = UI.n + 1
+  local r = UI.rects[i]
+  if not r then r = {}; UI.rects[i] = r end
+  r[1], r[2], r[3], r[4], r.kind, r.data = x1, y1, x2, y2, kind, data
+  UI.n = i
+end
 local route = { stage = nil, from = nil, to = nil, painted = nil }
 local lastClick = { t = 0, id = nil }
 
@@ -533,7 +542,8 @@ end
 
 function widget:MousePress(x, y, button)
   if over() or Hud.modal() or button ~= 1 then return false end
-  for _, r in ipairs(UI.rects) do
+  for i = 1, UI.n do
+    local r = UI.rects[i]
     if Ash.inRect(x, y, r) then
       if r.kind == "extract" then Hud.press("extract") elseif r.kind == "hero" then clickHero(r.data) end
       return true
@@ -644,7 +654,7 @@ local function drawCompany(x, y, right)
     if rec.state == "alive" and not rec.onPad and rec.zone and rec.zone ~= "" and b then
       text(Ash.fit(b:label(rec.zone), 8, 90), right - 6, y2 - 25, 8, Ash.COL.muted, "r")
     end
-    UI.rects[#UI.rects + 1] = { x, y1, right, y2, kind = "hero", data = rec }
+    addRect(x, y1, right, y2, "hero", rec)
     y = y - rowH
   end
   return y - 12
@@ -684,7 +694,7 @@ local function drawPad(x, y, right)
   Ash.actionRow(x, y - h, right, y, { fill = fill, focused = e.state ~= "empty" })
   text(e.label, x + 12, y - 19, 12, (e.state == "empty") and Ash.COL.bad or Ash.COL.ink, "l")
   if e.sub then text(Ash.fit(e.sub, 9, right - x - 16), x + 12, y - 33, 9, subCol, "l") end
-  UI.rects[#UI.rects + 1] = { x, y - h, right, y, kind = "extract" }
+  addRect(x, y - h, right, y, "extract", nil)
   y = y - h - 8
   if #e.left > 0 then
     text("LEFT IF YOU LIFT", x, y, 8, Ash.COL.ash, "l"); y = y - 12
@@ -706,36 +716,41 @@ end
 
 local BLOCKS = { { "phase", drawPhase, 30 }, { "mission", drawMission, 60 }, { "company", drawCompany, 40 }, { "pad", drawPad, 60 } }
 
+local function glReset()
+  local vx, vy = Spring.GetViewGeometry()
+  if vx and vx > 32 then vsx, vsy = vx, vy end
+  if gl.Scissor then gl.Scissor(false) end
+  if gl.DepthTest then gl.DepthTest(false) end
+  if gl.Blending then gl.Blending(true) end
+  gl.Color(1, 1, 1, 1)
+end
+
+local function blocks(top, x, inner)
+  local y = top - 8
+  for i = 1, #BLOCKS do local blk = BLOCKS[i]; y = guard(blk[1], blk[2], x, y, inner) or (y - blk[3]) end
+  return math.max(24, y)
+end
+
+local PANEL = { accent = Ash and Ash.COL.edge }
+
 function widget:DrawScreen()
   if Spring.IsGUIHidden() or not Ash or not M.seed or not R.phase then return end
-  pcall(function()
-    local vx, vy = Spring.GetViewGeometry()
-    if vx and vx > 32 then vsx, vsy = vx, vy end
-    if gl.Scissor then gl.Scissor(false) end
-    if gl.DepthTest then gl.DepthTest(false) end
-    if gl.Blending then gl.Blending(true) end
-    gl.Color(1, 1, 1, 1)
-  end)
-  UI.rects = {}
+  pcall(glReset)   -- named functions throughout: the rail draws every frame and makes no closures
+  UI.n = 0
   if S.sortieOver or Hud.modal() then return end
   local right = vsx - 10
   local left = right - W
   local top = vsy - TOP_GAP
   local x, inner = left + 12, right - 12
-  local function blocks()
-    local y = top - 8
-    for _, blk in ipairs(BLOCKS) do y = guard(blk[1], blk[2], x, y, inner) or (y - blk[3]) end
-    return math.max(24, y)
-  end
   -- the panel's height is last frame's content height (content changes slowly); when it changed,
   -- redraw the panel at the new size and the content once more
   local bottom = UI.lastBottom or (top - 320)
-  Ash.panel(left, bottom - 10, right, top + 10, { accent = Ash.COL.edge })
-  local y = blocks()
+  Ash.panel(left, bottom - 10, right, top + 10, PANEL)
+  local y = blocks(top, x, inner)
   if math.abs(y - bottom) > 2 then
-    UI.rects = {}
-    Ash.panel(left, y - 10, right, top + 10, { accent = Ash.COL.edge })
-    y = blocks()
+    UI.n = 0
+    Ash.panel(left, y - 10, right, top + 10, PANEL)
+    y = blocks(top, x, inner)
   end
   UI.lastBottom = y
   gl.Color(1, 1, 1, 1)

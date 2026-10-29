@@ -62,9 +62,20 @@ function Ash.color(name, alpha)
   return c
 end
 
+-- Draw-path hygiene: every widget calls these every frame, so none of them may allocate. Ash.with
+-- hands back one shared table per colour and alpha (alpha in 1/255 steps, the framebuffer's own
+-- precision), so treat what it returns as read-only. The line helpers below feed gl.BeginEnd one
+-- fixed function that reads module state, never a fresh closure.
+local withCache = setmetatable({}, { __mode = "k" })   -- colour table -> { [alpha step] = colour }
 function Ash.with(col, alpha)
   col = col or Ash.COL.ink
-  return { col[1], col[2], col[3], alpha }
+  local a = tonumber(alpha) or col[4] or 1
+  local q = math.floor(a * 255 + 0.5)
+  local byA = withCache[col]
+  if not byA then byA = {}; withCache[col] = byA end
+  local c = byA[q]
+  if not c then c = { col[1], col[2], col[3], q / 255 }; byA[q] = c end
+  return c
 end
 
 function Ash.setColor(col)
@@ -72,26 +83,51 @@ function Ash.setColor(col)
   gl.Color(col[1], col[2], col[3], col[4] or 1)
 end
 
+-- A colour at another alpha, without making the table.
+function Ash.setColorA(col, alpha)
+  col = col or Ash.COL.ink
+  gl.Color(col[1], col[2], col[3], alpha or col[4] or 1)
+end
+
+Ash.ALIGN = { c = "co", l = "lo", r = "ro" }
 function Ash.text(str, x, y, size, col, align)
   Ash.setColor(col or Ash.COL.ink)
-  gl.Text(tostring(str or ""), x, y, size or 12, (align or "c") .. "o")
+  if type(str) ~= "string" then str = tostring(str or "") end
+  gl.Text(str, x, y, size or 12, Ash.ALIGN[align or "c"] or ((align or "c") .. "o"))
 end
 
 function Ash.textW(str, size)
-  return gl.GetTextWidth(tostring(str or "")) * (size or 12)
+  if type(str) ~= "string" then str = tostring(str or "") end
+  return gl.GetTextWidth(str) * (size or 12)
 end
 
--- Clip a string to a pixel width (ellipsis).
+-- Clip a string to a pixel width (ellipsis). Remembered per (string, size, width): the rail asks
+-- the same question every frame, and the answer cost a substring per byte cut.
+local fitCache, fitCount = {}, 0
 function Ash.fit(str, size, maxW)
-  str = tostring(str or "")
-  if Ash.textW(str, size) <= maxW then return str end
-  local function chop(s)
-    local n = #s - 1
-    while n > 0 and s:byte(n + 1) >= 0x80 and s:byte(n + 1) < 0xC0 do n = n - 1 end
-    return s:sub(1, n)
+  if type(str) ~= "string" then str = tostring(str or "") end
+  size = size or 12
+  local bySize = fitCache[size]
+  if not bySize then bySize = {}; fitCache[size] = bySize end
+  local byW = bySize[maxW]
+  if not byW then byW = {}; bySize[maxW] = byW end
+  local hit = byW[str]
+  if hit then return hit end
+  local out = str
+  if Ash.textW(str, size) > maxW then
+    local function chop(s)
+      local n = #s - 1
+      while n > 0 and s:byte(n + 1) >= 0x80 and s:byte(n + 1) < 0xC0 do n = n - 1 end
+      return s:sub(1, n)
+    end
+    local cut = str
+    while #cut > 1 and Ash.textW(cut .. "…", size) > maxW do cut = chop(cut) end
+    out = cut .. "…"
   end
-  while #str > 1 and Ash.textW(str .. "…", size) > maxW do str = chop(str) end
-  return str .. "…"
+  fitCount = fitCount + 1
+  if fitCount > 2000 then fitCache, fitCount = {}, 0 end   -- the clock and distances churn; start over
+  byW[str] = out
+  return out
 end
 
 function Ash.rect(x1, y1, x2, y2, col)
@@ -99,12 +135,38 @@ function Ash.rect(x1, y1, x2, y2, col)
   gl.Rect(x1, y1, x2, y2)
 end
 
+local LB = { 0, 0, 0, 0, 4, 0, 0 }   -- line batch: x1, y1, x2, y2, step | cx, cy, r, segs
+local function vertsBox()
+  local x1, y1, x2, y2 = LB[1], LB[2], LB[3], LB[4]
+  gl.Vertex(x1, y1); gl.Vertex(x2, y1); gl.Vertex(x2, y2); gl.Vertex(x1, y2)
+end
+local function vertsHatch()
+  local x1, y1, x2, y2, step = LB[1], LB[2], LB[3], LB[4], LB[5]
+  local w, h = x2 - x1, y2 - y1
+  local d = step
+  while d < w + h do
+    local ax, ay = x1 + d, y1
+    if ax > x2 then ax = x2; ay = y1 + (d - w) end
+    local bx, by = x1, y1 + d
+    if by > y2 then by = y2; bx = x1 + (d - h) end
+    gl.Vertex(ax, ay); gl.Vertex(bx, by)
+    d = d + step
+  end
+end
+local function vertsRing()
+  local cx, cy, r, segs = LB[1], LB[2], LB[3], LB[4]
+  local k = math.pi * 2 / segs
+  for i = 0, segs - 1 do
+    local a = i * k
+    gl.Vertex(cx + math.cos(a) * r, cy + math.sin(a) * r)
+  end
+end
+
 function Ash.outline(x1, y1, x2, y2, col, width)
   Ash.setColor(col)
   gl.LineWidth(width or 1)
-  gl.BeginEnd(GL.LINE_LOOP, function()
-    gl.Vertex(x1, y1); gl.Vertex(x2, y1); gl.Vertex(x2, y2); gl.Vertex(x1, y2)
-  end)
+  LB[1], LB[2], LB[3], LB[4] = x1, y1, x2, y2
+  gl.BeginEnd(GL.LINE_LOOP, vertsBox)
   gl.LineWidth(1)
 end
 
@@ -195,18 +257,8 @@ function Ash.hatchRect(x1, y1, x2, y2, col, step)
   step = step or 4
   Ash.setColor(col or Ash.COL.bad)
   gl.LineWidth(1)
-  local w, h = x2 - x1, y2 - y1
-  gl.BeginEnd(GL.LINES, function()
-    local d = step
-    while d < w + h do
-      local ax, ay = x1 + d, y1
-      if ax > x2 then ax = x2; ay = y1 + (d - w) end
-      local bx, by = x1, y1 + d
-      if by > y2 then by = y2; bx = x1 + (d - h) end
-      gl.Vertex(ax, ay); gl.Vertex(bx, by)
-      d = d + step
-    end
-  end)
+  LB[1], LB[2], LB[3], LB[4], LB[5] = x1, y1, x2, y2, step
+  gl.BeginEnd(GL.LINES, vertsHatch)
 end
 
 --- Soft vignette fill behind a modal card.
@@ -246,12 +298,8 @@ function Ash.ring(cx, cy, r, col, width, segs)
   segs = segs or 32
   Ash.setColor(col)
   gl.LineWidth(width or 1.5)
-  gl.BeginEnd(GL.LINE_LOOP, function()
-    for i = 0, segs - 1 do
-      local a = (i / segs) * math.pi * 2
-      gl.Vertex(cx + math.cos(a) * r, cy + math.sin(a) * r)
-    end
-  end)
+  LB[1], LB[2], LB[3], LB[4] = cx, cy, r, segs
+  gl.BeginEnd(GL.LINE_LOOP, vertsRing)
   gl.LineWidth(1)
 end
 

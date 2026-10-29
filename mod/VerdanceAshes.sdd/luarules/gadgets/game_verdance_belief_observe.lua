@@ -13,6 +13,9 @@ function gadget:GetInfo()
   }
 end
 
+-- one shared options table for the rules params set every tick (a fresh { public = true } per call is garbage)
+local PUBLIC = { public = true }
+
 if not gadgetHandler:IsSyncedCode() then
   return
 end
@@ -259,7 +262,7 @@ local function sample(frame)
     -- weight by how much of us is there: one scout seen is a rumour, a column seen is a fact
     local weight = math.min(1, (oursSeen[id] or 0) / 6)
     seenBy[id] = math.max((seenBy[id] or 0) * decay, share * weight)
-    Spring.SetGameRulesParam("va_seen_" .. id, math.floor(seenBy[id] * 1000 + 0.5) / 1000, { public = true })
+    Spring.SetGameRulesParam("va_seen_" .. id, math.floor(seenBy[id] * 1000 + 0.5) / 1000, PUBLIC)
     local o = obs[id]
     o.enemyRecent = math.max(o.enemyRecent, o.enemyNow)
     if o.enemyNow > o.enemyPeak then o.enemyPeak = o.enemyNow end
@@ -267,10 +270,10 @@ local function sample(frame)
     if es > o.enemyStructPeak then o.enemyStructPeak = es end
     if fs > o.friendStructPeak then o.friendStructPeak = fs end
     o.friendStructNow, o.enemyStructNow = fs, es
-    Spring.SetGameRulesParam("va_obs_" .. id, math.floor(o.eta * 1000 + 0.5) / 1000, { public = true })
-    Spring.SetGameRulesParam("va_obs_enemy_" .. id, math.floor(o.enemyRecent + 0.5), { public = true })
+    Spring.SetGameRulesParam("va_obs_" .. id, math.floor(o.eta * 1000 + 0.5) / 1000, PUBLIC)
+    Spring.SetGameRulesParam("va_obs_enemy_" .. id, math.floor(o.enemyRecent + 0.5), PUBLIC)
   end
-  Spring.SetGameRulesParam("va_obs_tick", tick, { public = true })
+  Spring.SetGameRulesParam("va_obs_tick", tick, PUBLIC)
 end
 
 -- What the HUD could honestly believe about a zone from what it saw there.

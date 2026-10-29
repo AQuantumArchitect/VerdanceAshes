@@ -151,35 +151,44 @@ function widget:GameFrame(frame)
   end
 end
 
--- A disc of triangles; alpha may fall off from centre (a) to rim (b).
+-- A disc of triangles; alpha may fall off from centre (a) to rim (b). Drawn every frame, so the
+-- vertex loops read module state (D) rather than being fresh closures, and the colours are made once.
+local D = { cx = 0, cy = 0, r = 0, c = nil, a = 1, b = 1, segs = 32 }
+local function discVerts()
+  local cx, cy, r, c, segs = D.cx, D.cy, D.r, D.c, D.segs
+  gl.Color(c[1], c[2], c[3], D.a)
+  gl.Vertex(cx, cy)
+  gl.Color(c[1], c[2], c[3], D.b)
+  for i = 0, segs do
+    local t = i / segs * math.pi * 2
+    gl.Vertex(cx + math.cos(t) * r, cy + math.sin(t) * r)
+  end
+end
+local function loopVerts()
+  local cx, cy, r = D.cx, D.cy, D.r
+  for i = 0, 31 do local t = i / 32 * math.pi * 2; gl.Vertex(cx + math.cos(t) * r, cy + math.sin(t) * r) end
+end
 local function disc(cx, cy, r, c, a, b, segs)
-  gl.BeginEnd(GL.TRIANGLE_FAN, function()
-    gl.Color(c[1], c[2], c[3], a)
-    gl.Vertex(cx, cy)
-    gl.Color(c[1], c[2], c[3], b)
-    for i = 0, segs do
-      local t = i / segs * math.pi * 2
-      gl.Vertex(cx + math.cos(t) * r, cy + math.sin(t) * r)
-    end
-  end)
+  D.cx, D.cy, D.r, D.c, D.a, D.b, D.segs = cx, cy, r, c, a, b, segs
+  gl.BeginEnd(GL.TRIANGLE_FAN, discVerts)
 end
 
 -- The Tenebrium mark: a black donut breathing a faint violet glow. The hole shows the bar.
 local VOID = { 0.012, 0.004, 0.02 }
+local HAZE = { 0.23, 0.12, 0.36 }
+local HOLE = { 0.07, 0.09, 0.08 }
 local function donut(cx, cy, r, glowA)
-  disc(cx, cy, r * 1.9, { 0.23, 0.12, 0.36 }, glowA, 0.0, 32) -- violet haze
-  disc(cx, cy, r, VOID, 0.97, 0.97, 32)                   -- the black ring
+  disc(cx, cy, r * 1.9, HAZE, glowA, 0.0, 32) -- violet haze
+  disc(cx, cy, r, VOID, 0.97, 0.97, 32)       -- the black ring
   gl.Color(COL.tnb[1], COL.tnb[2], COL.tnb[3], 0.55)
   gl.LineWidth(1)
-  gl.BeginEnd(GL.LINE_LOOP, function()
-    for i = 0, 31 do local t = i / 32 * math.pi * 2; gl.Vertex(cx + math.cos(t) * r, cy + math.sin(t) * r) end
-  end)
-  disc(cx, cy, r * 0.42, { 0.07, 0.09, 0.08 }, 1.0, 1.0, 20) -- the hole
+  D.cx, D.cy, D.r = cx, cy, r
+  gl.BeginEnd(GL.LINE_LOOP, loopVerts)
+  disc(cx, cy, r * 0.42, HOLE, 1.0, 1.0, 20)  -- the hole
 end
 
-function widget:DrawScreen()
-  if Spring.IsGUIHidden() then return end
-  local ok, err = pcall(function()
+local labelBank, label = nil, ""
+local function drawChip()
     -- Just left of BAR's metal bar (WG.topbar publishes its area); top-centre if it is absent.
     local pos = WG and WG["topbar"] and WG["topbar"].GetPosition and WG["topbar"].GetPosition()
     local h, scale, right, y1
@@ -194,7 +203,7 @@ function widget:DrawScreen()
     local now = os.clock()
     local flashA = (flashKind and now < flashUntil) and math.max(0, (flashUntil - now) / FLASH_SECONDS) or 0
     local size = math.floor(h * 0.42)
-    local label = tostring(bank)
+    if labelBank ~= bank then labelBank, label = bank, tostring(bank) end
     local tw = gl.GetTextWidth(label) * size
     local r = h * 0.2
     right = right - 2 * r   -- clear of the metal bar's own icon: the number never sits under it
@@ -205,7 +214,11 @@ function widget:DrawScreen()
     if flashA > 0 then col = (flashKind == "good") and COL.good or COL.warn end
     text(label, right, cy - size * 0.35, size, col, "r")
     gl.Color(1, 1, 1, 1)
-  end)
+end
+
+function widget:DrawScreen()
+  if Spring.IsGUIHidden() then return end
+  local ok, err = pcall(drawChip)   -- a named function: no closure per frame
   if not ok and not widget._vaTnbFailLogged then
     widget._vaTnbFailLogged = true
     Spring.Echo("VA_UI_DRAW_FAIL tnb_bar " .. tostring(err))

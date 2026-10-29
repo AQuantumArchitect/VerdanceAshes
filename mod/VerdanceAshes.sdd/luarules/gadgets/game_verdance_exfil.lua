@@ -523,13 +523,20 @@ local function hudScan()
       end
     end
   end
-  for _, fid in ipairs(Spring.GetAllFeatures() or {}) do
+  -- down heroes: the campaign's own wreck ledger (hero_wrecks.lua), not a walk over every tree
+  local function addWreck(fid)
     local name = Spring.GetFeatureRulesParam(fid, "va_hero_wreck_name")
     if type(name) == "string" and name ~= "" then
       local fx, _, fz = Spring.GetFeaturePosition(fid)
       local hid = Spring.GetFeatureRulesParam(fid, "va_hero_wreck")
       heroes[#heroes + 1] = { id = tostring(hid or name), name = name, x = math.floor(fx or 0), z = math.floor(fz or 0), zone = zoneOf(fx, fz) or "", state = "down", feature = fid }
     end
+  end
+  local wrecks = GG.VA_HeroWreckFeatures
+  if type(wrecks) == "table" then
+    for fid in pairs(wrecks) do if Spring.ValidFeatureID(fid) then addWreck(fid) end end
+  else
+    for _, fid in ipairs(Spring.GetAllFeatures() or {}) do addWreck(fid) end
   end
   local enemy = enemiesOnPad()
   Spring.SetGameRulesParam("va_hud_heroes_json", toJson(heroes), { public = true })
@@ -540,14 +547,12 @@ local function hudScan()
   Spring.SetGameRulesParam("va_pad_enemy_live", enemy, { public = true })
 end
 
--- Memory watch (a playtest hit BAR's 1.2 GB Lua limit): once a game minute, how much the
--- synced Lua heap holds before and after a full collection. Kept high after = a leak; falls
--- back = churn. The LuaUI side is logged by the minimap widget.
+-- Memory watch (a playtest hit BAR's 1.2 GB Lua limit): once a game minute, the synced heap as it
+-- stands. It no longer forces a full collection to measure before/after: on a slow machine that
+-- was a stall of its own. The LuaUI side is logged by the minimap widget.
 local function memWatch(f, side)
   if f % 1800 ~= 900 or not collectgarbage then return end
-  local before = collectgarbage("count")
-  collectgarbage("collect")
-  Spring.Echo(string.format("VA_LUAMEM %s frame=%d before=%.0fMB after=%.0fMB", side, f, before / 1024, collectgarbage("count") / 1024))
+  Spring.Echo(string.format("VA_LUAMEM %s frame=%d heap=%.0fMB", side, f, collectgarbage("count") / 1024))
 end
 
 function gadget:GameFrame(f)

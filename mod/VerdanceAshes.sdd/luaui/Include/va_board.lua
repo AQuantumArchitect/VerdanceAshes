@@ -41,10 +41,13 @@ local function normToMap(v, size)
   return v
 end
 
--- Cells as world rects plus the zone's outline: only the edges with no neighbour in the
--- same zone, so a zone reads as one shape, never as a grid.
+-- A zone's cells, as drawn. Three shapes from the same cell set:
+--   cells  row runs: one world rect per horizontal run of cells (a muster is ~1000 cells, ~40 runs)
+--   lines  the outline merged into long segments (solid borders)
+--   edges  the outline cell edge by cell edge (dashed borders skip every other one; the pad's
+--          ground ring samples the terrain at each)
+-- plus the centroid, bounds and cell count, which are the same as cell by cell.
 local function expandCells(z, mapX, mapZ)
-  local out, edges = {}, {}
   local grid = z.cellGrid or {}
   local cols = tonumber(grid.cols) or 96
   local rows = tonumber(grid.rows) or 96
@@ -61,24 +64,59 @@ local function expandCells(z, mapX, mapZ)
         if row >= 0 and row < rows then set[idx] = true end
       end
     end
-    for idx in pairs(set) do
-      local col = idx % cols
-      local row = math.floor(idx / cols)
-      local x1, z1 = col * cw, row * ch
-      local x2, z2 = x1 + cw, z1 + ch
-      out[#out + 1] = { x1, z1, x2, z2 }
-      if not (row > 0 and set[idx - cols]) then edges[#edges + 1] = { x1, z1, x2, z1 } end
-      if not (row < rows - 1 and set[idx + cols]) then edges[#edges + 1] = { x1, z2, x2, z2 } end
-      if not (col > 0 and set[idx - 1]) then edges[#edges + 1] = { x1, z1, x1, z2 } end
-      if not (col < cols - 1 and set[idx + 1]) then edges[#edges + 1] = { x2, z1, x2, z2 } end
+    local out, edges = {}, {}
+    local hseg, vseg = {}, {}  -- boundary line -> list of unit segment starts (merged below)
+    local function seg(t, line, at) local l = t[line]; if not l then l = {}; t[line] = l end; l[#l + 1] = at end
+    local sx, sz, n = 0, 0, 0
+    local bx1, bz1, bx2, bz2 = math.huge, math.huge, -math.huge, -math.huge
+    for row = 0, rows - 1 do
+      local runStart = nil
+      for col = 0, cols do
+        local idx = row * cols + col
+        local inside = col < cols and set[idx]
+        if inside then
+          if not runStart then runStart = col end
+          local x1, z1 = col * cw, row * ch
+          local x2, z2 = x1 + cw, z1 + ch
+          sx, sz, n = sx + x1 + cw * 0.5, sz + z1 + ch * 0.5, n + 1
+          if x1 < bx1 then bx1 = x1 end
+          if z1 < bz1 then bz1 = z1 end
+          if x2 > bx2 then bx2 = x2 end
+          if z2 > bz2 then bz2 = z2 end
+          if not (row > 0 and set[idx - cols]) then edges[#edges + 1] = { x1, z1, x2, z1 }; seg(hseg, row, col) end
+          if not (row < rows - 1 and set[idx + cols]) then edges[#edges + 1] = { x1, z2, x2, z2 }; seg(hseg, row + 1, col) end
+          if not (col > 0 and set[idx - 1]) then edges[#edges + 1] = { x1, z1, x1, z2 }; seg(vseg, col, row) end
+          if not (col < cols - 1 and set[idx + 1]) then edges[#edges + 1] = { x2, z1, x2, z2 }; seg(vseg, col + 1, row) end
+        elseif runStart then
+          out[#out + 1] = { runStart * cw, row * ch, col * cw, (row + 1) * ch }
+          runStart = nil
+        end
+      end
     end
-    return out, edges
+    -- merge unit segments on each boundary line into long ones
+    local lines = {}
+    local function merge(t, horizontal)
+      for line, list in pairs(t) do
+        table.sort(list)
+        local a, b = list[1], list[1] + 1
+        for i = 2, #list + 1 do
+          local v = list[i]
+          if v == b then b = b + 1
+          else
+            if horizontal then lines[#lines + 1] = { a * cw, line * ch, b * cw, line * ch }
+            else lines[#lines + 1] = { line * cw, a * ch, line * cw, b * ch } end
+            if v then a, b = v, v + 1 end
+          end
+        end
+      end
+    end
+    merge(hseg, true); merge(vseg, false)
+    return out, edges, lines, n, (n > 0) and sx / n or 0, (n > 0) and sz / n or 0, bx1, bz1, bx2, bz2
   end
   local b = z.bounds or {}
   local x1, z1, x2, z2 = normToMap(b.xMin, mapX), normToMap(b.zMin, mapZ), normToMap(b.xMax, mapX), normToMap(b.zMax, mapZ)
-  out[1] = { x1, z1, x2, z2 }
-  edges = { { x1, z1, x2, z1 }, { x1, z2, x2, z2 }, { x1, z1, x1, z2 }, { x2, z1, x2, z2 } }
-  return out, edges
+  local edges = { { x1, z1, x2, z1 }, { x1, z2, x2, z2 }, { x1, z1, x1, z2 }, { x2, z1, x2, z2 } }
+  return { { x1, z1, x2, z2 } }, edges, edges, 1, (x1 + x2) * 0.5, (z1 + z2) * 0.5, x1, z1, x2, z2
 end
 
 function Board.new()
@@ -90,6 +128,7 @@ function Board.new()
 end
 
 function Board:reload()
+  self:dropCaches()
   self.zones, self.byId = {}, {}
   self.mission = readLua("singleplayer/verdance_ashes/generated/va_current.lua")
   self.zoneMap = readLua("singleplayer/verdance_ashes/generated/zone_map_current.lua") or (self.mission and self.mission.zoneMap)
@@ -107,21 +146,11 @@ function Board:reload()
   for _, z in ipairs(self.zoneMap.zones) do
     local id = tostring(z.zoneId or "")
     if id ~= "" then
-      local cells, edges = expandCells(z, self.mapX, self.mapZ)
-      local cx, cz, k = 0, 0, 0
-      local x1, z1, x2, z2 = math.huge, math.huge, -math.huge, -math.huge
-      for i = 1, #cells do
-        local c = cells[i]
-        cx = cx + (c[1] + c[3]) * 0.5; cz = cz + (c[2] + c[4]) * 0.5; k = k + 1
-        if c[1] < x1 then x1 = c[1] end
-        if c[2] < z1 then z1 = c[2] end
-        if c[3] > x2 then x2 = c[3] end
-        if c[4] > z2 then z2 = c[4] end
-      end
+      local cells, edges, lines, k, cx, cz, x1, z1, x2, z2 = expandCells(z, self.mapX, self.mapZ)
       local a = z.anchor or {}
       local rec = {
-        id = id, label = tostring(z.label or id), cells = cells, edges = edges,
-        cx = (k > 0) and cx / k or 0, cz = (k > 0) and cz / k or 0,
+        id = id, label = tostring(z.label or id), cells = cells, edges = edges, lines = lines,
+        cx = cx, cz = cz,
         ax = a.x and normToMap(a.x, self.mapX) or nil, az = a.z and normToMap(a.z, self.mapZ) or nil,
         x1 = x1, z1 = z1, x2 = x2, z2 = z2, area = k,
       }
@@ -245,39 +274,100 @@ end
 --   seenNow (table)  zoneId -> eta to use instead of live rules params (exfil snapshot)
 --   marks (table)    Board:marks() result (default: read live)
 --   contradicted     zoneId -> "held"|"empty" glyph kind
---   people           list of { x, z, glyph, col, label } drawn last
+--   people           list of { x, z, glyph, col, label } drawn last (or a function returning one)
 --   glyphSize        px (default 11); labels (bool) draw pad/objective zone names
 --   roleOnly (bool)  paint only role zones' borders (keeps the minimap quiet)
+--
+-- Cost: the board is drawn every frame on the minimap and on the infil / exfil cards, and a zone is
+-- ~1000 cells. Geometry goes out one gl.BeginEnd per zone per layer (row runs, merged outline), and
+-- Board:paintCached keeps it in a display list, so a frame is one CallList plus the glyphs.
+-- (Painting cell by cell, a hatch and a closure per cell, made ~850 KB of Lua garbage a frame in a
+-- fight: BAR's 1.2 GB emergency collection every minute or two.)
+
+local GL_LINES, GL_QUADS = GL and GL.LINES, GL and GL.QUADS
+
+-- Geometry batches: the vertex loops read these upvalues, so a batch allocates no closure.
+local B = { proj = nil, list = nil, n = 0, every = 1, step = 4 }
+
+local function vertsRects()       -- B.list = runs: filled quads
+  local proj, list = B.proj, B.list
+  for i = 1, #list do
+    local c = list[i]
+    local ax, ay = proj(c[1], c[2])
+    local bx, by = proj(c[3], c[4])
+    gl.Vertex(ax, ay); gl.Vertex(bx, ay); gl.Vertex(bx, by); gl.Vertex(ax, by)
+  end
+end
+
+local function vertsSegs()        -- B.list = segments; B.every = 2 skips every other one (dashed)
+  local proj, list, every = B.proj, B.list, B.every
+  for i = 1, #list, every do
+    local e = list[i]
+    local ax, ay = proj(e[1], e[2])
+    local bx, by = proj(e[3], e[4])
+    gl.Vertex(ax, ay); gl.Vertex(bx, by)
+  end
+end
+
+-- Diagonal hatch over a zone's runs. Lines are x + y = k * step in screen space, so the hatch runs
+-- on unbroken from one row of the zone to the next.
+local function vertsHatch()
+  local proj, list, step = B.proj, B.list, B.step
+  for i = 1, #list do
+    local c = list[i]
+    local ax, ay = proj(c[1], c[2])
+    local bx, by = proj(c[3], c[4])
+    local x1, y1, x2, y2 = math.min(ax, bx), math.min(ay, by), math.max(ax, bx), math.max(ay, by)
+    local w, h = x2 - x1, y2 - y1
+    if w > 0 and h > 0 then
+      local d = step - ((x1 + y1) % step)
+      while d < w + h do
+        local px, py = x1 + d, y1
+        if px > x2 then px = x2; py = y1 + (d - w) end
+        local qx, qy = x1, y1 + d
+        if qy > y2 then qy = y2; qx = x1 + (d - h) end
+        gl.Vertex(px, py); gl.Vertex(qx, qy)
+        d = d + step
+      end
+    end
+  end
+end
+
+local function batch(mode, fn, proj, list)
+  B.proj, B.list = proj, list
+  gl.BeginEnd(mode, fn)
+  B.proj, B.list = nil, nil
+end
+
 function Board:paint(proj, opts)
   opts = opts or {}
   if not Ash then return end
   local gs = opts.glyphSize or 11
   local seenNow = opts.seenNow
-  local function cellRect(c)
-    local ax, ay = proj(c[1], c[2])
-    local bx, by = proj(c[3], c[4])
-    return math.min(ax, bx), math.min(ay, by), math.max(ax, bx), math.max(ay, by)
-  end
-  local function fillCells(z, col, a)
-    Ash.setColor(Ash.with(col, a))
-    for i = 1, #z.cells do
-      local x1, y1, x2, y2 = cellRect(z.cells[i])
-      gl.Rect(x1, y1, x2, y2)
+  local sink = self._glyphSink   -- set by paintCached: words are recorded, not drawn
+  local function words(str, x, y, size, col, align)
+    if sink then
+      local i = sink.n + 1
+      local e = sink.glyphs[i]
+      if not e then e = {}; sink.glyphs[i] = e end
+      col = col or Ash.COL.ink
+      e[1], e[2], e[3], e[4] = tostring(str or ""), x, y, size or 12
+      e[5], e[6], e[7], e[8], e[9] = col[1], col[2], col[3], col[4] or 1, Ash.ALIGN[align or "c"] or "co"
+      sink.n = i
+    else
+      Ash.text(str, x, y, size, col, align)
     end
   end
+  local function fillCells(z, col, a)
+    Ash.setColorA(col, a)
+    batch(GL_QUADS, vertsRects, proj, z.cells)
+  end
   local function borderCells(z, col, a, dashed, width)
-    Ash.setColor(Ash.with(col, a))
+    Ash.setColorA(col, a)
     gl.LineWidth(width or 1)
-    gl.BeginEnd(GL.LINES, function()
-      for i = 1, #z.edges do
-        if not dashed or (i % 2 == 1) then
-          local e = z.edges[i]
-          local ax, ay = proj(e[1], e[2])
-          local bx, by = proj(e[3], e[4])
-          gl.Vertex(ax, ay); gl.Vertex(bx, by)
-        end
-      end
-    end)
+    B.every = dashed and 2 or 1
+    batch(GL_LINES, vertsSegs, proj, dashed and z.edges or (z.lines or z.edges))
+    B.every = 1
     gl.LineWidth(1)
   end
   local function etaOf(id)
@@ -311,11 +401,10 @@ function Board:paint(proj, opts)
     local seen = self:exposure(z.id)
     if seen > loud then loud, loudId = seen, z.id end
     if seen > 0.02 then
-      local hcol = Ash.with(Ash.COL.bad, math.min(0.85, 0.15 + 0.6 * seen))
-      for i = 1, #z.cells do
-        local x1, y1, x2, y2 = cellRect(z.cells[i])
-        Ash.hatchRect(x1, y1, x2, y2, hcol, 4)
-      end
+      Ash.setColorA(Ash.COL.bad, math.min(0.85, 0.15 + 0.6 * seen))
+      gl.LineWidth(1)
+      B.step = 4
+      batch(GL_LINES, vertsHatch, proj, z.cells)
     end
   end
 
@@ -331,13 +420,14 @@ function Board:paint(proj, opts)
   local G = Ash.GLYPH
   local function glyph(wx, wz, g, col, size, dy)
     local sx, sy = proj(wx, wz)
-    Ash.text(g, sx, sy - (size or gs) * 0.4 + (dy or 0), size or gs, col, "c")
+    words(g, sx, sy - (size or gs) * 0.4 + (dy or 0), size or gs, col, "c")
   end
   -- "?" where nobody looked (only zones big enough to carry it)
+  local unknownCol = Ash.with(Ash.COL.ash, opts.unknownAlpha or 0.55)
   for _, z in ipairs(self.zones) do
     local state = self:believed(z.id)
     if state == "dark" and z.area >= 6 and (not opts.fade or etaOf(z.id) < 0.3) then
-      glyph(z.cx, z.cz, G.unknown, Ash.with(Ash.COL.ash, opts.unknownAlpha or 0.55), gs - 1)
+      glyph(z.cx, z.cz, G.unknown, unknownCol, gs - 1)
     end
   end
   -- the pad: ring + △
@@ -349,7 +439,7 @@ function Board:paint(proj, opts)
       local r = math.abs(ex - sx)
       if r > 3 then Ash.ring(sx, sy, r, Ash.with(Ash.COL.steam, 0.85), 1.5, 36) end
       glyph(px, pz, G.pad, Ash.COL.steam, gs + 2)
-      if opts.labels then Ash.text("PAD", sx, sy + (gs + 2) * 0.9, gs - 2, Ash.COL.steam, "c") end
+      if opts.labels then words("PAD", sx, sy + (gs + 2) * 0.9, gs - 2, Ash.COL.steam, "c") end
     end
   end
   -- doors: the way to another map. ■ held (the road is open), □ not held.
@@ -361,7 +451,7 @@ function Board:paint(proj, opts)
       glyph(wx, wz, d.held and G.doorHeld or G.doorShut, col, gs)
       if opts.labels then
         local sx, sy = proj(wx, wz)
-        Ash.text("TO " .. string.upper(tostring(d.farMapName or "")), sx, sy + gs * 0.9, gs - 2, col, "c")
+        words("TO " .. string.upper(tostring(d.farMapName or "")), sx, sy + gs * 0.9, gs - 2, col, "c")
       end
     end
   end
@@ -373,7 +463,7 @@ function Board:paint(proj, opts)
       glyph(ox, oz, G.objective, done and Ash.COL.good or Ash.COL.warn, gs + 2)
       if opts.labels then
         local sx, sy = proj(ox, oz)
-        Ash.text(done and "DONE" or "OBJECTIVE", sx, sy + (gs + 2) * 0.9, gs - 2, done and Ash.COL.good or Ash.COL.warn, "c")
+        words(done and "DONE" or "OBJECTIVE", sx, sy + (gs + 2) * 0.9, gs - 2, done and Ash.COL.good or Ash.COL.warn, "c")
       end
     end
   end
@@ -402,17 +492,65 @@ function Board:paint(proj, opts)
     end
   end
   -- people
-  for _, p in ipairs(opts.people or {}) do
+  local people = opts.people
+  if type(people) == "function" then people = people() end
+  for _, p in ipairs(people or {}) do
     if p.x and p.z then
       glyph(p.x, p.z, p.glyph or G.offPad, p.col or Ash.COL.ink, p.size or gs)
       if opts.labels and p.label then
         local sx, sy = proj(p.x, p.z)
-        Ash.text(p.label, sx, sy - gs * 1.4, gs - 2, p.col or Ash.COL.ink, "c")
+        words(p.label, sx, sy - gs * 1.4, gs - 2, p.col or Ash.COL.ink, "c")
       end
     end
   end
   gl.Color(1, 1, 1, 1)
   gl.LineWidth(1)
+end
+
+-- The board through a display list. slot names the surface ("minimap", "infil", ...); k1..k4 are
+-- the numbers its projection is made of (minimap size, or the box). The list and the recorded words
+-- are rebuilt when the projection changes, the observation tick or the roles move, or every
+-- REBUILD_SECONDS (people, marks, the objective); in between a frame replays them and allocates
+-- nothing.
+local REBUILD_SECONDS = 0.5
+
+function Board:dropCaches()
+  for _, c in pairs(self._cache or {}) do
+    if c.list and gl and gl.DeleteList then gl.DeleteList(c.list) end
+  end
+  self._cache = {}
+end
+
+function Board:paintCached(slot, k1, k2, k3, k4, proj, opts)
+  if not (gl and gl.CreateList and gl.CallList) then return self:paint(proj, opts) end
+  local cache = self._cache
+  if not cache then cache = {}; self._cache = cache end
+  local c = cache[slot]
+  if not c then c = { glyphs = {}, n = 0, t = -math.huge }; cache[slot] = c end
+  local now = os.clock()
+  local tick = num("va_obs_tick", -1)
+  if not c.list or c.k1 ~= k1 or c.k2 ~= k2 or c.k3 ~= k3 or c.k4 ~= k4 or c.tick ~= tick
+      or c.roleKey ~= self.roleKey or now - c.t >= REBUILD_SECONDS then
+    if c.list then gl.DeleteList(c.list) end
+    c.n = 0
+    self._glyphSink = c
+    local ok, err = pcall(function() c.list = gl.CreateList(function() self:paint(proj, opts) end) end)
+    self._glyphSink = nil
+    if not ok then
+      c.list = nil
+      if not c.failed then c.failed = true; Spring.Echo("VA_BOARD paint failed: " .. tostring(err)) end
+      return
+    end
+    c.k1, c.k2, c.k3, c.k4, c.tick, c.roleKey, c.t = k1, k2, k3, k4, tick, self.roleKey, now
+  end
+  if c.list then gl.CallList(c.list) end
+  local g = c.glyphs
+  for i = 1, c.n do
+    local e = g[i]
+    gl.Color(e[5], e[6], e[7], e[8])
+    gl.Text(e[1], e[2], e[3], e[4], e[9])
+  end
+  gl.Color(1, 1, 1, 1)
 end
 
 -- Project the whole map into a screen rect, preserving aspect. Returns proj, and the rect used.

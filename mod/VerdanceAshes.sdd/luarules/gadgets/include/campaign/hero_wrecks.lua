@@ -7,6 +7,8 @@
 
 local heroPendingWreck = {}   -- dead unitID -> heroId (awaiting corpse FeatureCreated)
 local heroByFeatureID = {}    -- wreck featureID -> heroId
+-- Shared read-only with the exfil gadget's HUD scan, so it need not walk every feature on the map.
+if GG then GG.VA_HeroWreckFeatures = heroByFeatureID end
 local wreckConsumedByRez = {} -- featureID -> true when a resurrection consumed it
 local HERO_WRECK_TIMEOUT = 90 -- frames a corpse may lag the death (BAR corpse-link window)
 

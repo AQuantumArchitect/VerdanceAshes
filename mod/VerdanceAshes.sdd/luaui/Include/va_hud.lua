@@ -100,8 +100,25 @@ function Hud.dist(d)
 end
 function Hud.plural(n, one, many) return tostring(n) .. " " .. ((n == 1) and one or many) end
 
--- Word-wrap to at most maxLines; a cut last line ends in an ellipsis.
+-- Word-wrap to at most maxLines; a cut last line ends in an ellipsis. Remembered: the cards and the
+-- rail wrap the same text every frame. The list handed back is shared, so read it, don't change it.
+local wrapCache, wrapCount = {}, 0
+local wrapOnce
 function Hud.wrap(s, size, maxW, maxLines)
+  s = tostring(s or "")
+  local a = wrapCache[size]; if not a then a = {}; wrapCache[size] = a end
+  local b = a[maxW]; if not b then b = {}; a[maxW] = b end
+  local c = b[maxLines]; if not c then c = {}; b[maxLines] = c end
+  local hit = c[s]
+  if hit then return hit end
+  wrapCount = wrapCount + 1
+  if wrapCount > 500 then wrapCache, wrapCount = {}, 0 end   -- start over; this call's answer is still kept below
+  hit = wrapOnce(s, size, maxW, maxLines)
+  c[s] = hit
+  return hit
+end
+
+function wrapOnce(s, size, maxW, maxLines)
   local lines, cur, cut = {}, "", false
   for word in tostring(s or ""):gmatch("%S+") do
     local try = (cur == "") and word or (cur .. " " .. word)
@@ -128,11 +145,21 @@ function Hud.column(x1, y1, x2, y2, kicker, accent)
   return x1 + 12, y2 - 42, x2 - 12
 end
 
--- The board drawn into a box, letterboxed to the map's shape.
+-- The board drawn into a box, letterboxed to the map's shape. paintOpts.slot names the surface
+-- ("infil", "manifest", ...) so its display list is kept apart from the others (Board:paintCached).
+local BOX_BG = { 0.05, 0.09, 0.07, 1 }
+local boxes = {}   -- slot -> { x1, y1, x2, y2, proj, rect }
 function Hud.boardBox(b, x1, y1, x2, y2, paintOpts)
-  local proj, rect = b:fitProj(x1, y1, x2, y2)
-  Ash.rect(rect[1], rect[2], rect[3], rect[4], { 0.05, 0.09, 0.07, 1 })
-  b:paint(proj, paintOpts)
+  local slot = (paintOpts and paintOpts.slot) or "box"
+  local bx = boxes[slot]
+  if not bx or bx[1] ~= x1 or bx[2] ~= y1 or bx[3] ~= x2 or bx[4] ~= y2 or bx[7] ~= b then
+    local proj, rect = b:fitProj(x1, y1, x2, y2)
+    bx = { x1, y1, x2, y2, proj, rect, b }
+    boxes[slot] = bx
+  end
+  local proj, rect = bx[5], bx[6]
+  Ash.rect(rect[1], rect[2], rect[3], rect[4], BOX_BG)
+  if b.paintCached then b:paintCached("box:" .. slot, x1, y1, x2, y2, proj, paintOpts) else b:paint(proj, paintOpts) end
   Ash.outline(rect[1], rect[2], rect[3], rect[4], Ash.with(Ash.COL.edge, 0.4), 1)
   return rect
 end

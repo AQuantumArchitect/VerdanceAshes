@@ -26,8 +26,9 @@ local lastScan = -100
 local HERO_COL = { 0.490, 1.000, 0.541, 1.0 }  -- good
 local CRIT_COL = { 0.831, 0.769, 0.604, 1.0 }  -- gold
 local WRECK_COL = { 1.000, 0.490, 0.490, 1.0 } -- bad
+local Hud = VFS.Include("luaui/Include/va_hud.lua")
 do
-  local Ash = VFS.Include("luaui/Include/va_hud.lua").Ash
+  local Ash = Hud.Ash
   if Ash and Ash.COL then
     HERO_COL = { Ash.COL.good[1], Ash.COL.good[2], Ash.COL.good[3], 1 }
     CRIT_COL = { Ash.COL.gold[1], Ash.COL.gold[2], Ash.COL.gold[3], 1 }
@@ -62,13 +63,17 @@ local function scan()
       }
     end
   end
+  -- Down heroes come from the exfil gadget's HUD scan (va_hud_heroes_json lists each wreck with its
+  -- feature), so this does not walk every tree and rock on the map once a second.
   trackedWrecks = {}
-  local features = Spring.GetAllFeatures and Spring.GetAllFeatures() or {}
-  for i = 1, #features do
-    local featureID = features[i]
-    local name = Spring.GetFeatureRulesParam and Spring.GetFeatureRulesParam(featureID, "va_hero_wreck_name")
-    if type(name) == "string" and name ~= "" then
-      trackedWrecks[featureID] = { name = name }
+  local list = Hud and Hud.json and Hud.json("va_hud_heroes_json")
+  if type(list) == "table" then
+    for _, h in ipairs(list) do
+      local featureID = tonumber(h.feature)
+      local name = h.name
+      if h.state == "down" and featureID and type(name) == "string" and name ~= "" then
+        trackedWrecks[featureID] = { name = name, tag = string.upper(name) .. " (DOWN)" }
+      end
     end
   end
 end
@@ -105,7 +110,7 @@ function widget:DrawScreenEffects()
       if x then
         local sx, sy, sz = Spring.WorldToScreenCoords(x, y + 50, z)
         if sz and sz <= 1 then
-          drawTag(sx, sy, string.upper(rec.name) .. " (DOWN)", WRECK_COL)
+          drawTag(sx, sy, rec.tag, WRECK_COL)
         end
       end
     end

@@ -257,7 +257,7 @@ local function drawBoard(x1, y1, x2, y2)
   local bx1, by1, bx2, by2 = x, y1 + 12 + legendH, right, y + 10
   Ash.rect(bx1, by1, bx2, by2, Ash.with(Ash.COL.bg, 0.9))
   if b and #b.zones > 0 then
-    Hud.boardBox(b, bx1 + 6, by1 + 6, bx2 - 6, by2 - 6, { fade = false, labels = true, glyphSize = 13, contradicted = WG and WG.vaContradicted or nil })
+    Hud.boardBox(b, bx1 + 6, by1 + 6, bx2 - 6, by2 - 6, { slot = "infil", fade = false, labels = true, glyphSize = 13, contradicted = WG and WG.vaContradicted or nil })
   else
     text("no belief board for this map", (bx1 + bx2) * 0.5, (by1 + by2) * 0.5, 12, Ash.COL.muted, "c")
   end

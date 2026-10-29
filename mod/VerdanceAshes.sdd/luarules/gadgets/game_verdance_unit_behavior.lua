@@ -210,16 +210,21 @@ local function isSkirmisher(ud)
   return hp > 0 and hp <= 900 and range >= 280 and (ud.speed or 0) >= 1.4
 end
 
-local function isCommanderOrDecoy(unitID, ud)
-  if UnitClass and UnitClass.isCommanderOrDecoy and UnitClass.isCommanderOrDecoy(unitID, ud) then
-    return true
+-- Def-level answers never change in a match: remembered per UnitDef (the scans below ask them of
+-- every enemy near every hero, every think; each ask lowercases names and walks the weapons).
+local function memoByDef(fn)
+  local memo = {}
+  return function(ud)
+    if not ud then return false end
+    local key = ud.id or ud
+    local v = memo[key]
+    if v == nil then v = fn(ud) and true or false; memo[key] = v end
+    return v
   end
-  -- Weapon-level: any unit with a Dgun / disintegrator (behavior-only heuristic).
-  if not ud then
-    local dID = Spring.GetUnitDefID(unitID)
-    ud = dID and UnitDefs[dID]
-  end
-  if not ud or not ud.weapons then return false end
+end
+
+local hasDgunWeapon = memoByDef(function(ud)
+  if not ud.weapons then return false end
   for i = 1, #ud.weapons do
     local wd = WeaponDefs[ud.weapons[i].weaponDef]
     if wd then
@@ -231,6 +236,18 @@ local function isCommanderOrDecoy(unitID, ud)
     end
   end
   return false
+end)
+
+local function isCommanderOrDecoy(unitID, ud)
+  if UnitClass and UnitClass.isCommanderOrDecoy and UnitClass.isCommanderOrDecoy(unitID, ud) then
+    return true
+  end
+  -- Weapon-level: any unit with a Dgun / disintegrator (behavior-only heuristic).
+  if not ud then
+    local dID = Spring.GetUnitDefID(unitID)
+    ud = dID and UnitDefs[dID]
+  end
+  return hasDgunWeapon(ud)
 end
 
 local function isLaserOrBeamerThreat(ud)
@@ -258,6 +275,8 @@ local function isLaserOrBeamerThreat(ud)
   end
   return false
 end
+
+isLaserOrBeamerThreat = memoByDef(isLaserOrBeamerThreat)
 
 local function isTreeFeature(featureID)
   local fdID = Spring.GetFeatureDefID(featureID)
@@ -369,7 +388,8 @@ end
 local function findLaserThreat(teamID, fromX, fromZ, maxRange)
   local best, bestD2 = nil, maxRange * maxRange
   local bx, bz = nil, nil
-  local units = Spring.GetAllUnits() or {}
+  -- only what is in range: a cylinder query, not every unit on the map per hero per think
+  local units = Spring.GetUnitsInCylinder(fromX, fromZ, maxRange) or {}
   for i = 1, #units do
     local uid = units[i]
     if Spring.ValidUnitID(uid) and not Spring.GetUnitIsDead(uid) then
@@ -394,7 +414,7 @@ end
 
 local function findNearestComOrDecoy(teamID, fromX, fromZ, maxRange)
   local best, bestD2, bx, bz = nil, maxRange * maxRange, nil, nil
-  local units = Spring.GetAllUnits() or {}
+  local units = Spring.GetUnitsInCylinder(fromX, fromZ, maxRange) or {}
   for i = 1, #units do
     local uid = units[i]
     if Spring.ValidUnitID(uid) and not Spring.GetUnitIsDead(uid) then
@@ -893,6 +913,8 @@ local function isDefenseTarget(ud)
   return false
 end
 
+isDefenseTarget = memoByDef(isDefenseTarget)
+
 local function actPush(unitID, teamID, frame, doctrine)
   if not isIdle(unitID) or not CMD_FIGHT then return false end
   local x, _, z = unitPos(unitID)
@@ -901,7 +923,7 @@ local function actPush(unitID, teamID, frame, doctrine)
   local bestD2 = (preferDef and 2200 * 2200) or (1400 * 1400)
   local bestDefD2 = bestD2
   local bx, bz, defX, defZ = nil, nil, nil, nil
-  local units = Spring.GetAllUnits() or {}
+  local units = Spring.GetUnitsInCylinder(x, z, (preferDef and 2200) or 1400) or {}
   for i = 1, #units do
     local uid = units[i]
     if Spring.ValidUnitID(uid) and not Spring.GetUnitIsDead(uid) then
@@ -1099,7 +1121,11 @@ local function stampTelemetry(unitID, intent, beliefs, extra)
   end
 end
 
+local moleculePolicyResolved = false
 local function refreshMoleculePolicyMode()
+  -- the modoption cannot change mid-match: resolved once (each read builds the modoptions table)
+  if moleculePolicyResolved then return moleculePolicyMode end
+  moleculePolicyResolved = true
   if MoleculePolicy and MoleculePolicy.resolveMode then
     moleculePolicyMode = MoleculePolicy.resolveMode()
   else
@@ -1277,7 +1303,14 @@ function gadget:GameStart()
   playerTeam = (ok and teamOrErr) or playerTeam or 0
 end
 
+-- A unit's belief node leaves with it (every player unit given a combat order gets one; kept, they
+-- piled up all sortie and the field's upward pass grew with their square).
+local function dropBeliefNode(unitID)
+  if field and Belief and Belief.removeNode then Belief.removeNode(field, Belief.nodeIdForUnit(unitID)) end
+end
+
 function gadget:UnitDestroyed(unitID)
+  dropBeliefNode(unitID)
   lastAssist[unitID] = nil
   hurtRetreating[unitID] = nil
   aiOrdering[unitID] = nil
@@ -1287,6 +1320,7 @@ function gadget:UnitDestroyed(unitID)
 end
 
 function gadget:UnitTaken(unitID)
+  dropBeliefNode(unitID)
   lastAssist[unitID] = nil
   hurtRetreating[unitID] = nil
   aiOrdering[unitID] = nil

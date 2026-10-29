@@ -13,6 +13,9 @@ function gadget:GetInfo()
   }
 end
 
+-- one shared options table for the rules params set every tick (a fresh { public = true } per call is garbage)
+local PUBLIC = { public = true }
+
 if not gadgetHandler:IsSyncedCode() then
   return
 end
@@ -153,9 +156,9 @@ local function applyCraftRewards(unitID, rec)
     rangeMult = math.min(KETHA_RANGE_CAP, KETHA_RANGE_BASE + KETHA_RANGE_PER_XP * xp)
   end
 
-  Spring.SetUnitRulesParam(unitID, "va_craft_xp", xp, { public = true })
-  Spring.SetUnitRulesParam(unitID, "va_craft_bp_mult", bpMult, { public = true })
-  Spring.SetUnitRulesParam(unitID, "va_craft_range_mult", rangeMult, { public = true })
+  Spring.SetUnitRulesParam(unitID, "va_craft_xp", xp, PUBLIC)
+  Spring.SetUnitRulesParam(unitID, "va_craft_bp_mult", bpMult, PUBLIC)
+  Spring.SetUnitRulesParam(unitID, "va_craft_range_mult", rangeMult, PUBLIC)
 
   if rec.baseBp > 0 and Spring.SetUnitBuildSpeed and math.abs(bpMult - rec.lastBpMult) > 0.001 then
     -- Keep repair/rez/reclaim speeds in proportion to build speed.

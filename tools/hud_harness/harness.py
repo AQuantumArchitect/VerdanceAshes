@@ -105,6 +105,8 @@ _G.gl = {
   GetTextWidth = function(s) return #tostring(s) * 0.6 end, LineWidth = function() end, PointSize = function() end,
   BeginEnd = function(mode, fn) fn() end, Vertex = function() calls.vertex = calls.vertex + 1 end, Texture = function() end, TexCoord = function() end,
   Shape = function() end, Scissor = function() end, DepthTest = function() end, Blending = function() end, ColorMask = function() end,
+  -- display lists: the builder runs at once (so its errors surface here), the id replays for nothing
+  CreateList = function(fn, ...) fn(...); LISTS = (LISTS or 0) + 1; return LISTS end, CallList = function() end, DeleteList = function() end,
 }
 _G.RULES = { va_pad_x = 1578, va_pad_z = 6357, va_pad_r = 560, va_pad_zone = "TRJ_SW_LANE", va_objective_x = 4000, va_objective_z = 3000,
   va_secondary_total = 2, va_sec1_label = "Fuel dump", va_sec1_req = 1, va_sec1_x = 5000, va_sec1_z = 5000, va_sec1_kind = "structure",

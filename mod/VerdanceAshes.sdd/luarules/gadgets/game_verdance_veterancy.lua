@@ -13,6 +13,9 @@ function gadget:GetInfo()
   }
 end
 
+-- one shared options table for the rules params set every tick (a fresh { public = true } per call is garbage)
+local PUBLIC = { public = true }
+
 if not gadgetHandler:IsSyncedCode() then
   -- Forward rank-up juice to LuaUI playfeel widgets.
   function gadget:Initialize()
@@ -275,7 +278,7 @@ local function applyMoveSpeed(unitID, rec, speedMult)
     return GG.VA_MobilitySetVet(unitID, speedMult, move) and true or false
   end
   if spMoveCtrlGetTag and spMoveCtrlGetTag(unitID) ~= nil then return false end
-  Spring.SetUnitRulesParam(unitID, "va_vet_speed_mult", speedMult, { public = true })
+  Spring.SetUnitRulesParam(unitID, "va_vet_speed_mult", speedMult, PUBLIC)
   if GG and GG.VA_MobilityApply then
     return GG.VA_MobilityApply(unitID, { move = move }) and true or false
   end
@@ -304,15 +307,15 @@ local function applyVeterancy(unitID, rec, xp, reason)
   xp = math.max(0, tonumber(xp) or 0)
   local hpMult, reloadMult, speedMult, rangeMult, theta, aHp, aAs, rank = computeMults(xp)
 
-  Spring.SetUnitRulesParam(unitID, "va_vet_xp", xp, { public = true })
-  Spring.SetUnitRulesParam(unitID, "va_vet_theta", theta, { public = true })
-  Spring.SetUnitRulesParam(unitID, "va_vet_hp_mult", hpMult, { public = true })
-  Spring.SetUnitRulesParam(unitID, "va_vet_reload_mult", reloadMult, { public = true })
-  Spring.SetUnitRulesParam(unitID, "va_vet_speed_mult", speedMult, { public = true })
-  Spring.SetUnitRulesParam(unitID, "va_vet_range_mult", rangeMult, { public = true })
-  Spring.SetUnitRulesParam(unitID, "va_vet_rank", rank, { public = true })
-  Spring.SetUnitRulesParam(unitID, "va_vet_a_hp", aHp, { public = true })
-  Spring.SetUnitRulesParam(unitID, "va_vet_a_as", aAs, { public = true })
+  Spring.SetUnitRulesParam(unitID, "va_vet_xp", xp, PUBLIC)
+  Spring.SetUnitRulesParam(unitID, "va_vet_theta", theta, PUBLIC)
+  Spring.SetUnitRulesParam(unitID, "va_vet_hp_mult", hpMult, PUBLIC)
+  Spring.SetUnitRulesParam(unitID, "va_vet_reload_mult", reloadMult, PUBLIC)
+  Spring.SetUnitRulesParam(unitID, "va_vet_speed_mult", speedMult, PUBLIC)
+  Spring.SetUnitRulesParam(unitID, "va_vet_range_mult", rangeMult, PUBLIC)
+  Spring.SetUnitRulesParam(unitID, "va_vet_rank", rank, PUBLIC)
+  Spring.SetUnitRulesParam(unitID, "va_vet_a_hp", aHp, PUBLIC)
+  Spring.SetUnitRulesParam(unitID, "va_vet_a_as", aAs, PUBLIC)
 
   local hpChanged = math.abs(hpMult - rec.lastHpMult) > 0.002
   local asChanged = math.abs(reloadMult - rec.lastReloadMult) > 0.002

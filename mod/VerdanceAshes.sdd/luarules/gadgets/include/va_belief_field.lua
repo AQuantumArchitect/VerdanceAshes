@@ -120,15 +120,47 @@ function M.tick(field, dt)
   end
 end
 
-local function reduceRole(field, parent, role, leaf)
-  local kids = {}
+-- Drop a node (a unit that died or changed hands). Its children, if any, keep their parentId and
+-- simply stop inheriting until the parent comes back.
+function M.removeNode(field, id)
+  if not field or id == nil then return end
+  id = tostring(id)
+  if not field.nodes[id] then return end
+  field.nodes[id] = nil
+  local order, j = field.order, 0
+  for i = 1, #order do
+    local v = order[i]
+    if v ~= id then j = j + 1; order[j] = v end
+  end
+  for i = #order, j + 1, -1 do order[i] = nil end
+end
+
+-- children[parentId] = { child node, ... } in field order: built once per propagate, so the upward
+-- pass is linear in the nodes (it used to rescan every node for every parent and role).
+local function childIndex(field)
+  local children = {}
   for i = 1, #field.order do
     local n = field.nodes[field.order[i]]
-    if n and n.parentId == parent.id and n.roles[role] then
-      kids[#kids + 1] = n.roles[role]
+    if n and n.parentId then
+      local list = children[n.parentId]
+      if not list then list = {}; children[n.parentId] = list end
+      list[#list + 1] = n
     end
   end
-  if #kids == 0 then return end
+  return children
+end
+
+local kids = {}   -- reused by reduceRole
+local function reduceRole(children, parent, role, leaf)
+  local list = children[parent.id]
+  if not list then return end
+  local nk = 0
+  for i = 1, #list do
+    local r = list[i].roles[role]
+    if r then nk = nk + 1; kids[nk] = r end
+  end
+  for i = #kids, nk + 1, -1 do kids[i] = nil end
+  if nk == 0 then return end
   if leaf.reduce == M.REDUCE_MAX then
     local best, bestC = 0, 0
     for i = 1, #kids do
@@ -176,12 +208,13 @@ function M.propagate(field, inherit)
     end
   end
   -- Reduce dissipative roles upward (unitary command does not collapse into crowd).
+  local children = childIndex(field)
   for i = #field.order, 1, -1 do
     local parent = field.nodes[field.order[i]]
-    if parent then
+    if parent and children[parent.id] then
       for role, leaf in pairs(parent.roles) do
         if leaf.mode ~= M.MODE_UNITARY then
-          reduceRole(field, parent, role, leaf)
+          reduceRole(children, parent, role, leaf)
         end
       end
     end

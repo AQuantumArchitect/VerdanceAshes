@@ -91,6 +91,10 @@ def render(path, out, W=1920, Hh=1080, flipy=True, scale=1.0):
                 d.line(P + [P[0]], fill=c, width=wdt)
             elif mode == 0:
                 for p in P: d.point(p, fill=c)
+            elif mode == 7:   # GL.QUADS: filled, four corners each
+                ov = Image.new("RGBA", img.size, (0,0,0,0)); od = ImageDraw.Draw(ov)
+                for i in range(0, len(P) - 3, 4): od.polygon(P[i:i+4], fill=c)
+                img.alpha_composite(ov); d = ImageDraw.Draw(img, "RGBA")
             elif len(P) > 1:
                 d.line(P, fill=c, width=wdt)
     img.convert("RGB").save(out)
@@ -126,8 +130,8 @@ do
   gl.Rect = function(x1, y1, x2, y2) oldRect(ox + x1, oy + y1, ox + x2, oy + y2) end
   gl.Text = function(s, x, y, size, o) oldText(s, ox + x, oy + y, size, o) end
   gl.BeginEnd = function(mode, fn)
-    local oldV = gl.Vertex
-    oldBE(mode, function() gl.Vertex = function(x, y, z) oldV(ox + x, oy + y) end; fn(); gl.Vertex = oldV end)
+    -- the recorder's BeginEnd swaps gl.Vertex in, so take it from inside (not before the call)
+    oldBE(mode, function() local oldV = gl.Vertex; gl.Vertex = function(x, y, z) oldV(ox + x, oy + y) end; fn(); gl.Vertex = oldV end)
   end
   gl.Color(0.05, 0.09, 0.07, 1); gl.Rect(0, 0, S, S)
   mm:Update(); mm:DrawInMiniMap(S, S)

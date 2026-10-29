@@ -125,15 +125,15 @@ function widget:Shutdown()
   end
 end
 
--- Memory watch, LuaUI side (see game_verdance_exfil.lua): once a game minute.
+-- Memory watch, LuaUI side (see game_verdance_exfil.lua): once a game minute, the heap as it
+-- stands. It used to force a full collection to log before/after, which is itself a stall of a
+-- second or more on a slow machine when the heap is big; reading the count costs nothing.
 local lastMemFrame = -1
 local function memWatch()
   local f = Spring.GetGameFrame() or 0
   if f - lastMemFrame < 1800 or not collectgarbage then return end
   lastMemFrame = f
-  local before = collectgarbage("count")
-  collectgarbage("collect")
-  Spring.Echo(string.format("VA_LUAMEM ui frame=%d before=%.0fMB after=%.0fMB", f, before / 1024, collectgarbage("count") / 1024))
+  Spring.Echo(string.format("VA_LUAMEM ui frame=%d heap=%.0fMB", f, collectgarbage("count") / 1024))
 end
 
 function widget:Update()
@@ -167,6 +167,7 @@ function widget:TextCommand(cmd)
 end
 
 -- People for the board: heroes off the pad (○) and down (✚), from the sidebar's parsed roster.
+-- Read when the board's list is rebuilt (paintCached), not every frame.
 local function peopleGlyphs()
   local out = {}
   local heroes = WG and WG.vaHeroes
@@ -183,10 +184,14 @@ local function peopleGlyphs()
   return out
 end
 
+local mmOpts = { fade = true, contradicted = contradicted, people = peopleGlyphs, roleOnly = true, glyphSize = 11, unknownAlpha = 0.35 }
+local mmProj, mmX, mmY = nil, nil, nil
+
 function widget:DrawInMiniMap(sx, sy)
   if not enabled or not board or #board.zones == 0 then return end
-  local proj = board:minimapProj(sx, sy)
-  board:paint(proj, { fade = true, contradicted = contradicted, people = peopleGlyphs(), roleOnly = true, glyphSize = 11, unknownAlpha = 0.35 })
+  if sx ~= mmX or sy ~= mmY or not mmProj then mmProj, mmX, mmY = board:minimapProj(sx, sy), sx, sy end
+  local proj = mmProj
+  board:paintCached("minimap", sx, sy, 0, 0, proj, mmOpts)
   -- the live route stage, thin, in the stage colour (the painted battlefield line is the real one)
   local route = WG and WG.vaRoute
   if route and route.from and route.to then
@@ -203,7 +208,57 @@ end
 
 -- The pad ring on the ground: steam LINE_LOOP, pulsing; inner dashed ring turns warn while
 -- enemies stand inside (va_pad_enemy_live from the exfil gadget). No other reticles.
+-- The shape follows the ground, so it is sampled once (a ground height per vertex) into a display
+-- list when the pad moves; a frame only sets the pulse colour and calls the list.
 local function groundY(x, z) return (Spring.GetGroundHeight(x, z) or 0) end
+
+local ring = { key = nil, outer = nil, inner = nil }
+
+local function freeRing()
+  if ring.outer then gl.DeleteList(ring.outer) end
+  if ring.inner then gl.DeleteList(ring.inner) end
+  ring.outer, ring.inner, ring.key = nil, nil, nil
+end
+
+local function buildRing(zone, px, pz, pr)
+  freeRing()
+  if zone and zone.edges and #zone.edges > 0 then
+    local edges = zone.edges
+    ring.outer = gl.CreateList(function()
+      gl.BeginEnd(GL.LINES, function()
+        for _, e in ipairs(edges) do
+          gl.Vertex(e[1], groundY(e[1], e[2]) + 10, e[2])
+          gl.Vertex(e[3], groundY(e[3], e[4]) + 10, e[4])
+        end
+      end)
+    end)
+    return
+  end
+  local segs = 48
+  local twoPi = math.pi * 2
+  ring.outer = gl.CreateList(function()
+    gl.BeginEnd(GL.LINE_LOOP, function()
+      for i = 0, segs - 1 do
+        local a = (i / segs) * twoPi
+        local x, z = px + math.cos(a) * pr, pz + math.sin(a) * pr
+        gl.Vertex(x, groundY(x, z) + 10, z)
+      end
+    end)
+  end)
+  local inner = math.max(60, pr - 40)
+  ring.inner = gl.CreateList(function()
+    gl.BeginEnd(GL.LINES, function()
+      for i = 0, segs - 1, 2 do
+        local a1 = (i / segs) * twoPi
+        local a2 = ((i + 1) / segs) * twoPi
+        local x1, z1 = px + math.cos(a1) * inner, pz + math.sin(a1) * inner
+        local x2, z2 = px + math.cos(a2) * inner, pz + math.sin(a2) * inner
+        gl.Vertex(x1, groundY(x1, z1) + 10, z1)
+        gl.Vertex(x2, groundY(x2, z2) + 10, z2)
+      end
+    end)
+  end)
+end
 
 function widget:DrawWorld()
   if not board or Spring.IsGUIHidden() then return end
@@ -214,50 +269,38 @@ function widget:DrawWorld()
   -- The pad is the whole landing zone (the exfil gadget counts by zone): outline it on the
   -- ground, the same edges the minimap draws. Warn colour, faster pulse, while enemies stand on it.
   local zone = board.padId and board.byId[board.padId]
-  if zone and zone.edges and #zone.edges > 0 then
-    local hostile = Hud.num("va_pad_enemy_live", 0) > 0
+  local hasEdges = zone and zone.edges and #zone.edges > 0
+  -- the key: the pad zone when it has edges, else the circle (a number per pad: no string per frame)
+  local key = hasEdges and zone or (px * 1e6 + pz + pr * 1e-3)
+  if ring.key ~= key or not ring.outer then buildRing(hasEdges and zone or nil, px, pz, pr); ring.key = key end
+  local hostile = Hud.num("va_pad_enemy_live", 0) > 0
+  if hasEdges then
     local c = hostile and Ash.COL.warn or steam
     local speed = hostile and 4 or 1.6
     gl.Color(c[1], c[2], c[3], 0.4 + 0.35 * math.abs(math.sin(os.clock() * speed)))
     gl.LineWidth(3)
-    gl.BeginEnd(GL.LINES, function()
-      for _, e in ipairs(zone.edges) do
-        gl.Vertex(e[1], groundY(e[1], e[2]) + 10, e[2])
-        gl.Vertex(e[3], groundY(e[3], e[4]) + 10, e[4])
-      end
-    end)
+    gl.CallList(ring.outer)
     gl.LineWidth(1)
     gl.Color(1, 1, 1, 1)
     return
   end
-  local segs = 48
-  local twoPi = math.pi * 2
   local pulse = 0.35 + 0.35 * math.abs(math.sin(os.clock() * 1.6))
   gl.Color(steam[1], steam[2], steam[3], pulse)
   gl.LineWidth(3)
-  gl.BeginEnd(GL.LINE_LOOP, function()
-    for i = 0, segs - 1 do
-      local a = (i / segs) * twoPi
-      local x, z = px + math.cos(a) * pr, pz + math.sin(a) * pr
-      gl.Vertex(x, groundY(x, z) + 10, z)
-    end
-  end)
-  local hostile = Hud.num("va_pad_enemy_live", 0) > 0
-  local inner = math.max(60, pr - 40)
+  gl.CallList(ring.outer)
   local ic = hostile and Ash.COL.warn or steam
   local ia = hostile and (0.55 + 0.4 * math.abs(math.sin(os.clock() * 4))) or 0.3
   gl.Color(ic[1], ic[2], ic[3], ia)
   gl.LineWidth(2)
-  gl.BeginEnd(GL.LINES, function()
-    for i = 0, segs - 1, 2 do
-      local a1 = (i / segs) * twoPi
-      local a2 = ((i + 1) / segs) * twoPi
-      local x1, z1 = px + math.cos(a1) * inner, pz + math.sin(a1) * inner
-      local x2, z2 = px + math.cos(a2) * inner, pz + math.sin(a2) * inner
-      gl.Vertex(x1, groundY(x1, z1) + 10, z1)
-      gl.Vertex(x2, groundY(x2, z2) + 10, z2)
-    end
-  end)
+  if ring.inner then gl.CallList(ring.inner) end
   gl.LineWidth(1)
   gl.Color(1, 1, 1, 1)
+end
+
+-- Free the display lists (the ground ring, the board's cached surfaces) with the widget.
+local baseShutdown = widget.Shutdown
+function widget:Shutdown()
+  freeRing()
+  if board and board.dropCaches then board:dropCaches() end
+  baseShutdown(self)
 end

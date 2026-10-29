@@ -266,7 +266,7 @@ local function drawBoardColumn(m, x1, y1, x2, y2)
     local z = b.byId[tostring(zid)]
     if z then people[#people + 1] = { x = z.cx, z = z.cz + 90, glyph = Ash.GLYPH.holding, col = Ash.COL.gold, size = 11 } end
   end
-  Hud.boardBox(b, bx1 + 6, by1 + 6, bx2 - 6, by2 - 6, { fade = true, seenNow = m.seen, labels = true, glyphSize = 12, contradicted = WG and WG.vaContradicted or nil, people = people })
+  Hud.boardBox(b, bx1 + 6, by1 + 6, bx2 - 6, by2 - 6, { slot = "manifest", fade = true, seenNow = m.seen, labels = true, glyphSize = 12, contradicted = WG and WG.vaContradicted or nil, people = people })
 end
 
 local function drawDestinations(m, x0, y, W)
@@ -345,7 +345,7 @@ local function drawOver()
   if b and #b.zones > 0 then
     local bw = math.min(420, vsx * 0.35)
     local bx1, by1 = vsx * 0.5 - bw * 0.5, y - 70 - bw * (b.mapZ / b.mapX)
-    local rect = Hud.boardBox(b, bx1, by1, bx1 + bw, y - 70, { fade = true, seenNow = m.seen, glyphSize = 11, contradicted = WG and WG.vaContradicted or nil })
+    local rect = Hud.boardBox(b, bx1, by1, bx1 + bw, y - 70, { slot = "closing", fade = true, seenNow = m.seen, glyphSize = 11, contradicted = WG and WG.vaContradicted or nil })
     text("Returning to camp…", vsx * 0.5, rect[2] - 22, 13, Ash.COL.muted, "c")
   else
     text("Returning to camp…", vsx * 0.5, y - 70, 13, Ash.COL.muted, "c")

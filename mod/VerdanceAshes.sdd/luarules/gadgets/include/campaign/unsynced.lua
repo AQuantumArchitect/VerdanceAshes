@@ -73,8 +73,13 @@ function gadget:GameStart()
   requestPause("sortie_start")
 end
 
+-- Update runs every drawn frame for the whole match; the modoptions are a fresh ~200-entry table
+-- per read, so whether this is headless is read once.
+local headless = nil
 function gadget:Update()
-  if isHeadless() or not holdStartPause then return end
+  if not holdStartPause then return end
+  if headless == nil then headless = isHeadless() end
+  if headless then return end
   if gameIsPaused() then
     if not sawStartPaused then
       sawStartPaused = true
