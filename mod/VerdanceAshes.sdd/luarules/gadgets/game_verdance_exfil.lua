@@ -381,9 +381,10 @@ local function enemiesOnPad()
   return n
 end
 
--- What lifts: anything mobile on the pad, and every hero who cannot walk (Hearth's house, a
--- turret hero) wherever they stand: the company packs a person up, it does not leave them for
--- being a building.
+-- What lifts: anything mobile on an extraction point, and every hero whose body is a building
+-- (Hearth's fusion, the scout bays Spoke, Tick and Noctua, a turret hero, and any building hero
+-- to come: the test is the body, not a list) wherever they stand: the company packs a person up,
+-- it does not leave them for being a building.
 local function lifts(isHero, structure, onPad)
   if isHero and structure then return true end
   return onPad and not structure

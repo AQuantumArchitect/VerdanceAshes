@@ -41,7 +41,9 @@ local U = {
   [9] = { x = 300,  z = 1800, def = 1, team = 1 },
   [10] = { x = 600, z = 600, def = 2, team = 1 },  -- an enemy wall/turret in the pad zone: not "on the pad"
 }
-UnitDefs = { [1] = { name = "corthud", speed = 50, metalCost = 100 }, [2] = { name = "armnanotc", speed = 0, metalCost = 200 } }
+UnitDefs = { [1] = { name = "corthud", speed = 50, metalCost = 100 }, [2] = { name = "armnanotc", speed = 0, metalCost = 200 },
+  [3] = { name = "armckfus", isBuilding = true, metalCost = 3000 },           -- Hearth: a fusion
+  [4] = { name = "legvp", isFactory = true, speed = 0, metalCost = 600 } }   -- Spoke: a scout bay
 Game = { mapSizeX = 4096, mapSizeZ = 4096 }
 RULES, SENT, ENDED, GG = { va_dropped_heroes = "pavise,solarium,ketha" }, {}, {}, {}
 GG.VA_EndSortie = function(kind) ENDED[#ENDED + 1] = kind end
@@ -93,7 +95,17 @@ has('"staying":{"heroes":[]', "... and is not left behind as a person in the fie
 has('"units":{"FAR":1}', "a unit outside the pad zone stays")
 has('"enemyOnPad":1', "a mobile enemy anywhere in the pad zone is on the pad; a wall is not")
 has('"dropped":["pavise","solarium","ketha"]', "the manifest names who dropped (Python buries whoever is nowhere)")
-print("ok   manifest: pad is the landing zone; an immobile hero lifts from where it stands")
+-- the building heroes (owner, 2026-10-29): Hearth's fusion and a scout bay standing on ground
+-- nobody would lift from still pack up and come home, like every hero whose body is a building
+U[11] = { x = 1000, z = 3900, def = 3, team = 0, hero = "hearth" }
+U[12] = { x = 3000, z = 3900, def = 4, team = 0, hero = "spoke" }
+GG.VA_ExfilCmd("manifest")
+m = RULES.va_manifest_json
+has('{"heroId":"hearth","name":"hearth","unitDef":"armckfus"}', "Hearth's fusion lifts from ground that is not an extraction point")
+has('{"heroId":"spoke","name":"spoke","unitDef":"legvp"}', "a scout bay hero lifts from wherever it was built")
+has('"staying":{"heroes":[]', "... and neither is left in the field")
+U[11], U[12] = nil, nil
+print("ok   manifest: pad is the landing zone; an immobile hero lifts from where it stands; so do the building heroes")
 has('"hiredUnits":{"corthud":1}', "a unit the shop sent lifts but is marked hired (kept out of the reserve)")
 print("ok   the shop's units are hired for this drop")
 -- safe ground: everything of ours standing in a zone the company holds lifts, not only the pad
