@@ -125,8 +125,7 @@ local function zoneOf(x, z)
 end
 
 -- The pad is the whole zone the company leaves from. Publishes it for the HUD.
-local homePad = nil   -- where the company landed: a rescue always goes home from here
-local rescuedIds = {}
+local homePad = nil   -- where the company landed: always an extraction point
 
 local function placePad(zid, x, z, r)
   pad = { zoneId = zid, label = zoneLabel[zid] or zid, x = x, z = z, r = r }
@@ -312,19 +311,54 @@ local function onPadAt(x, z)
   return dx * dx + dz * dz <= pad.r * pad.r
 end
 
--- Safe ground (owner, 2026-10-27): everything of ours standing in a zone the company holds lifts on
--- extract, not only what stands on the pad: the pad zone, where we landed, and the zones the engine
--- names as ours (mission.safeZoneIds: held road doors and our own ground). Rescues still go home
--- from the landing zone only.
+-- Extraction points (owner call, 2026-10-29): every zone the company owns. Everything of ours
+-- standing in one lifts on extract, rescues included, and goes into the one reserve: the pad
+-- zone, where we landed, the zones the engine names as ours (mission.safeZoneIds: held road doors
+-- and our own ground), and any zone we own right now by the one rule (include/va_claim.lua: AV+DV
+-- over 1500 and over three times everyone else's), ground taken this sortie included.
+local VA_CLAIM = VFS.Include("luarules/gadgets/include/va_claim.lua")
+local liveOwned, liveOwnedAt = {}, -1000
+local function refreshLiveOwned(force)
+  local f = Spring.GetGameFrame() or 0
+  if not force and f - liveOwnedAt < 30 then return end
+  liveOwnedAt = f
+  liveOwned = {}
+  local need = mission and mission.objective and tonumber(mission.objective.claimValue) or VA_CLAIM.NEED
+  local dv = GG.VA_ZoneDv and GG.VA_ZoneDv() or {}
+  for zid, row in pairs(dv) do
+    if VA_CLAIM.ours(row, need) then liveOwned[tostring(zid)] = true end
+  end
+end
+
 local function safeZone(zid)
   if not zid or zid == "" or zid == "?" then return false end
   if pad and zid == pad.zoneId then return true end
   if homePad and zid == homePad.zoneId then return true end
+  if liveOwned[zid] then return true end
   local ids = mission and mission.safeZoneIds
   if type(ids) == "table" then
     for _, z in ipairs(ids) do if tostring(z) == zid then return true end end
   end
   return false
+end
+
+-- The extraction points besides the pad, for the board (va_lift_zones, comma-separated).
+local liftZonesSeen = nil
+local function publishLiftZones()
+  local ids, seen = {}, {}
+  local function add(z)
+    z = tostring(z or "")
+    if z ~= "" and not seen[z] and not (pad and z == pad.zoneId) and anchorOf[z] then seen[z] = true; ids[#ids + 1] = z end
+  end
+  if homePad then add(homePad.zoneId) end
+  for _, z in ipairs((mission and type(mission.safeZoneIds) == "table" and mission.safeZoneIds) or {}) do add(z) end
+  for z in pairs(liveOwned) do add(z) end
+  table.sort(ids)
+  local s = table.concat(ids, ",")
+  if s ~= liftZonesSeen then
+    liftZonesSeen = s
+    Spring.SetGameRulesParam("va_lift_zones", s, { public = true })
+  end
 end
 
 local function liftsFrom(x, z)
@@ -361,7 +395,6 @@ local function manifest()
     schema = "verdance-manifest/1",
     frame = Spring.GetGameFrame() or 0,
     pad = pad and { zoneId = pad.zoneId, label = pad.label, x = math.floor(pad.x), z = math.floor(pad.z), radius = pad.r } or nil,
-    homePad = nil,   -- filled below when the pad has moved and a rescue must still go home from the landing zone
     destinations = destinations(),
     going = { heroes = {}, units = {}, packUnits = {}, hiredUnits = {}, unitCount = 0, structures = 0, metal = 0 },
     staying = { heroes = {}, units = {}, unitCount = 0, structures = {}, structureCount = 0, metal = 0 },
@@ -373,7 +406,10 @@ local function manifest()
     for _, h in ipairs(GG.VA_JumpPorted() or {}) do m.going.heroes[#m.going.heroes + 1] = h end
   end
   if not pad then return m end
-  rescuedIds = {}
+  refreshLiveOwned(true)
+  publishLiftZones()
+  m.liftZones = {}
+  for z in tostring(liftZonesSeen or ""):gmatch("[^,]+") do m.liftZones[#m.liftZones + 1] = zoneLabel[z] or z end
   local units = Spring.GetTeamUnits(playerTeamID) or {}
   for i = 1, #units do
     local uid = units[i]
@@ -387,15 +423,6 @@ local function manifest()
       local hname = Spring.GetUnitRulesParam(uid, "va_hero_name")
       local onPad = liftsFrom(x, z)
       local zid = zoneOf(x, z) or "?"
-      -- Two exits (owner, 2026-10-27): the company leaves from the ground it took, but a rescue
-      -- always goes home from where it started: any hero raised or turned this sortie (va_recruited)
-      -- lifts only from the landing zone.
-      local hidNow = Spring.GetUnitRulesParam(uid, "va_hero_id")
-      local rescued = hidNow and (tonumber((Spring.GetUnitRulesParam(uid, "va_recruited"))) or 0) == 1
-      if rescued and homePad then
-        onPad = (zid == homePad.zoneId)
-        rescuedIds[#rescuedIds + 1] = tostring(hidNow)
-      end
       -- a pair's partner is named on the field but travels as its lead's pack
       local partner = Spring.GetUnitRulesParam(uid, "va_partner_of")
       local isHero = hid and hid ~= "" and hid ~= 0 and not (partner and partner ~= "")
@@ -439,9 +466,6 @@ local function manifest()
   end
   -- who else is standing on our pad
   m.enemyOnPad = enemiesOnPad()
-  if homePad and #rescuedIds > 0 then
-    m.homePad = { zoneId = homePad.zoneId, label = homePad.label, rescue = table.concat(rescuedIds, ",") }
-  end
   -- what we looked at (observe gadget), as a map zone -> eta
   if GG and GG.VA_ObservedZonesTable then
     m.seen = GG.VA_ObservedZonesTable() or {}
@@ -462,6 +486,8 @@ end
 --   va_pad_enemy_live                 who else stands on our pad (visible to us)
 local function hudScan()
   if not pad then return end
+  refreshLiveOwned()
+  publishLiftZones()
   if next(teamAlly) == nil then resolvePlayerTeam() end
   local heroes = {}
   local onPeople, onUnits, offUnits, offStructures = 0, 0, 0, 0
@@ -474,9 +500,6 @@ local function hudScan()
       local hid = Spring.GetUnitRulesParam(uid, "va_hero_id")
       local isHero = hid ~= nil and tostring(hid) ~= "" and tostring(hid) ~= "0"
       local onPad = liftsFrom(x, z)
-      if isHero and homePad and (tonumber((Spring.GetUnitRulesParam(uid, "va_recruited"))) or 0) == 1 then
-        onPad = (zoneOf(x, z) == homePad.zoneId)   -- a rescue goes home from where we landed
-      end
       if isHero and structure then
         onPeople = onPeople + 1
         onPad = true            -- packed up where it stands: it lifts with the company

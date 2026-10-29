@@ -503,8 +503,9 @@ export function storeWantsAttention() {
   return ((commerce().shop) || []).some(item => { const r = recommendation(item); return r && r.have < r.want; });
 }
 function storeLocked() {
+  // Open while the field loads (the drop carries the shop); shut once the drop is locked or gone.
   const phase = state.warm && state.warm.phase;
-  return phase === "loading" || phase === "ready" || phase === "dropping" || phase === "up";
+  return phase === "dropping" || phase === "up" || !!(state.warm && state.warm.dropLocked);
 }
 function renderShopListing(item) {
   const locked = !item.available || storeLocked();
@@ -543,8 +544,8 @@ export function renderShop() {
       <div class="bal tnb">Tenebrium<strong>${c.tenebrium ?? 0}</strong>for builders and the suit</div>`;
   $("shop-note").textContent = !state.hostLive
     ? "Preview only. Start PLAY.bat and keep its window open to make campaign purchases."
-    : storeLocked() ? "The field is loading. What you hired is aboard; the store opens again for the next drop."
-    : "Everything here is for this drop only. Hire, then Launch. A rented hero joins the party; win the campaign with them in the company and they are yours.";
+    : storeLocked() ? "The drop is locked. What you hired is aboard; the store opens again for the next drop."
+    : "Everything here is for this drop only, and the field keeps loading while you hire. A rented hero joins the party; win the campaign with them in the company and they are yours.";
   const kit = c.deployKit || [];
   const inbound = c.inbound || c.pendingDeliveries || [];
   const kitHtml = kit.map(k => `<div class="kit-line"><b>${esc(k.label || k.listingId)}</b>${k.count ? " · ×" + esc(k.count) : ""}${k.loan ? " · loan" : ""}${k.factoryDef ? " · fabricator" : ""}</div>`).join("");

@@ -85,6 +85,12 @@ WARS = {
 }
 KOOM_WAR = WARS["koom_valley"]
 
+# Who plays a war's seats while the company is on the field: the bake ran its own profiles (the
+# snapshot's), the live field may not. Koom (owner call, 2026-10-29): BARbarian on medium for every
+# seat, the Null Mercs' Legion as well as Armada. A fort's builder (va_warden) stays a fort builder.
+LIVE_PROFILES = {"koom_valley": "medium"}
+KEEP_PROFILES = {"va_warden"}
+
 # Who truly holds ground because a set piece stands there (the campaign's zone memory seeds it):
 # the seats each war holds.
 # The Eye's rim stays the raptors' whoever stands on it: its seats are the war's, its ground is wild.
@@ -181,7 +187,9 @@ def standing_war(map_id: str, workspace: Optional[Path], pad_zone: Optional[str]
             if c["key"].startswith("fort"):
                 continue  # a tier's added fort: not in this tier's war
             return None
-        seat.update(x=field["seat"][0], z=field["seat"][1], profile=field["profile"], bank=field["bank"])
+        live = LIVE_PROFILES.get(map_id)
+        profile = live if live and field["profile"] not in KEEP_PROFILES else field["profile"]
+        seat.update(x=field["seat"][0], z=field["seat"][1], profile=profile, bank=field["bank"])
         # the start commander is the engine's; every baked unit but a commander is placed
         seat["units"] = [u for u in field["units"]
                          if u[5] != "C" and not (pad and math.hypot(u[1] - pad[0], u[2] - pad[1]) < PAD_CLEARANCE)]

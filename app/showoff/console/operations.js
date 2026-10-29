@@ -3,7 +3,7 @@ import { state, session, BOARDS, commerce, companySealed, prettyMap, jobLabel, a
 import { api } from "./api.js";
 import { $, esc, toast, logLine, downloadJson, renderHeroCard, crewHeroName } from "./render.js";
 import { defaultMarks, snapGroundRoute, isLegalLanding, padLegality, padExposed, renderBoard, renderMapPicker } from "./board.js";
-import { rentedIds, renderShop, recomputeShopAvailability, storeWantsAttention, firstDrop, renderCompany, buildCompanyEntries, crewCoreIds, droppingPackIds, sealedDeployAces, livingCoreIds, heroIsDeployable, heroAway, heroWhereLabel, companyOwnedBand, showCompanyIntro, hideCompanyIntro } from "./company.js";
+import { rentedIds, renderShop, recomputeShopAvailability, renderCompany, buildCompanyEntries, crewCoreIds, droppingPackIds, sealedDeployAces, livingCoreIds, heroIsDeployable, heroAway, heroWhereLabel, companyOwnedBand, showCompanyIntro, hideCompanyIntro } from "./company.js";
 import { renderBadges } from "./shell.js";
 import { hideCoach } from "./system.js";
 import { renderReserve, reserveBring, resetReserveBring } from "./reserve.js";
@@ -179,7 +179,7 @@ export function updateDeployGate() {
 // at the drop. tools/verdance_kernel/hot_drop.py has the other half.
 export function dropRosterSealed() {
   const phase = state.warm && state.warm.phase;
-  return phase === "dropping" || phase === "up";
+  return phase === "dropping" || phase === "up" || !!(state.warm && state.warm.dropLocked);
 }
 function dropConfirmOpen() {
   const el = $("drop-confirm");
@@ -192,24 +192,31 @@ export function hideDropConfirm() {
 }
 function setWarm(phase, text) {
   state.warm.phase = phase;
+  if (phase !== "loading" && phase !== "ready") state.warm.dropLocked = false;
   state.warm.locked = phase === "dropping" || phase === "up";
   paintWarmStatus(text);
   renderDropSquad();
-  renderShop();          // the store locks while the field loads
+  renderShop();          // the store shuts once the drop is locked
   updateDeployGate();
 }
-// The drop window's three windows: the party, the reserve kits, the Cortex mercenary store.
+// The drop window's three windows, in order: the party, the reserve kits, the Cortex mercenary
+// store. The green button walks them (owner call, 2026-10-29): confirm the party, confirm the
+// reserve, then Lock drop on the store, which drops at once or the moment the field is ready.
+const DROP_STEPS = ["party", "reserve", "mercs"];
 export function showDropTab(name) {
-  document.querySelectorAll("[data-drop-tab]").forEach(b => b.classList.toggle("on", b.dataset.dropTab === name));
-  document.querySelectorAll("[data-drop-win]").forEach(w => w.classList.toggle("on", w.dataset.dropWin === name));
+  state.dropTab = DROP_STEPS.includes(name) ? name : "party";
+  document.querySelectorAll("[data-drop-tab]").forEach(b => b.classList.toggle("on", b.dataset.dropTab === state.dropTab));
+  document.querySelectorAll("[data-drop-win]").forEach(w => w.classList.toggle("on", w.dataset.dropWin === state.dropTab));
+  paintDropButton();
 }
 function paintWarmStatus(text) {
   const el = $("drop-warm-status");
   if (!el) return;
   const phase = state.warm && state.warm.phase;
   el.textContent = text || (
-    phase === "loading" ? `Loading ${prettyMap((state.plan || {}).mapId)} in Beyond All Reason behind this screen. Pick who goes; Drop wakes when the field is ready.`
-    : phase === "ready" ? "The field is loaded and paused, the enemy in place. Your company lands the moment you drop."
+    phase === "loading" && state.warm.dropLocked ? `The drop is locked. ${prettyMap((state.plan || {}).mapId)} is still loading; the company drops the moment it is ready. Press the button again to change something.`
+    : phase === "loading" ? `Loading ${prettyMap((state.plan || {}).mapId)} in Beyond All Reason behind this screen. Pick the party, the reserve and any mercenaries while it loads.`
+    : phase === "ready" ? "The field is loaded and paused, the enemy in place. Your company lands the moment you lock the drop."
     : phase === "dropping" ? "Dropping… the company is landing on the pad."
     : phase === "up" ? "The company is down on the pad, the field paused. Switch to Beyond All Reason and unpause when you are ready."
     : phase === "failed" ? "The field did not load. Adjust the route and try again."
@@ -280,16 +287,19 @@ export function renderDropSquad() {
 }
 function paintDropButton() {
   const go = $("drop-confirm-go");
-  if (go) {
-    const phase = state.warm && state.warm.phase;
-    go.disabled = phase === "loading" || phase === "dropping";
-    go.textContent = phase === "up" ? "Back to the map"
-      : phase === "dropping" ? "Dropping…"
-      : phase === "loading" ? "Field loading…"
-      : phase === "ready" ? "Drop"
-      : phase === "failed" ? "Try again"
-      : state.hostLive ? "Launch" : "Save plan";
-  }
+  if (!go) return;
+  const phase = state.warm && state.warm.phase;
+  const tab = state.dropTab || "party";
+  go.disabled = phase === "dropping";
+  go.classList.toggle("locked-drop", !!(state.warm && state.warm.dropLocked));
+  go.textContent = phase === "up" ? "Back to the map"
+    : phase === "dropping" ? "Dropping…"
+    : tab === "party" ? "Confirm the party"
+    : tab === "reserve" ? "Confirm the reserve"
+    : state.warm.dropLocked ? "Drop locked: waiting for the field"
+    : phase === "failed" ? "Try again"
+    : !state.hostLive ? "Save plan"
+    : "Lock drop";
 }
 function pollWarm() {
   if (state.warm.poll) clearTimeout(state.warm.poll);
@@ -306,9 +316,10 @@ function pollWarm() {
       }
       if (phase === "loading" && hot.phase === "ready") {
         setWarm("ready");
-        toast("The field is ready. Drop when your company is set.", "ok");
+        if (state.warm.dropLocked) return dropCompany();        // locked while it loaded: drop now
+        toast("The field is ready. Lock the drop when your company is set.", "ok");
       } else if ((phase === "loading" || phase === "ready") && (hot.phase === "none" || hot.phase === "closed") && status.deployPhase !== "building") {
-        return setWarm("idle", "Beyond All Reason closed before the drop. Launch to load the field again.");
+        return setWarm("idle", "Beyond All Reason closed before the drop. Open the drop window again to reload the field.");
       } else if (phase === "up" && hot.phase !== "dropped") {
         return setWarm("idle", "Beyond All Reason has closed.");
       }
@@ -363,7 +374,7 @@ export function showDropConfirm() {
     resetReserveBring();
     recomputeShopAvailability();
     setWarm("idle");
-    showDropTab(firstDrop() && storeWantsAttention() ? "mercs" : "party");
+    showDropTab("party");
     if (state.hostLive) launchField();
   } else {
     renderDropSquad();
@@ -419,10 +430,23 @@ async function dropCompany() {
 export function onDropConfirmGo() {
   const phase = state.warm && state.warm.phase;
   if (phase === "up") return hideDropConfirm();
-  if (phase === "ready") return dropCompany();
-  if (phase === "loading" || phase === "dropping") return paintWarmStatus();
+  if (phase === "dropping") return paintWarmStatus();
+  const tab = state.dropTab || "party";
+  if (tab !== "mercs") return showDropTab(DROP_STEPS[DROP_STEPS.indexOf(tab) + 1]);
   if (!state.hostLive) return commitDeploy(false);
-  launchField();
+  if (phase === "ready") return dropCompany();
+  if (phase === "loading") {
+    // Lock drop while the field loads: the company drops the moment it is ready. Again: unlock.
+    state.warm.dropLocked = !state.warm.dropLocked;
+    paintWarmStatus();
+    renderDropSquad();
+    renderShop();
+    return;
+  }
+  launchField();                                  // idle or failed: (re)load, then lock
+  state.warm.dropLocked = true;
+  paintWarmStatus();
+  paintDropButton();
 }
 
 /* ---- stamp ------------------------------------------------------------------- */

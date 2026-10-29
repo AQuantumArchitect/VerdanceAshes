@@ -5,14 +5,18 @@ A road is a strategic_link in the world graph. Each end is a door: a corner or e
 zone of its map. The rules (owner-approved, 2026-10-23):
 
   * You can cross a road only while you hold the door you leave by.
-  * You hold a door when your presence there (army or defences) outweighed everyone else's
-    when you lifted, and reached the claim presence (verdance.world.claim: 400 on Greenest
-    Fields, half as much again per road beyond). A door with nothing standing in it stays as
-    the company last knew it.
+  * You hold a door when you own it when you lifted (verdance.world.claim: your army and
+    defences there over 1500 metal and over three times everyone else's). A door nobody
+    dominates stays as the company last knew it.
   * Taking a door, the extraction moves onto it once it is yours: you leave by the exit.
   * Lose a door and the road is shut to you until you take it back. Maps already
     opened (walked) stay on the board.
   * Crossing lands you on the far door: your foothold on the new map.
+  * The first sortie on any map is founding a base there (owner call, 2026-10-29: Koom's first
+    mission is to establish a base, and the Rock Jungle's must be too, not a march across it to
+    the Eye's door). A crossing is that founding; an open map not yet walked that the company
+    holds a door on (home, through the start road) offers the same: dig in on the door you hold.
+    Its other doors wait until it has been walked.
   * The company starts on the start road, holding both of its doors (the ledger's
     default in verdance.campaign.schema).
 
@@ -67,6 +71,10 @@ MAP_FACTION = {
     "all_that_simmers": None,
 }
 
+# Where a founding digs in when it is not the door itself: home's camp ground behind its gate
+# (the same ground the opener's "Found the Rock Jungle camp" fortified).
+FOUND_TARGET = {"TRJ_NW_OUTER_MUSTER": "TRJ_NW_GATE"}
+
 _CACHE: Dict[str, Dict[str, Any]] = {}
 
 
@@ -118,7 +126,7 @@ def record_homecoming(state: Dict[str, Any], result: Dict[str, Any], workspace: 
     """Write what this sortie measured at its map's doors into the ledger.
 
     Only doors the gadget reported presence for change: whoever leads holds it, the company only
-    with the claim presence (verdance.world.claim). Returns the doors that changed hands."""
+    when it owns the door (verdance.world.claim). Returns the doors that changed hands."""
     if workspace is None:
         return []
     dv = result.get("zoneDv")
@@ -267,9 +275,22 @@ def legal_jobs(state: Dict[str, Any], workspace: Path) -> List[Dict[str, Any]]:
     doors = load_doors(workspace)
     opened = open_maps(state)
     jobs: List[Dict[str, Any]] = []
+    walked = {_canon_map(b.get("mapId")) for b in (state.get("history") or []) if isinstance(b, dict) and b.get("mapId")}
+    founding = set()
+    for zid, door in sorted(doors.items()):
+        map_id = door["mapId"]
+        if map_id in opened and map_id not in walked and map_id not in founding and held(state, zid):
+            founding.add(map_id)
+            heroes = _wild_on_map(state, map_id)
+            score = 1.6 * (SHUT_MAP + 0.3 * _leak(state, map_id)) + _rescue(heroes) + _q0_bias(state, map_id)
+            jobs.append({"kind": "found", "door": door, "mapId": map_id, "padZoneId": zid,
+                         "targetZoneId": FOUND_TARGET.get(zid, zid), "shut": False, "heroes": heroes,
+                         "score": round(score, 4), "id": f"found_{zid}"})
     for zid, door in sorted(doors.items()):
         if door["mapId"] not in opened:
             continue
+        if door["mapId"] in founding and not held(state, zid):
+            continue   # the map's first sortie is its base: its other doors wait
         if held(state, zid):
             far_map = door["farMapId"]
             if far_map in opened:
@@ -345,7 +366,12 @@ def _card(job: Dict[str, Any], lean: bool) -> Dict[str, Any]:
     heroes = job.get("heroes") or []
     along = (f"Along the way: {', '.join(h['name'] for h in heroes[:4])}."
              if heroes else "")
-    if job["kind"] == "cross":
+    if job["kind"] == "found":
+        label = f"Found a base on {map_name} at {door['label']}"
+        lines = [f"First time on {map_name}: land on {door['label']}, the door you hold, and dig in.",
+                 "Plant eco and defences and hold the ground. The rest of the map comes after."]
+        contract = "fortify_zone"
+    elif job["kind"] == "cross":
         far = door["farLabel"]
         label = f"Open {map_name} through {door['label']}"
         lines = [f"You hold {door['label']}, the door to {map_name}. Cross the road and land on its far door, {far}.",
@@ -355,8 +381,8 @@ def _card(job: Dict[str, Any], lean: bool) -> Dict[str, Any]:
         far_name = MAP_NAMES.get(door["farMapId"], door["farMapId"])
         label = f"Take {door['label']} on {map_name}, the door to {far_name}"
         lines = [f"{door['label']} is the door to {far_name}, and you do not hold it.",
-                 f"Stand there with {int(job.get('claim') or 0)} metal of army or defences, more than anyone else, and it is yours. "
-                 "Then the extraction moves onto the door: leave by it and the road opens."]
+                 f"Stand there with more than {int(job.get('claim') or 0)} metal of army and defences, and more than three times "
+                 "everyone else's there together, and it is yours. Then the extraction moves onto the door: leave by it and the road opens."]
         contract = "seize_lane"
     if job["mapId"] == "all_that_simmers":
         # Every drop on All That Simmers is the kings' showdown (verdance.world.theaters).
@@ -373,7 +399,8 @@ def _card(job: Dict[str, Any], lean: bool) -> Dict[str, Any]:
         "preferredCaptureZoneId": job["targetZoneId"],
         "sessionMode": "same_map" if job["mapId"] == HOME_MAP_ID else "map_travel",
         "against": "wild" if job["mapId"] == HOME_MAP_ID else (MAP_FACTION.get(job["mapId"]) or "armada"),
-        "journey": "road" if job["kind"] == "cross" else "door",
+        "journey": ("home_founding" if job["kind"] == "found" and job["mapId"] == HOME_MAP_ID
+                    else {"cross": "road", "found": "found"}.get(job["kind"], "door")),
         "door": {"zoneId": door["zoneId"], "farMapId": door["farMapId"], "farZoneId": door["farZoneId"]},
     }
     if job.get("padZoneId"):

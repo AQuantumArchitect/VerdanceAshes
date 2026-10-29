@@ -689,8 +689,8 @@ def apply_commander_story(
     # A suit won in the field (game_verdance_suits.lua): stolen off Koom, raised from under the queen.
     won = result.get("commanderSuit")
     if isinstance(won, dict) and won.get("unitDef"):
-        from .suits import grant_suit
-        if grant_suit(state, won.get("unitDef"), str(won.get("how") or "field")):
+        from .suits import came_home, grant_suit
+        if came_home(result, won.get("unitDef")) and grant_suit(state, won.get("unitDef"), str(won.get("how") or "field")):
             return {"event": "unlocked", "reason": "suit:" + str(won.get("how") or "field")}
     tags = [str(t) for t in (result.get("storyTags") or [])]
     sortie = result.get("sortie") if isinstance(result.get("sortie"), dict) else {}

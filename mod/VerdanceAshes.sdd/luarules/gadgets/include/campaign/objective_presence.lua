@@ -73,17 +73,21 @@ local function checkFortifyObjective(frame)
   end
 end
 
--- Standing on the wound is not taking it: the company's presence there (armed units and
--- defences, the same measure Python claims with at home) must reach mission.objective.claimValue
--- (verdance.world.claim). Published for the rail. Global (the main chunk is at the local cap).
+-- Standing on the wound is not taking it: the company must own it, by the one rule (AV + DV over
+-- mission.objective.claimValue and over three times everyone else's; include/va_claim.lua,
+-- verdance.world.claim). Published for the rail: our presence, and what owning it takes now.
+local VA_CLAIM = VFS.Include("luarules/gadgets/include/va_claim.lua")
 local function vaClaimStrength()
   local obj = mission and mission.objective or {}
-  local need = tonumber(obj.claimValue) or 0
+  local need = tonumber(obj.claimValue) or VA_CLAIM.NEED
   local row = obj.targetZoneId and zoneDvTable()[tostring(obj.targetZoneId)] or nil
-  local ours = math.floor((row and row.ashwalkers) or 0)
-  Spring.SetGameRulesParam("va_claim_value", ours, { public = true })
-  Spring.SetGameRulesParam("va_claim_need", need, { public = true })
-  return ours >= need
+  local ours, others = 0, 0
+  for faction, v in pairs(row or {}) do
+    if faction == "ashwalkers" then ours = ours + (tonumber(v) or 0) else others = others + (tonumber(v) or 0) end
+  end
+  Spring.SetGameRulesParam("va_claim_value", math.floor(ours), { public = true })
+  Spring.SetGameRulesParam("va_claim_need", math.floor(math.max(need, VA_CLAIM.DOMINANCE * others)) + 1, { public = true })
+  return VA_CLAIM.ours(row, need)
 end
 
 -- One tick of the hold clock on the target zone. Present and uncontested, the clock runs; enemy

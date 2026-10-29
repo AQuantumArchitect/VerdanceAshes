@@ -86,7 +86,7 @@ def fake_result(state, intent, plan, hs, n, brought):
         "observedZones": dict(seen),
         # the company dug in at its pad and its target with the claim presence (the objective will
         # not complete without it): it holds both at homecoming (doors too)
-        "zoneDv": {str(pad): {"ashwalkers": claim_need(plan["mapId"], REPO)},
+        "zoneDv": {str(pad): {"ashwalkers": claim_need(plan["mapId"], REPO) + 1},
                    str(target): {"ashwalkers": claim_need(plan["mapId"], REPO) + 100}},
         "beliefExport": {z: {"eta": e, "enemyNow": 0, "friendNow": 3 if z == pad else 0} for z, e in seen.items()},
         "manifest": {
