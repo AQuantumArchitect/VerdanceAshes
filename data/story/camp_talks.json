@@ -5257,6 +5257,994 @@
       ]
     },
     {
+      "id": "cauter__grath:C",
+      "pairId": "cauter__grath",
+      "a": "grath",
+      "b": "cauter",
+      "rank": "C",
+      "title": "Interest",
+      "polarity": "attract",
+      "motif": "two kinds of heat on the Legion line",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Bel-Ansa's Phalanx holds the breach while Grath's Prometheus burns the far side of it."
+        },
+        {
+          "speaker": "cauter",
+          "line": "You set my sentence on fire."
+        },
+        {
+          "speaker": "grath",
+          "line": "Your sentence owed me. Everything owes me."
+        },
+        {
+          "speaker": "cauter",
+          "line": "Then we're square. Same time tomorrow?"
+        },
+        {
+          "speaker": "grath",
+          "line": "With interest."
+        }
+      ]
+    },
+    {
+      "id": "bro__grath:C",
+      "pairId": "bro__grath",
+      "a": "grath",
+      "b": "bro",
+      "rank": "C",
+      "title": "Payroll",
+      "polarity": "rivalry",
+      "motif": "two mercenaries, one paymaster",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "The Null Mercs paymaster comes through camp. Grath and Bro end up in the same queue."
+        },
+        {
+          "speaker": "grath",
+          "line": "Three wars. I'm first."
+        },
+        {
+          "speaker": "bro",
+          "line": "Yeah. I'm here though."
+        },
+        {
+          "speaker": "grath",
+          "line": "Being here isn't a claim."
+        },
+        {
+          "speaker": "bro",
+          "line": "Is to them. Yeah."
+        }
+      ]
+    },
+    {
+      "id": "rumor__vale:C",
+      "pairId": "rumor__vale",
+      "a": "vale",
+      "b": "rumor",
+      "rank": "C",
+      "title": "Terms",
+      "polarity": "attract",
+      "motif": "fog and the contract",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Vale's three launchers and Rumor's Ghost share a hiding place nobody else knows about."
+        },
+        {
+          "speaker": "rumor",
+          "line": "Whose contract are we on tonight?"
+        },
+        {
+          "speaker": "vale",
+          "line": "Mine. The wall's going to pay it."
+        },
+        {
+          "speaker": "rumor",
+          "line": "And if the wall changes sides?"
+        },
+        {
+          "speaker": "vale",
+          "line": "Then you'll have told me first. You always do."
+        }
+      ]
+    },
+    {
+      "id": "gorgon__vale:C",
+      "pairId": "gorgon__vale",
+      "a": "vale",
+      "b": "gorgon",
+      "rank": "C",
+      "title": "Discretion",
+      "polarity": "friction",
+      "motif": "quiet invoices and loud stares",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Maelis's Medusa fires a full salvo from the open. Vale's launchers, hidden in the treeline, wince."
+        },
+        {
+          "speaker": "vale",
+          "line": "They'll know where we are now."
+        },
+        {
+          "speaker": "gorgon",
+          "line": "They'll know where I am. You're still invisible. You're welcome."
+        },
+        {
+          "speaker": "vale",
+          "line": "Subtlety is a courtesy."
+        },
+        {
+          "speaker": "gorgon",
+          "line": "So is winning."
+        }
+      ]
+    },
+    {
+      "id": "commando__mason:C",
+      "pairId": "commando__mason",
+      "a": "commando",
+      "b": "mason",
+      "rank": "C",
+      "title": "Foundations",
+      "polarity": "rivalry",
+      "motif": "she builds it, he mines it",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Tarquin lays a line of Dragon's Teeth. Cinder Hook follows behind her, planting mines between them."
+        },
+        {
+          "speaker": "mason",
+          "line": "Those are my walls."
+        },
+        {
+          "speaker": "commando",
+          "line": "And those are my mines. Your walls are the argument; my mines are the punchline."
+        },
+        {
+          "speaker": "mason",
+          "line": "My Sappers can sweep those."
+        },
+        {
+          "speaker": "commando",
+          "line": "Your Sappers can try."
+        }
+      ]
+    },
+    {
+      "id": "commando__lunkhead:C",
+      "pairId": "commando__lunkhead",
+      "a": "commando",
+      "b": "lunkhead",
+      "rank": "C",
+      "title": "Receipts",
+      "polarity": "tension",
+      "motif": "the veteran who has stepped on every mine",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Ferrow's Lunkhead stops dead at the edge of a field. Cinder Hook is grinning from the far side."
+        },
+        {
+          "speaker": "lunkhead",
+          "line": "Mines. Three rows, staggered."
+        },
+        {
+          "speaker": "commando",
+          "line": "How'd you know?"
+        },
+        {
+          "speaker": "lunkhead",
+          "line": "I've been hit by everything the war makes. I kept the receipts. You're on page forty."
+        },
+        {
+          "speaker": "commando",
+          "line": "Only forty? I'll try harder."
+        }
+      ]
+    },
+    {
+      "id": "nox__tremor:C",
+      "pairId": "nox__tremor",
+      "a": "nox",
+      "b": "tremor",
+      "rank": "C",
+      "title": "Coverage",
+      "polarity": "tension",
+      "motif": "the shells he cannot stop",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Lund's Tremor shells a position Nox's Umbrella was guarding."
+        },
+        {
+          "speaker": "nox",
+          "line": "That was under my cover."
+        },
+        {
+          "speaker": "tremor",
+          "line": "Your cover stops nukes. I'm not a nuke."
+        },
+        {
+          "speaker": "nox",
+          "line": "I still pay for every shell that lands near me."
+        },
+        {
+          "speaker": "tremor",
+          "line": "Then you'll be paying a while."
+        }
+      ]
+    },
+    {
+      "id": "nox__stiletto:C",
+      "pairId": "nox__stiletto",
+      "a": "nox",
+      "b": "stiletto",
+      "rank": "C",
+      "title": "Static",
+      "polarity": "friction",
+      "motif": "debts in the sky",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Cole's Stilettos pass over the camp. Nox's Umbrella flickers and goes quiet for ten seconds."
+        },
+        {
+          "speaker": "nox",
+          "line": "You stopped my reactor."
+        },
+        {
+          "speaker": "stiletto",
+          "line": "I stopped everything. That's the point of a pulse."
+        },
+        {
+          "speaker": "nox",
+          "line": "Ten seconds of no shield is ten seconds of debt."
+        },
+        {
+          "speaker": "stiletto",
+          "line": "Then I'll owe you ten seconds."
+        }
+      ]
+    },
+    {
+      "id": "charybdis__scylla:C",
+      "pairId": "charybdis__scylla",
+      "a": "charybdis",
+      "b": "scylla",
+      "rank": "C",
+      "title": "The strait",
+      "polarity": "sibling",
+      "motif": "the monster pair",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "The Scylla walks up one bank and the Charybdis floods up the other. Whatever was in the river between them is not there any more."
+        },
+        {
+          "speaker": "scylla",
+          "line": "You always take the left."
+        },
+        {
+          "speaker": "charybdis",
+          "line": "I take whichever side you aren't on. Sailors have been complaining about it for a thousand years."
+        },
+        {
+          "speaker": "scylla",
+          "line": "Let them complain."
+        },
+        {
+          "speaker": "charybdis",
+          "line": "They do. Briefly."
+        }
+      ]
+    },
+    {
+      "id": "charybdis__possum:C",
+      "pairId": "charybdis__possum",
+      "a": "charybdis",
+      "b": "possum",
+      "rank": "C",
+      "title": "Wake",
+      "polarity": "attract",
+      "motif": "hovers on the same water",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Calloway's hover pack rides the Charybdis's wake across the river, all eleven of them whooping."
+        },
+        {
+          "speaker": "possum",
+          "line": "Best ride on the map!"
+        },
+        {
+          "speaker": "charybdis",
+          "line": "You're not supposed to ride it. You're supposed to get out of the way."
+        },
+        {
+          "speaker": "possum",
+          "line": "We are out of the way. We're just right behind you."
+        },
+        {
+          "speaker": "charybdis",
+          "line": "Hm. Stay there."
+        }
+      ]
+    },
+    {
+      "id": "ketha__mask:C",
+      "pairId": "ketha__mask",
+      "a": "mask",
+      "b": "ketha",
+      "rank": "C",
+      "title": "Second chances",
+      "polarity": "bond",
+      "motif": "two who raise the fallen",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Mask's Fireflies and Ketha's Zagreus work the same wreck field after a hard drop."
+        },
+        {
+          "speaker": "ketha",
+          "line": "You raise them too."
+        },
+        {
+          "speaker": "mask",
+          "line": "I raise Pawns. You raise people."
+        },
+        {
+          "speaker": "ketha",
+          "line": "A wreck is a wreck. Every one is an unfinished sentence."
+        },
+        {
+          "speaker": "mask",
+          "line": "Then I'm a spare sentence. Thank you for finishing me, the first time."
+        }
+      ]
+    },
+    {
+      "id": "rookery__stronghold:C",
+      "pairId": "rookery__stronghold",
+      "a": "stronghold",
+      "b": "rookery",
+      "rank": "C",
+      "title": "Landing",
+      "polarity": "attract",
+      "motif": "the airlift and the nest",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "The Stronghold sets down on Atterby's cliff shelf, the only flat ground for a mile."
+        },
+        {
+          "speaker": "rookery",
+          "line": "You're on my lab."
+        },
+        {
+          "speaker": "stronghold",
+          "line": "I'm next to your lab. It's a big ship. It's a small cliff."
+        },
+        {
+          "speaker": "rookery",
+          "line": "Then I'll build you a bigger one."
+        },
+        {
+          "speaker": "stronghold",
+          "line": "Do. I'll bring the company to it."
+        }
+      ]
+    },
+    {
+      "id": "starlight__verse:C",
+      "pairId": "starlight__verse",
+      "a": "verse",
+      "b": "starlight",
+      "rank": "C",
+      "title": "Count",
+      "polarity": "attract",
+      "motif": "counting and the beam",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Verse counts the Javelins' missiles out loud. Dray's Starlight fires once, slowly, and the count stops."
+        },
+        {
+          "speaker": "verse",
+          "line": "Twelve, thirteen... you finished my sentence."
+        },
+        {
+          "speaker": "starlight",
+          "line": "The beam arrives before the argument. I'm sorry about your count."
+        },
+        {
+          "speaker": "verse",
+          "line": "Don't be. One is my favourite number when it's yours."
+        }
+      ]
+    },
+    {
+      "id": "lumen__warder:C",
+      "pairId": "lumen__warder",
+      "a": "lumen",
+      "b": "warder",
+      "rank": "C",
+      "title": "The circle",
+      "polarity": "attract",
+      "motif": "Pulsars and the Bulwark",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Sister Lumen raises a Pulsar on the edge of the Warder's circle of dirt."
+        },
+        {
+          "speaker": "warder",
+          "line": "That's my circle."
+        },
+        {
+          "speaker": "lumen",
+          "line": "And this is a tithe to it. The Bulwark burns the near edge; the Pulsar reaches the far one."
+        },
+        {
+          "speaker": "warder",
+          "line": "Then the circle got bigger."
+        },
+        {
+          "speaker": "lumen",
+          "line": "Circles do, when you tend them."
+        }
+      ]
+    },
+    {
+      "id": "lumen__solarium:C",
+      "pairId": "lumen__solarium",
+      "a": "lumen",
+      "b": "solarium",
+      "rank": "C",
+      "title": "The grid",
+      "polarity": "sibling",
+      "motif": "two who tithe the grid",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Solarium's spreadsheet and Sister Lumen's ledger of Prudes cover the same table."
+        },
+        {
+          "speaker": "solarium",
+          "line": "Your geothermals are running at ninety-one percent."
+        },
+        {
+          "speaker": "lumen",
+          "line": "And your solars at sixty. The sun is a fickle tithe."
+        },
+        {
+          "speaker": "solarium",
+          "line": "Then between us we never go dark."
+        },
+        {
+          "speaker": "lumen",
+          "line": "That's the whole of my faith, in one line."
+        }
+      ]
+    },
+    {
+      "id": "quill__rusk:C",
+      "pairId": "quill__rusk",
+      "a": "quill",
+      "b": "rusk",
+      "rank": "C",
+      "title": "Column",
+      "polarity": "attract",
+      "motif": "the tread marshal and the tank stack",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Quill's Bulls lead Rusk's five Decurions up the road in perfect column."
+        },
+        {
+          "speaker": "quill",
+          "line": "Now that is a line."
+        },
+        {
+          "speaker": "rusk",
+          "line": "It's a door that walks. Gate, jammed gat, a lie."
+        },
+        {
+          "speaker": "quill",
+          "line": "I don't care what you call it. It salutes."
+        },
+        {
+          "speaker": "rusk",
+          "line": "It doesn't."
+        },
+        {
+          "speaker": "quill",
+          "line": "It does when I'm watching."
+        }
+      ]
+    },
+    {
+      "id": "arrow__mammoth:C",
+      "pairId": "arrow__mammoth",
+      "a": "arrow",
+      "b": "mammoth",
+      "rank": "C",
+      "title": "Supper",
+      "polarity": "attract",
+      "motif": "the old mother and the Salamander crews",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Brandt feeds Venn's six Salamander crews before the sortie. Venn eats standing up."
+        },
+        {
+          "speaker": "mammoth",
+          "line": "Sit down, dear. The target will still be there."
+        },
+        {
+          "speaker": "arrow",
+          "line": "It might walk away."
+        },
+        {
+          "speaker": "mammoth",
+          "line": "Then you'll get it with the second shot. You always do."
+        },
+        {
+          "speaker": "arrow",
+          "line": "...Fine. One bowl."
+        }
+      ]
+    },
+    {
+      "id": "halbard__shiva:C",
+      "pairId": "halbard__shiva",
+      "a": "shiva",
+      "b": "halbard",
+      "rank": "C",
+      "title": "Alone together",
+      "polarity": "attract",
+      "motif": "two Cortex walkers",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "The Shiva and Varn's Halberd walk the same ridge without a word."
+        },
+        {
+          "speaker": "halbard",
+          "line": "You don't take an escort any more."
+        },
+        {
+          "speaker": "shiva",
+          "line": "I stopped needing the bait. You've got hovers all over you."
+        },
+        {
+          "speaker": "halbard",
+          "line": "They're company. You should try some."
+        },
+        {
+          "speaker": "shiva",
+          "line": "I have. That's why I walk alone."
+        }
+      ]
+    },
+    {
+      "id": "consul__shiva:C",
+      "pairId": "consul__shiva",
+      "a": "consul",
+      "b": "shiva",
+      "rank": "C",
+      "title": "Forms",
+      "polarity": "attract",
+      "motif": "the paperwork for one walker",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Weiss hands Ruhl a thick folder. She weighs it in one hand."
+        },
+        {
+          "speaker": "consul",
+          "line": "The decommission forms. For the eight Grunts."
+        },
+        {
+          "speaker": "shiva",
+          "line": "I sent them home."
+        },
+        {
+          "speaker": "consul",
+          "line": "There is a form for sending them home."
+        },
+        {
+          "speaker": "shiva",
+          "line": "Then file it. I'll walk."
+        }
+      ]
+    },
+    {
+      "id": "dam__hearth:C",
+      "pairId": "dam__hearth",
+      "a": "hearth",
+      "b": "dam",
+      "rank": "C",
+      "title": "Cooling",
+      "polarity": "bond",
+      "motif": "the quiet sun and the riverworks",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "The Damwrights route a river channel past Hearth's cloaked reactor."
+        },
+        {
+          "speaker": "dam",
+          "line": "You run hot. We brought you water."
+        },
+        {
+          "speaker": "hearth",
+          "line": "Nobody brings me anything. Nobody can find me."
+        },
+        {
+          "speaker": "dam",
+          "line": "We found you by the steam. Don't worry, nobody else reads steam."
+        },
+        {
+          "speaker": "hearth",
+          "line": "Then stay. The river's nice company."
+        }
+      ]
+    },
+    {
+      "id": "mira__starlight:C",
+      "pairId": "mira__starlight",
+      "a": "mira",
+      "b": "starlight",
+      "rank": "C",
+      "title": "Backline",
+      "polarity": "attract",
+      "motif": "two who shoot from far back",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Mira's Mausers fire by line. Dray's beam sweeps the same ridge a heartbeat later."
+        },
+        {
+          "speaker": "mira",
+          "line": "That was beautiful! Did you see the sparks?"
+        },
+        {
+          "speaker": "starlight",
+          "line": "I saw the ridge stop being a problem."
+        },
+        {
+          "speaker": "mira",
+          "line": "Same thing!"
+        },
+        {
+          "speaker": "starlight",
+          "line": "To you, perhaps. I'll allow it."
+        }
+      ]
+    },
+    {
+      "id": "spoke__veil:C",
+      "pairId": "spoke__veil",
+      "a": "veil",
+      "b": "spoke",
+      "rank": "C",
+      "title": "Visibility",
+      "polarity": "friction",
+      "motif": "fog against wheels",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Spoke's Wheelies tear through the fog Veil's Obscurer has spent an hour laying."
+        },
+        {
+          "speaker": "veil",
+          "line": "That fog was on contract."
+        },
+        {
+          "speaker": "spoke",
+          "line": "My wheels aren't. They go where they like."
+        },
+        {
+          "speaker": "veil",
+          "line": "Then the enemy saw where they like."
+        },
+        {
+          "speaker": "spoke",
+          "line": "Then I'll print more."
+        }
+      ]
+    },
+    {
+      "id": "gladius__halbard:C",
+      "pairId": "gladius__halbard",
+      "a": "halbard",
+      "b": "gladius",
+      "rank": "C",
+      "title": "Applause",
+      "polarity": "rivalry",
+      "motif": "the appetite and the show",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Ferro's Gladiators salute the enemy line just as Varn's Halberd walks through it."
+        },
+        {
+          "speaker": "gladius",
+          "line": "You walked through my bow."
+        },
+        {
+          "speaker": "halbard",
+          "line": "Halberd's hungry. It doesn't wait for bows."
+        },
+        {
+          "speaker": "gladius",
+          "line": "The crowd waits."
+        },
+        {
+          "speaker": "halbard",
+          "line": "The crowd's on fire."
+        }
+      ]
+    },
+    {
+      "id": "fatboy__mammoth:C",
+      "pairId": "fatboy__mammoth",
+      "a": "fatboy",
+      "b": "mammoth",
+      "rank": "C",
+      "title": "Size",
+      "polarity": "rivalry",
+      "motif": "two houses that walk",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Kell's Fatboy and Brandt's Mammoth end up standing side by side. Neither will move first."
+        },
+        {
+          "speaker": "fatboy",
+          "line": "House learned to knock."
+        },
+        {
+          "speaker": "mammoth",
+          "line": "And a grandmother learned to sit. Move over, dear. I was here first."
+        },
+        {
+          "speaker": "fatboy",
+          "line": "I've got Lances on the roof."
+        },
+        {
+          "speaker": "mammoth",
+          "line": "I've got a plasma cannon on mine. Move over."
+        }
+      ]
+    },
+    {
+      "id": "tick__yeva:C",
+      "pairId": "tick__yeva",
+      "a": "yeva",
+      "b": "tick",
+      "rank": "C",
+      "title": "Borrowed eyes",
+      "polarity": "friction",
+      "motif": "the sniper who borrows a carpet",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "Yeva's six Ticks wander off to join Tick's carpet. She calls them back. Twice."
+        },
+        {
+          "speaker": "tick",
+          "line": "They want to be with us."
+        },
+        {
+          "speaker": "yeva",
+          "line": "They're mine. Ghosts already walked it; your Ticks are walking it again, loudly."
+        },
+        {
+          "speaker": "tick",
+          "line": "We are never loud. We are many."
+        },
+        {
+          "speaker": "yeva",
+          "line": "Same thing, to a sniper."
+        }
+      ]
+    },
+    {
+      "id": "hearth__ketha:C",
+      "pairId": "hearth__ketha",
+      "a": "hearth",
+      "b": "ketha",
+      "rank": "C",
+      "title": "Night shift",
+      "polarity": "attract",
+      "motif": "the two who keep the company alive",
+      "generated": false,
+      "unlock": {
+        "coDeploy": 1,
+        "campLevelMin": 0,
+        "bondMin": 0
+      },
+      "beats": [
+        {
+          "speaker": "narrator",
+          "line": "After a hard drop, the only lights in camp are Hearth's reactor and Ketha's rez bots working the wreck field."
+        },
+        {
+          "speaker": "ketha",
+          "line": "You're the only other one awake."
+        },
+        {
+          "speaker": "hearth",
+          "line": "I'm always awake. That's what a coal is for."
+        },
+        {
+          "speaker": "ketha",
+          "line": "And I'm always finishing sentences. Keep the lights on for me?"
+        },
+        {
+          "speaker": "hearth",
+          "line": "Always. You bring them home; I keep them warm."
+        }
+      ]
+    },
+    {
       "id": "phoenix__thresh:C",
       "pairId": "phoenix__thresh",
       "a": "phoenix",
@@ -10971,108 +11959,6 @@
       ]
     },
     {
-      "id": "consul__shiva:C",
-      "pairId": "consul__shiva",
-      "a": "shiva",
-      "b": "consul",
-      "rank": "C",
-      "title": "Requisition",
-      "polarity": "attract",
-      "motif": "eight Grunts need paperwork",
-      "generated": false,
-      "unlock": {
-        "coDeploy": 1,
-        "campLevelMin": 0,
-        "bondMin": 0
-      },
-      "beats": [
-        {
-          "speaker": "narrator",
-          "line": "Shiva's Grunts line up outside the Consul's workshop like a queue at a counter."
-        },
-        {
-          "speaker": "shiva",
-          "line": "They need walls."
-        },
-        {
-          "speaker": "consul",
-          "line": "They need forms first. I don't build for anonymous labour."
-        },
-        {
-          "speaker": "shiva",
-          "line": "Then they'll sign."
-        }
-      ]
-    },
-    {
-      "id": "consul__shiva:B",
-      "pairId": "consul__shiva",
-      "a": "shiva",
-      "b": "consul",
-      "rank": "B",
-      "title": "Eight signatures",
-      "polarity": "attract",
-      "motif": "eight Grunts need paperwork",
-      "generated": false,
-      "unlock": {
-        "coDeploy": 2,
-        "campLevelMin": 1,
-        "bondMin": 25
-      },
-      "beats": [
-        {
-          "speaker": "narrator",
-          "line": "A small bastion went up behind the Grunts, built in an afternoon. Weiss kept the receipts."
-        },
-        {
-          "speaker": "consul",
-          "line": "Every nano accounted for."
-        },
-        {
-          "speaker": "shiva",
-          "line": "You build like someone paying a debt."
-        },
-        {
-          "speaker": "consul",
-          "line": "Is it that obvious?"
-        }
-      ]
-    },
-    {
-      "id": "consul__shiva:A",
-      "pairId": "consul__shiva",
-      "a": "shiva",
-      "b": "consul",
-      "rank": "A",
-      "title": "Paid up",
-      "polarity": "attract",
-      "motif": "eight Grunts need paperwork",
-      "generated": false,
-      "unlock": {
-        "coDeploy": 3,
-        "campLevelMin": 2,
-        "bondMin": 55
-      },
-      "beats": [
-        {
-          "speaker": "narrator",
-          "line": "The Grunts held the front. The Consul's wall held behind them. Neither had expected the other to arrive on time."
-        },
-        {
-          "speaker": "shiva",
-          "line": "You've paid more than the contract asked."
-        },
-        {
-          "speaker": "consul",
-          "line": "I'm not paying the contract."
-        },
-        {
-          "speaker": "shiva",
-          "line": "I know. Keep going. We'll hold the door."
-        }
-      ]
-    },
-    {
       "id": "halq__tremor:C",
       "pairId": "halq__tremor",
       "a": "tremor",
@@ -14215,5 +15101,5 @@
       ]
     }
   ],
-  "authoredCount": 301
+  "authoredCount": 324
 }

@@ -383,12 +383,3 @@ def presentable_debrief(
         "xpTier": credit.get("xpTier"),
     }
 
-
-def xp_multiplier(tier: str) -> float:
-    if tier == "full":
-        return 1.0
-    if tier == "partial":
-        return 0.5
-    if tier == "loss":
-        return 0.25  # fought and lost still banks a little blood
-    return 0.0

@@ -126,7 +126,8 @@ def test_the_builder_fields_every_baked_war_unit_for_unit():
         assert placed == sum(len(c["units"]) for c in theater["camps"]), map_id
         assert all(s["exact"] and len(s["at"]) == 4 * s["count"] for f in fields for s in war["recipes"][f["recipe"]]), map_id
         assert all(f["bank"]["energy"] > 0 for f in fields), map_id
-        assert {a["options"]["profile"] for a in war["ai"]} <= {"hard", "hard_aggressive"}, map_id
+        # va_dig_in: the entrenched BARb (Tabula's eastern seats, "Tabula entrenched", eb2ab54)
+        assert {a["options"]["profile"] for a in war["ai"]} <= {"hard", "hard_aggressive", "va_dig_in"}, map_id
 
 
 def test_simmers_is_a_kings_showdown_from_any_door():
@@ -214,10 +215,13 @@ def test_the_builder_fields_the_war_the_kings_and_the_dens():
     assert [k["faction"] for k in kings["kings"]] == ["ashwalkers", "armada", "nullmercs", "cortex"]
     assert kings["forces"] == [] and kings["alliances"] == []     # commanders only, everyone at war
 
-    dens = theaters.wild_dens(_state(), "eye_of_horus", ROOT, "EOH_NW_BASTION")
-    eye = _probe({"wildDens": dens})
-    assert sum(1 for f in eye["forces"] if f["id"].startswith("wild_den_")) == len(dens)
-    assert [t["faction"] for t in eye["teams"]] == ["wild"]
+    # The Eye's rim raptors went with the glassing (9149416); the Rock Jungle is the wild now.
+    dens = theaters.wild_dens(_state(), "the_rock_jungle", ROOT, "TRJ_NW_OUTER_MUSTER")
+    assert dens
+    wild = _probe({"wildDens": dens})
+    assert sum(1 for f in wild["forces"] if f["id"].startswith("wild_den_")) == len(dens)
+    assert [t["faction"] for t in wild["teams"]] == ["wild"]
+    assert theaters.wild_dens(_state(), "eye_of_horus", ROOT, "EOH_NW_BASTION") == []
 
 
 def test_a_new_campaign_has_its_bases_standing():

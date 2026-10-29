@@ -94,7 +94,7 @@ def test_every_pack_is_as_called():
 
 
 def test_the_retired_are_gone_everywhere():
-    for f in list(S.glob("*.json")) + [MOD / "luarules/gadgets/include/va_crew_roster.lua",
+    for f in list(S.rglob("*.json")) + [MOD / "luarules/gadgets/include/va_crew_roster.lua",
                                        MOD / "luarules/gadgets/include/va_hero_tags.lua", ROOT / "tools/verdance/company/company.py"]:
         txt = f.read_text(encoding="utf-8-sig")
         for r in RETIRED:
@@ -129,3 +129,17 @@ def test_nox_keeps_its_umbrella():
 def test_lumen_raises_only_prudes_and_pulsars():
     src = (MOD / "units/va_lumen.lua").read_text(encoding="utf-8")
     assert 'def.buildoptions = { "armgmm", "armanni" }' in src
+
+
+def test_every_hero_has_a_friend_a_rival_and_a_tie_across_factions():
+    """The enrichment round (2026-10-28 evening): nobody's web is one-sided or one-faction."""
+    web = _j(S / "support_web.json")
+    codex = {h["heroId"]: h for h in _j(S / "hero_codex.json")["heroes"]}
+    ally = {"bond", "attract", "sibling", "mentor", "mirror"}
+    for h in H:
+        ties = [e for e in web["edges"] if e.get("authored") and h in (e["a"], e["b"])]
+        assert len(ties) >= 4, (h, len(ties))
+        assert any(e["polarity"] in ally for e in ties) and any(e["polarity"] not in ally for e in ties), h
+        assert any(codex[e["a"]]["faction"] != codex[e["b"]]["faction"] for e in ties), h
+    stale = [e for e in web["edges"] if {e["a"], e["b"]} == {"consul", "shiva"}]
+    assert stale and not any("Grunts need paperwork" in m for m in stale[0]["motifs"])

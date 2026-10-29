@@ -6,7 +6,7 @@ Live mutators: verdance.campaign.apply_graph_deltas + measure_graph_from_world
 """
 from __future__ import annotations
 
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 # Short labels for hub chips / standing orders
 AXIS_LABEL = {

@@ -9,10 +9,6 @@
 -- Soft terminal skips Spring.GameOver; debrief pick reseeds in-place.
 -- ============================================================
 
-local function currentMapId()
-  return tostring((mission and mission.deploymentMapId) or (zoneMap and zoneMap.mapId) or "")
-end
-
 local function findEnemyCampTeam()
   if objectiveTeamID then return objectiveTeamID end
   for _, tid in ipairs(Spring.GetTeamList() or {}) do

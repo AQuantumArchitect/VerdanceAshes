@@ -16,17 +16,10 @@ accepts the pads its chosen card names.
 """
 from __future__ import annotations
 
-from typing import Any, Dict, Optional, Tuple
+from typing import Dict, Optional, Tuple
 
-from verdance.common import edge_score
 
-RIM_EDGE_THRESHOLD = 0.28
-ENEMY_CONTROL = frozenset({"armada", "cortex", "wild"})
 ASHWALKER_ALIASES = frozenset({"ashwalkers", "legion"})
-
-
-def is_rim_zone(bounds: dict, *, threshold: float = RIM_EDGE_THRESHOLD) -> bool:
-    return edge_score(bounds) <= threshold
 
 
 def _zone_mem(state: Optional[dict], map_id: str, zone_id: str) -> dict:
@@ -87,31 +80,6 @@ def is_ashwalker_majority(state: Optional[dict], map_id: str, zone_id: str) -> b
     if share is None:
         return True
     return share >= 0.5
-
-
-def zone_is_contested(
-    *,
-    control: str,
-    tags: Optional[list] = None,
-    role: str = "",
-) -> bool:
-    """Enemy-held or explicitly contested — not a quiet approach lane."""
-    ctrl = (control or "unknown").lower()
-    if ctrl in ENEMY_CONTROL:
-        return True
-    tagset = {str(t).lower() for t in (tags or [])}
-    role_l = (role or "").lower()
-    if "contested" in tagset or "contested" in role_l:
-        return True
-    # Authored hardpoints on the rim are not quiet approach pads unless we hold them.
-    if (
-        role_l in ("fortress", "bastion", "citadel")
-        or "fortress" in tagset
-        or "bastion" in tagset
-        or "citadel" in tagset
-    ):
-        return ctrl not in ASHWALKER_ALIASES
-    return False
 
 
 def legal_landing_reason(

@@ -535,20 +535,6 @@ def apply_pair_talk(
     }
 
 
-def grudge_zone_bias(state: Dict[str, Any]) -> Dict[str, float]:
-    """zoneId -> bonus score for quest ranking (prefer return contracts)."""
-    att = ensure_attachments(state)
-    out: Dict[str, float] = {}
-    for g in att.get("grudges") or []:
-        if not isinstance(g, dict):
-            continue
-        z = g.get("zoneId")
-        if not z:
-            continue
-        out[str(z)] = out.get(str(z), 0.0) + float(g.get("intensity") or 0) * 0.5
-    return out
-
-
 def power_signals_from_attachments(state: Dict[str, Any]) -> Dict[str, float]:
     """Aggregate attachment-derived strength for power-response curve."""
     att = ensure_attachments(state)

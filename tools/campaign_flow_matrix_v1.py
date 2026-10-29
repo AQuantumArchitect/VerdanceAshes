@@ -62,7 +62,6 @@ import argparse
 import json
 import math
 import re
-import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
@@ -119,7 +118,6 @@ HYDRO_GAIN = 0.6
 LINK_WEIGHT = {"same_map": 1.0, "strategic_link": 0.35}
 
 PLAYER = "ashwalkers"
-EMPIRES = ("armada", "cortex", "wild", "nullmercs")
 
 # Unclaimed ground is not a power and does not get a state.
 #

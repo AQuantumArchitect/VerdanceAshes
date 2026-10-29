@@ -10,13 +10,13 @@
     },
     "cauter": {
       "join": "I've already won the argument. The cannon's just the period.",
-      "held": "Close, boom, done. No poetry. {map} is ours.",
+      "held": "Shield up, Karkinos in, boom. No poetry. {map} is ours.",
       "costly": "We paid for {map} in people. I'd rather have paid in noise.",
       "death": "Period."
     },
     "halq": {
-      "join": "Give me the grid refs. I don't need the names.",
-      "held": "The rockets landed where the map said. The map and I are square.",
+      "join": "Give me the grid refs. The Euclid reads them, I call them, the Rocketeers answer.",
+      "held": "The rockets landed where I said. The map and I are square.",
       "costly": "The map lied about one square. I'll argue with it later.",
       "death": "Last grid ref: here. Write it down."
     },
@@ -33,21 +33,21 @@
       "death": "Out of exits. First time for everything."
     },
     "mira": {
-      "join": "Napalm is confetti! I brought enough for everyone!",
-      "held": "It sparkled! Did you see it sparkle? {map} is so much brighter now.",
+      "join": "Every shell is confetti! Five Mausers, one line, all of it for you!",
+      "held": "Fire by line, then again! {map} is so much brighter now.",
       "costly": "It wasn't a parade this time. I still cheered. Somebody had to.",
       "death": "Oh. That one wasn't confetti."
     },
     "kettle": {
-      "join": "Sky-saint. I keep the air honest. Hymns are included.",
+      "join": "Sky-saint. I keep the air honest, and the Hippotes carry the congregation. Hymns included.",
       "held": "The sky stayed ours over {map}. Hymn number four. You're welcome.",
       "costly": "The sky was honest. The ground wasn't. I can only bless one at a time.",
       "death": "Chainsaw's yours. The hymns were never mine."
     },
     "warder": {
-      "join": "A circle of dirt. That's all the empire I need. Point to one.",
-      "held": "Nobody crossed the circle. That's the whole report. It's a good report.",
-      "costly": "Somebody crossed it. Once. The beamers and I have discussed it.",
+      "join": "A circle of dirt. A Bulwark in the middle of it. That's all the empire I need.",
+      "held": "Nobody crossed the circle. The Bulwark made sure. That's the whole report.",
+      "costly": "Somebody crossed it. Once. The Bulwark and I have discussed it.",
       "death": "The circle holds. I'm just not in it."
     },
     "commando": {
@@ -58,7 +58,7 @@
     },
     "infestor": {
       "join": "The company doesn't recruit. It germinates. I'm the gardener.",
-      "held": "Quiet legs in the dark. {map} grew ours while they were looking elsewhere.",
+      "held": "Quiet legs in the dark, and two Recluses to keep them company. {map} grew ours.",
       "costly": "Pruned. It happens to gardens. The roots are fine.",
       "death": "The hive keeps growing. It just doesn't need me to."
     },
@@ -76,7 +76,7 @@
     },
     "vale": {
       "join": "Kiln announces himself. I invoice in fog. The wall never sees it coming.",
-      "held": "Two Ambassadors, no witnesses. {map} paid up without knowing it was billed.",
+      "held": "Three launchers, three factions, no witnesses. {map} paid up without knowing it was billed.",
       "costly": "The fog cleared at the wrong moment. Invoices are embarrassing in daylight.",
       "death": "Final invoice. Unpaid. Collect it."
     },
@@ -86,14 +86,8 @@
       "costly": "Something came down. Not the big one. I'm still paying for the big one.",
       "death": "Sky's still up. That was the whole debt."
     },
-    "ceil": {
-      "join": "Altitude's an opinion. The roof and I disagree. Five Roughnecks agree with me.",
-      "held": "Argued with every roof on {map}. Won. Roofs are bad at arguing.",
-      "costly": "One roof argued back. I'll grant it that. I won't grant it twice.",
-      "death": "Ceiling wins. Once."
-    },
     "lumen": {
-      "join": "I tithe heat into the pad. The grid is a congregation. It'll learn.",
+      "join": "I tithe the grid in Prudes and Pulsars. The radar sees the congregation; the jammer hides it.",
       "held": "The grid kept faith over {map}. It usually does when it's fed.",
       "costly": "The congregation thinned. I'll preach to what's left. Loudly.",
       "death": "The tithe's paid. Keep the grid warm. It remembers cold."
@@ -106,13 +100,13 @@
     },
     "volt": {
       "join": "Most eyes hide. I paint. Sight is a wound you give them.",
-      "held": "Saw it, burned it, left. {map} will have the marks for a while.",
+      "held": "Saw it, burned it, the Blitz finished it. {map} will have the marks for a while.",
       "costly": "I painted the ford and the ford painted back. Fair. Unpleasant.",
       "death": "Last thing I saw, I burned. Good."
     },
     "halbard": {
       "join": "Not Pavise. Different spelling, different manners. The Halberd's hungry.",
-      "held": "A door that learned to hover, and {map} learned the door.",
+      "held": "The Halberd ate, and the hovers kept the sky off its plate. {map} learned the door.",
       "costly": "Fed the Halberd. Fed it too much. We'll talk about portions.",
       "death": "Hungry till the end. Figures."
     },
@@ -129,25 +123,25 @@
       "death": "Apology accepted, I suppose."
     },
     "twitch": {
-      "join": "Build power with bad intentions. You'll find the surprises later. Everyone does.",
+      "join": "Build power with bad intentions, and a Printer to make them real. You'll find the surprises later.",
       "held": "Left a few things in the dirt at {map}. They'll find them. Loudly.",
       "costly": "One of my surprises surprised the wrong people. Bad form. Funny, though.",
       "death": "There's one under me. Wait for it."
     },
     "spoke": {
-      "join": "I trust wheels. Not boots, not bots, not promises. Wheels.",
-      "held": "Rolled through {map}, saw everything, died cheap, minted again. Wheels.",
-      "costly": "Lost the bay. Wheels don't mind. I do, a little.",
-      "death": "Bay's yours. It mints scouts like nervous habits. Keep it nervous."
+      "join": "I trust wheels, so I became the place they come from. Bay's down. Printing.",
+      "held": "Printed wheels all over {map}, saw everything, died cheap, printed again.",
+      "costly": "Lost a lot of wheels. The bay doesn't mind. I do, a little.",
+      "death": "The bay's yours. It prints scouts like nervous habits. Keep it nervous."
     },
     "tick": {
-      "join": "We are the eyes. Singular is a failure mode. There are many of us. Hello.",
+      "join": "We are the eyes, and now we are the factory too. Singular is a failure mode. Hello.",
       "held": "We carpeted the fog over {map}. We died cheap. We are back. We saw it all.",
       "costly": "Fewer of us came back. We are still plural. Barely.",
       "death": "One of us. That's all. The rest are watching."
     },
     "noctua": {
-      "join": "The bay dreams in flight paths. It woke up here. It likes the sky.",
+      "join": "The bay dreams in flight paths. It woke up here, with its own metal. It likes the sky.",
       "held": "The cloud of eyes over {map} saw what the ground captains argued about. The cloud was right.",
       "costly": "The bay dreamed badly. Fewer eyes came home. It'll dream again.",
       "death": "The bay's still dreaming. Don't wake it for me."
@@ -169,6 +163,24 @@
       "held": "Knocked on {map} until the house opened. Real estate with a plasma greeting.",
       "costly": "The house knocked back. Rude. I've noted the address.",
       "death": "The house learned to knock. I taught it."
+    },
+    "loom": {
+      "join": "I mend nets. The war just made them bigger. Hold still and you won't feel it.",
+      "held": "Nothing on {map} moved that I didn't let move. The wrecks are ours too.",
+      "costly": "Something tore through the net. I'll mend it. I always mend it.",
+      "death": "The net holds without me. Tie it off."
+    },
+    "hundred": {
+      "join": "We are here. All of us. You'll want to count us; we already have.",
+      "held": "A hundred hands over {map}, one grip. We let go when it was ours.",
+      "costly": "Fewer hands came home. We'll thank each one by its number.",
+      "death": "We are still flying. One of us isn't. Count again."
+    },
+    "gorgon": {
+      "join": "Point me at something. I'll look at it until it stops moving.",
+      "held": "Everything on {map} I looked at is very still now. The Shredders kept the sky off me.",
+      "costly": "Something moved while I wasn't looking. It won't happen twice.",
+      "death": "Close my eyes for me. Carefully."
     }
   }
 }

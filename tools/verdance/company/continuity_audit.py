@@ -18,11 +18,10 @@ from __future__ import annotations
 
 import argparse
 import json
-import sys
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Sequence, Set, Tuple
+from typing import Any, Dict, List, Optional, Sequence, Set, Tuple
 
 from verdance.common import load_json, utc_now
 

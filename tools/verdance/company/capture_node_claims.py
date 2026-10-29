@@ -21,10 +21,9 @@ from __future__ import annotations
 
 import argparse
 import json
-import sys
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 from verdance.common import WORKSPACE_ROOT, load_json, utc_now
 from verdance.world.offscreen_clash import PLAYER_IMPACT
@@ -33,7 +32,6 @@ from verdance.belief import hub_belief
 
 # Presence / capture objective kinds — claim living shell node, not grass.
 CAPTURE_KINDS = frozenset({"seize_lane", "gate_control", "hold_plateau"})
-CAPTURE_ARCHETYPES = CAPTURE_KINDS  # alias
 CAPTURE_MODE = "clear_hold_shell"
 OCCUPATION_MODEL = "living_shell"
 CLEAR_FRACTION = 0.6  # must match gadget CLEAR_FRACTION

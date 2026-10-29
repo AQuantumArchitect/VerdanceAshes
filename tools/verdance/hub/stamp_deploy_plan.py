@@ -22,9 +22,8 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
-from typing import Any
 
 from verdance.common import load_json, save_json, utc_now
 from verdance.world import zone_graph as wzg, landing_zones as lz, roads as _roads
@@ -57,15 +56,6 @@ def zone_meta_lookup(ws: Path, map_id: str) -> dict[str, dict]:
             "role": str(z.get("role") or ""),
         }
     return out
-
-
-def zone_bounds_lookup(ws: Path, map_id: str) -> dict[str, dict]:
-    """zoneId → bounds from authored zone map."""
-    return {
-        zid: meta["bounds"]
-        for zid, meta in zone_meta_lookup(ws, map_id).items()
-        if meta.get("bounds")
-    }
 
 
 def normalize_plan(raw: dict) -> dict:

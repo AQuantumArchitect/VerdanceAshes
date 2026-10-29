@@ -33,7 +33,6 @@ from verdance.readings import readings
 ROOT = WORKSPACE_ROOT
 
 MAX_FOG_MINUTES = 7 * 1440.0
-REST_MINUTES_DEFAULT = 720.0
 
 
 def _world_paths(workspace: Path):
@@ -120,14 +119,6 @@ def observed_etas(state: Dict[str, Any], result: Dict[str, Any], bead: Dict[str,
     for zid in on_map:
         out.setdefault(zid, 0.15)
     return out
-
-
-def _rest_minutes(state: Dict[str, Any]) -> float:
-    camp = state.get("camp") or {}
-    try:
-        return float(camp.get("restMinutes") or REST_MINUTES_DEFAULT)
-    except (TypeError, ValueError):
-        return REST_MINUTES_DEFAULT
 
 
 def fold_homecoming(state: Dict[str, Any], result: Dict[str, Any], bead: Dict[str, Any], workspace: Path,

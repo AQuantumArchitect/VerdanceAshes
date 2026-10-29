@@ -6,9 +6,9 @@
     "maxDegree": 5,
     "topEdges": 64,
     "heroCount": 64,
-    "edgeCount": 173,
-    "talkCount": 394,
-    "authoredSeeds": 129,
+    "edgeCount": 198,
+    "talkCount": 417,
+    "authoredSeeds": 154,
     "umweltAxes": [
       "energy",
       "offense",
@@ -1325,7 +1325,7 @@
       ],
       "doctrine": "rez",
       "hook": "Wrecks are unfinished sentences.",
-      "degree": 3,
+      "degree": 5,
       "umweltGlyph": "−off·+cra·+pad",
       "umweltMarks": [
         {
@@ -1351,7 +1351,7 @@
       ],
       "doctrine": "eco_heart",
       "hook": "Quiet sun. Won't go out.",
-      "degree": 7,
+      "degree": 9,
       "umweltGlyph": "+ene·−mob·+pad·−off",
       "umweltMarks": [
         {
@@ -1385,7 +1385,7 @@
       ],
       "doctrine": "constructor",
       "hook": "Spreadsheets, then sunlight.",
-      "degree": 5,
+      "degree": 6,
       "umweltGlyph": "+ene·+cra·+pad·−off",
       "umweltMarks": [
         {
@@ -1480,7 +1480,7 @@
       ],
       "doctrine": "eyes",
       "hook": "Only trusts wheels.",
-      "degree": 8,
+      "degree": 9,
       "umweltGlyph": "+mob·+sig·+fog·+led",
       "umweltMarks": [
         {
@@ -1514,7 +1514,7 @@
       ],
       "doctrine": "eyes",
       "hook": "Speaks in plurals.",
-      "degree": 6,
+      "degree": 7,
       "umweltGlyph": "+sig·+fog·+mob·−off",
       "umweltMarks": [
         {
@@ -1579,7 +1579,7 @@
       ],
       "doctrine": "eyes",
       "hook": "Fog is the payroll.",
-      "degree": 7,
+      "degree": 8,
       "umweltGlyph": "+sig·+fog·+mob·+led",
       "umweltMarks": [
         {
@@ -1613,7 +1613,7 @@
       ],
       "doctrine": "line",
       "hook": "Three wars unpaid.",
-      "degree": 5,
+      "degree": 7,
       "umweltGlyph": "+pad·+off·−mob·+led",
       "umweltMarks": [
         {
@@ -1643,7 +1643,7 @@
       ],
       "doctrine": "line",
       "hook": "Gate, jammed gat, a lie.",
-      "degree": 7,
+      "degree": 8,
       "umweltGlyph": "+pad·+off·−mob",
       "umweltMarks": [
         {
@@ -1695,7 +1695,7 @@
       ],
       "doctrine": "line",
       "hook": "Riot as punctuation.",
-      "degree": 3,
+      "degree": 4,
       "umweltGlyph": "+off·+pad·+hea",
       "umweltMarks": [
         {
@@ -1752,7 +1752,7 @@
       ],
       "doctrine": "skirm",
       "hook": "Counts missiles out loud.",
-      "degree": 4,
+      "degree": 5,
       "umweltGlyph": "+mob·−pad·+led·+off",
       "umweltMarks": [
         {
@@ -1808,7 +1808,7 @@
       ],
       "doctrine": "skirm",
       "hook": "Ghosts already walked it.",
-      "degree": 8,
+      "degree": 9,
       "umweltGlyph": "+mob·−pad·+sig·+fog",
       "umweltMarks": [
         {
@@ -1912,7 +1912,7 @@
       ],
       "doctrine": "siege_plod",
       "hook": "Yeah. I'll take that wall.",
-      "degree": 7,
+      "degree": 8,
       "umweltGlyph": "+off·−mob·−ene·+led",
       "umweltMarks": [
         {
@@ -1943,7 +1943,7 @@
       ],
       "doctrine": "siege_plod",
       "hook": "House learned to knock.",
-      "degree": 8,
+      "degree": 9,
       "umweltGlyph": "+off·−mob·−ene·+pad",
       "umweltMarks": [
         {
@@ -1974,7 +1974,7 @@
       ],
       "doctrine": "arty",
       "hook": "Napalm is confetti.",
-      "degree": 4,
+      "degree": 5,
       "umweltGlyph": "+off·+hea·−ene·−pad",
       "umweltMarks": [
         {
@@ -2031,7 +2031,7 @@
       ],
       "doctrine": "pad",
       "hook": "Owns a circle of dirt.",
-      "degree": 6,
+      "degree": 7,
       "umweltGlyph": "−mob·+pad·−off",
       "umweltMarks": [
         {
@@ -2057,7 +2057,7 @@
       ],
       "doctrine": "dirty",
       "hook": "Mines before the argument.",
-      "degree": 4,
+      "degree": 6,
       "umweltGlyph": "+fog·+mob·+cra·+pad",
       "umweltMarks": [
         {
@@ -2111,7 +2111,7 @@
       ],
       "doctrine": "line",
       "hook": "Orders walk on treads.",
-      "degree": 6,
+      "degree": 7,
       "umweltGlyph": "+off·+pad·+hea",
       "umweltMarks": [
         {
@@ -2165,7 +2165,7 @@
       ],
       "doctrine": "fog_siege",
       "hook": "The wall never saw the invoice.",
-      "degree": 4,
+      "degree": 6,
       "umweltGlyph": "+fog·+off·−ene·+led",
       "umweltMarks": [
         {
@@ -2196,7 +2196,7 @@
       ],
       "doctrine": "pad",
       "hook": "Still paying for the last sky.",
-      "degree": 6,
+      "degree": 8,
       "umweltGlyph": "−mob·+pad·+led·−off",
       "umweltMarks": [
         {
@@ -2227,7 +2227,7 @@
       ],
       "doctrine": "eco_heart",
       "hook": "Tithe the grid.",
-      "degree": 7,
+      "degree": 9,
       "umweltGlyph": "+ene·−off·−mob·+pad",
       "umweltMarks": [
         {
@@ -2338,7 +2338,7 @@
       ],
       "doctrine": "line",
       "hook": "Halberd's hungry.",
-      "degree": 3,
+      "degree": 5,
       "umweltGlyph": "",
       "umweltMarks": []
     },
@@ -2414,7 +2414,7 @@
       ],
       "doctrine": "decoy",
       "hook": "Every throne needs a spare.",
-      "degree": 3,
+      "degree": 4,
       "umweltGlyph": "+cra·+pad·+fog·+off",
       "umweltMarks": [
         {
@@ -2445,7 +2445,7 @@
       ],
       "doctrine": "eyes",
       "hook": "Everything changes sides eventually.",
-      "degree": 3,
+      "degree": 4,
       "umweltGlyph": "+fog·+cra·+sig·−pad",
       "umweltMarks": [
         {
@@ -2507,7 +2507,7 @@
       ],
       "doctrine": "siege_plod",
       "hook": "The water had better be wide.",
-      "degree": 5,
+      "degree": 6,
       "umweltGlyph": "+off·−pad·−mob·+hea",
       "umweltMarks": [
         {
@@ -2569,7 +2569,7 @@
       ],
       "doctrine": "siege_plod",
       "hook": "The beam arrives before the argument.",
-      "degree": 4,
+      "degree": 6,
       "umweltGlyph": "+off·−mob·+sig·+ene",
       "umweltMarks": [
         {
@@ -2631,7 +2631,7 @@
       ],
       "doctrine": "skirm",
       "hook": "Never misses twice.",
-      "degree": 3,
+      "degree": 4,
       "umweltGlyph": "+off·+mob·−pad·+led",
       "umweltMarks": [
         {
@@ -2693,7 +2693,7 @@
       ],
       "doctrine": "line",
       "hook": "The river is a runway.",
-      "degree": 3,
+      "degree": 5,
       "umweltGlyph": "+off·+pad·+mob·+hea",
       "umweltMarks": [
         {
@@ -2724,7 +2724,7 @@
       ],
       "doctrine": "line",
       "hook": "Eight Grunts and a decision.",
-      "degree": 3,
+      "degree": 4,
       "umweltGlyph": "+off·+pad·+hea·−mob",
       "umweltMarks": [
         {
@@ -2755,7 +2755,7 @@
       ],
       "doctrine": "arty",
       "hook": "Somebody has to see it first.",
-      "degree": 5,
+      "degree": 6,
       "umweltGlyph": "+off·−mob·+pad·+led",
       "umweltMarks": [
         {
@@ -2786,7 +2786,7 @@
       ],
       "doctrine": "sky_siege",
       "hook": "Nothing moves; then it is quiet.",
-      "degree": 3,
+      "degree": 4,
       "umweltGlyph": "+sky·+off·+mob·+ene",
       "umweltMarks": [
         {
@@ -2817,7 +2817,7 @@
       ],
       "doctrine": "line",
       "hook": "Already knows where it hurts.",
-      "degree": 3,
+      "degree": 4,
       "umweltGlyph": "+pad·+off·+led·−mob",
       "umweltMarks": [
         {
@@ -2848,7 +2848,7 @@
       ],
       "doctrine": "sky_siege",
       "hook": "Brings its own sky.",
-      "degree": 3,
+      "degree": 4,
       "umweltGlyph": "+sky·+mob·+off·−pad",
       "umweltMarks": [
         {
@@ -2879,7 +2879,7 @@
       ],
       "doctrine": "skirm",
       "hook": "Cheap, fast, rocket-happy.",
-      "degree": 3,
+      "degree": 4,
       "umweltGlyph": "+mob·+sig·−pad·+off",
       "umweltMarks": [
         {
@@ -2910,7 +2910,7 @@
       ],
       "doctrine": "constructor",
       "hook": "Every wall is the first line of a fort.",
-      "degree": 4,
+      "degree": 5,
       "umweltGlyph": "+cra·+ene·+pad·−off",
       "umweltMarks": [
         {
@@ -2941,7 +2941,7 @@
       ],
       "doctrine": "constructor",
       "hook": "Builds where nobody can walk to.",
-      "degree": 5,
+      "degree": 6,
       "umweltGlyph": "+cra·+sky·+mob·+ene",
       "umweltMarks": [
         {
@@ -2972,7 +2972,7 @@
       ],
       "doctrine": "constructor",
       "hook": "Water goes where we tell it.",
-      "degree": 4,
+      "degree": 5,
       "umweltGlyph": "+cra·+pad·+ene·−off",
       "umweltMarks": [
         {
@@ -3034,7 +3034,7 @@
       ],
       "doctrine": "line",
       "hook": "Sit down. I'll handle it.",
-      "degree": 4,
+      "degree": 6,
       "umweltGlyph": "+pad·+off·−mob·+hea",
       "umweltMarks": [
         {
@@ -3065,7 +3065,7 @@
       ],
       "doctrine": "skirm",
       "hook": "Bow first. Then the fight.",
-      "degree": 4,
+      "degree": 5,
       "umweltGlyph": "+off·+mob·−pad·+hea",
       "umweltMarks": [
         {
@@ -3189,7 +3189,7 @@
       ],
       "doctrine": "arty",
       "hook": "Whatever I look at stops moving.",
-      "degree": 4,
+      "degree": 5,
       "umweltGlyph": "+off·−mob·+pad·+sig",
       "umweltMarks": [
         {
@@ -3762,6 +3762,31 @@
         "C": "arrow__kit:C",
         "B": "arrow__kit:B",
         "A": "arrow__kit:A"
+      }
+    },
+    {
+      "id": "arrow__mammoth",
+      "a": "arrow",
+      "b": "mammoth",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "the old mother and the Salamander crews",
+        "patience at both ends"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Ysolde 'Arrow' Venn",
+      "bName": "Old Mother Brandt",
+      "aHook": "Never misses twice.",
+      "bHook": "Sit down. I'll handle it.",
+      "aGlyph": "+off·+mob·−pad·+led",
+      "bGlyph": "+pad·+off·−mob·+hea",
+      "talkIds": {
+        "C": "arrow__mammoth:C"
       }
     },
     {
@@ -4705,6 +4730,31 @@
       }
     },
     {
+      "id": "bro__grath",
+      "a": "grath",
+      "b": "bro",
+      "score": 1.0,
+      "polarity": "rivalry",
+      "motifs": [
+        "two mercenaries, one paymaster",
+        "arrears against 'yeah'"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Grath Arrears",
+      "bName": "Bro",
+      "aHook": "Three wars unpaid. The interest is heat.",
+      "bHook": "Yeah. I'll take that wall.",
+      "aGlyph": "+pad·+hea·+off·−mob",
+      "bGlyph": "+off·−mob·−ene·+led",
+      "talkIds": {
+        "C": "bro__grath:C"
+      }
+    },
+    {
       "id": "bro__halbard",
       "a": "bro",
       "b": "halbard",
@@ -4897,6 +4947,31 @@
       }
     },
     {
+      "id": "cauter__grath",
+      "a": "grath",
+      "b": "cauter",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "two kinds of heat on the Legion line",
+        "debt and riot"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Grath Arrears",
+      "bName": "Cauter Bel-Ansa",
+      "aHook": "Three wars unpaid. The interest is heat.",
+      "bHook": "Riot as punctuation.",
+      "aGlyph": "+pad·+hea·+off·−mob",
+      "bGlyph": "+off·+pad·+hea",
+      "talkIds": {
+        "C": "cauter__grath:C"
+      }
+    },
+    {
       "id": "cauter__kit",
       "a": "cauter",
       "b": "kit",
@@ -4980,6 +5055,58 @@
       }
     },
     {
+      "id": "charybdis__possum",
+      "a": "charybdis",
+      "b": "possum",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "hovers on the same water",
+        "a flood and its fry"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Orrin 'Charybdis' Tidewell",
+      "bName": "Pip 'Possum' Calloway",
+      "aHook": "The river is a runway.",
+      "bHook": "Cheap, fast, rocket-happy.",
+      "aGlyph": "+off·+pad·+mob·+hea",
+      "bGlyph": "+mob·+sig·−pad·+off",
+      "talkIds": {
+        "C": "charybdis__possum:C"
+      }
+    },
+    {
+      "id": "charybdis__scylla",
+      "a": "charybdis",
+      "b": "scylla",
+      "score": 1.0,
+      "polarity": "sibling",
+      "motifs": [
+        "the monster pair",
+        "the strait between them"
+      ],
+      "sharedTemperament": [
+        "plod"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Orrin 'Charybdis' Tidewell",
+      "bName": "Maren 'Scylla' Voss",
+      "aHook": "The river is a runway.",
+      "bHook": "The water had better be wide.",
+      "aGlyph": "+off·+pad·+mob·+hea",
+      "bGlyph": "+off·−pad·−mob·+hea",
+      "talkIds": {
+        "C": "charybdis__scylla:C"
+      }
+    },
+    {
       "id": "charybdis__triton",
       "a": "triton",
       "b": "charybdis",
@@ -5029,6 +5156,56 @@
       "bGlyph": "+pad·+off·+cra·+led",
       "talkIds": {
         "C": "commando__loom:C"
+      }
+    },
+    {
+      "id": "commando__lunkhead",
+      "a": "commando",
+      "b": "lunkhead",
+      "score": 1.0,
+      "polarity": "tension",
+      "motifs": [
+        "the veteran who has stepped on every mine",
+        "receipts and surprises"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Cinder Hook",
+      "bName": "Tobias 'Lunkhead' Ferrow",
+      "aHook": "Mines before the argument.",
+      "bHook": "Already knows where it hurts.",
+      "aGlyph": "+fog·+mob·+cra·+pad",
+      "bGlyph": "+pad·+off·+led·−mob",
+      "talkIds": {
+        "C": "commando__lunkhead:C"
+      }
+    },
+    {
+      "id": "commando__mason",
+      "a": "commando",
+      "b": "mason",
+      "score": 1.0,
+      "polarity": "rivalry",
+      "motifs": [
+        "she builds it, he mines it",
+        "walls and what's under them"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Cinder Hook",
+      "bName": "Livia 'Mason' Tarquin",
+      "aHook": "Mines before the argument.",
+      "bHook": "Every wall is the first line of a fort.",
+      "aGlyph": "+fog·+mob·+cra·+pad",
+      "bGlyph": "+cra·+ene·+pad·−off",
+      "talkIds": {
+        "C": "commando__mason:C"
       }
     },
     {
@@ -5242,29 +5419,27 @@
     },
     {
       "id": "consul__shiva",
-      "a": "shiva",
-      "b": "consul",
+      "a": "consul",
+      "b": "shiva",
       "score": 1.0,
       "polarity": "attract",
       "motifs": [
-        "eight Grunts need paperwork",
-        "building like an apology"
+        "the paperwork for one walker",
+        "she stopped needing the Grunts; he kept the forms"
       ],
       "sharedTemperament": [],
       "reasons": [
         "authored seed"
       ],
       "authored": true,
-      "aName": "Sivan 'Shiva' Ruhl",
-      "bName": "Consul Aurel Weiss",
-      "aHook": "A decision, alone.",
-      "bHook": "Builds like an apology.",
-      "aGlyph": "+off·+pad·+hea·−mob",
-      "bGlyph": "+cra·+ene·−off·+pad",
+      "aName": "Consul Aurel Weiss",
+      "bName": "Sivan 'Shiva' Ruhl",
+      "aHook": "Builds like an apology.",
+      "bHook": "A decision, alone.",
+      "aGlyph": "+cra·+ene·−off·+pad",
+      "bGlyph": "+off·+pad·+hea·−mob",
       "talkIds": {
-        "C": "consul__shiva:C",
-        "B": "consul__shiva:B",
-        "A": "consul__shiva:A"
+        "C": "consul__shiva:C"
       }
     },
     {
@@ -5292,6 +5467,33 @@
         "C": "consul__solarium:C",
         "B": "consul__solarium:B",
         "A": "consul__solarium:A"
+      }
+    },
+    {
+      "id": "dam__hearth",
+      "a": "hearth",
+      "b": "dam",
+      "score": 1.0,
+      "polarity": "bond",
+      "motifs": [
+        "the quiet sun and the riverworks",
+        "a reactor nobody finds beside a dam everybody sees"
+      ],
+      "sharedTemperament": [
+        "pad"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Hearth",
+      "bName": "The Damwrights",
+      "aHook": "Quiet sun. Won't go out, and you won't find it.",
+      "bHook": "Water goes where we tell it.",
+      "aGlyph": "+ene·−mob·+pad·−off",
+      "bGlyph": "+cra·+pad·+ene·−off",
+      "talkIds": {
+        "C": "dam__hearth:C"
       }
     },
     {
@@ -5537,6 +5739,34 @@
       }
     },
     {
+      "id": "fatboy__mammoth",
+      "a": "fatboy",
+      "b": "mammoth",
+      "score": 1.0,
+      "polarity": "rivalry",
+      "motifs": [
+        "two houses that walk",
+        "who is the biggest thing on the line"
+      ],
+      "sharedTemperament": [
+        "pad",
+        "plod"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Dorran 'Fatboy' Kell",
+      "bName": "Old Mother Brandt",
+      "aHook": "House learned to knock.",
+      "bHook": "Sit down. I'll handle it.",
+      "aGlyph": "+off·−mob·−ene·+pad",
+      "bGlyph": "+pad·+off·−mob·+hea",
+      "talkIds": {
+        "C": "fatboy__mammoth:C"
+      }
+    },
+    {
       "id": "fatboy__scylla",
       "a": "scylla",
       "b": "fatboy",
@@ -5776,6 +6006,31 @@
       }
     },
     {
+      "id": "gladius__halbard",
+      "a": "halbard",
+      "b": "gladius",
+      "score": 1.0,
+      "polarity": "rivalry",
+      "motifs": [
+        "the appetite and the show",
+        "who gets the crowd"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Ilse 'Halbard' Varn",
+      "bName": "Cassia 'Gladius' Ferro",
+      "aHook": "Halberd's hungry.",
+      "bHook": "Bow first. Then the fight.",
+      "aGlyph": "",
+      "bGlyph": "+off·+mob·−pad·+hea",
+      "talkIds": {
+        "C": "gladius__halbard:C"
+      }
+    },
+    {
       "id": "gladius__hundred",
       "a": "hundred",
       "b": "gladius",
@@ -5932,6 +6187,31 @@
       "bGlyph": "+off·−mob·+pad·+led",
       "talkIds": {
         "C": "gorgon__tremor:C"
+      }
+    },
+    {
+      "id": "gorgon__vale",
+      "a": "vale",
+      "b": "gorgon",
+      "score": 1.0,
+      "polarity": "friction",
+      "motifs": [
+        "quiet invoices and loud stares",
+        "two kinds of long range"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Vale Soft",
+      "bName": "Ivra 'Gorgon' Maelis",
+      "aHook": "The wall never saw the invoice.",
+      "bHook": "Whatever I look at stops moving.",
+      "aGlyph": "+fog·+off·−ene·+led",
+      "bGlyph": "+off·−mob·+pad·+sig",
+      "talkIds": {
+        "C": "gorgon__vale:C"
       }
     },
     {
@@ -6200,6 +6480,31 @@
       "bGlyph": "",
       "talkIds": {
         "C": "halbard__mammoth:C"
+      }
+    },
+    {
+      "id": "halbard__shiva",
+      "a": "shiva",
+      "b": "halbard",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "two Cortex walkers",
+        "a decision and an appetite"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Sivan 'Shiva' Ruhl",
+      "bName": "Ilse 'Halbard' Varn",
+      "aHook": "A decision, alone.",
+      "bHook": "Halberd's hungry.",
+      "aGlyph": "+off·+pad·+hea·−mob",
+      "bGlyph": "",
+      "talkIds": {
+        "C": "halbard__shiva:C"
       }
     },
     {
@@ -6619,6 +6924,31 @@
       }
     },
     {
+      "id": "hearth__ketha",
+      "a": "hearth",
+      "b": "ketha",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "the two who keep the company alive",
+        "the coal and the field surgeon"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Hearth",
+      "bName": "Ketha",
+      "aHook": "Quiet sun. Won't go out, and you won't find it.",
+      "bHook": "Wrecks are unfinished sentences.",
+      "aGlyph": "+ene·−mob·+pad·−off",
+      "bGlyph": "−off·+cra·+pad",
+      "talkIds": {
+        "C": "hearth__ketha:C"
+      }
+    },
+    {
       "id": "hearth__lumen",
       "a": "hearth",
       "b": "lumen",
@@ -6940,6 +7270,31 @@
         "C": "infestor__solarium:C",
         "B": "infestor__solarium:B",
         "A": "infestor__solarium:A"
+      }
+    },
+    {
+      "id": "ketha__mask",
+      "a": "mask",
+      "b": "ketha",
+      "score": 1.0,
+      "polarity": "bond",
+      "motifs": [
+        "two who raise the fallen",
+        "the spare king and the field surgeon"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Mask",
+      "bName": "Ketha",
+      "aHook": "Every throne needs a spare.",
+      "bHook": "Wrecks are unfinished sentences.",
+      "aGlyph": "+cra·+pad·+fog·+off",
+      "bGlyph": "−off·+cra·+pad",
+      "talkIds": {
+        "C": "ketha__mask:C"
       }
     },
     {
@@ -7507,6 +7862,33 @@
       }
     },
     {
+      "id": "lumen__solarium",
+      "a": "lumen",
+      "b": "solarium",
+      "score": 1.0,
+      "polarity": "sibling",
+      "motifs": [
+        "two who tithe the grid",
+        "spreadsheets and sermons"
+      ],
+      "sharedTemperament": [
+        "garden"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Sister Lumen",
+      "bName": "Solarium",
+      "aHook": "Tithe the grid.",
+      "bHook": "Spreadsheets, then sunlight.",
+      "aGlyph": "+ene·−off·−mob·+pad",
+      "bGlyph": "+ene·+cra·+pad·−off",
+      "talkIds": {
+        "C": "lumen__solarium:C"
+      }
+    },
+    {
       "id": "lumen__spoke",
       "a": "spoke",
       "b": "lumen",
@@ -7664,6 +8046,31 @@
         "C": "lumen__twitch:C",
         "B": "lumen__twitch:B",
         "A": "lumen__twitch:A"
+      }
+    },
+    {
+      "id": "lumen__warder",
+      "a": "lumen",
+      "b": "warder",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "Pulsars and the Bulwark",
+        "two who hold a circle"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Sister Lumen",
+      "bName": "Warder",
+      "aHook": "Tithe the grid.",
+      "bHook": "Owns a circle of dirt. Burns the edge.",
+      "aGlyph": "+ene·−off·−mob·+pad",
+      "bGlyph": "−mob·+pad·−off",
+      "talkIds": {
+        "C": "lumen__warder:C"
       }
     },
     {
@@ -7882,6 +8289,31 @@
         "C": "mason__twitch:C",
         "B": "mason__twitch:B",
         "A": "mason__twitch:A"
+      }
+    },
+    {
+      "id": "mira__starlight",
+      "a": "mira",
+      "b": "starlight",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "two who shoot from far back",
+        "one beam, five shells"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Mira Barrage",
+      "bName": "Halcyon Dray",
+      "aHook": "Every shell is confetti.",
+      "bHook": "The beam arrives before the argument.",
+      "aGlyph": "+off·+hea·−ene·−pad",
+      "bGlyph": "+off·−mob·+sig·+ene",
+      "talkIds": {
+        "C": "mira__starlight:C"
       }
     },
     {
@@ -8276,6 +8708,56 @@
       }
     },
     {
+      "id": "nox__stiletto",
+      "a": "nox",
+      "b": "stiletto",
+      "score": 1.0,
+      "polarity": "friction",
+      "motifs": [
+        "debts in the sky",
+        "the pulse that stops everything, including his"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Nox Tithe",
+      "bName": "Nadia 'Stiletto' Cole",
+      "aHook": "Still paying for the last sky.",
+      "bHook": "Nothing moves; then it is quiet.",
+      "aGlyph": "−mob·+pad·+led·−off",
+      "bGlyph": "+sky·+off·+mob·+ene",
+      "talkIds": {
+        "C": "nox__stiletto:C"
+      }
+    },
+    {
+      "id": "nox__tremor",
+      "a": "nox",
+      "b": "tremor",
+      "score": 1.0,
+      "polarity": "tension",
+      "motifs": [
+        "the shells he cannot stop",
+        "a shield for the sky and a hammer from it"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Nox Tithe",
+      "bName": "Edda 'Tremor' Lund",
+      "aHook": "Still paying for the last sky.",
+      "bHook": "Somebody has to see it first.",
+      "aGlyph": "−mob·+pad·+led·−off",
+      "bGlyph": "+off·−mob·+pad·+led",
+      "talkIds": {
+        "C": "nox__tremor:C"
+      }
+    },
+    {
       "id": "nox__vale",
       "a": "vale",
       "b": "nox",
@@ -8655,6 +9137,31 @@
       }
     },
     {
+      "id": "quill__rusk",
+      "a": "quill",
+      "b": "rusk",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "the tread marshal and the tank stack",
+        "orders that walk and doors that hold"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Ash-Marshal Quill",
+      "bName": "Rusk Halloway",
+      "aHook": "Orders walk on treads.",
+      "bHook": "Gate, jammed gat, a lie.",
+      "aGlyph": "+off·+pad·+hea",
+      "bGlyph": "+pad·+off·−mob",
+      "talkIds": {
+        "C": "quill__rusk:C"
+      }
+    },
+    {
       "id": "quill__stride",
       "a": "stride",
       "b": "quill",
@@ -8849,6 +9356,33 @@
       }
     },
     {
+      "id": "rookery__stronghold",
+      "a": "stronghold",
+      "b": "rookery",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "the airlift and the nest",
+        "who lands where nobody can walk"
+      ],
+      "sharedTemperament": [
+        "sky"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Dagny 'Stronghold' Reeve",
+      "bName": "Wynn 'Rookery' Atterby",
+      "aHook": "Brings its own sky.",
+      "bHook": "Builds where nobody can walk to.",
+      "aGlyph": "+sky·+mob·+off·−pad",
+      "bGlyph": "+cra·+sky·+mob·+ene",
+      "talkIds": {
+        "C": "rookery__stronghold:C"
+      }
+    },
+    {
       "id": "rookery__thresh",
       "a": "rookery",
       "b": "thresh",
@@ -8873,6 +9407,34 @@
       "bGlyph": "+off·+sky·+mob·−pad",
       "talkIds": {
         "C": "rookery__thresh:C"
+      }
+    },
+    {
+      "id": "rumor__vale",
+      "a": "vale",
+      "b": "rumor",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "fog and the contract",
+        "two who are never where the invoice says"
+      ],
+      "sharedTemperament": [
+        "contract",
+        "fog"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Vale Soft",
+      "bName": "Rumor",
+      "aHook": "The wall never saw the invoice.",
+      "bHook": "Everything changes sides eventually.",
+      "aGlyph": "+fog·+off·−ene·+led",
+      "bGlyph": "+fog·+cra·+sig·−pad",
+      "talkIds": {
+        "C": "rumor__vale:C"
       }
     },
     {
@@ -9259,6 +9821,58 @@
       }
     },
     {
+      "id": "spoke__veil",
+      "a": "veil",
+      "b": "spoke",
+      "score": 1.0,
+      "polarity": "friction",
+      "motifs": [
+        "fog against wheels",
+        "who sees first, and who gets paid for it"
+      ],
+      "sharedTemperament": [
+        "contract"
+      ],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Veil & Compass",
+      "bName": "Ivo 'Spoke' Rask",
+      "aHook": "Fog is the payroll.",
+      "bHook": "Only trusts wheels. Builds his own.",
+      "aGlyph": "+sig·+fog·+mob·+led",
+      "bGlyph": "+mob·+sig·+fog·+led",
+      "talkIds": {
+        "C": "spoke__veil:C"
+      }
+    },
+    {
+      "id": "starlight__verse",
+      "a": "verse",
+      "b": "starlight",
+      "score": 1.0,
+      "polarity": "attract",
+      "motifs": [
+        "counting and the beam",
+        "one shot that arrives, many that are counted"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Verse & Adder",
+      "bName": "Halcyon Dray",
+      "aHook": "Counts missiles out loud.",
+      "bHook": "The beam arrives before the argument.",
+      "aGlyph": "+mob·−pad·+led·+off",
+      "bGlyph": "+off·−mob·+sig·+ene",
+      "talkIds": {
+        "C": "starlight__verse:C"
+      }
+    },
+    {
       "id": "starlight__warder",
       "a": "starlight",
       "b": "warder",
@@ -9397,6 +10011,31 @@
         "C": "stronghold__vane:C",
         "B": "stronghold__vane:B",
         "A": "stronghold__vane:A"
+      }
+    },
+    {
+      "id": "tick__yeva",
+      "a": "yeva",
+      "b": "tick",
+      "score": 1.0,
+      "polarity": "friction",
+      "motifs": [
+        "the sniper who borrows a carpet",
+        "unseen, among a hundred seen things"
+      ],
+      "sharedTemperament": [],
+      "reasons": [
+        "authored seed"
+      ],
+      "authored": true,
+      "aName": "Whisper-of-Ash Yeva",
+      "bName": "Tamsin 'Tick' Hollis",
+      "aHook": "Ghosts already walked it.",
+      "bHook": "Speaks in plurals. Prints them too.",
+      "aGlyph": "+mob·−pad·+sig·+fog",
+      "bGlyph": "+sig·+fog·+mob·−off",
+      "talkIds": {
+        "C": "tick__yeva:C"
       }
     },
     {

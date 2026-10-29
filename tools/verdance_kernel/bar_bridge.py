@@ -9,7 +9,7 @@ and no powershell between the gadget and the campaign state any more.
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import TYPE_CHECKING, Any, Callable
 
 from verdance.common import utc_now

@@ -5,7 +5,7 @@ Writes a small, stable JSON the mutator can poll without talking HTTP.
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 

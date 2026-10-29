@@ -12,7 +12,6 @@ from __future__ import annotations
 import json
 import sys
 from datetime import datetime, timezone
-from pathlib import Path
 
 from verdance.common import ARCHETYPE_VERB, WORKSPACE_ROOT, load_json
 from verdance.belief import hub_belief

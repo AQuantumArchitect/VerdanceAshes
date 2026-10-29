@@ -27,9 +27,8 @@ from __future__ import annotations
 import argparse
 import io
 import json
-import sys
 from pathlib import Path
-from typing import Any, Dict, List, Set, Tuple
+from typing import Any, List, Set, Tuple
 
 # Keys that carry a BAR map name and must match the pool exactly. Deliberately
 # excludes minimapKey, which is an image filename stem and legitimately differs.
