@@ -41,7 +41,7 @@ forward). Arrow keys move the focus.
 In the hub: **System menu → Export feedback bundle** writes
 `export\feedback_<stamp>.zip` (your campaign state plus the logs the kernel
 needs to reproduce the problem). Attach it to an issue at
-<https://github.com/AQuantumArchitect/verdanceashes/issues> with what you did,
+<https://github.com/AQuantumArchitect/VerdanceAshes/issues> with what you did,
 what you expected, and what happened. `PLAYTESTING.md` has a short template.
 
 ## Package pieces

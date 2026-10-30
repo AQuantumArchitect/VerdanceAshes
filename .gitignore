@@ -67,3 +67,6 @@ autopilot_runs/
 _to_delete/
 _playtest_backup_*/
 state/
+
+# sync bundles between sessions and the laptop are transport, not history
+*.bundle

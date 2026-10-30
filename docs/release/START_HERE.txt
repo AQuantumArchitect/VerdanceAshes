@@ -40,7 +40,7 @@ SENDING FEEDBACK
 ----------------
 Hub: System menu -> Export feedback bundle
      writes export\feedback_<stamp>.zip (campaign state + kernel logs)
-Attach it to an issue: https://github.com/AQuantumArchitect/verdanceashes/issues
+Attach it to an issue: https://github.com/AQuantumArchitect/VerdanceAshes/issues
 Say what you did, what you expected, what happened.
 
 WHAT THIS IS

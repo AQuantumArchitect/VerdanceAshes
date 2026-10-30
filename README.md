@@ -25,7 +25,7 @@ Thirty-second path: [`docs/release/START_HERE.txt`](docs/release/START_HERE.txt)
 
 ## Sending feedback
 
-In the hub: **System menu → Export feedback bundle**. It writes `export/feedback_<stamp>.zip` (your campaign state plus the logs the kernel needs to reproduce the problem). Attach it to a GitHub issue at <https://github.com/AQuantumArchitect/verdanceashes/issues>, with the three lines from [`docs/release/PLAYTESTING.md`](docs/release/PLAYTESTING.md): what you did, what you expected, what happened.
+In the hub: **System menu → Export feedback bundle**. It writes `export/feedback_<stamp>.zip` (your campaign state plus the logs the kernel needs to reproduce the problem). Attach it to a GitHub issue at <https://github.com/AQuantumArchitect/VerdanceAshes/issues>, with the three lines from [`docs/release/PLAYTESTING.md`](docs/release/PLAYTESTING.md): what you did, what you expected, what happened.
 
 ## Ship (other machines)
 
@@ -89,4 +89,4 @@ Split on purpose. Read [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE).
 
 ## Status
 
-Public alpha. Version is the root `VERSION` file. Consolidation line starts at 0.8.0 (one play path). Current line: **0.13.0** (first test export: shell-only occupation, graph fallback objectives, SHIP -Dev).
+Public alpha. Version is the root `VERSION` file. Consolidation line starts at 0.8.0 (one play path). Current line: **0.14.0** (second test line: 64 heroes, field effects v2, bonds and encounters, territory, the performance pass). History: [`CHANGELOG.md`](CHANGELOG.md).

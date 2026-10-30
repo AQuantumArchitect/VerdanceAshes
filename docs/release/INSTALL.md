@@ -90,5 +90,5 @@ field units carry forward; a new enemy camp reseeds at the new target.
 In the hub: **System menu → Export feedback bundle**. It writes
 `export\feedback_<stamp>.zip` with your campaign state and the logs the kernel
 needs to reproduce the problem. Attach it to an issue at
-<https://github.com/AQuantumArchitect/verdanceashes/issues> and say what you
+<https://github.com/AQuantumArchitect/VerdanceAshes/issues> and say what you
 did, what you expected, and what happened.

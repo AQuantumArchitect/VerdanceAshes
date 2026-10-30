@@ -57,7 +57,7 @@ run. Update the Umwelt clone and ship again.
 1. In the hub: **System menu → Export feedback bundle**. It writes
    `export\feedback_<stamp>.zip` (your campaign state plus the logs the kernel
    needs to reproduce the problem).
-2. Open an issue at <https://github.com/AQuantumArchitect/verdanceashes/issues>,
+2. Open an issue at <https://github.com/AQuantumArchitect/VerdanceAshes/issues>,
    attach the zip, and paste the template below.
 
 ```
