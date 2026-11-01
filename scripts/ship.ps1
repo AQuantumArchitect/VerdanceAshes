@@ -21,6 +21,16 @@ $ErrorActionPreference = "Stop"
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 . (Join-Path $ScriptDir "_common.ps1")
 $Workspace = Get-VerdanceWorkspaceRoot -Workspace $Workspace
+# Git from Windows PowerShell 5.1 under ErrorActionPreference Stop: a native command's stderr becomes a
+# terminating error once it is redirected, so "git describe ... 2>$null" on an untagged HEAD, or any
+# git that prints a warning (the build PC's "Empty last update token"), killed the script. Output
+# is returned, stderr dropped, and $LASTEXITCODE says how git ended.
+function Invoke-GitQuiet {
+  $saved = $ErrorActionPreference
+  $ErrorActionPreference = 'Continue'
+  try { & git @args 2>$null } finally { $ErrorActionPreference = $saved }
+}
+
 
 if (-not $Version) {
   $verFile = Join-Path $Workspace "VERSION"
@@ -159,7 +169,7 @@ $umweltSrc = $null
 if ($env:UMWELT_SRC) {
   $umweltSrc = $env:UMWELT_SRC
   $umweltRoot = Split-Path -Parent $umweltSrc
-  $have = (git -C $umweltRoot rev-parse HEAD 2>$null)
+  $have = (Invoke-GitQuiet -C $umweltRoot rev-parse HEAD)
   if ($have -ne $umweltPin.commit -and -not $AllowUmweltDrift) {
     throw ("UMWELT_SRC is at " + $have + ", the pin (tools\umwelt_pin.json) is " + $umweltPin.commit +
            ". Check out the pin, bump the pin, or pass -AllowUmweltDrift for a dev build.")
@@ -168,16 +178,16 @@ if ($env:UMWELT_SRC) {
   $umweltRoot = Join-Path $Workspace "export\cache\umwelt"
   if (!(Test-Path (Join-Path $umweltRoot ".git"))) {
     New-Item -ItemType Directory -Force -Path (Split-Path -Parent $umweltRoot) | Out-Null
-    git clone --quiet $umweltPin.repo $umweltRoot
+    Invoke-GitQuiet clone --quiet $umweltPin.repo $umweltRoot | Out-Null
     if ($LASTEXITCODE -ne 0) { throw "Could not clone Umwelt from $($umweltPin.repo)." }
   }
-  git -C $umweltRoot fetch --quiet origin
-  git -C $umweltRoot checkout --quiet --detach $umweltPin.commit
+  Invoke-GitQuiet -C $umweltRoot fetch --quiet origin | Out-Null
+  Invoke-GitQuiet -C $umweltRoot checkout --quiet --detach $umweltPin.commit | Out-Null
   if ($LASTEXITCODE -ne 0) { throw "Umwelt commit $($umweltPin.commit) is not in $($umweltPin.repo)." }
   $umweltSrc = Join-Path $umweltRoot "src"
 }
 if (!(Test-Path (Join-Path $umweltSrc "umwelt\__init__.py"))) { throw "No umwelt package under $umweltSrc." }
-$umweltHash = (git -C $umweltRoot rev-parse HEAD 2>$null)
+$umweltHash = (Invoke-GitQuiet -C $umweltRoot rev-parse HEAD)
 $vendor = Join-Path $staging "tools\_vendor"
 New-Item -ItemType Directory -Force -Path $vendor | Out-Null
 Copy-Into (Join-Path $umweltSrc "umwelt") (Join-Path $vendor "umwelt")
@@ -463,7 +473,7 @@ $manifest = [ordered]@{
   version         = $Version
   builtAt         = (Get-Date).ToUniversalTime().ToString("o")
   # No machine paths in a shipped file (0.14.0 shipped the builder's workspace path here).
-  sourceCommit    = (git -C $Workspace rev-parse HEAD 2>$null)
+  sourceCommit    = (Invoke-GitQuiet -C $Workspace rev-parse HEAD)
   umweltCommit    = $umweltHash
   fileCount       = $files.Count
   playerEntry     = @("SETUP.bat", "PLAY.bat")

@@ -17,6 +17,16 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 $Root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+# Git from Windows PowerShell 5.1 under ErrorActionPreference Stop: a native command's stderr becomes a
+# terminating error once it is redirected, so "git describe ... 2>$null" on an untagged HEAD, or any
+# git that prints a warning (the build PC's "Empty last update token"), killed the script. Output
+# is returned, stderr dropped, and $LASTEXITCODE says how git ended.
+function Invoke-GitQuiet {
+  $saved = $ErrorActionPreference
+  $ErrorActionPreference = 'Continue'
+  try { & git @args 2>$null } finally { $ErrorActionPreference = $saved }
+}
+
 
 # ---- per-game config (keep in sync with RELEASE.md) -------------------------
 $ItchTarget   = 'aquantumarchitect/verdances-ashwalkers'
@@ -30,12 +40,12 @@ $C = $Channels[$Channel]
 
 Push-Location $Root
 try {
-  $dirty = git status --porcelain --untracked-files=no
+  $dirty = Invoke-GitQuiet status --porcelain --untracked-files=no
   if ($dirty -and -not $AllowUntagged) { throw "Working tree has uncommitted changes. Commit first; releases ship only committed code." }
-  $Version = git describe --tags --exact-match 2>$null
+  $Version = Invoke-GitQuiet describe --tags --exact-match
   if (-not $Version) {
     if (-not $AllowUntagged) { throw "HEAD has no tag. Tag it first, e.g.: git tag v0.3.1" }
-    $Version = (git describe --tags --always --dirty) + '-untagged'
+    $Version = (Invoke-GitQuiet describe --tags --always --dirty) + '-untagged'
   }
   $Out = Join-Path $Root $C.Out
   if (Test-Path $Out) { Remove-Item $Out -Recurse -Force }
@@ -70,7 +80,7 @@ try {
     }
     default { throw "Unknown kind $($C.Kind)" }
   }
-  Set-Content -Path (Join-Path $Out 'VERSION.txt') -Value "$Version`n$(git rev-parse HEAD)"
+  Set-Content -Path (Join-Path $Out 'VERSION.txt') -Value "$Version`n$(Invoke-GitQuiet rev-parse HEAD)"
   if ($C.Check -and -not (Test-Path (Join-Path $Out $C.Check))) { throw "Build output is missing $($C.Check)" }
 
   if ($DryRun) { Write-Host "DryRun: built $Out, not pushed."; return }
