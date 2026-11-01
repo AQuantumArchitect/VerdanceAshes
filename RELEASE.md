@@ -14,6 +14,7 @@
 | Play copy | an itch download, run SETUP.bat once then PLAY.bat |
 | Release command | bump `VERSION`, `git tag vX.Y.Z; .\tools\release.ps1 -Channel windows` (`-DryRun` builds without pushing) |
 | Last verified build | `0.14.0`: itch download byte-identical to the pushed folder. Not launched this pass (needs BAR + SETUP). |
+| Last dry run | 2026-10-31, `45371c1` (untagged, `.\tools\release.ps1 -Channel windows -DryRun -AllowUntagged` on the build PC): exit 0, no warnings, 3718 files, numpy + scipy in, Umwelt `8154c13` vendored with its LICENSE, belief world imports, parity and map-name gates pass, `release_manifest.json` carries commits and no paths. Not pushed, not launched. The first three tries found `release.ps1` bugs under Windows PowerShell 5.1 (git stderr under Stop, an array splat, a three-argument Join-Path), all fixed on master. |
 
 ## Umwelt license check (2026-10-31)
 
