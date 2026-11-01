@@ -93,17 +93,20 @@ _UMWELT_WARNED = False
 
 
 def umwelt_search_paths() -> List[Path]:
-    """Where the umwelt package may live, first match wins (sys.path order):
-    UMWELT_SRC, a sibling clone, ~/umwelt, ~/ws-win/umwelt, then LAST the shipped
-    snapshot tools/_vendor and the embedded runtime's runtime/site-packages."""
+    """Where the umwelt package may live, first match wins (sys.path order): UMWELT_SRC, then the
+    snapshot a shipped build carries (tools/_vendor, the pinned commit of tools/umwelt_pin.json),
+    then a dev checkout's sibling clone and ~/umwelt, and the embedded runtime's site-packages.
+
+    A shipped build reads its own snapshot before any clone on the machine: 0.14.0 on the
+    builder's own PC imported a stale ~/ws-win/umwelt ahead of the Umwelt it shipped, which is
+    no longer searched at all. A dev checkout has no tools/_vendor, so its clones still serve."""
     out: List[Path] = []
     src = os.environ.get("UMWELT_SRC")
     if src:
         out.append(Path(src))
-    out += [ROOT.parent / "umwelt" / "src",
+    out += [TOOLS_DIR / "_vendor",
+            ROOT.parent / "umwelt" / "src",
             Path.home() / "umwelt" / "src",
-            Path.home() / "ws-win" / "umwelt" / "src",
-            TOOLS_DIR / "_vendor",
             ROOT / "runtime" / "site-packages"]
     return out
 
@@ -114,7 +117,7 @@ def _umwelt():
     Never raises SystemExit. A failed import logs one line to stderr (once per process)
     and returns None; the campaign then runs without the belief world (VA_BELIEF_SKIP)."""
     global _UMWELT_WARNED
-    # Last candidates are appended, not inserted: a developer clone must beat the vendored snapshot.
+    # Appended in umwelt_search_paths order, after whatever sys.path already holds (PYTHONPATH).
     for cand in umwelt_search_paths():
         try:
             if cand.is_dir() and (cand / "umwelt" / "__init__.py").is_file() and str(cand) not in sys.path:

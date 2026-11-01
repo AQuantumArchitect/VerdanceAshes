@@ -83,5 +83,6 @@ goto :eof
 set "VA_PY_CAND="
 REM Optional research paths (forge only, never required for play). Discovery,
 REM not assumption: a missing clone changes nothing.
-if exist "%USERPROFILE%\ws-win\umwelt\src" set "PYTHONPATH=%PYTHONPATH%;%USERPROFILE%\ws-win\umwelt\src"
+REM (Umwelt is not put on PYTHONPATH here: a shipped build carries its own pinned snapshot in
+REM tools\_vendor, and verdance.belief.world finds it, or UMWELT_SRC, before any other clone.)
 if exist "%USERPROFILE%\ws-win\yurt-sync\work\_wargen\coral" set "PYTHONPATH=%PYTHONPATH%;%USERPROFILE%\ws-win\yurt-sync\work\_wargen\coral"

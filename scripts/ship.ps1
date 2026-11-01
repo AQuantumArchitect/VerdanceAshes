@@ -11,6 +11,8 @@ param(
   [switch]$InstallToMyGames,
   # Test-machine build: also stage the headless rig (AUTOPILOT, WAR_BAKE) and the test suite.
   [switch]$Dev,
+  # Vendor UMWELT_SRC even when it is not at the pinned commit (tools/umwelt_pin.json). Dev builds only.
+  [switch]$AllowUmweltDrift,
   [string]$PythonEmbedZip = "",
   [string]$PythonEmbedUrl = "https://www.python.org/ftp/python/3.12.8/python-3.12.8-embed-amd64.zip"
 )
@@ -147,29 +149,45 @@ foreach ($noise in @(
 # ---- Umwelt (belief-field engine; FREEZE law: depend, don't copy) ----
 # The campaign imports the umwelt package at run time (tools\verdance\belief\world.py). A player
 # build has no clone of the Umwelt repo, so vendor a snapshot of its src\umwelt package into
-# tools\_vendor, which verdance.belief.world adds to sys.path last (UMWELT_SRC and a sibling clone win).
-# Discovery only, never an assumption: UMWELT_SRC, then a sibling clone, then the two
-# conventional home-folder clones. No match = a WARNING and a build without belief.
-$umweltCandidates = @()
-if ($env:UMWELT_SRC) { $umweltCandidates += $env:UMWELT_SRC }
-$umweltCandidates += (Join-Path (Split-Path -Parent $Workspace) "umwelt\src")
-if ($env:USERPROFILE) {
-  $umweltCandidates += (Join-Path $env:USERPROFILE "umwelt\src")
-  $umweltCandidates += (Join-Path $env:USERPROFILE "ws-win\umwelt\src")
-}
-$umweltSrc = $umweltCandidates | Where-Object { $_ -and (Test-Path (Join-Path $_ "umwelt\__init__.py")) } | Select-Object -First 1
-if ($umweltSrc) {
-  $vendor = Join-Path $staging "tools\_vendor"
-  New-Item -ItemType Directory -Force -Path $vendor | Out-Null
-  Copy-Into (Join-Path $umweltSrc "umwelt") (Join-Path $vendor "umwelt")
-  Get-ChildItem $vendor -Recurse -Directory -Filter "__pycache__" -ErrorAction SilentlyContinue |
-    Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
-  $umweltHash = (git -C (Split-Path -Parent $umweltSrc) rev-parse --short HEAD 2>$null)
-  Set-Content -Path (Join-Path $vendor "UMWELT_SNAPSHOT.txt") -Value ("umwelt snapshot from " + $umweltSrc + " at " + (Get-Date).ToString("s") + " commit " + $umweltHash)
-  Write-Host "Umwelt vendored from $umweltSrc ($umweltHash)"
+# tools\_vendor, which a shipped build's verdance.belief.world reads before any clone on the machine.
+# Which Umwelt: exactly the commit in tools\umwelt_pin.json, fetched into export\cache\umwelt.
+# Home-folder clones are no longer searched: 0.13.0 and 0.14.0 picked up a stale ~\ws-win copy.
+# UMWELT_SRC still wins when set, and must sit on the pinned commit (-AllowUmweltDrift to override).
+# Umwelt is Apache-2.0: its LICENSE ships beside the snapshot (NOTICE, RELEASE.md).
+$umweltPin = Get-Content -Raw (Join-Path $Workspace "tools\umwelt_pin.json") | ConvertFrom-Json
+$umweltSrc = $null
+if ($env:UMWELT_SRC) {
+  $umweltSrc = $env:UMWELT_SRC
+  $umweltRoot = Split-Path -Parent $umweltSrc
+  $have = (git -C $umweltRoot rev-parse HEAD 2>$null)
+  if ($have -ne $umweltPin.commit -and -not $AllowUmweltDrift) {
+    throw ("UMWELT_SRC is at " + $have + ", the pin (tools\umwelt_pin.json) is " + $umweltPin.commit +
+           ". Check out the pin, bump the pin, or pass -AllowUmweltDrift for a dev build.")
+  }
 } else {
-  Write-Warning "Umwelt source not found (UMWELT_SRC / ..\umwelt\src / ~\umwelt\src / ~\ws-win\umwelt\src); the shipped build will run with the belief world OFF."
+  $umweltRoot = Join-Path $Workspace "export\cache\umwelt"
+  if (!(Test-Path (Join-Path $umweltRoot ".git"))) {
+    New-Item -ItemType Directory -Force -Path (Split-Path -Parent $umweltRoot) | Out-Null
+    git clone --quiet $umweltPin.repo $umweltRoot
+    if ($LASTEXITCODE -ne 0) { throw "Could not clone Umwelt from $($umweltPin.repo)." }
+  }
+  git -C $umweltRoot fetch --quiet origin
+  git -C $umweltRoot checkout --quiet --detach $umweltPin.commit
+  if ($LASTEXITCODE -ne 0) { throw "Umwelt commit $($umweltPin.commit) is not in $($umweltPin.repo)." }
+  $umweltSrc = Join-Path $umweltRoot "src"
 }
+if (!(Test-Path (Join-Path $umweltSrc "umwelt\__init__.py"))) { throw "No umwelt package under $umweltSrc." }
+$umweltHash = (git -C $umweltRoot rev-parse HEAD 2>$null)
+$vendor = Join-Path $staging "tools\_vendor"
+New-Item -ItemType Directory -Force -Path $vendor | Out-Null
+Copy-Into (Join-Path $umweltSrc "umwelt") (Join-Path $vendor "umwelt")
+Copy-File (Join-Path $umweltRoot "LICENSE") (Join-Path $vendor "umwelt\LICENSE")
+if (!(Test-Path (Join-Path $vendor "umwelt\LICENSE"))) { throw "Umwelt's LICENSE did not stage; Apache-2.0 requires it beside the snapshot." }
+Get-ChildItem $vendor -Recurse -Directory -Filter "__pycache__" -ErrorAction SilentlyContinue |
+  Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+# No machine paths in a shipped file: the repo and the commit say exactly which Umwelt this is.
+Set-Content -Path (Join-Path $vendor "UMWELT_SNAPSHOT.txt") -Value ("umwelt " + $umweltPin.repo + " commit " + $umweltHash + " (Apache-2.0, see umwelt\LICENSE)")
+Write-Host "Umwelt vendored at $umweltHash"
 
 Copy-File (Join-Path $Workspace "verdance_config.template.json") (Join-Path $staging "verdance_config.template.json")
 Copy-File (Join-Path $Workspace "requirements-ship.txt") (Join-Path $staging "requirements-ship.txt")
@@ -380,8 +398,13 @@ if ((Test-Path $embedPy) -and (Test-Path (Join-Path $staging "tools\_vendor\umwe
   if ($beliefOk) {
     Write-Host "Belief world: the vendored Umwelt imports (ON)."
   } else {
-    Write-Warning ("The vendored Umwelt (" + $umweltSrc + ") does not import what the campaign needs; it is probably a stale clone. " +
-                   "git pull it and ship again. This build runs with the belief world OFF, and AUTOPILOT refuses to run without it.")
+    $sciencePresent = Test-Path (Join-Path $staging "runtime\python\Lib\site-packages\numpy")
+    $why = "The vendored Umwelt (commit " + $umweltHash + ") does not import what the campaign needs."
+    if ($sciencePresent) {
+      # numpy and scipy are in, so nothing else excuses it: a build without belief is not a release.
+      throw ($why + " Bump tools\umwelt_pin.json to an Umwelt that has the names verdance.belief.world imports.")
+    }
+    Write-Warning ($why + " (-SkipScience build: numpy/scipy are not staged, so the belief world is OFF.)")
   }
 }
 
@@ -439,7 +462,9 @@ $manifest = [ordered]@{
   name            = $releaseName
   version         = $Version
   builtAt         = (Get-Date).ToUniversalTime().ToString("o")
-  sourceWorkspace = $Workspace
+  # No machine paths in a shipped file (0.14.0 shipped the builder's workspace path here).
+  sourceCommit    = (git -C $Workspace rev-parse HEAD 2>$null)
+  umweltCommit    = $umweltHash
   fileCount       = $files.Count
   playerEntry     = @("SETUP.bat", "PLAY.bat")
   includesKernel  = $true

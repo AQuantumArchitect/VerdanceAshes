@@ -38,6 +38,10 @@ Applies to:
                                   mission generation, analysis tooling
   app/**                          hub, kernel launcher and surface
 
+Not covered: tools/_vendor/umwelt/ in a built distribution is a snapshot of
+Umwelt, a separate project under the Apache License 2.0 (its LICENSE ships
+beside it). See NOTICE.
+
 Copyright (c) 2026 Luke Spooner. All rights reserved.
 
 No license is granted to copy, modify, redistribute or create derivative works

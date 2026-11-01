@@ -44,6 +44,37 @@ own terms.
 
 
 --------------------------------------------------------------------------------
+Umwelt  --  redistributed in shipped builds
+--------------------------------------------------------------------------------
+
+  Location:  tools/_vendor/umwelt/ in a built distribution (export/dist/...)
+  Version:   the commit pinned in tools/umwelt_pin.json
+  Author:    Luke Spooner
+  License:   Apache License 2.0
+  Upstream:  https://github.com/AQuantumArchitect/umwelt
+
+The belief-field engine the campaign imports at run time. scripts/ship.ps1
+copies the src/umwelt package unmodified, at exactly the pinned commit, and
+places Umwelt's LICENSE beside it (tools/_vendor/umwelt/LICENSE), which is what
+Apache 2.0 section 4 asks of a redistribution. Umwelt has no NOTICE file of its
+own. The kernel's all-rights-reserved terms (LICENSE, part 2) do not reach it.
+
+
+--------------------------------------------------------------------------------
+NumPy and SciPy  --  redistributed in shipped builds
+--------------------------------------------------------------------------------
+
+  Location:  runtime/python/Lib/site-packages/ in a built distribution
+  License:   BSD 3-Clause (NumPy, SciPy); their wheels also bundle libraries
+             under their own permissive terms (e.g. OpenBLAS, BSD)
+  Upstream:  https://numpy.org/   https://scipy.org/
+
+Installed unmodified from PyPI by scripts/ship.ps1 into the embedded runtime
+(requirements-ship.txt), for Umwelt. Each package's license texts ship inside
+its own *.dist-info directory.
+
+
+--------------------------------------------------------------------------------
 Beyond All Reason  --  required at runtime, never redistributed
 --------------------------------------------------------------------------------
 
