@@ -66,7 +66,7 @@ try {
       $log = Join-Path $Root 'Logs\release-build.log'
       $p = Start-Process $unity -ArgumentList @('-batchmode','-quit','-projectPath',"`"$Root`"",'-executeMethod',$C.Method,'-logFile',"`"$log`"") -Wait -PassThru
       if ($p.ExitCode -ne 0) { throw "Unity build failed ($($p.ExitCode)); see $log" }
-      Copy-Item (Join-Path $Root $C.BuiltDir '*') $Out -Recurse -Force
+      Copy-Item (Join-Path (Join-Path $Root $C.BuiltDir) '*') $Out -Recurse -Force
     }
     'static' {
       $src = Join-Path $Root $C.Source
@@ -79,7 +79,7 @@ try {
       $scriptArgs = $C.ScriptArgs
       & (Join-Path $Root $C.Script) @scriptArgs
       if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { throw "Build script failed ($LASTEXITCODE)" }
-      Copy-Item (Join-Path $Root $C.BuiltDir '*') $Out -Recurse -Force
+      Copy-Item (Join-Path (Join-Path $Root $C.BuiltDir) '*') $Out -Recurse -Force
     }
     default { throw "Unknown kind $($C.Kind)" }
   }

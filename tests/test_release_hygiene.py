@@ -83,3 +83,5 @@ def test_release_ps1_runs_on_windows_powershell():
     code = "\n".join(line for line in rel.splitlines() if not line.lstrip().startswith("#"))
     assert "2>$null" not in code.replace("& git @args 2>$null", "")
     assert "@scriptArgs" in rel and "@($C.ScriptArgs)" not in rel
+    # Join-Path with three paths is PowerShell 7; the build PC runs Windows PowerShell 5.1
+    assert not re.search(r"Join-Path \$\w+ \$[\w.]+ '", code), "three-argument Join-Path"
