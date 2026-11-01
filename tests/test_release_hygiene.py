@@ -75,3 +75,10 @@ def test_the_umwelt_the_tests_import_is_the_pin():
     head = subprocess.run(["git", "-C", str(Path(src).parent), "rev-parse", "HEAD"],
                           capture_output=True, text=True).stdout.strip()
     assert head == PIN["commit"], f"UMWELT_SRC is at {head}; tools/umwelt_pin.json pins {PIN['commit']}"
+
+
+def test_release_ps1_runs_on_windows_powershell():
+    """Two 0.14.0 bugs the first dry run hit: git stderr under Stop, and an array splat."""
+    rel = (ROOT / "tools" / "release.ps1").read_text(encoding="utf-8-sig")
+    assert "2>$null" not in rel.replace("& git @args 2>$null", "")
+    assert "@scriptArgs" in rel and "@($C.ScriptArgs)" not in rel

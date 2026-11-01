@@ -31,7 +31,7 @@ function Invoke-GitQuiet {
 # ---- per-game config (keep in sync with RELEASE.md) -------------------------
 $ItchTarget   = 'aquantumarchitect/verdances-ashwalkers'
 $Channels = @{
-  windows = @{ Kind='script'; Script='scripts/ship.ps1'; ScriptArgs=@('-SkipZip','-OutDir','export\dist\release'); BuiltDir='export/dist/release'; Out='build/release/windows' }
+  windows = @{ Kind='script'; Script='scripts/ship.ps1'; ScriptArgs=@{ SkipZip=$true; OutDir='export\dist\release' }; BuiltDir='export/dist/release'; Out='build/release/windows' }
 }
 # -----------------------------------------------------------------------------
 
@@ -74,7 +74,10 @@ try {
       else { Copy-Item (Join-Path $src '*') $Out -Recurse -Force }
     }
     'script' {
-      & (Join-Path $Root $C.Script) @($C.ScriptArgs)
+      # Splat a hashtable: '& script @(...)' passed the whole array as one positional value, so
+      # ship.ps1 took "-SkipZip -OutDir ..." as its -Workspace and stopped.
+      $scriptArgs = $C.ScriptArgs
+      & (Join-Path $Root $C.Script) @scriptArgs
       if ($LASTEXITCODE -and $LASTEXITCODE -ne 0) { throw "Build script failed ($LASTEXITCODE)" }
       Copy-Item (Join-Path $Root $C.BuiltDir '*') $Out -Recurse -Force
     }
