@@ -80,5 +80,6 @@ def test_the_umwelt_the_tests_import_is_the_pin():
 def test_release_ps1_runs_on_windows_powershell():
     """Two 0.14.0 bugs the first dry run hit: git stderr under Stop, and an array splat."""
     rel = (ROOT / "tools" / "release.ps1").read_text(encoding="utf-8-sig")
-    assert "2>$null" not in rel.replace("& git @args 2>$null", "")
+    code = "\n".join(line for line in rel.splitlines() if not line.lstrip().startswith("#"))
+    assert "2>$null" not in code.replace("& git @args 2>$null", "")
     assert "@scriptArgs" in rel and "@($C.ScriptArgs)" not in rel
