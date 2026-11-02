@@ -52,7 +52,11 @@ if (-not $modSource) {
 }
 $modDest = $config.modSdd
 $gamesDir = Split-Path -Parent $modDest
-if (!(Test-Path $gamesDir)) { throw "BAR games directory not found: $gamesDir" }
+if (!(Test-Path $gamesDir)) {
+  # A stock BAR install has no games\ until something is installed into it (Assert-BARDataRoot).
+  if (!(Test-Path (Join-Path (Split-Path -Parent $gamesDir) "engine"))) { throw "BAR data directory not found: $(Split-Path -Parent $gamesDir)" }
+  New-Item -ItemType Directory -Force -Path $gamesDir | Out-Null
+}
 
 if ($Remove) {
   if (Test-Path $modDest) {

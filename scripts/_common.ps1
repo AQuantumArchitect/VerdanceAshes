@@ -100,7 +100,9 @@ function Find-BARDataRoot {
     if (Test-BARDataRoot -BarDataRoot $candidate) { return $candidate }
   }
   foreach ($candidate in $candidates) {
-    if (Test-Path (Join-Path $candidate "games")) { return $candidate }
+    # BAR installed but never launched: no engine yet. A launcher install keeps the game in
+    # packages\ (rapid), a developer one in games\; either marks the folder as BAR's.
+    if ((Test-Path (Join-Path $candidate "games")) -or (Test-Path (Join-Path $candidate "packages"))) { return $candidate }
   }
   return $null
 }
@@ -111,12 +113,20 @@ function Assert-BARDataRoot {
   if (-not $BarDataRoot -or !(Test-Path $BarDataRoot)) {
     throw "No Beyond All Reason data directory found. Install BAR first (https://www.beyondallreason.info), then run SETUP.bat and enter the path to its 'data' folder when asked."
   }
-  if (!(Test-Path (Join-Path $BarDataRoot "games"))) {
-    throw "'$BarDataRoot' does not look like a BAR data directory (no games\ folder). It is usually ...\Beyond-All-Reason\data."
+  # A stock install from beyondallreason.info has engine\, packages\ and pool\ but no games\ (the
+  # launcher keeps the game as a rapid package); only a developer install has games\. The engine is
+  # what makes it BAR's data folder; games\ is made when the mutator is installed (2026-11-01: a
+  # friend's stock install was refused for "no games\ folder").
+  $looksLikeBar = (Test-Path (Join-Path $BarDataRoot "engine")) -or (Test-Path (Join-Path $BarDataRoot "games")) -or
+                  (Test-Path (Join-Path $BarDataRoot "packages"))
+  if (-not $looksLikeBar) {
+    throw "'$BarDataRoot' does not look like a BAR data directory (no engine\ folder). It is usually ...\Beyond-All-Reason\data."
   }
   if (-not (Test-BARDataRoot -BarDataRoot $BarDataRoot)) {
     throw "No engine with spring.exe found under $BarDataRoot\engine. Launch BAR once so it installs an engine, then run SETUP.bat again."
   }
+  $games = Join-Path $BarDataRoot "games"
+  if (!(Test-Path $games)) { New-Item -ItemType Directory -Force -Path $games | Out-Null }
 }
 
 function Get-VerdanceConfig {

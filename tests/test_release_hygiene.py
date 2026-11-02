@@ -98,3 +98,28 @@ def test_the_installed_mutator_depends_on_the_bar_the_player_has():
     assert "Replace(\"'Beyond All Reason `$VERSION'\"" in inst
     modinfo = (ROOT / "mod" / "VerdanceAshes.sdd" / "modinfo.lua").read_text(encoding="utf-8")
     assert "'Beyond All Reason $VERSION'" in modinfo      # the stamp's anchor: keep the two in step
+
+
+def test_a_stock_bar_data_folder_without_games_is_accepted():
+    """A friend's stock install (2026-11-01): data\\ held engine\\, packages\\, pool\\ and no games\\, and
+    SETUP refused it ("does not look like a BAR data directory (no games\\ folder)"). The engine makes
+    it BAR's; games\\ is created for the mutator."""
+    common = (ROOT / "scripts" / "_common.ps1").read_text(encoding="utf-8-sig")
+    body = common[common.index("function Assert-BARDataRoot"):common.index("function Get-VerdanceConfig")]
+    assert "no games\\ folder)" not in body.split("#")[0] and 'throw "\'$BarDataRoot\' does not look like a BAR data directory (no engine' in body
+    assert 'New-Item -ItemType Directory -Force -Path $games' in body
+    inst = (ROOT / "scripts" / "install_mod_archive.ps1").read_text(encoding="utf-8-sig")
+    assert 'throw "BAR games directory not found' not in inst
+    import tempfile
+    from verdance_kernel import sortie
+    with tempfile.TemporaryDirectory() as d:
+        data = Path(d) / "Programs" / "Beyond-All-Reason" / "data"
+        (data / "packages").mkdir(parents=True)
+        os.environ["LOCALAPPDATA"], saved = d, os.environ.get("LOCALAPPDATA")
+        try:
+            assert sortie.find_bar_data_root(None) == str(data)
+        finally:
+            if saved is None:
+                os.environ.pop("LOCALAPPDATA", None)
+            else:
+                os.environ["LOCALAPPDATA"] = saved

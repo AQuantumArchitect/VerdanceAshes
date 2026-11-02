@@ -22,7 +22,8 @@ function Normalize-BARDataRootInput([string]$Text) {
   if (-not $p) { return "" }
   # Accept the install folder too (the one that holds data\), and a path into engine\ or games\.
   $dataSub = Join-Path $p "data"
-  if ((Test-Path (Join-Path $dataSub "games")) -and !(Test-Path (Join-Path $p "games"))) { $p = $dataSub }
+  if (((Test-Path (Join-Path $dataSub "engine")) -or (Test-Path (Join-Path $dataSub "games"))) -and
+      !(Test-Path (Join-Path $p "engine")) -and !(Test-Path (Join-Path $p "games"))) { $p = $dataSub }
   foreach ($tail in @("\engine", "\games")) {
     if ($p.ToLower().EndsWith($tail)) { $p = $p.Substring(0, $p.Length - $tail.Length) }
   }
@@ -43,7 +44,7 @@ if (-not $NonInteractive) {
     if ($BarDataRoot) { Write-Host $problem } else { Write-Host "Could not auto-detect your Beyond All Reason install." }
     Write-Host "It is usually  $env:LOCALAPPDATA\Programs\Beyond-All-Reason\data"
     Write-Host "(or ...\Steam\steamapps\common\Beyond All Reason\data for the Steam build)."
-    $answer = Read-Host "Enter the full path to your BAR 'data' folder (contains engine\ and games\), or press Enter to stop"
+    $answer = Read-Host "Enter the full path to your BAR 'data' folder (contains engine\), or press Enter to stop"
     if (-not $answer -or -not $answer.Trim()) { break }
     $BarDataRoot = Normalize-BARDataRootInput $answer
   }

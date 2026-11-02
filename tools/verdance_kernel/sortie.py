@@ -133,7 +133,7 @@ def find_bar_data_root(ws: Optional[Path] = None) -> Optional[str]:
         if has_engine(c):
             return str(c)
     for c in cands:
-        if (c / "games").is_dir():
+        if (c / "games").is_dir() or (c / "packages").is_dir():   # a stock install has packages\, no games\
             return str(c)
     return None
 
