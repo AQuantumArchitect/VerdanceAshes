@@ -7,7 +7,7 @@ A fix release: 0.14.1 started on a stock BAR install but a friend's first match 
 - **SETUP accepts a stock BAR data folder.** A fresh install has no `games\` folder; SETUP now makes it instead of refusing.
 - **Fresh installs get the campaign maps.** SETUP fetches all seven, PLAY re-checks before a drop, and a drop that is missing one says which. The map service answers with a single object for some names, which 0.14.1 read as "no such map" (Greenest Fields 1.3 never downloaded).
 - **Another installed version of a pinned map is named.** BAR's own download may give 1.3.1 where the campaign is pinned to 1.3; the message now says so rather than reporting the map missing.
-- **Autopilot `--stock`** rehearses a fresh BAR install (engine and rapid game only), and dev checkouts find the pinned Umwelt clone.
+- **Autopilot `--stock`** rehearses a fresh BAR install (engine and rapid game only), and dev checkouts find the pinned Umwelt clone. A run capped with `--sorties N` passes (exit 0, `REHEARSAL OK`) when every sortie came home.
 - **Umwelt moves to `7ee6d08`** (its `main` on 2026-11-02). The 0.14.1 pin (`8154c13`) had no `foresight.encounter`, so wild heroes never roamed in a shipped build; the hub now speaks the newer encounter vocabulary (`arrival` where it said `presence`).
 
 ## 0.14.1 — 2026-11-01
