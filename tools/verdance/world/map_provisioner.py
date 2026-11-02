@@ -115,6 +115,25 @@ def resolve(map_name: str) -> Dict[str, Any]:
     return entry
 
 
+def other_versions(maps_dir: Path, archive: Optional[str]) -> List[str]:
+    """Other versions of the same map in BAR's maps folder (greenest_fields_1.3.1.sd7 beside a missing
+    greenest_fields_1.3.sd7). The campaign is pinned to one version per map (its zones, pads and baked
+    wars were drawn on it, and BAR treats each version as a separate map), so these do not count."""
+    if not archive or not Path(maps_dir).is_dir():
+        return []
+    stem = archive[:-4] if archive.endswith(".sd7") else archive
+    family = stem.rsplit("_", 1)[0] + "_"
+    return sorted(p.name for p in Path(maps_dir).glob(family + "*.sd7") if p.name != archive)
+
+
+def _pinned_note(maps_dir: Path, archive: Optional[str]) -> str:
+    others = other_versions(maps_dir, archive)
+    if not others:
+        return ""
+    return (f" (BAR has {', '.join(others)}, but the campaign needs exactly {archive}: "
+            f"another version of the map does not count)")
+
+
 def pr_downloader(bar_root: Path) -> Optional[Path]:
     """The engine's own downloader (engine/<version>/pr-downloader.exe), newest engine first."""
     eng = Path(bar_root) / "engine"
@@ -313,8 +332,11 @@ def ensure(map_name: str, bar_root: Path, workspace: Optional[Path] = None,
             if progress:
                 progress.done()
             return {"map": map_name, "status": "downloaded", "path": str(got), "via": "pr-downloader"}
+        note = _pinned_note(maps_dir, known)
         if progress:
-            progress.failed(str(exc))
+            progress.failed(str(exc) + note)
+        if note:
+            raise MapProvisionError(str(exc) + note) from exc
         raise
     filename = str(entry["filename"])
     dest = maps_dir / filename
@@ -368,7 +390,7 @@ def ensure(map_name: str, bar_root: Path, workspace: Optional[Path] = None,
             if progress:
                 progress.done(size)
             return {"map": map_name, "status": "downloaded", "path": str(got), "via": "pr-downloader"}
-        msg = "; ".join(errors) or "download failed"
+        msg = ("; ".join(errors) or "download failed") + _pinned_note(maps_dir, filename)
         if progress:
             progress.failed(msg)
         raise MapProvisionError(msg)

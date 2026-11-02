@@ -86,3 +86,18 @@ def test_setup_play_and_every_drop_fetch_missing_maps():
     assert "_ensure_campaign_maps(Path(kernel.ws))" in launcher
     sortie = (ROOT / "tools" / "verdance_kernel" / "sortie.py").read_text(encoding="utf-8")
     assert "prov = provision_map(ws, cfg, map_name" in sortie and "could not be downloaded" in sortie
+
+
+def test_another_version_of_the_map_is_named_but_does_not_count():
+    """2026-11-01: BAR downloaded Greenest Fields 1.3.1; the campaign is pinned to 1.3."""
+    with tempfile.TemporaryDirectory() as d:
+        bar = Path(d)
+        (bar / "maps").mkdir()
+        (bar / "maps" / "greenest_fields_1.3.1.sd7").write_bytes(b"x")
+        assert mp.other_versions(bar / "maps", "greenest_fields_1.3.sd7") == ["greenest_fields_1.3.1.sd7"]
+        with mock.patch.object(mp.urllib.request, "urlopen", side_effect=OSError("offline")):
+            try:
+                mp.ensure("Greenest Fields 1.3", bar, workspace=ROOT, quiet=True)
+                raise AssertionError("1.3.1 must not stand in for 1.3")
+            except mp.MapProvisionError as exc:
+                assert "greenest_fields_1.3.1.sd7" in str(exc) and "needs exactly greenest_fields_1.3.sd7" in str(exc)
