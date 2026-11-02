@@ -6,27 +6,32 @@ This is a campaign shell for Beyond All Reason (public alpha).
 
 ONE PATH
 --------
-1. Install Beyond All Reason and launch it once (it installs an engine).
-2. From this folder:
-     SETUP.bat     (once: finds BAR, asks for the path if it cannot,
-                    installs the mutator, writes mission 1)
-     PLAY.bat      (every session - leave the window open)
-     RESET.bat     (start the campaign over; old save kept in state\backups)
-3. On the war map (http://127.0.0.1:8770):
-     - Choose a green "sortie"
-     - Confirm the objective (green) on the briefing table
-     - Click Launch: the field loads in BAR behind the hub
-     - Pick who goes, then click Drop
-   The first Launch on a new map downloads that map from BAR's content
+1. Install Beyond All Reason from beyondallreason.info, start it once and
+   let its launcher finish downloading (the engine and the game). You can
+   close BAR again after that. Keep BAR closed while you play this.
+2. Unzip this folder somewhere you can write, e.g. Documents\VerdanceAshes
+   (not Program Files).
+3. Double-click SETUP.bat (once). If Windows says "Windows protected your
+   PC", click "More info" then "Run anyway". SETUP finds BAR (and asks for
+   the path to BAR's "data" folder if it cannot), installs the campaign into
+   BAR, and writes mission 1.
+4. Double-click PLAY.bat. Your browser opens the war map at
+   http://127.0.0.1:8770. Leave the PLAY window open while you play.
+     - Choose a green sortie on the map, mark the target and the pad
+     - Ready the drop: BAR starts loading the field in the background
+     - Confirm the party, confirm the reserve, hire mercenaries if you like,
+       then Lock drop: the company lands as soon as the field is ready
+     - Switch to BAR and unpause to start
+   The first drop on a new map downloads that map from BAR's content
    service (about 100 MB); the hub shows the progress.
-4. Play the sortie in BAR. Space dismisses the briefing.
+   RESET.bat starts the campaign over (old save kept in state\backups).
+5. Play the sortie in BAR. Space dismisses the briefing.
    After a win, 1/2/3 can keep fighting on the same map.
 5. When the match ends, the kernel bridge brings the result home.
    If the map does not move: After the fight - bring it home
 6. Talk, rest, hire mercs, or take the next drop.
 
-Zip build: Python is embedded under runtime\, nothing to install.
-Git clone: Python 3.10+ must be installed (python.org, "Add to PATH").
+Python is embedded under runtime\: nothing else to install.
 
 IN-GAME SHORTCUTS
 -----------------

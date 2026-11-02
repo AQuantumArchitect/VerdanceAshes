@@ -5,7 +5,7 @@ Last updated: 2026-07-04
 Source handoff:
 
 ```text
-C:\Users\Luke Spooner\Documents\BAR_Verdance_Workspace\inbox\verdance_codex_handoff_v1
+<workspace>\inbox\verdance_codex_handoff_v1
 ```
 
 ## Promotion Accepted

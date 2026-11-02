@@ -119,7 +119,7 @@ Write-Host "Stop when idle:  aws ec2 stop-instances --region $Region --instance-
 Write-Host "Start later:     aws ec2 start-instances --region $Region --instance-ids $iid"
 
 # Write a local pointer (not secrets)
-$wsHint = "C:\Users\Luke Spooner\Documents\BAR_Verdance_Workspace\outbox\aws_bar_instance.latest.json"
+$wsHint = Join-Path (Resolve-Path (Join-Path $PSScriptRoot "..\..\..\..")).Path "outbox\aws_bar_instance.latest.json"
 $info = @{
   schemaVersion = "verdance-aws-instance/1.0"
   region = $Region

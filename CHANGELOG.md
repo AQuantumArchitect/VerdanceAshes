@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.14.1 — 2026-11-01
+
+A fix release: 0.14.0 needs it to start on a normal BAR install.
+
+- **Plays on a stock Beyond All Reason.** The campaign mutator depended on `Beyond All Reason $VERSION`, which only a developer checkout of BAR is called. A BAR installed from beyondallreason.info stopped at load with `Dependent archive "Beyond All Reason $VERSION" not found`. SETUP and every drop now set the installed copy to depend on the BAR the launcher downloaded (`Beyond All Reason test-N-hash`), and pick up BAR updates.
+- **Setup instructions** (START_HERE.txt, docs/INSTALL.md) follow the current drop: Ready the drop, confirm the party and the reserve, hire, Lock drop. They also cover Windows' "protected your PC" prompt and the new load error.
+- **Umwelt** is the pinned commit (`tools/umwelt_pin.json`), and its Apache-2.0 LICENSE ships beside it. 0.14.0 had picked up a stale copy and shipped none.
+- **No machine paths in the build.** `release_manifest.json` records commits, not the builder's folder, and the launcher has no developer-only hooks.
+- **Release tooling** runs on Windows PowerShell 5.1.
+
 ## 0.14.0 — 2026-10-29
 
 The second test line. Everything since the first test export (0.13.0, 2026-10-26).

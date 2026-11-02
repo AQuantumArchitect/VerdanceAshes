@@ -20,7 +20,7 @@ Campaign Overmind
 Version 1 succeeds when a local or headless BAR test on All That Simmers produces:
 
 ```text
-C:\Users\Luke Spooner\Documents\BAR_Verdance_Workspace\outbox\bar_zone_telemetry.latest.json
+<workspace>\outbox\bar_zone_telemetry.latest.json
 ```
 
 The file must be valid JSON with:

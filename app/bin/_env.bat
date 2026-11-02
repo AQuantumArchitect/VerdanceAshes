@@ -8,7 +8,6 @@ REM   1) runtime\python\python.exe   (the SHIP zip embeds it)
 REM   2) VERDANCE_PY env             (explicit override)
 REM   3) py -3 launcher
 REM   4) python.exe / python3.exe on PATH
-REM   5) optional dev venv under %USERPROFILE%\ws-win\umwelt (never required)
 REM Every candidate must actually run (import sys, version 3.10+) before it is
 REM accepted, and anything under WindowsApps is rejected: on a box with no
 REM Python installed, "where python" returns the Microsoft Store stub, which
@@ -48,11 +47,6 @@ if defined VA_PY_OK goto :py_ok
 for /f "delims=" %%P in ('where python3.exe 2^>nul') do call :try_py "%%P"
 if defined VA_PY_OK goto :py_ok
 
-REM 5) dev-machine venv. Written against %USERPROFILE% rather than a literal
-REM path so no account name ships in anyone's copy. Optional discovery only.
-call :try_py "%USERPROFILE%\ws-win\umwelt\.venv\Scripts\python.exe"
-if defined VA_PY_OK goto :py_ok
-
 echo.
 echo  ERROR: No working Python 3.10+ was found on this machine.
 echo.
@@ -81,8 +75,3 @@ goto :eof
 
 :py_ok
 set "VA_PY_CAND="
-REM Optional research paths (forge only, never required for play). Discovery,
-REM not assumption: a missing clone changes nothing.
-REM (Umwelt is not put on PYTHONPATH here: a shipped build carries its own pinned snapshot in
-REM tools\_vendor, and verdance.belief.world finds it, or UMWELT_SRC, before any other clone.)
-if exist "%USERPROFILE%\ws-win\yurt-sync\work\_wargen\coral" set "PYTHONPATH=%PYTHONPATH%;%USERPROFILE%\ws-win\yurt-sync\work\_wargen\coral"

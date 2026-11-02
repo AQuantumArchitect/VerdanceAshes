@@ -5,7 +5,7 @@
 Primary deliverable:
 
 ```text
-C:\Users\Luke Spooner\Documents\BAR_Verdance_Workspace\outbox\bar_zone_telemetry.latest.json
+<workspace>\outbox\bar_zone_telemetry.latest.json
 ```
 
 Required top-level shape:

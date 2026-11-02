@@ -2,13 +2,13 @@
 from __future__ import annotations
 
 import importlib.util
+import os
 import sys
 import unittest
 from pathlib import Path
 
-MUSCLE_PATH = Path(
-    r"C:\Users\Luke Spooner\ws-win\yurt-sync\work\_wargen\coral\player_proxy_muscle.py"
-)
+# Yurt's coral module lives outside this repo: VERDANCE_PROXY_MUSCLE names it, else the test skips.
+MUSCLE_PATH = Path(os.environ.get("VERDANCE_PROXY_MUSCLE") or "/nonexistent/player_proxy_muscle.py")
 
 
 def _load_muscle():

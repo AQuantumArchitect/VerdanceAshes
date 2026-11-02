@@ -103,8 +103,8 @@ Derived in `occasions.latest.json → roll`: the dead in the order they went, ea
 **Law:** Verdance is an Umwelt world. The company's comprehension is a belief field, not
 a record. Truth lives in `state/campaign_state.json` (zoneMemory, frontEvents) and is not
 shown to the player; **intel** is what reached camp. One engine under the house, the hive
-and the war (`AQuantumArchitect/umwelt`; set `UMWELT_SRC=<umwelt>/src`, or keep a checkout at
-`~/ws-win/umwelt`). Verdance stays importable without it: every belief step skips cleanly.
+and the war (`AQuantumArchitect/umwelt`; set `UMWELT_SRC=<umwelt>/src`, or keep a checkout beside
+this repo or at `~/umwelt`). Verdance stays importable without it: every belief step skips cleanly.
 
 ```
 tools/umwelt_world_v1.py        DomainSpec from the zone graph + codex + the six questions; VerdanceWorld host
@@ -273,8 +273,8 @@ with "still catching up" while the worker runs). The folded record (`/api/chroni
 **Chronicle**. Legacy tab layout gets a fourth "Camp" tab instead.
 
 **Ship.** `scripts/ship.ps1` stages the pass one–four tools and vendors a snapshot of Umwelt's
-`src/umwelt` package into `tools/_vendor` (from `UMWELT_SRC`, a sibling clone, or `~/ws-win`);
-`umwelt_world_v1._umwelt()` tries that path last, after a live clone. `requirements-ship.txt`
+`src/umwelt` package into `tools/_vendor`, at exactly the commit in `tools/umwelt_pin.json`
+(2026-10-31); a shipped build imports that snapshot before any clone on the machine. `requirements-ship.txt`
 gains numpy. FREEZE law stands: the snapshot is distribution, not a fork — nothing in it is edited.
 
 **Checks.** A structural Lua check (brackets and block balance; superseded by `tools/hud_harness/luasyn.py`)

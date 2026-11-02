@@ -4,7 +4,7 @@
 
 - Windows 10/11
 - Beyond All Reason installed (the standard installer from beyondallreason.info),
-  launched at least once so it has downloaded a game engine
+  launched at least once so its launcher has downloaded the engine and the game
 - ~50 MB free disk space for the package itself
 - Up to ~700 MB more in your **BAR install** for campaign maps, if you don't
   already have them. The campaign uses seven community maps and fetches each one
@@ -23,7 +23,8 @@ downloads them from the same place it always does.
 
 1. Unzip the package anywhere you like (e.g. `Documents\VerdanceAshes`).
    Avoid folders that need admin rights (like `Program Files`).
-2. Double-click `SETUP.bat` (once).
+2. Double-click `SETUP.bat` (once). If Windows shows "Windows protected your PC"
+   (it does for any downloaded .bat), click **More info**, then **Run anyway**.
    - It auto-detects your BAR install: the standard installer
      (`%LOCALAPPDATA%\Programs\Beyond-All-Reason\data`), Program Files, then
      Steam libraries. If it cannot find one it **asks you for the path** to the
@@ -31,7 +32,9 @@ downloads them from the same place it always does.
      in `verdance_config.json`.
    - It needs an engine: if BAR has never been launched there is no
      `engine\*\spring.exe` yet. Launch BAR once, then run SETUP again.
-   - It copies `VerdanceAshes.sdd` into BAR's `data\games\` folder.
+   - It copies `VerdanceAshes.sdd` into BAR's `data\games\` folder, set to depend
+     on the Beyond All Reason version your launcher downloaded (every drop
+     re-checks, so BAR updates are picked up).
    - It writes a fresh campaign state (mission 1).
 3. Double-click `PLAY.bat` to play. Leave the window open.
 4. `RESET.bat` starts the campaign over whenever you want (old save kept in
@@ -43,7 +46,9 @@ downloads them from the same place it always does.
 opened in your browser) and leaves it running -- leave the window open:
 
 ```
-planet -> field -> sortie -> Launch (BAR loads behind the hub) -> pick who goes -> Drop -> play
+planet -> field -> sortie -> Ready the drop (BAR loads behind the hub)
+       -> confirm the party -> confirm the reserve -> mercenaries -> Lock drop
+       -> the company lands when the field is ready -> unpause in BAR -> play
    |-- the kernel's BAR bridge brings the result home automatically
    +-- back on the war map: hire mercs, rest, talk, or take the next drop
 ```
@@ -66,6 +71,9 @@ field units carry forward; a new enemy camp reseeds at the new target.
 - **"No working Python 3.10+ was found"** (git clone only) -- install Python from
   python.org with "Add python.exe to PATH", or use the zip build, which embeds it.
   The Microsoft Store `python` stub does not count; SETUP skips it on purpose.
+- **BAR closes at once with `Dependent archive "Beyond All Reason ..." not found`** --
+  the campaign could not find the game BAR downloaded. Start BAR from its own
+  launcher once, let it finish updating, close it, and run SETUP.bat again.
 - **BAR launches vanilla skirmish instead of the mission** -- the mutator isn't installed;
   re-run SETUP.bat and check that `data\games\VerdanceAshes.sdd\modinfo.lua` exists.
 - **BAR closes instantly, or `Dependent archive "<map name>" not found`** -- the

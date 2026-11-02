@@ -85,3 +85,16 @@ def test_release_ps1_runs_on_windows_powershell():
     assert "@scriptArgs" in rel and "@($C.ScriptArgs)" not in rel
     # Join-Path with three paths is PowerShell 7; the build PC runs Windows PowerShell 5.1
     assert not re.search(r"Join-Path \$\w+ \$[\w.]+ '", code), "three-argument Join-Path"
+
+
+def test_the_installed_mutator_depends_on_the_bar_the_player_has():
+    """A BAR from beyondallreason.info is a rapid package named 'Beyond All Reason test-N-hash';
+    'Beyond All Reason $VERSION' is only a developer checkout (games/BAR.sdd). Against a stock install
+    the engine stopped at load: Dependent archive "Beyond All Reason $VERSION" not found (headless rig,
+    2026-11-01). The copy SETUP and every Drop install is stamped with the BAR that is there."""
+    inst = (ROOT / "scripts" / "install_mod_archive.ps1").read_text(encoding="utf-8-sig")
+    assert "function Resolve-InstalledBarGame" in inst
+    assert "versions.gz" in inst and '"packages"' in inst and "^Beyond All Reason test-(\\d+)-" in inst
+    assert "Replace(\"'Beyond All Reason `$VERSION'\"" in inst
+    modinfo = (ROOT / "mod" / "VerdanceAshes.sdd" / "modinfo.lua").read_text(encoding="utf-8")
+    assert "'Beyond All Reason $VERSION'" in modinfo      # the stamp's anchor: keep the two in step
