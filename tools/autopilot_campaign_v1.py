@@ -58,19 +58,29 @@ def link_content(source: Path, dest: Path) -> None:
         shutil.copy2(source, dest)
 
 
-def isolate_bar(dest: Path, source: Path) -> Path:
+def isolate_bar(dest: Path, source: Path, stock: bool = False) -> Path:
+    """The run's own BAR data directory, with the player's engine and content linked in.
+
+    stock=True is a fresh install from beyondallreason.info, as a friend's PC has it: the engine and
+    the launcher's rapid game (packages, pool, rapid) and nothing else. No games folder (SETUP and
+    the Drop must make it), no developer BAR.sdd (the mutator must be stamped with the rapid BAR), no
+    maps (the provisioner must download the mission's map)."""
     bar = dest / "bar_data"
-    (bar / "games").mkdir(parents=True)
-    for name in ("engine", "maps", "pool", "packages"):
+    bar.mkdir(parents=True)
+    names = ("engine", "pool", "packages", "rapid") if stock else ("engine", "maps", "pool", "packages")
+    for name in names:
         if (source / name).exists():
             link_content(source / name, bar / name)
+    if stock:
+        return bar
+    (bar / "games").mkdir()
     for game in (source / "games").iterdir():
         if game.name.lower() != "verdanceashes.sdd":
             link_content(game, bar / "games" / game.name)
     return bar
 
 
-def copy_workspace(dest: Path, bar_root: str) -> Path:
+def copy_workspace(dest: Path, bar_root: str, stock: bool = False) -> Path:
     ws = dest / "ws"
     for name in ("tools", "data", "app", "mod", "scripts", "docs", "VERSION"):
         src = ROOT / name
@@ -84,7 +94,7 @@ def copy_workspace(dest: Path, bar_root: str) -> Path:
     # Do not inherit absolute destinations pointing into the player's install.
     for key in ("infolog", "modSdd", "seedDestination", "seedOutbox", "barSdd", "engineDir"):
         cfg.pop(key, None)
-    cfg.update({"barDataRoot": str(isolate_bar(dest, Path(bar_root))), "workspace": str(ws), "devMode": False})
+    cfg.update({"barDataRoot": str(isolate_bar(dest, Path(bar_root), stock=stock)), "workspace": str(ws), "devMode": False})
     (ws / "verdance_config.json").write_text(json.dumps(cfg, indent=2), encoding="utf-8")
     return ws
 
@@ -183,6 +193,9 @@ def main() -> int:
     ap.add_argument("--startup-timeout", type=int, default=600, help="wall seconds allowed before game frame 0 (cold map caches can be slow)")
     ap.add_argument("--wall-timeout", type=int, default=1800, help="maximum wall seconds per engine process")
     ap.add_argument("--allow-no-belief", action="store_true", help="allow a diagnostic run without the Umwelt belief system")
+    ap.add_argument("--stock", action="store_true",
+                    help="rehearse a fresh beyondallreason.info install: engine + rapid game only, no games\\, "
+                         "no developer BAR.sdd, no maps (the Drop must install, stamp and download)")
     ap.add_argument("--resume", type=Path, help="continue an existing run directory and its isolated campaign state")
     args = ap.parse_args()
     if min(args.sorties, args.speed, args.startup_timeout, args.wall_timeout) <= 0:
@@ -211,7 +224,9 @@ def main() -> int:
     bar_root = S.bar_config(ROOT)["barDataRoot"]
     print(f"[autopilot] run {run_dir}")
     print(f"[autopilot] {'resuming isolated campaign' if args.resume else 'copying the workspace and isolating BAR'} (your campaign is untouched)")
-    ws = run_dir / "ws" if args.resume else copy_workspace(run_dir, bar_root)
+    ws = run_dir / "ws" if args.resume else copy_workspace(run_dir, bar_root, stock=args.stock)
+    if args.stock:
+        print(f"[autopilot] stock BAR rehearsal: {ws.parent / 'bar_data'} has the engine and the rapid game only")
     sys.path.insert(0, str(ws / "tools"))
     os.chdir(ws)
     env = dict(os.environ, PYTHONPATH=os.pathsep.join([str(ws / "tools"), os.environ.get("PYTHONPATH", "")]).rstrip(os.pathsep))

@@ -95,7 +95,8 @@ _UMWELT_WARNED = False
 def umwelt_search_paths() -> List[Path]:
     """Where the umwelt package may live, first match wins (sys.path order): UMWELT_SRC, then the
     snapshot a shipped build carries (tools/_vendor, the pinned commit of tools/umwelt_pin.json),
-    then a dev checkout's sibling clone and ~/umwelt, and the embedded runtime's site-packages.
+    then a dev checkout's pinned clone (export/cache/umwelt, which ship.ps1 fetches), a sibling
+    clone and ~/umwelt, and the embedded runtime's site-packages.
 
     A shipped build reads its own snapshot before any clone on the machine: 0.14.0 on the
     builder's own PC imported a stale ~/ws-win/umwelt ahead of the Umwelt it shipped, which is
@@ -105,6 +106,7 @@ def umwelt_search_paths() -> List[Path]:
     if src:
         out.append(Path(src))
     out += [TOOLS_DIR / "_vendor",
+            ROOT / "export" / "cache" / "umwelt" / "src",   # the pinned clone ship.ps1 keeps (dev checkout)
             ROOT.parent / "umwelt" / "src",
             Path.home() / "umwelt" / "src",
             ROOT / "runtime" / "site-packages"]
