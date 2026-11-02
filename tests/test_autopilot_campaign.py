@@ -8,10 +8,21 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
-from autopilot_campaign_v1 import archive_log, isolate_bar, patch_startscript
+from autopilot_campaign_v1 import archive_log, isolate_bar, patch_startscript, sorties_came_home
 
 
 class AutopilotTests(unittest.TestCase):
+    def test_a_capped_rehearsal_passes_when_every_sortie_came_home(self):
+        """The stock rehearsal (--stock --sorties 1) on 2026-11-02: one sortie, engine exit 0, result
+        applied, watch 'home'. The campaign is not complete after one sortie, and that is not a failure."""
+        home = {"watch": "home", "engineExitCode": 0}
+        self.assertTrue(sorties_came_home([home], 1))
+        self.assertFalse(sorties_came_home([home], 2))                        # stopped early
+        self.assertFalse(sorties_came_home([], 1))
+        self.assertFalse(sorties_came_home([{"watch": "closed-without-result", "engineExitCode": 3221225477}], 1))
+        self.assertFalse(sorties_came_home([dict(home, crashed={"lastVerdanceLine": None})], 1))
+        self.assertFalse(sorties_came_home([dict(home, stall="engine wall timeout", killed=True)], 1))
+
     def test_run_owns_its_mod_and_seeds(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

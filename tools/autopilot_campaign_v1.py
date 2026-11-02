@@ -389,13 +389,31 @@ def main() -> int:
             break
 
     st = jload(sp)
-    summary = {"complete": bool(st.get("campaignComplete")), "outcome": st.get("campaignComplete"), "sorties": rows,
+    came_home = sorties_came_home(rows, args.sorties)
+    summary = {"complete": bool(st.get("campaignComplete")), "outcome": st.get("campaignComplete"),
+               "sortiesCameHome": came_home, "sorties": rows,
                "band": band, "boost": boosts, "profile": args.profile, "workspace": str(ws), "beliefEnabled": belief,
                "rig": {"hud": bool(args.hud or args.windowed), "forceComplete": False, "fastWin": False, "extractAnywhere": False,
                        "speed": args.speed, "minutes": args.minutes, "settle": args.settle}}
     (run_dir / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
-    print("[autopilot]", "COMPLETE " + json.dumps(st.get("campaignComplete")) if summary["complete"] else "NOT COMPLETE", "·", run_dir)
-    return 0 if summary["complete"] else 1
+    if summary["complete"]:
+        print("[autopilot] COMPLETE " + json.dumps(st.get("campaignComplete")), "·", run_dir)
+    elif came_home:
+        # A capped run (--sorties N, a rehearsal) passes when every sortie it was given came home:
+        # the engine ran the match, exited cleanly and the hub applied the result.
+        print(f"[autopilot] REHEARSAL OK: {len(rows)} of {args.sorties} sorties came home · {run_dir}")
+    else:
+        print("[autopilot] NOT COMPLETE", "·", run_dir)
+    return 0 if (summary["complete"] or came_home) else 1
+
+
+def sorties_came_home(rows: list, budget: int) -> bool:
+    """True when the run used its whole sortie budget and every sortie came home: the engine exited 0,
+    nothing stalled or crashed, and the hub applied the result."""
+    if not rows or len(rows) < budget:
+        return False
+    return all(r.get("watch") == "home" and r.get("engineExitCode") == 0
+               and not r.get("stall") and not r.get("crashed") and not r.get("killed") for r in rows)
 
 
 if __name__ == "__main__":
