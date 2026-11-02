@@ -390,15 +390,23 @@ def present_heroes(state: Dict[str, Any]) -> List[str]:
 def _weights(E, workspace: Path):
     """The encounter field's weights. presence (encounter_rules.json): how much a relation to someone in
     the company raises the chance of meeting, per side. Bonds are the default meeting, rivals the accent,
-    strangers uncommon (ally > adversary, both strong). An older Umwelt without the per-side weights
-    gets the shared one."""
+    strangers uncommon (ally > adversary, both strong). Umwelt calls these arrival_* since 18e87d0
+    ("presence" is a banned engine word there); the older presence_* names are still tried, and an
+    Umwelt without the per-side weights gets the shared one."""
     pr = rules(workspace).get("presence") or {}
     rel = float(pr.get("relation", 2.5))
-    try:
-        return E.Weights(presence_relation=rel, presence_ally=float(pr.get("ally", rel)),
-                         presence_adversary=float(pr.get("adversary", rel)))
-    except TypeError:
-        return E.Weights(presence_relation=rel)
+    ally, adv = float(pr.get("ally", rel)), float(pr.get("adversary", rel))
+    for word in ("arrival", "presence"):
+        try:
+            return E.Weights(**{f"{word}_relation": rel, f"{word}_ally": ally, f"{word}_adversary": adv})
+        except TypeError:
+            continue
+    for word in ("arrival", "presence"):
+        try:
+            return E.Weights(**{f"{word}_relation": rel})
+        except TypeError:
+            continue
+    return E.Weights()
 
 
 def build(state: Dict[str, Any], workspace: Optional[Path] = None):
@@ -484,7 +492,7 @@ def refresh_whereabouts(state: Dict[str, Any], workspace: Optional[Path] = None)
         if hid in ctx["anchors"]:
             reasons = [ctx["anchors"][hid]] + [r for r in reasons if r != "anchored here"]
         pool[hid]["roam"] = {"mapId": ctx["maps"].get(zid), "zoneId": zid, "label": ctx["labels"].get(zid, zid),
-                             "p": row["p"], "presence": row["presence"], "anchored": row["anchored"],
+                             "p": row["p"], "presence": row.get("arrival", row.get("presence")), "anchored": row["anchored"],
                              "regions": dict(list(row["regions"].items())[:3]), "reasons": reasons[:5],
                              "asOfMission": int(state.get("missionNumber") or 1)}
     return {"placed": sum(1 for h in wild if "roam" in pool.get(h, {})), "wild": len(wild)}

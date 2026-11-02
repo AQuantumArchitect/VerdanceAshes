@@ -46,8 +46,8 @@ def test_every_wild_hero_is_placed_and_anchors_hold():
 def test_bonds_draw_heroes_toward_the_company():
     _skip()
     field, ctx = EN.build(_state(band=("vane", "brakhov", "verse")), ROOT)
-    with_verse, why = field.presence("arrow", present=ctx["present"])
-    without, _ = field.presence("arrow", present=["ketha"])
+    with_verse, why = field.arrival("arrow", present=ctx["present"])
+    without, _ = field.arrival("arrow", present=["ketha"])
     assert with_verse > without and any("verse (rivalry)" in w for w in why)
 
 
