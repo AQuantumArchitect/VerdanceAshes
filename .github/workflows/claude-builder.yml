@@ -10,7 +10,7 @@ jobs:
     if: >-
       !contains(github.event.issue.labels.*.name, 'agent:grok-code') && (
       (github.event_name == 'issues' && github.event.label.name == 'building') ||
-      (github.event_name == 'issue_comment' && !github.event.issue.pull_request &&
+      (github.event_name == 'issue_comment' &&
        contains(github.event.comment.body, '@claude') &&
        github.event.comment.user.login == github.repository_owner))
     runs-on: ubuntu-latest
@@ -42,9 +42,12 @@ jobs:
             ISSUE: #${{ github.event.issue.number }} — ${{ github.event.issue.title }}
             EXTRA INSTRUCTION FROM OWNER COMMENT (may be empty): ${{ github.event.comment.body }}
 
-            You are the builder for Luke Spooner's projects. Read the issue (gh issue view ${{ github.event.issue.number }} --comments) and implement it fully to its "done when" criteria.
+            MODE: ${{ github.event.issue.pull_request && 'PR REVISION' || 'NEW BUILD' }}
+
+            You are the builder for Luke Spooner's projects.
+            If MODE is NEW BUILD: read the issue (gh issue view ${{ github.event.issue.number }} --comments) and implement it fully to its "done when" criteria. Work on a new branch named claude/issue-${{ github.event.issue.number }}, commit, push, and open EXACTLY ONE pull request with `gh pr create` whose body contains "Closes #${{ github.event.issue.number }}" and a short summary of what changed and how it was verified.
+            If MODE is PR REVISION: #${{ github.event.issue.number }} is an existing pull request. Run `gh pr checkout ${{ github.event.issue.number }}`, read the PR, its linked issue, its reviews and comments (gh pr view ${{ github.event.issue.number }} --comments; gh api repos/${{ github.repository }}/pulls/${{ github.event.issue.number }}/comments), and address the owner's requested changes (the extra instruction above takes priority). If asked to rebase, rebase onto the default branch and force-push with lease. Commit and push to the SAME PR branch; do NOT open a new PR. Finish with a short PR comment saying what changed.
             Rules:
-            - Work on a new branch named claude/issue-${{ github.event.issue.number }}, commit, push, and open EXACTLY ONE pull request with `gh pr create` whose body contains "Closes #${{ github.event.issue.number }}" and a short summary of what changed and how it was verified.
             - Run the repo's existing tests/linters where feasible before opening the PR.
             - Act as Luke's proxy for taste: keep the spirit and feel of the project, prefer small coherent changes over sprawl, no slop.
             - Never put secrets, tokens or credentials in code, commits, or PR/issue text.
