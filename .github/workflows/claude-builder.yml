@@ -1,0 +1,61 @@
+name: Claude Builder
+on:
+  issues:
+    types: [labeled]
+  issue_comment:
+    types: [created]
+
+jobs:
+  build:
+    if: >-
+      (github.event_name == 'issues' && github.event.label.name == 'building') ||
+      (github.event_name == 'issue_comment' && !github.event.issue.pull_request &&
+       contains(github.event.comment.body, '@claude') &&
+       github.event.comment.user.login == github.repository_owner)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    concurrency:
+      group: claude-builder-${{ github.repository }}-${{ github.event.issue.number }}
+      cancel-in-progress: false
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Build with Claude
+        id: claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          claude_args: |
+            --model sonnet
+            --max-turns 60
+            --allowedTools "Edit,Write,Read,Glob,Grep,MultiEdit,Bash"
+          prompt: |
+            REPO: ${{ github.repository }}
+            ISSUE: #${{ github.event.issue.number }} — ${{ github.event.issue.title }}
+            EXTRA INSTRUCTION FROM OWNER COMMENT (may be empty): ${{ github.event.comment.body }}
+
+            You are the builder for Luke Spooner's projects. Read the issue (gh issue view ${{ github.event.issue.number }} --comments) and implement it fully to its "done when" criteria.
+            Rules:
+            - Work on a new branch named claude/issue-${{ github.event.issue.number }}, commit, push, and open EXACTLY ONE pull request with `gh pr create` whose body contains "Closes #${{ github.event.issue.number }}" and a short summary of what changed and how it was verified.
+            - Run the repo's existing tests/linters where feasible before opening the PR.
+            - Act as Luke's proxy for taste: keep the spirit and feel of the project, prefer small coherent changes over sprawl, no slop.
+            - Never put secrets, tokens or credentials in code, commits, or PR/issue text.
+            - Never invent numbers. Any metric you did not actually measure must be marked DARK.
+            - Do not spend money, configure live payments or auth providers, publish or deploy, or send messages to real people. If the issue needs any of those, implement up to that point and flag it clearly in the PR body under "Needs Luke".
+            - Stay in the issue's scope.
+            - If you cannot finish, comment on the issue (gh issue comment) explaining exactly why and what is needed, and do not open a half-done PR unless it is clearly marked draft.
+      - name: Mark blocked on failure
+        if: failure() || cancelled()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh label create blocked --repo "$GITHUB_REPOSITORY" --color B60205 2>/dev/null || true
+          gh issue edit ${{ github.event.issue.number }} --repo "$GITHUB_REPOSITORY" --add-label blocked --remove-label building
+          gh issue comment ${{ github.event.issue.number }} --repo "$GITHUB_REPOSITORY" --body "Claude Builder run failed or timed out: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID — marked blocked."
