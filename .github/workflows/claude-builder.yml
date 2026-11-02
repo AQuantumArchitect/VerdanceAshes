@@ -51,6 +51,46 @@ jobs:
             - Do not spend money, configure live payments or auth providers, publish or deploy, or send messages to real people. If the issue needs any of those, implement up to that point and flag it clearly in the PR body under "Needs Luke".
             - Stay in the issue's scope.
             - If you cannot finish, comment on the issue (gh issue comment) explaining exactly why and what is needed, and do not open a half-done PR unless it is clearly marked draft.
+      - name: Log Claude usage
+        if: always()
+        continue-on-error: true
+        env:
+          EXEC_FILE: ${{ steps.claude.outputs.execution_file }}
+          OUTCOME: ${{ steps.claude.outcome }}
+          ISSUE: ${{ github.event.issue.number }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set +e
+          F="${EXEC_FILE:-$RUNNER_TEMP/claude-execution-output.json}"
+          if [ -s "$F" ]; then
+            jq -s 'if length==1 and (.[0]|type)=="array" then .[0] else . end' "$F" > /tmp/msgs.json 2>/dev/null || echo '[]' > /tmp/msgs.json
+          else echo '[]' > /tmp/msgs.json; fi
+          jq --arg outcome "$OUTCOME" --arg issue "$ISSUE" --arg run_id "$GITHUB_RUN_ID" --arg run_url "$RUN_URL" --arg repo "$GITHUB_REPOSITORY" '
+            (map(select(.type=="result"))|last) as $r
+            | (map(select(.type=="system" and .subtype=="init"))|first) as $i
+            | ($r.modelUsage // {}) as $mu
+            | def musum(k): ([$mu[]|.[k]?|numbers]|if length>0 then add else null end);
+            {schema:"claude-usage/1", repo:$repo,
+             issue:($issue|tonumber? // null), run_id:($run_id|tonumber), run_url:$run_url,
+             model:($i.model // null), outcome:(if $outcome=="" then null else $outcome end),
+             result_subtype:($r.subtype // null),
+             tokens_in:($r.usage.input_tokens // musum("inputTokens")),
+             tokens_out:($r.usage.output_tokens // musum("outputTokens")),
+             cache_read:($r.usage.cache_read_input_tokens // musum("cacheReadInputTokens")),
+             cache_creation:($r.usage.cache_creation_input_tokens // musum("cacheCreationInputTokens")),
+             turns:($r.num_turns // null), total_cost_usd:($r.total_cost_usd // null),
+             duration_ms:($r.duration_ms // null)}' /tmp/msgs.json > usage.json 2>/dev/null \
+            || jq -n --arg o "$OUTCOME" --arg i "$ISSUE" --arg r "$GITHUB_RUN_ID" --arg u "$RUN_URL" '{schema:"claude-usage/1",issue:($i|tonumber? // null),run_id:($r|tonumber),run_url:$u,outcome:$o,model:null,tokens_in:null,tokens_out:null,cache_read:null,cache_creation:null,turns:null,total_cost_usd:null,duration_ms:null}' > usage.json
+          jq -r '"Claude usage: model=\(.model) in=\(.tokens_in) out=\(.tokens_out) cache_read=\(.cache_read) turns=\(.turns) cost_equiv_usd=\(.total_cost_usd) duration_ms=\(.duration_ms) outcome=\(.outcome)"' usage.json >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload usage artifact
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: claude-usage
+          path: usage.json
+          retention-days: 90
+          if-no-files-found: ignore
       - name: Mark blocked on failure
         if: failure() || cancelled()
         env:
