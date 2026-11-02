@@ -327,7 +327,9 @@ def _launch(ws: Path) -> dict[str, Any]:
         pass
     prov = provision_map(ws, cfg, map_name or "")
     if prov.get("ok") is False:
-        return {"ok": False, "reason": f"map '{map_name}' could not be provisioned", "provision": prov}
+        why = (provision_status(ws) or {}).get("error") or prov.get("error") or ""
+        return {"ok": False, "reason": f"map '{map_name}' could not be downloaded" + (f": {why}" if why else "")
+                + ". Check the internet connection, or run SETUP.bat again (it fetches every map).", "provision": prov}
     # the pad and the belief ride beside the seed, wherever the installer put the seed
     gen_src = ws / "mod" / "VerdanceAshes.sdd" / "singleplayer" / "verdance_ashes" / "generated"
     for name in ("va_pad_current.lua", "va_intel_current.lua"):

@@ -14,7 +14,8 @@ ONE PATH
 3. Double-click SETUP.bat (once). If Windows says "Windows protected your
    PC", click "More info" then "Run anyway". SETUP finds BAR (and asks for
    the path to BAR's "data" folder if it cannot), installs the campaign into
-   BAR, and writes mission 1.
+   BAR, downloads the seven campaign maps (about 670 MB the first time) and
+   writes mission 1.
 4. Double-click PLAY.bat. Your browser opens the war map at
    http://127.0.0.1:8770. Leave the PLAY window open while you play.
      - Choose a green sortie on the map, mark the target and the pad
@@ -22,8 +23,8 @@ ONE PATH
      - Confirm the party, confirm the reserve, hire mercenaries if you like,
        then Lock drop: the company lands as soon as the field is ready
      - Switch to BAR and unpause to start
-   The first drop on a new map downloads that map from BAR's content
-   service (about 100 MB); the hub shows the progress.
+   PLAY re-checks the maps every time it starts and fetches any that are
+   missing.
    RESET.bat starts the campaign over (old save kept in state\backups).
 5. Play the sortie in BAR. Space dismisses the briefing.
    After a win, 1/2/3 can keep fighting on the same map.

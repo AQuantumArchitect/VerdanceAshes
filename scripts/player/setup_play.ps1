@@ -44,6 +44,19 @@ if (-not $Junction) {
 $py = Get-VerdancePython -Workspace $Workspace
 $env:PYTHONPATH = (Join-Path $Workspace "tools")
 Write-Host "Python:    $py"
+
+# The seven campaign maps (owner call, 2026-11-01): a fresh BAR has none, and BAR dies before the
+# campaign loads without the mission's map. Fetch them all now (about 670 MB the first time; maps
+# already there are skipped). Not fatal: PLAY and every Drop check again.
+Write-Host "Campaign maps: checking BAR's maps folder, downloading any that are missing..."
+$savedEap = $ErrorActionPreference
+$ErrorActionPreference = "Continue"
+& $py -m verdance.world.map_provisioner --workspace $Workspace --check-all
+$mapsRc = $LASTEXITCODE
+$ErrorActionPreference = $savedEap
+if ($mapsRc -ne 0) {
+  Write-Warning "Not every campaign map could be downloaded (see above). PLAY.bat tries again, and so does each drop. Check the internet connection."
+}
 Write-Host "Rebuilding hub surface..."
 
 $prev = Get-Location

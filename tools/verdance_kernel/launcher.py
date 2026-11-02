@@ -122,6 +122,33 @@ def _try_webview(url: str, title: str = "Verdance's Ashes") -> bool:
         return False
 
 
+def _ensure_campaign_maps(workspace: Path) -> None:
+    """Every PLAY checks that the seven campaign maps are in BAR's maps folder and fetches any that are
+    missing (owner call, 2026-11-01: a fresh BAR has none of them, and a missing map kills BAR before
+    the campaign loads). Disk first, so a full set costs nothing and needs no network. Never fatal:
+    every Drop checks its own map again before BAR starts."""
+    try:
+        from verdance_kernel.sortie import find_bar_data_root
+        from verdance.world import map_provisioner as mp
+        root = find_bar_data_root(workspace)
+        if not root:
+            return
+        maps = mp.campaign_maps(workspace)
+        missing = [m for m in maps if not (Path(root) / "maps" / m["archive"]).exists()]
+        if not missing:
+            print(f"Campaign maps: all {len(maps)} installed.")
+            return
+        print(f"Campaign maps: {len(missing)} of {len(maps)} missing; fetching them from BAR's map service now.")
+        for m in missing:
+            try:
+                res = mp.ensure(m["mapName"], Path(root), workspace=workspace)
+                print(f"  {res['status']:<12} {m['mapName']}")
+            except Exception as exc:  # noqa: BLE001 - the Drop retries its own map
+                print(f"  FAILED       {m['mapName']}: {exc}", file=sys.stderr)
+    except Exception as exc:  # noqa: BLE001
+        print(f"Campaign maps: could not check ({type(exc).__name__}: {exc}).", file=sys.stderr)
+
+
 def _bar_mod_banner(workspace: Path) -> None:
     """Print which tree BAR will load for VerdanceAshes.sdd (deployed vs workspace)."""
     try:
@@ -177,6 +204,7 @@ def launch(
         return 2
 
     _bar_mod_banner(Path(kernel.ws))
+    _ensure_campaign_maps(Path(kernel.ws))
 
     # A fresh clone / unzip has no campaign yet; the rebuild below would fail with a
     # message about war_map.json. Say the one true thing instead.

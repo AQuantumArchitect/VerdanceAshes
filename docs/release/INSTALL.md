@@ -35,6 +35,9 @@ downloads them from the same place it always does.
    - It copies `VerdanceAshes.sdd` into BAR's `data\games\` folder, set to depend
      on the Beyond All Reason version your launcher downloaded (every drop
      re-checks, so BAR updates are picked up).
+   - It downloads the seven campaign maps into BAR's `data\maps\` folder (about 670 MB
+     the first time, from BAR's own map service; maps already there are skipped).
+     PLAY.bat checks them again every time it starts, and each drop checks its own map.
    - It writes a fresh campaign state (mission 1).
 3. Double-click `PLAY.bat` to play. Leave the window open.
 4. `RESET.bat` starts the campaign over whenever you want (old save kept in
@@ -82,8 +85,8 @@ field units carry forward; a new enemy camp reseeds at the new target.
   downloads the map first (up to 30 minutes on a slow line; the hub shows the
   progress from `outbox\provision.latest.json`). Check your connection and try
   again; to fetch every map up front, run:
-  `runtime\python\python.exe tools\map_provisioner_v1.py --check-all`
-  (git clone: `python tools\map_provisioner_v1.py --check-all`)
+  `runtime\python\python.exe -m verdance.world.map_provisioner --check-all`
+  from the game folder with `set PYTHONPATH=tools` first (or just run SETUP.bat again).
   As a last resort, join any BAR lobby on that map once and let the client pull it.
 - **Mission ends but nothing advances** -- check the kernel's status page
   (`http://127.0.0.1:8770/api/status`) and BAR's `data\infolog.txt` for

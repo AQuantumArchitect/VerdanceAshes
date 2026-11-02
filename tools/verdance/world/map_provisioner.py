@@ -20,7 +20,11 @@ BAR runs its own content service, and it is a plain JSON API:
     GET https://files-cdn.beyondallreason.dev/find?category=map&springname=The+Rock+Jungle+2.1.1
     -> [{"filename": "...sd7", "md5": "...", "size": 106567121, "mirrors": ["https://..."]}]
 
-That is what this uses. Not bundling: the seven campaign maps total ~673 MB
+That is what this uses, accepting the answer as a list or as a single object (2026-11-01: the
+service answered Greenest Fields with an object, and a fresh install on a friend's PC could not
+get its first map). Every mirror is tried, and when the service or its mirrors fail, the engine's
+own pr-downloader (shipped in every BAR engine folder, the tool BAR's launcher fetches maps with)
+gets the map instead. Not bundling: the seven campaign maps total ~673 MB
 against a 12 MB dist, and shipping them would redistribute seven map authors'
 work -- throwing away the whole reason this project has a clean legal posture.
 The player's own client downloads them from the project that hosts them.
@@ -37,6 +41,7 @@ import argparse
 import hashlib
 import json
 import os
+import subprocess
 import time
 import urllib.parse
 import urllib.request
@@ -95,14 +100,52 @@ def resolve(map_name: str) -> Dict[str, Any]:
     except Exception as exc:  # noqa: BLE001 - surfaced to the player verbatim
         raise MapProvisionError(f"could not reach BAR's map service: {exc}") from exc
 
-    if not isinstance(payload, list) or not payload:
+    # The service answers a list of matches, or (2026-11) a single object.
+    entry = payload[0] if isinstance(payload, list) and payload else payload
+    if not isinstance(entry, dict) or not entry.get("filename"):
         raise MapProvisionError(
             f"BAR's map service does not know a map named {map_name!r}. "
             "Check the mapName in data/map_pool/seven_maps.json.")
-    entry = payload[0]
-    if not entry.get("mirrors"):
+    mirrors = [m for m in (entry.get("mirrors") or []) if isinstance(m, str) and m]
+    if entry.get("md5"):
+        mirrors.append(f"https://files-cdn.beyondallreason.dev/file/{entry['md5']}/{entry['filename']}")
+    entry["mirrors"] = list(dict.fromkeys(mirrors))
+    if not entry["mirrors"]:
         raise MapProvisionError(f"no download mirror listed for {map_name!r}.")
     return entry
+
+
+def pr_downloader(bar_root: Path) -> Optional[Path]:
+    """The engine's own downloader (engine/<version>/pr-downloader.exe), newest engine first."""
+    eng = Path(bar_root) / "engine"
+    if not eng.is_dir():
+        return None
+    for d in sorted((p for p in eng.iterdir() if p.is_dir()), key=lambda p: p.name, reverse=True):
+        for name in ("pr-downloader.exe", "pr-downloader"):
+            if (d / name).is_file():
+                return d / name
+    return None
+
+
+def _engine_fetch(map_name: str, bar_root: Path, archive: Optional[str], quiet: bool) -> Optional[Path]:
+    """Let BAR's pr-downloader fetch the map into <bar_root>/maps, as BAR's launcher does. Returns the
+    archive on disk, or None when there is no pr-downloader or it did not produce the map."""
+    exe = pr_downloader(bar_root)
+    if exe is None:
+        return None
+    maps_dir = Path(bar_root) / "maps"
+    before = {p.name for p in maps_dir.glob("*.sd7")} if maps_dir.is_dir() else set()
+    if not quiet:
+        print(f"  Fetching {map_name} with BAR's own downloader...", flush=True)
+    try:
+        subprocess.run([str(exe), "--filesystem-writepath", str(bar_root), "--download-map", map_name],
+                       cwd=str(exe.parent), capture_output=True, text=True, timeout=1800)
+    except Exception:  # noqa: BLE001 - None tells the caller it did not work
+        return None
+    if archive and (maps_dir / archive).exists():
+        return maps_dir / archive
+    new = [p for p in maps_dir.glob("*.sd7") if p.name not in before] if maps_dir.is_dir() else []
+    return new[0] if new else None
 
 
 def _md5(path: Path) -> str:
@@ -264,6 +307,12 @@ def ensure(map_name: str, bar_root: Path, workspace: Optional[Path] = None,
     try:
         entry = resolve(map_name)
     except MapProvisionError as exc:
+        # The service is down, blocked or changed: BAR's own downloader may still get it.
+        got = None if dry_run else _engine_fetch(map_name, bar_root, known, quiet)
+        if got is not None:
+            if progress:
+                progress.done()
+            return {"map": map_name, "status": "downloaded", "path": str(got), "via": "pr-downloader"}
         if progress:
             progress.failed(str(exc))
         raise
@@ -304,14 +353,25 @@ def ensure(map_name: str, bar_root: Path, workspace: Optional[Path] = None,
         print(f"  Downloading {map_name} ({size / 1048576:.0f} MB) from BAR's map service...")
     if progress:
         progress.start(size)
-    try:
-        _download(entry["mirrors"][0], dest, md5, size,
-                  _chain_progress(None if quiet else _default_progress(filename),
-                                  progress.progress if progress else None))
-    except MapProvisionError as exc:
+    errors: List[str] = []
+    for url in entry["mirrors"]:
+        try:
+            _download(url, dest, md5, size,
+                      _chain_progress(None if quiet else _default_progress(filename),
+                                      progress.progress if progress else None))
+            break
+        except MapProvisionError as exc:
+            errors.append(str(exc))
+    else:
+        got = _engine_fetch(map_name, bar_root, filename, quiet)
+        if got is not None:
+            if progress:
+                progress.done(size)
+            return {"map": map_name, "status": "downloaded", "path": str(got), "via": "pr-downloader"}
+        msg = "; ".join(errors) or "download failed"
         if progress:
-            progress.failed(str(exc))
-        raise
+            progress.failed(msg)
+        raise MapProvisionError(msg)
     if progress:
         progress.done(size)
     return {"map": map_name, "status": "downloaded", "path": str(dest)}
