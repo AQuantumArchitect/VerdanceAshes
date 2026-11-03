@@ -6,8 +6,10 @@
     "Tune the timings in 'pacing' (the one table; every key is explained in 'pacingNotes'). The beat sheet is docs/MISSION1_OPENING.md.",
     "A prompt only appears if the player has not done the thing yet, and it clears the moment they do.",
     "Lines: Ketha's register (data/story/voices/ketha.json): short, dry, at most 66 characters so a line fits its frame. No game-system vocabulary in anyone's mouth.",
-    "Lives in data/escalation because that folder ships with the game; a new data folder would also need a line in scripts/ship.ps1."
+    "Lives in data/escalation because that folder ships with the game; a new data folder would also need a line in scripts/ship.ps1.",
+    "appliesTo: the sortie this script is for. It applies to the authored opening order, and to a hub-stamped deploy with the same mission, map, pad and target (the hub's stamp does not carry the openingMission flag)."
   ],
+  "appliesTo": { "missionNumber": 1, "freshCampaign": true, "mapId": "greenest_fields", "deploymentZoneId": "GF_NW_MUSTER", "targetZoneId": "GF_NW_BASTION" },
   "pacing": {
     "briefingMaxWords": 60,
     "selectPromptSeconds": 12,

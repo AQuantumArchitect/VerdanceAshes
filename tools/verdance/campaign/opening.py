@@ -61,6 +61,26 @@ def load_opening(workspace: Optional[Path]) -> Optional[Dict[str, Any]]:
     return data
 
 
+def applies(script: Dict[str, Any], state: Dict[str, Any], sortie: Optional[Dict[str, Any]], map_id: str,
+            deploy_zone: Optional[str], target_zone: Optional[str]) -> bool:
+    """Is this sortie the one the script is for? The authored opening order says so itself
+    (openingMission). A deploy the hub stamped carries no such flag, so it is matched on what the
+    script names in appliesTo: the mission, a fresh campaign, the map, the pad and the target."""
+    if (sortie or {}).get("openingMission"):
+        return True
+    want = script.get("appliesTo") or {}
+    if not want:
+        return False
+    if int(state.get("missionNumber", 1) or 1) != int(want.get("missionNumber", 1)):
+        return False
+    if want.get("freshCampaign") and state.get("history"):
+        return False
+    for key, have in (("mapId", map_id), ("deploymentZoneId", deploy_zone), ("targetZoneId", target_zone)):
+        if want.get(key) and str(want[key]) != str(have or ""):
+            return False
+    return True
+
+
 def problems(script: Dict[str, Any]) -> List[str]:
     """What is missing from a script. Empty means the hub can build the opening from it."""
     out: List[str] = []
@@ -267,6 +287,6 @@ def merge_opening_beats(script: Dict[str, Any], generic: List[Dict[str, Any]], t
 
 
 __all__ = [
-    "HERO_BEATS", "LINE_KEYS", "OPENING_FILE", "PACING_KEYS", "REPLACED_BEATS", "card_words", "farm_point",
+    "HERO_BEATS", "LINE_KEYS", "OPENING_FILE", "PACING_KEYS", "REPLACED_BEATS", "applies", "card_words", "farm_point",
     "load_opening", "merge_opening_beats", "opening_beats", "opening_briefing", "opening_card", "problems", "words",
 ]

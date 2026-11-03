@@ -9,7 +9,7 @@ turns and minute five ends on a hook. Issue #7.
 | What | Where |
 |---|---|
 | The script and its one pacing table | `data/escalation/mission1_opening.json` (`pacing`, explained key by key in `pacingNotes`) |
-| The hub half: briefing, card words, the beats | `tools/verdance/campaign/opening.py`, called from `materialize_next_intent` when the sortie is the authored opening |
+| The hub half: briefing, card words, the beats | `tools/verdance/campaign/opening.py`, called from `materialize_next_intent` for the sortie the script's `appliesTo` names (mission 1 of a fresh campaign, Greenest Fields, pad `GF_NW_MUSTER`, target `GF_NW_BASTION`), whether the order is the authored opening or the hub's own deploy stamp of it (the stamp does not carry the `openingMission` flag) |
 | The gadget half: runs the beats, nothing else | `mod/VerdanceAshes.sdd/luarules/gadgets/include/campaign/beats.lua` |
 | The facts the beats wait on | the campaign gadget's call-ins (`UnitCommand`, `UnitDamaged`, `UnitDestroyed`, `UnitCreated`, `AllowFeatureBuildStep`) and one UI message (`vabeatfact selected`, from `gui_verdance_field_marks.lua`; selection is unsynced) |
 | What the player sees | `gui_verdance_infil.lua` (the card), `gui_verdance_sidebar.lua` (the rail and the route), `va_board.lua` (the board and minimap), `gui_verdance_field_marks.lua` (rings on the ground), `gui_verdance_voice.lua` (lines and prompts) |

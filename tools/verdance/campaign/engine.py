@@ -371,7 +371,10 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
     patron = (sortie or {}).get("patron") or objective.get("patron") or "nullmercs"
     # Mission 1's opening (data/escalation/mission1_opening.json, verdance.campaign.opening): its own
     # briefing, a staged job and learn-by-doing beats in place of the generic briefing and opening bark.
-    opening = _opening.load_opening(workspace) if (sortie or {}).get("openingMission") else None
+    # The authored order and a hub-stamped deploy of the same raid both get it (opening.applies).
+    opening = _opening.load_opening(workspace)
+    if opening and not _opening.applies(opening, state, sortie, map_id, deploy_zone, objective.get("targetZoneId")):
+        opening = None
     opening_card = (_opening.opening_card(opening, workspace, map_id, objective.get("targetZoneId"))
                     if opening else None)
     briefing = (_opening.opening_briefing(opening) if opening

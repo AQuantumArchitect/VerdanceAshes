@@ -178,6 +178,16 @@ def test_farm_point_picks_the_nearest_pocket_in_the_target_zone():
     assert O.farm_point([], ROOT, "greenest_fields", "GF_NW_MUSTER", "GF_NW_BASTION") is None
 
 
+def test_the_script_applies_to_the_opening_raid_however_it_was_ordered():
+    fresh = {"missionNumber": 1, "history": []}
+    args = ("greenest_fields", "GF_NW_MUSTER", "GF_NW_BASTION")
+    assert O.applies(SCRIPT, fresh, {"openingMission": True}, "the_rock_jungle", "X", "Y"), "the authored order says so itself"
+    assert O.applies(SCRIPT, fresh, {"source": "hub_deploy_plan"}, *args), "a hub stamp of the same raid"
+    assert not O.applies(SCRIPT, fresh, {"source": "hub_deploy_plan"}, "greenest_fields", "GF_NW_MUSTER", "GF_N_PLATEAU")
+    assert not O.applies(SCRIPT, {"missionNumber": 2, "history": []}, {}, *args)
+    assert not O.applies(SCRIPT, {"missionNumber": 1, "history": [{"status": "victory"}]}, {}, *args)
+
+
 # ---------------------------------------------------------------- the intent (hub end to end)
 def _fresh_workspace():
     tmp = tempfile.TemporaryDirectory()
@@ -208,6 +218,29 @@ def test_a_fresh_campaign_opens_with_the_authored_opening():
         assert ids[0] == "op_stage_first" and "b1_move_out" not in ids and "b5_run_home" in ids
         first = intent["beats"][0]["actions"][0]
         assert first.get("towardX") is not None, "the hub found the Bastion's nearest farm"
+
+
+def test_a_hub_stamped_deploy_of_the_raid_still_gets_the_opening():
+    # The hub's deploy stamps a plan (source hub_deploy_plan, no openingMission flag) before it
+    # materialises the intent; the opening must survive that path, the one a player takes.
+    from verdance.campaign import engine as E
+    from verdance.hub.stamp_deploy_plan import stamp
+    tmp, ws = _fresh_workspace()
+    if ws is None:
+        return
+    with tmp:
+        (ws / "state").mkdir()
+        state = E.migrate_state(E.default_v1_state())
+        E.ensure_zone_memory(state, ws)
+        (ws / "state" / "campaign_state.json").write_text(json.dumps(state), encoding="utf-8")
+        plan = {"schemaVersion": "verdance-deploy-plan/1.0", "mapId": "greenest_fields", "contractKind": "eco_raid",
+                "deployAces": ["ketha"], "crewBand": [],
+                "marks": {"deployZoneId": "GF_NW_MUSTER", "extractZoneId": "GF_NW_MUSTER", "captureZoneIds": ["GF_NW_BASTION"]},
+                "patron": "nullmercs", "against": "armada", "sessionMode": "reload_travel"}
+        assert stamp(plan, ws).get("ok")
+        intent = E.materialize_next_intent(json.loads((ws / "state" / "campaign_state.json").read_text()), ws)
+        assert intent.get("opening") and intent["beats"][0]["id"] == "op_stage_first"
+        assert [l["tag"] for l in intent["briefing"]["lines"]][:3] == ["opening"] * 3
 
 
 def test_other_missions_keep_the_generic_briefing_and_beats():
