@@ -161,6 +161,7 @@ return function(tenebLoot, api)
     tenebLoot.wrecksLost = 0
     tenebLoot.heapTransfer = {}
     tenebLoot.pendingLoss = {}
+    tenebLoot.blockedSaid = {}
     tenebLoot.events = {}
     local mission = api.mission()
     local tn = (mission and mission.tenebrium) or {}
@@ -541,9 +542,25 @@ return function(tenebLoot, api)
     local cost = tenebLoot.costOf(unitDefID)
     if cost <= 0 then return true end
     if builderTeam == api.playerTeamID() and (tenebLoot.bank or 0) < cost then
-      Spring.Echo("VA_TENEBRIUM_BLOCKED need=" .. tostring(cost)
-        .. " have=" .. tostring(tenebLoot.bank or 0)
-        .. (resurrecting and " rez=1" or ""))
+      -- The engine asks again every frame a factory or constructor keeps the build at the front of
+      -- its queue, so this said itself every frame: 1.6 million lines in one 45-minute finale on
+      -- Luke's PC (2026-11-03), until LuaUI ran out of memory and the engine quit with the sortie
+      -- unreported. Once per builder and unit type every 30 seconds, with how many tries it was.
+      local f = (Spring.GetGameFrame and Spring.GetGameFrame()) or 0
+      local key = tostring(builderID or 0) .. ":" .. tostring(unitDefID)
+      tenebLoot.blockedSaid = tenebLoot.blockedSaid or {}
+      local said = tenebLoot.blockedSaid[key]
+      if not said or f - said.frame >= 900 then
+        local ud = UnitDefs and UnitDefs[unitDefID]
+        Spring.Echo("VA_TENEBRIUM_BLOCKED need=" .. tostring(cost)
+          .. " have=" .. tostring(tenebLoot.bank or 0)
+          .. " unit=" .. tostring(ud and ud.name or unitDefID)
+          .. " tries=" .. tostring(said and said.tries or 1)
+          .. (resurrecting and " rez=1" or ""))
+        tenebLoot.blockedSaid[key] = { frame = f, tries = 1 }
+      else
+        said.tries = said.tries + 1
+      end
       return false
     end
     return true

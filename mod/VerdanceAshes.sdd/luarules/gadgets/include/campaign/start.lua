@@ -47,6 +47,7 @@ tenebLoot = {
   wrecksClaimed = 0,
   wrecksLost = 0,
   pendingLoss = {},
+  blockedSaid = {},          -- "builder:unitDef" -> { frame, tries }: a refused build says so every 30 s
   armadaCrisis = true,       -- default on: Armada has no Tnb
   factionBank = { armada = 0, cortex = 0 },
   enabled = true,
