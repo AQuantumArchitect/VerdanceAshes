@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.14.4 — 2026-11-02
+
+Mission 1 gets a designed opening, and the door you take stays taken.
+
+- **Mission 1's opening** (#10, `docs/MISSION1_OPENING.md`):
+  - The briefing is three of Ketha's lines.
+  - The job arrives in two stages: first "Off the pad. Eyes on their farm." with a gold ring on the ground, then the real job once the farm is in sight.
+  - Select, move, attack and build are each prompted only if you haven't done them yet. A prompt clears the moment you do.
+  - Minute five ends on an intercepted Armada dispatch and a column on its way.
+  - Every timing is tunable in `data/escalation/mission1_opening.json` (`pacing`).
+- **A door taken stays taken.** The result the hub reads at home dropped the list of the company's allies. So a door the company lifted from with the Null Mercs beside it was not held at home, and the next sortie offered the same door again.
+- **Fixed on the way:**
+  - The briefing card printed "table: 0x…" for its line.
+  - Mission 1's objective mark sat at the Bastion's box centre instead of on the farm.
+  - The generic "hero down" bark fired at the first second about field recruits nobody had met.
+- **Autopilot `--beats`** keeps the authored beats on in a headless rehearsal.
+
 ## 0.14.3 — 2026-11-02
 
 A fix release: on 0.14.2, the first mission could not be won once the Null Mercs followed the company in.
