@@ -294,15 +294,19 @@ def main() -> int:
     for h in (st.get("roster") or {}).get("heroes") or []:
         if not args.resume and h.get("heroId") in boosts:
             h["xp"] = h["peakBarXp"] = boosts[h["heroId"]]
-    if not args.resume and args.finale:
-        finale_state(st, args.finale)
-        print(f"[autopilot] rehearsing the ending: mission {st['missionNumber']}, finale path {args.finale}")
     if not args.resume:
         sp.write_text(json.dumps(st, indent=2), encoding="utf-8")
     seal = {"ok": True} if args.resume else k.seal_company(band=band)
     print(f"[autopilot] company {band} boost {boosts} -> {'preserved' if args.resume else 'sealed' if seal.get('ok') else seal}")
     if not seal.get("ok"):
         return 2
+    if not args.resume and args.finale:
+        # after the seal: past mission 1 the hub forms a default company of its own
+        st = jload(sp)
+        finale_state(st, args.finale)
+        sp.write_text(json.dumps(st, indent=2), encoding="utf-8")
+        k.rebuild_hub(skip_apply=True)
+        print(f"[autopilot] rehearsing the ending: mission {st['missionNumber']}, finale path {args.finale}")
 
     log_path = run_dir / "log.jsonl"
     rows = []
