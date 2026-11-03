@@ -1,5 +1,9 @@
 
-if Spring.Utilities.Gametype.IsRaptors() and not Spring.Utilities.Gametype.IsScavengers() then
+-- BAR moved its utilities from Spring.Utilities to BAR.Utilities (test-31774, 2026-11). On a current
+-- BAR this line raised and the whole spawner failed to load: no raptor waves, no rage, no queen on
+-- the Rock Jungle. Read whichever this BAR has.
+local Utilities = (BAR and BAR.Utilities) or Spring.Utilities
+if Utilities.Gametype.IsRaptors() and not Utilities.Gametype.IsScavengers() then
 	Spring.Log("Raptor Defense Spawner", LOG.INFO, "Raptor Defense Spawner Activated!")
 else
 	Spring.Log("Raptor Defense Spawner", LOG.INFO, "Raptor Defense Spawner Deactivated!")
@@ -183,8 +187,8 @@ if gadgetHandler:IsSyncedCode() then
 	}
 	local queenIDs = {}
 	local bosses = {resistances = queenResistance, statuses = {}, playerDamages = {}}
-	local raptorTeamID = Spring.Utilities.GetRaptorTeamID()
-	local raptorAllyTeamID = Spring.Utilities.GetRaptorAllyTeamID()
+	local raptorTeamID = Utilities.GetRaptorTeamID()
+	local raptorAllyTeamID = Utilities.GetRaptorAllyTeamID()
 	local lsx1, lsz1, lsx2, lsz2
 	local burrows = {}
 	local aliveEggsTable = {}

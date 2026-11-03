@@ -146,18 +146,41 @@ local SIEGE_GUNS = 12
 -- The Spire Jump is won at the gate, not at the hive: the guns stand around the gate (and the
 -- fusions going up beside it) instead of marching on the nests. In the finale-C rehearsal the
 -- siege took 14 guns to the hive heart, 3,000 elmos off, and the raptors took the gate.
+-- The guard stands 450 elmos off the gate toward the middle of the map, where the hive is: in front
+-- of the generators going up around the gate, and off its pad. Guarding the gate's own centre crowded
+-- the pad: on Luke's PC (run 20261103_010856) three heroes went through and the fourth stood off it for
+-- fifteen minutes.
+local function guardPoint(gx, gz)
+  local dx, dz = Game.mapSizeX / 2 - gx, Game.mapSizeZ / 2 - gz
+  local d = math.sqrt(dx * dx + dz * dz)
+  if d < 1 then return gx, gz end
+  return gx + dx / d * 450, gz + dz / d * 450
+end
+
+-- The units each standing job holds, so the job can order them again: held is one flag for every job,
+-- and a unit the siege held stayed held while any wreck waited for a rescue. In the kings' showdown
+-- (container rig, 2026-11-03) the first siege's guns sat where the Cortex king had died for an hour
+-- while the other two kings lived.
+local sieged, guarding = {}, {}
+
 local function guardTheGate()
   local state = tostring(Spring.GetGameRulesParam("va_gate_state") or "")
-  if state == "" or state == "lost" then return false end
+  if state == "lost" then return false end
+  -- the Spire Jump: never march on the nests, even in the first second, before the gate gadget has
+  -- published the gate (frame 30): the siege at frame 11 took the whole army to the hive
+  if state == "" then return mission ~= nil and type(mission.jumpGate) == "table" end
   local gx, gz = rp("va_gate_x"), rp("va_gate_z")
-  if gx <= 0 then return false end
+  if gx <= 0 then return true end
   local guns = companyUnits(function(ud, uid)
     local hid = Spring.GetUnitRulesParam(uid, "va_hero_id")
     local hero = hid ~= nil and hid ~= "" and hid ~= 0
-    return mobile(ud) and ud.canAttack and not ud.isBuilder and not held[uid] and not (state == "open" and hero)
+    return mobile(ud) and ud.canAttack and not ud.isBuilder and (guarding[uid] or not held[uid])
+      and not (state == "open" and hero)
   end)
   if #guns == 0 then return true end
-  order(guns, CMD.FIGHT, { gx, Spring.GetGroundHeight(gx, gz) or 0, gz }, true)
+  local px, pz = guardPoint(gx, gz)
+  order(guns, CMD.FIGHT, { px, Spring.GetGroundHeight(px, pz) or 0, pz }, true)
+  for _, uid in ipairs(guns) do guarding[uid] = true end
   Spring.Echo("VA_AUTOPILOT guard gate guns=" .. #guns .. " state=" .. state)
   return true
 end
@@ -169,8 +192,15 @@ local function siege()
     targets = GG.VA_RivalKings()   -- the kings' showdown: the rival commanders are the targets
   end
   if not targets or next(targets) == nil then return end
-  local guns = companyUnits(function(ud, uid) return mobile(ud) and ud.canAttack and not ud.isBuilder and not held[uid] end)
-  if #guns < SIEGE_GUNS then return end
+  local guns = companyUnits(function(ud, uid)
+    return mobile(ud) and ud.canAttack and not ud.isBuilder and (sieged[uid] or not held[uid])
+  end)
+  if #guns < SIEGE_GUNS then
+    -- too thin to break anything: what is left of the siege goes back to BARb until there are more
+    for uid in pairs(sieged) do held[uid] = nil end
+    sieged = {}
+    return
+  end
   local cx, cz, n = 0, 0, 0
   for _, uid in ipairs(guns) do
     local x, _, z = Spring.GetUnitPosition(uid)
@@ -188,6 +218,7 @@ local function siege()
   end
   if not bx then return end
   order(guns, CMD.FIGHT, { bx, Spring.GetGroundHeight(bx, bz) or 0, bz }, true)
+  for _, uid in ipairs(guns) do sieged[uid] = true end
   Spring.Echo("VA_AUTOPILOT siege guns=" .. #guns .. " at=" .. math.floor(bx) .. "," .. math.floor(bz))
 end
 
@@ -492,6 +523,12 @@ local function gateRig()
       if d < bd then best, bd = uid, d end
     end
     order({ best }, CMD.MOVE, { gx, Spring.GetGroundHeight(gx, gz) or 0, gz }, true)
+    if ((Spring.GetGameFrame and Spring.GetGameFrame()) or 0) % 900 < 30 then
+      local q = Spring.GetUnitCommands(best, 1)
+      Spring.Echo("VA_AUTOPILOT gate next hero=" .. tostring(Spring.GetUnitRulesParam(best, "va_hero_id"))
+        .. " off_pad=" .. math.floor(math.sqrt(bd)) .. " pad_r=" .. rp("va_gate_pad_r")
+        .. " cmd=" .. tostring(q and q[1] and q[1].id or "idle") .. " waiting=" .. (#heroes - 1))
+    end
     local rest = {}
     for _, uid in ipairs(heroes) do if uid ~= best then rest[#rest + 1] = uid end end
     local wait = math.max(300, rp("va_gate_pad_r") + 150)
@@ -539,7 +576,15 @@ local function rescue()
   local wx, _, wz = Spring.GetFeaturePosition(fid)
   if not wx then return end
   -- the squad: the four nearest guns fight to the wreck
-  local guns = companyUnits(function(ud) return mobile(ud) and ud.canAttack and not ud.isBuilder end)
+  -- (once the Spire Gate is open the heroes belong on its pad, not in a rescue squad)
+  local gateOpen = tostring(Spring.GetGameRulesParam("va_gate_state") or "") == "open"
+  local guns = companyUnits(function(ud, uid)
+    if gateOpen then
+      local hid = Spring.GetUnitRulesParam(uid, "va_hero_id")
+      if hid ~= nil and hid ~= "" and hid ~= 0 then return false end
+    end
+    return mobile(ud) and ud.canAttack and not ud.isBuilder
+  end)
   local dist = {}
   for _, uid in ipairs(guns) do
     local x, _, z = Spring.GetUnitPosition(uid)

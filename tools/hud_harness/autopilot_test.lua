@@ -147,7 +147,24 @@ positions[90] = { 5000, 5000 }
 UnitDefs[1].canAttack = true
 gadget:GameFrame(611)
 local guard = find(CMD.FIGHT)
-assert(guard and guard.params[1] == 1000 and guard.params[3] == 1000, "in the Spire Jump the guns guard the gate")
+assert(guard and math.abs(guard.params[1] - 1318) < 2 and math.abs(guard.params[3] - 1318) < 2,
+  "in the Spire Jump the guns guard the gate, 450 off it toward the middle of the map (off its pad)")
+-- before the gate gadget publishes the gate (frame 30), the siege must not take the army to the hive
+local function nestWorld(jump)
+  gateWorld()
+  mission.jumpGate = jump
+  rules.va_gate_state = nil
+  units = {}
+  for i = 100, 111 do units[#units + 1] = i; unitDef[i] = 1; positions[i] = { 900, 900 } end
+  positions[90] = { 5000, 5000 }   -- the hive (an objective target)
+  Spring.ValidUnitID = function() return true end
+  gadget:GameFrame(11)
+  mission.jumpGate = nil
+  local f = find(CMD.FIGHT)
+  return f and f.params[1] == 5000
+end
+assert(nestWorld(nil), "(without a gate the siege goes for the objective targets)")
+assert(not nestWorld({ zoneId = "TRJ_NW_MUSTER" }), "the Spire Jump: no march on the nests in the first second")
 GG.VA_ObjectiveTargets = nil
 gateWorld()
 rules.va_gate_state = "unpowered"; rules.va_gate_afus = 1; rules.va_gate_afus_need = 4
@@ -245,6 +262,17 @@ GG.VA_RivalKings = function() return { [950] = 1 } end
 gadget:GameFrame(611)
 local k = find(CMD.FIGHT)
 assert(k and k.params[1] == 3000, "the guns go for the nearest rival king")
+-- that king falls; the siege's own guns (held) go for the next one
+positions[951] = { 100, 3000 }
+GG.VA_RivalKings = function() return { [951] = 2 } end
+orders = {}
+gadget:GameFrame(1211)
+local k2 = find(CMD.FIGHT)
+assert(k2 and k2.params[1] == 100 and k2.params[3] == 3000, "the siege's held guns go for the next king")
+-- too few guns left: the siege lets go of them
+guns = { 100, 101 }
+gadget:GameFrame(11)   -- (the harness clock is one minute: frame 1800 would be the departure)
+assert(gadget:AllowCommand(100), "a siege too thin to break anything goes back to BARb")
 GG.VA_RivalKings = nil
 
 print("ok: rescue squad, protected orders, departure to the real pad radius, leaving with and without a HUD, holding a capture, the Spire Gate and its tech ladder, the siege")
