@@ -324,6 +324,24 @@ Spring.IsUnitInLos = function() return true end
 guns = { 100, 101 }
 gadget:GameFrame(11)   -- (the harness clock is one minute: frame 1800 would be the departure)
 assert(gadget:AllowCommand(100), "a siege too thin to break anything goes back to BARb")
+-- a king far off: the guns gather 2,200 short of it first, then strike together
+reset()
+guns = {}
+for i = 100, 139 do guns[#guns + 1] = i; positions[i] = { 0, 0 } end
+Spring.GetTeamUnits = function() return guns end
+Spring.GetUnitDefID = function() return 1 end
+Spring.ValidUnitID = function() return true end
+positions[951] = { 8000, 0 }
+GG.VA_RivalKings = function() return { [951] = 2 } end
+gadget:GameFrame(611)
+local rally = find(CMD.FIGHT)
+assert(not find(CMD.ATTACK) and rally and rally.params[1] == 5800 and rally.params[3] == 0,
+  "the guns rally 2,200 short of a far king, not straight at it")
+for i = 100, 139 do positions[i] = { 5700, 0 } end
+orders = {}
+gadget:GameFrame(1211)
+local strike = find(CMD.ATTACK)
+assert(strike and strike.params[1] == 951, "gathered, they strike the king together")
 GG.VA_RivalKings = nil
 
 print("ok: rescue squad, protected orders, departure to the real pad radius, leaving with and without a HUD, holding a capture, the Spire Gate and its tech ladder, the siege")

@@ -200,6 +200,8 @@ local function guardTheGate()
   return true
 end
 
+local striking = false                -- a king's siege has gathered and gone in (until it thins out)
+local RALLY_SHORT, RALLY_RADIUS = 2200, 900
 local function siege()
   if guardTheGate() then return end
   local targets = GG.VA_ObjectiveTargets and GG.VA_ObjectiveTargets() or nil
@@ -238,6 +240,7 @@ local function siege()
     -- too thin to break anything: what is left of the siege goes back to BARb until there are more
     for uid in pairs(sieged) do held[uid] = nil end
     sieged = {}
+    striking = false
     return
   end
   local cx, cz, n = 0, 0, 0
@@ -263,6 +266,29 @@ local function siege()
       local x, _, z = Spring.GetUnitPosition(uid)
       if x and x == bx and z == bz then king = uid end
     end
+  end
+  -- A king's siege gathers first. Guns sent one by one from the factory walked the map alone: on the
+  -- container rig (2026-11-03, run8) the siege's guns stood 2,500 to 4,700 elmos from the Armada king, on
+  -- average, for 40 minutes, and the king never fell. They gather 2,200 elmos short of the king, on
+  -- the company's side, and strike together once three in four of the guns needed are there.
+  if kings and not striking then
+    local d = math.sqrt(bd)
+    local rx, rz = bx, bz
+    if d > RALLY_SHORT then
+      rx, rz = bx + (cx - bx) / d * RALLY_SHORT, bz + (cz - bz) / d * RALLY_SHORT
+    end
+    local near = 0
+    for _, uid in ipairs(guns) do
+      local x, _, z = Spring.GetUnitPosition(uid)
+      if x and (x - rx) ^ 2 + (z - rz) ^ 2 < RALLY_RADIUS ^ 2 then near = near + 1 end
+    end
+    if near < math.ceil(need * 0.75) then
+      order(guns, CMD.FIGHT, { rx, Spring.GetGroundHeight(rx, rz) or 0, rz }, true)
+      for _, uid in ipairs(guns) do sieged[uid] = true end
+      Spring.Echo("VA_AUTOPILOT siege rally guns=" .. #guns .. " gathered=" .. near .. " at=" .. math.floor(rx) .. "," .. math.floor(rz))
+      return
+    end
+    striking = true
   end
   -- attack the commander itself once the company can see it; until then fight the way to where it
   -- stands (an order to attack a unit out of sight does nothing: on the container rig 80 guns stood
