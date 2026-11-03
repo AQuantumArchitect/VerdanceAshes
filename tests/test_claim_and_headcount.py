@@ -194,3 +194,11 @@ def test_the_alliance_reaches_home_through_the_result_contract():
     roads.record_homecoming(state, dict(v1, deploymentMapId="greenest_fields", missionNumber=2), ROOT)
     assert roads.held(state, "GF_SE_PLATEAU")
 
+
+def test_the_company_and_the_mercs_never_clash_between_sorties():
+    """Stock rehearsal, 2026-11-02: the Null Mercs held the Northwest Bastion at extraction (8038,
+    no one else), and the between-sortie clashes flipped it to the company next door."""
+    from verdance.world import offscreen_clash as oc
+    assert not oc._are_rivals("ashwalkers", "nullmercs") and not oc._are_rivals("nullmercs", "ashwalkers")
+    assert oc._are_rivals("nullmercs", "armada") and oc._are_rivals("ashwalkers", "armada")
+

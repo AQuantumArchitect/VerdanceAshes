@@ -91,8 +91,16 @@ def zone_strength(zone_mem: Dict[str, Any], actor: str, activity: float = 1.0) -
     return max(0.05, raw) * (0.75 + 0.5 * bias.get("aggression", 1.0)) * activity
 
 
+# The company and the Null Mercs fight on the same side (owner call, 2026-11-02): the mercs compete
+# against Armada but not against the player, so their borders never clash between sorties. Before,
+# a merc-held zone next to the company's flipped to the company here (mission 1, stock rehearsal).
+ALLIED_BLOC = frozenset({"ashwalkers", "nullmercs"})
+
+
 def _are_rivals(fa: str, fb: str) -> bool:
     if fa == fb:
+        return False
+    if fa in ALLIED_BLOC and fb in ALLIED_BLOC:
         return False
     if fa not in RIVAL_FACTIONS or fb not in RIVAL_FACTIONS:
         return False
