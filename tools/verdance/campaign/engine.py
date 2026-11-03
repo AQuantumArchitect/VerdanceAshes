@@ -545,7 +545,7 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
         if isinstance(intent.get("briefing"), dict):
             intent["briefing"].setdefault("lines", []).append(
                 {"speaker": "ketha", "text": _eye.BRIEFING[eye["patron"]], "tag": "contract"})
-    # The Spire Jump: the gate on the spires, charged by four advanced fusions (verdance.world.spire_gate).
+    # The Spire Jump: the gate on the spires, charged by the generators around it (verdance.world.spire_gate).
     fin = intent.get("finale") or {}
     if (fin.get("objective") or {}).get("kind") == "jump_gate":
         from verdance.world import spire_gate as _sg

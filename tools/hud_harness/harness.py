@@ -257,6 +257,9 @@ step("the job's gauge, per kind of job", function()
   assert(gauge() == "build the gate 40%", gauge())
   RULES.va_gate_state = "unpowered"; RULES.va_gate_afus = 2; RULES.va_gate_afus_need = 4
   assert(gauge() == "power 2 / 4 fusions", gauge())
+  RULES.va_gate_power = 640; RULES.va_gate_power_need = 1500
+  assert(gauge() == "power 640 / 1500 energy", gauge())
+  RULES.va_gate_power = nil; RULES.va_gate_power_need = nil
   RULES.va_gate_state = "charging"; RULES.va_gate_charge = 0.5
   assert(gauge() == "charging 50%", gauge())
   RULES.va_gate_state = "open"; RULES.va_gate_ported = 1

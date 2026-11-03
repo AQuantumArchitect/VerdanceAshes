@@ -11,7 +11,7 @@ from typing import Any, Dict, Optional
 
 MAP_ID = "the_rock_jungle"
 CONFIG_REL = "data/base_templates/the_rock_jungle/spire_gate.json"
-KEYS = ("startBuilt", "needAfus", "radius", "chargeSeconds", "padRadius", "channelSeconds",
+KEYS = ("startBuilt", "needPower", "needAfus", "radius", "chargeSeconds", "padRadius", "channelSeconds",
         "rageOnline", "angerOnline", "ragePerHero", "angerPerHero")
 
 

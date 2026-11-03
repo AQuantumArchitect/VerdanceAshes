@@ -1,8 +1,11 @@
 -- The Spire Jump (finale C on the Rock Jungle, verdance.campaign.acts): the company leaves the jungle
 -- through the Spire Gate (va_jump_gate). mission.jumpGate places it:
 --   1. its frame stands unfinished on the spires (the company's; constructors finish it);
---   2. finished, it charges while the company owns needAfus advanced fusions within radius of it,
---      and drains when it owns fewer;
+--   2. finished, it charges while the company generates needPower energy a second within radius of
+--      it (any finished generator: solars, winds, geothermals, fusions; Hearth's reactor), and drains
+--      when it generates less. (Until 2026-11-03 it wanted four advanced fusions, which only a T2
+--      constructor builds, and the company raises no T2 lab off All That Simmers: game_verdance_lab_tier.
+--      A seed with needAfus and no needPower still counts fusions.)
 --   3. charged, a named hero who holds on the gate's pad for channelSeconds is ported out (removed,
 --      no wreck, reported survived and going home); the rest of the army holds the line;
 --   4. every step makes the raptors angrier (GG.VA_RaptorRage in raptor_spawner_defense.lua), and the
@@ -10,7 +13,7 @@
 function gadget:GetInfo()
   return {
     name = "Verdance Spire Gate",
-    desc = "The Rock Jungle's way out: finish the gate, power it from four advanced fusions, port the named heroes",
+    desc = "The Rock Jungle's way out: finish the gate, power it from the company's generators around it, port the named heroes",
     author = "Verdance",
     layer = 0,
     enabled = true,
@@ -156,6 +159,24 @@ local function afusNear(x, z, r)
   return n
 end
 
+-- The energy the company makes within r of (x, z): every finished building of its that makes more
+-- than it uses, as BAR measures it this second (a wind's share of the wind, a solar's upkeep).
+local function powerNear(x, z, r)
+  local total = 0
+  for _, uid in ipairs(Spring.GetUnitsInCylinder(x, z, r, playerTeam) or {}) do
+    if uid ~= gateID then
+      local ud = UnitDefs[Spring.GetUnitDefID(uid) or -1]
+      local _, _, _, _, built = Spring.GetUnitHealth(uid)
+      if ud and (ud.speed or 0) == 0 and (built or 1) >= 1 then
+        local _, _, eMake, eUse = Spring.GetUnitResources(uid)
+        local net = (tonumber(eMake) or 0) - (tonumber(eUse) or 0)
+        if net > 0 then total = total + net end
+      end
+    end
+  end
+  return total
+end
+
 local function heroesLeft()
   local list = {}
   for _, uid in ipairs(Spring.GetTeamUnits(playerTeam) or {}) do
@@ -221,15 +242,24 @@ function gadget:GameFrame(frame)
     Spring.SetGameRulesParam("va_gate_state", "frame", { public = true })
     return
   end
-  local need = tonumber(cfg.needAfus) or 4
-  local have = afusNear(x, z, tonumber(cfg.radius) or 2200)
-  Spring.SetGameRulesParam("va_gate_afus", have, { public = true })
-  Spring.SetGameRulesParam("va_gate_afus_need", need, { public = true })
+  local r = tonumber(cfg.radius) or 2200
+  local needPower = tonumber(cfg.needPower) or 0
+  local need, have
+  if needPower > 0 then
+    need, have = needPower, powerNear(x, z, r)
+    Spring.SetGameRulesParam("va_gate_power", math.floor(have + 0.5), { public = true })
+    Spring.SetGameRulesParam("va_gate_power_need", need, { public = true })
+  else
+    need, have = tonumber(cfg.needAfus) or 4, afusNear(x, z, r)
+    Spring.SetGameRulesParam("va_gate_afus", have, { public = true })
+    Spring.SetGameRulesParam("va_gate_afus_need", need, { public = true })
+  end
+  if frame % 900 == 0 then Spring.Echo("VA_GATE_POWER have=" .. math.floor(have) .. " need=" .. need .. " charge=" .. string.format("%.2f", charge)) end
   local chargeSeconds = tonumber(cfg.chargeSeconds) or 120
   if have >= need then
     if not onlineAnnounced then
       onlineAnnounced = true
-      Spring.Echo("VA_GATE_ONLINE afus=" .. have)
+      Spring.Echo("VA_GATE_ONLINE power=" .. math.floor(have) .. " need=" .. need)
       rage(tonumber(cfg.rageOnline) or 10, tonumber(cfg.angerOnline) or 10)
     end
     charge = math.min(1, charge + 1 / chargeSeconds)

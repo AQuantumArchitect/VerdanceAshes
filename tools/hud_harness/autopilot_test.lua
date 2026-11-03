@@ -137,7 +137,18 @@ rules.va_gate_state = "frame"
 gadget:GameFrame(41)
 local rep = find(CMD.REPAIR)
 assert(rep and rep.params[1] == 77, "the builders finish the gate's frame")
-assert(not gadget:AllowCommand(4) and not gadget:AllowCommand(5), "BARb must not pull the builders off the frame")
+assert(not gadget:AllowCommand(5), "BARb must not pull the gate crew off the frame")
+assert(gadget:AllowCommand(4), "half the builders (the nearest to the gate) are its crew: the rest stay BARb's, for the economy")
+-- the guns stand at the gate, not at the hive (objective targets on the far side of the map)
+gateWorld()
+rules.va_gate_state = "frame"
+GG.VA_ObjectiveTargets = function() return { [90] = true } end
+positions[90] = { 5000, 5000 }
+UnitDefs[1].canAttack = true
+gadget:GameFrame(611)
+local guard = find(CMD.FIGHT)
+assert(guard and guard.params[1] == 1000 and guard.params[3] == 1000, "in the Spire Jump the guns guard the gate")
+GG.VA_ObjectiveTargets = nil
 gateWorld()
 rules.va_gate_state = "unpowered"; rules.va_gate_afus = 1; rules.va_gate_afus_need = 4
 gadget:GameFrame(41)
@@ -147,6 +158,22 @@ queues[4] = { { id = -50 } }
 built = {}
 gadget:GameFrame(71)
 assert(#built == 0, "a builder already on a fusion is left to it")
+-- power (2026-11-03): the crew builds the strongest generator BAR lets it place near the gate, and
+-- stops ordering once what stands and what is going up covers the need
+gateWorld()
+UnitDefs[60] = { speed = 0, energyMake = 300 }          -- a geothermal: no vent near the gate
+UnitDefs[61] = { speed = 0, energyMake = 100 }          -- an advanced solar
+UnitDefs[62] = { speed = 0, energyUpkeep = -20 }        -- a solar
+UnitDefs[5] = { speed = 40, isBuilder = true, buildOptions = { 62, 60, 61 } }
+Spring.TestBuildOrder = function(def) return def == 60 and 0 or 2 end
+rules.va_gate_state = "unpowered"; rules.va_gate_power = 200; rules.va_gate_power_need = 1500
+gadget:GameFrame(41)
+assert(#built == 1 and built[1].uid == 5 and built[1].cmd == -61, "the gate crew builds the strongest generator it can place")
+queues[5] = { { id = -61 } }
+built = {}
+rules.va_gate_power = 1600
+gadget:GameFrame(71)
+assert(#built == 0, "enough power standing: no more orders")
 gateWorld()
 rules.va_gate_state = "open"
 gadget:GameFrame(41)

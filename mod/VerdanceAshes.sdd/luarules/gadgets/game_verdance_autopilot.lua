@@ -143,7 +143,27 @@ end
 
 -- ---------------------------------------------------------------- siege
 local SIEGE_GUNS = 12
+-- The Spire Jump is won at the gate, not at the hive: the guns stand around the gate (and the
+-- fusions going up beside it) instead of marching on the nests. In the finale-C rehearsal the
+-- siege took 14 guns to the hive heart, 3,000 elmos off, and the raptors took the gate.
+local function guardTheGate()
+  local state = tostring(Spring.GetGameRulesParam("va_gate_state") or "")
+  if state == "" or state == "lost" then return false end
+  local gx, gz = rp("va_gate_x"), rp("va_gate_z")
+  if gx <= 0 then return false end
+  local guns = companyUnits(function(ud, uid)
+    local hid = Spring.GetUnitRulesParam(uid, "va_hero_id")
+    local hero = hid ~= nil and hid ~= "" and hid ~= 0
+    return mobile(ud) and ud.canAttack and not ud.isBuilder and not held[uid] and not (state == "open" and hero)
+  end)
+  if #guns == 0 then return true end
+  order(guns, CMD.FIGHT, { gx, Spring.GetGroundHeight(gx, gz) or 0, gz }, true)
+  Spring.Echo("VA_AUTOPILOT guard gate guns=" .. #guns .. " state=" .. state)
+  return true
+end
+
 local function siege()
+  if guardTheGate() then return end
   local targets = GG.VA_ObjectiveTargets and GG.VA_ObjectiveTargets() or nil
   if (not targets or next(targets) == nil) and GG.VA_RivalKings then
     targets = GG.VA_RivalKings()   -- the kings' showdown: the rival commanders are the targets
@@ -220,6 +240,35 @@ local function busyWith(uid, test)
   return q ~= nil and q[1] ~= nil and test(q[1])
 end
 
+-- A factory's build queue is not in its unit commands (those are the orders its products get), so
+-- a factory read through busyWith always looked idle: the rig queued another constructor every
+-- second, 498 of them in the 2026-11-03 finale-C rehearsal.
+local function factoryBusy(f)
+  if Spring.GetFactoryCommands then
+    local q = Spring.GetFactoryCommands(f, 1)
+    if type(q) == "number" then return q > 0 end
+    return type(q) == "table" and #q > 0
+  end
+  return busyWith(f, function(c) return c.id < 0 end)
+end
+
+-- What a building of each type makes at most, by its def: a solar its upkeep, a wind the map's
+-- average wind, a reactor its output. Buildings only (the Spire Gate's power, game_verdance_jump_gate).
+local GENERATORS = nil
+local function generators()
+  if GENERATORS then return GENERATORS end
+  GENERATORS = {}
+  local wind = ((Game.windMin or 0) + (Game.windMax or 0)) / 2
+  for id, ud in pairs(UnitDefs) do
+    if (ud.speed or 0) == 0 and not ud.isFactory then
+      local out = (ud.energyMake or 0) + math.max(0, -(ud.energyUpkeep or 0))
+      if (ud.windGenerator or 0) > 0 then out = out + math.min(ud.windGenerator, wind) end
+      if out > 0 then GENERATORS[id] = out end
+    end
+  end
+  return GENERATORS
+end
+
 -- The tech ladder to an advanced fusion, worked out from the unit defs (any faction):
 --   fusionBuilders  can build one          t2Labs        factories that make a fusion builder
 --   labBuilders     can build a t2Lab      t1Labs        factories that make a lab builder
@@ -268,7 +317,7 @@ local function climbToFusion(gx, gz)
   local idle = function(uid) return not busyWith(uid, function(c) return c.id < 0 end) end
   local function make(factories, set, what)
     for _, f in ipairs(factories) do
-      if idle(f) then
+      if not factoryBusy(f) then
         local want = L.anyIn(UnitDefs[Spring.GetUnitDefID(f)], set)
         if want then
           issuing = true
@@ -307,7 +356,14 @@ local function gateRig()
         .. ":" .. tostring(q and q[1] and q[1].id or "idle")
     end
     local facs = #companyUnits(function(ud) return ud and ud.isFactory end)
-    Spring.Echo("VA_AUTOPILOT gate " .. state .. " built=" .. rp("va_gate_built") .. " afus=" .. rp("va_gate_afus")
+    local m, mIn, e, eIn = 0, 0, 0, 0
+    if Spring.GetTeamResources then
+      m, _, _, mIn = Spring.GetTeamResources(playerTeam, "metal")
+      e, _, _, eIn = Spring.GetTeamResources(playerTeam, "energy")
+    end
+    Spring.Echo("VA_AUTOPILOT gate " .. state .. " built=" .. rp("va_gate_built") .. " power=" .. rp("va_gate_power")
+      .. "/" .. rp("va_gate_power_need") .. " afus=" .. rp("va_gate_afus")
+      .. string.format(" metal=%d+%.1f energy=%d+%.1f", m or 0, mIn or 0, e or 0, eIn or 0)
       .. " factories=" .. facs .. " builders=" .. #builders .. " " .. table.concat(rows, " "))
   end
   if #builders < 4 then
@@ -322,7 +378,7 @@ local function gateRig()
       return set
     end)()
     for _, f in ipairs(companyUnits(function(ud) return ud and ud.isFactory end)) do
-      if not busyWith(f, function(c) return c.id < 0 end) then
+      if not factoryBusy(f) then
         local want = L.anyIn(UnitDefs[Spring.GetUnitDefID(f)], L.mobileBuilders)
         if want then
           issuing = true
@@ -333,9 +389,21 @@ local function gateRig()
       end
     end
   end
+  -- the gate crew: the builders nearest the gate, half of them (at least one). The rest stay BARb's,
+  -- to raise the economy the gate and its power are built from: with every builder on the gate, the
+  -- rehearsal's metal store ran dry at 44% and nothing ever refilled it.
+  local dist = {}
+  for _, uid in ipairs(builders) do
+    local x, _, z = Spring.GetUnitPosition(uid)
+    dist[uid] = x and ((x - gx) ^ 2 + (z - gz) ^ 2) or math.huge
+  end
+  local crew = {}
+  for i, uid in ipairs(builders) do crew[i] = uid end
+  table.sort(crew, function(a, b) if dist[a] == dist[b] then return a < b end return dist[a] < dist[b] end)
+  for i = #crew, math.max(1, math.ceil(#builders / 2)) + 1, -1 do crew[i] = nil end
   if state == "frame" then
     local free = {}
-    for _, uid in ipairs(builders) do
+    for _, uid in ipairs(crew) do
       if not busyWith(uid, function(c) return c.id == CMD.REPAIR end) then free[#free + 1] = uid end
     end
     if #free > 0 and gate > 0 then
@@ -347,6 +415,39 @@ local function gateRig()
         where[#where + 1] = tostring(ud and ud.name or "?") .. "@" .. (x and math.floor(math.sqrt((x - gx) ^ 2 + (z - gz) ^ 2)) or "?")
       end
       Spring.Echo("VA_AUTOPILOT gate repair builders=" .. #free .. " " .. table.concat(where, " ") .. " built=" .. rp("va_gate_built"))
+    end
+  elseif (state == "unpowered" or state == "charging") and rp("va_gate_power_need") > 0 then
+    -- power: the crew builds the strongest generator it can, as near the gate as BAR allows, until
+    -- what stands and what is going up covers the need with a tenth to spare
+    local need, have = rp("va_gate_power_need"), rp("va_gate_power")
+    local GEN = generators()
+    local coming = 0
+    for _, uid in ipairs(crew) do
+      local q = Spring.GetUnitCommands(uid, 1)
+      local c = q and q[1]
+      if c and c.id < 0 and GEN[-c.id] then coming = coming + GEN[-c.id] end
+    end
+    if have + coming >= need * 1.1 then return end
+    local placed = {}
+    for _, uid in ipairs(crew) do
+      if not busyWith(uid, function(c) return c.id < 0 end) then
+        local ud = UnitDefs[Spring.GetUnitDefID(uid) or -1]
+        local opts = {}
+        for _, b in ipairs((ud and ud.buildOptions) or {}) do if GEN[b] then opts[#opts + 1] = b end end
+        table.sort(opts, function(a, b) if GEN[a] == GEN[b] then return a < b end return GEN[a] > GEN[b] end)
+        for _, def in ipairs(opts) do
+          if buildAt(uid, def, gx, gz) then
+            coming = coming + GEN[def]
+            placed[#placed + 1] = tostring(UnitDefs[def] and UnitDefs[def].name or def)
+            break
+          end
+        end
+      end
+      if have + coming >= need * 1.1 then break end
+    end
+    if #placed > 0 then
+      Spring.Echo("VA_AUTOPILOT gate power orders=" .. table.concat(placed, ",") .. " have=" .. math.floor(have)
+        .. " coming=" .. math.floor(coming) .. " need=" .. need)
     end
   elseif state == "unpowered" or state == "charging" then
     local need, have = math.max(1, rp("va_gate_afus_need")), rp("va_gate_afus")

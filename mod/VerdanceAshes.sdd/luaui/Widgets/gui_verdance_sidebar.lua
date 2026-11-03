@@ -221,6 +221,12 @@ local GATE_WORDS = {   -- game_verdance_jump_gate.lua: frame → unpowered → c
   lost = function() return { frac = 0, label = "the gate is lost", col = Ash.COL.bad } end,
   frame = function() local b = num("va_gate_built", 0); return { frac = b, label = string.format("build the gate %d%%", math.floor(b * 100)), col = Ash.COL.warn } end,
   unpowered = function()
+    -- the energy the company makes around the gate (a seed from before 2026-11-03 counts fusions)
+    local needE = num("va_gate_power_need", 0)
+    if needE > 0 then
+      local haveE = num("va_gate_power", 0)
+      return { frac = haveE / needE, label = string.format("power %d / %d energy", haveE, needE), col = Ash.COL.warn }
+    end
     local have, need = num("va_gate_afus", 0), math.max(1, num("va_gate_afus_need", 4))
     return { frac = have / need, label = string.format("power %d / %d fusions", have, need), col = Ash.COL.warn }
   end,

@@ -163,7 +163,7 @@ def operation_summary(choice):
         "fortify_zone": "Land on the far door and build it up until it is yours: army or defences outweighing everyone there.",
         "hunt_scouts": "Kill every Armada scout constructor.",
         "raze_camp": "Wreck the mercenary camp in the crater.",
-        "jump_gate": "Finish the Spire Gate, power it with four advanced fusions, get every named hero through.",
+        "jump_gate": "Finish the Spire Gate, power it with 1,500 energy a second from generators around it, get every named hero through.",
         "seize_lane": TAKE_ZONE,
         "gate_control": TAKE_ZONE.replace("marked zone", "marked gate"),
         "hold_plateau": TAKE_ZONE.replace("marked zone", "marked plateau"),
