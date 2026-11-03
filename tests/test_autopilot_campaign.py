@@ -37,6 +37,14 @@ class AutopilotTests(unittest.TestCase):
         self.assertEqual((it["hydrology"]["level"], it["hydrology"]["nextLevel"]), (0.0, 0.0))
         self.assertFalse([b for b in it.get("beats") or [] if any(a.get("type") == "hydrology" for a in b.get("actions") or [])])
 
+    def test_the_kings_showdown_has_no_tenebrium_gate(self):
+        """Proxy call, 2026-11-03: the showdown is a straight game of BAR. The rival kings were never
+        gated; the company was, and with 12 Tnb could not field an army to reach a corner."""
+        builder = (ROOT / "scripts" / "build_next_mission_v1.ps1").read_text(encoding="utf-8-sig")
+        self.assertIn("gate = -not $isKings", builder)
+        lua = (ROOT / "mod/VerdanceAshes.sdd/luarules/gadgets/include/va_tenebrium_handlers.lua").read_text()
+        self.assertIn("tenebLoot.enabled = tn.gate ~= false", lua)
+
     def test_rival_ai_swaps_every_rival_barb_seat_and_not_the_company(self):
         text = ("[GAME]\n{\n  [AI0]\n  {\n    Name=BARb(Armada North);\n    ShortName=BARb;\n    Team=1;\n    Version=stable;\n"
                 "    [Options]\n    {\n      profile=hard;\n    }\n  }\n  [AI1]\n  {\n    Name=RaptorsDefenseAI(Verdance);\n"

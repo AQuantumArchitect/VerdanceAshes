@@ -167,6 +167,9 @@ return function(tenebLoot, api)
     local tn = (mission and mission.tenebrium) or {}
     local com = (mission and mission.commerce) or {}
     local startBank = tonumber(tn.playerBank or tn.bank or com.tenebrium or 0) or 0
+    -- The kings' showdown is a straight game of BAR: no Tenebrium gate on building (tn.gate = false).
+    tenebLoot.enabled = tn.gate ~= false
+    if not tenebLoot.enabled then Spring.Echo("VA_TENEBRIUM_GATE off: building is free this match") end
     -- Mid-reload restore: prefer live published bank over reseeding to 0.
     local frame = (Spring.GetGameFrame and Spring.GetGameFrame()) or 0
     local published = tonumber((Spring.GetGameRulesParam and Spring.GetGameRulesParam("va_tenebrium_bank")))

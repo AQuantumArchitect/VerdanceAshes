@@ -3091,6 +3091,8 @@ $scenario = [ordered]@{
         armadaBank = if ($fb -and $null -ne $fb.armada) { [int]$fb.armada } else { 0 }
         cortexBank = if ($fb -and $null -ne $fb.cortex) { [int]$fb.cortex } else { 2 }
         armadaCrisis = if ($wcT -and $null -ne $wcT.armadaTenebriumCrisis) { [bool]$wcT.armadaTenebriumCrisis } else { $true }
+        # The kings' showdown is a straight game of BAR: the company builds without the Tnb gate, as the rival kings do.
+        gate = -not $isKings
         notes = "Build-power units cost >=1 Tnb; wrecks keep Tnb until reclaimed or truly gone."
       }
     )

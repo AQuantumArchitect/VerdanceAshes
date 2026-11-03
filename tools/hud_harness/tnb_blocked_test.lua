@@ -34,3 +34,16 @@ assert(tenebLoot.allowCreate(8, 0, 42) == true, "a build with no Tenebrium cost 
 tenebLoot.bank = 1
 assert(tenebLoot.allowCreate(7, 0, 42) == true, "with the Tenebrium it goes ahead")
 print("ok: a refused build says so once per builder and unit type every 30 seconds")
+
+-- The kings' showdown seeds tenebrium.gate = false: a straight game of BAR, every build goes ahead.
+local free = { bank = 0, enabled = true, blockedSaid = {}, publish = function() end }
+attach(free, {
+  jnum = tostring, jstr = tostring, teamFaction = {}, SendToUnsynced = function() end,
+  playerTeamID = function() return 0 end, playerAllyTeamID = function() return 0 end,
+  mission = function() return { tenebrium = { playerBank = 0, gate = false } } end, publishRules = function() end,
+})
+Spring.GetGameRulesParam = function() return nil end
+pcall(free.initFromMission)
+assert(free.enabled == false, "gate = false turns the gate off")
+assert(free.allowCreate(7, 0, 42) == true, "with no gate a constructor goes ahead on an empty bank")
+print("ok: the showdown's seed turns the Tenebrium gate off")
