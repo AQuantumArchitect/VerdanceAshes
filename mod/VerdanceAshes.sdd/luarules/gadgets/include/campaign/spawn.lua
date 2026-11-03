@@ -202,7 +202,8 @@ local function spawnOneUnit(defName, x, z, facing, teamID, spec, force, hpPct)
         local ud = UnitDefs[defID]
         local bookIt = isStructure(defID)
         if bookIt and force.book == "guns_and_command" then
-          bookIt = (canFight(defID) or (ud and ud.isFactory)) and true or false
+          -- weapons, not canAttack: Recoil leaves canAttack true on a windmill
+          bookIt = ud and ((ud.weapons and #ud.weapons > 0) or ud.isFactory) and true or false
         end
         if bookIt then
           local forceId = tostring(force.id or "objective")
