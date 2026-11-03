@@ -21,6 +21,10 @@ end
 --
 -- BARb fights; it knows nothing of the campaign. This rig only, on top of it:
 --   nudge      idle units fight toward the wound
+--   the gate   the Spire Jump (finale C, game_verdance_jump_gate.lua): builders finish the frame,
+--              then build advanced fusions around it until it has its four, and once it is open
+--              the heroes walk onto its pad one at a time. BARb knows none of this.
+--   finales    get three times the clock (va_autopilot_minutes) before the company leaves
 --   hold       a capture in its hold, the company short of presence there: every armed unit not
 --              on another errand fights to the hold's centre (va_hold_cx/cz) and stays. BARb
 --              wandered off and the hold never ran (stock rehearsal, 2026-11-02)
@@ -147,6 +151,101 @@ local function holdTheZone()
   if #guns == 0 then return end
   order(guns, CMD.FIGHT, { cx, Spring.GetGroundHeight(cx, cz) or 0, cz }, true)
   Spring.Echo("VA_AUTOPILOT hold units=" .. #guns .. " presence=" .. rp("va_claim_value") .. "/" .. need)
+end
+
+-- ---------------------------------------------------------------- the Spire Gate (finale C)
+local AFUS_DEFS = nil
+local function afusDefs()
+  if AFUS_DEFS then return AFUS_DEFS end
+  AFUS_DEFS = {}
+  for _, n in ipairs({ "legafus", "armafus", "corafus" }) do
+    if UnitDefNames and UnitDefNames[n] then AFUS_DEFS[#AFUS_DEFS + 1] = UnitDefNames[n].id end
+  end
+  return AFUS_DEFS
+end
+
+local function canBuild(ud, defID)
+  for _, b in ipairs((ud and ud.buildOptions) or {}) do if b == defID then return true end end
+  return false
+end
+
+-- A free spot for a building near the gate: rings outward from it, the first place BAR accepts.
+local function spotNear(defID, gx, gz)
+  for _, r in ipairs({ 450, 650, 850, 1050, 1300, 1600 }) do
+    for k = 0, 11 do
+      local a = (k / 12) * 2 * math.pi
+      local x, z = gx + math.cos(a) * r, gz + math.sin(a) * r
+      local y = Spring.GetGroundHeight(x, z) or 0
+      if (Spring.TestBuildOrder(defID, x, y, z, 0) or 0) > 0 then return x, y, z end
+    end
+  end
+  return nil
+end
+
+local function busyWith(uid, test)
+  local q = Spring.GetUnitCommands(uid, 1)
+  return q ~= nil and q[1] ~= nil and test(q[1])
+end
+
+local function gateRig()
+  local state = tostring(Spring.GetGameRulesParam("va_gate_state") or "")
+  if state == "" or state == "lost" then return end
+  local gx, gz, gate = rp("va_gate_x"), rp("va_gate_z"), rp("va_gate_unit")
+  if gx <= 0 then return end
+  local builders = companyUnits(function(ud) return mobile(ud) and ud.isBuilder and (ud.buildOptions and #ud.buildOptions > 0) end)
+  if state == "frame" then
+    local free = {}
+    for _, uid in ipairs(builders) do
+      if not busyWith(uid, function(c) return c.id == CMD.REPAIR end) then free[#free + 1] = uid end
+    end
+    if #free > 0 and gate > 0 then
+      order(free, CMD.REPAIR, { gate }, true)
+      Spring.Echo("VA_AUTOPILOT gate repair builders=" .. #free)
+    end
+  elseif state == "unpowered" or state == "charging" then
+    local need, have = math.max(1, rp("va_gate_afus_need")), rp("va_gate_afus")
+    if have >= need then return end
+    local placed = 0
+    for _, uid in ipairs(builders) do
+      if not busyWith(uid, function(c) return c.id < 0 end) then
+        local ud = UnitDefs[Spring.GetUnitDefID(uid) or -1]
+        for _, def in ipairs(afusDefs()) do
+          if canBuild(ud, def) then
+            local x, y, z = spotNear(def, gx, gz)
+            if x then
+              held[uid] = true
+              issuing = true
+              pcall(Spring.GiveOrderToUnit, uid, -def, { x, y, z, 0 }, 0)
+              issuing = false
+              placed = placed + 1
+            end
+            break
+          end
+        end
+      end
+      if have + placed >= need + 1 then break end   -- one spare in case one dies
+    end
+    if placed > 0 then Spring.Echo("VA_AUTOPILOT gate afus orders=" .. placed .. " have=" .. have .. "/" .. need) end
+  elseif state == "open" then
+    -- one hero at a time: the nearest walks onto the pad and stays; the rest wait near it
+    local heroes = companyUnits(function(ud, uid)
+      local hid = Spring.GetUnitRulesParam(uid, "va_hero_id")
+      local partner = Spring.GetUnitRulesParam(uid, "va_partner_of")
+      return mobile(ud) and hid ~= nil and hid ~= "" and hid ~= 0 and not (partner and partner ~= "")
+    end)
+    if #heroes == 0 then return end
+    local best, bd = nil, math.huge
+    for _, uid in ipairs(heroes) do
+      local x, _, z = Spring.GetUnitPosition(uid)
+      local d = x and ((x - gx) ^ 2 + (z - gz) ^ 2) or math.huge
+      if d < bd then best, bd = uid, d end
+    end
+    order({ best }, CMD.MOVE, { gx, Spring.GetGroundHeight(gx, gz) or 0, gz }, true)
+    local rest = {}
+    for _, uid in ipairs(heroes) do if uid ~= best then rest[#rest + 1] = uid end end
+    local wait = math.max(300, rp("va_gate_pad_r") + 150)
+    if #rest > 0 then order(rest, CMD.MOVE, { gx + wait, Spring.GetGroundHeight(gx + wait, gz) or 0, gz }, true) end
+  end
 end
 
 -- ---------------------------------------------------------------- rescue
@@ -285,6 +384,8 @@ function gadget:Initialize()
   local ok, m = pcall(VFS.Include, "singleplayer/verdance_ashes/generated/va_current.lua")
   mission = ok and type(m) == "table" and m or nil
   playerTeam = tonumber(mission and mission.balance and mission.balance.playerTeamID) or 0
+  -- a finale is a long fight (the gate's fusions and charge, the kings' war): three times the clock
+  if mission and type(mission.finale) == "table" then CAP_FRAMES = CAP_FRAMES * 3 end
   Spring.Echo("VA_AUTOPILOT armed team=" .. playerTeam .. " cap=" .. CAP_FRAMES .. " settle=" .. SETTLE_FRAMES
     .. " mission=" .. tostring(mission and mission.missionId))
 end
@@ -319,6 +420,7 @@ function gadget:GameFrame(f)
     if readyToLeave(f) then return leave(departureWhy, f) end
     return
   end
+  gateRig()
   if f % RESCUE_EVERY == 311 then rescue() end
   if f % NUDGE_EVERY < 30 then holdTheZone(); nudge() end
 end

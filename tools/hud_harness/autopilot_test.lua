@@ -18,7 +18,7 @@ gadgetHandler = {
   IsSyncedCode = function() return true end,
   RegisterAllowCommand = function(_, id) registered = id end,
 }
-CMD = { ANY = -1, FIGHT = 16, MOVE = 10, RESURRECT = 125 }
+CMD = { ANY = -1, FIGHT = 16, MOVE = 10, RESURRECT = 125, REPAIR = 40 }
 Game = { maxUnits = 10000, mapSizeX = 8192, mapSizeZ = 8192 }
 UnitDefs = {
   [1] = { speed = 50, canAttack = true },
@@ -110,4 +110,48 @@ rules.va_claim_value = 1800; rules.va_claim_need = 1501
 gadget:GameFrame(611)
 assert(gadget:AllowCommand(1), "enough presence there already: the guns stay BARb's")
 
-print("ok: rescue squad, protected orders, departure to the real pad radius, leaving with and without a HUD, holding a capture")
+-- 4. The Spire Gate (finale C): builders finish the frame, then build fusions around it, then the
+--    heroes walk onto its pad one at a time.
+local units, unitDef, heroOf, queues, built = {}, {}, {}, {}, {}
+local function gateWorld()
+  reset()
+  UnitDefs[4] = { speed = 40, isBuilder = true, buildOptions = { 50 } }      -- a T2 constructor
+  UnitDefs[5] = { speed = 40, isBuilder = true, buildOptions = { 51 } }      -- a T1 constructor: no fusion
+  UnitDefNames = { legafus = { id = 50 } }
+  units = { 1, 4, 5, 6 }
+  unitDef = { [1] = 1, [4] = 4, [5] = 5, [6] = 1 }
+  heroOf = { [1] = "halbard", [6] = "vane" }
+  positions[4], positions[5], positions[6] = { 900, 900 }, { 900, 950 }, { 2000, 2000 }
+  queues, built = {}, {}
+  Spring.GetTeamUnits = function() return units end
+  Spring.GetUnitDefID = function(uid) return unitDef[uid] end
+  Spring.GetUnitRulesParam = function(uid, k) if k == "va_hero_id" then return heroOf[uid] end end
+  Spring.GetUnitCommands = function(uid) return queues[uid] or {} end
+  Spring.TestBuildOrder = function() return 2 end
+  Spring.GiveOrderToUnit = function(uid, cmd, params) assert(gadget:AllowCommand(uid)); built[#built + 1] = { uid = uid, cmd = cmd, x = params[1] } end
+  rules.va_gate_x, rules.va_gate_z, rules.va_gate_unit, rules.va_gate_pad_r = 1000, 1000, 77, 220
+end
+gateWorld()
+rules.va_gate_state = "frame"
+gadget:GameFrame(41)
+local rep = find(CMD.REPAIR)
+assert(rep and rep.params[1] == 77, "the builders finish the gate's frame")
+assert(not gadget:AllowCommand(4) and not gadget:AllowCommand(5), "BARb must not pull the builders off the frame")
+gateWorld()
+rules.va_gate_state = "unpowered"; rules.va_gate_afus = 1; rules.va_gate_afus_need = 4
+gadget:GameFrame(41)
+assert(#built == 1 and built[1].uid == 4 and built[1].cmd == -50, "the T2 constructor builds a fusion near the gate")
+assert(math.abs(built[1].x - 1000) <= 1600, "...near it")
+queues[4] = { { id = -50 } }
+built = {}
+gadget:GameFrame(71)
+assert(#built == 0, "a builder already on a fusion is left to it")
+gateWorld()
+rules.va_gate_state = "open"
+gadget:GameFrame(41)
+local moves = {}
+for _, o in ipairs(orders) do if o.cmd == CMD.MOVE then moves[#moves + 1] = o end end
+assert(moves[1] and moves[1].params[1] == 1000 and moves[1].params[3] == 1000, "the nearest hero walks onto the pad")
+assert(moves[2] and moves[2].params[1] ~= 1000, "the others wait off the pad")
+
+print("ok: rescue squad, protected orders, departure to the real pad radius, leaving with and without a HUD, holding a capture, the Spire Gate")

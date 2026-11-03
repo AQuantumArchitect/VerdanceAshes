@@ -57,12 +57,21 @@ local function xz()
   return x, z
 end
 
+-- Where the gate and its pad are, for the HUD and the autopilot rig (game_verdance_autopilot.lua).
+local function publishGate(x, z)
+  Spring.SetGameRulesParam("va_gate_x", math.floor(x), { public = true })
+  Spring.SetGameRulesParam("va_gate_z", math.floor(z), { public = true })
+  Spring.SetGameRulesParam("va_gate_unit", gateID or 0, { public = true })
+  Spring.SetGameRulesParam("va_gate_pad_r", tonumber(cfg.padRadius) or 220, { public = true })
+end
+
 local function placeFrame()
   -- A gate from an earlier try (company footprints rehydrate the works) is the gate: adopt it.
   local gateDef = UnitDefNames["va_jump_gate"].id
   for _, uid in ipairs(Spring.GetTeamUnits(playerTeam) or {}) do
     if Spring.GetUnitDefID(uid) == gateDef then
       gateID = uid
+      publishGate(xz())   -- the pad is where the config puts it (GameFrame measures from xz())
       Spring.Echo("VA_GATE_ADOPTED unit=" .. uid)
       return
     end
@@ -73,6 +82,7 @@ local function placeFrame()
   -- what BAR's Prevent Lab Hax2 kills on sight. Its health follows its build progress.
   gateID = Spring.CreateUnit("va_jump_gate", x, y, z, 0, playerTeam, false)
   if gateID then
+    publishGate(x, z)
     local b = tonumber(cfg.startBuilt) or 0.05
     local _, maxHp = Spring.GetUnitHealth(gateID)
     Spring.SetUnitHealth(gateID, { build = b, health = math.max(100, (maxHp or 24000) * b) })
