@@ -27,6 +27,16 @@ end
 local config = VFS.Include('LuaRules/Configs/raptor_spawn_defs.lua')
 -- Verdance keeps its authored hives only in a hub-launched match; otherwise this is stock BAR.
 local VA_ACTIVE = VFS.Include("LuaRules/Configs/va_active.lua")
+-- The kings' showdown: the den holds one corner of four, so it grows no turret that reaches the others.
+-- The meteor turret shoots the whole map (range 72000); on 2026-11-03 one in the south-west den killed
+-- the company's king in the north-west at minute 68. The den's other turrets reach 5000 at most.
+if VA_ACTIVE and config.raptorTurrets then
+	local okm, vam = pcall(VFS.Include, "singleplayer/verdance_ashes/generated/va_current.lua")
+	if okm and type(vam) == "table" and type(vam.kings) == "table" and #vam.kings > 0 then
+		config.raptorTurrets["raptor_turret_meteor_t4_v1"] = nil
+		Spring.Echo("VA_RAPTOR_DEN corner den: no map-wide meteor turret")
+	end
+end
 -- The Queen's Nest (units/va_queen_nest.lua): when the campaign places one, the queen wakes when it
 -- falls (or her anger fills), not when the roost count runs low.
 local VA_NEST = { def = VA_ACTIVE and UnitDefNames and UnitDefNames.va_queen_nest and UnitDefNames.va_queen_nest.id or nil,

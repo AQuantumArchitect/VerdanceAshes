@@ -45,6 +45,13 @@ class AutopilotTests(unittest.TestCase):
         lua = (ROOT / "mod/VerdanceAshes.sdd/luarules/gadgets/include/va_tenebrium_handlers.lua").read_text()
         self.assertIn("tenebLoot.enabled = tn.gate ~= false", lua)
 
+    def test_the_showdown_den_grows_no_map_wide_turret(self):
+        """2026-11-03, rig run7: a meteor turret (range 72000) in the south-west den killed the company's
+        king in the north-west at minute 68. In the showdown the den keeps every turret but that one."""
+        spawner = (ROOT / "mod/VerdanceAshes.sdd/luarules/gadgets/raptor_spawner_defense.lua").read_text()
+        self.assertIn('config.raptorTurrets["raptor_turret_meteor_t4_v1"] = nil', spawner)
+        self.assertIn("#vam.kings > 0", spawner)
+
     def test_rival_ai_swaps_every_rival_barb_seat_and_not_the_company(self):
         text = ("[GAME]\n{\n  [AI0]\n  {\n    Name=BARb(Armada North);\n    ShortName=BARb;\n    Team=1;\n    Version=stable;\n"
                 "    [Options]\n    {\n      profile=hard;\n    }\n  }\n  [AI1]\n  {\n    Name=RaptorsDefenseAI(Verdance);\n"

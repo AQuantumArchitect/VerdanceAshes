@@ -5,6 +5,7 @@
 - **The kings' showdown in four corners** (finale B, owner call). The company lands north-west, Armada starts north-east, Cortex south-east, and a raptor den with its hives holds the south-west. That makes three kings and the wild, with every corner occupied. The Null Mercs no longer sit a throne. The raptors fight everyone, at an easier pace than the Rock Jungle's (very easy, with a slower queen), so they harry the kings without deciding the throne. The throne is still the last commander standing. In Cortex's own suit, Cortex stays home and its corner stands empty.
 - **The showdown keeps the map's own water** for the whole match: no sink and no tide. All That Simmers is flat, and the tide drowned whole seats mid-match.
 - **No Tenebrium gate in the showdown.** It is a straight game of BAR: the company builds freely, as the rival kings always have. With the gate on and a walked bank of 12, the company was refused its T2 plant 251 times in one match and never fielded an army that could reach a corner.
+- **The den holds its own corner.** In the showdown the raptor den grows every turret except the meteor turret, which shoots the whole map. In one test match a meteor turret in the south-west killed the company's king in the north-west at minute 68.
 - **Testing only:** `autopilot_campaign_v1.py --rival-ai SimpleAI` plays every rival seat as SimpleAI, to check that a field can be won at all. The real game keeps BARb.
 
 ## 0.14.6 — 2026-11-03
