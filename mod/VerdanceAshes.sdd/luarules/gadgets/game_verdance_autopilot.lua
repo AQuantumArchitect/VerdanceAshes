@@ -187,6 +187,76 @@ local function busyWith(uid, test)
   return q ~= nil and q[1] ~= nil and test(q[1])
 end
 
+-- The tech ladder to an advanced fusion, worked out from the unit defs (any faction):
+--   fusionBuilders  can build one          t2Labs        factories that make a fusion builder
+--   labBuilders     can build a t2Lab      t1Labs        factories that make a lab builder
+local LADDER = nil
+local function ladder()
+  if LADDER then return LADDER end
+  local function anyIn(ud, set)
+    for _, b in ipairs((ud and ud.buildOptions) or {}) do if set[b] then return b end end
+    return nil
+  end
+  local afus = {}
+  for _, d in ipairs(afusDefs()) do afus[d] = true end
+  local L = { fusionBuilders = {}, t2Labs = {}, labBuilders = {}, t1Labs = {} }
+  for id, ud in pairs(UnitDefs) do if not ud.isFactory and anyIn(ud, afus) then L.fusionBuilders[id] = true end end
+  for id, ud in pairs(UnitDefs) do if ud.isFactory and anyIn(ud, L.fusionBuilders) then L.t2Labs[id] = true end end
+  for id, ud in pairs(UnitDefs) do if not ud.isFactory and anyIn(ud, L.t2Labs) then L.labBuilders[id] = true end end
+  for id, ud in pairs(UnitDefs) do if ud.isFactory and anyIn(ud, L.labBuilders) then L.t1Labs[id] = true end end
+  L.anyIn = anyIn
+  LADDER = L
+  return L
+end
+
+local function buildAt(uid, def, gx, gz)
+  local x, y, z = spotNear(def, gx, gz)
+  if not x then return false end
+  held[uid] = true
+  issuing = true
+  pcall(Spring.GiveOrderToUnit, uid, -def, { x, y, z, 0 }, 0)
+  issuing = false
+  return true
+end
+
+-- No one can build an advanced fusion yet: climb one rung (a factory makes the builder, a builder
+-- makes the factory), one order at a time. Returns what it ordered, for the log.
+local function climbToFusion(gx, gz)
+  local L = ladder()
+  local have = { fusionBuilders = {}, t2Labs = {}, labBuilders = {}, t1Labs = {} }
+  for _, uid in ipairs(Spring.GetTeamUnits(playerTeam) or {}) do
+    local d = Spring.GetUnitDefID(uid)
+    local _, _, _, _, built = Spring.GetUnitHealth(uid)
+    if d and (built or 1) >= 1 then
+      for k in pairs(have) do if L[k][d] then have[k][#have[k] + 1] = uid end end
+    end
+  end
+  if #have.fusionBuilders > 0 then return nil end
+  local idle = function(uid) return not busyWith(uid, function(c) return c.id < 0 end) end
+  local function make(factories, set, what)
+    for _, f in ipairs(factories) do
+      if idle(f) then
+        local want = L.anyIn(UnitDefs[Spring.GetUnitDefID(f)], set)
+        if want then
+          issuing = true
+          pcall(Spring.GiveOrderToUnit, f, -want, {}, 0)
+          issuing = false
+          return what
+        end
+      end
+    end
+  end
+  if #have.t2Labs > 0 then return make(have.t2Labs, L.fusionBuilders, "fusion builder") end
+  for _, uid in ipairs(have.labBuilders) do
+    if idle(uid) then
+      local lab = L.anyIn(UnitDefs[Spring.GetUnitDefID(uid)], L.t2Labs)
+      if lab and buildAt(uid, lab, gx, gz) then return "advanced lab" end
+    end
+  end
+  if #have.labBuilders == 0 and #have.t1Labs > 0 then return make(have.t1Labs, L.labBuilders, "lab builder") end
+  return nil
+end
+
 local function gateRig()
   local state = tostring(Spring.GetGameRulesParam("va_gate_state") or "")
   if state == "" or state == "lost" then return end
@@ -226,6 +296,10 @@ local function gateRig()
       if have + placed >= need + 1 then break end   -- one spare in case one dies
     end
     if placed > 0 then Spring.Echo("VA_AUTOPILOT gate afus orders=" .. placed .. " have=" .. have .. "/" .. need) end
+    if placed == 0 then
+      local step = climbToFusion(gx, gz)
+      if step then Spring.Echo("VA_AUTOPILOT gate tech " .. step) end
+    end
   elseif state == "open" then
     -- one hero at a time: the nearest walks onto the pad and stays; the rest wait near it
     local heroes = companyUnits(function(ud, uid)

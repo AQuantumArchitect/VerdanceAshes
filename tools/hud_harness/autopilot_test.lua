@@ -128,6 +128,7 @@ local function gateWorld()
   Spring.GetUnitRulesParam = function(uid, k) if k == "va_hero_id" then return heroOf[uid] end end
   Spring.GetUnitCommands = function(uid) return queues[uid] or {} end
   Spring.TestBuildOrder = function() return 2 end
+  Spring.GetUnitHealth = function() return 1, 1, 0, 0, 1 end
   Spring.GiveOrderToUnit = function(uid, cmd, params) assert(gadget:AllowCommand(uid)); built[#built + 1] = { uid = uid, cmd = cmd, x = params[1] } end
   rules.va_gate_x, rules.va_gate_z, rules.va_gate_unit, rules.va_gate_pad_r = 1000, 1000, 77, 220
 end
@@ -154,4 +155,33 @@ for _, o in ipairs(orders) do if o.cmd == CMD.MOVE then moves[#moves + 1] = o en
 assert(moves[1] and moves[1].params[1] == 1000 and moves[1].params[3] == 1000, "the nearest hero walks onto the pad")
 assert(moves[2] and moves[2].params[1] ~= 1000, "the others wait off the pad")
 
-print("ok: rescue squad, protected orders, departure to the real pad radius, leaving with and without a HUD, holding a capture, the Spire Gate")
+-- 5. Nobody can build an advanced fusion yet: the rig climbs the tech ladder, one rung per order.
+local function ladderWorld(have)
+  gateWorld()
+  UnitDefs[10] = { isFactory = true, buildOptions = { 11 } }               -- a T1 lab
+  UnitDefs[11] = { speed = 40, isBuilder = true, buildOptions = { 12 } }   -- a T1 constructor
+  UnitDefs[12] = { isFactory = true, buildOptions = { 13 } }               -- an advanced lab
+  UnitDefs[13] = { speed = 40, isBuilder = true, buildOptions = { 50 } }   -- an advanced constructor
+  UnitDefs[4], UnitDefs[5] = nil, nil
+  units, unitDef = {}, {}
+  for uid, def in pairs(have) do units[#units + 1] = uid; unitDef[uid] = def; positions[uid] = { 900, 900 } end
+  Spring.GetUnitHealth = function() return 1, 1, 0, 0, 1 end
+  rules.va_gate_state = "unpowered"; rules.va_gate_afus = 0; rules.va_gate_afus_need = 4
+end
+ladderWorld({ [20] = 10 })
+gadget:GameFrame(41)
+assert(built[1] and built[1].uid == 20 and built[1].cmd == -11, "the T1 lab makes a constructor")
+ladderWorld({ [20] = 10, [21] = 11 })
+gadget:GameFrame(41)
+assert(built[1] and built[1].uid == 21 and built[1].cmd == -12, "the constructor builds an advanced lab by the gate")
+ladderWorld({ [20] = 10, [21] = 11, [22] = 12 })
+gadget:GameFrame(41)
+local made = false
+for _, b in ipairs(built) do if b.uid == 22 and b.cmd == -13 then made = true end end
+assert(made, "the advanced lab makes a constructor that can build the fusion")
+ladderWorld({ [23] = 13 })
+gadget:GameFrame(41)
+assert(built[1] and built[1].uid == 23 and built[1].cmd == -50, "and that one builds the fusion")
+for _, id in ipairs({ 10, 11, 12, 13 }) do UnitDefs[id] = nil end
+
+print("ok: rescue squad, protected orders, departure to the real pad radius, leaving with and without a HUD, holding a capture, the Spire Gate and its tech ladder")
