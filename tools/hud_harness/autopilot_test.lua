@@ -184,4 +184,25 @@ gadget:GameFrame(41)
 assert(built[1] and built[1].uid == 23 and built[1].cmd == -50, "and that one builds the fusion")
 for _, id in ipairs({ 10, 11, 12, 13 }) do UnitDefs[id] = nil end
 
-print("ok: rescue squad, protected orders, departure to the real pad radius, leaving with and without a HUD, holding a capture, the Spire Gate and its tech ladder")
+-- 6. Targets to break (the Overthrow): with enough guns, they all fight to the nearest target.
+reset()
+local guns = {}
+for i = 100, 111 do guns[#guns + 1] = i; positions[i] = { 0, 0 } end
+Spring.GetTeamUnits = function() return guns end
+Spring.GetUnitDefID = function() return 1 end
+Spring.ValidUnitID = function() return true end
+positions[900], positions[901] = { 5000, 5000 }, { 800, 600 }
+GG.VA_ObjectiveTargets = function() return { [900] = "keep", [901] = "keep" } end
+gadget:GameFrame(611)
+local s = find(CMD.FIGHT)
+assert(s and s.params[1] == 800 and s.params[3] == 600, "the guns go for the nearest target")
+assert(not gadget:AllowCommand(100), "and BARb leaves them on it")
+reset()
+guns = { 100, 101 }
+Spring.GetTeamUnits = function() return guns end
+Spring.GetUnitDefID = function() return 1 end
+gadget:GameFrame(611)
+assert(gadget:AllowCommand(100), "too few guns: no siege yet")
+GG.VA_ObjectiveTargets = nil
+
+print("ok: rescue squad, protected orders, departure to the real pad radius, leaving with and without a HUD, holding a capture, the Spire Gate and its tech ladder, the siege")

@@ -25,6 +25,8 @@ end
 --              then build advanced fusions around it until it has its four, and once it is open
 --              the heroes walk onto its pad one at a time. BARb knows none of this.
 --   finales    get three times the clock (va_autopilot_minutes) before the company leaves
+--   siege      a job with targets to break (the Overthrow): once the company has SIEGE_GUNS guns,
+--              every gun not on another errand fights to the target nearest the company
 --   hold       a capture in its hold, the company short of presence there: every armed unit not
 --              on another errand fights to the hold's centre (va_hold_cx/cz) and stays. BARb
 --              wandered off and the hold never ran (stock rehearsal, 2026-11-02)
@@ -136,6 +138,33 @@ local function nudge()
   if #idle == 0 then return end
   order(idle, CMD.FIGHT, { x, Spring.GetGroundHeight(x, z) or 0, z })
   Spring.Echo("VA_AUTOPILOT nudge idle=" .. #idle)
+end
+
+-- ---------------------------------------------------------------- siege
+local SIEGE_GUNS = 12
+local function siege()
+  local targets = GG.VA_ObjectiveTargets and GG.VA_ObjectiveTargets() or nil
+  if not targets or next(targets) == nil then return end
+  local guns = companyUnits(function(ud, uid) return mobile(ud) and ud.canAttack and not ud.isBuilder and not held[uid] end)
+  if #guns < SIEGE_GUNS then return end
+  local cx, cz, n = 0, 0, 0
+  for _, uid in ipairs(guns) do
+    local x, _, z = Spring.GetUnitPosition(uid)
+    if x then cx, cz, n = cx + x, cz + z, n + 1 end
+  end
+  if n == 0 then return end
+  cx, cz = cx / n, cz / n
+  local bx, bz, bd = nil, nil, math.huge
+  for uid in pairs(targets) do
+    if Spring.ValidUnitID(uid) and not Spring.GetUnitIsDead(uid) then
+      local x, _, z = Spring.GetUnitPosition(uid)
+      local d = x and ((x - cx) ^ 2 + (z - cz) ^ 2) or math.huge
+      if d < bd then bx, bz, bd = x, z, d end
+    end
+  end
+  if not bx then return end
+  order(guns, CMD.FIGHT, { bx, Spring.GetGroundHeight(bx, bz) or 0, bz }, true)
+  Spring.Echo("VA_AUTOPILOT siege guns=" .. #guns .. " at=" .. math.floor(bx) .. "," .. math.floor(bz))
 end
 
 -- ---------------------------------------------------------------- hold
@@ -496,5 +525,5 @@ function gadget:GameFrame(f)
   end
   gateRig()
   if f % RESCUE_EVERY == 311 then rescue() end
-  if f % NUDGE_EVERY < 30 then holdTheZone(); nudge() end
+  if f % NUDGE_EVERY < 30 then siege(); holdTheZone(); nudge() end
 end

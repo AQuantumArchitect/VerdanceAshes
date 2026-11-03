@@ -37,6 +37,8 @@ VA_KINDS = {
 VA_GADGET_KINDS = { jump_gate = "jumped" }
 
 objectiveTargets = {}             -- unitID -> forceId (objective_target structures)
+-- The targets still standing, for the autopilot rig (game_verdance_autopilot.lua): unitID -> forceId.
+GG.VA_ObjectiveTargets = function() return objectiveTargets end
 objectiveTargetCount = 0
 objectiveTargetsDestroyed = 0
 objectiveComplete = false
