@@ -39,16 +39,32 @@ gives up. **Fixed** names the change on branch `claude/issue-4`.
 | 2:09 | Vane goes down (a hero wreck; Ketha can raise her). | A hero is at stake. | — |
 | ~14:00 | (Headless rig, the capture seed with Halbard's heat ray.) `game_verdance_heatray.lua:83` raised in GameFrame every 10 frames, about 900 times: a Halberd that veterancy never touched has no `va_vet_range_mult` at all, and `tonumber()` of no value is an error. The burn ticks after it stopped too. | — | **Fixed**, with a harness case that fails without the fix. |
 
-## Minutes 5 – 10, once the hold works
+## The same match with the fixes (verified)
 
-With the allies fix, a player who stands in the Bastion with more than 1,500 metal of army, and
-three times whatever the Armada has left there, holds for 30 s and the objective completes around
-the 3 – 5 minute mark. Then `MARKS` (bonus marks: the fusion vaults at the gates, Pavise's or
-Cauter's wreck to raise) and `EXTRACT`: get onto the pad, press EXTRACT, confirm the manifest.
-The 7:30 clock only ends in overtime, which wakes the map; nothing ends the sortie but the player.
+The rehearsal again on Luke's PC with this branch (run `20261102_162701`, stock BAR data folder):
+
+| When | What happens |
+|---|---|
+| 0:00 | `APPROACH 7:30 · presence 0 / 1501`: the hold's need is the company's own 1,500 (the Null Mercs no longer count). |
+| 0:13 | Ketha goes down south of the pad, and a blast takes her wreck at 0:19. See below. |
+| 1:35 | Pocket clear, 65 of 108. |
+| 2:00 | `hold 0s / 30s · waiting for presence · presence 860 / 2896`: an Armada regrow wave is in the zone, so the need is three times theirs. The autopilot sends its guns in. |
+| 3:00 | `hold 18s / 30s · presence 2060 / 1501`. |
+| 3:12 | `VA_NODE_CLAIMED zone=GF_NW_BASTION`, objective complete (`node_claimed`). The Bastion at the end: Null Mercs 3,156, company 1,960. Under the old rule nobody owned it. |
+| 3:57 | Extracted, verdict **victory**, mission 1 → 2. Engine exit 0, `REHEARSAL OK`. |
+
+After the objective comes `MARKS` (bonus marks: the fusion vaults at the gates, the wrecks to
+raise) and `EXTRACT`: get onto the pad, press EXTRACT, confirm the manifest. The 7:30 clock only
+ends in overtime, which wakes the map. Nothing ends the sortie but the player.
 
 ## Not fixed here
 
+- **Ketha can die in the first 20 seconds.** In the second run she followed the army south of the
+  pad, went down at 0:13, and a blast destroyed her wreck at 0:19. She is the only rez captain
+  ("she brings the fallen back"), and losing her before the player has read the HUD is a hard
+  first lesson. The bot moved her, so a human may keep her back. Luke's call: whether Ketha's
+  wreck should get a longer grace in mission 1, or whether the first column should sit further
+  from the pad.
 - The seal button's missing busy state (above).
 - Overtime pacing after a completed objective: not reached in this run, so not judged.
 - A hands-on two-minute play on a stock install. The rehearsal is a bot. A human pass on the
