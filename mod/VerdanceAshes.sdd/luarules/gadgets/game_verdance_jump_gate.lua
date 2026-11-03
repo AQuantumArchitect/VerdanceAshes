@@ -65,23 +65,24 @@ local function xz()
 end
 
 -- Can a ground constructor walk from the drop pad to (x, z)? The anchor of TRJ_NW_MUSTER sits on rock
--- the company's builders cannot climb: in the finale-C rehearsals (2026-11-03) both stood 560 elmos
--- off with a repair order for 45 minutes and the frame never left 5%.
+-- the company's constructors cannot climb: in the finale-C rehearsals (2026-11-03) both stood 560
+-- elmos off with a repair order for 45 minutes and the frame never left 5%. A straight line from the
+-- pad, every 64 elmos ground the constructor can stand on (TestMoveOrder: slope and water). Not a
+-- path search: Spring.RequestPath from a gadget at frame 6 crashed the engine in QTPFS.
 local function walkable(x, z)
   local px = tonumber((Spring.GetGameRulesParam("va_pad_x"))) or 0
   local pz = tonumber((Spring.GetGameRulesParam("va_pad_z"))) or 0
-  if px <= 0 or not Spring.RequestPath then return true end
   local ud = UnitDefNames["legck"] or UnitDefNames["armck"]
-  local md = ud and ud.moveDef and ud.moveDef.name
-  if not md then return true end
-  local ok, path = pcall(Spring.RequestPath, md, px, Spring.GetGroundHeight(px, pz) or 0, pz,
-    x, Spring.GetGroundHeight(x, z) or 0, z, 160)
-  if not ok or not path then return false end
-  local okw, pts = pcall(path.GetPathWayPoints, path)
-  if not okw or type(pts) ~= "table" or #pts == 0 then return false end
-  local last = pts[#pts]
-  local lx, lz = last[1], last[3]
-  return lx ~= nil and ((lx - x) ^ 2 + (lz - z) ^ 2) <= 260 * 260
+  if px <= 0 or not ud or not Spring.TestMoveOrder then return true end
+  local d = math.sqrt((x - px) ^ 2 + (z - pz) ^ 2)
+  local steps = math.max(1, math.floor(d / 64))
+  for i = 1, steps do
+    local t = i / steps
+    local sx, sz = px + (x - px) * t, pz + (z - pz) * t
+    local ok, can = pcall(Spring.TestMoveOrder, ud.id, sx, Spring.GetGroundHeight(sx, sz) or 0, sz, 0, 0, 0, true, false, true)
+    if ok and can == false then return false end
+  end
+  return true
 end
 
 -- The nearest place to the anchor where the gate fits on the ground and a builder can reach it.
