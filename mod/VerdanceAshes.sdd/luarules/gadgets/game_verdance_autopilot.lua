@@ -145,9 +145,12 @@ end
 local SIEGE_GUNS = 12
 -- The kings' showdown is BARb's war: on the container rig it brought down two kings of three on its
 -- own (Cortex at 20 minutes, the Null Mercs at 43), and the run where the rig besieged the nearest
--- king took none (its 21 guns stood off the Armada king's base for an hour). The rig only goes for
--- the last king, with a real army, and attacks the commander itself rather than the place it stood.
+-- king took none (its 21 guns stood off the Armada king's base for an hour: that king was under the
+-- sea, game_verdance_kings now walks it ashore). The rig goes for the last king, and after half an
+-- hour for the nearest one, with a real army, attacking the commander itself rather than the place
+-- it stood: in one run BARb took one king of three in ninety minutes and then sat.
 local KING_SIEGE_GUNS = 40
+local KING_WAR_FRAMES = 30 * 60 * 30
 -- The Spire Jump is won at the gate, not at the hive: the guns stand around the gate (and the
 -- fusions going up beside it) instead of marching on the nests. In the finale-C rehearsal the
 -- siege took 14 guns to the hive heart, 3,000 elmos off, and the raptors took the gate.
@@ -213,7 +216,8 @@ local function siege()
       end
       Spring.Echo("VA_AUTOPILOT kings standing=" .. n .. " company_guns=" .. armed .. " " .. table.concat(rows, " "))
     end
-    if n > 1 then targets = nil end   -- more than one king standing: BARb's war, not the rig's
+    -- more than one king standing: BARb's war, not the rig's, for the first half hour
+    if n > 1 and ((Spring.GetGameFrame and Spring.GetGameFrame()) or 0) < KING_WAR_FRAMES then targets = nil end
   end
   local guns = companyUnits(function(ud, uid)
     return mobile(ud) and ud.canAttack and not ud.isBuilder and (sieged[uid] or not held[uid])
@@ -242,7 +246,10 @@ local function siege()
   if not bx then return end
   if kings then
     local king
-    for uid in pairs(targets) do king = uid end
+    for uid in pairs(targets) do
+      local x, _, z = Spring.GetUnitPosition(uid)
+      if x and x == bx and z == bz then king = uid end
+    end
     order(guns, CMD.ATTACK, { king }, true)
   else
     order(guns, CMD.FIGHT, { bx, Spring.GetGroundHeight(bx, bz) or 0, bz }, true)

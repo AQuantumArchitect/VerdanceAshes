@@ -267,6 +267,17 @@ positions[950], positions[951] = { 3000, 100 }, { 100, 3000 }
 GG.VA_RivalKings = function() return { [950] = 1, [951] = 2 } end
 gadget:GameFrame(611)
 assert(not find(CMD.ATTACK) and gadget:AllowCommand(100), "two kings standing: the rig leaves the war to BARb")
+Spring.GetGameFrame = function() return 31 * 60 * 30 end   -- half an hour on, two kings still stand
+gadget:GameFrame(611)
+local near = find(CMD.ATTACK)
+assert(near and (near.params[1] == 950 or near.params[1] == 951), "after half an hour the rig goes for the nearest king")
+Spring.GetGameFrame = nil
+reset()
+for i = 100, 139 do positions[i] = { 0, 0 } end
+Spring.GetTeamUnits = function() return guns end
+Spring.GetUnitDefID = function() return 1 end
+Spring.ValidUnitID = function() return true end
+positions[950], positions[951] = { 3000, 100 }, { 100, 3000 }
 GG.VA_RivalKings = function() return { [951] = 2 } end
 gadget:GameFrame(1211)
 local k = find(CMD.ATTACK)
