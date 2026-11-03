@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.14.6 — 2026-11-03
 
 Every ending can be reached and won. On a stock BAR install, a hard AI (BARb, hard_aggressive) beat the whole campaign and each of the three finales.
 

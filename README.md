@@ -89,4 +89,4 @@ Split on purpose. Read [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE).
 
 ## Status
 
-Public alpha. Version is the root `VERSION` file. Consolidation line starts at 0.8.0 (one play path). Current line: **0.14.5** (second test line: 64 heroes, field effects v2, bonds and encounters, territory, the performance pass). History: [`CHANGELOG.md`](CHANGELOG.md).
+Public alpha. Version is the root `VERSION` file. Consolidation line starts at 0.8.0 (one play path). Current line: **0.14.6** (second test line: 64 heroes, field effects v2, bonds and encounters, territory, the performance pass). History: [`CHANGELOG.md`](CHANGELOG.md).

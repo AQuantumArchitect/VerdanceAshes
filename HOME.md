@@ -65,7 +65,7 @@ Doc shelf (bots only): [`docs/archive/PROXY_CAMPAIGN.md`](docs/archive/PROXY_CAM
 
 ## Version
 
-Root `VERSION` (kernel reads it). Consolidation line starts at **0.8.0**. Current line: **0.14.5** (second test line, fix release; see CHANGELOG.md). 0.13.0 was the first test export.
+Root `VERSION` (kernel reads it). Consolidation line starts at **0.8.0**. Current line: **0.14.6** (second test line; every ending won by the hard AI; see CHANGELOG.md). 0.13.0 was the first test export.
 
 ## Dev tools
 
