@@ -25,8 +25,9 @@ end
 --              then build advanced fusions around it until it has its four, and once it is open
 --              the heroes walk onto its pad one at a time. BARb knows none of this.
 --   finales    get three times the clock (va_autopilot_minutes) before the company leaves
---   siege      a job with targets to break (the Overthrow): once the company has SIEGE_GUNS guns,
---              every gun not on another errand fights to the target nearest the company
+--   siege      a job with targets to break (the Overthrow; in the kings' showdown, the rival
+--              commanders): once the company has SIEGE_GUNS guns, every gun not on another errand
+--              fights to the target nearest the company
 --   hold       a capture in its hold, the company short of presence there: every armed unit not
 --              on another errand fights to the hold's centre (va_hold_cx/cz) and stays. BARb
 --              wandered off and the hold never ran (stock rehearsal, 2026-11-02)
@@ -144,6 +145,9 @@ end
 local SIEGE_GUNS = 12
 local function siege()
   local targets = GG.VA_ObjectiveTargets and GG.VA_ObjectiveTargets() or nil
+  if (not targets or next(targets) == nil) and GG.VA_RivalKings then
+    targets = GG.VA_RivalKings()   -- the kings' showdown: the rival commanders are the targets
+  end
   if not targets or next(targets) == nil then return end
   local guns = companyUnits(function(ud, uid) return mobile(ud) and ud.canAttack and not ud.isBuilder and not held[uid] end)
   if #guns < SIEGE_GUNS then return end
@@ -532,6 +536,8 @@ function gadget:Initialize()
   playerTeam = tonumber(mission and mission.balance and mission.balance.playerTeamID) or 0
   -- a finale is a long fight (the gate's fusions and charge, the kings' war): three times the clock
   if mission and type(mission.finale) == "table" then CAP_FRAMES = CAP_FRAMES * 3 end
+  -- the kings' showdown ends only with the throne: twice that again before the company gives up
+  if mission and type(mission.kings) == "table" and #mission.kings > 0 then CAP_FRAMES = CAP_FRAMES * 2 end
   Spring.Echo("VA_AUTOPILOT armed team=" .. playerTeam .. " cap=" .. CAP_FRAMES .. " settle=" .. SETTLE_FRAMES
     .. " mission=" .. tostring(mission and mission.missionId))
 end

@@ -206,5 +206,18 @@ Spring.GetUnitDefID = function() return 1 end
 gadget:GameFrame(611)
 assert(gadget:AllowCommand(100), "too few guns: no siege yet")
 GG.VA_ObjectiveTargets = nil
+-- the kings' showdown: the rival commanders are the targets
+reset()
+guns = {}
+for i = 100, 111 do guns[#guns + 1] = i; positions[i] = { 0, 0 } end
+Spring.GetTeamUnits = function() return guns end
+Spring.GetUnitDefID = function() return 1 end
+Spring.ValidUnitID = function() return true end
+positions[950] = { 3000, 100 }
+GG.VA_RivalKings = function() return { [950] = 1 } end
+gadget:GameFrame(611)
+local k = find(CMD.FIGHT)
+assert(k and k.params[1] == 3000, "the guns go for the nearest rival king")
+GG.VA_RivalKings = nil
 
 print("ok: rescue squad, protected orders, departure to the real pad radius, leaving with and without a HUD, holding a capture, the Spire Gate and its tech ladder, the siege")

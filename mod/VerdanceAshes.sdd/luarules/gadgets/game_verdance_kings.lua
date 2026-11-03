@@ -73,6 +73,19 @@ function gadget:Initialize()
   Spring.Echo("VA_KINGS " .. tostring(#order))
 end
 
+-- The rival kings still standing, for the autopilot rig (game_verdance_autopilot.lua): unitID -> teamID.
+GG.VA_RivalKings = function()
+  local out = {}
+  for tid, k in pairs(kings) do
+    if tid ~= playerTeamID and not k.fallen then
+      for _, uID in ipairs(Spring.GetTeamUnits(tid) or {}) do
+        if isCommander(Spring.GetUnitDefID(uID)) and not Spring.GetUnitIsDead(uID) then out[uID] = tid end
+      end
+    end
+  end
+  return out
+end
+
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerDefID, attackerTeam)
   if kings[unitTeam] and isCommander(unitDefID) and attackerTeam and attackerTeam ~= unitTeam then
     local by = kings[attackerTeam]
