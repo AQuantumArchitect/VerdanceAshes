@@ -21,3 +21,17 @@ def test_the_overthrow_has_something_to_break():
     from verdance.campaign.acts import FINALE_PLANS
     keep = FINALE_PLANS["A"]["objective"]["targetZoneId"]
     assert any(t.get("zoneId") == keep and t.get("faction") == "armada" for t in snap["teams"]), keep
+
+
+def test_a_finale_is_won_by_its_own_objective_not_by_ground():
+    """The first hard-AI campaign completed on the Overthrow by taking AB_NE_CRATERS (ground taken)
+    with the objective incomplete. The ground rule is for ordinary sorties."""
+    from verdance.belief import manifest
+    state = {"zoneMemory": {"ancient_bastion": {"AB_NE_CRATERS": {"controllingFaction": "armada"}}}}
+    base = {"deploymentMapId": "ancient_bastion", "zoneDv": {"AB_NE_CRATERS": {"ashwalkers": 4000}},
+            "manifest": {"schema": "verdance-manifest/1", "kind": "extracted", "objectiveComplete": False}}
+    sortie = dict(base, objectiveResults=[{"objectiveId": "GF_X", "status": "incomplete"}])
+    assert manifest.ground_taken(state, sortie) == ["AB_NE_CRATERS"]
+    finale = dict(base, objectiveResults=[{"objectiveId": "FINALE_OVERTHROW", "status": "incomplete"}])
+    assert manifest.ground_taken(state, finale) == []
+    assert manifest.verdict_from(manifest.with_ground(state, finale)) == "partial"

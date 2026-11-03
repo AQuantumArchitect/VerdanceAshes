@@ -99,11 +99,23 @@ def held_zones(result: Dict[str, Any], workspace=None) -> list:
     return sorted(out)
 
 
+def is_finale(result: Dict[str, Any]) -> bool:
+    """An act-3 finale: its objective ids are FINALE_* (verdance.campaign.acts)."""
+    if result.get("finale") or "finale" in (result.get("storyTags") or []):
+        return True
+    for row in result.get("objectiveResults") or []:
+        if isinstance(row, dict) and str(row.get("objectiveId") or "").startswith("FINALE_"):
+            return True
+    return str(result.get("objectiveId") or "").startswith("FINALE_")
+
+
 def ground_taken(state: Dict[str, Any], result: Dict[str, Any], workspace=None) -> list:
     """Zones the company holds now that an enemy (or the wild) held before it came. Read-only: the
     campaign has not yet moved any zone's control when this is asked. Not for a kings' showdown,
-    which has its own end (the throne)."""
-    if throne_taken(result) is not None:
+    which has its own end (the throne), nor for any finale: an ending is won by its own objective.
+    (The first hard-AI campaign, 2026-11-02, "won" the Overthrow by holding a crater next to its pad
+    and never touched the Keep.)"""
+    if throne_taken(result) is not None or is_finale(result):
         return []
     from verdance.common import canonical_map_id
     from verdance.campaign.zones import canonical_zone_id
