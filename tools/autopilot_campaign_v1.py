@@ -130,6 +130,27 @@ def patch_startscript(text: str, *, profile: str, speed: int, minutes: float, se
     return text, team
 
 
+def finale_state(st: dict, path: str) -> dict:
+    """A fresh campaign moved to its act-3 finale on one path, for a rehearsal of the ending:
+    mission 11 (verdance.campaign.acts), that path's signal leading, and for B (the kings'
+    showdown, which needs one) a Legion commander suit. Everything else is the fresh campaign."""
+    from verdance.campaign.acts import ACT2_END_MISSION, FINALE_PLANS
+    from verdance.campaign.schema import mission_id
+    if path not in FINALE_PLANS:
+        raise ValueError(f"no finale path {path!r}")
+    n = ACT2_END_MISSION + 1
+    st["missionNumber"] = n
+    st["currentMissionId"] = mission_id(n)
+    st["pathSignal"] = path
+    graph = st.setdefault("graph", {})
+    for k in ("A", "B", "C"):
+        graph["pathSignal" + k] = 1.0 if k == path else 0.0
+    if path == "B":
+        from verdance.campaign.suits import grant_suit
+        grant_suit(st, "legcom", "rehearsal")
+    return st
+
+
 def archive_log(run_dir: Path, n: int) -> Path:
     """Stdout belongs to this process; BAR's shared infolog may be truncated or replaced."""
     dest = run_dir / f"sortie_{n:02d}.infolog.txt"
@@ -200,6 +221,8 @@ def main() -> int:
     ap.add_argument("--stock", action="store_true",
                     help="rehearse a fresh beyondallreason.info install: engine + rapid game only, no games\\, "
                          "no developer BAR.sdd, no maps (the Drop must install, stamp and download)")
+    ap.add_argument("--finale", choices=["A", "B", "C"],
+                    help="start at the act-3 finale on this path (A Overthrow, B the kings' showdown with a suit, C the Spire Jump)")
     ap.add_argument("--resume", type=Path, help="continue an existing run directory and its isolated campaign state")
     args = ap.parse_args()
     if min(args.sorties, args.speed, args.startup_timeout, args.wall_timeout) <= 0:
@@ -271,6 +294,9 @@ def main() -> int:
     for h in (st.get("roster") or {}).get("heroes") or []:
         if not args.resume and h.get("heroId") in boosts:
             h["xp"] = h["peakBarXp"] = boosts[h["heroId"]]
+    if not args.resume and args.finale:
+        finale_state(st, args.finale)
+        print(f"[autopilot] rehearsing the ending: mission {st['missionNumber']}, finale path {args.finale}")
     if not args.resume:
         sp.write_text(json.dumps(st, indent=2), encoding="utf-8")
     seal = {"ok": True} if args.resume else k.seal_company(band=band)

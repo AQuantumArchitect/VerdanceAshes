@@ -8,10 +8,19 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
-from autopilot_campaign_v1 import archive_log, isolate_bar, patch_startscript, sorties_came_home
+from autopilot_campaign_v1 import archive_log, finale_state, isolate_bar, patch_startscript, sorties_came_home
 
 
 class AutopilotTests(unittest.TestCase):
+    def test_a_finale_rehearsal_lands_on_its_path(self):
+        """--finale A|B|C: the campaign starts at mission 11 with that path leading; B gets a suit."""
+        from verdance.campaign import default_v1_state
+        from verdance.campaign.acts import finale_plan_for_state
+        for path, kind in (("A", "overthrow"), ("B", "sovereignty"), ("C", "spire_jump")):
+            st = finale_state(default_v1_state(), path)
+            self.assertEqual(st["missionNumber"], 11)
+            self.assertEqual(finale_plan_for_state(st)["kind"], kind, path)
+
     def test_a_capped_rehearsal_passes_when_every_sortie_came_home(self):
         """The stock rehearsal (--stock --sorties 1) on 2026-11-02: one sortie, engine exit 0, result
         applied, watch 'home'. The campaign is not complete after one sortie, and that is not a failure."""
