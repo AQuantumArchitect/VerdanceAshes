@@ -50,11 +50,56 @@ local function rage(aggression, anger)
   if GG.VA_RaptorRage then pcall(GG.VA_RaptorRage, aggression, anger) end
 end
 
-local function xz()
+local placedX, placedZ           -- where the frame actually stands (sited near the zone's anchor)
+
+local function anchorXZ()
   local x, z = tonumber(cfg.x) or 0.5, tonumber(cfg.z) or 0.5
   if x <= 1.5 then x = x * Game.mapSizeX end
   if z <= 1.5 then z = z * Game.mapSizeZ end
   return x, z
+end
+
+local function xz()
+  if placedX then return placedX, placedZ end
+  return anchorXZ()
+end
+
+-- Can a ground constructor walk from the drop pad to (x, z)? The anchor of TRJ_NW_MUSTER sits on rock
+-- the company's builders cannot climb: in the finale-C rehearsals (2026-11-03) both stood 560 elmos
+-- off with a repair order for 45 minutes and the frame never left 5%.
+local function walkable(x, z)
+  local px = tonumber((Spring.GetGameRulesParam("va_pad_x"))) or 0
+  local pz = tonumber((Spring.GetGameRulesParam("va_pad_z"))) or 0
+  if px <= 0 or not Spring.RequestPath then return true end
+  local ud = UnitDefNames["legck"] or UnitDefNames["armck"]
+  local md = ud and ud.moveDef and ud.moveDef.name
+  if not md then return true end
+  local ok, path = pcall(Spring.RequestPath, md, px, Spring.GetGroundHeight(px, pz) or 0, pz,
+    x, Spring.GetGroundHeight(x, z) or 0, z, 160)
+  if not ok or not path then return false end
+  local okw, pts = pcall(path.GetPathWayPoints, path)
+  if not okw or type(pts) ~= "table" or #pts == 0 then return false end
+  local last = pts[#pts]
+  local lx, lz = last[1], last[3]
+  return lx ~= nil and ((lx - x) ^ 2 + (lz - z) ^ 2) <= 260 * 260
+end
+
+-- The nearest place to the anchor where the gate fits on the ground and a builder can reach it.
+local function siteGate(gateDef)
+  local ax, az = anchorXZ()
+  for _, r in ipairs({ 0, 200, 400, 600, 800, 1000, 1300, 1600, 2000 }) do
+    local steps = (r == 0) and 1 or 16
+    for k = 0, steps - 1 do
+      local a = (k / steps) * 2 * math.pi
+      local x, z = ax + math.cos(a) * r, az + math.sin(a) * r
+      if x > 100 and z > 100 and x < Game.mapSizeX - 100 and z < Game.mapSizeZ - 100 then
+        local y = Spring.GetGroundHeight(x, z) or 0
+        local fits = (Spring.TestBuildOrder(gateDef, x, y, z, 0) or 0) > 0
+        if fits and walkable(x, z) then return x, z, r end
+      end
+    end
+  end
+  return ax, az, -1
 end
 
 -- Where the gate and its pad are, for the HUD and the autopilot rig (game_verdance_autopilot.lua).
@@ -71,12 +116,16 @@ local function placeFrame()
   for _, uid in ipairs(Spring.GetTeamUnits(playerTeam) or {}) do
     if Spring.GetUnitDefID(uid) == gateDef then
       gateID = uid
-      publishGate(xz())   -- the pad is where the config puts it (GameFrame measures from xz())
+      local ux, _, uz = Spring.GetUnitPosition(uid)
+      if ux then placedX, placedZ = ux, uz end
+      publishGate(xz())   -- the pad is the gate's own place (GameFrame measures from xz())
       Spring.Echo("VA_GATE_ADOPTED unit=" .. uid)
       return
     end
   end
-  local x, z = xz()
+  local x, z, moved = siteGate(gateDef)
+  placedX, placedZ = x, z
+  Spring.Echo("VA_GATE_SITED at=" .. math.floor(x) .. "," .. math.floor(z) .. " off_anchor=" .. tostring(moved))
   local y = Spring.GetGroundHeight(x, z)
   -- Born finished, then set back to a frame: a nanoframe born with no live builder and ~0 hp is
   -- what BAR's Prevent Lab Hax2 kills on sight. Its health follows its build progress.
