@@ -107,20 +107,24 @@ local function dryGround(x, z)
     end
     return true
   end
-  for r = 64, 3000, 64 do
-    for i = -6, 6 do                      -- within 90 degrees either side of the way inland
-      local a = inward + i / 6 * (math.pi / 2)
-      local px, pz = x + math.cos(a) * r, z + math.sin(a) * r
-      if ok(px, pz, a) then return px, pz end
+  for _, cone in ipairs({ 6, 12 }) do      -- within 90 degrees either side of the way inland, then anywhere
+    for r = 64, 5000, 64 do
+      for i = -cone, cone do
+        local a = inward + i / 6 * (math.pi / 2)
+        local px, pz = x + math.cos(a) * r, z + math.sin(a) * r
+        if ok(px, pz, a) then return px, pz end
+      end
     end
   end
   return nil
 end
 
+local ashoreChecked = {}                 -- unitID -> true: each king's commander is looked at once
 local function kingsAshore()
   for _, tid in ipairs(order) do
     for _, uID in ipairs(tid ~= playerTeamID and Spring.GetTeamUnits(tid) or {}) do
-      if isCommander(Spring.GetUnitDefID(uID)) then
+      if not ashoreChecked[uID] and isCommander(Spring.GetUnitDefID(uID)) then
+        ashoreChecked[uID] = true
         local x, _, z = Spring.GetUnitPosition(uID)
         if x and (Spring.GetGroundHeight(x, z) or 0) < DRY + riseAhead then
           local px, pz = dryGround(x, z)
@@ -129,6 +133,9 @@ local function kingsAshore()
             Spring.GiveOrderToUnit(uID, CMD.STOP, {}, 0)
             Spring.Echo("VA_KING_ASHORE faction=" .. kings[tid].faction .. " from=" .. math.floor(x) .. "," .. math.floor(z)
               .. " to=" .. math.floor(px) .. "," .. math.floor(pz) .. " tide_to_come=" .. math.floor(riseAhead))
+          else
+            Spring.Echo("VA_KING_ASHORE faction=" .. kings[tid].faction .. " no dry ground within 5000 of "
+              .. math.floor(x) .. "," .. math.floor(z) .. " tide_to_come=" .. math.floor(riseAhead))
           end
         end
       end
@@ -197,7 +204,8 @@ local function fall(tid, frame)
 end
 
 function gadget:GameFrame(frame)
-  if frame == 1 or frame == 5 then kingsAshore() end
+  -- each king as it appears: with StartPosType 3 BAR spawns the commanders a few frames after 1
+  if frame <= 900 and (frame <= 5 or frame % CHECK_EVERY == 0) then kingsAshore() end
   if done or frame % CHECK_EVERY ~= 0 then return end
   for _, tid in ipairs(order) do
     local k = kings[tid]

@@ -46,8 +46,12 @@ Spring = {
 }
 dofile(GADGET)
 gadget:Initialize()
+teamUnits[1] = {}                 -- with StartPosType 3 BAR spawns the commanders a few frames late
 gadget:GameFrame(1)
-assert(moved[11], "the Armada king in the sea walks ashore")
+assert(not moved[11])
+teamUnits[1] = { 11 }
+gadget:GameFrame(15)
+assert(moved[11], "the Armada king in the sea walks ashore, when it appears")
 assert(ground(pos[11][1], pos[11][2]) > 65, "onto ground the tide still to come leaves dry, got " .. ground(pos[11][1], pos[11][2]))
 assert(not moved[10], "the company's commander lands where the drop puts it")
 assert(not moved[12], "a king on high ground stays")
