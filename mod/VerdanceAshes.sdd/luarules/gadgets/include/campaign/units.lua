@@ -25,11 +25,14 @@ function isStructure(defID)
   return ud and (ud.isBuilding or ud.isFactory or ud.speed == 0)
 end
 
+-- Armed: it has weapons. Not canAttack: Recoil leaves canAttack true on windmills, extractors and
+-- converters, so presence (AV + DV, "armed units and armed structures") counted a farm's eco as
+-- defence, and an enemy windmill in a zone marked the hold contested (Overthrow rehearsal,
+-- 2026-11-02: 62 of the Keep's 66 structures read as guns).
 function canFight(defID)
   local ud = UnitDefs[defID]
   if not ud then return false end
-  if ud.canAttack then return true end
-  return ud.weapons and #ud.weapons > 0
+  return (ud.weapons and #ud.weapons > 0) and true or false
 end
 
 -- Territory ownership is DV-only. Pad-tooth heroes (area_control / Warder ring)
