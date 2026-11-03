@@ -134,6 +134,10 @@ function Expand-ScenarioForces {
     if ($force.PSObject.Properties["required"] -and $null -ne $force.required) {
       $expanded.required = [bool]$force.required
     }
+    # The Overthrow's war seat books only its guns and factories (spawn.lua, force.book).
+    if ($force.PSObject.Properties["book"] -and $force.book) {
+      $expanded.book = [string]$force.book
+    }
     $forces += $expanded
   }
   return @($forces)

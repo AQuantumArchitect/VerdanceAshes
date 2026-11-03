@@ -19,6 +19,9 @@ def test_the_overthrow_has_something_to_break():
     # ...its guns and its factories, not all 66 structures of the seat (the second run broke 10 of 66
     # in 33 minutes, most of them windmills and extractors)
     assert '$force.book = "guns_and_command"' in ps1
+    # ...and the installer's whitelist carries it into the seed (the first try booked all 66 again)
+    slice_ps1 = (ROOT / "scripts/install_playable_slice.ps1").read_text(encoding="utf-8-sig")
+    assert "$expanded.book = [string]$force.book" in slice_ps1
     spawn = (ROOT / "mod/VerdanceAshes.sdd/luarules/gadgets/include/campaign/spawn.lua").read_text(encoding="utf-8")
     assert 'force.book == "guns_and_command"' in spawn and "canFight(defID) or (ud and ud.isFactory)" in spawn
     snap = json.loads((ROOT / "data/base_templates/ancient_bastion/war_snapshot_v1.json").read_text(encoding="utf-8-sig"))
