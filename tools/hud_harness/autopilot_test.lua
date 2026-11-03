@@ -342,6 +342,22 @@ orders = {}
 gadget:GameFrame(1211)
 local strike = find(CMD.ATTACK)
 assert(strike and strike.params[1] == 951, "gathered, they strike the king together")
+-- a rally that never gathers goes in anyway after three minutes
+for i = 100, 139 do positions[i] = { 0, 0 } end
+guns = { 100, 101 }
+gadget:GameFrame(11)                              -- thin out: the siege resets
+guns = {}
+for i = 100, 139 do guns[#guns + 1] = i end
+local clock = 40 * 60 * 30
+Spring.GetGameFrame = function() return clock end
+orders = {}
+gadget:GameFrame(611)
+assert(not find(CMD.ATTACK) and find(CMD.FIGHT), "a fresh rally: no strike yet")
+clock = clock + 3 * 60 * 30 + 30
+orders = {}
+gadget:GameFrame(1211)
+assert(find(CMD.ATTACK), "three minutes on, the guns go in with what has gathered")
+Spring.GetGameFrame = nil
 GG.VA_RivalKings = nil
 
 print("ok: rescue squad, protected orders, departure to the real pad radius, leaving with and without a HUD, holding a capture, the Spire Gate and its tech ladder, the siege")

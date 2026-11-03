@@ -202,6 +202,8 @@ end
 
 local striking = false                -- a king's siege has gathered and gone in (until it thins out)
 local RALLY_SHORT, RALLY_RADIUS = 2200, 900
+local RALLY_MAX_FRAMES = 3 * 60 * 30
+local rallySince = nil                 -- frame the current rally began
 local function siege()
   if guardTheGate() then return end
   local targets = GG.VA_ObjectiveTargets and GG.VA_ObjectiveTargets() or nil
@@ -241,6 +243,7 @@ local function siege()
     for uid in pairs(sieged) do held[uid] = nil end
     sieged = {}
     striking = false
+    rallySince = nil
     return
   end
   local cx, cz, n = 0, 0, 0
@@ -282,13 +285,18 @@ local function siege()
       local x, _, z = Spring.GetUnitPosition(uid)
       if x and (x - rx) ^ 2 + (z - rz) ^ 2 < RALLY_RADIUS ^ 2 then near = near + 1 end
     end
-    if near < math.ceil(need * 0.75) then
+    -- ...or after three minutes of rallying, whatever has come: on the rig (run9) the guns stopped to
+    -- fight on the way, and for 18 minutes 6 of 60 stood at the rally while the Cortex king lived on
+    local now = (Spring.GetGameFrame and Spring.GetGameFrame()) or 0
+    rallySince = rallySince or now
+    if near < math.ceil(need * 0.75) and now - rallySince < RALLY_MAX_FRAMES then
       order(guns, CMD.FIGHT, { rx, Spring.GetGroundHeight(rx, rz) or 0, rz }, true)
       for _, uid in ipairs(guns) do sieged[uid] = true end
       Spring.Echo("VA_AUTOPILOT siege rally guns=" .. #guns .. " gathered=" .. near .. " at=" .. math.floor(rx) .. "," .. math.floor(rz))
       return
     end
     striking = true
+    rallySince = nil
   end
   -- attack the commander itself once the company can see it; until then fight the way to where it
   -- stands (an order to attack a unit out of sight does nothing: on the container rig 80 guns stood
