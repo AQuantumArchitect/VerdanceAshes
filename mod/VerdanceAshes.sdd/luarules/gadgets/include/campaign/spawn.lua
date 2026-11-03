@@ -197,7 +197,14 @@ local function spawnOneUnit(defName, x, z, facing, teamID, spec, force, hpPct)
       Spring.SetUnitRulesParam(unitID, "va_force_role", tostring(force.role), { public = true })
       if force.role == "objective_target" then
         local defID = Spring.GetUnitDefID(unitID)
-        if isStructure(defID) then
+        -- book = "guns_and_command": only what fights and what builds (the Overthrow's castle guns and
+        -- command post), not every windmill and metal extractor of the seat
+        local ud = UnitDefs[defID]
+        local bookIt = isStructure(defID)
+        if bookIt and force.book == "guns_and_command" then
+          bookIt = (canFight(defID) or (ud and ud.isFactory)) and true or false
+        end
+        if bookIt then
           local forceId = tostring(force.id or "objective")
           objectiveTargets[unitID] = forceId
           objectiveTargetCount = objectiveTargetCount + 1

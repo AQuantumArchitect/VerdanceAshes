@@ -16,6 +16,11 @@ def test_the_overthrow_has_something_to_break():
     ps1 = (ROOT / "scripts/build_next_mission_v1.ps1").read_text(encoding="utf-8-sig")
     assert '$isFinale -and $objectiveKind -eq "destroy_key_structure"' in ps1
     assert '[string]$camp.zoneId -eq $targetZoneId' in ps1
+    # ...its guns and its factories, not all 66 structures of the seat (the second run broke 10 of 66
+    # in 33 minutes, most of them windmills and extractors)
+    assert '$force.book = "guns_and_command"' in ps1
+    spawn = (ROOT / "mod/VerdanceAshes.sdd/luarules/gadgets/include/campaign/spawn.lua").read_text(encoding="utf-8")
+    assert 'force.book == "guns_and_command"' in spawn and "canFight(defID) or (ud and ud.isFactory)" in spawn
     snap = json.loads((ROOT / "data/base_templates/ancient_bastion/war_snapshot_v1.json").read_text(encoding="utf-8-sig"))
     __import__("sys").path.insert(0, str(ROOT / "tools"))
     from verdance.campaign.acts import FINALE_PLANS

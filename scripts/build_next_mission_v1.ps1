@@ -1946,6 +1946,8 @@ function Add-StandingWar {
       }
     }
     $force = [ordered]@{ id = $field; label = "$($wt.W.label) field"; teamID = $wt.teamID; side = $wt.W.side; faction = [string]$camp.faction; role = $warRole; zoneId = [string]$camp.zoneId; base = [ordered]@{ x = $c[0]; z = $c[1] }; recipe = $field }
+    # the Overthrow books the seat's guns and its factories, not its windmills (spawn.lua)
+    if ($warRole -eq "objective_target" -and -not $script:eyeStory) { $force.book = "guns_and_command" }
     if ($camp.PSObject.Properties["bank"] -and $camp.bank) {
       $force.bank = [ordered]@{ metal = [double]$camp.bank.metal; energy = [double]$camp.bank.energy }
     }
