@@ -18,7 +18,7 @@ gadgetHandler = {
   IsSyncedCode = function() return true end,
   RegisterAllowCommand = function(_, id) registered = id end,
 }
-CMD = { ANY = -1, FIGHT = 16, MOVE = 10, RESURRECT = 125, REPAIR = 40 }
+CMD = { ANY = -1, FIGHT = 16, MOVE = 10, RESURRECT = 125, REPAIR = 40, ATTACK = 20 }
 Game = { maxUnits = 10000, mapSizeX = 8192, mapSizeZ = 8192 }
 UnitDefs = {
   [1] = { speed = 50, canAttack = true },
@@ -255,25 +255,23 @@ Spring.GetUnitDefID = function() return 1 end
 gadget:GameFrame(611)
 assert(gadget:AllowCommand(100), "too few guns: no siege yet")
 GG.VA_ObjectiveTargets = nil
--- the kings' showdown: the rival commanders are the targets
+-- the kings' showdown is BARb's war: the rig goes only for the last king, with forty guns, and
+-- attacks the commander itself
 reset()
 guns = {}
-for i = 100, 111 do guns[#guns + 1] = i; positions[i] = { 0, 0 } end
+for i = 100, 139 do guns[#guns + 1] = i; positions[i] = { 0, 0 } end
 Spring.GetTeamUnits = function() return guns end
 Spring.GetUnitDefID = function() return 1 end
 Spring.ValidUnitID = function() return true end
-positions[950] = { 3000, 100 }
-GG.VA_RivalKings = function() return { [950] = 1 } end
+positions[950], positions[951] = { 3000, 100 }, { 100, 3000 }
+GG.VA_RivalKings = function() return { [950] = 1, [951] = 2 } end
 gadget:GameFrame(611)
-local k = find(CMD.FIGHT)
-assert(k and k.params[1] == 3000, "the guns go for the nearest rival king")
--- that king falls; the siege's own guns (held) go for the next one
-positions[951] = { 100, 3000 }
+assert(not find(CMD.ATTACK) and gadget:AllowCommand(100), "two kings standing: the rig leaves the war to BARb")
 GG.VA_RivalKings = function() return { [951] = 2 } end
-orders = {}
 gadget:GameFrame(1211)
-local k2 = find(CMD.FIGHT)
-assert(k2 and k2.params[1] == 100 and k2.params[3] == 3000, "the siege's held guns go for the next king")
+local k = find(CMD.ATTACK)
+assert(k and k.params[1] == 951, "the last king: the guns attack the commander itself")
+assert(not gadget:AllowCommand(100), "and BARb leaves them on it")
 -- too few guns left: the siege lets go of them
 guns = { 100, 101 }
 gadget:GameFrame(11)   -- (the harness clock is one minute: frame 1800 would be the departure)

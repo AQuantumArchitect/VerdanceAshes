@@ -143,6 +143,11 @@ end
 
 -- ---------------------------------------------------------------- siege
 local SIEGE_GUNS = 12
+-- The kings' showdown is BARb's war: on the container rig it brought down two kings of three on its
+-- own (Cortex at 20 minutes, the Null Mercs at 43), and the run where the rig besieged the nearest
+-- king took none (its 21 guns stood off the Armada king's base for an hour). The rig only goes for
+-- the last king, with a real army, and attacks the commander itself rather than the place it stood.
+local KING_SIEGE_GUNS = 40
 -- The Spire Jump is won at the gate, not at the hive: the guns stand around the gate (and the
 -- fusions going up beside it) instead of marching on the nests. In the finale-C rehearsal the
 -- siege took 14 guns to the hive heart, 3,000 elmos off, and the raptors took the gate.
@@ -188,14 +193,18 @@ end
 local function siege()
   if guardTheGate() then return end
   local targets = GG.VA_ObjectiveTargets and GG.VA_ObjectiveTargets() or nil
+  local kings = false
   if (not targets or next(targets) == nil) and GG.VA_RivalKings then
     targets = GG.VA_RivalKings()   -- the kings' showdown: the rival commanders are the targets
+    local n = 0
+    for _ in pairs(targets or {}) do n = n + 1 end
+    kings = n > 0
+    if n > 1 then targets = nil end   -- more than one king standing: BARb's war, not the rig's
   end
-  if not targets or next(targets) == nil then return end
   local guns = companyUnits(function(ud, uid)
     return mobile(ud) and ud.canAttack and not ud.isBuilder and (sieged[uid] or not held[uid])
   end)
-  if #guns < SIEGE_GUNS then
+  if not targets or next(targets) == nil or #guns < (kings and KING_SIEGE_GUNS or SIEGE_GUNS) then
     -- too thin to break anything: what is left of the siege goes back to BARb until there are more
     for uid in pairs(sieged) do held[uid] = nil end
     sieged = {}
@@ -217,9 +226,16 @@ local function siege()
     end
   end
   if not bx then return end
-  order(guns, CMD.FIGHT, { bx, Spring.GetGroundHeight(bx, bz) or 0, bz }, true)
+  if kings then
+    local king
+    for uid in pairs(targets) do king = uid end
+    order(guns, CMD.ATTACK, { king }, true)
+  else
+    order(guns, CMD.FIGHT, { bx, Spring.GetGroundHeight(bx, bz) or 0, bz }, true)
+  end
   for _, uid in ipairs(guns) do sieged[uid] = true end
-  Spring.Echo("VA_AUTOPILOT siege guns=" .. #guns .. " at=" .. math.floor(bx) .. "," .. math.floor(bz))
+  Spring.Echo("VA_AUTOPILOT siege guns=" .. #guns .. " at=" .. math.floor(bx) .. "," .. math.floor(bz)
+    .. " ground=" .. math.floor(Spring.GetGroundHeight(bx, bz) or 0) .. " from=" .. math.floor(math.sqrt(bd)))
 end
 
 -- ---------------------------------------------------------------- hold
