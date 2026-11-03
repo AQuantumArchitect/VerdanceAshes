@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.14.5 — 2026-11-02
+
+The Null Mercs fight Armada, not you.
+
+- **One side.** The company and the Null Mercs, allied in the match, no longer contest each other's ground. Each still needs more than 1,500 of its own strength in a zone and three times its enemies'. Neither lends strength to the other, and when both qualify the zone is the company's. A zone the mercs hold beside you (mercs 4,000, you 1,400, Armada 500) is now theirs instead of nobody's. The game and the hub use the same rule; a test runs both on the same zones.
+- **No clashes between allies between sorties.** The campaign's between-mission fights paired a mercs zone with the company's next door and handed it to the company. Now only Armada (and the others) fight either of you.
+
 ## 0.14.4 — 2026-11-02
 
 Mission 1 gets a designed opening, and the door you take stays taken.
