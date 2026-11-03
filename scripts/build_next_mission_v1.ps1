@@ -1933,6 +1933,12 @@ function Add-StandingWar {
     # The Eye (verdance.world.eye_story): Armada's job makes the Cortex camp the target; Cortex's job
     # makes it the company's ally.
     $warRole = "standing_war"
+    # Finale A, the Overthrow: the castle guns and the command post in the Keep are the seat the war
+    # left standing there. Its structures are the objective's targets (spawn.lua books objective_target
+    # structures only), or the finale had nothing to break and fell back to holding the Keep.
+    if ($isFinale -and $objectiveKind -eq "destroy_key_structure" -and $targetZoneId -and [string]$camp.zoneId -eq $targetZoneId) {
+      $warRole = "objective_target"
+    }
     if ($script:eyeStory -and [string]$camp.faction -eq "cortex") {
       if ([string]$script:eyeStory.kind -eq "raze_camp") { $warRole = "objective_target" }
       if ([string]$script:eyeStory.alliedWith -eq "cortex") {
