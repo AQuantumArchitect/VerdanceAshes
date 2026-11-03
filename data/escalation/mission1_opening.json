@@ -1,0 +1,88 @@
+{
+  "schemaVersion": "verdance-opening/1.0",
+  "notes": [
+    "Mission 1's opening: the briefing, the staged objective, the learn-by-doing prompts and the first five minutes of pacing.",
+    "The hub (tools/verdance/campaign/opening.py) reads this file and writes the beats into the mission intent; the campaign gadget (beats.lua) only runs them.",
+    "Tune the timings in 'pacing' (the one table; every key is explained in 'pacingNotes'). The beat sheet is docs/MISSION1_OPENING.md.",
+    "A prompt only appears if the player has not done the thing yet, and it clears the moment they do.",
+    "Lines: Ketha's register (data/story/voices/ketha.json): short, dry, at most 66 characters so a line fits its frame. No game-system vocabulary in anyone's mouth.",
+    "Lives in data/escalation because that folder ships with the game; a new data folder would also need a line in scripts/ship.ps1."
+  ],
+  "pacing": {
+    "briefingMaxWords": 60,
+    "selectPromptSeconds": 12,
+    "movePromptSeconds": 15,
+    "revealFallbackSeconds": 100,
+    "attackPromptSeconds": 25,
+    "answerDelaySeconds": 20,
+    "probeSeconds": 120,
+    "buildPromptSeconds": 25,
+    "wreckMarkSeconds": 60,
+    "reliefLineDelaySeconds": 3,
+    "paviseLineDelaySeconds": 6,
+    "hookSeconds": 285,
+    "hookReplySeconds": 4,
+    "columnSeconds": 150,
+    "heroBarksNotBeforeSeconds": 60,
+    "promptShowSeconds": 9,
+    "lineShowSeconds": 7,
+    "dispatchShowSeconds": 9,
+    "goalRingRadius": 300,
+    "goalStopShort": 700,
+    "goalMinFromPad": 900,
+    "wreckRingRadius": 110
+  },
+  "pacingNotes": {
+    "briefingMaxWords": "words the player reads before control is handed over: the briefing lines, the first goal and the pause line on the card",
+    "selectPromptSeconds": "seconds after the company lands; if nothing has been selected by then, Ketha says how",
+    "movePromptSeconds": "seconds after the first selection; if nobody has been ordered to move, Ketha points at the gold ring",
+    "revealFallbackSeconds": "seconds after landing; the real job is revealed then even if the gold ring was never reached",
+    "attackPromptSeconds": "seconds after the reveal; if nothing of theirs has been hit, Ketha says how",
+    "answerDelaySeconds": "seconds after our first hit on them; the farm's answer (forces.answer) arrives",
+    "probeSeconds": "seconds after the reveal; if we still have not hit anything, they come to us (forces.probe)",
+    "buildPromptSeconds": "seconds after our first kill; if no builder has touched a wreck or a build, Ketha says how",
+    "wreckMarkSeconds": "seconds the ring on that first wreck stays up (it also goes the moment a builder works it)",
+    "reliefLineDelaySeconds": "seconds after the first reclaim or raise; Ketha's relief line",
+    "paviseLineDelaySeconds": "seconds after Ketha's relief line; Pavise's, only if Pavise dropped",
+    "hookSeconds": "seconds after landing; the intercepted Armada dispatch that ends minute five",
+    "hookReplySeconds": "seconds after the dispatch; Ketha's reply",
+    "columnSeconds": "seconds after the dispatch; the column (forces.column) arrives unless the farm is already taken",
+    "heroBarksNotBeforeSeconds": "the generic hero-down and hero-back barks stay quiet for this many seconds of the sortie",
+    "promptShowSeconds": "how long a prompt stays on screen if the player does not do the thing",
+    "lineShowSeconds": "how long a story line stays on screen",
+    "dispatchShowSeconds": "how long the intercepted dispatch stays on screen",
+    "goalRingRadius": "elmos: the radius of the first goal's gold ring, and how close a unit must get to reach it",
+    "goalStopShort": "elmos: the first goal sits this far short of the nearest farm (a shell pocket in the target zone), on the line from the pad, so reaching it puts the farm in sight",
+    "wreckRingRadius": "elmos: the radius of the ring on the first wreck",
+    "goalMinFromPad": "elmos: the first goal is never closer to the pad than this; keep goalMinFromPad - goalRingRadius above 560 (the pad's radius) so the ring clears the pad"
+  },
+  "briefing": [
+    { "speaker": "ketha", "text": "Armada spent its last Tenebrium on decoys: empty commanders, farming sun for nobody." },
+    { "speaker": "ketha", "text": "One of those farms sits next door to our pad." },
+    { "speaker": "ketha", "text": "Break it. Carry home what it drops. Everyone who lands, lifts." }
+  ],
+  "card": {
+    "firstGoal": "Off the pad. Eyes on their farm.",
+    "missionGoal": "Take the {target}: break the farm, then hold the ground.",
+    "pauseLine": "Paused until you press Pause."
+  },
+  "lines": {
+    "selectPrompt": { "speaker": "Ketha", "text": "We're on the pad, waiting on your word. Drag a box round us." },
+    "movePrompt": { "speaker": "Ketha", "text": "See the gold ring? Right-click inside it. We'll walk." },
+    "reveal": { "speaker": "Ketha", "text": "There's the farm. Clear it, then hold the Bastion till it's ours." },
+    "attackPrompt": { "speaker": "Ketha", "text": "Pick one of their panels and right-click it. We'll do the rest." },
+    "answer": { "speaker": "Ketha", "text": "They've noticed. Something's coming to ask what we're doing." },
+    "probe": { "speaker": "Ketha", "text": "They got tired of waiting for us. Here they come." },
+    "buildPrompt": { "speaker": "Ketha", "text": "That wreck's still warm. Right-click it with a Zagreus." },
+    "relief": { "speaker": "Ketha", "text": "That's metal we didn't have this morning." },
+    "pavise": { "speaker": "Pavise", "text": "I've got your left. Like before.", "onlyIfHero": "pavise" },
+    "hookDispatch": { "speaker": "Brask · intercepted", "text": "Farm hit. Irregulars, and the deserter with them. Send a column." },
+    "hookReply": { "speaker": "Ketha", "text": "Deserter. He means you. Finish this before his column gets here." },
+    "column": { "speaker": "Ketha", "text": "Column's here. Hold the farm or load the pad. Pick now." }
+  },
+  "forces": {
+    "answer": [ { "unitDefName": "armpw", "count": 3 }, { "unitDefName": "armham", "count": 1 } ],
+    "probe": [ { "unitDefName": "armfav", "count": 2 } ],
+    "column": [ { "unitDefName": "armpw", "count": 4 }, { "unitDefName": "armham", "count": 2 } ]
+  }
+}

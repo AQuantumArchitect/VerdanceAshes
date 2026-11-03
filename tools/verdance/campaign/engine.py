@@ -50,6 +50,7 @@ from .voice import (
     pick_line,
     pick_title,
 )
+from . import opening as _opening
 from .roster import (
     apply_act_rewards,
     apply_commander_story,
@@ -368,6 +369,17 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
     flavor = (sortie or {}).get("flavor")
     against = (sortie or {}).get("against") or objective.get("enemyFaction") or "armada"
     patron = (sortie or {}).get("patron") or objective.get("patron") or "nullmercs"
+    # Mission 1's opening (data/escalation/mission1_opening.json, verdance.campaign.opening): its own
+    # briefing, a staged job and learn-by-doing beats in place of the generic briefing and opening bark.
+    opening = _opening.load_opening(workspace) if (sortie or {}).get("openingMission") else None
+    opening_card = (_opening.opening_card(opening, workspace, map_id, objective.get("targetZoneId"))
+                    if opening else None)
+    briefing = (_opening.opening_briefing(opening) if opening
+                else generate_briefing(state, voice, map_id, family, objective, pressure, esc_plan))
+    beats = generate_beats(state, voice, family, objective, map_waterline(state, map_id, workspace))
+    if opening:
+        farm = _opening.farm_point(_shell_pockets(map_id, workspace), workspace, map_id, deploy_zone, objective.get("targetZoneId"))
+        beats = _opening.merge_opening_beats(opening, beats, objective.get("targetZoneId"), opening_card["missionGoal"], farm)
     intent = {
         "schemaVersion": INTENT_SCHEMA,
         "campaignId": state.get("campaignId", CAMPAIGN_ID),
@@ -402,10 +414,10 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
         "enemyInfrastructure": zone_infrastructure_for(map_id, workspace),
         "title": title,
         "escalationPlan": esc_plan,
-        "briefing": generate_briefing(state, voice, map_id, family, objective, pressure, esc_plan),
+        "briefing": briefing,
+        "opening": opening_card,
         "debriefCandidates": generate_debrief_candidates(state, voice),
-        "beats": generate_beats(state, voice, family, objective,
-                                map_waterline(state, map_id, workspace)),
+        "beats": beats,
         "persistentBaseRehydrate": rehydrate,
         # Who may bring reinforcements in, and where: the zones each faction truly holds on this
         # map. The gadget lets a team enter only on the map edge inside one of its own zones, out

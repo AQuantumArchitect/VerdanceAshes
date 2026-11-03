@@ -206,6 +206,8 @@ function gadget:GameStart()
     armPendingDeliveries()
   end
   publishTenebriumRules()
+  -- The stage the authored beats set before anyone moves (mission 1's first goal).
+  beatsOnGameStart()
 end
 
 -- Every frame, in this order. Each tick lives in the part named in its own comment.
@@ -234,7 +236,9 @@ function gadget:GameFrame(frame)
   tickDevTelemetry(frame)
 end
 
-function gadget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOpts, cmdTag)
+function gadget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOpts, cmdTag, playerID, fromSynced, fromLua)
+  -- What the player has done, for the learn-by-doing beats (a move, an attack, a build order).
+  beatsOnUnitCommand(unitTeam, cmdID, fromSynced)
   if not devTel.enabled then return end
   if unitTeam ~= playerTeamID then return end
   local key = classifyCmd(cmdID)
@@ -244,6 +248,7 @@ end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
   trackPlayerCommanderCreated(unitID, unitDefID, unitTeam)
+  beatsOnUnitCreated(unitTeam, builderID)
   -- A rez bot consuming a tracked hero wreck brings the hero back.
   heroOnUnitCreated(unitID, unitDefID, unitTeam, builderID)
   -- Factory bay rez/capture landing on the player team.
@@ -274,6 +279,7 @@ end
 
 -- Reclaim of builder/decoy wrecks pulls durable Tenebrium into the bank.
 function gadget:AllowFeatureBuildStep(builderID, builderTeam, featureID, featureDefID, step)
+  beatsOnFeatureBuildStep(builderTeam)
   if tenebLoot.tryLoot then
     local ok, err = pcall(tenebLoot.tryLoot, builderID, builderTeam, featureID, step)
     if not ok then
@@ -297,7 +303,13 @@ function gadget:UnitGiven(unitID, unitDefID, newTeam, oldTeam)
   end
 end
 
-function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
+-- Our first hit on the enemy, for the beats. beats.lua removes this call-in once nothing waits on it.
+function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, projectileID, attackerID, attackerDefID, attackerTeam)
+  beatsOnUnitDamaged(unitTeam, attackerTeam)
+end
+
+function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerDefID, attackerTeam)
+  beatsOnUnitDestroyed(unitID, unitTeam, attackerTeam)
   mentorsOnUnitDestroyed(unitID, unitDefID, unitTeam)
   fieldEngineOnUnitDestroyed(unitID)
   heroOnUnitDestroyed(unitID)
@@ -347,6 +359,11 @@ function gadget:RecvLuaMsg(msg, playerID)
     for id in string.gmatch(rest, "[%w_]+") do picks[#picks + 1] = id end
     VA_CREW_confirm(picks)
     return
+  end
+  -- What only the UI can see (a selection), for the learn-by-doing beats.
+  if cmd:match("^vabeatfact ") then
+    beatsNoteFact(cmd:sub(12), playerID)
+    return true
   end
   if (cmd == "manifest" or cmd:match("^extract:")) and GG.VA_ExfilCmd then
     GG.VA_ExfilCmd(cmd)

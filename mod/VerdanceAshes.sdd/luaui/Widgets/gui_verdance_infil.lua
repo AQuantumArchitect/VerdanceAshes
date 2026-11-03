@@ -82,8 +82,18 @@ local function compose()
   end
   table.sort(order, function(a, b) return counts[a] > counts[b] end)
   for i = 1, math.min(6, #order) do C.units[#C.units + 1] = { name = order[i], count = counts[order[i]] } end
+  -- Briefing lines are { speaker, text, tag } (verdance.campaign.voice); an older seed had strings.
+  -- The opening (intent.opening, verdance.campaign.opening) shows its own lines and nothing else.
+  C.opening = (type(intent.opening) == "table" and intent.opening.staged) and intent.opening or nil
   if type(intent.briefing) == "table" and type(intent.briefing.lines) == "table" then
-    for i = 1, math.min(2, #intent.briefing.lines) do C.lines[#C.lines + 1] = tostring(intent.briefing.lines[i]) end
+    for _, row in ipairs(intent.briefing.lines) do
+      local text = (type(row) == "table") and row.text or row
+      local tag = (type(row) == "table") and row.tag or nil
+      if type(text) == "string" and text ~= "" and (not C.opening or tag == "opening") then
+        C.lines[#C.lines + 1] = { speaker = (type(row) == "table" and row.speaker) and tostring(row.speaker) or "ketha", text = text }
+      end
+      if not C.opening and #C.lines >= 2 then break end
+    end
   end
   -- marks the seed knows about (the live ledger arrives once the gadget publishes)
   for _, sid in ipairs(obj.secondaryCaptureZoneIds or mission.secondaryCaptureZoneIds or {}) do C.marks[#C.marks + 1] = tostring(sid) end
@@ -282,9 +292,24 @@ local function drawBoard(x1, y1, x2, y2)
   text("they see us", lx + 13, ly, 9, Ash.COL.muted, "l")
 end
 
+-- The job is staged (mission 1): only the first goal, gold and hollow like its ring on the ground.
+-- The rest is said on the ground once the company has footing (beats.lua objective_stage).
+local function staged() return C.opening ~= nil and Hud.num("va_op_stage", 0) == 1 end
+
+local function drawFirstGoal(x1, y1, x2, y2)
+  local x, y, right = column(x1, y1, x2, y2, "THE JOB  ·  FIRST", Ash.COL.gold)
+  local goal = Hud.str("va_op_goal_label") or C.opening.firstGoal or ""
+  text(Ash.GLYPH.markOpt, x, y - 6, 22, Ash.COL.gold, "l")
+  for _, line in ipairs(wrap(goal, 16, right - x - 30, 3)) do text(line, x + 30, y - 4, 16, Ash.COL.gold, "l"); y = y - 22 end
+  if C.threat then y = y - 10; text(Ash.fit(C.threat, 10, right - x), x, y, 10, Ash.COL.warn, "l") end
+end
+
 local function drawJob(x1, y1, x2, y2)
+  if staged() then return drawFirstGoal(x1, y1, x2, y2) end
   local x, y, right = column(x1, y1, x2, y2, "THE JOB", Ash.COL.warn)
-  for _, line in ipairs(wrap(C.objective, 12, right - x, 4)) do text(line, x, y, 12, Ash.COL.ink, "l"); y = y - 16 end
+  -- after the reveal (/vabrief), the job in the words the beat revealed it with
+  local job = (C.opening and Hud.str("va_op_job_label")) or C.objective
+  for _, line in ipairs(wrap(job, 12, right - x, 4)) do text(line, x, y, 12, Ash.COL.ink, "l"); y = y - 16 end
   if C.threat then y = y - 2; text(Ash.fit(C.threat, 10, right - x), x, y, 10, Ash.COL.warn, "l"); y = y - 16 end
   local b = theBoard()
   local marks = b and b:marks() or {}
@@ -327,7 +352,8 @@ function widget:DrawScreen()
   local top = vsy - 56
   text("DROP  ·  MISSION " .. tostring(C.missionNumber), x0, top, 10, Ash.COL.ash, "l")
   text(C.title or "", x0, top - 28, 24, Ash.COL.gold, "l")
-  if C.reason then text(Ash.fit(tostring(C.reason), 11, Wd * 0.5), x0 + Wd, top - 24, 11, Ash.COL.muted, "r") end
+  -- the opening's briefing says why; the hub's one-line reason would be a second voice saying it
+  if C.reason and not staged() then text(Ash.fit(tostring(C.reason), 11, Wd * 0.5), x0 + Wd, top - 24, 11, Ash.COL.muted, "r") end
   local colTop = top - 52
   local gap = 16
   local leftW = Wd * 0.26
@@ -343,10 +369,27 @@ function widget:DrawScreen()
   pcall(drawJob, x0 + Wd - rightW, colBot, x0 + Wd, colTop)
   -- Ketha's line + BEGIN, right under the columns
   local by = math.max(vsy * 0.08, colBot - 64)
-  if C.lines[1] then Ash.voiceBlock(x0 + 330 + (Wd - 330) * 0.5, by + 21, Wd - 330, "Ketha", C.lines[1], 1) end
+  local helpY = by - 18
+  if staged() and #C.lines > 0 then
+    -- the opening's briefing: every line, one under another, in one voice frame
+    local bx1, bx2 = x0 + 330, x0 + Wd
+    local h = 26 + 20 * #C.lines
+    local top = by + 42
+    Ash.rect(bx1, top - h, bx2, top, Ash.with(Ash.COL.panel, 0.88))
+    Ash.rect(bx1, top - h, bx1 + 3, top, Ash.with(Ash.COL.edge, 0.9))
+    text(string.upper(C.lines[1].speaker), bx1 + 16, top - 14, 10, Ash.COL.edge, "l")
+    for i, row in ipairs(C.lines) do text(row.text, bx1 + 16, top - 16 - 20 * i, 14, Ash.COL.gold, "l") end
+    helpY = math.min(helpY, top - h - 18)
+  elseif C.lines[1] then
+    Ash.voiceBlock(x0 + 330 + (Wd - 330) * 0.5, by + 21, Wd - 330, C.lines[1].speaker, C.lines[1].text, 1)
+  end
   Ash.actionRow(x0, by, x0 + 300, by + 42, { fill = Ash.COL.steam, focused = true })
   text("TO THE FIELD   [Enter]", x0 + 150, by + 15, 14, Ash.COL.ink, "c")
   buttons[#buttons + 1] = { x0, by, x0 + 300, by + 42, action = "begin" }
-  text("The field stays paused: queue your orders, then press Pause to begin.  The pad is where you land and where you lift; what is not on it at EXTRACT stays on Verdance.  /vabrief reopens this card.", x0, by - 18, 11, Ash.COL.muted, "l")
+  if staged() then
+    text(tostring(C.opening.pauseLine or "Paused until you press Pause.") .. "   /vabrief reopens this card.", x0, helpY, 11, Ash.COL.muted, "l")
+  else
+    text("The field stays paused: queue your orders, then press Pause to begin.  The pad is where you land and where you lift; what is not on it at EXTRACT stays on Verdance.  /vabrief reopens this card.", x0, helpY, 11, Ash.COL.muted, "l")
+  end
   gl.Color(1, 1, 1, 1)
 end

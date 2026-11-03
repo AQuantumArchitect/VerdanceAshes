@@ -176,6 +176,11 @@ local function poll()
   S.padEnemy = num("va_pad_enemy_live", 0)
   S.inbound = num("va_inbound_total", 0)
   S.status = str("va_status") or S.status
+  -- The staged job (mission 1, beats.lua objective_stage): 1 = the first goal only, 2 = the real job.
+  S.opStage = num("va_op_stage", 0)
+  S.opGoal = str("va_op_goal_label")
+  S.opJob = str("va_op_job_label")
+  S.opGoalX, S.opGoalZ = num("va_op_goal_x", -1), num("va_op_goal_z", -1)
   pollHeroes()
 end
 
@@ -281,6 +286,7 @@ local SIDE_GAUGES = {
 
 local function railGauges()
   local out = {}
+  if S.opStage == 1 then return out end   -- the first goal has no gauge: the ring is the gauge
   if not S.objectiveComplete and not S.objectiveFailed then
     for _, g in ipairs(JOB_GAUGES) do
       local v = g()
@@ -399,10 +405,13 @@ local function refreshRoute()
   local pad, objective = point(px, pz, "PAD"), point(ox, oz, "OBJECTIVE")
   local function lastStop() local ld = lastDoneMark(); return ld and point(ld.x, ld.z, ld.label) or objective end
   local mk = nextRequiredMark()
-  if (S.allDone or S.objectiveFailed) and pad then
+  local first = (S.opGoalX >= 0) and point(S.opGoalX, S.opGoalZ, "FIRST") or nil
+  if S.opStage == 1 and first and pad then
+    route.stage, route.from, route.to = "first", pad, first
+  elseif (S.allDone or S.objectiveFailed) and pad then
     route.stage, route.from, route.to = "extract", lastStop(), pad
   elseif not S.objectiveComplete and objective then
-    route.stage, route.from, route.to = "push", pad, objective
+    route.stage, route.from, route.to = "push", (S.opStage == 2 and first) or pad, objective
   elseif S.objectiveComplete and S.requiredLeft > 0 and mk then
     route.stage, route.from, route.to = "marks", objective, point(mk.x, mk.z, mk.label)
   elseif pad then
@@ -442,6 +451,7 @@ local ON_MISSION = {
     playUi("beep6", 0.9)
     say("Ketha", "Nothing of theirs is left standing. The purge is done.", 7)
   end,
+  objective_stage = function() end,   -- the rail redraws below; the beat brings its own sound and line
   secondary_complete = function() playUi("beep4", 0.7) end,
   secondary_changed = function() playUi("warning2", 0.6) end,
   secondary_failed = function() playUi("warning1", 0.7) end,
@@ -603,8 +613,15 @@ local function drawMission(x, y, right)
   y = y - 18
   text(Ash.fit(M.title or "", 12, right - x), x, y, 12, Ash.COL.gold, "l"); y = y - 16
   local col, glyph = Ash.COL.ink, Ash.GLYPH.objective
+  local words = M.objective or ""
+  if S.opStage == 1 then
+    -- the first goal: gold and hollow (◇), like its ring on the ground and its mark on the board
+    col, glyph, words = Ash.COL.gold, Ash.GLYPH.markOpt, S.opGoal or words
+  elseif S.opStage == 2 and S.opJob then
+    words = S.opJob
+  end
   if S.objectiveComplete then col, glyph = Ash.COL.good, Ash.GLYPH.done elseif S.objectiveFailed then col, glyph = Ash.COL.bad, Ash.GLYPH.failed end
-  for i, line in ipairs(Hud.wrap(M.objective or "", 11, right - x - 14, 2)) do
+  for i, line in ipairs(Hud.wrap(words, 11, right - x - 14, 2)) do
     text((i == 1 and (glyph .. " ") or "   ") .. line, x, y, 11, col, "l"); y = y - 14
   end
   for _, g in ipairs(R.gauges) do
