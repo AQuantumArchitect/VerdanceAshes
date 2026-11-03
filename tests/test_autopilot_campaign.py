@@ -42,6 +42,8 @@ class AutopilotTests(unittest.TestCase):
         gated; the company was, and with 12 Tnb could not field an army to reach a corner."""
         builder = (ROOT / "scripts" / "build_next_mission_v1.ps1").read_text(encoding="utf-8-sig")
         self.assertIn("gate = -not $isKings", builder)
+        # and no hostile field recruit loose on the board: one killed the Cortex king at minute 7
+        self.assertIn('if (-not $isKings -and $state -and $state.PSObject.Properties["fieldPool"]', builder)
         lua = (ROOT / "mod/VerdanceAshes.sdd/luarules/gadgets/include/va_tenebrium_handlers.lua").read_text()
         self.assertIn("tenebLoot.enabled = tn.gate ~= false", lua)
 

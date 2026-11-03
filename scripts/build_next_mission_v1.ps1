@@ -2773,7 +2773,9 @@ if ($intent.PSObject.Properties["marks"] -and $intent.marks) {
 if ($intent.deploymentZoneId) { $markedRecruitZones += @([string]$intent.deploymentZoneId) }
 if ($targetZoneId) { $markedRecruitZones += @([string]$targetZoneId) }
 $markedRecruitZones = @($markedRecruitZones | Where-Object { $_ } | Select-Object -Unique)
-if ($state -and $state.PSObject.Properties["fieldPool"] -and $state.fieldPool) {
+# Not in the kings' showdown: four corners, three kings and the den. A hostile recruit loose on the
+# map decided the throne (a Tsunami seaplane killed the Cortex king at minute 7, rig 2026-11-03).
+if (-not $isKings -and $state -and $state.PSObject.Properties["fieldPool"] -and $state.fieldPool) {
   $sortieMapId = [string]$intent.mapId
   $ranked = @()
   try {
