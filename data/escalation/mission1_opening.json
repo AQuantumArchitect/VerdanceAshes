@@ -66,7 +66,7 @@
   "card": {
     "firstGoal": "Off the pad. Eyes on their farm.",
     "missionGoal": "Take the {target}: break the farm, then hold the ground.",
-    "pauseLine": "Paused until you press Pause."
+    "pauseLine": "The field waits for you. Press Pause to begin."
   },
   "lines": {
     "selectPrompt": { "speaker": "Ketha", "text": "We're on the pad, waiting on your word. Drag a box round us." },
@@ -78,9 +78,9 @@
     "buildPrompt": { "speaker": "Ketha", "text": "That wreck's still warm. Right-click it with a Zagreus." },
     "relief": { "speaker": "Ketha", "text": "That's metal we didn't have this morning." },
     "pavise": { "speaker": "Pavise", "text": "I've got your left. Like before.", "onlyIfHero": "pavise" },
-    "hookDispatch": { "speaker": "Brask · intercepted", "text": "Farm hit. Irregulars, and the deserter with them. Send a column." },
-    "hookReply": { "speaker": "Ketha", "text": "Deserter. He means you. Finish this before his column gets here." },
-    "hookReplyTaken": { "speaker": "Ketha", "text": "Deserter. He means you. Load the pad before his column lands." },
+    "hookDispatch": { "speaker": "Brask · intercepted", "text": "Farm hit by irregulars. Find out who leads them. Send a column." },
+    "hookReply": { "speaker": "Ketha", "text": "Now they want a name. Finish this before the column gets here." },
+    "hookReplyTaken": { "speaker": "Ketha", "text": "Now they want a name. Load the pad before the column lands." },
     "column": { "speaker": "Ketha", "text": "Column's here. Hold the farm or load the pad. Pick now." }
   },
   "forces": {
