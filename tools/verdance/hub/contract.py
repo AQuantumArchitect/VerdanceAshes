@@ -384,6 +384,10 @@ def normalize_result(raw: Dict[str, Any], *, campaign_id: str = "verdance_ashes"
         "beliefExport": (raw.get("beliefExport") if isinstance(raw.get("beliefExport"), dict) else None),
         #   zoneDv {zoneId: {faction: metal}} — defensive value standing in each zone at the end (a fact).
         "zoneDv": (raw.get("zoneDv") if isinstance(raw.get("zoneDv"), dict) else None),
+        #   alliedFactions [faction] — who fought beside the company: they neither help nor contest its
+        #   claim on a zone (verdance.world.claim.company_owns). Dropped here until 2026-11-02, so a door
+        #   the company lifted from with the Null Mercs beside it was not held at home.
+        "alliedFactions": (raw.get("alliedFactions") if isinstance(raw.get("alliedFactions"), list) else []),
         "destroyedObjectives": raw.get("destroyedObjectives") or raw.get("destroyedObjectiveIds") or [],
         "destroyedObjectiveIds": raw.get("destroyedObjectiveIds") or raw.get("destroyedObjectives") or [],
         "objectiveResults": raw.get("objectiveResults") or [],
@@ -482,6 +486,7 @@ def result_v2_to_v1_fields(r: Dict[str, Any]) -> Dict[str, Any]:
         **({"manifest": r.get("manifest")} if isinstance(r.get("manifest"), dict) else {}),
         **({"beliefExport": r.get("beliefExport")} if isinstance(r.get("beliefExport"), dict) else {}),
         **({"zoneDv": r.get("zoneDv")} if isinstance(r.get("zoneDv"), dict) else {}),
+        **({"alliedFactions": r.get("alliedFactions")} if isinstance(r.get("alliedFactions"), list) else {}),
         "objectiveResults": r.get("objectiveResults") or [],
         "secondaryResults": r.get("secondaryResults") or [],
         "elapsedFrames": r.get("elapsedFrames"),

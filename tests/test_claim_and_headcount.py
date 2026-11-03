@@ -127,3 +127,19 @@ def test_the_roster_buries_a_hero_the_ledger_lost():
     assert by["vane"]["status"] == "active"
     assert by["pavise"]["campaignXp"] == 0.0     # never on the field: no XP for sitting at home
 
+
+def test_the_alliance_reaches_home_through_the_result_contract():
+    """Three-sortie stock rehearsal (2026-11-02): mission 2 took the Koom door (GF_SE_PLATEAU) and lifted
+    from it with the Null Mercs beside it (9425 to our 9112), but the door was not held at home: the
+    result contract dropped alliedFactions, so the mercs counted against the company again, and mission 3
+    was offered the same door."""
+    from verdance.hub.contract import normalize_result, result_v2_to_v1_fields
+    raw = {"zoneDv": {"GF_SE_PLATEAU": {"nullmercs": 9425, "ashwalkers": 9112}}, "alliedFactions": ["nullmercs"]}
+    norm = normalize_result(raw)
+    assert norm["alliedFactions"] == ["nullmercs"]
+    v1 = result_v2_to_v1_fields(norm)
+    assert v1["alliedFactions"] == ["nullmercs"]
+    state = engine.default_v1_state()
+    roads.record_homecoming(state, dict(v1, deploymentMapId="greenest_fields", missionNumber=2), ROOT)
+    assert roads.held(state, "GF_SE_PLATEAU")
+
