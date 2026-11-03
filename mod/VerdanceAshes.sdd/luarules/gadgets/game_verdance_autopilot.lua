@@ -199,6 +199,20 @@ local function siege()
     local n = 0
     for _ in pairs(targets or {}) do n = n + 1 end
     kings = n > 0
+    if kings and ((Spring.GetGameFrame and Spring.GetGameFrame()) or 0) % 3600 < 30 then
+      -- where the kings stand, every two minutes, and how big the company's army is
+      local rows, armed = {}, 0
+      for _, uid in ipairs(companyUnits(function(ud) return mobile(ud) and ud.canAttack and not ud.isBuilder end)) do armed = armed + 1 end
+      for uid, team in pairs(targets) do
+        local x, y, z = Spring.GetUnitPosition(uid)
+        local ud = UnitDefs[Spring.GetUnitDefID(uid) or -1]
+        if x then
+          rows[#rows + 1] = tostring(team) .. ":" .. tostring(ud and ud.name or "?") .. "@" .. math.floor(x) .. ","
+            .. math.floor(z) .. " y=" .. math.floor(y or 0) .. " ground=" .. math.floor(Spring.GetGroundHeight(x, z) or 0)
+        end
+      end
+      Spring.Echo("VA_AUTOPILOT kings standing=" .. n .. " company_guns=" .. armed .. " " .. table.concat(rows, " "))
+    end
     if n > 1 then targets = nil end   -- more than one king standing: BARb's war, not the rig's
   end
   local guns = companyUnits(function(ud, uid)

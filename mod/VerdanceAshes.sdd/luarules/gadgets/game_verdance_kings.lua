@@ -54,6 +54,88 @@ local function commanders(teamID)
   return n
 end
 
+-- A king who starts under the sea is a king nobody can reach: the Southeast Shore seat stands in the
+-- water (the Armada commander started at y -47 on the container rig, 2026-11-03), and through six
+-- 90-minute rehearsals no army but torpedoes could touch it while the other two kings fell. In the
+-- first frames every rival king standing in water walks inland, onto the nearest dry ground toward the
+-- middle of the map that a bot could stand on, and on ground that stays dry a little further in (not a
+-- sandbar on the map's edge). The company's own commander lands where the drop puts it.
+local DRY = 10                          -- elmos above sea level
+-- ...and above the tide still to come: the waterline rises during the match (game_verdance_campaign's
+-- waterline sinks the world from mission.hydrology.level toward nextLevel). The first try put the
+-- Armada king on ground 41 high, and the tide took it to -13 by minute 22.
+local riseAhead = 0
+local function tideStillToCome(mission)
+  local hydro = type(mission) == "table" and mission.hydrology or nil
+  local okz, zm = pcall(VFS.Include, "singleplayer/verdance_ashes/generated/zone_map_current.lua")
+  local line = okz and type(zm) == "table" and zm.waterline or nil
+  local elev = line and line.elevations
+  if not hydro or type(elev) ~= "table" or #elev == 0 then return 0 end
+  local levels = line.levels or {}
+  local function at(level)
+    local t = math.max(0, math.min(1, tonumber(level) or 0))
+    for i = 1, #elev do
+      local l = tonumber(levels[i]) or ((i - 1) / math.max(1, #elev - 1))
+      if l >= t then
+        if i == 1 then return tonumber(elev[1]) or 0 end
+        local p = tonumber(levels[i - 1]) or 0
+        local f = (l - p) > 0 and (t - p) / (l - p) or 0
+        return elev[i - 1] + (elev[i] - elev[i - 1]) * f
+      end
+    end
+    return tonumber(elev[#elev]) or 0
+  end
+  local now = tonumber(hydro.level) or 0
+  local top = math.max(now, tonumber(hydro.nextLevel) or now)
+  return math.max(0, at(top) - at(now))
+end
+
+local function dryGround(x, z)
+  local DRY = DRY + riseAhead
+  local walker = UnitDefNames["armpw"] or UnitDefNames["legcen"]
+  local cx, cz = Game.mapSizeX / 2, Game.mapSizeZ / 2
+  local inward = math.atan2(cz - z, cx - x)
+  local function dry(px, pz)
+    if px < 64 or pz < 64 or px > Game.mapSizeX - 64 or pz > Game.mapSizeZ - 64 then return false end
+    return (Spring.GetGroundHeight(px, pz) or -1) >= DRY
+  end
+  local function ok(px, pz, a)
+    if not (dry(px, pz) and dry(px + math.cos(a) * 256, pz + math.sin(a) * 256)) then return false end
+    if walker and Spring.TestMoveOrder then
+      local okm, can = pcall(Spring.TestMoveOrder, walker.id, px, Spring.GetGroundHeight(px, pz), pz)
+      if okm and can == false then return false end
+    end
+    return true
+  end
+  for r = 64, 3000, 64 do
+    for i = -6, 6 do                      -- within 90 degrees either side of the way inland
+      local a = inward + i / 6 * (math.pi / 2)
+      local px, pz = x + math.cos(a) * r, z + math.sin(a) * r
+      if ok(px, pz, a) then return px, pz end
+    end
+  end
+  return nil
+end
+
+local function kingsAshore()
+  for _, tid in ipairs(order) do
+    for _, uID in ipairs(tid ~= playerTeamID and Spring.GetTeamUnits(tid) or {}) do
+      if isCommander(Spring.GetUnitDefID(uID)) then
+        local x, _, z = Spring.GetUnitPosition(uID)
+        if x and (Spring.GetGroundHeight(x, z) or 0) < DRY + riseAhead then
+          local px, pz = dryGround(x, z)
+          if px then
+            Spring.SetUnitPosition(uID, px, pz)
+            Spring.GiveOrderToUnit(uID, CMD.STOP, {}, 0)
+            Spring.Echo("VA_KING_ASHORE faction=" .. kings[tid].faction .. " from=" .. math.floor(x) .. "," .. math.floor(z)
+              .. " to=" .. math.floor(px) .. "," .. math.floor(pz) .. " tide_to_come=" .. math.floor(riseAhead))
+          end
+        end
+      end
+    end
+  end
+end
+
 function gadget:Initialize()
   local ok, mission = pcall(VFS.Include, "singleplayer/verdance_ashes/generated/va_current.lua")
   if not ok or type(mission) ~= "table" or type(mission.kings) ~= "table" or #mission.kings == 0 then
@@ -61,6 +143,7 @@ function gadget:Initialize()
     return
   end
   playerTeamID = tonumber(mission.balance and mission.balance.playerTeamID) or 0
+  riseAhead = tideStillToCome(mission)
   for _, k in ipairs(mission.kings) do
     local tid = tonumber(k.teamID)
     if tid then
@@ -103,6 +186,7 @@ local function fall(tid, frame)
 end
 
 function gadget:GameFrame(frame)
+  if frame == 1 or frame == 5 then kingsAshore() end
   if done or frame % CHECK_EVERY ~= 0 then return end
   for _, tid in ipairs(order) do
     local k = kings[tid]
