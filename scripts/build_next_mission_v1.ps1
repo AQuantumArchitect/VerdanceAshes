@@ -2009,14 +2009,20 @@ function Add-EyeScouts {
 }
 
 function Add-Kings {
-  # All That Simmers, the kings' showdown: a classic game of BAR. Each rival is a BARbarian on its
-  # own seat with its start commander and nothing else; the company's commander is the third
-  # king. Everyone is at war with everyone. The kings gadget reports who falls.
+  # All That Simmers, the kings' showdown: a game of BAR in four corners. Armada and Cortex are
+  # BARbarians on their seats with their start commanders and nothing else; the company's commander
+  # is the third king; raptors hold the fourth corner. Everyone is at war with everyone. The kings
+  # gadget reports who falls.
   param($Theater)
   $script:kings = @([ordered]@{ teamID = 0; faction = "ashwalkers"; label = "The company" })
   foreach ($k in @($Theater.kings)) {
     $wt = New-WarTeam ([string]$k.faction) @([double]$k.x, [double]$k.z) ([string]$k.label) 0.12
     $script:kings += [ordered]@{ teamID = $wt.teamID; faction = [string]$k.faction; label = "$($wt.W.label) king"; zoneId = [string]$k.zoneId }
+  }
+  # The fourth corner is the wild's (owner call, 2026-11-03): a raptor den with its hives, at war
+  # with every king. It is no king: the throne is still the last commander standing.
+  if ($Theater.PSObject.Properties["raptorDen"] -and $Theater.raptorDen) {
+    Add-RaptorCamp @([double]$Theater.raptorDen.x, [double]$Theater.raptorDen.z) $false ([string]$Theater.raptorDen.label)
   }
   Write-Host ("Kings: {0}" -f (($script:kings | ForEach-Object { $_.faction }) -join ", "))
 }

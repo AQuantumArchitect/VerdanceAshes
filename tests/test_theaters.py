@@ -135,9 +135,25 @@ def test_simmers_is_a_kings_showdown_from_any_door():
     for pad in ("ATS_NW_SHORE", "ATS_SW_MUSTER"):
         show = theaters.kings_showdown("all_that_simmers", ROOT, pad)
         kings = show["kings"]
-        assert [k["faction"] for k in kings] == ["armada", "nullmercs", "cortex"]
-        assert pad not in {k["zoneId"] for k in kings}
+        assert [k["faction"] for k in kings] == ["armada", "cortex"]
+        corners = {pad} | {k["zoneId"] for k in kings} | {show["raptorDen"]["zoneId"]}
+        assert corners == set(theaters.SIMMERS_SEATS)          # every corner occupied, once
         assert show["throne"]["zoneId"] == theaters.SIMMERS_THRONE
+
+
+def test_the_finale_showdown_layout():
+    """Owner call, 2026-11-03: the company north-west (the finale's pad), Armada north-east, Cortex
+    south-east, a raptor den south-west."""
+    show = theaters.kings_showdown("all_that_simmers", ROOT, engine.FINALE_PLANS["B"]["deploymentZoneId"])
+    assert engine.FINALE_PLANS["B"]["deploymentZoneId"] == "ATS_NW_SHORE"
+    assert {k["faction"]: k["zoneId"] for k in show["kings"]} == {"armada": "ATS_NE_MUSTER", "cortex": "ATS_SE_SHORE"}
+    assert show["raptorDen"]["zoneId"] == "ATS_SW_MUSTER"
+
+
+def test_the_showdown_water_stays_at_the_maps_own_level():
+    still = theaters.still_water({"level": 0.26, "nextLevel": 0.79, "amplitude": 1.0, "basins": ["BASIN_C"]})
+    assert still["level"] == 0.0 and still["nextLevel"] == 0.0 and still["amplitude"] == 0.0
+    assert still["basins"] == ["BASIN_C"]
 
 
 def test_the_commander_walks_out_alone():
@@ -213,8 +229,10 @@ def test_the_builder_fields_the_war_the_kings_and_the_dens():
     assert not any(0 in p for p in pacts)
 
     kings = _probe({"theater": theaters.kings_showdown("all_that_simmers", ROOT, "ATS_NW_SHORE"), "wildDens": []})
-    assert [k["faction"] for k in kings["kings"]] == ["ashwalkers", "armada", "nullmercs", "cortex"]
-    assert kings["forces"] == [] and kings["alliances"] == []     # commanders only, everyone at war
+    assert [k["faction"] for k in kings["kings"]] == ["ashwalkers", "armada", "cortex"]
+    assert kings["alliances"] == []                                # everyone at war
+    assert {f["faction"] for f in kings["forces"]} == {"wild"}     # commanders only, and the raptor den
+    assert any(a["shortName"] == "RaptorsAI" for a in kings["ai"])
 
     # The Eye's rim raptors went with the glassing (9149416); the Rock Jungle is the wild now.
     dens = theaters.wild_dens(_state(), "the_rock_jungle", ROOT, "TRJ_NW_OUTER_MUSTER")

@@ -99,12 +99,13 @@ def test_in_cortexs_own_suit_cortex_stays_home():
     s = _state()
     suits.grant_suit(s, "armcom", "stolen_koom")
     show = theaters.kings_showdown(suits.SIMMERS, ROOT, "ATS_NW_SHORE", s)
-    assert sorted(k["faction"] for k in show["kings"]) == ["armada", "cortex", "nullmercs"]
+    assert sorted(k["faction"] for k in show["kings"]) == ["armada", "cortex"]
     assert show["company"]["unitDef"] == "armcom" and not show.get("cortexSitsOut")
     c = _state()
     suits.grant_suit(c, "corcom", "bought_cortex")
     show = theaters.kings_showdown(suits.SIMMERS, ROOT, "ATS_NW_SHORE", c)
-    assert sorted(k["faction"] for k in show["kings"]) == ["armada", "nullmercs"] and show["cortexSitsOut"]
+    assert [k["faction"] for k in show["kings"]] == ["armada"] and show["cortexSitsOut"]
+    assert show["raptorDen"]["zoneId"] == "ATS_SW_MUSTER"      # the den is there either way
 
 
 def test_sovereignty_waits_on_a_suit():

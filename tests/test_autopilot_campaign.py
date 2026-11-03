@@ -8,7 +8,9 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
-from autopilot_campaign_v1 import archive_log, finale_state, isolate_bar, patch_startscript, sorties_came_home
+from autopilot_campaign_v1 import archive_log, finale_state, isolate_bar, patch_startscript, rivals_to, sorties_came_home
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 class AutopilotTests(unittest.TestCase):
@@ -21,6 +23,31 @@ class AutopilotTests(unittest.TestCase):
             self.assertEqual(st["missionNumber"], 11)
             self.assertEqual(finale_plan_for_state(st)["kind"], kind, path)
             self.assertGreaterEqual(st["commerce"]["tenebrium"], 12, "a walked campaign's bank, not a fresh one's")
+
+    def test_the_kings_showdown_intent_four_corners_and_still_water(self):
+        """Owner call, 2026-11-03: company NW, Armada NE, Cortex SE, raptors SW; the water stays at the
+        map's own level all match (no sink, no tide beats)."""
+        from verdance.campaign import default_v1_state
+        from verdance.campaign.engine import materialize_next_intent
+        it = materialize_next_intent(finale_state(default_v1_state(), "B"), ROOT)
+        theater = it["theater"]
+        self.assertEqual(it["deploymentZoneId"], "ATS_NW_SHORE")
+        self.assertEqual({k["faction"]: k["zoneId"] for k in theater["kings"]}, {"armada": "ATS_NE_MUSTER", "cortex": "ATS_SE_SHORE"})
+        self.assertEqual(theater["raptorDen"]["zoneId"], "ATS_SW_MUSTER")
+        self.assertEqual((it["hydrology"]["level"], it["hydrology"]["nextLevel"]), (0.0, 0.0))
+        self.assertFalse([b for b in it.get("beats") or [] if any(a.get("type") == "hydrology" for a in b.get("actions") or [])])
+
+    def test_rival_ai_swaps_every_rival_barb_seat_and_not_the_company(self):
+        text = ("[GAME]\n{\n  [AI0]\n  {\n    Name=BARb(Armada North);\n    ShortName=BARb;\n    Team=1;\n    Version=stable;\n"
+                "    [Options]\n    {\n      profile=hard;\n    }\n  }\n  [AI1]\n  {\n    Name=RaptorsDefenseAI(Verdance);\n"
+                "    ShortName=RaptorsAI;\n    Team=3;\n  }\n  [AI2]\n  {\n    Name=Autopilot(BARb hard_aggressive);\n"
+                "    ShortName=BARb;\n    Team=0;\n    Version=stable;\n  }\n}\n")
+        out, n = rivals_to(text, "SimpleAI")
+        self.assertEqual(n, 1)
+        self.assertIn("Name=SimpleAI(Armada North);", out)
+        self.assertNotIn("profile=hard;", out)
+        self.assertIn("Name=Autopilot(BARb hard_aggressive);", out)
+        self.assertIn("ShortName=RaptorsAI;", out)
 
     def test_a_capped_rehearsal_passes_when_every_sortie_came_home(self):
         """The stock rehearsal (--stock --sorties 1) on 2026-11-02: one sortie, engine exit 0, result

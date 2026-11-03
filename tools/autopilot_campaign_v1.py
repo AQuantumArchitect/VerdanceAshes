@@ -130,6 +130,25 @@ def patch_startscript(text: str, *, profile: str, speed: int, minutes: float, se
     return text, team
 
 
+def rivals_to(text: str, short: str) -> tuple[str, int]:
+    """Every BARb seat but the company's own autopilot plays as `short` (SimpleAI): a test of whether
+    a field can be won at all, never the real game. Returns the text and how many seats changed."""
+    n = 0
+
+    def swap(m: "re.Match[str]") -> str:
+        nonlocal n
+        block = m.group(0)
+        if "ShortName=BARb;" not in block or "Name=Autopilot(" in block:
+            return block
+        n += 1
+        block = re.sub(r"Name=BARb\(", f"Name={short}(", block, count=1)
+        block = block.replace("ShortName=BARb;", f"ShortName={short};")
+        block = re.sub(r"Version=[^;]*;", "Version=<not-versioned>;", block)
+        return re.sub(r"\s*\[Options\]\s*\{[^{}]*\}", "", block)
+
+    return re.sub(r"\[AI\d+\]\s*\{(?:[^{}]|\{[^{}]*\})*\}", swap, text), n
+
+
 FINALE_BANK = {"tenebrium": 12, "metalK": 28}
 
 
@@ -235,6 +254,8 @@ def main() -> int:
     ap.add_argument("--finale", choices=["A", "B", "C"],
                     help="start at the act-3 finale on this path (A Overthrow, B the kings' showdown with a suit, C the Spire Jump)")
     ap.add_argument("--resume", type=Path, help="continue an existing run directory and its isolated campaign state")
+    ap.add_argument("--rival-ai", default="", metavar="SHORTNAME",
+                    help="TESTING ONLY: every rival BARb seat plays as this AI (SimpleAI), to check a field can be won")
     args = ap.parse_args()
     if min(args.sorties, args.speed, args.startup_timeout, args.wall_timeout) <= 0:
         ap.error("sorties, speed, and timeouts must be positive")
@@ -361,6 +382,9 @@ def main() -> int:
         text, team = patch_startscript(script.read_text(encoding="utf-8", errors="replace"), profile=args.profile,
                                        speed=args.speed, minutes=args.minutes, settle=args.settle, hud=args.hud or args.windowed,
                                        beats=args.beats)
+        if args.rival_ai:
+            text, swapped = rivals_to(text, args.rival_ai)
+            print(f"[autopilot] TEST: {swapped} rival BARb seat(s) play as {args.rival_ai}", flush=True)
         script.write_text(text, encoding="utf-8")
         shutil.copy2(script, run_dir / f"sortie_{n:02d}.startscript.txt")
         rep = launch(ws, headless=not args.windowed, run_dir=run_dir, n=n, hud=args.hud)

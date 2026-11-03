@@ -17,8 +17,9 @@ if not gadgetHandler:IsSyncedCode() then
   return
 end
 
--- All That Simmers is a classic game of BAR: Armada, Null Mercs and the company each start with
--- one commander (mission.kings, from verdance.world.theaters). A king falls when its team has no
+-- All That Simmers is a game of BAR in four corners: the company, Armada and Cortex each start with
+-- one commander (mission.kings, from verdance.world.theaters), and a raptor den holds the fourth
+-- corner (no king; the raptors fight everyone). A king falls when its team has no
 -- commander left. This gadget reports facts only:
 --
 --   GG.VA_KingsJson() -> [{"faction":"armada","teamID":1,"fallen":true,"minute":12.4,"by":"ashwalkers"}, ...]

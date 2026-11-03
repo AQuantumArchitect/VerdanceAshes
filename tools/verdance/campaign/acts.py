@@ -51,8 +51,10 @@ FINALE_PLANS = {
         "mapId": "all_that_simmers",
         "deploymentZoneId": "ATS_NW_SHORE",
         "title": "Finale — Sovereignty",
-        # The kings' showdown (owner call, 2026-10-23): a classic game of BAR. Armada, Null Mercs
-        # and the company each start with one commander; last commander standing takes the throne.
+        # The kings' showdown (owner calls, 2026-10-23 and 2026-11-03): a game of BAR in four corners.
+        # The company lands north-west, Armada starts north-east, Cortex south-east, and a raptor den
+        # holds the south-west. One commander each; last commander standing takes the throne. The
+        # water stays at the map's own level all match.
         "objective": {
             "id": "FINALE_SOVEREIGNTY",
             "kind": "kings_showdown",

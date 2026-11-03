@@ -99,11 +99,13 @@ STANDING_CONTROL = {m: {s["zoneId"]: s["faction"] for s in seats
                         if not (m == "eye_of_horus" and s["zoneId"] in EYE_RIM_ZONES) and not s["key"].startswith("fort")}
                     for m, seats in WARS.items()}
 
-# All That Simmers' seats: the corners a king can start from. The company's seat is its pad; the
-# two rivals take the seats that make the widest triangle with it.
-SIMMERS_SEATS = ["ATS_NE_MUSTER", "ATS_SE_SHORE", "ATS_SW_MUSTER", "ATS_NW_SHORE"]
+# All That Simmers' four corners, clockwise from the north-west. The showdown (owner call, 2026-11-03):
+# the company in its corner (the finale lands it in the north-west), Armada in the next corner
+# clockwise (north-east), Cortex across the map (south-east), and a raptor den in the last corner
+# (south-west). Three kings and the wild; every corner occupied.
+SIMMERS_SEATS = ["ATS_NW_SHORE", "ATS_NE_MUSTER", "ATS_SE_SHORE", "ATS_SW_MUSTER"]
 SIMMERS_THRONE = "ATS_C_BASTION"
-SIMMERS_RIVALS = ("armada", "nullmercs", "cortex")
+SIMMERS_RIVALS = ("armada", "cortex")
 
 # A den or a camp never stands this close to the company's pad.
 PAD_CLEARANCE = 0.22
@@ -212,40 +214,33 @@ def standing_war(map_id: str, workspace: Optional[Path], pad_zone: Optional[str]
 
 def kings_showdown(map_id: str, workspace: Optional[Path], pad_zone: Optional[str],
                    state: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]:
+    """The kings' showdown on All That Simmers: the company in the corner nearest its pad, Armada in
+    the next corner clockwise, Cortex across the map, a raptor den in the last corner. In Cortex's own
+    suit Cortex stays home and its corner stands empty."""
     if map_id != "all_that_simmers":
         return None
     from verdance.campaign import suits as _suits
     worn = _suits.suit(state) if state is not None else None
-    rivals = [f for f in SIMMERS_RIVALS if not (f == "cortex" and worn and worn["unitDef"] == "corcom")]
     zones = _zones(map_id, workspace)
-    seats = [s for s in (_seat(zones, z) for z in SIMMERS_SEATS) if s]
+    seats = [_seat(zones, z) for z in SIMMERS_SEATS]
     pad = _point(zones.get(str(pad_zone), {})) if pad_zone else None
-    if not pad or len(seats) < 3:
+    if not pad or not all(seats):
         return None
-    open_seats = [s for s in seats if math.hypot(s["x"] - pad[0], s["z"] - pad[1]) >= PAD_CLEARANCE]
-
-    def spread(a: Dict[str, Any], b: Dict[str, Any]) -> float:
-        d = lambda p, q: math.hypot(p[0] - q[0], p[1] - q[1])  # noqa: E731
-        pa, pb = (a["x"], a["z"]), (b["x"], b["z"])
-        return min(d(pad, pa), d(pad, pb), d(pa, pb))
-
-    pairs = [(a, b) for i, a in enumerate(open_seats) for b in open_seats[i + 1:]]
-    if not pairs:
-        return None
-    a, b = max(pairs, key=lambda ab: (round(spread(*ab), 4), ab[0]["zoneId"], ab[1]["zoneId"]))
-    kings = [dict(a, faction=rivals[0]), dict(b, faction=rivals[1])]
-    # the third rival (Cortex) takes the open seat farthest from the company
-    rest = [s for s in open_seats if s["zoneId"] not in (a["zoneId"], b["zoneId"])]
-    if len(rivals) > 2 and rest:
-        c = max(rest, key=lambda s: (round(math.hypot(s["x"] - pad[0], s["z"] - pad[1]), 4), s["zoneId"]))
-        kings.append(dict(c, faction=rivals[2]))
+    home = min(range(4), key=lambda i: math.hypot(seats[i]["x"] - pad[0], seats[i]["z"] - pad[1]))
+    corner = lambda k: seats[(home + k) % 4]  # noqa: E731
+    cortex_out = bool(worn and worn["unitDef"] == "corcom")
+    kings = [dict(corner(1), faction="armada")]
+    if not cortex_out:
+        kings.append(dict(corner(2), faction="cortex"))
+    den = dict(corner(3), label=corner(3)["label"] + " den")
     throne = _seat(zones, SIMMERS_THRONE)
     company: Dict[str, Any] = {"zoneId": pad_zone}
     if worn:
         company.update(unitDef=worn["unitDef"], side=worn["side"])
-    out = {"kind": "kings_showdown", "label": "The kings' showdown: one commander each, last one standing",
-           "throne": throne, "kings": kings, "company": company}
-    if worn and worn["unitDef"] == "corcom":
+    out = {"kind": "kings_showdown",
+           "label": "The kings' showdown: one commander each, last one standing; raptors in the fourth corner",
+           "throne": throne, "kings": kings, "raptorDen": den, "company": company}
+    if cortex_out:
         out["cortexSitsOut"] = True
     return out
 
@@ -256,9 +251,17 @@ SET_PIECES = {
     "tabula": {"kind": "standing_war", "label": "Standing war: Null Mercs hold the west terraces, Armada the east, twenty minutes in; you take the north-west seat"},
     "ancient_bastion": {"kind": "standing_war", "label": "Standing war: Armada hold the western castle, Null Mercs besiege it from the east; you take the north-east seat"},
     "eye_of_horus": {"kind": "standing_war", "label": "The glassed crater: a Cortex mercenary camp dug into the crater Armada once glassed; the corners are littered with Armada's old assault"},
-    "all_that_simmers": {"kind": "kings_showdown", "label": "Kings' showdown: one commander each, last one standing takes the throne. No duel without a commander suit"},
+    "all_that_simmers": {"kind": "kings_showdown", "label": "Kings' showdown: the company, Armada and Cortex, one commander each, and a raptor den in the fourth corner; last one standing takes the throne. No duel without a commander suit"},
     "the_rock_jungle": {"kind": "wild_ground", "label": "Wild ground: raptors wander every zone; the hive is in the south-west"},
 }
+
+
+def still_water(hydrology: Optional[Dict[str, Any]]) -> Dict[str, Any]:
+    """The kings' showdown's waterline: the map's own, all match long (no sink, no tide)."""
+    out = dict(hydrology or {})
+    out.update(level=0.0, nextLevel=0.0, amplitude=0.0, elevation=0.0, terraformDelta=0.0,
+               areaSubmerged=0.0, metalSpotsSubmerged=0.0, still=True)
+    return out
 
 
 def solo_command(intent: Dict[str, Any]) -> Dict[str, Any]:

@@ -557,10 +557,16 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
         intent["theater"] = theater
         if theater.get("kind") == "kings_showdown":
             _theaters.solo_command(intent)
+            # The showdown is fought at the map's own waterline, start to finish (owner call,
+            # 2026-11-03): All That Simmers is flat, and the tide drowned whole seats mid-match.
+            intent["hydrology"] = _theaters.still_water(intent.get("hydrology"))
+            intent["beats"] = [b for b in intent.get("beats") or []
+                               if not any(a.get("type") == "hydrology" for a in b.get("actions") or [])
+                               and not str(b.get("id", "")).startswith("b8_water")]
             from verdance.campaign import suits as _suits
             say = [_suits.line(state)]
             if theater.get("cortexSitsOut"):
-                say.append("Cortex sees its own suit walking out to the duel and stays home. Two kings to beat, not three.")
+                say.append("Cortex sees its own suit walking out to the duel and stays home. One king to beat, and the raptors.")
             if isinstance(intent.get("briefing"), dict):
                 for text in [t for t in say if t]:
                     intent["briefing"].setdefault("lines", []).append({"speaker": "ketha", "text": text, "tag": "suit"})
