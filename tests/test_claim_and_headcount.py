@@ -41,6 +41,49 @@ def test_the_gadgets_read_the_same_rule():
     assert "VA_CLAIM.withoutAllies(row, allies)" in presence
 
 
+ROWS = [
+    {"ashwalkers": 1600, "nullmercs": 7731}, {"ashwalkers": 1400, "nullmercs": 7731},
+    {"nullmercs": 4000, "ashwalkers": 1400, "armada": 500}, {"nullmercs": 4000, "armada": 1400},
+    {"armada": 5200, "nullmercs": 900, "ashwalkers": 800}, {"armada": 5000, "nullmercs": 900, "ashwalkers": 800},
+    {"ashwalkers": 2000, "nullmercs": 3000, "armada": 100}, {"ashwalkers": 1600, "armada": 300, "wild": 300},
+    {"armada": 2000, "ashwalkers": 500}, {"armada": 50}, {},
+]
+
+
+def test_lua_and_python_name_the_same_holder():
+    """va_claim.lua and verdance.world.claim are one rule: same row, same allies, same owner."""
+    import ctypes, glob
+    libs = glob.glob("/usr/lib/x86_64-linux-gnu/liblua5.4.so*")
+    if not libs:
+        return
+    L = ctypes.CDLL(libs[0])
+    L.luaL_newstate.restype = ctypes.c_void_p
+    L.luaL_openlibs.argtypes = [ctypes.c_void_p]
+    L.luaL_loadbufferx.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_size_t, ctypes.c_char_p, ctypes.c_char_p]
+    L.lua_pcallk.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_void_p, ctypes.c_void_p]
+    L.lua_tolstring.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_void_p]
+    L.lua_tolstring.restype = ctypes.c_char_p
+    st = L.luaL_newstate(); L.luaL_openlibs(st)
+    lua_src = (ROOT / "mod/VerdanceAshes.sdd/luarules/gadgets/include/va_claim.lua").read_text(encoding="utf-8")
+    def row(r):
+        return "{" + ",".join(f'["{k}"]={v}' for k, v in r.items()) + "}"
+    cases = []
+    for r in ROWS:
+        for allies in ([], ["nullmercs"]):
+            cases.append((r, allies))
+    body = "local M = (function()\n" + lua_src + "\nend)()\nlocal out = {}\n"
+    for r, allies in cases:
+        al = "{" + ",".join(f'["{a}"]=true' for a in allies) + "}"
+        body += f"out[#out+1] = tostring((M.holder({row(r)}, 1500, 3, {al})))\n"
+    body += "return table.concat(out, ',')"
+    b = body.encode()
+    assert L.luaL_loadbufferx(st, b, len(b), b"claim", b"t") == 0, L.lua_tolstring(st, -1, None)
+    assert L.lua_pcallk(st, 0, 1, 0, None, None) == 0, L.lua_tolstring(st, -1, None)
+    lua = L.lua_tolstring(st, -1, None).decode().split(",")
+    py = [str(claim.holder(r, 1500, 3, allies)[0]) for r, allies in cases]
+    assert lua == [p.replace("None", "nil") for p in py], list(zip(cases, lua, py))
+
+
 def test_allies_do_not_contest_the_company():
     """Mission 1 on a stock BAR (2026-11-02): the Null Mercs, allied with the company, followed it into
     GF_NW_BASTION, and the hold's need climbed from 3871 to 27751 because their presence counted as
@@ -51,6 +94,14 @@ def test_allies_do_not_contest_the_company():
     assert not claim.company_owns({"ashwalkers": 1400, "nullmercs": 7731}, allies=mercs)  # allies don't lend
     assert not claim.company_owns({"ashwalkers": 1600, "armada": 600, "nullmercs": 50}, allies=mercs)
     assert claim.zone_holder({"nullmercs": 7731}, allies=mercs) == "nullmercs"     # the mercs' own ground
+    # the mercs compete against Armada but not against the company (owner call, 2026-11-02)
+    assert claim.zone_holder({"nullmercs": 4000, "ashwalkers": 1400, "armada": 500}, allies=mercs) == "nullmercs"
+    assert claim.zone_holder({"nullmercs": 4000, "ashwalkers": 1400, "armada": 500}) is None
+    assert claim.zone_holder({"nullmercs": 4000, "armada": 1400}, allies=mercs) is None     # 3 x 1400 = 4200
+    assert claim.zone_holder({"armada": 5000, "nullmercs": 900, "ashwalkers": 800}, allies=mercs) is None  # 3 x 1700
+    assert claim.zone_holder({"armada": 5200, "nullmercs": 900, "ashwalkers": 800}, allies=mercs) == "armada"
+    # both qualify: the company holds it
+    assert claim.zone_holder({"ashwalkers": 2000, "nullmercs": 3000, "armada": 100}, allies=mercs) == "ashwalkers"
     assert claim.zone_holder({"ashwalkers": 2000, "nullmercs": 4000}, allies=mercs) == "ashwalkers"
     assert claim.zone_holder({"ashwalkers": 2000, "nullmercs": 4000}) is None
 

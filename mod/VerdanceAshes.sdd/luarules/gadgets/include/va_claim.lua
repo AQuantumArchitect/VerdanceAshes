@@ -4,22 +4,39 @@
 -- structures standing in the zone. A side owns the zone when
 --     1500 < (AV+DV)self > 3 * SUM(AV+DV)others
 -- and nobody meeting that changes nothing. Every zone the company owns is an extraction point.
--- The company's allies in the match neither count for it nor against it (M.ours).
+-- The company and its allies in the match do not contest each other (M.holder).
 local M = { NEED = 1500, DOMINANCE = 3 }
 
--- row: { faction = presence }. Returns the owner (or nil) and the leader's presence.
-function M.holder(row, need, dominance)
+-- row: { faction = presence }; allies: the company's allies in the match, { faction = true }.
+-- The company and its allies do not contest each other (owner call, 2026-11-02): the Null Mercs
+-- compete against Armada but not against the player, and the player not against them. Neither
+-- lends presence to the other. When the company and an ally both qualify, the company holds it.
+-- Returns the owner (or nil) and its presence (or the best presence when nobody owns it).
+function M.holder(row, need, dominance, allies)
   need = tonumber(need) or M.NEED
   if need <= 0 then need = M.NEED end
   dominance = tonumber(dominance) or M.DOMINANCE
-  local leader, best, total = nil, 0, 0
+  allies = allies or {}
+  local function inBloc(f) return f == "ashwalkers" or allies[f] == true end
+  local vals, best = {}, 0
   for faction, v in pairs(row or {}) do
     v = tonumber(v) or 0
-    total = total + v
-    if v > best or (v == best and leader and tostring(faction) < tostring(leader)) then leader, best = faction, v end
+    vals[faction] = v
+    if v > best then best = v end
   end
-  if not leader or best <= need or best <= dominance * (total - best) then return nil, best end
-  return leader, best
+  local leader, lv = nil, 0
+  for f, v in pairs(vals) do
+    local hostile = 0
+    for g, w in pairs(vals) do
+      if g ~= f and not (inBloc(f) and inBloc(g)) then hostile = hostile + w end
+    end
+    if v > need and v > dominance * hostile then
+      if f == "ashwalkers" then return f, v end
+      if v > lv or (v == lv and leader and tostring(f) < tostring(leader)) then leader, lv = f, v end
+    end
+  end
+  if not leader then return nil, best end
+  return leader, lv
 end
 
 -- Allies don't contest (owner-proxy call, 2026-11-02): a faction allied with the company in the
@@ -38,7 +55,7 @@ end
 
 -- The company's: "ashwalkers" (the gadgets' name for the player team in a presence row).
 function M.ours(row, need, dominance, allies)
-  return M.holder(M.withoutAllies(row, allies), need, dominance) == "ashwalkers"
+  return M.holder(row, need, dominance, allies) == "ashwalkers"
 end
 
 return M

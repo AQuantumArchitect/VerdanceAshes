@@ -9,9 +9,10 @@ The rule (owner call, 2026-10-29, replacing the 2026-10-24 claim presence):
     DOMINANCE (3) times everyone else's presence there put together:
         1500 < (AV+DV)self > 3 * SUM(AV+DV)others
   * Nobody meeting that changes nothing: the zone stays as it was believed.
-  * Allies don't contest (owner-proxy call, 2026-11-02): a faction allied with the company in the
-    match (result.alliedFactions: the Null Mercs when they fight beside it) is left out of the
-    company's "everyone else", and does not count for the company either (company_owns).
+  * Allies don't contest each other (owner call, 2026-11-02): a faction allied with the company in
+    the match (result.alliedFactions: the Null Mercs when they fight beside it) competes against
+    Armada and everyone else, but not against the company, and the company not against it. Neither
+    lends presence to the other.
   * Every zone the company owns is an extraction point (game_verdance_exfil.lua), and what lifts
     from any of them goes into the one reserve, ready for any sortie.
 
@@ -25,6 +26,7 @@ from typing import Dict, Iterable, Optional, Tuple
 
 CLAIM_NEED = 1500.0
 DOMINANCE = 3.0
+COMPANY = "ashwalkers"
 
 
 def claim_need(map_id: object = None, workspace: Optional[Path] = None) -> float:
@@ -33,21 +35,29 @@ def claim_need(map_id: object = None, workspace: Optional[Path] = None) -> float
 
 
 def holder(presence: Dict[str, float], need: float = CLAIM_NEED,
-           dominance: float = DOMINANCE) -> Tuple[Optional[str], float]:
+           dominance: float = DOMINANCE, allies: Iterable[str] = ()) -> Tuple[Optional[str], float]:
     """Who owns a zone given its presence row (faction -> AV+DV), or (None, best) when nothing
     changes: nobody stands there, or nobody has more than ``need`` and more than ``dominance``
-    times everyone else together."""
+    times the presence of everyone it is fighting there.
+
+    ``allies`` are the company's allies in the match. The company and its allies do not contest
+    each other (owner call, 2026-11-02): the Null Mercs compete against Armada but not against the
+    player, and the player not against them. Neither lends presence to the other. When the company
+    and an ally both qualify, the company holds it."""
     vals = {str(f).lower(): float(v or 0) for f, v in (presence or {}).items()}
     if not vals:
         return None, 0.0
-    leader, best = max(vals.items(), key=lambda kv: kv[1])
-    others = sum(vals.values()) - best
-    if best <= float(need) or best <= float(dominance) * others:
+    bloc = {COMPANY} | {str(a).lower() for a in (allies or ())}
+
+    def hostile(f: str) -> float:
+        return sum(v for g, v in vals.items() if g != f and not (f in bloc and g in bloc))
+
+    qualified = [f for f, v in vals.items() if v > float(need) and v > float(dominance) * hostile(f)]
+    best = max(vals.values())
+    if not qualified:
         return None, best
-    return leader, best
-
-
-COMPANY = "ashwalkers"
+    leader = COMPANY if COMPANY in qualified else max(qualified, key=lambda f: (vals[f], f))
+    return leader, vals[leader]
 
 
 def without_allies(presence: Dict[str, float], allies: Iterable[str] = ()) -> Dict[str, float]:
@@ -58,14 +68,13 @@ def without_allies(presence: Dict[str, float], allies: Iterable[str] = ()) -> Di
 
 def company_owns(presence: Dict[str, float], need: float = CLAIM_NEED, allies: Iterable[str] = (),
                  dominance: float = DOMINANCE) -> bool:
-    """Whether the company owns a zone: the rule above on the row without its allies."""
-    return holder(without_allies(presence, allies), need, dominance)[0] == COMPANY
+    """Whether the company owns a zone: more than ``need`` of its own, and more than ``dominance``
+    times its enemies' there (its allies count neither way)."""
+    return holder(presence, need, dominance, allies)[0] == COMPANY
 
 
 def zone_holder(presence: Dict[str, float], need: float = CLAIM_NEED, allies: Iterable[str] = (),
                 dominance: float = DOMINANCE) -> Optional[str]:
-    """Who holds a zone after a sortie: the company when it owns it (company_owns, allies left
-    out), otherwise whoever the plain rule names (or None: nothing changes)."""
-    if company_owns(presence, need, allies, dominance):
-        return COMPANY
-    return holder(presence, need, dominance)[0]
+    """Who holds a zone after a sortie (or None: nothing changes). The company and its allies do
+    not contest each other; each still has to outweigh the enemies there three to one."""
+    return holder(presence, need, dominance, allies)[0]
