@@ -292,6 +292,29 @@ local function gateRig()
   local gx, gz, gate = rp("va_gate_x"), rp("va_gate_z"), rp("va_gate_unit")
   if gx <= 0 then return end
   local builders = companyUnits(function(ud) return mobile(ud) and ud.isBuilder and (ud.buildOptions and #ud.buildOptions > 0) end)
+  if #builders < 4 then
+    -- the finale kit brings a lab and few constructors: every idle factory that can make a
+    -- constructor makes one, until there are four
+    local L = ladder()
+    L.mobileBuilders = L.mobileBuilders or (function()
+      local set = {}
+      for id, ud in pairs(UnitDefs) do
+        if ud.isBuilder and (ud.speed or 0) > 0 and ud.buildOptions and #ud.buildOptions > 0 then set[id] = true end
+      end
+      return set
+    end)()
+    for _, f in ipairs(companyUnits(function(ud) return ud and ud.isFactory end)) do
+      if not busyWith(f, function(c) return c.id < 0 end) then
+        local want = L.anyIn(UnitDefs[Spring.GetUnitDefID(f)], L.mobileBuilders)
+        if want then
+          issuing = true
+          pcall(Spring.GiveOrderToUnit, f, -want, {}, 0)
+          issuing = false
+          Spring.Echo("VA_AUTOPILOT gate builders=" .. #builders .. " factory makes one")
+        end
+      end
+    end
+  end
   if state == "frame" then
     local free = {}
     for _, uid in ipairs(builders) do
@@ -299,7 +322,13 @@ local function gateRig()
     end
     if #free > 0 and gate > 0 then
       order(free, CMD.REPAIR, { gate }, true)
-      Spring.Echo("VA_AUTOPILOT gate repair builders=" .. #free)
+      local where = {}
+      for _, uid in ipairs(free) do
+        local x, _, z = Spring.GetUnitPosition(uid)
+        local ud = UnitDefs[Spring.GetUnitDefID(uid) or -1]
+        where[#where + 1] = tostring(ud and ud.name or "?") .. "@" .. (x and math.floor(math.sqrt((x - gx) ^ 2 + (z - gz) ^ 2)) or "?")
+      end
+      Spring.Echo("VA_AUTOPILOT gate repair builders=" .. #free .. " " .. table.concat(where, " ") .. " built=" .. rp("va_gate_built"))
     end
   elseif state == "unpowered" or state == "charging" then
     local need, have = math.max(1, rp("va_gate_afus_need")), rp("va_gate_afus")
