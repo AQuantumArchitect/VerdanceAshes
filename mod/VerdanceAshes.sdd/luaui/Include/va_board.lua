@@ -183,8 +183,11 @@ function Board:refreshRoles()
   -- every zone we own is an extraction point too (game_verdance_exfil.lua va_lift_zones)
   self.liftIds = {}
   for zid in tostring(str("va_lift_zones") or ""):gmatch("[^,]+") do self.liftIds[zid] = true end
+  -- A staged job (mission 1, va_op_stage 1): the first goal shows, the objective waits for footing.
+  self.veiled = num("va_op_stage", 0) == 1
+  local shownObjective = (not self.veiled) and self.objectiveId or nil
   for _, z in ipairs(self.zones) do
-    z.role = (z.id == self.objectiveId and "objective") or (z.id == self.padId and "pad") or (self.markIds[z.id] and "mark")
+    z.role = (z.id == shownObjective and "objective") or (z.id == self.padId and "pad") or (self.markIds[z.id] and "mark")
       or (self.liftIds[z.id] and "exit") or nil
   end
   self.roleKey = self:roleKeyNow()
@@ -192,6 +195,7 @@ end
 
 function Board:roleKeyNow()
   return tostring(self.objectiveId) .. ":" .. tostring(str("va_pad_zone") or self.padId) .. ":" .. tostring(str("va_lift_zones") or "")
+    .. ":" .. tostring(num("va_op_stage", 0))
 end
 
 -- The pad point: va_pad_x/z/r, then the pad file, then the pad zone's anchor.
@@ -455,9 +459,21 @@ function Board:paint(proj, opts)
       end
     end
   end
+  -- the first goal ◇ while the job is staged (gold and hollow, like its ring on the ground)
+  if self.veiled then
+    local gx, gz = num("va_op_goal_x", -1), num("va_op_goal_z", -1)
+    if gx >= 0 then
+      glyph(gx, gz, G.markOpt, Ash.COL.gold, gs + 2)
+      if opts.labels then
+        local sx, sy = proj(gx, gz)
+        words("FIRST", sx, sy + (gs + 2) * 0.9, gs - 2, Ash.COL.gold, "c")
+      end
+    end
+  end
   -- the objective ◆ (good once complete)
   do
     local ox, oz = self:objectivePoint()
+    if self.veiled then ox = nil end
     if ox then
       local done = num("va_objective_complete", 0) == 1
       glyph(ox, oz, G.objective, done and Ash.COL.good or Ash.COL.warn, gs + 2)

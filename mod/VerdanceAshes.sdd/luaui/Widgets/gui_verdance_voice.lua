@@ -29,7 +29,9 @@ local live = {}       -- showing { ..., until_ }
 local log = {}
 local lastAmbient = -999
 
-local function say(speaker, text, seconds, accent, ambient)
+-- tag: a key a later clear(tag) takes the line down by (a prompt the player has just acted on).
+-- boxed: the line is a prompt and gets a border, so a prompt differs in shape as well as colour.
+local function say(speaker, text, seconds, accent, ambient, tag, boxed)
   text = tostring(text or "")
   if text == "" then return end
   speaker = tostring(speaker or "")
@@ -39,8 +41,29 @@ local function say(speaker, text, seconds, accent, ambient)
   local now = Spring.GetGameSeconds() or 0
   if ambient and (now - lastAmbient < 15 or #queue > 0 or #live >= SLOTS) then return end
   if ambient then lastAmbient = now end
-  local entry = { speaker = speaker, text = text, seconds = tonumber(seconds) or 7, accent = accent, ambient = ambient }
+  local entry = { speaker = speaker, text = text, seconds = tonumber(seconds) or 7, accent = accent, ambient = ambient, tag = tag, boxed = boxed }
   if ambient then queue[#queue + 1] = entry else table.insert(queue, 1, entry) end
+end
+
+-- Take a tagged line down: dropped if it is still waiting, faded out if it is showing.
+local function clear(tag)
+  if not tag or tag == "" then return end
+  for i = #queue, 1, -1 do if queue[i].tag == tag then table.remove(queue, i) end end
+  local now = Spring.GetGameSeconds() or 0
+  for _, e in ipairs(live) do
+    if e.tag == tag and e.until_ > now + 0.75 then e.until_ = now + 0.75 end
+  end
+end
+
+-- A beat's bark style: "priority|accent|tag" (beats.lua barkStyle). An ambient bark may be dropped
+-- when the stack is busy; a line or a prompt never is. A prompt (the company asking the player for
+-- a control) wears the pad's blue, so it never reads as story.
+local function barkStyle(d)
+  local priority, accent, tag = tostring(d or ""):match("^([^|]*)|([^|]*)|(.*)$")
+  priority = priority or "ambient"
+  local col = Ash and accent and accent ~= "" and Ash.COL[accent] or nil
+  if not col and priority == "prompt" and Ash then col = Ash.COL.steam end
+  return priority ~= "line" and priority ~= "prompt", col, (tag ~= "" and tag) or nil, priority == "prompt"
 end
 
 local function promote()
@@ -61,7 +84,7 @@ end
 
 function widget:Initialize()
   if WG then
-    WG.vaVoice = { say = say }
+    WG.vaVoice = { say = say, clear = clear }
     WG.vaVoiceOwner = "voice"
   end
   pcall(function()
@@ -81,12 +104,19 @@ end
 function widget:ViewResize(x, y) vsx, vsy = x, y end
 
 -- Beats from the synced side (beats.lua and the gadgets' barks), by kind:
---   bark (speaker, text, seconds) · sound (file, volume) · wave_warning (.., .., .., where)
---   narrative (x, z, "title|body|radius|seconds") · marker (x, y, z, text): said, never pinged
---   crew_ready / field_recruit (.., .., line)
+--   bark (speaker, text, seconds, "priority|accent|tag") · clear_bark (tag) · sound (file, volume)
+--   wave_warning (.., .., .., where) · narrative (x, z, "title|body|radius|seconds")
+--   marker (x, y, z, text): said, never pinged · crew_ready / field_recruit (.., .., line)
+--   field_mark (id, x, z, "shape|radius|seconds") / clear_mark (id): rings on the ground, drawn by
+--   the field marks widget (WG.vaFieldMarks); this widget holds the one VerdanceBeat global
 function widget:VerdanceBeat(kind, a, b, c, d)
   if kind == "bark" then
-    say(a, b, c, nil, true)
+    local ambient, accent, tag, boxed = barkStyle(d)
+    say(a, b, c, accent, ambient, tag, boxed)
+  elseif kind == "clear_bark" then
+    clear(tostring(a or ""))
+  elseif kind == "field_mark" or kind == "clear_mark" then
+    if WG and WG.vaFieldMarks then WG.vaFieldMarks(kind, a, b, c, d) end
   elseif kind == "sound" then
     playUi(a, tonumber(b) or 1.0)
   elseif kind == "wave_warning" then
@@ -146,6 +176,7 @@ function widget:DrawScreen()
     local e = live[i]
     local a = math.min(1, (e.until_ - now) / 0.75)
     Ash.voiceBlock(cx, y, w, e.speaker, e.text, a, e.accent)
+    if e.boxed then Ash.outline(cx - w / 2, y - 21, cx + w / 2, y + 21, Ash.with(e.accent or Ash.COL.steam, 0.7 * a), 1) end
     y = y + STEP
   end
   gl.Color(1, 1, 1, 1)

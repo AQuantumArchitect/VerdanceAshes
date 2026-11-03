@@ -15,6 +15,7 @@ Contracts and references:
 | `CAMPAIGN_BAR_PROTOCOL.md` | The sortie result: facts Lua reports, verdicts Python derives. |
 | `hub_state_v1.md` | The hub's JSON. |
 | `UI_ASH_CONSOLE.md` | The Ash Console tokens, glyphs and surfaces shared by hub and HUD. |
+| `MISSION1_OPENING.md` | Mission 1's first five minutes: the beat sheet, the staged objective, the learn-by-doing prompts, the one pacing table. |
 | `SHIP_ARCHITECTURE.md` | Kernel phases and process tree. |
 | `NARRATIVE_READINGS_SSOT.md` | Readings, occasions, and the pass-by-pass log (passes one to seven). |
 | `HERO_*`, `SUPPORT_WEB.md`, `WHEELIE_HERO.md` | Generated hero / support references. |
