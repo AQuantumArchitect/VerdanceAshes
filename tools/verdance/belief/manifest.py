@@ -89,11 +89,12 @@ def held_zones(result: Dict[str, Any], workspace=None) -> list:
     dv = result.get("zoneDv")
     if not isinstance(dv, dict) or not dv:
         return []
-    from verdance.world.claim import claim_need, holder
+    from verdance.world.claim import claim_need, company_owns
     need = claim_need(result.get("deploymentMapId") or result.get("mapId") or "", workspace)
+    allies = result.get("alliedFactions") if isinstance(result.get("alliedFactions"), list) else ()
     out = []
     for zone_id, row in dv.items():
-        if isinstance(row, dict) and holder(row, need)[0] == COMPANY:
+        if isinstance(row, dict) and company_owns(row, need, allies):
             out.append(str(zone_id))
     return sorted(out)
 

@@ -95,4 +95,19 @@ assert(not extracted, "still the HUD's turn")
 gadget:GameFrame(1841 + 600)
 assert(extracted, "a silent HUD: the autopilot extracts by itself")
 
-print("ok: rescue squad, protected orders, departure to the real pad radius, leaving with and without a HUD")
+-- 3. A capture in its hold, the company short of presence: the guns go to the hold's centre and stay.
+reset()
+rules.va_capture_phase = "hold"; rules.va_hold_cx = 700; rules.va_hold_cz = 800
+rules.va_claim_value = 140; rules.va_claim_need = 1501
+gadget:GameFrame(611)
+local hold = find(CMD.FIGHT)
+assert(hold and hold.params[1] == 700 and hold.params[3] == 800, "the guns fight to the hold's centre")
+assert(not gadget:AllowCommand(1), "BARb must not pull them off the hold")
+assert(gadget:AllowCommand(2), "builders are not sent to hold")
+reset()
+rules.va_capture_phase = "hold"; rules.va_hold_cx = 700; rules.va_hold_cz = 800
+rules.va_claim_value = 1800; rules.va_claim_need = 1501
+gadget:GameFrame(611)
+assert(gadget:AllowCommand(1), "enough presence there already: the guns stay BARb's")
+
+print("ok: rescue squad, protected orders, departure to the real pad radius, leaving with and without a HUD, holding a capture")

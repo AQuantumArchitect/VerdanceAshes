@@ -142,23 +142,36 @@ def what_it_pays(kind: str = "") -> str:
     return line
 
 
+# What "Take the zone" asks, in the numbers the gadget uses (objectives.lua CLEAR_FRACTION and the
+# hold; include/va_claim.lua: more than 1500, and three times everyone else's).
+TAKE_ZONE = ("Take the marked zone: wreck most of what the enemy has there, then hold it until the hold "
+             "bar fills. Holding takes more than 1,500 metal of your own army there, and three times the enemy's.")
+
+
 def operation_summary(choice):
     effect = choice.get("effect") or {}
     kind = effect.get("objectiveArchetype") or effect.get("contractKind") or choice.get("objectiveArchetype") or ""
+    # Every contract is territory (2026-10-27): the engine runs a job with a target zone as a capture
+    # of that zone (capture_node_claims.as_territory_capture), and the job's own kind rides along as
+    # its reason. "To win" says what the game will check, not the contract's name: the opening raid
+    # (eco_raid) said "Destroy the required raid targets" while the rail asked for clear-and-hold.
+    from verdance.company.capture_node_claims import KEEP_KINDS
+    target = effect.get("preferredCaptureZoneId") or effect.get("targetZoneId") or choice.get("targetZoneId")
+    run_kind = kind if (kind in KEEP_KINDS or not target) else "seize_lane"
     required = {
         "kings_showdown": "Be the last commander standing. Your commander walks out alone.",
         "fortify_zone": "Land on the far door and build it up until it is yours: army or defences outweighing everyone there.",
         "hunt_scouts": "Kill every Armada scout constructor.",
         "raze_camp": "Wreck the mercenary camp in the crater.",
         "jump_gate": "Finish the Spire Gate, power it with four advanced fusions, get every named hero through.",
-        "seize_lane": "Clear and hold the marked zone until the objective confirms completion.",
-        "gate_control": "Clear and hold the marked gate until the objective confirms completion.",
-        "hold_plateau": "Hold the marked plateau until the objective confirms completion.",
+        "seize_lane": TAKE_ZONE,
+        "gate_control": TAKE_ZONE.replace("marked zone", "marked gate"),
+        "hold_plateau": TAKE_ZONE.replace("marked zone", "marked plateau"),
         "economy_disrupt": "Destroy the marked economic targets; optional targets are separate.",
         "eco_raid": "Destroy the required raid targets. Recover salvage before leaving.",
         "strike_relay": "Destroy the marked relay targets.",
         "destroy_key_structure": "Destroy the marked key structures.",
-    }.get(kind, "Complete the required marks shown in the battle briefing; optional marks do not replace them.")
+    }.get(run_kind, "Complete the required marks shown in the battle briefing; optional marks do not replace them.")
     # The card's name without the lean prefix (the rail shows a pill), and the blurb without the
     # board's closing lean/open line (the pill says it).
     title = str(choice.get("label") or "Operation")

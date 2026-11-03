@@ -59,6 +59,7 @@ function resultWorldFields(c)
     '"graph":{' .. graphJson() .. '}',
     '"reputation":{' .. reputationJson() .. '}',
     '"zoneDv":' .. zoneDvJson(),
+    '"alliedFactions":' .. alliedFactionsJson(),
     -- pass three belief contract, produced by game_verdance_belief_observe.lua (GG, no new locals here)
     '"observedZones":' .. ((GG and GG.VA_ObservedZonesJson) and GG.VA_ObservedZonesJson() or 'null'),
     '"beliefExport":' .. ((GG and GG.VA_BeliefExportJson) and GG.VA_BeliefExportJson() or 'null'),

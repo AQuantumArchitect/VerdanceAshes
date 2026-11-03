@@ -21,6 +21,9 @@ end
 --
 -- BARb fights; it knows nothing of the campaign. This rig only, on top of it:
 --   nudge      idle units fight toward the wound
+--   hold       a capture in its hold, the company short of presence there: every armed unit not
+--              on another errand fights to the hold's centre (va_hold_cx/cz) and stays. BARb
+--              wandered off and the hold never ran (stock rehearsal, 2026-11-02)
 --   rescue     a hero's wreck on the field gets a squad: the four nearest guns go to it, and once
 --              the ground is quiet, the rez bots raise it (critical rez bots only if no other)
 --   departure  the objective done, failed, or the clock out: everyone walks to the real pad
@@ -129,6 +132,21 @@ local function nudge()
   if #idle == 0 then return end
   order(idle, CMD.FIGHT, { x, Spring.GetGroundHeight(x, z) or 0, z })
   Spring.Echo("VA_AUTOPILOT nudge idle=" .. #idle)
+end
+
+-- ---------------------------------------------------------------- hold
+local function holdTheZone()
+  if tostring(Spring.GetGameRulesParam("va_capture_phase") or "") ~= "hold" then return end
+  local need = rp("va_claim_need")
+  if need > 0 and rp("va_claim_value") >= need then return end
+  local cx, cz = tonumber((Spring.GetGameRulesParam("va_hold_cx"))), tonumber((Spring.GetGameRulesParam("va_hold_cz")))
+  if not cx then return end
+  local guns = companyUnits(function(ud, uid)
+    return mobile(ud) and ud.canAttack and not ud.isBuilder and not held[uid]
+  end)
+  if #guns == 0 then return end
+  order(guns, CMD.FIGHT, { cx, Spring.GetGroundHeight(cx, cz) or 0, cz }, true)
+  Spring.Echo("VA_AUTOPILOT hold units=" .. #guns .. " presence=" .. rp("va_claim_value") .. "/" .. need)
 end
 
 -- ---------------------------------------------------------------- rescue
@@ -302,5 +320,5 @@ function gadget:GameFrame(f)
     return
   end
   if f % RESCUE_EVERY == 311 then rescue() end
-  if f % NUDGE_EVERY < 30 then nudge() end
+  if f % NUDGE_EVERY < 30 then holdTheZone(); nudge() end
 end

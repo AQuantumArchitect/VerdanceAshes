@@ -246,6 +246,12 @@ step("the job's gauge, per kind of job", function()
   assert(gauge() == "clear 2 / 3", gauge())
   RULES.va_capture_phase = "hold"; RULES.va_zone_hold = 300; RULES.va_zone_hold_need = 900; RULES.va_zone_hold_contested = 1
   assert(gauge() == "hold 10s / 30s · contested", gauge()); RULES.va_zone_hold_contested = 0
+  -- a stopped clock says why: not there in strength (mission 1 on stock BAR, 2026-11-02)
+  RULES.va_zone_hold = 0; RULES.va_claim_value = 600; RULES.va_claim_need = 1501
+  assert(gauge() == "hold 0s / 30s · waiting for presence", gauge())
+  RULES.va_claim_value = 1800
+  assert(gauge() == "hold 0s / 30s", gauge())
+  RULES.va_claim_value = 0; RULES.va_claim_need = 0
   RULES.va_capture_mode = 0; RULES.va_zone_hold = 0
   RULES.va_gate_state = "frame"; RULES.va_gate_built = 0.4
   assert(gauge() == "build the gate 40%", gauge())

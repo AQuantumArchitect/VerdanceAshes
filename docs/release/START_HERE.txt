@@ -23,14 +23,16 @@ ONE PATH
      - Confirm the party, confirm the reserve, hire mercenaries if you like,
        then Lock drop: the company lands as soon as the field is ready
      - Switch to BAR and unpause to start
+     The first drop on a new BAR install loads for several minutes while
+     BAR scans its files once. It is not stuck; later drops load faster.
    PLAY re-checks the maps every time it starts and fetches any that are
    missing.
    RESET.bat starts the campaign over (old save kept in state\backups).
 5. Play the sortie in BAR. Space dismisses the briefing.
    After a win, 1/2/3 can keep fighting on the same map.
-5. When the match ends, the kernel bridge brings the result home.
+6. When the match ends, the kernel bridge brings the result home.
    If the map does not move: After the fight - bring it home
-6. Talk, rest, hire mercs, or take the next drop.
+7. Talk, rest, hire mercs, or take the next drop.
 
 Python is embedded under runtime\: nothing else to install.
 

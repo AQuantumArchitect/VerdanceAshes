@@ -36,7 +36,33 @@ def test_the_gadgets_read_the_same_rule():
     lua = (ROOT / "mod/VerdanceAshes.sdd/luarules/gadgets/include/va_claim.lua").read_text(encoding="utf-8")
     assert "NEED = 1500, DOMINANCE = 3" in lua
     exfil = (ROOT / "mod/VerdanceAshes.sdd/luarules/gadgets/game_verdance_exfil.lua").read_text(encoding="utf-8")
-    assert "VA_CLAIM.ours(row, need)" in exfil and "liveOwned[zid]" in exfil
+    assert "VA_CLAIM.ours(row, need, nil, allies)" in exfil and "liveOwned[zid]" in exfil
+    presence = (ROOT / "mod/VerdanceAshes.sdd/luarules/gadgets/include/campaign/objective_presence.lua").read_text(encoding="utf-8")
+    assert "VA_CLAIM.withoutAllies(row, allies)" in presence
+
+
+def test_allies_do_not_contest_the_company():
+    """Mission 1 on a stock BAR (2026-11-02): the Null Mercs, allied with the company, followed it into
+    GF_NW_BASTION, and the hold's need climbed from 3871 to 27751 because their presence counted as
+    "everyone else". The company's allies in the match now count neither for it nor against it."""
+    mercs = ["nullmercs"]
+    assert claim.company_owns({"ashwalkers": 1600, "nullmercs": 7731}, allies=mercs)
+    assert not claim.company_owns({"ashwalkers": 1600, "nullmercs": 7731})          # without the alliance
+    assert not claim.company_owns({"ashwalkers": 1400, "nullmercs": 7731}, allies=mercs)  # allies don't lend
+    assert not claim.company_owns({"ashwalkers": 1600, "armada": 600, "nullmercs": 50}, allies=mercs)
+    assert claim.zone_holder({"nullmercs": 7731}, allies=mercs) == "nullmercs"     # the mercs' own ground
+    assert claim.zone_holder({"ashwalkers": 2000, "nullmercs": 4000}, allies=mercs) == "ashwalkers"
+    assert claim.zone_holder({"ashwalkers": 2000, "nullmercs": 4000}) is None
+
+
+def test_allied_presence_at_home_follows_the_same_rule():
+    state = {"zoneMemory": {"greenest_fields": {"GF_NW_BASTION": {"controllingFaction": "armada", "abstract": {"control": "armada"}}}}}
+    res = {"deploymentMapId": "greenest_fields", "alliedFactions": ["nullmercs"],
+           "zoneDv": {"GF_NW_BASTION": {"ashwalkers": 2000, "nullmercs": 4000}}}
+    assert apply_zone_dv(state, res, ROOT) == ["GF_NW_BASTION"]
+    assert state["zoneMemory"]["greenest_fields"]["GF_NW_BASTION"]["controllingFaction"] == "ashwalkers"
+    assert manifest.held_zones(res) == ["GF_NW_BASTION"]
+    assert manifest.held_zones(dict(res, alliedFactions=[])) == []
 
 
 def test_homecoming_claims_only_with_presence():
@@ -100,3 +126,4 @@ def test_the_roster_buries_a_hero_the_ledger_lost():
     assert by["ketha"]["status"] == "dead"
     assert by["vane"]["status"] == "active"
     assert by["pavise"]["campaignXp"] == 0.0     # never on the field: no XP for sitting at home
+

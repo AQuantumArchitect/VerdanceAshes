@@ -325,8 +325,9 @@ local function refreshLiveOwned(force)
   liveOwned = {}
   local need = mission and mission.objective and tonumber(mission.objective.claimValue) or VA_CLAIM.NEED
   local dv = GG.VA_ZoneDv and GG.VA_ZoneDv() or {}
+  local allies = GG.VA_AlliedFactions and GG.VA_AlliedFactions() or {}   -- allies count neither way
   for zid, row in pairs(dv) do
-    if VA_CLAIM.ours(row, need) then liveOwned[tostring(zid)] = true end
+    if VA_CLAIM.ours(row, need, nil, allies) then liveOwned[tostring(zid)] = true end
   end
 end
 
