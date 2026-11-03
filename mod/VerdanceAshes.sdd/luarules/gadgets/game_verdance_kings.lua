@@ -174,6 +174,17 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
     local by = kings[attackerTeam]
     lastKiller[unitTeam] = by and by.faction or "other"
   end
+  if kings[unitTeam] and isCommander(unitDefID) then
+    -- what took the commander, and where: one Armada king fell at 1.2 minutes to "the company",
+    -- whose army was nowhere near it (Luke's PC, 2026-11-03)
+    local x, _, z = Spring.GetUnitPosition(unitID)
+    local ad = attackerDefID and UnitDefs[attackerDefID]
+    local ax, _, az
+    if attackerID then ax, _, az = Spring.GetUnitPosition(attackerID) end
+    Spring.Echo("VA_KING_COMMANDER_DOWN team=" .. tostring(unitTeam) .. " at=" .. math.floor(x or -1) .. "," .. math.floor(z or -1)
+      .. " by_team=" .. tostring(attackerTeam) .. " by_unit=" .. tostring(ad and ad.name or attackerDefID)
+      .. (ax and (" from=" .. math.floor(ax) .. "," .. math.floor(az)) or ""))
+  end
 end
 
 local function fall(tid, frame)

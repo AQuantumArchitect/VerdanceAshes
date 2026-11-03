@@ -389,6 +389,9 @@ $numUsers = 1 + @($aiSpecs).Count
 $bodyBlocks = @($allyTeamBlocks) + @($teamBlocks) + @($aiBlocks)
 $blocksText = $bodyBlocks -join "`r`n`r`n"
 
+# StartPosType 1 puts each team on one of the map's start points in random order; 3 uses the
+# StartPosX/Z below (the kings' showdown: each king on its seat).
+$startPosType = if ($variantObject.PSObject.Properties["startPosType"] -and $variantObject.startPosType) { [int]$variantObject.startPosType } else { 1 }
 $gameType = if ($config.PSObject.Properties["gameType"] -and $config.gameType) { [string]$config.gameType } else { 'Verdance Ashes $VERSION' }
 # Rock Jungle home shelf: ~5 min raptor grace (mult≈0.85). Other maps keep ~15 min (2.5).
 $raptorGraceMult = if ($safeMapId -eq "the_rock_jungle") { "0.85" } else { "2.5" }
@@ -398,7 +401,7 @@ $startScript = @"
   MapName=$mapName;
   GameType=$gameType;
   GameStartDelay=0;
-  StartPosType=1;
+  StartPosType=$startPosType;
   RecordDemo=1;
   MyPlayerName=VerdanceCommander;
   IsHost=1;
@@ -450,7 +453,7 @@ $scenarioManifest = [ordered]@{
     targetZoneId = $scenario.missionBase.objective.targetZoneId
     extractionZoneId = $scenario.missionBase.extractionZoneId
   }
-  startPosType = 1
+  startPosType = $startPosType
   playerTeamID = $playerTeamID
   seedOutbox = $config.seedOutbox
   seedDestination = $config.seedDestination

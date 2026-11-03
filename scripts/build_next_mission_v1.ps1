@@ -3103,6 +3103,9 @@ $scenario = [ordered]@{
       id = "alpha_player"
       label = "Alpha Campaign Player"
       playerTeamID = 0
+      # The kings start on their seats (StartPosType 3 reads StartPosX/Z). With 1, BAR put each king on
+      # one of the map's own start points in random order, so the seats and the HUD's labels were fiction.
+      startPosType = $(if ($isKings) { 3 } else { 1 })
       playerSide = "Legion"
       playerStartLabel = "Legion Green Player"
       notes = "Human-controlled alpha campaign sortie generated from next_mission_intent.json."
