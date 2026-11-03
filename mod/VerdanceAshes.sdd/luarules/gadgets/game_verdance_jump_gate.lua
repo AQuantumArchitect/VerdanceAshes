@@ -197,7 +197,8 @@ local function port(uid)
   portedById[hid] = true
   if GG.VA_HeroPorted then pcall(GG.VA_HeroPorted, hid) end
   local x, y, z = Spring.GetUnitPosition(uid)
-  if x and Spring.SpawnCEG then pcall(Spring.SpawnCEG, "teleport", x, y + 20, z) end
+  -- BAR ships no "teleport" CEG (the rehearsal logged it invalid); the commander spawn flash it has
+  if x and Spring.SpawnCEG then pcall(Spring.SpawnCEG, "commander-spawn", x, y, z) end
   Spring.DestroyUnit(uid, false, true)
   Spring.SetGameRulesParam("va_gate_ported", #ported, { public = true })
   Spring.Echo("VA_GATE_PORTED hero=" .. hid .. " n=" .. #ported)

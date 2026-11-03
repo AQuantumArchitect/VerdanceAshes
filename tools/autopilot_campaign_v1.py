@@ -130,10 +130,14 @@ def patch_startscript(text: str, *, profile: str, speed: int, minutes: float, se
     return text, team
 
 
+FINALE_BANK = {"tenebrium": 12, "metalK": 28}
+
+
 def finale_state(st: dict, path: str) -> dict:
     """A fresh campaign moved to its act-3 finale on one path, for a rehearsal of the ending:
     mission 11 (verdance.campaign.acts), that path's signal leading, and for B (the kings'
-    showdown, which needs one) a Legion commander suit. Everything else is the fresh campaign."""
+    showdown, which needs one) a Legion commander suit, and a walked campaign's bank. Everything else
+    is the fresh campaign."""
     from verdance.campaign.acts import ACT2_END_MISSION, FINALE_PLANS
     from verdance.campaign.schema import mission_id
     if path not in FINALE_PLANS:
@@ -148,6 +152,13 @@ def finale_state(st: dict, path: str) -> dict:
     if path == "B":
         from verdance.campaign.suits import grant_suit
         grant_suit(st, "legcom", "rehearsal")
+    # The bank of a company that walked the campaign, not a fresh one's: the first hard-AI campaign
+    # (run 20261102_210457) reached its finale with 12 Tenebrium and 28k metal. Every unit with build
+    # power costs Tenebrium, so a fresh bank buys a lab and one constructor: in the kings' showdown,
+    # where the commander walks out alone, that was the whole company.
+    com = st.setdefault("commerce", {})
+    com["tenebrium"] = max(int(com.get("tenebrium") or 0), FINALE_BANK["tenebrium"])
+    com["metalK"] = max(int(com.get("metalK") or 0), FINALE_BANK["metalK"])
     return st
 
 

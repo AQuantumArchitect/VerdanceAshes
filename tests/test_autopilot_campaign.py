@@ -20,6 +20,7 @@ class AutopilotTests(unittest.TestCase):
             st = finale_state(default_v1_state(), path)
             self.assertEqual(st["missionNumber"], 11)
             self.assertEqual(finale_plan_for_state(st)["kind"], kind, path)
+            self.assertGreaterEqual(st["commerce"]["tenebrium"], 12, "a walked campaign's bank, not a fresh one's")
 
     def test_a_capped_rehearsal_passes_when_every_sortie_came_home(self):
         """The stock rehearsal (--stock --sorties 1) on 2026-11-02: one sortie, engine exit 0, result
