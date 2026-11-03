@@ -80,7 +80,9 @@ local function retune(unitID, rec)
     pcall(spSetUnitWeaponDamages, unitID, WEAPON, "default", rec.baseDamage * lv.damage)
   end
   -- veterancy owns the XP part of the reach; the bank's part rides on top of it
-  local vet = tonumber(spGetUnitRulesParam(unitID, "va_vet_range_mult")) or 1
+  -- The extra parentheses keep one value: a param that was never set returns no value at all, and
+  -- tonumber() with nothing raised in GameFrame every 10 frames (stock-BAR rig, 2026-11-02).
+  local vet = tonumber((spGetUnitRulesParam(unitID, "va_vet_range_mult"))) or 1
   local r = rec.baseRange * vet * lv.range
   pcall(spSetUnitWeaponState, unitID, WEAPON, "range", r)
   if spSetUnitMaxRange then pcall(spSetUnitMaxRange, unitID, r) end

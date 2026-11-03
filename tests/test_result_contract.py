@@ -30,7 +30,7 @@ SECTIONS = {
                              "tenebriumWrecksCreated tenebriumWrecksClaimed tenebriumWrecksLost "
                              "tenebriumUnclaimedOnExtraction tenebriumClaimEvents tenebriumTeamBanks "
                              "tenebriumFactionBanks armadaTenebriumCrisis",
-    "resultWorldFields": "economy graph reputation zoneDv observedZones beliefExport kings",
+    "resultWorldFields": "economy graph reputation zoneDv alliedFactions observedZones beliefExport kings",
 }
 
 
@@ -51,4 +51,4 @@ def test_result_sections_run_in_order_and_no_key_is_written_twice():
     block = re.search(r"(?s)local RESULT_SECTIONS = \{(.*?)\n\}", src).group(1)
     assert re.findall(r"return (result\w+Fields)\(c\)", block) == list(SECTIONS)
     every = [k for keys in SECTIONS.values() for k in keys.split()]
-    assert len(every) == len(set(every)) == 95
+    assert len(every) == len(set(every)) == 96

@@ -1,9 +1,10 @@
 -- campaign/telemetry.lua: zone cells, per-zone metrics, dev telemetry and the headless/profiling options
 -- Part of game_verdance_campaign.lua, loaded into that gadget's environment
 -- (VFS.Include with the gadget table), so its globals are the gadget's globals.
--- Provides: addUnitToBucket, armDevTelemetry, classifyCmd, configureHeadlessClient, devTel,
--- emptyMetrics, logTelemetry, makeTeamBucket, readProfilingOptions, tickDevTelemetry,
--- tickProfiling, vaZoneCellIndex, zoneDvJson, zoneDvTable, zoneForPosition
+-- Provides: addUnitToBucket, alliedFactions, alliedFactionsJson, armDevTelemetry, classifyCmd,
+-- configureHeadlessClient, devTel, emptyMetrics, logTelemetry, makeTeamBucket,
+-- readProfilingOptions, tickDevTelemetry, tickProfiling, vaZoneCellIndex, zoneDvJson, zoneDvTable,
+-- zoneForPosition
 -- Uses: mission_data, result, setup, state, terminal, translation, units, waterline
 
 -- Dev telemetry: one table so GameFrame stays under Lua 5.1's 60-upvalue cap.
@@ -182,6 +183,28 @@ function zoneDvTable()
     end
   end
   return byZone
+end
+
+-- The factions allied with the company in this match (the Null Mercs, when they fight beside it),
+-- as { faction = true }. Their presence neither counts for the company's claim nor against it
+-- (include/va_claim.lua M.ours); Python reads the list from result.alliedFactions.
+function alliedFactions()
+  local out = {}
+  for _, teamID in ipairs(Spring.GetTeamList() or {}) do
+    if teamID ~= playerTeamID and teamID ~= gaiaTeamID and Spring.AreTeamsAllied(teamID, playerTeamID) then
+      local faction = tostring(teamFaction[teamID] or ""):lower()
+      if faction ~= "" and faction ~= "ashwalkers" then out[faction] = true end
+    end
+  end
+  return out
+end
+GG.VA_AlliedFactions = alliedFactions   -- the exfil gadget's extraction points
+
+function alliedFactionsJson()
+  local names = {}
+  for faction in pairs(alliedFactions()) do names[#names + 1] = jstr(faction) end
+  table.sort(names)
+  return "[" .. table.concat(names, ",") .. "]"
 end
 
 function zoneDvJson()

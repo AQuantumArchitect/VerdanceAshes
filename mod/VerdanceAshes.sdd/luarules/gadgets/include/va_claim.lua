@@ -4,6 +4,7 @@
 -- structures standing in the zone. A side owns the zone when
 --     1500 < (AV+DV)self > 3 * SUM(AV+DV)others
 -- and nobody meeting that changes nothing. Every zone the company owns is an extraction point.
+-- The company's allies in the match neither count for it nor against it (M.ours).
 local M = { NEED = 1500, DOMINANCE = 3 }
 
 -- row: { faction = presence }. Returns the owner (or nil) and the leader's presence.
@@ -21,9 +22,23 @@ function M.holder(row, need, dominance)
   return leader, best
 end
 
+-- Allies don't contest (owner-proxy call, 2026-11-02): a faction allied with the company in the
+-- match (the Null Mercs, when they fight beside it) is left out of the company's "everyone else",
+-- and does not count for the company either. Before this, mercs following the company into the
+-- objective zone made the hold impossible (mission 1, 2026-11-02: need 3871 -> 27751).
+-- allies: { faction = true }. Returns the row without them.
+function M.withoutAllies(row, allies)
+  if not allies or next(allies) == nil then return row end
+  local out = {}
+  for faction, v in pairs(row or {}) do
+    if faction == "ashwalkers" or not allies[faction] then out[faction] = v end
+  end
+  return out
+end
+
 -- The company's: "ashwalkers" (the gadgets' name for the player team in a presence row).
-function M.ours(row, need, dominance)
-  return M.holder(row, need, dominance) == "ashwalkers"
+function M.ours(row, need, dominance, allies)
+  return M.holder(M.withoutAllies(row, allies), need, dominance) == "ashwalkers"
 end
 
 return M

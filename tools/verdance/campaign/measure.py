@@ -285,10 +285,11 @@ def update_measured_zone_memory(state: Dict[str, Any], result: Dict[str, Any], t
 
 def apply_zone_dv(state: Dict[str, Any], result: Dict[str, Any], workspace: Optional[Path] = None) -> List[str]:
     """Presence at extraction (result.zoneDv): each faction's AV + DV in the zone. A side owns it
-    with more than 1500 and more than three times everyone else together (verdance.world.claim).
+    with more than 1500 and more than three times everyone else together (verdance.world.claim);
+    the company's allies in the match don't count against the company (result.alliedFactions).
     Only zones it reports change hands: a zone with nothing standing, or one nobody dominates,
     stays as it was believed."""
-    from verdance.world.claim import claim_need, holder
+    from verdance.world.claim import claim_need, zone_holder
     dv = result.get("zoneDv")
     if not isinstance(dv, dict) or not dv:
         return []
@@ -297,12 +298,13 @@ def apply_zone_dv(state: Dict[str, Any], result: Dict[str, Any], workspace: Opti
         return []
     memory = state.setdefault("zoneMemory", {}).setdefault(map_id, {})
     need = claim_need(map_id, workspace)
+    allies = result.get("alliedFactions") if isinstance(result.get("alliedFactions"), list) else ()
     changed = []
     for zone_id, row in dv.items():
         if not isinstance(row, dict):
             continue
         vals = {str(f): float(v or 0) for f, v in row.items()}
-        leader, _best = holder(vals, need)
+        leader = zone_holder(vals, need, allies)
         if not leader:
             continue
         zid = str(canonical_zone_id(zone_id, workspace) or zone_id)

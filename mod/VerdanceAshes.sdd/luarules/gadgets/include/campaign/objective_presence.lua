@@ -75,12 +75,15 @@ end
 
 -- Standing on the wound is not taking it: the company must own it, by the one rule (AV + DV over
 -- mission.objective.claimValue and over three times everyone else's; include/va_claim.lua,
--- verdance.world.claim). Published for the rail: our presence, and what owning it takes now.
+-- verdance.world.claim). The company's allies in the match count neither way. Published for the
+-- rail: our presence, and what owning it takes now.
 local VA_CLAIM = VFS.Include("luarules/gadgets/include/va_claim.lua")
 local function vaClaimStrength()
   local obj = mission and mission.objective or {}
   local need = tonumber(obj.claimValue) or VA_CLAIM.NEED
+  local allies = alliedFactions()
   local row = obj.targetZoneId and zoneDvTable()[tostring(obj.targetZoneId)] or nil
+  row = VA_CLAIM.withoutAllies(row, allies)
   local ours, others = 0, 0
   for faction, v in pairs(row or {}) do
     if faction == "ashwalkers" then ours = ours + (tonumber(v) or 0) else others = others + (tonumber(v) or 0) end

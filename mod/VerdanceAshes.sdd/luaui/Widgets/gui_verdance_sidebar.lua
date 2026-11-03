@@ -203,9 +203,13 @@ end
 -- { frac, label, col } (frac nil: words only) or nil when it does not apply.
 local function holdGauge(word)
   local need = (S.zoneHoldNeed > 0) and S.zoneHoldNeed or 900
-  -- contested: the enemy fights on it, so the clock waits (never colour alone: the word says so)
-  return { frac = S.zoneHold / need, col = S.zoneHoldContested and Ash.COL.warn or Ash.COL.steam,
-           label = string.format("%s %ds / %ds", word, math.floor(S.zoneHold / 30), math.floor(need / 30)) .. (S.zoneHoldContested and " · contested" or "") }
+  -- Why the clock is not running, in words as well as colour: the enemy fights on it (contested),
+  -- or the company is not there in strength (short: the presence gauge beside it says how short).
+  -- A stopped clock with no reason read as a broken objective (mission 1, 2026-11-02).
+  local short = (not S.zoneHoldContested) and S.zoneHold <= 0 and S.claimNeed > 0 and S.claimValue < S.claimNeed
+  local why = S.zoneHoldContested and " · contested" or (short and " · waiting for presence" or "")
+  return { frac = S.zoneHold / need, col = (S.zoneHoldContested or short) and Ash.COL.warn or Ash.COL.steam,
+           label = string.format("%s %ds / %ds", word, math.floor(S.zoneHold / 30), math.floor(need / 30)) .. why }
 end
 
 local GATE_WORDS = {   -- game_verdance_jump_gate.lua: frame → unpowered → charging → open; lost

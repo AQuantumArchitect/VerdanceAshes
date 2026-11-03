@@ -90,6 +90,14 @@ def _first_error_line(*reports: dict[str, Any]) -> str:
     return "deploy pipeline failed -- see build.stderr_tail"
 
 
+def _mod_sync_reason(report: dict[str, Any]) -> str:
+    """Why the Drop could not copy the campaign into BAR, in one line for the hub."""
+    line = _first_error_line(report)
+    if line.startswith("deploy pipeline failed"):
+        line = "the installer gave no reason (System menu: Export feedback bundle)"
+    return "mod sync failed: " + line
+
+
 def _plan_key(plan: dict[str, Any] | None, state: dict[str, Any] | None = None) -> str:
     """What fixes the loaded field: the map, the pad, the targets and the job. Not the company and
     not the shop: the drop carries who goes, what was bought, a rented hero (every pack is in the
@@ -1337,8 +1345,12 @@ class CampaignKernel:
                 mod_report: dict[str, Any] = {"skipped": True}
                 if intent_report.get("ok"):
                     mod_report = self.sync_mod(copy=True)
+                # A failed sync says why (the installer's first error line): "mod sync failed" alone
+                # left a player on a stock BAR with nothing to act on (2026-11-02).
                 build_report = (
-                    self.build_mission() if intent_report.get("ok") and mod_report.get("ok") is not False else {"ok": False, "skipped": True, "reason": "mod sync failed" if mod_report.get("ok") is False else "intent failed"}
+                    self.build_mission() if intent_report.get("ok") and mod_report.get("ok") is not False else {
+                        "ok": False, "skipped": True,
+                        "reason": (_mod_sync_reason(mod_report) if mod_report.get("ok") is False else "intent failed")}
                 )
                 launch_report: dict[str, Any] = {"skipped": True}
                 if launch and build_report.get("ok"):

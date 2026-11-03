@@ -76,7 +76,8 @@ Spring = {
   SetUnitWeaponDamages = function(_, _, k, v) log.damages[#log.damages + 1] = v return true end,
   SetUnitMaxRange = function(_, v) log.maxRanges[#log.maxRanges + 1] = v end,
   GetUnitWeaponTarget = function() return 1, false, FOE end,
-  GetUnitRulesParam = function(_, k) if k == "va_vet_range_mult" then return vet end end,
+  -- like Recoil: a param that was never set returns no value at all (not nil)
+  GetUnitRulesParam = function(_, k) if k == "va_vet_range_mult" and vet ~= nil then return vet end end,
   SetUnitRulesParam = function(_, k, v) params[k] = v end,
   ValidUnitID = function(u) return alive[u] == true end,
   GetUnitIsDead = function(u) return alive[u] ~= true end,
@@ -113,6 +114,10 @@ bankEnergy, bankStorage = 4000, 4000
 vet = 1.2
 frames(31, 40)
 out.vetRange = last(log.ranges)
+-- a Halberd veterancy never touched: no va_vet_range_mult at all (the rig's GameFrame error, 2026-11-02)
+vet = nil
+local okNoVet, errNoVet = pcall(frames, 41, 50)
+out.noVetOk, out.noVetErr, out.noVetRange = okNoVet, errNoVet and tostring(errNoVet) or nil, last(log.ranges)
 vet = 1
 
 -- a pulse at full bank: draws 6% of the bank and leaves the target burning
@@ -164,6 +169,7 @@ check("a full bank reaches 140%", near(s["fullRange"], 330 * 1.4) and near(s["ma
 check("a full bank burns the target for 3s", near(s["fullBurn"], 3.0, 0.01), s)
 check("charge is a fraction of the deeper bank", near(s["halfCharge"], 0.5, 0.001), s)
 check("veterancy's reach rides under the bank's", near(s["vetRange"], 330 * 1.4 * 1.2), s)
+check("no veterancy param is reach x1, not an error", s["noVetOk"] is True and near(s["noVetRange"], 330 * 1.4), s)
 check("a pulse draws 6% of the bank", near(s["drawn"], 240, 0.01), s)
 check("it burns for 3s at 10-frame ticks", s["burnTicks"] in (8, 9, 10), s)
 check("each tick is the pulse's damage x burn rate x 1/3s", near(s["burnEach"], 190 * 0.2 * 2.2 / 3, 0.2), s)

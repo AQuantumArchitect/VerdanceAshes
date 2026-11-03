@@ -40,7 +40,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from verdance.common import clamp, load_json
 from verdance.company.company import score_field_recruit_belief
-from verdance.world.claim import claim_need, holder
+from verdance.world.claim import claim_need, zone_holder
 
 HOME_MAP_ID = "the_rock_jungle"
 PLAYER_FACTIONS = {"ashwalkers", "nullmercs", "legion"}
@@ -137,10 +137,11 @@ def record_homecoming(state: Dict[str, Any], result: Dict[str, Any], workspace: 
     mission = int(result.get("missionNumber") or state.get("missionNumber") or 0)
     changed: List[Dict[str, Any]] = []
     need = claim_need(map_id, workspace)
+    allies = result.get("alliedFactions") if isinstance(result.get("alliedFactions"), list) else ()
     for zid, door in load_doors(Path(workspace)).items():
         if door["mapId"] != map_id or not isinstance(dv.get(zid), dict):
             continue
-        leader, _best = holder(dv[zid], need)
+        leader = zone_holder(dv[zid], need, allies)
         if not leader:
             continue
         now = leader in PLAYER_FACTIONS

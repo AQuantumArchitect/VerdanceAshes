@@ -198,10 +198,12 @@ def opening_sortie_order(state: Dict[str, Any], workspace: Optional[Path] = None
             "rezBots": 6,
         },
         "label": "Raid Greenest Fields for Tenebrium",
+        # The opening's target moved to the Northwest Bastion next door (Luke, 2026-10-25); the card
+        # still sent the player to the southeast plateau until 2026-11-02.
         "hubBlurb": (
-            "Cross the start road to Greenest Fields: land on its north-west muster, break the "
-            "Armada's decoy's farms on the southeast plateau for Tenebrium, and lift from the same pad. "
-            "Hold the plateau too and the road to Koom Valley opens."
+            "Cross the start road to Greenest Fields and land on its north-west muster. Break the "
+            "Armada decoy farms in the Northwest Bastion next door, hold the ground, and lift from "
+            "the same pad. Fallen builders leave Tenebrium: reclaim it."
         ),
         "notes": (
             "Opening Tnb raid from the start road's door, Greenest Fields' north-west muster. "
