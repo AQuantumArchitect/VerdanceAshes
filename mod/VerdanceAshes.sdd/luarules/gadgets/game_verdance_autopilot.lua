@@ -128,11 +128,15 @@ local function target()
   return tx, tz
 end
 
+-- The company's commander is never nudged into the fight: it is the company's king in the showdown
+-- (it falls, the sortie is lost) and its suit everywhere else, and BARb needs it home to build.
+local COM = VFS.Include("luarules/gadgets/include/va_commanders.lua")
+
 local function nudge()
   local x, z = target()
   if not x then return end
   local idle = companyUnits(function(ud, uid)
-    if not mobile(ud) or (ud.isBuilder and not ud.canAttack) or held[uid] then return false end
+    if not mobile(ud) or (ud.isBuilder and not ud.canAttack) or held[uid] or COM.isCommander(ud) then return false end
     local q = Spring.GetUnitCommands(uid, 1)
     return q == nil or #q == 0
   end)

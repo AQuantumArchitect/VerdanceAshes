@@ -31,6 +31,7 @@ GG = {
 }
 VFS = { Include = function(path)
   if path:find("va_active") then return true end
+  if path:find("va_commanders") then return dofile("mod/VerdanceAshes.sdd/luarules/gadgets/include/va_commanders.lua") end
   return mission
 end }
 Spring = {
@@ -56,15 +57,30 @@ Spring = {
   GetAllUnits = function() return { 1, 2 } end,
   GiveOrderToUnitArray = function(units, cmd, params)
     for _, uid in ipairs(units) do assert(gadget:AllowCommand(uid)) end
-    orders[#orders + 1] = { cmd = cmd, params = params }
+    orders[#orders + 1] = { cmd = cmd, params = params, units = units }
   end,
 }
+
+local function find(cmd) for _, o in ipairs(orders) do if o.cmd == cmd then return o end end end
+-- 0. The company's commander is never nudged into the fight (the king of the showdown, the suit).
+do
+  reset()
+  UnitDefs[7] = { speed = 30, isBuilder = true, canAttack = true, name = "legcom", buildOptions = { 1 } }
+  local was = Spring.GetTeamUnits
+  Spring.GetTeamUnits = function() return { 1, 7 } end
+  positions[7] = { 0, 0 }
+  gadget:GameFrame(11)
+  local fight = find(CMD.FIGHT)
+  assert(fight, "an idle gun is nudged")
+  for _, uid in ipairs(fight.units) do assert(uid ~= 7, "the commander is left to BARb") end
+  Spring.GetTeamUnits = was
+  UnitDefs[7] = nil
+end
 
 -- 1. No HUD (the Windows headless rig): the rescue, then straight out once everyone is aboard.
 reset()
 assert(registered == CMD.ANY)
 gadget:GameFrame(311)
-local function find(cmd) for _, o in ipairs(orders) do if o.cmd == cmd then return o end end end
 assert(find(CMD.FIGHT) and find(CMD.FIGHT).params[1] == 200, "the squad must go to the actual wreck")
 assert(find(CMD.RESURRECT) and find(CMD.RESURRECT).params[1] == 10009, "the rez bots raise the wreck")
 assert(not gadget:AllowCommand(2), "BARb must not overwrite the rescue order")

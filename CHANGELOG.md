@@ -2,15 +2,16 @@
 
 ## Unreleased
 
-Every ending can be reached and won. A hard AI (BARb, hard_aggressive) played each finale on a stock BAR install.
+Every ending can be reached and won. On a stock BAR install, a hard AI (BARb, hard_aggressive) beat the whole campaign and each of the three finales.
 
 - **Raptors on current BAR.** BAR moved its utilities from `Spring.Utilities` to `BAR.Utilities`. Verdance's raptor spawner read the old name on its first line, so on a current install it failed to load: the Rock Jungle had no raptor waves, no rage and no queen. It now reads whichever this BAR has.
 - **The finale's massive start lands again.** Since 0.14.0, a sealed hub crew also dropped the act-3 kit: the base, lab and army the finale is built around. They land beside the company again; the heroes still come in their packs.
 - **The Spire Jump (finale C) can be powered.** The gate wanted four advanced fusions, which only a T2 constructor builds, and the company raises T2 labs only on All That Simmers. It now charges from 1,500 energy a second of the company's own generators near it (solars, winds, geothermals, fusions, Hearth's reactor). The rail reads `power 640 / 1500 energy`. The gate's frame now stands where a constructor can walk to it; it used to stand on rock the company could not climb.
 - **The Overthrow (finale A) is the Keep.** The Keep's war seat is the target, and its 18 guns and factories are what you break, not its 66 windmills and extractors. A finale is won by its own objective, not by holding ground next to the pad.
+- **The kings' showdown (finale B) can be won.** Each king now starts on its seat; BAR used to put them on the map's own start points in random order. A king whose ground lies under the sea, or under the tide still to come in the match, walks inland in the first seconds. The Armada king used to start under water, where no land army could reach it.
 - **Armed means it has weapons.** Presence, contested holds and the Overthrow's booking counted windmills and extractors as fighters (BAR leaves them able to attack).
 - **A build refused for want of Tenebrium** says so once every 30 seconds per builder. It used to say so every frame: a factory left with a constructor queued and an empty bank wrote 1.6 million lines in one finale, until the game ran out of memory and the sortie came home without a result.
-- **Rehearsals:** `autopilot_campaign_v1.py --finale A|B|C` starts at the ending with a walked campaign's bank (12 Tenebrium). The autopilot breaks the Overthrow's targets, builds and powers the Spire Gate and walks the heroes through, and in the kings' showdown leaves the war to BARb and goes for the last king.
+- **Rehearsals:** `autopilot_campaign_v1.py --finale A|B|C` starts at the ending with a walked campaign's bank (12 Tenebrium). The autopilot breaks the Overthrow's targets, builds and powers the Spire Gate and walks the heroes through, and in the kings' showdown leaves the war to BARb for half an hour, then attacks the kings' commanders.
 
 ## 0.14.5 — 2026-11-02
 
