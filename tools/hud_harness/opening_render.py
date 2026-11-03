@@ -34,11 +34,20 @@ from verdance.campaign import engine as E  # noqa: E402
 
 OUT = Path(sys.argv[1]) if len(sys.argv) > 1 else WS / "docs" / "screens" / "mission1_opening"
 SCALE = 0.75
+# The "before" card is this ref's infil widget on the same seed (VA_BEFORE_REF; default master).
+BEFORE_REF = os.environ.get("VA_BEFORE_REF", "origin/master")
+SCRATCH = tempfile.TemporaryDirectory(prefix="va_opening_render_")   # removed when the script ends
+
+
+def scratch(name: str) -> Path:
+    d = Path(SCRATCH.name) / name
+    d.mkdir(parents=True, exist_ok=True)
+    return d
 
 
 def opening_intent():
     """A fresh campaign's mission 1, materialised by the hub in a throwaway workspace."""
-    tmp = Path(tempfile.mkdtemp(prefix="va_opening_"))
+    tmp = scratch("workspace")
     os.symlink(WS / "data", tmp / "data")
     (tmp / "outbox").mkdir()
     state = E.migrate_state(E.default_v1_state())
@@ -290,11 +299,11 @@ shot("12_hook", "4:51  hookSeconds after landing: Armada's intercepted dispatch 
 def old_infil():
     """The card as it was on master (for the before/after): its widget, same seed."""
     try:
-        src = subprocess.run(["git", "-C", str(WS), "show", "origin/master:mod/VerdanceAshes.sdd/luaui/Widgets/gui_verdance_infil.lua"],
+        src = subprocess.run(["git", "-C", str(WS), "show", BEFORE_REF + ":mod/VerdanceAshes.sdd/luaui/Widgets/gui_verdance_infil.lua"],
                              capture_output=True, text=True, check=True).stdout
     except Exception:
         return False
-    path = Path(tempfile.mkdtemp(prefix="va_old_infil_")) / "gui_verdance_infil_master.lua"
+    path = scratch("before") / "gui_verdance_infil_before.lua"
     path.write_text(src, encoding="utf-8")
     return str(path)
 
@@ -317,7 +326,7 @@ def main():
     pre = H.prelude.replace("FX_JSON_LUA", json.dumps(os.path.join(H.INCLUDE, "va_json.lua"))).replace("FX_JSON", rd("files.json")) \
         .replace("HEROES_JSON", rd("heroes.json")).replace("STATES_JSON", rd("states.json"))
     OUT.mkdir(parents=True, exist_ok=True)
-    tmp_out = Path(tempfile.mkdtemp(prefix="va_opening_render_"))
+    tmp_out = scratch("draws")
     beats_path = WS / "mod" / "VerdanceAshes.sdd" / "luarules" / "gadgets" / "include" / "campaign" / "beats.lua"
     shots = []
 
