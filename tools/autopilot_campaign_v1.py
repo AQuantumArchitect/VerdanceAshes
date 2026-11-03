@@ -102,7 +102,7 @@ def copy_workspace(dest: Path, bar_root: str, stock: bool = False) -> Path:
 # ----------------------------------------------------------------------------- the startscript
 
 def patch_startscript(text: str, *, profile: str, speed: int, minutes: float, settle: int,
-                      hud: bool = False) -> tuple[str, int]:
+                      hud: bool = False, beats: bool = False) -> tuple[str, int]:
     """Company team -> BARb; the human becomes a spectator; autopilot modoptions in."""
     m = re.search(r"\[PLAYER0\]\s*\{(.*?)\}", text, re.S)
     if not m:
@@ -121,6 +121,9 @@ def patch_startscript(text: str, *, profile: str, speed: int, minutes: float, se
     text = re.sub(r"NumUsers=(\d+);", lambda mm: f"NumUsers={int(mm.group(1)) + 1};", text, count=1)
     text = re.sub(r"RecordDemo=\d+;", "RecordDemo=0;", text, count=1)
     no_ui = "" if hud else "va_no_ui=1;\n    "
+    # A headless autostart turns the authored beats off (profiling); --beats keeps them, so a rehearsal
+    # plays mission 1's opening script as a player would get it.
+    no_ui += "va_beats=1;\n    " if beats else ""
     mods = (f"va_autopilot=1;\n    {no_ui}va_headless_autostart=1;\n    va_headless_fastwin=0;\n    va_headless_quit=1;\n    va_headless_speed={speed};\n    va_autopilot_speed={speed};\n"
             f"    va_autopilot_minutes={minutes};\n    va_autopilot_settle={settle};\n    ")
     text = text.replace("va_campaign=1;", "va_campaign=1;\n    " + mods.rstrip(), 1)
@@ -187,6 +190,7 @@ def main() -> int:
     ap.add_argument("--minutes", type=float, default=15.0, help="game minutes before the company leaves regardless")
     ap.add_argument("--settle", type=int, default=40, help="game seconds held after the objective completes")
     ap.add_argument("--windowed", action="store_true", help="spring.exe instead of spring-headless.exe")
+    ap.add_argument("--beats", action="store_true", help="keep the authored in-mission beats on (a headless run turns them off)")
     ap.add_argument("--hud", action="store_true", help="headless with LuaUI on: the company leaves through the HUD (EXTRACT, the manifest, confirm)")
     ap.add_argument("--prefer", default="", help="prefer a map id substring; default follows the hub's recommended choice")
     ap.add_argument("--max-stalls", type=int, default=3, help="stop after this many sorties in a row that did not advance")
@@ -314,7 +318,8 @@ def main() -> int:
             break
         script = S.startscript_from_manifest(ws)
         text, team = patch_startscript(script.read_text(encoding="utf-8", errors="replace"), profile=args.profile,
-                                       speed=args.speed, minutes=args.minutes, settle=args.settle, hud=args.hud or args.windowed)
+                                       speed=args.speed, minutes=args.minutes, settle=args.settle, hud=args.hud or args.windowed,
+                                       beats=args.beats)
         script.write_text(text, encoding="utf-8")
         shutil.copy2(script, run_dir / f"sortie_{n:02d}.startscript.txt")
         rep = launch(ws, headless=not args.windowed, run_dir=run_dir, n=n, hud=args.hud)

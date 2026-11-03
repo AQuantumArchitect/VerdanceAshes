@@ -62,6 +62,9 @@ class AutopilotTests(unittest.TestCase):
         self.assertIn("va_headless_fastwin=0;", patched)
         self.assertNotIn("va_autopilot_force_complete", patched)
         self.assertNotIn("va_extract_anywhere", patched)
+        self.assertNotIn("va_beats", patched)
+        with_beats, _ = patch_startscript(script, profile="hard", speed=8, minutes=15, settle=40, beats=True)
+        self.assertIn("va_beats=1;", with_beats)
 
     def test_process_log_archive_includes_result_and_ignores_shared_infolog(self):
         with tempfile.TemporaryDirectory() as tmp:
