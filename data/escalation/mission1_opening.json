@@ -40,13 +40,13 @@
     "movePromptSeconds": "seconds after the first selection; if nobody has been ordered to move, Ketha points at the gold ring",
     "revealFallbackSeconds": "seconds after landing; the real job is revealed then even if the gold ring was never reached",
     "attackPromptSeconds": "seconds after the reveal; if nothing of theirs has been hit, Ketha says how",
-    "answerDelaySeconds": "seconds after our first hit on them; the farm's answer (forces.answer) arrives",
+    "answerDelaySeconds": "seconds after our first hit on them, counted from the reveal if the hit came before it; the farm's answer (forces.answer) arrives",
     "probeSeconds": "seconds after the reveal; if we still have not hit anything, they come to us (forces.probe)",
     "buildPromptSeconds": "seconds after our first kill; if no builder has touched a wreck or a build, Ketha says how",
     "wreckMarkSeconds": "seconds the ring on that first wreck stays up (it also goes the moment a builder works it)",
     "reliefLineDelaySeconds": "seconds after the first reclaim or raise; Ketha's relief line",
     "paviseLineDelaySeconds": "seconds after Ketha's relief line; Pavise's, only if Pavise dropped",
-    "hookSeconds": "seconds after landing; the intercepted Armada dispatch that ends minute five",
+    "hookSeconds": "seconds after landing; the intercepted Armada dispatch that ends minute five (sooner if the farm falls first: losing it is what makes them call)",
     "hookReplySeconds": "seconds after the dispatch; Ketha's reply",
     "columnSeconds": "seconds after the dispatch; the column (forces.column) arrives unless the farm is already taken",
     "heroBarksNotBeforeSeconds": "the generic hero-down and hero-back barks stay quiet for this many seconds of the sortie",
@@ -80,6 +80,7 @@
     "pavise": { "speaker": "Pavise", "text": "I've got your left. Like before.", "onlyIfHero": "pavise" },
     "hookDispatch": { "speaker": "Brask · intercepted", "text": "Farm hit. Irregulars, and the deserter with them. Send a column." },
     "hookReply": { "speaker": "Ketha", "text": "Deserter. He means you. Finish this before his column gets here." },
+    "hookReplyTaken": { "speaker": "Ketha", "text": "Deserter. He means you. Load the pad before his column lands." },
     "column": { "speaker": "Ketha", "text": "Column's here. Hold the farm or load the pad. Pick now." }
   },
   "forces": {

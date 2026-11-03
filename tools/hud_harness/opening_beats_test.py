@@ -10,6 +10,10 @@ plays a different player and checks what the beats did:
   quick      selects, moves, reaches the ring, attacks, kills and reclaims: no prompt ever shows,
              the reveal comes from the ring, the farm answers the first hit, the wreck ring clears
   late       does each thing a little after its prompt: the prompt shows, then is taken down
+  hot pad    fights on the pad before the reveal: the farm's answer still waits for the reveal;
+             a hero bay printing on its own is not the player building
+  fast       takes the farm before minute five: the hook comes when the farm falls, and Ketha's
+             reply sends the company to the pad instead of back to the farm
   heroes     a field recruit lying as a wreck from frame 2 is not "hero down"; a company hero
              down in the first minute waits until the minute is up
   generic    the beats of any other mission still run as before (time, objective progress)
@@ -88,6 +92,7 @@ Spring = {
   AreTeamsAllied = function(a, b) return a == b end,
   GetUnitPosition = function(id) local u = UNITS[id]; if u then return u.x, 0, u.z end end,
   GetUnitTeam = function(id) local u = UNITS[id]; return u and u.team end,
+  GetUnitDefID = function(id) local u = UNITS[id]; return u and u.def end,
   GetPlayerInfo = function(pid) return "p", true, false, 0 end,
   CreateUnit = function(def, x, y, z, f, team) SPAWNED[#SPAWNED + 1] = def; return 900 + #SPAWNED end,
   GiveOrderToUnit = function() end,
@@ -99,6 +104,7 @@ end
 gadgetHandler = { RemoveCallIn = function(self, name) REMOVED[#REMOVED + 1] = name end }
 Game = { mapSizeX = 8192, mapSizeZ = 8192 }
 UnitDefNames = { armpw = { id = 1 }, armham = { id = 2 }, armfav = { id = 3 } }
+UnitDefs = { [7] = { name = "legap", isFactory = true }, [8] = { name = "legrezbot" } }
 CMD = { MOVE = 10, FIGHT = 16, PATROL = 15, ATTACK = 20, RECLAIM = 90, RESURRECT = 125, REPAIR = 40, FIRE_STATE = 45 }
 playerTeamID, gaiaTeamID, objectiveTeamID, mercTeamID = 0, 9, 1, nil
 VA_HOT = { pending = false }
@@ -267,6 +273,37 @@ for _, s in ipairs(SENT) do if s.kind == "bark" and tostring(s.d):find("op_selec
     check("late: the build prompt comes after buildPromptSeconds, and goes when a builder works", out.get("build") == 150 + P["buildPromptSeconds"] and out.get("clearBuild") == 150 + P["buildPromptSeconds"] + 3, (out.get("build"), out.get("clearBuild")))
     check("late: a prompt is styled as a prompt and lasts promptShowSeconds", out.get("style") == "prompt||op_selectPrompt" and out.get("seconds") == P["promptShowSeconds"], (out.get("style"), out.get("seconds")))
     check("late: Pavise speaks when Pavise dropped", out.get("pavise") is not None, out.get("pavise"))
+
+    # ---- hot pad: a fight in the first seconds, a hero bay printing on repeat
+    out = run(beats, r'''
+OUT = {}
+LAND()
+UNITS[20] = { x = 1250, z = 950, team = 0, def = 7 }   -- a bay, printing on its own
+RUN_TO(80, function(t)
+  if t == 4 then beatsOnUnitDamaged(1, 0) end
+  if t == 6 then beatsOnUnitCreated(0, 20) end
+  if t == 30 then UNITS[1].x, UNITS[1].z = RULES.va_op_goal_x, RULES.va_op_goal_z end
+  if t == 40 then UNITS[50] = { x = 900, z = 1600, team = 1 }; beatsOnUnitDestroyed(50, 1, 0) end
+end)
+OUT.reveal = STAGE_AT(2); OUT.answer = SAID("op_answer"); OUT.build = SAID("op_buildPrompt")
+''')
+    check("hot pad: the farm's answer counts from the reveal, not from a fight on the pad", out.get("answer") == out.get("reveal", 0) + P["answerDelaySeconds"], out)
+    check("hot pad: a bay printing on its own is not the player building", out.get("build") == 40 + P["buildPromptSeconds"], out.get("build"))
+
+    # ---- fast: the farm falls before minute five
+    out = run(beats, r'''
+OUT = {}
+LAND()
+RUN_TO(400, function(t)
+  if t == 3 then beatsNoteFact("selected", 0); beatsOnUnitCommand(0, CMD.FIGHT, false) end
+  if t == 190 then objectiveComplete = true end
+end)
+OUT.hook = SAID("op_hookDispatch"); OUT.reply = SAID("op_hookReply"); OUT.taken = SAID("op_hookReplyTaken")
+OUT.column = FIRED("op_column"); OUT.replyCancelled = CANCELLED("op_hook_reply"); OUT.columnCancelled = CANCELLED("op_column")
+''')
+    check("fast: the hook comes when the farm falls", out.get("hook") == 190, out.get("hook"))
+    check("fast: Ketha sends them to the pad, not back to the farm", out.get("taken") == 190 + P["hookReplySeconds"] and out.get("reply") is None and out.get("replyCancelled"), out)
+    check("fast: no second column (taking the farm brings the gadget's own)", out.get("column") is False and out.get("columnCancelled"), out)
 
     # ---- heroes: generic hero beats only for the company, and not in the first minute
     voice = load_ketha_voice(WS)

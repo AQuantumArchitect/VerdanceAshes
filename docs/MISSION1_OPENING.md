@@ -48,15 +48,21 @@ Every timer is a key in `pacing`.
 | 3 | 0:05–0:20 [prompt at selection + `movePromptSeconds`] | `op_moved`, `op_move_prompt` | `player_moved` (a move, fight or patrol order) | the units walk. Stalled: "See the gold ring? Right-click inside it. We'll walk." | **move** | momentum |
 | 4 | 0:30–0:50 [fallback at +`revealFallbackSeconds`] | `op_reveal` | a unit within `goalRingRadius` of the ring, or the fallback timer | the ring goes; the rail becomes "◆ Take the Northwest Bastion: break the farm, then hold the ground." with its gauges; the board and minimap show ◆ on the farm (the mark moves from the zone's box centre to the claimed targets); the route repaints ring → farm; a beep; Ketha: "There's the farm. Clear it, then hold the Bastion till it's ours." | the real job | tension rises: the farm is in sight |
 | 5 | 0:50–1:20 [prompt at reveal + `attackPromptSeconds`] | `op_attacked`, `op_attack_prompt` | `player_attacked` (our first hit on an enemy, an attack or fight order, or a kill) | combat. Stalled: "Pick one of their panels and right-click it. We'll do the rest." | **attack** | tension |
-| 6 | first hit + `answerDelaySeconds` | `op_answer` | elapsed after `op_attacked` | 3 Pawns and a Mace come in from Armada's own edge, out of sight, fighting toward us. Ketha: "They've noticed. Something's coming to ask what we're doing." | the enemy answers what you do | tension peaks |
+| 6 | first hit + `answerDelaySeconds` | `op_answer` | elapsed after both `op_attacked` and `op_reveal` (a fight on a hot pad in the first seconds does not call the farm's help early) | 3 Pawns and a Mace come in from Armada's own edge, out of sight, fighting toward us. Ketha: "They've noticed. Something's coming to ask what we're doing." | the enemy answers what you do | tension peaks |
 | 6b | reveal + `probeSeconds`, only if nothing was hit | `op_probe` | elapsed after `op_reveal`, cancelled by `player_attacked` | 2 Rovers come to the company. Ketha: "They got tired of waiting for us. Here they come." | sitting still is a choice too | tension for a passive player |
 | 7 | 1:20–2:00 | `op_first_kill` | `enemy_killed` (our first kill of an enemy unit) | a blue dashed ring on the wreck, and a soft beep. No words. | wrecks are worth something (the ring says so) | relief begins |
 | 8 | [kill + `buildPromptSeconds`] | `op_build_prompt` | elapsed after `op_first_kill`, cancelled by `player_built` | Stalled: "That wreck's still warm. Right-click it with a Zagreus." | **build** (reclaim or raise with the rez bots; a build order counts too) | — |
 | 9 | 1:40–2:30 | `op_built`, then `op_relief` (+`reliefLineDelaySeconds`), then `op_pavise` (+`paviseLineDelaySeconds`) | `player_built` after the kill (a builder working a wreck, or a build started) | the ring clears; metal comes in; Ketha: "That's metal we didn't have this morning." Then, if Pavise dropped: "I've got your left. Like before." | the loop: fight, wreck, haul | relief, warmth |
 | 10 | 3:00–3:30 | `b3_midfight` (kept from the generic beats) | half the objective's targets down | Ketha's midfight line from her own pool | — | tension: the bill is being written |
 | 11 | 3:30–4:30 | (the capture's hold) | the pocket cleared to the capture's fraction | the rail's gauge turns to "hold" | stand on it | relief: it is nearly ours |
-| 12 | 4:45 (+`hookSeconds` after landing) | `op_hook`, then `op_hook_reply` (+`hookReplySeconds`) | elapsed after `op_land` | Armada's radio, intercepted, in orange: "Farm hit. Irregulars, and the deserter with them. Send a column." Ketha: "Deserter. He means you. Finish this before his column gets here." | they know who you are | the hook: a name, and a clock |
+| 12 | 4:45 (+`hookSeconds` after landing), or the moment the farm falls if that is sooner | `op_hook`, then `op_hook_reply` or `op_hook_reply_taken` (+`hookReplySeconds`) | elapsed after `op_land`, or `objective_complete` | Armada's radio, intercepted, in orange: "Farm hit. Irregulars, and the deserter with them. Send a column." Ketha: "Deserter. He means you. Finish this before his column gets here." If the farm is already taken: "Deserter. He means you. Load the pad before his column lands." | they know who you are | the hook: a name, and a clock |
 | 13 | hook + `columnSeconds` (about 7:15) | `op_column` | elapsed after `op_hook`, cancelled by `objective_complete` | 4 Pawns and 2 Maces. Ketha: "Column's here. Hold the farm or load the pad. Pick now." (If the farm was already taken, the gadget's own hot-extraction answer is the column.) | the extract choice | the hook pays off |
+
+The match is not calm at 0:00 for everyone: the stock-BAR rehearsal in `docs/FIRST_MATCH.md` had
+Yeva's "there is a column in it" about the muster at 0:02 and a fight near the pad in the first
+seconds, and a bot took the Bastion by 3:12. So the farm's answer waits for the reveal, and the hook
+comes early when the farm falls early (taking the farm already brings the gadget's own counter-pack
+on mission 1, `hotExtractOnly`, so `op_column` stands down).
 
 The rhythm, for the typical player: calm (0:00) → rising (0:45, the farm in sight) → peak (1:40, the
 answer) → relief (2:20, the first haul) → rising (3:15, half done) → relief (4:00, the hold) → hook
@@ -109,7 +115,11 @@ A beat is `{ id, trigger, afterBeat, notBefore, cancelIf, actions }`.
 - `notBefore` is seconds of game time before which the beat cannot fire.
 - New triggers: `sortie_start`, `company_landed`, `elapsed`, `near_point`, `player_selected`,
   `player_moved`, `player_attacked`, `player_built`, `enemy_killed` (the facts take `atLeast`, and
-  `fresh: true` counts only what happened after the beat's `afterBeat` fired), `any_of`, `all_of`.
+  `fresh: true` counts only what happened after the beat's `afterBeat` fired), `beat_fired`,
+  `any_of`, `all_of`.
+- `player_built` counts a builder working a wreck, a build or a raise it started, and a build,
+  reclaim, raise or repair order. Not a factory's own production: a hero bay lands printing on
+  repeat without the player.
 - New actions: `objective_stage` (stage 1: a first goal with a ring; stage 2: the job's own words),
   `field_mark` / `clear_mark` (rings on the ground), `clear_bark` (take a tagged line down). A
   `bark` takes `priority` (`ambient` may be dropped when the voice stack is busy; `line` and

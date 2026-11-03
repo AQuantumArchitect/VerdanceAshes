@@ -19,7 +19,7 @@
 -- Triggers: time · elapsed · sortie_start · company_landed · zone_entered · near_point ·
 --   objective_progress · objective_complete · extraction_started · wave_spawned ·
 --   hero_down · hero_recovered · hero_lost · player_selected · player_moved · player_attacked ·
---   player_built · enemy_killed · any_of · all_of
+--   player_built · enemy_killed · beat_fired · any_of · all_of
 --   The player_* facts and enemy_killed take atLeast (default 1); fresh = true counts only what
 --   happened after the beat's afterBeat fired.
 -- Actions: bark · clear_bark · marker · field_mark · clear_mark · sound · wave · spawn · hydrology ·
@@ -158,6 +158,9 @@ local function compileCond(t)
     c.index = tonumber(t.index) or 1
   elseif kind == "hero_down" or kind == "hero_recovered" or kind == "hero_lost" then
     c.heroId = t.heroId and tostring(t.heroId) or nil
+  elseif kind == "beat_fired" then
+    c.beat = t.beat and tostring(t.beat) or nil
+    if not c.beat then return nil end
   elseif FACT_OF[kind] then
     c.fact = FACT_OF[kind]
     c.atLeast = tonumber(t.atLeast) or 1
@@ -191,6 +194,8 @@ local function condMet(c, b, frame)
   elseif k == "all_of" then
     for _, s in ipairs(c.of) do if not condMet(s, b, frame) then return false end end
     return true
+  elseif k == "beat_fired" then
+    return beatFiredAt[c.beat] ~= nil
   elseif k == "sortie_start" then
     return true   -- beatsOnGameStart fires these before the first frame; this is the fallback
   elseif k == "company_landed" then
@@ -508,10 +513,16 @@ function beatsOnUnitDestroyed(unitID, unitTeam, attackerTeam)
   if facts.attacked == 0 then noteFact("attacked") end
 end
 
--- A unit our builder started (a build, or a wreck raised). Called by gadget:UnitCreated.
+-- A unit our builder started (a build, or a wreck raised). Not a factory's: a hero bay lands already
+-- printing on repeat, and the player queueing a factory is counted as the order (UnitCommand).
+-- Called by gadget:UnitCreated.
 function beatsOnUnitCreated(unitTeam, builderID)
   if not beatsEnabled or not builderID or unitTeam ~= playerTeamID then return end
-  if Spring.GetUnitTeam(builderID) == playerTeamID then noteFact("built") end
+  if Spring.GetUnitTeam(builderID) ~= playerTeamID then return end
+  local defID = Spring.GetUnitDefID and Spring.GetUnitDefID(builderID)
+  local ud = defID and UnitDefs and UnitDefs[defID]
+  if ud and ud.isFactory then return end
+  noteFact("built")
 end
 
 -- Our builder working a wreck (reclaim or raise). Called by gadget:AllowFeatureBuildStep.

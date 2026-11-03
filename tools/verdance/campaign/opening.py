@@ -33,7 +33,7 @@ PACING_KEYS = (
 )
 LINE_KEYS = (
     "selectPrompt", "movePrompt", "reveal", "attackPrompt", "answer", "probe", "buildPrompt",
-    "relief", "pavise", "hookDispatch", "hookReply", "column",
+    "relief", "pavise", "hookDispatch", "hookReply", "hookReplyTaken", "column",
 )
 
 _CACHE: Dict[str, Optional[Dict[str, Any]]] = {}
@@ -237,8 +237,9 @@ def opening_beats(script: Dict[str, Any], target_zone: Optional[str], mission_go
          "cancelIf": [{"type": "player_attacked"}], "actions": [prompt("attackPrompt")]},
         {"id": "op_attacked", "afterBeat": "op_land", "trigger": {"type": "player_attacked"},
          "actions": [{"type": "clear_bark", "tag": "op_attackPrompt"}]},
-        # The enemy answers what the player did: our first hit calls the farm's help...
-        {"id": "op_answer", "afterBeat": "op_attacked", "trigger": after("answerDelaySeconds"),
+        # The enemy answers what the player did: our first hit calls the farm's help. Not before the
+        # reveal: a fight on a hot pad in the first seconds must not snowball minute one.
+        {"id": "op_answer", "afterBeat": ["op_attacked", "op_reveal"], "trigger": after("answerDelaySeconds"),
          "actions": [spawn("answer"), line("answer")]},
         # ... and a company that sits still gets visited.
         {"id": "op_probe", "afterBeat": "op_reveal", "trigger": after("probeSeconds"),
@@ -258,11 +259,17 @@ def opening_beats(script: Dict[str, Any], target_zone: Optional[str], mission_go
         {"id": "op_pavise", "afterBeat": "op_relief", "trigger": after("paviseLineDelaySeconds"),
          "actions": [line("pavise")]},
         # The hook that ends minute five: the Armada names the commander, and a column is coming.
-        {"id": "op_hook", "afterBeat": "op_land", "trigger": after("hookSeconds"),
+        # Sooner if the farm falls first (losing it is what makes them call); Ketha's reply follows
+        # what is true by then: finish the farm, or get to the pad.
+        {"id": "op_hook", "afterBeat": "op_land",
+         "trigger": {"type": "any_of", "of": [after("hookSeconds"), {"type": "objective_complete"}]},
          "actions": [bark("hookDispatch", "line", "dispatchShowSeconds", accent="warn"),
                      {"type": "sound", "file": "warning2", "volume": 0.6}]},
         {"id": "op_hook_reply", "afterBeat": "op_hook", "trigger": after("hookReplySeconds"),
-         "actions": [line("hookReply")]},
+         "cancelIf": [{"type": "objective_complete"}], "actions": [line("hookReply")]},
+        {"id": "op_hook_reply_taken", "afterBeat": "op_hook",
+         "trigger": {"type": "all_of", "of": [after("hookReplySeconds"), {"type": "objective_complete"}]},
+         "cancelIf": [{"type": "beat_fired", "beat": "op_hook_reply"}], "actions": [line("hookReplyTaken")]},
         # The column pays the hook off, unless the farm is already taken (then the gadget's own
         # hot-extraction answer is the column).
         {"id": "op_column", "afterBeat": "op_hook", "trigger": after("columnSeconds"),

@@ -143,7 +143,7 @@ def test_each_control_is_learned_by_doing_with_a_stall_prompt():
 
 def test_the_enemy_answers_what_the_player_does():
     beats = _by_id(_beats())
-    assert beats["op_answer"]["afterBeat"] == "op_attacked"
+    assert beats["op_answer"]["afterBeat"] == ["op_attacked", "op_reveal"], "the answer waits for the hit and the reveal"
     assert any(a["type"] == "spawn" and a["fightTo"] == "player" for a in beats["op_answer"]["actions"])
     probe = beats["op_probe"]
     assert [c["type"] for c in probe["cancelIf"]] == ["player_attacked"], "they only come to a company that sits still"
@@ -152,8 +152,13 @@ def test_the_enemy_answers_what_the_player_does():
 def test_minute_five_ends_on_a_hook_that_is_paid_off():
     beats = _by_id(_beats())
     hook = beats["op_hook"]
-    assert hook["afterBeat"] == "op_land" and 240 <= hook["trigger"]["seconds"] <= 300
-    assert beats["op_hook_reply"]["afterBeat"] == "op_hook"
+    timer, fell = hook["trigger"]["of"]
+    assert hook["afterBeat"] == "op_land" and hook["trigger"]["type"] == "any_of"
+    assert timer["type"] == "elapsed" and 240 <= timer["seconds"] <= 300, "minute five"
+    assert fell == {"type": "objective_complete"}, "or sooner, when the farm falls"
+    reply, taken = beats["op_hook_reply"], beats["op_hook_reply_taken"]
+    assert reply["afterBeat"] == "op_hook" and reply["cancelIf"] == [{"type": "objective_complete"}]
+    assert taken["cancelIf"] == [{"type": "beat_fired", "beat": "op_hook_reply"}], "one reply, never both"
     column = beats["op_column"]
     assert column["afterBeat"] == "op_hook" and any(a["type"] == "spawn" for a in column["actions"])
 
