@@ -397,9 +397,10 @@ local function gateRig()
       .. string.format(" metal=%d+%.1f energy=%d+%.1f", m or 0, mIn or 0, e or 0, eIn or 0)
       .. " factories=" .. facs .. " builders=" .. #builders .. " " .. table.concat(rows, " "))
   end
-  if #builders < 4 then
+  if #builders < 4 and rp("va_tenebrium_bank") >= 1 then
     -- the finale kit brings a lab and few constructors: every idle factory that can make a
-    -- constructor makes one, until there are four
+    -- constructor makes one, until there are four (a constructor costs Tenebrium: none queued
+    -- that the bank cannot pay, or the factory asks for it every frame)
     local L = ladder()
     L.mobileBuilders = L.mobileBuilders or (function()
       local set = {}

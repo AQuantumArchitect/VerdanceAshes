@@ -211,6 +211,7 @@ local function ladderWorld(have)
   for uid, def in pairs(have) do units[#units + 1] = uid; unitDef[uid] = def; positions[uid] = { 900, 900 } end
   Spring.GetUnitHealth = function() return 1, 1, 0, 0, 1 end
   rules.va_gate_state = "unpowered"; rules.va_gate_afus = 0; rules.va_gate_afus_need = 4
+  rules.va_tenebrium_bank = 5
 end
 local function ordered(uid, cmd) for _, b in ipairs(built) do if b.uid == uid and b.cmd == cmd then return true end end return false end
 ladderWorld({ [20] = 10 })
@@ -220,6 +221,10 @@ ladderWorld({ [20] = 10, [21] = 11 })
 gadget:GameFrame(41)
 assert(ordered(21, -12), "the constructor builds an advanced lab by the gate")
 assert(ordered(20, -11), "and with fewer than four builders the lab makes more")
+ladderWorld({ [20] = 10, [21] = 11 })
+rules.va_tenebrium_bank = 0
+gadget:GameFrame(41)
+assert(not ordered(20, -11), "no Tenebrium, no constructor queued (the factory would ask every frame)")
 ladderWorld({ [20] = 10, [21] = 11, [22] = 12 })
 gadget:GameFrame(41)
 local made = false
