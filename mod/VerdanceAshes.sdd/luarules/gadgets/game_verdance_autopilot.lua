@@ -154,6 +154,9 @@ local SIEGE_GUNS = 12
 -- hour for the nearest one, with a real army, attacking the commander itself rather than the place
 -- it stood: in one run BARb took one king of three in ninety minutes and then sat.
 local KING_SIEGE_GUNS = 40
+-- ...and after 45 minutes with whatever army there is (twenty guns or more): with the kings on their
+-- seats in the corners nobody came to anybody, and the company's army stood at 29 guns for an hour.
+local KING_LATE_FRAMES, KING_LATE_GUNS = 45 * 60 * 30, 20
 local KING_WAR_FRAMES = 30 * 60 * 30
 -- The Spire Jump is won at the gate, not at the hive: the guns stand around the gate (and the
 -- fusions going up beside it) instead of marching on the nests. In the finale-C rehearsal the
@@ -226,7 +229,12 @@ local function siege()
   local guns = companyUnits(function(ud, uid)
     return mobile(ud) and ud.canAttack and not ud.isBuilder and (sieged[uid] or not held[uid])
   end)
-  if not targets or next(targets) == nil or #guns < (kings and KING_SIEGE_GUNS or SIEGE_GUNS) then
+  local need = SIEGE_GUNS
+  if kings then
+    local late = ((Spring.GetGameFrame and Spring.GetGameFrame()) or 0) >= KING_LATE_FRAMES
+    need = late and KING_LATE_GUNS or KING_SIEGE_GUNS
+  end
+  if not targets or next(targets) == nil or #guns < need then
     -- too thin to break anything: what is left of the siege goes back to BARb until there are more
     for uid in pairs(sieged) do held[uid] = nil end
     sieged = {}

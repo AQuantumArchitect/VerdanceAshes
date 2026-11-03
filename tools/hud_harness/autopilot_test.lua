@@ -287,6 +287,19 @@ Spring.GetGameFrame = function() return 31 * 60 * 30 end   -- half an hour on, t
 gadget:GameFrame(611)
 local near = find(CMD.ATTACK)
 assert(near and (near.params[1] == 950 or near.params[1] == 951), "after half an hour the rig goes for the nearest king")
+reset()
+local few = {}
+for i = 100, 124 do few[#few + 1] = i; positions[i] = { 0, 0 } end
+Spring.GetTeamUnits = function() return few end
+Spring.GetUnitDefID = function() return 1 end
+Spring.ValidUnitID = function() return true end
+positions[950], positions[951] = { 3000, 100 }, { 100, 3000 }
+Spring.GetGameFrame = function() return 31 * 60 * 30 end
+gadget:GameFrame(611)
+assert(not find(CMD.ATTACK), "twenty-five guns at half an hour: not yet")
+Spring.GetGameFrame = function() return 46 * 60 * 30 end
+gadget:GameFrame(1211)
+assert(find(CMD.ATTACK), "after 45 minutes the army there is goes")
 Spring.GetGameFrame = nil
 reset()
 for i = 100, 139 do positions[i] = { 0, 0 } end
