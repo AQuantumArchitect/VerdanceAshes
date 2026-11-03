@@ -272,7 +272,8 @@ gadget:GameFrame(611)
 assert(gadget:AllowCommand(100), "too few guns: no siege yet")
 GG.VA_ObjectiveTargets = nil
 -- the kings' showdown is BARb's war: the rig goes only for the last king, with forty guns, and
--- attacks the commander itself
+-- attacks the commander itself once it can see it
+Spring.IsUnitInLos = function() return true end
 reset()
 guns = {}
 for i = 100, 139 do guns[#guns + 1] = i; positions[i] = { 0, 0 } end
@@ -312,6 +313,13 @@ gadget:GameFrame(1211)
 local k = find(CMD.ATTACK)
 assert(k and k.params[1] == 951, "the last king: the guns attack the commander itself")
 assert(not gadget:AllowCommand(100), "and BARb leaves them on it")
+Spring.IsUnitInLos = function() return false end
+orders = {}
+gadget:GameFrame(611)
+local walk = find(CMD.FIGHT)
+assert(not find(CMD.ATTACK) and walk and walk.params[1] == 100 and walk.params[3] == 3000,
+  "a king out of sight: the guns fight their way to where it stands")
+Spring.IsUnitInLos = function() return true end
 -- too few guns left: the siege lets go of them
 guns = { 100, 101 }
 gadget:GameFrame(11)   -- (the harness clock is one minute: frame 1800 would be the departure)

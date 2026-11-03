@@ -256,12 +256,18 @@ local function siege()
     end
   end
   if not bx then return end
+  local myAlly = select(6, Spring.GetTeamInfo(playerTeam, false))
+  local king
   if kings then
-    local king
     for uid in pairs(targets) do
       local x, _, z = Spring.GetUnitPosition(uid)
       if x and x == bx and z == bz then king = uid end
     end
+  end
+  -- attack the commander itself once the company can see it; until then fight the way to where it
+  -- stands (an order to attack a unit out of sight does nothing: on the container rig 80 guns stood
+  -- 5,000 elmos from the Cortex king for twenty minutes with one)
+  if king and Spring.IsUnitInLos and Spring.IsUnitInLos(king, myAlly) then
     order(guns, CMD.ATTACK, { king }, true)
   else
     order(guns, CMD.FIGHT, { bx, Spring.GetGroundHeight(bx, bz) or 0, bz }, true)
