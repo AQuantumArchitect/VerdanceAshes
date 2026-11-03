@@ -292,6 +292,20 @@ local function gateRig()
   local gx, gz, gate = rp("va_gate_x"), rp("va_gate_z"), rp("va_gate_unit")
   if gx <= 0 then return end
   local builders = companyUnits(function(ud) return mobile(ud) and ud.isBuilder and (ud.buildOptions and #ud.buildOptions > 0) end)
+  if ((Spring.GetGameFrame and Spring.GetGameFrame()) or 0) % 900 < 30 then
+    -- where the gate work stands: each builder, how far from the gate, and what it is doing
+    local rows = {}
+    for _, uid in ipairs(builders) do
+      local x, _, z = Spring.GetUnitPosition(uid)
+      local q = Spring.GetUnitCommands(uid, 1)
+      local ud = UnitDefs[Spring.GetUnitDefID(uid) or -1]
+      rows[#rows + 1] = tostring(ud and ud.name or "?") .. "@" .. (x and math.floor(math.sqrt((x - gx) ^ 2 + (z - gz) ^ 2)) or "?")
+        .. ":" .. tostring(q and q[1] and q[1].id or "idle")
+    end
+    local facs = #companyUnits(function(ud) return ud and ud.isFactory end)
+    Spring.Echo("VA_AUTOPILOT gate " .. state .. " built=" .. rp("va_gate_built") .. " afus=" .. rp("va_gate_afus")
+      .. " factories=" .. facs .. " builders=" .. #builders .. " " .. table.concat(rows, " "))
+  end
   if #builders < 4 then
     -- the finale kit brings a lab and few constructors: every idle factory that can make a
     -- constructor makes one, until there are four
