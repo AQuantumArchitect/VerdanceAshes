@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- **The kings' showdown in four corners** (finale B, owner call). The company lands north-west, Armada starts north-east, Cortex south-east, and a raptor den with its hives holds the south-west. That makes three kings and the wild, with every corner occupied. The Null Mercs no longer sit a throne. The raptors fight everyone, at an easier pace than the Rock Jungle's (very easy, with a slower queen), so they harry the kings without deciding the throne. The throne is still the last commander standing. In Cortex's own suit, Cortex stays home and its corner stands empty.
+- **The showdown keeps the map's own water** for the whole match: no sink and no tide. All That Simmers is flat, and the tide drowned whole seats mid-match.
+- **Testing only:** `autopilot_campaign_v1.py --rival-ai SimpleAI` plays every rival seat as SimpleAI, to check that a field can be won at all. The real game keeps BARb.
+
 ## 0.14.6 — 2026-11-03
 
 Every ending can be reached and won. On a stock BAR install, a hard AI (BARb, hard_aggressive) beat the whole campaign and each of the three finales.

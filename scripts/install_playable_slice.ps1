@@ -395,6 +395,10 @@ $startPosType = if ($variantObject.PSObject.Properties["startPosType"] -and $var
 $gameType = if ($config.PSObject.Properties["gameType"] -and $config.gameType) { [string]$config.gameType } else { 'Verdance Ashes $VERSION' }
 # Rock Jungle home shelf: ~5 min raptor grace (mult≈0.85). Other maps keep ~15 min (2.5).
 $raptorGraceMult = if ($safeMapId -eq "the_rock_jungle") { "0.85" } else { "2.5" }
+# A field may carry its own raptor pace (the kings' showdown: a den that harries every king without
+# deciding the throne). The variant says; otherwise normal raptors and the stock queen clock.
+$raptorDifficulty = if ($variantObject.PSObject.Properties["raptorDifficulty"] -and $variantObject.raptorDifficulty) { [string]$variantObject.raptorDifficulty } else { "normal" }
+$raptorQueenTimeMult = if ($variantObject.PSObject.Properties["raptorQueenTimeMult"] -and $variantObject.raptorQueenTimeMult) { [string]$variantObject.raptorQueenTimeMult } else { "1" }
 $startScript = @"
 [GAME]
 {
@@ -417,8 +421,9 @@ $startScript = @"
     deathmode=neverend;
     experimentallegionfaction=1;
     teamffa_start_boxes_shuffle=0;
-    raptor_difficulty=normal;
+    raptor_difficulty=$raptorDifficulty;
     raptor_graceperiodmult=$raptorGraceMult;
+    raptor_queentimemult=$raptorQueenTimeMult;
     raptor_spawncountmult=1.0;
     va_campaign=1;
 $balanceModOptions

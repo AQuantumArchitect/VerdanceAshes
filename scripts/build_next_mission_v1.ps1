@@ -3112,6 +3112,10 @@ $scenario = [ordered]@{
       # The kings start on their seats (StartPosType 3 reads StartPosX/Z). With 1, BAR put each king on
       # one of the map's own start points in random order, so the seats and the HUD's labels were fiction.
       startPosType = $(if ($isKings) { 3 } else { 1 })
+      # The showdown's raptor den harries every king without deciding the throne: at normal pace its
+      # T4 broods took the company's commander at 35 minutes (Luke's PC, 2026-11-03).
+      raptorDifficulty = $(if ($isKings) { "veryeasy" } else { "normal" })
+      raptorQueenTimeMult = $(if ($isKings) { "1.5" } else { "1" })
       playerSide = "Legion"
       playerStartLabel = "Legion Green Player"
       notes = "Human-controlled alpha campaign sortie generated from next_mission_intent.json."

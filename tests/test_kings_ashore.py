@@ -29,6 +29,17 @@ class KingsSeatTests(unittest.TestCase):
         self.assertIn("StartPosType=$startPosType;", installer)
         self.assertIn('$variantObject.PSObject.Properties["startPosType"]', installer)
 
+    def test_the_showdowns_raptor_den_harries_without_deciding_the_throne(self):
+        """At normal pace the den's T4 broods took the company's commander at 35 minutes (Luke's PC,
+        2026-11-03): the showdown's raptors run at veryeasy with a slower queen; every other field
+        keeps normal and the stock clock."""
+        root = Path(__file__).resolve().parents[1]
+        builder = (root / "scripts" / "build_next_mission_v1.ps1").read_text(encoding="utf-8-sig")
+        installer = (root / "scripts" / "install_playable_slice.ps1").read_text(encoding="utf-8-sig")
+        self.assertIn('raptorDifficulty = $(if ($isKings) { "veryeasy" } else { "normal" })', builder)
+        self.assertIn('raptor_difficulty=$raptorDifficulty;', installer)
+        self.assertIn('raptor_queentimemult=$raptorQueenTimeMult;', installer)
+
 
 if __name__ == "__main__":
     unittest.main()
