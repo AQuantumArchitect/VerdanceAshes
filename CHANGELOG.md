@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.14.3 — 2026-11-02
+
+A fix release: on 0.14.2, the first mission could not be won once the Null Mercs followed the company in.
+
+- **Allies don't contest the company's ground.** In mission 1, the Null Mercs (allied in the match) walked into the Northwest Bastion behind the company. Their presence counted as "everyone else", so the hold's need climbed from 3,871 to 27,751 and the hold never started. The company's allies now count neither for it nor against it: in the objective's hold, in the live extraction points and when the campaign moves zones at home. On a stock BAR the opening now completes in about three minutes.
+- **The opening's card names the real target.** It said "the southeast plateau" and promised the Koom Valley road; the target is the Northwest Bastion next door. "To win" says what the game checks (wreck most of the zone, then hold it with more than 1,500 of your own army there and three times the enemy's), not the contract's name.
+- **A stopped hold says why**: `hold 0s / 30s · waiting for presence`.
+- **A failed Drop says why**: `mod sync failed:` and the installer's first error line.
+- **Heat ray**: no more GameFrame error every 10 frames for a Halberd with no veterancy yet.
+- **The first drop on a new BAR install** loads for several minutes while BAR scans its files once; START_HERE says so.
+- **Autopilot** holds a capture's zone when the company is short of presence there, so rehearsals can finish a capture; `docs/FIRST_MATCH.md` walks the first match minute by minute.
+
 ## 0.14.2 — 2026-11-02
 
 A fix release: 0.14.1 started on a stock BAR install but a friend's first match still did not.
