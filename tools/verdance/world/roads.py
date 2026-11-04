@@ -305,7 +305,10 @@ def legal_jobs(state: Dict[str, Any], workspace: Path) -> List[Dict[str, Any]]:
         else:
             map_id = door["mapId"]
             heroes = _wild_on_map(state, map_id)
-            pad = next((z for z, d in sorted(doors.items()) if d["mapId"] == map_id and held(state, z)), None)
+            # land at a door we hold on this map; holding none (all lost, the Rock Jungle after two
+            # defeats on the PC, 2026-11-04), land on the door itself and take it, as a crossing does.
+            # A job with no pad had no legal drop at all, and the campaign stalled on it.
+            pad = next((z for z, d in sorted(doors.items()) if d["mapId"] == map_id and held(state, z)), None) or zid
             leads_out = door["farMapId"] not in opened
             score = 1.6 * (TAKE_DOOR + (0.8 if leads_out else 0.0)) + 0.5 * _rescue(heroes) + _q0_bias(state, map_id)
             jobs.append({"kind": "take", "door": door, "mapId": map_id, "padZoneId": pad,

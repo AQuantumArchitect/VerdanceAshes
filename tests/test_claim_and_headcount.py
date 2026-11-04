@@ -202,3 +202,18 @@ def test_the_company_and_the_mercs_never_clash_between_sorties():
     assert not oc._are_rivals("ashwalkers", "nullmercs") and not oc._are_rivals("nullmercs", "ashwalkers")
     assert oc._are_rivals("nullmercs", "armada") and oc._are_rivals("ashwalkers", "armada")
 
+
+
+def test_a_door_job_always_has_a_pad():
+    """Luke's PC, 2026-11-04: after two Rock Jungle defeats the company held no door there, the hub
+    recommended taking its home door back with no pad, and the campaign stalled on an illegal drop.
+    Holding no door on the map, the job lands on the door itself (as a road crossing does)."""
+    state = engine.default_v1_state()
+    state["history"] = [{"mapId": "greenest_fields"}, {"mapId": "the_rock_jungle"}]
+    state["doors"] = {}   # nothing held anywhere
+    jobs = [j for j in roads.legal_jobs(state, ROOT) if j["kind"] == "take"]
+    assert jobs and all(j["padZoneId"] for j in jobs)
+    lost = [j for j in jobs if j["mapId"] == "the_rock_jungle"]
+    assert lost and all(j["padZoneId"] == j["targetZoneId"] for j in lost)
+    card = roads._card(lost[0], False)
+    assert card["effect"]["preferredDeployZoneId"] == lost[0]["targetZoneId"] and card["effect"]["padLocked"]
