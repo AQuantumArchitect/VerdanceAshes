@@ -67,6 +67,14 @@ files = {
     "singleplayer/verdance_ashes/generated/va_intel_current.lua": intel_lua,
     "singleplayer/verdance_ashes/generated/va_pad_current.lua": pad_lua,
 }
+# VA_SEED_DIR: a real sortie's generated seed (tools/screen_tour_v1.py) in place of the fixtures. The
+# in-match game rules (RULES below) stay the fixture's: the rail draws fixture people on a real mission.
+SEED = os.environ.get("VA_SEED_DIR")
+if SEED:
+    for name in ("va_current.lua", "zone_map_current.lua", "va_intel_current.lua", "va_pad_current.lua"):
+        f = os.path.join(SEED, name)
+        if os.path.isfile(f):
+            files["singleplayer/verdance_ashes/generated/" + name] = open(f, encoding="utf-8", errors="replace").read()
 for inc in sorted(os.listdir(INCLUDE)):   # every UI library (va_hud, va_ash_tokens, va_board, va_json, ...)
     files["luaui/Include/" + inc] = open(os.path.join(INCLUDE, inc), encoding='utf-8').read()
     files["LuaUI/Include/" + inc] = files["luaui/Include/" + inc]

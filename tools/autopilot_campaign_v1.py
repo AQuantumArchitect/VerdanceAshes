@@ -231,6 +231,34 @@ def launch(ws: Path, *, headless: bool, run_dir: Path, n: int, hud: bool = False
             "infologPath": str(infolog), "infologBaseline": 0, "mapName": map_name}
 
 
+def keep_hub(ws: Path, dest: Path) -> None:
+    """The hub as the player would open it now: its state and embeds (the page itself is the repo's)."""
+    dest.mkdir(parents=True, exist_ok=True)
+    for f in (ws / "app" / "showoff").iterdir():
+        if f.is_file() and f.suffix in (".json", ".js"):
+            shutil.copy2(f, dest / f.name)
+
+
+def tour_sortie(ws: Path, run_dir: Path, n: int, k, plan: dict, intent: dict, st: dict, hs: dict, fake_result) -> dict:
+    """--tour: keep the hub and the real seed, fake a clean extraction, bring it home, keep the debrief."""
+    out = run_dir / "tour" / f"{n:02d}"
+    keep_hub(ws, out / "hub_before")
+    bar = Path(jload(ws / "verdance_config.json").get("barDataRoot") or (ws.parent / "bar_data"))
+    gen = bar / "games" / "VerdanceAshes.sdd" / "singleplayer" / "verdance_ashes" / "generated"
+    (out / "seed").mkdir(parents=True, exist_ok=True)
+    for f in gen.glob("*.lua"):
+        shutil.copy2(f, out / "seed" / f.name)
+    (out / "intent.json").write_text(json.dumps(intent, indent=1), encoding="utf-8")
+    result = fake_result(st, intent, plan, hs, n, (jload(ws / "state" / "campaign_state.json").get("roster") or {}).get("cadre") or {})
+    (ws / "inbox").mkdir(exist_ok=True)
+    (ws / "inbox" / "latest_va_result.json").write_text(json.dumps(result), encoding="utf-8")
+    (out / "result.json").write_text(json.dumps(result, indent=1), encoding="utf-8")
+    home = k.bring_home(extract=False)
+    k.rebuild_hub(skip_apply=True, keep_result=True)
+    keep_hub(ws, out / "hub_after")
+    return {"tour": str(out), "seedFiles": len(list((out / "seed").glob("*.lua"))), "home": bool(home.get("ok"))}
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--sorties", type=int, default=20)
@@ -254,6 +282,10 @@ def main() -> int:
     ap.add_argument("--finale", choices=["A", "B", "C"],
                     help="start at the act-3 finale on this path (A Overthrow, B the kings' showdown with a suit, C the Spire Jump)")
     ap.add_argument("--resume", type=Path, help="continue an existing run directory and its isolated campaign state")
+    ap.add_argument("--tour", action="store_true",
+                    help="no BAR: each sortie builds its real seed, fakes a clean extraction (as tests/playthrough_campaign.py "
+                         "does) and brings it home; the hub before and after and the seed are kept in <run>/tour/NN for the "
+                         "screen inventory (tools/screen_tour_v1.py renders them)")
     ap.add_argument("--rival-ai", default="", metavar="SHORTNAME",
                     help="TESTING ONLY: every rival BARb seat plays as this AI (SimpleAI), to check a field can be won")
     args = ap.parse_args()
@@ -263,7 +295,7 @@ def main() -> int:
     os.environ.setdefault("VA_PERSPECTIVES_SYNC", "1")
     os.environ.setdefault("VA_PERSPECTIVES_NOSPAWN", "1")
     sys.path.insert(0, str(ROOT / "tests"))
-    from playthrough_campaign import pick_choice, plan_for  # noqa: E402
+    from playthrough_campaign import pick_choice, plan_for, fake_result  # noqa: E402
 
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     run_dir = args.resume.resolve() if args.resume else ROOT / "autopilot_runs" / stamp
@@ -378,6 +410,22 @@ def main() -> int:
             rows.append(row)
             print(json.dumps(row))
             break
+        if args.tour:
+            row.update(tour_sortie(ws, run_dir, n, k, plan, intent, st, hs, fake_result))
+            st2 = jload(sp)
+            row.update(after=st2.get("missionNumber"), complete=bool(st2.get("campaignComplete")))
+            rows.append(row)
+            print(json.dumps(row), flush=True)
+            with log_path.open("a", encoding="utf-8") as fh:
+                fh.write(json.dumps(row) + "\n")
+            if st2.get("campaignComplete"):
+                k.rebuild_hub(skip_apply=True)
+                keep_hub(ws, run_dir / "tour" / f"{n + 1:02d}" / "hub_before")
+                break
+            if int(st2.get("missionNumber") or 0) <= int(st.get("missionNumber") or 0):
+                row["stall"] = "mission did not advance"
+                break
+            continue
         script = S.startscript_from_manifest(ws)
         text, team = patch_startscript(script.read_text(encoding="utf-8", errors="replace"), profile=args.profile,
                                        speed=args.speed, minutes=args.minutes, settle=args.settle, hud=args.hud or args.windowed,

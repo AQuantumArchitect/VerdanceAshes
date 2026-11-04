@@ -110,6 +110,25 @@ if __name__ == "__main__":
     pre = H.prelude.replace("FX_JSON_LUA", json.dumps(os.path.join(H.INCLUDE, 'va_json.lua'))).replace("FX_JSON", rd('files.json')).replace("HEROES_JSON", rd('heroes.json')).replace("STATES_JSON", rd('states.json'))
     H.run(st, pre, "prelude")
     H.run(st, RECORDER, "recorder")
+    if H.SEED:
+        # a real seed: the pad and the secondary marks come from it, not from the fixture's rules
+        H.run(st, r'''
+local okp, pad = pcall(VFS.Include, "singleplayer/verdance_ashes/generated/va_pad_current.lua")
+if okp and type(pad) == "table" and pad.x then
+  RULES.va_pad_x, RULES.va_pad_z = pad.x * Game.mapSizeX, pad.z * Game.mapSizeZ
+  RULES.va_pad_r, RULES.va_pad_zone = pad.radius or 560, pad.zoneId
+end
+local okm, m = pcall(VFS.Include, "singleplayer/verdance_ashes/generated/va_current.lua")
+local sec = okm and type(m) == "table" and m.secondaries or {}
+for i = 1, 2 do
+  for _, k in ipairs({ "label", "req", "x", "z", "kind" }) do RULES["va_sec" .. i .. "_" .. k] = nil end
+end
+RULES.va_secondary_total = #sec
+for i, s in ipairs(sec) do
+  RULES["va_sec" .. i .. "_label"] = s.label or s.id
+  RULES["va_sec" .. i .. "_req"] = s.required and 1 or 0
+end
+''', "seed_rules")
     for w in ('gui_verdance_voice', 'gui_verdance_minimap', 'gui_verdance_sidebar', 'gui_verdance_infil', 'gui_verdance_exfil'):
         p = os.path.join(H.WIDGETS, w + '.lua')
         H.run(st, f"W_{w} = LOADW({json.dumps(p)}, {json.dumps(w)}); if W_{w}.Initialize then W_{w}:Initialize() end", w)

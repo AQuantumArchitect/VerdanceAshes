@@ -8,6 +8,7 @@
 - **The den holds its own corner.** In the showdown the raptor den grows every turret except the meteor turret, which shoots the whole map. In one test match a meteor turret in the south-west killed the company's king in the north-west at minute 68.
 - **No field recruits in the showdown.** A hostile recruit loose on the board decided the throne: in one test match a Tsunami seaplane killed the Cortex king at minute 7.
 - **Autopilot (testing rig):** a king's siege gathers 2,200 elmos short of the king and strikes together, or after three minutes with whatever has gathered.
+- **Screen tour (tooling):** `autopilot_campaign_v1.py --tour` walks the campaign without BAR. Each sortie builds its real seed, fakes a clean extraction and keeps the hub before and after. `tools/screen_tour_v1.py` renders every hub tab and the briefing, field and extraction screens from that seed, with a word count for each, so the UI pass can cut from a measured inventory.
 - **Testing only:** `autopilot_campaign_v1.py --rival-ai SimpleAI` plays every rival seat as SimpleAI, to check that a field can be won at all. The real game keeps BARb.
 
 ## 0.14.6 — 2026-11-03
