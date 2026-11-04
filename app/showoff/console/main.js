@@ -7,7 +7,7 @@ import { $, toast, logLine } from "./render.js";
 import { installOverlays } from "./board.js";
 import { refreshTheaterForFocus, showDropConfirm, hideDropConfirm, onDropConfirmGo, resetRoute, setMarkMode, onChoice, showDropTab } from "./operations.js";
 import { renderCompany, renderShop, sealCompany, toggleCrew, tryBuy, recommendCompany, showCompanyIntro, companyMemberIds, fieldPeople } from "./company.js";
-import { raiseCamp, openFoundingSortie, confirmHearthTalk, cancelHearthTalk, refreshCamp, renderCampCard } from "./home.js";
+import { confirmHearthTalk, cancelHearthTalk, refreshCamp, renderCampCard } from "./home.js";
 import { showHomecoming, hideHomecoming, pullHubState, pullBarResult, abandonSortie, startResultPoll } from "./homecoming.js";
 import { installSystemDrawer, renderRegions, showCoach, hideCoach } from "./system.js";
 import { installLive } from "./live.js";
@@ -40,8 +40,6 @@ function bindControls() {
   // Hero cards (intro grid, drop squad) toggle through one delegated handler.
   document.addEventListener("click", ev => { const b = ev.target.closest("[data-crew]"); if (b && !b.disabled) toggleCrew(b.dataset.crew); });
   $("shop-list").addEventListener("click", ev => { const b = ev.target.closest("[data-buy]"); if (b && !b.disabled) tryBuy(b.dataset.buy); });
-  $("btn-camp-raise").onclick = raiseCamp;
-  $("btn-camp-founding").onclick = () => { showWorkspace("operations"); openFoundingSortie(); };
   $("btn-hearth-confirm").onclick = confirmHearthTalk;
   $("btn-hearth-cancel").onclick = cancelHearthTalk;
   $("btn-seal-company-intro").onclick = sealCompany;

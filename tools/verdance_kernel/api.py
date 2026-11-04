@@ -20,7 +20,6 @@ from verdance.common import load_json, save_json, utc_now
 from verdance.belief import camp_clock as camp, hub_belief, perspectives as P, world as W
 from verdance.belief.match_credit import credit_from_result, presentable_debrief
 from verdance.campaign import (
-    apply_home_build,
     build_war_map,
     ensure_commerce,
     migrate_state,
@@ -1698,36 +1697,6 @@ class CampaignKernel:
                 return {"ok": False, "error": f"{type(e).__name__}: {e}"}
             finally:
                 self._busy = False
-
-    @_campaign_lock
-    def home_build(self) -> dict[str, Any]:
-        """Raise the Rock Jungle camp (Tnb + 1km$ metal). Hub-only scale lever."""
-        if not state_path(self.ws).is_file():
-            return {"ok": False, "error": "missing campaign_state.json"}
-        try:
-
-            raw = load_json(state_path(self.ws))
-            state = migrate_state(raw)
-            receipt = apply_home_build(state, self.ws)
-            if not receipt.get("ok"):
-                return receipt
-            save_json(state_path(self.ws), state)
-            hub_info = apply_result_to_hub(self.ws, skip_advance=True)
-            hub_payload = self.get_hub_surface()
-            hub = hub_payload.get("hub") if hub_payload.get("ok") else {}
-            surface_mod.write_surface(self.ws, hub)
-            return {
-                "ok": True,
-                "at": utc_now(),
-                "receipt": receipt,
-                "homeCamp": hub.get("homeCamp") or receipt.get("homeCamp"),
-                "flags": hub.get("flags") or receipt.get("flags"),
-                "tenebrium": hub.get("tenebrium"),
-                "commerce": hub.get("commerce"),
-                "hubResultPath": hub_info.get("hubResultPath") if isinstance(hub_info, dict) else None,
-            }
-        except Exception as e:  # noqa: BLE001
-            return {"ok": False, "error": f"{type(e).__name__}: {e}"}
 
     def write_campaign_surface(self) -> dict[str, Any]:
         hub = self.get_hub_surface()

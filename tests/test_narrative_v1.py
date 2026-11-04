@@ -22,7 +22,7 @@ def fresh():
     return {"campaignId": "fixture", "missionNumber": 1, "graph": {}, "history": [],
             "company": {"sealed": True, "core": ["ketha"], "band": ["vane", "hearth", "brakhov"]},
             "characters": {i: {"player": True, "status": "active", "wounds": 0} for i in ("ketha", "vane", "hearth", "brakhov")},
-            "homeCamp": {"level": 0}, "commerce": {"tenebrium": 3}, "reputation": {"nullmercs": 48, "cortex": 70}}
+            "homeCamp": {}, "commerce": {"tenebrium": 3}, "reputation": {"nullmercs": 48, "cortex": 70}}
 
 
 def result(state, key="r1", verdict="victory", workspace=None, **extra):
@@ -206,7 +206,7 @@ class NarrativeTests(unittest.TestCase):
 
     def test_home_commitment_resolves_after_build_and_return(self):
         state=fresh();narrative.choose(state,'place:home',narrative.revision(state),'home-promise')
-        state['homeCamp']['level']=1
+        state['playerFootprints']={'the_rock_jungle':{'units':[{'unitDefName':'legsolar'}]}}   # something stands at home
         self.assertEqual(next(t for t in narrative.project(state)['threads'] if t['id']=='place')['stage'],'Committed')
         result(state)
         self.assertEqual(state['narrative']['threads']['place']['stage'],'Resolved')

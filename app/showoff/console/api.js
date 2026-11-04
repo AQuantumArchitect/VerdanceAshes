@@ -47,7 +47,6 @@ export const api = {
   drop: (body) => post("/api/drop", body),
   cancelPreload: () => post("/api/cancel-preload"),
   purchase: (listingId) => post("/api/purchase", { listingId }),
-  homeBuild: () => call("/api/home-build", { method: "POST" }),
   advanceExtract: () => call("/api/advance?extract=1", { method: "POST" }),
   abandon: () => post("/api/abandon", { reason: "player_abandon" }),
   resetCampaign: () => post("/api/reset-campaign", { confirm: "YES" }),

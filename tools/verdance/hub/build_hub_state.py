@@ -17,6 +17,7 @@ from verdance.common import ARCHETYPE_VERB, WORKSPACE_ROOT, load_json
 from verdance.belief import hub_belief
 from verdance.readings.narrative import project as narrative_project
 from verdance.campaign import (
+    camp_footprint,
     evaluate_home_clear,
     commander_is_unlocked,
     ensure_roster,
@@ -553,9 +554,10 @@ def build_open_node(state: dict, regions: list[dict], aces: list[dict], rep: dic
     home = state.get("sessionHomeMap") or HOME_MAP_ID
     flags = state.get("flags") or {}
     camp = state.get("homeCamp") or {}
-    camp_level = int(camp.get("level") or 0)
+    # The camp is what the company has built in the Rock Jungle; Tenebrium to spend sends it home.
+    camp_built = camp_footprint(state) > 0
     tnb = int((state.get("commerce") or {}).get("tenebrium") or 0)
-    home_ready = bool(flags.get("homeClearReady")) or tnb >= 3 or camp_level >= 1
+    home_ready = bool(flags.get("homeClearReady")) or tnb >= 3
     home_cleared = bool(flags.get("homeCleared"))
     fresh_opening = mission_n == 1 and not state.get("history") and not state.get("lastResult")
 
@@ -650,18 +652,18 @@ def build_open_node(state: dict, regions: list[dict], aces: list[dict], rep: dic
                 "id": "c_home_probe" if fresh_opening or not home_ready else "c_home_clear",
                 "label": (
                     "Found the Rock Jungle camp"
-                    if fresh_opening or camp_level <= 0
+                    if fresh_opening or not camp_built
                     else ("Clear the Rock Jungle" if home_ready else "Hold the jungle shelf")
                 ),
                 "blurb": (
                     "Start the new Ashwalker base: plant eco, dig in against raptor pests, "
                     "and maybe mint a small exfil force. Spend leftover Tnb on constructors "
                     "at the broker if you did not seat expensive heroes."
-                    if fresh_opening or camp_level <= 0
+                    if fresh_opening or not camp_built
                     else (
-                        "The lagoon maze still breeds. You need Tenebrium scale — or a camp — to finish this."
+                        "The lagoon maze still breeds. Bring Tenebrium home to build, then finish it."
                         if not home_ready
-                        else "Enough metal in the blood. Take the wilds. This is the Ashwalker win."
+                        else f"{tnb} Tenebrium to spend. Go home, build, and take the wilds. This is the Ashwalker win."
                     )
                 ),
                 "kind": "deploy",
@@ -671,12 +673,12 @@ def build_open_node(state: dict, regions: list[dict], aces: list[dict], rep: dic
                     # Full hive clear only when the camp exists and the player is ready.
                     "contractKind": (
                         "hive_clear_or_bypass"
-                        if (camp_level >= 1 and home_ready and not home_cleared and not fresh_opening)
+                        if (camp_built and home_ready and not home_cleared and not fresh_opening)
                         else "fortify_zone"
                     ),
                     "preferredCaptureZoneId": (
                         "TRJ_C_SPILLWAY"
-                        if (camp_level >= 1 and home_ready and not home_cleared and not fresh_opening)
+                        if (camp_built and home_ready and not home_cleared and not fresh_opening)
                         else "TRJ_NW_GATE"
                     ),
                     "preferredDeployZoneId": "TRJ_NW_OUTER_MUSTER",
@@ -686,7 +688,7 @@ def build_open_node(state: dict, regions: list[dict], aces: list[dict], rep: dic
                     "sessionMode": "same_map",
                     "against": "wild",
                     "homeClearAttempt": bool(
-                        camp_level >= 1 and home_ready and not home_cleared and not fresh_opening
+                        camp_built and home_ready and not home_cleared and not fresh_opening
                     ),
                     "journey": "home_founding",
                 },
@@ -696,7 +698,7 @@ def build_open_node(state: dict, regions: list[dict], aces: list[dict], rep: dic
         # Retitle the existing home deploy so founding fiction sticks.
         for c in choices:
             if c.get("kind") == "deploy" and str((c.get("effect") or {}).get("mapId") or "") == HOME_MAP_ID:
-                if fresh_opening or camp_level <= 0:
+                if fresh_opening or not camp_built:
                     c["label"] = "Found the Rock Jungle camp"
                     c["blurb"] = (
                         "Start the new Ashwalker base: plant eco, dig in against raptor pests, "
@@ -706,7 +708,7 @@ def build_open_node(state: dict, regions: list[dict], aces: list[dict], rep: dic
                 effect = dict(c.get("effect") or {})
                 effect["journey"] = "home_founding"
                 # Upgrade stale hive-march home probes into fortify dig-ins.
-                if camp_level <= 0 or fresh_opening:
+                if not camp_built or fresh_opening:
                     effect["contractKind"] = "fortify_zone"
                     effect.setdefault("preferredCaptureZoneId", "TRJ_NW_GATE")
                     effect.setdefault("preferredDeployZoneId", "TRJ_NW_OUTER_MUSTER")
@@ -786,16 +788,22 @@ def build_open_node(state: dict, regions: list[dict], aces: list[dict], rep: dic
         )
     elif focus == true_home or focus == HOME_MAP_ID:
         ketha_line = (
-            f"Still under the spires. Camp L{camp_level}. Tnb {tnb}. "
-            f"{'Scale enough — take the maze.' if home_ready else 'Raid. Print. Build the camp. Then we clear.'}"
+            f"Still under the spires. {tnb} Tenebrium. "
+            f"{'Enough to build on. Take the maze.' if home_ready else 'Raid. Bring it home. Build. Then we clear.'}"
         )
-    elif camp_level <= 0 and tnb < 6:
-        # Hot raid fantasy: grab Tnb, extract, haul loot home, raise the shelf.
+    elif home_ready:
+        # Tenebrium to spend: the camp is built in the Rock Jungle, so that is where it goes.
+        ketha_line = (
+            f"{tnb} Tenebrium in the bag.{dead_hint} "
+            f"That is a camp's worth. Take it home to {true_home_name} and build."
+        )
+    elif not camp_built and tnb < 6:
+        # Hot raid fantasy: grab Tnb, extract, haul loot home, build there.
         ketha_line = (
             f"Mission {mission_n} on {focus_name} is hot — do not settle here."
             f"{dead_hint} "
             f"Crack decoy farms for Tenebrium, hit extract, haul the loot to "
-            f"{true_home_name}. Camp is still L{camp_level}; we build with what we bring back."
+            f"{true_home_name}. We build with what we bring back."
         )
     else:
         ketha_line = (
@@ -1188,23 +1196,17 @@ def build_hub(state: dict, war: dict) -> dict:
 
     focus_map = (node.get("regionHint") if isinstance(node, dict) else None) or session_home
     theater = build_theater(state, focus_map, capture_contracts)
-    home_camp = dict(state.get("homeCamp") or {"level": 0, "mapId": HOME_MAP_ID, "label": "Jungle shelf camp"})
+    home_camp = dict(state.get("homeCamp") or {"mapId": HOME_MAP_ID, "label": "Jungle shelf camp"})
+    home_camp.pop("level", None)
     flags = dict(state.get("flags") or {})
     if home_eval:
         flags["homeClearReady"] = home_eval.get("homeClearReady")
         flags["homeCleared"] = home_eval.get("homeCleared")
-    # Camp overlay surface (left bar) — raise is hub spend, not a main journey.
-    camp_level = int(home_camp.get("level") or 0)
+    # The camp: what stands in the Rock Jungle. Nothing to buy here; Tenebrium is spent by building there.
     home_cleared = bool(flags.get("homeCleared") or (home_eval or {}).get("homeCleared"))
-    tnb_bag = int(commerce.get("tenebrium") or 0)
-    metal_k_bag = int(commerce.get("metalK") or 0)
-    can_raise = (not home_cleared) and tnb_bag >= 1 and metal_k_bag >= 1
-    home_camp["canRaise"] = can_raise
-    home_camp["raiseTnbCost"] = 1
-    home_camp["raiseMetalCostK"] = 1
+    home_camp["built"] = camp_footprint(state)
     home_camp["cleared"] = home_cleared
     home_camp["clearReady"] = bool(flags.get("homeClearReady") or (home_eval or {}).get("homeClearReady"))
-    home_camp["level"] = camp_level
     try:
 
         walker_on = commander_is_unlocked(state)

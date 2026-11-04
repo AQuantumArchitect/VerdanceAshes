@@ -239,10 +239,10 @@
       "resists": "vane",
       "evidence": [
         {
-          "probe": "home_level",
-          "scale": 2,
+          "probe": "home_built",
+          "scale": 12,
           "weight": 1.0,
-          "witness": "home camp at level {value}"
+          "witness": "{value} structures standing in the Rock Jungle"
         },
         {
           "probe": "flag",

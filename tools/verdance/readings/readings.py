@@ -312,10 +312,13 @@ def probe(spec: Dict[str, Any], ctx: Context) -> Tuple[float, Dict[str, Any]]:
         n = sum(len(ch.get("scars") or []) for ch in ctx.named().values())
         f["count"] = n
         return clamp(n / float(spec.get("scale", 4))), f
-    if kind == "home_level":
-        lvl = int(_path(st, "homeCamp.level", 0) or 0)
-        f["value"] = lvl
-        return clamp(lvl / float(spec.get("scale", 2))), f
+    if kind == "home_built":
+        # the camp: what the company has built and left standing in the Rock Jungle
+        fp = _path(st, "playerFootprints.the_rock_jungle", {}) or {}
+        units = fp.get("units") if isinstance(fp, dict) else fp
+        n = len(units) if isinstance(units, list) else 0
+        f["value"] = n
+        return clamp(n / float(spec.get("scale", 12))), f
     if kind == "walker_locked":
         return (0.0 if _path(st, "roster.commander.unlocked") else 1.0), f
     if kind == "front_flips":

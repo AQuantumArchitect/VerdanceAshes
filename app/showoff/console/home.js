@@ -1,112 +1,19 @@
-// Home: the camp card (raise the shelf), the camp clock panel (the DERIVE faces the kernel
+// Home: the camp clock panel (the DERIVE faces the kernel
 // serves: /api/camp, /api/intel, /api/exposure, /api/chronicle) and the hearth talks.
 //
 // Law: the hub shows INTEL, never truth. Zone rows come from the company's own belief frame
 // (value/confidence/age/source). "dark" means nobody has looked. /api/exposure is our side of
 // the mirror only; /api/divergence and /api/truth are dev faces the kernel refuses to the player.
-import { state, camp as S, commerce, metalKOf, prettyMap } from "./state.js";
+import { state, camp as S } from "./state.js";
 import { api } from "./api.js";
 import { $, esc, toast, logLine, aceById, crewPack } from "./render.js";
-import { renderBoard, renderMapPicker, focusMapAndRepaint } from "./board.js";
-import { onChoice, refreshTheaterForFocus } from "./operations.js";
 import { renderCompany } from "./company.js";
-import { renderBadges, renderHeadline } from "./shell.js";
 import { pullHubState } from "./homecoming.js";
 import { renderFoldedChronicle } from "./chronicle.js";
 
-/* ---- camp card ----------------------------------------------------------------- */
+/* ---- camp card: the hearth talks (the camp itself is what stands in the Rock Jungle; no level) ---- */
 export function renderCampCard() {
-  const camp = state.hub.homeCamp || {};
-  const c = commerce();
-  const level = Number(camp.level || 0);
-  const cleared = !!(camp.cleared || (state.hub.flags && state.hub.flags.homeCleared));
-  const ready = !!(camp.clearReady || (state.hub.flags && state.hub.flags.homeClearReady));
-  const tCost = Number(camp.raiseTnbCost != null ? camp.raiseTnbCost : 1);
-  const mCost = Number(camp.raiseMetalCostK != null ? camp.raiseMetalCostK : 1);
-  const canRaise = camp.canRaise != null ? !!camp.canRaise : (!cleared && Number(c.tenebrium || 0) >= tCost && metalKOf(c) >= mCost);
-  if ($("camp-sheet-stats")) {
-    $("camp-sheet-stats").innerHTML =
-      `<span class="chip">L${level}</span>` +
-      `<span class="chip">${esc(prettyMap(camp.mapId || state.hub.sessionHomeMap || "the_rock_jungle"))}</span>` +
-      `<span class="chip">${Number(c.tenebrium || 0)} Tnb</span>` +
-      `<span class="chip">${(metalKOf(c) * 1000).toLocaleString()} metal</span>` +
-      (cleared ? `<span class="chip">cleared</span>` : "") +
-      (ready && !cleared ? `<span class="chip">clear-ready</span>` : "") +
-      (camp.commanderLine != null ? `<span class="chip">${camp.commanderUnlocked ? "command walker" : "walker scrap"}</span>` : "");
-  }
-  const raiseBtn = $("btn-camp-raise");
-  if (raiseBtn) {
-    raiseBtn.hidden = !!cleared;
-    raiseBtn.disabled = !canRaise;
-    raiseBtn.textContent = canRaise
-      ? `Raise camp (L${level} → L${level + 1}) · ${tCost} Tnb + ${(mCost * 1000).toLocaleString()} metal`
-      : `Need ${tCost} Tnb + ${(mCost * 1000).toLocaleString()} metal to raise`;
-  }
   renderHearthList();
-}
-
-export async function doHomeBuild() {
-  if (state.hostLive) {
-    try {
-      toast("Raising the jungle camp…");
-      const { ok, data } = await api.homeBuild();
-      if (!ok || data.ok === false) return toast((data && data.error) || "Camp build failed", "err");
-      if (data.homeCamp) state.hub.homeCamp = data.homeCamp;
-      if (data.flags) state.hub.flags = Object.assign(state.hub.flags || {}, data.flags);
-      if (data.tenebrium != null) {
-        state.hub.tenebrium = data.tenebrium;
-        if (state.hub.commerce) state.hub.commerce.tenebrium = data.tenebrium;
-      }
-      if (data.commerce) state.hub.commerce = data.commerce;
-      logLine(`Jungle camp raised to L${(data.homeCamp && data.homeCamp.level) || "?"}.`);
-      toast("Camp raised — scale at home", "ok");
-      await pullHubState();
-      refreshTheaterForFocus();
-      return;
-    } catch (e) {
-      return toast(String(e.message || e), "err");
-    }
-  }
-  // Map-only demo bag
-  const c = commerce();
-  const tnb = Number(c.tenebrium || 0);
-  const mk = metalKOf(c);
-  if (tnb < 1) return toast("Need 1 Tenebrium — raid to print", "err");
-  if (mk < 1) return toast("Need 1,000 campaign metal", "err");
-  c.tenebrium = tnb - 1;
-  c.metalK = mk - 1;
-  delete c.scrapCredits;
-  delete c.credits;
-  state.hub.homeCamp = state.hub.homeCamp || { level: 0, mapId: "the_rock_jungle" };
-  state.hub.homeCamp.level = (state.hub.homeCamp.level || 0) + 1;
-  state.hub.flags = state.hub.flags || {};
-  if (state.hub.homeCamp.level >= 1 || c.tenebrium >= 3) state.hub.flags.homeClearReady = true;
-  state.hub.tenebrium = c.tenebrium;
-  logLine(`Demo camp → L${state.hub.homeCamp.level}`);
-  toast("Camp raised (demo bag)", "ok");
-  renderBadges();
-  renderHeadline();
-  renderMapPicker();
-  renderBoard();
-}
-export async function raiseCamp() {
-  await doHomeBuild();
-  renderCampCard();
-}
-export function openFoundingSortie() {
-  const founding = ((state.hub.node || {}).choices || []).find(ch =>
-    ch && ch.kind === "deploy" && (
-      (ch.effect && ch.effect.journey === "home_founding") ||
-      String((ch.effect && ch.effect.mapId) || "") === "the_rock_jungle" ||
-      /rock jungle|found/i.test(String(ch.label || ""))
-    ));
-  if (founding) {
-    state.focusMap = "the_rock_jungle";
-    onChoice(founding.id);
-    return;
-  }
-  focusMapAndRepaint("the_rock_jungle", "Founding sortie");
-  toast("Mark the Rock Jungle founding route, then Drop", "ok");
 }
 
 /* ---- hearth · support talks ------------------------------------------------------- */

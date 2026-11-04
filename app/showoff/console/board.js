@@ -391,10 +391,9 @@ export function renderBoard() {
   const sub = $("theater-sub");
   if (title) title.textContent = prettyMap(plan.mapId);
   if (sub) {
-    const camp = (state.hub.homeCamp && state.hub.homeCamp.level) || 0;
     const flags = state.hub.flags || {};
     const homeNote = plan.mapId === "the_rock_jungle"
-      ? (flags.homeCleared ? " · home cleared" : ` · camp L${camp}${flags.homeClearReady ? " · clear ready" : " · need Tnb to scale"}`)
+      ? (flags.homeCleared ? " · home cleared" : flags.homeClearReady ? " · Tenebrium to build with" : "")
       : "";
     const piece = (state.hub.theaters || {})[plan.mapId];
     sub.textContent = `${jobLabel(plan.contractKind)} · ${(plan.deployAces || []).join(", ") || "your aces"}${homeNote}` + (piece ? ` · ${piece.label}` : "");

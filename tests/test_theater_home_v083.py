@@ -77,28 +77,20 @@ class TestPadStamp(unittest.TestCase):
 
 
 class TestHomeCamp(unittest.TestCase):
-    def test_home_build_costs_tnb(self):
+    def test_home_clear_ready_from_tenebrium_to_spend(self):
+        """Owner call, 2026-11-03: no camp level. Tenebrium to spend sends the company home."""
         st = engine.default_v1_state()
         st["commerce"]["tenebrium"] = 2
-        st["commerce"]["metalK"] = 4
-        r = engine.apply_home_build(st, None)
-        self.assertTrue(r.get("ok"), r)
-        self.assertEqual(st["homeCamp"]["level"], 1)
-        self.assertEqual(st["commerce"]["tenebrium"], 1)
-        self.assertEqual(st["commerce"]["metalK"], 3)
+        self.assertFalse(engine.evaluate_home_clear(st).get("homeClearReady"))
+        st["commerce"]["tenebrium"] = 3
+        self.assertTrue(engine.evaluate_home_clear(st).get("homeClearReady"))
+        self.assertNotIn("level", st["homeCamp"])
 
-    def test_home_build_blocks_without_tnb(self):
+    def test_the_camp_is_what_stands_in_the_rock_jungle(self):
         st = engine.default_v1_state()
-        st["commerce"]["tenebrium"] = 0
-        st["commerce"]["metalK"] = 10
-        r = engine.apply_home_build(st, None)
-        self.assertFalse(r.get("ok"))
-
-    def test_home_clear_ready_from_camp(self):
-        st = engine.default_v1_state()
-        st["homeCamp"]["level"] = 1
-        ev = engine.evaluate_home_clear(st)
-        self.assertTrue(ev.get("homeClearReady"))
+        self.assertEqual(engine.camp_footprint(st), 0)
+        st["playerFootprints"] = {"the_rock_jungle": {"units": [{"unitDefName": "legsolar"}, {"unitDefName": "legmex"}]}}
+        self.assertEqual(engine.camp_footprint(st), 2)
 
 
 class TestHubHome(unittest.TestCase):

@@ -58,7 +58,7 @@ function renderInspector() {
   if (session.selectedZone) $("cc-map-details").innerHTML = "<summary>Selected map location</summary>" + zoneInspector(session.selectedZone, snap.focusMap, n);
   const inspector = $("cc-inspector");
   if (t && session.workspace === "operations") inspector.innerHTML = thread(t, snap.live);
-  else if (session.workspace === "home") inspector.innerHTML = field("A practical home", "Camp level and home clearance reflect the existing simulation. Improvements cost 1 Tenebrium and 1,000 campaign metal.") + field("Resources", "Tenebrium supports construction capacity. Check each broker listing for its price and delivery conditions.");
+  else if (session.workspace === "home") inspector.innerHTML = "";
   else if (session.workspace === "company" && session.selectedHero) {
     const ace = (snap.hub.aces || []).find(a => a.id === session.selectedHero);
     const pack = CREW.heroes?.[session.selectedHero] || {};
@@ -124,10 +124,6 @@ export function paint() {
     (session.error ? `<p role="status" class="cc-error">${escape(session.error)}</p>` : "");
   renderChronicle(n);
   renderCampCard();
-  const camp = snap.hub.homeCamp || {};
-  $("cc-home-status").innerHTML = field("Established", camp.cleared ? "Home ground secured" : `Camp level ${camp.level || 0}`) +
-    field("Next milestone", camp.cleared ? "Hold what the company has built." : camp.clearReady ? "The home-clear operation is ready. Review its route and requirements." : "Raise the camp to prepare for clearing the surrounding wilds.") +
-    field("Next improvement", camp.cleared ? "Home clear achieved." : `1 Tenebrium + 1,000 campaign metal. ${camp.canRaise ? "Available now." : "Gather the required resources before raising camp."}`);
   const condition = st => ({ active: "Ready", wounded: "Wounded: sits out until healed", dead: "Fallen", lost: "Lost" })[String(st || "active").toLowerCase()] || pretty(st);
   $("cc-company-members").innerHTML = "<div class=\"cc-members\">" + (snap.hub.aces || []).filter(a => companyMemberIds().includes(a.id)).map(a => {
     const p = CREW.heroes?.[a.id] || {};

@@ -29,7 +29,7 @@ FIELD_RE = re.compile(r"{([a-zA-Z_][a-zA-Z0-9_]*)}")
 PROBES = {"const", "rep", "rep_inverse", "graph", "tag_rate", "verdict_rate", "commitment", "holdings_ratio",
           "holdings_count", "holdings_share_inverse", "claimed_nodes", "thread_resolved", "thread_stage",
           "thread_trust", "thread_distrust", "flag", "number", "ledger_ops", "tenebrium_low", "wounded_named",
-          "dead_named", "scars_total", "home_level", "walker_locked", "front_flips", "clashes_near_held",
+          "dead_named", "scars_total", "home_built", "walker_locked", "front_flips", "clashes_near_held",
           "unobserved_held_maps", "belief_holdings_count", "belief_holdings_ratio", "belief_dark_share",
           "belief_threat_near_held", "intel_count", "question"}
 PROBE_FIELDS = {"pct", "value", "count", "window", "a", "b", "names", "n", "m", "threshold", "source", "status"}

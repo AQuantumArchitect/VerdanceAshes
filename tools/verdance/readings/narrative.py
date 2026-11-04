@@ -20,6 +20,13 @@ VERDICTS = {"victory": "Success", "partial": "Partial success", "defeat": "Defea
             "abandon": "Withdrawn", "incomplete": "Result pending"}
 
 
+
+def _camp_built(state):
+    """The camp is what the company has built and left standing in the Rock Jungle."""
+    fp = (state.get("playerFootprints") or {}).get("the_rock_jungle") or {}
+    units = fp.get("units") if isinstance(fp, dict) else fp
+    return bool(units)
+
 def enabled(state):
     return os.environ.get("VERDANCE_NARRATIVE", "1") != "0" and (state.get("features") or {}).get("narrative", True)
 
@@ -86,7 +93,6 @@ def holds_ground(state, workspace=None):
 
 
 def eligible(fid, state, workspace=None):
-    home = state.get("homeCamp") or {}
     history = state.get("history") or []
     if fid == "place":
         return not (state.get("flags") or {}).get("homeCleared", False)
@@ -116,7 +122,7 @@ def reconcile(state, data, workspace=None):
         if fid != "place" and t["stage"] == "Resolved" and n["turn"] >= t.get("resolvedTurn", n["turn"]) + 3 and eligible(fid, state, workspace):
             t.update(stage="Available", cycle=t.get("cycle", 1) + 1, explanation=spec["callback"] + " A new opportunity has emerged.")
             t.pop("deadline", None)
-        if fid == "place" and ((state.get("homeCamp") or {}).get("level", 0) > 0 or (state.get("flags") or {}).get("homeCleared")):
+        if fid == "place" and (_camp_built(state) or (state.get("flags") or {}).get("homeCleared")):
             if t["stage"] not in ("Resolved", "Committed"):
                 t.update(stage="Resolved", explanation="Your camp is established. The next task is securing the surrounding wilds.")
         elif fid == "shelter" and not eligible(fid, state, workspace) and t["stage"] in ("Available", "Committed"):
@@ -301,7 +307,7 @@ def project(state, choices=(), workspace=None):
             "operations": operations,
             "chronicle": list(reversed(n["events"])), "intelligence": intelligence, "scenes": scenes,
             "leadership": copy.deepcopy(n["leadership"]), "reactions": reactions,
-            "home": {"level": (state.get("homeCamp") or {}).get("level", 0), "cleared": bool((state.get("flags") or {}).get("homeCleared"))}}
+            "home": {"built": _camp_built(state), "cleared": bool((state.get("flags") or {}).get("homeCleared"))}}
 
 
 def choose(state, choice_id, expected_revision, request_id, workspace=None):
@@ -354,7 +360,7 @@ def goal_met(goal, state, result, credit):
     victory = credit.get("verdict") == "victory"
     mid = result.get("mapId")
     return {
-        "home": (state.get("homeCamp") or {}).get("level", 0) > 0,
+        "home": _camp_built(state),
         "raid": mid == "greenest_fields" and clean,
         "claim": bool(flags.get("nodeClaimed")),
         "extract": clean,

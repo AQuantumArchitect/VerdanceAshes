@@ -236,12 +236,6 @@ def make_handler(kernel: CampaignKernel, showoff: Path):
                 code, body, ct = _json_bytes(result, code)
                 return self._send(code, body, ct)
 
-            if path == "/api/home-build":
-                result = kernel.home_build()
-                code = 200 if result.get("ok") else 400
-                code, body, ct = _json_bytes(result, code)
-                return self._send(code, body, ct)
-
             if path == "/api/camp-talk":
                 try:
                     body_in = _read_json_body(self)
