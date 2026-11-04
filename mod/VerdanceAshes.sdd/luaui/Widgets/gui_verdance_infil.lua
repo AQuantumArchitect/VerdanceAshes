@@ -318,7 +318,7 @@ local function drawJob(x1, y1, x2, y2)
     text("MARKS", x, y, 9, Ash.COL.ash, "l"); y = y - 14
     for _, mk in ipairs(marks) do
       local g = mk.req and Ash.GLYPH.markReq or Ash.GLYPH.markOpt
-      local col = (mk.kind == "hero_recover") and Ash.COL.bad or Ash.COL.gold
+      local col = (mk.kind == "scout") and Ash.COL.pad or (mk.kind == "hero_recover") and Ash.COL.bad or Ash.COL.gold
       text(g .. "  " .. Ash.fit(mk.label, 11, right - x - 70), x, y, 11, col, "l")
       text(mk.req and "required" or "optional", right, y, 9, Ash.COL.muted, "r")
       y = y - 15

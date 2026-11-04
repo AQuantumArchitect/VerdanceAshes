@@ -39,7 +39,6 @@ export const api = {
   exposure: () => getJson("/api/exposure"),
   // POST acts
   narrativeChoice: (body) => post("/api/narrative-choice", body),
-  campAct: (body) => post("/api/camp-act", body),
   campTalk: (body) => post("/api/camp-talk", body),
   sealCompany: (band) => post("/api/seal-company", { band }),
   // Hot drop: load the field on sortie pick, then drop the chosen packs into the running game.

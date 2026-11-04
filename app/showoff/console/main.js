@@ -54,7 +54,7 @@ function bindControls() {
   // The camp faces are slow; refresh them when Home or Chronicle is opened.
   document.addEventListener("click", e => {
     const b = e.target.closest("[data-workspace]");
-    if (b && (b.dataset.workspace === "home" || b.dataset.workspace === "chronicle")) setTimeout(refreshCamp, 0);
+    if (b && (b.dataset.workspace === "chronicle")) setTimeout(refreshCamp, 0);
   }, true);
   installOverlays();
   installSystemDrawer();

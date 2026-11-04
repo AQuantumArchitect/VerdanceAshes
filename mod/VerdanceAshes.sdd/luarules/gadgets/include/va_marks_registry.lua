@@ -9,6 +9,7 @@ M.KIND = {
   vault = "vault",
   structure = "structure",
   hero_recover = "hero_recover",
+  scout = "scout",          -- look at a zone (game_verdance_belief_observe's eta), always optional
 }
 
 function M.new()

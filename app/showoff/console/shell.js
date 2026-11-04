@@ -40,7 +40,7 @@ export function renderHeadline() {
 }
 
 /* ---- workspaces ------------------------------------------------------------------- */
-const WORKSPACES = { operations: "workspace-operations", company: "col-aces", home: "workspace-home", chronicle: "workspace-chronicle" };
+const WORKSPACES = { operations: "workspace-operations", company: "col-aces", chronicle: "workspace-chronicle" };
 export function showWorkspace(name) {
   session.workspace = name;
   for (const [key, id] of Object.entries(WORKSPACES)) $(id).hidden = key !== name;
@@ -58,7 +58,6 @@ function renderInspector() {
   if (session.selectedZone) $("cc-map-details").innerHTML = "<summary>Selected map location</summary>" + zoneInspector(session.selectedZone, snap.focusMap, n);
   const inspector = $("cc-inspector");
   if (t && session.workspace === "operations") inspector.innerHTML = thread(t, snap.live);
-  else if (session.workspace === "home") inspector.innerHTML = "";
   else if (session.workspace === "company" && session.selectedHero) {
     const ace = (snap.hub.aces || []).find(a => a.id === session.selectedHero);
     const pack = CREW.heroes?.[session.selectedHero] || {};

@@ -2450,6 +2450,15 @@ if ($escSecondaries.Count -gt 0 -and -not $isFinale -and -not $isKings -and $zon
     if (-not $secCenter) { continue }
     $secLabel = if ($sec.label) { [string]$sec.label } else { $secZid }
     $secId = if ($sec.id) { [string]$sec.id } else { "sec_" + $secZid.ToLower() }
+    if ([string]$sec.kind -eq "scout") {
+      # A scout mark: look hard at the zone (the gadget reads the company's look at it). Nothing is built.
+      $script:secondaryMeta += [ordered]@{
+        id = $secId; label = $secLabel; kind = "scout"; required = $false; zoneId = $secZid
+        x = [double]$secCenter[0]; z = [double]$secCenter[1]
+      }
+      Write-Host ("Secondary objective: scout {0} ({1})" -f $secZid, $secLabel)
+      continue
+    }
     if ($shellOccupied -and $script:livingShellPayload) {
       # The mark is the shell's own works in that zone (the gadget tags them); no camp is built.
       # The opening only spawns its primary pocket, and a scarred or vault pocket is no mark.
@@ -2991,6 +3000,9 @@ $scenario = [ordered]@{
     fieldPeople = @($fieldPeople)
     # Safe ground: everything of ours standing in these zones lifts on extract (game_verdance_exfil.lua).
     safeZoneIds = @($(if ($intent.PSObject.Properties["safeZoneIds"] -and $intent.safeZoneIds) { @($intent.safeZoneIds | ForEach-Object { [string]$_ }) } else { @() }))
+    # The camp grew while the company was away: builders left at base (verdance.campaign.home).
+    # game_verdance_camp_growth.lua places this many structures near the home pad.
+    campGrowth = $(if ([string]$intent.mapId -eq "the_rock_jungle" -and $state -and $state.PSObject.Properties["homeCamp"] -and $state.homeCamp -and $state.homeCamp.PSObject.Properties["growthPending"] -and [int]$state.homeCamp.growthPending -gt 0) { [ordered]@{ count = [int]$state.homeCamp.growthPending } } else { $null })
     # Taking a door: once it is ours the extraction moves onto it (game_verdance_exfil.lua).
     exitDoorZoneId = $(if ($intent.PSObject.Properties["exitDoorZoneId"] -and $intent.exitDoorZoneId) { [string]$intent.exitDoorZoneId } else { $null })
     economy = if ($state -and $state.economy) { $state.economy } else { [ordered]@{ metalIncome = 0; energyIncome = 0; buildPower = 0 } }

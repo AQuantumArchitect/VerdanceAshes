@@ -57,6 +57,42 @@ def camp_footprint(state: Dict[str, Any]) -> int:
     return len(units) if isinstance(units, list) else 0
 
 
+# The camp grows while the company is away (owner call, 2026-11-04): whoever is not on the drop
+# is at base, and constructors left there build. Each one left home while the company fights on
+# another map adds CAMP_GROWTH_PER_BUILDER structures (eco first, then laser towers) to what the
+# next Rock Jungle sortie finds standing; game_verdance_camp_growth.lua places them on ground a
+# builder could use, near the home pad. Once placed they are the camp like anything built by hand.
+CAMP_GROWTH_PER_BUILDER = 2
+CAMP_GROWTH_PER_SORTIE_MAX = 8
+CAMP_GROWTH_PENDING_MAX = 24
+BUILDER_DEFS = frozenset(
+    f + kind for f in ("arm", "cor", "leg") for kind in ("ck", "cv", "ca", "ch", "ack", "acv", "aca", "ach")
+)
+
+
+def builders_left_home(reserve: Dict[str, Any], brought: Dict[str, Any]) -> int:
+    """Constructors in the reserve that did not board this drop."""
+    n = 0
+    for d, k in (reserve or {}).items():
+        if str(d) in BUILDER_DEFS:
+            n += max(0, int(k or 0) - int((brought or {}).get(d, 0) or 0))
+    return n
+
+
+def grow_camp_while_away(state: Dict[str, Any], reserve: Dict[str, Any], brought: Dict[str, Any],
+                         map_id: str) -> int:
+    """A sortie came home: builders left at base grew the camp, unless the sortie was at home
+    (then the camp was in play, and what the field built is the camp). Returns the pending count."""
+    camp = ensure_home_camp(state)
+    mid = str(map_id or "").lower().replace(" ", "_")
+    if mid in (HOME_MAP_ID, "rock_jungle"):
+        camp["growthPending"] = 0          # the Rock Jungle sortie placed it; the footprint keeps it
+        return 0
+    add = min(CAMP_GROWTH_PER_SORTIE_MAX, CAMP_GROWTH_PER_BUILDER * builders_left_home(reserve, brought))
+    camp["growthPending"] = min(CAMP_GROWTH_PENDING_MAX, int(camp.get("growthPending") or 0) + add)
+    return camp["growthPending"]
+
+
 def _zone_control(state: Dict[str, Any], map_id: str, zone_id: str) -> str:
     zm = (state.get("zoneMemory") or {}).get(map_id) or {}
     z = zm.get(zone_id) or zm.get(load_zone_migration().get(zone_id, "")) or {}
@@ -108,6 +144,8 @@ __all__ = [
     "HOME_MAP_ID",
     "_zone_control",
     "camp_footprint",
+    "builders_left_home",
+    "grow_camp_while_away",
     "ensure_home_camp",
     "evaluate_home_clear",
 ]

@@ -1136,7 +1136,8 @@ class Drop4EscalationTests(unittest.TestCase):
             plan = intent.get("escalationPlan") or {}
             secs = plan.get("secondaries") or []
             self.assertEqual(len(secs), 1)
-            self.assertTrue(secs[0]["required"])
+            # secondaries are scouting, always optional (owner call, 2026-11-04)
+            self.assertEqual((secs[0]["kind"], secs[0]["required"]), ("scout", False))
             self.assertTrue(secs[0]["zoneId"])
             self.assertNotEqual(secs[0]["zoneId"], intent.get("targetZoneId"))
             state["missionNumber"] = 10

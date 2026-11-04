@@ -1126,6 +1126,8 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
     bonus_secondaries = [
         s for s in (result.get("secondaryResults") or [])
         if isinstance(s, dict) and s.get("completed") and not s.get("required")
+        # a scouting pays in what the company now knows; a rescue pays a person
+        and s.get("kind") not in ("scout", "hero_recover")
     ]
     if bonus_secondaries and result.get("status") in ("victory", "partial"):
         rep_map = state.setdefault("reputation", {})

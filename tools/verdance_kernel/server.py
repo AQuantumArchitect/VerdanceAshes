@@ -144,14 +144,6 @@ def make_handler(kernel: CampaignKernel, showoff: Path):
             path = parsed.path
             qs = parse_qs(parsed.query or "")
 
-            if path == "/api/camp-act":
-                try:
-                    result = kernel.camp_act(_read_json_body(self))
-                except (ValueError, TypeError, AttributeError):
-                    result = {"ok": False, "error": "Invalid camp action request."}
-                code, body, ct = _json_bytes(result, 200 if result.get("ok") else 409)
-                return self._send(code, body, ct)
-
             if path == "/api/narrative-choice":
                 try:
                     result = kernel.narrative_choice(_read_json_body(self))

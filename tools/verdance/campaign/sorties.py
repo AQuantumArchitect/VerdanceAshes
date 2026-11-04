@@ -452,9 +452,9 @@ def build_escalation_plan(state: Dict[str, Any], map_id: str, objective: Dict[st
                           finale_plan: Optional[Dict[str, Any]],
                           workspace: Optional[Path]) -> Optional[Dict[str, Any]]:
     """Drop 4: the authored escalation for this mission — scale window,
-    objective strength (surgical/raze/purge), waves override, and secondary
-    objectives resolved to real zones off the quest board (always distinct
-    from the primary target). Compiler and gadget both honor this stamp."""
+    objective strength (surgical/raze/purge), waves override, and scout
+    secondaries resolved to real zones off the quest board (always distinct
+    from the primary target, always optional). Compiler and gadget both honor this stamp."""
     mission_num = int(state.get("missionNumber", 1) or 1)
     plan = ladder.plan_for_mission(mission_num, bool(finale_plan), workspace)
     specs = list(plan.get("secondaries") or [])
@@ -480,11 +480,14 @@ def build_escalation_plan(state: Dict[str, Any], map_id: str, objective: Dict[st
                 # rather than doubling up on the primary.
                 continue
             taken.add(zone)
+            # Secondaries are scouting (owner call, 2026-11-04): look hard at a zone the quest board
+            # points at, always optional. Rescues are the field-recruit wrecks, marked in the field.
             resolved.append({
-                "id": "sec_" + zone.lower(),
+                "id": "scout_" + zone.lower(),
+                "kind": "scout",
                 "zoneId": zone,
                 "label": label,
-                "required": bool(spec.get("required")),
+                "required": False,
             })
     return {
         "missionNumber": mission_num,

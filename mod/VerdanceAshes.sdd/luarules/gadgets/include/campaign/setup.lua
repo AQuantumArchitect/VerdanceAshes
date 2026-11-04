@@ -2,7 +2,8 @@
 -- Part of game_verdance_campaign.lua, loaded into that gadget's environment
 -- (VFS.Include with the gadget table), so its globals are the gadget's globals.
 -- Provides: resourceIncome, spawnPlayableSetup
--- Uses: crew, field_recruits, mission_data, objectives, reinforcements, spawn, state
+-- Uses: crew, field_recruits, mission_data, objective_targets, objectives, reinforcements, spawn,
+-- state
 
 local playableSetupSpawned = false
 
@@ -206,6 +207,7 @@ function spawnPlayableSetup()
   Spring.SetGameRulesParam("va_objective_destroyed", 0, { public = true })
   -- Drop 4: enrich marks from seed meta, arm purge, publish HUD ledger once.
   MarksLib.enrichFromMission(marks, mission and mission.secondaries, Game.mapSizeX, Game.mapSizeZ)
+  armScoutMarks()
   MarksLib.publish(marks)
   if MarksLib.count(marks) > 0 then
     Spring.Echo("VA_SECONDARY_ARMED groups=" .. tostring(MarksLib.count(marks))

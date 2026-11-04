@@ -1,7 +1,8 @@
 -- campaign/objective_targets.lua: what the objective's targets are: the living shell's eco and teeth, high-value marks, and a target going down
 -- Part of game_verdance_campaign.lua, loaded into that gadget's environment
 -- (VFS.Include with the gadget table), so its globals are the gadget's globals.
--- Provides: marksOnUnitDestroyed, objectiveTargetDestroyed, tickShellClaims
+-- Provides: armScoutMarks, marksOnUnitDestroyed, objectiveTargetDestroyed, tickScoutMarks,
+-- tickShellClaims
 -- Uses: objective_checks, objectives, reinforcements, state, terminal, units
 
 -- ============================================================
@@ -320,5 +321,45 @@ function marksOnUnitDestroyed(unitID)
     vaMaybeAnnounceAllDone()
   elseif secId then
     marksCommit("secondary_changed", secId)
+  end
+end
+
+
+-- ---------------------------------------------------------------- scout marks
+-- A sortie's secondaries are scouting and rescues (owner call, 2026-11-04). A scout mark is
+-- done the moment the company has looked hard at its zone: game_verdance_belief_observe's eta
+-- for it (va_obs_<zoneId>, 0..1, each point counted once seen) reaches SCOUT_ETA. Always optional.
+local SCOUT_ETA = 0.7
+local scoutZones = {}          -- mark id -> zoneId, while open
+
+function armScoutMarks()
+  for _, sec in ipairs((mission and mission.secondaries) or {}) do
+    if sec and tostring(sec.kind or "") == MarksLib.KIND.scout and sec.zoneId then
+      local sid = tostring(sec.id or ("scout_" .. tostring(sec.zoneId):lower()))
+      MarksLib.upsert(marks, sid, {
+        kind = MarksLib.KIND.scout, label = tostring(sec.label or sec.zoneId), required = false, total = 1,
+        x = math.floor((tonumber(sec.x) or 0.5) * Game.mapSizeX), z = math.floor((tonumber(sec.z) or 0.5) * Game.mapSizeZ),
+        meta = { zoneId = tostring(sec.zoneId) },
+      })
+      scoutZones[sid] = tostring(sec.zoneId)
+    end
+  end
+end
+
+-- Called by gadget:GameFrame.
+function tickScoutMarks(frame)
+  if frame % 60 ~= 15 or next(scoutZones) == nil then return end
+  for sid, zid in pairs(scoutZones) do
+    local eta = tonumber((Spring.GetGameRulesParam("va_obs_" .. zid))) or 0
+    if eta >= SCOUT_ETA then
+      scoutZones[sid] = nil
+      MarksLib.complete(marks, sid, nil)
+      marksCommit("secondary_complete", sid)
+      Spring.Echo("VA_SECONDARY_COMPLETE id=" .. sid .. " kind=scout zone=" .. zid .. " eta=" .. string.format("%.2f", eta))
+      local g = marks.groups[sid]
+      if SendToUnsynced and g and g.x then
+        SendToUnsynced("VERDANCE_BEAT", "narrative", g.x, g.z, "SECONDARY|Scouted " .. tostring(g.label or zid) .. "|640|4.5|1", "")
+      end
+    end
   end
 end

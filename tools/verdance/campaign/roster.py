@@ -182,7 +182,11 @@ def update_roster(state: Dict[str, Any], result: Dict[str, Any], success: bool, 
 
     # The reserve (verdance.company.reserve): this drop's bring left it; what lifted off the
     # pad (minus hero packs) comes back. Survivors left in the field are not carried.
-    from verdance.company.reserve import homecoming as _reserve_homecoming
+    from verdance.company.reserve import homecoming as _reserve_homecoming, ensure_reserve as _ensure_reserve
+    from verdance.campaign.home import grow_camp_while_away as _grow_camp
+    # builders who stayed at base grew the camp while the company was away
+    _grow_camp(state, dict(_ensure_reserve(roster)), dict(roster.get("cadre") or {}),
+               str(result.get("mapId") or result.get("deploymentMapId") or ""))
     _reserve_homecoming(roster, result)
 
     # Veteran XP bank by unitDef — majority retain between drops.

@@ -490,6 +490,8 @@ function Board:paint(proj, opts)
       if mk.failed then g, col = G.failed, Ash.COL.bad
       elseif mk.done then g, col = G.done, Ash.COL.good
       elseif mk.req then g, col = G.markReq, Ash.COL.gold
+      elseif mk.kind == "scout" then g, col = G.markOpt, Ash.COL.pad          -- a zone to look at
+      elseif mk.kind == "hero_recover" then g, col = G.markOpt, Ash.COL.bad   -- someone to rez
       else g, col = G.markOpt, Ash.COL.gold end
       glyph(mk.x, mk.z, g, col, gs)
     end

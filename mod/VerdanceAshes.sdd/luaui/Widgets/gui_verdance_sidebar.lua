@@ -139,7 +139,7 @@ local function pollMarks()
   for i = 1, num("va_secondary_total", 0) do
     local p = "va_sec" .. i .. "_"
     out[#out + 1] = {
-      i = i, id = str(p .. "id"), kind = str(p .. "kind") or "", label = str(p .. "label") or ("Mark " .. i),
+      i = i, id = str(p .. "id"), kind = str(p .. "kind") or "", subtype = str(p .. "subtype") or "", label = str(p .. "label") or ("Mark " .. i),
       req = on(p .. "req"), done = on(p .. "done"), failed = on(p .. "failed"), x = num(p .. "x", -1), z = num(p .. "z", -1),
     }
   end
@@ -325,9 +325,18 @@ local function lastDoneMark()
   return nil
 end
 
+-- Secondaries are scouting and rescues (owner call, 2026-11-04): the verb says which.
 local function markLine(mk)
-  local lbl = (mk.kind == "hero_recover") and ("recover " .. mk.label:gsub("^[^:]+:%s*", "")) or mk.label
-  return (mk.req and "required · " or "optional · ") .. lbl
+  local name = mk.label:gsub("^[^:]+:%s*", "")
+  local lbl = (mk.kind == "scout") and ("scout " .. mk.label)
+    or (mk.kind == "hero_recover") and ((mk.subtype == "recruit" and "rescue " or "recover ") .. name)
+    or mk.label
+  return mk.req and ("required · " .. lbl) or lbl
+end
+local function markColor(mk)
+  if mk.kind == "scout" then return Ash.COL.pad end
+  if mk.kind == "hero_recover" then return Ash.COL.bad end
+  return Ash.COL.gold
 end
 
 -- ---------------------------------------------------------------- the rail: the pad and EXTRACT
@@ -597,7 +606,7 @@ local function drawMarks(x, y, right)
     local col, filled
     if mk.failed then col, filled = Ash.COL.bad, true
     elseif mk.done then col, filled = Ash.COL.good, true
-    elseif mk.kind == "hero_recover" then col, filled = Ash.COL.bad, false
+    elseif mk.kind == "hero_recover" or mk.kind == "scout" then col, filled = markColor(mk), false
     else col, filled = Ash.COL.gold, mk.req end
     Ash.swatch(mx, y - 1, 9, Ash.with(col, filled and 0.9 or 0.8), filled)
     if mk.failed then text(Ash.GLYPH.failed, mx + 4.5, y - 1, 8, Ash.COL.ink, "c")
@@ -606,7 +615,7 @@ local function drawMarks(x, y, right)
     mx = mx + 14
   end
   if R.current then
-    text(Ash.fit(markLine(R.current), 10, right - mx - 6), mx + 6, y, 10, R.current.kind == "hero_recover" and Ash.COL.bad or Ash.COL.gold, "l")
+    text(Ash.fit(markLine(R.current), 10, right - mx - 6), mx + 6, y, 10, markColor(R.current), "l")
   elseif S.requiredLeft == 0 and S.objectiveComplete then
     text("marks done", mx + 6, y, 10, Ash.COL.good, "l")
   end
