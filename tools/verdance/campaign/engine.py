@@ -139,6 +139,12 @@ from verdance.readings import (
 )
 
 
+
+# Player-facing names for the briefing subtitle (storyReason).
+_SIDE_NAMES = {"nullmercs": "the Null Mercs", "armada": "Armada", "cortex": "Cortex", "wild": "the wilds",
+               "raptors": "the wilds", "scavengers": "the Scavengers", "ashwalkers": "ourselves"}
+_FINALE_NAMES = {"overthrow": "the Overthrow", "sovereignty": "the kings' showdown", "spire_jump": "the Spire Jump"}
+
 def _shell_pockets(map_id: str, workspace: Optional[Path]) -> List[Dict[str, Any]]:
     """The map's living-shell pockets (for wardens), from the same template names the builder tries."""
     if workspace is None:
@@ -482,12 +488,14 @@ def materialize_next_intent(state: Dict[str, Any], workspace: Optional[Path] = N
         },
         "dialogueHooks": intent_story_tags(map_id, family, pressure),
         "storyReason": (
-            f"Path {finale_plan['pathKey']} finale ({finale_plan['kind']}): the campaign's closing battle on {map_id}."
+            # the briefing's subtitle, in the player's words (it used to read "Contract for nullmercs
+            # against armada on tabula/T_NW_RESERVE": the screen inventory, 2026-11-03)
+            "The last fight: " + _FINALE_NAMES.get(str(finale_plan.get("kind")), "the end of the war") + "."
             if finale_plan
             else (
                 "Opening raid: hit Armada's decoy farms in Greenest Fields with Thugs and Legion Karkinos, then extract."
                 if (sortie or {}).get("openingMission")
-                else f"Contract for {patron} against {against} on {map_id}/{objective.get('targetZoneId')}"
+                else f"For {_SIDE_NAMES.get(str(patron), str(patron))}, against {_SIDE_NAMES.get(str(against), str(against))}."
             )
             if contract_active
             else story_reason_for_intent(map_id, family, pressure)
