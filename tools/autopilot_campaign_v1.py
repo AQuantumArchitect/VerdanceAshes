@@ -249,6 +249,19 @@ def tour_sortie(ws: Path, run_dir: Path, n: int, k, plan: dict, intent: dict, st
     for f in gen.glob("*.lua"):
         shutil.copy2(f, out / "seed" / f.name)
     (out / "intent.json").write_text(json.dumps(intent, indent=1), encoding="utf-8")
+    # the mission builder's inputs and output, for the Python port's parity corpus: the state as the
+    # builder read it, the intent, the scenario it wrote and the startscript the installer made
+    build = out / "build"
+    build.mkdir(exist_ok=True)
+    for src, name in ((ws / "state" / "campaign_state.json", "state.json"),
+                      (ws / "outbox" / "next_mission_intent.json", "intent.json"),
+                      (ws / "data" / "scenarios" / "generated" / "next_mission_intent.playable.json", "scenario.json"),
+                      (ws / "outbox" / "next_mission_build_manifest.json", "manifest.json"),
+                      (ws / "outbox" / "hot_drop.json", "hot_drop.json")):
+        if src.is_file():
+            shutil.copy2(src, build / name)
+    for f in (bar / "games" / "VerdanceAshes.sdd" / "singleplayer" / "verdance_ashes").glob("*.txt"):
+        shutil.copy2(f, build / f.name)
     result = fake_result(st, intent, plan, hs, n, (jload(ws / "state" / "campaign_state.json").get("roster") or {}).get("cadre") or {})
     (ws / "inbox").mkdir(exist_ok=True)
     (ws / "inbox" / "latest_va_result.json").write_text(json.dumps(result), encoding="utf-8")
