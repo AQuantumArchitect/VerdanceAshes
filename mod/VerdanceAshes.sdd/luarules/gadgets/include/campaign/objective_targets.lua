@@ -328,8 +328,8 @@ end
 -- ---------------------------------------------------------------- scout marks
 -- A sortie's secondaries are scouting and rescues (owner call, 2026-11-04). A scout mark is
 -- done the moment the company has looked hard at its zone: game_verdance_belief_observe's eta
--- for it (va_obs_<zoneId>, 0..1, each point counted once seen) reaches SCOUT_ETA. Always optional.
-local SCOUT_ETA = 0.7
+-- for it (va_obs_<zoneId>, 0..1, each point counted once seen, fading) reaches SCOUT_ETA. Always optional.
+local SCOUT_ETA = 0.5          -- the pad zone, with the army standing on it, reads about 0.56 (rig, 2026-11-04)
 local scoutZones = {}          -- mark id -> zoneId, while open
 
 function armScoutMarks()

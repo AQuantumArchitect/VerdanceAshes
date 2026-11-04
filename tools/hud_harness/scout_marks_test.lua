@@ -1,6 +1,6 @@
 -- Run with Lua 5.4 from the workspace root. A sortie's scout mark (mission.secondaries kind
 -- "scout") is armed optional and is done once the company has looked hard at its zone
--- (va_obs_<zoneId> from game_verdance_belief_observe reaches 0.7).
+-- (va_obs_<zoneId> from game_verdance_belief_observe reaches 0.5).
 local rules, echoes, events = {}, {}, {}
 Spring = {
   Echo = function(s) echoes[#echoes + 1] = s end,
@@ -22,7 +22,7 @@ MarksLib.publish(marks)
 assert(MarksLib.count(marks) == 1, "one scout mark armed, the vault waits for its structures")
 assert(rules.va_sec1_kind == "scout" and rules.va_sec1_req == 0, "scout marks are always optional")
 assert(rules.va_sec1_label == "Northwest Lane" and rules.va_sec1_x == math.floor(0.2 * 8192))
-rules.va_obs_T_NW_LANE = 0.4
+rules.va_obs_T_NW_LANE = 0.3
 tickScoutMarks(75)
 assert(rules.va_sec1_done == 0, "a glance is not a scouting")
 rules.va_obs_T_NW_LANE = 0.72
