@@ -447,7 +447,13 @@ def main() -> int:
         watch.watch(rep)
         engine_start = time.time()
         while watch.phase not in ("home", "closed-without-result") and time.time() - engine_start < args.wall_timeout:
-            txt = Path(rep["infologPath"]).read_text(encoding="utf-8", errors="replace")
+            try:
+                txt = Path(rep["infologPath"]).read_text(encoding="utf-8", errors="replace")
+            except (MemoryError, OSError):
+                # the machine ran short of memory for a moment (Luke's PC, 2026-11-04: BAR, a browser
+                # and two chat apps left 2.6 GB of commit): wait and look again, do not lose the sortie
+                time.sleep(5)
+                continue
             if "VA_SEED_MISSING" in txt:
                 row["stall"] = "engine did not load the campaign seed"
                 break
