@@ -285,10 +285,12 @@ export function renderDropSquad() {
     const perks = state.hub.bondPerks || {};
     const gifts = (perks.bondGifts || []).filter(g => going.has(g.a) && going.has(g.b));
     const xps = (perks.bondXp || []).filter(r => going.has(r.a) && going.has(r.b));
-    if (xps.length) html += `<div class="theater-sub spaced"><b>Bonds on this drop</b> · ${xps.map(r => {
-      const g = gifts.find(x => x.a === r.a && x.b === r.b);
-      return `${esc(crewHeroName(r.a))} & ${esc(crewHeroName(r.b))} (rank ${esc(r.rank)}: +${r.xp} XP each${g ? `, bringing ${g.count}× ${esc(g.name || g.unitDef)}` : ""})`;
-    }).join(" · ")}</div>`;
+    // one line: how many bonds ride along and what they add; a pair with a gift is named
+    if (xps.length) {
+      const xpSum = xps.reduce((t, r) => t + Number(r.xp || 0), 0);
+      const named = gifts.map(g => `${esc(crewHeroName(g.a))} & ${esc(crewHeroName(g.b))} bring ${g.count}× ${esc(g.name || g.unitDef)}`);
+      html += `<div class="theater-sub spaced"><b>${xps.length} bond${xps.length === 1 ? "" : "s"} on this drop</b> · +${+xpSum.toFixed(2)} XP shared${named.length ? " · " + named.join(" · ") : ""}</div>`;
+    }
     squadEl.innerHTML = html;
   }
   paintDropButton();

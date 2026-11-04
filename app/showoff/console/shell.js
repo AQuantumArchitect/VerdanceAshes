@@ -1,6 +1,6 @@
 // Shell: the four workspaces, the operations rail, the matters column and its inspector,
 // the HUD badges, and the narrative poll that keeps them fresh.
-import { state, session, CREW, commerce, metalKOf, prettyMap, sessionLabel, jobLabel } from "./state.js";
+import { state, session, CREW, BOARDS, commerce, metalKOf, prettyMap, sessionLabel, jobLabel } from "./state.js";
 import { api } from "./api.js";
 import { $, esc, escape, pretty, field, operation, thread, reactions, scene, fieldLine, toast } from "./render.js";
 import { updateIntelligence, zoneInspector, predictedFieldRecruits } from "./board.js";
@@ -90,7 +90,12 @@ function opCard(c, op, snap) {
   let meet = [];
   try {
     meet = predictedFieldRecruits(eff.mapId, { mapId: eff.mapId, marks: { captureZoneIds: eff.captureZoneIds || (eff.preferredCaptureZoneId ? [eff.preferredCaptureZoneId] : []), deployZoneId: eff.preferredDeployZoneId || null } })
-      .map(r => `${r.name || r.id}${r.stance && r.stance.kind === "hostile" ? " (beat them first)" : ""}`);
+      .map(r => {
+        // who, where, and whether they fight you first: the rescue mark as the board shows it
+        const z = r.zoneId && ((BOARDS[r.mapId] || {}).zones || []).find(x => x.zoneId === r.zoneId);
+        const where = z ? ` at ${z.label || r.zoneId}` : "";
+        return `${r.name || r.id}${where}${r.stance && r.stance.kind === "hostile" ? " (against us: beat them first)" : ""}`;
+      });
   } catch (err) { meet = []; }
   return `<button class="cc-operation" type="button" data-operation="${escape(c.id)}" ${c.disabled ? "disabled" : ""} aria-pressed="${c.id === snap.plan?.choiceId}">` +
     `${lean ? `<em class="cc-lean" title="The war is moving this way">the world leans here</em>` : ""}<strong>${escape(title)}</strong><span>${escape(sub)}</span>` +
