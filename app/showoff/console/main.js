@@ -5,7 +5,7 @@ import { state, H, commerce, prettyMap, availableMaps, ensureFocusMapAvailable, 
 import { probeKernel } from "./api.js";
 import { $, toast, logLine } from "./render.js";
 import { installOverlays } from "./board.js";
-import { refreshTheaterForFocus, showDropConfirm, hideDropConfirm, onDropConfirmGo, resetRoute, setMarkMode, onChoice, showDropTab } from "./operations.js";
+import { refreshTheaterForFocus, showDropConfirm, hideDropConfirm, onDropConfirmGo, resetRoute, setMarkMode, onChoice, showDropTab, paintDropButton } from "./operations.js";
 import { renderCompany, renderShop, sealCompany, toggleCrew, tryBuy, recommendCompany, showCompanyIntro, companyMemberIds, fieldPeople } from "./company.js";
 import { confirmHearthTalk, cancelHearthTalk, refreshCamp, renderCampCard } from "./home.js";
 import { showHomecoming, hideHomecoming, pullHubState, pullBarResult, abandonSortie, startResultPoll } from "./homecoming.js";
@@ -25,6 +25,7 @@ window.Verdance = {
   fieldPeople,
   companyMemberIds,
   recommendCompany,
+  onTalksChanged: paintDropButton,   // flow.js: an answer may open the next screen
 };
 
 function bindControls() {

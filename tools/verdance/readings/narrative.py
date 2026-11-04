@@ -246,6 +246,11 @@ def scene_evidence(scene, events):
     return None
 
 
+# Every talk has a null answer (owner call, 2026-11-03): "No time for this." It records that the
+# talk happened and was declined, costs nothing, and the talk does not come back.
+NULL_LABEL = "No time for this."
+
+
 def project(state, choices=(), workspace=None):
     if not enabled(state):
         return {"enabled": False, "revision": revision(state), "threads": [], "scenes": [], "chronicle": []}
@@ -267,6 +272,9 @@ def project(state, choices=(), workspace=None):
         # Prefix after unpacking so an authored local id cannot replace the wire id.
         for c in row["choices"]:
             c["id"] = spec["id"] + ":" + c["id"].split(":")[-1]
+        if row["choices"]:
+            row["choices"].append({"id": spec["id"] + ":none", "label": NULL_LABEL, "null": True, "stance": "", "goal": None})
+        row["passed"] = bool(t.get("passed"))
         row["operations"] = [c["id"] for c in choices if c.get("kind") == "deploy" and not c.get("disabled") and (c.get("effect") or {}).get("mapId") in spec["maps"]]
         row["operationLabels"] = {c["id"]: c.get("label", "Operation") for c in choices if c.get("id") in row["operations"]}
         recent = 20 if t.get("history") and t["history"][-1].get("turn") == n["turn"] else 0
@@ -283,7 +291,8 @@ def project(state, choices=(), workspace=None):
         scene['sourceEventId'] = scene_evidence(scene, n['events'])
         decision = n['sceneDecisions'].get(scene['id'])
         scene['decision'] = decision
-        scene['choices'] = [] if decision else [{**c, 'id':'scene:'+scene['id']+':'+c['id']} for c in scene.get('choices',[])]
+        scene['choices'] = [] if decision else [{**c, 'id':'scene:'+scene['id']+':'+c['id']} for c in scene.get('choices',[])] + [
+            {'id': 'scene:' + scene['id'] + ':none', 'label': NULL_LABEL, 'stance': '', 'response': '', 'null': True}]
     reactions = leadership_reactions(snapshot, data)
     for row in out:
         row['reactions'] = [r for r in reactions if r['speaker'] in {p['speaker'] for p in row['perspectives']}][:2]
@@ -327,8 +336,11 @@ def choose(state, choice_id, expected_revision, request_id, workspace=None):
         n = ensure(state)
         decision = {'choiceId':choice_id, 'stance':choice['stance'], 'words':choice['label'],
                     'response':choice['response'], 'turn':n['turn'], 'eventId':request_id}
+        if choice.get('null'):
+            decision['declined'] = True
         n['sceneDecisions'][scene['id']] = decision
-        n['leadership'].append(copy.deepcopy(decision))
+        if not choice.get('null'):     # a declined talk is no leadership stance
+            n['leadership'].append(copy.deepcopy(decision))
         receipt = {'ok':True,'choiceId':choice_id,'requestId':request_id,'cost':0,
                    'obligation':'Conversation response recorded. No sortie deadline or resource effect.'}
         n['requests'][request_id] = receipt
@@ -340,6 +352,14 @@ def choose(state, choice_id, expected_revision, request_id, workspace=None):
     reconcile(state, catalog(workspace), workspace)
     n = state["narrative"]
     t = n["threads"][row["id"]]
+    if choice.get("null"):
+        # declined: no commitment, and the camp talks do not raise it again (the Company tab still can)
+        t["passed"] = True
+        t["passedTurn"] = n["turn"]
+        receipt = {"ok": True, "choiceId": choice_id, "requestId": request_id, "cost": 0, "declined": True,
+                   "obligation": "Declined. No commitment, no cost."}
+        n["requests"][request_id] = receipt
+        return copy.deepcopy(receipt)
     n["leadership"].append({"choiceId": choice_id, "stance": choice.get("stance", ""), "words": choice["label"], "turn": n["turn"], "eventId": request_id})
     t.update(stance=choice.get("stance"), response=choice.get("response"), promise=choice["label"])
     t.update(stage="Committed", commitment=choice_id, goal=choice["goal"], committedTurn=n["turn"],

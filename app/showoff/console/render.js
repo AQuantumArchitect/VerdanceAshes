@@ -169,9 +169,10 @@ export function operation(op) {
   // The job, how to win it, and the field's standing rules folded away (they read the same on every job).
   const sub = [pretty(op.mapId), op.kind ? jobLabel(op.kind) : ""].filter(Boolean).join(" · ");
   return `<p class="cc-eyebrow">${escape(sub)}${op.lean ? ` <span class="cc-lean">the world leans here</span>` : ""}</p>` +
-    `<h3 class="cc-op-title">${escape(op.title)}</h3>` +
-    field("The job", op.purpose) + field("To win", op.required) + (op.pays ? field("What it pays", op.pays) : "") +
-    `<details class="cc-rules"><summary>Field rules</summary>` +
+    // the job is told once, on its card; here only how to win it, the rest folded away
+    field("To win", op.required) +
+    `<details class="cc-rules"><summary>The rules of the job</summary>` +
+    field("The job", op.purpose) + (op.pays ? field("What it pays", op.pays) : "") +
     field("Bringing it home", op.bringHome) + field("What you don't know", op.risks) + field("What changes", op.consequences) +
     `</details>`;
 }

@@ -311,6 +311,44 @@ local function siege()
     .. " ground=" .. math.floor(Spring.GetGroundHeight(bx, bz) or 0) .. " from=" .. math.floor(math.sqrt(bd)))
 end
 
+-- ---------------------------------------------------------------- scout marks
+-- A sortie's scout marks (blue on the rail) are done once the company has had a good look at the
+-- zone. BARb never scouts on its own, so the rig sends one quick fighter to each open mark: the
+-- fastest armed mobile unit nobody else holds, not a hero, not a builder. It goes on FIGHT, so it
+-- looks on the way; when the mark is done the unit goes back to BARb.
+local scouting = {}           -- mark index -> unitID
+local function scout()
+  for i = 1, rp("va_secondary_total") do
+    local kind = tostring(Spring.GetGameRulesParam("va_sec" .. i .. "_kind") or "")
+    local uid = scouting[i]
+    if kind == "scout" then
+      local done = rp("va_sec" .. i .. "_done") == 1
+      if done or (uid and Spring.GetUnitIsDead(uid) ~= false) then
+        if uid then held[uid] = nil end
+        scouting[i] = nil
+        uid = nil
+      end
+      if not done and not uid then
+        local x, z = rp("va_sec" .. i .. "_x"), rp("va_sec" .. i .. "_z")
+        local best, bestSpeed = nil, 0
+        for _, u in ipairs(companyUnits(function(ud, u)
+          local hid = Spring.GetUnitRulesParam(u, "va_hero_id")
+          local hero = hid ~= nil and hid ~= "" and hid ~= 0
+          return mobile(ud) and ud.canAttack and not ud.isBuilder and not held[u] and not sieged[u] and not hero
+        end)) do
+          local sp = (UnitDefs[Spring.GetUnitDefID(u) or -1] or {}).speed or 0
+          if sp > bestSpeed then best, bestSpeed = u, sp end
+        end
+        if best and x > 0 then
+          order({ best }, CMD.FIGHT, { x, Spring.GetGroundHeight(x, z) or 0, z }, true)
+          scouting[i] = best
+          Spring.Echo("VA_AUTOPILOT scout mark=" .. i .. " unit=" .. tostring(best) .. " to=" .. math.floor(x) .. "," .. math.floor(z))
+        end
+      end
+    end
+  end
+end
+
 -- ---------------------------------------------------------------- hold
 local function holdTheZone()
   if tostring(Spring.GetGameRulesParam("va_capture_phase") or "") ~= "hold" then return end
@@ -811,4 +849,5 @@ function gadget:GameFrame(f)
   gateRig()
   if f % RESCUE_EVERY == 311 then rescue() end
   if f % NUDGE_EVERY < 30 then siege(); holdTheZone(); nudge() end
+  if f % NUDGE_EVERY == 341 then scout() end   -- (frames run at f % 30 == 11; 311 is the rescue)
 end

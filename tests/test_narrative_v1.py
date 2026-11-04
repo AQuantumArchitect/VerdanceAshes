@@ -51,7 +51,7 @@ class NarrativeTests(unittest.TestCase):
 
     def test_conversation_response_remembers_without_time_or_cost(self):
         s=fresh(); result(s,deployAces=['vane','ketha'])
-        c=next(c for scene in narrative.project(s)['scenes'] for c in scene['choices'])
+        c=next(c for scene in narrative.project(s)['scenes'] for c in scene['choices'] if not c.get('null'))
         before=copy.deepcopy(s); rev=narrative.revision(s)
         receipt=narrative.choose(s,c['id'],rev,'scene-request')
         self.assertTrue(receipt['ok'])
@@ -61,6 +61,29 @@ class NarrativeTests(unittest.TestCase):
         self.assertEqual(len(s['narrative']['leadership']),1)
         self.assertTrue(narrative.project(s)['reactions'])
         self.assertFalse(narrative.choose(s,c['id'],narrative.revision(s),'different-request')['ok'])
+
+    def test_every_talk_can_be_declined_and_does_not_come_back(self):
+        """Owner call, 2026-11-03: every talk offers 'No time for this.' It costs nothing, records
+        no stance, and the talk is closed (a scene) or not raised again by the camp (a matter)."""
+        s=fresh(); result(s,deployAces=['vane','ketha'])
+        view=narrative.project(s)
+        scene=next(x for x in view['scenes'] if x['choices'])
+        none=[c for c in scene['choices'] if c.get('null')]
+        self.assertEqual([c['label'] for c in none], [narrative.NULL_LABEL])
+        before=copy.deepcopy(s)
+        self.assertTrue(narrative.choose(s,none[0]['id'],narrative.revision(s),'decline-scene')['ok'])
+        self.assertEqual(s['commerce'],before['commerce'])
+        self.assertEqual(len(s['narrative']['leadership']),len(before['narrative']['leadership']))
+        again=next(x for x in narrative.project(s)['scenes'] if x['id']==scene['id'])
+        self.assertEqual(again['choices'],[])
+        self.assertTrue(again['decision']['declined'])
+        matter=next(t for t in narrative.project(s)['threads'] if t['choices'])
+        decline=next(c for c in matter['choices'] if c.get('null'))
+        r=narrative.choose(s,decline['id'],narrative.revision(s),'decline-matter')
+        self.assertTrue(r['ok'] and r['declined'])
+        row=next(t for t in narrative.project(s)['threads'] if t['id']==matter['id'])
+        self.assertTrue(row['passed'])
+        self.assertNotEqual(row['stage'],'Committed')
 
     def test_projection_is_pure_and_deterministic(self):
         s = fresh(); before = copy.deepcopy(s)

@@ -7,6 +7,7 @@ import { rentedIds, renderShop, recomputeShopAvailability, renderCompany, buildC
 import { renderBadges } from "./shell.js";
 import { hideCoach } from "./system.js";
 import { renderReserve, reserveBring, resetReserveBring } from "./reserve.js";
+import { buildTalkQueue, renderTalks, talksLeft } from "./flow.js";
 
 /* ---- plan ------------------------------------------------------------------- */
 export function ensureTheaterPlan(choice) {
@@ -60,7 +61,7 @@ export function openDeploy(choice) {
   renderMapPicker(); // the plan may have moved the focus map
   renderBoard();
   logLine(`Route briefing — ${prettyMap(state.plan.mapId)} · ${jobLabel(state.plan.contractKind)}`);
-  toast(`${prettyMap(state.plan.mapId)}: mark the pad and the target, then Ready the drop`, "ok");
+  toast(`${prettyMap(state.plan.mapId)}: the board shows where you land and what you take`, "ok");
   const th = $("theater");
   if (th) th.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
@@ -152,7 +153,7 @@ export function updateDeployGate() {
   }
   if (phase === "loading" || phase === "ready" || phase === "dropping") {
     btn.title = "The field is loaded (or loading) behind this screen. Open the drop window to pick who goes and drop.";
-    btn.textContent = phase === "loading" ? "Field loading: pick who goes" : "Field ready: pick who goes";
+    btn.textContent = phase === "loading" ? "Field loading: back to the drop" : "Field ready: back to the drop";
     return;
   }
   if (!companySealed()) {
@@ -168,9 +169,9 @@ export function updateDeployGate() {
     return;
   }
   btn.title = state.hostLive
-    ? "Opens the drop window: who goes, what they carry, the mercenary store. The field loads while you choose."
-    : "Map only: the drop window saves the plan. Start PLAY.bat to fight.";
-  btn.textContent = "Ready the drop";
+    ? "The field starts loading in Beyond All Reason; you talk with the company, pick who goes and what comes while it loads."
+    : "Map only: start PLAY.bat to fight.";
+  btn.textContent = "Choose this job";
 }
 
 /* ---- the drop sheet: the field loads while you pick who goes (hot drop) ------------ */
@@ -199,12 +200,16 @@ function setWarm(phase, text) {
   renderShop();          // the store shuts once the drop is locked
   updateDeployGate();
 }
-// The drop window's three windows, in order: the party, the reserve kits, the Cortex mercenary
-// store. The green button walks them (owner call, 2026-10-29): confirm the party, confirm the
-// reserve, then Lock drop on the store, which drops at once or the moment the field is ready.
-const DROP_STEPS = ["party", "reserve", "mercs"];
+// The sortie flow's three screens, in order (owner calls, 2026-11-03/04): the camp talks, who goes,
+// what comes (the reserve and the mercenary store on one screen). The green button walks them; on
+// the last it drops at once, or the moment the field is ready. Every talk must be answered first.
+const DROP_STEPS = ["talks", "party", "reserve"];
 export function showDropTab(name) {
-  state.dropTab = DROP_STEPS.includes(name) ? name : "party";
+  if (name === "mercs") name = "reserve";
+  // no skipping past the talks: they happen before the drop
+  if (name !== "talks" && talksLeft() > 0) name = "talks";
+  state.dropTab = DROP_STEPS.includes(name) ? name : "talks";
+  if (state.dropTab === "talks") renderTalks();
   document.querySelectorAll("[data-drop-tab]").forEach(b => b.classList.toggle("on", b.dataset.dropTab === state.dropTab));
   document.querySelectorAll("[data-drop-win]").forEach(w => w.classList.toggle("on", w.dataset.dropWin === state.dropTab));
   paintDropButton();
@@ -213,15 +218,17 @@ function paintWarmStatus(text) {
   const el = $("drop-warm-status");
   if (!el) return;
   const phase = state.warm && state.warm.phase;
+  const where = prettyMap((state.plan || {}).mapId);
   el.textContent = text || (
-    phase === "loading" && state.warm.dropLocked ? `The drop is locked. ${prettyMap((state.plan || {}).mapId)} is still loading; the company drops the moment it is ready. Press the button again to change something.`
-    : phase === "loading" ? `Loading ${prettyMap((state.plan || {}).mapId)} in Beyond All Reason behind this screen. Pick the party, the reserve and any mercenaries while it loads.`
-    : phase === "ready" ? "The field is loaded and paused, the enemy in place. Your company lands the moment you lock the drop."
-    : phase === "dropping" ? "Dropping… the company is landing on the pad."
-    : phase === "up" ? "The company is down on the pad, the field paused. Switch to Beyond All Reason and unpause when you are ready."
-    : phase === "failed" ? "The field did not load. Adjust the route and try again."
-    : "Launch loads the field now. You pick who goes while it loads."
+    phase === "loading" && state.warm.dropLocked ? `${where} is still loading. The company drops the moment it is ready.`
+    : phase === "loading" ? `${where} is loading behind these screens.`
+    : phase === "ready" ? "The field is ready."
+    : phase === "dropping" ? "Dropping…"
+    : phase === "up" ? "The company is down, the field paused. Switch to Beyond All Reason and unpause."
+    : phase === "failed" ? "The field did not load. Go back to the jobs and try again."
+    : state.hostLive ? "" : "Map only: start PLAY.bat to fight."
   );
+  el.classList.toggle("ready", phase === "ready");
 }
 export function noteRosterChanged() {
   if (!dropConfirmOpen()) return;
@@ -250,9 +257,10 @@ export function renderDropSquad() {
   const entries = buildCompanyEntries().filter(e => e.tier === "deployed" || e.tier === "base");
   const packN = droppingPackIds().length;
   const coreN = livingCoreIds().length;
+  // anyone left off is at base (owner call, 2026-11-04): no posting, no rest
   if (kicker) kicker.textContent = entries.length
-    ? `Who drops: ${packN} pack${packN === 1 ? "" : "s"} and ${coreIds.map(crewHeroName).join(", ")}. Click a card to bring someone or leave them home.`
-    : `Who drops: ${coreIds.map(crewHeroName).join(", ")} only`;
+    ? `${packN + coreN} on the drop · tap a card to leave someone at base`
+    : `${coreIds.map(crewHeroName).join(", ")} only`;
   if (squadEl) {
     const locked = dropRosterSealed();
     const cards = entries.map(e => {
@@ -261,7 +269,7 @@ export function renderDropSquad() {
       const canToggle = !isCore && !!e.pickable && !locked;
       return renderHeroCard({
         id: e.id, ace: e.ace,
-        tag: isCore ? "always comes" : [rented.has(e.id) ? "rented" : "", on ? "" : "stays home"].filter(Boolean).join(", ") || null,
+        tag: isCore ? "always comes" : [rented.has(e.id) ? "rented" : "", on ? "" : "at base"].filter(Boolean).join(", ") || null,
         classes: [isCore ? "core" : "", on ? "on" : "tier-base", canToggle ? "toggleable" : ""].filter(Boolean),
         compact: true, hideCost: true, dataCrew: canToggle ? e.id : null, disabled: !canToggle, type: "button",
       });
@@ -285,21 +293,24 @@ export function renderDropSquad() {
   }
   paintDropButton();
 }
-function paintDropButton() {
+export function paintDropButton() {
   const go = $("drop-confirm-go");
   if (!go) return;
   const phase = state.warm && state.warm.phase;
-  const tab = state.dropTab || "party";
+  const tab = state.dropTab || "talks";
   go.disabled = phase === "dropping";
   go.classList.toggle("locked-drop", !!(state.warm && state.warm.dropLocked));
-  go.textContent = phase === "up" ? "Back to the map"
+  const talking = tab === "talks" && talksLeft() > 0;
+  if (tab === "talks") go.disabled = go.disabled || talking;
+  go.textContent = phase === "up" ? "Back to the jobs"
     : phase === "dropping" ? "Dropping…"
-    : tab === "party" ? "Confirm the party"
-    : tab === "reserve" ? "Confirm the reserve"
+    : tab === "talks" ? (talking ? `${talksLeft()} to answer` : "Next: who goes")
+    : tab === "party" ? "Next: what comes"
     : state.warm.dropLocked ? "Drop locked: waiting for the field"
     : phase === "failed" ? "Try again"
     : !state.hostLive ? "Save plan"
-    : "Lock drop";
+    : phase === "ready" ? "Drop"
+    : "Drop when ready";
 }
 function pollWarm() {
   if (state.warm.poll) clearTimeout(state.warm.poll);
@@ -317,7 +328,7 @@ function pollWarm() {
       if (phase === "loading" && hot.phase === "ready") {
         setWarm("ready");
         if (state.warm.dropLocked) return dropCompany();        // locked while it loaded: drop now
-        toast("The field is ready. Lock the drop when your company is set.", "ok");
+        toast("The field is ready.", "ok");
       } else if ((phase === "loading" || phase === "ready") && (hot.phase === "none" || hot.phase === "closed") && status.deployPhase !== "building") {
         return setWarm("idle", "Beyond All Reason closed before the drop. Open the drop window again to reload the field.");
       } else if (phase === "up" && hot.phase !== "dropped") {
@@ -355,13 +366,11 @@ export function showDropConfirm() {
   const body = $("drop-confirm-body");
   if (body) {
     const eyes = padExposed(m.deployZoneId);
+    // the job in one line: where, what to take, where you lift (the rules are in "How this works")
     body.innerHTML =
-      `Drop on <b>${esc(prettyMap(plan.mapId))}</b> · <b>${esc(jobLabel(plan.contractKind))}</b><br>` +
-      `Pad <b>${esc(zoneName(m.deployZoneId))}</b> → target <b>${esc(targets)}</b> → ` +
-      (exitDoor ? `once it is yours, leave by the door itself, <b>${esc(zoneName(exitDoor))}</b>.`
-                : `back to <b>${esc(zoneName(m.deployZoneId))}</b>.`) +
-      (eyes === "known" ? `<br><span class="bad">Armada has eyes on this pad.</span>` : "") +
-      `<p>Get what you want onto the pad and press EXTRACT. What is off the pad stays. What stays becomes a holding.</p>`;
+      `<b>${esc(prettyMap(plan.mapId))}</b> · take <b>${esc(targets)}</b> · land and lift at <b>${esc(zoneName(m.deployZoneId))}</b>` +
+      (exitDoor ? ` · leave by <b>${esc(zoneName(exitDoor))}</b> once it is yours` : "") +
+      (eyes === "known" ? ` · <span class="bad">Armada has eyes on this pad</span>` : "");
     body.setAttribute("data-route", body.innerHTML);
   }
   const el = $("drop-confirm");
@@ -374,7 +383,8 @@ export function showDropConfirm() {
     resetReserveBring();
     recomputeShopAvailability();
     setWarm("idle");
-    showDropTab("party");
+    buildTalkQueue();
+    showDropTab("talks");
     if (state.hostLive) launchField();
   } else {
     renderDropSquad();
@@ -431,8 +441,9 @@ export function onDropConfirmGo() {
   const phase = state.warm && state.warm.phase;
   if (phase === "up") return hideDropConfirm();
   if (phase === "dropping") return paintWarmStatus();
-  const tab = state.dropTab || "party";
-  if (tab !== "mercs") return showDropTab(DROP_STEPS[DROP_STEPS.indexOf(tab) + 1]);
+  const tab = state.dropTab || "talks";
+  if (tab === "talks" && talksLeft() > 0) return paintDropButton();
+  if (tab !== "reserve") return showDropTab(DROP_STEPS[DROP_STEPS.indexOf(tab) + 1]);
   if (!state.hostLive) return commitDeploy(false);
   if (phase === "ready") return dropCompany();
   if (phase === "loading") {

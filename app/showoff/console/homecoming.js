@@ -64,7 +64,10 @@ export function showHomecoming(opts) {
   const man = (opts && opts.manifest) || null;
   const manKind = String((man && man.kind) || "").toLowerCase();
   const manHeadline = manKind === "wiped" ? "Nobody came back." : manKind === "closed" ? "Left the field." : null;
-  if ($("hc-headline")) $("hc-headline").textContent = manHeadline || (opts && opts.headline) || ui.headline;
+  // the banner is the verdict; a headline that only repeats it says nothing
+  const headline = manHeadline || (opts && opts.headline) || ui.headline;
+  const norm = (x) => String(x || "").toLowerCase().replace(/[^a-z]/g, "");
+  if ($("hc-headline")) $("hc-headline").textContent = norm(headline) === norm(banner && banner.textContent) ? "" : headline;
   if ($("hc-hint")) $("hc-hint").textContent = (opts && (opts.reasonHint || opts.hint)) || "";
   const chips = $("hc-chips");
   if (chips) {

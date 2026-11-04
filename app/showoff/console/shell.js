@@ -44,6 +44,10 @@ const WORKSPACES = { operations: "workspace-operations", company: "col-aces", ch
 export function showWorkspace(name) {
   session.workspace = name;
   for (const [key, id] of Object.entries(WORKSPACES)) $(id).hidden = key !== name;
+  // One question per screen: the side column (company matters, the inspector) is the Company tab's
+  // only. The matters reach the player as camp talks in the sortie flow (flow.js).
+  const app = $("app");
+  if (app) { for (const key of Object.keys(WORKSPACES)) app.classList.toggle("ws-" + key, key === name); }
   document.querySelectorAll(".cc-nav button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.workspace === name)));
   $("theater-actions").hidden = name !== "operations";
   renderInspector();
@@ -86,11 +90,11 @@ function opCard(c, op, snap) {
   let meet = [];
   try {
     meet = predictedFieldRecruits(eff.mapId, { mapId: eff.mapId, marks: { captureZoneIds: eff.captureZoneIds || (eff.preferredCaptureZoneId ? [eff.preferredCaptureZoneId] : []), deployZoneId: eff.preferredDeployZoneId || null } })
-      .map(r => `${r.name || r.id}${r.stance && r.stance.kind === "hostile" ? " (against us)" : ""}`);
+      .map(r => `${r.name || r.id}${r.stance && r.stance.kind === "hostile" ? " (beat them first)" : ""}`);
   } catch (err) { meet = []; }
   return `<button class="cc-operation" type="button" data-operation="${escape(c.id)}" ${c.disabled ? "disabled" : ""} aria-pressed="${c.id === snap.plan?.choiceId}">` +
     `${lean ? `<em class="cc-lean" title="The war is moving this way">the world leans here</em>` : ""}<strong>${escape(title)}</strong><span>${escape(sub)}</span>` +
-    `${meet.length ? `<span class="cc-meet">May meet: ${escape(meet.join(", "))}</span>` : ""}</button>`;
+    `${meet.slice(0, 2).map(m => `<span class="cc-meet rescue">rescue ${escape(m)}</span>`).join("")}${meet.length > 2 ? `<span class="cc-meet rescue more">and ${meet.length - 2} more</span>` : ""}</button>`;
 }
 export function paint() {
   const n = session.narrative;
@@ -107,16 +111,13 @@ export function paint() {
   session.signature = signature;
   const actionable = n?.threads?.filter(t => ["Available", "Committed", "Changed"].includes(t.stage)) || [];
   const shown = session.allThreads ? actionable : actionable.filter(t => n.recommended.includes(t.id));
-  // Who this drop can rescue rides with the operations: under the cards, above the sortie text.
-  // The node is kept and moved (company.js fills it), never rebuilt with the rail.
-  const recruit = $("company-recruit");
-  $("operations-rail").innerHTML = '<p class="cc-eyebrow">Company operations</p><h2>Where do we go next?</h2>' + fieldLine(fieldPeople()) +
+  $("operations-rail").innerHTML = '<h2>What are we doing next?</h2>' + fieldLine(fieldPeople()) +
     choices.slice(0, 3).map(c => opCard(c, ranking.find(o => o.id === c.id), snap)).join("") +
     (choices.length > 3 ? `<details><summary>All ${choices.length} operations</summary>${choices.slice(3).map(c => opCard(c, ranking.find(o => o.id === c.id), snap)).join("")}</details>` : "") +
     (over ? `<p class="cc-epilogue">${escape(snap.hub.node.text)}</p><p>The campaign is complete. The chronicle and the company remain.</p>`
       : !choices.length ? "<p>No operation on this theater. Select another map or refresh after your return.</p>" : "") +
     '<section id="cc-operation-details" aria-label="Selected operation"></section>';
-  if (recruit) $("operations-rail").insertBefore(recruit, $("cc-operation-details"));
+  // Rescues are marks on the board (REZ), not a list beside it.
   $("cc-matters").innerHTML = '<p class="cc-eyebrow">Around the company table</p><h2>Company matters</h2><p class="cc-matters-intro">People, principles, and promises.</p>' +
     shown.map(t => `<button class="cc-thread" type="button" data-thread="${escape(t.id)}" data-stage="${escape(t.stage)}" aria-pressed="${t.id === session.selectedThread}"><small>${escape(t.stage)}${t.remaining !== null ? ` · ${t.remaining} sorties left` : ""}</small><strong>${escape(t.title)}</strong><span>${escape(t.reason)}</span></button>`).join("") +
     (actionable.length > 3 ? `<button type="button" id="cc-more">${session.allThreads ? "Show recommended" : "Show all matters"}</button>` : "") +

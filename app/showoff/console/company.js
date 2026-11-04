@@ -561,7 +561,7 @@ export function renderShop() {
   $("shop-list").innerHTML = ids.map(sec => `<div class="shop-shelf">${esc(shopShelfLabel(sec))}</div>${groups[sec].map(renderShopListing).join("")}`).join("")
     || `<div class="panel-card meta">The store is empty: re-export the campaign pack.</div>`;
   const tab = $("drop-tab-mercs");
-  if (tab) tab.innerHTML = "Mercenaries" + (storeWantsAttention() && !storeLocked() ? `<span class="badge">recommended</span>` : "");
+  if (tab) tab.innerHTML = "<b>What comes</b><span>What else do we bring?</span>" + (storeWantsAttention() && !storeLocked() ? `<span class="badge">hire recommended</span>` : "");
 }
 export function recomputeShopAvailability() {
   const c = commerce();

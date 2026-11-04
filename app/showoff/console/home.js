@@ -20,13 +20,14 @@ export function renderCampCard() {
 
 /* ---- hearth · support talks ------------------------------------------------------- */
 let hearthPending = null;
+export function hearthName(id) { return aceName(id); }
 function aceName(id) {
   const ace = aceById(id);
   if (ace && ace.name) return ace.name;
   const pack = crewPack(id);
   return (pack && pack.name) || id;
 }
-function hearthEligible() {
+export function hearthEligible() {
   const sw = (state.hub && state.hub.supportWeb) || {};
   let talks = Array.isArray(sw.eligibleTalks) ? sw.eligibleTalks.slice() : [];
   if (!talks.length && window.VA_CAMP_TALKS && Array.isArray(window.VA_CAMP_TALKS.talks)) {
@@ -83,7 +84,10 @@ function previewHearthTalk(tid) {
 }
 export async function confirmHearthTalk() {
   if (!hearthPending) return;
-  const talk = hearthPending;
+  await sealHearthTalk(hearthPending);
+}
+// Seal a support talk: the camp talks step (flow.js) and the Company tab's hearth list both call it.
+export async function sealHearthTalk(talk) {
   if (state.hostLive) {
     try {
       const { data } = await api.campTalk({ talkId: talk.id, a: talk.a, b: talk.b });

@@ -63,14 +63,14 @@
       <div class="kicker" id="kicker">Ashwalker command</div>
       <h1 id="title">…</h1>
       <div class="homecoming" id="homecoming" aria-live="polite">
-        <div class="hc-kicker">Sortie home</div>
+        <div class="hc-kicker">Debrief · what happened, and what it changed</div>
         <div class="hc-banner" id="hc-banner">—</div>
         <div class="hc-headline" id="hc-headline"></div>
         <p class="hc-hint" id="hc-hint"></p>
         <div class="hc-chips" id="hc-chips"></div>
         <div class="hc-manifest" id="hc-manifest" hidden></div>
         <div class="hc-actions">
-          <button type="button" class="btn-ghost" id="hc-dismiss">Dismiss</button>
+          <button type="button" class="btn-primary" id="hc-dismiss">Choose the next job</button>
         </div>
       </div>
       <details id="cc-return" hidden></details>
@@ -85,7 +85,7 @@
         <div class="theater-head">
           <div>
             <h2 id="theater-title">Theater</h2>
-            <p class="theater-sub" id="theater-sub">Mark the target (◎), the zone to take, and the pad (△), where you land and lift: a road door we hold, ground we believe is ours, or the camp's next pad. The board shows what the company believes, not the ground.</p>
+            <p class="theater-sub" id="theater-sub"></p>
           </div>
           <div class="waterline" id="waterline" aria-live="polite"></div>
           <div class="mode-bar">
@@ -94,22 +94,6 @@
             <button type="button" class="mode-btn" data-mode="pad" title="Click a zone to land and lift there">△ Pad</button>
           </div>
         </div>
-        <div class="legend-row">
-          <span class="lg-infil">△ Pad — land and lift</span>
-          <span class="lg-target">◎ Target</span>
-          <span class="lg-open">Available objective</span>
-          <span class="lg-stale">Stale belief</span>
-          <span class="lg-dark">? Nobody looked</span>
-          <span class="lg-threat">Threat</span>
-          <span class="lg-eyes">◉ Their eyes on ours</span>
-        </div>
-        <fieldset class="cc-overlays" id="cc-overlays">
-          <legend>Map layers</legend>
-          <label><input type="checkbox" data-overlay="ownership" checked> Ownership</label>
-          <label><input type="checkbox" data-overlay="intelligence" checked> Intelligence</label>
-          <label><input type="checkbox" data-overlay="route" checked> Route</label>
-          <label><input type="checkbox" data-overlay="water" checked> Water</label>
-        </fieldset>
         <!-- Belief key: what the COMPANY believes holds each zone. Faction colour = "we believe they hold it". -->
         <div class="cc-faction-key" aria-label="Belief legend">
           <span class="ally">● Ours</span><span class="held">◆ Held · unseen</span><span class="armada">◆ Armada</span><span class="cortex">◆ Cortex</span><span class="nullmercs">◆ Null Mercs</span><span class="raptors">◆ Wild</span><span class="scavengers">◆ Scavengers</span><span class="empty">○ Empty</span><span class="dark">? Dark · nobody looked</span>
@@ -171,10 +155,9 @@
 
   <footer class="foot">
     <div class="theater-actions" id="theater-actions">
-      <ol class="drop-steps" id="drop-steps" aria-label="Steps to a drop"></ol>
       <div class="actions">
         <button type="button" class="btn-ghost" id="btn-clear-marks" title="Put the pad and the target back where the job starts them">Reset marks</button>
-        <button type="button" class="btn-primary" id="btn-deploy">Ready the drop</button>
+        <button type="button" class="btn-primary" id="btn-deploy">Choose this job</button>
       </div>
       <div class="marks-sum" id="marks-sum"></div>
     </div>
@@ -186,34 +169,39 @@
   </footer>
 </div>
 
-<div class="scrim drop-confirm" id="drop-confirm" role="dialog" aria-modal="true" aria-labelledby="drop-confirm-title">
-  <div class="sheet-card drop-confirm-card">
-    <p class="epigraph">Step 5 of 5 · ready the drop</p>
-    <h2 id="drop-confirm-title">Into the field</h2>
-    <p class="lede" id="drop-confirm-body">The field loads in Beyond All Reason behind the hub while you choose.</p>
-    <div class="drop-tabs" role="tablist" id="drop-tabs">
-      <button type="button" role="tab" class="drop-tab on" data-drop-tab="party">Party</button>
-      <button type="button" role="tab" class="drop-tab" data-drop-tab="reserve">Reserve</button>
-      <button type="button" role="tab" class="drop-tab" data-drop-tab="mercs" id="drop-tab-mercs">Mercenaries</button>
-    </div>
-    <section class="drop-win on" data-drop-win="party" aria-label="Who is dropping">
-      <div class="drop-squad-kicker" id="drop-squad-kicker">Who is dropping</div>
+<!-- The sortie flow (console/flow.js, operations.js): the field loads in BAR behind these screens. -->
+<div class="scrim drop-confirm flow" id="drop-confirm" role="dialog" aria-modal="true" aria-labelledby="drop-confirm-title">
+  <div class="sheet-card drop-confirm-card flow-card">
+    <ol class="flow-steps" id="drop-tabs" aria-label="Before the drop">
+      <li><button type="button" class="drop-tab on" data-drop-tab="talks"><b>Camp talks</b><span>What does the company need to say?</span></button></li>
+      <li><button type="button" class="drop-tab" data-drop-tab="party"><b>Who goes</b><span>Who's on the drop?</span></button></li>
+      <li><button type="button" class="drop-tab" data-drop-tab="reserve" id="drop-tab-mercs"><b>What comes</b><span>What else do we bring?</span></button></li>
+    </ol>
+    <p class="flow-route" id="drop-confirm-body"></p>
+    <h2 id="drop-confirm-title" class="visually-hidden">Before the drop</h2>
+    <section class="drop-win on" data-drop-win="talks" aria-label="Camp talks">
+      <div id="flow-talks" class="flow-talks"></div>
+    </section>
+    <section class="drop-win" data-drop-win="party" aria-label="Who goes">
+      <div class="drop-squad-kicker" id="drop-squad-kicker">Who goes</div>
       <div class="drop-squad" id="drop-squad"></div>
     </section>
-    <section class="drop-win" data-drop-win="reserve" aria-label="What boards from the reserve">
-      <div class="drop-reserve" id="drop-reserve"></div>
+    <section class="drop-win" data-drop-win="reserve" aria-label="What comes">
+      <div class="flow-two">
+        <div class="drop-reserve" id="drop-reserve"></div>
+        <div id="panel-shop">
+          <div class="drop-squad-kicker">Hire for this drop</div>
+          <div class="shop-balances" id="shop-balances"></div>
+          <p id="shop-note" class="shop-note"></p>
+          <div id="deploy-kit"></div>
+          <div id="shop-list"></div>
+        </div>
+      </div>
     </section>
-    <section class="drop-win" data-drop-win="mercs" aria-label="The Cortex mercenary store" id="panel-shop">
-      <div class="drop-squad-kicker">The Cortex mercenary store · for this drop</div>
-      <div class="shop-balances" id="shop-balances"></div>
-      <p id="shop-note" class="shop-note"></p>
-      <div id="deploy-kit"></div>
-      <div id="shop-list"></div>
-    </section>
-    <p class="hint" id="drop-warm-status">The field loads while you confirm the party, the reserve and any mercenaries; Lock drop sends them in the moment it is ready.</p>
+    <p class="hint flow-load" id="drop-warm-status"></p>
     <div class="sheet-actions">
-      <button type="button" class="btn-ghost" id="drop-confirm-cancel">Back to the map</button>
-      <button type="button" class="btn-primary" id="drop-confirm-go">Confirm the party</button>
+      <button type="button" class="btn-ghost" id="drop-confirm-cancel">Back to the jobs</button>
+      <button type="button" class="btn-primary" id="drop-confirm-go">Next</button>
     </div>
   </div>
 </div>
@@ -250,9 +238,9 @@
     </p>
     <ol class="steps">
       <li><span class="n">1</span><span><b>Form the Company</b> on first open — core always ships; pick <b>3 unlocked packs</b>. Unpicked heroes stay off your board until a field recruit.</span></li>
-      <li><span class="n">2</span><span>Pick a <b>field</b> on the planet and a <b>sortie</b> on it, mark the <b>target</b> and the <b>pad</b> (you lift from where you landed), then <b>Ready the drop</b>. The field loads behind the hub while you confirm the party, the reserve and the mercenaries; <b>Lock drop</b> sends them in as soon as it is ready.</span></li>
+      <li><span class="n">2</span><span>Pick a <b>field</b> on the planet and a <b>sortie</b> on it, mark the <b>target</b> and the <b>pad</b> (you lift from where you landed), then <b>Choose this job</b>. The field loads behind the hub while you talk with the company, pick who goes and what comes; <b>Drop</b> sends them in as soon as it is ready.</span></li>
       <li><span class="n">3</span><span>In BAR, take the objective, get what you want to keep onto the pad and press <b>EXTRACT</b> (the fight also ends if the company is wiped). The clock never ends a sortie — overtime only wakes the map. The kernel brings the result home to this screen.</span></li>
-      <li><span class="n">4</span><span><b>Home</b> is the camp — raise the jungle shelf there. The <b>Broker</b> is in <b>Company</b> and shows each available purchase and its exact cost.</span></li>
+      <li><span class="n">4</span><span><b>The camp</b> is what you build in the Rock Jungle. Constructors you leave at base keep building while you are away.</span></li>
       <li><span class="n">5</span><span><b>Save / Load / Reset</b> live under <b>System</b> in the top bar.</span></li>
     </ol>
     <p class="hint">Lost? Hit <b>How this works</b> in the bar below anytime.</p>

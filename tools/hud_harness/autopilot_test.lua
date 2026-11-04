@@ -360,4 +360,21 @@ assert(find(CMD.ATTACK), "three minutes on, the guns go in with what has gathere
 Spring.GetGameFrame = nil
 GG.VA_RivalKings = nil
 
-print("ok: rescue squad, protected orders, departure to the real pad radius, leaving with and without a HUD, holding a capture, the Spire Gate and its tech ladder, the siege")
+-- a scout mark: the rig sends its fastest fighter there on FIGHT, and lets go once it is done
+reset()
+Spring.GetTeamUnits = function() return { 1, 2 } end
+Spring.GetUnitDefID = function(uid) return uid end
+GG.VA_RivalKings, GG.VA_ObjectiveTargets = nil, nil
+Spring.GetUnitRulesParam = function() return nil end      -- nobody here is a hero
+rules.va_secondary_total, rules.va_sec1_kind, rules.va_sec1_done, rules.va_sec1_x, rules.va_sec1_z = 1, "scout", 0, 4000, 1200
+gadget:GameFrame(941)
+local sc = find(CMD.FIGHT)
+assert(sc and sc.units[1] == 1 and sc.params[1] == 4000 and sc.params[3] == 1200, "the fighter goes to look")
+assert(not gadget:AllowCommand(1), "and BARb leaves it on the look")
+rules.va_sec1_done = 1
+orders = {}
+gadget:GameFrame(1541)
+assert(gadget:AllowCommand(1), "scouted: back to BARb")
+assert(not find(CMD.FIGHT), "and nobody is sent again")
+
+print("ok: scout marks, rescue squad, protected orders, departure to the real pad radius, leaving with and without a HUD, holding a capture, the Spire Gate and its tech ladder, the siege")
