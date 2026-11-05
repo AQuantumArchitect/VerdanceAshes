@@ -405,18 +405,26 @@ class Field:
 
     @staticmethod
     def war_faction(fac: str) -> Dict[str, Any]:
+        """Get-WarFaction.
+
+        PS FAULT, KEPT: the PS1's parameter was ``[string]$Faction``, and PowerShell variable names
+        ignore case, so inside that function ``$FACTION["Armada"]`` indexed the parameter string, not
+        the faction table, and came back null. Every Armada and Cortex war seat (standing wars, Eye
+        scouts, visit-tier wardens, kings) went out with ``rgb: null`` (all ten standing-war sorties
+        of the 2026-11-04 corpus); only the Null Mercs, read from $MERC, had a colour.
+        """
         if ieq(fac, "nullmercs"):
             return {"T": MERC, "side": "Legion", "label": "Null Mercs"}
         if ieq(fac, "cortex"):
-            return {"T": FACTION["Cortex"], "side": "Cortex", "label": "Cortex"}
-        return {"T": FACTION["Armada"], "side": "Armada", "label": "Armada"}
+            return {"T": None, "side": "Cortex", "label": "Cortex"}
+        return {"T": None, "side": "Armada", "label": "Armada"}
 
     def new_war_team(self, fac: str, center: List[float], label: str, rect: float = 0.16) -> Dict[str, Any]:
         w = self.war_faction(fac)
         team_id, ally_id = self._seat()
         self.ally_teams.append({"id": ally_id, "startRect": start_rect(center, rect)})
         self.teams.append({"id": team_id, "side": w["side"], "allyTeam": ally_id, "base": [center[0], center[1]],
-                           "rgb": w["T"]["rgb"], "label": f"{w['label']} - {label}", "faction": fac})
+                           "rgb": g(w["T"], "rgb"), "label": f"{w['label']} - {label}", "faction": fac})
         self.ai.append({"name": f"BARb({w['label']} {label})", "shortName": "BARb", "team": team_id,
                         "version": "<not-versioned>"})
         if ieq(fac, "armada") and self.primary_enemy_team_id is None:

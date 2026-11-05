@@ -26,7 +26,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 from verdance.mission_builder import kits
 from verdance.mission_builder import shell as shell_mod
 from verdance.mission_builder._ps import (
-    CIDict, B, D, I, R, S, T, arr, eq, fmt, g, has, ieq, iin, ilike, imatch, sign, sort_unique_ints,
+    CIDict, B, D, I, JNum, R, S, T, arr, plain_json, ps_json, eq, fmt, g, has, ieq, iin, ilike, imatch, sign, sort_unique_ints,
 )
 from verdance.mission_builder.field import (
     SHELL_CAPABLE_KINDS, Field, clamp01, edge_score, push_to_rim, start_rect, zone_by_id, zone_center,
@@ -245,9 +245,9 @@ def _field_recruit_rows(ws: Path, state: Any, map_id: str, marked: List[Any], ar
     try:
         from verdance.company.company import field_recruits_for_map
 
-        rows = field_recruits_for_map(copy.deepcopy(state), map_id, workspace=Path(ws), limit=None,
+        rows = field_recruits_for_map(plain_json(state), map_id, workspace=Path(ws), limit=None,
                                       marked_zone_ids=list(marked or []), objective_archetype=archetype or "")
-        payload = json.loads(json.dumps({"rows": rows}))
+        payload = json.loads(json.dumps({"rows": rows}), parse_float=JNum)
     except Exception as e:  # noqa: BLE001
         log(fmt("Field recruit draw failed ({0}); this sortie meets nobody.", str(e)))
         return []
@@ -283,8 +283,9 @@ def _build(ws: Path, intent: Dict[str, Any], state: Any, *, intent_path: str, st
            launch: bool = False, save_game: bool = False, save_name: str = "", timeout_seconds: int = 300,
            extra_mod_options: str = "", log: Log = print) -> BuildResult:
     ws = Path(ws)
-    intent = copy.deepcopy(intent)
-    state = copy.deepcopy(state)
+    # 5.1 held every non-integer JSON number as a decimal (see _ps.JNum).
+    intent = ps_json(copy.deepcopy(intent))
+    state = ps_json(copy.deepcopy(state))
     res = BuildResult()
 
     pool_path = ws / "data" / "map_pool" / "seven_maps.json"

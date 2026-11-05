@@ -14,7 +14,7 @@ import re
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Set
 
-from verdance.mission_builder._ps import CIDict, D, I, S, T, arr, eq, fmt, g, has, ieq, iin, imatch, ilike
+from verdance.mission_builder._ps import CIDict, D, I, JNum, S, T, arr, eq, fmt, g, has, ieq, iin, imatch, ilike
 from verdance.mission_builder.kits import each, props, scatter
 
 Log = Callable[[str], None]
@@ -29,7 +29,7 @@ def read_json(path: Path) -> Any:
     template's "growMix" note, none of which it copies), so the port reads UTF-8 and does not copy
     that fault.
     """
-    return json.loads(Path(path).read_text(encoding="utf-8-sig"))
+    return json.loads(Path(path).read_text(encoding="utf-8-sig"), parse_float=JNum)
 
 
 def ci_get(obj: Any, name: Any) -> Any:

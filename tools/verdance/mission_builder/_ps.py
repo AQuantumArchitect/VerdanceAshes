@@ -15,6 +15,68 @@ import re
 from typing import Any, Dict, Iterable, Iterator, List, Optional, Tuple
 
 
+class JNum(float):
+    """A non-integer number read from JSON, as Windows PowerShell 5.1 holds it: a System.Decimal.
+
+    5.1's ConvertFrom-Json (JavaScriptSerializer) reads 0.24000000000000002 as that exact decimal,
+    and ``[double]`` on it is Decimal.ToDouble, which converts the 17-digit mantissa to a double
+    first and divides by the power of ten after: 0.24, where Python's own parse keeps
+    0.24000000000000002 (the companion's xp, tour 07 and tour 11 of the 2026-11-04 corpus). The value
+    behaves as the float Python parsed; ``D()`` and ``S()`` see the decimal.
+    """
+
+    __slots__ = ("text",)
+
+    def __new__(cls, text: str) -> "JNum":
+        obj = super().__new__(cls, float(text))
+        obj.text = text
+        return obj
+
+    def to_double(self) -> float:
+        from decimal import Decimal
+
+        d = Decimal(self.text)
+        sign_, digits, exp = d.as_tuple()
+        if not isinstance(exp, int):
+            return float(self)
+        m = int("".join(map(str, digits))) if digits else 0
+        if exp >= 0:
+            v = float(m * (10 ** exp))
+        else:
+            v = float(m) / (10.0 ** (-exp))
+        return -v if sign_ else v
+
+    def to_text(self) -> str:
+        from decimal import Decimal
+
+        return format(Decimal(self.text), "f")
+
+
+def ps_json(v: Any) -> Any:
+    """Data as 5.1 parsed it: every non-integer number becomes a JNum (its text is Python's repr,
+    which is what the Python side wrote into the file)."""
+    if isinstance(v, JNum):
+        return v
+    if isinstance(v, float):
+        return JNum(repr(v)) if math.isfinite(v) else v
+    if isinstance(v, dict):
+        return {k: ps_json(x) for k, x in v.items()}
+    if isinstance(v, list):
+        return [ps_json(x) for x in v]
+    return v
+
+
+def plain_json(v: Any) -> Any:
+    """The reverse of ps_json, for output: a JNum written back is the decimal text it was read as."""
+    if isinstance(v, JNum):
+        return float(v)
+    if isinstance(v, dict):
+        return {k: plain_json(x) for k, x in v.items()}
+    if isinstance(v, list):
+        return [plain_json(x) for x in v]
+    return v
+
+
 def T(v: Any) -> bool:
     """LanguagePrimitives.IsTrue: what ``if ($v)`` and ``-not $v`` decide."""
     if v is None:
@@ -80,6 +142,8 @@ def S(v: Any) -> str:
         return "True" if v else "False"
     if isinstance(v, int):
         return str(v)
+    if isinstance(v, JNum):
+        return v.to_text()
     if isinstance(v, float):
         return dotnet_double_str(v)
     if isinstance(v, str):
@@ -144,6 +208,8 @@ def D(v: Any) -> float:
         return 0.0
     if isinstance(v, bool):
         return 1.0 if v else 0.0
+    if isinstance(v, JNum):
+        return v.to_double()
     if isinstance(v, (int, float)):
         return float(v)
     if isinstance(v, str):
