@@ -549,7 +549,7 @@ export function renderShop() {
       <div class="bal cred">Metal to spend<strong>${(metalKOf(c) * 1000).toLocaleString()}</strong>from what you brought home</div>
       <div class="bal tnb">Tenebrium<strong>${c.tenebrium ?? 0}</strong>for builders and the suit</div>`;
   $("shop-note").textContent = storeLocked() ? "The drop is locked. What you hired is aboard; the store opens again for the next drop."
-    : "Everything here is for this drop only, and the field keeps loading while you hire. A rented hero joins the party; win the campaign with them in the company and they are yours.";
+    : "Everything here is for this drop only. A rented hero joins the party; win the campaign with them in the company and they are yours.";
   const kit = c.deployKit || [];
   const inbound = c.inbound || c.pendingDeliveries || [];
   const kitHtml = kit.map(k => `<div class="kit-line"><b>${esc(k.label || k.listingId)}</b>${k.count ? " · ×" + esc(k.count) : ""}${k.loan ? " · loan" : ""}${k.factoryDef ? " · fabricator" : ""}</div>`).join("");

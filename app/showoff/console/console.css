@@ -188,6 +188,7 @@ details.advanced summary { color:var(--steam); }
 .cc-rail button.cc-operation[aria-pressed=true] { border-left:3px solid var(--gold); }
 .cc-rail .cc-operation .cc-meet { display:block; margin-top:.3rem; font-size:var(--fs-xs); color:var(--steam); }
 .cc-rail .cc-operation .cc-standing { display:block; margin-top:.2rem; font-size:var(--fs-xs); color:var(--muted); }
+.cc-home-pull { font-size:var(--fs-sm); color:var(--tnb); line-height:1.45; margin:.2rem 0 .6rem; border-left:2px solid var(--tnb); padding-left:.5rem; }
 .cc-field-people { font-size:var(--fs-sm); color:var(--muted); line-height:1.45; margin:.2rem 0 .6rem; border-left:2px solid var(--warn); padding-left:.5rem; }
 .cc-field-people b { color:var(--good); font-weight:600; }
 .cc-field-people b.bad { color:var(--bad); }

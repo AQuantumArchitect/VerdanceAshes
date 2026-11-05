@@ -74,7 +74,7 @@ export function renderTalks() {
   const said = queue.filter(t => answered.has(t.key)).map(t =>
     `<li><b>${escape(t.title)}</b> <span>${escape(answered.get(t.key))}</span></li>`).join("");
   if (!next) {
-    root.innerHTML = `<p class="flow-kicker">All ${queue.length} talked through</p><ul class="flow-said">${said}</ul>`;
+    root.innerHTML = `<p class="flow-kicker">${queue.length === 1 ? "Talked through" : queue.length === 2 ? "Both talked through" : `All ${queue.length} talked through`}</p><ul class="flow-said">${said}</ul>`;
     return;
   }
   root.innerHTML =

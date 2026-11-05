@@ -42,9 +42,12 @@ function setCount(def, n) {
 
 // Bring the builders along, or leave them home to build. Bringing them makes room on a full lift by
 // leaving the cheapest fighters home first, one at a time, until the builders fit.
+let madeRoom = "";
 function toggleBuilders() {
   const bring = reserveBring();
+  madeRoom = "";
   if (buildersAboard(bring)) { for (const u of builders()) delete bring[u.unitDef]; return; }
+  const before = { ...bring };
   const cap = Number(surface().liftCap) || 0;
   const want = Math.min(cap, builders().reduce((s, u) => s + u.value * u.count, 0));
   const fighters = (surface().units || []).filter(u => !u.builder).sort((a, b) => a.value - b.value);
@@ -55,13 +58,16 @@ function toggleBuilders() {
     }
   }
   for (const u of builders()) setCount(u.unitDef, u.count);
+  const left = fighters.filter(u => (before[u.unitDef] || 0) > (bring[u.unitDef] || 0))
+    .map(u => `−${(before[u.unitDef] || 0) - (bring[u.unitDef] || 0)} ${u.name}`);
+  madeRoom = left.length ? `Made room: ${left.join(", ")} stay at base.` : "";
 }
 
 export function renderReserve(locked) {
   const host = $("drop-reserve");
   if (!host) return;
   const s = surface();
-  const padRule = `<p class="rv-rule">Only what stands on the pad when you extract comes home. Anything left in the field stays there.</p>`;
+  const padRule = `<p class="rv-rule">Only what stands on the pad when you extract comes home. Anything left in the field stays there, and what you built there becomes a holding.</p>`;
   if (!(s.units || []).length) {
     host.innerHTML = `<div class="drop-squad-kicker">The reserve</div>` +
       `<p class="hint">Nothing in reserve yet. What you build, raise or capture and get onto the pad comes home and waits here.</p>` + padRule;
@@ -77,7 +83,8 @@ export function renderReserve(locked) {
     ? `<div class="rv-builders"><span>${bOn
         ? (atHome() ? `Builders come along to build the camp.` : `Builders come along, so nobody builds at base this time.`)
         : (atHome() ? `Builders stay at base. Bring them to build the camp.` : `Builders stay at base and build the camp while you are away.`)}</span>` +
-      (locked ? "" : `<button type="button" class="btn-ghost" data-rv-builders="1">${bOn ? "Leave them home" : "Bring them"}</button>`) + `</div>`
+      (locked ? "" : `<button type="button" class="btn-ghost" data-rv-builders="1">${bOn ? "Leave them home" : "Bring them"}</button>`) + `</div>` +
+      (bOn && madeRoom ? `<p class="rv-note">${esc(madeRoom)}</p>` : "")
     : "";
   const rows = (s.units || []).map(u => {
     const n = bring[u.unitDef] || 0;
@@ -108,6 +115,7 @@ export function installReserve() {
     const b = ev.target.closest("button");
     if (!b || b.disabled) return;
     const bring = reserveBring();
+    if (!b.dataset.rvBuilders) madeRoom = "";
     if (b.dataset.rvSuggest) resetReserveBring();
     else if (b.dataset.rvBuilders) toggleBuilders();
     else if (b.dataset.rvPlus) setCount(b.dataset.rvPlus, (bring[b.dataset.rvPlus] || 0) + 1);

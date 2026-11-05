@@ -107,6 +107,16 @@ function opCard(c, op, snap) {
     `${lean ? `<em class="cc-lean" title="The war is moving this way">the world leans here</em>` : ""}<strong>${escape(title)}</strong><span>${escape(sub)}</span>${standing}` +
     `${meet.slice(0, 2).map(m => `<span class="cc-meet rescue">rescue ${escape(m)}</span>`).join("")}${meet.length > 2 ? `<span class="cc-meet rescue more">and ${meet.length - 2} more</span>` : ""}</button>`;
 }
+// The pull home (verdance.campaign.home.home_pull) in one line, once the bag is worth the trip.
+function homePullLine(hub) {
+  const c = (hub && hub.homeCamp) || {};
+  if (c.cleared || !(Number(c.pull) >= 0.5)) return "";
+  const tnb = Number((hub.commerce || {}).tenebrium ?? hub.tenebrium ?? 0);
+  const want = Math.round(Number(c.stockWanted) || 0);
+  const why = Number(c.worthK) >= 0.05 ? `the camp stands at ${Number(c.worthK).toFixed(1)}k metal, so a visit wants about ${want}`
+    : `nothing stands in the camp yet, and about ${want} is enough to start one`;
+  return `<p class="cc-home-pull">${escape(`${tnb} Tenebrium in the bag: ${Number(c.pull) >= 0.8 ? "take it home and build" : "worth the trip home"}. Ketha: ${why}.`)}</p>`;
+}
 export function paint() {
   const n = session.narrative;
   const snap = snapshot();
@@ -122,7 +132,7 @@ export function paint() {
   session.signature = signature;
   const actionable = n?.threads?.filter(t => ["Available", "Committed", "Changed"].includes(t.stage)) || [];
   const shown = session.allThreads ? actionable : actionable.filter(t => n.recommended.includes(t.id));
-  $("operations-rail").innerHTML = '<h2>What are we doing next?</h2>' + fieldLine(fieldPeople()) +
+  $("operations-rail").innerHTML = '<h2>What are we doing next?</h2>' + homePullLine(snap.hub) + fieldLine(fieldPeople()) +
     choices.slice(0, 3).map(c => opCard(c, ranking.find(o => o.id === c.id), snap)).join("") +
     (choices.length > 3 ? `<details><summary>All ${choices.length} operations</summary>${choices.slice(3).map(c => opCard(c, ranking.find(o => o.id === c.id), snap)).join("")}</details>` : "") +
     (over ? `<p class="cc-epilogue">${escape(snap.hub.node.text)}</p><p>The campaign is complete. The chronicle and the company remain.</p>`

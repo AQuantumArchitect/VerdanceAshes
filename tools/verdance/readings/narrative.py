@@ -136,13 +136,12 @@ def what_it_pays(kind: str = "") -> str:
         rewards = json.loads((ROOT / "data" / "commerce" / "commerce_catalog.json").read_text(encoding="utf-8-sig")).get("sortieRewards") or {}
     except Exception:  # noqa: BLE001
         rewards = {}
-    line = ("The metal in storage when you extract comes home (1k for every 1,000 above what the field gave you): "
-            "build metal storage and reclaim everything before you lift.")
+    line = "Metal in storage at extract comes home, above what the field gave you. Build storage and reclaim before you lift."
     v = rewards.get("metalOnVictory") or {}
     if v and int(v.get("max") or 0):
         lo, hi = int(v.get("min") or 0), int(v.get("max") or 0)
         line += f" A win adds {lo}-{hi}k." if hi > lo else f" A win adds {hi}k."
-    line += " Tenebrium only from what fallen builders leave: reclaim it. A scout mark pays in what you learn, a rescue in a person."
+    line += " Tenebrium: reclaim fallen builders. Scouting pays in what you learn, a rescue in a person."
     if kind == "kings_showdown":
         line = "The throne. " + line
     return line
