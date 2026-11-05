@@ -36,3 +36,17 @@ def test_the_debrief_says_what_moved():
     assert mv["rescued"] == ["Vane"] and mv["camp"] == {"grew": 4, "waiting": 6}
     home = engine.what_moved(before, st, res, "the_rock_jungle", [], [])
     assert home["camp"]["placed"] == 2
+
+
+def test_a_beating_at_home_raises_the_bar_and_fades():
+    from verdance.campaign.home import home_pull
+    st = {"commerce": {"tenebrium": 2}, "history": []}
+    calm = home_pull(st)["pull"]
+    st["history"] = [{"mapId": "the_rock_jungle", "verdict": "defeat"}]
+    beaten = home_pull(st)["pull"]
+    assert beaten < calm - 0.2
+    later = []
+    for _ in range(6):
+        st["history"].append({"mapId": "tabula", "verdict": "victory"})
+        later.append(home_pull(st)["pull"])
+    assert all(b > a for a, b in zip([beaten] + later, later)) and later[-1] > calm - 0.1

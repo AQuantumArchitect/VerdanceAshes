@@ -34,6 +34,11 @@ HOME_PULL_PER_STAKE = 0.6     # Tnb more per 1k metal of camp, while the camp is
 HOME_PULL_STAKE_SCALE = 8.0   # 1k metal: where the rise starts to slow
 HOME_PULL_WIDTH = 0.9         # Tnb: how soft the curve is around its threshold
 HOME_READY_PULL = 0.5         # the clear job is offered from here (the curve's midpoint)
+# A beating at home raises the bar too (hard-AI run, 2026-11-04: three Rock Jungle defeats in six
+# sorties with 2 Tnb and no camp, the bag never moving): each Rock Jungle defeat adds
+# HOME_SCAR_RISE Tnb to the stock a visit wants, fading by e every HOME_SCAR_FADE sorties since.
+HOME_SCAR_RISE = 1.5          # Tnb
+HOME_SCAR_FADE = 3.0          # sorties
 HOME_KEY_ZONES = (
     "TRJ_C_SPILLWAY",
     "TRJ_C_INNER_SPILLWAY",
@@ -85,13 +90,26 @@ def camp_stake(state: Dict[str, Any], workspace: Path | None = None) -> float:
     return total / 1000.0
 
 
+def home_scar(state: Dict[str, Any]) -> float:
+    """Recent Rock Jungle defeats, each fading by e every HOME_SCAR_FADE sorties."""
+    hist = [b for b in (state.get("history") or []) if isinstance(b, dict)]
+    total = 0.0
+    for age, b in enumerate(reversed(hist)):
+        mid = str(b.get("mapId") or "").lower().replace(" ", "_")
+        if mid in (HOME_MAP_ID, "rock_jungle") and str(b.get("verdict") or "").lower() == "defeat":
+            total += math.exp(-age / HOME_SCAR_FADE)
+    return total
+
+
 def home_pull(state: Dict[str, Any], workspace: Path | None = None) -> Dict[str, Any]:
     """How hard the Tenebrium in the bag pulls the company home: a smooth curve, never a rule."""
     tnb = float((state.get("commerce") or {}).get("tenebrium") or 0)
     stake = camp_stake(state, workspace)
     threshold = HOME_PULL_BASE + HOME_PULL_PER_STAKE * HOME_PULL_STAKE_SCALE * math.log1p(stake / HOME_PULL_STAKE_SCALE)
+    scar = home_scar(state)
+    threshold += HOME_SCAR_RISE * scar
     pull = 1.0 / (1.0 + math.exp(-(tnb - threshold) / HOME_PULL_WIDTH))
-    return {"pull": round(pull, 4), "tenebrium": int(tnb), "stake": round(stake, 3),
+    return {"pull": round(pull, 4), "tenebrium": int(tnb), "stake": round(stake, 3), "scar": round(scar, 4),
             "threshold": round(threshold, 3), "ready": pull >= HOME_READY_PULL}
 
 
@@ -184,6 +202,9 @@ __all__ = [
     "HOME_PULL_STAKE_SCALE",
     "HOME_PULL_WIDTH",
     "HOME_READY_PULL",
+    "HOME_SCAR_RISE",
+    "HOME_SCAR_FADE",
+    "home_scar",
     "camp_stake",
     "home_pull",
     "HOME_KEY_ZONES",
