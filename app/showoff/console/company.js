@@ -507,6 +507,12 @@ function storeLocked() {
   const phase = state.warm && state.warm.phase;
   return phase === "dropping" || phase === "up" || !!(state.warm && state.warm.dropLocked);
 }
+// One line per listing (playtest, 2026-11-04): the first sentence; the rest is on hover.
+function firstSentence(text) {
+  const t = String(text || "").trim();
+  const m = t.match(/^.*?[.!?](\s|$)/);
+  return m ? m[0].trim() : t;
+}
 function renderShopListing(item) {
   const locked = !item.available || storeLocked();
   const owned = item.owned;
@@ -530,11 +536,11 @@ function renderShopListing(item) {
   return `<div class="listing ${owned ? "owned" : ""} ${locked ? "locked" : ""} ${rec && rec.have < rec.want ? "recommended" : ""}" data-id="${esc(item.id)}">
       <div class="title"><strong>${esc(item.label)}</strong><span class="cost">${esc(costs.join(" · "))}</span></div>
       ${recLine}
-      <div class="blurb">${esc(item.blurb)}</div>
+      <div class="blurb" title="${esc(item.blurb || "")}">${esc(firstSentence(item.blurb))}</div>
       ${etaLine}
       ${why ? `<div class="block">${esc(why)}</div>` : ""}
       ${ownedLine}
-      ${showBuy ? `<button type="button" class="btn-buy" data-buy="${esc(item.id)}" ${locked ? "disabled" : ""}>${state.hostLive ? verb : "Preview " + verb.toLowerCase()}</button>` : ""}
+      ${showBuy ? `<button type="button" class="btn-buy" data-buy="${esc(item.id)}" ${locked ? "disabled" : ""}>${verb}</button>` : ""}
     </div>`;
 }
 export function renderShop() {
@@ -542,9 +548,7 @@ export function renderShop() {
   $("shop-balances").innerHTML = `
       <div class="bal cred">Metal to spend<strong>${(metalKOf(c) * 1000).toLocaleString()}</strong>from what you brought home</div>
       <div class="bal tnb">Tenebrium<strong>${c.tenebrium ?? 0}</strong>for builders and the suit</div>`;
-  $("shop-note").textContent = !state.hostLive
-    ? "Preview only. Start PLAY.bat and keep its window open to make campaign purchases."
-    : storeLocked() ? "The drop is locked. What you hired is aboard; the store opens again for the next drop."
+  $("shop-note").textContent = storeLocked() ? "The drop is locked. What you hired is aboard; the store opens again for the next drop."
     : "Everything here is for this drop only, and the field keeps loading while you hire. A rented hero joins the party; win the campaign with them in the company and they are yours.";
   const kit = c.deployKit || [];
   const inbound = c.inbound || c.pendingDeliveries || [];

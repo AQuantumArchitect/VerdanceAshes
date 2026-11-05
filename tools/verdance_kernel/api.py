@@ -1116,9 +1116,10 @@ class CampaignKernel:
             held = _reserve.ensure_reserve(roster)
             cap = _reserve.lift_cap(st)
             asked = (body or {}).get("reserveBring")
+            _intent = load_json(self.ws / "outbox" / "next_mission_intent.json", {})
             roster["cadre"] = (_reserve.clamp_bring(asked, held, cap, self.ws) if isinstance(asked, dict)
-                               else _reserve.default_bring(held, cap, self.ws))
-            if _theaters.is_solo(load_json(self.ws / "outbox" / "next_mission_intent.json", {})):
+                               else _reserve.default_bring(held, cap, self.ws, map_id=str(_intent.get("mapId") or "")))
+            if _theaters.is_solo(_intent):
                 band, aces, roster["cadre"] = [], [], {}     # the kings' showdown: the commander alone
             save_json(sp, st)
             _hot.record_roster(self.ws, band, aces)
@@ -1281,7 +1282,8 @@ class CampaignKernel:
                             roster["cadre"] = {d: int(n) for d, n in held.items() if int(n or 0) > 0}
                         else:
                             roster["cadre"] = (_reserve.clamp_bring(asked, held, cap, self.ws) if isinstance(asked, dict)
-                                               else _reserve.default_bring(held, cap, self.ws))
+                                               else _reserve.default_bring(held, cap, self.ws,
+                                                                           map_id=str(plan.get("mapId") or "")))
                         plan["reserveBring"] = dict(roster["cadre"])
                         save_json(sp, st)
                 except Exception as e:  # noqa: BLE001

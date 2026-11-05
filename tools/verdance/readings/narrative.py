@@ -142,7 +142,7 @@ def what_it_pays(kind: str = "") -> str:
     if v and int(v.get("max") or 0):
         lo, hi = int(v.get("min") or 0), int(v.get("max") or 0)
         line += f" A win adds {lo}-{hi}k." if hi > lo else f" A win adds {hi}k."
-    line += " Tenebrium only from what fallen builders leave: reclaim it. Bonus marks earn Null Mercs standing."
+    line += " Tenebrium only from what fallen builders leave: reclaim it. A scout mark pays in what you learn, a rescue in a person."
     if kind == "kings_showdown":
         line = "The throne. " + line
     return line

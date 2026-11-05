@@ -18,6 +18,8 @@ from .measure import bp_access
 from .roster import ensure_roster
 
 METAL_UNIT = 1000  # 1km$ = 1000 BAR metal
+_FACTION_NAME = {"armada": "Armada", "cortex": "Cortex", "legion": "Legion", "nullmercs": "the Null Mercs",
+                 "ashwalkers": "the Ashwalkers", "wild": "the wilds"}
 
 
 def load_commerce_catalog(workspace: Optional[Path] = None) -> Dict[str, Any]:
@@ -286,15 +288,15 @@ def listing_available(
     for faction, need in (listing.get("repMin") or {}).items():
         have = float(rep.get(faction, 0) or 0)
         if have < float(need):
-            return False, f"need {faction} rep >= {need} (have {have:.0f})"
+            return False, f"needs standing {float(need):.0f} with {_FACTION_NAME.get(faction, faction.title())} (you have {have:.0f})"
     tcost = int(listing.get("tenebriumCost") or 0)
     if listing.get("builds") and tcost < 1:
         tcost = 1
     mcost = listing_metal_cost_k(listing)
     if int(commerce.get("tenebrium") or 0) < tcost:
-        return False, f"need {tcost} Tenebrium (have {commerce.get('tenebrium', 0)})"
+        return False, f"needs {tcost} Tenebrium (you have {commerce.get('tenebrium', 0)})"
     if int(commerce.get("metalK") or 0) < mcost:
-        return False, f"need {mcost}×1km$ metal (have {commerce.get('metalK', 0)})"
+        return False, f"needs {mcost}k metal (you have {commerce.get('metalK', 0)}k)"
     return True, "ok"
 
 

@@ -80,11 +80,32 @@ class TestHomeCamp(unittest.TestCase):
     def test_home_clear_ready_from_tenebrium_to_spend(self):
         """Owner call, 2026-11-03: no camp level. Tenebrium to spend sends the company home."""
         st = engine.default_v1_state()
-        st["commerce"]["tenebrium"] = 2
+        st["commerce"]["tenebrium"] = 1
         self.assertFalse(engine.evaluate_home_clear(st).get("homeClearReady"))
         st["commerce"]["tenebrium"] = 3
         self.assertTrue(engine.evaluate_home_clear(st).get("homeClearReady"))
         self.assertNotIn("level", st["homeCamp"])
+
+    def test_the_pull_home_is_a_smooth_curve_that_a_bigger_camp_raises(self):
+        """Owner call, 2026-11-04: parametric and continuous, and the more already in the Rock
+        Jungle, the more Tenebrium to stock before going back."""
+        from verdance.campaign.home import home_pull
+        def pull(tnb, n_towers):
+            st = {"commerce": {"tenebrium": tnb},
+                  "playerFootprints": {"the_rock_jungle": {"units": [{"unitDefName": "leglht"}] * n_towers}}}
+            return home_pull(st)
+        empty = [pull(t, 0)["pull"] for t in range(0, 9)]
+        big = [pull(t, 120)["pull"] for t in range(0, 9)]
+        # rises with the bag, never jumps more than a curve of width ~1 Tnb can
+        for row in (empty, big):
+            self.assertTrue(all(0.0 < p < 1.0 for p in row))
+            self.assertTrue(all(b > a for a, b in zip(row, row[1:])))
+            self.assertTrue(all(b - a < 0.3 for a, b in zip(row, row[1:])))
+        # the same bag pulls less once the camp is worth more: the bar moved up, smoothly
+        self.assertTrue(all(b < e for b, e in zip(big, empty)))
+        thresholds = [pull(3, n)["threshold"] for n in (0, 10, 40, 120, 400)]
+        self.assertTrue(all(b > a for a, b in zip(thresholds, thresholds[1:])))
+        self.assertAlmostEqual(pull(0, 0)["threshold"], 2.0)
 
     def test_the_camp_is_what_stands_in_the_rock_jungle(self):
         st = engine.default_v1_state()

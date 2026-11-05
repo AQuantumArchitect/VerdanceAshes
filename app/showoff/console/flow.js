@@ -7,7 +7,8 @@
 //
 // Talks: the story scenes and the company matters the kernel has open (verdance.readings.narrative),
 // and one hearth support talk. Every talk has the null answer "No time for this." A declined scene
-// or matter is closed for good; a declined support talk can come back (supports build up).
+// or matter is closed for good; a declined support talk can come back (supports build up). Two talks
+// at most per drop (TALKS_PER_DROP); whatever is left waits for the next one.
 // Talks never change the mission: the field is already loading.
 import { state, session } from "./state.js";
 import { api } from "./api.js";
@@ -15,6 +16,9 @@ import { $, esc, escape, pretty, toast } from "./render.js";
 import { hearthEligible, hearthName, sealHearthTalk } from "./home.js";
 
 const NULL_LABEL = "No time for this.";
+// At most this many talks before one drop (playtest, 2026-11-04: four in a row on the 20th sortie is
+// a chore). Story scenes go first, then the most pressing matter, then a support talk; the rest wait.
+export const TALKS_PER_DROP = 2;
 let queue = [];            // the talks of this flow, fixed when it opens
 let answered = new Map();  // talk key -> the answer's label
 let busy = false;
@@ -51,7 +55,7 @@ export function buildTalkQueue() {
   // one matter at a time: the company's most pressing open question it hasn't declined
   const matter = (n.threads || []).find(t => t.stage === "Available" && !t.passed && (t.choices || []).length);
   const hearth = (hearthEligible() || [])[0];
-  queue = scenes.concat(matter ? [matterTalk(matter)] : [], hearth ? [hearthTalk(hearth)] : []);
+  queue = scenes.concat(matter ? [matterTalk(matter)] : [], hearth ? [hearthTalk(hearth)] : []).slice(0, TALKS_PER_DROP);
   answered = new Map();
   return queue;
 }

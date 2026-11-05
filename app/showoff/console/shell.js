@@ -97,8 +97,14 @@ function opCard(c, op, snap) {
         return `${r.name || r.id}${where}${r.stance && r.stance.kind === "hostile" ? " (against us: beat them first)" : ""}`;
       });
   } catch (err) { meet = []; }
+  // Standing where the job touches it (playtest, 2026-11-04): who you fight, and how they regard you now.
+  const rep = snap.hub.reputation || {};
+  const sideName = { armada: "Armada", cortex: "Cortex", legion: "Legion", nullmercs: "the Null Mercs" };
+  const against = String(eff.against || "");
+  const standing = sideName[against] && rep[against] != null
+    ? `<span class="cc-standing">against ${escape(sideName[against])} · standing ${Math.round(Number(rep[against]))} of 100</span>` : "";
   return `<button class="cc-operation" type="button" data-operation="${escape(c.id)}" ${c.disabled ? "disabled" : ""} aria-pressed="${c.id === snap.plan?.choiceId}">` +
-    `${lean ? `<em class="cc-lean" title="The war is moving this way">the world leans here</em>` : ""}<strong>${escape(title)}</strong><span>${escape(sub)}</span>` +
+    `${lean ? `<em class="cc-lean" title="The war is moving this way">the world leans here</em>` : ""}<strong>${escape(title)}</strong><span>${escape(sub)}</span>${standing}` +
     `${meet.slice(0, 2).map(m => `<span class="cc-meet rescue">rescue ${escape(m)}</span>`).join("")}${meet.length > 2 ? `<span class="cc-meet rescue more">and ${meet.length - 2} more</span>` : ""}</button>`;
 }
 export function paint() {
@@ -110,7 +116,7 @@ export function paint() {
   const over = snap.hub.node?.kind === "epilogue";
   const ranking = n?.operations || [];
   choices.sort((a, b) => ranking.findIndex(o => o.id === a.id) - ranking.findIndex(o => o.id === b.id));
-  const signature = JSON.stringify([snap.hub.node?.kind, snap.hub.node?.choices?.length, n, snap.live, snap.focusMap, snap.plan?.choiceId, snap.hub.homeCamp, snap.hub.aces, snap.hub.lastResult, snap.hub.camp, session.allThreads, session.selectedThread, session.error]);
+  const signature = JSON.stringify([snap.hub.node?.kind, snap.hub.node?.choices?.length, n, snap.live, snap.focusMap, snap.plan?.choiceId, snap.hub.homeCamp, snap.hub.reputation, snap.hub.aces, snap.hub.lastResult, snap.hub.camp, session.allThreads, session.selectedThread, session.error]);
   updateIntelligence(n, snap.focusMap);
   if (signature === session.signature) return;
   session.signature = signature;

@@ -71,6 +71,17 @@ function escortMeta(h) {
     return `${e.count || 1}× ${label}`;
   }).join(", ");
 }
+/** The pack is told once, on the meta line (playtest, 2026-11-04): a blurb whose first sentence
+ *  names the chassis or an escort ("Vane on a Hoplite, with ten Phobos.") keeps only the rest. */
+function withoutPackLine(text, h, chassis) {
+  const s = String(text || "");
+  const m = s.match(/^(.*?[.!?])(\s+|$)([\s\S]*)$/);
+  if (!m || !m[3]) return s;
+  const first = m[1].toLowerCase();
+  const names = [chassis].concat((h.escorts || []).map(e => e.label || ((CREW.chassis || {})[e.unitDef] || {}).label || ""))
+    .map(n => String(n || "").toLowerCase().split(/\s+/).filter(w => w.length > 3)).flat();
+  return names.some(w => first.includes(w)) ? m[3].trim() : s;
+}
 /** Flavor text must not carry prices — cost lives on the badge. */
 function sanitizeHeroBlurb(text) {
   let s = String(text || "");
@@ -111,7 +122,7 @@ export function renderHeroCard(opts) {
   const costKm = o.costKm != null ? Number(o.costKm) : Number(h.hireKm || 0);
   const metaBits = [o.meta, chassis, packN > 1 ? `pack ×${packN}` : null, escLines || null].filter(Boolean);
   const meta = [...new Set(metaBits)].join(" · ");
-  const blurb = sanitizeHeroBlurb(o.blurb != null ? o.blurb : (h.blurb || ""));
+  const blurb = withoutPackLine(sanitizeHeroBlurb(o.blurb != null ? o.blurb : (h.blurb || "")), h, chassis);
   const showFree = o.showFreeCost != null ? !!o.showFreeCost : !!o.pickable;
   const costHtml = o.hideCost ? "" : renderCostBadges(costTnb, costKm, { showFree });
   const classes = ["hero-card"]
@@ -170,9 +181,9 @@ export function operation(op) {
   const sub = [pretty(op.mapId), op.kind ? jobLabel(op.kind) : ""].filter(Boolean).join(" · ");
   return `<p class="cc-eyebrow">${escape(sub)}${op.lean ? ` <span class="cc-lean">the world leans here</span>` : ""}</p>` +
     // the job is told once, on its card; here only how to win it, the rest folded away
-    field("To win", op.required) +
+    field("To win", op.required) + (op.pays ? field("What it pays", op.pays) : "") +
     `<details class="cc-rules"><summary>The rules of the job</summary>` +
-    field("The job", op.purpose) + (op.pays ? field("What it pays", op.pays) : "") +
+    field("The job", op.purpose) +
     field("Bringing it home", op.bringHome) + field("What you don't know", op.risks) + field("What changes", op.consequences) +
     `</details>`;
 }

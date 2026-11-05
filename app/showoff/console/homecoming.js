@@ -51,6 +51,37 @@ function renderManifest(man) {
     `</div>`;
 }
 
+// What moved (playtest, 2026-11-04): standing, the marks, the camp, and who is still out there,
+// from the kernel's debrief.moved (verdance.campaign.engine.what_moved).
+const MAP_NAME = { the_rock_jungle: "the Rock Jungle", greenest_fields: "Greenest Fields", tabula: "Tabula",
+  ancient_bastion: "Ancient Bastion", koom_valley: "Koom Valley", eye_of_horus: "Eye of Horus", all_that_simmers: "All That Simmers" };
+function renderMoved(mv) {
+  const box = $("hc-moved");
+  if (!box) return;
+  if (!mv || typeof mv !== "object" || mv.error) { box.innerHTML = ""; box.hidden = true; return; }
+  const parts = [];
+  const sign = (d) => (d > 0 ? "+" : "−") + Math.abs(d).toFixed(Math.abs(d) % 1 ? 1 : 0);
+  if ((mv.standing || []).length) {
+    parts.push(`<div class="mv-row"><div class="mv-h">Standing</div><ul>${mv.standing.map(r =>
+      `<li class="${r.delta > 0 ? "good" : "bad"}">${esc(String(r.name).replace(/^./, ch => ch.toUpperCase()))} ${esc(r.before)} → <b>${esc(r.after)}</b> (${esc(sign(r.delta))})</li>`).join("")}</ul></div>`);
+  }
+  const marks = (mv.marks || []).map(m => `<li class="${m.done ? "good" : "warn"}">${m.kind === "scout" ? "Scouted" : "Rescue"} ${esc(m.label)}${m.done ? "" : m.kind === "scout" ? ": not seen" : ": missed"}</li>`)
+    .concat((mv.rescued || []).map(n => `<li class="good">${esc(n)} joined the company</li>`))
+    .concat((mv.lostRescues || []).map(n => `<li class="bad">${esc(n)} was lost</li>`));
+  if (marks.length) parts.push(`<div class="mv-row"><div class="mv-h">Scouting and rescues</div><ul>${marks.join("")}</ul></div>`);
+  const c = mv.camp || {};
+  const campLine = c.placed != null
+    ? (c.placed ? `The builders at base had put up ${c.placed} while you were away. ${c.standing} standing in the camp now.` : `${c.standing || 0} standing in the camp now.`)
+    : c.grew ? `The builders at base put up ${c.grew} more. ${c.waiting} wait for you in the Rock Jungle.` : (c.waiting ? `${c.waiting} built at base wait for you in the Rock Jungle.` : "");
+  if (campLine) parts.push(`<div class="mv-row"><div class="mv-h">The camp</div><ul><li>${esc(campLine)}</li></ul></div>`);
+  if ((mv.leftInField || []).length) {
+    parts.push(`<div class="mv-row"><div class="mv-h">Still out there</div><ul>${mv.leftInField.map(p =>
+      `<li>${esc(p.name)} at ${esc(p.label)}, ${esc(MAP_NAME[p.mapId] || p.mapId)}</li>`).join("")}</ul></div>`);
+  }
+  box.hidden = !parts.length;
+  box.innerHTML = parts.join("");
+}
+
 export function showHomecoming(opts) {
   const el = $("homecoming");
   if (!el) return;
@@ -87,6 +118,7 @@ export function showHomecoming(opts) {
     });
   }
   renderManifest(man);
+  renderMoved(opts && opts.moved);
   el.classList.add("show");
 }
 export function hideHomecoming() {
@@ -153,6 +185,7 @@ export function mergeHubPatch(patch) {
       reasonHint: reasonHint || "Review the return ledger for confirmed changes.",
       chips: chips.slice(0, 12),
       manifest: (patch.lastResult && patch.lastResult.manifest) || patch.manifest || null,
+      moved: (debrief && debrief.moved) || null,
     });
     if (verdict === "incomplete") toast(headline || "Result not home — retry bring-home or Abandon", "err");
     else if (verdict === "abandon") toast(headline || "Left the field — mark the next board", "warn");

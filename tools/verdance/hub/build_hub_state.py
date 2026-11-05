@@ -18,6 +18,7 @@ from verdance.belief import hub_belief
 from verdance.readings.narrative import project as narrative_project
 from verdance.campaign import (
     camp_footprint,
+    home_pull,
     evaluate_home_clear,
     commander_is_unlocked,
     ensure_roster,
@@ -556,8 +557,11 @@ def build_open_node(state: dict, regions: list[dict], aces: list[dict], rep: dic
     camp = state.get("homeCamp") or {}
     # The camp is what the company has built in the Rock Jungle; Tenebrium to spend sends it home.
     camp_built = camp_footprint(state) > 0
-    tnb = int((state.get("commerce") or {}).get("tenebrium") or 0)
-    home_ready = bool(flags.get("homeClearReady")) or tnb >= 3
+    # How hard the bag pulls home: a smooth curve whose midpoint rises with the camp's worth
+    # (verdance.campaign.home.home_pull). The clear job comes from its midpoint, not a fixed count.
+    pull = home_pull(state)
+    tnb = pull["tenebrium"]
+    home_ready = bool(flags.get("homeClearReady")) or bool(pull["ready"])
     home_cleared = bool(flags.get("homeCleared"))
     fresh_opening = mission_n == 1 and not state.get("history") and not state.get("lastResult")
 
@@ -816,6 +820,13 @@ def build_open_node(state: dict, regions: list[dict], aces: list[dict], rep: dic
 
     if road_voice:
         ketha_line = road_voice
+        if not home_cleared and pull["pull"] >= 0.5:
+            # the strength of the pull picks the words; the numbers are the curve's own
+            urge = "That is worth the trip home" if pull["pull"] < 0.8 else "Take it home and build"
+            worth = (f"the camp stands at {pull['stake']:.1f}k metal, so a visit wants about {pull['threshold']:.0f}"
+                     if pull["stake"] >= 0.05 else
+                     f"nothing stands in the camp yet, so about {pull['threshold']:.0f} is enough to start one")
+            ketha_line += f" {tnb} Tenebrium in the bag. {urge}: {worth}."
     if finale:
         ketha_line = f"This is the last fight. {(finale.get('objective') or {}).get('label') or finale.get('title')}."
     done = state.get("campaignComplete")
@@ -1205,6 +1216,10 @@ def build_hub(state: dict, war: dict) -> dict:
     # The camp: what stands in the Rock Jungle. Nothing to buy here; Tenebrium is spent by building there.
     home_cleared = bool(flags.get("homeCleared") or (home_eval or {}).get("homeCleared"))
     home_camp["built"] = camp_footprint(state)
+    _hp = home_pull(state)
+    home_camp["pull"] = _hp["pull"]
+    home_camp["worthK"] = _hp["stake"]
+    home_camp["stockWanted"] = _hp["threshold"]
     home_camp["cleared"] = home_cleared
     home_camp["clearReady"] = bool(flags.get("homeClearReady") or (home_eval or {}).get("homeClearReady"))
     try:

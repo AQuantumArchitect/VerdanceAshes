@@ -49,6 +49,11 @@ TEMPERATURE = 0.75
 SHUT_MAP = 1.4      # a road onto a map the company has never walked
 TAKE_DOOR = 0.9     # a door to take back or take for the first time
 Q0_BIAS = 0.35
+# Home pulls along a smooth curve (verdance.campaign.home.home_pull): a job in the Rock Jungle adds
+# HOME_PULL_WEIGHT * (2 * pull - 1), from -WEIGHT with an empty bag to +WEIGHT with a camp's worth of
+# Tenebrium. Before this, nothing pushed back, and Rock Jungle doors (each leads out) won 7 of 11
+# leans on the hard-AI run (2026-11-04).
+HOME_PULL_WEIGHT = 1.2
 
 MAP_NAMES = {
     "greenest_fields": "Greenest Fields",
@@ -319,6 +324,13 @@ def legal_jobs(state: Dict[str, Any], workspace: Path) -> List[Dict[str, Any]]:
     from verdance.campaign.suits import SIMMERS, has_suit
     if not has_suit(state):
         jobs = [j for j in jobs if j["mapId"] != SIMMERS]
+    from verdance.campaign.home import home_pull
+    hp = home_pull(state, Path(workspace))
+    home_term = HOME_PULL_WEIGHT * (2.0 * float(hp["pull"]) - 1.0)
+    for j in jobs:
+        if j["mapId"] == HOME_MAP_ID:
+            j["homePull"] = hp["pull"]
+            j["score"] = round(float(j["score"]) + home_term, 4)
     jobs.sort(key=lambda j: (-float(j["score"]), j["id"]))
     return jobs
 

@@ -517,7 +517,8 @@ export function renderBoard() {
   const clicking = state.markMode === "pad"
     ? `Clicking a zone sets the pad (${legalN} zone${legalN === 1 ? "" : "s"} can take one, marked △).`
     : "Clicking a zone sets the target.";
-  const route = pad && targets ? `Land at <b>${esc(pad)}</b>, take <b>${esc(targets)}</b>, lift from <b>${esc(pad)}</b>. `
+  // where you lift is told once, on the drop screen's route line
+  const route = pad && targets ? `Land at <b>${esc(pad)}</b>, take <b>${esc(targets)}</b>. `
     : (pad ? `Land at <b>${esc(pad)}</b>. ` : "");
   $("marks-sum").innerHTML = route + `<span class="muted">${esc(clicking)}</span>` +
     (padEyes === "known" ? ` <span class="bad">◉ Armada has eyes on this pad.</span>` : "") + padNote;

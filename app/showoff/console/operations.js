@@ -168,9 +168,7 @@ export function updateDeployGate() {
     btn.textContent = block.replace(/ first$/, "");
     return;
   }
-  btn.title = state.hostLive
-    ? "The field starts loading in Beyond All Reason; you talk with the company, pick who goes and what comes while it loads."
-    : "Map only: start PLAY.bat to fight.";
+  btn.title = "The field starts loading in Beyond All Reason; you talk with the company, pick who goes and what comes while it loads.";
   btn.textContent = "Choose this job";
 }
 
@@ -226,7 +224,7 @@ function paintWarmStatus(text) {
     : phase === "dropping" ? "Dropping…"
     : phase === "up" ? "The company is down, the field paused. Switch to Beyond All Reason and unpause."
     : phase === "failed" ? "The field did not load. Go back to the jobs and try again."
-    : state.hostLive ? "" : "Map only: start PLAY.bat to fight."
+    : ""
   );
   el.classList.toggle("ready", phase === "ready");
 }
@@ -370,8 +368,11 @@ export function showDropConfirm() {
     const eyes = padExposed(m.deployZoneId);
     // the job in one line: where, what to take, where you lift (the rules are in "How this works")
     body.innerHTML =
-      `<b>${esc(prettyMap(plan.mapId))}</b> · take <b>${esc(targets)}</b> · land and lift at <b>${esc(zoneName(m.deployZoneId))}</b>` +
-      (exitDoor ? ` · leave by <b>${esc(zoneName(exitDoor))}</b> once it is yours` : "") +
+      // one route line (playtest, 2026-11-04: "land and lift here · leave by there" read as two rules)
+      `<b>${esc(prettyMap(plan.mapId))}</b> · take <b>${esc(targets)}</b> · land at <b>${esc(zoneName(m.deployZoneId))}</b>` +
+      (exitDoor
+        ? ` · lift here, or from <b>${esc(zoneName(exitDoor))}</b> once it is yours`
+        : ` · lift from the same pad`) +
       (eyes === "known" ? ` · <span class="bad">Armada has eyes on this pad</span>` : "");
     body.setAttribute("data-route", body.innerHTML);
   }
