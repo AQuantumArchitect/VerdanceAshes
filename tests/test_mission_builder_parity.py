@@ -245,3 +245,21 @@ def test_the_game_builds_with_the_ps1_faults_fixed():
         n_wardens = len(((intent.get("visitTier") or {}).get("wardens")) or [])
         if n_wardens == 1:
             assert len(wardens(faulty)) == 0 and len(wardens(fixed)) == 1, f"tour{case}: the lone warden"
+
+
+def test_the_builder_prints_its_arrows_on_a_cp1252_console():
+    """The PC, 2026-11-04: the first live build died on "'charmap' codec can't encode '→'"."""
+    import os
+    import subprocess
+    import sys as _sys
+    code = ("import verdance.mission_builder.builder as B\n"
+            "def fake(ws, log=print, **k):\n"
+            "    log('Route: pad → target — done')\n"
+            "    return {'installed': False, 'missionId': 'x', 'scenarioPath': 'y'}\n"
+            "B.run = fake\n"
+            "raise SystemExit(B.main(['--workspace', '.']))\n")
+    env = dict(os.environ, PYTHONIOENCODING="cp1252", PYTHONPATH=str(ROOT / "tools"))
+    env.pop("PYTHONUTF8", None)
+    r = subprocess.run([_sys.executable, "-c", code], capture_output=True, env=env, cwd=str(ROOT), timeout=120)
+    assert r.returncode == 0, r.stderr.decode("utf-8", "replace")
+    assert "→".encode("utf-8") in r.stdout

@@ -15,13 +15,17 @@ def run_cmd(
     *,
     timeout: int = 300,
     env: dict[str, str] | None = None,
+    encoding: str | None = None,
 ) -> dict[str, Any]:
+    # errors="replace": a child's stray byte must never fail the run that printed it
     try:
         r = subprocess.run(
             cmd,
             cwd=str(cwd),
             capture_output=True,
             text=True,
+            encoding=encoding,
+            errors="replace",
             timeout=timeout,
             env=env,
         )
@@ -60,4 +64,7 @@ def run_module(ws: Path, module: str, args: list[str] | None = None, *, workspac
     cmd = [sys.executable, "-m", module, *(args or [])]
     if workspace_flag and "--workspace" not in (args or []):
         cmd.extend(["--workspace", str(ws)])
-    return run_cmd(cmd, ws, timeout=timeout, env=tools_env(ws))
+    # A Python child prints UTF-8 whatever the console's code page (the PC's cp1252 could not print
+    # the mission builder's "→" and the build failed, 2026-11-04).
+    env = dict(tools_env(ws), PYTHONIOENCODING="utf-8", PYTHONUTF8="1")
+    return run_cmd(cmd, ws, timeout=timeout, env=env, encoding="utf-8")

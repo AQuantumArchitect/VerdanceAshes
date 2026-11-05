@@ -1536,6 +1536,12 @@ def main(argv: Optional[List[str]] = None) -> int:
                     help="passed straight through to install_playable_slice.ps1's [MODOPTIONS]; semicolon-separated key=value")
     ap.add_argument("--no-install", action="store_true", help="write the scenario and manifest only")
     a = ap.parse_args(argv)
+    # The log speaks in arrows and dashes; a Windows console's code page must not end the build over one.
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
     try:
         manifest = run(Path(a.workspace), intent_path=a.intent, state_path=a.state, launch=a.launch,
                        save_game=a.save_game, save_name=a.save_name, timeout_seconds=a.timeout_seconds,
