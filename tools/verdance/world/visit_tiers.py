@@ -8,13 +8,14 @@ stays there. That gives each board depth and gives the company a reason to move 
     living-shell fields (Greenest Fields)           Armada wardens (BARb va_warden) join the shell
                                                    and fortify the richest pockets as the drop runs;
                                                    a metal-poor field keeps them modest
-    raptor ground (the Rock Jungle, the Eye's rim)  grace 10 minutes, then none, then the raptors
-                                                   already half an hour into their clock
+    raptor ground (the Rock Jungle)                 grace and the raptors' head start move smoothly
+                                                   with every visit (raptor_pace)
     the Ancient Bastion, All That Simmers           no tiers: the siege and the kings' showdown are
                                                    authored as they are
 """
 from __future__ import annotations
 
+import math
 from typing import Any, Dict, List, Optional
 
 from verdance.common import canonical_map_id
@@ -23,13 +24,23 @@ MAX_TIER = 3
 NO_TIERS = {"ancient_bastion", "all_that_simmers"}
 RAPTOR_MAPS = {"the_rock_jungle"}  # the Eye's rim was glassed clean (2026-10-26)
 
-# Raptor pace by tier: grace before the first waves, and how far into the raptors' own clock the
-# drop starts (game_verdance raptor_spawner_defense.lua: va_raptor_grace_seconds, va_raptor_clock_seconds).
-RAPTOR_TIERS = {
-    1: {"graceSeconds": 600, "clockSeconds": 0},
-    2: {"graceSeconds": 1, "clockSeconds": 0},
-    3: {"graceSeconds": 1, "clockSeconds": 1800},
-}
+# Raptor pace: grace before the first waves, and how far into the raptors' own clock the drop starts
+# (raptor_spawner_defense.lua: va_raptor_grace_seconds, va_raptor_clock_seconds). Smooth in the visits
+# already made (proxy call, 2026-11-04, after "everything should be parametric and continuous"): the
+# Rock Jungle is home, and the steps it had (10 minutes of grace, then none, then the raptors half an
+# hour in) wiped the company 80 to 200 seconds after landing on every visit after the first in the
+# hard-AI run. Now each visit takes grace down by e every RAPTOR_GRACE_FADE visits and moves the clock
+# toward RAPTOR_CLOCK_MAX by e every RAPTOR_CLOCK_RISE: 600/0 s, then 430/212, 308/398, 221/562 ...
+RAPTOR_GRACE0 = 600.0
+RAPTOR_GRACE_FADE = 3.0
+RAPTOR_CLOCK_MAX = 1800.0
+RAPTOR_CLOCK_RISE = 8.0
+
+
+def raptor_pace(visits_made: int) -> Dict[str, int]:
+    v = max(0, int(visits_made))
+    return {"graceSeconds": max(1, int(round(RAPTOR_GRACE0 * math.exp(-v / RAPTOR_GRACE_FADE)))),
+            "clockSeconds": int(round(RAPTOR_CLOCK_MAX * (1.0 - math.exp(-v / RAPTOR_CLOCK_RISE))))}
 
 # Living-shell fields: wardens by tier, on the shell's pockets in this order (the first that exist).
 WARDEN_POCKETS = {
@@ -58,7 +69,7 @@ def plan(state: Dict[str, Any], map_id: str, pockets: Optional[List[Dict[str, An
     tier = tier_for(state, mid)
     out: Dict[str, Any] = {"tier": tier, "visits": visits(state, mid), "tiered": mid not in NO_TIERS}
     if mid in RAPTOR_MAPS:
-        out["raptor"] = dict(RAPTOR_TIERS[tier])
+        out["raptor"] = raptor_pace(out["visits"])
     wanted = WARDENS_BY_TIER.get(tier, 0)
     if wanted and mid in WARDEN_POCKETS:
         by_id = {str(p.get("pocketId")): p for p in pockets or []}
@@ -76,4 +87,4 @@ def plan(state: Dict[str, Any], map_id: str, pockets: Optional[List[Dict[str, An
     return out
 
 
-__all__ = ["MAX_TIER", "NO_TIERS", "RAPTOR_MAPS", "RAPTOR_TIERS", "WARDEN_POCKETS", "plan", "tier_for", "visits"]
+__all__ = ["MAX_TIER", "NO_TIERS", "RAPTOR_MAPS", "RAPTOR_GRACE0", "RAPTOR_GRACE_FADE", "RAPTOR_CLOCK_MAX", "RAPTOR_CLOCK_RISE", "raptor_pace", "WARDEN_POCKETS", "plan", "tier_for", "visits"]

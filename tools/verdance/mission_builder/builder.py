@@ -284,7 +284,7 @@ class BuildResult:
 FIXED_PS1_FAULTS = {
     "war_seat_colour": "Armada and Cortex war seats went out with rgb null ($Faction shadowed $FACTION).",
     "lone_warden": "A single visit-tier warden never took the field (5.1: a bare object has no .Count).",
-    # not fixed, kept as played: "rock_jungle_grace" (see the raptor grace below)
+    # not fixed, moot: "rock_jungle_grace" (the visit-tier raptor pace always sets the grace now)
 }
 
 
@@ -1367,11 +1367,9 @@ def _build(ws: Path, intent: Dict[str, Any], state: Any, *, intent_path: str, st
         log(fmt("Raptor pace (visit tier {0}): grace {1}s, clock +{2}s", g(visit_tier, "tier"),
                 g(tier_raptor, "graceSeconds"), g(tier_raptor, "clockSeconds")))
     elif is_wild_home or (is_rock_jungle and ieq(against, "wild")):
-        # PS1 FAULT, KEPT ON PURPOSE (FIXED_PS1_FAULTS notes it): `$extraMods -notmatch "..."` on an
-        # array filters it, so with no -ExtraModOptions the ~5 min Rock Jungle grace was never added,
-        # and every Rock Jungle sortie ever played (and every hard-AI run, which lost there already)
-        # had the installer's default ~15 min grace. That is the balance as tested; the shorter grace
-        # stays off until a playtest asks for it (proxy call, 2026-11-04).
+        # PS1 FAULT, KEPT (moot): `$extraMods -notmatch "..."` on an array filters it, so with no
+        # -ExtraModOptions this shorter grace is never added. It no longer matters: every Rock Jungle
+        # intent carries visitTier.raptor (verdance.world.visit_tiers.raptor_pace), and that branch wins.
         if any(not re.search("raptor_graceperiodmult=", m, re.IGNORECASE) for m in extra_mods):
             extra_mods.append("raptor_graceperiodmult=0.85")
             log("Raptor grace: mult=0.85 (~5 min) for Rock Jungle wild home.")

@@ -27,11 +27,13 @@ def test_the_bastion_and_the_kings_do_not_rank_up():
     assert V.tier_for(many, "all_that_simmers") == 1
 
 
-def test_raptor_pace_shortens_then_starts_late():
-    paces = [V.plan(_state(*["the_rock_jungle"] * n), "the_rock_jungle")["raptor"] for n in (0, 1, 2)]
+def test_raptor_pace_moves_smoothly_with_every_visit():
+    paces = [V.plan(_state(*["the_rock_jungle"] * n), "the_rock_jungle")["raptor"] for n in range(0, 10)]
     assert paces[0] == {"graceSeconds": 600, "clockSeconds": 0}
-    assert paces[1]["graceSeconds"] <= 1 and paces[1]["clockSeconds"] == 0
-    assert paces[2]["clockSeconds"] == 1800
+    grace = [p["graceSeconds"] for p in paces]
+    clock = [p["clockSeconds"] for p in paces]
+    assert all(b < a for a, b in zip(grace, grace[1:])) and grace[1] > 300   # no cliff to nothing
+    assert all(b > a for a, b in zip(clock, clock[1:])) and clock[-1] < V.RAPTOR_CLOCK_MAX
     assert "raptor" not in V.plan(_state(), "greenest_fields")
 
 
