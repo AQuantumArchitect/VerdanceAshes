@@ -1011,10 +1011,16 @@ class CampaignKernel:
         return out
 
     def build_mission(self) -> dict[str, Any]:
-        script = self._resolve_ps1("build")
-        if script is None:
-            return {"ok": False, "reason": "build mission script missing"}
-        return run_ps1(script, self.ws, timeout=240)
+        """Build the next mission: verdance.mission_builder writes the scenario, then runs
+        install_playable_slice.ps1 for the seeds and the startscript. The Python port replaced
+        build_next_mission_v1.ps1 here on 2026-11-04; VERDANCE_BUILDER=ps1 runs the PowerShell one,
+        which stays as the reference until the port has a few tours on the PC behind it."""
+        if os.environ.get("VERDANCE_BUILDER", "").strip().lower() == "ps1":
+            script = self._resolve_ps1("build")
+            if script is None:
+                return {"ok": False, "reason": "build mission script missing"}
+            return run_ps1(script, self.ws, timeout=240)
+        return run_module(self.ws, "verdance.mission_builder", timeout=240)
 
     def launch_bar(self, *, max_missions: int = 1, auto_relaunch: bool = False) -> dict[str, Any]:
         """Start spring.exe on the startscript the build wrote, and watch the infolog for the result.

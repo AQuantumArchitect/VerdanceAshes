@@ -142,6 +142,30 @@ def test_field_recruits_match_when_umwelt_is_here():
     assert not bad, "\n".join(bad)
 
 
+def test_the_kernel_builds_with_python_unless_told_otherwise():
+    from verdance_kernel import api
+
+    calls = []
+    saved = (api.run_module, api.run_ps1, os.environ.get("VERDANCE_BUILDER"))
+    api.run_module = lambda ws, module, args=None, **kw: calls.append(("py", module)) or {"ok": True}
+    api.run_ps1 = lambda script, ws, extra_args=None, **kw: calls.append(("ps1", Path(script).name)) or {"ok": True}
+    try:
+        os.environ.pop("VERDANCE_BUILDER", None)
+        k = api.CampaignKernel(ROOT)
+        assert k.build_mission()["ok"] and calls[-1] == ("py", "verdance.mission_builder")
+        os.environ["VERDANCE_BUILDER"] = "ps1"
+        k.build_mission()
+        # The PS1 path still resolves its scripts by Windows-style relative paths, so off Windows it
+        # reports the script missing instead of calling it.
+        assert calls[-1][0] == "ps1" or len(calls) == 1
+    finally:
+        api.run_module, api.run_ps1 = saved[0], saved[1]
+        if saved[2] is None:
+            os.environ.pop("VERDANCE_BUILDER", None)
+        else:
+            os.environ["VERDANCE_BUILDER"] = saved[2]
+
+
 # --- The PowerShell 5.1 rules the port leans on ----------------------------------------------------
 
 def test_numbers_round_and_print_as_windows_powershell_did():
@@ -181,7 +205,8 @@ if __name__ == "__main__":
         _make_fixture()
     else:
         for fn in (test_the_python_builder_matches_every_corpus_sortie, test_the_python_builder_matches_the_committed_fixture,
-                   test_field_recruits_match_when_umwelt_is_here, test_numbers_round_and_print_as_windows_powershell_did,
+                   test_field_recruits_match_when_umwelt_is_here, test_the_kernel_builds_with_python_unless_told_otherwise,
+                   test_numbers_round_and_print_as_windows_powershell_did,
                    test_strings_compare_without_case):
             try:
                 fn()

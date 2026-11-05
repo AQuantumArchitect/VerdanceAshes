@@ -384,7 +384,7 @@ def stamp(plan_raw: dict, workspace: Path) -> dict:
         "error": lz_hard[0] if lz_hard else None,
         "next": [
             "python -m verdance.campaign.engine intent --workspace .",
-            "powershell -File scripts/build_next_mission_v1.ps1",
+            "python -m verdance.mission_builder --workspace .",
             "Or: python -m verdance_kernel serve  (POST /api/preload, then /api/drop)",
         ],
     }
