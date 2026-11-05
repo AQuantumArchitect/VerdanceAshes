@@ -102,8 +102,9 @@ def _faction_word(side: str) -> str:
 class Field:
     """Everything the PS1 kept in $script: scope while it laid the camps out."""
 
-    def __init__(self, ws: Path, intent: Dict[str, Any], state: Any, log: Log) -> None:
+    def __init__(self, ws: Path, intent: Dict[str, Any], state: Any, log: Log, ps1_faults: bool = False) -> None:
         self.ws = Path(ws)
+        self.ps1_faults = ps1_faults
         self.intent = intent
         self.state = state
         self.log = log
@@ -403,11 +404,10 @@ class Field:
                                 "zoneId": S(g(den, "zoneId")), "base": {"x": c[0], "z": c[1]}, "recipe": recipe})
         self.log(fmt("Wild ground: {0} dens.", len(dens)))
 
-    @staticmethod
-    def war_faction(fac: str) -> Dict[str, Any]:
+    def war_faction(self, fac: str) -> Dict[str, Any]:
         """Get-WarFaction.
 
-        PS FAULT, KEPT: the PS1's parameter was ``[string]$Faction``, and PowerShell variable names
+        PS1 FAULT, FIXED (FIXED_PS1_FAULTS["war_seat_colour"]; ps1_faults=True reproduces it): the PS1's parameter was ``[string]$Faction``, and PowerShell variable names
         ignore case, so inside that function ``$FACTION["Armada"]`` indexed the parameter string, not
         the faction table, and came back null. Every Armada and Cortex war seat (standing wars, Eye
         scouts, visit-tier wardens, kings) went out with ``rgb: null`` (all ten standing-war sorties
@@ -416,8 +416,8 @@ class Field:
         if ieq(fac, "nullmercs"):
             return {"T": MERC, "side": "Legion", "label": "Null Mercs"}
         if ieq(fac, "cortex"):
-            return {"T": None, "side": "Cortex", "label": "Cortex"}
-        return {"T": None, "side": "Armada", "label": "Armada"}
+            return {"T": None if self.ps1_faults else FACTION["Cortex"], "side": "Cortex", "label": "Cortex"}
+        return {"T": None if self.ps1_faults else FACTION["Armada"], "side": "Armada", "label": "Armada"}
 
     def new_war_team(self, fac: str, center: List[float], label: str, rect: float = 0.16) -> Dict[str, Any]:
         w = self.war_faction(fac)

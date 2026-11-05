@@ -86,7 +86,7 @@ def mismatches(want: Any, got: Any, path: str = "", ignore: Iterable[str] = ()) 
 
 
 def _check(case: str, state: Any, intent: Any, scenario: Any, manifest: Any) -> List[str]:
-    sc, man = build_scenario(ROOT, intent, state, log=lambda _line: None)
+    sc, man = build_scenario(ROOT, intent, state, log=lambda _line: None, ps1_faults=True)
     sc = json.loads(json.dumps(sc))
     man = json.loads(json.dumps(man))
     skip = list(IGNORED_SCENARIO) + ([] if _umwelt() else list(NEEDS_UMWELT))
@@ -135,7 +135,7 @@ def test_field_recruits_match_when_umwelt_is_here():
     bad: List[str] = []
     for case in FIXTURE_CASES:
         d = FIXTURE / f"tour{case}"
-        sc, _ = build_scenario(ROOT, _load(d / "intent.json.gz"), _load(d / "state.json.gz"), log=lambda _l: None)
+        sc, _ = build_scenario(ROOT, _load(d / "intent.json.gz"), _load(d / "state.json.gz"), log=lambda _l: None, ps1_faults=True)
         want = _load(d / "scenario.json.gz")["missionBase"]["fieldRecruits"]
         bad += [f"tour{case} {m}" for m in mismatches(want, json.loads(json.dumps(sc["missionBase"]["fieldRecruits"])),
                                                       "/missionBase/fieldRecruits")]
@@ -213,3 +213,35 @@ if __name__ == "__main__":
                 print("ok  ", fn.__name__)
             except unittest.SkipTest as e:
                 print("skip", fn.__name__, e)
+
+
+def test_the_game_builds_with_the_ps1_faults_fixed():
+    """Proxy call, 2026-11-04: war seats get their side's colour, and a lone warden takes the field.
+    Tour 02 had one warden and a standing war; tour 08 seats Armada in a standing war."""
+    from verdance.mission_builder.builder import FIXED_PS1_FAULTS
+    assert set(FIXED_PS1_FAULTS) == {"war_seat_colour", "lone_warden"}
+    for case in FIXTURE_CASES:
+        d = FIXTURE / f"tour{case}"
+        intent, state = _load(d / "intent.json.gz"), _load(d / "state.json.gz")
+        fixed, _ = build_scenario(ROOT, intent, state, log=lambda _l: None)
+        faulty, _ = build_scenario(ROOT, intent, state, log=lambda _l: None, ps1_faults=True)
+        teams = lambda sc: (sc.get("variants") or {}).get(sc.get("defaultVariant") or "", sc).get("teams") or sc.get("teams") or []
+        def all_teams(sc):
+            out = []
+            def walk(x):
+                if isinstance(x, dict):
+                    if "rgb" in x and "side" in x:
+                        out.append(x)
+                    for v in x.values():
+                        walk(v)
+                elif isinstance(x, list):
+                    for v in x:
+                        walk(v)
+            walk(sc)
+            return out
+        war = [t for t in all_teams(fixed) if str(t.get("side")) in ("Armada", "Cortex")]
+        assert all(t.get("rgb") for t in war), f"tour{case}: a war seat without colour"
+        wardens = lambda sc: [t for t in all_teams(sc) if "warden" in str(t.get("label") or "")]
+        n_wardens = len(((intent.get("visitTier") or {}).get("wardens")) or [])
+        if n_wardens == 1:
+            assert len(wardens(faulty)) == 0 and len(wardens(fixed)) == 1, f"tour{case}: the lone warden"

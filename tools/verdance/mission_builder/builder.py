@@ -279,9 +279,20 @@ class BuildResult:
         self.map_name = ""
 
 
+# The reference PS1's faults (found in the port, 2026-11-04). The game builds with the first two fixed;
+# build_scenario(..., ps1_faults=True) reproduces them for the parity test against the PC corpus.
+FIXED_PS1_FAULTS = {
+    "war_seat_colour": "Armada and Cortex war seats went out with rgb null ($Faction shadowed $FACTION).",
+    "lone_warden": "A single visit-tier warden never took the field (5.1: a bare object has no .Count).",
+    # not fixed, kept as played: "rock_jungle_grace" (see the raptor grace below)
+}
+
+
 def _build(ws: Path, intent: Dict[str, Any], state: Any, *, intent_path: str, state_path: str,
            launch: bool = False, save_game: bool = False, save_name: str = "", timeout_seconds: int = 300,
-           extra_mod_options: str = "", log: Log = print) -> BuildResult:
+           extra_mod_options: str = "", log: Log = print, ps1_faults: bool = False) -> BuildResult:
+    """ps1_faults=True reproduces the reference PS1's three faults (see FIXED_PS1_FAULTS) so the
+    parity test can hold the port to the PC corpus exactly; the game always builds with them fixed."""
     ws = Path(ws)
     # 5.1 held every non-integer JSON number as a decimal (see _ps.JNum).
     intent = ps_json(copy.deepcopy(intent))
@@ -379,7 +390,7 @@ def _build(ws: Path, intent: Dict[str, Any], state: Any, *, intent_path: str, st
     frames = required_frames(intent)
     description = objective_description(intent)
 
-    f = Field(ws, intent, state, log)
+    f = Field(ws, intent, state, log, ps1_faults=ps1_faults)
     f.eye_story = intent["eyeStory"] if (has(intent, "eyeStory") and T(intent["eyeStory"])) else None
 
     # --- Difficulty scaling from campaign state ---
@@ -687,14 +698,14 @@ def _build(ws: Path, intent: Dict[str, Any], state: Any, *, intent_path: str, st
     # Visit tier wardens (verdance.world.visit_tiers): on a living-shell field's second and later
     # visits, Armada BARbarians (va_warden) start on the shell's richest pockets and fortify them.
     #
-    # PS 5.1 FAULT, KEPT: the PS1 read the list with `$x = if (...) { @(list) }`, which hands back the
-    # bare object when the list holds one warden, and Windows PowerShell 5.1 gives a bare
-    # PSCustomObject no .Count. So one warden never took the field on the PC (tour 02, 2026-11-04:
-    # one warden on Greenest Fields, three teams), while two or more did. Kept so the field does not
-    # change under the gadget unannounced; fixing it is an owner call.
+    # PS1 FAULT, FIXED (FIXED_PS1_FAULTS["lone_warden"]): the PS1 read the list with
+    # `$x = if (...) { @(list) }`, which hands back the bare object when the list holds one warden, and
+    # Windows PowerShell 5.1 gives a bare PSCustomObject no .Count. So one warden never took the field
+    # on the PC (tour 02, 2026-11-04: one warden on Greenest Fields, three teams), while two or more did.
     visit_tier = g(intent, "visitTier")
     tier_wardens = arr(visit_tier["wardens"]) if (T(visit_tier) and has(visit_tier, "wardens")) else []
-    warden_count = None if (len(tier_wardens) == 1 and isinstance(tier_wardens[0], dict)) else len(tier_wardens)
+    warden_count = (None if (ps1_faults and len(tier_wardens) == 1 and isinstance(tier_wardens[0], dict))
+                    else len(tier_wardens))
     if shell_occupied and warden_count is not None and warden_count > 0 and not is_finale and not T(theater):
         for wd in tier_wardens:
             wc = [D(g(wd, "x")), D(g(wd, "z"))]
@@ -1356,10 +1367,11 @@ def _build(ws: Path, intent: Dict[str, Any], state: Any, *, intent_path: str, st
         log(fmt("Raptor pace (visit tier {0}): grace {1}s, clock +{2}s", g(visit_tier, "tier"),
                 g(tier_raptor, "graceSeconds"), g(tier_raptor, "clockSeconds")))
     elif is_wild_home or (is_rock_jungle and ieq(against, "wild")):
-        # PS FAULT, KEPT: `$extraMods -notmatch "..."` on an array filters it, so with no
-        # -ExtraModOptions the filter is empty and false, and the ~5 min Rock Jungle grace was never
-        # added. It is added only when the caller passed some other modoption. The kernel never passes
-        # one, so on the PC the wild home kept the installer's default grace.
+        # PS1 FAULT, KEPT ON PURPOSE (FIXED_PS1_FAULTS notes it): `$extraMods -notmatch "..."` on an
+        # array filters it, so with no -ExtraModOptions the ~5 min Rock Jungle grace was never added,
+        # and every Rock Jungle sortie ever played (and every hard-AI run, which lost there already)
+        # had the installer's default ~15 min grace. That is the balance as tested; the shorter grace
+        # stays off until a playtest asks for it (proxy call, 2026-11-04).
         if any(not re.search("raptor_graceperiodmult=", m, re.IGNORECASE) for m in extra_mods):
             extra_mods.append("raptor_graceperiodmult=0.85")
             log("Raptor grace: mult=0.85 (~5 min) for Rock Jungle wild home.")
@@ -1433,13 +1445,14 @@ def _standing_pocket_zones(ws: Path, state: Any, map_id: str) -> Optional[CIDict
 def build_scenario(workspace: Path, intent: Dict[str, Any], state: Any, *, intent_path: Optional[str] = None,
                    state_path: Optional[str] = None, launch: bool = False, save_game: bool = False,
                    save_name: str = "", timeout_seconds: int = 300, extra_mod_options: str = "",
-                   log: Log = print) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+                   log: Log = print, ps1_faults: bool = False) -> Tuple[Dict[str, Any], Dict[str, Any]]:
     """The scenario and the build manifest for this intent and state. Writes nothing."""
     ws = Path(workspace)
     ip = intent_path if intent_path is not None else str(ws / "outbox" / "next_mission_intent.json")
     sp = state_path if state_path is not None else str(ws / "state" / "campaign_state.json")
     res = _build(ws, intent, state, intent_path=ip, state_path=sp, launch=launch, save_game=save_game,
-                 save_name=save_name, timeout_seconds=timeout_seconds, extra_mod_options=extra_mod_options, log=log)
+                 save_name=save_name, timeout_seconds=timeout_seconds, extra_mod_options=extra_mod_options, log=log,
+                 ps1_faults=ps1_faults)
     return res.scenario, res.manifest
 
 
