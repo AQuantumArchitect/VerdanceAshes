@@ -222,7 +222,7 @@ function paintWarmStatus(text) {
     : phase === "loading" ? `${where} is loading behind these screens.`
     : phase === "ready" ? "The field is ready."
     : phase === "dropping" ? "Dropping…"
-    : phase === "up" ? "The company is down, the field paused. Switch to Beyond All Reason and unpause."
+    : phase === "up" ? "The company is down and the field is paused. Beyond All Reason comes to the front: unpause when ready."
     : phase === "failed" ? "The field did not load. Go back to the jobs and try again."
     : ""
   );
@@ -431,7 +431,7 @@ async function dropCompany() {
     renderBadges();
     logLine(`Dropped ${(data.crewBand || []).length} pack${(data.crewBand || []).length === 1 ? "" : "s"} into ${prettyMap((state.plan || {}).mapId)}.`);
     setWarm("up");
-    toast("The company is down and the field is paused. Switch to Beyond All Reason and unpause when ready.", "ok");
+    toast("The company is down and the field is paused. Beyond All Reason comes to the front: unpause when ready.", "ok");
     pollWarm();
     // The sheet has said its piece: back to the hub menu after a beat.
     setTimeout(() => { if (state.warm.phase === "up") hideDropConfirm(); }, 2000);

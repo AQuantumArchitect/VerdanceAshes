@@ -150,34 +150,57 @@ def _windows_of(pid: int) -> list[int]:
     return found
 
 
-def keep_behind(pid: int, until: threading.Event, seconds: float = 120.0) -> threading.Thread:
-    """While the field loads, keep the engine window minimized so the hub stays in front."""
+def keep_behind(pid: int, until: threading.Event, seconds: float = 90.0) -> threading.Thread:
+    """While the field loads, hand the screen back to whatever had it (the hub's browser).
+
+    The engine window is never minimized or pushed to the bottom any more. On a new laptop
+    (2026-11-04), BAR minimized while it loaded and restored without activation came back as a
+    transparent window that took no clicks, and the match never showed. So the window is left
+    alone; once it appears and takes the foreground, the window that had the foreground when the
+    field started loading gets it back, once. If Windows refuses (its foreground lock), BAR simply
+    stays in front and the player switches back to the hub."""
+    prev = ctypes.windll.user32.GetForegroundWindow() if sys.platform == "win32" else 0
+
     def run() -> None:
-        if sys.platform != "win32":
+        if sys.platform != "win32" or not prev:
             return
+        user32 = ctypes.windll.user32
         end = time.time() + seconds
         while time.time() < end and not until.is_set():
-            for hwnd in _windows_of(pid):
-                if not ctypes.windll.user32.IsIconic(hwnd):
-                    ctypes.windll.user32.ShowWindow(hwnd, 6)        # SW_MINIMIZE
+            mine = _windows_of(pid)
+            if mine and user32.GetForegroundWindow() in mine:
+                _take_foreground(prev)
+                return
             until.wait(0.5)
     t = threading.Thread(target=run, name="va-hotdrop-behind", daemon=True)
     t.start()
     return t
 
 
+def _take_foreground(hwnd: int) -> bool:
+    """SetForegroundWindow from a background process: Windows allows it right after an input
+    event, so tap Alt first (the usual way round the foreground lock)."""
+    user32 = ctypes.windll.user32
+    try:
+        user32.keybd_event(0x12, 0, 0, 0)          # VK_MENU down
+        user32.keybd_event(0x12, 0, 0x0002, 0)     # VK_MENU up
+    except Exception:  # noqa: BLE001
+        pass
+    return bool(user32.SetForegroundWindow(hwnd))
+
+
 def wake_behind(pid: int) -> bool:
-    """Un-minimize the engine window without taking the foreground, and park it under the hub:
-    BAR draws again (so it reads the drop file at once) while the hub keeps the screen. The
-    company lands paused; the player switches over and unpauses when ready."""
+    """The company is dropping: bring BAR to the front, restored and active, so it draws and the
+    player is in the match. (Restoring it without activation, under the hub, is what left the new
+    laptop with a transparent window.)"""
     if sys.platform != "win32":
         return False
     user32 = ctypes.windll.user32
     ok = False
     for hwnd in _windows_of(pid):
-        user32.ShowWindow(hwnd, 4)                                   # SW_SHOWNOACTIVATE
-        # HWND_BOTTOM, with SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE
-        ok = bool(user32.SetWindowPos(hwnd, 1, 0, 0, 0, 0, 0x0001 | 0x0002 | 0x0010)) or ok
+        if user32.IsIconic(hwnd):
+            user32.ShowWindow(hwnd, 9)                               # SW_RESTORE
+        ok = _take_foreground(hwnd) or ok
     return ok
 
 
