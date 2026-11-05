@@ -26,12 +26,12 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 from verdance.mission_builder import kits
 from verdance.mission_builder import shell as shell_mod
 from verdance.mission_builder._ps import (
-    CIDict, B, D, I, JNum, R, S, T, arr, plain_json, ps_json, eq, fmt, g, has, ieq, iin, ilike, imatch, sign, sort_unique_ints,
+    CIDict, B, D, I, JNum, R, S, T, arr, plain_json, ps_json, eq, fmt, g, has, hashtable_key_order, ieq, iin, ilike, imatch, sign, sort_unique_ints,
 )
 from verdance.mission_builder.field import (
     SHELL_CAPABLE_KINDS, Field, clamp01, edge_score, push_to_rim, start_rect, zone_by_id, zone_center,
 )
-from verdance.mission_builder.kits import FACTION, each, faction, props
+from verdance.mission_builder.kits import each, faction, props
 
 Log = Callable[[str], None]
 
@@ -894,8 +894,6 @@ def _build(ws: Path, intent: Dict[str, Any], state: Any, *, intent_path: str, st
         if fac not in same:
             same[fac] = []
         same[fac] = same[fac] + [I(tm["allyTeam"])]
-    from verdance.mission_builder._ps import hashtable_key_order
-
     for fac in hashtable_key_order(same.keys()):
         ids = sort_unique_ints(same[fac])
         for i in range(len(ids)):

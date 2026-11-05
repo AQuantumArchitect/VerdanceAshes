@@ -10,7 +10,7 @@ from __future__ import annotations
 import math
 from typing import Any, Dict, List, Optional
 
-from verdance.mission_builder._ps import D, I, S, T, R, arr, eq, g, has, iin, ieq, ilike, imatch
+from verdance.mission_builder._ps import D, I, S, T, R, arr, eq, g, has, ieq, ilike, imatch
 
 Spec_ = Dict[str, Any]
 

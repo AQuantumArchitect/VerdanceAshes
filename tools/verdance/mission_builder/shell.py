@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Set
 
 from verdance.mission_builder._ps import CIDict, D, I, JNum, S, T, arr, eq, fmt, g, has, ieq, iin, imatch, ilike
-from verdance.mission_builder.kits import each, props, scatter
+from verdance.mission_builder.kits import props, scatter
 
 Log = Callable[[str], None]
 

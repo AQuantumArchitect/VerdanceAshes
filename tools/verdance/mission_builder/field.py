@@ -16,9 +16,9 @@ from typing import Any, Callable, Dict, List, Optional
 from verdance.mission_builder import kits
 from verdance.mission_builder import shell as shell_mod
 from verdance.mission_builder._ps import (
-    CIDict, D, I, S, T, arr, eq, fmt, g, has, hashtable_key_order, ieq, iin, sign,
+    CIDict, D, I, S, T, arr, eq, fmt, g, has, hashtable_key_order, ieq, sign,
 )
-from verdance.mission_builder.kits import FACTION, MERC, Spec, each, faction, patrol_sweep, scaled_count
+from verdance.mission_builder.kits import FACTION, MERC, Spec, faction, patrol_sweep, scaled_count
 
 Log = Callable[[str], None]
 
