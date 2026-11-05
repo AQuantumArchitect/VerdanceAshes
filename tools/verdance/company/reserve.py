@@ -90,24 +90,9 @@ def clamp_bring(requested: Any, reserve: Dict[str, int], cap: float, workspace: 
     return out
 
 
-HOME_MAP_ID = "the_rock_jungle"
-
-
-def is_builder(unit_def: str) -> bool:
-    from verdance.campaign.home import BUILDER_DEFS   # campaign imports company; keep this lazy
-    return str(unit_def) in BUILDER_DEFS
-
-
-def default_bring(reserve: Dict[str, int], cap: float, workspace: Optional[Path] = None,
-                  map_id: Optional[str] = None) -> Dict[str, int]:
-    """The suggestion: the most valuable units that fit. Builders stay home (owner call, 2026-11-04:
-    whoever is not on the drop is at base, and constructors there build the camp) unless the job
-    is in the Rock Jungle, where the camp is the job. No map given: the old rule, everything."""
-    mid = str(map_id or "").lower().replace(" ", "_")
-    pool = dict(reserve)
-    if mid and mid not in (HOME_MAP_ID, "rock_jungle"):
-        pool = {d: n for d, n in pool.items() if not is_builder(d)}
-    return clamp_bring(pool, reserve, cap, workspace)
+def default_bring(reserve: Dict[str, int], cap: float, workspace: Optional[Path] = None) -> Dict[str, int]:
+    """The suggestion: the most valuable units that fit."""
+    return clamp_bring(reserve, reserve, cap, workspace)
 
 
 def homecoming(roster: Dict[str, Any], result: Dict[str, Any]) -> Dict[str, Any]:
@@ -141,13 +126,10 @@ def hub_surface(state: Dict[str, Any], workspace: Optional[Path] = None) -> Dict
     reserve = _counts(roster.get("reserve")) if isinstance(roster.get("reserve"), dict) else _counts(roster.get("cadre"))
     cap = lift_cap(state)
     rows = sorted(
-        ({"unitDef": d, "name": unit_name(d, workspace), "count": n, "value": round(unit_value(d, workspace)),
-          "builder": is_builder(d)}
+        ({"unitDef": d, "name": unit_name(d, workspace), "count": n, "value": round(unit_value(d, workspace))}
          for d, n in reserve.items()),
         key=lambda r: -r["value"],
     )
     return {"units": rows, "liftCap": round(cap), "sortiesHome": sorties_home(state),
-            # away from home the builders stay at base and grow the camp; at home they come
-            "suggested": default_bring(reserve, cap, workspace, map_id="away"),
-            "suggestedHome": default_bring(reserve, cap, workspace, map_id=HOME_MAP_ID),
+            "suggested": default_bring(reserve, cap, workspace),
             "perSortie": round(LIFT_PER_SORTIE), "base": round(LIFT_BASE)}

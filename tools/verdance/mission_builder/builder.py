@@ -1185,6 +1185,8 @@ def _build(ws: Path, intent: Dict[str, Any], state: Any, *, intent_path: str, st
     fb = intent["factionBanks"] if (has(intent, "factionBanks") and T(intent["factionBanks"])) else None
     wc_t = intent["worldConflict"] if (has(intent, "worldConflict") and T(intent["worldConflict"])) else None
     home = g(state, "homeCamp") if T(state) else None
+    # Inert since the owner cut camp growth (2026-11-04 evening): nothing sets growthPending any more,
+    # and no gadget reads mission.campGrowth. Kept so the scenario keeps the PS1's shape (parity).
     camp_growth = None
     if ieq(map_id, "the_rock_jungle") and T(state) and has(state, "homeCamp") and T(home) \
             and has(home, "growthPending") and I(home["growthPending"]) > 0:

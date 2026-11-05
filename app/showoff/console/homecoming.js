@@ -51,7 +51,7 @@ function renderManifest(man) {
     `</div>`;
 }
 
-// What moved (playtest, 2026-11-04): standing, the marks, the camp, and who is still out there,
+// What moved (playtest, 2026-11-04): standing, the marks, and who is still out there,
 // from the kernel's debrief.moved (verdance.campaign.engine.what_moved).
 const MAP_NAME = { the_rock_jungle: "the Rock Jungle", greenest_fields: "Greenest Fields", tabula: "Tabula",
   ancient_bastion: "Ancient Bastion", koom_valley: "Koom Valley", eye_of_horus: "Eye of Horus", all_that_simmers: "All That Simmers" };
@@ -69,11 +69,6 @@ function renderMoved(mv) {
     .concat((mv.rescued || []).map(n => `<li class="good">${esc(n)} joined the company</li>`))
     .concat((mv.lostRescues || []).map(n => `<li class="bad">${esc(n)} was lost</li>`));
   if (marks.length) parts.push(`<div class="mv-row"><div class="mv-h">Scouting and rescues</div><ul>${marks.join("")}</ul></div>`);
-  const c = mv.camp || {};
-  const campLine = c.placed != null
-    ? (c.placed ? `The builders at base had put up ${c.placed} while you were away. ${c.standing} standing in the camp now.` : `${c.standing || 0} standing in the camp now.`)
-    : c.grew ? `The builders at base put up ${c.grew} more. ${c.waiting} wait for you in the Rock Jungle.` : (c.waiting ? `${c.waiting} built at base wait for you in the Rock Jungle.` : "");
-  if (campLine) parts.push(`<div class="mv-row"><div class="mv-h">The camp</div><ul><li>${esc(campLine)}</li></ul></div>`);
   if ((mv.leftInField || []).length) {
     parts.push(`<div class="mv-row"><div class="mv-h">Still out there</div><ul>${mv.leftInField.map(p =>
       `<li>${esc(p.name)} at ${esc(p.label)}, ${esc(MAP_NAME[p.mapId] || p.mapId)}</li>`).join("")}</ul></div>`);

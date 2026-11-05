@@ -616,18 +616,15 @@ _STANDING_NAMES = {"armada": "Armada", "cortex": "Cortex", "legion": "Legion", "
 
 
 def _moved_snapshot(state: Dict[str, Any]) -> Dict[str, Any]:
-    camp = state.get("homeCamp") if isinstance(state.get("homeCamp"), dict) else {}
     return {"reputation": {k: float(v) for k, v in (state.get("reputation") or {}).items()
-                           if isinstance(v, (int, float)) and not isinstance(v, bool)},
-            "growthPending": int(camp.get("growthPending") or 0)}
+                           if isinstance(v, (int, float)) and not isinstance(v, bool)}}
 
 
 def what_moved(before: Dict[str, Any], state: Dict[str, Any], result: Dict[str, Any], map_id: str,
                hero_joins: List[Dict[str, Any]], field_losses: List[Any]) -> Dict[str, Any]:
-    """The debrief's "what moved" (playtest, 2026-11-04): standing, the secondary marks, the camp,
-    and who is still out there. Read from the state before and after, never invented."""
+    """The debrief's "what moved" (playtest, 2026-11-04): standing, the secondary marks, and who is
+    still out there. Read from the state before and after, never invented."""
     from verdance.world.roads import people_in_the_field
-    from .home import HOME_MAP_ID, camp_footprint
     rep_after = state.get("reputation") or {}
     standing = []
     for side, name in _STANDING_NAMES.items():
@@ -640,17 +637,12 @@ def what_moved(before: Dict[str, Any], state: Dict[str, Any], result: Dict[str, 
         if isinstance(sec, dict) and sec.get("kind") in ("scout", "hero_recover"):
             marks.append({"kind": sec.get("kind"), "label": str(sec.get("label") or sec.get("id") or ""),
                           "done": bool(sec.get("completed"))})
-    camp = state.get("homeCamp") if isinstance(state.get("homeCamp"), dict) else {}
-    at_home = canonical_map_id(map_id) == HOME_MAP_ID
-    pending_now = int(camp.get("growthPending") or 0)
-    growth = ({"placed": int(before.get("growthPending") or 0), "standing": camp_footprint(state)} if at_home
-              else {"grew": max(0, pending_now - int(before.get("growthPending") or 0)), "waiting": pending_now})
     field = [{"name": p["name"], "mapId": m, "label": p["label"]}
              for m, rows in sorted(people_in_the_field(state).items()) for p in rows]
     return {"standing": standing, "marks": marks,
             "rescued": [str(j.get("name") or j.get("heroId") or "") for j in hero_joins if isinstance(j, dict)],
             "lostRescues": [str(x.get("name") or x.get("heroId") or "") for x in field_losses if isinstance(x, dict)],
-            "camp": growth, "leftInField": field}
+            "leftInField": field}
 
 
 def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Optional[Dict[str, Any]], workspace: Path, translation: Optional[Dict[str, Any]] = None) -> Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Any], Dict[str, Any]]:

@@ -44,17 +44,3 @@ def test_presence_is_defensive_value():
     assert zm["T_C_SPILLWAY"]["controllingFaction"] == "ashwalkers"
     assert zm["T_C_INNER_SPILLWAY"]["controllingFaction"] == "armada"
     assert set(changed) == {"T_C_SPILLWAY", "T_C_INNER_SPILLWAY"}
-
-
-def test_builders_stay_home_unless_the_job_is_in_the_rock_jungle():
-    """Owner call, 2026-11-04: whoever is not on the drop is at base, and constructors there build."""
-    reserve = {"legck": 2, "armart": 4}
-    away = R.default_bring(reserve, 1e9, map_id="tabula")
-    home = R.default_bring(reserve, 1e9, map_id="the_rock_jungle")
-    assert "legck" not in away and away.get("armart") == 4
-    assert home.get("legck") == 2 and home.get("armart") == 4
-    # no map: everything that fits, as before
-    assert R.default_bring(reserve, 1e9).get("legck") == 2
-    surface = R.hub_surface({"roster": {"reserve": reserve}, "history": [{"verdict": "victory"}] * 9})
-    assert "legck" not in surface["suggested"] and surface["suggestedHome"].get("legck") == 2
-    assert next(u for u in surface["units"] if u["unitDef"] == "legck")["builder"] is True
