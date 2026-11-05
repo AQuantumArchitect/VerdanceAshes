@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.15.0 — 2026-11-04
+
+The sortie flow. Choosing a job starts loading the field in Beyond All Reason; while it loads you answer up to two camp talks, pick who goes, and pick what comes. Then you drop. Missions are built in Python (no PowerShell needed to build), the pull home is a smooth curve on the Tenebrium you bring back, and the Rock Jungle's raptors pick up gradually with every visit.
+
 - **The kings' showdown in four corners** (finale B, owner call). The company lands north-west, Armada starts north-east, Cortex south-east, and a raptor den with its hives holds the south-west. That makes three kings and the wild, with every corner occupied. The Null Mercs no longer sit a throne. The raptors fight everyone, at an easier pace than the Rock Jungle's (very easy, with a slower queen), so they harry the kings without deciding the throne. The throne is still the last commander standing. In Cortex's own suit, Cortex stays home and its corner stands empty.
 - **The showdown keeps the map's own water** for the whole match: no sink and no tide. All That Simmers is flat, and the tide drowned whole seats mid-match.
 - **No Tenebrium gate in the showdown.** It is a straight game of BAR: the company builds freely, as the rival kings always have. With the gate on and a walked bank of 12, the company was refused its T2 plant 251 times in one match and never fielded an army that could reach a corner.
