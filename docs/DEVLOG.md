@@ -2,6 +2,50 @@
 
 One entry per working day: what changed, what was measured, what's next. The newest entry comes first. Run folders live under `autopilot_runs\` on the dev PC (fenrir); they're not in git.
 
+## Morning summary for Luke (2026-11-09)
+
+**Decisions waiting on you**
+1. **The Overthrow's medium soak may be a notch too hard for the proxy.** Two independent finales on it broke 52 and 50 of the Keep's 65 guns and factories in 45 game minutes, then left (partial). The easy soak (15 min) was won outright. Options:
+   - Bake medium at 17–18 minutes.
+   - Keep 20 and make the proxy better at sieges.
+   - Accept it: a human may well do better than the proxy.
+2. **The hard soak's tors spend the soak on economy.** 515 metal makers at one tor; 3,309 units in all. Swapping the tors' SimpleConstructorAI for SimpleDefenderAI would give fortifications instead.
+3. **The pull home never lets go on the hard-AI runs.** The bag's Tenebrium isn't spent at home, so the proxy keeps choosing Rock Jungle jobs. v2 did seven door jobs in a row. Is that the intended pull, or should a few visits without spending ease it?
+
+**What changed overnight** (all on master, local CI green each time)
+- The drop limit grows 1k per sortie played, with no cap. A wipe loses its stockpile. The field's free 1k is no longer banked as hauled metal (a contract bug).
+- Rock Jungle grace has a 5-minute floor.
+- The Overthrow is a soak: eight Armada works, a strip after, one commander left in the Keep.
+- Proxy player:
+  - Hero caution, which steps away from enemies before heading home; Ketha is held back sooner.
+  - The home profile is BARb `hard`, and it leaves on the raptor clock.
+  - It buys mercs.
+  - It holds the door on Rock Jungle jobs.
+- Air heroes (Rookery, Stiletto) can be rescued; they used to vanish at frame 120.
+- Hero temper, the first slice of mood-driven hero AI: camp bonds, wounds and grief become nerve and drive. They tilt the hero's doctrine in the field and show on the hub as steady, shaken, eager or grieving.
+- UI:
+  - Compact hero cards with XP bars.
+  - The flow's tabs say where they stand.
+  - The debrief says what was brought home.
+  - A shorter jobs screen; the legend folded into a Key.
+  - Talk answers lead with what they stand for.
+  - The store sorts by what you can buy and shows that it scrolls.
+  - **No more `VA_` debug lines in the in-game console.**
+  - The mission rail clears BAR's raptor panel.
+- Tooling:
+  - Local CI (`scripts\test\ci.bat`).
+  - `--soak`, `--shots` (windowed screenshots for HUD review), `--modopt` and `--prefer` on the autopilot.
+  - A camp-talk word audit (`docs/writing/talk_audit.md`: talks are short, but 43% of their words are narration).
+
+**Measured** (details below)
+- Rock Jungle wipes: baseline 6, v2 0.
+- Caution A/B: 1 against 4 heroes dead after sortie 1, and 5 against 2 victories.
+- The door-hold fix won a Rock Jungle door and broke the home loop in v3.
+
+**Not done or not verified**
+- The HUD reviewer's density cuts to the mission rail (smaller rows, fewer lines). Some of what it would cut is yours by design ("Left if you lift"), so it waits for you.
+- The writing pass itself: only the audit is done, not rewrites.
+
 ## 2026-11-09 (night): owner notes worked through
 
 Owner notes after the baseline (Luke asleep; "err on the side of doing too much"):
