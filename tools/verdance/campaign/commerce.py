@@ -773,6 +773,12 @@ def settle_commerce_after_sortie(
         raw_export_k = int(math.floor(metal_stored / float(metal_unit)))
     else:
         raw_export_k = 0
+    # Losing costs what is on the map (owner call, 2026-11-09): a wiped company lifted nothing,
+    # and its stockpile was on the map. terminalKind is the gadget's word (hub.contract).
+    wiped = str(result.get("terminalKind") or "").lower() == "wiped"
+    if wiped and (raw_export_k or metal_stored > 0):
+        notes.append(f"stockpile lost with the company ({int(max(metal_stored, 0))} metal on the map)")
+        raw_export_k, metal_k_field, metal_stored = 0, 0, 0.0
     try:
         metal_k_brought = int(float(result.get("metalKBrought")))
     except (TypeError, ValueError):

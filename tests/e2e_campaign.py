@@ -198,11 +198,11 @@ def main() -> int:
     hs2 = json.loads(hs_path.read_text(encoding="utf-8-sig"))
     lr = hs2.get("lastResult") or {}
     rsv = hs2.get("reserve") or {}
-    # the lift starts at nothing and grows with the value brought home (half of everything lifted)
-    check("hub shows the reserve and the lift limit",
-          int(rsv.get("broughtHome") or 0) > 0 and abs(rsv.get("liftCap", -1) - rsv.get("liftShare", 0) * rsv.get("broughtHome", 0)) <= 1
+    # the drop limit starts at nothing and grows 1k with every sortie played, whatever the verdict
+    check("hub shows the reserve and the drop limit",
+          int(rsv.get("missionsPlayed") or 0) >= 1 and rsv.get("liftCap") == 1000 * int(rsv.get("missionsPlayed") or 0)
           and any(u.get("unitDef") == "corthud" for u in rsv.get("units") or []),
-          json.dumps({k: rsv.get(k) for k in ("liftCap", "broughtHome", "liftShare", "base")}))
+          json.dumps({k: rsv.get(k) for k in ("liftCap", "missionsPlayed", "perMission", "base")}))
     check("hub lastResult has the manifest and a verdict word", isinstance(lr.get("manifest"), dict) and bool(lr.get("verdict")))
     aces = {a["id"]: a for a in hs2.get("aces") or []}
     check("left hero not deployable on the hub", bool(left) and aces.get(left[0], {}).get("deployable") is False)

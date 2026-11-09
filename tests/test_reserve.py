@@ -1,55 +1,10 @@
-"""The company's reserve: what lifts comes home (hero packs excepted), what boards leaves it,
-the lift limit starts at nothing and grows with the value actually brought home."""
+"""The company's reserve: what lifts comes home (hero packs excepted), what boards leaves it, and
+the drop limit, which starts at nothing and grows 1k with every sortie played, with no ceiling."""
+from pathlib import Path
+
 from verdance.company import reserve as R
 
-
-def test_the_lift_grows_with_the_metal_lifted_home_not_the_units():
-    """Owner calls 2026-11-09: the lift grows with the stored metal the company lifts off with (reclaim
-    the field, build storage), net of the field's starting allotment. Units that lift go into the
-    reserve and do not count; a wiped company lifts nothing; verdicts do not matter."""
-    roster = {"reserve": {}, "cadre": {}}
-    st = {"roster": roster, "history": []}
-    assert R.lift_cap(st) == 0
-    partial = {"status": "extracted", "metalStored": 6400.0, "metalKFieldStart": 1,
-               "manifest": {"going": {"units": {"armpw": 10}}}}
-    out = R.homecoming(roster, partial, history=[])
-    assert out["metalLifted"] == 5400 and roster["reserve"] == {"armpw": 10}
-    assert R.lift_cap(st) == R.LIFT_SHARE * 5400                    # the ten Peewees are reserve, not lift
-    st["history"].append({"verdict": "partial"})
-    R.homecoming(roster, {"status": "wiped", "metalStored": 9000.0, "manifest": {"going": {"units": {}}}},
-                 history=st["history"])
-    st["history"].append({"verdict": "defeat"})
-    assert R.lift_cap(st) == R.LIFT_SHARE * 5400                    # nobody lifted: the stockpile stayed
-    R.homecoming(roster, {"status": "extracted", "metalStored": 300.0, "metalKFieldStart": 1,
-                          "manifest": {"going": {"units": {}}}}, history=st["history"])
-    assert R.lift_cap(st) == R.LIFT_SHARE * 5400                    # spent below the allotment: nothing gained
-
-
-def test_the_contract_keeps_the_field_allotment_so_it_is_not_counted_as_hauled():
-    """The gadget's result goes through hub.contract before commerce and the roster read it. Until
-    2026-11-09 the contract dropped metalKFieldStart: every sortie banked its free 1k allotment as
-    hauled metal (the 11-08 rehearsal lifted off with exactly that 1000, unspent)."""
-    from verdance.hub.contract import normalize_result, result_v2_to_v1_fields
-    raw = {"schemaVersion": "verdance-match-result/2.0", "status": "extracted", "metalStored": 1000.0,
-           "metalKExtracted": 1, "metalKFieldStart": 1, "metalKBrought": 0,
-           "manifest": {"going": {"heroes": [{"heroId": "ketha"}], "units": {}}}}
-    flat = result_v2_to_v1_fields(normalize_result(raw))
-    assert flat["metalKFieldStart"] == 1 and flat["metalKBrought"] == 0 and flat["terminalKind"] == "extracted"
-    assert R.metal_lifted(flat) == 0.0
-    flat["metalStored"] = 7500.0
-    assert R.metal_lifted(flat) == 6500.0
-
-
-def test_an_old_save_keeps_its_lift_on_the_upgrade():
-    """A save from before the ledger (0.15): its first homecoming seeds the ledger from the old rule,
-    1k per victory or extraction before this sortie, then adds what this sortie lifted."""
-    hist = [{"verdict": "victory"}, {"verdict": "partial"}, {"verdict": "extracted"}]
-    roster = {"reserve": {}, "cadre": {}}
-    st = {"roster": roster, "history": hist}
-    assert R.lift_cap(st) == 2000
-    R.homecoming(roster, {"status": "extracted", "metalStored": 2000.0, "manifest": {"going": {"units": {"armpw": 2}}}},
-                 history=hist)
-    assert R.lift_cap(st) == 2000 + R.LIFT_SHARE * 2000
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_lifted_units_join_the_reserve_and_escorts_do_not():
@@ -66,21 +21,57 @@ def test_brought_units_that_did_not_lift_are_gone():
     assert roster["reserve"] == {"armart": 2}
 
 
-def test_lift_limit_holds_and_grows():
+def test_the_drop_limit_grows_with_every_sortie_played_whatever_the_verdict():
+    """Owner call 2026-11-09: the drop grows 1k per mission, no cap; the longer you play, the more of
+    the reserve you can start a drop with. A partial or a defeat counts; an abandoned sortie does not."""
     reserve = {"armart": 40, "armsh": 40}
     st = {"history": []}
     assert R.lift_cap(st) == 0 and R.default_bring(reserve, 0) == {}
-    st["history"] = [{"verdict": "victory"}, {"verdict": "partial"}, {"verdict": "defeat"}, {"verdict": "extracted"}]
+    st["history"] = [{"verdict": "victory"}, {"verdict": "partial"}, {"verdict": "defeat"},
+                     {"verdict": "abandon"}, {"verdict": "extracted"}]
     cap = R.lift_cap(st)
-    assert cap == 2 * R.LIFT_PER_SORTIE == 2000  # no ledger yet: the old rule's lift
+    assert R.missions_played(st) == 4 and cap == 4 * R.DROP_PER_MISSION == 4000
+    st["history"] += [{"verdict": "partial"}] * 46
+    assert R.lift_cap(st) == 50_000                     # no ceiling
     bring = R.default_bring(reserve, cap)
     assert 0 < R.bring_value(bring) <= cap
     assert R.clamp_bring({"armart": 99}, {"armart": 3}, 1e9) == {"armart": 3}
 
 
+def test_the_veteran_perk_is_one_more_missions_worth():
+    st = {"history": [{"verdict": "partial"}], "roster": {"commander": {"perks": ["veteran_cadre"]}}}
+    assert R.lift_cap(st) == 2000
+
+
 def test_an_old_save_starts_its_reserve_from_the_cadre():
     roster = {"cadre": {"armsh": 3}}
     assert R.ensure_reserve(roster) == {"armsh": 3}
+
+
+def _settle(result, metal_k=5):
+    from verdance.campaign import commerce
+    from verdance.hub.contract import normalize_result, result_v2_to_v1_fields
+    state = {"missionNumber": 3, "commerce": {"tenebrium": 0, "metalK": metal_k, "owned": {}}}
+    flat = result_v2_to_v1_fields(normalize_result(dict(result, schemaVersion="verdance-match-result/2.0")))
+    commerce.settle_commerce_after_sortie(state, flat, False, False, False, workspace=ROOT)
+    return state["commerce"]["metalK"]
+
+
+def test_the_wallet_banks_what_lifts_off_beyond_the_field_allotment():
+    """The metal you lift off with is yours to spend (floor to 1k), net of the 1k the field handed
+    you. Until 2026-11-09 the result contract dropped metalKFieldStart, so every sortie banked its
+    unspent allotment as hauled metal (the 11-08 rehearsal lifted off with exactly that 1000)."""
+    lifted = {"status": "extracted", "metalKFieldStart": 1, "metalKBrought": 0,
+              "manifest": {"going": {"heroes": [{"heroId": "ketha"}], "units": {}}}}
+    assert _settle(dict(lifted, metalStored=1000.0, metalKExtracted=1)) == 5      # the allotment, unspent
+    assert _settle(dict(lifted, metalStored=6400.0, metalKExtracted=6)) == 10     # 6k off the pad, 1k of it handed out
+
+
+def test_a_wiped_company_banks_none_of_its_stockpile():
+    """Owner call 2026-11-09: losing costs what is on the map, and the stockpile was on the map."""
+    wiped = {"status": "wiped", "metalStored": 9000.0, "metalKExtracted": 9, "metalKFieldStart": 1, "metalKBrought": 0,
+             "manifest": {"going": {"heroes": [], "units": {}}}}
+    assert _settle(wiped) == 5
 
 
 def test_presence_is_defensive_value():

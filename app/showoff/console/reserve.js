@@ -1,6 +1,6 @@
 // The reserve: the army the company built and lifted home. At the drop the player picks what
-// boards, up to the lift limit (metal value; it grows with every sortie brought home). The
-// kernel clamps the same way, so this is a view of the rule, not the rule.
+// boards, up to the drop limit (liftCap in the kernel: metal value, +1k with every sortie played).
+// The kernel clamps the same way, so this is a view of the rule, not the rule.
 //
 // One row per unit type, with how many board and − / + (playtest, 2026-11-04: 22 identical kit
 // tiles read as noise).
@@ -58,10 +58,10 @@ export function renderReserve(locked) {
       `</span></li>`;
   }).join("");
   host.innerHTML =
-    `<div class="drop-squad-kicker">The reserve · lift <b>${Math.round(used)}</b> of ${cap}` +
+    `<div class="drop-squad-kicker">The reserve · dropping <b>${Math.round(used)}</b> of ${cap}` +
     (locked ? "" : ` <button type="button" class="btn-ghost rv-suggest" data-rv-suggest="1">Suggested</button>`) + `</div>` +
     `<div class="rv-meter"><i style="width:${cap ? Math.min(100, used / cap * 100).toFixed(1) : 0}%"></i></div>` +
-    `<p class="rv-note">Lift is how much one drop can carry, in metal value. It grows with the metal you lift off with: half of all the stored metal you have ever brought home.</p>` +
+    `<p class="rv-note">The drop limit is how much of the reserve a drop can start with, in metal value. It grows by ${s.perMission} with every sortie you play.</p>` +
     `<ul class="rv-rows">${rows}</ul>` + padRule;
 }
 

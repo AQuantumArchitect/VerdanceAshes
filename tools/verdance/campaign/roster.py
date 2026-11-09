@@ -181,10 +181,9 @@ def update_roster(state: Dict[str, Any], result: Dict[str, Any], success: bool, 
             commander["level"] = new_level
 
     # The reserve (verdance.company.reserve): this drop's bring left it; what lifted off the
-    # pad (minus hero packs) comes back, and its value grows the lift. Survivors left in the
-    # field are not carried. The history here is still the one before this sortie's bead.
+    # pad (minus hero packs) comes back. Survivors left in the field are not carried.
     from verdance.company.reserve import homecoming as _reserve_homecoming, ensure_reserve as _ensure_reserve
-    _reserve_homecoming(roster, result, history=state.get("history"))
+    _reserve_homecoming(roster, result)
 
     # Veteran XP bank by unitDef — majority retain between drops.
     # Named heroes already track peakBarXp; this covers packs / escorts / cadre.
