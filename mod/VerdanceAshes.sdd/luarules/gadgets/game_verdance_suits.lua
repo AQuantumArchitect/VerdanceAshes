@@ -14,6 +14,7 @@ if not VFS.Include("LuaRules/Configs/va_active.lua") then return false end -- pl
 -- commanderSuit = { unitDef, how } (GG.VA_SuitJson, read by game_verdance_campaign.lua).
 --
 -- mission.noCommanders (Tabula): every start commander but the company's is taken away, quietly.
+-- With mission.commanderSpare (the Overthrow's soak) the one nearest that point stays: the Keep's.
 function gadget:GetInfo()
   return {
     name = "Verdance Suits",
@@ -29,6 +30,7 @@ if not gadgetHandler:IsSyncedCode() then return end
 local mapId = ""
 local playerTeam = 0
 local noCommanders = false
+local commanderSpare = nil              -- { x, z } elmos: the sweep spares the commander nearest it
 local won                               -- { unitDef, how }
 local queenSuits = {}                   -- { x, z, fid } wrecks laid under fallen queens
 local pendingWrecks = {}                -- queens fallen this frame: lay the wreck next frame
@@ -44,6 +46,10 @@ function gadget:Initialize()
   mapId = tostring(data.deploymentMapId or data.mapId or "")
   playerTeam = tonumber(data.balance and data.balance.playerTeamID) or 0
   noCommanders = data.noCommanders == true
+  -- the Overthrow's soak: one commander stays, the one nearest the Keep (data.commanderSpare, 0..1)
+  if type(data.commanderSpare) == "table" and tonumber(data.commanderSpare.x) then
+    commanderSpare = { x = tonumber(data.commanderSpare.x) * Game.mapSizeX, z = tonumber(data.commanderSpare.z) * Game.mapSizeZ }
+  end
   GG.VA_SuitJson = function()
     if not won then return "null" end
     return '{"unitDef":"' .. won.unitDef .. '","how":"' .. won.how .. '"}'
@@ -77,7 +83,7 @@ local function win(defID, how, uid)
 end
 
 local function sweepCommanders()
-  COM.sweep({ skipTeams = { [playerTeam] = true }, label = "no_commanders " .. mapId })
+  COM.sweep({ skipTeams = { [playerTeam] = true }, spare = commanderSpare, label = "no_commanders " .. mapId })
 end
 
 local function layQueenSuit(q)

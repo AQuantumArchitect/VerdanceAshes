@@ -101,6 +101,46 @@ def test_past_the_cap_the_cheapest_mobiles_go_first():
     assert len(defs) == 7 and "armpw" not in defs and "armbull" in defs and "armcom" in defs
 
 
+def test_the_overthrow_soak_has_eight_keep_works_and_no_ai_on_the_company_seat():
+    """Owner call 2026-11-09: five simple defenders/constructors and three balanced BARbs soak the castle
+    unopposed; the company's seat stays in the recipe (the mission needs it) but has no AI in the sim."""
+    rec = W.load_recipe(ROOT, "ancient_bastion")
+    assert rec["soak"]["easy"] < rec["soak"]["medium"] < rec["soak"]["hard"]
+    baked = W.baked_teams(rec)
+    assert len(baked) == 8 and {t["ally"] for t in baked} == {"keep"}
+    assert rec["playerSeat"] not in {t["key"] for t in baked}
+    s = W.startscript(rec, game_type="Verdance Ashes $VERSION")
+    assert s.count("[TEAM") == 8 and s.count("[ALLYTEAM") == 1
+    assert s.count("ShortName=BARb;") == 3 and s.count("profile=hard;") == 3
+    assert s.count("ShortName=SimpleDefenderAI;") == 3 and s.count("ShortName=SimpleConstructorAI;") == 2
+
+
+def test_the_soak_strip_keeps_factories_some_builders_and_one_commander():
+    rec = W.load_recipe(ROOT, "ancient_bastion")
+    lines = ["VA_SHELL_MAP 16384 8192"]
+    for team in range(8):
+        x = 1792 + team * 300
+        lines.append(f"VA_SHELL_UNIT armcom {x}.0 4053.0 0 {team} 1.0 1.0 C bp=300 fac=0")
+        lines.append(f"VA_SHELL_UNIT armlab {x}.0 4100.0 0 {team} 1.0 1.0 S bp=150 fac=1")
+        lines.append(f"VA_SHELL_UNIT armllt {x}.0 4200.0 0 {team} 1.0 1.0 S bp=0 fac=0")
+        for k in range(5):
+            lines.append(f"VA_SHELL_UNIT armck {x + k}.0 4300.0 0 {team} 1.0 1.0 M bp=80 fac=0")
+        lines.append(f"VA_SHELL_UNIT armnanotc {x}.0 4400.0 0 {team} 1.0 1.0 S bp=200 fac=0")
+    snap = W.build_snapshot(rec, W.parse_dump("\n".join(lines)), costs={})
+    units = [u for t in snap["teams"] for u in t["units"]]
+    assert sum(1 for u in units if u[0] == "armcom") == 1                      # one commander for the Keep
+    assert sum(1 for u in units if u[0] == "armlab") == 8                      # factories stay
+    assert sum(1 for u in units if u[0] == "armllt") == 8                      # the defences stay
+    builders = sum(1 for u in units if u[0] in ("armck", "armnanotc"))
+    assert builders == round(48 * rec["snapshot"]["strip"]["builderKeep"])     # 15% of 48
+    assert snap["stripped"] == {"builders": 48 - builders, "commanders": 7}
+
+
+def test_an_old_dump_without_build_power_strips_nothing_by_it():
+    d = W.parse_dump("VA_SHELL_UNIT armck 100.0 100.0 0 0 1.0 1.0 M")
+    assert d["units"][0]["bp"] is None and d["units"][0]["factory"] is False
+
+
 def test_progress_ticks_can_be_read_while_the_sim_runs():
     t = "VA_SHELL_BAKE_TICK frame=1800 target=36000 units=0:12,1:9\nVA_SHELL_BAKE_TICK frame=3600 target=36000 units=0:30,1:25"
     assert W.progress(t) == {"frame": 3600, "target": 36000, "units": {0: 30, 1: 25}}
@@ -149,7 +189,9 @@ def test_every_map_has_a_sound_recipe():
         for t in rec["teams"]:
             assert (tuple(t["startElmos"]) in native) != bool(t.get("virtual")), (m, t["key"])
         s = W.startscript(rec, game_type="Verdance Ashes $VERSION")
-        assert s.count("[TEAM") == len(rec["teams"]) and s.count("[ALLYTEAM") == 2, m
+        # a soak (the Overthrow) bakes one side with nobody on the company's seat
+        baked = W.baked_teams(rec)
+        assert s.count("[TEAM") == len(baked) and s.count("[ALLYTEAM") == len({t["ally"] for t in baked}), m
         assert f"va_shell_bake_mapid={m};" in s and f"MapName={rec['mapName']};" in s, m
 
 

@@ -92,12 +92,19 @@ def _num(v: float) -> str:
     return f"{v:.4f}".rstrip("0").rstrip(".")
 
 
+def baked_teams(recipe: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """The seats that play in the bake, in engine team order. A seat marked ``skipBake`` (the
+    company's, in a soak: nobody may attack the castle while it is raised) stays in the recipe for
+    the mission but has no AI in the sim."""
+    return [t for t in recipe["teams"] if not t.get("skipBake")]
+
+
 def startscript(recipe: Dict[str, Any], *, game_type: str, frames: Optional[int] = None,
                 map_size: Optional[tuple] = None) -> str:
     """The BARb war as a Spring startscript: one ally team per side, a spectator host, seats at the
     recipe's positions (StartPosType 3 reads StartPosX/Z from the script)."""
     map_size = tuple(map_size or recipe.get("mapSize") or DEFAULT_MAP_SIZE)
-    teams = recipe["teams"]
+    teams = baked_teams(recipe)
     sides = recipe["sides"]
     frames = int(frames or recipe.get("minutes", 20) * 60 * 30)
     allies = sorted({t["ally"] for t in teams})
@@ -121,6 +128,12 @@ def startscript(recipe: Dict[str, Any], *, game_type: str, frames: Optional[int]
             f"    StartPosX={int(t['startElmos'][0])};\n    StartPosZ={int(t['startElmos'][1])};\n  }}\n")
     for i, t in enumerate(teams):
         side = sides[t["ally"]]
+        if t.get("ai"):
+            # one of BAR's Lua AIs (SimpleDefenderAI, SimpleConstructorAI, SimpleAI): no version, no profile
+            blocks.append(
+                f"  [AI{i}]\n  {{\n    Name={t['ai']} ({side['side']} {t['key']});\n    ShortName={t['ai']};\n"
+                f"    Team={i};\n    Host=0;\n    Version=<not-versioned>;\n  }}\n")
+            continue
         blocks.append(
             f"  [AI{i}]\n  {{\n    Name=BARb {t['profile']} ({side['side']} {t['key']});\n    ShortName=BARb;\n"
             f"    Team={i};\n    Host=0;\n    Version=stable;\n    [OPTIONS]\n    {{\n      profile={t['profile']};\n    }}\n  }}\n")
@@ -139,7 +152,8 @@ def startscript(recipe: Dict[str, Any], *, game_type: str, frames: Optional[int]
 
 # ----------------------------------------------------------------------------- the dump
 
-_UNIT = re.compile(r"VA_SHELL_UNIT\s+(\S+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(\d+)\s+(-?\d+)\s+([\d.]+)\s+([\d.]+)\s+([SMAWC])")
+_UNIT = re.compile(r"VA_SHELL_UNIT\s+(\S+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(\d+)\s+(-?\d+)\s+([\d.]+)\s+([\d.]+)\s+([SMAWC])"
+                   r"(?:\s+bp=([\d.]+)\s+fac=(\d))?")
 _TEAM = re.compile(r"VA_SHELL_TEAM\s+(\d+)\s+(\S*)\s+(-?\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)")
 _MAP = re.compile(r"VA_SHELL_MAP\s+(\d+)\s+(\d+)")
 _WRECK = re.compile(r"VA_SHELL_WRECK\s+(\S+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?\d+)\s+(\d+)")
@@ -157,9 +171,10 @@ def parse_dump(text: str) -> Dict[str, Any]:
             continue
         m = _UNIT.search(line)
         if m:
-            d, x, z, face, team, hp, built, kind = m.groups()
+            d, x, z, face, team, hp, built, kind, bp, fac = m.groups()
             out["units"].append({"def": d, "x": float(x), "z": float(z), "facing": int(face), "team": int(team),
-                                 "hp": float(hp), "built": float(built), "kind": kind})
+                                 "hp": float(hp), "built": float(built), "kind": kind,
+                                 "bp": float(bp) if bp is not None else None, "factory": fac == "1"})
             continue
         m = _TEAM.search(line)
         if m:
@@ -195,11 +210,49 @@ def _cost(costs: Dict[str, Any], def_name: str) -> float:
     return float(row[0]) if isinstance(row, (list, tuple)) and row else 0.0
 
 
+def soak_strip(recipe: Dict[str, Any], dump: Dict[str, Any], map_size: tuple) -> Dict[str, Any]:
+    """After a soak (owner call, 2026-11-09): the AIs built the fortress; most of what built it goes.
+    recipe.snapshot.strip = {"builderKeep": share of builders kept (mobile constructors and nano
+    turrets, never factories), "commanders": how many commanders each side keeps (the ones nearest the
+    middle of that side's seats)}. Fewer builders on the field is less Tenebrium to reclaim from it.
+    Returns {"units": the dump's units without the stripped, "stripped": counts}."""
+    strip = (recipe.get("snapshot") or {}).get("strip") or {}
+    if not strip:
+        return {"units": dump["units"], "stripped": {}}
+    keep_share = max(0.0, min(1.0, float(strip.get("builderKeep", 1.0))))
+    keep_coms = int(strip.get("commanders", 10 ** 6))
+    rec_teams = baked_teams(recipe)
+    ally_of = {i: t["ally"] for i, t in enumerate(rec_teams)}
+    centre: Dict[str, tuple] = {}
+    for ally in set(ally_of.values()):
+        seats = [t["startElmos"] for t in rec_teams if t["ally"] == ally]
+        centre[ally] = (sum(s[0] for s in seats) / len(seats), sum(s[1] for s in seats) / len(seats))
+
+    def dist(u: Dict[str, Any]) -> float:
+        cx, cz = centre.get(ally_of.get(u["team"]), (map_size[0] / 2, map_size[1] / 2))
+        return (u["x"] - cx) ** 2 + (u["z"] - cz) ** 2
+
+    gone: set = set()
+    counts = {"builders": 0, "commanders": 0}
+    for ally in set(ally_of.values()):
+        mine = [u for u in dump["units"] if ally_of.get(u["team"]) == ally]
+        builders = sorted((u for u in mine if (u.get("bp") or 0) > 0 and not u.get("factory") and u["kind"] != "C"), key=dist)
+        keep_n = int(round(len(builders) * keep_share))
+        for u in builders[keep_n:]:
+            gone.add(id(u))
+            counts["builders"] += 1
+        coms = sorted((u for u in mine if u["kind"] == "C"), key=dist)
+        for u in coms[keep_coms:]:
+            gone.add(id(u))
+            counts["commanders"] += 1
+    return {"units": [u for u in dump["units"] if id(u) not in gone], "stripped": counts}
+
+
 def build_snapshot(recipe: Dict[str, Any], dump: Dict[str, Any], *, costs: Optional[Dict[str, Any]] = None,
                    baked_at: str = "", minutes: Optional[float] = None) -> Dict[str, Any]:
     """The war as the mission builder wants it: positions normalized, the company's seat pulled out,
     unfinished work left behind, each side capped to what a drop can carry."""
-    rec_teams = recipe["teams"]
+    rec_teams = baked_teams(recipe)
     sides = recipe["sides"]
     mx, mz = dump.get("map") or tuple(recipe.get("mapSize") or DEFAULT_MAP_SIZE)
     cfg = recipe.get("snapshot") or {}
@@ -208,8 +261,10 @@ def build_snapshot(recipe: Dict[str, Any], dump: Dict[str, Any], *, costs: Optio
     player_key = recipe.get("playerSeat")
     teams: List[Dict[str, Any]] = []
     pulled: Dict[str, Any] = {}
+    stripped = soak_strip(recipe, dump, (mx, mz))
+    all_units = stripped["units"]
     for i, t in enumerate(rec_teams):
-        mine = [u for u in dump["units"] if u["team"] == i]
+        mine = [u for u in all_units if u["team"] == i]
         if t["key"] == player_key:
             pulled = {"key": t["key"], "units": len(mine), "commanders": sum(1 for u in mine if u["kind"] == "C")}
             continue
@@ -235,7 +290,7 @@ def build_snapshot(recipe: Dict[str, Any], dump: Dict[str, Any], *, costs: Optio
         })
     # The field's dead: the war's wrecks and heaps, richest first, none on the company's own seat.
     max_wrecks = int(cfg.get("maxWrecks") or 240)
-    seat = next((t["startElmos"] for t in rec_teams if t["key"] == player_key), None)
+    seat = next((t["startElmos"] for t in recipe["teams"] if t["key"] == player_key), None)
     lying = [w for w in dump.get("wrecks") or []
              if not (seat and ((w["x"] - seat[0]) / mx) ** 2 + ((w["z"] - seat[1]) / mz) ** 2 < WRECK_SEAT_CLEARANCE ** 2)]
     lying.sort(key=lambda w: -w["metal"])
@@ -246,12 +301,14 @@ def build_snapshot(recipe: Dict[str, Any], dump: Dict[str, Any], *, costs: Optio
         "dry": bool(recipe.get("dry", True)), "seed": recipe.get("seed"),
         "character": recipe.get("character"), "mapSize": [mx, mz],
         "pulled": pulled, "teams": teams, "wrecks": wrecks, "tier": int(recipe.get("tier") or 1),
+        **({"stripped": stripped["stripped"]} if stripped["stripped"] else {}),
         "unitCount": sum(t["unitCount"] for t in teams),
     }
 
 
-def write_snapshot(workspace: Path, snapshot: Dict[str, Any]) -> Path:
-    path = Path(workspace) / snapshot_rel(str(snapshot.get("mapId") or MAP_ID), int(snapshot.get("tier") or 1))
+def write_snapshot(workspace: Path, snapshot: Dict[str, Any], path: Optional[Path] = None) -> Path:
+    """Write a snapshot where the builder reads it (its map and tier), or to ``path`` (a soak trial)."""
+    path = Path(path) if path else Path(workspace) / snapshot_rel(str(snapshot.get("mapId") or MAP_ID), int(snapshot.get("tier") or 1))
     path.parent.mkdir(parents=True, exist_ok=True)
     # one line per unit would be big; keep each team's units on a line apiece
     head = {k: v for k, v in snapshot.items() if k != "teams"}

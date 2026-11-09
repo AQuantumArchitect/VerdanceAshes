@@ -31,11 +31,27 @@ function COM.sweep(opts)
   local skip = opts.skipTeams or {}
   local keep = tonumber(opts.keep) or 0
   local removed = 0
+  -- opts.spare = { x, z } in elmos: the one commander nearest it (of the swept teams) stays
+  local spared = nil
+  if opts.spare and opts.spare.x and opts.spare.z then
+    local best
+    for _, tid in ipairs(teams) do
+      if tid ~= gaia and not skip[tid] then
+        for _, uid in ipairs(Spring.GetTeamUnits(tid) or {}) do
+          if COM.isCommander(Spring.GetUnitDefID(uid)) then
+            local x, _, z = Spring.GetUnitPosition(uid)
+            local d = x and ((x - opts.spare.x) ^ 2 + (z - opts.spare.z) ^ 2)
+            if d and (not best or d < best) then best, spared = d, uid end
+          end
+        end
+      end
+    end
+  end
   for _, tid in ipairs(teams) do
     if tid ~= gaia and not skip[tid] then
       local kept = 0
       for _, uid in ipairs(Spring.GetTeamUnits(tid) or {}) do
-        if COM.isCommander(Spring.GetUnitDefID(uid)) then
+        if COM.isCommander(Spring.GetUnitDefID(uid)) and uid ~= spared then
           if kept < keep then
             kept = kept + 1
           else

@@ -15,6 +15,7 @@ builder reads for every drop onto that map (verdance.world.war_snapshot, verdanc
     python tools\\war_bake_v1.py --map ancient_bastion --field --no-install   the field sets the war (try it)
     python tools\\war_bake_v1.py --map tabula --from-log PATH       build the snapshot from an infolog you already have
     python tools\\war_bake_v1.py --map tabula --tier 2               the war a second visit meets (recipe "tiers")
+    python tools\\war_bake_v1.py --map ancient_bastion --soak hard   a soak recipe at its hard soak time
 
 Your own campaign is untouched, but BAR's infolog and data\\games\\VerdanceAshes.sdd are shared: don't
 play BAR while it runs. A run is kept in headless_runs\\war_<map>_<stamp>\\ (startscript, engine output,
@@ -58,15 +59,26 @@ def summary(snap: dict) -> list[str]:
     return rows
 
 
-def finish(infolog_text: str, recipe: dict, minutes: float, out_dir: Path | None, no_install: bool) -> int:
+def finish(infolog_text: str, recipe: dict, minutes: float, out_dir: Path | None, no_install: bool,
+           soak: str | None = None) -> int:
     dump = W.parse_dump(infolog_text)
     if not dump["units"]:
         print("[war] no VA_SHELL_UNIT lines in the infolog: the bake gadget did not dump. See", out_dir or "the log")
         return 3
     snap = W.build_snapshot(recipe, dump, costs=_costs(), minutes=minutes,
                             baked_at=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"))
-    print(f"[war] {recipe['mapId']}, frozen:")
+    if soak:
+        snap["soak"] = soak
+    print(f"[war] {recipe['mapId']}, frozen{' (soak ' + soak + ')' if soak else ''}:")
     print("\n".join(summary(snap)))
+    if snap.get("stripped"):
+        print(f"[war] stripped after the soak: {snap['stripped']}")
+    if soak and soak != "medium" and not no_install:
+        if out_dir:
+            (out_dir / "snapshot.preview.json").write_text(json.dumps({k: v for k, v in snap.items() if k != "teams"}, indent=2), encoding="utf-8")
+        path = W.write_snapshot(ROOT, snap, path=ROOT / "data" / "base_templates" / recipe["mapId"] / f"war_snapshot_{soak}.json")
+        print(f"[war] soak {soak}: saved for trials as {path} (the shipped medium snapshot is unchanged)")
+        return 0
     if out_dir:
         (out_dir / "snapshot.preview.json").write_text(json.dumps({k: v for k, v in snap.items() if k != "teams"}, indent=2), encoding="utf-8")
     if no_install:
@@ -92,7 +104,13 @@ def bake(map_id: str, args, cfg, S) -> int:
             recipe = F.apply_plan(recipe, plan)
             print(f"[war] field plan: {plan['was']['minutes']} -> {plan['minutes']} min; "
                   + ", ".join(f"{s['key']} {s['handicap']:+d}% {s['profile']}" for s in plan["seats"]))
-    minutes = float(args.minutes or recipe.get("minutes") or 20)
+    soak = getattr(args, "soak", None)
+    if soak:
+        levels = recipe.get("soak") or {}
+        if soak not in levels:
+            print(f"[war] {map_id} has no soak '{soak}' (recipe soak: {', '.join(k for k in levels if k != 'note') or 'none'})")
+            return 2
+    minutes = float(args.minutes or ((recipe.get("soak") or {}).get(soak) if soak else None) or recipe.get("minutes") or 20)
     exe = S.engine_exe(cfg, "spring.exe" if args.windowed else "spring-headless.exe")
     prov = S.provision_map(ROOT, cfg, recipe["mapName"])
     if prov.get("ok") is False:
@@ -137,7 +155,7 @@ def bake(map_id: str, args, cfg, S) -> int:
         except OSError:
             pass
     (out_dir / "infolog.txt").write_text(text, encoding="utf-8")
-    rc = finish(text, recipe, minutes, out_dir, args.no_install)
+    rc = finish(text, recipe, minutes, out_dir, args.no_install, soak=soak)
     (out_dir / "summary.json").write_text(json.dumps({"exit": rc, "wallSeconds": int(time.time() - t0), "minutes": minutes, "map": map_id}), encoding="utf-8")
     return rc
 
@@ -157,6 +175,9 @@ def main() -> int:
     ap.add_argument("--tier", type=int, default=1, choices=(1, 2, 3),
                     help="visit tier to bake (verdance.world.visit_tiers): 2 and 3 apply the recipe's \"tiers\" overrides")
     ap.add_argument("--from-log", help="skip the sim: read the dump out of this infolog (needs one --map)")
+    ap.add_argument("--soak", choices=("easy", "medium", "hard"),
+                    help="a soak recipe (the Overthrow): the recipe's soak minutes for this level; medium writes the shipped "
+                         "snapshot, easy and hard write war_snapshot_<level>.json for trials")
     args = ap.parse_args()
 
     known = W.war_maps(ROOT)
@@ -179,7 +200,8 @@ def main() -> int:
             return 2
         recipe = W.recipe_for_tier(W.load_recipe(ROOT, wanted[0]), args.tier)
         minutes = float(args.minutes or recipe.get("minutes") or 20)
-        return finish(Path(args.from_log).read_text(encoding="utf-8", errors="replace"), recipe, minutes, None, args.no_install)
+        return finish(Path(args.from_log).read_text(encoding="utf-8", errors="replace"), recipe, minutes, None, args.no_install,
+                      soak=args.soak)
 
     from verdance_kernel import sortie as S  # type: ignore
 

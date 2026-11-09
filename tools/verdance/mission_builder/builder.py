@@ -1280,6 +1280,10 @@ def _build(ws: Path, intent: Dict[str, Any], state: Any, *, intent_path: str, st
         "scoutParties": list(f.scout_parties),
         "jumpGate": piped(intent["jumpGate"]) if (has(intent, "jumpGate") and T(intent["jumpGate"])) else None,
         "noCommanders": bool(T(theater) and has(theater, "noCommanders") and T(theater["noCommanders"])),
+        # the one commander the sweep spares (the Overthrow's Keep), as a 0..1 map point; only when set,
+        # so every other scenario stays value for value the PowerShell builder's
+        **({"commanderSpare": piped(theater["commanderSpare"])}
+           if (T(theater) and has(theater, "commanderSpare") and T(theater["commanderSpare"])) else {}),
         "occupationModel": "living_shell",
         "sessionMode": S(intent["sessionMode"]) if T(g(intent, "sessionMode")) else "same_map",
         # WO-035: Arc A off (hot extract wave only in the gadget); light/full later.

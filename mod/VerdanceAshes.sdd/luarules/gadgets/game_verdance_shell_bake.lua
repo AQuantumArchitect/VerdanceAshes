@@ -94,8 +94,11 @@ local function dumpAllUnits()
       elseif ud.isBuilding or not ud.canMove then kind = "S"
       elseif ud.canFly then kind = "A"
       elseif ud.isShip or ud.floatOnWater then kind = "W" end
+      -- build power and whether it is a factory, for the soak strip (war_snapshot.build_snapshot)
+      local bp = (ud.isBuilder and (ud.buildSpeed or 0)) or 0
+      local fac = ud.isFactory and 1 or 0
       Spring.Echo(string.format(
-        "VA_SHELL_UNIT %s %.1f %.1f %d %d %.3f %.2f %s",
+        "VA_SHELL_UNIT %s %.1f %.1f %d %d %.3f %.2f %s bp=%.0f fac=%d",
         ud.name,
         x or 0,
         z or 0,
@@ -103,7 +106,9 @@ local function dumpAllUnits()
         Spring.GetUnitTeam(unitID) or -1,
         hpFrac,
         built or 1,
-        kind
+        kind,
+        bp,
+        fac
       ))
       count = count + 1
     end

@@ -66,13 +66,16 @@ WARS = {
         {"key": "fort_keep", "faction": "armada", "zoneId": "T_SE_MUSTER"},
         {"key": "fort_s", "faction": "armada", "zoneId": "T_SE_LANE"},
     ],
+    # the Overthrow's soak (2026-11-09): the Keep alone, eight works; no besiegers
     "ancient_bastion": [
         {"key": "keep_s", "faction": "armada", "zoneId": "AB_SW_RAMPART"},
         {"key": "keep_n", "faction": "armada", "zoneId": "AB_W_KEEP"},
+        {"key": "keep", "faction": "armada", "zoneId": "AB_W_KEEP"},
         {"key": "out_n", "faction": "armada", "zoneId": "AB_NW_RAMPART"},
         {"key": "out_s", "faction": "armada", "zoneId": "AB_SW_RAMPART"},
-        {"key": "se", "faction": "nullmercs", "zoneId": "AB_SE_HEIGHTS"},
-        {"key": "mid", "faction": "nullmercs", "zoneId": "AB_E_RIDGE"},
+        {"key": "gate", "faction": "armada", "zoneId": "AB_W_GATEHOUSES"},
+        {"key": "tor_n", "faction": "armada", "zoneId": "AB_NW_TOR"},
+        {"key": "tor_s", "faction": "armada", "zoneId": "AB_SW_TOR"},
     ],
     # The Eye (2026-10-26): only the Cortex mercenary camp in the glassed crater stands; Armada's assault
     # from the corners was the bake's history and is gone but for its wrecks.
@@ -209,6 +212,13 @@ def standing_war(map_id: str, workspace: Optional[Path], pad_zone: Optional[str]
     # Tabula (owner call, 2026-10-26): no commanders on the field but the company's own.
     if recipe and recipe.get("noCommanders"):
         out["noCommanders"] = True
+    # The Overthrow's soak (owner call, 2026-11-09): one commander, the one nearest this zone, and
+    # every other start commander but the company's goes (game_verdance_suits.lua).
+    spare = recipe.get("keepOneCommander") if recipe else None
+    if spare and _point(zones.get(spare, {})):
+        out["noCommanders"] = True
+        sx, sz = _point(zones[spare])
+        out["commanderSpare"] = {"zoneId": spare, "x": round(sx, 4), "z": round(sz, 4)}
     return out
 
 

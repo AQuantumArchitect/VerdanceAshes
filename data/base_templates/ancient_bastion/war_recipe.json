@@ -6,12 +6,22 @@
     16384,
     8192
   ],
-  "character": "Ancient Bastion, the siege: four Armada seats hold the western castle; Null Mercs besiege it from the east, twenty minutes in. The besiegers' north-east seat, by the Tabula door, is the company's.",
+  "character": "Ancient Bastion, the Overthrow: the Keep has had the western castle to itself for a while. Eight Armada works raised it, and most of the hands that built it have gone; one commander holds the Keep. The company comes from the north-east heights by the Tabula door.",
   "minutes": 20,
+  "soak": {
+    "easy": 15,
+    "medium": 20,
+    "hard": 35,
+    "note": "Owner call 2026-11-09: the finale is a soak. Simple defenders and constructors and three balanced BARbs build the castle unopposed; how long they soak is the difficulty (35 minutes brings a T3 lab). Medium is the shipped war_snapshot_v1.json; war_bake_v1.py --soak easy|hard writes war_snapshot_<level>.json for trials."
+  },
   "seed": 3313,
   "dry": true,
   "playerSeat": "ne",
-  "notes": "The terrain's five native seats are all in the western third, so the castle takes four of them (Keep, outworks). The besiegers have no native seats: they stand on the eastern plateaus (buildable ground at x 13581, a forward post at x 11932), the company's beside the NE door. The besiegers are hard_aggressive: a siege is a charge.",
+  "fieldSides": [
+    "keep"
+  ],
+  "keepOneCommander": "AB_W_KEEP",
+  "notes": "Was a siege (four Armada seats against three Null Mercs besiegers, 20 minutes, 2026-10-25 bake; see git history). Now the Keep alone soaks: the three BARbs (profile hard, 'Hard | Balanced') take the castle's native seats and the Keep itself, the five Lua AIs take the outworks, the tors and the gatehouses. After the soak the strip takes most of the build power (mobile constructors and nano turrets; factories stay) and every commander but the one nearest the Keep; in the mission the engine's start commanders go too, all but the Keep's (keepOneCommander). In the mission every seat plays as BARb hard.",
   "sides": {
     "keep": {
       "faction": "armada",
@@ -48,9 +58,22 @@
       "label": "The Keep, north"
     },
     {
+      "key": "keep",
+      "ally": "keep",
+      "profile": "hard",
+      "zoneId": "AB_W_KEEP",
+      "startElmos": [
+        1792,
+        4053
+      ],
+      "label": "The Keep",
+      "virtual": true
+    },
+    {
       "key": "out_n",
       "ally": "keep",
       "profile": "hard",
+      "ai": "SimpleDefenderAI",
       "zoneId": "AB_NW_RAMPART",
       "startElmos": [
         2803,
@@ -62,12 +85,52 @@
       "key": "out_s",
       "ally": "keep",
       "profile": "hard",
+      "ai": "SimpleDefenderAI",
       "zoneId": "AB_SW_RAMPART",
       "startElmos": [
         2803,
         5588
       ],
       "label": "South outworks"
+    },
+    {
+      "key": "gate",
+      "ally": "keep",
+      "profile": "hard",
+      "ai": "SimpleDefenderAI",
+      "zoneId": "AB_W_GATEHOUSES",
+      "startElmos": [
+        4694,
+        4053
+      ],
+      "label": "The gatehouses",
+      "virtual": true
+    },
+    {
+      "key": "tor_n",
+      "ally": "keep",
+      "profile": "hard",
+      "ai": "SimpleConstructorAI",
+      "zoneId": "AB_NW_TOR",
+      "startElmos": [
+        2987,
+        1100
+      ],
+      "label": "Northwest tor",
+      "virtual": true
+    },
+    {
+      "key": "tor_s",
+      "ally": "keep",
+      "profile": "hard",
+      "ai": "SimpleConstructorAI",
+      "zoneId": "AB_SW_TOR",
+      "startElmos": [
+        2987,
+        7090
+      ],
+      "label": "Southwest tor",
+      "virtual": true
     },
     {
       "key": "ne",
@@ -79,36 +142,17 @@
         2643
       ],
       "label": "Northeast (the company's seat)",
-      "virtual": true
-    },
-    {
-      "key": "se",
-      "ally": "siege",
-      "profile": "hard_aggressive",
-      "zoneId": "AB_SE_HEIGHTS",
-      "startElmos": [
-        13581,
-        5588
-      ],
-      "label": "Southeast plateau",
-      "virtual": true
-    },
-    {
-      "key": "mid",
-      "ally": "siege",
-      "profile": "hard_aggressive",
-      "zoneId": "AB_E_RIDGE",
-      "startElmos": [
-        11932,
-        4107
-      ],
-      "label": "Forward post",
-      "virtual": true
+      "virtual": true,
+      "skipBake": true
     }
   ],
   "snapshot": {
     "maxUnitsPerTeam": 900,
     "minBuilt": 0.5,
-    "note": "Past the cap the cheapest mobile units go first; structures and commanders are kept."
+    "strip": {
+      "builderKeep": 0.15,
+      "commanders": 1
+    },
+    "note": "Past the cap the cheapest mobile units go first; structures and commanders are kept. The strip comes first: 15% of the builders (nearest the Keep) and one commander stay."
   }
 }
