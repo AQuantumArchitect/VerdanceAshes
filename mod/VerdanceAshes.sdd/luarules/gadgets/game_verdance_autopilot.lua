@@ -74,6 +74,9 @@ local CAUTION_EVERY = 30
 local HERO_LOW, HERO_HURT, HERO_WHOLE = 0.55, 0.85, 0.90
 local HERO_CROWD, HERO_SENSE = 5, 700
 local HERO_QUIET = 90 * 30
+-- taking fire it cannot see (finale trial 20261109_012053: the Keep's long guns took Halbard from 0.85 to
+-- 0.21 with "enemies=0" within 700): losing this much health in a second, below HERO_HURT, pulls back too
+local HERO_BLEED = 0.12
 
 if not gadgetHandler:IsSyncedCode() then
   local started, sped, echoed = false, false, false
@@ -103,6 +106,7 @@ local hudPresent = false                    -- the rig player widget said VA_RIG
 local tx, tz = nil, nil
 local held = {}                             -- unitID -> true: the rig's order stands
 local retreating = {}                       -- unitID -> frame it was pulled back (hero caution)
+local lastHp = {}                           -- unitID -> health fraction at the last caution pass
 local issuing = false
 
 -- Drop the rig's holds (a rescue squad, a siege) but keep the heroes that are being pulled back.
@@ -796,6 +800,8 @@ local function caution(f)
       local hp, maxHp = Spring.GetUnitHealth(uid)
       local frac = (hp and maxHp and maxHp > 0) and hp / maxHp or 1
       local x, _, z = Spring.GetUnitPosition(uid)
+      local bleed = (lastHp[uid] or frac) - frac
+      lastHp[uid] = frac
       if x then
         local crowd = threatsNear(x, z, HERO_SENSE)
         if retreating[uid] then
@@ -804,11 +810,11 @@ local function caution(f)
             Spring.Echo("VA_AUTOPILOT hero back to work id=" .. tostring(Spring.GetUnitRulesParam(uid, "va_hero_id"))
               .. " hp=" .. string.format("%.2f", frac))
           end
-        elseif frac < HERO_LOW or (frac < HERO_HURT and crowd >= HERO_CROWD) then
+        elseif frac < HERO_LOW or (frac < HERO_HURT and (crowd >= HERO_CROWD or bleed >= HERO_BLEED)) then
           retreating[uid] = f
           pulled[#pulled + 1] = uid
           Spring.Echo("VA_AUTOPILOT hero pulls back id=" .. tostring(Spring.GetUnitRulesParam(uid, "va_hero_id"))
-            .. " hp=" .. string.format("%.2f", frac) .. " enemies=" .. crowd)
+            .. " hp=" .. string.format("%.2f", frac) .. " enemies=" .. crowd .. " bleed=" .. string.format("%.2f", bleed))
         end
       end
     elseif retreating[uid] then
