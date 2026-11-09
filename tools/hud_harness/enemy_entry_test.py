@@ -8,6 +8,7 @@ reinforcements enter only on the map edge, only inside a zone their faction trul
     VA_WS=$PWD python3 tools/hud_harness/enemy_entry_test.py
 """
 import ctypes, glob, json, os, sys
+import liblua  # noqa: E402  (tools/hud_harness: finds Lua 5.4 on Linux or Windows)
 
 WS = os.environ.get("VA_WS") or os.getcwd()
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
@@ -17,7 +18,7 @@ start = SRC.index("local SIGHT_MARGIN = 2200")
 end = SRC.index('return nil, "every_owned_edge_in_sight"\nend', start) + len('return nil, "every_owned_edge_in_sight"\nend')
 RULE = SRC[start:end]
 
-L = ctypes.CDLL(glob.glob('/usr/lib/x86_64-linux-gnu/liblua5.4.so*')[0])
+L = ctypes.CDLL(liblua.paths()[0])
 L.luaL_newstate.restype = ctypes.c_void_p
 L.luaL_openlibs.argtypes = [ctypes.c_void_p]
 L.luaL_loadstring.argtypes = [ctypes.c_void_p, ctypes.c_char_p]

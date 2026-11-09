@@ -8,12 +8,13 @@ import glob
 import json
 import re
 from pathlib import Path
+from lua_harness import liblua_paths  # noqa: E402
 
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 INCLUDE = ROOT / "mod" / "VerdanceAshes.sdd" / "luarules" / "gadgets" / "include"
-LIBS = glob.glob('/usr/lib/x86_64-linux-gnu/liblua5.4.so*')
+LIBS = liblua_paths()
 
 
 def _fields() -> dict:

@@ -78,6 +78,9 @@ def main(argv: list[str]) -> int:
     umwelt = os.environ.get("UMWELT_SRC") or str(ROOT.parent / "umwelt" / "src")
     if (Path(umwelt) / "umwelt" / "__init__.py").is_file() and umwelt not in sys.path:
         sys.path.append(umwelt)
+    # no detached belief workers from the tests: they outlive the test, and on Windows their open
+    # worker.log stops the temp workspace from being removed (as the other rigs already do)
+    os.environ.setdefault("VA_PERSPECTIVES_NOSPAWN", "1")
     os.chdir(ROOT)
     _bootstrap_fresh_tree()
     files = sorted(TESTS.glob("test_*.py"))

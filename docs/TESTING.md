@@ -7,7 +7,7 @@ How the game is tested, what each rig is for, and what was open when testing mov
 | Rig | Needs | What it answers | How |
 |---|---|---|---|
 | Unit suite | Python 3, `UMWELT_SRC` for the belief tests | Does the code still do what it says? 680 tests, about 10 minutes. | `UMWELT_SRC=<umwelt>/src python3 tests/run_tests.py [name filters]` |
-| Lua harness | Lua 5.4 | Do the gadgets behave (autopilot, kings, exfil, heat ray…)? | `python3 tools/test_rig/run_lua.py tools/hud_harness/autopilot_test.lua` |
+| Lua harness | Lua 5.4: `apt install liblua5.4-0`, or on Windows `winget install DEVCOM.Lua` (`VA_LIBLUA` points at another build) | Do the gadgets behave (autopilot, kings, exfil, heat ray…)? | `python3 tools/test_rig/run_lua.py tools/hud_harness/autopilot_test.lua` |
 | No-BAR campaign | Python | Does a whole campaign walk with fake results (jobs, roads, pull home)? | `python3 tests/playthrough_campaign.py --sorties 20` |
 | Hub snapshot + flow walk | Python, Playwright + Chromium | What does the player see at sortie N? Screens and word counts for a playtester. | `tools/test_rig/hub_snapshot.py N OUT`, then `tools/test_rig/flow_walk.py OUT SHOTS` |
 | Screen tour | Windows, BAR | Every hub tab and BAR screen per sortie, plus each sortie's build inputs (the builder parity corpus). | `scripts\test\tour.bat` |

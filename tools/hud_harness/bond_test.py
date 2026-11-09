@@ -5,6 +5,7 @@ pair's XP and gift land only when both heroes are on the drop.
     VA_WS=$PWD python3 tools/hud_harness/bond_test.py
 """
 import ctypes, glob, json, os, sys
+import liblua  # noqa: E402  (tools/hud_harness: finds Lua 5.4 on Linux or Windows)
 
 WS = os.environ.get("VA_WS") or os.getcwd()
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
@@ -12,7 +13,7 @@ import campaign_lua  # noqa: E402
 SRC = campaign_lua.source()
 start = SRC.index("function VA_BOND_apply(")
 FN = SRC[start:SRC.index("\nend\n", start) + 5]
-L = ctypes.CDLL(glob.glob('/usr/lib/x86_64-linux-gnu/liblua5.4.so*')[0])
+L = ctypes.CDLL(liblua.paths()[0])
 L.luaL_newstate.restype = ctypes.c_void_p
 L.luaL_openlibs.argtypes = [ctypes.c_void_p]
 L.luaL_loadstring.argtypes = [ctypes.c_void_p, ctypes.c_char_p]

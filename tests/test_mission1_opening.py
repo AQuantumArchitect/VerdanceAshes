@@ -15,6 +15,7 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
+from lua_harness import liblua_paths  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
@@ -268,7 +269,7 @@ def test_other_missions_keep_the_generic_briefing_and_beats():
 # ---------------------------------------------------------------- the beats in Lua
 def test_the_opening_beats_run_in_lua():
     harness = ROOT / "tools" / "hud_harness" / "opening_beats_test.py"
-    if not glob.glob('/usr/lib/x86_64-linux-gnu/liblua5.4.so*') or not harness.is_file():
+    if not liblua_paths() or not harness.is_file():
         return  # no Lua here, or a SHIP -Dev tree (the HUD harness stays in the workspace)
     r = subprocess.run([sys.executable, str(harness)], capture_output=True, text=True,
                        env=dict(os.environ, VA_WS=str(ROOT)), timeout=120)

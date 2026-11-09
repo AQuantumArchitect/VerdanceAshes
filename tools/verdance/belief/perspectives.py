@@ -243,8 +243,8 @@ def spawn_worker(workspace: Path) -> bool:
     import os, subprocess, sys as _sys
     if _lock_alive(_lock_path(workspace)):
         return False
-    kw: Dict[str, Any] = {"cwd": str(workspace), "stdin": subprocess.DEVNULL,
-                          "stdout": open(_jobs_dir(workspace) / "worker.log", "ab"), "stderr": subprocess.STDOUT}
+    log = open(_jobs_dir(workspace) / "worker.log", "ab")
+    kw: Dict[str, Any] = {"cwd": str(workspace), "stdin": subprocess.DEVNULL, "stdout": log, "stderr": subprocess.STDOUT}
     if os.name == "nt":
         kw["creationflags"] = 0x00000008 | 0x00000200 | 0x00004000  # DETACHED | NEW_PROCESS_GROUP | BELOW_NORMAL_PRIORITY
     else:
@@ -259,6 +259,8 @@ def spawn_worker(workspace: Path) -> bool:
         return True
     except Exception:
         return False
+    finally:
+        log.close()  # the worker has its own handle; the hub's would hold worker.log open until GC
 
 
 def run_worker(workspace: Path, max_jobs: int = 50) -> int:

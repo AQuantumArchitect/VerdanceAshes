@@ -8,12 +8,13 @@ hand-off), not only through RecvLuaMsg, which an earlier gadget in BAR swallowed
     VA_WS=$PWD python3 tools/hud_harness/exfil_gadget_test.py
 """
 import ctypes, glob, json, os, sys
+import liblua  # noqa: E402  (tools/hud_harness: finds Lua 5.4 on Linux or Windows)
 
 WS = os.environ.get("VA_WS") or os.getcwd()
 GADGET = os.path.join(WS, "mod", "VerdanceAshes.sdd", "luarules", "gadgets", "game_verdance_exfil.lua")
 ACTIVE = os.path.join(WS, "mod", "VerdanceAshes.sdd", "luarules", "configs", "va_active.lua")
 CLAIM = os.path.join(WS, "mod", "VerdanceAshes.sdd", "luarules", "gadgets", "include", "va_claim.lua")
-L = ctypes.CDLL(glob.glob('/usr/lib/x86_64-linux-gnu/liblua5.4.so*')[0])
+L = ctypes.CDLL(liblua.paths()[0])
 L.luaL_newstate.restype = ctypes.c_void_p
 L.luaL_openlibs.argtypes = [ctypes.c_void_p]
 L.luaL_loadstring.argtypes = [ctypes.c_void_p, ctypes.c_char_p]

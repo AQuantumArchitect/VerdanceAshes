@@ -14,13 +14,14 @@ import subprocess
 import sys
 import unittest
 from pathlib import Path
+from lua_harness import liblua_paths  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 S = ROOT / "data" / "story"
 INCLUDE = ROOT / "mod" / "VerdanceAshes.sdd" / "luarules" / "gadgets" / "include"
 FX = json.loads((S / "field_effects.json").read_text(encoding="utf-8"))
 H = FX["heroes"]
-LIBS = glob.glob("/usr/lib/x86_64-linux-gnu/liblua5.4.so*")
+LIBS = liblua_paths()
 
 
 # ---------------------------------------------------------------- the data

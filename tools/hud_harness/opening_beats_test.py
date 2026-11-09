@@ -28,6 +28,7 @@ import json
 import os
 import sys
 from pathlib import Path
+import liblua  # noqa: E402  (tools/hud_harness: finds Lua 5.4 on Linux or Windows)
 
 WS = Path(os.environ.get("VA_WS") or os.getcwd()).resolve()
 sys.path.insert(0, str(WS / "tools"))
@@ -36,7 +37,7 @@ from verdance.campaign.voice import generate_beats, load_ketha_voice  # noqa: E4
 
 BEATS_LUA = WS / "mod" / "VerdanceAshes.sdd" / "luarules" / "gadgets" / "include" / "campaign" / "beats.lua"
 
-L = ctypes.CDLL(glob.glob('/usr/lib/x86_64-linux-gnu/liblua5.4.so*')[0])
+L = ctypes.CDLL(liblua.paths()[0])
 L.luaL_newstate.restype = ctypes.c_void_p
 L.luaL_openlibs.argtypes = [ctypes.c_void_p]
 L.luaL_loadstring.argtypes = [ctypes.c_void_p, ctypes.c_char_p]

@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
+from lua_harness import liblua_paths  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
@@ -53,7 +54,7 @@ ROWS = [
 def test_lua_and_python_name_the_same_holder():
     """va_claim.lua and verdance.world.claim are one rule: same row, same allies, same owner."""
     import ctypes, glob
-    libs = glob.glob("/usr/lib/x86_64-linux-gnu/liblua5.4.so*")
+    libs = liblua_paths()
     if not libs:
         return
     L = ctypes.CDLL(libs[0])

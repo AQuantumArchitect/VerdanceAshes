@@ -115,11 +115,21 @@ def test_a_stock_bar_data_folder_without_games_is_accepted():
     with tempfile.TemporaryDirectory() as d:
         data = Path(d) / "Programs" / "Beyond-All-Reason" / "data"
         (data / "packages").mkdir(parents=True)
-        os.environ["LOCALAPPDATA"], saved = d, os.environ.get("LOCALAPPDATA")
+        # Only the fake stock install may be seen: a machine with BAR installed (home folder,
+        # Program Files, Steam) would otherwise win with its engine.
+        keys = ("LOCALAPPDATA", "USERPROFILE", "HOME", "ProgramFiles", "ProgramFiles(x86)", "BAR_DATA_ROOT")
+        saved = {k: os.environ.get(k) for k in keys}
+        steam = sortie._steam_library_roots
+        for k in keys:
+            os.environ.pop(k, None)
+        os.environ.update(LOCALAPPDATA=d, USERPROFILE=d, HOME=d)
+        sortie._steam_library_roots = lambda: []
         try:
             assert sortie.find_bar_data_root(None) == str(data)
         finally:
-            if saved is None:
-                os.environ.pop("LOCALAPPDATA", None)
-            else:
-                os.environ["LOCALAPPDATA"] = saved
+            sortie._steam_library_roots = steam
+            for k, v in saved.items():
+                if v is None:
+                    os.environ.pop(k, None)
+                else:
+                    os.environ[k] = v

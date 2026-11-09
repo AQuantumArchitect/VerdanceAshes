@@ -8,13 +8,14 @@ the bank allowed), veterancy's reach rides under the bank's, and a dead Halberd 
     VA_WS=$PWD python3 tools/hud_harness/heat_ray_test.py
 """
 import ctypes, glob, json, os, sys
+import liblua  # noqa: E402  (tools/hud_harness: finds Lua 5.4 on Linux or Windows)
 
 WS = os.environ.get("VA_WS") or os.getcwd()
 GADGETS = os.path.join(WS, "mod", "VerdanceAshes.sdd", "luarules", "gadgets")
 GADGET = os.path.join(GADGETS, "game_verdance_heatray.lua")
 CURVE = os.path.join(GADGETS, "include", "va_heat_ray.lua")
 
-L = ctypes.CDLL(glob.glob('/usr/lib/x86_64-linux-gnu/liblua5.4.so*')[0])
+L = ctypes.CDLL(liblua.paths()[0])
 L.luaL_newstate.restype = ctypes.c_void_p
 L.luaL_openlibs.argtypes = [ctypes.c_void_p]
 L.luaL_loadstring.argtypes = [ctypes.c_void_p, ctypes.c_char_p]

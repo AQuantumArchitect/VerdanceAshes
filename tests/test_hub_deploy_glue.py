@@ -85,7 +85,10 @@ def test_stamp_writes_outbox():
 
     ws = Path(tempfile.mkdtemp())
     try:
-        (ws / "data").symlink_to(ROOT / "data")
+        try:
+            (ws / "data").symlink_to(ROOT / "data")
+        except OSError:  # Windows without Developer Mode may not make symlinks; data\ is small, copy it
+            shutil.copytree(ROOT / "data", ws / "data")
         (ws / "outbox").mkdir()
         save_json(ws / "state" / "campaign_state.json", migrate_state(default_v1_state()))
         plan = {

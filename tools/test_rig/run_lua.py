@@ -1,6 +1,8 @@
 """Run one Lua file with the system Lua 5.4 (the hud_harness *_test.lua files): python tools/test_rig/run_lua.py FILE.lua"""
-import ctypes,glob,sys
-L=ctypes.CDLL(glob.glob("/usr/lib/x86_64-linux-gnu/liblua5.4.so*")[0])
+import ctypes,glob,os,sys
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'hud_harness'))
+import liblua  # noqa: E402
+L=ctypes.CDLL(liblua.paths()[0])
 L.luaL_newstate.restype=ctypes.c_void_p
 L.luaL_openlibs.argtypes=[ctypes.c_void_p]
 L.luaL_loadfilex.argtypes=[ctypes.c_void_p,ctypes.c_char_p,ctypes.c_char_p]

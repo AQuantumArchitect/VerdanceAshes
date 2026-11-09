@@ -9,13 +9,14 @@ comes into sight (once), painted while it stands, and that its fall is announced
     VA_WS=$PWD python3 tools/hud_harness/queen_nest_test.py
 """
 import ctypes, glob, json, os, re, sys
+import liblua  # noqa: E402  (tools/hud_harness: finds Lua 5.4 on Linux or Windows)
 
 WS = os.environ.get("VA_WS") or os.getcwd()
 MOD = os.path.join(WS, "mod", "VerdanceAshes.sdd")
 SPAWNER = open(os.path.join(MOD, "luarules", "gadgets", "raptor_spawner_defense.lua"), encoding="utf-8").read()
 WIDGET = os.path.join(MOD, "luaui", "Widgets", "gui_verdance_queen_nest.lua")
 
-L = ctypes.CDLL(glob.glob('/usr/lib/x86_64-linux-gnu/liblua5.4.so*')[0])
+L = ctypes.CDLL(liblua.paths()[0])
 L.luaL_newstate.restype = ctypes.c_void_p
 L.luaL_openlibs.argtypes = [ctypes.c_void_p]
 L.luaL_loadstring.argtypes = [ctypes.c_void_p, ctypes.c_char_p]

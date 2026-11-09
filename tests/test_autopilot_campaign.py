@@ -6,6 +6,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from lua_harness import liblua_paths  # noqa: E402
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 from autopilot_campaign_v1 import archive_log, finale_state, isolate_bar, patch_startscript, rivals_to, sorties_came_home
@@ -139,7 +140,7 @@ class AutopilotTests(unittest.TestCase):
 
 class AutopilotGadgetTests(unittest.TestCase):
     def test_rescue_orders_departure_and_leaving(self):
-        libs = glob.glob("/usr/lib/x86_64-linux-gnu/liblua5.4.so*")
+        libs = liblua_paths()
         if not libs:
             self.skipTest("liblua5.4 is not installed")
         L = ctypes.CDLL(libs[0])

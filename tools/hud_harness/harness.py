@@ -2,13 +2,14 @@
 """Run the pass-7 widgets under a stubbed Spring/gl in liblua5.4 (ctypes). Catches runtime
 errors in draw/update paths that a syntax check cannot. Not BAR; a smoke test."""
 import ctypes, glob, json, os
+import liblua  # noqa: E402  (tools/hud_harness: finds Lua 5.4 on Linux or Windows)
 HERE = os.path.dirname(os.path.abspath(__file__))
 # Fixtures: the repo's own (tools/hud_harness → workspace root), overridable with VA_FIXTURES / VA_WS.
 WS = os.environ.get("VA_WS") or os.path.abspath(os.path.join(HERE, "..", ".."))
 FIX = os.environ.get("VA_FIXTURES") or os.path.join(HERE, "fixtures")
 WIDGETS = os.environ.get("VA_WIDGETS") or os.path.join(WS, "mod", "VerdanceAshes.sdd", "luaui", "Widgets")
 INCLUDE = os.environ.get("VA_INCLUDE") or os.path.join(WS, "mod", "VerdanceAshes.sdd", "luaui", "Include")
-so = glob.glob('/usr/lib/x86_64-linux-gnu/liblua5.4.so*')[0]
+so = liblua.paths()[0]
 L = ctypes.CDLL(so)
 L.luaL_newstate.restype = ctypes.c_void_p
 L.luaL_openlibs.argtypes = [ctypes.c_void_p]
