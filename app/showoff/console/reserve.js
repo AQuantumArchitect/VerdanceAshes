@@ -34,7 +34,7 @@ export function renderReserve(locked) {
   const host = $("drop-reserve");
   if (!host) return;
   const s = surface();
-  const padRule = `<p class="rv-rule">Only what stands on the pad when you extract comes home. Anything left in the field stays there, and what you built there becomes a holding.</p>`;
+  const padRule = `<p class="rv-rule">Only what stands on the pad at extract comes home. What you build and leave becomes a holding.</p>`;
   if (!(s.units || []).length) {
     host.innerHTML = `<div class="drop-squad-kicker">The reserve</div>` +
       `<p class="hint">Nothing in reserve yet. What you build, raise or capture and get onto the pad comes home and waits here.</p>` + padRule;

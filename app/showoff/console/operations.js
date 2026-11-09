@@ -210,7 +210,15 @@ export function showDropTab(name) {
   if (state.dropTab === "talks") renderTalks();
   document.querySelectorAll("[data-drop-tab]").forEach(b => b.classList.toggle("on", b.dataset.dropTab === state.dropTab));
   document.querySelectorAll("[data-drop-win]").forEach(w => w.classList.toggle("on", w.dataset.dropWin === state.dropTab));
+  markScrollEnd(document.querySelector('[data-drop-win="reserve"]'));
   paintDropButton();
+}
+// The store's fade (console.css) lifts once the list is scrolled to its end, or fits.
+function markScrollEnd(el) {
+  if (!el) return;
+  const paint = () => el.classList.toggle("at-end", el.scrollTop + el.clientHeight >= el.scrollHeight - 4);
+  if (!el.dataset.scrollEndWired) { el.addEventListener("scroll", paint, { passive: true }); el.dataset.scrollEndWired = "1"; }
+  requestAnimationFrame(paint);
 }
 function paintWarmStatus(text) {
   const el = $("drop-warm-status");
@@ -306,7 +314,8 @@ export function paintDropButton() {
   if (tab === "talks") go.disabled = go.disabled || talking;
   go.textContent = phase === "up" ? "Back to the jobs"
     : phase === "dropping" ? "Dropping…"
-    : tab === "talks" ? (talking ? `${talksLeft()} to answer` : "Next: who goes")
+    // talks can't be skipped; say what unlocks the button (UI review 2026-11-09: "2 to answer" read as a dead end)
+    : tab === "talks" ? (talking ? `Answer ${talksLeft()} more to go on` : "Next: who goes")
     : tab === "party" ? "Next: what comes"
     : state.warm.dropLocked ? "Drop locked: waiting for the field"
     : phase === "failed" ? "Try again"

@@ -135,14 +135,17 @@ details.advanced summary { color:var(--steam); }
   display:flex; justify-content:space-between; align-items:center; gap:.75rem; flex-wrap:wrap;
   font-size:var(--fs-sm); color:var(--muted); background:var(--shade);
 }
-.foot-actions { display:flex; flex-wrap:wrap; gap:.35rem; align-items:center; order:5; }
-#foot-left { order:4; }
+/* Footer, left to right (UI review 2026-11-09: "Choose this job" sat bottom-left at the weight of
+   three other buttons): the quiet links, what the marks say, then the one primary action. */
+.foot-actions { display:flex; flex-wrap:wrap; gap:.15rem .6rem; align-items:center; order:1; }
+#foot-left { order:3; }
 #foot-left:empty { display:none; }
 .foot-actions button {
-  font-size:var(--fs-sm); padding:.28rem .55rem; border-radius:8px;
-  border:1px solid var(--line-strong); background:var(--shade); color:var(--ink);
+  font-size:var(--fs-xs); padding:.15rem .1rem; border-radius:4px;
+  border:none; background:none; color:var(--muted); text-decoration:underline; text-decoration-color:color-mix(in srgb, var(--muted) 45%, transparent); text-underline-offset:3px;
 }
-.foot-actions button.primary { border-color:color-mix(in srgb, var(--gold) 45%, transparent); color:var(--gold); }
+.foot-actions button:hover { color:var(--ink); }
+.foot-actions button.primary { color:var(--steam); }
 
 /* ───────────────────────────── buttons ───────────────────────────── */
 .btn-buy, .btn-primary, .btn-ghost {
@@ -394,10 +397,10 @@ details.advanced summary { color:var(--steam); }
 /* The theater actions sit in the footer row itself: steps and buttons on top, the route line beside the help. */
 .theater-actions { display:contents; }
 .theater-actions[hidden] { display:none; }
-.theater-actions .actions { display:flex; gap:.4rem; flex-wrap:wrap; order:2; }
+.theater-actions .actions { display:flex; gap:.4rem; flex-wrap:wrap; order:4; margin-left:auto; }
 .theater-actions .actions .btn-primary { min-width:9.5rem; font-size:var(--fs-md); padding:.45rem .9rem; }
 .btn-primary.blocked { background:transparent; color:var(--gold); border-style:dashed; }
-.marks-sum { font-size:var(--fs-sm); color:var(--muted); line-height:1.45; flex:1 1 calc(100% - 24rem); min-width:14rem; order:3; }
+.marks-sum { font-size:var(--fs-sm); color:var(--muted); line-height:1.45; flex:1 1 20rem; min-width:14rem; order:2; }
 .marks-sum .muted { color:var(--muted); opacity:.85; }
 /* The steps to a drop: done, the one to do now, and the ones after. */
 .drop-steps { list-style:none; margin:0; padding:0; display:flex; gap:.3rem; flex:1 1 40rem; min-width:0; order:1; }
@@ -792,6 +795,12 @@ details.advanced summary { color:var(--steam); }
 .drop-tab .badge { margin-left:.35rem; font-size:var(--fs-xs); color:var(--bg); background:var(--gold); border-radius:var(--r-pill); padding:0 .35rem; letter-spacing:.04em; }
 .drop-win { display:none; flex:1 1 auto; min-height:0; overflow:auto; flex-direction:column; }
 .drop-win.on { display:flex; }
+/* A long store says it goes on (UI review 2026-11-09: build rights sat half off the bottom with no
+   cue that the list scrolled): a visible scrollbar, and a fade over the last line while there's more. */
+.drop-win[data-drop-win="reserve"] { scrollbar-width:thin; scrollbar-color:var(--line-strong) transparent;
+  -webkit-mask-image:linear-gradient(to bottom, #000 calc(100% - 2.2rem), transparent);
+          mask-image:linear-gradient(to bottom, #000 calc(100% - 2.2rem), transparent); padding-bottom:1.6rem; }
+.drop-win[data-drop-win="reserve"].at-end { -webkit-mask-image:none; mask-image:none; }
 .drop-win .drop-squad-kicker { margin-top:.5rem; }
 #shop-list { display:grid; grid-template-columns:repeat(auto-fill, minmax(14rem,1fr)); gap:.4rem; }
 #shop-list .shop-shelf { grid-column:1 / -1; margin:.4rem 0 0; font-size:var(--fs-xs); letter-spacing:.14em; text-transform:uppercase; color:var(--ash); }

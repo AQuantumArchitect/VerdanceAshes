@@ -47,21 +47,16 @@ Missions are built in Python: `python -m verdance.mission_builder`, called by th
 - `build_scenario(..., ps1_faults=True)` reproduces the two PowerShell faults the game no longer has: war seats without colour, and the lone warden that never took the field.
 - To make a new corpus after a builder change, run `scripts\test\tour.bat`, then zip `autopilot_runs\<stamp>\tour\*\build`.
 
-## What was open on 2026-11-08
+## What was open on 2026-11-08, and where it stands
 
-The design state behind these is in the project docs, newest first: VERDANCE_SMOOTH_PULL_AND_PY_BUILDER_2026-11-04 and VERDANCE_SORTIE_FLOW_BUILT_2026-11-04.
+The day-by-day record from 2026-11-09 on is `docs/DEVLOG.md`. The design state before that is in the project docs: VERDANCE_SMOOTH_PULL_AND_PY_BUILDER_2026-11-04 and VERDANCE_SORTIE_FLOW_BUILT_2026-11-04.
 
-1. **The lift limit counts only victories and extractions.** A partial adds nothing. On the 11-04 hard-AI run, nine partials left the lift at about 1k metal while the reserve held about 100 units, so the companies that landed were the hero packs alone. The next continuous rule to write: lift grows with the value actually brought home. It needs an owner call.
-2. **Rock Jungle field recruits die at frame 120 with no wreck.** Rookery and Stiletto, every visit, on both 11-04 runs: something on the shelf kills them as they spawn. Not looked into yet.
-3. **The hard AI still loses at home.** With the smooth raptor pace, the wipes came at 72–108 s, inside the grace. That points to a hollowed-out company (see 1), not to the raptors.
-4. **Playtester notes not yet done:**
-   - Who goes: the hero cards are tall and mostly empty. Make them half height, show xp as progress, and show Ketha in full colour with an "always comes" lock.
-   - Store blurbs restate the price ("for a fortune in metal").
-   - The jobs screen is about 376 words.
-   - New recruits on the debrief don't say where they are.
-   - A hostile rescue hides under "and 1 more".
+1. ~~The lift limit counts only victories and extractions.~~ **Done 2026-11-09** (owner call): the drop limit grows 1k with every sortie played, any verdict, no ceiling (`verdance.company.reserve`).
+2. **Rock Jungle field recruits die at frame 120 with no wreck.** Rookery and Stiletto, every visit, on both 11-04 runs. Still not looked into; the 11-08 rehearsal's draw had neither.
+3. **The hard AI still loses at home.** The 11-09 baseline wiped six times in seven Rock Jungle visits. Being worked on: a five-minute grace floor, and a proxy player that plays BARb "hard" at home, leaves when the raptors are due and pulls hurt heroes back (DEVLOG).
+4. ~~Playtester notes~~ **Done 2026-11-09:** compact hero cards with XP progress and Ketha's lock; blurbs without prices; a shorter jobs screen; recruits say where they are; hostile rescues always listed.
 5. **The hot drop window fix is confirmed.** 0.15.0 played on the new laptop, so BAR is no longer minimized while it loads. Watch for the hub not getting the screen back: Windows' foreground lock can refuse. That is harmless, and BAR simply stays in front.
-6. **`v0.15.0` is tagged only on wargen.** The build you played was made from `cfb8f27`. Push the tag from wargen (`git push origin v0.15.0`), or recreate it anywhere with `git tag v0.15.0 cfb8f27`. The itch push is the Grok bot's.
+6. ~~`v0.15.0` is tagged only on wargen.~~ **Done 2026-11-09:** tagged on `cfb8f27` and released on GitHub.
 
 ## Moving the workspace to another machine
 
