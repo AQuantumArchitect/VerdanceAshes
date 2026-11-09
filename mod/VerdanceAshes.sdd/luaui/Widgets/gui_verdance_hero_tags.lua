@@ -25,14 +25,16 @@ local lastScan = -100
 -- Ash Console tokens (docs/UI_ASH_CONSOLE.md)
 local HERO_COL = { 0.490, 1.000, 0.541, 1.0 }  -- good
 local CRIT_COL = { 0.831, 0.769, 0.604, 1.0 }  -- gold
-local WRECK_COL = { 1.000, 0.490, 0.490, 1.0 } -- bad
+-- A fallen hero's tag in light ink, not red (2026-11-09 HUD review: "CAUTER BEL-ANSA (DOWN)" in red
+-- capitals over red enemy units could not be read); the outline carries it over any colour.
+local WRECK_COL = { 0.93, 0.91, 0.86, 1.0 }    -- ink
 local Hud = VFS.Include("luaui/Include/va_hud.lua")
 do
   local Ash = Hud.Ash
   if Ash and Ash.COL then
     HERO_COL = { Ash.COL.good[1], Ash.COL.good[2], Ash.COL.good[3], 1 }
     CRIT_COL = { Ash.COL.gold[1], Ash.COL.gold[2], Ash.COL.gold[3], 1 }
-    WRECK_COL = { Ash.COL.bad[1], Ash.COL.bad[2], Ash.COL.bad[3], 1 }
+    if Ash.COL.ink then WRECK_COL = { Ash.COL.ink[1], Ash.COL.ink[2], Ash.COL.ink[3], 1 } end
   end
 end
 
@@ -72,7 +74,7 @@ local function scan()
       local featureID = tonumber(h.feature)
       local name = h.name
       if h.state == "down" and featureID and type(name) == "string" and name ~= "" then
-        trackedWrecks[featureID] = { name = name, tag = string.upper(name) .. " (DOWN)" }
+        trackedWrecks[featureID] = { name = name, tag = name .. " · down" }
       end
     end
   end
