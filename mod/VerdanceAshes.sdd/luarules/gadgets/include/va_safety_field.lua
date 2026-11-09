@@ -417,12 +417,14 @@ function M:horizon(h)
 end
 
 -- One plan's worth: walk to (x, z) and stay t seconds there for `gain`. Returns U, S.
+-- Temper (verdance.company.temper, on Umwelt): a hero sees danger e^-nerve as large (shaken, larger;
+-- steady, smaller) and gains e^drive as large. nerve, drive in [-1, 1]; 0 when unknown.
 function M:planValue(h, V, x, z, gain, t)
   h.p = h.p or M.profile(h.defID)
   h.speed = h.p.speed
   local risk = self:walkHazard(h, h.x, h.z, x, z) + self:incoming(x, z, h.speed) / max(h.hp, 1) * t
-  local S = exp(-risk)
-  return S * (V + gain), S
+  local S = exp(-risk * exp(-(h.nerve or 0)))
+  return S * (V + gain * exp(h.drive or 0)), S
 end
 
 -- h = { uid, x, z, hp, maxHp, defID, hid, plan = { x, z } (where its current orders take it) }

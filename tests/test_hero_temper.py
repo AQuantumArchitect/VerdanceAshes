@@ -35,6 +35,31 @@ def test_camp_talks_steady_the_pair_on_the_same_drop():
     assert alone["nerve"] == 0.0                                        # the bond steadies only when both drop
 
 
+def test_the_same_history_gives_the_same_mood():
+    """Order-free: two heroes with the same bond and no other history come out the same."""
+    st = _state()
+    for i in range(4):
+        apply_pair_talk(st, "halbard", "pavise", talk_id=f"t{i}")
+    t = T.temper_for_drop(st, ["halbard", "pavise"], ROOT)
+    assert t["halbard"] == t["pavise"]
+    t2 = T.temper_for_drop(st, ["pavise", "halbard"], ROOT)
+    assert t2 == t
+
+
+def test_grief_reaches_the_living_through_the_bond():
+    """A friend who died pulls a hero's nerve and drive down by the bond's strength (the dead node is held
+    at despair and the Umwelt bridge carries it)."""
+    st = _state()
+    st["roster"]["heroes"][2]["status"] = "dead"                             # halbard
+    calm = T.temper_for_drop(st, ["vane"], ROOT)["vane"]
+    apply_pair_talk(st, "vane", "halbard", delta=20)
+    light = T.temper_for_drop(st, ["vane"], ROOT)["vane"]
+    apply_pair_talk(st, "vane", "halbard", delta=40)
+    heavy = T.temper_for_drop(st, ["vane"], ROOT)["vane"]
+    assert calm["nerve"] > light["nerve"] > heavy["nerve"]
+    assert calm["drive"] > light["drive"] > heavy["drive"]
+
+
 def test_wounds_and_grief_shake_a_hero():
     st = _state()
     apply_pair_talk(st, "vane", "ketha", delta=40)

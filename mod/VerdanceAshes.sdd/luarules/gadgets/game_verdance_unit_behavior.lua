@@ -802,8 +802,10 @@ local function fieldRezChoice(unitID, teamID, frame)
   local hp, maxHp = Spring.GetUnitHealth(unitID)
   hp = tonumber(hp) or 0
   local px, pz = tonumber((Spring.GetGameRulesParam("va_pad_x"))), tonumber((Spring.GetGameRulesParam("va_pad_z")))
+  local hid = namedHero(unitID)
+  local t = hid and GG.VA_HeroTemper and GG.VA_HeroTemper[hid]
   local h = { uid = unitID, x = x, z = z, hp = hp, maxHp = tonumber(maxHp) or hp,
-    defID = Spring.GetUnitDefID(unitID), hid = namedHero(unitID) }
+    defID = Spring.GetUnitDefID(unitID), hid = hid, nerve = t and t.nerve or 0, drive = t and t.drive or 0 }
   local best = f:choose(h, px or x, pz or z)
   return best
 end
@@ -1205,7 +1207,6 @@ end
 -- the doctrine its personality gives it. nerve and drive are in [-1, 1]; a shaken hero (low nerve)
 -- bails and kites sooner, a steady one holds; drive leans into the push. Continuous, no thresholds.
 local heroTemper = {}
-local TEMPER_BAIL, TEMPER_KITE, TEMPER_PUSH = 0.30, 0.15, 0.30
 
 local function loadTemper()
   local ok, m = pcall(VFS.Include, "singleplayer/verdance_ashes/generated/va_current.lua")
@@ -1218,6 +1219,7 @@ local function loadTemper()
       Spring.Echo("VA_HERO_TEMPER id=" .. tostring(hid) .. " nerve=" .. tostring(row.nerve) .. " drive=" .. tostring(row.drive))
     end
   end
+  GG.VA_HeroTemper = heroTemper   -- the safety field's choices read it too
   return n
 end
 
@@ -1227,9 +1229,11 @@ local function withTemper(doctrine, hid)
   local out = {}
   for k, v in pairs(doctrine) do out[k] = v end   -- profiles are shared tables: never scale them in place
   local function clamp01(v) if v < 0 then return 0 elseif v > 1 then return 1 end return v end
-  out.bailBias = clamp01((tonumber(out.bailBias) or 0.7) * (1 - TEMPER_BAIL * t.nerve))
-  out.kiteBias = clamp01((tonumber(out.kiteBias) or 0.6) * (1 - TEMPER_KITE * t.nerve))
-  out.pushBias = clamp01((tonumber(out.pushBias) or 0.5) * (1 + TEMPER_PUSH * t.drive))
+  -- the same reading as the safety field: a shaken hero sees danger e^-nerve as large, an eager one
+  -- sees the push e^drive as worth it (no hand-set weights; was 0.30 / 0.15 / 0.30 linear)
+  out.bailBias = clamp01((tonumber(out.bailBias) or 0.7) * math.exp(-t.nerve))
+  out.kiteBias = clamp01((tonumber(out.kiteBias) or 0.6) * math.exp(-t.nerve))
+  out.pushBias = clamp01((tonumber(out.pushBias) or 0.5) * math.exp(t.drive))
   return out
 end
 

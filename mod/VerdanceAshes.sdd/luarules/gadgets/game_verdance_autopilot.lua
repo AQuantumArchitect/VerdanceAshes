@@ -830,8 +830,12 @@ local function caution(f)
       local x, _, z = Spring.GetUnitPosition(uid)
       local hp, maxHp = healthOf(uid)
       if x and hp > 0 then
-        local h = { uid = uid, x = x, z = z, hp = hp, maxHp = maxHp, defID = Spring.GetUnitDefID(uid),
-          hid = Spring.GetUnitRulesParam(uid, "va_hero_id"), plan = (not retreating[uid]) and planOf(uid) or nil }
+        local hid = Spring.GetUnitRulesParam(uid, "va_hero_id")
+        -- its temper from camp (mission.heroTemper, on Umwelt): how large it sees danger and gain
+        local t = mission and type(mission.heroTemper) == "table" and mission.heroTemper[tostring(hid)] or nil
+        local h = { uid = uid, x = x, z = z, hp = hp, maxHp = maxHp, defID = Spring.GetUnitDefID(uid), hid = hid,
+          nerve = t and tonumber(t.nerve) or 0, drive = t and tonumber(t.drive) or 0,
+          plan = (not retreating[uid]) and planOf(uid) or nil }
         local best = field:choose(h, px, pz)
         local name = tostring(h.hid)
         if best.kind == "stay" then

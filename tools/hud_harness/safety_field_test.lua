@@ -195,4 +195,26 @@ do
   assert(d > 300, "the refuge is out of the rifle's reach: " .. d)
 end
 
-print("ok: profiles from defs, fire shared over the crowd, memory sharp for turrets and blurred for walkers, forgetting, the unknown as danger, long guns, Ketha's wrecks, the dark, a fighter's trade")
+-- 9. Temper: a shaken hero (low nerve) sees the same danger larger and leaves sooner; a steady one stays.
+do
+  local api = world()
+  W.seen = function() return true end
+  add(1, 0, 6, 1000, 1000); W.hero[1] = "vane"
+  add(50, 1, 1, 1250, 1000)
+  W.features = {}
+  local f = SF.new(0, api)
+  f:refresh(30); f:refresh(60)
+  local function choice(hp, nerve)
+    local h = { uid = 1, x = 1000, z = 1000, hp = hp, maxHp = 2000, defID = 6, hid = "vane", nerve = nerve, drive = 0 }
+    return f:choose(h, 0, 0).kind
+  end
+  -- find the health where a level-tempered hero turns: the shaken one has turned already, the steady
+  -- one not yet
+  local turn
+  for hp = 2000, 50, -50 do if choice(hp, 0) ~= "stay" then turn = hp; break end end
+  assert(turn, "a level hero leaves at some health")
+  assert(choice(turn + 50, -1) ~= "stay", "shaken, it has left already at " .. (turn + 50))
+  assert(choice(turn, 1) == "stay", "steady, it still holds at " .. turn)
+end
+
+print("ok: temper scales seen danger; profiles from defs, fire shared over the crowd, memory sharp for turrets and blurred for walkers, forgetting, the unknown as danger, long guns, Ketha's wrecks, the dark, a fighter's trade")
