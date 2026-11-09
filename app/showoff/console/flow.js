@@ -83,8 +83,9 @@ export function renderTalks() {
     (next.setup ? `<p class="flow-setup">${escape(next.setup)}</p>` : "") +
     next.beats.map(b => `<p class="flow-beat">${b.who ? `<b>${escape(b.who)}</b>` : ""}${escape(b.text)}</p>`).join("") +
     `<div class="flow-answers" role="group" aria-label="Your answer">` +
+    // what an answer stands for leads it (UI review 2026-11-09: the value sat tiny at the far right)
     next.answers.map(a => `<button type="button" class="${a.null ? "null" : ""}" data-talk-answer="${escape(a.id)}" ${busy ? "disabled" : ""}>` +
-      `<span>${escape(a.label)}</span>${a.note ? `<small>${escape(a.note)}</small>` : ""}</button>`).join("") +
+      `${a.note ? `<small class="flow-value">${escape(a.note)}</small>` : ""}<span>${escape(a.label)}</span></button>`).join("") +
     `</div>` + (said ? `<ul class="flow-said">${said}</ul>` : "");
   root.querySelectorAll("[data-talk-answer]").forEach(b => { b.onclick = () => answer(next, b.dataset.talkAnswer); });
 }

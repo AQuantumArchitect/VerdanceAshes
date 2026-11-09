@@ -872,7 +872,9 @@ details.advanced summary { color:var(--steam); }
 .flow-answers button { font:inherit; text-align:left; display:flex; justify-content:space-between; gap:1rem; align-items:baseline;
   background:var(--panel); color:var(--ink); border:1px solid var(--line); border-radius:6px; padding:.6rem .8rem; cursor:pointer; }
 .flow-answers button:hover, .flow-answers button:focus-visible { border-color:var(--gold); outline:none; }
-.flow-answers button small { color:var(--muted); font-size:var(--fs-xs); text-align:right; }
+.flow-answers button { justify-content:flex-start; }
+.flow-answers button small.flow-value { flex:0 0 9rem; white-space:normal; line-height:1.25; color:var(--steam); font-size:var(--fs-xs); letter-spacing:.08em; text-transform:uppercase; text-align:left; }
+.flow-answers button.null small.flow-value { color:var(--muted); }
 .flow-answers button.null { background:none; border-style:dashed; color:var(--muted); }
 .flow-answers button:disabled { opacity:.5; cursor:wait; }
 .flow-said { list-style:none; margin:.6rem 0 0; padding:0; display:grid; gap:.2rem; font-size:var(--fs-sm); }
