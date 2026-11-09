@@ -90,6 +90,7 @@ local CRIT_WHOLE, CRIT_LEASH = 0.98, 1500
 -- the retreat steps away from the enemies near it before it heads for the pad (it used to walk straight
 -- to the pad, often through them)
 local RETREAT_STEP = 700
+local PAD_HOT = 3            -- this many armed enemies within HERO_SENSE of the pad: the pad is no refuge
 
 if not gadgetHandler:IsSyncedCode() then
   local started, sped, echoed = false, false, false
@@ -885,7 +886,15 @@ local function caution(f)
         local sx = math.max(32, math.min(Game.mapSizeX - 32, x + dx / len * RETREAT_STEP))
         local sz = math.max(32, math.min(Game.mapSizeZ - 32, z + dz / len * RETREAT_STEP))
         Spring.GiveOrderToUnit(uid, CMD.MOVE, { sx, Spring.GetGroundHeight(sx, sz) or 0, sz }, 0)
-        Spring.GiveOrderToUnit(uid, CMD.MOVE, { px, Spring.GetGroundHeight(px, pz) or 0, pz }, { "shift" })
+        if threatsNear(px, pz, HERO_SENSE) < PAD_HOT then
+          Spring.GiveOrderToUnit(uid, CMD.MOVE, { px, Spring.GetGroundHeight(px, pz) or 0, pz }, { "shift" })
+        else
+          -- the pad is the fight (a fortify job on contested ground, campaign_hard_v4 Koom Valley: Verse
+          -- and Halbard went back to it and fell): a second step further from the enemies instead
+          local fx = math.max(32, math.min(Game.mapSizeX - 32, x + dx / len * RETREAT_STEP * 2))
+          local fz = math.max(32, math.min(Game.mapSizeZ - 32, z + dz / len * RETREAT_STEP * 2))
+          Spring.GiveOrderToUnit(uid, CMD.MOVE, { fx, Spring.GetGroundHeight(fx, fz) or 0, fz }, { "shift" })
+        end
       else
         Spring.GiveOrderToUnit(uid, CMD.MOVE, { px, Spring.GetGroundHeight(px, pz) or 0, pz }, 0)
       end

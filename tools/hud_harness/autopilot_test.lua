@@ -412,11 +412,28 @@ local step = find(CMD.MOVE)
 assert(step and step.units[1] == 5 and step.params[1] < 500, "she steps away from the enemies (they stand east) before the pad")
 gadget:GameFrame(131)
 assert(not gadget:AllowCommand(5), "the same a second later: still held (no flapping)")
+-- a quiet pad: after the step away the hero goes on to the pad
+local function lastMovesOf(uid)
+  local mv = {}
+  for _, o in ipairs(orders) do if o.cmd == CMD.MOVE and o.units[1] == uid then mv[#mv + 1] = o end end
+  return mv
+end
+orders = {}
 heroHp[6] = 0.5
 gadget:GameFrame(161)
 assert(not gadget:AllowCommand(6), "Vane at half health: pulled back")
+local mv = lastMovesOf(6)
+assert(#mv == 2 and mv[2].params[1] == 0 and mv[2].params[3] == 0, "two enemies at the pad (not hot): step away, then the pad")
 threats, heroHp[6] = {}, 0.95
 gadget:GameFrame(191)
 assert(gadget:AllowCommand(6), "Vane mostly whole again: back to BARb")
+-- a hot pad (the fight is on it, a fortify job on contested ground): a second step away, not the pad
+threats, heroHp[6] = { 3, 3, 3, 3 }, 0.5
+positions[6] = { 3000, 0 }                      -- east of the enemies (at 2100), clear of the map edge
+orders = {}
+gadget:GameFrame(221)
+mv = lastMovesOf(6)
+assert(#mv == 2 and mv[2].params[1] ~= 0 and math.abs(mv[2].params[1] - 2100) > math.abs(mv[1].params[1] - 2100),
+  "four enemies at the pad: the second leg goes further from them, not back to the pad")
 
 print("ok: scout marks, rescue squad, protected orders, departure to the real pad radius, leaving with and without a HUD, holding a capture, the Spire Gate and its tech ladder, the siege, hero caution and Ketha's leash")
