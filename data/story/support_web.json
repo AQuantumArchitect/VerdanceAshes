@@ -4774,7 +4774,7 @@
       "aHook": "Yeah. I'll take that wall.",
       "bHook": "Halberd's hungry.",
       "aGlyph": "+off·−mob·−ene·+led",
-      "bGlyph": "",
+      "bGlyph": "+off·+mob·+pad·+sig",
       "talkIds": {
         "C": "bro__halbard:C",
         "B": "bro__halbard:B",
@@ -6015,7 +6015,9 @@
         "the appetite and the show",
         "who gets the crowd"
       ],
-      "sharedTemperament": [],
+      "sharedTemperament": [
+        "gleeful"
+      ],
       "reasons": [
         "authored seed"
       ],
@@ -6024,7 +6026,7 @@
       "bName": "Cassia 'Gladius' Ferro",
       "aHook": "Halberd's hungry.",
       "bHook": "Bow first. Then the fight.",
-      "aGlyph": "",
+      "aGlyph": "+off·+mob·+pad·+sig",
       "bGlyph": "+off·+mob·−pad·+hea",
       "talkIds": {
         "C": "gladius__halbard:C"
@@ -6440,7 +6442,9 @@
         "the veteran with receipts",
         "the hero with the big gun"
       ],
-      "sharedTemperament": [],
+      "sharedTemperament": [
+        "captain"
+      ],
       "reasons": [
         "authored seed"
       ],
@@ -6450,7 +6454,7 @@
       "aHook": "Already knows where it hurts.",
       "bHook": "Halberd's hungry.",
       "aGlyph": "+pad·+off·+led·−mob",
-      "bGlyph": "",
+      "bGlyph": "+off·+mob·+pad·+sig",
       "talkIds": {
         "C": "halbard__lunkhead:C",
         "B": "halbard__lunkhead:B",
@@ -6477,7 +6481,7 @@
       "aHook": "Sit down. I'll handle it.",
       "bHook": "Halberd's hungry.",
       "aGlyph": "+pad·+off·−mob·+hea",
-      "bGlyph": "",
+      "bGlyph": "+off·+mob·+pad·+sig",
       "talkIds": {
         "C": "halbard__mammoth:C"
       }
@@ -6492,7 +6496,9 @@
         "two Cortex walkers",
         "a decision and an appetite"
       ],
-      "sharedTemperament": [],
+      "sharedTemperament": [
+        "captain"
+      ],
       "reasons": [
         "authored seed"
       ],
@@ -6502,7 +6508,7 @@
       "aHook": "A decision, alone.",
       "bHook": "Halberd's hungry.",
       "aGlyph": "+off·+pad·+hea·−mob",
-      "bGlyph": "",
+      "bGlyph": "+off·+mob·+pad·+sig",
       "talkIds": {
         "C": "halbard__shiva:C"
       }
@@ -7316,7 +7322,7 @@
       "bName": "Ketha",
       "aHook": "I still walk your left.",
       "bHook": "Wrecks are unfinished sentences.",
-      "aGlyph": "",
+      "aGlyph": "+pad·+off·−mob·+cra",
       "bGlyph": "−off·+cra·+pad",
       "talkIds": {
         "C": "ketha__pavise:C",
@@ -8095,7 +8101,7 @@
       "aHook": "Already knows where it hurts.",
       "bHook": "I still walk your left.",
       "aGlyph": "+pad·+off·+led·−mob",
-      "bGlyph": "",
+      "bGlyph": "+pad·+off·−mob·+cra",
       "talkIds": {
         "C": "lunkhead__pavise:C",
         "B": "lunkhead__pavise:B",
@@ -8178,7 +8184,7 @@
       "aHook": "Every throne needs a spare.",
       "bHook": "I still walk your left.",
       "aGlyph": "+cra·+pad·+fog·+off",
-      "bGlyph": "",
+      "bGlyph": "+pad·+off·−mob·+cra",
       "talkIds": {
         "C": "mask__pavise:C",
         "B": "mask__pavise:B",
@@ -9040,7 +9046,7 @@
       "bName": "Ash-Marshal Quill",
       "aHook": "I still walk your left.",
       "bHook": "Orders walk on treads.",
-      "aGlyph": "",
+      "aGlyph": "+pad·+off·−mob·+cra",
       "bGlyph": "+off·+pad·+hea",
       "talkIds": {
         "C": "pavise__quill:C",

@@ -14,6 +14,7 @@ editing a *_bonds.json file:
 from __future__ import annotations
 
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -34,6 +35,24 @@ def save(name: str, data: dict) -> None:
     crlf = b"\r\n" in path.read_bytes()[:200]
     text = json.dumps(data, indent=2, ensure_ascii=False) + "\n"
     path.write_bytes((text.replace("\n", "\r\n") if crlf else text).encode("utf-8"))
+
+
+# The old generator (tools/support_web_v1.py, removed 2026-10-21) opened a narrator line with the two
+# heroes' doctrine roles, "core_skirm seat beside core_rez. You two keep finding the same fire.", and
+# players read the ids (93 talks, found 2026-11-09). The prefix goes; the sentence after it stays.
+ROLE_PREFIX = re.compile(r"^\s*[a-z]+(?:_[a-z]+)*\s+seat beside\s+[a-z]+(?:_[a-z]+)*\.\s*")
+
+
+def clean_beats(beats: list) -> list:
+    out = []
+    for b in beats:
+        if b.get("speaker") == "narrator":
+            line = ROLE_PREFIX.sub("", str(b.get("line") or ""))
+            if not line.strip():
+                continue
+            b = dict(b, line=line[:1].upper() + line[1:])
+        out.append(b)
+    return out
 
 
 def pair_id(a: str, b: str) -> str:
@@ -94,6 +113,8 @@ def main() -> int:
     params = web.setdefault("params", {})
     params.update(heroCount=len(nodes), edgeCount=len(web["edges"]), talkCount=len(talk_rows),
                   authoredSeeds=sum(1 for e in web["edges"] if e.get("authored")))
+    for t in list(talk_rows.values()) + list(written_rows.values()):
+        t["beats"] = clean_beats(t.get("beats") or [])
     talks["talks"] = list(talk_rows.values())
     written["talks"] = list(written_rows.values())
     talks["authoredCount"] = sum(1 for t in talks["talks"] if t.get("generated") is False)
