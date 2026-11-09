@@ -79,6 +79,12 @@ local HERO_QUIET = 90 * 30
 -- taking fire it cannot see (finale trial 20261109_012053: the Keep's long guns took Halbard from 0.85 to
 -- 0.21 with "enemies=0" within 700): losing this much health in a second, below HERO_HURT, pulls back too
 local HERO_BLEED = 0.12
+-- a critical hero (Ketha, the company's rez captain: she raises the others) is kept out of it sooner
+-- (campaign_hard_v2/v3: she fell more than anyone): any hurt with two enemies near
+local CRIT_HURT, CRIT_CROWD = 0.95, 2
+-- the retreat steps away from the enemies near it before it heads for the pad (it used to walk straight
+-- to the pad, often through them)
+local RETREAT_STEP = 700
 
 if not gadgetHandler:IsSyncedCode() then
   local started, sped, echoed = false, false, false
@@ -734,6 +740,23 @@ local function rescueWreck()
   return rescueFid
 end
 
+-- Where the armed enemies within r of (x, z) stand on average, or nil when none.
+local function threatCentroid(x, z, r)
+  local myAlly = select(6, Spring.GetTeamInfo(playerTeam, false))
+  local sx, sz, n = 0, 0, 0
+  for _, u in ipairs(Spring.GetUnitsInCylinder(x, z, r) or {}) do
+    local t = Spring.GetUnitTeam(u)
+    local ud = UnitDefs[Spring.GetUnitDefID(u) or -1]
+    if t and t ~= Spring.GetGaiaTeamID() and select(6, Spring.GetTeamInfo(t, false)) ~= myAlly
+        and ud and ud.weapons and #ud.weapons > 0 and not Spring.GetUnitIsDead(u) then
+      local ux, _, uz = Spring.GetUnitPosition(u)
+      if ux then sx, sz, n = sx + ux, sz + uz, n + 1 end
+    end
+  end
+  if n == 0 then return nil end
+  return sx / n, sz / n
+end
+
 local function threatsNear(x, z, r)
   local myAlly = select(6, Spring.GetTeamInfo(playerTeam, false))
   local n = 0
@@ -820,7 +843,8 @@ local function caution(f)
             Spring.Echo("VA_AUTOPILOT hero back to work id=" .. tostring(Spring.GetUnitRulesParam(uid, "va_hero_id"))
               .. " hp=" .. string.format("%.2f", frac))
           end
-        elseif frac < HERO_LOW or (frac < HERO_HURT and (crowd >= HERO_CROWD or bleed >= HERO_BLEED)) then
+        elseif frac < HERO_LOW or (frac < HERO_HURT and (crowd >= HERO_CROWD or bleed >= HERO_BLEED))
+            or ((tonumber((Spring.GetUnitRulesParam(uid, "va_hero_critical"))) or 0) == 1 and frac < CRIT_HURT and crowd >= CRIT_CROWD) then
           retreating[uid] = f
           pulled[#pulled + 1] = uid
           Spring.Echo("VA_AUTOPILOT hero pulls back id=" .. tostring(Spring.GetUnitRulesParam(uid, "va_hero_id"))
@@ -834,9 +858,25 @@ local function caution(f)
   for uid in pairs(retreating) do
     if Spring.GetUnitIsDead(uid) ~= false then retreating[uid], held[uid] = nil, nil end
   end
-  if #pulled > 0 then
-    -- back to the pad: the company's base and builders stand there, and it is where they lift from
-    order(pulled, CMD.MOVE, { px, Spring.GetGroundHeight(px, pz) or 0, pz }, true)
+  -- each one steps away from the enemies near it, then goes back to the pad (the company's base and
+  -- builders stand there, and it is where they lift from)
+  for _, uid in ipairs(pulled) do
+    local x, _, z = Spring.GetUnitPosition(uid)
+    local ex, ez = x and threatCentroid(x, z, HERO_SENSE)
+    held[uid] = true
+    issuing = true
+    if ex then
+      local dx, dz = x - ex, z - ez
+      local len = math.sqrt(dx * dx + dz * dz)
+      if len < 1 then dx, dz, len = px - x, pz - z, math.max(1, math.sqrt((px - x) ^ 2 + (pz - z) ^ 2)) end
+      local sx = math.max(32, math.min(Game.mapSizeX - 32, x + dx / len * RETREAT_STEP))
+      local sz = math.max(32, math.min(Game.mapSizeZ - 32, z + dz / len * RETREAT_STEP))
+      pcall(Spring.GiveOrderToUnit, uid, CMD.MOVE, { sx, Spring.GetGroundHeight(sx, sz) or 0, sz }, 0)
+      pcall(Spring.GiveOrderToUnit, uid, CMD.MOVE, { px, Spring.GetGroundHeight(px, pz) or 0, pz }, { "shift" })
+    else
+      pcall(Spring.GiveOrderToUnit, uid, CMD.MOVE, { px, Spring.GetGroundHeight(px, pz) or 0, pz }, 0)
+    end
+    issuing = false
   end
 end
 
