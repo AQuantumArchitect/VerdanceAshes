@@ -71,6 +71,8 @@ local RAPTOR_LEAVE_FRAMES = RAPTOR_GRACE and math.floor((RAPTOR_GRACE + RAPTOR_S
 -- (trial 20261109_005443: at 0.40/0.70 and every 2 s, Vane pulled back at 0.49 among ten enemies and
 -- still fell, and Ketha went from whole to 0.18 between two checks; now earlier and every second)
 local CAUTION_EVERY = 30
+-- va_autopilot_caution=0 turns hero caution off (A/B trials of the proxy player)
+local CAUTION_ON = num("va_autopilot_caution", 1) ~= 0
 local HERO_LOW, HERO_HURT, HERO_WHOLE = 0.55, 0.85, 0.90
 local HERO_CROWD, HERO_SENSE = 5, 700
 local HERO_QUIET = 90 * 30
@@ -941,7 +943,7 @@ function gadget:GameFrame(f)
     return
   end
   gateRig()
-  caution(f)   -- every pass (frames run at f % 30 == 11: once a second)
+  if CAUTION_ON then caution(f) end   -- every pass (frames run at f % 30 == 11: once a second)
   if f % RESCUE_EVERY == 311 then rescue() end
   if f % NUDGE_EVERY < 30 then siege(); holdTheZone(); nudge() end
   if f % NUDGE_EVERY == 341 then scout() end   -- (frames run at f % 30 == 11; 311 is the rescue)

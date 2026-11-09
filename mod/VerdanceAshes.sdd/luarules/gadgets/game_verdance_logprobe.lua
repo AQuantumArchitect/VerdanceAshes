@@ -30,5 +30,11 @@ function gadget:GameFrame(f)
     pcall(Spring.Log, "Verdance", LOG and LOG.NOTICE or "notice", "VA_PROBE route=log_notice")
     pcall(Spring.Log, "Verdance", LOG and LOG.INFO or "info", "VA_PROBE route=log_info")
     pcall(Spring.Log, "Verdance", LOG and LOG.DEBUG or "debug", "VA_PROBE route=log_debug")
+    -- BAR's chat (gui_chat.lua AddConsoleLine) drops priority L_DEPRECATED lines; does the infolog keep
+    -- them, every time (twice, to catch de-duplication)?
+    Spring.Echo("VA_PROBE LOG.DEPRECATED=" .. tostring(LOG and LOG.DEPRECATED))
+    pcall(Spring.Log, "Verdance", LOG and LOG.DEPRECATED or "deprecated", "VA_PROBE route=log_deprecated n=1")
+    pcall(Spring.Log, "Verdance", LOG and LOG.DEPRECATED or "deprecated", "VA_PROBE route=log_deprecated n=1")
+    pcall(Spring.Log, "Verdance", LOG and LOG.DEPRECATED or "deprecated", "VA_PROBE route=log_deprecated n=2")
   end
 end
