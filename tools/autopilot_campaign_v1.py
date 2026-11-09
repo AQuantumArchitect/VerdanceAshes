@@ -312,6 +312,9 @@ def main() -> int:
                          "'' uses --profile everywhere")
     ap.add_argument("--raptor-stay", type=int, default=60,
                     help="game seconds the company stays on raptor ground after the grace ends before it leaves")
+    ap.add_argument("--soak", choices=["easy", "hard"],
+                    help="trials of a soaked war (the Overthrow): this run's workspace copy uses war_snapshot_<soak>.json "
+                         "in place of the shipped medium snapshot (tools/war_bake_v1.py --soak makes them)")
     ap.add_argument("--mercs", type=float, default=0.8,
                     help="share of the metal bag spent on mercenaries before each drop (0 = none)")
     ap.add_argument("--speed", type=int, default=8)
@@ -367,6 +370,10 @@ def main() -> int:
     ws = run_dir / "ws" if args.resume else copy_workspace(run_dir, bar_root, stock=args.stock)
     if args.stock:
         print(f"[autopilot] stock BAR rehearsal: {ws.parent / 'bar_data'} has the engine and the rapid game only")
+    if args.soak and not args.resume:
+        for alt in (ws / "data" / "base_templates").glob(f"*/war_snapshot_{args.soak}.json"):
+            shutil.copy2(alt, alt.parent / "war_snapshot_v1.json")
+            print(f"[autopilot] soak trial: {alt.parent.name} plays its {args.soak} soak ({alt.name})")
     sys.path.insert(0, str(ws / "tools"))
     os.chdir(ws)
     env = dict(os.environ, PYTHONPATH=os.pathsep.join([str(ws / "tools"), os.environ.get("PYTHONPATH", "")]).rstrip(os.pathsep))
