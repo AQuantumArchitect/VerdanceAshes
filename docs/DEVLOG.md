@@ -36,7 +36,7 @@ One entry per working day: what changed, what was measured, what's next. The new
 
 **Measured** (details below)
 - Rock Jungle wipes: baseline 6, v2 0.
-- Caution A/B over four arms: hero-sorties lost per run fell from 5.0 with no caution to 2.7 with the current one (Ketha leashed and let go only when whole).
+- Caution A/B: hero-sorties lost per run fell from 5.0 with no caution to 3.0 with the current one, and Ketha survived every sortie of the last trials. A Lua error had silently broken one version; it was found by a new harness test, fixed, and the runner now flags such errors.
 - The door-hold fix won Rock Jungle doors and broke the home loop in v3.
 - **Campaign v3** (everything up to the soak, the door hold, temper and the bleed rule): **completed in 12 sorties.**
   - The finale on the medium soak: partial (50/65), then won (65/65).
@@ -145,7 +145,11 @@ Owner notes after the baseline (Luke asleep; "err on the side of doing too much"
   - **Correction: the v2 and v3 arms ran with a bug.** From 9a5f6a4, the "step away from the enemies" retreat raised a Lua error on every pull-back with an enemy near. In `local ex, ez = x and threatCentroid(...)`, `and` keeps one value, so `ez` was nil. The error also left the order guard (`issuing`) stuck on, so BARb could override the rig's orders.
     - In those arms, no retreat order was ever given with enemies near.
     - v3's better numbers came from the Ketha leash, whose pull-backs happen with no enemies near.
-    - Found by the new caution cases in `tools/hud_harness/autopilot_test.lua`; fixed in c847524 (the retreat now runs in pcall). The fixed caution is being measured as `ab_caution4_*`.
+    - Found by the new caution cases in `tools/hud_harness/autopilot_test.lua`; fixed in c847524 (the retreat now runs in pcall).
+  - **Fixed caution** (`ab_caution4_*`, 3 runs): 3.0 hero-sorties lost per run (off 5.0, v1 3.7), 0.67 dead after sortie 1, 4/9 victories, 1 wipe, no Lua errors.
+    - **Ketha survived every sortie of every run.**
+    - The main casualty is now Vane, nearly always in mission 1's opening: about 40 s in, his pack meets ten enemies. Pulled back at 0.74, he falls about 25 s later. That opening is already flagged in RELEASE.md as wanting tuning from a human play.
+  - The runner now records each sortie's Verdance Lua errors (`luaErrors` in the row) and warns.
 - **Console clean-up** (6d5fc43): `VA_` debug lines no longer reach the player's chat. Found with the windowed screenshot rig (`--windowed --shots N`) and a log probe. BAR's chat drops priority L_DEPRECATED, and the infolog keeps it.
 - Also tonight:
   - The Rock Jungle door jobs sat in "clear" all sortie with nothing booked. A capture with nothing to wreck clears by standing in the zone in strength. The proxy now masses there in that phase too (f2793fd).
