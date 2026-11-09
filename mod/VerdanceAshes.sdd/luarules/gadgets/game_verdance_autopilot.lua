@@ -80,9 +80,17 @@ local HERO_BLEED = 0.12
 
 if not gadgetHandler:IsSyncedCode() then
   local started, sped, echoed = false, false, false
+  -- va_autopilot_shots=S: a screenshot every S game seconds (windowed runs only: the HUD review rig)
+  local SHOT_EVERY = math.floor(num("va_autopilot_shots", 0) * 30)
+  local nextShot = SHOT_EVERY > 0 and 30 * 20 or nil
   function gadget:GameStart() started = true end
   function gadget:Update()
     if not started then return end
+    if nextShot and (Spring.GetGameFrame() or 0) >= nextShot then
+      nextShot = nextShot + SHOT_EVERY
+      pcall(Spring.SendCommands, "screenshot png")
+      Spring.Echo("VA_AUTOPILOT_SHOT frame=" .. tostring(Spring.GetGameFrame()))
+    end
     local _, _, paused = Spring.GetGameSpeed()
     if paused then
       pcall(Spring.SendCommands, "pause 0")

@@ -312,6 +312,9 @@ def main() -> int:
                          "'' uses --profile everywhere")
     ap.add_argument("--raptor-stay", type=int, default=60,
                     help="game seconds the company stays on raptor ground after the grace ends before it leaves")
+    ap.add_argument("--shots", type=int, default=0,
+                    help="with --windowed: a BAR screenshot every N game seconds, for the HUD review "
+                         "(bar_data\\screenshots of the run)")
     ap.add_argument("--soak", choices=["easy", "hard"],
                     help="trials of a soaked war (the Overthrow): this run's workspace copy uses war_snapshot_<soak>.json "
                          "in place of the shipped medium snapshot (tools/war_bake_v1.py --soak makes them)")
@@ -491,6 +494,8 @@ def main() -> int:
         text, team = patch_startscript(script.read_text(encoding="utf-8", errors="replace"), profile=profile,
                                        speed=args.speed, minutes=args.minutes, settle=args.settle, hud=args.hud or args.windowed,
                                        beats=args.beats, raptor_stay=args.raptor_stay)
+        if args.shots > 0 and args.windowed:
+            text = text.replace("va_autopilot=1;", f"va_autopilot=1;\n    va_autopilot_shots={int(args.shots)};", 1)
         if args.rival_ai:
             text, swapped = rivals_to(text, args.rival_ai)
             print(f"[autopilot] TEST: {swapped} rival BARb seat(s) play as {args.rival_ai}", flush=True)
