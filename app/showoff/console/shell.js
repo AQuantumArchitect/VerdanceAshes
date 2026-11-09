@@ -152,9 +152,16 @@ export function paint() {
   renderChronicle(n);
   renderCampCard();
   const condition = st => ({ active: "Ready", wounded: "Wounded: sits out until healed", dead: "Fallen", lost: "Lost" })[String(st || "active").toLowerCase()] || pretty(st);
+  // the mood the camp left them in (verdance.company.temper, hub aces.temper), when it is notable
+  const mood = t => {
+    if (!t) return "";
+    const n = Number(t.nerve) || 0, d = Number(t.drive) || 0;
+    return Math.abs(n) >= Math.abs(d) ? (n >= 0.25 ? "steady" : n <= -0.25 ? "shaken" : "") : (d >= 0.3 ? "eager" : d <= -0.3 ? "grieving" : "");
+  };
   $("cc-company-members").innerHTML = "<div class=\"cc-members\">" + (snap.hub.aces || []).filter(a => companyMemberIds().includes(a.id)).map(a => {
     const p = CREW.heroes?.[a.id] || {};
-    return `<button type="button" data-hero="${escape(a.id)}"><strong>${escape(a.name || pretty(a.id))}</strong><span>${escape(condition(a.status))}</span><p>${escape(p.blurb || a.role || "Company specialist")}</p></button>`;
+    const m = String(a.status || "active").toLowerCase() === "active" ? mood(a.temper) : "";
+    return `<button type="button" data-hero="${escape(a.id)}"><strong>${escape(a.name || pretty(a.id))}</strong><span>${escape(condition(a.status))}${m ? ` · ${escape(m)}` : ""}</span><p>${escape(p.blurb || a.role || "Company specialist")}</p></button>`;
   }).join("") + "</div>";
   const scenes = $("cc-company-scenes");
   const openScenes = new Set([...scenes.querySelectorAll("details[open][data-scene]")].map(el => el.dataset.scene));
