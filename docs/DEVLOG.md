@@ -47,7 +47,20 @@ Batch 1 is on the field's first version (before the flapping fix, temper in the 
 - Ketha's Rock Jungle death is why "a named hero is worth every sortie it would still serve" exists: she went to raise a wreck at 38% survival.
 - The finale on the new medium soak (one try): partial, 19 of the Keep's 46 targets, all four heroes alive. Harder than last night's eight-work soak (36/65 on a first try).
 
-Batch 2 (everything as of 50b34fe; two field campaigns, one with caution off, and a finale) is running; results below when in.
+Batch 2: everything as of 50b34fe (no flapping, temper in the field, campaign worth). Two field campaigns, one campaign with caution off on the same code, and a finale.
+
+| Core-hero deaths | Sorties | Deaths | Per 7 sorties |
+|---|---|---|---|
+| Caution off (batch 2) | 7 | 4 (Ketha twice, Vane, Halbard) | 4.0 |
+| Old caution (last night) | 14 | 4 | 2.0 |
+| Field v1 (batch 1) | 14 | 1 | 0.5 |
+| Field, current (batch 2) | 14 | 1 | 0.5 |
+
+- Every run came home 7 of 7, with no Lua errors. One campaign drew five Koom drops and lost nobody.
+- **The finale on the ten-work medium soak:** 17/46, then **46/46 on the second try. Campaign complete, all four heroes alive.** Still a two-try finale, as last night's eight-work soak was.
+- **Both field deaths were Ketha on Rock Jungle.** The second (batch 2, sortie 6) shows why: she was held by the pad all sortie (survival 0.97, falling to 0.51 as the raptors came) and died 17 s after the departure order, while the company boarded. Caution doesn't run during departure, and on raptor ground the pad itself is overrun.
+- **Next:** the departure is still a knob (leave 60 s after the grace; the 15-minute clock). Make leaving a field decision: go when staying costs the company more than it still gains.
+- **Not done:** the pull home (decision 3) is the hub's job recommendation, which the field doesn't touch. A continuous version would weigh each job by the company's expected survival there (its strength against the job's known opposition on the belief board).
 
 ## Morning summary for Luke (2026-11-09)
 
