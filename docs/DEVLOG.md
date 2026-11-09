@@ -58,6 +58,9 @@ One entry per working day: what changed, what was measured, what's next. The new
 **Decision 4:** do the drafts in `talk_proposals.md` sound like your characters? If so, I'll write the rest the same way.
 
 **Decision 5:** in mission 1's opening, Vane's pack meets about ten enemies 40 s in and he usually falls, even with caution working. Tune the opening's forces, or have the proxy pull heroes back pre-emptively when heavily outnumbered?
+- New evidence (04:40, trial `koom_hotpad_2`, mission 1): caution did fire early. Ketha pulled back at 0.91 health with 5 enemies near and was down 28 s later. Halbard pulled back at 0.80 with 6 near and was down 69 s later. Neither was released back to work first.
+- So pulling back sooner won't help much on its own. The retreat leg isn't safe: the enemy follows, or reaches wherever the hero stops.
+- On the proxy side, the next things to try are an escort for a retreating hero, or retreating toward the nearest friendly army rather than a fixed step. I've left this until you choose between tuning the opening and changing the proxy.
 
 **Not done or not verified**
 - The HUD reviewer's density cuts to the mission rail (smaller rows, fewer lines). Some of what it would cut is yours by design ("Left if you lift"), so it waits for you.
