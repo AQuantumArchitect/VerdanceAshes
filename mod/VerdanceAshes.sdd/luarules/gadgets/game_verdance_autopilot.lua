@@ -382,17 +382,23 @@ end
 
 -- ---------------------------------------------------------------- hold
 local function holdTheZone()
-  if tostring(Spring.GetGameRulesParam("va_capture_phase") or "") ~= "hold" then return end
+  local phase = tostring(Spring.GetGameRulesParam("va_capture_phase") or "")
+  -- A capture with nothing booked to wreck (a Rock Jungle door) clears by standing in the zone in
+  -- strength with no enemy fighting there (objective_presence.captureClearStep), so the clear phase
+  -- needs the army there too: on campaign_hard_v2 the door jobs sat in "clear" all sortie.
+  local emptyClear = phase == "clear" and rp("va_objective_total") <= 0
+  if phase ~= "hold" and not emptyClear then return end
   local need = rp("va_claim_need")
-  if need > 0 and rp("va_claim_value") >= need then return end
+  if phase == "hold" and need > 0 and rp("va_claim_value") >= need then return end
   local cx, cz = tonumber((Spring.GetGameRulesParam("va_hold_cx"))), tonumber((Spring.GetGameRulesParam("va_hold_cz")))
+  if not cx or cx <= 0 then cx, cz = target() end
   if not cx then return end
   local guns = companyUnits(function(ud, uid)
     return mobile(ud) and ud.canAttack and not ud.isBuilder and not held[uid]
   end)
   if #guns == 0 then return end
   order(guns, CMD.FIGHT, { cx, Spring.GetGroundHeight(cx, cz) or 0, cz }, true)
-  Spring.Echo("VA_AUTOPILOT hold units=" .. #guns .. " presence=" .. rp("va_claim_value") .. "/" .. need)
+  Spring.Echo("VA_AUTOPILOT hold phase=" .. phase .. " units=" .. #guns .. " presence=" .. rp("va_claim_value") .. "/" .. need)
 end
 
 -- ---------------------------------------------------------------- the Spire Gate (finale C)
