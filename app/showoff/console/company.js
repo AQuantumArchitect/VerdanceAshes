@@ -562,10 +562,16 @@ export function renderShop() {
   const groups = {};
   (c.shop || []).forEach(item => { const sec = storeSection(item); (groups[sec] || (groups[sec] = [])).push(item); });
   const ids = order.filter(id => groups[id] && groups[id].length).concat(Object.keys(groups).filter(id => !order.includes(id)));
-  $("shop-list").innerHTML = ids.map(sec => `<div class="shop-shelf">${esc(shopShelfLabel(sec))}</div>${groups[sec].map(renderShopListing).join("")}`).join("")
+  // what you can buy now comes first on each shelf (UI review 2026-11-09), in catalog order otherwise
+  const byReach = (list) => list.map((item, i) => [item, i]).sort((a, b) => (b[0].available ? 1 : 0) - (a[0].available ? 1 : 0) || a[1] - b[1]).map(p => p[0]);
+  $("shop-list").innerHTML = ids.map(sec => `<div class="shop-shelf">${esc(shopShelfLabel(sec))}</div>${byReach(groups[sec]).map(renderShopListing).join("")}`).join("")
     || `<div class="panel-card meta">The store is empty: re-export the campaign pack.</div>`;
   const tab = $("drop-tab-mercs");
-  if (tab) tab.innerHTML = "<b>What comes</b><span>What else do we bring?</span>" + (storeWantsAttention() && !storeLocked() ? `<span class="badge">hire recommended</span>` : "");
+  if (tab) {
+    // keep the step's status line (operations.paintTabStatus writes it); only the badge is the store's
+    const status = (tab.querySelector("span") || {}).textContent || "mercenaries and gear";
+    tab.innerHTML = `<b>What comes</b><span>${esc(status)}</span>` + (storeWantsAttention() && !storeLocked() ? `<span class="badge">hire recommended</span>` : "");
+  }
 }
 export function recomputeShopAvailability() {
   const c = commerce();
