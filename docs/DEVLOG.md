@@ -59,6 +59,23 @@ Owner notes after the baseline (Luke asleep; "err on the side of doing too much"
   - Under the old siege bake, Verse alone took the Overthrow in 154 s.
   - The soak time works as a difficulty dial. Medium may be a little past what the proxy can finish: the next lever is soak minutes (17–18) or the strip.
   - The heroes lost hp with "enemies=0" within 700: the Keep's long guns. Since then, a hero losing 12% hp in a second pulls back too (18214ea).
+- **`campaign_hard_v2`** (`20261109_011314`, done): 11 sorties to the finale, **0 wipes** (baseline 6).
+  - Vane lived to sortie 10 (baseline: died in sortie 1). Halbard lived throughout (baseline: died in sortie 3). Ketha fell from sortie 4 on.
+  - Eight Rock Jungle visits all extracted, but sorties 4–10 were the same door job, partial every time: the hold never started (fixed after v2 began, f2793fd). The pull home kept choosing home, because the bag's Tenebrium is never spent there.
+  - Its finale used the old siege bake (it started before the soak landed), so its finale win says nothing about the soak.
+- **`campaign_hard_v3`** (all fixes) started badly: Vane died in sortie 1, Halbard in sortie 3, and sortie 4 wiped. The wipe was by roaming raptors inside the grace, with only Verse left. Hence the A/B test below rather than a judgement from one run.
+- **Caution A/B**, 3 trials each, 3 sorties (the caution toggle `va_autopilot_caution=0`):
+
+  | | Caution on | Caution off |
+  |---|---|---|
+  | Heroes dead after sortie 1 | 1 | 4 |
+  | Heroes dead by sortie 3 | 6 | 7 |
+  | Hero-sorties lost | 11 | 15 |
+  | Victories in 9 sorties | 5 | 2 |
+  | Wipes | 1 | 1 |
+
+  Caution helps clearly early on and comes with more victories. Heroes still die from sortie 2. Next for hero survival: rescue faster after a hero falls (Ketha herself falls most), and retreat paths that avoid the enemy.
+- **Console clean-up** (6d5fc43): `VA_` debug lines no longer reach the player's chat. Found with the windowed screenshot rig (`--windowed --shots N`) and a log probe. BAR's chat drops priority L_DEPRECATED, and the infolog keeps it.
 - Also tonight:
   - The Rock Jungle door jobs sat in "clear" all sortie with nothing booked. A capture with nothing to wreck clears by standing in the zone in strength. The proxy now masses there in that phase too (f2793fd).
   - Temper reads the mean bond with drop-mates; the sum saturated.
