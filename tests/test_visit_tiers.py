@@ -37,6 +37,12 @@ def test_raptor_pace_moves_smoothly_with_every_visit():
     assert "raptor" not in V.plan(_state(), "greenest_fields")
 
 
+def test_raptor_grace_never_falls_below_five_minutes():
+    """Owner call 2026-11-09: the baseline's grace fell to 81 s by the tenth sortie; five minutes is the floor."""
+    grace = [V.raptor_pace(v)["graceSeconds"] for v in range(0, 60)]
+    assert min(grace) >= 300 and grace[-1] - 300 < 2 and grace[3] > 400
+
+
 def test_greenest_wardens_take_real_pockets_one_then_two():
     pockets = engine._shell_pockets("greenest_fields", ROOT)
     assert pockets, "no Greenest shell template"

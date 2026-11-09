@@ -30,8 +30,12 @@ RAPTOR_MAPS = {"the_rock_jungle"}  # the Eye's rim was glassed clean (2026-10-26
 # Rock Jungle is home, and the steps it had (10 minutes of grace, then none, then the raptors half an
 # hour in) wiped the company 80 to 200 seconds after landing on every visit after the first in the
 # hard-AI run. Now each visit takes grace down by e every RAPTOR_GRACE_FADE visits and moves the clock
-# toward RAPTOR_CLOCK_MAX by e every RAPTOR_CLOCK_RISE: 600/0 s, then 430/212, 308/398, 221/562 ...
+# toward RAPTOR_CLOCK_MAX by e every RAPTOR_CLOCK_RISE. Owner call 2026-11-09, after the hard-AI baseline
+# wiped six times in seven visits with grace down to 81 s: grace never falls below five minutes. It now
+# eases from 600 toward RAPTOR_GRACE_FLOOR (600, 515, 454, 410, 381 ... s) while the clock climbs (0, 212,
+# 398, 562 ... s). The rest of the fix is the company leaving when the raptors come.
 RAPTOR_GRACE0 = 600.0
+RAPTOR_GRACE_FLOOR = 300.0
 RAPTOR_GRACE_FADE = 3.0
 RAPTOR_CLOCK_MAX = 1800.0
 RAPTOR_CLOCK_RISE = 8.0
@@ -39,7 +43,8 @@ RAPTOR_CLOCK_RISE = 8.0
 
 def raptor_pace(visits_made: int) -> Dict[str, int]:
     v = max(0, int(visits_made))
-    return {"graceSeconds": max(1, int(round(RAPTOR_GRACE0 * math.exp(-v / RAPTOR_GRACE_FADE)))),
+    grace = RAPTOR_GRACE_FLOOR + (RAPTOR_GRACE0 - RAPTOR_GRACE_FLOOR) * math.exp(-v / RAPTOR_GRACE_FADE)
+    return {"graceSeconds": int(round(grace)),
             "clockSeconds": int(round(RAPTOR_CLOCK_MAX * (1.0 - math.exp(-v / RAPTOR_CLOCK_RISE))))}
 
 # Living-shell fields: wardens by tier, on the shell's pockets in this order (the first that exist).
@@ -87,4 +92,4 @@ def plan(state: Dict[str, Any], map_id: str, pockets: Optional[List[Dict[str, An
     return out
 
 
-__all__ = ["MAX_TIER", "NO_TIERS", "RAPTOR_MAPS", "RAPTOR_GRACE0", "RAPTOR_GRACE_FADE", "RAPTOR_CLOCK_MAX", "RAPTOR_CLOCK_RISE", "raptor_pace", "WARDEN_POCKETS", "plan", "tier_for", "visits"]
+__all__ = ["MAX_TIER", "NO_TIERS", "RAPTOR_MAPS", "RAPTOR_GRACE0", "RAPTOR_GRACE_FLOOR", "RAPTOR_GRACE_FADE", "RAPTOR_CLOCK_MAX", "RAPTOR_CLOCK_RISE", "raptor_pace", "WARDEN_POCKETS", "plan", "tier_for", "visits"]
