@@ -53,7 +53,7 @@ with sync_playwright() as pw:
     rows.append(("lift after +", pg.locator(".drop-reserve .drop-squad-kicker").inner_text()))
     rows.append(("last button", pg.locator("#drop-confirm-go").inner_text()))
     pg.click("#drop-confirm-cancel"); pg.wait_for_timeout(300)
-    pg.evaluate("""() => window.Verdance.homecoming({verdict:'victory', chips:['zone claimed','scouted Northwest Lane'], hint:'Everyone lifted from Northwest Reserve.',
+    pg.evaluate("""() => window.Verdance.homecoming({verdict:'victory', haul:{metalK:5, tnb:2, reserve:9}, chips:['zone claimed','scouted Northwest Lane'], hint:'Everyone lifted from Northwest Reserve.',
        moved: (window.HUB_STATE.lastResult && window.HUB_STATE.lastResult.debrief && window.HUB_STATE.lastResult.debrief.moved) || {standing:[{name:'Armada',before:22,after:18,delta:-4},{name:'Cortex',before:61,after:64,delta:3}], marks:[{kind:'scout',label:'Northwest Lane',done:true},{kind:'hero_recover',label:'Vane at the ford',done:false}], rescued:[], lostRescues:[], leftInField:[{name:'Odessa',mapId:'tabula',label:'West Causeway'}]},
        manifest:{kind:'extracted', mapId:'tabula', pad:'T_NW_RESERVE', destination:'camp', going:{heroes:['pavise','ketha','solarium','halbard'], units:9}, staying:{heroes:[], units:0, structures:2}}})""")
     shot("0_debrief", "#homecoming")

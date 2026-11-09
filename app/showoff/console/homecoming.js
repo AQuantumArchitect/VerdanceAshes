@@ -19,36 +19,46 @@ export const VERDICT_UI = {
   incomplete: { banner: "RESULT NOT HOME", headline: "Result not home — Retry extract or Abandon." },
 };
 
-// Debrief from the extraction manifest: who went, who stayed, where the company is now.
-function renderManifest(man) {
+// Debrief from the extraction manifest, in two lines (UI review 2026-11-09: three boxes for "Going",
+// "Staying: nobody" and "Destination: Camp" spent the card on nothing): who lifted and from where,
+// then who and what stayed, only when someone or something did. haul = what the wallet and the
+// reserve gained (mergeHubPatch), the outcome the debrief used to leave out.
+function renderManifest(man, haul) {
   const box = $("hc-manifest");
   if (!box) return;
   if (!man || typeof man !== "object") { box.innerHTML = ""; box.hidden = true; return; }
   const mapId = man.mapId || null;
   const going = man.going || {};
   const staying = man.staying || {};
+  const kind = String(man.kind || "").toLowerCase();
   const goingNames = (going.heroes || []).map(heroNameAny);
   const stayRows = (staying.heroes || []).map(h => {
     const id = typeof h === "string" ? h : (h && h.heroId);
     const zid = h && typeof h === "object" ? h.zoneId : null;
-    return `${heroNameAny(id)}${zid ? ` · ${zoneLabelAny(zid, mapId)}` : ""}`;
+    return `${heroNameAny(id)}${zid ? ` at ${zoneLabelAny(zid, mapId)}` : ""}`;
   });
   const dest = String(man.destination || "").toLowerCase();
-  const destLabel = !dest || dest === "camp" ? "Camp" : zoneLabelAny(man.destination, mapId);
-  const unitsLine = (n, word) => (Number(n) > 0 ? `<li class="hm-units">${esc(n)} ${word}</li>` : "");
-  const col = (title, items, extra) =>
-    `<div class="hm-col"><div class="hm-h">${esc(title)}</div><ul>` +
-    (items.map(s => `<li>${esc(s)}</li>`).join("") || `<li class="hm-none">nobody</li>`) + (extra || "") + `</ul></div>`;
-  const kind = String(man.kind || "").toLowerCase();
+  const where = man.pad ? zoneLabelAny(man.pad, mapId) : "";
+  const to = dest && dest !== "camp" ? ` to ${zoneLabelAny(man.destination, mapId)}` : "";
+  const rows = [];
+  if (kind === "wiped") rows.push(`<li class="bad">Nobody lifted${where ? ` from ${esc(where)}` : ""}.</li>`);
+  else if (kind === "closed") rows.push(`<li class="warn">The field was closed before anyone lifted.</li>`);
+  else {
+    const bits = goingNames.map(esc).concat(Number(going.units) > 0 ? [`${esc(going.units)} units`] : []);
+    rows.push(`<li><span class="hm-h">Lifted${where ? ` from ${esc(where)}` : ""}${esc(to)}</span> ${bits.join(", ") || "nobody"}</li>`);
+  }
+  const left = stayRows.map(esc).concat(Number(staying.units) > 0 ? [`${esc(staying.units)} units`] : [],
+    Number(staying.structures) > 0 ? [`${esc(staying.structures)} structures, now holdings`] : []);
+  if (left.length) rows.push(`<li><span class="hm-h">Left behind</span> ${left.join(", ")}</li>`);
+  const got = [];
+  if (haul) {
+    if (haul.metalK) got.push(`${haul.metalK > 0 ? "+" : "−"}${Math.abs(haul.metalK)}k metal`);
+    if (haul.tnb) got.push(`${haul.tnb > 0 ? "+" : "−"}${Math.abs(haul.tnb)} Tenebrium`);
+    if (haul.reserve) got.push(`${haul.reserve > 0 ? "+" : "−"}${Math.abs(haul.reserve)} units in the reserve`);
+  }
+  if (got.length) rows.push(`<li><span class="hm-h">Brought home</span> ${got.map(esc).join(", ")}</li>`);
   box.hidden = false;
-  box.innerHTML =
-    `<div class="hm-kicker">${man.pad ? `Lifted from ${esc(zoneLabelAny(man.pad, mapId))}` : "Manifest"}` +
-    (kind === "wiped" ? " · nobody lifted" : kind === "closed" ? " · the field was closed" : "") + `</div>` +
-    `<div class="hm-grid">` +
-    col("Going", goingNames, unitsLine(going.units, "units")) +
-    col("Staying", stayRows, unitsLine(staying.units, "units") + (Number(staying.structures) > 0 ? `<li class="hm-units">${esc(staying.structures)} structures → holdings</li>` : "")) +
-    `<div class="hm-col"><div class="hm-h">Destination</div><ul><li>${esc(destLabel)}</li></ul></div>` +
-    `</div>`;
+  box.innerHTML = `<ul class="hm-lines">${rows.join("")}</ul>`;
 }
 
 // What moved (playtest, 2026-11-04): standing, the marks, and who is still out there,
@@ -115,9 +125,20 @@ export function showHomecoming(opts) {
       chips.appendChild(span);
     });
   }
-  renderManifest(man);
+  renderManifest(man, opts && opts.haul);
   renderMoved(opts && opts.moved);
   el.classList.add("show");
+}
+// What the wallet and the reserve gained over a homecoming (only what the patch actually carried).
+function haulSince(before, patch) {
+  const out = {};
+  const com = patch.commerce || {};
+  if (com.metalK != null && Number.isFinite(before.metalK)) out.metalK = Number(com.metalK) - before.metalK;
+  const tnb = patch.tenebrium != null ? patch.tenebrium : com.tenebrium;
+  if (tnb != null && Number.isFinite(before.tnb)) out.tnb = Number(tnb) - before.tnb;
+  const units = patch.reserve && patch.reserve.units;
+  if (Array.isArray(units)) out.reserve = units.reduce((s, u) => s + (Number(u.count) || 0), 0) - before.reserve;
+  return out;
 }
 export function hideHomecoming() {
   const el = $("homecoming");
@@ -127,6 +148,12 @@ export function hideHomecoming() {
 /* ---- merging a result into the hub ------------------------------------------------- */
 export function mergeHubPatch(patch) {
   if (!patch) return;
+  // the wallet and the reserve before this patch, for the debrief's "Brought home"
+  const before = {
+    metalK: Number((state.hub.commerce || {}).metalK),
+    tnb: Number((state.hub.commerce || {}).tenebrium ?? state.hub.tenebrium),
+    reserve: ((state.hub.reserve || {}).units || []).reduce((s, u) => s + (Number(u.count) || 0), 0),
+  };
   if (patch.aces) state.hub.aces = patch.aces;
   if (patch.missionNumber != null) {
     state.hub.missionNumber = patch.missionNumber;
@@ -184,6 +211,7 @@ export function mergeHubPatch(patch) {
       chips: chips.slice(0, 12),
       manifest: (patch.lastResult && patch.lastResult.manifest) || patch.manifest || null,
       moved: (debrief && debrief.moved) || null,
+      haul: haulSince(before, patch),
     });
     if (verdict === "incomplete") toast(headline || "Result not home — retry bring-home or Abandon", "err");
     else if (verdict === "abandon") toast(headline || "Left the field — mark the next board", "warn");

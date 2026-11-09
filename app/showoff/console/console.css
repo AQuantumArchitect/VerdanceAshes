@@ -464,6 +464,13 @@ details.advanced summary { color:var(--steam); }
 .homecoming .hm-col ul { margin:0; padding:0; list-style:none; font-size:var(--fs-sm); line-height:1.4; color:var(--ink); }
 .homecoming .hm-col li.hm-units, .homecoming .hm-col li.hm-none { color:var(--muted); }
 .homecoming .hm-col li.hm-none { font-style:italic; }
+/* the manifest as lines (2026-11-09): a small caps label, then what it says */
+.homecoming .hm-lines { margin:.2rem 0 0; padding:0; list-style:none; font-size:var(--fs-md); line-height:1.5; color:var(--ink); display:grid; gap:.25rem; }
+.homecoming .hm-lines li { display:grid; grid-template-columns:minmax(9rem, 14rem) 1fr; gap:.6rem; align-items:baseline; }
+.homecoming .hm-lines li.bad, .homecoming .hm-lines li.warn { display:block; }
+.homecoming .hm-lines .hm-h { margin:0; }
+.homecoming .hm-lines li.bad { color:var(--bad); }
+.homecoming .hm-lines li.warn { color:var(--warn); }
 .homecoming .hc-actions { display:flex; flex-wrap:wrap; gap:.35rem; margin-top:.55rem; justify-content:flex-end; }
 
 /* ───────────────────────────── matters · inspector (conversation language) ───────────────────────────── */
