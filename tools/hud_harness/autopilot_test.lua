@@ -445,14 +445,32 @@ assert(not gadget:AllowCommand(5) and #orders == n, "the same a second later: he
 threats = {}
 gadget:GameFrame(131)
 assert(gadget:AllowCommand(5), "the gun gone: Ketha is let go")
+-- no flapping (field trial 11-09: 78 swaps a sortie): BARb wants her by the gun; taken, she walks to
+-- the refuge; there, she is weighed on what BARb wanted, not on where she stands, and stays held
+local wasCommands = Spring.GetUnitCommands
+Spring.GetUnitCommands = function(uid) if uid == 5 then return { { id = CMD.MOVE, params = { 2100, 0, 50 } } } end return {} end
+positions[5] = { 1700, 0 }
+threats, orders = { 3 }, {}
+gadget:GameFrame(161)
+mv = lastOf(5, CMD.MOVE)
+assert(mv and not gadget:AllowCommand(5), "BARb's plan is under the gun: taken")
+positions[5] = { mv.params[1], mv.params[3] }   -- she walked there
+n = #orders
+for fr = 191, 311, 30 do gadget:GameFrame(fr) end
+assert(not gadget:AllowCommand(5) and #orders == n, "at the refuge, the gun alive: held, no new orders, no release")
+threats = {}
+gadget:GameFrame(341)
+assert(gadget:AllowCommand(5), "the gun gone: what BARb wanted is safe now, she goes back")
+Spring.GetUnitCommands = wasCommands
+positions[5] = { 2000, 0 }
 -- a wreck under a gun: she will not raise it; the gun broken, she does
 Spring.GetAllFeatures = function() return { 9 } end
 Spring.GetFeaturePosition = function() return 2150, 0, 0 end
 threats, orders = { 3 }, {}
-gadget:GameFrame(161)
+gadget:GameFrame(371)
 assert(not lastOf(5, CMD.RESURRECT), "she does not raise a wreck under the gun")
 threats, orders = {}, {}
-gadget:GameFrame(191)
+gadget:GameFrame(401)
 local rz = lastOf(5, CMD.RESURRECT)
 assert(rz and rz.params[1] == 10009, "the gun gone, she raises it")
 -- Vane: whole, against one gun, the trade is his (he kills it faster than it kills him); at a tenth of
@@ -460,10 +478,10 @@ assert(rz and rz.params[1] == 10009, "the gun gone, she raises it")
 Spring.GetAllFeatures = function() return {} end
 positions[5], positions[6], positions[3] = { 300, 300 }, { 1500, 0 }, { 1800, 0 }
 threats, orders = { 3 }, {}
-gadget:GameFrame(221)
+gadget:GameFrame(431)
 assert(gadget:AllowCommand(6), "Vane whole against one gun: he keeps fighting")
 heroHp[6] = 0.1
-gadget:GameFrame(251)
+gadget:GameFrame(461)
 assert(not gadget:AllowCommand(6), "Vane at a tenth: out of it")
 mv = lastOf(6, CMD.MOVE)
 assert(mv and math.abs(mv.params[1] - 1800) > 400, "out of the gun's reach")

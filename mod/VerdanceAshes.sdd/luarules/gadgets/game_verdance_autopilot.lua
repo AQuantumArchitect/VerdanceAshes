@@ -833,9 +833,13 @@ local function caution(f)
         local hid = Spring.GetUnitRulesParam(uid, "va_hero_id")
         -- its temper from camp (mission.heroTemper, on Umwelt): how large it sees danger and gain
         local t = mission and type(mission.heroTemper) == "table" and mission.heroTemper[tostring(hid)] or nil
+        -- its own orders: BARb's now, or, while caution holds it, what BARb wanted when it was taken (it
+        -- goes back only when that plan has become the best; weighing where it stands instead let it go
+        -- every other second and BARb sent it straight back: 78 swaps in a sortie, field trial 11-09)
+        local plan
+        if retreating[uid] then plan = chosen[uid] and chosen[uid].was else plan = planOf(uid) end
         local h = { uid = uid, x = x, z = z, hp = hp, maxHp = maxHp, defID = Spring.GetUnitDefID(uid), hid = hid,
-          nerve = t and tonumber(t.nerve) or 0, drive = t and tonumber(t.drive) or 0,
-          plan = (not retreating[uid]) and planOf(uid) or nil }
+          nerve = t and tonumber(t.nerve) or 0, drive = t and tonumber(t.drive) or 0, plan = plan }
         local best = field:choose(h, px, pz)
         local name = tostring(h.hid)
         if best.kind == "stay" then
@@ -846,8 +850,10 @@ local function caution(f)
         else
           -- a new order only when the plan changed by more than the hero walks in a refresh
           local prev = chosen[uid]
+          best.was = (prev and prev.was) or plan
           local same = prev and prev.kind == best.kind and ((best.fid and prev.fid == best.fid)
             or (not best.fid and math.sqrt((prev.x - best.x) ^ 2 + (prev.z - best.z) ^ 2) <= h.speed * field.dt))
+          if same then best = prev end
           if not same then
             held[uid] = true
             issuing = true

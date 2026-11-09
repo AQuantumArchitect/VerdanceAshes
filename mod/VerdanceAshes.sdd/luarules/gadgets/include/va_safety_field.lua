@@ -446,7 +446,9 @@ function M:choose(h, padX, padZ)
   -- its own orders (BARb's, or the player's): where they take it, and what it does there
   local px, pz = (h.plan and h.plan.x) or h.x, (h.plan and h.plan.z) or h.z
   add("stay", px, pz, self:combatGain(h, px, pz, H), H)
-  -- refuges: the pad; the middle of the company's strength; a ring as far as it walks in H
+  -- refuges: where it stands (first: among equally safe places it does not walk for nothing); the pad;
+  -- the middle of the company's strength; a ring as far as it walks in H
+  add("refuge", h.x, h.z, 0, H)
   add("refuge", padX or h.x, padZ or h.z, 0, H)
   local fx, fz, fw = 0, 0, 0
   for _, a in ipairs(self.allies) do
@@ -475,9 +477,11 @@ function M:choose(h, padX, padZ)
       best = max(best, list[#list].U)
     end
   end
-  -- the best; its own orders win a tie (the hero is not taken from them for nothing)
+  -- the best; its own orders win a tie, then staying where it is (the hero is not taken from its orders,
+  -- or walked about, for nothing). A tie is equal to float precision: a gun's normal tail never reaches
+  -- exactly zero, and 1e-16 is not a reason to walk.
   local best = list[1]
-  for i = 2, #list do if list[i].U > best.U then best = list[i] end end
+  for i = 2, #list do if list[i].U > best.U * (1 + 1e-9) then best = list[i] end end
   return best, list, V
 end
 
