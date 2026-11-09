@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- **The lift grows with what you bring home** (owner call). The lift limit used to grow 1k metal per victory or extraction and nothing for a partial. On the 11-04 hard-AI run, nine partials left it near 1k while the reserve held about 100 units, so the company dropped as hero packs alone. Now the lift is half the metal value of everything that has ever lifted off a pad into the reserve. A partial that brings an army home grows it; a victory that lifts nothing does not. A save from before the change keeps the lift it had and grows from there.
+
 - **CI runs locally.** GitHub Actions is manual only (Actions minutes are scarce). `scripts\test\ci.bat` is the gate before a push: the hub tests with the real Umwelt pin, the ship dry run and the staged-build check. The workflows use the Node 24 actions (checkout v5, setup-python v6, upload-artifact v5).
 - **The test rig runs on Windows.** Lua 5.4 is found on Linux or Windows (`winget install DEVCOM.Lua`, or `VA_LIBLUA`), the hub tests start no detached belief workers, and the tests that assumed Linux (symlinks, BAR's install paths) work on a PC with BAR installed.
 

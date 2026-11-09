@@ -61,7 +61,7 @@ export function renderReserve(locked) {
     `<div class="drop-squad-kicker">The reserve · lift <b>${Math.round(used)}</b> of ${cap}` +
     (locked ? "" : ` <button type="button" class="btn-ghost rv-suggest" data-rv-suggest="1">Suggested</button>`) + `</div>` +
     `<div class="rv-meter"><i style="width:${cap ? Math.min(100, used / cap * 100).toFixed(1) : 0}%"></i></div>` +
-    `<p class="rv-note">Lift is how much one drop can carry, in metal value. It grows by ${s.perSortie} with each sortie you bring home.</p>` +
+    `<p class="rv-note">Lift is how much one drop can carry, in metal value. It grows with what you bring home: half the value of everything that has lifted off a pad.</p>` +
     `<ul class="rv-rows">${rows}</ul>` + padRule;
 }
 
