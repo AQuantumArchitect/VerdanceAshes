@@ -40,7 +40,8 @@ One entry per working day: what changed, what was measured, what's next. The new
 - The door-hold fix won Rock Jungle doors and broke the home loop in v3.
 - **Campaign v3** (everything up to the soak, the door hold, temper and the bleed rule): **completed in 12 sorties.**
   - The finale on the medium soak: partial (50/65), then won (65/65).
-  - Vane and Halbard fell early (sorties 1 and 3), and the hollowed company lost three Rock Jungle drops to roaming raptors. Since then the retreat steps away from the enemy first and Ketha is held back sooner (9a5f6a4), now in A/B trials.
+  - Vane and Halbard fell early (sorties 1 and 3), and the hollowed company lost three Rock Jungle drops to roaming raptors. The caution work since then is measured above.
+- **Campaign v4**, on everything as of 03:40 (fixed caution, Ketha leash, quiet console, air recruits, temper), was started at 03:40. Its result is in `export\campaign_hard_v4.log` and the `luaErrors` field of each row. It runs slowly: another overnight job (`node tune.mjs`, not Verdance) holds about 72% of the CPU.
 
 **Writing** (`docs/writing/`)
 - 93 camp talks no longer read out internal role ids ("core_skirm seat beside core_rez.").
@@ -49,9 +50,13 @@ One entry per working day: what changed, what was measured, what's next. The new
 
 **Decision 4:** do the drafts in `talk_proposals.md` sound like your characters? If so, I'll write the rest the same way.
 
+**Decision 5:** in mission 1's opening, Vane's pack meets about ten enemies 40 s in and he usually falls, even with caution working. Tune the opening's forces, or have the proxy pull heroes back pre-emptively when heavily outnumbered?
+
 **Not done or not verified**
 - The HUD reviewer's density cuts to the mission rail (smaller rows, fewer lines). Some of what it would cut is yours by design ("Left if you lift"), so it waits for you.
-- The writing pass itself: only the audit is done, not rewrites.
+- The rail's text is about 7 px on a 2560×1600 screen. A UI scale has to scale the EXTRACT button's click area too, so it needs an interactive test (headed BAR).
+- The writing pass itself: only the role-id clean-up, the audit and three drafts are done.
+- Hero temper is in the field, but nothing yet measures whether a steady hero behaves differently from a shaken one.
 
 ## 2026-11-09 (night): owner notes worked through
 
