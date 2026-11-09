@@ -142,6 +142,10 @@ Owner notes after the baseline (Luke asleep; "err on the side of doing too much"
 
   - v3 keeps heroes alive best. Ketha survived sorties 1 and 2 in every run.
   - Victories vary with the route: sortie 3 went to Koom Valley in two v3 runs. Samples are small.
+  - **Correction: the v2 and v3 arms ran with a bug.** From 9a5f6a4, the "step away from the enemies" retreat raised a Lua error on every pull-back with an enemy near. In `local ex, ez = x and threatCentroid(...)`, `and` keeps one value, so `ez` was nil. The error also left the order guard (`issuing`) stuck on, so BARb could override the rig's orders.
+    - In those arms, no retreat order was ever given with enemies near.
+    - v3's better numbers came from the Ketha leash, whose pull-backs happen with no enemies near.
+    - Found by the new caution cases in `tools/hud_harness/autopilot_test.lua`; fixed in c847524 (the retreat now runs in pcall). The fixed caution is being measured as `ab_caution4_*`.
 - **Console clean-up** (6d5fc43): `VA_` debug lines no longer reach the player's chat. Found with the windowed screenshot rig (`--windowed --shots N`) and a log probe. BAR's chat drops priority L_DEPRECATED, and the infolog keeps it.
 - Also tonight:
   - The Rock Jungle door jobs sat in "clear" all sortie with nothing booked. A capture with nothing to wreck clears by standing in the zone in strength. The proxy now masses there in that phase too (f2793fd).
