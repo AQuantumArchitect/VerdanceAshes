@@ -2,6 +2,57 @@
 
 One entry per working day: what changed, what was measured, what's next. The newest entry comes first. Run folders live under `autopilot_runs\` on the dev PC (fenrir); they're not in git.
 
+## 2026-11-09 (night): owner notes worked through
+
+Owner notes after the baseline (Luke asleep; "err on the side of doing too much"):
+- Rock Jungle grace of 5 minutes.
+- A safer proxy that plays non-aggressive at home and leaves when the raptors come.
+- Mercenaries.
+- The finale as a soak.
+- When in doubt, the UI.
+
+**Changes (all on master, local CI green each time)**
+- Raptor grace eases from 600 toward a 300 s floor (d3aa1fa).
+- Proxy player, 4f05519:
+  - **Hero caution:** every second, a hero below 55% health, or below 85% with five enemies near, walks to the pad and is held until whole.
+  - **No nudging heroes** into the wound.
+  - **Raptor ground:** plays BARb `hard` ("Hard | Balanced"; BARb has no defensive profile) and departs 60 s after the grace ends.
+  - **Mercs:** 80% of the metal bag spent on them before each drop.
+- The Overthrow is a soak (c91f183):
+  - Three BARb hard and five Simple defender/constructor AIs raise the castle unopposed.
+  - Easy 15 / medium 20 (shipped) / hard 35 min.
+  - The strip keeps factories, 15% of builders and one commander, the Keep's.
+  - In the mission, every start commander but the Keep's is swept.
+  - Medium: 957 units. Easy: 699. Hard: 3,309, of which the two tor constructor AIs built 1,800 structures, mostly economy (515 metal makers at one tor). Medium is the playable one; the hard soak's tors probably want SimpleDefenderAI instead.
+- Air heroes can be rescued (bb8f519). The frame-120 deaths of Rookery and Stiletto were air seeds: a quietly killed aircraft leaves no corpse.
+- Hero temper (50d0d69), the first slice of mood-driven hero AI:
+  - Camp bonds, wounds and griefs become each hero's nerve and drive on a drop.
+  - The behaviour gadget scales the hero's doctrine by them (bail, kite, push).
+- UI, from the playtester notes and a blind Sonnet review:
+  - Compact hero cards with XP progress and Ketha's "always comes" lock.
+  - Blurbs without prices.
+  - Hostile rescues always listed.
+  - Recruits say where they wait.
+  - A shorter jobs screen.
+  - "Choose this job" alone on the right.
+  - The store shows it scrolls.
+  - Talks say what unlocks Next.
+
+**Measured so far**
+- Trial `20261109_005443` (3 sorties, before tightening the caution thresholds):
+  - Caution and rescue worked.
+  - Vane and Ketha still fell at the first thresholds.
+  - Mercs were bought every drop.
+- `campaign_hard_v2` (`20261109_011314`), in progress:
+  - Sortie 1 (Greenest) came home with all four heroes; the baseline lost Vane and Ketha there.
+  - Sortie 2, the Rock Jungle founding (baseline: wiped), extracted clean with all four plus Veil. It departed on the raptor clock at frame 19,811 (600 s grace plus 60 s).
+  - Sortie 3 (Greenest): everyone home.
+  - Sortie 4 (Rock Jungle): extracted clean; Ketha fell.
+- Finale A trial on the medium soak (`20261109_012053`), in progress:
+  - The commander sweep removed 7 of 8.
+  - The objective counts 65 guns and factories (was 18).
+  - The proxy besieges with about 70 guns.
+
 ## 2026-11-09: the hard-AI baseline
 
 **Run:** `scripts\test\campaign_hard.bat` (BARb hard_aggressive, stock BAR, speed 10, beats on), `autopilot_runs\20261109_001446`. It ran on 0cfc556, so it predates the drop-limit rule of 1be6f78. It's a baseline for the proxy player, not for the drop limit.

@@ -303,7 +303,27 @@ export function renderDropSquad() {
   }
   paintDropButton();
 }
+// Each step's tab says where it stands instead of a question (UI review 2026-11-09: the subtitles
+// "What does the company need to say?" and the like added nothing): talks left, who is going, what
+// the reserve drop holds against the limit.
+function paintTabStatus() {
+  const put = (tab, text) => {
+    const span = document.querySelector(`[data-drop-tab="${tab}"] span`);
+    if (span && text) span.textContent = text;
+  };
+  const left = talksLeft();
+  put("talks", left > 0 ? `${left} to answer` : "done");
+  if (state.plan && soloCommand(state.plan.mapId)) put("party", "the commander alone");
+  else put("party", `${livingCoreIds().length + droppingPackIds().length} going`);
+  const cap = Number((state.hub.reserve || {}).liftCap) || 0;
+  const units = (state.hub.reserve || {}).units || [];
+  const bring = reserveBring();
+  const used = Object.entries(bring || {}).reduce((s, [d, n]) => s + (Number((units.find(u => u.unitDef === d) || {}).value) || 0) * n, 0);
+  put("reserve", cap > 0 ? `dropping ${Math.round(used).toLocaleString()} of ${cap.toLocaleString()}` : "mercenaries and gear");
+}
+
 export function paintDropButton() {
+  paintTabStatus();
   const go = $("drop-confirm-go");
   if (!go) return;
   const phase = state.warm && state.warm.phase;
