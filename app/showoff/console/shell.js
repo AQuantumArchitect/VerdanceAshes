@@ -94,9 +94,15 @@ function opCard(c, op, snap) {
         // who, where, and whether they fight you first: the rescue mark as the board shows it
         const z = r.zoneId && ((BOARDS[r.mapId] || {}).zones || []).find(x => x.zoneId === r.zoneId);
         const where = z ? ` at ${z.label || r.zoneId}` : "";
-        return `${r.name || r.id}${where}${r.stance && r.stance.kind === "hostile" ? " (against us: beat them first)" : ""}`;
+        const hostile = !!(r.stance && r.stance.kind === "hostile");
+        return { text: `${r.name || r.id}${where}${hostile ? " (against us: beat them first)" : ""}`, hostile };
       });
   } catch (err) { meet = []; }
+  // A rescue that fights you first is never folded into "and N more" (playtester note, 2026-11-04):
+  // hostile ones are always listed, then friendly ones up to two lines in all.
+  const hostileMeet = meet.filter(m => m.hostile);
+  const shownMeet = hostileMeet.concat(meet.filter(m => !m.hostile).slice(0, Math.max(0, 2 - hostileMeet.length)));
+  const moreMeet = meet.length - shownMeet.length;
   // Standing where the job touches it (playtest, 2026-11-04): who you fight, and how they regard you now.
   const rep = snap.hub.reputation || {};
   const sideName = { armada: "Armada", cortex: "Cortex", legion: "Legion", nullmercs: "the Null Mercs" };
@@ -105,7 +111,7 @@ function opCard(c, op, snap) {
     ? `<span class="cc-standing">against ${escape(sideName[against])} · standing ${Math.round(Number(rep[against]))} of 100</span>` : "";
   return `<button class="cc-operation" type="button" data-operation="${escape(c.id)}" ${c.disabled ? "disabled" : ""} aria-pressed="${c.id === snap.plan?.choiceId}">` +
     `${lean ? `<em class="cc-lean" title="The war is moving this way">the world leans here</em>` : ""}<strong>${escape(title)}</strong><span>${escape(sub)}</span>${standing}` +
-    `${meet.slice(0, 2).map(m => `<span class="cc-meet rescue">rescue ${escape(m)}</span>`).join("")}${meet.length > 2 ? `<span class="cc-meet rescue more">and ${meet.length - 2} more</span>` : ""}</button>`;
+    `${shownMeet.map(m => `<span class="cc-meet rescue${m.hostile ? " hostile" : ""}">rescue ${escape(m.text)}</span>`).join("")}${moreMeet > 0 ? `<span class="cc-meet rescue more">and ${moreMeet} more</span>` : ""}</button>`;
 }
 // The pull home (verdance.campaign.home.home_pull) in one line, once the bag is worth the trip.
 function homePullLine(hub) {

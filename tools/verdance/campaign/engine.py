@@ -639,8 +639,21 @@ def what_moved(before: Dict[str, Any], state: Dict[str, Any], result: Dict[str, 
                           "done": bool(sec.get("completed"))})
     field = [{"name": p["name"], "mapId": m, "label": p["label"]}
              for m, rows in sorted(people_in_the_field(state).items()) for p in rows]
+    # Where each new recruit is now (playtester note, 2026-11-04: "new recruits on the debrief don't
+    # say where they are"): home with the company, or still standing where they were raised.
+    people = (state.get("camp") or {}).get("people") or {}
+    joined = []
+    for j in hero_joins:
+        if not isinstance(j, dict):
+            continue
+        rec = people.get(str(j.get("heroId") or "")) or {}
+        row = {"name": str(j.get("name") or j.get("heroId") or ""), "where": "camp"}
+        if rec.get("where") == "field" and rec.get("zoneId"):
+            row.update(where="field", mapId=str(rec.get("mapId") or map_id), label=str(rec.get("label") or rec["zoneId"]))
+        joined.append(row)
     return {"standing": standing, "marks": marks,
             "rescued": [str(j.get("name") or j.get("heroId") or "") for j in hero_joins if isinstance(j, dict)],
+            "joined": joined,
             "lostRescues": [str(x.get("name") or x.get("heroId") or "") for x in field_losses if isinstance(x, dict)],
             "leftInField": field}
 

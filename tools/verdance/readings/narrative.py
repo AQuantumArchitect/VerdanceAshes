@@ -136,12 +136,13 @@ def what_it_pays(kind: str = "") -> str:
         rewards = json.loads((ROOT / "data" / "commerce" / "commerce_catalog.json").read_text(encoding="utf-8-sig")).get("sortieRewards") or {}
     except Exception:  # noqa: BLE001
         rewards = {}
-    line = "Metal in storage at extract comes home, above what the field gave you. Build storage and reclaim before you lift."
+    # (2026-11-09: 39 words to 25; the jobs screen was the wordiest the playtester read)
+    line = "The metal you lift off with is yours, past the 1k the field hands you."
     v = rewards.get("metalOnVictory") or {}
     if v and int(v.get("max") or 0):
         lo, hi = int(v.get("min") or 0), int(v.get("max") or 0)
         line += f" A win adds {lo}-{hi}k." if hi > lo else f" A win adds {hi}k."
-    line += " Tenebrium: reclaim fallen builders. Scouting pays in what you learn, a rescue in a person."
+    line += " Tenebrium comes from reclaiming fallen builders."
     if kind == "kings_showdown":
         line = "The throne. " + line
     return line
@@ -149,8 +150,8 @@ def what_it_pays(kind: str = "") -> str:
 
 # What "Take the zone" asks, in the numbers the gadget uses (objectives.lua CLEAR_FRACTION and the
 # hold; include/va_claim.lua: more than 1500, and three times everyone else's).
-TAKE_ZONE = ("Take the marked zone: wreck most of what the enemy has there, then hold it until the hold "
-             "bar fills. Holding takes more than 1,500 metal of your own army there, and three times the enemy's.")
+TAKE_ZONE = ("Wreck most of what the enemy has in the marked zone, then hold it until the bar fills: "
+             "more than 1,500 metal of your army there, and three times the enemy's.")
 
 
 def operation_summary(choice):

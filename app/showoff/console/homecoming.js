@@ -66,7 +66,10 @@ function renderMoved(mv) {
       `<li class="${r.delta > 0 ? "good" : "bad"}">${esc(String(r.name).replace(/^./, ch => ch.toUpperCase()))} ${esc(r.before)} → <b>${esc(r.after)}</b> (${esc(sign(r.delta))})</li>`).join("")}</ul></div>`);
   }
   const marks = (mv.marks || []).map(m => `<li class="${m.done ? "good" : "warn"}">${m.kind === "scout" ? "Scouted" : "Rescue"} ${esc(m.label)}${m.done ? "" : m.kind === "scout" ? ": not seen" : ": missed"}</li>`)
-    .concat((mv.rescued || []).map(n => `<li class="good">${esc(n)} joined the company</li>`))
+    // where each recruit is now (debrief.moved.joined); an older debrief has names only
+    .concat((mv.joined || (mv.rescued || []).map(n => ({ name: n }))).map(j => `<li class="good">${esc(j.name)} joined the company` +
+      (j.where === "field" ? `, and waits at ${esc(j.label)}, ${esc(MAP_NAME[j.mapId] || j.mapId)}: bring them home`
+        : j.where === "camp" ? `, home at camp` : "") + `</li>`))
     .concat((mv.lostRescues || []).map(n => `<li class="bad">${esc(n)} was lost</li>`));
   if (marks.length) parts.push(`<div class="mv-row"><div class="mv-h">Scouting and rescues</div><ul>${marks.join("")}</ul></div>`);
   if ((mv.leftInField || []).length) {

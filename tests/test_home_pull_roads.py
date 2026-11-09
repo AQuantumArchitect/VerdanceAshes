@@ -34,3 +34,11 @@ def test_the_debrief_says_what_moved():
     assert mv["standing"] == [{"side": "armada", "name": "Armada", "before": 20, "after": 17, "delta": -3.0}]
     assert mv["marks"] == [{"kind": "scout", "label": "the ford", "done": True}]
     assert mv["rescued"] == ["Vane"] and "camp" not in mv
+    assert mv["joined"] == [{"name": "Vane", "where": "camp"}]
+
+
+def test_the_debrief_says_where_a_new_recruit_waits():
+    """Playtester note 2026-11-04: a recruit raised and left on the field says where to fetch them."""
+    st = {"camp": {"people": {"mira": {"where": "field", "mapId": "tabula", "zoneId": "T_W_CAUSEWAY", "label": "West Causeway"}}}}
+    mv = engine.what_moved({}, st, {}, "tabula", [{"heroId": "mira", "name": "Mira"}], [])
+    assert mv["joined"] == [{"name": "Mira", "where": "field", "mapId": "tabula", "label": "West Causeway"}]

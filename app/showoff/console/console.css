@@ -819,6 +819,9 @@ details.advanced summary { color:var(--steam); }
 @media (max-width:980px) { .app:not(.ws-company) { grid-template-columns:1fr; } }
 .cc-rail .cc-operation .cc-meet.rescue { color:var(--bad); }
 .cc-rail .cc-operation .cc-meet.rescue:not(.more)::before { content:"◇ "; }
+/* a rescue that fights you first: always listed, and marked as a fight */
+.cc-rail .cc-operation .cc-meet.rescue.hostile { font-weight:600; }
+.cc-rail .cc-operation .cc-meet.rescue.hostile::before { content:"⚔ "; }
 
 /* the debrief: the homecoming card is a screen of its own, between the fight and the next job */
 .homecoming.show {
