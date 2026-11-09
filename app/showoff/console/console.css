@@ -864,5 +864,7 @@ details.advanced summary { color:var(--steam); }
 .flow-said span { color:var(--muted); }
 .flow-said span::before { content:"· "; }
 .flow-empty { color:var(--muted); }
-.flow-two { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:1.2rem; align-items:start; }
+/* What comes: the reserve is a few rows, the store a shelf of cards; the store gets the room
+   (2026-11-09: at 1:1 the store scrolled while half the screen stood empty under the reserve) */
+.flow-two { display:grid; grid-template-columns:minmax(15rem,.72fr) minmax(0,1.28fr); gap:1.2rem; align-items:start; }
 @media (max-width:820px) { .flow-two { grid-template-columns:1fr; } .flow-steps .drop-tab span { display:none; } }

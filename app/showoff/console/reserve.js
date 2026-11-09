@@ -61,7 +61,7 @@ export function renderReserve(locked) {
     `<div class="drop-squad-kicker">The reserve · dropping <b>${Math.round(used)}</b> of ${cap}` +
     (locked ? "" : ` <button type="button" class="btn-ghost rv-suggest" data-rv-suggest="1">Suggested</button>`) + `</div>` +
     `<div class="rv-meter"><i style="width:${cap ? Math.min(100, used / cap * 100).toFixed(1) : 0}%"></i></div>` +
-    `<p class="rv-note">The drop limit is how much of the reserve a drop can start with, in metal value. It grows by ${s.perMission} with every sortie you play.</p>` +
+    `<p class="rv-note" title="How much of the reserve a drop can start with, in metal value">The drop limit grows by ${Number(s.perMission || 0).toLocaleString()} metal with every sortie you play.</p>` +
     `<ul class="rv-rows">${rows}</ul>` + padRule;
 }
 
