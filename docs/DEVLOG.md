@@ -26,7 +26,7 @@ One entry per working day: what changed, what was measured, what's next. The new
   - Compact hero cards with XP bars.
   - The flow's tabs say where they stand.
   - The debrief says what was brought home.
-  - A shorter jobs screen; the legend folded into a Key.
+  - A shorter jobs screen; the legend folded into a Key (now one small toggle line; a generic box style had drawn it as an empty 56 px panel).
   - Talk answers lead with what they stand for.
   - The store sorts by what you can buy and shows that it scrolls.
   - **No more `VA_` debug lines in the in-game console.**
@@ -47,7 +47,8 @@ One entry per working day: what changed, what was measured, what's next. The new
   - Sorties 1–5 all extracted clean (one victory, four partials), though Vane fell in sortie 1 (mission 1's opening).
   - **Sortie 6, a fortify job on Koom Valley's standing war**, killed Verse and Halbard. The pad was the fight, so the retreat led back into it. Fixed in cb8e5de: on a hot pad, the second leg steps further away. That fix is in the harness but not yet seen in the field: Koom isn't offered in the first three missions.
   - With Vane, Verse and Halbard gone, sorties 7–10 were four Rock Jungle wipes in a row: the pull home keeps choosing home for a company that can't hold it.
-  - It's still running, in `export\campaign_hard_v4.log`. It runs slowly: another overnight job (`node tune.mjs`, not Verdance) holds about 72% of the CPU.
+  - Sortie 11, the finale with every core hero dead: partial, 36 of 65, and Mask came home. Sortie 12 is the second finale attempt; it's still running, in `export\campaign_hard_v4.log`. It runs slowly: another overnight job (`node tune.mjs`, not Verdance) holds about 72% of the CPU.
+- **Two 3-sortie trials on the current code** (hot-pad retreat included): 6 of 6 sorties came home, with no wipes and no Lua errors. Three victories and three partials, one of them a Rock Jungle drop. Trial 1 lost no heroes. In trial 2, Halbard fell in mission 1's opening, the same spot as decision 5. Neither trial was offered Koom, so two 7-sortie trials preferring Koom are running (`export\koom_act2_*.log`).
 
 **Writing** (`docs/writing/`)
 - 93 camp talks no longer read out internal role ids ("core_skirm seat beside core_rez.").
