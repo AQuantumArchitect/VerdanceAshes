@@ -82,6 +82,11 @@ local HERO_BLEED = 0.12
 -- a critical hero (Ketha, the company's rez captain: she raises the others) is kept out of it sooner
 -- (campaign_hard_v2/v3: she fell more than anyone): any hurt with two enemies near
 local CRIT_HURT, CRIT_CROWD = 0.95, 2
+-- ...and let go only whole with nobody near (A/B 2026-11-09: released at 0.90 she flapped, pulled at
+-- 0.93 and let go at 0.93 every other second, and BARb sent her straight back to the front each time),
+-- and leashed: beyond CRIT_LEASH of the pad, not on a rescue, she is walked back and held until within
+-- half of it (she fell at the front 13 minutes in, 3.5 s after a pull-back that came too late)
+local CRIT_WHOLE, CRIT_LEASH = 0.98, 1500
 -- the retreat steps away from the enemies near it before it heads for the pad (it used to walk straight
 -- to the pad, often through them)
 local RETREAT_STEP = 700
@@ -835,16 +840,20 @@ local function caution(f)
       local x, _, z = Spring.GetUnitPosition(uid)
       local bleed = (lastHp[uid] or frac) - frac
       lastHp[uid] = frac
+      local critical = (tonumber((Spring.GetUnitRulesParam(uid, "va_hero_critical"))) or 0) == 1
+      local padDist = x and math.sqrt((x - px) ^ 2 + (z - pz) ^ 2) or 0
       if x then
         local crowd = threatsNear(x, z, HERO_SENSE)
+        local whole = critical and (frac >= CRIT_WHOLE and crowd == 0 and padDist <= CRIT_LEASH * 0.5) or (not critical and frac >= HERO_WHOLE)
         if retreating[uid] then
-          if frac >= HERO_WHOLE or (crowd == 0 and f - retreating[uid] >= HERO_QUIET) then
+          if whole or (crowd == 0 and f - retreating[uid] >= HERO_QUIET and (not critical or padDist <= CRIT_LEASH * 0.5)) then
             retreating[uid], held[uid] = nil, nil
             Spring.Echo("VA_AUTOPILOT hero back to work id=" .. tostring(Spring.GetUnitRulesParam(uid, "va_hero_id"))
               .. " hp=" .. string.format("%.2f", frac))
           end
         elseif frac < HERO_LOW or (frac < HERO_HURT and (crowd >= HERO_CROWD or bleed >= HERO_BLEED))
-            or ((tonumber((Spring.GetUnitRulesParam(uid, "va_hero_critical"))) or 0) == 1 and frac < CRIT_HURT and crowd >= CRIT_CROWD) then
+            or (critical and frac < CRIT_HURT and crowd >= CRIT_CROWD)
+            or (critical and padDist > CRIT_LEASH and not held[uid]) then
           retreating[uid] = f
           pulled[#pulled + 1] = uid
           Spring.Echo("VA_AUTOPILOT hero pulls back id=" .. tostring(Spring.GetUnitRulesParam(uid, "va_hero_id"))
