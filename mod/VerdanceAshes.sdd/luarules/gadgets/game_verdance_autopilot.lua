@@ -871,20 +871,25 @@ local function caution(f)
   -- builders stand there, and it is where they lift from)
   for _, uid in ipairs(pulled) do
     local x, _, z = Spring.GetUnitPosition(uid)
-    local ex, ez = x and threatCentroid(x, z, HERO_SENSE)
+    -- (not `x and threatCentroid(...)`: `and` keeps only the first value, and ez was always nil, which
+    -- raised on every pull-back with an enemy near and left `issuing` stuck on, 9a5f6a4 to this fix)
+    local ex, ez
+    if x then ex, ez = threatCentroid(x, z, HERO_SENSE) end
     held[uid] = true
     issuing = true
-    if ex then
-      local dx, dz = x - ex, z - ez
-      local len = math.sqrt(dx * dx + dz * dz)
-      if len < 1 then dx, dz, len = px - x, pz - z, math.max(1, math.sqrt((px - x) ^ 2 + (pz - z) ^ 2)) end
-      local sx = math.max(32, math.min(Game.mapSizeX - 32, x + dx / len * RETREAT_STEP))
-      local sz = math.max(32, math.min(Game.mapSizeZ - 32, z + dz / len * RETREAT_STEP))
-      pcall(Spring.GiveOrderToUnit, uid, CMD.MOVE, { sx, Spring.GetGroundHeight(sx, sz) or 0, sz }, 0)
-      pcall(Spring.GiveOrderToUnit, uid, CMD.MOVE, { px, Spring.GetGroundHeight(px, pz) or 0, pz }, { "shift" })
-    else
-      pcall(Spring.GiveOrderToUnit, uid, CMD.MOVE, { px, Spring.GetGroundHeight(px, pz) or 0, pz }, 0)
-    end
+    pcall(function()
+      if ex and ez then
+        local dx, dz = x - ex, z - ez
+        local len = math.sqrt(dx * dx + dz * dz)
+        if len < 1 then dx, dz, len = px - x, pz - z, math.max(1, math.sqrt((px - x) ^ 2 + (pz - z) ^ 2)) end
+        local sx = math.max(32, math.min(Game.mapSizeX - 32, x + dx / len * RETREAT_STEP))
+        local sz = math.max(32, math.min(Game.mapSizeZ - 32, z + dz / len * RETREAT_STEP))
+        Spring.GiveOrderToUnit(uid, CMD.MOVE, { sx, Spring.GetGroundHeight(sx, sz) or 0, sz }, 0)
+        Spring.GiveOrderToUnit(uid, CMD.MOVE, { px, Spring.GetGroundHeight(px, pz) or 0, pz }, { "shift" })
+      else
+        Spring.GiveOrderToUnit(uid, CMD.MOVE, { px, Spring.GetGroundHeight(px, pz) or 0, pz }, 0)
+      end
+    end)
     issuing = false
   end
 end

@@ -377,4 +377,46 @@ gadget:GameFrame(1541)
 assert(gadget:AllowCommand(1), "scouted: back to BARb")
 assert(not find(CMD.FIGHT), "and nobody is sent again")
 
-print("ok: scout marks, rescue squad, protected orders, departure to the real pad radius, leaving with and without a HUD, holding a capture, the Spire Gate and its tech ladder, the siege")
+-- 7. Hero caution (2026-11-09): a hurt hero walks back and is held; Ketha (critical) is leashed to the
+--    pad and let go only whole, with nobody near, close to it (she used to flap between pull-back at
+--    0.95 and release at 0.90, and BARb sent her back to the front every other second).
+local heroHp = {}
+local function cautionWorld()
+  reset()
+  GG.VA_RivalKings, GG.VA_ObjectiveTargets = nil, nil
+  rules.va_secondary_total = 0
+  heroHp = { [5] = 1.0, [6] = 1.0 }
+  positions[5], positions[6], positions[3] = { 2000, 0 }, { 300, 0 }, { 2100, 0 }
+  threats = {}
+  Spring.GetTeamUnits = function() return { 5, 6 } end
+  Spring.GetUnitDefID = function(uid) return uid == 3 and 3 or 1 end
+  Spring.GetUnitRulesParam = function(uid, k)
+    if k == "va_hero_id" then return ({ [5] = "ketha", [6] = "vane" })[uid] end
+    if k == "va_hero_critical" then return uid == 5 and 1 or 0 end
+  end
+  Spring.GetUnitHealth = function(uid) return heroHp[uid] or 1, 1 end
+  Spring.GiveOrderToUnit = function(uid, cmd, params) orders[#orders + 1] = { cmd = cmd, params = params, units = { uid } } end
+end
+cautionWorld()
+gadget:GameFrame(41)
+assert(not gadget:AllowCommand(5), "Ketha 2000 from the pad, whole: leashed and held")
+assert(gadget:AllowCommand(6), "Vane whole and near: BARb's")
+positions[5], heroHp[5] = { 500, 0 }, 0.99
+gadget:GameFrame(71)
+assert(gadget:AllowCommand(5), "Ketha back near the pad, whole, nobody near: let go")
+threats, heroHp[5] = { 3, 3 }, 0.93
+orders = {}
+gadget:GameFrame(101)
+assert(not gadget:AllowCommand(5), "Ketha hurt with two enemies near: pulled back")
+local step = find(CMD.MOVE)
+assert(step and step.units[1] == 5 and step.params[1] < 500, "she steps away from the enemies (they stand east) before the pad")
+gadget:GameFrame(131)
+assert(not gadget:AllowCommand(5), "the same a second later: still held (no flapping)")
+heroHp[6] = 0.5
+gadget:GameFrame(161)
+assert(not gadget:AllowCommand(6), "Vane at half health: pulled back")
+threats, heroHp[6] = {}, 0.95
+gadget:GameFrame(191)
+assert(gadget:AllowCommand(6), "Vane mostly whole again: back to BARb")
+
+print("ok: scout marks, rescue squad, protected orders, departure to the real pad radius, leaving with and without a HUD, holding a capture, the Spire Gate and its tech ladder, the siege, hero caution and Ketha's leash")
