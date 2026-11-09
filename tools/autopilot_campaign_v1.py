@@ -312,6 +312,8 @@ def main() -> int:
                          "'' uses --profile everywhere")
     ap.add_argument("--raptor-stay", type=int, default=60,
                     help="game seconds the company stays on raptor ground after the grace ends before it leaves")
+    ap.add_argument("--modopt", action="append", default=[], metavar="KEY=VALUE",
+                    help="test rig: an extra modoption in every sortie's startscript (repeat), e.g. va_logprobe=1")
     ap.add_argument("--shots", type=int, default=0,
                     help="with --windowed: a BAR screenshot every N game seconds, for the HUD review "
                          "(bar_data\\screenshots of the run)")
@@ -496,6 +498,10 @@ def main() -> int:
                                        beats=args.beats, raptor_stay=args.raptor_stay)
         if args.shots > 0 and args.windowed:
             text = text.replace("va_autopilot=1;", f"va_autopilot=1;\n    va_autopilot_shots={int(args.shots)};", 1)
+        for kv in args.modopt:
+            opt_key, _, opt_val = kv.partition("=")   # (not k: k is the campaign kernel)
+            if re.fullmatch(r"[a-z_][a-z0-9_]*", opt_key.strip()) and re.fullmatch(r"[A-Za-z0-9_.-]*", opt_val.strip()):
+                text = text.replace("va_autopilot=1;", f"va_autopilot=1;\n    {opt_key.strip()}={opt_val.strip()};", 1)
         if args.rival_ai:
             text, swapped = rivals_to(text, args.rival_ai)
             print(f"[autopilot] TEST: {swapped} rival BARb seat(s) play as {args.rival_ai}", flush=True)
