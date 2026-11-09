@@ -762,6 +762,9 @@ details.advanced summary { color:var(--steam); }
   font-size:var(--fs-xs); letter-spacing:.06em; text-transform:uppercase; color:var(--gold); padding:.06rem .4rem;
   border:1px solid var(--line-gold); border-radius:var(--r-pill); background:color-mix(in srgb, var(--gold) 10%, transparent); }
 .hero-card .hc-lock svg { width:.7rem; height:.7rem; fill:currentColor; }
+.hero-card .hc-temper { grid-column:1 / -1; justify-self:start; font-size:var(--fs-xs); font-style:italic; color:var(--muted); }
+.hero-card .hc-temper.good { color:var(--good); }
+.hero-card .hc-temper.bad { color:var(--warn); }
 .hero-card .hc-xp.hc-xp-progress { grid-column:1 / -1; grid-row:auto; justify-self:stretch; display:flex; align-items:center; gap:.4rem; white-space:nowrap; }
 .hero-card .hc-xp-bar { flex:1 1 auto; height:.28rem; border-radius:var(--r-pill); background:color-mix(in srgb, var(--steam) 16%, transparent); overflow:hidden; }
 .hero-card .hc-xp-bar i { display:block; height:100%; background:var(--steam); border-radius:inherit; }

@@ -101,6 +101,23 @@ def build_aces(state: dict) -> list[dict]:
             ace["bonds"]["vane"] = 10
         aces.append(ace)
 
+    # Temper (verdance.company.temper) against the company as it would drop (core + band): the mood a
+    # hero brings, so the hub can show who is steady or shaken before the drop, not only in the field.
+    try:
+        from verdance.company.temper import temper_for_drop
+        comp = state.get("company") or {}
+        circle = []
+        for h in list(comp.get("core") or []) + list(comp.get("band") or []) + list(comp.get("joinedLater") or []):
+            hid = h if isinstance(h, str) else ((h or {}).get("heroId") or (h or {}).get("id") if isinstance(h, dict) else None)
+            if hid:
+                circle.append(str(hid))
+        living = {a["id"] for a in aces if a.get("status") in ("active", "wounded")}
+        tempers = temper_for_drop(state, [h for h in dict.fromkeys(circle) if h in living])
+        for a in aces:
+            if a["id"] in tempers:
+                a["temper"] = tempers[a["id"]]
+    except Exception:  # noqa: BLE001
+        pass
     return aces
 
 

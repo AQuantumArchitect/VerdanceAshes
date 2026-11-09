@@ -5,7 +5,7 @@ personality and mood, and the mood moves with camp interactions, so a hero plays
 what happened at camp. Personality is the hero's doctrine (data/story/hero_codex.json ->
 va_hero_doctrine.lua: line, skirm, rez...). Temper is the mood on top of it, two numbers in [-1, 1]:
 
-  nerve   steadiness under fire. Bonds with the people on this drop steady a hero (a camp talk adds
+  nerve   steadiness under fire. The mean bond with the people on this drop steadies a hero (a camp talk adds
           bond points; so does fighting together); a rival on the drop, a wound being carried, the
           times they have gone down, and bonded friends lost all shake it.
   drive   appetite to push. Bonds and experience raise it; grief lowers it.
@@ -65,13 +65,17 @@ def temper_for_drop(state: Dict[str, Any], drop: Iterable[str], workspace: Optio
     polarity = _web_polarity(workspace)
     out: Dict[str, Dict[str, float]] = {}
     for hid in drop:
-        support = 0.0
+        # the mean bond with drop-mates, not the sum: how close this hero is to this group (a sum
+        # saturated at nerve ~0.8 for everyone after six sorties of co-deploys)
+        support, mates = 0.0, 0
         for other in drop:
             if other == hid:
                 continue
             pts = _points(pairs, hid, other) / 100.0
             sign = -1.0 if polarity.get(frozenset((hid, other))) in ADVERSARY else 1.0
             support += sign * pts
+            mates += 1
+        support /= max(1, mates)
         grief = sum(1 for d in dead if d != hid and _points(pairs, hid, d) >= 25)
         h = roster.get(hid) or {}
         c = chars.get(hid) if isinstance(chars.get(hid), dict) else {}

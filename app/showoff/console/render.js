@@ -63,9 +63,10 @@ function heroLevelXp(id, override) {
   const level = Number(ace.level || pack.level || 1) || 1;
   const xpRaw = ace.campaignXp != null ? ace.campaignXp : (pack.campaignXp != null ? pack.campaignXp : null);
   const xp = xpRaw != null ? Math.round(Number(xpRaw) || 0) : null;
+  const temper = ace.temper && typeof ace.temper === "object" ? ace.temper : null;
   const perLevel = Number(ace.xpPerLevel) || 0;
   const maxLevel = Number(ace.maxLevel) || 0;
-  return { level, xp, rank: ace.rank || null, status: ace.status || null, wounds: ace.wounds || 0, perLevel, maxLevel,
+  return { level, xp, rank: ace.rank || null, status: ace.status || null, wounds: ace.wounds || 0, perLevel, maxLevel, temper,
            rawXp: xpRaw != null ? Number(xpRaw) || 0 : null };
 }
 function escortMeta(h) {
@@ -106,6 +107,18 @@ function renderCostBadges(tnb, km, { showFree } = {}) {
   if (Number(km) > 0) bits.push(`<span class="hc-cost km">${(Number(km) * 1000).toLocaleString()} metal</span>`);
   if (!bits.length && showFree) bits.push(`<span class="hc-cost free">free</span>`);
   return bits.length ? `<div class="hc-cost-row">${bits.join("")}</div>` : "";
+}
+/** A hero's temper (verdance.company.temper) as one word, only when it is notable: what the camp did
+ *  to them shows before the drop. Nerve: bonds on the drop steady, wounds/rivals/grief shake. */
+function temperHtml(t) {
+  if (!t) return "";
+  const n = Number(t.nerve) || 0, d = Number(t.drive) || 0;
+  const pick = Math.abs(n) >= Math.abs(d)
+    ? (n >= 0.25 ? ["steady", "good"] : n <= -0.25 ? ["shaken", "bad"] : null)
+    : (d >= 0.3 ? ["eager", "good"] : d <= -0.3 ? ["grieving", "bad"] : null);
+  if (!pick) return "";
+  const tip = `Nerve ${n >= 0 ? "+" : ""}${n.toFixed(2)}, drive ${d >= 0 ? "+" : ""}${d.toFixed(2)}: bonds with who drops steady them; wounds, rivals and the fallen weigh on them.`;
+  return `<div class="hc-temper ${pick[1]}" title="${esc(tip)}">${pick[0]}</div>`;
 }
 /**
  * Shared hero card — company intro, drop confirm, recruit slot. Level sits opposite
@@ -182,6 +195,7 @@ export function renderHeroCard(opts) {
       ${peakNorm === "green" ? "" : `<div class="${peakClass}" title="Career rank">${esc(peakRaw)}</div>`}
       <div class="hc-meta">${esc(meta)}</div>
       ${xpHtml}
+      ${temperHtml(stats.temper)}
       ${o.lock ? `<div class="hc-lock" title="${esc(o.lockTitle || o.lock)}"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 7V5a4 4 0 1 1 8 0v2h1v8H3V7zm2 0h4V5a2 2 0 1 0-4 0z"/></svg>${esc(o.lock)}</div>` : ""}
       ${tagLine ? `<div class="hc-tags" title="Procedural tags (boost / nerf)">${esc(tagLine)}</div>` : ""}
       ${costHtml}
