@@ -356,6 +356,12 @@ def main() -> int:
 
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     run_dir = args.resume.resolve() if args.resume else ROOT / "autopilot_runs" / stamp
+    if not args.resume:
+        # parallel runs started in the same second (A/B trials) must not share a directory
+        n_try = 1
+        while run_dir.exists():
+            n_try += 1
+            run_dir = ROOT / "autopilot_runs" / f"{stamp}_{n_try}"
     if args.resume and not (run_dir / "ws" / "state" / "campaign_state.json").is_file():
         ap.error("resume directory has no ws/state/campaign_state.json")
     if args.resume:
