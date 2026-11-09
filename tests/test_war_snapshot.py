@@ -101,18 +101,34 @@ def test_past_the_cap_the_cheapest_mobiles_go_first():
     assert len(defs) == 7 and "armpw" not in defs and "armbull" in defs and "armcom" in defs
 
 
-def test_the_overthrow_soak_has_eight_keep_works_and_no_ai_on_the_company_seat():
-    """Owner call 2026-11-09: five simple defenders/constructors and three balanced BARbs soak the castle
-    unopposed; the company's seat stays in the recipe (the mission needs it) but has no AI in the sim."""
+def test_the_overthrow_soak_has_ten_keep_works_and_no_ai_on_the_company_seat():
+    """Owner calls 2026-11-09: five simple defenders, two simple constructors (three would scale too
+    hard) and three balanced BARbs soak the castle unopposed, twenty minutes at medium; the company's
+    seat stays in the recipe (the mission needs it) but has no AI in the sim."""
     rec = W.load_recipe(ROOT, "ancient_bastion")
     assert rec["soak"]["easy"] < rec["soak"]["medium"] < rec["soak"]["hard"]
+    assert rec["soak"]["medium"] == 20
     baked = W.baked_teams(rec)
-    assert len(baked) == 8 and {t["ally"] for t in baked} == {"keep"}
+    assert len(baked) == 10 and {t["ally"] for t in baked} == {"keep"}
     assert rec["playerSeat"] not in {t["key"] for t in baked}
     s = W.startscript(rec, game_type="Verdance Ashes $VERSION")
-    assert s.count("[TEAM") == 8 and s.count("[ALLYTEAM") == 1
+    assert s.count("[TEAM") == 10 and s.count("[ALLYTEAM") == 1
     assert s.count("ShortName=BARb;") == 3 and s.count("profile=hard;") == 3
-    assert s.count("ShortName=SimpleDefenderAI;") == 3 and s.count("ShortName=SimpleConstructorAI;") == 2
+    assert s.count("ShortName=SimpleDefenderAI;") == 5 and s.count("ShortName=SimpleConstructorAI;") == 2
+
+
+def test_the_overthrow_has_two_lrpcs_on_the_gatehouse_towers():
+    """Owner call 2026-11-09: a couple of LRPCs on the walls, set down after the soak (the AIs never
+    build around them), finished, in the gatehouse seat."""
+    rec = W.load_recipe(ROOT, "ancient_bastion")
+    assert [e["def"] for e in rec["emplace"]] == ["armbrtha", "armbrtha"]
+    snap = W.load_snapshot(ROOT, "ancient_bastion")
+    gate = next(t for t in snap["teams"] if t["key"] == "gate")
+    lrpcs = [u for u in gate["units"] if u[0] == "armbrtha"]
+    assert len(lrpcs) == 2 and all(u[4] == 100 and u[5] == "S" for u in lrpcs)
+    sx, sz = snap["mapSize"]
+    for e, u in zip(rec["emplace"], lrpcs):
+        assert abs(u[1] * sx - e["elmos"][0]) < 2 and abs(u[2] * sz - e["elmos"][1]) < 2
 
 
 def test_the_soak_strip_keeps_factories_some_builders_and_one_commander():

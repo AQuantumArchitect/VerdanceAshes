@@ -288,6 +288,16 @@ def build_snapshot(recipe: Dict[str, Any], dump: Dict[str, Any], *, costs: Optio
             "units": [[u["def"], round(u["x"] / mx, 4), round(u["z"] / mz, 4), u["facing"], int(round(u["hp"] * 100)), u["kind"]]
                       for u in done],
         })
+    # Emplacements (owner call 2026-11-09: LRPCs on the walls): set down after the soak, so the AIs never
+    # build around them or pull them; each joins its team as a finished structure.
+    by_key = {t["key"]: t for t in teams}
+    for e in recipe.get("emplace") or []:
+        t = by_key.get(e.get("team"))
+        if not t:
+            continue
+        ex, ez = e["elmos"]
+        t["units"].append([e["def"], round(ex / mx, 4), round(ez / mz, 4), int(e.get("facing", 0)), 100, "S"])
+        t["unitCount"] = len(t["units"])
     # The field's dead: the war's wrecks and heaps, richest first, none on the company's own seat.
     max_wrecks = int(cfg.get("maxWrecks") or 240)
     seat = next((t["startElmos"] for t in recipe["teams"] if t["key"] == player_key), None)

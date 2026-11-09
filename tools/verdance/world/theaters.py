@@ -66,7 +66,7 @@ WARS = {
         {"key": "fort_keep", "faction": "armada", "zoneId": "T_SE_MUSTER"},
         {"key": "fort_s", "faction": "armada", "zoneId": "T_SE_LANE"},
     ],
-    # the Overthrow's soak (2026-11-09): the Keep alone, eight works; no besiegers
+    # the Overthrow's soak (2026-11-09): the Keep alone, ten works; no besiegers
     "ancient_bastion": [
         {"key": "keep_s", "faction": "armada", "zoneId": "AB_SW_RAMPART"},
         {"key": "keep_n", "faction": "armada", "zoneId": "AB_W_KEEP"},
@@ -74,6 +74,8 @@ WARS = {
         {"key": "out_n", "faction": "armada", "zoneId": "AB_NW_RAMPART"},
         {"key": "out_s", "faction": "armada", "zoneId": "AB_SW_RAMPART"},
         {"key": "gate", "faction": "armada", "zoneId": "AB_W_GATEHOUSES"},
+        {"key": "rampart_n", "faction": "armada", "zoneId": "AB_NW_RAMPART"},
+        {"key": "rampart_s", "faction": "armada", "zoneId": "AB_SW_RAMPART"},
         {"key": "tor_n", "faction": "armada", "zoneId": "AB_NW_TOR"},
         {"key": "tor_s", "faction": "armada", "zoneId": "AB_SW_TOR"},
     ],

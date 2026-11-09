@@ -6,13 +6,13 @@
     16384,
     8192
   ],
-  "character": "Ancient Bastion, the Overthrow: the Keep has had the western castle to itself for a while. Eight Armada works raised it, and most of the hands that built it have gone; one commander holds the Keep. The company comes from the north-east heights by the Tabula door.",
+  "character": "Ancient Bastion, the Overthrow: the Keep has had the western castle to itself for a while. Ten Armada works raised it, two long-range guns stand on the gatehouse towers, and most of the hands that built it have gone; one commander holds the Keep. The company comes from the north-east heights by the Tabula door.",
   "minutes": 20,
   "soak": {
     "easy": 15,
     "medium": 20,
     "hard": 35,
-    "note": "Owner call 2026-11-09: the finale is a soak. Simple defenders and constructors and three balanced BARbs build the castle unopposed; how long they soak is the difficulty (35 minutes brings a T3 lab). Medium is the shipped war_snapshot_v1.json; war_bake_v1.py --soak easy|hard writes war_snapshot_<level>.json for trials."
+    "note": "Owner calls 2026-11-09: the finale is a soak. Five simple defenders, two simple constructors (three would scale too hard) and three balanced BARbs, ten works in all, build the castle unopposed, and two LRPCs stand on the gatehouse towers (emplace); how long they soak is the difficulty (35 minutes brings a T3 lab). Medium is the shipped war_snapshot_v1.json; war_bake_v1.py --soak easy|hard writes war_snapshot_<level>.json for trials."
   },
   "seed": 3313,
   "dry": true,
@@ -21,7 +21,7 @@
     "keep"
   ],
   "keepOneCommander": "AB_W_KEEP",
-  "notes": "Was a siege (four Armada seats against three Null Mercs besiegers, 20 minutes, 2026-10-25 bake; see git history). Now the Keep alone soaks: the three BARbs (profile hard, 'Hard | Balanced') take the castle's native seats and the Keep itself, the five Lua AIs take the outworks, the tors and the gatehouses. After the soak the strip takes most of the build power (mobile constructors and nano turrets; factories stay) and every commander but the one nearest the Keep; in the mission the engine's start commanders go too, all but the Keep's (keepOneCommander). In the mission every seat plays as BARb hard.",
+  "notes": "Was a siege (four Armada seats against three Null Mercs besiegers, 20 minutes, 2026-10-25 bake; see git history). Now the Keep alone soaks: the three BARbs (profile hard, 'Hard | Balanced') take the castle's native seats and the Keep itself; the five SimpleDefenderAIs take the outworks, the ramparts and the gatehouses; the two SimpleConstructorAIs take the tors. (BAR's SimpleDefenderAI builders put up turrets on their random rolls and around every mex; its factories still build a patrol army that fights on friendly ground.) After the soak the strip takes most of the build power (mobile constructors and nano turrets; factories stay) and every commander but the one nearest the Keep; in the mission the engine's start commanders go too, all but the Keep's (keepOneCommander). In the mission every seat plays as BARb hard.",
   "sides": {
     "keep": {
       "faction": "armada",
@@ -107,6 +107,32 @@
       "virtual": true
     },
     {
+      "key": "rampart_n",
+      "ally": "keep",
+      "profile": "hard",
+      "ai": "SimpleDefenderAI",
+      "zoneId": "AB_NW_RAMPART",
+      "startElmos": [
+        1963,
+        2005
+      ],
+      "label": "North rampart",
+      "virtual": true
+    },
+    {
+      "key": "rampart_s",
+      "ally": "keep",
+      "profile": "hard",
+      "ai": "SimpleDefenderAI",
+      "zoneId": "AB_SW_RAMPART",
+      "startElmos": [
+        1963,
+        6187
+      ],
+      "label": "South rampart",
+      "virtual": true
+    },
+    {
       "key": "tor_n",
       "ally": "keep",
       "profile": "hard",
@@ -154,5 +180,27 @@
       "commanders": 1
     },
     "note": "Past the cap the cheapest mobile units go first; structures and commanders are kept. The strip comes first: 15% of the builders (nearest the Keep) and one commander stay."
-  }
+  },
+  "emplace": [
+    {
+      "def": "armbrtha",
+      "team": "gate",
+      "elmos": [
+        4608,
+        2816
+      ],
+      "facing": 1,
+      "label": "LRPC on the north gatehouse tower"
+    },
+    {
+      "def": "armbrtha",
+      "team": "gate",
+      "elmos": [
+        4608,
+        5120
+      ],
+      "facing": 1,
+      "label": "LRPC on the south gatehouse tower"
+    }
+  ]
 }
