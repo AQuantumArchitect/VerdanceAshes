@@ -119,6 +119,11 @@ Owner notes after the baseline (Luke asleep; "err on the side of doing too much"
   | Wipes | 1 | 1 |
 
   Caution helps clearly early on and comes with more victories. Heroes still die from sortie 2. Next for hero survival: rescue faster after a hero falls (Ketha herself falls most), and retreat paths that avoid the enemy.
+- **Caution, second version** (9a5f6a4: step away from the enemies first; Ketha pulled back hurt with two near): **worse at first.**
+  - After sortie 1, heroes lost: 1, 1, 1, 2, 2 (old caution-on 0, 1, 0).
+  - Ketha fell in sortie 1 in three of five runs.
+  - The traces showed why: her pull-back threshold (0.95) sat above the release threshold (0.90), so she flapped, pulled back and let go every other second, and BARb sent her straight back to the front each time. One trace has her pulled back at 0.90 and down 3.5 s later, thirteen minutes in, at the front.
+  - Fixed in d248b0e: a critical hero is let go only whole (0.98), with nobody near and close to the pad, and is leashed within 1,500 of the pad outside a rescue. Trials `ab_caution3_*` measure it.
 - **Console clean-up** (6d5fc43): `VA_` debug lines no longer reach the player's chat. Found with the windowed screenshot rig (`--windowed --shots N`) and a log probe. BAR's chat drops priority L_DEPRECATED, and the infolog keeps it.
 - Also tonight:
   - The Rock Jungle door jobs sat in "clear" all sortie with nothing booked. A capture with nothing to wreck clears by standing in the zone in strength. The proxy now masses there in that phase too (f2793fd).
