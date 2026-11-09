@@ -789,6 +789,11 @@ local function safetyFor(teamID, frame)
   if not f then
     f = SafetyField.new(ally)
     GG.VA_SafetyFields[ally] = f
+    local ok, m = pcall(VFS.Include, "singleplayer/verdance_ashes/generated/va_current.lua")
+    if ok and type(m) == "table" then
+      local act = type(m.act) == "table" and m.act or {}
+      f:setCampaign(m.missionNumber or act.missionNumber, act.act2EndMission)
+    end
   end
   f:refresh(frame)
   return f

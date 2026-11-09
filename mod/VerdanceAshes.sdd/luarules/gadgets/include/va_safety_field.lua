@@ -352,9 +352,17 @@ function M:walkHazard(h, x1, z1, x2, z2)
 end
 
 -- ------------------------------------------------------------------ worth and gains
+-- The campaign: a named hero who dies is gone for every sortie still to come (the finale is the one
+-- after act 2's last mission). The gadgets pass the mission's own numbers.
+function M:setCampaign(missionNumber, act2EndMission)
+  local n, last = tonumber(missionNumber), tonumber(act2EndMission)
+  if n and last then self.sortiesLeft = max(0, last + 1 - n) end
+end
+
 -- What the company loses with this hero: its unit's worth at its level (cost x its health over the
 -- def's), and for a rez hero its share of the raising still to do (every known wreck's worth x its
--- share of the company's rez speed).
+-- share of the company's rez speed); for a named hero, all of that again for every sortie it would
+-- still have served.
 function M:heroWorth(h)
   local v = h.p.cost * (h.maxHp / max(h.p.hp, 1))
   if h.p.rez > 0 then
@@ -363,6 +371,7 @@ function M:heroWorth(h)
     local share = all > 0 and mine / all or 1
     v = v + share * self:wreckWorth()
   end
+  if h.hid then v = v * (1 + (self.sortiesLeft or 0)) end
   return v
 end
 

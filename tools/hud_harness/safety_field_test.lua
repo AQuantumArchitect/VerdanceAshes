@@ -217,4 +217,24 @@ do
   assert(choice(turn, 1) == "stay", "steady, it still holds at " .. turn)
 end
 
-print("ok: temper scales seen danger; profiles from defs, fire shared over the crowd, memory sharp for turrets and blurred for walkers, forgetting, the unknown as danger, long guns, Ketha's wrecks, the dark, a fighter's trade")
+-- 10. The campaign: early on, a hero has many sorties left to serve, so a risky wreck is not worth her;
+--     at the finale, with nothing after, the same wreck is.
+do
+  local api = world()
+  W.seen = function() return true end
+  UnitDefs[7] = { id = 7, name = "scout", speed = 80, health = 300, metalCost = 400, buildTime = 1000 }
+  UnitDefNames.scout = UnitDefs[7]
+  add(1, 0, 2, 1000, 1000); W.hero[1] = "ketha"
+  add(50, 1, 1, 2950, 1000)                       -- a rifle 250 from the wreck (in its reach)
+  for i = 1, 9 do add(110 + i, 0, 1, 2650 + i * 10, 1050) end   -- nine of the company's guns by the wreck
+  W.features = { [905] = { def = "scout", x = 2700, z = 1000 } } -- a quick raise (10 s), worth 400
+  local f = SF.new(0, api)
+  f:refresh(30); f:refresh(60)
+  local h = { uid = 1, x = 1000, z = 1000, hp = 500, maxHp = 500, defID = 2, hid = "ketha" }
+  f:setCampaign(11, 10)                           -- the finale
+  assert(f:choose(h, 1000, 1000).kind == "rez", "at the finale the wreck is worth the risk")
+  f:setCampaign(2, 10)                            -- mission 2 of 11
+  assert(f:choose(h, 1000, 1000).kind ~= "rez", "with nine sorties still to serve, it is not")
+end
+
+print("ok: the campaign weighs a hero's life; temper scales seen danger; profiles from defs, fire shared over the crowd, memory sharp for turrets and blurred for walkers, forgetting, the unknown as danger, long guns, Ketha's wrecks, the dark, a fighter's trade")

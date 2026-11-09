@@ -949,6 +949,8 @@ function gadget:Initialize()
   GG.VA_SafetyFields = GG.VA_SafetyFields or {}
   field = GG.VA_SafetyFields[myAlly] or SafetyField.new(myAlly)
   GG.VA_SafetyFields[myAlly] = field
+  local act = mission and type(mission.act) == "table" and mission.act or {}
+  field:setCampaign(mission and mission.missionNumber or act.missionNumber, act.act2EndMission)
   -- a finale is a long fight (the gate's fusions and charge, the kings' war): three times the clock
   if mission and type(mission.finale) == "table" then CAP_FRAMES = CAP_FRAMES * 3 end
   -- the kings' showdown ends only with the throne: twice that again before the company gives up
