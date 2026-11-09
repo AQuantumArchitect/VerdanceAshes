@@ -3,21 +3,41 @@ the lift limit starts at nothing and grows with the value actually brought home.
 from verdance.company import reserve as R
 
 
-def test_the_lift_grows_with_value_brought_home_not_with_verdicts():
-    """Owner call 2026-11-09: a partial that lifts an army off the pad grows the lift; a victory that
-    lifts nothing does not. The lift is LIFT_SHARE of everything ever brought home."""
+def test_the_lift_grows_with_the_metal_lifted_home_not_the_units():
+    """Owner calls 2026-11-09: the lift grows with the stored metal the company lifts off with (reclaim
+    the field, build storage), net of the field's starting allotment. Units that lift go into the
+    reserve and do not count; a wiped company lifts nothing; verdicts do not matter."""
     roster = {"reserve": {}, "cadre": {}}
     st = {"roster": roster, "history": []}
     assert R.lift_cap(st) == 0
-    out = R.homecoming(roster, {"verdict": "partial", "manifest": {"going": {"units": {"armpw": 10}}}}, history=[])
-    ten = 10 * R.unit_value("armpw")
-    assert out["liftedValue"] == round(ten) and abs(R.lift_cap(st) - R.LIFT_SHARE * ten) < 0.5
+    partial = {"status": "extracted", "metalStored": 6400.0, "metalKFieldStart": 1,
+               "manifest": {"going": {"units": {"armpw": 10}}}}
+    out = R.homecoming(roster, partial, history=[])
+    assert out["metalLifted"] == 5400 and roster["reserve"] == {"armpw": 10}
+    assert R.lift_cap(st) == R.LIFT_SHARE * 5400                    # the ten Peewees are reserve, not lift
     st["history"].append({"verdict": "partial"})
-    R.homecoming(roster, {"verdict": "victory", "manifest": {"going": {"units": {}}}}, history=st["history"])
-    st["history"].append({"verdict": "victory"})
-    assert abs(R.lift_cap(st) - R.LIFT_SHARE * ten) < 0.5          # a victory lifting nothing adds nothing
-    R.homecoming(roster, {"manifest": {"going": {"units": {"armpw": 4}, "packUnits": {"armpw": 4}}}}, history=st["history"])
-    assert abs(R.lift_cap(st) - R.LIFT_SHARE * ten) < 0.5          # a hero's pack is not cargo
+    R.homecoming(roster, {"status": "wiped", "metalStored": 9000.0, "manifest": {"going": {"units": {}}}},
+                 history=st["history"])
+    st["history"].append({"verdict": "defeat"})
+    assert R.lift_cap(st) == R.LIFT_SHARE * 5400                    # nobody lifted: the stockpile stayed
+    R.homecoming(roster, {"status": "extracted", "metalStored": 300.0, "metalKFieldStart": 1,
+                          "manifest": {"going": {"units": {}}}}, history=st["history"])
+    assert R.lift_cap(st) == R.LIFT_SHARE * 5400                    # spent below the allotment: nothing gained
+
+
+def test_the_contract_keeps_the_field_allotment_so_it_is_not_counted_as_hauled():
+    """The gadget's result goes through hub.contract before commerce and the roster read it. Until
+    2026-11-09 the contract dropped metalKFieldStart: every sortie banked its free 1k allotment as
+    hauled metal (the 11-08 rehearsal lifted off with exactly that 1000, unspent)."""
+    from verdance.hub.contract import normalize_result, result_v2_to_v1_fields
+    raw = {"schemaVersion": "verdance-match-result/2.0", "status": "extracted", "metalStored": 1000.0,
+           "metalKExtracted": 1, "metalKFieldStart": 1, "metalKBrought": 0,
+           "manifest": {"going": {"heroes": [{"heroId": "ketha"}], "units": {}}}}
+    flat = result_v2_to_v1_fields(normalize_result(raw))
+    assert flat["metalKFieldStart"] == 1 and flat["metalKBrought"] == 0 and flat["terminalKind"] == "extracted"
+    assert R.metal_lifted(flat) == 0.0
+    flat["metalStored"] = 7500.0
+    assert R.metal_lifted(flat) == 6500.0
 
 
 def test_an_old_save_keeps_its_lift_on_the_upgrade():
@@ -27,8 +47,9 @@ def test_an_old_save_keeps_its_lift_on_the_upgrade():
     roster = {"reserve": {}, "cadre": {}}
     st = {"roster": roster, "history": hist}
     assert R.lift_cap(st) == 2000
-    R.homecoming(roster, {"manifest": {"going": {"units": {"armpw": 2}}}}, history=hist)
-    assert abs(R.lift_cap(st) - (2000 + R.LIFT_SHARE * 2 * R.unit_value("armpw"))) < 0.5
+    R.homecoming(roster, {"status": "extracted", "metalStored": 2000.0, "manifest": {"going": {"units": {"armpw": 2}}}},
+                 history=hist)
+    assert R.lift_cap(st) == 2000 + R.LIFT_SHARE * 2000
 
 
 def test_lifted_units_join_the_reserve_and_escorts_do_not():

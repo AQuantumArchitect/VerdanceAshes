@@ -5,11 +5,12 @@ roster's ``reserve``: unitDef -> count). Hero packs and escorts are not reserve:
 with their hero every drop. At each Drop the player chooses what to bring (``roster.cadre`` is
 this drop's bring; the builder spawns it), up to the lift limit: what one drop can carry, in
 metal value (metal + energy / energyPerMetal, the same measure as the hero packs). The limit
-grows with what the company has actually brought home (owner call, 2026-11-09): it is
-LIFT_SHARE of the metal value of every unit that has ever lifted off a pad into the reserve. A
-partial that lifts 3k off the pad grows it as much as a victory that lifts 3k; a sortie that
-lifts nothing grows it not at all. Units left in the field stay where they were left; they are
-not in the reserve.
+grows with the metal the company has actually lifted home (owner calls, 2026-11-09): it is
+LIFT_SHARE of all the stored metal it has ever lifted off a pad, net of the field's own starting
+allotment. Reclaim the field and build storage, and a partial that lifts off with 6k grows it
+as much as a victory that does. Units that lift go into the reserve and do not count toward it;
+a wiped company lifts nothing. Units left in the field stay where they were left; they are not
+in the reserve.
 """
 from __future__ import annotations
 
@@ -20,7 +21,7 @@ from typing import Any, Dict, Optional
 from verdance.common import WORKSPACE_ROOT
 
 LIFT_BASE = 0.0           # the first drop is the packs alone
-LIFT_SHARE = 0.5          # the lift is half of all the value ever brought home off a pad
+LIFT_SHARE = 0.5          # the lift is half of all the stored metal ever lifted home off a pad
 LIFT_PER_SORTIE = 1000.0  # the old rule (1k per victory/extraction): seeds a save from before the ledger
 VETERAN_LIFT = 1000.0     # the commander's veteran_cadre perk: one more load's worth
 SUCCESS = ("victory", "extracted")
@@ -71,14 +72,36 @@ def sorties_home(state: Dict[str, Any]) -> int:
 
 
 def brought_home(state: Dict[str, Any]) -> float:
-    """Metal value of everything that has ever lifted off a pad into the reserve. A save from
-    before the ledger starts where its old lift stood (1k per victory or extraction), so a
+    """All the stored metal the company has ever lifted home (roster.metalLiftedHome). A save
+    from before the ledger starts where its old lift stood (1k per victory or extraction), so a
     campaign in progress never loses lift on the upgrade."""
     roster = state.get("roster") or {}
-    v = roster.get("broughtHomeValue")
+    v = roster.get("metalLiftedHome")
     if isinstance(v, (int, float)):
         return float(v)
     return LIFT_PER_SORTIE * sorties_home(state) / LIFT_SHARE
+
+
+def metal_lifted(result: Dict[str, Any]) -> float:
+    """The stored metal this sortie lifted off the pad: the team's metal at extraction, net of the
+    field's starting allotment (metalKFieldStart, in 1k). Nothing when the company did not lift
+    (wiped, or the engine closed without a manifest)."""
+    # terminalKind is the gadget's word once hub.contract has read the verdict into status
+    kind = str(result.get("terminalKind") or result.get("status") or "").lower()
+    if kind != "extracted":
+        return 0.0
+    try:
+        stored = float(result.get("metalStored"))
+    except (TypeError, ValueError):
+        try:
+            stored = 1000.0 * float(result.get("metalKExtracted"))
+        except (TypeError, ValueError):
+            return 0.0
+    try:
+        start = 1000.0 * max(0.0, float(result.get("metalKFieldStart") or 0))
+    except (TypeError, ValueError):
+        start = 0.0
+    return max(0.0, stored - start)
 
 
 def lift_cap(state: Dict[str, Any]) -> float:
@@ -114,12 +137,12 @@ def default_bring(reserve: Dict[str, int], cap: float, workspace: Optional[Path]
 def homecoming(roster: Dict[str, Any], result: Dict[str, Any], history: Optional[list] = None,
                workspace: Optional[Path] = None) -> Dict[str, Any]:
     """After a sortie: the units brought left the reserve; what lifted off the pad (minus hero
-    packs) comes back into it and its value joins the lift ledger. Brought units that died or
-    stayed in the field are not in it. `history` is the campaign's, before this sortie's bead,
-    to seed the ledger of a save from before it."""
+    packs) comes back into it. The stored metal that lifted off joins the lift ledger; the units
+    do not. Brought units that died or stayed in the field are not in it. `history` is the
+    campaign's, before this sortie's bead, to seed the ledger of a save from before it."""
     reserve = ensure_reserve(roster)
-    if not isinstance(roster.get("broughtHomeValue"), (int, float)):
-        roster["broughtHomeValue"] = brought_home({"roster": {}, "history": history or []})
+    if not isinstance(roster.get("metalLiftedHome"), (int, float)):
+        roster["metalLiftedHome"] = brought_home({"roster": {}, "history": history or []})
     brought = _counts(roster.get("cadre"))
     for d, n in brought.items():
         left = int(reserve.get(d, 0)) - n
@@ -137,10 +160,11 @@ def homecoming(roster: Dict[str, Any], result: Dict[str, Any], history: Optional
     lifted = {d: n for d, n in lifted.items() if n > 0 and not d.endswith("com")}
     for d, n in lifted.items():
         reserve[d] = int(reserve.get(d, 0)) + n
-    value = bring_value(lifted, workspace)
-    roster["broughtHomeValue"] = round(float(roster["broughtHomeValue"]) + value, 1)
+    metal = metal_lifted(result)
+    roster["metalLiftedHome"] = round(float(roster["metalLiftedHome"]) + metal, 1)
+    roster.pop("broughtHomeValue", None)  # the units-as-lift ledger of 0cfc556, never released
     roster["cadre"] = {}
-    return {"brought": brought, "lifted": lifted, "reserve": dict(reserve), "liftedValue": round(value)}
+    return {"brought": brought, "lifted": lifted, "reserve": dict(reserve), "metalLifted": round(metal)}
 
 
 def hub_surface(state: Dict[str, Any], workspace: Optional[Path] = None) -> Dict[str, Any]:

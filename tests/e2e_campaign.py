@@ -159,6 +159,7 @@ def main() -> int:
         "objectiveResults": [{"kind": (intent.get("objectiveTarget") or {}).get("kind") or "eco_raid", "targetZoneId": target, "done": True}],
         "secondaryResults": [],
         "playerSurvivors": {"corthud": 4},
+        "metalStored": 4200.0, "metalKFieldStart": 0,
         "heroResults": {h: {"heroId": h, "name": h, "state": "alive", "outcome": "alive"} for h in hero_ids},
         "tenebriumBank": 2, "tenebriumLooted": 2, "tenebriumSpent": 0,
         "observedZones": dict(seen), "beliefExport": {z: {"eta": e, "enemyNow": 0 if z == pad else 4, "friendNow": 3 if z == pad else 0} for z, e in seen.items()},

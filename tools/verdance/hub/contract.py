@@ -357,6 +357,11 @@ def normalize_result(raw: Dict[str, Any], *, campaign_id: str = "verdance_ashes"
         "metalStored": raw.get("metalStored"),
         "metalStorage": raw.get("metalStorage"),
         "metalKExtracted": _i(raw.get("metalKExtracted"), -1),
+        # the field's free starting allotment and any bag brought: commerce nets these out of the
+        # export, and the lift counts only metal hauled beyond them (dropped here until 2026-11-09,
+        # so every sortie banked its 1k allotment as if it had been hauled home)
+        "metalKFieldStart": _i(raw.get("metalKFieldStart"), 0),
+        "metalKBrought": _i(raw.get("metalKBrought"), -1),
         "armadaTenebriumCrisis": _b(raw.get("armadaTenebriumCrisis"), True),
         "shellScars": scars,
         "survivingInstalls": (
@@ -471,6 +476,8 @@ def result_v2_to_v1_fields(r: Dict[str, Any]) -> Dict[str, Any]:
         "metalStored": r.get("metalStored"),
         "metalStorage": r.get("metalStorage"),
         "metalKExtracted": r.get("metalKExtracted"),
+        "metalKFieldStart": r.get("metalKFieldStart"),
+        "metalKBrought": r.get("metalKBrought"),
         "armadaTenebriumCrisis": r.get("armadaTenebriumCrisis"),
         "shellScars": r.get("shellScars"),
         "survivingInstalls": r.get("survivingInstalls") or [],
