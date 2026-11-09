@@ -29,6 +29,23 @@ local W = 272
 local TOP_GAP = 98          -- under BAR's resource bar + the Tnb bar
 local lastPoll = -999
 
+-- On raptor ground BAR's raptor panel (luaui/widgets/gui_raptorstatspanel.lua) sits in this same
+-- corner: 300 x 210 scaled by 0.75 + vsx*vsy/1e7, centred at 0.94 vsx, 0.89 vsy. The rail starts
+-- below it there (2026-11-09 HUD review: the two overlapped on the Rock Jungle). Nil elsewhere.
+local raptorGame = nil
+local function raptorPanelBottom()
+  if raptorGame == nil then
+    raptorGame = false
+    for _, t in ipairs((Spring.GetTeamList and Spring.GetTeamList()) or {}) do
+      local ai = Spring.GetTeamLuaAI and Spring.GetTeamLuaAI(t)
+      if ai and tostring(ai):find("Raptor") then raptorGame = true break end
+    end
+  end
+  if not raptorGame then return nil end
+  local s = 0.75 + (vsx * vsy) / 10000000
+  return vsy * 0.89 - (210 * s) / 2
+end
+
 local M = {}                -- the mission seed: title, objective, kind, requiredFrames, roster, kings
 local S = { status = "active" }  -- polled facts
 local H = { list = {}, byId = {} } -- heroes (live json merged with the seed roster)
@@ -779,6 +796,8 @@ function widget:DrawScreen()
   local right = vsx - 10
   local left = right - W
   local top = vsy - TOP_GAP
+  local rb = raptorPanelBottom()
+  if rb then top = math.min(top, rb - 14) end
   local x, inner = left + 12, right - 12
   -- the panel's height is last frame's content height (content changes slowly); when it changed,
   -- redraw the panel at the new size and the content once more
