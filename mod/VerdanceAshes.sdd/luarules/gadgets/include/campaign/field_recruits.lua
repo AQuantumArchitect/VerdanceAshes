@@ -40,6 +40,18 @@ local function spawnFieldRecruitWreck(fr, x, z)
       return false
     end
   end
+  -- An aircraft killed quietly leaves no corpse, so an air seed never became a wreck and the hero was
+  -- "lost" at frame 120 (cause=no_wreck): Rookery (armca) and Stiletto (armstil) on every Rock Jungle
+  -- visit of the 11-04 and 11-09 hard-AI runs. Seed a ground constructor of the same faction instead;
+  -- the rez promotes it to the real chassis, as for building heroes (needsChassisPromote below).
+  local sud = UnitDefNames[seedDef]
+  if sud and sud.canFly then
+    local proxy = ({ arm = "armck", cor = "corck", leg = "legck" })[seedDef:sub(1, 3)] or "armck"
+    if UnitDefNames[proxy] then
+      Spring.Echo("VA_FIELD_RECRUIT_AIR_PROXY id=" .. hid .. " air=" .. seedDef .. " seed=" .. proxy)
+      seedDef = proxy
+    end
+  end
   local gaia = (Spring.GetGaiaTeamID and Spring.GetGaiaTeamID()) or 0
   -- Ground the hero can be raised on and walk (or drive) away from: a bay where a bay fits.
   local unitID, sx, sz = nil, x, z
