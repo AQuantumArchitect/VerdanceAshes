@@ -36,6 +36,12 @@ end
 --   departure  the objective done, failed, or the clock out: everyone walks to the real pad
 --              (va_pad_x/z/r), and the company leaves once all of it stands there (or after
 --              three settles, for stuck units)
+--   raptors    on raptor ground (va_raptor_grace_seconds set: the Rock Jungle) the company builds
+--              through the grace and leaves RAPTOR_STAY seconds after the waves are due, done or
+--              not (owner call, 2026-11-09: the baseline's six home wipes came from staying)
+--   caution    a named hero badly hurt, or hurt and outnumbered, walks back to the pad and is held
+--              there until it is mostly whole again or the ground near it has been quiet a while;
+--              heroes are never nudged into the wound (the baseline lost 20 named heroes)
 --   leaving    through the HUD when there is one: this publishes va_autopilot_leave, the rig
 --              player widget (gui_verdance_rig_player.lua, which says VA_RIG:hud at start)
 --              presses EXTRACT and confirms the manifest; if the HUD has not ended the sortie
@@ -56,6 +62,18 @@ local RESCUE_EVERY = 600
 local HUD_WAIT = 20 * 30
 -- test rig only: va_autopilot_force_complete=M marks the objective done at game minute M
 local FORCE_AT = num("va_autopilot_force_complete", 0) > 0 and math.floor(num("va_autopilot_force_complete", 0) * 1800) or nil
+-- raptor ground: leave this long after the grace ends (va_autopilot_raptor_stay seconds, default 60)
+local RAPTOR_GRACE = tonumber(opts.va_raptor_grace_seconds)
+local RAPTOR_STAY = num("va_autopilot_raptor_stay", 60)
+local RAPTOR_LEAVE_FRAMES = RAPTOR_GRACE and math.floor((RAPTOR_GRACE + RAPTOR_STAY) * 30) or nil
+-- hero caution: retreat below HERO_LOW health, or below HERO_HURT with HERO_CROWD armed enemies near;
+-- released at HERO_WHOLE, or after HERO_QUIET frames with no enemy near
+-- (trial 20261109_005443: at 0.40/0.70 and every 2 s, Vane pulled back at 0.49 among ten enemies and
+-- still fell, and Ketha went from whole to 0.18 between two checks; now earlier and every second)
+local CAUTION_EVERY = 30
+local HERO_LOW, HERO_HURT, HERO_WHOLE = 0.55, 0.85, 0.90
+local HERO_CROWD, HERO_SENSE = 5, 700
+local HERO_QUIET = 90 * 30
 
 if not gadgetHandler:IsSyncedCode() then
   local started, sped, echoed = false, false, false
@@ -84,7 +102,14 @@ local leaveAt, leaveWhy = nil, nil          -- ...and to leave (the HUD's turn)
 local hudPresent = false                    -- the rig player widget said VA_RIG:hud
 local tx, tz = nil, nil
 local held = {}                             -- unitID -> true: the rig's order stands
+local retreating = {}                       -- unitID -> frame it was pulled back (hero caution)
 local issuing = false
+
+-- Drop the rig's holds (a rescue squad, a siege) but keep the heroes that are being pulled back.
+local function releaseHolds()
+  held = {}
+  for uid in pairs(retreating) do held[uid] = true end
+end
 
 local function rp(k) return tonumber((Spring.GetGameRulesParam(k))) or 0 end
 
@@ -132,11 +157,17 @@ end
 -- (it falls, the sortie is lost) and its suit everywhere else, and BARb needs it home to build.
 local COM = VFS.Include("luarules/gadgets/include/va_commanders.lua")
 
+local function isHero(uid)
+  local hid = Spring.GetUnitRulesParam(uid, "va_hero_id")
+  return hid ~= nil and hid ~= "" and hid ~= 0
+end
+
 local function nudge()
   local x, z = target()
   if not x then return end
   local idle = companyUnits(function(ud, uid)
     if not mobile(ud) or (ud.isBuilder and not ud.canAttack) or held[uid] or COM.isCommander(ud) then return false end
+    if isHero(uid) then return false end   -- heroes are never sent into the wound (hero caution)
     local q = Spring.GetUnitCommands(uid, 1)
     return q == nil or #q == 0
   end)
@@ -699,7 +730,7 @@ end
 
 local function rescue()
   local fid = rescueWreck()
-  if not fid then held = {}; return end
+  if not fid then releaseHolds(); return end
   local hid = tostring(Spring.GetFeatureRulesParam(fid, "va_hero_wreck") or "?")
   local wx, _, wz = Spring.GetFeaturePosition(fid)
   if not wx then return end
@@ -745,6 +776,48 @@ local function rescue()
   Spring.Echo("VA_AUTOPILOT rez hero=" .. hid .. " feature=" .. fid .. " builders=" .. #rez)
 end
 
+-- ---------------------------------------------------------------- hero caution
+-- BARb treats a named hero as one more unit: on the 11-09 baseline 20 of them died. A hero badly hurt,
+-- or hurt with a crowd of armed enemies near, walks back to the pad (where the base and the builders
+-- are) and stays out of BARb's hands until it is mostly whole, or the ground near it has been quiet for
+-- HERO_QUIET (a pad with no repair still lets it go back to work).
+local function caution(f)
+  local px, pz = tonumber((Spring.GetGameRulesParam("va_pad_x"))), tonumber((Spring.GetGameRulesParam("va_pad_z")))
+  if not px then return end
+  local pulled = {}
+  for _, uid in ipairs(Spring.GetTeamUnits(playerTeam) or {}) do
+    if isHero(uid) and not Spring.GetUnitIsDead(uid) then
+      local hp, maxHp = Spring.GetUnitHealth(uid)
+      local frac = (hp and maxHp and maxHp > 0) and hp / maxHp or 1
+      local x, _, z = Spring.GetUnitPosition(uid)
+      if x then
+        local crowd = threatsNear(x, z, HERO_SENSE)
+        if retreating[uid] then
+          if frac >= HERO_WHOLE or (crowd == 0 and f - retreating[uid] >= HERO_QUIET) then
+            retreating[uid], held[uid] = nil, nil
+            Spring.Echo("VA_AUTOPILOT hero back to work id=" .. tostring(Spring.GetUnitRulesParam(uid, "va_hero_id"))
+              .. " hp=" .. string.format("%.2f", frac))
+          end
+        elseif frac < HERO_LOW or (frac < HERO_HURT and crowd >= HERO_CROWD) then
+          retreating[uid] = f
+          pulled[#pulled + 1] = uid
+          Spring.Echo("VA_AUTOPILOT hero pulls back id=" .. tostring(Spring.GetUnitRulesParam(uid, "va_hero_id"))
+            .. " hp=" .. string.format("%.2f", frac) .. " enemies=" .. crowd)
+        end
+      end
+    elseif retreating[uid] then
+      retreating[uid], held[uid] = nil, nil
+    end
+  end
+  for uid in pairs(retreating) do
+    if Spring.GetUnitIsDead(uid) ~= false then retreating[uid], held[uid] = nil, nil end
+  end
+  if #pulled > 0 then
+    -- back to the pad: the company's base and builders stand there, and it is where they lift from
+    order(pulled, CMD.MOVE, { px, Spring.GetGroundHeight(px, pz) or 0, pz }, true)
+  end
+end
+
 -- ---------------------------------------------------------------- departure and leaving
 local function regroup()
   local px, pz = tonumber((Spring.GetGameRulesParam("va_pad_x"))), tonumber((Spring.GetGameRulesParam("va_pad_z")))
@@ -758,7 +831,7 @@ end
 local function depart(why, f)
   if departureAt then return end
   departureAt, departureWhy = f, why
-  held = {}
+  held, retreating = {}, {}
   Spring.Echo("VA_AUTOPILOT depart reason=" .. why .. " frame=" .. f)
   regroup()
 end
@@ -839,6 +912,7 @@ function gadget:GameFrame(f)
   if not departureAt then
     if rp("va_objective_complete") == 1 then depart("objective", f)
     elseif rp("va_objective_failed") == 1 then depart("objective_failed", f)
+    elseif RAPTOR_LEAVE_FRAMES and f >= RAPTOR_LEAVE_FRAMES then depart("raptors", f)
     elseif f >= CAP_FRAMES then depart("clock", f) end
   end
   if departureAt then
@@ -847,6 +921,7 @@ function gadget:GameFrame(f)
     return
   end
   gateRig()
+  caution(f)   -- every pass (frames run at f % 30 == 11: once a second)
   if f % RESCUE_EVERY == 311 then rescue() end
   if f % NUDGE_EVERY < 30 then siege(); holdTheZone(); nudge() end
   if f % NUDGE_EVERY == 341 then scout() end   -- (frames run at f % 30 == 11; 311 is the rescue)

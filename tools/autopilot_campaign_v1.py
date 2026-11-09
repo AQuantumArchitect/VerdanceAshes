@@ -101,8 +101,37 @@ def copy_workspace(dest: Path, bar_root: str, stock: bool = False) -> Path:
 
 # ----------------------------------------------------------------------------- the startscript
 
+def buy_mercs(k, hub: dict, share: float, log=print) -> list:
+    """Spend `share` of the metal bag on mercenaries before a drop, as a player would: the dearest
+    metal-only package that fits, again and again, up to four. Tenebrium is for builders and is never
+    spent here. Returns the listings bought."""
+    com = hub.get("commerce") or {}
+    bag = int(com.get("metalK") or 0)
+    budget = int(bag * max(0.0, min(1.0, share)))
+    bought: list = []
+    for _ in range(4):
+        shop = [s for s in (com.get("shop") or [])
+                if s.get("kind") in ("purchase_package", "hero_rental") and s.get("available")
+                and int(s.get("tenebriumCost") or 0) == 0 and 0 < int(s.get("metalCostK") or 0) <= budget]
+        if not shop:
+            break
+        pick = max(shop, key=lambda s: (int(s.get("metalCostK") or 0), str(s.get("id"))))
+        r = k.purchase(pick["id"])
+        if not r.get("ok"):
+            log(f"[autopilot] mercs: {pick['id']} refused: {r.get('error')}")
+            break
+        bought.append(pick["id"])
+        budget -= int(pick.get("metalCostK") or 0)
+        k.rebuild_hub(skip_apply=True)
+        hub = jload(Path(k.ws) / "app" / "showoff" / "hub_state.json")
+        com = hub.get("commerce") or {}
+    if bought:
+        log(f"[autopilot] mercs: bought {', '.join(bought)} (bag {bag}k -> {int(com.get('metalK') or 0)}k)")
+    return bought
+
+
 def patch_startscript(text: str, *, profile: str, speed: int, minutes: float, settle: int,
-                      hud: bool = False, beats: bool = False) -> tuple[str, int]:
+                      hud: bool = False, beats: bool = False, raptor_stay: int = 60) -> tuple[str, int]:
     """Company team -> BARb; the human becomes a spectator; autopilot modoptions in."""
     m = re.search(r"\[PLAYER0\]\s*\{(.*?)\}", text, re.S)
     if not m:
@@ -125,7 +154,7 @@ def patch_startscript(text: str, *, profile: str, speed: int, minutes: float, se
     # plays mission 1's opening script as a player would get it.
     no_ui += "va_beats=1;\n    " if beats else ""
     mods = (f"va_autopilot=1;\n    {no_ui}va_headless_autostart=1;\n    va_headless_fastwin=0;\n    va_headless_quit=1;\n    va_headless_speed={speed};\n    va_autopilot_speed={speed};\n"
-            f"    va_autopilot_minutes={minutes};\n    va_autopilot_settle={settle};\n    ")
+            f"    va_autopilot_minutes={minutes};\n    va_autopilot_settle={settle};\n    va_autopilot_raptor_stay={raptor_stay};\n    ")
     text = text.replace("va_campaign=1;", "va_campaign=1;\n    " + mods.rstrip(), 1)
     return text, team
 
@@ -278,6 +307,13 @@ def main() -> int:
     ap.add_argument("--band", default="verse,vane,halbard", help="three packs (hero ids); the first is you")
     ap.add_argument("--boost", default="verse=4.0", help="hero=xp,... set before sealing (unlocks them); '' for none")
     ap.add_argument("--profile", default="hard_aggressive", help="BARb profile: hard_aggressive | hard | medium | easy")
+    ap.add_argument("--home-profile", default="hard",
+                    help="BARb profile on raptor ground (the Rock Jungle): build and hold, not attack (owner call 2026-11-09); "
+                         "'' uses --profile everywhere")
+    ap.add_argument("--raptor-stay", type=int, default=60,
+                    help="game seconds the company stays on raptor ground after the grace ends before it leaves")
+    ap.add_argument("--mercs", type=float, default=0.8,
+                    help="share of the metal bag spent on mercenaries before each drop (0 = none)")
     ap.add_argument("--speed", type=int, default=8)
     ap.add_argument("--minutes", type=float, default=15.0, help="game minutes before the company leaves regardless")
     ap.add_argument("--settle", type=int, default=40, help="game seconds held after the objective completes")
@@ -411,6 +447,8 @@ def main() -> int:
             break
         plan = plan_for(hs, choice, boards)
         row.update(map=plan["mapId"], pad=plan["marks"]["deployZoneId"], target=(plan["marks"]["captureZoneIds"] or [None])[0])
+        if args.mercs > 0 and not args.tour:
+            row["mercs"] = buy_mercs(k, hs, args.mercs)
         if ip.exists():
             ip.unlink()
         t0 = time.time()
@@ -440,9 +478,12 @@ def main() -> int:
                 break
             continue
         script = S.startscript_from_manifest(ws)
-        text, team = patch_startscript(script.read_text(encoding="utf-8", errors="replace"), profile=args.profile,
+        from verdance.world.visit_tiers import RAPTOR_MAPS  # type: ignore
+        profile = args.home_profile if (args.home_profile and row["map"] in RAPTOR_MAPS) else args.profile
+        row["profile"] = profile
+        text, team = patch_startscript(script.read_text(encoding="utf-8", errors="replace"), profile=profile,
                                        speed=args.speed, minutes=args.minutes, settle=args.settle, hud=args.hud or args.windowed,
-                                       beats=args.beats)
+                                       beats=args.beats, raptor_stay=args.raptor_stay)
         if args.rival_ai:
             text, swapped = rivals_to(text, args.rival_ai)
             print(f"[autopilot] TEST: {swapped} rival BARb seat(s) play as {args.rival_ai}", flush=True)
