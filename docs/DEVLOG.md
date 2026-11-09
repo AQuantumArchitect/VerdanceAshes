@@ -42,6 +42,13 @@ One entry per working day: what changed, what was measured, what's next. The new
   - The finale on the medium soak: partial (50/65), then won (65/65).
   - Vane and Halbard fell early (sorties 1 and 3), and the hollowed company lost three Rock Jungle drops to roaming raptors. Since then the retreat steps away from the enemy first and Ketha is held back sooner (9a5f6a4), now in A/B trials.
 
+**Writing** (`docs/writing/`)
+- 93 camp talks no longer read out internal role ids ("core_skirm seat beside core_rez.").
+- **The cluttered feeling is mostly a template.** 60 generated talks share the same four middle lines and the close "Support locks. X and Y leave the hearth different."
+- `talk_proposals.md` lists all 60 and drafts three replacements in the pairs' own voices (Ketha/Vane goes from 82 to 46 words). These are proposals; nothing was applied.
+
+**Decision 4:** do the drafts in `talk_proposals.md` sound like your characters? If so, I'll write the rest the same way.
+
 **Not done or not verified**
 - The HUD reviewer's density cuts to the mission rail (smaller rows, fewer lines). Some of what it would cut is yours by design ("Left if you lift"), so it waits for you.
 - The writing pass itself: only the audit is done, not rewrites.
