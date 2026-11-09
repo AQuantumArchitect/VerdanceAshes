@@ -210,6 +210,18 @@ def finale_state(st: dict, path: str) -> dict:
     return st
 
 
+_LUA_ERR = re.compile(r"RunCallInTraceback.*?((?:game_verdance|gui_verdance|va_)\w*\.lua\"?\]?:\d+: [^\]\n]{0,120})")
+
+
+def lua_errors(log_text: str) -> dict:
+    """Verdance's own Lua errors in a sortie's engine log, {message: count}. A gadget that raises keeps
+    running in BAR, so nothing else shows it (the hero caution raised 180 times, 2026-11-09, unseen)."""
+    out: dict = {}
+    for m in _LUA_ERR.finditer(log_text):
+        out[m.group(1)] = out.get(m.group(1), 0) + 1
+    return out
+
+
 def archive_log(run_dir: Path, n: int) -> Path:
     """Stdout belongs to this process; BAR's shared infolog may be truncated or replaced."""
     dest = run_dir / f"sortie_{n:02d}.infolog.txt"
@@ -551,6 +563,14 @@ def main() -> int:
             archive_log(run_dir, n)
         except Exception:  # noqa: BLE001
             pass
+        try:
+            errs = lua_errors((run_dir / f"sortie_{n:02d}.engine.txt").read_text(encoding="utf-8", errors="replace"))
+        except OSError:
+            errs = {}
+        if errs:
+            row["luaErrors"] = errs
+            print(f"[autopilot] WARNING sortie {n}: {sum(errs.values())} Verdance Lua error(s): "
+                  + "; ".join(f"{k} (x{v})" for k, v in list(errs.items())[:3]), flush=True)
         crash = None
         try:
             txt = (run_dir / f"sortie_{n:02d}.infolog.txt").read_text(encoding="utf-8", errors="replace")
