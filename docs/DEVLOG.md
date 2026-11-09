@@ -40,6 +40,7 @@ One entry per working day: what changed, what was measured, what's next. The new
 - Rock Jungle wipes: baseline 6, v2 0.
 - Caution A/B: hero-sorties lost per run fell from 5.0 with no caution to 3.0 with the current one, and Ketha survived every sortie of the last trials. A Lua error had silently broken one version; it was found by a new harness test, fixed, and the runner now flags such errors.
 - The door-hold fix won Rock Jungle doors and broke the home loop in v3.
+- **Campaigns v3 and v4 both completed in 12 sorties**, winning the medium-soak finale on the second try. v4 lost its four core heroes by sortie 6 and still won.
 - **Campaign v3** (everything up to the soak, the door hold, temper and the bleed rule): **completed in 12 sorties.**
   - The finale on the medium soak: partial (50/65), then won (65/65).
   - Vane and Halbard fell early (sorties 1 and 3), and the hollowed company lost three Rock Jungle drops to roaming raptors. The caution work since then is measured above.
@@ -47,7 +48,13 @@ One entry per working day: what changed, what was measured, what's next. The new
   - Sorties 1–5 all extracted clean (one victory, four partials), though Vane fell in sortie 1 (mission 1's opening).
   - **Sortie 6, a fortify job on Koom Valley's standing war**, killed Verse and Halbard. The pad was the fight, so the retreat led back into it. Fixed in cb8e5de: on a hot pad, the second leg steps further away. That fix is in the harness but not yet seen in the field: Koom isn't offered in the first three missions.
   - With Vane, Verse and Halbard gone, sorties 7–10 were four Rock Jungle wipes in a row: the pull home keeps choosing home for a company that can't hold it.
-  - Sortie 11, the finale with every core hero dead: partial, 36 of 65, and Mask came home. Sortie 12 is the second finale attempt; it's still running, in `export\campaign_hard_v4.log`. It runs slowly: another overnight job (`node tune.mjs`, not Verdance) holds about 72% of the CPU.
+  - Sortie 11, the finale with every core hero dead: partial, 36 of 65, and Mask came home.
+  - **Sortie 12 won the finale, 65 of 65. Campaign v4 completed in 12 sorties**, the same as v3, with no Lua errors in any row. It needed two finale tries again, which fits decision 1.
+- **Two 7-sortie trials preferring Koom** (current code): 14 of 14 sorties came home, with no Lua errors. Three victories, ten partials and one Rock Jungle defeat.
+  - Vane died in both: in mission 1 of trial 1, and by sortie 3 of trial 2. Halbard died by sortie 3 in both. That is decision 5's opening problem again, and Rock Jungle's.
+  - Only trial 1 reached Koom, on its last sortie: partial, clean, Verse unhurt. **The hot-pad retreat still hasn't fired in the field**, because no hero pulled back on that drop.
+  - Ketha went down 14 s in, about 830 from the pad, before caution's once-a-second check saw her hurt. She was walking toward a hostile rescue wreck. Her wreck was a heap (heavy overkill). Nothing from the baked battle stands within 1,500 of the pad. A Legion base (team `w`) begins about 1,700 from where she fell: cluster artillery ×3, light turrets ×10 and drone hives. So she most likely walked into artillery range.
+  - This is a level question as much as a proxy one: a rescue wreck sits beyond an artillery base, and the critical hero's 1,500 leash lets her walk toward it. On the proxy side, I could keep a critical rez hero inside the pad's radius until the rescue path is quiet. That's untested.
 - **Two 3-sortie trials on the current code** (hot-pad retreat included): 6 of 6 sorties came home, with no wipes and no Lua errors. Three victories and three partials, one of them a Rock Jungle drop. Trial 1 lost no heroes. In trial 2, Halbard fell in mission 1's opening, the same spot as decision 5. Neither trial was offered Koom, so two 7-sortie trials preferring Koom are running (`export\koom_act2_*.log`).
 
 **Writing** (`docs/writing/`)
