@@ -48,10 +48,21 @@ Owner notes after the baseline (Luke asleep; "err on the side of doing too much"
   - Sortie 2, the Rock Jungle founding (baseline: wiped), extracted clean with all four plus Veil. It departed on the raptor clock at frame 19,811 (600 s grace plus 60 s).
   - Sortie 3 (Greenest): everyone home.
   - Sortie 4 (Rock Jungle): extracted clean; Ketha fell.
-- Finale A trial on the medium soak (`20261109_012053`), in progress:
-  - The commander sweep removed 7 of 8.
-  - The objective counts 65 guns and factories (was 18).
-  - The proxy besieges with about 70 guns.
+- Finale A, the Overthrow, as a soak, in 45 game minutes against the hard AI with mercenaries (it rents Bro and his Tzar):
+
+  | Soak | Targets | Result | Heroes |
+  |---|---|---|---|
+  | Medium, shipped (`20261109_012053`) | 65 | 52 broken, then left on the clock: partial | Vane and Halbard fell; Ketha and Verse came home wounded |
+  | Easy (`--soak easy`) | 34 | all broken: won | Bro, Lunkhead and Verse came home |
+
+  - The sweep left one commander of eight.
+  - Under the old siege bake, Verse alone took the Overthrow in 154 s.
+  - The soak time works as a difficulty dial. Medium may be a little past what the proxy can finish: the next lever is soak minutes (17–18) or the strip.
+  - The heroes lost hp with "enemies=0" within 700: the Keep's long guns. Since then, a hero losing 12% hp in a second pulls back too (18214ea).
+- Also tonight:
+  - The Rock Jungle door jobs sat in "clear" all sortie with nothing booked. A capture with nothing to wreck clears by standing in the zone in strength. The proxy now masses there in that phase too (f2793fd).
+  - Temper reads the mean bond with drop-mates; the sum saturated.
+  - Hero cards and the Company tab say steady, shaken, eager or grieving when it's notable.
 
 ## 2026-11-09: the hard-AI baseline
 
