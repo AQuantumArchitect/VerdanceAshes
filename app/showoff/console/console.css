@@ -262,9 +262,14 @@ details.advanced summary { color:var(--steam); }
 .legend-row .lg-open::before { background:transparent; border:1px solid var(--warn); }
 .cc-overlays { display:flex; gap:1rem; border:0; padding:.25rem .4rem; margin:.2rem 0; font-size:var(--fs-sm); }
 .cc-overlays legend { float:left; margin-right:1rem; color:var(--muted); }
-.cc-faction-key { font-size:var(--fs-sm); padding:.2rem .4rem; }
-.cc-faction-key summary { cursor:pointer; color:var(--muted); font-size:var(--fs-xs); letter-spacing:.12em; text-transform:uppercase; display:inline-block; }
-.cc-faction-key[open] { display:flex; flex-wrap:wrap; gap:.6rem; align-items:baseline; }
+/* folded, the key is one small toggle line; the generic .cc-workspace details box (border, padding)
+   outranked this rule and drew a 56px empty panel above the board (2026-11-09 UI pass) */
+.cc-workspace .cc-faction-key, .cc-faction-key { font-size:var(--fs-sm); padding:0; margin:.25rem 0; border:0; }
+.cc-faction-key summary { cursor:pointer; color:var(--muted); font-size:var(--fs-xs); letter-spacing:.12em; text-transform:uppercase; display:inline-flex; align-items:center; list-style:none; }
+.cc-faction-key summary::-webkit-details-marker { display:none; }
+.cc-faction-key summary::before { content:"▸ "; }
+.cc-faction-key[open] summary::before { content:"▾ "; }
+.cc-workspace .cc-faction-key[open], .cc-faction-key[open] { display:flex; flex-wrap:wrap; gap:.6rem; align-items:baseline; padding:.3rem .5rem; border:1px solid var(--line-soft); border-radius:5px; }
 .cc-faction-key[open] summary { color:var(--ink); }
 .cc-faction-key .ally { color:var(--good); } .cc-faction-key .held { color:var(--warn); }
 .cc-faction-key .armada { color:var(--f-armada); } .cc-faction-key .cortex { color:var(--f-cortex); }
