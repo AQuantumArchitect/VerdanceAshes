@@ -36,7 +36,7 @@ One entry per working day: what changed, what was measured, what's next. The new
 
 **Measured** (details below)
 - Rock Jungle wipes: baseline 6, v2 0.
-- Caution A/B: 1 against 4 heroes dead after sortie 1, and 5 against 2 victories.
+- Caution A/B over four arms: hero-sorties lost per run fell from 5.0 with no caution to 2.7 with the current one (Ketha leashed and let go only when whole).
 - The door-hold fix won Rock Jungle doors and broke the home loop in v3.
 - **Campaign v3** (everything up to the soak, the door hold, temper and the bleed rule): **completed in 12 sorties.**
   - The finale on the medium soak: partial (50/65), then won (65/65).
@@ -123,7 +123,18 @@ Owner notes after the baseline (Luke asleep; "err on the side of doing too much"
   - After sortie 1, heroes lost: 1, 1, 1, 2, 2 (old caution-on 0, 1, 0).
   - Ketha fell in sortie 1 in three of five runs.
   - The traces showed why: her pull-back threshold (0.95) sat above the release threshold (0.90), so she flapped, pulled back and let go every other second, and BARb sent her straight back to the front each time. One trace has her pulled back at 0.90 and down 3.5 s later, thirteen minutes in, at the front.
-  - Fixed in d248b0e: a critical hero is let go only whole (0.98), with nobody near and close to the pad, and is leashed within 1,500 of the pad outside a rescue. Trials `ab_caution3_*` measure it.
+  - Fixed in d248b0e: a critical hero is let go only whole (0.98), with nobody near and close to the pad, and is leashed within 1,500 of the pad outside a rescue.
+- **Caution, all arms** (3 sorties a run, the same start):
+
+  | Arm | Runs | Hero-sorties lost per run | Dead after sortie 1 | Victories | Wipes |
+  |---|---|---|---|---|---|
+  | Off | 3 | 5.0 | 1.33 | 2/9 | 1 |
+  | v1 | 3 | 3.7 | 0.33 | 5/9 | 1 |
+  | v2 (Ketha flapping) | 5 | 4.8 | 1.4 | 6/15 | 0 |
+  | **v3 (Ketha fixed)** | 3 | **2.7** | 0.33 | 3/9 | 1 |
+
+  - v3 keeps heroes alive best. Ketha survived sorties 1 and 2 in every run.
+  - Victories vary with the route: sortie 3 went to Koom Valley in two v3 runs. Samples are small.
 - **Console clean-up** (6d5fc43): `VA_` debug lines no longer reach the player's chat. Found with the windowed screenshot rig (`--windowed --shots N`) and a log probe. BAR's chat drops priority L_DEPRECATED, and the infolog keeps it.
 - Also tonight:
   - The Rock Jungle door jobs sat in "clear" all sortie with nothing booked. A capture with nothing to wreck clears by standing in the zone in strength. The proxy now masses there in that phase too (f2793fd).
