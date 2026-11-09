@@ -1,8 +1,8 @@
 name: CI
+# Manual only: Actions minutes are scarce. CI runs locally on the dev PC before every push
+# (scripts\test\ci.bat: the hub tests with the real Umwelt pin, then this same ship dry run).
 on:
-  pull_request:
-  push:
-    branches: [master]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -12,8 +12,8 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
       - name: Hub tests
@@ -23,8 +23,8 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
       # The pinned Umwelt (tools/umwelt_pin.json) is a private repo, so CI cannot clone it yet.

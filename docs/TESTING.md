@@ -2,6 +2,10 @@
 
 How the game is tested, what each rig is for, and what was open when testing moved off wargen (2026-11-08). Everything here runs from a clone of this repo. Nothing depends on the old machine.
 
+## Local CI, before every push
+
+GitHub Actions minutes are scarce, so the CI workflow is manual only (`workflow_dispatch`) and GitHub is the save file. Before pushing to master, run `scripts\test\ci.bat`. It runs the hub tests with Umwelt at the pin, then the ship dry run and the staged-build check, which is what `.github/workflows/ci.yml` does, but with the real Umwelt instead of a stub. About a minute. `-TestsOnly` skips the build.
+
 ## The rigs, fastest first
 
 | Rig | Needs | What it answers | How |

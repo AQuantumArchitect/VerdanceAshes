@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- **CI runs locally.** GitHub Actions is manual only (Actions minutes are scarce). `scripts\test\ci.bat` is the gate before a push: the hub tests with the real Umwelt pin, the ship dry run and the staged-build check. The workflows use the Node 24 actions (checkout v5, setup-python v6, upload-artifact v5).
+- **The test rig runs on Windows.** Lua 5.4 is found on Linux or Windows (`winget install DEVCOM.Lua`, or `VA_LIBLUA`), the hub tests start no detached belief workers, and the tests that assumed Linux (symlinks, BAR's install paths) work on a PC with BAR installed.
+
 - **The test rig travels with the repo.** `scripts\test\` holds the autopilot bats (hard-AI campaign, tour, finale, resume, two-sortie rehearsal). They build their own venv and Umwelt at the pin, with no machine paths. `tools/test_rig/` holds the hub snapshot, the flow walk the playtester reads, and the Lua runner. `docs/TESTING.md` covers what each rig is for and what was open on 2026-11-08.
 
 

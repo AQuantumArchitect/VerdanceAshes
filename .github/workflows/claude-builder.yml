@@ -25,7 +25,7 @@ jobs:
       id-token: write
       actions: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - name: Build with Claude
@@ -39,7 +39,7 @@ jobs:
             --allowedTools "Edit,Write,Read,Glob,Grep,MultiEdit,Bash"
           prompt: |
             REPO: ${{ github.repository }}
-            ISSUE: #${{ github.event.issue.number }} — ${{ github.event.issue.title }}
+            ISSUE: #${{ github.event.issue.number }} â€” ${{ github.event.issue.title }}
             EXTRA INSTRUCTION FROM OWNER COMMENT (may be empty): ${{ github.event.comment.body }}
 
             MODE: ${{ github.event.issue.pull_request && 'PR REVISION' || 'NEW BUILD' }}
@@ -89,7 +89,7 @@ jobs:
       - name: Upload usage artifact
         if: always()
         continue-on-error: true
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: claude-usage
           path: usage.json
@@ -102,4 +102,4 @@ jobs:
         run: |
           gh label create blocked --repo "$GITHUB_REPOSITORY" --color B60205 2>/dev/null || true
           gh issue edit ${{ github.event.issue.number }} --repo "$GITHUB_REPOSITORY" --add-label blocked --remove-label building
-          gh issue comment ${{ github.event.issue.number }} --repo "$GITHUB_REPOSITORY" --body "Claude Builder run failed or timed out: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID — marked blocked."
+          gh issue comment ${{ github.event.issue.number }} --repo "$GITHUB_REPOSITORY" --body "Claude Builder run failed or timed out: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID â€” marked blocked."
