@@ -1289,6 +1289,9 @@ def _build(ws: Path, intent: Dict[str, Any], state: Any, *, intent_path: str, st
         # WO-035: Arc A off (hot extract wave only in the gadget); light/full later.
         "escalation": escalation,
         "heroes": hero_manifest,
+        # Each hero's temper on this drop (verdance.company.temper): the camp's bonds, wounds and
+        # griefs as nerve and drive; game_verdance_unit_behavior scales the hero's doctrine by them.
+        "heroTemper": _hero_temper(state, deploy_allow, ws, log),
         # Per-def veteran XP bank: the gadget seeds SetUnitExperience / craft XP on spawn.
         "cadreXp": cadre_xp,
         "beats": piped(arr(intent["beats"])) if (has(intent, "beats") and T(intent["beats"])) else None,
@@ -1444,6 +1447,17 @@ def _standing_pocket_zones(ws: Path, state: Any, map_id: str) -> Optional[CIDict
         if zid and zid not in scarred and S(g(pk, "pocketId")) not in dead:
             zones[zid] = True
     return zones
+
+
+def _hero_temper(state: Any, drop: List[str], ws: Path, log: Log) -> Dict[str, Dict[str, float]]:
+    """Temper for the heroes on this drop; never stops a build (an odd save gets no temper)."""
+    try:
+        from verdance.company.temper import temper_for_drop
+        plain = json.loads(json.dumps(state, default=float)) if state is not None else {}
+        return temper_for_drop(plain if isinstance(plain, dict) else {}, drop, ws)
+    except Exception as e:  # noqa: BLE001
+        log(f"WARNING: hero temper skipped: {e}")
+        return {}
 
 
 def build_scenario(workspace: Path, intent: Dict[str, Any], state: Any, *, intent_path: Optional[str] = None,
