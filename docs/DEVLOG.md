@@ -7,7 +7,9 @@ One entry per working day: what changed, what was measured, what's next. The new
 **Decisions waiting on you**
 1. **The Overthrow's medium soak is hard but beatable.** First attempts broke 52 and 50 of the Keep's 65 guns and factories in 45 game minutes (partial). Then campaign v3 **won it on its second attempt, 65/65** (the campaign offers the finale again after a partial). The easy soak (15 min) was won outright. My read: keep medium at 20 minutes; it's a two-try finale for the proxy. Your call if it should be one try (bake at 17–18).
 2. **The hard soak's tors spend the soak on economy.** 515 metal makers at one tor; 3,309 units in all. Swapping the tors' SimpleConstructorAI for SimpleDefenderAI would give fortifications instead.
-3. **The pull home never lets go on the hard-AI runs.** The bag's Tenebrium isn't spent at home, so the proxy keeps choosing Rock Jungle jobs. v2 did seven door jobs in a row. Is that the intended pull, or should a few visits without spending ease it?
+3. **The pull home never lets go on the hard-AI runs.** The bag's Tenebrium isn't spent at home, so the proxy keeps choosing Rock Jungle jobs. v2 did seven door jobs in a row. In v4, once the core heroes were dead, it chose home four times in a row and was wiped each time. Two levers, both yours:
+   - Should the pull ease after visits that spend nothing, or after wipes?
+   - Should a company too thin to hold home (heroes dead, reserve small) feel less pull?
 
 **What changed overnight** (all on master, local CI green each time)
 - The drop limit grows 1k per sortie played, with no cap. A wipe loses its stockpile. The field's free 1k is no longer banked as hauled metal (a contract bug).
@@ -41,7 +43,11 @@ One entry per working day: what changed, what was measured, what's next. The new
 - **Campaign v3** (everything up to the soak, the door hold, temper and the bleed rule): **completed in 12 sorties.**
   - The finale on the medium soak: partial (50/65), then won (65/65).
   - Vane and Halbard fell early (sorties 1 and 3), and the hollowed company lost three Rock Jungle drops to roaming raptors. The caution work since then is measured above.
-- **Campaign v4**, on everything as of 03:40 (fixed caution, Ketha leash, quiet console, air recruits, temper), was started at 03:40. Its result is in `export\campaign_hard_v4.log` and the `luaErrors` field of each row. It runs slowly: another overnight job (`node tune.mjs`, not Verdance) holds about 72% of the CPU.
+- **Campaign v4** (everything as of 03:40), interim at sortie 10:
+  - Sorties 1–5 all extracted clean (one victory, four partials), though Vane fell in sortie 1 (mission 1's opening).
+  - **Sortie 6, a fortify job on Koom Valley's standing war**, killed Verse and Halbard. The pad was the fight, so the retreat led back into it. Fixed in cb8e5de: on a hot pad, the second leg steps further away. That fix is in the harness but not yet seen in the field: Koom isn't offered in the first three missions.
+  - With Vane, Verse and Halbard gone, sorties 7–10 were four Rock Jungle wipes in a row: the pull home keeps choosing home for a company that can't hold it.
+  - It's still running, in `export\campaign_hard_v4.log`. It runs slowly: another overnight job (`node tune.mjs`, not Verdance) holds about 72% of the CPU.
 
 **Writing** (`docs/writing/`)
 - 93 camp talks no longer read out internal role ids ("core_skirm seat beside core_rez.").
