@@ -66,31 +66,17 @@ local FORCE_AT = num("va_autopilot_force_complete", 0) > 0 and math.floor(num("v
 local RAPTOR_GRACE = tonumber(opts.va_raptor_grace_seconds)
 local RAPTOR_STAY = num("va_autopilot_raptor_stay", 60)
 local RAPTOR_LEAVE_FRAMES = RAPTOR_GRACE and math.floor((RAPTOR_GRACE + RAPTOR_STAY) * 30) or nil
--- hero caution: retreat below HERO_LOW health, or below HERO_HURT with HERO_CROWD armed enemies near;
--- released at HERO_WHOLE, or after HERO_QUIET frames with no enemy near
--- (trial 20261109_005443: at 0.40/0.70 and every 2 s, Vane pulled back at 0.49 among ten enemies and
--- still fell, and Ketha went from whole to 0.18 between two checks; now earlier and every second)
+-- hero caution, once a second: the safety field (include/va_safety_field.lua) weighs each place a hero
+-- could be (its own orders; the pad; the middle of the company's strength; a ring as far as it walks
+-- in the time it takes to cross the enemy's reach; for a rez hero, the wrecks it knows of) by the chance
+-- it lives through getting there and staying, times what it keeps and gains, and the hero goes to the
+-- best. Owner call 2026-11-09: no leash and no thresholds (this replaced health cut-offs at 0.55, 0.85
+-- and 0.90, "five enemies within 700", Ketha's 1500 leash, a 700 step and a "hot pad" count; history
+-- in git and docs/DEVLOG.md).
 local CAUTION_EVERY = 30
 -- va_autopilot_caution=0 turns hero caution off (A/B trials of the proxy player)
 local CAUTION_ON = num("va_autopilot_caution", 1) ~= 0
-local HERO_LOW, HERO_HURT, HERO_WHOLE = 0.55, 0.85, 0.90
-local HERO_CROWD, HERO_SENSE = 5, 700
-local HERO_QUIET = 90 * 30
--- taking fire it cannot see (finale trial 20261109_012053: the Keep's long guns took Halbard from 0.85 to
--- 0.21 with "enemies=0" within 700): losing this much health in a second, below HERO_HURT, pulls back too
-local HERO_BLEED = 0.12
--- a critical hero (Ketha, the company's rez captain: she raises the others) is kept out of it sooner
--- (campaign_hard_v2/v3: she fell more than anyone): any hurt with two enemies near
-local CRIT_HURT, CRIT_CROWD = 0.95, 2
--- ...and let go only whole with nobody near (A/B 2026-11-09: released at 0.90 she flapped, pulled at
--- 0.93 and let go at 0.93 every other second, and BARb sent her straight back to the front each time),
--- and leashed: beyond CRIT_LEASH of the pad, not on a rescue, she is walked back and held until within
--- half of it (she fell at the front 13 minutes in, 3.5 s after a pull-back that came too late)
-local CRIT_WHOLE, CRIT_LEASH = 0.98, 1500
--- the retreat steps away from the enemies near it before it heads for the pad (it used to walk straight
--- to the pad, often through them)
-local RETREAT_STEP = 700
-local PAD_HOT = 3            -- this many armed enemies within HERO_SENSE of the pad: the pad is no refuge
+local SafetyField = VFS.Include("luarules/gadgets/include/va_safety_field.lua")
 
 if not gadgetHandler:IsSyncedCode() then
   local started, sped, echoed = false, false, false
@@ -128,7 +114,8 @@ local hudPresent = false                    -- the rig player widget said VA_RIG
 local tx, tz = nil, nil
 local held = {}                             -- unitID -> true: the rig's order stands
 local retreating = {}                       -- unitID -> frame it was pulled back (hero caution)
-local lastHp = {}                           -- unitID -> health fraction at the last caution pass
+local chosen = {}                           -- unitID -> the plan caution last ordered ({ kind, x, z, fid })
+local field = nil                           -- the safety field (shared on GG with the hero doctrine)
 local issuing = false
 
 -- Drop the rig's holds (a rescue squad, a siege) but keep the heroes that are being pulled back.
@@ -746,44 +733,21 @@ local function rescueWreck()
   return rescueFid
 end
 
--- Where the armed enemies within r of (x, z) stand on average, or nil when none.
-local function threatCentroid(x, z, r)
-  local myAlly = select(6, Spring.GetTeamInfo(playerTeam, false))
-  local sx, sz, n = 0, 0, 0
-  for _, u in ipairs(Spring.GetUnitsInCylinder(x, z, r) or {}) do
-    local t = Spring.GetUnitTeam(u)
-    local ud = UnitDefs[Spring.GetUnitDefID(u) or -1]
-    if t and t ~= Spring.GetGaiaTeamID() and select(6, Spring.GetTeamInfo(t, false)) ~= myAlly
-        and ud and ud.weapons and #ud.weapons > 0 and not Spring.GetUnitIsDead(u) then
-      local ux, _, uz = Spring.GetUnitPosition(u)
-      if ux then sx, sz, n = sx + ux, sz + uz, n + 1 end
-    end
-  end
-  if n == 0 then return nil end
-  return sx / n, sz / n
+local function healthOf(uid)
+  local hp, maxHp = Spring.GetUnitHealth(uid)
+  hp = tonumber(hp) or 0
+  return hp, tonumber(maxHp) or hp
 end
 
-local function threatsNear(x, z, r)
-  local myAlly = select(6, Spring.GetTeamInfo(playerTeam, false))
-  local n = 0
-  for _, u in ipairs(Spring.GetUnitsInCylinder(x, z, r) or {}) do
-    local t = Spring.GetUnitTeam(u)
-    local ud = UnitDefs[Spring.GetUnitDefID(u) or -1]
-    if t and select(6, Spring.GetTeamInfo(t, false)) ~= myAlly and t ~= Spring.GetGaiaTeamID()
-        and ud and ud.weapons and #ud.weapons > 0 and not Spring.GetUnitIsDead(u) then
-      n = n + 1
-    end
-  end
-  return n
-end
-
-local function rescue()
+local function rescue(f)
   local fid = rescueWreck()
   if not fid then releaseHolds(); return end
   local hid = tostring(Spring.GetFeatureRulesParam(fid, "va_hero_wreck") or "?")
   local wx, _, wz = Spring.GetFeaturePosition(fid)
   if not wx then return end
-  -- the squad: the four nearest guns fight to the wreck
+  field:refresh(f)
+  -- the squad: the nearest guns, as many as it takes to outfight what covers the wreck (Lanchester: the
+  -- sums of (dps x hp)^1/2 on each side, the unseen enemy included)
   -- (once the Spire Gate is open the heroes belong on its pad, not in a rescue squad)
   local gateOpen = tostring(Spring.GetGameRulesParam("va_gate_state") or "") == "open"
   local guns = companyUnits(function(ud, uid)
@@ -799,107 +763,111 @@ local function rescue()
     dist[uid] = x and ((x - wx) ^ 2 + (z - wz) ^ 2) or math.huge
   end
   table.sort(guns, function(a, b) if dist[a] == dist[b] then return a < b end return dist[a] < dist[b] end)
-  local squad = {}
-  for i = 1, math.min(4, #guns) do squad[i] = guns[i] end
-  if #squad > 0 then order(squad, CMD.FIGHT, { wx, Spring.GetGroundHeight(wx, wz) or 0, wz }, true) end
-  -- the rez: only once the ground is quiet (armed enemies near a wreck turn a rescue into a
-  -- feeding), or nearly quiet when the pocket is mostly wrecked anyway
-  local threats = threatsNear(wx, wz, 700)
-  local total, down = rp("va_objective_total"), rp("va_objective_destroyed")
-  local crippled = total > 0 and down / total >= 0.6
-  if threats > 0 and not (crippled and threats <= 12) then
-    Spring.Echo("VA_AUTOPILOT rez waiting hero=" .. hid .. " threats=" .. threats)
-    return
+  local need, have, squad = field:enemyFightAt(wx, wz), 0, {}
+  for _, uid in ipairs(guns) do
+    if have >= need then break end
+    squad[#squad + 1] = uid
+    have = have + SafetyField.profile(Spring.GetUnitDefID(uid)).fight
   end
-  local rez, crit = {}, {}
+  if #squad > 0 then order(squad, CMD.FIGHT, { wx, Spring.GetGroundHeight(wx, wz) or 0, wz }, true) end
+  -- the rez: each rez bot raises it when that is worth more to it than staying where it is (the walk
+  -- and the work weighed by the field; the hero raised is worth what it was worth alive). With caution
+  -- on, the rez heroes make that choice in caution, among every wreck they know of.
+  local name = Spring.GetFeatureResurrect and Spring.GetFeatureResurrect(fid)
+  local wdef = name and UnitDefNames and UnitDefNames[name]
+  local wp = SafetyField.profile(wdef and wdef.id)
+  local gain = field.heroValue[hid] or wp.cost
+  local rez = {}
   for _, uid in ipairs(companyUnits(function(ud) return ud and ud.canResurrect end)) do
     local q = Spring.GetUnitCommands(uid, 1)
     local busy = q and q[1] and q[1].id == CMD.RESURRECT and q[1].params and q[1].params[1] == fid + Game.maxUnits
     if busy then held[uid] = true
-    elseif (tonumber((Spring.GetUnitRulesParam(uid, "va_hero_critical"))) or 0) == 1 then crit[#crit + 1] = uid
-    else rez[#rez + 1] = uid end
+    elseif not (CAUTION_ON and isHero(uid)) then
+      local x, _, z = Spring.GetUnitPosition(uid)
+      local hp, maxHp = healthOf(uid)
+      local h = { uid = uid, x = x, z = z, hp = hp, maxHp = maxHp, defID = Spring.GetUnitDefID(uid) }
+      local H = x and field:horizon(h) or 0
+      if x and h.speed > 0 and h.p.rez > 0 then
+        local V = field:heroWorth(h)
+        local go = field:planValue(h, V, wx, wz, gain, wp.buildTime / h.p.rez)
+        local stay = field:planValue(h, V, x, z, 0, H)
+        if go > stay then rez[#rez + 1] = uid end
+      end
+    end
   end
-  if #rez == 0 then rez = crit end
-  if #rez == 0 then return end
+  if #rez == 0 then
+    Spring.Echo("VA_AUTOPILOT rez waiting hero=" .. hid .. string.format(" need=%.0f have=%.0f", need, have))
+    return
+  end
   order(rez, CMD.RESURRECT, { fid + Game.maxUnits }, true)
   Spring.Echo("VA_AUTOPILOT rez hero=" .. hid .. " feature=" .. fid .. " builders=" .. #rez)
 end
 
 -- ---------------------------------------------------------------- hero caution
--- BARb treats a named hero as one more unit: on the 11-09 baseline 20 of them died. A hero badly hurt,
--- or hurt with a crowd of armed enemies near, walks back to the pad (where the base and the builders
--- are) and stays out of BARb's hands until it is mostly whole, or the ground near it has been quiet for
--- HERO_QUIET (a pad with no repair still lets it go back to work).
+-- BARb treats a named hero as one more unit: on the 11-09 baseline 20 of them died. Once a second each
+-- hero's plan is weighed against the alternatives (the safety field) and the best is taken: its own
+-- orders (back to BARb), a refuge (held there), or a wreck to raise (a rez hero).
+
+-- Where a unit's current orders take it: the order's point, or the unit or feature it is aimed at.
+local function planOf(uid)
+  local q = Spring.GetUnitCommands(uid, 1)
+  local p = q and q[1] and q[1].params
+  if not p or #p == 0 then return nil end
+  if #p >= 3 then return { x = p[1], z = p[3] } end
+  local id, x, z = p[1], nil, nil
+  local _
+  if id >= Game.maxUnits then x, _, z = Spring.GetFeaturePosition(id - Game.maxUnits)
+  else x, _, z = Spring.GetUnitPosition(id) end
+  if x then return { x = x, z = z } end
+end
+
 local function caution(f)
   local px, pz = tonumber((Spring.GetGameRulesParam("va_pad_x"))), tonumber((Spring.GetGameRulesParam("va_pad_z")))
   if not px then return end
-  local pulled = {}
+  field:refresh(f)
   for _, uid in ipairs(Spring.GetTeamUnits(playerTeam) or {}) do
     if isHero(uid) and not Spring.GetUnitIsDead(uid) then
-      local hp, maxHp = Spring.GetUnitHealth(uid)
-      local frac = (hp and maxHp and maxHp > 0) and hp / maxHp or 1
       local x, _, z = Spring.GetUnitPosition(uid)
-      local bleed = (lastHp[uid] or frac) - frac
-      lastHp[uid] = frac
-      local critical = (tonumber((Spring.GetUnitRulesParam(uid, "va_hero_critical"))) or 0) == 1
-      local padDist = x and math.sqrt((x - px) ^ 2 + (z - pz) ^ 2) or 0
-      if x then
-        local crowd = threatsNear(x, z, HERO_SENSE)
-        local whole = critical and (frac >= CRIT_WHOLE and crowd == 0 and padDist <= CRIT_LEASH * 0.5) or (not critical and frac >= HERO_WHOLE)
-        if retreating[uid] then
-          if whole or (crowd == 0 and f - retreating[uid] >= HERO_QUIET and (not critical or padDist <= CRIT_LEASH * 0.5)) then
-            retreating[uid], held[uid] = nil, nil
-            Spring.Echo("VA_AUTOPILOT hero back to work id=" .. tostring(Spring.GetUnitRulesParam(uid, "va_hero_id"))
-              .. " hp=" .. string.format("%.2f", frac))
+      local hp, maxHp = healthOf(uid)
+      if x and hp > 0 then
+        local h = { uid = uid, x = x, z = z, hp = hp, maxHp = maxHp, defID = Spring.GetUnitDefID(uid),
+          hid = Spring.GetUnitRulesParam(uid, "va_hero_id"), plan = (not retreating[uid]) and planOf(uid) or nil }
+        local best = field:choose(h, px, pz)
+        local name = tostring(h.hid)
+        if best.kind == "stay" then
+          if retreating[uid] then
+            retreating[uid], held[uid], chosen[uid] = nil, nil, nil
+            Spring.Echo("VA_AUTOPILOT hero back to work id=" .. name .. string.format(" hp=%.2f S=%.3f", hp / math.max(maxHp, 1), best.S))
           end
-        elseif frac < HERO_LOW or (frac < HERO_HURT and (crowd >= HERO_CROWD or bleed >= HERO_BLEED))
-            or (critical and frac < CRIT_HURT and crowd >= CRIT_CROWD)
-            or (critical and padDist > CRIT_LEASH and not held[uid]) then
-          retreating[uid] = f
-          pulled[#pulled + 1] = uid
-          Spring.Echo("VA_AUTOPILOT hero pulls back id=" .. tostring(Spring.GetUnitRulesParam(uid, "va_hero_id"))
-            .. " hp=" .. string.format("%.2f", frac) .. " enemies=" .. crowd .. " bleed=" .. string.format("%.2f", bleed))
+        else
+          -- a new order only when the plan changed by more than the hero walks in a refresh
+          local prev = chosen[uid]
+          local same = prev and prev.kind == best.kind and ((best.fid and prev.fid == best.fid)
+            or (not best.fid and math.sqrt((prev.x - best.x) ^ 2 + (prev.z - best.z) ^ 2) <= h.speed * field.dt))
+          if not same then
+            held[uid] = true
+            issuing = true
+            pcall(function()
+              if best.kind == "rez" then
+                Spring.GiveOrderToUnit(uid, CMD.RESURRECT, { best.fid + Game.maxUnits }, 0)
+              else
+                Spring.GiveOrderToUnit(uid, CMD.MOVE, { best.x, Spring.GetGroundHeight(best.x, best.z) or 0, best.z }, 0)
+              end
+            end)
+            issuing = false
+            retreating[uid] = retreating[uid] or f
+            chosen[uid] = best
+            Spring.Echo("VA_AUTOPILOT hero " .. (best.kind == "rez" and "raises" or "pulls back") .. " id=" .. name
+              .. string.format(" hp=%.2f S=%.3f to=%d,%d", hp / math.max(maxHp, 1), best.S, math.floor(best.x), math.floor(best.z)))
+          end
         end
       end
     elseif retreating[uid] then
-      retreating[uid], held[uid] = nil, nil
+      retreating[uid], held[uid], chosen[uid] = nil, nil, nil
     end
   end
   for uid in pairs(retreating) do
-    if Spring.GetUnitIsDead(uid) ~= false then retreating[uid], held[uid] = nil, nil end
-  end
-  -- each one steps away from the enemies near it, then goes back to the pad (the company's base and
-  -- builders stand there, and it is where they lift from)
-  for _, uid in ipairs(pulled) do
-    local x, _, z = Spring.GetUnitPosition(uid)
-    -- (not `x and threatCentroid(...)`: `and` keeps only the first value, and ez was always nil, which
-    -- raised on every pull-back with an enemy near and left `issuing` stuck on, 9a5f6a4 to this fix)
-    local ex, ez
-    if x then ex, ez = threatCentroid(x, z, HERO_SENSE) end
-    held[uid] = true
-    issuing = true
-    pcall(function()
-      if ex and ez then
-        local dx, dz = x - ex, z - ez
-        local len = math.sqrt(dx * dx + dz * dz)
-        if len < 1 then dx, dz, len = px - x, pz - z, math.max(1, math.sqrt((px - x) ^ 2 + (pz - z) ^ 2)) end
-        local sx = math.max(32, math.min(Game.mapSizeX - 32, x + dx / len * RETREAT_STEP))
-        local sz = math.max(32, math.min(Game.mapSizeZ - 32, z + dz / len * RETREAT_STEP))
-        Spring.GiveOrderToUnit(uid, CMD.MOVE, { sx, Spring.GetGroundHeight(sx, sz) or 0, sz }, 0)
-        if threatsNear(px, pz, HERO_SENSE) < PAD_HOT then
-          Spring.GiveOrderToUnit(uid, CMD.MOVE, { px, Spring.GetGroundHeight(px, pz) or 0, pz }, { "shift" })
-        else
-          -- the pad is the fight (a fortify job on contested ground, campaign_hard_v4 Koom Valley: Verse
-          -- and Halbard went back to it and fell): a second step further from the enemies instead
-          local fx = math.max(32, math.min(Game.mapSizeX - 32, x + dx / len * RETREAT_STEP * 2))
-          local fz = math.max(32, math.min(Game.mapSizeZ - 32, z + dz / len * RETREAT_STEP * 2))
-          Spring.GiveOrderToUnit(uid, CMD.MOVE, { fx, Spring.GetGroundHeight(fx, fz) or 0, fz }, { "shift" })
-        end
-      else
-        Spring.GiveOrderToUnit(uid, CMD.MOVE, { px, Spring.GetGroundHeight(px, pz) or 0, pz }, 0)
-      end
-    end)
-    issuing = false
+    if Spring.GetUnitIsDead(uid) ~= false then retreating[uid], held[uid], chosen[uid] = nil, nil, nil end
   end
 end
 
@@ -966,6 +934,11 @@ function gadget:Initialize()
   local ok, m = pcall(VFS.Include, "singleplayer/verdance_ashes/generated/va_current.lua")
   mission = ok and type(m) == "table" and m or nil
   playerTeam = tonumber(mission and mission.balance and mission.balance.playerTeamID) or 0
+  -- one safety field per ally team, shared on GG (the hero doctrine reads the same one)
+  local myAlly = select(6, Spring.GetTeamInfo(playerTeam, false)) or playerTeam
+  GG.VA_SafetyFields = GG.VA_SafetyFields or {}
+  field = GG.VA_SafetyFields[myAlly] or SafetyField.new(myAlly)
+  GG.VA_SafetyFields[myAlly] = field
   -- a finale is a long fight (the gate's fusions and charge, the kings' war): three times the clock
   if mission and type(mission.finale) == "table" then CAP_FRAMES = CAP_FRAMES * 3 end
   -- the kings' showdown ends only with the throne: twice that again before the company gives up
@@ -1007,7 +980,7 @@ function gadget:GameFrame(f)
   end
   gateRig()
   if CAUTION_ON then caution(f) end   -- every pass (frames run at f % 30 == 11: once a second)
-  if f % RESCUE_EVERY == 311 then rescue() end
+  if f % RESCUE_EVERY == 311 then rescue(f) end
   if f % NUDGE_EVERY < 30 then siege(); holdTheZone(); nudge() end
   if f % NUDGE_EVERY == 341 then scout() end   -- (frames run at f % 30 == 11; 311 is the rescue)
 end

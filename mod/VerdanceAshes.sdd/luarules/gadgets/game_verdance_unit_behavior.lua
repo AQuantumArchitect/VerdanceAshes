@@ -83,6 +83,7 @@ if CMD_ATTACK then PLAYER_COMBAT_CMDS[CMD_ATTACK] = true end
 if CMD_GUARD then PLAYER_COMBAT_CMDS[CMD_GUARD] = true end
 
 local Util, UnitClass, Belief, Intent, HeroDoctrine, MoleculePolicy = nil, nil, nil, nil, nil, nil
+local SafetyField = nil
 do
   local ok, mod = pcall(VFS.Include, "luarules/gadgets/include/va_util.lua")
   if ok and type(mod) == "table" then Util = mod end
@@ -102,6 +103,8 @@ do
     ok, mod = pcall(VFS.Include, "LuaRules/gadgets/include/va_molecule_policy.lua")
   end
   if ok and type(mod) == "table" then MoleculePolicy = mod end
+  ok, mod = pcall(VFS.Include, "luarules/gadgets/include/va_safety_field.lua")
+  if ok and type(mod) == "table" then SafetyField = mod end
   -- Synced env has no rawget/_G; pin doctrine onto Intent explicitly.
   if Intent and Intent.setHeroDoctrine and HeroDoctrine then
     Intent.setHeroDoctrine(HeroDoctrine)
@@ -315,6 +318,13 @@ local function issueOrder(unitID, cmdID, params, opts)
   local ok = pcall(Spring.GiveOrderToUnit, unitID, cmdID, params, opts or {})
   aiOrdering[unitID] = nil
   return ok
+end
+
+-- A feature as a command's one target: the engine reads a single id below Game.maxUnits as a unit, so a
+-- feature is offset by it (the raw featureID here used to aim reclaim and rez at whatever unit had that
+-- number; found 2026-11-09).
+local function featureTarget(featureID)
+  return featureID + ((Game and Game.maxUnits) or 0)
 end
 
 local function issueMove(unitID, x, z)
@@ -761,6 +771,43 @@ local function thinkHurtRetreat(unitID, teamID, frame, ud, forceBail)
   return false
 end
 
+-- (heroIdFor is defined further down; these come first)
+local function namedHero(unitID)
+  local hid = Spring.GetUnitRulesParam(unitID, "va_hero_id")
+  if hid ~= nil and tostring(hid) ~= "" and hid ~= 0 then return tostring(hid) end
+  return nil
+end
+
+-- The safety field for a team's ally team, shared on GG (the proxy player's autopilot reads the same),
+-- refreshed at most once a frame.
+local function safetyFor(teamID, frame)
+  if not SafetyField then return nil end
+  local ally = select(6, Spring.GetTeamInfo(teamID, false))
+  if ally == nil then return nil end
+  GG.VA_SafetyFields = GG.VA_SafetyFields or {}
+  local f = GG.VA_SafetyFields[ally]
+  if not f then
+    f = SafetyField.new(ally)
+    GG.VA_SafetyFields[ally] = f
+  end
+  f:refresh(frame)
+  return f
+end
+
+local function fieldRezChoice(unitID, teamID, frame)
+  local f = safetyFor(teamID, frame)
+  if not f then return nil end
+  local x, _, z = unitPos(unitID)
+  if not x then return nil end
+  local hp, maxHp = Spring.GetUnitHealth(unitID)
+  hp = tonumber(hp) or 0
+  local px, pz = tonumber((Spring.GetGameRulesParam("va_pad_x"))), tonumber((Spring.GetGameRulesParam("va_pad_z")))
+  local h = { uid = unitID, x = x, z = z, hp = hp, maxHp = tonumber(maxHp) or hp,
+    defID = Spring.GetUnitDefID(unitID), hid = namedHero(unitID) }
+  local best = f:choose(h, px or x, pz or z)
+  return best
+end
+
 local function isConstructor(ud)
   if not ud then return false end
   if ud.isFactory then return false end
@@ -786,7 +833,7 @@ local function thinkConstructor(unitID, teamID, frame, ud, allowBusy)
       if not isIdle(unitID) and CMD_STOP then
         issueOrder(unitID, CMD_STOP, {}, {})
       end
-      if issueOrder(unitID, CMD_RECLAIM, { shard }, {}) then
+      if issueOrder(unitID, CMD_RECLAIM, { featureTarget(shard) }, {}) then
         Spring.SetUnitRulesParam(unitID, "va_behavior", "tnb_soak", { public = true })
         Spring.SetUnitRulesParam(unitID, "va_chase_r", math.floor(tnbChase), { public = true })
         lastAssist[unitID] = { kind = "tnb_soak", frame = frame }
@@ -809,10 +856,30 @@ local function thinkConstructor(unitID, teamID, frame, ud, allowBusy)
     end
   end
 
-  if (ud.canResurrect or CMD_RESURRECT) and CMD_RESURRECT then
+  -- A rez hero (Ketha) chooses by the safety field (owner call 2026-11-09): the wreck worth most once
+  -- the walk and the work are weighed by the chance she lives through them, or a refuge when every
+  -- wreck, and where she stands, is worse. She does not walk into the dark, or under guns, for a wreck.
+  if ud.canResurrect and CMD_RESURRECT and SafetyField and namedHero(unitID) then
+    local best = fieldRezChoice(unitID, teamID, frame)
+    if best and best.kind == "rez" then
+      if issueOrder(unitID, CMD_RESURRECT, { featureTarget(best.fid) }, {}) then
+        Spring.SetUnitRulesParam(unitID, "va_behavior", "rez", { public = true })
+        Spring.SetUnitRulesParam(unitID, "va_safety", math.floor(best.S * 100 + 0.5), { public = true })
+        lastAssist[unitID] = { kind = "rez", frame = frame }
+        return true
+      end
+    elseif best and best.kind == "refuge" then
+      if issueMove(unitID, best.x, best.z) then
+        Spring.SetUnitRulesParam(unitID, "va_behavior", "refuge", { public = true })
+        Spring.SetUnitRulesParam(unitID, "va_safety", math.floor(best.S * 100 + 0.5), { public = true })
+        lastAssist[unitID] = { kind = "refuge", frame = frame }
+        return true
+      end
+    end
+  elseif (ud.canResurrect or CMD_RESURRECT) and CMD_RESURRECT then
     local wreck = findNearestRezWreck(x, z, craftChase)
     if wreck then
-      if issueOrder(unitID, CMD_RESURRECT, { wreck }, {}) then
+      if issueOrder(unitID, CMD_RESURRECT, { featureTarget(wreck) }, {}) then
         Spring.SetUnitRulesParam(unitID, "va_behavior", "rez", { public = true })
         Spring.SetUnitRulesParam(unitID, "va_chase_r", math.floor(craftChase), { public = true })
         lastAssist[unitID] = { kind = "rez", frame = frame }
@@ -845,7 +912,7 @@ local function thinkConstructor(unitID, teamID, frame, ud, allowBusy)
   if isRezBot(ud) and energyInDeficit(teamID) and CMD_RECLAIM then
     local tree = findNearestTree(x, z, treeChase)
     if tree then
-      if issueOrder(unitID, CMD_RECLAIM, { tree }, {}) then
+      if issueOrder(unitID, CMD_RECLAIM, { featureTarget(tree) }, {}) then
         Spring.SetUnitRulesParam(unitID, "va_behavior", "eat_tree", { public = true })
         Spring.SetUnitRulesParam(unitID, "va_chase_r", math.floor(treeChase), { public = true })
         lastAssist[unitID] = { kind = "tree", frame = frame }

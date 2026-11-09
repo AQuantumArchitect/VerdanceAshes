@@ -9,6 +9,7 @@ local function reset()
   rules = { va_pad_x = 0, va_pad_z = 0, va_pad_r = 100 }
   positions = { [1] = { 150, 0 }, [2] = { 0, 0 } }
   orders, extracted, registered, threats = {}, false, false, {}
+  if GG then GG.VA_SafetyFields = nil end   -- a new match, a new field
   gadget = {}
   dofile(GADGET)
   gadget:Initialize()
@@ -20,11 +21,18 @@ gadgetHandler = {
 }
 CMD = { ANY = -1, FIGHT = 16, MOVE = 10, RESURRECT = 125, REPAIR = 40, ATTACK = 20 }
 Game = { maxUnits = 10000, mapSizeX = 8192, mapSizeZ = 8192 }
-UnitDefs = {
-  [1] = { speed = 50, canAttack = true },
-  [2] = { speed = 50, isBuilder = true, canResurrect = true },
-  [3] = { weapons = { 1 } },
+WeaponDefs = {
+  [1] = { damages = { [0] = 50 }, reload = 1, range = 400 },    -- the enemy's gun
+  [2] = { damages = { [0] = 100 }, reload = 1, range = 350 },   -- a fighter hero's
 }
+UnitDefs = {
+  [1] = { speed = 50, canAttack = true, health = 1000, metalCost = 100 },
+  [2] = { speed = 50, isBuilder = true, canResurrect = true, buildSpeed = 100, health = 500, metalCost = 200 },
+  [3] = { weapons = { { weaponDef = 1 } }, health = 500, metalCost = 100 },
+  [4] = { name = "pilot", speed = 40, health = 1000, metalCost = 300, buildTime = 3000 },   -- a hero's wreck raises this
+  [6] = { speed = 50, canAttack = true, health = 2000, metalCost = 400, weapons = { { weaponDef = 2 } } },
+}
+UnitDefNames = { pilot = { id = 4 } }
 GG = {
   VA_ExfilCmd = function(cmd) assert(cmd == "extract:home"); extracted = true end,
   VA_ZoneAnchor = function() return 999, 999 end,
@@ -32,6 +40,7 @@ GG = {
 VFS = { Include = function(path)
   if path:find("va_active") then return true end
   if path:find("va_commanders") then return dofile("mod/VerdanceAshes.sdd/luarules/gadgets/include/va_commanders.lua") end
+  if path:find("va_safety_field") then return dofile("mod/VerdanceAshes.sdd/luarules/gadgets/include/va_safety_field.lua") end
   return mission
 end }
 Spring = {
@@ -48,11 +57,18 @@ Spring = {
   GetGaiaTeamID = function() return 9 end,
   GetUnitIsDead = function() return false end,
   GetTeamInfo = function(team) return 0, 0, 0, 0, 0, team end,
-  GetTeamUnits = function() return { 1, 2 } end,
+  -- the company is team 0 (ally 0); the enemy is team 1 (ally 1), whatever stands in `threats`
+  GetTeamUnits = function(team) if team == 1 then return threats end return { 1, 2 } end,
+  GetTeamList = function(at) return { at } end,
+  GetAllyTeamList = function() return { 0, 1 } end,
+  IsPosInLos = function() return true end,
+  GetUnitLosState = function() return { los = true } end,
+  GetUnitHealth = function(uid) local d = UnitDefs[Spring.GetUnitDefID(uid)]; local h = d and d.health or 1; return h, h end,
+  GetFeatureResurrect = function() return "pilot" end,
   GetUnitDefID = function(uid) return uid end,
   GetUnitRulesParam = function() return 0 end,
   GetGroundHeight = function() return 0 end,
-  GetUnitPosition = function(uid) return positions[uid][1], 0, positions[uid][2] end,
+  GetUnitPosition = function(uid) local p = positions[uid]; if p then return p[1], 0, p[2] end end,
   GetUnitCommands = function() return {} end,
   GetAllUnits = function() return { 1, 2 } end,
   GiveOrderToUnitArray = function(units, cmd, params)
@@ -80,13 +96,18 @@ end
 -- 1. No HUD (the Windows headless rig): the rescue, then straight out once everyone is aboard.
 reset()
 assert(registered == CMD.ANY)
+threats = { 3 }
+positions[3] = { 260, 200 }                         -- an enemy gun covers the wreck (at 200, 200)
 gadget:GameFrame(311)
-assert(find(CMD.FIGHT) and find(CMD.FIGHT).params[1] == 200, "the squad must go to the actual wreck")
+assert(find(CMD.FIGHT) and find(CMD.FIGHT).params[1] == 200, "a squad goes to the actual wreck")
+assert(not find(CMD.RESURRECT), "nobody walks into the gun to raise it")
+threats = {}                                        -- the squad broke it (its ground is seen empty)
+gadget:GameFrame(911)
 assert(find(CMD.RESURRECT) and find(CMD.RESURRECT).params[1] == 10009, "the rez bots raise the wreck")
 assert(not gadget:AllowCommand(2), "BARb must not overwrite the rescue order")
 assert(gadget:AllowCommand(3), "units the rig never ordered stay BARb's")
 threats = { 3 }
-gadget:GameFrame(911)
+gadget:GameFrame(1511)
 assert(not gadget:AllowCommand(2), "incoming threats must not release an active rescue order")
 gadget:GameFrame(1811)
 assert(orders[#orders].cmd == CMD.MOVE, "the clock must regroup before extracting")
@@ -377,63 +398,74 @@ gadget:GameFrame(1541)
 assert(gadget:AllowCommand(1), "scouted: back to BARb")
 assert(not find(CMD.FIGHT), "and nobody is sent again")
 
--- 7. Hero caution (2026-11-09): a hurt hero walks back and is held; Ketha (critical) is leashed to the
---    pad and let go only whole, with nobody near, close to it (she used to flap between pull-back at
---    0.95 and release at 0.90, and BARb sent her back to the front every other second).
+-- 7. Hero caution from the safety field (owner call 2026-11-09: no leash, no thresholds). Ketha (a rez
+--    hero) out by an enemy gun is pulled out of its reach and held; with the gun gone she is let go;
+--    she raises a wreck only once it is safe. Vane (a fighter) keeps trading with one gun while whole,
+--    and leaves when the trade turns against him.
 local heroHp = {}
 local function cautionWorld()
   reset()
   GG.VA_RivalKings, GG.VA_ObjectiveTargets = nil, nil
+  UnitDefNames = UnitDefNames or {}
+  UnitDefNames.pilot = { id = 4 }                -- (the Spire Gate case swapped these out)
+  UnitDefs[4] = { name = "pilot", speed = 40, health = 1000, metalCost = 300, buildTime = 3000 }
   rules.va_secondary_total = 0
-  heroHp = { [5] = 1.0, [6] = 1.0 }
+  heroHp = {}
   positions[5], positions[6], positions[3] = { 2000, 0 }, { 300, 0 }, { 2100, 0 }
   threats = {}
-  Spring.GetTeamUnits = function() return { 5, 6 } end
-  Spring.GetUnitDefID = function(uid) return uid == 3 and 3 or 1 end
+  Spring.GetTeamUnits = function(team) if team == 1 then return threats end return { 5, 6 } end
+  Spring.GetUnitDefID = function(uid) return ({ [3] = 3, [5] = 2, [6] = 6 })[uid] or 1 end
   Spring.GetUnitRulesParam = function(uid, k)
     if k == "va_hero_id" then return ({ [5] = "ketha", [6] = "vane" })[uid] end
-    if k == "va_hero_critical" then return uid == 5 and 1 or 0 end
   end
-  Spring.GetUnitHealth = function(uid) return heroHp[uid] or 1, 1 end
+  Spring.GetUnitHealth = function(uid)
+    local h = UnitDefs[Spring.GetUnitDefID(uid)].health
+    return (heroHp[uid] or 1) * h, h
+  end
+  Spring.GetAllFeatures = function() return {} end
   Spring.GiveOrderToUnit = function(uid, cmd, params) orders[#orders + 1] = { cmd = cmd, params = params, units = { uid } } end
+end
+local function lastOf(uid, cmd)
+  local out
+  for _, o in ipairs(orders) do if o.cmd == cmd and o.units[1] == uid then out = o end end
+  return out
 end
 cautionWorld()
 gadget:GameFrame(41)
-assert(not gadget:AllowCommand(5), "Ketha 2000 from the pad, whole: leashed and held")
-assert(gadget:AllowCommand(6), "Vane whole and near: BARb's")
-positions[5], heroHp[5] = { 500, 0 }, 0.99
+assert(gadget:AllowCommand(5) and gadget:AllowCommand(6), "nothing known to fear: both are BARb's")
+threats = { 3 }                                 -- an enemy gun 100 from Ketha (reach 400)
+orders = {}
 gadget:GameFrame(71)
-assert(gadget:AllowCommand(5), "Ketha back near the pad, whole, nobody near: let go")
-threats, heroHp[5] = { 3, 3 }, 0.93
-orders = {}
+assert(not gadget:AllowCommand(5), "Ketha within a gun's reach: pulled back and held")
+local mv = lastOf(5, CMD.MOVE)
+assert(mv and math.abs(mv.params[1] - 2100) > 400 + 50, "...out of its reach: " .. tostring(mv and mv.params[1]))
+local n = #orders
 gadget:GameFrame(101)
-assert(not gadget:AllowCommand(5), "Ketha hurt with two enemies near: pulled back")
-local step = find(CMD.MOVE)
-assert(step and step.units[1] == 5 and step.params[1] < 500, "she steps away from the enemies (they stand east) before the pad")
+assert(not gadget:AllowCommand(5) and #orders == n, "the same a second later: held, no new order (no flapping)")
+threats = {}
 gadget:GameFrame(131)
-assert(not gadget:AllowCommand(5), "the same a second later: still held (no flapping)")
--- a quiet pad: after the step away the hero goes on to the pad
-local function lastMovesOf(uid)
-  local mv = {}
-  for _, o in ipairs(orders) do if o.cmd == CMD.MOVE and o.units[1] == uid then mv[#mv + 1] = o end end
-  return mv
-end
-orders = {}
-heroHp[6] = 0.5
+assert(gadget:AllowCommand(5), "the gun gone: Ketha is let go")
+-- a wreck under a gun: she will not raise it; the gun broken, she does
+Spring.GetAllFeatures = function() return { 9 } end
+Spring.GetFeaturePosition = function() return 2150, 0, 0 end
+threats, orders = { 3 }, {}
 gadget:GameFrame(161)
-assert(not gadget:AllowCommand(6), "Vane at half health: pulled back")
-local mv = lastMovesOf(6)
-assert(#mv == 2 and mv[2].params[1] == 0 and mv[2].params[3] == 0, "two enemies at the pad (not hot): step away, then the pad")
-threats, heroHp[6] = {}, 0.95
+assert(not lastOf(5, CMD.RESURRECT), "she does not raise a wreck under the gun")
+threats, orders = {}, {}
 gadget:GameFrame(191)
-assert(gadget:AllowCommand(6), "Vane mostly whole again: back to BARb")
--- a hot pad (the fight is on it, a fortify job on contested ground): a second step away, not the pad
-threats, heroHp[6] = { 3, 3, 3, 3 }, 0.5
-positions[6] = { 3000, 0 }                      -- east of the enemies (at 2100), clear of the map edge
-orders = {}
+local rz = lastOf(5, CMD.RESURRECT)
+assert(rz and rz.params[1] == 10009, "the gun gone, she raises it")
+-- Vane: whole, against one gun, the trade is his (he kills it faster than it kills him); at a tenth of
+-- his health it is not
+Spring.GetAllFeatures = function() return {} end
+positions[5], positions[6], positions[3] = { 300, 300 }, { 1500, 0 }, { 1800, 0 }
+threats, orders = { 3 }, {}
 gadget:GameFrame(221)
-mv = lastMovesOf(6)
-assert(#mv == 2 and mv[2].params[1] ~= 0 and math.abs(mv[2].params[1] - 2100) > math.abs(mv[1].params[1] - 2100),
-  "four enemies at the pad: the second leg goes further from them, not back to the pad")
+assert(gadget:AllowCommand(6), "Vane whole against one gun: he keeps fighting")
+heroHp[6] = 0.1
+gadget:GameFrame(251)
+assert(not gadget:AllowCommand(6), "Vane at a tenth: out of it")
+mv = lastOf(6, CMD.MOVE)
+assert(mv and math.abs(mv.params[1] - 1800) > 400, "out of the gun's reach")
 
-print("ok: scout marks, rescue squad, protected orders, departure to the real pad radius, leaving with and without a HUD, holding a capture, the Spire Gate and its tech ladder, the siege, hero caution and Ketha's leash")
+print("ok: scout marks, rescue squad sized to outfight the gun, protected orders, departure to the real pad radius, leaving with and without a HUD, holding a capture, the Spire Gate and its tech ladder, the siege, hero caution from the safety field")
