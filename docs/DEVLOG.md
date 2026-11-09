@@ -2,9 +2,56 @@
 
 One entry per working day: what changed, what was measured, what's next. The newest entry comes first. Run folders live under `autopilot_runs\` on the dev PC (fenrir); they're not in git.
 
+## 2026-11-09 (afternoon): the safety field, temper on Umwelt, the ten-work soak
+
+**Owner calls (after the morning summary)**
+- No leashes and no magic numbers anywhere: reason from continuous geometry, as Umwelt proposes. Zones of safety from the balance of allied and enemy power; unknown ground is scary; Ketha, a rez bot, keeps to known-safe ground.
+- The loop to aim for: the army smashes the base and loses a couple of units; Ketha runs in once it's safe and raises the wrecks; everyone extracts when safe.
+- Mood and personality graphs run on Umwelt graphs.
+- The finale: a 20-minute soak with five SimpleDefenderAIs, two SimpleConstructorAIs (three would scale too hard) and balanced BARbs, 8–10 AIs in all, plus a couple of LRPCs on the walls.
+- Mission 1 is fine as it is. The pull home (decision 3) may be solved by continuous decisions. The camp talks are still to be read.
+
+**What changed** (all on master, local CI green each time)
+- **The safety field** (`include/va_safety_field.lua`; 4ebc469, 9c87172, d49fe8e, 50b34fe). Every quantity comes from unit defs, positions and what the company has seen:
+  - **Fire.** A known gun covers its weapon range. Its edge is blurred by how far it could have walked since it was seen, as a 2-D normal that is exact at the centre. A turret seen once stays sharp. Its fire is shared over the company units it can reach.
+  - **The unknown.** Enemy firepower not yet located is spread over unseen or long-unseen ground. "Long" means the time the enemy's typical walker takes to cross a cell; a cell is the company's median sight.
+  - **Hazard.** Fire reaching the hero ÷ its health now.
+  - **A plan's worth.** U = e^(−hazard on the way and while there) × (the hero's worth + what it gains). The hero takes the best plan among its own orders, staying put, the pad, the company's centre of strength, a ring at one enemy reach, and the wrecks it knows of (for a rez hero).
+  - **Worth.** A hero's worth is its unit's cost at its level, plus (for a rez hero) its share of the raising still to do. All of that is multiplied by the sorties it would still serve.
+  - **Temper** (below) scales seen danger × e^(−nerve) and gain × e^(drive).
+- **The proxy (autopilot)** now runs caution and the rescue on the field. The old knobs are gone: 0.55/0.85/0.90 health, "5 enemies in 700", Ketha's 1500 leash, the 700 step, the hot-pad count, the 4-gun squad and the 700 quiet rule.
+  - The rescue squad is the nearest guns until they outfight what covers the wreck (Lanchester).
+  - While a hero is held, it's weighed on what BARb wanted when it was taken. That ended the flapping (78 swaps a sortie in the first trial).
+- **The hero doctrine (human play).** An idle rez hero picks a wreck or a refuge from the same field.
+  - **Bug found:** the doctrine aimed reclaim and rez at raw feature IDs, which the engine reads as *unit* IDs. They're now offset by `Game.maxUnits`.
+- **Temper on Umwelt** (7a31af5). Each hero on the drop is a node with dissipative nerve and drive.
+  - Camp events are observations: each level, each time down, a wound carried, and each bond felt (at a confidence of its points).
+  - Bridges bind bonded drop-mates (coupling = points/100, negative for rivals) and each bonded friend who died; the dead are held at despair, so grief reaches the living through the bond.
+  - Umwelt's transport runs across the graph's width. The doctrine's temper weights (0.30/0.15/0.30) are now the same exponentials.
+  - The old tanh form is kept only for a build without Umwelt.
+- **The Overthrow soak** (4ebc469). Ten works: five SimpleDefenderAIs, two SimpleConstructorAIs and three balanced BARbs. Two LRPCs (`armbrtha`) stand on the gatehouse towers, set down after the soak.
+  - Re-baked: medium 1,198 units (was 957), easy 792, hard 2,362.
+  - **Note:** BAR's SimpleDefenderAI is not turret-only. Its builders put up turrets on their random rolls and around every mex, but its factories still build an army that patrols friendly ground.
+
+**Measured**
+
+Batch 1 is on the field's first version (before the flapping fix, temper in the field, and the campaign worth). Same setup as last night: two 7-sortie campaigns preferring Koom.
+
+| | Old caution (last night) | Field v1 |
+|---|---|---|
+| Sorties home | 14/14 | 14/14 |
+| Core heroes killed | 4 (Vane and Halbard in both, by sortie 3) | 1 (Ketha, Rock Jungle, sortie 3) |
+| Koom drops survived by every hero | — (one drop, Ketha down 14 s in) | 4 of 4 |
+| Lua errors | 0 | 0 |
+
+- Ketha's Rock Jungle death is why "a named hero is worth every sortie it would still serve" exists: she went to raise a wreck at 38% survival.
+- The finale on the new medium soak (one try): partial, 19 of the Keep's 46 targets, all four heroes alive. Harder than last night's eight-work soak (36/65 on a first try).
+
+Batch 2 (everything as of 50b34fe; two field campaigns, one with caution off, and a finale) is running; results below when in.
+
 ## Morning summary for Luke (2026-11-09)
 
-**Decisions waiting on you**
+**Decisions waiting on you** (afternoon: 1, 2 and 5 answered above; 3 hoped for; 4 still yours)
 1. **The Overthrow's medium soak is hard but beatable.** First attempts broke 52 and 50 of the Keep's 65 guns and factories in 45 game minutes (partial). Then campaign v3 **won it on its second attempt, 65/65** (the campaign offers the finale again after a partial). The easy soak (15 min) was won outright. My read: keep medium at 20 minutes; it's a two-try finale for the proxy. Your call if it should be one try (bake at 17–18).
 2. **The hard soak's tors spend the soak on economy.** 515 metal makers at one tor; 3,309 units in all. Swapping the tors' SimpleConstructorAI for SimpleDefenderAI would give fortifications instead.
 3. **The pull home never lets go on the hard-AI runs.** The bag's Tenebrium isn't spent at home, so the proxy keeps choosing Rock Jungle jobs. v2 did seven door jobs in a row. In v4, once the core heroes were dead, it chose home four times in a row and was wiped each time. Two levers, both yours:
