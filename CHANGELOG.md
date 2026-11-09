@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- **The test rig travels with the repo.** `scripts\test\` holds the autopilot bats (hard-AI campaign, tour, finale, resume, two-sortie rehearsal). They build their own venv and Umwelt at the pin, with no machine paths. `tools/test_rig/` holds the hub snapshot, the flow walk the playtester reads, and the Lua runner. `docs/TESTING.md` covers what each rig is for and what was open on 2026-11-08.
+
 
 ## 0.15.0 — 2026-11-04
 
