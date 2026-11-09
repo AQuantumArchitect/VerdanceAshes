@@ -57,6 +57,9 @@ def rank_from_level(level: int) -> str:
     return {1: "Runner", 2: "Scarred", 3: "Captain", 4: "Legend"}.get(level, f"Lv{level}")
 
 
+from verdance.campaign.progression import HERO_CAMPAIGN_XP_PER_LEVEL as _HERO_XP_PER_LEVEL, HERO_MAX_LEVEL as _HERO_MAX_LEVEL  # noqa: E402
+
+
 def build_aces(state: dict) -> list[dict]:
     _away = hub_belief.away_from_camp(state)
     characters = state.get("characters") or {}
@@ -81,6 +84,8 @@ def build_aces(state: dict) -> list[dict]:
             "level": level,
             "rank": rh.get("rank") or rank_from_level(level),
             "campaignXp": float(rh.get("campaignXp") or ch.get("xp") or 0),
+            # the ladder (verdance.campaign.progression), so a card can show xp as progress to the next level
+            "xpPerLevel": _HERO_XP_PER_LEVEL, "maxLevel": _HERO_MAX_LEVEL,
             "wounds": int(ch.get("wounds") or rh.get("timesWounded") or 0),
             "status": rh.get("status") or ch.get("status") or "active",
             "scars": list(ch.get("scars") or rh.get("scars") or []),

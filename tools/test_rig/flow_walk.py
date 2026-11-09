@@ -27,7 +27,7 @@ with sync_playwright() as pw:
     def shot(name, sel):
         pg.wait_for_timeout(500); pg.screenshot(path=str(OUT/f"{name}.png"))
         t = pg.locator(sel).inner_text() if pg.locator(sel).count() else ""
-        rows.append((name, W(t))); (OUT/f"{name}.txt").write_text(t)
+        rows.append((name, W(t))); (OUT/f"{name}.txt").write_text(t, encoding="utf-8")
     shot("1_job", "#app")
     pg.click("#btn-deploy"); pg.wait_for_timeout(800)
     shot("2_talks", "#drop-confirm .flow-card")

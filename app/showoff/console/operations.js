@@ -267,7 +267,9 @@ export function renderDropSquad() {
       const canToggle = !isCore && !!e.pickable && !locked;
       return renderHeroCard({
         id: e.id, ace: e.ace,
-        tag: isCore ? "always comes" : [rented.has(e.id) ? "rented" : "", on ? "" : "at base"].filter(Boolean).join(", ") || null,
+        tag: isCore ? null : [rented.has(e.id) ? "rented" : "", on ? "" : "at base"].filter(Boolean).join(", ") || null,
+        lock: isCore ? "always comes" : null,
+        lockTitle: isCore ? "Ketha comes on every drop: she brings the fallen back." : null,
         classes: [isCore ? "core" : "", on ? "on" : "tier-base", canToggle ? "toggleable" : ""].filter(Boolean),
         compact: true, hideCost: true, dataCrew: canToggle ? e.id : null, disabled: !canToggle, type: "button",
       });

@@ -738,9 +738,21 @@ details.advanced summary { color:var(--steam); }
 .drop-confirm-card h2 { text-transform:uppercase; letter-spacing:.12em; }
 .drop-confirm-card .lede { max-width:none; }
 .drop-squad-kicker { margin:.85rem 0 .35rem; font-size:var(--fs-xs); letter-spacing:.14em; text-transform:uppercase; color:var(--ash); }
-.drop-squad { display:grid; grid-template-columns:repeat(auto-fill, minmax(10.5rem,1fr)); gap:.4rem; margin:0 0 .15rem; overflow:auto; min-height:0; flex:1 1 auto; }
-.drop-squad .hero-card { background:color-mix(in srgb, var(--bg) 32%, transparent); }
+/* Cards keep their own height (playtest, 2026-11-04: "tall and mostly empty"): the grid's rows no
+   longer stretch to fill the flow card. */
+.drop-squad { display:grid; grid-template-columns:repeat(auto-fill, minmax(10.5rem,1fr)); gap:.4rem; margin:0 0 .15rem; overflow:auto; min-height:0; flex:1 1 auto; align-content:start; align-items:start; }
+.drop-squad .hero-card { background:color-mix(in srgb, var(--bg) 32%, transparent); align-content:start; }
 .drop-squad .hero-card.core { border-color:var(--line-gold); }
+/* Who always comes is not unavailable: full colour, with a lock instead of a toggle */
+.drop-squad .hero-card.core:disabled { opacity:1; cursor:default; }
+.hero-card .hc-lock { grid-column:1 / -1; justify-self:start; display:inline-flex; align-items:center; gap:.28rem; margin-top:.1rem;
+  font-size:var(--fs-xs); letter-spacing:.06em; text-transform:uppercase; color:var(--gold); padding:.06rem .4rem;
+  border:1px solid var(--line-gold); border-radius:var(--r-pill); background:color-mix(in srgb, var(--gold) 10%, transparent); }
+.hero-card .hc-lock svg { width:.7rem; height:.7rem; fill:currentColor; }
+.hero-card .hc-xp.hc-xp-progress { grid-column:1 / -1; grid-row:auto; justify-self:stretch; display:flex; align-items:center; gap:.4rem; white-space:nowrap; }
+.hero-card .hc-xp-bar { flex:1 1 auto; height:.28rem; border-radius:var(--r-pill); background:color-mix(in srgb, var(--steam) 16%, transparent); overflow:hidden; }
+.hero-card .hc-xp-bar i { display:block; height:100%; background:var(--steam); border-radius:inherit; }
+.hero-card .hc-xp-progress small { font-size:var(--fs-xs); color:var(--steam); opacity:.85; }
 .drop-squad .theater-sub { grid-column:1 / -1; }
 .drop-reserve { flex:0 1 auto; min-height:0; display:flex; flex-direction:column; }
 .drop-reserve .drop-squad-kicker b { color:var(--gold); }

@@ -63,7 +63,10 @@ function heroLevelXp(id, override) {
   const level = Number(ace.level || pack.level || 1) || 1;
   const xpRaw = ace.campaignXp != null ? ace.campaignXp : (pack.campaignXp != null ? pack.campaignXp : null);
   const xp = xpRaw != null ? Math.round(Number(xpRaw) || 0) : null;
-  return { level, xp, rank: ace.rank || null, status: ace.status || null, wounds: ace.wounds || 0 };
+  const perLevel = Number(ace.xpPerLevel) || 0;
+  const maxLevel = Number(ace.maxLevel) || 0;
+  return { level, xp, rank: ace.rank || null, status: ace.status || null, wounds: ace.wounds || 0, perLevel, maxLevel,
+           rawXp: xpRaw != null ? Number(xpRaw) || 0 : null };
 }
 function escortMeta(h) {
   return (h.escorts || []).map(e => {
@@ -133,6 +136,17 @@ export function renderHeroCard(opts) {
     .filter(Boolean).join(" ");
   // Earned campaign XP only: the start xp a pack is bought at is bookkeeping, not something to read.
   const xpLine = stats.xp ? `xp ${stats.xp}` : (o.xpLabel || "");
+  // XP as progress to the next level (playtest, 2026-11-04: "show xp as progress"), when the hub
+  // sends the ladder; a bare number otherwise.
+  let xpHtml = xpLine ? `<div class="hc-xp">${esc(xpLine)}</div>` : "";
+  if (stats.rawXp != null && stats.perLevel > 0) {
+    const top = stats.maxLevel && stats.level >= stats.maxLevel;
+    const into = top ? stats.perLevel : stats.rawXp - (stats.level - 1) * stats.perLevel;
+    const pct = Math.max(0, Math.min(100, into / stats.perLevel * 100));
+    const label = top ? "top level" : `${Math.round(into)} / ${stats.perLevel} to L${stats.level + 1}`;
+    xpHtml = `<div class="hc-xp hc-xp-progress" title="Campaign XP ${Math.round(stats.rawXp)}">` +
+      `<span class="hc-xp-bar"><i style="width:${pct.toFixed(1)}%"></i></span><small>${esc(label)}</small></div>`;
+  }
   const levelLine = `L${stats.level}`;
   // Sticky peak: career rank (Green/Proven/…). "Runner" is a SPEED tag, not a rank.
   // Legacy "Blooded" read as wounded — display as Proven.
@@ -167,7 +181,8 @@ export function renderHeroCard(opts) {
       <div class="hc-level" title="${esc(peakRaw)}">${esc(levelLine)}</div>
       ${peakNorm === "green" ? "" : `<div class="${peakClass}" title="Career rank">${esc(peakRaw)}</div>`}
       <div class="hc-meta">${esc(meta)}</div>
-      ${xpLine ? `<div class="hc-xp">${esc(xpLine)}</div>` : ""}
+      ${xpHtml}
+      ${o.lock ? `<div class="hc-lock" title="${esc(o.lockTitle || o.lock)}"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 7V5a4 4 0 1 1 8 0v2h1v8H3V7zm2 0h4V5a2 2 0 1 0-4 0z"/></svg>${esc(o.lock)}</div>` : ""}
       ${tagLine ? `<div class="hc-tags" title="Procedural tags (boost / nerf)">${esc(tagLine)}</div>` : ""}
       ${costHtml}
       <div class="hc-blurb">${esc(blurb)}</div>
