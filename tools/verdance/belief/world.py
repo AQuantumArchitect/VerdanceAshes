@@ -127,15 +127,16 @@ def _umwelt():
         except OSError:
             continue
     try:
-        from umwelt.spec.schema import DomainSpec, NodeSpec, BridgeSpec, BindingSpec, DriverSpec, AxisFace  # noqa
-        from umwelt.host.api import GameHost  # noqa
+        # Umwelt's stable surface (v0.2.0, docs/STABILITY.md); the deep paths are internal there
+        from umwelt import DomainSpec, NodeSpec, BridgeSpec, BindingSpec, DriverSpec, AxisFace, GameHost  # noqa
     except Exception as exc:  # noqa: BLE001 - ImportError, or numpy/scipy missing under it
         if not _UMWELT_WARNED:
             _UMWELT_WARNED = True
             print(f"verdance.belief.world: Umwelt not importable ({type(exc).__name__}: {exc}); belief world off. "
                   "Set UMWELT_SRC=<umwelt>/src, or ship with numpy/scipy + tools/_vendor.", file=sys.stderr)
         return None
-    return sys.modules["umwelt.spec.schema"], sys.modules["umwelt.host.api"]
+    # the modules that define them (wherever the facade keeps them)
+    return sys.modules[DomainSpec.__module__], sys.modules[GameHost.__module__]
 
 
 def umwelt_available() -> bool:

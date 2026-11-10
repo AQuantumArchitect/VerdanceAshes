@@ -1,6 +1,7 @@
 {
   "_doc": "The Umwelt a build ships (scripts/ship.ps1 vendors exactly this commit into tools/_vendor). Bump commit when Umwelt moves; the tests and the PC dev clones should sit on it too.",
   "repo": "https://github.com/AQuantumArchitect/umwelt.git",
-  "commit": "7ee6d083e7d211a6a20356f03e78808f16516cfa",
+  "tag": "v0.2.0",
+  "commit": "a00a0e718bd8a4f9c6a6c97ec9af5dfd855b6282",
   "license": "Apache-2.0"
 }
