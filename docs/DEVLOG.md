@@ -2,6 +2,57 @@
 
 One entry per working day: what changed, what was measured, what's next. The newest entry comes first. Run folders live under `autopilot_runs\` on the dev PC (fenrir); they're not in git.
 
+## 2026-11-10 (overnight): leaving on the field, Umwelt v0.2.0
+
+**Owner calls**
+- Put leaving the field on the safety field ("Yes, do it here").
+- Umwelt v0.2.0 is out, a moderately stable release: make it the base.
+- Keep iterating overnight.
+
+**Umwelt v0.2.0** (91a2be6, pushed). Pin `a00a0e7`. The belief world now imports through Umwelt's stable surface (`from umwelt import DomainSpec, …, GameHost`) instead of internal paths. Nothing else needed changing: 699 hub tests pass, and the ship dry run vendors the new pin.
+
+**Leaving: what was built** (`va_safety_field.lua`: `companyStays`, `fightOutcome`, `clearUp`, `boarding`)
+- **While the objective is open:** Lanchester's square law in fight units, sqrt(dps × hp). Ours is every mobile gun. Theirs is what contests the company: an enemy walker within twice its reach (its reach plus one reach of walking), a turret only where it covers the pad or the objective. The campaign gives no price for an objective (a failed one is another sortie), so it's worth what the company risked: staying is worth sqrt(1 − r²) × 2A, going is A × the walk home. It goes when sqrt(1 − r²) falls below half its chance of getting home (r ≈ 0.87 on a safe walk).
+- **After the objective:** stay only while the raising under way (Ketha) brings back worth faster than the field takes it.
+- **At the pad:** wait for a walker only while that's worth what the units aboard risk meanwhile. A walker that made no ground over the time it takes to cross a cell isn't waited for.
+- **Hero caution runs on the walk home.** During the departure a hero's own plan is the walk to the pad with no wait there, so caution only takes a refuge as a way round.
+- Gone: the 40 s settle, "three settles" for stuck units, and "60 s after the raptor grace". The 15-minute clock stays, as the rig's budget only.
+
+**What the trials taught** (each one a fix)
+- **Batch 3: every enemy army on the map counted.** Greenest Fields left at frame 0. Fix: only enemies that contest the company count.
+- **Batch 3: boarding on the unknown's prior priced every walk home on raptor ground at nothing.** Fifteen units and Vane were left behind. Fix: the company's own calls read the guns it has seen.
+- **Batch 4: point-blank enemies barely counted.** The contest kernel ("blur by one reach") gave an enemy right beside the company only a 0.39 chance of being in the fight. Fix: a disc of twice its reach.
+- **Batch 5: with the fight read only logged, Rock Jungle wiped once.** The company read r ≈ 0.75 on what it had seen and lost three quarters of its strength in the next minute to raptors it hadn't. Vane sat twelve minutes in a corner refuge (ring points pinned to the map edge) and was stranded. Fixes: off-map refuges are dropped; the walk home during departure.
+- **Batch 6: adding the unseen enemy to the company's fight left every Rock Jungle sortie in its first seconds.** The raptors' unfound strength, spread over the jungle, read r ≈ 0.88 at every pad. Taken back out: the prior is for where a hero stands.
+- **Batch 7: the departure log named what the company was facing.**
+  - At Greenest Fields' pad, 20,307 of 22,932 was one Legion commander's D-Gun read as sustained fire. Fix: manual-fire weapons aren't fire.
+  - A raptor queen nest 5,456 from the pad read r = 3.74 because one unit had wandered into its reach. Fix: a turret counts only where it covers the pad or the objective.
+
+- **Batch 8: a paired baseline.** Master's timers and the new rule ran side by side on identical settings: two campaigns preferring Rock Jungle, one preferring Koom, seven sorties each.
+- **Batch 9: an enemy counts once it has hurt the company.** The claim fades over the time the enemy takes to walk its reach. This came from batch 8's raptors near the pad reading r ≈ 1 when they weren't attacking. Boarding also averaged each walker's closing speed since the departure order.
+
+**Measured: the paired comparison**
+
+| Same campaigns (3 × 7 sorties) | Master: timers | New rule, batch 8 (proximity) | New rule, batch 9 (hits) |
+|---|---|---|---|
+| Rock Jungle campaigns: core-hero deaths (14 sorties) | **0** | 1 (Vane, after being stranded) | **7** (Ketha 3, Vane 2, Halbard 2) |
+| Rock Jungle defeats | 0 | 0 | 3 |
+| Rock Jungle heroes stranded | 0 | 1 | 1 sortie with 3 left behind |
+| Everyone on the pad at lift | 14/14 | most; walkers left on Koom (4/6, 9/15) | mostly |
+| Koom-leaning campaign | 1 stranded (Halbard); 2 sorties didn't finish | Vane stranded | Ketha, Vane, Halbard dead in one Rock Jungle sortie; Verse stranded |
+| Lua errors | 0 | 0 | 0 |
+
+- **Decision: the leave rule doesn't go to master.** It's parked on `wip/field-departure` (0592d14) with its tests. Master keeps "60 s after the raptor grace", the 15-minute clock, and "wait for everyone, or three settles".
+- **Why it fails on raptor ground.** No reading of the present sees a wave before it lands. Proximity reads every wandering raptor as a fight; the unknown's prior reads the whole jungle as one; hits taken arrive too late. The timer works because it encodes the spawner's schedule.
+- **Next, if it's picked up again:**
+  - Forecast the waves from the spawner's own published state (`raptorGracePeriod`, `raptorQueenAnger`/`raptorTechAnger`, its wave cooldowns) as known danger arriving at a known time. That keeps what the timer knows without its fixed 60 s.
+  - Boarding should keep the old "wait for everyone" behaviour, priced by what the units aboard risk, rather than drop walkers.
+- **Worth testing alone first** (on the branch, not on master): the D-Gun fix; dropping refuges past the map edge; the twice-reach contest. Each changes hero caution as well, so each needs its own trial.
+
+**Also**
+- **Flaky `test_sortie_flow`, fixed.** It failed in about half of today's full CI runs and never alone. It waited a flat 2 s, then checked for the formation screen. Under a loaded run the page hadn't drawn it yet, so the test took the sealed-company path and failed on a screen that wasn't there. It now waits for either screen to be visible. The full suite then passed three times out of three (699 passed). Found on the way: `build_hub_state.py` writes `app/showoff/hub_state.embed.js` under the real workspace, so trials and tests overwrite the page's state while they run. That didn't cause this failure, but it's an isolation gap.
+- **The raptor forecast, for later.** The spawner's next wave is predictable: `timeOfLastWave + raptorSpawnRate × waveTimeMultiplier`, with the multiplier set when each wave fires. Each wave's contents are rolled at spawn time, so its strength would have to be estimated from the waves already seen (the raptor roster's jump at each wave). Publishing the next wave's time from the mod's spawner copy is a one-line addition, but it touches live gameplay code, so it waits for the owner.
+
 ## 2026-11-09 (afternoon): the safety field, temper on Umwelt, the ten-work soak
 
 **Owner calls (after the morning summary)**

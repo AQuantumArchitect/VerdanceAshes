@@ -32,7 +32,11 @@ class SortieFlow(unittest.TestCase):
                 pg = b.new_page(viewport={"width": 1500, "height": 950})
                 pg.on("pageerror", lambda e: errors.append(str(e)))
                 pg.goto(f"http://127.0.0.1:{httpd.server_address[1]}/index.html")
-                pg.wait_for_timeout(2000)
+                # Wait for the page to show one of its two screens (the formation for a fresh campaign,
+                # the jobs board for a sealed one) instead of a fixed 2 s: under a loaded full run the
+                # intro was not drawn yet, the test took the sealed path, and failed (2 runs in 4, 11-09/10).
+                pg.wait_for_selector("#company-intro:visible, #btn-deploy:visible", timeout=20000)
+                pg.wait_for_timeout(300)
                 if pg.locator("#coach-skip").is_visible():
                     pg.click("#coach-skip")
                 self.assertFalse(pg.locator('button[data-workspace="home"]').count(), "the Home tab is gone")
