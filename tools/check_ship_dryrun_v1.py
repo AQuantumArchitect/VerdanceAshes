@@ -3,9 +3,11 @@
 
     python tools/check_ship_dryrun_v1.py export/dist/VerdanceAshes_v<VERSION>
 
-Looks for: the repo LICENSE and NOTICE beside the build, Umwelt's LICENSE beside the vendored
-snapshot (Apache-2.0 requires it), and a release_manifest.json with every field and the right
-values for a -SkipPython build. Exit 0 = clean, 1 = problems (each printed).
+Looks for: the repo LICENSE and NOTICE beside the build, Umwelt's LICENSE,
+LICENSE-EXCEPTION.md and NOTICE beside the vendored snapshot (AGPL-3.0-or-later
+with the AQuantumArchitect exception), the exception's source link left intact,
+and a release_manifest.json with every field and the right values for a
+-SkipPython build. Exit 0 = clean, 1 = problems (each printed).
 """
 from __future__ import annotations
 
@@ -24,11 +26,15 @@ REQUIRED_FIELDS = (
 
 def check(staging: Path) -> list[str]:
     bad: list[str] = []
-    for rel in ("LICENSE", "NOTICE", "tools/_vendor/umwelt/LICENSE", "tools/_vendor/umwelt/__init__.py",
-                "tools/_vendor/UMWELT_SNAPSHOT.txt"):
+    for rel in ("LICENSE", "NOTICE", "tools/_vendor/umwelt/LICENSE",
+                "tools/_vendor/umwelt/LICENSE-EXCEPTION.md", "tools/_vendor/umwelt/NOTICE",
+                "tools/_vendor/umwelt/__init__.py", "tools/_vendor/UMWELT_SNAPSHOT.txt"):
         f = staging / rel
         if not f.is_file() or f.stat().st_size == 0:
             bad.append(f"missing or empty: {rel}")
+    exc = staging / "tools/_vendor/umwelt/LICENSE-EXCEPTION.md"
+    if exc.is_file() and "https://github.com/AQuantumArchitect/umwelt-engine" not in exc.read_text(encoding="utf-8"):
+        bad.append("LICENSE-EXCEPTION.md does not keep the umwelt-engine source link")
     mf = staging / "release_manifest.json"
     if not mf.is_file():
         return bad + ["missing: release_manifest.json"]

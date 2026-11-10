@@ -44,20 +44,28 @@ own terms.
 
 
 --------------------------------------------------------------------------------
-Umwelt  --  redistributed in shipped builds
+Umwelt Engine  --  redistributed in shipped builds
 --------------------------------------------------------------------------------
 
-  Location:  tools/_vendor/umwelt/ in a built distribution (export/dist/...)
-  Version:   the commit pinned in tools/umwelt_pin.json
-  Author:    Luke Spooner
-  License:   Apache License 2.0
-  Upstream:  https://github.com/AQuantumArchitect/umwelt
+  Location:    tools/_vendor/umwelt/ in a built distribution (export/dist/...)
+  Version:     the commit pinned in tools/umwelt_pin.json (tag on that pin)
+  Distribution name:  umwelt-engine
+  Import name: umwelt
+  Author:      Luke Spooner
+  License:     AGPL-3.0-or-later WITH AQuantumArchitect exception
+               (LICENSE-EXCEPTION.md)
+  Upstream:    https://github.com/AQuantumArchitect/umwelt-engine
 
 The belief-field engine the campaign imports at run time. scripts/ship.ps1
 copies the src/umwelt package unmodified, at exactly the pinned commit, and
-places Umwelt's LICENSE beside it (tools/_vendor/umwelt/LICENSE), which is what
-Apache 2.0 section 4 asks of a redistribution. Umwelt has no NOTICE file of its
-own. The kernel's all-rights-reserved terms (LICENSE, part 2) do not reach it.
+places Umwelt's LICENSE, LICENSE-EXCEPTION.md and NOTICE beside it
+(tools/_vendor/umwelt/). The exception, from copyright holder Luke Spooner,
+lets any repository owned by the AQuantumArchitect GitHub account link or
+bundle Umwelt Engine without the rest of that work becoming AGPL. Umwelt
+itself, and any modification of it, stays AGPL-3.0-or-later. The copied
+exception keeps its source link,
+https://github.com/AQuantumArchitect/umwelt-engine. The kernel's
+all-rights-reserved terms (LICENSE, part 2) do not reach the snapshot.
 
 
 --------------------------------------------------------------------------------

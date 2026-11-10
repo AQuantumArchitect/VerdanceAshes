@@ -1,7 +1,7 @@
 {
-  "_doc": "The Umwelt a build ships (scripts/ship.ps1 vendors exactly this commit into tools/_vendor). Bump commit when Umwelt moves; the tests and the PC dev clones should sit on it too.",
-  "repo": "https://github.com/AQuantumArchitect/umwelt.git",
-  "tag": "v0.2.0",
-  "commit": "a00a0e718bd8a4f9c6a6c97ec9af5dfd855b6282",
-  "license": "Apache-2.0"
+  "_doc": "The Umwelt a build ships (scripts/ship.ps1 vendors exactly this commit into tools/_vendor). Public umwelt-engine snapshot: its history is not a fast-forward of the private umwelt pin, so treat a move as a new pin. Fetch the tag with no token and check the commit after checkout. Bump commit when Umwelt moves; the tests and the dev clones should sit on it too.",
+  "repo": "https://github.com/AQuantumArchitect/umwelt-engine.git",
+  "tag": "v0.2.1",
+  "commit": "ad1c4cb422c253c8cc00f044956924b85ebafd94",
+  "license": "AGPL-3.0-or-later WITH AQuantumArchitect exception (LICENSE-EXCEPTION.md)"
 }

@@ -120,15 +120,8 @@ def _width(nodes: List[str], edges: List[Tuple[str, str]]) -> int:
     return best
 
 
-def _umwelt_temper(drop: List[str], events, bonds, grief) -> Optional[Dict[str, Dict[str, float]]]:
-    try:
-        from verdance.belief.world import _umwelt
-        mods = _umwelt()
-    except Exception:  # noqa: BLE001
-        mods = None
-    if mods is None:
-        return None
-    schema, api = mods
+def build_temper_spec(schema, drop, bonds, grief):
+    """The camp-temper DomainSpec (strict validate_spec: known kinds, declared roles, efficiency in [0, 1])."""
     mourned = sorted({d for _, d, _ in grief})
     node = {h: f"hero:{h}" for h in drop}
     node.update({d: f"dead:{d}" for d in mourned})
@@ -148,6 +141,19 @@ def _umwelt_temper(drop: List[str], events, bonds, grief) -> Optional[Dict[str, 
     bindings = [schema.BindingSpec(f"obs_{node[k]}_{r}", zone=node[k], role=r, normalizer=norm, force_observe=True,
                                    efficiency=1.0, strength=1.0) for k in list(drop) + mourned for r in ROLES]
     spec = schema.DomainSpec(name="verdance-camp-temper", nodes=tuple(nodes), bridges=tuple(bridges), bindings=tuple(bindings))
+    return spec, node, couplings, mourned
+
+
+def _umwelt_temper(drop: List[str], events, bonds, grief) -> Optional[Dict[str, Dict[str, float]]]:
+    try:
+        from verdance.belief.world import _umwelt
+        mods = _umwelt()
+    except Exception:  # noqa: BLE001
+        mods = None
+    if mods is None:
+        return None
+    schema, api = mods
+    spec, node, couplings, mourned = build_temper_spec(schema, drop, bonds, grief)
     host = api.GameHost().register_world(spec, population=False)
     # the bonds as couplings, fixed (the substrate may not learn them away inside one reading)
     for br in host.engine.graph.bridges:

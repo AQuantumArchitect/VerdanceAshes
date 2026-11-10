@@ -163,40 +163,86 @@ foreach ($noise in @(
 # Which Umwelt: exactly the commit in tools\umwelt_pin.json, fetched into export\cache\umwelt.
 # Home-folder clones are no longer searched: 0.13.0 and 0.14.0 picked up a stale ~\ws-win copy.
 # UMWELT_SRC still wins when set, and must sit on the pinned commit (-AllowUmweltDrift to override).
-# Umwelt is Apache-2.0: its LICENSE ships beside the snapshot (NOTICE, RELEASE.md).
+# The pin is the public umwelt-engine repo. Fetch it with no token: the URL carries none, and this
+# block clears credential helpers and any stored Authorization header so a token for the old private
+# repo is not sent. The public history is not a fast-forward of that private repo, so an existing
+# cache is pointed at the pin's URL before the tag is fetched. The commit is checked after checkout.
+# Umwelt Engine is AGPL-3.0-or-later plus LICENSE-EXCEPTION.md: both, and its NOTICE, ship beside
+# the snapshot (NOTICE, RELEASE.md). The exception's source link stays on the copied file.
 $umweltPin = Get-Content -Raw (Join-Path $Workspace "tools\umwelt_pin.json") | ConvertFrom-Json
+if ($umweltPin.repo -match '@') { throw "tools\umwelt_pin.json repo must be a public URL with no token." }
 $umweltSrc = $null
 if ($env:UMWELT_SRC) {
   $umweltSrc = $env:UMWELT_SRC
   $umweltRoot = Split-Path -Parent $umweltSrc
-  $have = (Invoke-GitQuiet -C $umweltRoot rev-parse HEAD)
+  $have = "$(Invoke-GitQuiet -C $umweltRoot rev-parse HEAD)".Trim()
   if ($have -ne $umweltPin.commit -and -not $AllowUmweltDrift) {
     throw ("UMWELT_SRC is at " + $have + ", the pin (tools\umwelt_pin.json) is " + $umweltPin.commit +
            ". Check out the pin, bump the pin, or pass -AllowUmweltDrift for a dev build.")
   }
 } else {
   $umweltRoot = Join-Path $Workspace "export\cache\umwelt"
-  if (!(Test-Path (Join-Path $umweltRoot ".git"))) {
-    New-Item -ItemType Directory -Force -Path (Split-Path -Parent $umweltRoot) | Out-Null
-    Invoke-GitQuiet clone --quiet $umweltPin.repo $umweltRoot | Out-Null
-    if ($LASTEXITCODE -ne 0) { throw "Could not clone Umwelt from $($umweltPin.repo)." }
+  $savedPrompt = $env:GIT_TERMINAL_PROMPT
+  $savedCfgCount = $env:GIT_CONFIG_COUNT
+  $savedCfgKey0 = $env:GIT_CONFIG_KEY_0
+  $savedCfgVal0 = $env:GIT_CONFIG_VALUE_0
+  $savedCfgKey1 = $env:GIT_CONFIG_KEY_1
+  $savedCfgVal1 = $env:GIT_CONFIG_VALUE_1
+  $env:GIT_TERMINAL_PROMPT = "0"
+  # Empty credential.helper resets helpers; empty http.extraheader drops a stored token.
+  $env:GIT_CONFIG_COUNT = "2"
+  $env:GIT_CONFIG_KEY_0 = "credential.helper"
+  $env:GIT_CONFIG_VALUE_0 = ""
+  $env:GIT_CONFIG_KEY_1 = "http.extraheader"
+  $env:GIT_CONFIG_VALUE_1 = ""
+  try {
+    if (!(Test-Path (Join-Path $umweltRoot ".git"))) {
+      New-Item -ItemType Directory -Force -Path (Split-Path -Parent $umweltRoot) | Out-Null
+      Invoke-GitQuiet clone --quiet $umweltPin.repo $umweltRoot | Out-Null
+      if ($LASTEXITCODE -ne 0) { throw "Could not clone Umwelt from $($umweltPin.repo) (public, no token)." }
+    }
+    Invoke-GitQuiet -C $umweltRoot remote set-url origin $umweltPin.repo | Out-Null
+    if ($LASTEXITCODE -ne 0) { throw "Could not point the Umwelt cache at $($umweltPin.repo)." }
+    $tagSpec = "+refs/tags/$($umweltPin.tag):refs/tags/$($umweltPin.tag)"
+    Invoke-GitQuiet -C $umweltRoot fetch --quiet origin $tagSpec | Out-Null
+    if ($LASTEXITCODE -ne 0) { throw "Could not fetch $($umweltPin.tag) from $($umweltPin.repo) (public, no token)." }
+    Invoke-GitQuiet -C $umweltRoot checkout --quiet --detach $umweltPin.commit | Out-Null
+    if ($LASTEXITCODE -ne 0) { throw "Umwelt commit $($umweltPin.commit) is not in $($umweltPin.repo)." }
+    $checked = "$(Invoke-GitQuiet -C $umweltRoot rev-parse HEAD)".Trim()
+    if ($checked -ne $umweltPin.commit) {
+      throw ("Umwelt checkout is " + $checked + ", tools\umwelt_pin.json pins " + $umweltPin.commit + ".")
+    }
+  } finally {
+    if ($null -eq $savedPrompt) { Remove-Item Env:GIT_TERMINAL_PROMPT -ErrorAction SilentlyContinue } else { $env:GIT_TERMINAL_PROMPT = $savedPrompt }
+    if ($null -eq $savedCfgCount) { Remove-Item Env:GIT_CONFIG_COUNT -ErrorAction SilentlyContinue } else { $env:GIT_CONFIG_COUNT = $savedCfgCount }
+    if ($null -eq $savedCfgKey0) { Remove-Item Env:GIT_CONFIG_KEY_0 -ErrorAction SilentlyContinue } else { $env:GIT_CONFIG_KEY_0 = $savedCfgKey0 }
+    if ($null -eq $savedCfgVal0) { Remove-Item Env:GIT_CONFIG_VALUE_0 -ErrorAction SilentlyContinue } else { $env:GIT_CONFIG_VALUE_0 = $savedCfgVal0 }
+    if ($null -eq $savedCfgKey1) { Remove-Item Env:GIT_CONFIG_KEY_1 -ErrorAction SilentlyContinue } else { $env:GIT_CONFIG_KEY_1 = $savedCfgKey1 }
+    if ($null -eq $savedCfgVal1) { Remove-Item Env:GIT_CONFIG_VALUE_1 -ErrorAction SilentlyContinue } else { $env:GIT_CONFIG_VALUE_1 = $savedCfgVal1 }
   }
-  Invoke-GitQuiet -C $umweltRoot fetch --quiet origin | Out-Null
-  Invoke-GitQuiet -C $umweltRoot checkout --quiet --detach $umweltPin.commit | Out-Null
-  if ($LASTEXITCODE -ne 0) { throw "Umwelt commit $($umweltPin.commit) is not in $($umweltPin.repo)." }
   $umweltSrc = Join-Path $umweltRoot "src"
 }
 if (!(Test-Path (Join-Path $umweltSrc "umwelt\__init__.py"))) { throw "No umwelt package under $umweltSrc." }
-$umweltHash = (Invoke-GitQuiet -C $umweltRoot rev-parse HEAD)
+$umweltHash = "$(Invoke-GitQuiet -C $umweltRoot rev-parse HEAD)".Trim()
+if ($umweltHash -ne $umweltPin.commit -and -not $AllowUmweltDrift) {
+  throw ("Umwelt checkout is " + $umweltHash + ", tools\umwelt_pin.json pins " + $umweltPin.commit + ".")
+}
 $vendor = Join-Path $staging "tools\_vendor"
 New-Item -ItemType Directory -Force -Path $vendor | Out-Null
 Copy-Into (Join-Path $umweltSrc "umwelt") (Join-Path $vendor "umwelt")
 Copy-File (Join-Path $umweltRoot "LICENSE") (Join-Path $vendor "umwelt\LICENSE")
-if (!(Test-Path (Join-Path $vendor "umwelt\LICENSE"))) { throw "Umwelt's LICENSE did not stage; Apache-2.0 requires it beside the snapshot." }
+Copy-File (Join-Path $umweltRoot "LICENSE-EXCEPTION.md") (Join-Path $vendor "umwelt\LICENSE-EXCEPTION.md")
+Copy-File (Join-Path $umweltRoot "NOTICE") (Join-Path $vendor "umwelt\NOTICE")
+foreach ($need in @("LICENSE", "LICENSE-EXCEPTION.md", "NOTICE")) {
+  if (!(Test-Path (Join-Path $vendor "umwelt\$need"))) {
+    throw ("Umwelt's " + $need + " did not stage. AGPL-3.0-or-later with the AQuantumArchitect exception requires LICENSE, LICENSE-EXCEPTION.md and NOTICE beside the snapshot.")
+  }
+}
 Get-ChildItem $vendor -Recurse -Directory -Filter "__pycache__" -ErrorAction SilentlyContinue |
   Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
 # No machine paths in a shipped file: the repo and the commit say exactly which Umwelt this is.
-Set-Content -Path (Join-Path $vendor "UMWELT_SNAPSHOT.txt") -Value ("umwelt " + $umweltPin.repo + " commit " + $umweltHash + " (Apache-2.0, see umwelt\LICENSE)")
+# LICENSE-EXCEPTION.md keeps its own source link (https://github.com/AQuantumArchitect/umwelt-engine).
+Set-Content -Path (Join-Path $vendor "UMWELT_SNAPSHOT.txt") -Value ("umwelt-engine " + $umweltPin.repo + " commit " + $umweltHash + " (AGPL-3.0-or-later WITH AQuantumArchitect exception, see umwelt\LICENSE and umwelt\LICENSE-EXCEPTION.md)")
 Write-Host "Umwelt vendored at $umweltHash"
 
 Copy-File (Join-Path $Workspace "verdance_config.template.json") (Join-Path $staging "verdance_config.template.json")

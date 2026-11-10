@@ -27,21 +27,11 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
-      # The pinned Umwelt (tools/umwelt_pin.json) is a private repo, so CI cannot clone it yet.
-      # Until a read-only deploy key exists, stage a stub Umwelt and let ship.ps1 drift on it.
-      # This checks ship's plumbing and licence/manifest shape, not the real pin.
-      - name: Stub Umwelt
-        shell: pwsh
-        run: |
-          $u = Join-Path $env:RUNNER_TEMP "umwelt"
-          New-Item -ItemType Directory -Force -Path (Join-Path $u "src\umwelt") | Out-Null
-          Set-Content (Join-Path $u "src\umwelt\__init__.py") "# CI stub"
-          Set-Content (Join-Path $u "LICENSE") "Apache License 2.0 (CI stub)"
-          "UMWELT_SRC=$(Join-Path $u 'src')" | Add-Content $env:GITHUB_ENV
-          Write-Host "::warning::Umwelt is a CI stub; the real pin is not verified here."
+      # ship.ps1 fetches the public umwelt-engine pin (tools/umwelt_pin.json) with no token
+      # and checks the commit after checkout. No UMWELT_SRC override, no deploy key.
       - name: Ship dry run
         shell: pwsh
-        run: ./scripts/ship.ps1 -SkipPython -SkipZip -AllowUmweltDrift
+        run: ./scripts/ship.ps1 -SkipPython -SkipZip
       - name: Check staged build
         shell: pwsh
         run: |

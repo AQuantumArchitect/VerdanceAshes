@@ -23,7 +23,7 @@ GitHub Actions minutes are scarce, so the CI workflow is manual only (`workflow_
 
 Double-click them. `autopilot.bat` prepares the environment the first time:
 - `export\venv` with numpy and scipy. It uses `VA_PYTHON`, else `py -3`, else `python`.
-- `export\cache\umwelt` at the commit pinned in `tools\umwelt_pin.json`. The Umwelt repo is private, so the machine needs GitHub access to clone it once.
+- `export\cache\umwelt` at the commit pinned in `tools\umwelt_pin.json`. The pin is the public umwelt-engine repository (https://github.com/AQuantumArchitect/umwelt-engine). `autopilot.bat` clones it with no token the first time, fetches the pinned tag, and checks the commit after checkout.
 
 It then runs `tools\autopilot_campaign_v1.py --stock` with the preset's arguments.
 - `--stock` copies only the engine and the rapid game into `autopilot_runs\<stamp>\bar_data`, so your own BAR install and campaign are untouched.
