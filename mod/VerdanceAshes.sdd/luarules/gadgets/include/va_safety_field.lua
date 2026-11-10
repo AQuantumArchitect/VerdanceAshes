@@ -22,6 +22,10 @@
 --             survives the plan; V = what the company loses with it (its unit's worth at its level, and
 --             for a rez hero its share of the raising still to do); G = what the plan gains (a raised
 --             unit's worth; a fighter's damage, valued at what it destroys). The best plan wins.
+--   leaving   the company as one (companyStays, boarding): while the objective is open it stays as
+--             long as it can win at a price worth paying (Lanchester); after, only while raising what
+--             fell pays for the risk; at the pad it waits for a walker only while that is worth what
+--             the ones aboard risk meanwhile.
 --
 -- The numbers below that are not read from the game are numerical, not behavioural: the normal
 -- CDF's coefficients, the tail beyond which a gun's reach is negligible, how finely a path is sampled.
@@ -76,8 +80,10 @@ function M.profile(defID)
     if ud.canResurrect then p.rez = tonumber(ud.resurrectSpeed) or tonumber(ud.buildSpeed) or 0 end
     for _, w in ipairs(ud.weapons or {}) do
       local wd = WeaponDefs and WeaponDefs[w.weaponDef]
-      -- guns that can hit the ground (anti-air and paralyzers do not threaten a walking hero)
-      if wd and wd.canAttackGround ~= false and not wd.paralyzer then
+      -- guns that can hit the ground (anti-air and paralyzers do not threaten a walking hero), and that
+      -- fire on their own: a commander's D-Gun fires only when ordered, and read as a gun that fires every
+      -- reload it made one Legion commander 20,307 of the 22,932 a company faced at its pad (batch 7)
+      if wd and wd.canAttackGround ~= false and not wd.paralyzer and not wd.manualFire then
         local dmg = wd.damages and (wd.damages[0] or wd.damages.default) or 0
         local reload = max(tonumber(wd.reload) or 0, 1 / FRAMES_PER_SECOND)   -- a gun fires at most once a frame
         p.dps = p.dps + dmg * (tonumber(wd.salvoSize) or 1) * (tonumber(wd.projectiles) or 1) / reload
@@ -102,6 +108,7 @@ function M.new(allyTeam, api)
   self.mem = {}        -- enemy unitID -> { x, z, frame, defID }
   self.seen = {}       -- cell -> last frame it was in sight
   self.heroValue = {}  -- hero id -> worth while it lived (to value raising its wreck)
+  self.hits = {}       -- enemy unitID -> last frame it hurt the company (the gadget reports it)
   return self
 end
 
@@ -212,6 +219,8 @@ function M:refresh(frame)
     if not alive[u] and self.seen[idx] == frame then self.mem[u] = nil end
   end
 
+  for u in pairs(self.hits) do if not alive[u] then self.hits[u] = nil end end
+
   -- the known enemy: guns whose reach spans a couple of cells are bucketed by cell; the long guns
   -- (artillery, an LRPC) are few and kept in one list, so a lookup never scans the map for them
   -- (a lookup cost split, not a behaviour)
@@ -220,7 +229,7 @@ function M:refresh(frame)
     local p = m.defID and M.profile(m.defID) or typical
     local age = (frame - m.frame) / FRAMES_PER_SECOND
     local e = { uid = u, x = m.x, z = m.z, p = p, dps = p.dps, range = p.range, speed = p.speed,
-      sigma = p.speed * age, load = 0 }
+      sigma = p.speed * age, load = 0, alive = alive[u] == true, hit = self.hits[u] }
     enemies[#enemies + 1] = e
     local span = e.range + TAIL * (e.sigma + e.speed * self.dt)
     if span > 2 * self.cell then
@@ -311,7 +320,8 @@ function M:nearEnemies(x, z, extra)
 end
 
 -- Fire (damage per second) that would reach one more unit standing at (x, z), moving at vSelf.
-function M:incoming(x, z, vSelf)
+-- knownOnly: the guns the company has seen (the evidence), without the unknown's prior.
+function M:incoming(x, z, vSelf, knownOnly)
   local total = 0
   vSelf = vSelf or 0
   for _, e in ipairs(self:nearEnemies(x, z)) do
@@ -319,7 +329,7 @@ function M:incoming(x, z, vSelf)
     local k = reach(sqrt((x - e.x) ^ 2 + (z - e.z) ^ 2), e.range, s)
     if k > 0 then total = total + e.dps * k * (k / (k + e.load)) end
   end
-  if self.rhoDps > 0 then total = total + self.rhoDps * self:unseenNear(x, z) / (1 + self:crowdAt(x, z)) end
+  if not knownOnly and self.rhoDps > 0 then total = total + self.rhoDps * self:unseenNear(x, z) / (1 + self:crowdAt(x, z)) end
   return total
 end
 
@@ -337,18 +347,28 @@ end
 -- to lose on the way. Sampled every half of the shortest enemy reach (the finest detail the field has:
 -- a gun's disc is crossed in at least two samples).
 function M:walkHazard(h, x1, z1, x2, z2)
+  return self:walkFire(h.speed, x1, z1, x2, z2) / max(h.hp, 1)
+end
+
+-- The damage a walker at `speed` expects to take on that walk (walkHazard before its health).
+function M:walkFire(speed, x1, z1, x2, z2, knownOnly)
   local len = sqrt((x2 - x1) ^ 2 + (z2 - z1) ^ 2)
   if len <= 0 then return 0 end
-  if h.speed <= 0 then return math.huge end
+  if speed <= 0 then return math.huge end
   local step = (self.rmin or 0) / 2
-  if step <= 0 then step = h.speed * self.dt end
+  if step <= 0 then step = speed * self.dt end
   local n = max(1, ceil(len / step))
   local acc = 0
   for i = 1, n do
     local t = (i - 0.5) / n
-    acc = acc + self:incoming(x1 + (x2 - x1) * t, z1 + (z2 - z1) * t, h.speed)
+    acc = acc + self:incoming(x1 + (x2 - x1) * t, z1 + (z2 - z1) * t, speed, knownOnly)
   end
-  return (acc / n) * (len / h.speed) / max(h.hp, 1)
+  return (acc / n) * (len / speed)
+end
+
+-- An enemy unit hurt the company (the gadget's UnitDamaged): it is in the company's fight.
+function M:hitBy(attackerID, frame)
+  if attackerID then self.hits[attackerID] = frame end
 end
 
 -- ------------------------------------------------------------------ worth and gains
@@ -364,7 +384,8 @@ end
 -- share of the company's rez speed); for a named hero, all of that again for every sortie it would
 -- still have served.
 function M:heroWorth(h)
-  local v = h.p.cost * (h.maxHp / max(h.p.hp, 1))
+  h.p = h.p or M.profile(h.defID)
+  local v = h.p.cost * ((h.maxHp or h.p.hp) / max(h.p.hp, 1))
   if h.p.rez > 0 then
     local mine, all = h.p.rez, 0
     for _, a in ipairs(self.allies) do all = all + a.p.rez end
@@ -428,10 +449,13 @@ end
 -- One plan's worth: walk to (x, z) and stay t seconds there for `gain`. Returns U, S.
 -- Temper (verdance.company.temper, on Umwelt): a hero sees danger e^-nerve as large (shaken, larger;
 -- steady, smaller) and gains e^drive as large. nerve, drive in [-1, 1]; 0 when unknown.
+-- h.home (the company is leaving: the pad): every plan ends with the walk from there to it, since a
+-- hero who stays out is left in the field.
 function M:planValue(h, V, x, z, gain, t)
   h.p = h.p or M.profile(h.defID)
   h.speed = h.p.speed
   local risk = self:walkHazard(h, h.x, h.z, x, z) + self:incoming(x, z, h.speed) / max(h.hp, 1) * t
+  if h.home then risk = risk + self:walkHazard(h, x, z, h.home.x, h.home.z) end
   local S = exp(-risk * exp(-(h.nerve or 0)))
   return S * (V + gain * exp(h.drive or 0)), S
 end
@@ -446,19 +470,28 @@ function M:choose(h, padX, padZ)
   if h.hid then self.heroValue[tostring(h.hid)] = V end
   local function hazardHere(x, z) return self:incoming(x, z, h.speed) / max(h.hp, 1) end
   local list = {}
+  -- (a place off the map is no refuge: a ring point past the edge is dropped, not pinned to it; pinned,
+  -- the ring's points piled into the corner, and Vane sat in one for twelve minutes, batch 5, 11-09)
+  local mx, mz = (Game and Game.mapSizeX) or math.huge, (Game and Game.mapSizeZ) or math.huge
   local function add(kind, x, z, gain, t, fid)
-    x = min(max(x, 0), (Game and Game.mapSizeX) or x)
-    z = min(max(z, 0), (Game and Game.mapSizeZ) or z)
+    if x < 0 or z < 0 or x > mx or z > mz then return end
     local U, S = self:planValue(h, V, x, z, gain, t)
     list[#list + 1] = { kind = kind, x = x, z = z, fid = fid, S = S, U = U }
   end
-  -- its own orders (BARb's, or the player's): where they take it, and what it does there
-  local px, pz = (h.plan and h.plan.x) or h.x, (h.plan and h.plan.z) or h.z
-  add("stay", px, pz, self:combatGain(h, px, pz, H), H)
+  if h.home then
+    -- the company is leaving: its orders are the walk home, and at the pad it waits for nothing (the
+    -- company lifts when it is ready). Every refuge is a wait plus a walk home after it, so on a field
+    -- that is not forecast to change it takes one only as a way round (a gun on the straight road).
+    add("stay", h.home.x, h.home.z, 0, 0)
+  else
+    -- its own orders (BARb's, or the player's): where they take it, and what it does there
+    local px, pz = (h.plan and h.plan.x) or h.x, (h.plan and h.plan.z) or h.z
+    add("stay", px, pz, self:combatGain(h, px, pz, H), H)
+  end
   -- refuges: where it stands (first: among equally safe places it does not walk for nothing); the pad;
   -- the middle of the company's strength; a ring as far as it walks in H
   add("refuge", h.x, h.z, 0, H)
-  add("refuge", padX or h.x, padZ or h.z, 0, H)
+  if not h.home then add("refuge", padX or h.x, padZ or h.z, 0, H) end
   local fx, fz, fw = 0, 0, 0
   for _, a in ipairs(self.allies) do
     if not a.hero and a.p.fight > 0 then fx, fz, fw = fx + a.x * a.p.fight, fz + a.z * a.p.fight, fw + a.p.fight end
@@ -492,6 +525,212 @@ function M:choose(h, padX, padZ)
   local best = list[1]
   for i = 2, #list do if list[i].U > best.U * (1 + 1e-9) then best = list[i] end end
   return best, list, V
+end
+
+-- ------------------------------------------------------------------ the company: stay or go
+-- The company leaves as one; each second it weighs staying against walking to the pad now.
+--
+-- While the sortie's objective is open, the question is the war's: can the company win here, and at
+-- what cost? Lanchester's square law. Each side's strength is the sum of its units'
+-- (dps x hp)^1/2 over the units in the fight. Ours: every mobile gun (the company brings its army to
+-- its fight), and a turret by the chance an enemy is in its reach. Theirs: what is fighting it, on the
+-- evidence: an enemy that has hurt the company, the claim fading over the time it takes to walk its own
+-- reach (a turret keeps it while it lives), and a turret that covers the pad or the objective, where the
+-- company has to stand. The unseen enemy stays out of it (below). With r = theirs / ours:
+--   r < 1   the company wins and keeps sqrt(1 - r^2) of what it commits
+--   r >= 1  it loses what it commits
+-- What it commits, A: the worth of its mobile guns, and of its unarmed units by the chance they are in
+-- reach. The objective is worth what the company risked to come for it (A: the campaign has no other
+-- price for it; a failed sortie is one more to fly), and is won with what is left standing; what it
+-- destroys on the way is how it is won, not a second prize. So staying is worth sqrt(1 - r^2) x 2A;
+-- going, A x each unit's chance of making the walk to the pad. It goes when the share it would keep
+-- falls below half its chance of getting home (r near 0.87 on a safe walk). No fight at all: it stays.
+--
+-- Once the objective is resolved (done or failed) the only gain left is raising what fell: the
+-- company stays while the raising under way brings back worth faster than the field takes it (each
+-- mobile unit's worth that would come home x its hazard where it stands). Equal (nothing being
+-- raised): it goes.
+--
+-- The clear-up and boarding at the pad read the evidence: the guns the company has seen. The company
+-- walks home through the dark either way, and on raptor ground the prior priced every walker's way
+-- home at nothing (batch 3, 11-09: fifteen units and Vane left on the field).
+
+local function asUnit(u)
+  local h = { uid = u.uid, x = u.x, z = u.z, hp = u.hp, maxHp = u.maxHp or u.hp, defID = u.defID, hid = u.hid }
+  h.p = M.profile(h.defID)
+  h.speed = h.p.speed
+  return h
+end
+
+-- The chance each unit makes the walk to the pad (1 if it lifts where it stands). Units in one cell
+-- at one speed share the walk's fire, sampled from the first of them (a lookup cost split; a cell is
+-- what one of the company's units sees).
+local function walks(self, padX, padZ, lifts, knownOnly)
+  local memo = {}
+  return function(h)
+    if lifts and lifts(h.x, h.z) then return 1 end
+    if not padX then return 1 end
+    local key = cellOf(self, h.x, h.z) .. ":" .. h.speed
+    local fire = memo[key]
+    if not fire then
+      fire = self:walkFire(h.speed, h.x, h.z, padX, padZ, knownOnly)
+      memo[key] = fire
+    end
+    return exp(-fire / max(h.hp, 1))
+  end
+end
+
+-- Lanchester's outcome for the company's units (all of them: a turret fights though it does not lift).
+-- objX, objZ: where the objective is (an enemy turret counts only where it covers the pad or that).
+-- Returns { stay, go, ours, theirs, r, keep, atStake, theirWorth, who (what contests it, most first) }.
+function M:fightOutcome(units, padX, padZ, lifts, objX, objZ)
+  local walk = walks(self, padX, padZ, lifts, true)
+  local engaged = {}    -- enemy -> expected count of our units it contests
+  local ours, atStake, goes = 0, 0, 0
+  for _, u in ipairs(units) do
+    local h = asUnit(u)
+    local walker, gun = h.speed > 0, h.p.fight > 0
+    if walker or gun then
+      local n = 0
+      -- an enemy walker contests a unit within its reach and one more reach of walking (twice its
+      -- reach, its edge blurred as ever); a turret, one already in its reach (or in ours)
+      for _, e in ipairs(self:nearEnemies(h.x, h.z, max(h.p.range, self.rmax))) do
+        if e.alive then
+          local d = sqrt((h.x - e.x) ^ 2 + (h.z - e.z) ^ 2)
+          local s = e.sigma + (e.speed + h.speed) * self.dt
+          local k = max(reach(d, e.speed > 0 and 2 * e.range or e.range, s), reach(d, h.p.range, s))
+          if k > 0 then
+            n = n + k
+            engaged[e] = (engaged[e] or 0) + k
+          end
+        end
+      end
+      local c = (walker and gun) and 1 or (1 - exp(-n))
+      ours = ours + c * h.p.fight
+      if walker and c > 0 then
+        local V = self:heroWorth(h)
+        atStake = atStake + c * V
+        goes = goes + c * V * walk(h)
+      end
+    end
+  end
+  -- An enemy turret cannot come to the fight: the company meets it only where it has to stand, at the
+  -- pad to leave and at the objective to win. One unit wandering into a raptor nest's reach made the
+  -- whole company "face" it (r = 3.74, batch 7); a unit in a turret's reach elsewhere can walk away.
+  local function covers(e)
+    local k = 0
+    local s = e.sigma + e.speed * self.dt
+    if padX then k = max(k, reach(sqrt((e.x - padX) ^ 2 + (e.z - padZ) ^ 2), e.range, s)) end
+    if objX then k = max(k, reach(sqrt((e.x - objX) ^ 2 + (e.z - objZ) ^ 2), e.range, s)) end
+    return k
+  end
+  -- An enemy is in the company's fight once it has hurt the company; the claim fades over the time it
+  -- takes to walk its own reach (a turret keeps it while it lives). Standing near is not fighting: on
+  -- wild ground raptors wander every zone, and counting each one near read r = 1 at most pads and sent
+  -- the company home in its first minute (paired trial 8, 11-10).
+  local function fought(e)
+    if not e.hit then return 0 end
+    local age = (self.frame - e.hit) / FRAMES_PER_SECOND
+    if e.speed <= 0 then return 1 end
+    return exp(-age * e.speed / max(e.range, 1))
+  end
+  local theirs, theirWorth, who = 0, 0, {}
+  for _, e in ipairs(self.enemies or {}) do
+    if e.alive and e.p.fight > 0 and (e.hit or e.speed <= 0) then
+      local c = fought(e)
+      if e.speed <= 0 then c = max(c, covers(e)) end
+      theirs, theirWorth = theirs + c * e.p.fight, theirWorth + c * e.p.cost
+      who[#who + 1] = { e = e, share = c * e.p.fight }
+    end
+  end
+  table.sort(who, function(a, b) return a.share > b.share end)
+  -- (the unseen enemy is not in this fight: spread over the dark, on wild ground the raptors' unfound
+  -- strength alone read r = 0.88 by every pad, and the company left every Rock Jungle sortie in its
+  -- first seconds: batch 6, 11-09. The prior is for where a hero stands, not for going home.)
+  local keep, r = 1, 0
+  if theirs > 0 then
+    if ours <= 0 then keep, r = 0, math.huge
+    else
+      r = theirs / ours
+      keep = r < 1 and sqrt(1 - r * r) or 0
+    end
+  end
+  return { stay = 2 * atStake * keep, go = goes, ours = ours, theirs = theirs, r = r,
+    keep = keep, atStake = atStake, theirWorth = theirWorth, who = who }
+end
+
+-- What a rez unit's raising of wreck fid brings back per second: the wreck's worth, by the chance it
+-- lives through the walk and the work left, over the time that takes.
+function M:raiseRate(h, fid)
+  local S = self.S
+  h.p = h.p or M.profile(h.defID)
+  h.speed = h.p.speed
+  if h.p.rez <= 0 or not fid then return 0 end
+  local name = S.GetFeatureResurrect and S.GetFeatureResurrect(fid)
+  local def = name and name ~= "" and UnitDefNames and UnitDefNames[name]
+  if not def then return 0 end
+  local x, _, z = S.GetFeaturePosition(fid)
+  if not x then return 0 end
+  local p = M.profile(def.id)
+  local hid = S.GetFeatureRulesParam and S.GetFeatureRulesParam(fid, "va_hero_wreck")
+  local worth = (hid and hid ~= "" and self.heroValue[tostring(hid)]) or p.cost
+  local progress = 0
+  if S.GetFeatureHealth then progress = tonumber((select(3, S.GetFeatureHealth(fid)))) or 0 end
+  local work = max(0, 1 - progress) * p.buildTime / h.p.rez
+  local walkT = h.speed > 0 and sqrt((x - h.x) ^ 2 + (z - h.z) ^ 2) / h.speed or 0
+  local risk = self:walkHazard(h, h.x, h.z, x, z) + self:incoming(x, z, h.speed) / max(h.hp, 1) * work
+  return worth * exp(-risk) / max(walkT + work, self.dt)
+end
+
+-- After the objective: { gain, loss } per second of staying. raising: unitID -> the wreck it is raising.
+function M:clearUp(units, padX, padZ, lifts, raising)
+  local walk = walks(self, padX, padZ, lifts, true)
+  local gain, loss = 0, 0
+  for _, u in ipairs(units) do
+    local h = asUnit(u)
+    if h.speed > 0 then
+      loss = loss + self:heroWorth(h) * walk(h) * self:incoming(h.x, h.z, h.speed, true) / max(h.hp, 1)
+      if raising and raising[h.uid] then gain = gain + self:raiseRate(h, raising[h.uid]) end
+    end
+  end
+  return { gain = gain, loss = loss }
+end
+
+-- Stay or go. open: the objective is still open. Returns true to stay, and the numbers weighed.
+function M:companyStays(units, padX, padZ, lifts, open, raising, objX, objZ)
+  if open then
+    local o = self:fightOutcome(units, padX, padZ, lifts, objX, objZ)
+    return o.stay >= o.go * (1 - 1e-9), o
+  end
+  local c = self:clearUp(units, padX, padZ, lifts, raising)
+  return c.gain > c.loss * (1 + 1e-9), c
+end
+
+-- At the pad: leave now, or wait for the ones still walking in? Waiting t costs the units already
+-- there (or lifting where they stand) their hazard for t, and brings home each walker that arrives
+-- by t at its chance of making the walk. rows: { V, S (the walk), hazard (where it stands), on, eta }
+-- (a walker that is not closing on the pad has eta = huge and is not waited for). Returns the best
+-- wait (0: leave now), the value of leaving now, and the value of that wait.
+function M.boarding(rows)
+  local on, walkers = {}, {}
+  for _, r in ipairs(rows) do
+    if r.on then on[#on + 1] = r
+    elseif r.eta and r.eta < math.huge then walkers[#walkers + 1] = r end
+  end
+  table.sort(walkers, function(a, b) return a.eta < b.eta end)
+  local function value(t, k)
+    local v = 0
+    for _, r in ipairs(on) do v = v + r.V * exp(-(r.hazard or 0) * t) end
+    for i = 1, k do v = v + walkers[i].V * (walkers[i].S or 1) end
+    return v
+  end
+  local now = value(0, 0)
+  local best, bestT = now, 0
+  for k = 1, #walkers do
+    local v = value(walkers[k].eta, k)
+    if v > best * (1 + 1e-9) then best, bestT = v, walkers[k].eta end
+  end
+  return bestT, now, best
 end
 
 return M

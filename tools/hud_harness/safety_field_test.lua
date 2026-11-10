@@ -237,4 +237,189 @@ do
   assert(f:choose(h, 1000, 1000).kind ~= "rez", "with nine sorties still to serve, it is not")
 end
 
-print("ok: the campaign weighs a hero's life; temper scales seen danger; profiles from defs, fire shared over the crowd, memory sharp for turrets and blurred for walkers, forgetting, the unknown as danger, long guns, Ketha's wrecks, the dark, a fighter's trade")
+-- The company's units as the field reads them (team 0).
+local function company()
+  local out = {}
+  for u, tm in pairs(W.team) do
+    if tm == 0 then
+      local p = W.units[u]
+      local hp = W.hp[u] or UnitDefs[p.def].health
+      out[#out + 1] = { uid = u, x = p.x, z = p.z, hp = hp, maxHp = UnitDefs[p.def].health, defID = p.def, hid = W.hero[u] }
+    end
+  end
+  table.sort(out, function(a, b) return a.uid < b.uid end)
+  return out
+end
+
+-- 11. Stay or go while the objective is open: Lanchester on the living enemy it has seen. Ten rifles
+--     (fight 316 each) against a seen tank column (447 each, mobile: it can come to the fight).
+do
+  local api = world()
+  W.seen = function() return true end
+  for i = 1, 10 do add(100 + i, 0, 1, 1000 + i * 20, 1000) end
+  local f = SF.new(0, api)
+  f:refresh(30); f:refresh(60)
+  local stays, o = f:companyStays(company(), 1000, 1000, nil, true)
+  assert(stays and o.theirs == 0, "no enemy seen: it stays")
+  for i = 1, 7 do add(60 + i, 1, 6, 6000, 6000 + i * 30) end   -- seven tanks across the map
+  f:refresh(90)
+  stays, o = f:companyStays(company(), 1000, 1000, nil, true)
+  assert(stays and o.theirs == 0, "seven tanks across the map are not in this fight: it stays (theirs " .. o.theirs .. ")")
+  for i = 1, 7 do W.units[60 + i], W.team[60 + i] = nil, nil end
+  for i = 1, 3 do add(60 + i, 1, 6, 1300, 1000 + i * 30) end   -- three tanks at the gates
+  f:refresh(120)
+  stays, o = f:companyStays(company(), 1000, 1000, nil, true)
+  assert(stays and o.r < 0.5, "three tanks to ten rifles (r " .. o.r .. "): it can win at little cost, it stays")
+  for i = 4, 7 do add(60 + i, 1, 6, 1300, 1000 + i * 30) end   -- seven: r = 0.99
+  f:refresh(150)
+  stays, o = f:companyStays(company(), 1000, 1000, nil, true)
+  assert(stays and o.theirs == 0, "seven tanks at the gates that have not fired: not yet a fight (theirs " .. o.theirs .. ")")
+  for i = 1, 7 do f:hitBy(60 + i, 150) end                    -- they open fire
+  f:refresh(151)
+  stays, o = f:companyStays(company(), 1000, 1000, nil, true)
+  assert(not stays and o.r > 0.9, "seven tanks at the gates (r " .. o.r .. "): a win would cost nearly all of it, it goes")
+  -- a turret far off does not come to the fight
+  for i = 4, 7 do W.units[60 + i], W.team[60 + i] = nil, nil end
+  add(70, 1, 3, 7000, 2000); add(71, 1, 3, 7000, 2600); add(72, 1, 3, 7000, 3200)
+  f:refresh(180)
+  stays, o = f:companyStays(company(), 1000, 1000, nil, true)
+  assert(stays and o.r < 0.5, "three turrets across the map and three tanks: it stays (r " .. o.r .. ")")
+  -- the dead are not counted, though the company has not seen the ground they died on
+  W.seen = function(x, z) return z < 1300 end
+  for i = 1, 3 do add(80 + i, 1, 6, 1300, 1400 + i * 30) end
+  f:refresh(210)
+  for i = 1, 3 do W.units[80 + i], W.team[80 + i] = nil, nil end
+  f:refresh(240)
+  stays, o = f:companyStays(company(), 1000, 1000, nil, true)
+  assert(stays and o.r < 0.5, "three more tanks remembered but dead: not in the fight (r " .. o.r .. ")")
+end
+
+-- 12. After the objective: the company stays only while the raising under way pays for the risk.
+do
+  local api = world()
+  W.seen = function() return true end
+  add(1, 0, 2, 1000, 1000); W.hero[1] = "ketha"
+  for i = 1, 4 do add(100 + i, 0, 1, 1000 + i * 20, 1000) end
+  add(50, 1, 1, 5000, 5000)                                   -- a rifle far off: a little danger nowhere near
+  W.features = { [906] = { def = "tank", x = 1300, z = 1000 } }
+  local f = SF.new(0, api)
+  f:refresh(30); f:refresh(60)
+  local stays, c = f:companyStays(company(), 1000, 1000, nil, false, {})
+  assert(not stays, "objective done, nothing being raised: it goes")
+  stays, c = f:companyStays(company(), 1000, 1000, nil, false, { [1] = 906 })
+  assert(stays and c.gain > 0, "Ketha raising a tank on quiet ground: it waits for her (" .. c.gain .. "/s)")
+  -- the same wreck with an enemy army on it: what she would bring back is not worth what it costs
+  for i = 1, 6 do add(60 + i, 1, 6, 1350, 1000 + i * 20) end
+  f:refresh(90)
+  stays, c = f:companyStays(company(), 1000, 1000, nil, false, { [1] = 906 })
+  assert(not stays, "raising under six tanks: it goes (gain " .. c.gain .. " loss " .. c.loss .. ")")
+end
+
+-- 13. Boarding: wait for a walker while the pad is quiet; not when the ones aboard are under fire for
+--     a walker worth little; never for one that is not closing.
+do
+  local wait = SF.boarding({ { V = 1000, on = true, hazard = 0.001 }, { V = 400, S = 0.95, eta = 20 } })
+  assert(wait == 20, "a quiet pad: it waits the 20 s for the tank")
+  wait = SF.boarding({ { V = 1000, on = true, hazard = 0.05 }, { V = 100, S = 0.9, eta = 20 } })
+  assert(wait == 0, "the pad under fire, a cheap walker 20 s out: it leaves now")
+  wait = SF.boarding({ { V = 1000, on = true, hazard = 0.05 }, { V = 6000, S = 0.9, eta = 20 } })
+  assert(wait == 20, "...but it waits for a hero worth six times what is aboard")
+  wait = SF.boarding({ { V = 1000, on = true, hazard = 0 }, { V = 6000, S = 1, eta = math.huge } })
+  assert(wait == 0, "a walker that is not coming is not waited for")
+  assert(SF.boarding({}) == 0, "nobody left: it leaves")
+end
+
+-- 14. The walk home: once the company is leaving, every plan ends with the walk to the pad, so a
+--     refuge out in the field is worth less than the same refuge with nowhere to go after.
+do
+  local api = world()
+  W.seen = function() return true end
+  add(1, 0, 6, 3000, 1000); W.hero[1] = "vane"
+  add(50, 1, 3, 2000, 1000)                       -- a turret between the hero and the pad
+  local f = SF.new(0, api)
+  f:refresh(30); f:refresh(60)
+  local h = { uid = 1, x = 3000, z = 1000, hp = 2000, maxHp = 2000, defID = 6, hid = "vane" }
+  local V = f:heroWorth(h)
+  local free = f:planValue(h, V, 3500, 1000, 0, 10)
+  h.home = { x = 1000, z = 1000 }
+  local leaving = f:planValue(h, V, 3500, 1000, 0, 10)
+  assert(leaving < free, "a refuge past the turret, the company leaving: the walk back past it counts")
+end
+
+-- 15. Leaving: a hero out in a quiet corner walks home (the company will not wait while it rests),
+--     and a refuge past the map's edge is no refuge.
+do
+  local api = world()
+  W.seen = function(x, z) return x < 3000 and z < 3000 end
+  add(1, 0, 6, 150, 150); W.hero[1] = "vane"
+  for i = 1, 5 do add(100 + i, 0, 1, 2000 + i * 20, 2000) end
+  add(60, 1, 6, 7000, 7000)                       -- the enemy, far off and unseen: the dark is not empty
+  local f = SF.new(0, api)
+  f:refresh(30); f:refresh(60)
+  local h = { uid = 1, x = 150, z = 150, hp = 2000, maxHp = 2000, defID = 6, hid = "vane", home = { x = 2000, z = 2000 } }
+  local best, list = f:choose(h, 2000, 2000)
+  assert(best.kind == "stay" and best.x == 2000 and best.z == 2000, "leaving, out in a corner: it walks home (" .. best.kind .. ")")
+  for _, l in ipairs(list) do assert(l.x >= 0 and l.z >= 0, "no refuge past the edge: " .. l.x .. "," .. l.z) end
+end
+
+-- 16. The dark does not count in the company's fight (batch 6, 11-09: on wild ground the raptors' unfound
+--     strength alone sent it home from every pad): ten tanks unfound and a dark strip by the company,
+--     and it stays on what it has seen.
+do
+  local api = world()
+  W.seen = function(x, z) return x < 1100 or x > 1500 or z < 600 or z > 1400 end
+  for i = 1, 10 do add(100 + i, 0, 1, 1000 + i * 2, 1000) end
+  for i = 21, 30 do add(200 + i, 1, 6, 1120 + (i - 20) * 30, 1000) end
+  local f = SF.new(0, api)
+  f:refresh(30); f:refresh(60)
+  local stays, o = f:companyStays(company(), 1000, 1000, nil, true)
+  assert(stays and o.theirs == 0, "nothing seen contests it: it stays (theirs " .. o.theirs .. ")")
+  -- seen, and firing, the same ten tanks are what it is leaving from, strongest first
+  W.seen = function() return true end
+  for i = 21, 30 do f:hitBy(200 + i, 90) end
+  f:refresh(90)
+  stays, o = f:companyStays(company(), 1000, 1000, nil, true)
+  assert(not stays and #o.who == 10 and o.who[1].share >= o.who[10].share, "seen at the gates, ten tanks: it goes, and says what from")
+end
+
+-- 17. What the company faces (batch 7): a commander's D-Gun fires only when ordered, so it is not fire;
+--     a turret counts only where it covers the pad or the objective (one unit wandering into a nest's
+--     reach is not the company's fight).
+do
+  WeaponDefs[5] = { damages = { [0] = 20000 }, reload = 1, range = 250, manualFire = true }   -- a D-Gun
+  UnitDefs[8] = { id = 8, name = "commander", speed = 40, health = 3000, metalCost = 1500, weapons = { { weaponDef = 1 }, { weaponDef = 5 } } }
+  UnitDefNames.commander = UnitDefs[8]
+  local c = SF.profile(8)
+  assert(c.dps == 100, "the commander's fire is its rifle, not its D-Gun: " .. c.dps)
+  local api = world()
+  W.seen = function() return true end
+  for i = 1, 10 do add(100 + i, 0, 1, 1000 + i * 20, 1000) end
+  add(111, 0, 1, 5000, 5000)                      -- one rifle wandered off, into a fortress's reach
+  for i = 1, 6 do add(70 + i, 1, 3, 5100 + i * 50, 5100) end
+  local f = SF.new(0, api)
+  f:refresh(30); f:refresh(60)
+  local stays, o = f:companyStays(company(), 1000, 1000, nil, true, nil, 2000, 1000)
+  assert(stays and o.theirs == 0, "six turrets far from the pad and the objective: not its fight (theirs " .. o.theirs .. ")")
+  stays, o = f:companyStays(company(), 1000, 1000, nil, true, nil, 5200, 5100)
+  assert(o.theirs > 0, "the same turrets around the objective: they are what it must beat (theirs " .. o.theirs .. ")")
+end
+
+-- 18. Near is not fighting (paired trial 8: raptors wander every zone of wild ground). Seven tanks pass
+--     by: it stays. They open fire: it goes. Long after the last shot (many times the time a tank takes
+--     to walk its reach), the claim has faded: it stays.
+do
+  local api = world()
+  W.seen = function() return true end
+  for i = 1, 10 do add(100 + i, 0, 1, 1000 + i * 20, 1000) end
+  for i = 1, 7 do add(60 + i, 1, 6, 1300, 1000 + i * 30) end
+  local f = SF.new(0, api)
+  f:refresh(30); f:refresh(60)
+  assert(f:companyStays(company(), 1000, 1000, nil, true), "tanks passing by: it stays")
+  for i = 1, 7 do f:hitBy(60 + i, 90) end
+  f:refresh(90)
+  assert(not f:companyStays(company(), 1000, 1000, nil, true), "the same tanks firing: it goes")
+  f:refresh(90 + 30 * 60)                         -- a minute on: a tank walks its 300 reach in 5 s
+  assert(f:companyStays(company(), 1000, 1000, nil, true), "a minute after the last shot: no longer its fight")
+end
+
+print("ok: the campaign weighs a hero's life; temper scales seen danger; profiles from defs, fire shared over the crowd, memory sharp for turrets and blurred for walkers, forgetting, the unknown as danger, long guns, Ketha's wrecks, the dark, a fighter's trade; stay or go (Lanchester while the objective is open, the raising after), boarding, the walk home, leaving from a corner, the company's fight on the evidence, what it faces, near is not fighting")

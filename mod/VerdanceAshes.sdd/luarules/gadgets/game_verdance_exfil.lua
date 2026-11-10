@@ -366,6 +366,8 @@ local function liftsFrom(x, z)
   if onPadAt(x, z) then return true end
   return safeZone(zoneOf(x, z))
 end
+-- (the autopilot's leaving reads it: who is already where the company lifts)
+GG.VA_LiftsFrom = function(x, z) refreshLiveOwned(false); return liftsFrom(x, z) end
 
 local function enemiesOnPad()
   local n = 0

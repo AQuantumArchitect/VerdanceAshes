@@ -16,8 +16,9 @@ end
 -- Modoptions (tools/autopilot_campaign_v1.py writes them into the startscript):
 --   va_autopilot=1            the company's team is an AI (BARb); a spectator hosts
 --   va_autopilot_speed=N      sim speed (default 8)
---   va_autopilot_minutes=M    game minutes before the company leaves regardless (default 15)
---   va_autopilot_settle=S     game seconds to hold after the objective completes (default 40)
+--   va_autopilot_minutes=M    the rig's budget: game minutes before the company leaves regardless
+--                             (default 15; a trial's wall-clock, not a judgement: the field decides
+--                             when the company goes, and this only ends a sortie that never would)
 --
 -- BARb fights; it knows nothing of the campaign. This rig only, on top of it:
 --   nudge      idle units fight toward the wound
@@ -33,14 +34,20 @@ end
 --              wandered off and the hold never ran (stock rehearsal, 2026-11-02)
 --   rescue     a hero's wreck on the field gets a squad: the four nearest guns go to it, and once
 --              the ground is quiet, the rez bots raise it (critical rez bots only if no other)
---   departure  the objective done, failed, or the clock out: everyone walks to the real pad
---              (va_pad_x/z/r), and the company leaves once all of it stands there (or after
---              three settles, for stuck units)
---   raptors    on raptor ground (va_raptor_grace_seconds set: the Rock Jungle) the company builds
---              through the grace and leaves RAPTOR_STAY seconds after the waves are due, done or
---              not (owner call, 2026-11-09: the baseline's six home wipes came from staying)
---   caution    a named hero badly hurt, or hurt and outnumbered, walks back to the pad and is held
---              there until it is mostly whole again or the ground near it has been quiet a while;
+--   departure  the safety field's call (include/va_safety_field.lua, companyStays), once a second.
+--              While the objective is open the company stays as long as it wins the fight in front
+--              of it at a price worth paying (Lanchester, on the enemy it has seen that contests
+--              it; the unseen enemy is for where heroes stand). Once the
+--              objective is done or failed, it stays only while the raising under way (Ketha on the
+--              wrecks) brings back worth faster than the field takes it. Then everyone walks to the
+--              real pad (va_pad_x/z/r), and the company leaves when waiting for the next unit still
+--              walking in is worth less than what the ones already there risk while they wait
+--              (SafetyField.boarding; a unit that has stopped closing on the pad is not waited for).
+--              This replaced a 40 s settle, "three settles" for stuck units, and on raptor ground a
+--              fixed 60 s after the waves were due (history in git and docs/DEVLOG.md).
+--   caution    each named hero, once a second, weighs its orders against a refuge (or a wreck to
+--              raise) on the safety field and takes the best; it runs through the walk to the pad
+--              too (the Rock Jungle pad was overrun while the company boarded, field trial 11-09);
 --              heroes are never nudged into the wound (the baseline lost 20 named heroes)
 --   leaving    through the HUD when there is one: this publishes va_autopilot_leave, the rig
 --              player widget (gui_verdance_rig_player.lua, which says VA_RIG:hud at start)
@@ -56,16 +63,11 @@ if tostring(opts.va_autopilot) ~= "1" then return false end
 local function num(k, d) local v = tonumber(opts[k]); if v == nil then return d end; return v end
 local SPEED = num("va_autopilot_speed", 8)
 local CAP_FRAMES = math.floor(num("va_autopilot_minutes", 15) * 60 * 30)
-local SETTLE_FRAMES = math.floor(num("va_autopilot_settle", 40) * 30)
 local NUDGE_EVERY = 600
 local RESCUE_EVERY = 600
 local HUD_WAIT = 20 * 30
 -- test rig only: va_autopilot_force_complete=M marks the objective done at game minute M
 local FORCE_AT = num("va_autopilot_force_complete", 0) > 0 and math.floor(num("va_autopilot_force_complete", 0) * 1800) or nil
--- raptor ground: leave this long after the grace ends (va_autopilot_raptor_stay seconds, default 60)
-local RAPTOR_GRACE = tonumber(opts.va_raptor_grace_seconds)
-local RAPTOR_STAY = num("va_autopilot_raptor_stay", 60)
-local RAPTOR_LEAVE_FRAMES = RAPTOR_GRACE and math.floor((RAPTOR_GRACE + RAPTOR_STAY) * 30) or nil
 -- hero caution, once a second: the safety field (include/va_safety_field.lua) weighs each place a hero
 -- could be (its own orders; the pad; the middle of the company's strength; a ring as far as it walks
 -- in the time it takes to cross the enemy's reach; for a rez hero, the wrecks it knows of) by the chance
@@ -839,12 +841,17 @@ local function caution(f)
         local plan
         if retreating[uid] then plan = chosen[uid] and chosen[uid].was else plan = planOf(uid) end
         local h = { uid = uid, x = x, z = z, hp = hp, maxHp = maxHp, defID = Spring.GetUnitDefID(uid), hid = hid,
-          nerve = t and tonumber(t.nerve) or 0, drive = t and tonumber(t.drive) or 0, plan = plan }
+          nerve = t and tonumber(t.nerve) or 0, drive = t and tonumber(t.drive) or 0, plan = plan,
+          home = departureAt and { x = px, z = pz } or nil }
         local best = field:choose(h, px, pz)
         local name = tostring(h.hid)
         if best.kind == "stay" then
           if retreating[uid] then
             retreating[uid], held[uid], chosen[uid] = nil, nil, nil
+            if departureAt then
+              -- the company is leaving: its orders were the walk to the pad
+              order({ uid }, CMD.MOVE, { px, Spring.GetGroundHeight(px, pz) or 0, pz }, true)
+            end
             Spring.Echo("VA_AUTOPILOT hero back to work id=" .. name .. string.format(" hp=%.2f S=%.3f", hp / math.max(maxHp, 1), best.S))
           end
         else
@@ -882,38 +889,149 @@ local function caution(f)
 end
 
 -- ---------------------------------------------------------------- departure and leaving
+-- Everyone mobile walks to the pad (the heroes caution holds elsewhere walk when it lets them go).
 local function regroup()
   local px, pz = tonumber((Spring.GetGameRulesParam("va_pad_x"))), tonumber((Spring.GetGameRulesParam("va_pad_z")))
   if not px then return end
-  local mob = companyUnits(mobile)
+  local mob = companyUnits(function(ud, uid) return mobile(ud) and not retreating[uid] end)
   if #mob == 0 then return end
   order(mob, CMD.MOVE, { px, Spring.GetGroundHeight(px, pz) or 0, pz }, true)
   Spring.Echo("VA_AUTOPILOT regroup units=" .. #mob .. " pad=" .. tostring((Spring.GetGameRulesParam("va_pad_zone"))))
 end
 
-local function depart(why, f)
+local function depart(why, f, said)
   if departureAt then return end
   departureAt, departureWhy = f, why
-  held, retreating = {}, {}
-  Spring.Echo("VA_AUTOPILOT depart reason=" .. why .. " frame=" .. f)
+  releaseHolds()
+  -- a hero caution holds goes back to the walk home, not to what BARb last wanted, when it is let go
+  local px, pz = rp("va_pad_x"), rp("va_pad_z")
+  for uid in pairs(retreating) do if chosen[uid] then chosen[uid].was = { x = px, z = pz } end end
+  Spring.Echo("VA_AUTOPILOT depart reason=" .. why .. " frame=" .. f .. (said or ""))
   regroup()
 end
 
--- Everyone mobile inside the pad's own radius, or three settles gone (a unit stuck on a cliff).
-local function readyToLeave(f)
-  if f - departureAt < SETTLE_FRAMES then return false end
+-- Whether a unit standing at (x, z) lifts where it is (the pad, or any extraction point the exfil
+-- gadget names), else the pad's own circle.
+local function liftsAt(x, z)
+  if GG.VA_LiftsFrom then return GG.VA_LiftsFrom(x, z) == true end
   local px, pz, pr = rp("va_pad_x"), rp("va_pad_z"), math.max(1, rp("va_pad_r"))
-  local mob, on = 0, 0
-  for _, uid in ipairs(companyUnits(mobile)) do
+  return ((x - px) ^ 2 + (z - pz) ^ 2) <= pr ^ 2
+end
+
+-- The company's units as the field reads them.
+local function fieldUnits(filter)
+  local out = {}
+  for _, uid in ipairs(Spring.GetTeamUnits(playerTeam) or {}) do
+    local ud = UnitDefs[Spring.GetUnitDefID(uid) or -1]
+    if ud and (not filter or filter(ud, uid)) and not Spring.GetUnitIsDead(uid) then
+      local x, _, z = Spring.GetUnitPosition(uid)
+      local hp, maxHp = healthOf(uid)
+      if x and hp > 0 then
+        local hid = Spring.GetUnitRulesParam(uid, "va_hero_id")
+        out[#out + 1] = { uid = uid, x = x, z = z, hp = hp, maxHp = maxHp, defID = Spring.GetUnitDefID(uid),
+          hid = (hid ~= nil and hid ~= "" and hid ~= 0) and hid or nil }
+      end
+    end
+  end
+  return out
+end
+
+-- What the company is raising right now: unitID -> featureID.
+local function raisingNow()
+  local out = {}
+  for _, uid in ipairs(Spring.GetTeamUnits(playerTeam) or {}) do
+    local q = Spring.GetUnitCommands(uid, 1)
+    local c = q and q[1]
+    if c and c.id == CMD.RESURRECT and c.params and #c.params == 1 and c.params[1] >= Game.maxUnits then
+      out[uid] = c.params[1] - Game.maxUnits
+    end
+  end
+  return out
+end
+
+-- Stay or go (before the departure): the safety field's call.
+local lastSaid = -1
+local function shouldGo(f)
+  field:refresh(f)
+  local open = rp("va_objective_complete") ~= 1 and rp("va_objective_failed") ~= 1
+  local px, pz = tonumber((Spring.GetGameRulesParam("va_pad_x"))), tonumber((Spring.GetGameRulesParam("va_pad_z")))
+  local ox, oz = rp("va_objective_x"), rp("va_objective_z")
+  if ox <= 0 and oz <= 0 then ox, oz = target() end
+  local stays, v = field:companyStays(fieldUnits(), px, pz, liftsAt, open, raisingNow(), ox, oz)
+  local said
+  if open then
+    said = string.format(" r=%.2f keep=%.2f stay=%.0f go=%.0f ours=%.0f theirs=%.0f", math.min(v.r, 99),
+      v.keep, v.stay, v.go, v.ours, v.theirs)
+    if not stays then
+      -- what it is leaving from: the strongest of what contests it (unit, distance from the pad, share)
+      local parts = {}
+      for i = 1, math.min(6, #(v.who or {})) do
+        local w = v.who[i]
+        local ud = UnitDefs[Spring.GetUnitDefID(w.e.uid) or -1]
+        parts[#parts + 1] = string.format("%s@%d:%.0f", ud and ud.name or "?",
+          math.floor(math.sqrt((w.e.x - (px or 0)) ^ 2 + (w.e.z - (pz or 0)) ^ 2)), w.share)
+      end
+      said = said .. " facing=" .. #(v.who or {}) .. " " .. table.concat(parts, " ")
+    end
+  else
+    said = string.format(" raising=%.2f/s losing=%.2f/s", v.gain, v.loss)
+  end
+  -- a line a minute while it stays (and the line that sends it home)
+  if stays and f - lastSaid >= 1800 then
+    lastSaid = f
+    Spring.Echo("VA_AUTOPILOT stays" .. said)
+  end
+  if stays then return nil end
+  local why = (rp("va_objective_complete") == 1 and "objective") or (rp("va_objective_failed") == 1 and "objective_failed")
+    or "losing"
+  return why, said
+end
+
+-- At the pad: leave when waiting for the next unit still walking in is worth less than what the
+-- ones already there risk while they wait (SafetyField.boarding). How fast each walker closes on the
+-- pad is watched: its speed until it has had the time it takes to cross a cell of the field, then the
+-- ground it has made since the order to go, over that time. One that has made none (stuck on a cliff)
+-- is not waited for; one held up a moment in the crowd still is (judged on each stretch alone, units in
+-- traffic were left behind: 4 of 6, 9 of 15 aboard, paired trial 8).
+local closing = {}   -- unitID -> { d0, frame0 (when it was first watched), v }
+local function readyToLeave(f)
+  field:refresh(f)
+  local px, pz, pr = rp("va_pad_x"), rp("va_pad_z"), math.max(1, rp("va_pad_r"))
+  local rows, mob, on = {}, 0, 0
+  for _, u in ipairs(fieldUnits(mobile)) do
     mob = mob + 1
-    local x, _, z = Spring.GetUnitPosition(uid)
-    if x and ((x - px) ^ 2 + (z - pz) ^ 2) <= pr ^ 2 then on = on + 1 end
+    local p = SafetyField.profile(u.defID)
+    local h = { uid = u.uid, x = u.x, z = u.z, hp = u.hp, maxHp = u.maxHp, defID = u.defID, hid = u.hid,
+      p = p, speed = p.speed }
+    -- (on the evidence, as the company's other calls: the unknown's prior is for where a hero stands)
+    local row = { V = field:heroWorth(h), on = liftsAt(u.x, u.z),
+      hazard = field:incoming(u.x, u.z, p.speed, true) / math.max(u.hp, 1) }
+    if row.on then
+      on = on + 1
+    else
+      local d = math.max(0, math.sqrt((u.x - px) ^ 2 + (u.z - pz) ^ 2) - pr)
+      local c = closing[u.uid]
+      if not c then
+        c = { d0 = d, frame0 = f, v = p.speed }
+        closing[u.uid] = c
+      else
+        local span = (f - c.frame0) / 30
+        if p.speed > 0 and span >= field.cell / p.speed then c.v = (c.d0 - d) / span end
+      end
+      row.eta = c.v > 0 and d / c.v or math.huge
+      row.S = math.exp(-field:walkFire(p.speed, u.x, u.z, px, pz, true) / math.max(u.hp, 1))
+    end
+    rows[#rows + 1] = row
   end
-  if mob == 0 or on == mob or f - departureAt >= SETTLE_FRAMES * 3 then
-    Spring.Echo("VA_AUTOPILOT on pad " .. on .. "/" .. mob)
-    return true
+  local wait, now, best = SafetyField.boarding(rows)
+  if wait > 0 then
+    if (f - departureAt) % 900 == 0 then
+      Spring.Echo("VA_AUTOPILOT boarding " .. on .. "/" .. mob .. string.format(" wait=%.0fs now=%.0f then=%.0f", wait, now, best))
+    end
+    return false
   end
-  return false
+  Spring.Echo("VA_AUTOPILOT on pad " .. on .. "/" .. mob .. string.format(" (leaving now: %.0f; the best wait was worth no more)", now))
+  return true
 end
 
 local function extractDirectly(reason, f, why)
@@ -939,6 +1057,14 @@ local function leave(reason, f)
 end
 
 -- ---------------------------------------------------------------- call-ins
+-- An enemy that hurts the company is in its fight (the safety field's evidence for leaving).
+function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, projectileID, attackerID, attackerDefID, attackerTeam)
+  if field and unitTeam == playerTeam and attackerID and attackerTeam and attackerTeam ~= playerTeam
+    and not (Spring.AreTeamsAllied and Spring.AreTeamsAllied(unitTeam, attackerTeam)) then
+    field:hitBy(attackerID, Spring.GetGameFrame and Spring.GetGameFrame() or 0)
+  end
+end
+
 function gadget:Initialize()
   gadgetHandler:RegisterAllowCommand(CMD.ANY)
   local ok, m = pcall(VFS.Include, "singleplayer/verdance_ashes/generated/va_current.lua")
@@ -955,7 +1081,7 @@ function gadget:Initialize()
   if mission and type(mission.finale) == "table" then CAP_FRAMES = CAP_FRAMES * 3 end
   -- the kings' showdown ends only with the throne: twice that again before the company gives up
   if mission and type(mission.kings) == "table" and #mission.kings > 0 then CAP_FRAMES = CAP_FRAMES * 2 end
-  Spring.Echo("VA_AUTOPILOT armed team=" .. playerTeam .. " cap=" .. CAP_FRAMES .. " settle=" .. SETTLE_FRAMES
+  Spring.Echo("VA_AUTOPILOT armed team=" .. playerTeam .. " cap=" .. CAP_FRAMES
     .. " mission=" .. tostring(mission and mission.missionId))
 end
 
@@ -979,10 +1105,12 @@ function gadget:GameFrame(f)
     Spring.Echo("VA_AUTOPILOT test: forcing objective complete frame=" .. f)
     GG.VA_ObjectiveComplete("test_forced")
   end
+  -- hero caution first, every pass (frames run at f % 30 == 11: once a second), on the walk home too:
+  -- the company's call reads what its rez heroes have just chosen to raise
+  if CAUTION_ON then caution(f) end
   if not departureAt then
-    if rp("va_objective_complete") == 1 then depart("objective", f)
-    elseif rp("va_objective_failed") == 1 then depart("objective_failed", f)
-    elseif RAPTOR_LEAVE_FRAMES and f >= RAPTOR_LEAVE_FRAMES then depart("raptors", f)
+    local why, said = shouldGo(f)
+    if why then depart(why, f, said)
     elseif f >= CAP_FRAMES then depart("clock", f) end
   end
   if departureAt then
@@ -991,7 +1119,6 @@ function gadget:GameFrame(f)
     return
   end
   gateRig()
-  if CAUTION_ON then caution(f) end   -- every pass (frames run at f % 30 == 11: once a second)
   if f % RESCUE_EVERY == 311 then rescue(f) end
   if f % NUDGE_EVERY < 30 then siege(); holdTheZone(); nudge() end
   if f % NUDGE_EVERY == 341 then scout() end   -- (frames run at f % 30 == 11; 311 is the rescue)

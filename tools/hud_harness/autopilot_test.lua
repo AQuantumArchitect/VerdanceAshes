@@ -24,9 +24,10 @@ Game = { maxUnits = 10000, mapSizeX = 8192, mapSizeZ = 8192 }
 WeaponDefs = {
   [1] = { damages = { [0] = 50 }, reload = 1, range = 400 },    -- the enemy's gun
   [2] = { damages = { [0] = 100 }, reload = 1, range = 350 },   -- a fighter hero's
+  [3] = { damages = { [0] = 200 }, reload = 1, range = 350 },   -- the company's gun
 }
 UnitDefs = {
-  [1] = { speed = 50, canAttack = true, health = 1000, metalCost = 100 },
+  [1] = { speed = 50, canAttack = true, health = 1000, metalCost = 100, weapons = { { weaponDef = 3 } } },
   [2] = { speed = 50, isBuilder = true, canResurrect = true, buildSpeed = 100, health = 500, metalCost = 200 },
   [3] = { weapons = { { weaponDef = 1 } }, health = 500, metalCost = 100 },
   [4] = { name = "pilot", speed = 40, health = 1000, metalCost = 300, buildTime = 3000 },   -- a hero's wreck raises this
@@ -44,7 +45,7 @@ VFS = { Include = function(path)
   return mission
 end }
 Spring = {
-  GetModOptions = function() return { va_autopilot = "1", va_autopilot_minutes = "1", va_autopilot_settle = "1" } end,
+  GetModOptions = function() return { va_autopilot = "1", va_autopilot_minutes = "1" } end,
   Echo = function() end,
   GetGameRulesParam = function(k) return rules[k] end,
   SetGameRulesParam = function(k, v) rules[k] = v end,
@@ -83,7 +84,7 @@ do
   reset()
   UnitDefs[7] = { speed = 30, isBuilder = true, canAttack = true, name = "legcom", buildOptions = { 1 } }
   local was = Spring.GetTeamUnits
-  Spring.GetTeamUnits = function() return { 1, 7 } end
+  Spring.GetTeamUnits = function(team) if team == 1 then return threats end return { 1, 7 } end
   positions[7] = { 0, 0 }
   gadget:GameFrame(11)
   local fight = find(CMD.FIGHT)
@@ -160,7 +161,7 @@ local function gateWorld()
   heroOf = { [1] = "halbard", [6] = "vane" }
   positions[4], positions[5], positions[6] = { 900, 900 }, { 900, 950 }, { 2000, 2000 }
   queues, built = {}, {}
-  Spring.GetTeamUnits = function() return units end
+  Spring.GetTeamUnits = function(team) if team == 1 then return threats end return units end
   Spring.GetUnitDefID = function(uid) return unitDef[uid] end
   Spring.GetUnitRulesParam = function(uid, k) if k == "va_hero_id" then return heroOf[uid] end end
   Spring.GetUnitCommands = function(uid) return queues[uid] or {} end
@@ -276,7 +277,7 @@ for _, id in ipairs({ 10, 11, 12, 13 }) do UnitDefs[id] = nil end
 reset()
 local guns = {}
 for i = 100, 111 do guns[#guns + 1] = i; positions[i] = { 0, 0 } end
-Spring.GetTeamUnits = function() return guns end
+Spring.GetTeamUnits = function(team) if team == 1 then return threats end return guns end
 Spring.GetUnitDefID = function() return 1 end
 Spring.ValidUnitID = function() return true end
 positions[900], positions[901] = { 5000, 5000 }, { 800, 600 }
@@ -287,7 +288,7 @@ assert(s and s.params[1] == 800 and s.params[3] == 600, "the guns go for the nea
 assert(not gadget:AllowCommand(100), "and BARb leaves them on it")
 reset()
 guns = { 100, 101 }
-Spring.GetTeamUnits = function() return guns end
+Spring.GetTeamUnits = function(team) if team == 1 then return threats end return guns end
 Spring.GetUnitDefID = function() return 1 end
 gadget:GameFrame(611)
 assert(gadget:AllowCommand(100), "too few guns: no siege yet")
@@ -298,7 +299,7 @@ Spring.IsUnitInLos = function() return true end
 reset()
 guns = {}
 for i = 100, 139 do guns[#guns + 1] = i; positions[i] = { 0, 0 } end
-Spring.GetTeamUnits = function() return guns end
+Spring.GetTeamUnits = function(team) if team == 1 then return threats end return guns end
 Spring.GetUnitDefID = function() return 1 end
 Spring.ValidUnitID = function() return true end
 positions[950], positions[951] = { 3000, 100 }, { 100, 3000 }
@@ -312,7 +313,7 @@ assert(near and (near.params[1] == 950 or near.params[1] == 951), "after half an
 reset()
 local few = {}
 for i = 100, 124 do few[#few + 1] = i; positions[i] = { 0, 0 } end
-Spring.GetTeamUnits = function() return few end
+Spring.GetTeamUnits = function(team) if team == 1 then return threats end return few end
 Spring.GetUnitDefID = function() return 1 end
 Spring.ValidUnitID = function() return true end
 positions[950], positions[951] = { 3000, 100 }, { 100, 3000 }
@@ -325,7 +326,7 @@ assert(find(CMD.ATTACK), "after 45 minutes the army there is goes")
 Spring.GetGameFrame = nil
 reset()
 for i = 100, 139 do positions[i] = { 0, 0 } end
-Spring.GetTeamUnits = function() return guns end
+Spring.GetTeamUnits = function(team) if team == 1 then return threats end return guns end
 Spring.GetUnitDefID = function() return 1 end
 Spring.ValidUnitID = function() return true end
 positions[950], positions[951] = { 3000, 100 }, { 100, 3000 }
@@ -349,7 +350,7 @@ assert(gadget:AllowCommand(100), "a siege too thin to break anything goes back t
 reset()
 guns = {}
 for i = 100, 139 do guns[#guns + 1] = i; positions[i] = { 0, 0 } end
-Spring.GetTeamUnits = function() return guns end
+Spring.GetTeamUnits = function(team) if team == 1 then return threats end return guns end
 Spring.GetUnitDefID = function() return 1 end
 Spring.ValidUnitID = function() return true end
 positions[951] = { 8000, 0 }
@@ -383,7 +384,7 @@ GG.VA_RivalKings = nil
 
 -- a scout mark: the rig sends its fastest fighter there on FIGHT, and lets go once it is done
 reset()
-Spring.GetTeamUnits = function() return { 1, 2 } end
+Spring.GetTeamUnits = function(team) if team == 1 then return threats end return { 1, 2 } end
 Spring.GetUnitDefID = function(uid) return uid end
 GG.VA_RivalKings, GG.VA_ObjectiveTargets = nil, nil
 Spring.GetUnitRulesParam = function() return nil end      -- nobody here is a hero
@@ -486,4 +487,76 @@ assert(not gadget:AllowCommand(6), "Vane at a tenth: out of it")
 mv = lastOf(6, CMD.MOVE)
 assert(mv and math.abs(mv.params[1] - 1800) > 400, "out of the gun's reach")
 
-print("ok: scout marks, rescue squad sized to outfight the gun, protected orders, departure to the real pad radius, leaving with and without a HUD, holding a capture, the Spire Gate and its tech ladder, the siege, hero caution from the safety field")
+-- 8. Leaving on the field's call (no clock in sight: the harness clock is one minute, frame 1800).
+local hero8, cmds8 = {}, {}
+local function leaveWorld(company)
+  reset()
+  GG.VA_RivalKings, GG.VA_ObjectiveTargets = nil, nil
+  rules.va_secondary_total = 0
+  threats, hero8, cmds8 = {}, {}, {}
+  Spring.GetTeamUnits = function(team) if team == 1 then return threats end return company end
+  Spring.GetUnitDefID = function(uid) if uid >= 60 and uid < 70 then return 6 end if uid == 5 then return 2 end return uid >= 100 and 1 or uid end
+  Spring.GetUnitRulesParam = function(uid, k) if k == "va_hero_id" then return hero8[uid] end end
+  Spring.GetUnitHealth = function(uid) local h = UnitDefs[Spring.GetUnitDefID(uid)].health; return h, h end
+  Spring.GetUnitCommands = function(uid) return cmds8[uid] or {} end
+  Spring.GetAllFeatures = function() return {} end
+  Spring.GiveOrderToUnit = function(uid, cmd, params) orders[#orders + 1] = { cmd = cmd, params = params, units = { uid } } end
+end
+-- the objective open: an army of ten guns stays against three tanks; one gun alone goes home
+leaveWorld({ 1, 2, 100, 101, 102, 103, 104, 105, 106, 107, 108 })
+for i = 100, 108 do positions[i] = { 60, i - 100 } end
+threats = { 61, 62, 63 }
+for i = 61, 63 do positions[i] = { 3000, i * 10 } end
+gadget:GameFrame(41)
+assert(not find(CMD.MOVE), "ten guns against three tanks: the company stays")
+leaveWorld({ 1, 2 })
+threats = { 61, 62, 63 }
+for i = 61, 63 do positions[i] = { 3000, i * 10 } end
+gadget:GameFrame(41)
+assert(not find(CMD.MOVE), "three tanks across the map: not this fight, the company stays")
+for i = 61, 63 do positions[i] = { 400, i - 60 } end
+gadget:GameFrame(71)
+assert(not find(CMD.MOVE), "three tanks at the gates, not firing: the company stays")
+for i = 61, 63 do gadget:UnitDamaged(1, 1, 0, 50, false, 2, nil, i, 6, 1) end   -- they open fire on the gun
+gadget:GameFrame(101)
+local home = find(CMD.MOVE)
+assert(home and home.params[1] == 0 and home.params[3] == 0, "one gun against three tanks firing at it: the company walks to the pad")
+leaveWorld({ 1, 2 })
+rules.va_objective_failed = 1
+gadget:GameFrame(41)
+home = find(CMD.MOVE)
+assert(home and home.params[1] == 0 and home.params[3] == 0, "the objective failed, nothing to raise: the company walks to the pad")
+-- the objective done: it waits while Ketha raises a wreck on quiet ground, and goes once nothing is raised
+leaveWorld({ 1, 5 })
+hero8[5] = "ketha"
+positions[5] = { 150, 0 }
+rules.va_objective_complete = 1
+Spring.GetAllFeatures = function() return { 9 } end
+Spring.GetFeaturePosition = function() return 200, 0, 0 end
+cmds8[5] = { { id = CMD.RESURRECT, params = { 10009 } } }
+gadget:GameFrame(41)
+assert(not find(CMD.MOVE), "Ketha raising on quiet ground: the company waits for her")
+Spring.GetAllFeatures = function() return {} end
+cmds8[5] = {}
+gadget:GameFrame(71)
+assert(find(CMD.MOVE), "raised: the company walks to the pad")
+-- boarding: one on the pad, one 900 out that does not move: waited for while it might come, then not
+leaveWorld({ 1, 2 })
+positions[1], positions[2] = { 50, 0 }, { 1000, 0 }
+rules.va_objective_complete = 1
+gadget:GameFrame(41)
+assert(find(CMD.MOVE) and not extracted, "the company walks to the pad and waits for the one still out")
+for fr = 71, 131, 30 do gadget:GameFrame(fr) end
+assert(extracted, "it made no ground in the time it takes to cross a cell: the company leaves without it")
+-- ...and one that walks in is waited for
+leaveWorld({ 1, 2 })
+positions[1], positions[2] = { 50, 0 }, { 1000, 0 }
+rules.va_objective_complete = 1
+gadget:GameFrame(41)
+for fr = 71, 131, 30 do positions[2] = { positions[2][1] - 50, 0 }; gadget:GameFrame(fr) end
+assert(not extracted, "a walker closing on the pad: waited for")
+positions[2] = { 60, 0 }
+gadget:GameFrame(161)
+assert(extracted, "aboard: away")
+
+print("ok: scout marks, rescue squad sized to outfight the gun, protected orders, departure to the real pad radius, leaving with and without a HUD, holding a capture, the Spire Gate and its tech ladder, the siege, hero caution from the safety field, leaving on the field's call (the fight, the raising, boarding)")
