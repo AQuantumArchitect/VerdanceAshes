@@ -13,7 +13,8 @@ Every observation carries eta. Drop telemetry is ~1.0; a scout patrol 0.5-0.7; a
 inferred from an adjacent measured zone 0.2; a patron dispatch 0.3 and biased. eta=0 is a
 no-op. A value nobody measured renders dark, never zero (frame/1 law).
 
-Depends on Umwelt (AQuantumArchitect/umwelt): set UMWELT_SRC to its src/ dir, or install it.
+Depends on Umwelt Engine (AQuantumArchitect/umwelt-engine, import name umwelt): set UMWELT_SRC
+to its src/ dir, or install it.
 Pure data in, pure data out: build_spec() reads data/zone_maps/world_zone_graph.v1.json,
 data/story/hero_codex.json and data/story/readings.json.
 """
@@ -127,7 +128,8 @@ def _umwelt():
         except OSError:
             continue
     try:
-        # Umwelt's stable surface (v0.2.0, docs/STABILITY.md); the deep paths are internal there
+        # Umwelt's stable surface (v0.2.1, docs/STABILITY.md). umwelt.consumers is gone.
+        # umwelt.foresight.encounter stays a deep import (STABILITY.md: internal, still present).
         from umwelt import DomainSpec, NodeSpec, BridgeSpec, BindingSpec, DriverSpec, AxisFace, GameHost  # noqa
     except Exception as exc:  # noqa: BLE001 - ImportError, or numpy/scipy missing under it
         if not _UMWELT_WARNED:
@@ -152,6 +154,34 @@ def _require_umwelt():
 
 def minute_to_time(campaign_minute: float) -> datetime:
     return EPOCH + timedelta(minutes=float(campaign_minute or 0.0))
+
+
+def read_confidence(confidence: Any) -> Optional[float]:
+    """None or a non-finite number is DARK, not zero.
+
+    Forecast confidence is None without a persistence baseline (Umwelt 0.2), and a
+    non-finite Bloch radius is a step the RK4 guard refused. Callers must not assume
+    a number."""
+    if confidence is None:
+        return None
+    try:
+        number = float(confidence)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(number):
+        return None
+    return number
+
+
+def finite_bloch(bloch: Any) -> Tuple[float, float, float]:
+    """A non-finite Bloch vector is DARK (the RK4 guard refuses the step; collapse does not commit it)."""
+    try:
+        x, y, z = float(bloch[0]), float(bloch[1]), float(bloch[2])
+    except (TypeError, ValueError, IndexError):
+        return (0.0, 0.0, 0.0)
+    if not (math.isfinite(x) and math.isfinite(y) and math.isfinite(z)):
+        return (0.0, 0.0, 0.0)
+    return (x, y, z)
 
 
 # ----------------------------------------------------------------------------- spec
@@ -411,7 +441,7 @@ class VerdanceWorld:
         for hid in hero_ids(self.workspace):
             c = self.host.engine.field.clusters.get(f"hero:{hid}")
             try:
-                z = float(c.role_bloch(DRAW_ROLE)[2]) if c is not None else 0.0
+                z = finite_bloch(c.role_bloch(DRAW_ROLE))[2] if c is not None else 0.0
             except Exception:
                 z = 0.0
             out[hid] = round((z + 1.0) / 2.0, 4)
@@ -422,8 +452,7 @@ class VerdanceWorld:
         c = self.host.engine.field.clusters.get(node)
         if c is None:
             return (0.0, 0.0, 0.0)
-        b = c.role_bloch(role)
-        return (float(b[0]), float(b[1]), float(b[2]))
+        return finite_bloch(c.role_bloch(role))
 
     def question_status(self, question: str, x: float, y: float, z: float) -> str:
         """open: not yet forced. leaning / settled: forced one way. torn: forced both
@@ -451,15 +480,19 @@ class VerdanceWorld:
                 continue
             seen = self.last_seen.get(key)
             age = (now_m - float(seen["minute"])) if seen else None
-            if seen is None or b.confidence < dark_below:
+            # Forecast confidence may be None (DARK). A missing number is not zero, and it
+            # does not settle the row.
+            conf = read_confidence(getattr(b, "confidence", None))
+            value = read_confidence(getattr(b, "value", None))
+            if seen is None or conf is None or conf < dark_below or value is None:
                 state = "dark"
             elif age is not None and age > stale_after_minutes:
                 state = "stale"
             else:
                 state = "current"
             row = {"id": key, "node": node, "role": role,
-                   "value": None if state == "dark" else round(b.value, 4),
-                   "confidence": round(b.confidence, 4),
+                   "value": None if state == "dark" else round(value, 4),
+                   "confidence": None if conf is None else round(conf, 4),
                    "state": state,
                    "age_min": None if age is None else round(age, 1),
                    "source": (seen or {}).get("source"),

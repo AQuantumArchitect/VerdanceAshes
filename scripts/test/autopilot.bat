@@ -27,16 +27,26 @@ if not exist export\venv\Scripts\python.exe (
 echo === numpy scipy >> "%LOG%"
 export\venv\Scripts\python.exe -m pip install -q --disable-pip-version-check numpy scipy >> "%LOG%" 2>&1
 echo PIP %ERRORLEVEL% >> "%LOG%"
-rem --- Umwelt at the pin (private repo: the machine needs GitHub access to clone it once)
+rem --- Umwelt at the public pin (tools\umwelt_pin.json). No token: credential helper cleared.
 for /f "usebackq delims=" %%c in (`powershell -NoProfile -Command "(Get-Content -Raw tools\umwelt_pin.json | ConvertFrom-Json).commit"`) do set "PIN=%%c"
+for /f "usebackq delims=" %%r in (`powershell -NoProfile -Command "(Get-Content -Raw tools\umwelt_pin.json | ConvertFrom-Json).repo"`) do set "UMWELT_REPO=%%r"
+for /f "usebackq delims=" %%t in (`powershell -NoProfile -Command "(Get-Content -Raw tools\umwelt_pin.json | ConvertFrom-Json).tag"`) do set "UMWELT_TAG=%%t"
+set "GIT_TERMINAL_PROMPT=0"
 if not exist export\cache\umwelt\.git (
   echo === cloning umwelt >> "%LOG%"
-  git clone -q https://github.com/AQuantumArchitect/umwelt.git export\cache\umwelt >> "%LOG%" 2>&1
+  git -c credential.helper= -c http.extraheader= clone -q %UMWELT_REPO% export\cache\umwelt >> "%LOG%" 2>&1
 )
+rem The public history is not a fast-forward of the private pin, so retarget an old cache.
+git -C export\cache\umwelt remote set-url origin %UMWELT_REPO% >> "%LOG%" 2>&1
 echo === umwelt to pin %PIN% >> "%LOG%"
-git -C export\cache\umwelt fetch -q origin >> "%LOG%" 2>&1
+git -c credential.helper= -c http.extraheader= -C export\cache\umwelt fetch -q origin tag %UMWELT_TAG% >> "%LOG%" 2>&1
 git -C export\cache\umwelt checkout -q --detach %PIN% >> "%LOG%" 2>&1
 git -C export\cache\umwelt rev-parse HEAD >> "%LOG%" 2>&1
+for /f "usebackq delims=" %%h in (`git -C export\cache\umwelt rev-parse HEAD`) do set "UMWELT_HEAD=%%h"
+if not "%UMWELT_HEAD%"=="%PIN%" (
+  echo Umwelt checkout %UMWELT_HEAD% is not the pin %PIN% >> "%LOG%"
+  exit /b 1
+)
 set "UMWELT_SRC=%CD%\export\cache\umwelt\src"
 echo === git >> "%LOG%"
 git log --oneline -1 >> "%LOG%" 2>&1

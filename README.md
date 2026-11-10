@@ -33,7 +33,7 @@ In the hub: **System menu → Export feedback bundle**. It writes `export/feedba
 SHIP.bat
 ```
 
-Writes `export/dist/VerdanceAshes_vX.Y.Z` and a zip. It downloads the embeddable Python, installs numpy + scipy into it (the belief world's substrate; `-SkipScience` opts out) and vendors the Umwelt package when a clone is found (`UMWELT_SRC`, a sibling `..\umwelt`, or `~\umwelt`). Recipients unzip anywhere, run `SETUP.bat`, then `PLAY.bat`.
+Writes `export/dist/VerdanceAshes_vX.Y.Z` and a zip. It downloads the embeddable Python, installs numpy + scipy into it (the belief world's substrate; `-SkipScience` opts out) and vendors Umwelt Engine from the public pin in `tools/umwelt_pin.json` (https://github.com/AQuantumArchitect/umwelt-engine, fetched with no token). `UMWELT_SRC` still overrides and must sit on that commit. Recipients unzip anywhere, run `SETUP.bat`, then `PLAY.bat`.
 
 Steam, GitHub Releases, and a Steam AppID are not wired yet. The dist zip is the publishing path.
 

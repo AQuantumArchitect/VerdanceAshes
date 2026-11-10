@@ -12,13 +12,18 @@ $umwelt = Join-Path $ws "export\cache\umwelt"
 if (-not (Test-Path $py)) { throw "export\venv is missing: run scripts\test\autopilot.bat once (or py -3.12 -m venv export\venv; pip install numpy scipy playwright)" }
 if (-not (Test-Path (Join-Path $umwelt ".git"))) { throw "export\cache\umwelt is missing: run scripts\test\autopilot.bat once (it clones Umwelt at the pin)" }
 
-$pin = (Get-Content -Raw "tools\umwelt_pin.json" | ConvertFrom-Json).commit
+$pinJson = Get-Content -Raw "tools\umwelt_pin.json" | ConvertFrom-Json
+$pin = $pinJson.commit
+if ($pinJson.repo -match '@') { throw "tools\umwelt_pin.json repo must be a public URL with no token." }
+$env:GIT_TERMINAL_PROMPT = "0"
+# Public snapshot: no token, and not a fast-forward of a private cache.
+git -C $umwelt remote set-url origin $pinJson.repo
+git -c credential.helper= -c http.extraheader= -C $umwelt fetch -q origin "+refs/tags/$($pinJson.tag):refs/tags/$($pinJson.tag)"
+if ($LASTEXITCODE -ne 0) { throw "Could not fetch $($pinJson.tag) from $($pinJson.repo) (public, no token)." }
+git -C $umwelt checkout -q --detach $pin
+if ($LASTEXITCODE -ne 0) { throw "Umwelt commit $pin is not in $($pinJson.repo)." }
 $head = (git -C $umwelt rev-parse HEAD).Trim()
-if ($head -ne $pin) {
-  Write-Host "Umwelt at $($head.Substring(0,7)), pin is $($pin.Substring(0,7)): checking out the pin"
-  git -C $umwelt fetch -q origin
-  git -C $umwelt checkout -q --detach $pin
-}
+if ($head -ne $pin) { throw "Umwelt checkout is $head, tools\umwelt_pin.json pins $pin." }
 $env:UMWELT_SRC = Join-Path $umwelt "src"
 
 $results = [ordered]@{}

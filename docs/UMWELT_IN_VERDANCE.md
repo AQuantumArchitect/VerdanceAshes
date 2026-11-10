@@ -6,7 +6,7 @@
 
 Most strategy games keep one world state and hide parts of it from the player with a fog mask. Verdance's Ashes keeps **one belief state per mind** and never shows the player anything else. The company, Armada, Cortex and the mercenaries each hold their own picture of the same zone graph; each picture is updated only by what that mind observed, decays where it has not looked, absorbs rumours, and drives that mind's decisions. The hidden truth frame exists only to resolve what each mind sees. The game is played in the gap between a belief and the ground.
 
-The engine that holds these pictures is **Umwelt** ([AQuantumArchitect/umwelt](https://github.com/AQuantumArchitect/umwelt)): a belief-field engine where a world is a graph and a mind's belief is a density-matrix-style field over it rather than a table of facts. Verdance's Ashes is its first public demonstration.
+The engine that holds these pictures is **Umwelt Engine** ([umwelt-engine](https://github.com/AQuantumArchitect/umwelt-engine), import name `umwelt`): a belief-field engine where a world is a graph and a mind's belief is a density-matrix-style field over it rather than a table of facts. Verdance's Ashes is its first public demonstration.
 
 ## The words
 
