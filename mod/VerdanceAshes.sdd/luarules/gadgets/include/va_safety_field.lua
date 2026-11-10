@@ -111,6 +111,16 @@ local function cellOf(self, x, z)
   return r * self.cols + c, c, r
 end
 
+-- The hot lookups below walk the grid in place: a table built per lookup (the cell list, the enemies
+-- near, an empty "or {}") was garbage the collector could not keep up with. In Koom Valley's act-2 war
+-- the synced heap climbed 250 MB a minute to 1.2 GB, and four sorties hit LuaRules' 1.6 GB cap (11-10).
+local NONE = {}
+-- the grid's index range covering (x, z) +- r: c0, c1, r0, r1
+local function cellRange(self, x, z, r)
+  return max(0, floor((x - r) / self.cell)), min(self.cols - 1, floor((x + r) / self.cell)),
+    max(0, floor((z - r) / self.cell)), min(self.rows - 1, floor((z + r) / self.cell))
+end
+
 -- cells whose centres lie within reach r of (x, z), as (index, centre x, centre z)
 local function cellsNear(self, x, z, r)
   local out = {}
@@ -132,22 +142,34 @@ function M:refresh(frame)
   if self.frame then self.dt = max(1 / FRAMES_PER_SECOND, (frame - self.frame) / FRAMES_PER_SECOND) end
   self.frame = frame
   local gaia = S.GetGaiaTeamID and S.GetGaiaTeamID()
+  -- (records are kept per unit and refreshed in place, each stamped with the frame it was last
+  -- seen, so a refresh makes next to no garbage; see NONE above)
+  self._aobj, self._eobj, self._alive = self._aobj or {}, self._eobj or {}, self._alive or {}
+  local aobj, eobj, alive = self._aobj, self._eobj, self._alive
 
   -- the company and its allies
-  local allies, sights = {}, {}
-  for _, team in ipairs(S.GetTeamList(self.ally) or {}) do
-    for _, u in ipairs(S.GetTeamUnits(team) or {}) do
+  local allies, sights = self.allies or {}, nil
+  local na = 0
+  if not self.cell then sights = {} end
+  for _, team in ipairs(S.GetTeamList(self.ally) or NONE) do
+    for _, u in ipairs(S.GetTeamUnits(team) or NONE) do
       local x, _, z = S.GetUnitPosition(u)
       if x then
         local p = M.profile(S.GetUnitDefID(u))
         local hid = S.GetUnitRulesParam(u, "va_hero_id")
-        local hero = hid ~= nil and hid ~= "" and hid ~= 0
         local hp = S.GetUnitHealth(u)
-        allies[#allies + 1] = { uid = u, x = x, z = z, p = p, hp = tonumber(hp) or p.hp, hero = hero }
-        if p.sight > 0 then sights[#sights + 1] = p.sight end
+        local a = aobj[u]
+        if not a then a = { uid = u }; aobj[u] = a end
+        a.x, a.z, a.p, a.hp, a.gen = x, z, p, tonumber(hp) or p.hp, frame
+        a.hero = hid ~= nil and hid ~= "" and hid ~= 0
+        na = na + 1
+        allies[na] = a
+        if sights and p.sight > 0 then sights[#sights + 1] = p.sight end
       end
     end
   end
+  for i = #allies, na + 1, -1 do allies[i] = nil end
+  for u, a in pairs(aobj) do if a.gen ~= frame then aobj[u] = nil end end
   self.allies = allies
 
   -- the grid: one cell is what one of the company's units sees (the median sight), so "seen" means
@@ -170,26 +192,25 @@ function M:refresh(frame)
   -- the enemy: what is in sight or on radar now is remembered where it is; the whole roster's sum is
   -- the briefing (how much enemy there is, not where)
   local rosterDps, rosterFight, rosterSpeedW, rosterRangeW, rosterN = 0, 0, 0, 0, 0
-  local alive = {}
-  for _, at in ipairs(S.GetAllyTeamList() or {}) do
+  for _, at in ipairs(S.GetAllyTeamList() or NONE) do
     if at ~= self.ally then
-      for _, team in ipairs(S.GetTeamList(at) or {}) do
+      for _, team in ipairs(S.GetTeamList(at) or NONE) do
         if team ~= gaia then
-          for _, u in ipairs(S.GetTeamUnits(team) or {}) do
+          for _, u in ipairs(S.GetTeamUnits(team) or NONE) do
             local def = S.GetUnitDefID(u)
             local p = M.profile(def)
             if p.dps > 0 then
-              alive[u] = true
+              alive[u] = frame
               rosterDps, rosterFight, rosterN = rosterDps + p.dps, rosterFight + p.fight, rosterN + 1
               rosterSpeedW, rosterRangeW = rosterSpeedW + p.speed * p.dps, rosterRangeW + p.range * p.dps
               local los = S.GetUnitLosState(u, self.ally)
               if los and (los.los or los.radar) then
                 local x, _, z = S.GetUnitPosition(u)
                 if x then
-                  local m = self.mem[u] or {}
+                  local m = self.mem[u]
+                  if not m then m = {}; self.mem[u] = m end
                   m.x, m.z, m.frame = x, z, frame
                   if los.los or los.typed then m.defID = def end
-                  self.mem[u] = m
                 end
               end
             end
@@ -202,57 +223,80 @@ function M:refresh(frame)
   -- the enemy's typical gun (fire-weighted): how far it reaches, how fast it walks
   self.rbar = rosterDps > 0 and rosterRangeW / rosterDps or 0
   self.vbar = rosterDps > 0 and rosterSpeedW / rosterDps or 0
-  local typical = { dps = rosterN > 0 and rosterDps / rosterN or 0, range = self.rbar, speed = self.vbar,
-    hp = 1, cost = 0, fight = rosterN > 0 and rosterFight / rosterN or 0 }
+  local typical = self._typical or {}
+  self._typical = typical
+  typical.dps, typical.range, typical.speed = rosterN > 0 and rosterDps / rosterN or 0, self.rbar, self.vbar
+  typical.hp, typical.cost, typical.fight = 1, 0, rosterN > 0 and rosterFight / rosterN or 0
 
   -- forget a remembered gun whose ground is in sight now and it is not there (it moved, or it died)
   for u, m in pairs(self.mem) do
     local idx = cellOf(self, m.x, m.z)
     if m.frame < frame and self.seen[idx] == frame then self.mem[u] = nil end
-    if not alive[u] and self.seen[idx] == frame then self.mem[u] = nil end
+    if alive[u] ~= frame and self.seen[idx] == frame then self.mem[u] = nil end
   end
+  for u, f in pairs(alive) do if f ~= frame then alive[u] = nil end end
 
   -- the known enemy: guns whose reach spans a couple of cells are bucketed by cell; the long guns
   -- (artillery, an LRPC) are few and kept in one list, so a lookup never scans the map for them
   -- (a lookup cost split, not a behaviour)
-  local enemies, buckets, far, knownDps, knownFight, rmax, rmin = {}, {}, {}, 0, 0, 0, math.huge
+  local enemies, buckets, far = self.enemies or {}, self.buckets or {}, self.far or {}
+  for _, b in pairs(buckets) do for i = #b, 1, -1 do b[i] = nil end end
+  for i = #far, 1, -1 do far[i] = nil end
+  local ne, knownDps, knownFight, rmax, rmin = 0, 0, 0, 0, math.huge
   for u, m in pairs(self.mem) do
     local p = m.defID and M.profile(m.defID) or typical
     local age = (frame - m.frame) / FRAMES_PER_SECOND
-    local e = { uid = u, x = m.x, z = m.z, p = p, dps = p.dps, range = p.range, speed = p.speed,
-      sigma = p.speed * age, load = 0 }
-    enemies[#enemies + 1] = e
+    local e = eobj[u]
+    if not e then e = { uid = u }; eobj[u] = e end
+    e.x, e.z, e.p, e.dps, e.range, e.speed = m.x, m.z, p, p.dps, p.range, p.speed
+    e.sigma, e.load, e.gen = p.speed * age, 0, frame
+    ne = ne + 1
+    enemies[ne] = e
     local span = e.range + TAIL * (e.sigma + e.speed * self.dt)
     if span > 2 * self.cell then
       far[#far + 1] = e
     else
       local idx = cellOf(self, e.x, e.z)
-      buckets[idx] = buckets[idx] or {}
-      table.insert(buckets[idx], e)
+      local b = buckets[idx]
+      if not b then b = {}; buckets[idx] = b end
+      b[#b + 1] = e
       rmax = max(rmax, span)
     end
     knownDps, knownFight = knownDps + p.dps, knownFight + p.fight
     if e.range > 0 then rmin = min(rmin, e.range) end
   end
+  for i = #enemies, ne + 1, -1 do enemies[i] = nil end
+  for u, e in pairs(eobj) do if e.gen ~= frame then eobj[u] = nil end end
   self.enemies, self.buckets, self.far, self.rmax = enemies, buckets, far, rmax
   self.rmin = rmin < math.huge and rmin or self.rbar
 
   -- allies bucketed too (for the share of fire each gun spreads over them)
-  local abuckets = {}
-  for _, a in ipairs(allies) do
+  local abuckets = self.abuckets or {}
+  for _, b in pairs(abuckets) do for i = #b, 1, -1 do b[i] = nil end end
+  for i = 1, na do
+    local a = allies[i]
     local idx = cellOf(self, a.x, a.z)
-    abuckets[idx] = abuckets[idx] or {}
-    table.insert(abuckets[idx], a)
+    local b = abuckets[idx]
+    if not b then b = {}; abuckets[idx] = b end
+    b[#b + 1] = a
   end
   self.abuckets = abuckets
   -- each gun's load: how many of the company's (non-hero) units it can reach, each by its chance
-  for _, e in ipairs(enemies) do
+  for i = 1, ne do
+    local e = enemies[i]
     local s = e.sigma + e.speed * self.dt
     local reachR = e.range + TAIL * s
-    for _, idx in ipairs(cellsNear(self, e.x, e.z, reachR)) do
-      for _, a in ipairs(abuckets[idx] or {}) do
-        if not a.hero then
-          e.load = e.load + reach(sqrt((a.x - e.x) ^ 2 + (a.z - e.z) ^ 2), e.range, s + a.p.speed * self.dt)
+    local c0, c1, r0, r1 = cellRange(self, e.x, e.z, reachR)
+    for rr = r0, r1 do
+      for cc = c0, c1 do
+        local b = abuckets[rr * self.cols + cc]
+        if b then
+          for k = 1, #b do
+            local a = b[k]
+            if not a.hero then
+              e.load = e.load + reach(sqrt((a.x - e.x) ^ 2 + (a.z - e.z) ^ 2), e.range, s + a.p.speed * self.dt)
+            end
+          end
         end
       end
     end
@@ -261,7 +305,7 @@ function M:refresh(frame)
   -- the unknown: ground never seen, or seen long enough ago that the enemy's typical walker could have
   -- crossed it since (weight 1 - exp(-age / (cell / vbar)))
   local tau = self.vbar > 0 and self.cell / self.vbar or math.huge
-  local unseen, unseenArea = {}, 0
+  local unseen, unseenArea = self.unseen or {}, 0
   for idx = 0, self.cols * self.rows - 1 do
     local f = self.seen[idx]
     local u = 1
@@ -280,9 +324,16 @@ end
 -- crowd an unseen gun would have to choose from.
 function M:crowdAt(x, z)
   local n = 0
-  for _, idx in ipairs(cellsNear(self, x, z, self.rbar)) do
-    for _, a in ipairs(self.abuckets[idx] or {}) do
-      if not a.hero then n = n + reach(sqrt((a.x - x) ^ 2 + (a.z - z) ^ 2), self.rbar, 0) end
+  local c0, c1, r0, r1 = cellRange(self, x, z, self.rbar)
+  for rr = r0, r1 do
+    for cc = c0, c1 do
+      local b = self.abuckets[rr * self.cols + cc]
+      if b then
+        for i = 1, #b do
+          local a = b[i]
+          if not a.hero then n = n + reach(sqrt((a.x - x) ^ 2 + (a.z - z) ^ 2), self.rbar, 0) end
+        end
+      end
     end
   end
   return n
@@ -291,10 +342,13 @@ end
 -- The unseen ground within the enemy's typical reach of (x, z), in square elmos.
 function M:unseenNear(x, z)
   local area = 0
-  for _, idx in ipairs(cellsNear(self, x, z, self.rbar)) do
-    local c, r = idx % self.cols, floor(idx / self.cols)
-    local cx, cz = (c + 0.5) * self.cell, (r + 0.5) * self.cell
-    area = area + (self.unseen[idx] or 1) * self.cellArea * reach(sqrt((cx - x) ^ 2 + (cz - z) ^ 2), self.rbar, self.cell / 2)
+  local c0, c1, r0, r1 = cellRange(self, x, z, self.rbar)
+  for rr = r0, r1 do
+    for cc = c0, c1 do
+      local idx = rr * self.cols + cc
+      local cx, cz = (cc + 0.5) * self.cell, (rr + 0.5) * self.cell
+      area = area + (self.unseen[idx] or 1) * self.cellArea * reach(sqrt((cx - x) ^ 2 + (cz - z) ^ 2), self.rbar, self.cell / 2)
+    end
   end
   return area
 end
@@ -304,7 +358,7 @@ end
 function M:nearEnemies(x, z, extra)
   local out = {}
   for _, idx in ipairs(cellsNear(self, x, z, self.rmax + (extra or 0))) do
-    for _, e in ipairs(self.buckets[idx] or {}) do out[#out + 1] = e end
+    for _, e in ipairs(self.buckets[idx] or NONE) do out[#out + 1] = e end
   end
   for _, e in ipairs(self.far) do out[#out + 1] = e end
   return out
@@ -314,9 +368,24 @@ end
 function M:incoming(x, z, vSelf)
   local total = 0
   vSelf = vSelf or 0
-  for _, e in ipairs(self:nearEnemies(x, z)) do
-    local s = e.sigma + (e.speed + vSelf) * self.dt
-    local k = reach(sqrt((x - e.x) ^ 2 + (z - e.z) ^ 2), e.range, s)
+  local dt = self.dt
+  local c0, c1, r0, r1 = cellRange(self, x, z, self.rmax)
+  for rr = r0, r1 do
+    for cc = c0, c1 do
+      local b = self.buckets[rr * self.cols + cc]
+      if b then
+        for i = 1, #b do
+          local e = b[i]
+          local k = reach(sqrt((x - e.x) ^ 2 + (z - e.z) ^ 2), e.range, e.sigma + (e.speed + vSelf) * dt)
+          if k > 0 then total = total + e.dps * k * (k / (k + e.load)) end
+        end
+      end
+    end
+  end
+  local far = self.far
+  for i = 1, #far do
+    local e = far[i]
+    local k = reach(sqrt((x - e.x) ^ 2 + (z - e.z) ^ 2), e.range, e.sigma + (e.speed + vSelf) * dt)
     if k > 0 then total = total + e.dps * k * (k / (k + e.load)) end
   end
   if self.rhoDps > 0 then total = total + self.rhoDps * self:unseenNear(x, z) / (1 + self:crowdAt(x, z)) end

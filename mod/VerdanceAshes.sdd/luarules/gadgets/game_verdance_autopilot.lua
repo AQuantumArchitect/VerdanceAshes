@@ -84,8 +84,21 @@ if not gadgetHandler:IsSyncedCode() then
   local SHOT_EVERY = math.floor(num("va_autopilot_shots", 0) * 30)
   local nextShot = SHOT_EVERY > 0 and 30 * 20 or nil
   function gadget:GameStart() started = true end
+  -- Lua memory, from here: synced code has no gcinfo, collectgarbage or GetLuaMemUsage in this engine,
+  -- and LuaRules ran out of memory (its 1.6 GB cap) on Koom Valley's act-2 war, 11-10, with no curve
+  -- to read. Every 30 game seconds, what the engine reports.
+  local lastMem = -1
+  local function memLine()
+    local f = Spring.GetGameFrame() or 0
+    if not Spring.GetLuaMemUsage or f - lastMem < 900 then return end
+    lastMem = f
+    local v = { Spring.GetLuaMemUsage() }
+    for i = 1, #v do v[i] = tostring(v[i]) end
+    Spring.Echo("VA_AUTOPILOT_LUAMEM frame=" .. f .. " " .. table.concat(v, ","))
+  end
   function gadget:Update()
     if not started then return end
+    memLine()
     if nextShot and (Spring.GetGameFrame() or 0) >= nextShot then
       nextShot = nextShot + SHOT_EVERY
       pcall(Spring.SendCommands, "screenshot png")

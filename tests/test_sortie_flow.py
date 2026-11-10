@@ -3,6 +3,8 @@ every talk can be answered or declined and must be before Who goes, then What co
 browser on the repo's own hub state, map only. Skipped where Playwright is not installed."""
 import http.server
 import re
+import shutil
+import tempfile
 import threading
 import unittest
 from functools import partial
@@ -23,7 +25,17 @@ class Quiet(http.server.SimpleHTTPRequestHandler):
 @unittest.skipIf(sync_playwright is None, "playwright is not installed")
 class SortieFlow(unittest.TestCase):
     def test_choose_talk_who_goes_what_comes(self):
-        httpd = http.server.ThreadingHTTPServer(("127.0.0.1", 0), partial(Quiet, directory=str(ROOT / "app" / "showoff")))
+        # The page is served from a snapshot taken now: autopilot trials and the hub builder rewrite
+        # app/showoff/hub_state.embed.js (under the real workspace) while they run.
+        snap = Path(tempfile.mkdtemp()) / "showoff"
+        shutil.copytree(ROOT / "app" / "showoff", snap)
+        try:
+            self._walk(snap)
+        finally:
+            shutil.rmtree(snap.parent, ignore_errors=True)
+
+    def _walk(self, snap):
+        httpd = http.server.ThreadingHTTPServer(("127.0.0.1", 0), partial(Quiet, directory=str(snap)))
         threading.Thread(target=httpd.serve_forever, daemon=True).start()
         errors = []
         try:
@@ -33,8 +45,7 @@ class SortieFlow(unittest.TestCase):
                 pg.on("pageerror", lambda e: errors.append(str(e)))
                 pg.goto(f"http://127.0.0.1:{httpd.server_address[1]}/index.html")
                 # Wait for the page to show one of its two screens (the formation for a fresh campaign,
-                # the jobs board for a sealed one) instead of a fixed 2 s: under a loaded full run the
-                # intro was not drawn yet, the test took the sealed path, and failed (2 runs in 4, 11-09/10).
+                # the jobs board for a sealed one) rather than a fixed 2 s.
                 pg.wait_for_selector("#company-intro:visible, #btn-deploy:visible", timeout=20000)
                 pg.wait_for_timeout(300)
                 if pg.locator("#coach-skip").is_visible():
