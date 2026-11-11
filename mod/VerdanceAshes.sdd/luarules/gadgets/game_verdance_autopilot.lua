@@ -134,6 +134,7 @@ local chosen = {}                           -- unitID -> the plan caution last o
 local field = nil                           -- the safety field (shared on GG with the hero doctrine)
 local issuing = false
 local MUSTER = false                        -- a Rock Jungle muster (mission.muster): see GameFrame
+local boarding = {}                         -- unitID -> true: told to go at the departure (readyToLeave)
 
 -- Drop the rig's holds (a rescue squad, a siege) but keep the heroes that are being pulled back.
 local function releaseHolds()
@@ -919,6 +920,8 @@ local function depart(why, f)
   if departureAt then return end
   departureAt, departureWhy = f, why
   held, retreating = {}, {}
+  boarding = {}
+  for _, uid in ipairs(companyUnits(mobile)) do boarding[uid] = true end
   Spring.Echo("VA_AUTOPILOT depart reason=" .. why .. " frame=" .. f)
   regroup()
 end
@@ -927,11 +930,16 @@ end
 local function readyToLeave(f)
   if f - departureAt < SETTLE_FRAMES then return false end
   local px, pz, pr = rp("va_pad_x"), rp("va_pad_z"), math.max(1, rp("va_pad_r"))
+  -- who was told to go: a lab still printing during the walk home kept "everyone" out of reach. In
+  -- trial 18's third campaign a muster's 172 units grew to 178 while they boarded, the company waited
+  -- the full three settles, and wave 12 landed on the walk and killed Ketha (2026-11-11).
   local mob, on = 0, 0
   for _, uid in ipairs(companyUnits(mobile)) do
+    if boarding[uid] then
     mob = mob + 1
     local x, _, z = Spring.GetUnitPosition(uid)
     if x and ((x - px) ^ 2 + (z - pz) ^ 2) <= pr ^ 2 then on = on + 1 end
+    end
   end
   if mob == 0 or on == mob or f - departureAt >= SETTLE_FRAMES * 3 then
     Spring.Echo("VA_AUTOPILOT on pad " .. on .. "/" .. mob)

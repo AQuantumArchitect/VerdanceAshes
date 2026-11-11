@@ -564,4 +564,18 @@ rules.va_objective_complete = 1
 gadget:GameFrame(41)
 assert(regrouped(), "any other sortie goes once its objective is done")
 
-print("ok: scout marks, rescue squad sized to outfight the gun, protected orders, departure to the real pad radius, leaving with and without a HUD, holding a capture, the Spire Gate and its tech ladder, the siege, hero caution from the safety field, leaving on the raptor waves' forecast, a muster staying past its secured gate")
+-- 10. Boarding waits for who was told to go: a unit made after the departure (a lab still printing on a
+-- muster) does not hold the company on the field (trial 18: Ketha died on the over-long walk home).
+mission.muster = nil
+reset()
+Spring.GetTeamUnits = function(team) if team == 1 then return {} end return { 1, 2 } end
+positions[1], positions[2] = { 0, 0 }, { 10, 0 }
+rules.va_objective_complete = 1
+gadget:GameFrame(41)
+assert(regrouped(), "it departs")
+Spring.GetTeamUnits = function(team) if team == 1 then return {} end return { 1, 2, 6 } end
+positions[6] = { 3000, 3000 }                       -- new, far off the pad
+gadget:GameFrame(41 + 60)
+assert(extracted, "the company told to go is aboard: it leaves without waiting for the newcomer")
+
+print("ok: scout marks, rescue squad sized to outfight the gun, protected orders, departure to the real pad radius, leaving with and without a HUD, holding a capture, the Spire Gate and its tech ladder, the siege, hero caution from the safety field, leaving on the raptor waves' forecast, a muster staying past its secured gate, boarding only who was told to go")
