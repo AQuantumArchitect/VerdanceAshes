@@ -37,7 +37,9 @@ FIXTURE_CASES = ("02", "08", "11")
 # Run-specific, so never compared: where that run's workspace sat on that PC, and when it ran.
 IGNORED_SCENARIO = ("/sourceIntentPath", "/sourceStatePath",
                     # added after the port, so the PS1 reference has none: each hero's temper (2026-11-09)
-                    "/missionBase/heroTemper")
+                    "/missionBase/heroTemper",
+                    # and each hero's mind (2026-11-11)
+                    "/missionBase/heroMind")
 IGNORED_MANIFEST = ("/generatedAt", "/intentPath", "/statePath", "/scenarioPath", "/seedOutbox", "/seedDestination",
                     # Python only: whether install_playable_slice.ps1 ran. The PS1 had no such field.
                     "/installed")

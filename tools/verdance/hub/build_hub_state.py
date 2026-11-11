@@ -563,7 +563,9 @@ def _road_choices(state: dict, deploy_aces: list) -> tuple[list[dict], str | Non
             "blurb": card.get("blurb"),
             "kind": "deploy",
             "recommended": bool(card.get("recommended")),
+            "lean": bool(card.get("lean")),
             "effect": effect,
+            **({"muster": card["muster"]} if card.get("muster") else {}),
         })
     return choices, (str(sorties.get("voice") or "") or None)
 
@@ -1243,6 +1245,13 @@ def build_hub(state: dict, war: dict) -> dict:
     home_camp["worthK"] = _hp["stake"]
     home_camp["stockWanted"] = _hp["threshold"]
     home_camp["cleared"] = home_cleared
+    # The muster (verdance.world.roads.muster_job): what the rail's line says about Tenebrium at home.
+    try:
+        _mj = _roads.muster_job(state, ROOT)
+    except Exception as exc:  # noqa: BLE001
+        print(f"VA_MUSTER_HUB_FAIL {exc}")
+        _mj = None
+    home_camp["muster"] = ({k: _mj[k] for k in ("due", "tenebrium", "floor", "builtLast")} if _mj else None)
     home_camp["clearReady"] = bool(flags.get("homeClearReady") or (home_eval or {}).get("homeClearReady"))
     try:
 
@@ -1269,7 +1278,8 @@ def build_hub(state: dict, war: dict) -> dict:
         "tagline": (
             "Found the Rock Jungle camp — or raid Greenest Fields for Tenebrium to fund it."
             if fresh_opening
-            else "Home is the Rock Jungle. Raid the Fields for Tenebrium. Clear the wilds when you can scale."
+            # the pathway (owner call, 2026-11-11): build at home, then invade
+            else "Home is the Rock Jungle. Build the army there, then take it out along the roads."
         ),
         "sessionMode": session_mode,
         "sessionHomeMap": session_home,

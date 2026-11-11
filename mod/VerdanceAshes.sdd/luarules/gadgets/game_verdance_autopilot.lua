@@ -36,6 +36,9 @@ end
 --   departure  the objective done, failed, or the clock out: everyone walks to the real pad
 --              (va_pad_x/z/r), and the company leaves once all of it stands there (or after
 --              three settles, for stuck units)
+--   muster     a Rock Jungle muster (mission.muster, the hub's muster card) does not leave when the
+--              gate is secured: the builders stake the bank and the lab prints the army until the
+--              waves' forecast or the clock says go (owner call, 2026-11-11)
 --   raptors    on raptor ground (va_raptor_grace_seconds set: the Rock Jungle) the company leaves on
 --              the waves' forecast (raptorsCall, below): now if it is losing the fight on its
 --              hands, or in time to be on the pad before a wave that would tip it lands. It replaced
@@ -130,6 +133,7 @@ local retreating = {}                       -- unitID -> frame it was pulled bac
 local chosen = {}                           -- unitID -> the plan caution last ordered ({ kind, x, z, fid })
 local field = nil                           -- the safety field (shared on GG with the hero doctrine)
 local issuing = false
+local MUSTER = false                        -- a Rock Jungle muster (mission.muster): see GameFrame
 
 -- Drop the rig's holds (a rescue squad, a siege) but keep the heroes that are being pulled back.
 local function releaseHolds()
@@ -1030,8 +1034,9 @@ function gadget:Initialize()
   if mission and type(mission.finale) == "table" then CAP_FRAMES = CAP_FRAMES * 3 end
   -- the kings' showdown ends only with the throne: twice that again before the company gives up
   if mission and type(mission.kings) == "table" and #mission.kings > 0 then CAP_FRAMES = CAP_FRAMES * 2 end
+  MUSTER = mission ~= nil and type(mission.muster) == "table"
   Spring.Echo("VA_AUTOPILOT armed team=" .. playerTeam .. " cap=" .. CAP_FRAMES .. " settle=" .. SETTLE_FRAMES
-    .. " mission=" .. tostring(mission and mission.missionId))
+    .. " mission=" .. tostring(mission and mission.missionId) .. (MUSTER and " muster" or ""))
 end
 
 local function memWatch(f)
@@ -1055,7 +1060,9 @@ function gadget:GameFrame(f)
     GG.VA_ObjectiveComplete("test_forced")
   end
   if not departureAt then
-    if rp("va_objective_complete") == 1 then depart("objective", f)
+    -- a muster (owner call, 2026-11-11: the builders spend all the Tenebrium) is not over when the
+    -- gate is secured: the company stays and builds until the waves' forecast or the clock says go
+    if rp("va_objective_complete") == 1 and not MUSTER then depart("objective", f)
     elseif rp("va_objective_failed") == 1 then depart("objective_failed", f)
     elseif f >= CAP_FRAMES then depart("clock", f)
     elseif RAPTOR_GRACE then

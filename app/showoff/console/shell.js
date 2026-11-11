@@ -81,10 +81,17 @@ function renderInspector() {
 // kind of job, or the reason the company is pushing it.
 function opCard(c, op, snap) {
   const raw = String(c.label || "Operation");
-  const lean = !!(c.recommended || c.lean || raw.startsWith("Lean · "));
+  // Two marks, two meanings (owner call, 2026-11-11): "recommended" is the company's best move (the
+  // muster when Tenebrium sits unstaked; otherwise the road the world leans to), "the world leans
+  // here" is the story's pull. A muster recommended over the lean shows both, on different cards.
+  const recommended = !!c.recommended;
+  const lean = !!(c.lean || raw.startsWith("Lean · "));
   const title = raw.replace(/^Lean · /, "");
   const kind = (c.effect && (c.effect.objectiveArchetype || c.effect.contractKind)) || "";
-  const sub = (op && op.recommendation) || [prettyMap(c.effect && c.effect.mapId), kind ? jobLabel(kind) : ""].filter(Boolean).join(" · ");
+  // The muster says why it is (or is not) the move: its first line (verdance.world.roads._muster_card).
+  const why = c.muster ? String(c.blurb || "").split(/\r?\n/)[0] : "";
+  const sub = why ? [prettyMap(c.effect && c.effect.mapId), why].filter(Boolean).join(" · ")
+    : (op && op.recommendation) || [prettyMap(c.effect && c.effect.mapId), kind ? jobLabel(kind) : ""].filter(Boolean).join(" · ");
   // Who the company may meet on this job's field (the kernel's draw; nobody is promised).
   const eff = c.effect || {};
   let meet = [];
@@ -110,12 +117,20 @@ function opCard(c, op, snap) {
   const standing = sideName[against] && rep[against] != null
     ? `<span class="cc-standing">against ${escape(sideName[against])} · standing ${Math.round(Number(rep[against]))} of 100</span>` : "";
   return `<button class="cc-operation" type="button" data-operation="${escape(c.id)}" ${c.disabled ? "disabled" : ""} aria-pressed="${c.id === snap.plan?.choiceId}">` +
+    `${recommended ? `<em class="cc-lean cc-recommended" title="The company's best move">recommended</em>` : ""}` +
     `${lean ? `<em class="cc-lean" title="The war is moving this way">the world leans here</em>` : ""}<strong>${escape(title)}</strong><span>${escape(sub)}</span>${standing}` +
     `${shownMeet.map(m => `<span class="cc-meet rescue${m.hostile ? " hostile" : ""}">rescue ${escape(m.text)}</span>`).join("")}${moreMeet > 0 ? `<span class="cc-meet rescue more">and ${moreMeet} more</span>` : ""}</button>`;
 }
-// The pull home (verdance.campaign.home.home_pull) in one line, once the bag is worth the trip.
+// Tenebrium at home in one line. Once the Rock Jungle is founded it follows the muster
+// (verdance.world.roads.muster_job: due when the bag can pay a builder's stake and the last sortie
+// was not a dig-in at home); before that, the pull home (verdance.campaign.home.home_pull).
 function homePullLine(hub) {
   const c = (hub && hub.homeCamp) || {};
+  const m = c.muster;
+  if (m) {
+    if (!m.due) return "";
+    return `<p class="cc-home-pull">${escape(`${m.tenebrium} Tenebrium sits unstaked. Muster at the camp: the builders put it to work, then the army goes out.`)}</p>`;
+  }
   if (c.cleared || !(Number(c.pull) >= 0.5)) return "";
   const tnb = Number((hub.commerce || {}).tenebrium ?? hub.tenebrium ?? 0);
   const want = Math.round(Number(c.stockWanted) || 0);
@@ -131,7 +146,9 @@ export function paint() {
   const choices = (snap.hub.node?.choices || []).filter(c => c.kind === "deploy" && (c.finale || c.effect?.mapId === snap.focusMap));
   const over = snap.hub.node?.kind === "epilogue";
   const ranking = n?.operations || [];
-  choices.sort((a, b) => ranking.findIndex(o => o.id === a.id) - ranking.findIndex(o => o.id === b.id));
+  // The recommended job leads the rail; the story's ranking orders the rest.
+  choices.sort((a, b) => (Number(!!b.recommended) - Number(!!a.recommended))
+    || (ranking.findIndex(o => o.id === a.id) - ranking.findIndex(o => o.id === b.id)));
   const signature = JSON.stringify([snap.hub.node?.kind, snap.hub.node?.choices?.length, n, snap.live, snap.focusMap, snap.plan?.choiceId, snap.hub.homeCamp, snap.hub.reputation, snap.hub.aces, snap.hub.lastResult, snap.hub.camp, session.allThreads, session.selectedThread, session.error]);
   updateIntelligence(n, snap.focusMap);
   if (signature === session.signature) return;

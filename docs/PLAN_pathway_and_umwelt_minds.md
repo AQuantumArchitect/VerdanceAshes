@@ -162,6 +162,31 @@ This one declarative spec is the single source of truth.
 - **Learning happens between runs, while the player is in the menu.** The hub replays the sortie's observation log through Python Umwelt while the debrief and camp screens are up, and the next `va_current.lua` carries the update.
 - **Camp decisions shape what a hero learns from the mission.** It's the owner's idea and fits the shape. What the player does at camp (who sits with whom, who's praised or blamed, who gets the rest) sets the learning step for that hero's replay: which observations weigh more, and which couplings are allowed to move. The same sortie teaches a praised hero confidence and a blamed one caution. It needs a spec for which camp choices map to which learning weights; draft that with the owner before building it.
 
+### Progress (2026-11-11, overnight)
+
+- **Steps 1–3 are done:**
+  - **The spec:** `tools/verdance/company/hero_mind.py`. `mind_tables` splits the drop into clusters by its bonds, and `domain_spec` and `reference_run` are the Umwelt side.
+  - **The runtime:** `include/va_umwelt_lite.lua`. It's allocation-free and frame-based.
+  - **The parity suite:** `tests/test_umwelt_lite_parity.py`. Umwelt runs in a fresh fp64 process with learning frozen, against the Lua under Lua 5.4. Four clusters (a pair, rivals, a chain of three, one alone), 60 ingests each, with gaps past the catch-up cap and overwritten readings. The worst difference is 4.4e-16.
+- **The math, from the source** (a00a0e7, GameHost path):
+  - Each role is a Bloch vector. Every ingest is one fixed RK4 step, h = 0.01, and z relaxes toward the centre by P(−γh), with γ = 5.
+  - Bridges nudge both ends toward their mean, scaled by 0.5·|c|, with the far end mirrored for a negative c.
+  - A forced observation blends the vector toward (0, 0, 0.95·(2v−1)) by η.
+  - Real time enters only through `ingest_hold_s`: min(⌊gap/hold⌋ − 1, 32) catch-up steps.
+  - The default host also learns online (a Hamiltonian drawn from an unseeded RNG), so it isn't reproducible. The engine copy runs the frozen dynamics and learns between sorties instead (step 7).
+- **One timing catch.** Umwelt's clock is whole microseconds, so 2.4 s / 0.6 s comes out at 3.9999999999999996: three holds, not four. The runtime takes game frames, and frames/30 is the same correctly-rounded double.
+- **Step 4 is in shadow:**
+  - The builder ships `mission.heroMind`.
+  - `include/va_hero_mind.lua` sees, steps and publishes from the hero doctrine's think loop. The think period (0.6 s) is the hold, so each think is one step.
+  - **Pain** is the share of health lost. **Threat** is 1 − exp(−incoming/hp × horizon), the safety field's own reading of staying.
+  - A hero going down makes its node despair (nerve 0), and its cluster steps at once.
+  - It publishes `va_mind_<role>` and `va_mind_<role>_c` on each hero unit, the same interface as `va_doctrine`. Nothing reads it yet.
+- **A design call made here:** bridges carry mood (nerve, drive) only, as temper does. Threat and pain are a hero's own.
+- **Next:**
+  - Show the minds on the HUD's hero cards.
+  - Read them in the safety field instead of the camp-fixed temper (S × (V + G) with live nerve and drive).
+  - Then intents with tendril hysteresis, paired trials, and learning between runs.
+
 ### Owner calls needed
 
 - **Where the contribution lives:** in the Umwelt repo (`examples/`, with the Lua as reference code), or in Verdance with only the spec and vectors upstream? Umwelt's layering law keeps applications out of `src/`, and examples are where foreign worlds go.

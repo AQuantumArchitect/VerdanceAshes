@@ -140,6 +140,7 @@ return function(tenebLoot, api)
     tenebLoot.pending = tenebLoot.pending or {}
     tenebLoot.byFeature = tenebLoot.byFeature or {}
     tenebLoot.byUnit = tenebLoot.byUnit or {}
+    tenebLoot.paid = tenebLoot.paid or {}
     tenebLoot.heapTransfer = tenebLoot.heapTransfer or {}
     tenebLoot.pendingLoss = tenebLoot.pendingLoss or {}
     if tenebLoot._inited then
@@ -154,6 +155,7 @@ return function(tenebLoot, api)
     tenebLoot.pending = {}
     tenebLoot.byFeature = {}
     tenebLoot.byUnit = {}
+    tenebLoot.paid = {}
     tenebLoot.teamBanks = {}
     tenebLoot.claimEvents = {}
     tenebLoot.wrecksCreated = 0
@@ -307,6 +309,7 @@ return function(tenebLoot, api)
   tenebLoot.onDead = function(unitID, unitDefID, unitTeam)
     local invested = tenebLoot.byUnit[unitID]
     tenebLoot.byUnit[unitID] = nil
+    if tenebLoot.paid then tenebLoot.paid[unitID] = nil end
     local isDecoy = tenebLoot.isDecoy(unitID, unitDefID)
     -- Drop can be 0 even when cost was > 0 (T2 fabs explode too hard to salvage).
     local drop = tenebLoot.dropOf and tenebLoot.dropOf(unitDefID) or tenebLoot.costOf(unitDefID)
@@ -590,6 +593,8 @@ return function(tenebLoot, api)
       tenebLoot.bank = (tenebLoot.bank or 0) - cost
       tenebLoot.spent = (tenebLoot.spent or 0) + cost
       tenebLoot.stampUnit(unitID, cost)
+      tenebLoot.paid = tenebLoot.paid or {}
+      tenebLoot.paid[unitID] = cost   -- the bank paid it: it comes back at exfil
       tenebLoot.publish()
       Spring.Echo("VA_TENEBRIUM_SPEND amount=" .. tostring(cost)
         .. " bank=" .. tostring(tenebLoot.bank)
@@ -623,21 +628,43 @@ return function(tenebLoot, api)
     return total, n
   end
 
+  -- What a living unit's stake paid in, to give back at exfil: what the field bank paid
+  -- (onUnitCreated) or the broker sold at the hub (a delivery: va_package_tag). A kit unit's stamp
+  -- (the mission's own constructor, a pack's builder) was never paid, so it does not come back: it
+  -- only marks the shard the unit leaves if it dies. Refunding stamps minted Tenebrium, one per
+  -- surviving kit builder per sortie (found 2026-11-11, planning the Rock Jungle muster).
+  tenebLoot.paidStake = function(uid)
+    local paid = tenebLoot.paid and tenebLoot.paid[uid]
+    if paid then return paid end
+    local tag = Spring.GetUnitRulesParam and Spring.GetUnitRulesParam(uid, "va_package_tag")
+    if tag == nil or tag == "" then return 0 end
+    local amt = tonumber(tenebLoot.byUnit[uid]) or 0
+    if amt <= 0 and Spring.GetUnitRulesParam then
+      amt = tonumber((Spring.GetUnitRulesParam(uid, "va_tenebrium_invested"))) or 0
+    end
+    return math.max(0, math.floor(amt))
+  end
+
   -- Exfil: pull living build-stakes back into liquid bank so campaign bag
   -- recovers Tnb spent on structures/units you leave behind when you extract.
   -- Does not touch unclaimed wreck shards (those stay lost unless reclaimed).
   tenebLoot.refundLivingStakesOnExfil = function(teamID)
     teamID = tonumber(teamID) or api.playerTeamID()
-    local total, n = tenebLoot.livingStakes(teamID)
+    local total, n = 0, 0
+    local units = Spring.GetTeamUnits(teamID) or {}
+    for i = 1, #units do
+      local back = tenebLoot.paidStake(units[i])
+      if back > 0 then total, n = total + back, n + 1 end
+    end
     if total <= 0 then
       return 0, 0
     end
-    local units = Spring.GetTeamUnits(teamID) or {}
     for i = 1, #units do
       local uid = units[i]
       if tenebLoot.byUnit[uid] then
         tenebLoot.byUnit[uid] = nil
       end
+      if tenebLoot.paid then tenebLoot.paid[uid] = nil end
       if Spring.SetUnitRulesParam then
         pcall(Spring.SetUnitRulesParam, uid, "va_tenebrium_invested", 0, { public = true })
       end

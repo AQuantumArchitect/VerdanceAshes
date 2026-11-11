@@ -25,6 +25,40 @@ One entry per working day: what changed, what was measured, what's next. The new
   - The forecast decided 11 of the 14 departures, at 375–875 s. The clock decided 3.
   - Some stragglers didn't make the pad on three sorties (26/29, 20/26, 20/25). That's the boarding, not the call.
 
+**The muster (built tonight)**
+- **The card.** The Rock Jungle's standing offer after the founding is a fortify at `TRJ_NW_GATE`, journey `muster` (`roads.muster_job`).
+  - It's recommended when the bag can pay for one builder (the catalog's `buildFloor`) and the last sortie wasn't a dig-in at home. Otherwise a battle is.
+  - The lean card stays as a mark.
+  - The home pull term on the Rock Jungle's door jobs is gone.
+- **The kit.** Every Rock Jungle fortify (muster or founding) brings one `legck`, flagged `muster` so the crew kit lets it land (`setup.lua`).
+- **The autopilot** doesn't leave a muster when the gate is secured.
+- **The hub.** The recommended card leads the rail with its own mark, the muster card says why, and the tagline is updated.
+- **Fixed: exfil minted Tenebrium.** Kit stamps were refunded; now only stakes actually paid come back (`paidStake`).
+- **A tour** (faked results) gives: raid, found, battle, muster, battle, muster, battle out through the Eye's road, muster.
+
+**Trial 13** (two campaigns, no `--prefer`; started before the kit flag)
+- The first musters ran as musters (the autopilot armed `muster`) but brought no constructor. The crew kit drops every layout unit that isn't the sealed company: `player_deployment units=0`. That's fixed now with the flag.
+- Neither muster ever secured its gate, so staying past it never mattered. The forecast called both departures.
+- **Deaths so far:** Vane in run 1's muster (down at frame 9277 just after wave 3, while the forecast held at r_now 0.66 with the next wave 472 s out), and Halbard in run 2's Rock Jungle door take (sortie 3).
+- Run 1 took `GF_SE_PLATEAU` on sortie 5, the door to Koom Valley.
+- A fresh pair runs with the constructor fix.
+
+**Umwelt hero minds** (Part 2, steps 1–4)
+- **The math** (an agent read of a00a0e7):
+  - per role, a Bloch vector; one RK4 step per ingest, z ← z·P(−γh) with γ = 5 and h = 0.01;
+  - bridges nudge toward the mean by 0.5·|c|, mirrored for c < 0;
+  - forced observations blend toward 0.95·(2v−1) by η;
+  - real time enters only through `ingest_hold_s` catch-up steps (≤ 32).
+  - The default host learns online from an unseeded RNG, so parity freezes learning and uses fp64.
+- **Built:**
+  - `hero_mind.py`: clusters by bonds, the tables, the Umwelt reference;
+  - `va_umwelt_lite.lua`: allocation-free, frame-based;
+  - `va_hero_mind.lua`, the shadow host in the doctrine's think loop. Pain is health lost; threat is 1 − exp(−incoming/hp × horizon). A hero down makes its node despair. It publishes `va_mind_*`.
+  - The sidebar draws nerve as a slim line under each hero's health.
+- **Parity:** four clusters, 60 ingests each, worst difference 4.4e-16.
+  - One bug found: Umwelt's microsecond clock makes 2.4 s / 0.6 s = 3.9999999999999996, three holds. The runtime takes frames.
+- **A design call:** bridges carry mood (nerve, drive) only. Threat and pain stay each hero's own.
+
 **Nobody spends the Tenebrium** (the next work)
 - In all 14 sorties the bank stayed at 3, with `tenebriumSpent 0` and metal income 0.
 - The player's commander is swept at game start, the rig's band (verse, vane, halbard) has no builder, the Rock Jungle kit ("wild") brings none, and the mercenary buyer spends metal only. So BARb had nothing that could build.

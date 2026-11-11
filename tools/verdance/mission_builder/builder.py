@@ -579,6 +579,21 @@ def _build(ws: Path, intent: Dict[str, Any], state: Any, *, intent_path: str, st
     else:
         player_kit = kits.add_commerce_deploy_to_kit(kits.player_kit(map_family), commerce)
     player_kit = kits.add_reserve_to_kit(player_kit, roster)
+    # The Rock Jungle muster (verdance.world.roads.muster_job; owner call, 2026-11-11): a constructor
+    # rides with the company and stakes the bank on a lab and more builders. Its own stake is the
+    # kit's stamp, never paid and so never refunded (va_tenebrium_handlers.lua, paidStake). Same
+    # place and spacing as the economy family's constructor. Muster and fortify are one mission type,
+    # so every dig-in at home is one: the founding too (it plants the camp, and none brought a builder
+    # in the 11-11 trials).
+    from verdance.world.roads import MUSTER_ID
+    muster = ieq(S(intent["hubChoiceId"]) if (has(intent, "hubChoiceId") and T(intent["hubChoiceId"])) else "", MUSTER_ID) \
+        or (is_rock_jungle and fortify_kind)
+    if muster:
+        builder_spec = kits.Spec("legck", 1, 180, 240, 90)
+        # the crew kit lands only the sealed company (setup.lua): this flag lets the camp's builder through
+        builder_spec["muster"] = True
+        player_kit.append(builder_spec)
+        log("Muster: a constructor rides with the company to stake the Tenebrium at the camp.")
     if T(commerce):
         tnb = commerce["tenebrium"] if g(commerce, "tenebrium") is not None else 0
         if g(commerce, "metalK") is not None:
@@ -1192,6 +1207,7 @@ def _build(ws: Path, intent: Dict[str, Any], state: Any, *, intent_path: str, st
             and has(home, "growthPending") and I(home["growthPending"]) > 0:
         camp_growth = {"count": I(home["growthPending"])}
 
+    hero_temper = _hero_temper(state, deploy_allow, ws, log)
     mission_base = {
         "schemaVersion": "verdance-playable/1.0-alpha",
         "campaignId": "verdance_ashes",
@@ -1291,7 +1307,10 @@ def _build(ws: Path, intent: Dict[str, Any], state: Any, *, intent_path: str, st
         "heroes": hero_manifest,
         # Each hero's temper on this drop (verdance.company.temper): the camp's bonds, wounds and
         # griefs as nerve and drive; game_verdance_unit_behavior scales the hero's doctrine by them.
-        "heroTemper": _hero_temper(state, deploy_allow, ws, log),
+        "heroTemper": hero_temper,
+        # each hero's mind, run in the engine on Umwelt's dynamics (verdance.company.hero_mind;
+        # va_umwelt_lite.lua); shadow for now: published for the HUD, deciding nothing yet
+        "heroMind": _hero_mind(state, deploy_allow, ws, log, hero_temper),
         # Per-def veteran XP bank: the gadget seeds SetUnitExperience / craft XP on spawn.
         "cadreXp": cadre_xp,
         "beats": piped(arr(intent["beats"])) if (has(intent, "beats") and T(intent["beats"])) else None,
@@ -1313,6 +1332,10 @@ def _build(ws: Path, intent: Dict[str, Any], state: Any, *, intent_path: str, st
         "worldConflict": piped(intent["worldConflict"]) if (has(intent, "worldConflict") and T(intent["worldConflict"])) else {},
         "storyIntent": intent,
     }
+    if muster:
+        # Only on a muster, so every other scenario keeps the PS1's shape (parity). The autopilot reads
+        # it: a muster is not over when the gate is secured (game_verdance_autopilot.lua).
+        mission_base["muster"] = {"choiceId": MUSTER_ID, "zoneId": S(target_zone_id) if T(target_zone_id) else None}
     scenario = {
         "schemaVersion": "verdance-playable-scenario/1.0-alpha",
         "sourceIntentPath": intent_path,
@@ -1457,6 +1480,17 @@ def _hero_temper(state: Any, drop: List[str], ws: Path, log: Log) -> Dict[str, D
         return temper_for_drop(plain if isinstance(plain, dict) else {}, drop, ws)
     except Exception as e:  # noqa: BLE001
         log(f"WARNING: hero temper skipped: {e}")
+        return {}
+
+
+def _hero_mind(state: Any, drop: List[str], ws: Path, log: Log, temper: Dict[str, Dict[str, float]]) -> Dict[str, Any]:
+    """The drop's hero minds (mission.heroMind); never stops a build."""
+    try:
+        from verdance.company.hero_mind import mind_tables
+        plain = json.loads(json.dumps(state, default=float)) if state is not None else {}
+        return mind_tables(plain if isinstance(plain, dict) else {}, drop, ws, temper=temper)
+    except Exception as e:  # noqa: BLE001
+        log(f"WARNING: hero mind skipped: {e}")
         return {}
 
 

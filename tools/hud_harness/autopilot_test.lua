@@ -546,4 +546,22 @@ rules.va_raptor_next_wave = nil
 gadget:GameFrame(341)
 assert(not regrouped(), "no waves forecast: the raptors alone do not send it home")
 
-print("ok: scout marks, rescue squad sized to outfight the gun, protected orders, departure to the real pad radius, leaving with and without a HUD, holding a capture, the Spire Gate and its tech ladder, the siege, hero caution from the safety field, leaving on the raptor waves' forecast")
+-- 9. A muster (the hub's muster card: mission.muster; owner call 2026-11-11) is not over when the gate
+-- is secured: the builders stake the Tenebrium and the lab prints the army until the clock (or the
+-- waves' forecast) says go. Any other sortie still leaves once its objective is done.
+Spring.GetModOptions = function() return { va_autopilot = "1", va_autopilot_minutes = "1", va_autopilot_settle = "1" } end
+Spring.GetTeamUnits = function(team) if team == 1 then return {} end return { 1, 2 } end
+mission.muster = { choiceId = "muster_rock_jungle" }
+reset()
+rules.va_objective_complete = 1
+gadget:GameFrame(41)
+assert(not regrouped(), "a muster stays to build once the gate is secured")
+gadget:GameFrame(1811)
+assert(regrouped(), "the clock still sends a muster home")
+mission.muster = nil
+reset()
+rules.va_objective_complete = 1
+gadget:GameFrame(41)
+assert(regrouped(), "any other sortie goes once its objective is done")
+
+print("ok: scout marks, rescue squad sized to outfight the gun, protected orders, departure to the real pad radius, leaving with and without a HUD, holding a capture, the Spire Gate and its tech ladder, the siege, hero caution from the safety field, leaving on the raptor waves' forecast, a muster staying past its secured gate")

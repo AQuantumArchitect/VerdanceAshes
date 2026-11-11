@@ -1212,6 +1212,14 @@ end
 -- the doctrine its personality gives it. nerve and drive are in [-1, 1]; a shaken hero (low nerve)
 -- bails and kites sooner, a steady one holds; drive leans into the push. Continuous, no thresholds.
 local heroTemper = {}
+-- Each hero's mind on Umwelt's dynamics (include/va_hero_mind.lua; verdance.company.hero_mind), in shadow:
+-- it observes, steps and publishes va_mind_* for the HUD, and decides nothing yet. One table, for the
+-- gadget's local budget: { mod = the include, st = this match's minds, list = reused { uid, hid } rows }
+local mindHost = { list = {} }
+do
+  local ok, mod = pcall(VFS.Include, "luarules/gadgets/include/va_hero_mind.lua")
+  mindHost.mod = ok and type(mod) == "table" and mod or nil
+end
 
 local function loadTemper()
   local ok, m = pcall(VFS.Include, "singleplayer/verdance_ashes/generated/va_current.lua")
@@ -1225,6 +1233,10 @@ local function loadTemper()
     end
   end
   GG.VA_HeroTemper = heroTemper   -- the safety field's choices read it too
+  if mindHost.mod then
+    local okMind, st = pcall(mindHost.mod.load, ok and m or nil)
+    mindHost.st = okMind and st or nil
+  end
   return n
 end
 
@@ -1421,6 +1433,13 @@ local function dropBeliefNode(unitID)
 end
 
 function gadget:UnitDestroyed(unitID)
+  if mindHost.st and Spring.GetUnitTeam(unitID) == playerTeam
+      and (tonumber((Spring.GetGameRulesParam("va_terminal"))) or 0) ~= 1 then
+    local hid = Spring.GetUnitRulesParam(unitID, "va_hero_id")
+    if hid ~= nil and hid ~= "" and hid ~= 0 then
+      pcall(mindHost.mod.down, mindHost.st, Spring.GetGameFrame(), tostring(hid))
+    end
+  end
   dropBeliefNode(unitID)
   lastAssist[unitID] = nil
   hurtRetreating[unitID] = nil
@@ -1504,5 +1523,25 @@ function gadget:GameFrame(frame)
   for i = 1, #assist do
     local unitID, ud, rez = assist[i][1], assist[i][2], assist[i][3]
     thinkAssistUnit(unitID, teamID, frame, ud, rez)
+  end
+
+  -- the heroes' minds (shadow): what each saw this think, one Umwelt step, published
+  if mindHost.st then
+    local list, n = mindHost.list, 0
+    for i = 1, #assist do
+      local hid = Spring.GetUnitRulesParam(assist[i][1], "va_hero_id")
+      if hid ~= nil and hid ~= "" and hid ~= 0 then
+        n = n + 1
+        local row = list[n] or {}
+        list[n] = row
+        row[1], row[2] = assist[i][1], tostring(hid)
+      end
+    end
+    for i = #list, n + 1, -1 do list[i] = nil end
+    local ok, err = pcall(mindHost.mod.think, mindHost.st, frame, list, safetyFor(teamID, frame))
+    if not ok then
+      Spring.Echo("VA_HERO_MIND failed: " .. tostring(err))
+      mindHost.st = nil
+    end
   end
 end

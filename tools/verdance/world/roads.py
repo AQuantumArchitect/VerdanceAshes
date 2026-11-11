@@ -49,11 +49,6 @@ TEMPERATURE = 0.75
 SHUT_MAP = 1.4      # a road onto a map the company has never walked
 TAKE_DOOR = 0.9     # a door to take back or take for the first time
 Q0_BIAS = 0.35
-# Home pulls along a smooth curve (verdance.campaign.home.home_pull): a job in the Rock Jungle adds
-# HOME_PULL_WEIGHT * (2 * pull - 1), from -WEIGHT with an empty bag to +WEIGHT with a camp's worth of
-# Tenebrium. Before this, nothing pushed back, and Rock Jungle doors (each leads out) won 7 of 11
-# leans on the hard-AI run (2026-11-04).
-HOME_PULL_WEIGHT = 1.2
 
 MAP_NAMES = {
     "greenest_fields": "Greenest Fields",
@@ -324,15 +319,76 @@ def legal_jobs(state: Dict[str, Any], workspace: Path) -> List[Dict[str, Any]]:
     from verdance.campaign.suits import SIMMERS, has_suit
     if not has_suit(state):
         jobs = [j for j in jobs if j["mapId"] != SIMMERS]
-    from verdance.campaign.home import home_pull
-    hp = home_pull(state, Path(workspace))
-    home_term = HOME_PULL_WEIGHT * (2.0 * float(hp["pull"]) - 1.0)
-    for j in jobs:
-        if j["mapId"] == HOME_MAP_ID:
-            j["homePull"] = hp["pull"]
-            j["score"] = round(float(j["score"]) + home_term, 4)
+    # Tenebrium's pull home is the muster now (muster_job, below), not a term on these jobs.
     jobs.sort(key=lambda j: (-float(j["score"]), j["id"]))
     return jobs
+
+
+# --- the muster ------------------------------------------------------------------
+# Owner call, 2026-11-11: "they should go to the jungle, do a sortie while the builders spend all
+# their Tnb, and then the next sortie should be out on the fields of battle again", and muster and
+# fortify are one mission type: the dig-in at the camp's gate (Journey A's). Tenebrium is a stake
+# (va_tenebrium_handlers.lua): what the bank pays into a builder comes back at exfil while the
+# builder lives, so a muster puts the whole bank to work for the builders' risk alone, and what they
+# build lifts into the reserve (verdance.company.reserve). This replaced the home pull, a term on
+# every Rock Jungle door job (HOME_PULL_WEIGHT): it raised the home doors while the bag was full,
+# and in the 11-10 trials nothing built there anyway (no builder came; DEVLOG 2026-11-11).
+MUSTER_ID = "muster_rock_jungle"
+MUSTER_ZONE = "TRJ_NW_GATE"          # the camp's gate: Journey A's dig-in
+MUSTER_PAD = "TRJ_NW_OUTER_MUSTER"   # home's door, the pad of every home sortie
+HOME_BUILD_KINDS = ("fortify_zone", "home_founding")   # a sortie that built at home
+
+
+def build_floor(workspace: Path) -> int:
+    """The cheapest builder's stake: the broker catalog's buildFloor (a T1 builder's
+    ceil(buildSpeed / 150)), with the commerce module's own default when the catalog has none."""
+    from verdance.campaign.commerce import load_commerce_catalog
+    catalog = load_commerce_catalog(Path(workspace))
+    return max(1, int((catalog.get("resource") or {}).get("buildFloor") or 1))
+
+
+def built_at_home_last(state: Dict[str, Any]) -> bool:
+    """The last sortie fought was a dig-in at home (the founding or a muster)."""
+    hist = [b for b in (state.get("history") or []) if isinstance(b, dict)]
+    if not hist:
+        return False
+    last = hist[-1]
+    return _canon_map(last.get("mapId")) == HOME_MAP_ID and str(last.get("objectiveKind") or "") in HOME_BUILD_KINDS
+
+
+def muster_job(state: Dict[str, Any], workspace: Path) -> Optional[Dict[str, Any]]:
+    """The camp's standing offer once the Rock Jungle is founded. It is due (the hub recommends it)
+    when the bag can pay a builder's stake and the last sortie did not already build at home."""
+    walked = {_canon_map(b.get("mapId")) for b in (state.get("history") or []) if isinstance(b, dict) and b.get("mapId")}
+    if HOME_MAP_ID not in walked:
+        return None   # the founding comes first (legal_jobs' found job, or the home card)
+    tnb = int((state.get("commerce") or {}).get("tenebrium") or 0)
+    floor = build_floor(workspace)
+    built = built_at_home_last(state)
+    return {"kind": "muster", "mapId": HOME_MAP_ID, "padZoneId": MUSTER_PAD, "targetZoneId": MUSTER_ZONE,
+            "tenebrium": tnb, "floor": floor, "builtLast": built, "due": tnb >= floor and not built,
+            "score": 0.0, "id": MUSTER_ID}
+
+
+def _muster_card(job: Dict[str, Any]) -> Dict[str, Any]:
+    tnb, floor = job["tenebrium"], job["floor"]
+    if job["due"]:
+        why = f"{tnb} Tenebrium sits unstaked. Put it to work at the camp, then take the army out."
+    elif job["builtLast"]:
+        why = "The camp built last time. Take the army out onto the field first."
+    else:
+        why = f"Nothing to stake: a builder takes {floor} Tenebrium and the bag holds {tnb}."
+    lines = [why,
+             "Muster at the camp's gate. A constructor comes with you and stakes the Tenebrium on a lab and more "
+             "builders; the lab prints the army from the jungle's metal.",
+             "A living builder's stake comes back when you lift, and everything that lifts joins the reserve.",
+             "Recommended." if job["due"] else "Still open."]
+    effect = {"mapId": HOME_MAP_ID, "contractKind": "fortify_zone", "preferredCaptureZoneId": job["targetZoneId"],
+              "preferredDeployZoneId": job["padZoneId"], "preferredExtractionZoneId": job["padZoneId"],
+              "padLocked": True, "sessionMode": "same_map", "against": "wild", "journey": "muster"}
+    return {"id": job["id"], "label": "Muster at the Rock Jungle camp", "blurb": "\n".join(lines), "kind": "deploy",
+            "lean": False, "recommended": bool(job["due"]), "score": job["score"], "effect": effect,
+            "muster": {"due": bool(job["due"]), "tenebrium": tnb, "floor": floor, "builtLast": bool(job["builtLast"])}}
 
 
 def walls(state: Dict[str, Any], workspace: Path) -> List[Dict[str, Any]]:
@@ -476,10 +532,20 @@ def road_sorties(state: Dict[str, Any], workspace: Path, *, seed: Optional[int] 
     jobs = legal_jobs(state, Path(workspace))
     used = collapse_seed(state) if seed is None else int(seed)
     lean, rest = _draw(jobs, used)
-    cards = ([_card(lean, True)] if lean else []) + [_card(j, False) for j in rest]
+    muster = muster_job(state, Path(workspace))
+    due = bool(muster and muster["due"])
+    cards = [_muster_card(muster)] if due else []
+    if lean:
+        card = _card(lean, True)
+        if due:
+            card["recommended"] = False   # the lean stays a mark (the world's pull); the muster is the move
+        cards.append(card)
+    cards += [_card(j, False) for j in rest]
+    if muster and not due:
+        cards.append(_muster_card(muster))
     fetches = fetch_jobs(state, Path(workspace))
     cards += [_fetch_card(j) for j in fetches]
-    jobs = jobs + fetches
+    jobs = jobs + ([muster] if muster else []) + fetches
     voice = ""
     if cards:
         voice = ("Doors are the way between maps. Hold the door you leave by and the road is open; "

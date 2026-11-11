@@ -120,6 +120,8 @@ local function pollHeroes()
       if tonumber(h.level) then rec.level = tonumber(h.level) end
       if h.rank and h.rank ~= "" then rec.rank = h.rank end
       if h.name and h.name ~= "" then rec.name = h.name end
+      -- its mind, when it has one (va_hero_mind.lua publishes va_mind_* on the hero unit)
+      rec.nerve = rec.unit and tonumber((Spring.GetUnitRulesParam(rec.unit, "va_mind_nerve"))) or nil
     end
   end
   for id, st in pairs(type(states) == "table" and states or {}) do
@@ -699,10 +701,14 @@ local function drawCompany(x, y, right)
     -- the field effect, and "on" while its condition holds (field effects v2)
     if rec.state == "alive" and rec.fx and rec.fx ~= "" then chip = chip .. " · " .. rec.fx .. (rec.fxOn and " on" or "") end
     if rec.vet and rec.vet ~= "" and rec.vet ~= "green" then chip = chip .. " · " .. rec.vet end
-    text(Ash.fit(chip, 8, 120), x + 10, y2 - 25, 8, Ash.COL.ash, "l")
+    text(Ash.fit(chip, 8, rec.nerve and 104 or 120), x + 10, y2 - 25, 8, Ash.COL.ash, "l")
     if rec.state == "alive" then
       local hp = math.max(0, math.min(1, rec.hp or 1))
       Ash.meter(x + 118, y2 - 11, x + 172, y2 - 7, hp, (hp > 0.6 and Ash.COL.good) or (hp > 0.3 and Ash.COL.warn) or Ash.COL.bad)
+      -- nerve, from the hero's mind on Umwelt: the slim line under health (empty shaken, full steady)
+      if rec.nerve then
+        Ash.meter(x + 118, y2 - 22, x + 172, y2 - 19, math.max(0, math.min(1, rec.nerve)), Ash.COL.steam)
+      end
     end
     local lbl, col = heroStateLabel(rec)
     text(lbl, right - 6, y2 - 13, 10, col, "r")
