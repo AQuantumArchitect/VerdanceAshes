@@ -6,7 +6,7 @@ One entry per working day: what changed, what was measured, what's next. The new
 
 **Brief.** Game Butler (Luke's release manager bot) set a standing brief: get the game polished, fun and itch-ready by about 2026-11-22, then open one `ready-for-human-playtest` issue. Never tag a release or push to itch.
 
-The playtest rules it points to (CLAUDE.md, "Ready for a human playtest") are on `origin/cursor/playtest-signoff-and-faction-lore-83fa` (7b42abb), not yet merged to master. I follow them as written: commit SHA, version, `SETUP.bat` then `PLAY.bat` on stock BAR, evidence, time to beat (3 hours or more), known issues.
+The playtest rules it points to (CLAUDE.md, "Ready for a human playtest") landed on master in #12 (f302dde). I follow them as written: commit SHA, version, `SETUP.bat` then `PLAY.bat` on stock BAR, evidence, time to beat (3 hours or more), known issues.
 
 **Done**
 - **No Clans in the player's text** (4fbcff1). Per the faction rule, the Ashwalkers are a band within the Null Mercs. Ketha's lines, the objective text and the epilogue now name them.
@@ -18,13 +18,12 @@ The playtest rules it points to (CLAUDE.md, "Ready for a human playtest") are on
 - Two more full campaigns running for the evidence.
 
 **Questions for Luke**
-1. Playwright's Chromium is gone from `%LOCALAPPDATA%\ms-playwright` on fenrir, so the hub's browser walk is skipped. Reinstall it (`exportenv\Scripts\python -m playwright install chromium-headless-shell`)? I didn't download it unasked.
-2. The CLAUDE.md playtest rules are on an unmerged branch. Merge it?
-3. The finale's path: should map geography choose it (Path A from the Bastion road), or stay with the path signals?
-4. Keep "the world leans here" visible as a second mark beside "recommended"?
-5. Hero minds: keep them in shadow until more paired trials show a gain, or turn on live?
-6. Your idea that camp choices shape what a hero learns: I'd like your mapping of camp choices to learning before building it.
-7. VERSION still reads 0.15.0, and all of tonight's work is unreleased. Bumping it is Game Butler's call at release time.
+1. Playwright's Chromium is gone from `%LOCALAPPDATA%\ms-playwright` on fenrir, so the hub's browser walk is skipped. Reinstall it (`export\venv\Scripts\python -m playwright install chromium-headless-shell`)? I didn't download it unasked.
+2. The finale's path: should map geography choose it (Path A from the Bastion road), or stay with the path signals?
+3. Keep "the world leans here" visible as a second mark beside "recommended"?
+4. Hero minds: keep them in shadow until more paired trials show a gain, or turn on live?
+5. Your idea that camp choices shape what a hero learns: I'd like your mapping of camp choices to learning before building it.
+6. VERSION still reads 0.15.0, and all of tonight's work is unreleased. Bumping it is Game Butler's call at release time.
 
 ## 2026-11-11: the raptor wave forecast, and why nobody spends Tenebrium
 
