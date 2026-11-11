@@ -94,7 +94,7 @@ Path B. Static and dropout = the path is collapsing. This is a zero-UI narrative
 hiding inside an ambient audio system. Very low implementation cost, very high feel.
 
 ### 2.4 Rhekk as a living Q6 weight
-Rhekk's survival status directly affects Q6b (clan sovereignty weight). His death
+Rhekk's survival status directly affects Q6b (Ashwalker sovereignty weight). His death
 drops Independent pressure by 0.15 — a significant graph shift. This means the player
 who "plays optimally" militarily (sacrificing Rhekk's enclave to secure a strategic
 position) is unknowingly sabotaging their political geometry. The graph punishes

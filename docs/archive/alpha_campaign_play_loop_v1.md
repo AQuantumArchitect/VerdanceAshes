@@ -76,8 +76,8 @@ scrap-line crews in ash-grey null colors) hold **one foothold per map** and pres
 the Armada approaches on their own contract. **Cortex is an accent only** — it
 survives as contractor pockets around explicitly Cortex-named zones (the dealer
 relay on eye_of_horus) and as Cortex-built objective centerpieces that an Armada
-garrison protects (the synth works). The player's clans (Ashwalkers) thread
-through that war.
+garrison protects (the synth works). The player's Ashwalkers, a messy
+mercenary band within the Null Mercs, thread through that war.
 
 - Faction control is assigned in the story engine (`ensure_zone_memory`): Armada
   on defender/fortress zones, Cortex only on `cortex_*`/`*CORTEX*` zones, the
