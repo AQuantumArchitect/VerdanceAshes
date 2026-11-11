@@ -11,7 +11,8 @@
 --   1. catch-up: min(floor(gap / hold) - 1, catchupMax) field steps for the quiet since its last ingest
 --      (none on its first), then one more (engine.py:1070-1089, 1118)
 --   2. a field step: every role relaxes toward its centre by RK4's step on the dissipator,
---      z <- z P(-gd h), (x, y) <- (x, y) P(-gd h / 2), P(s) = 1 + s + s^2/2 + s^3/6 + s^4/24
+--      z <- z P(-gd h), (x, y) <- (x, y) P(-gd h / 2), P(s) = 1 + s + s^2/2 + s^3/6 + s^4/24, gd the
+--      role's own rate where the spec gives one (tables.roleGamma: mood holds for a sortie)
 --      (batched_evolve.py:361-399); then each bridge in order nudges both ends toward their mean,
 --      alpha = bridgeStrength |c|, the far end mirrored (x, -y, -z) when c < 0 (field.py:286-339)
 --   3. what was seen since the last ingest (the last reading of a role wins) blends in after the step:
@@ -44,15 +45,18 @@ function M.new(tables)
     clusters = {},
     hold = tonumber(tables.holdS) or 0,
     fps = (Game and tonumber(Game.gameSpeed)) or 30,   -- BAR's sim frames per game second
-    gdh = (tonumber(u.gammaDiss) or 0) * (tonumber(u.h) or 0),
+    fz = {}, fxy = {},   -- per role: the dissipator's RK4 step on z and on (x, y)
     bs = tonumber(u.bridgeStrength) or 0,
     rObs = tonumber(u.rObs) or 0,
     cmax = tonumber(u.catchupMax) or 0,
   }
-  mind.fz, mind.fxy = P(-mind.gdh), P(-mind.gdh / 2)
+  local h, roleGamma = tonumber(u.h) or 0, tables.roleGamma or {}
   for i, r in ipairs(tables.roles or {}) do
     mind.roles[i] = tostring(r)
     mind.roleIx[tostring(r)] = i
+    -- a role's own rate when the spec gives one (NodeSpec.params gamma_diss_<role>), else the node's
+    local gdh = (tonumber(roleGamma[tostring(r)]) or tonumber(u.gammaDiss) or 0) * h
+    mind.fz[i], mind.fxy[i] = P(-gdh), P(-gdh / 2)
   end
   mind.R = #mind.roles
   for _, r in ipairs(tables.shared or tables.roles or {}) do
@@ -105,7 +109,8 @@ local function fieldStep(mind, c)
     local base = (hi - 1) * R
     for ri = 1, R do
       local k = base + ri
-      x[k], y[k], z[k] = x[k] * fxy, y[k] * fxy, z[k] * fz
+      local a, b = fxy[ri], fz[ri]
+      x[k], y[k], z[k] = x[k] * a, y[k] * a, z[k] * b
     end
   end
   local bs = mind.bs

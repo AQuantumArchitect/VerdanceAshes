@@ -80,7 +80,7 @@ def mind_tables(state: Dict[str, Any], drop: Iterable[str], workspace: Optional[
         t = temper.get(h) or {}
         start[h] = {r: round((float(t.get(r, 0.0)) + 1.0) / 2.0, 4) if r in TEMPER_ROLES else 0.5 for r in ROLES}
     return {"roles": list(ROLES), "shared": list(SHARED_ROLES), "clusters": out_clusters, "start": start,
-            "umwelt": dict(UMWELT), "holdS": HOLD_S}
+            "umwelt": dict(UMWELT), "holdS": HOLD_S, "roleGamma": dict(ROLE_GAMMA)}
 
 
 # --- Umwelt's own numbers, for the engine's copy ----------------------------------------------------
@@ -98,19 +98,30 @@ UMWELT = {
 # every 18 frames (game_verdance_unit_behavior.lua THINK_PERIOD, 0.6 s), so a mind forgets at the pace
 # the hero acts: about 14 holds (8 s) to forget half of what it saw.
 HOLD_S = 18 / 30
+# Mood holds for the sortie. The relaxation above forgets a belief in about 12 s (hold / (gammaDiss h)),
+# right for threat and pain, which are seen again every think, but the temper a hero brings from camp
+# was gone a minute into the drop (trial 14, 2026-11-11: Ketha's nerve 0.567 -> 0.500 by frame 1845).
+# Nerve and drive get Umwelt's per-role rate (NodeSpec.params gamma_diss_<role>) set so they forget over
+# one sortie's planned length, the stamp's targetDuration of 10 minutes (stamp_deploy_plan.py): what
+# moves them within a drop is what happens to the hero, not the clock.
+SORTIE_S = 10 * 60
+MOOD_GAMMA = HOLD_S / (UMWELT["h"] * SORTIE_S)
+ROLE_GAMMA = {r: MOOD_GAMMA for r in TEMPER_ROLES}
 
 
 def domain_spec(cluster: Dict[str, Any], start: Dict[str, Dict[str, float]], roles=ROLES, hold_s: float = HOLD_S,
-                shared=SHARED_ROLES):
+                shared=SHARED_ROLES, role_gamma=None):
     """One cluster's mind as an Umwelt DomainSpec, and the couplings to set on its bridges. Every role is
     dissipative and observed directly (force_observe: a high reading raises the belief), as temper's are."""
+    role_gamma = ROLE_GAMMA if role_gamma is None else role_gamma
     from umwelt import BindingSpec, BridgeSpec, DomainSpec, NodeSpec
     modes = {r: "dissipative" for r in roles}
     nodes = [NodeSpec("mind", parent=None, kind="root", roles=())]
+    params = {f"gamma_diss_{r}": (float(g), 0.0, float(g), float(g)) for r, g in role_gamma.items() if r in roles}
     for h in cluster["heroes"]:
         prep = {r: (0.0, 0.0, 2.0 * float(start[h][r]) - 1.0) for r in roles}
         nodes.append(NodeSpec(f"hero:{h}", parent="mind", kind="entity", roles=tuple(roles),
-                              role_modes=dict(modes), initial_bloch=prep))
+                              role_modes=dict(modes), initial_bloch=prep, params=dict(params)))
     bridges, couplings = [], {}
     for a, b, c in cluster["bridges"]:
         bridges.append(BridgeSpec(f"hero:{a}", f"hero:{b}", shared_roles=tuple(shared), kind="open"))
@@ -124,7 +135,8 @@ def domain_spec(cluster: Dict[str, Any], start: Dict[str, Dict[str, float]], rol
 
 
 def reference_run(cluster: Dict[str, Any], start: Dict[str, Dict[str, float]], script: List[Any],
-                  roles=ROLES, hold_s: float = HOLD_S, shared=SHARED_ROLES) -> List[Dict[str, Dict[str, List[float]]]]:
+                  roles=ROLES, hold_s: float = HOLD_S, shared=SHARED_ROLES,
+                  role_gamma=None) -> List[Dict[str, Dict[str, List[float]]]]:
     """Run one cluster's mind on Umwelt itself: the reference the Lua runtime must match.
 
     script: [[dt_s, [[hero, role, value01, eta], ...]], ...]; an empty list is a heartbeat (a step with
@@ -135,7 +147,7 @@ def reference_run(cluster: Dict[str, Any], start: Dict[str, Dict[str, float]], s
     draws its learned Hamiltonian from an unseeded generator."""
     from datetime import timedelta
     from umwelt import GameHost
-    spec, couplings = domain_spec(cluster, start, roles, hold_s, shared)
+    spec, couplings = domain_spec(cluster, start, roles, hold_s, shared, role_gamma)
     host = GameHost().register_world(spec, population=False)
     host.engine.graph.root.param_bundle.params["context_learn"].value = 0.0
     for br in host.engine.graph.bridges:
@@ -171,7 +183,8 @@ def _main(argv: List[str]) -> int:
         return 2
     case = json.loads(Path(argv[2]).read_text(encoding="utf-8"))
     rows = reference_run(case["cluster"], case["start"], case["script"], tuple(case.get("roles") or ROLES),
-                         float(case.get("holdS") or HOLD_S), tuple(case.get("shared") or SHARED_ROLES))
+                         float(case.get("holdS") or HOLD_S), tuple(case.get("shared") or SHARED_ROLES),
+                         case.get("roleGamma"))
     Path(argv[3]).write_text(json.dumps(rows), encoding="utf-8")
     return 0
 

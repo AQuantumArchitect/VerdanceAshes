@@ -1,0 +1,5949 @@
+{
+ "schema": "verdance-unit-fight/1",
+ "source": "va_safety_field.lua M.profile over BAR's UnitDefs and WeaponDefs, echoed by the autopilot (va_autopilot_profiles=1) and harvested by tools/harvest_fight_profiles.py",
+ "units": {
+  "arm_hat_halloween_witch": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 6000000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "arm_hat_xmas_santa": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 6000000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "arm_leftshoulder_nationwars_eec": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 6000000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "arm_leftshoulder_nationwars_ger": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 6000000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "arm_leftshoulder_nationwars_us": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 6000000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "arm_necklace_halloween_broom": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 6000000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "arm_necklace_xmas_santabag": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 6000000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armaak": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2200.0,
+   "range": 0.0,
+   "speed": 47.4
+  },
+  "armaap": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3750.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armaas": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3900.0,
+   "range": 0.0,
+   "speed": 63.0
+  },
+  "armaca": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 200.0,
+   "range": 0.0,
+   "speed": 192.0
+  },
+  "armack": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 930.0,
+   "range": 0.0,
+   "speed": 33.0
+  },
+  "armacsub": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1110.0,
+   "range": 0.0,
+   "speed": 72.0
+  },
+  "armacv": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2050.0,
+   "range": 0.0,
+   "speed": 52.5
+  },
+  "armadvsol": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1130.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armafus": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 7900.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armageo": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3600.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armah": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1070.0,
+   "range": 0.0,
+   "speed": 88.5
+  },
+  "armalab": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 4250.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armamb": {
+   "fight": 1247.219,
+   "dps": 388.889,
+   "hp": 4000.0,
+   "range": 1380.0,
+   "speed": 0.0
+  },
+  "armamd": {
+   "fight": 1573.213,
+   "dps": 750.0,
+   "hp": 3300.0,
+   "range": 72000.0,
+   "speed": 0.0
+  },
+  "armamex": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1610.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armamph": {
+   "fight": 357.262,
+   "dps": 109.091,
+   "hp": 1170.0,
+   "range": 275.0,
+   "speed": 90.0
+  },
+  "armamsub": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2650.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armanac": {
+   "fight": 327.261,
+   "dps": 70.0,
+   "hp": 1530.0,
+   "range": 370.0,
+   "speed": 69.99
+  },
+  "armanavaldefturret": {
+   "fight": 2316.147,
+   "dps": 865.248,
+   "hp": 6200.0,
+   "range": 950.0,
+   "speed": 0.0
+  },
+  "armanni": {
+   "fight": 2579.641,
+   "dps": 1090.909,
+   "hp": 6100.0,
+   "range": 1400.0,
+   "speed": 0.0
+  },
+  "armantiship": {
+   "fight": 1936.492,
+   "dps": 750.0,
+   "hp": 5000.0,
+   "range": 72000.0,
+   "speed": 63.0
+  },
+  "armap": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2050.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armarad": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 500.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armart": {
+   "fight": 161.993,
+   "dps": 42.326,
+   "hp": 620.0,
+   "range": 710.0,
+   "speed": 54.0
+  },
+  "armaser": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 340.0,
+   "range": 0.0,
+   "speed": 37.0
+  },
+  "armason": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2350.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armassistdrone": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 335.0,
+   "range": 0.0,
+   "speed": 210.0
+  },
+  "armassistdrone_land": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2000.0,
+   "range": 0.0,
+   "speed": 37.5
+  },
+  "armasy": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 6000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armatl": {
+   "fight": 1003.992,
+   "dps": 360.0,
+   "hp": 2800.0,
+   "range": 915.0,
+   "speed": 0.0
+  },
+  "armatlas": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 265.0,
+   "range": 0.0,
+   "speed": 207.0
+  },
+  "armavp": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 4750.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armawac": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 890.0,
+   "range": 0.0,
+   "speed": 317.4
+  },
+  "armbanth": {
+   "fight": 10002.5,
+   "dps": 1450.0,
+   "hp": 69000.0,
+   "range": 860.0,
+   "speed": 45.6
+  },
+  "armbats": {
+   "fight": 2424.871,
+   "dps": 600.0,
+   "hp": 9800.0,
+   "range": 880.0,
+   "speed": 57.9
+  },
+  "armbeamer": {
+   "fight": 616.75,
+   "dps": 266.0,
+   "hp": 1430.0,
+   "range": 490.0,
+   "speed": 0.0
+  },
+  "armbeaver": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1030.0,
+   "range": 0.0,
+   "speed": 42.0
+  },
+  "armblade": {
+   "fight": 709.183,
+   "dps": 167.647,
+   "hp": 3000.0,
+   "range": 420.0,
+   "speed": 204.0
+  },
+  "armbrawl": {
+   "fight": 435.737,
+   "dps": 106.667,
+   "hp": 1780.0,
+   "range": 380.0,
+   "speed": 160.8
+  },
+  "armbrtha": {
+   "fight": 740.15,
+   "dps": 123.106,
+   "hp": 4450.0,
+   "range": 4650.0,
+   "speed": 0.0
+  },
+  "armbull": {
+   "fight": 1068.346,
+   "dps": 245.455,
+   "hp": 4650.0,
+   "range": 460.0,
+   "speed": 62.0
+  },
+  "armca": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 156.0,
+   "range": 0.0,
+   "speed": 136.0
+  },
+  "armcarry": {
+   "fight": 1936.492,
+   "dps": 750.0,
+   "hp": 5000.0,
+   "range": 72000.0,
+   "speed": 63.0
+  },
+  "armch": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1440.0,
+   "range": 0.0,
+   "speed": 66.9
+  },
+  "armcir": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 4450.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armck": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 760.0,
+   "range": 0.0,
+   "speed": 36.0
+  },
+  "armckfus": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3800.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armclaw": {
+   "fight": 459.603,
+   "dps": 158.824,
+   "hp": 1330.0,
+   "range": 430.0,
+   "speed": 0.0
+  },
+  "armcom": {
+   "fight": 20311.1,
+   "dps": 111497.5,
+   "hp": 3700.0,
+   "range": 300.0,
+   "speed": 37.5
+  },
+  "armcomcon": {
+   "fight": 19326.578,
+   "dps": 111497.5,
+   "hp": 3350.0,
+   "range": 300.0,
+   "speed": 37.5
+  },
+  "armcomlvl10": {
+   "fight": 40146.23,
+   "dps": 122100.0,
+   "hp": 13200.0,
+   "range": 870.0,
+   "speed": 37.5
+  },
+  "armcomlvl2": {
+   "fight": 26011.922,
+   "dps": 112770.0,
+   "hp": 6000.0,
+   "range": 300.0,
+   "speed": 37.5
+  },
+  "armcomlvl3": {
+   "fight": 28017.957,
+   "dps": 113768.977,
+   "hp": 6900.0,
+   "range": 450.0,
+   "speed": 37.5
+  },
+  "armcomlvl4": {
+   "fight": 30151.432,
+   "dps": 116552.422,
+   "hp": 7800.0,
+   "range": 550.0,
+   "speed": 37.5
+  },
+  "armcomlvl5": {
+   "fight": 31559.965,
+   "dps": 114486.367,
+   "hp": 8700.0,
+   "range": 620.0,
+   "speed": 37.5
+  },
+  "armcomlvl6": {
+   "fight": 33284.23,
+   "dps": 115400.0,
+   "hp": 9600.0,
+   "range": 730.0,
+   "speed": 37.5
+  },
+  "armcomlvl7": {
+   "fight": 34980.996,
+   "dps": 116540.0,
+   "hp": 10500.0,
+   "range": 730.0,
+   "speed": 37.5
+  },
+  "armcomlvl8": {
+   "fight": 36664.535,
+   "dps": 117920.0,
+   "hp": 11400.0,
+   "range": 800.0,
+   "speed": 37.5
+  },
+  "armcomlvl9": {
+   "fight": 38453.414,
+   "dps": 120216.664,
+   "hp": 12300.0,
+   "range": 870.0,
+   "speed": 37.5
+  },
+  "armcomnew": {
+   "fight": 20311.1,
+   "dps": 111497.5,
+   "hp": 3700.0,
+   "range": 300.0,
+   "speed": 37.5
+  },
+  "armconsul": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1080.0,
+   "range": 0.0,
+   "speed": 78.0
+  },
+  "armcroc": {
+   "fight": 838.526,
+   "dps": 140.625,
+   "hp": 5000.0,
+   "range": 480.0,
+   "speed": 54.0
+  },
+  "armcrus": {
+   "fight": 1642.924,
+   "dps": 482.0,
+   "hp": 5600.0,
+   "range": 500.0,
+   "speed": 60.0
+  },
+  "armcs": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1040.0,
+   "range": 0.0,
+   "speed": 65.4
+  },
+  "armcsa": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 405.0,
+   "range": 0.0,
+   "speed": 124.0
+  },
+  "armcv": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1380.0,
+   "range": 0.0,
+   "speed": 54.0
+  },
+  "armdecade": {
+   "fight": 361.87,
+   "dps": 135.0,
+   "hp": 970.0,
+   "range": 280.0,
+   "speed": 104.7
+  },
+  "armdecom": {
+   "fight": 1043.765,
+   "dps": 294.444,
+   "hp": 3700.0,
+   "range": 300.0,
+   "speed": 37.5
+  },
+  "armdecomlvl10": {
+   "fight": 8533.893,
+   "dps": 11034.443,
+   "hp": 6600.0,
+   "range": 870.0,
+   "speed": 37.5
+  },
+  "armdecomlvl2": {
+   "fight": 2261.268,
+   "dps": 1704.444,
+   "hp": 3000.0,
+   "range": 300.0,
+   "speed": 37.5
+  },
+  "armdecomlvl3": {
+   "fight": 3053.98,
+   "dps": 2703.419,
+   "hp": 3450.0,
+   "range": 450.0,
+   "speed": 37.5
+  },
+  "armdecomlvl4": {
+   "fight": 4625.882,
+   "dps": 5486.869,
+   "hp": 3900.0,
+   "range": 550.0,
+   "speed": 37.5
+  },
+  "armdecomlvl5": {
+   "fight": 3857.527,
+   "dps": 3420.808,
+   "hp": 4350.0,
+   "range": 620.0,
+   "speed": 37.5
+  },
+  "armdecomlvl6": {
+   "fight": 4561.286,
+   "dps": 4334.444,
+   "hp": 4800.0,
+   "range": 730.0,
+   "speed": 37.5
+  },
+  "armdecomlvl7": {
+   "fight": 5361.048,
+   "dps": 5474.444,
+   "hp": 5250.0,
+   "range": 730.0,
+   "speed": 37.5
+  },
+  "armdecomlvl8": {
+   "fight": 6250.626,
+   "dps": 6854.444,
+   "hp": 5700.0,
+   "range": 800.0,
+   "speed": 37.5
+  },
+  "armdecomlvl9": {
+   "fight": 7501.956,
+   "dps": 9151.111,
+   "hp": 6150.0,
+   "range": 870.0,
+   "speed": 37.5
+  },
+  "armdf": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3800.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armdfly": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1170.0,
+   "range": 0.0,
+   "speed": 210.0
+  },
+  "armdl": {
+   "fight": 574.456,
+   "dps": 150.0,
+   "hp": 2200.0,
+   "range": 600.0,
+   "speed": 0.0
+  },
+  "armdrag": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2800.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armdrone": {
+   "fight": 90.83,
+   "dps": 18.333,
+   "hp": 450.0,
+   "range": 350.0,
+   "speed": 330.0
+  },
+  "armdronecarry": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3500.0,
+   "range": 1300.0,
+   "speed": 63.0
+  },
+  "armdroneold": {
+   "fight": 81.65,
+   "dps": 16.667,
+   "hp": 400.0,
+   "range": 350.0,
+   "speed": 225.0
+  },
+  "armemp": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3350.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armepoch": {
+   "fight": 7894.392,
+   "dps": 1246.429,
+   "hp": 50000.0,
+   "range": 2450.0,
+   "speed": 53.85
+  },
+  "armestor": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1890.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armexcalibur": {
+   "fight": 400.0,
+   "dps": 133.333,
+   "hp": 1200.0,
+   "range": 600.0,
+   "speed": 60.0
+  },
+  "armeyes": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 280.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armfark": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 335.0,
+   "range": 0.0,
+   "speed": 75.0
+  },
+  "armfast": {
+   "fight": 287.75,
+   "dps": 120.0,
+   "hp": 690.0,
+   "range": 230.0,
+   "speed": 111.3
+  },
+  "armfatf": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1610.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armfav": {
+   "fight": 60.622,
+   "dps": 35.0,
+   "hp": 105.0,
+   "range": 180.0,
+   "speed": 168.0
+  },
+  "armfboy": {
+   "fight": 944.155,
+   "dps": 114.286,
+   "hp": 7800.0,
+   "range": 700.0,
+   "speed": 30.0
+  },
+  "armfdrag": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 4450.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armferret": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1600.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armfflak": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1750.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armfgate": {
+   "fight": 62.45,
+   "dps": 1.0,
+   "hp": 3900.0,
+   "range": 10.0,
+   "speed": 0.0
+  },
+  "armfhlt": {
+   "fight": 995.825,
+   "dps": 233.333,
+   "hp": 4250.0,
+   "range": 630.0,
+   "speed": 0.0
+  },
+  "armfhp": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3350.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armfido": {
+   "fight": 304.512,
+   "dps": 77.273,
+   "hp": 1200.0,
+   "range": 650.0,
+   "speed": 69.0
+  },
+  "armfig": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 167.0,
+   "range": 0.0,
+   "speed": 289.2
+  },
+  "armflak": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1750.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armflash": {
+   "fight": 256.32,
+   "dps": 90.0,
+   "hp": 730.0,
+   "range": 180.0,
+   "speed": 101.0
+  },
+  "armflea": {
+   "fight": 48.99,
+   "dps": 40.0,
+   "hp": 60.0,
+   "range": 140.0,
+   "speed": 132.0
+  },
+  "armfmine3": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 11.0,
+   "range": 64.0,
+   "speed": 0.0
+  },
+  "armfmkr": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 167.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armfort": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 8900.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armfrad": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 110.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armfrock": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1330.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armfrt": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 330.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armfus": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3800.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armgate": {
+   "fight": 59.582,
+   "dps": 1.0,
+   "hp": 3550.0,
+   "range": 10.0,
+   "speed": 0.0
+  },
+  "armgeo": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1940.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armgmm": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 13900.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armgplat": {
+   "fight": 383.979,
+   "dps": 194.0,
+   "hp": 760.0,
+   "range": 520.0,
+   "speed": 0.0
+  },
+  "armgremlin": {
+   "fight": 304.549,
+   "dps": 87.5,
+   "hp": 1060.0,
+   "range": 220.0,
+   "speed": 70.5
+  },
+  "armguard": {
+   "fight": 803.668,
+   "dps": 211.765,
+   "hp": 3050.0,
+   "range": 1220.0,
+   "speed": 0.0
+  },
+  "armhaap": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 16000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armhaapuw": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3750.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armhaca": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1405.0,
+   "range": 0.0,
+   "speed": 192.0
+  },
+  "armhack": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1335.0,
+   "range": 0.0,
+   "speed": 75.0
+  },
+  "armhacs": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2460.0,
+   "range": 0.0,
+   "speed": 66.0
+  },
+  "armhacv": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2080.0,
+   "range": 0.0,
+   "speed": 85.0
+  },
+  "armhalab": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 16000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armham": {
+   "fight": 244.949,
+   "dps": 60.0,
+   "hp": 1000.0,
+   "range": 380.0,
+   "speed": 46.2
+  },
+  "armhasy": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 16000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armhavp": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 16000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armhawk": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 370.0,
+   "range": 0.0,
+   "speed": 358.0
+  },
+  "armhlt": {
+   "fight": 747.663,
+   "dps": 215.0,
+   "hp": 2600.0,
+   "range": 620.0,
+   "speed": 0.0
+  },
+  "armhp": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3350.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armhvytrans": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 630.0,
+   "range": 0.0,
+   "speed": 110.0
+  },
+  "armjam": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 510.0,
+   "range": 0.0,
+   "speed": 43.0
+  },
+  "armjamt": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 790.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armjanus": {
+   "fight": 301.065,
+   "dps": 88.0,
+   "hp": 1030.0,
+   "range": 380.0,
+   "speed": 54.0
+  },
+  "armjeth": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 630.0,
+   "range": 0.0,
+   "speed": 56.25
+  },
+  "armjuno": {
+   "fight": 34.278,
+   "dps": 0.5,
+   "hp": 2350.0,
+   "range": 32000.0,
+   "speed": 0.0
+  },
+  "armkam": {
+   "fight": 146.969,
+   "dps": 38.571,
+   "hp": 560.0,
+   "range": 350.0,
+   "speed": 184.8
+  },
+  "armkraken": {
+   "fight": 1550.161,
+   "dps": 540.0,
+   "hp": 4450.0,
+   "range": 800.0,
+   "speed": 0.0
+  },
+  "armlab": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2900.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armlance": {
+   "fight": 600.0,
+   "dps": 187.5,
+   "hp": 1920.0,
+   "range": 400.0,
+   "speed": 285.0
+  },
+  "armlatnk": {
+   "fight": 394.293,
+   "dps": 146.667,
+   "hp": 1060.0,
+   "range": 300.0,
+   "speed": 90.0
+  },
+  "armliche": {
+   "fight": 1198.958,
+   "dps": 625.0,
+   "hp": 2300.0,
+   "range": 250.0,
+   "speed": 294.9
+  },
+  "armllt": {
+   "fight": 315.663,
+   "dps": 160.714,
+   "hp": 620.0,
+   "range": 430.0,
+   "speed": 0.0
+  },
+  "armlship": {
+   "fight": 741.62,
+   "dps": 250.0,
+   "hp": 2200.0,
+   "range": 400.0,
+   "speed": 99.0
+  },
+  "armlun": {
+   "fight": 1298.343,
+   "dps": 318.056,
+   "hp": 5300.0,
+   "range": 575.0,
+   "speed": 50.1
+  },
+  "armmakr": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 167.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armmanni": {
+   "fight": 1220.394,
+   "dps": 531.915,
+   "hp": 2800.0,
+   "range": 950.0,
+   "speed": 42.0
+  },
+  "armmar": {
+   "fight": 1282.576,
+   "dps": 335.714,
+   "hp": 4900.0,
+   "range": 350.0,
+   "speed": 94.5
+  },
+  "armmark": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 355.0,
+   "range": 0.0,
+   "speed": 40.5
+  },
+  "armmart": {
+   "fight": 302.844,
+   "dps": 85.714,
+   "hp": 1070.0,
+   "range": 820.0,
+   "speed": 60.0
+  },
+  "armmav": {
+   "fight": 690.652,
+   "dps": 265.0,
+   "hp": 1800.0,
+   "range": 365.0,
+   "speed": 50.0
+  },
+  "armmercury": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1670.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armmerl": {
+   "fight": 380.058,
+   "dps": 111.111,
+   "hp": 1300.0,
+   "range": 1300.0,
+   "speed": 33.0
+  },
+  "armmex": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 270.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armmh": {
+   "fight": 162.788,
+   "dps": 50.0,
+   "hp": 530.0,
+   "range": 710.0,
+   "speed": 63.9
+  },
+  "armmine1": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 11.0,
+   "range": 64.0,
+   "speed": 0.0
+  },
+  "armmine2": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 11.0,
+   "range": 64.0,
+   "speed": 0.0
+  },
+  "armmine3": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 11.0,
+   "range": 64.0,
+   "speed": 0.0
+  },
+  "armmls": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1460.0,
+   "range": 0.0,
+   "speed": 66.0
+  },
+  "armmlv": {
+   "fight": 40.927,
+   "dps": 5.0,
+   "hp": 335.0,
+   "range": 220.0,
+   "speed": 75.0
+  },
+  "armmmkr": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 445.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armmoho": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2800.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armmship": {
+   "fight": 602.426,
+   "dps": 108.333,
+   "hp": 3350.0,
+   "range": 1550.0,
+   "speed": 63.0
+  },
+  "armmstor": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2100.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armnanotc": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 560.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armnanotc2plat": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2200.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armnanotcplat": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 560.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armnanotct2": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2200.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armnavaldefturret": {
+   "fight": 1073.934,
+   "dps": 222.222,
+   "hp": 5190.0,
+   "range": 730.0,
+   "speed": 0.0
+  },
+  "armpb": {
+   "fight": 1086.853,
+   "dps": 421.875,
+   "hp": 2800.0,
+   "range": 730.0,
+   "speed": 0.0
+  },
+  "armpeep": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 89.0,
+   "range": 0.0,
+   "speed": 375.0
+  },
+  "armpincer": {
+   "fight": 321.911,
+   "dps": 77.333,
+   "hp": 1340.0,
+   "range": 305.0,
+   "speed": 63.0
+  },
+  "armplat": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armpnix": {
+   "fight": 463.357,
+   "dps": 190.0,
+   "hp": 1130.0,
+   "range": 1280.0,
+   "speed": 258.0
+  },
+  "armprowl": {
+   "fight": 1282.576,
+   "dps": 335.714,
+   "hp": 4900.0,
+   "range": 350.0,
+   "speed": 94.5
+  },
+  "armpship": {
+   "fight": 500.833,
+   "dps": 116.667,
+   "hp": 2150.0,
+   "range": 470.0,
+   "speed": 81.0
+  },
+  "armpt": {
+   "fight": 225.953,
+   "dps": 65.455,
+   "hp": 780.0,
+   "range": 300.0,
+   "speed": 93.0
+  },
+  "armpw": {
+   "fight": 182.483,
+   "dps": 90.0,
+   "hp": 370.0,
+   "range": 180.0,
+   "speed": 87.0
+  },
+  "armpw_wings": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armrad": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 180.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armraz": {
+   "fight": 3736.977,
+   "dps": 1050.0,
+   "hp": 13300.0,
+   "range": 475.0,
+   "speed": 69.0
+  },
+  "armrecl": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 420.0,
+   "range": 0.0,
+   "speed": 66.0
+  },
+  "armrectr": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 220.0,
+   "range": 0.0,
+   "speed": 78.0
+  },
+  "armrespawn": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 20000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armrl": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 330.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armrock": {
+   "fight": 172.474,
+   "dps": 41.316,
+   "hp": 720.0,
+   "range": 475.0,
+   "speed": 50.7
+  },
+  "armroy": {
+   "fight": 979.636,
+   "dps": 259.375,
+   "hp": 3700.0,
+   "range": 700.0,
+   "speed": 67.2
+  },
+  "armsaber": {
+   "fight": 259.487,
+   "dps": 66.667,
+   "hp": 1010.0,
+   "range": 425.0,
+   "speed": 156.9
+  },
+  "armsam": {
+   "fight": 145.451,
+   "dps": 25.8,
+   "hp": 820.0,
+   "range": 550.0,
+   "speed": 55.0
+  },
+  "armsat": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 780.0,
+   "range": 0.0,
+   "speed": 30.0
+  },
+  "armsb": {
+   "fight": 408.831,
+   "dps": 142.857,
+   "hp": 1170.0,
+   "range": 1280.0,
+   "speed": 267.3
+  },
+  "armscab": {
+   "fight": 466.369,
+   "dps": 250.0,
+   "hp": 870.0,
+   "range": 72000.0,
+   "speed": 51.0
+  },
+  "armsd": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2650.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armseadragon": {
+   "fight": 1000.0,
+   "dps": 416.667,
+   "hp": 2400.0,
+   "range": 72000.0,
+   "speed": 48.0
+  },
+  "armseap": {
+   "fight": 384.968,
+   "dps": 114.0,
+   "hp": 1300.0,
+   "range": 600.0,
+   "speed": 210.0
+  },
+  "armseer": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 980.0,
+   "range": 0.0,
+   "speed": 57.0
+  },
+  "armsehak": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 580.0,
+   "range": 0.0,
+   "speed": 338.1
+  },
+  "armserp": {
+   "fight": 855.68,
+   "dps": 206.25,
+   "hp": 3550.0,
+   "range": 800.0,
+   "speed": 45.0
+  },
+  "armsfig": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 220.0,
+   "range": 0.0,
+   "speed": 310.8
+  },
+  "armsfig2": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 220.0,
+   "range": 0.0,
+   "speed": 310.8
+  },
+  "armsh": {
+   "fight": 131.909,
+   "dps": 60.0,
+   "hp": 290.0,
+   "range": 230.0,
+   "speed": 113.7
+  },
+  "armshltx": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 16000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armshltxuw": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 16000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armshockwave": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 4200.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armsilo": {
+   "fight": 1567.907,
+   "dps": 416.667,
+   "hp": 5900.0,
+   "range": 72000.0,
+   "speed": 0.0
+  },
+  "armsjam": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1350.0,
+   "range": 0.0,
+   "speed": 45.0
+  },
+  "armsnipe": {
+   "fight": 380.789,
+   "dps": 250.0,
+   "hp": 580.0,
+   "range": 900.0,
+   "speed": 33.0
+  },
+  "armsolar": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 340.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armsonar": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 56.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armspid": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1110.0,
+   "range": 0.0,
+   "speed": 71.55
+  },
+  "armsptk": {
+   "fight": 472.645,
+   "dps": 160.714,
+   "hp": 1390.0,
+   "range": 575.0,
+   "speed": 47.0
+  },
+  "armspy": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 300.0,
+   "range": 100.0,
+   "speed": 65.0
+  },
+  "armstil": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1880.0,
+   "range": 0.0,
+   "speed": 300.0
+  },
+  "armstump": {
+   "fight": 381.445,
+   "dps": 80.833,
+   "hp": 1800.0,
+   "range": 350.0,
+   "speed": 75.0
+  },
+  "armsub": {
+   "fight": 267.993,
+   "dps": 85.5,
+   "hp": 840.0,
+   "range": 500.0,
+   "speed": 66.0
+  },
+  "armsubk": {
+   "fight": 641.288,
+   "dps": 175.0,
+   "hp": 2350.0,
+   "range": 400.0,
+   "speed": 81.0
+  },
+  "armsy": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 4100.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armtarg": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2100.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armtdrone": {
+   "fight": 103.682,
+   "dps": 35.833,
+   "hp": 300.0,
+   "range": 200.0,
+   "speed": 330.0
+  },
+  "armthor": {
+   "fight": 7361.627,
+   "dps": 967.742,
+   "hp": 56000.0,
+   "range": 540.0,
+   "speed": 54.0
+  },
+  "armthund": {
+   "fight": 247.824,
+   "dps": 91.667,
+   "hp": 670.0,
+   "range": 1280.0,
+   "speed": 250.0
+  },
+  "armtide": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 400.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armtl": {
+   "fight": 492.612,
+   "dps": 186.667,
+   "hp": 1300.0,
+   "range": 500.0,
+   "speed": 0.0
+  },
+  "armtorps": {
+   "fight": 206.809,
+   "dps": 45.5,
+   "hp": 940.0,
+   "range": 300.0,
+   "speed": 90.0
+  },
+  "armtrident": {
+   "fight": 760.263,
+   "dps": 170.0,
+   "hp": 3400.0,
+   "range": 1300.0,
+   "speed": 67.5
+  },
+  "armuwadves": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 11700.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armuwadvms": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 10300.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armuwageo": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3600.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armuwes": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1890.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armuwfus": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 5600.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armuwgeo": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1940.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armuwmme": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2800.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armuwmmm": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 445.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armuwms": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3600.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armvader": {
+   "fight": 2109.502,
+   "dps": 10000.0,
+   "hp": 445.0,
+   "range": 42.0,
+   "speed": 84.0
+  },
+  "armvang": {
+   "fight": 1639.55,
+   "dps": 316.25,
+   "hp": 8500.0,
+   "range": 1450.0,
+   "speed": 33.0
+  },
+  "armveil": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 830.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armvp": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armvulc": {
+   "fight": 9309.493,
+   "dps": 2708.333,
+   "hp": 32000.0,
+   "range": 5750.0,
+   "speed": 0.0
+  },
+  "armwar": {
+   "fight": 539.907,
+   "dps": 183.333,
+   "hp": 1590.0,
+   "range": 325.0,
+   "speed": 45.0
+  },
+  "armwin": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 196.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "armyork": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2600.0,
+   "range": 0.0,
+   "speed": 70.5
+  },
+  "armzeus": {
+   "fight": 673.009,
+   "dps": 129.412,
+   "hp": 3500.0,
+   "range": 280.0,
+   "speed": 48.0
+  },
+  "babylegdrone": {
+   "fight": 93.095,
+   "dps": 26.667,
+   "hp": 325.0,
+   "range": 300.0,
+   "speed": 280.5
+  },
+  "babyleggob": {
+   "fight": 73.03,
+   "dps": 26.667,
+   "hp": 200.0,
+   "range": 261.0,
+   "speed": 75.0
+  },
+  "babylegheavydrone": {
+   "fight": 454.148,
+   "dps": 125.0,
+   "hp": 1650.0,
+   "range": 430.0,
+   "speed": 180.5
+  },
+  "babyleglob": {
+   "fight": 128.452,
+   "dps": 30.0,
+   "hp": 550.0,
+   "range": 400.0,
+   "speed": 51.0
+  },
+  "babylegshot": {
+   "fight": 593.085,
+   "dps": 105.0,
+   "hp": 3350.0,
+   "range": 280.0,
+   "speed": 44.0
+  },
+  "ceg_test_projectile_unit": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 100000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "comeffigylvl1": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 4000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "comeffigylvl2": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 6000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "comeffigylvl3": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 8000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "comeffigylvl4": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 10000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "comeffigylvl5": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 12000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "cor_hat_fightnight": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 6000000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "cor_hat_gnome": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 6000000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "cor_hat_halloween_mask": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 6000000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "cor_hat_halloween_pumpkin": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 6000000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "cor_hat_legfn": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 6000000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "cor_hat_pirate": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 6000000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "cor_hat_viking": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 6000000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "cor_hat_xmas_reindeer": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 6000000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "cor_leftshoulder_nationwars_eec": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 6000000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "cor_leftshoulder_nationwars_ger": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 6000000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "cor_leftshoulder_nationwars_us": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 6000000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "coraak": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3200.0,
+   "range": 0.0,
+   "speed": 34.5
+  },
+  "coraap": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3900.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "coraca": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 205.0,
+   "range": 0.0,
+   "speed": 181.5
+  },
+  "corack": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1000.0,
+   "range": 0.0,
+   "speed": 33.0
+  },
+  "coracsub": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1110.0,
+   "range": 0.0,
+   "speed": 64.8
+  },
+  "coracv": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2150.0,
+   "range": 0.0,
+   "speed": 49.5
+  },
+  "coradvsol": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1200.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corafus": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 9400.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corageo": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 4150.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corah": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1120.0,
+   "range": 0.0,
+   "speed": 88.5
+  },
+  "corak": {
+   "fight": 143.944,
+   "dps": 74.0,
+   "hp": 280.0,
+   "range": 215.0,
+   "speed": 81.0
+  },
+  "coralab": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 4500.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "coramph": {
+   "fight": 639.489,
+   "dps": 174.02,
+   "hp": 2350.0,
+   "range": 400.0,
+   "speed": 55.5
+  },
+  "coramsub": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2800.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "coranavaldefturret": {
+   "fight": 2144.761,
+   "dps": 575.0,
+   "hp": 8000.0,
+   "range": 950.0,
+   "speed": 0.0
+  },
+  "corantiship": {
+   "fight": 1936.492,
+   "dps": 750.0,
+   "hp": 5000.0,
+   "range": 72000.0,
+   "speed": 63.0
+  },
+  "corap": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2150.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corape": {
+   "fight": 415.955,
+   "dps": 110.909,
+   "hp": 1560.0,
+   "range": 410.0,
+   "speed": 159.0
+  },
+  "corarad": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 500.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corarch": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3900.0,
+   "range": 0.0,
+   "speed": 60.48
+  },
+  "corason": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2400.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corassistdrone": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 335.0,
+   "range": 0.0,
+   "speed": 210.0
+  },
+  "corassistdrone_land": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2000.0,
+   "range": 0.0,
+   "speed": 37.5
+  },
+  "corasy": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 5900.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "coratl": {
+   "fight": 1007.663,
+   "dps": 362.637,
+   "hp": 2800.0,
+   "range": 890.0,
+   "speed": 0.0
+  },
+  "coravp": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 5100.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corawac": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 990.0,
+   "range": 0.0,
+   "speed": 321.0
+  },
+  "corban": {
+   "fight": 577.35,
+   "dps": 133.333,
+   "hp": 2500.0,
+   "range": 800.0,
+   "speed": 54.0
+  },
+  "corbats": {
+   "fight": 2811.964,
+   "dps": 658.929,
+   "hp": 12000.0,
+   "range": 950.0,
+   "speed": 53.1
+  },
+  "corbhmth": {
+   "fight": 1639.878,
+   "dps": 324.0,
+   "hp": 8300.0,
+   "range": 1650.0,
+   "speed": 0.0
+  },
+  "corblackhy": {
+   "fight": 8314.066,
+   "dps": 1304.221,
+   "hp": 53000.0,
+   "range": 2550.0,
+   "speed": 49.5
+  },
+  "corbuzz": {
+   "fight": 9558.433,
+   "dps": 2727.273,
+   "hp": 33500.0,
+   "range": 6100.0,
+   "speed": 0.0
+  },
+  "corbw": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 83.0,
+   "range": 0.0,
+   "speed": 270.0
+  },
+  "corca": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 161.0,
+   "range": 0.0,
+   "speed": 131.0
+  },
+  "corcan": {
+   "fight": 1436.141,
+   "dps": 343.75,
+   "hp": 6000.0,
+   "range": 275.0,
+   "speed": 38.0
+  },
+  "corcarry": {
+   "fight": 1936.492,
+   "dps": 750.0,
+   "hp": 5000.0,
+   "range": 72000.0,
+   "speed": 60.24
+  },
+  "corcat": {
+   "fight": 1913.113,
+   "dps": 600.0,
+   "hp": 6100.0,
+   "range": 1350.0,
+   "speed": 48.0
+  },
+  "corch": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1490.0,
+   "range": 0.0,
+   "speed": 60.899
+  },
+  "corck": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 820.0,
+   "range": 0.0,
+   "speed": 34.5
+  },
+  "corcom": {
+   "fight": 20311.1,
+   "dps": 111497.5,
+   "hp": 3700.0,
+   "range": 300.0,
+   "speed": 37.5
+  },
+  "corcomcon": {
+   "fight": 19326.578,
+   "dps": 111497.5,
+   "hp": 3350.0,
+   "range": 300.0,
+   "speed": 37.5
+  },
+  "corcomlvl10": {
+   "fight": 49249.906,
+   "dps": 121277.664,
+   "hp": 20000.0,
+   "range": 870.0,
+   "speed": 47.0
+  },
+  "corcomlvl2": {
+   "fight": 25916.135,
+   "dps": 111941.0,
+   "hp": 6000.0,
+   "range": 300.0,
+   "speed": 37.5
+  },
+  "corcomlvl3": {
+   "fight": 26028.525,
+   "dps": 112914.016,
+   "hp": 6000.0,
+   "range": 450.0,
+   "speed": 37.5
+  },
+  "corcomlvl4": {
+   "fight": 30249.32,
+   "dps": 114377.672,
+   "hp": 8000.0,
+   "range": 550.0,
+   "speed": 37.5
+  },
+  "corcomlvl5": {
+   "fight": 33856.082,
+   "dps": 114623.422,
+   "hp": 10000.0,
+   "range": 620.0,
+   "speed": 39.0
+  },
+  "corcomlvl6": {
+   "fight": 37208.57,
+   "dps": 115373.141,
+   "hp": 12000.0,
+   "range": 730.0,
+   "speed": 40.5
+  },
+  "corcomlvl7": {
+   "fight": 40382.348,
+   "dps": 116481.0,
+   "hp": 14000.0,
+   "range": 730.0,
+   "speed": 42.0
+  },
+  "corcomlvl8": {
+   "fight": 43404.332,
+   "dps": 117746.0,
+   "hp": 16000.0,
+   "range": 800.0,
+   "speed": 43.5
+  },
+  "corcomlvl9": {
+   "fight": 46361.75,
+   "dps": 119411.766,
+   "hp": 18000.0,
+   "range": 870.0,
+   "speed": 45.0
+  },
+  "corcrash": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 640.0,
+   "range": 0.0,
+   "speed": 53.49
+  },
+  "corcrus": {
+   "fight": 1815.839,
+   "dps": 531.818,
+   "hp": 6200.0,
+   "range": 500.0,
+   "speed": 54.0
+  },
+  "corcrwh": {
+   "fight": 3243.609,
+   "dps": 630.0,
+   "hp": 16700.0,
+   "range": 575.0,
+   "speed": 114.9
+  },
+  "corcs": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1080.0,
+   "range": 0.0,
+   "speed": 60.0
+  },
+  "corcsa": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 435.0,
+   "range": 0.0,
+   "speed": 140.0
+  },
+  "corcut": {
+   "fight": 270.242,
+   "dps": 72.308,
+   "hp": 1010.0,
+   "range": 430.0,
+   "speed": 152.4
+  },
+  "corcv": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1430.0,
+   "range": 0.0,
+   "speed": 51.0
+  },
+  "cordecom": {
+   "fight": 1043.765,
+   "dps": 294.444,
+   "hp": 3700.0,
+   "range": 300.0,
+   "speed": 37.5
+  },
+  "cordecomlvl10": {
+   "fight": 10105.499,
+   "dps": 10212.111,
+   "hp": 10000.0,
+   "range": 870.0,
+   "speed": 47.0
+  },
+  "cordecomlvl2": {
+   "fight": 1620.597,
+   "dps": 875.444,
+   "hp": 3000.0,
+   "range": 300.0,
+   "speed": 37.5
+  },
+  "cordecomlvl3": {
+   "fight": 2354.867,
+   "dps": 1848.466,
+   "hp": 3000.0,
+   "range": 450.0,
+   "speed": 37.5
+  },
+  "cordecomlvl4": {
+   "fight": 3639.841,
+   "dps": 3312.111,
+   "hp": 4000.0,
+   "range": 550.0,
+   "speed": 37.5
+  },
+  "cordecomlvl5": {
+   "fight": 4217.742,
+   "dps": 3557.869,
+   "hp": 5000.0,
+   "range": 620.0,
+   "speed": 39.0
+  },
+  "cordecomlvl6": {
+   "fight": 5083.849,
+   "dps": 4307.587,
+   "hp": 6000.0,
+   "range": 730.0,
+   "speed": 40.5
+  },
+  "cordecomlvl7": {
+   "fight": 6156.957,
+   "dps": 5415.444,
+   "hp": 7000.0,
+   "range": 730.0,
+   "speed": 42.0
+  },
+  "cordecomlvl8": {
+   "fight": 7310.51,
+   "dps": 6680.444,
+   "hp": 8000.0,
+   "range": 800.0,
+   "speed": 43.5
+  },
+  "cordecomlvl9": {
+   "fight": 8666.944,
+   "dps": 8346.214,
+   "hp": 9000.0,
+   "range": 870.0,
+   "speed": 45.0
+  },
+  "cordemon": {
+   "fight": 5091.169,
+   "dps": 1440.0,
+   "hp": 18000.0,
+   "range": 500.0,
+   "speed": 63.0
+  },
+  "cordesolator": {
+   "fight": 1128.236,
+   "dps": 489.583,
+   "hp": 2600.0,
+   "range": 72000.0,
+   "speed": 45.0
+  },
+  "cordl": {
+   "fight": 593.717,
+   "dps": 150.0,
+   "hp": 2350.0,
+   "range": 600.0,
+   "speed": 0.0
+  },
+  "cordoom": {
+   "fight": 3771.389,
+   "dps": 1513.125,
+   "hp": 9400.0,
+   "range": 950.0,
+   "speed": 0.0
+  },
+  "cordrag": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2800.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "cordrone": {
+   "fight": 174.284,
+   "dps": 45.0,
+   "hp": 675.0,
+   "range": 360.0,
+   "speed": 315.0
+  },
+  "cordronecarry": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3500.0,
+   "range": 1300.0,
+   "speed": 63.0
+  },
+  "cordroneold": {
+   "fight": 52.599,
+   "dps": 16.667,
+   "hp": 166.0,
+   "range": 360.0,
+   "speed": 280.5
+  },
+  "corenaa": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1840.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corerad": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 4450.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corestor": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "coresupp": {
+   "fight": 209.125,
+   "dps": 91.111,
+   "hp": 480.0,
+   "range": 280.0,
+   "speed": 109.8
+  },
+  "coreter": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 580.0,
+   "range": 0.0,
+   "speed": 41.0
+  },
+  "corexp": {
+   "fight": 481.07,
+   "dps": 160.714,
+   "hp": 1440.0,
+   "range": 435.0,
+   "speed": 0.0
+  },
+  "coreyes": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 280.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corfast": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 830.0,
+   "range": 0.0,
+   "speed": 90.0
+  },
+  "corfatf": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1530.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corfav": {
+   "fight": 53.513,
+   "dps": 31.818,
+   "hp": 90.0,
+   "range": 180.0,
+   "speed": 153.0
+  },
+  "corfdoom": {
+   "fight": 2213.075,
+   "dps": 731.0,
+   "hp": 6700.0,
+   "range": 900.0,
+   "speed": 0.0
+  },
+  "corfdrag": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 4450.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corfgate": {
+   "fight": 64.031,
+   "dps": 1.0,
+   "hp": 4100.0,
+   "range": 10.0,
+   "speed": 0.0
+  },
+  "corfhlt": {
+   "fight": 1002.422,
+   "dps": 231.0,
+   "hp": 4350.0,
+   "range": 630.0,
+   "speed": 0.0
+  },
+  "corfhp": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3750.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corfink": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 100.0,
+   "range": 0.0,
+   "speed": 360.0
+  },
+  "corflak": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1840.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corfmd": {
+   "fight": 1573.213,
+   "dps": 750.0,
+   "hp": 3300.0,
+   "range": 72000.0,
+   "speed": 0.0
+  },
+  "corfmine3": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 11.0,
+   "range": 64.0,
+   "speed": 0.0
+  },
+  "corfmkr": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 167.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corfort": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 8900.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corfrad": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 114.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corfrock": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2800.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corfrt": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 335.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corfship": {
+   "fight": 1006.231,
+   "dps": 375.0,
+   "hp": 2700.0,
+   "range": 450.0,
+   "speed": 93.0
+  },
+  "corfus": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 4300.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corgant": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 18000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corgantuw": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 17800.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corgarp": {
+   "fight": 331.381,
+   "dps": 77.333,
+   "hp": 1420.0,
+   "range": 305.0,
+   "speed": 58.5
+  },
+  "corgate": {
+   "fight": 59.582,
+   "dps": 1.0,
+   "hp": 3550.0,
+   "range": 10.0,
+   "speed": 0.0
+  },
+  "corgator": {
+   "fight": 277.263,
+   "dps": 93.75,
+   "hp": 820.0,
+   "range": 230.0,
+   "speed": 85.0
+  },
+  "corgeo": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2050.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corgol": {
+   "fight": 1416.232,
+   "dps": 257.143,
+   "hp": 7800.0,
+   "range": 650.0,
+   "speed": 39.0
+  },
+  "corgplat": {
+   "fight": 396.409,
+   "dps": 194.0,
+   "hp": 810.0,
+   "range": 520.0,
+   "speed": 0.0
+  },
+  "corhaap": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 17800.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corhaapuw": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3900.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corhaca": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1435.0,
+   "range": 0.0,
+   "speed": 182.0
+  },
+  "corhack": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1830.0,
+   "range": 0.0,
+   "speed": 85.0
+  },
+  "corhacs": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2600.0,
+   "range": 0.0,
+   "speed": 55.0
+  },
+  "corhacv": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3125.0,
+   "range": 0.0,
+   "speed": 60.0
+  },
+  "corhal": {
+   "fight": 1222.83,
+   "dps": 343.75,
+   "hp": 4350.0,
+   "range": 300.0,
+   "speed": 45.3
+  },
+  "corhalab": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 17800.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corhasy": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 17800.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corhavp": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 17800.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corhllt": {
+   "fight": 732.657,
+   "dps": 321.429,
+   "hp": 1670.0,
+   "range": 490.0,
+   "speed": 0.0
+  },
+  "corhlt": {
+   "fight": 773.385,
+   "dps": 217.5,
+   "hp": 2750.0,
+   "range": 620.0,
+   "speed": 0.0
+  },
+  "corhp": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3750.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corhrk": {
+   "fight": 254.583,
+   "dps": 106.25,
+   "hp": 610.0,
+   "range": 1210.0,
+   "speed": 54.0
+  },
+  "corhunt": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 730.0,
+   "range": 0.0,
+   "speed": 324.3
+  },
+  "corhurc": {
+   "fight": 601.284,
+   "dps": 237.857,
+   "hp": 1520.0,
+   "range": 1280.0,
+   "speed": 248.399
+  },
+  "corhvytrans": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 800.0,
+   "range": 0.0,
+   "speed": 100.0
+  },
+  "corint": {
+   "fight": 766.485,
+   "dps": 125.0,
+   "hp": 4700.0,
+   "range": 4950.0,
+   "speed": 0.0
+  },
+  "corjamt": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1070.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corjugg": {
+   "fight": 19382.43,
+   "dps": 1121.429,
+   "hp": 335000.0,
+   "range": 590.0,
+   "speed": 16.5
+  },
+  "corjuno": {
+   "fight": 35.355,
+   "dps": 0.5,
+   "hp": 2500.0,
+   "range": 32000.0,
+   "speed": 0.0
+  },
+  "corkarg": {
+   "fight": 2738.613,
+   "dps": 600.0,
+   "hp": 12500.0,
+   "range": 600.0,
+   "speed": 45.0
+  },
+  "corkorg": {
+   "fight": 25076.193,
+   "dps": 4220.238,
+   "hp": 149000.0,
+   "range": 950.0,
+   "speed": 37.0
+  },
+  "corlab": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2900.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corlevlr": {
+   "fight": 384.419,
+   "dps": 105.556,
+   "hp": 1400.0,
+   "range": 315.0,
+   "speed": 40.0
+  },
+  "corllt": {
+   "fight": 323.209,
+   "dps": 160.714,
+   "hp": 650.0,
+   "range": 435.0,
+   "speed": 0.0
+  },
+  "cormabm": {
+   "fight": 466.369,
+   "dps": 250.0,
+   "hp": 870.0,
+   "range": 72000.0,
+   "speed": 51.0
+  },
+  "cormadsam": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2500.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "cormakr": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 167.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "cormando": {
+   "fight": 600.0,
+   "dps": 200.0,
+   "hp": 1800.0,
+   "range": 300.0,
+   "speed": 75.0
+  },
+  "cormart": {
+   "fight": 317.49,
+   "dps": 84.0,
+   "hp": 1200.0,
+   "range": 800.0,
+   "speed": 58.0
+  },
+  "cormaw": {
+   "fight": 717.774,
+   "dps": 320.0,
+   "hp": 1610.0,
+   "range": 410.0,
+   "speed": 0.0
+  },
+  "cormex": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 275.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "cormexp": {
+   "fight": 2205.225,
+   "dps": 623.464,
+   "hp": 7800.0,
+   "range": 650.0,
+   "speed": 0.0
+  },
+  "cormh": {
+   "fight": 183.333,
+   "dps": 61.111,
+   "hp": 550.0,
+   "range": 700.0,
+   "speed": 63.9
+  },
+  "cormine1": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 11.0,
+   "range": 64.0,
+   "speed": 0.0
+  },
+  "cormine2": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 11.0,
+   "range": 64.0,
+   "speed": 0.0
+  },
+  "cormine3": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 11.0,
+   "range": 64.0,
+   "speed": 0.0
+  },
+  "cormine4": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 11.0,
+   "range": 64.0,
+   "speed": 0.0
+  },
+  "cormist": {
+   "fight": 147.214,
+   "dps": 25.2,
+   "hp": 860.0,
+   "range": 575.0,
+   "speed": 52.0
+  },
+  "cormls": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1600.0,
+   "range": 0.0,
+   "speed": 57.75
+  },
+  "cormlv": {
+   "fight": 47.434,
+   "dps": 5.0,
+   "hp": 450.0,
+   "range": 220.0,
+   "speed": 69.0
+  },
+  "cormmkr": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 560.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "cormoho": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3900.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "cormort": {
+   "fight": 248.37,
+   "dps": 65.625,
+   "hp": 940.0,
+   "range": 850.0,
+   "speed": 50.0
+  },
+  "cormship": {
+   "fight": 678.694,
+   "dps": 137.5,
+   "hp": 3350.0,
+   "range": 1550.0,
+   "speed": 61.44
+  },
+  "cormstor": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2100.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "cormuskrat": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1110.0,
+   "range": 0.0,
+   "speed": 40.5
+  },
+  "cornanotc": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 560.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "cornanotc2plat": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2200.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "cornanotcplat": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 560.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "cornanotct2": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2200.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "cornavaldefturret": {
+   "fight": 978.264,
+   "dps": 165.0,
+   "hp": 5800.0,
+   "range": 720.0,
+   "speed": 0.0
+  },
+  "cornecro": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 220.0,
+   "range": 0.0,
+   "speed": 78.0
+  },
+  "coronager": {
+   "fight": 334.664,
+   "dps": 80.0,
+   "hp": 1400.0,
+   "range": 600.0,
+   "speed": 58.0
+  },
+  "corparrow": {
+   "fight": 1137.981,
+   "dps": 205.556,
+   "hp": 6300.0,
+   "range": 575.0,
+   "speed": 51.0
+  },
+  "corphantom": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1400.0,
+   "range": 0.0,
+   "speed": 72.0
+  },
+  "corplat": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2200.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corprince": {
+   "fight": 4249.183,
+   "dps": 722.222,
+   "hp": 25000.0,
+   "range": 3200.0,
+   "speed": 53.85
+  },
+  "corprinter": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 5125.0,
+   "range": 0.0,
+   "speed": 49.5
+  },
+  "corpship": {
+   "fight": 531.037,
+   "dps": 120.0,
+   "hp": 2350.0,
+   "range": 480.0,
+   "speed": 82.5
+  },
+  "corpt": {
+   "fight": 144.62,
+   "dps": 23.5,
+   "hp": 890.0,
+   "range": 650.0,
+   "speed": 69.0
+  },
+  "corpun": {
+   "fight": 847.597,
+   "dps": 221.053,
+   "hp": 3250.0,
+   "range": 1245.0,
+   "speed": 0.0
+  },
+  "corpyro": {
+   "fight": 504.381,
+   "dps": 240.0,
+   "hp": 1060.0,
+   "range": 230.0,
+   "speed": 82.5
+  },
+  "corrad": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 180.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corraid": {
+   "fight": 402.078,
+   "dps": 80.833,
+   "hp": 2000.0,
+   "range": 350.0,
+   "speed": 72.0
+  },
+  "correap": {
+   "fight": 891.628,
+   "dps": 150.0,
+   "hp": 5300.0,
+   "range": 410.0,
+   "speed": 69.0
+  },
+  "correcl": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 420.0,
+   "range": 0.0,
+   "speed": 66.0
+  },
+  "correspawn": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 20000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corrl": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 335.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corroach": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 620.0,
+   "range": 42.0,
+   "speed": 76.0
+  },
+  "corroy": {
+   "fight": 1037.335,
+   "dps": 272.421,
+   "hp": 3950.0,
+   "range": 710.0,
+   "speed": 62.4
+  },
+  "corsala": {
+   "fight": 586.205,
+   "dps": 163.636,
+   "hp": 2100.0,
+   "range": 340.0,
+   "speed": 72.0
+  },
+  "corsat": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 780.0,
+   "range": 0.0,
+   "speed": 30.0
+  },
+  "corsb": {
+   "fight": 375.5,
+   "dps": 150.0,
+   "hp": 940.0,
+   "range": 1280.0,
+   "speed": 240.0
+  },
+  "corscreamer": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1670.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corsd": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2800.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corseah": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2200.0,
+   "range": 0.0,
+   "speed": 185.0
+  },
+  "corseal": {
+   "fight": 578.888,
+   "dps": 128.889,
+   "hp": 2600.0,
+   "range": 440.0,
+   "speed": 72.0
+  },
+  "corseap": {
+   "fight": 292.404,
+   "dps": 85.5,
+   "hp": 1000.0,
+   "range": 600.0,
+   "speed": 200.0
+  },
+  "corsent": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2700.0,
+   "range": 0.0,
+   "speed": 69.0
+  },
+  "corsentinel": {
+   "fight": 803.741,
+   "dps": 170.0,
+   "hp": 3800.0,
+   "range": 1300.0,
+   "speed": 63.0
+  },
+  "corsfig": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 220.0,
+   "range": 0.0,
+   "speed": 315.6
+  },
+  "corsfig2": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 220.0,
+   "range": 0.0,
+   "speed": 315.6
+  },
+  "corsh": {
+   "fight": 123.693,
+   "dps": 60.0,
+   "hp": 255.0,
+   "range": 230.0,
+   "speed": 109.5
+  },
+  "corshad": {
+   "fight": 251.926,
+   "dps": 93.333,
+   "hp": 680.0,
+   "range": 1280.0,
+   "speed": 234.0
+  },
+  "corshark": {
+   "fight": 506.099,
+   "dps": 159.091,
+   "hp": 1610.0,
+   "range": 400.0,
+   "speed": 84.0
+  },
+  "corshiva": {
+   "fight": 1956.308,
+   "dps": 407.143,
+   "hp": 9400.0,
+   "range": 800.0,
+   "speed": 48.0
+  },
+  "corshroud": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 890.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corsiegebreaker": {
+   "fight": 1224.745,
+   "dps": 500.0,
+   "hp": 3000.0,
+   "range": 910.0,
+   "speed": 54.0
+  },
+  "corsilo": {
+   "fight": 1760.682,
+   "dps": 500.0,
+   "hp": 6200.0,
+   "range": 72000.0,
+   "speed": 0.0
+  },
+  "corsjam": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1450.0,
+   "range": 0.0,
+   "speed": 40.0
+  },
+  "corsktl": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 355.0,
+   "range": 42.0,
+   "speed": 84.0
+  },
+  "corsnap": {
+   "fight": 346.987,
+   "dps": 70.0,
+   "hp": 1720.0,
+   "range": 370.0,
+   "speed": 66.99
+  },
+  "corsok": {
+   "fight": 1082.82,
+   "dps": 279.167,
+   "hp": 4200.0,
+   "range": 725.0,
+   "speed": 45.3
+  },
+  "corsolar": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 355.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corsonar": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 58.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corspec": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 350.0,
+   "range": 0.0,
+   "speed": 35.0
+  },
+  "corspy": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 450.0,
+   "range": 100.0,
+   "speed": 62.0
+  },
+  "corssub": {
+   "fight": 896.87,
+   "dps": 206.25,
+   "hp": 3900.0,
+   "range": 850.0,
+   "speed": 39.0
+  },
+  "corstorm": {
+   "fight": 174.853,
+   "dps": 41.316,
+   "hp": 740.0,
+   "range": 475.0,
+   "speed": 47.7
+  },
+  "corsub": {
+   "fight": 380.799,
+   "dps": 136.8,
+   "hp": 1060.0,
+   "range": 500.0,
+   "speed": 57.0
+  },
+  "corsumo": {
+   "fight": 2802.142,
+   "dps": 503.333,
+   "hp": 15600.0,
+   "range": 650.0,
+   "speed": 23.0
+  },
+  "corsy": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 4300.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "cortarg": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "cortdrone": {
+   "fight": 138.293,
+   "dps": 42.5,
+   "hp": 450.0,
+   "range": 200.0,
+   "speed": 315.0
+  },
+  "cortermite": {
+   "fight": 1013.348,
+   "dps": 331.25,
+   "hp": 3100.0,
+   "range": 340.0,
+   "speed": 50.0
+  },
+  "corthud": {
+   "fight": 256.905,
+   "dps": 60.0,
+   "hp": 1100.0,
+   "range": 380.0,
+   "speed": 45.0
+  },
+  "cortide": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 395.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "cortitan": {
+   "fight": 542.218,
+   "dps": 150.0,
+   "hp": 1960.0,
+   "range": 400.0,
+   "speed": 279.0
+  },
+  "cortl": {
+   "fight": 518.459,
+   "dps": 186.667,
+   "hp": 1440.0,
+   "range": 500.0,
+   "speed": 0.0
+  },
+  "cortoast": {
+   "fight": 1303.841,
+   "dps": 400.0,
+   "hp": 4250.0,
+   "range": 1390.0,
+   "speed": 0.0
+  },
+  "cortrem": {
+   "fight": 1095.445,
+   "dps": 400.0,
+   "hp": 3000.0,
+   "range": 1470.0,
+   "speed": 40.5
+  },
+  "cortron": {
+   "fight": 2664.583,
+   "dps": 2000.0,
+   "hp": 3550.0,
+   "range": 2250.0,
+   "speed": 0.0
+  },
+  "coruwadves": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 12700.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "coruwadvms": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 11200.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "coruwageo": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 4150.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "coruwes": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "coruwfus": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 5900.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "coruwgeo": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2050.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "coruwmme": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3900.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "coruwmmm": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 560.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "coruwms": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2100.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corvac": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3000.0,
+   "range": 0.0,
+   "speed": 49.5
+  },
+  "corvacct": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 5125.0,
+   "range": 0.0,
+   "speed": 49.5
+  },
+  "corvalk": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 280.0,
+   "range": 0.0,
+   "speed": 198.0
+  },
+  "corvamp": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 290.0,
+   "range": 0.0,
+   "speed": 379.0
+  },
+  "corveng": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 156.0,
+   "range": 0.0,
+   "speed": 297.6
+  },
+  "corvipe": {
+   "fight": 1112.43,
+   "dps": 412.5,
+   "hp": 3000.0,
+   "range": 730.0,
+   "speed": 0.0
+  },
+  "corvoyr": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 390.0,
+   "range": 0.0,
+   "speed": 38.0
+  },
+  "corvp": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corvrad": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 570.0,
+   "range": 0.0,
+   "speed": 50.0
+  },
+  "corvroc": {
+   "fight": 398.33,
+   "dps": 113.333,
+   "hp": 1400.0,
+   "range": 1310.0,
+   "speed": 33.0
+  },
+  "corwin": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 220.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "corwolv": {
+   "fight": 178.017,
+   "dps": 42.254,
+   "hp": 750.0,
+   "range": 710.0,
+   "speed": 48.0
+  },
+  "critter_ant": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 11.0,
+   "range": 0.0,
+   "speed": 18.0
+  },
+  "critter_crab": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 44.0,
+   "range": 0.0,
+   "speed": 13.5
+  },
+  "critter_duck": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 17.0,
+   "range": 0.0,
+   "speed": 10.5
+  },
+  "critter_goldfish": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 11.0,
+   "range": 0.0,
+   "speed": 18.0
+  },
+  "critter_gull": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 11.0,
+   "range": 0.0,
+   "speed": 54.0
+  },
+  "critter_penguin": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 167.0,
+   "range": 0.0,
+   "speed": 15.0
+  },
+  "critter_penguinbro": {
+   "fight": 1240.967,
+   "dps": 700.0,
+   "hp": 2200.0,
+   "range": 266.0,
+   "speed": 22.5
+  },
+  "critter_penguinking": {
+   "fight": 8000.0,
+   "dps": 1142.857,
+   "hp": 56000.0,
+   "range": 800.0,
+   "speed": 25.5
+  },
+  "dbg_sphere": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 940.0,
+   "range": 0.0,
+   "speed": 71.55
+  },
+  "dbg_sphere_fullmetal": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 940.0,
+   "range": 0.0,
+   "speed": 71.55
+  },
+  "dice": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 560000.0,
+   "range": 0.0,
+   "speed": 30.0
+  },
+  "dummycom": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3700.0,
+   "range": 0.0,
+   "speed": 37.5
+  },
+  "freefusion": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 560.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "leegmech": {
+   "fight": 9339.853,
+   "dps": 1453.881,
+   "hp": 60000.0,
+   "range": 850.0,
+   "speed": 40.5
+  },
+  "leg_hat_halloween_mask": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 6000000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legaabot": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 610.0,
+   "range": 0.0,
+   "speed": 55.0
+  },
+  "legaap": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3900.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legabm": {
+   "fight": 1654.539,
+   "dps": 750.0,
+   "hp": 3650.0,
+   "range": 72000.0,
+   "speed": 0.0
+  },
+  "legaca": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 195.0,
+   "range": 0.0,
+   "speed": 203.0
+  },
+  "legaceb": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 830.0,
+   "range": 0.0,
+   "speed": 75.0
+  },
+  "legack": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 860.0,
+   "range": 0.0,
+   "speed": 36.0
+  },
+  "legacluster": {
+   "fight": 935.582,
+   "dps": 236.571,
+   "hp": 3700.0,
+   "range": 1380.0,
+   "speed": 0.0
+  },
+  "legacv": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1950.0,
+   "range": 0.0,
+   "speed": 55.5
+  },
+  "legadvaabot": {
+   "fight": 28.284,
+   "dps": 0.333,
+   "hp": 2400.0,
+   "range": 1151.0,
+   "speed": 34.5
+  },
+  "legadveconv": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 560.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legadvestore": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 12700.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legadvshipyard": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 5900.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legadvsol": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1100.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legafcv": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 450.0,
+   "range": 0.0,
+   "speed": 110.0
+  },
+  "legafigdef": {
+   "fight": 97.98,
+   "dps": 20.0,
+   "hp": 480.0,
+   "range": 600.0,
+   "speed": 270.0
+  },
+  "legafus": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 9500.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legageo": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 4150.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legah": {
+   "fight": 289.828,
+   "dps": 75.0,
+   "hp": 1120.0,
+   "range": 700.0,
+   "speed": 88.5
+  },
+  "legaheattank": {
+   "fight": 2067.607,
+   "dps": 750.0,
+   "hp": 5700.0,
+   "range": 450.0,
+   "speed": 52.0
+  },
+  "legajam": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 830.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legajamk": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 350.0,
+   "range": 0.0,
+   "speed": 35.0
+  },
+  "legalab": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 4500.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legamcluster": {
+   "fight": 228.218,
+   "dps": 41.667,
+   "hp": 1250.0,
+   "range": 930.0,
+   "speed": 44.0
+  },
+  "legamph": {
+   "fight": 1744.515,
+   "dps": 1106.667,
+   "hp": 2750.0,
+   "range": 600.0,
+   "speed": 48.0
+  },
+  "legamphlab": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2800.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legamphtank": {
+   "fight": 321.911,
+   "dps": 77.333,
+   "hp": 1340.0,
+   "range": 305.0,
+   "speed": 63.0
+  },
+  "legamstor": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 11200.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "leganavalaaturret": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1750.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "leganavaladvgeo": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 4150.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "leganavaldefturret": {
+   "fight": 2151.86,
+   "dps": 735.0,
+   "hp": 6300.0,
+   "range": 700.0,
+   "speed": 0.0
+  },
+  "leganavaleconv": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 560.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "leganavalfusion": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 5900.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "leganavalmex": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3900.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "leganavalpinpointer": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1530.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "leganavalsonarstation": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2400.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "leganavaltorpturret": {
+   "fight": 1007.663,
+   "dps": 362.637,
+   "hp": 2800.0,
+   "range": 890.0,
+   "speed": 0.0
+  },
+  "leganavyaaship": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3900.0,
+   "range": 0.0,
+   "speed": 57.0
+  },
+  "leganavyantinukecarrier": {
+   "fight": 1936.492,
+   "dps": 750.0,
+   "hp": 5000.0,
+   "range": 72000.0,
+   "speed": 63.0
+  },
+  "leganavyantiswarm": {
+   "fight": 662.639,
+   "dps": 190.909,
+   "hp": 2300.0,
+   "range": 350.0,
+   "speed": 105.0
+  },
+  "leganavyartyship": {
+   "fight": 3091.848,
+   "dps": 434.524,
+   "hp": 22000.0,
+   "range": 2100.0,
+   "speed": 48.0
+  },
+  "leganavybattleship": {
+   "fight": 3009.36,
+   "dps": 875.0,
+   "hp": 10350.0,
+   "range": 750.0,
+   "speed": 25.0
+  },
+  "leganavybattlesub": {
+   "fight": 650.385,
+   "dps": 180.0,
+   "hp": 2350.0,
+   "range": 600.0,
+   "speed": 72.0
+  },
+  "leganavyconsub": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1110.0,
+   "range": 0.0,
+   "speed": 64.8
+  },
+  "leganavycruiser": {
+   "fight": 1648.029,
+   "dps": 485.0,
+   "hp": 5600.0,
+   "range": 500.0,
+   "speed": 57.0
+  },
+  "leganavyengineer": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1600.0,
+   "range": 0.0,
+   "speed": 57.75
+  },
+  "leganavyflagship": {
+   "fight": 12092.974,
+   "dps": 3046.667,
+   "hp": 48000.0,
+   "range": 1000.0,
+   "speed": 63.0
+  },
+  "leganavyheavysub": {
+   "fight": 896.87,
+   "dps": 206.25,
+   "hp": 3900.0,
+   "range": 850.0,
+   "speed": 39.0
+  },
+  "leganavymissileship": {
+   "fight": 1002.497,
+   "dps": 300.0,
+   "hp": 3350.0,
+   "range": 1550.0,
+   "speed": 61.44
+  },
+  "leganavyradjamship": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1700.0,
+   "range": 0.0,
+   "speed": 42.0
+  },
+  "legap": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1780.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legapopupdef": {
+   "fight": 1140.691,
+   "dps": 464.706,
+   "hp": 2800.0,
+   "range": 730.0,
+   "speed": 0.0
+  },
+  "legarad": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 500.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legaradk": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 390.0,
+   "range": 0.0,
+   "speed": 45.0
+  },
+  "legaskirmtank": {
+   "fight": 512.348,
+   "dps": 105.0,
+   "hp": 2500.0,
+   "range": 600.0,
+   "speed": 65.0
+  },
+  "legaspy": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 300.0,
+   "range": 100.0,
+   "speed": 62.5
+  },
+  "legassistdrone": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 335.0,
+   "range": 0.0,
+   "speed": 210.0
+  },
+  "legassistdrone_land": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2000.0,
+   "range": 0.0,
+   "speed": 37.5
+  },
+  "legatorpbomber": {
+   "fight": 638.077,
+   "dps": 214.286,
+   "hp": 1900.0,
+   "range": 400.0,
+   "speed": 290.0
+  },
+  "legatrans": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 800.0,
+   "range": 0.0,
+   "speed": 100.0
+  },
+  "legavantinuke": {
+   "fight": 424.264,
+   "dps": 250.0,
+   "hp": 720.0,
+   "range": 72000.0,
+   "speed": 58.0
+  },
+  "legavjam": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 510.0,
+   "range": 0.0,
+   "speed": 41.0
+  },
+  "legavp": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 5100.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legavrad": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 980.0,
+   "range": 0.0,
+   "speed": 57.0
+  },
+  "legavroc": {
+   "fight": 380.058,
+   "dps": 111.111,
+   "hp": 1300.0,
+   "range": 1300.0,
+   "speed": 33.0
+  },
+  "legbal": {
+   "fight": 202.26,
+   "dps": 45.455,
+   "hp": 900.0,
+   "range": 460.0,
+   "speed": 43.5
+  },
+  "legbar": {
+   "fight": 134.164,
+   "dps": 12.0,
+   "hp": 1500.0,
+   "range": 535.0,
+   "speed": 40.5
+  },
+  "legbart": {
+   "fight": 231.084,
+   "dps": 30.0,
+   "hp": 1780.0,
+   "range": 625.0,
+   "speed": 60.0
+  },
+  "legbastion": {
+   "fight": 787.401,
+   "dps": 51.667,
+   "hp": 12000.0,
+   "range": 1100.0,
+   "speed": 0.0
+  },
+  "legbombard": {
+   "fight": 1024.695,
+   "dps": 375.0,
+   "hp": 2800.0,
+   "range": 750.0,
+   "speed": 0.0
+  },
+  "legbunk": {
+   "fight": 1702.449,
+   "dps": 308.333,
+   "hp": 9400.0,
+   "range": 650.0,
+   "speed": 82.0
+  },
+  "legca": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 151.0,
+   "range": 0.0,
+   "speed": 139.0
+  },
+  "legcar": {
+   "fight": 1003.992,
+   "dps": 280.0,
+   "hp": 3600.0,
+   "range": 321.0,
+   "speed": 51.0
+  },
+  "legcen": {
+   "fight": 300.0,
+   "dps": 107.143,
+   "hp": 840.0,
+   "range": 180.0,
+   "speed": 90.0
+  },
+  "legch": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1390.0,
+   "range": 0.0,
+   "speed": 72.9
+  },
+  "legcib": {
+   "fight": 7.746,
+   "dps": 0.1,
+   "hp": 600.0,
+   "range": 450.0,
+   "speed": 300.0
+  },
+  "legck": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 700.0,
+   "range": 0.0,
+   "speed": 39.0
+  },
+  "legcluster": {
+   "fight": 538.516,
+   "dps": 100.0,
+   "hp": 2900.0,
+   "range": 1000.0,
+   "speed": 0.0
+  },
+  "legcom": {
+   "fight": 20307.113,
+   "dps": 111453.75,
+   "hp": 3700.0,
+   "range": 300.0,
+   "speed": 37.5
+  },
+  "legcomecon": {
+   "fight": 827.018,
+   "dps": 204.167,
+   "hp": 3350.0,
+   "range": 300.0,
+   "speed": 24.99
+  },
+  "legcomlvl10": {
+   "fight": 50830.637,
+   "dps": 117443.336,
+   "hp": 22000.0,
+   "range": 950.0,
+   "speed": 49.5
+  },
+  "legcomlvl2": {
+   "fight": 25881.412,
+   "dps": 111641.25,
+   "hp": 6000.0,
+   "range": 350.0,
+   "speed": 37.5
+  },
+  "legcomlvl3": {
+   "fight": 29902.285,
+   "dps": 111768.336,
+   "hp": 8000.0,
+   "range": 500.0,
+   "speed": 37.5
+  },
+  "legcomlvl4": {
+   "fight": 33483.594,
+   "dps": 112115.094,
+   "hp": 10000.0,
+   "range": 550.0,
+   "speed": 37.5
+  },
+  "legcomlvl5": {
+   "fight": 36770.129,
+   "dps": 112670.188,
+   "hp": 12000.0,
+   "range": 620.0,
+   "speed": 39.5
+  },
+  "legcomlvl6": {
+   "fight": 39812.672,
+   "dps": 113217.781,
+   "hp": 14000.0,
+   "range": 730.0,
+   "speed": 41.5
+  },
+  "legcomlvl7": {
+   "fight": 42699.5,
+   "dps": 113952.953,
+   "hp": 16000.0,
+   "range": 730.0,
+   "speed": 43.5
+  },
+  "legcomlvl8": {
+   "fight": 45488.984,
+   "dps": 114958.211,
+   "hp": 18000.0,
+   "range": 800.0,
+   "speed": 45.5
+  },
+  "legcomlvl9": {
+   "fight": 48184.492,
+   "dps": 116087.273,
+   "hp": 20000.0,
+   "range": 870.0,
+   "speed": 47.5
+  },
+  "legcomoff": {
+   "fight": 1313.488,
+   "dps": 515.0,
+   "hp": 3350.0,
+   "range": 400.0,
+   "speed": 42.498
+  },
+  "legcomt2com": {
+   "fight": 2494.625,
+   "dps": 928.829,
+   "hp": 6700.0,
+   "range": 600.0,
+   "speed": 30.0
+  },
+  "legcomt2def": {
+   "fight": 1102.651,
+   "dps": 273.222,
+   "hp": 4450.0,
+   "range": 400.0,
+   "speed": 37.5
+  },
+  "legcomt2off": {
+   "fight": 1573.902,
+   "dps": 556.667,
+   "hp": 4450.0,
+   "range": 400.0,
+   "speed": 47.499
+  },
+  "legctl": {
+   "fight": 574.456,
+   "dps": 150.0,
+   "hp": 2200.0,
+   "range": 600.0,
+   "speed": 0.0
+  },
+  "legcv": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1330.0,
+   "range": 0.0,
+   "speed": 57.0
+  },
+  "legdecom": {
+   "fight": 1198.465,
+   "dps": 388.194,
+   "hp": 3700.0,
+   "range": 300.0,
+   "speed": 37.5
+  },
+  "legdecomlvl10": {
+   "fight": 8375.892,
+   "dps": 6377.777,
+   "hp": 11000.0,
+   "range": 950.0,
+   "speed": 49.5
+  },
+  "legdecomlvl2": {
+   "fight": 1314.185,
+   "dps": 575.694,
+   "hp": 3000.0,
+   "range": 350.0,
+   "speed": 37.5
+  },
+  "legdecomlvl3": {
+   "fight": 1676.637,
+   "dps": 702.778,
+   "hp": 4000.0,
+   "range": 500.0,
+   "speed": 37.5
+  },
+  "legdecomlvl4": {
+   "fight": 2290.783,
+   "dps": 1049.537,
+   "hp": 5000.0,
+   "range": 550.0,
+   "speed": 37.5
+  },
+  "legdecomlvl5": {
+   "fight": 3102.866,
+   "dps": 1604.63,
+   "hp": 6000.0,
+   "range": 620.0,
+   "speed": 39.5
+  },
+  "legdecomlvl6": {
+   "fight": 3881.437,
+   "dps": 2152.222,
+   "hp": 7000.0,
+   "range": 730.0,
+   "speed": 41.5
+  },
+  "legdecomlvl7": {
+   "fight": 4806.157,
+   "dps": 2887.393,
+   "hp": 8000.0,
+   "range": 730.0,
+   "speed": 43.5
+  },
+  "legdecomlvl8": {
+   "fight": 5918.946,
+   "dps": 3892.659,
+   "hp": 9000.0,
+   "range": 800.0,
+   "speed": 45.5
+  },
+  "legdecomlvl9": {
+   "fight": 7086.407,
+   "dps": 5021.717,
+   "hp": 10000.0,
+   "range": 870.0,
+   "speed": 47.5
+  },
+  "legdeflector": {
+   "fight": 59.582,
+   "dps": 1.0,
+   "hp": 3550.0,
+   "range": 10.0,
+   "speed": 0.0
+  },
+  "legdrag": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2800.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legdrone": {
+   "fight": 93.095,
+   "dps": 26.667,
+   "hp": 325.0,
+   "range": 300.0,
+   "speed": 280.5
+  },
+  "legdtr": {
+   "fight": 439.545,
+   "dps": 120.0,
+   "hp": 1610.0,
+   "range": 400.0,
+   "speed": 0.0
+  },
+  "legeallterrainmech": {
+   "fight": 1661.325,
+   "dps": 300.0,
+   "hp": 9200.0,
+   "range": 1380.0,
+   "speed": 33.0
+  },
+  "legeconv": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 167.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legeheatraymech": {
+   "fight": 17169.74,
+   "dps": 2680.0,
+   "hp": 110000.0,
+   "range": 800.0,
+   "speed": 40.0
+  },
+  "legeheatraymech_old": {
+   "fight": 20871.031,
+   "dps": 3960.0,
+   "hp": 110000.0,
+   "range": 800.0,
+   "speed": 40.0
+  },
+  "legehovertank": {
+   "fight": 1040.232,
+   "dps": 220.833,
+   "hp": 4900.0,
+   "range": 500.0,
+   "speed": 63.0
+  },
+  "legelrpcmech": {
+   "fight": 1683.251,
+   "dps": 166.667,
+   "hp": 17000.0,
+   "range": 3100.0,
+   "speed": 25.0
+  },
+  "legerailtank": {
+   "fight": 3633.18,
+   "dps": 800.0,
+   "hp": 16500.0,
+   "range": 1000.0,
+   "speed": 61.0
+  },
+  "legeshotgunmech": {
+   "fight": 5208.967,
+   "dps": 1233.333,
+   "hp": 22000.0,
+   "range": 700.0,
+   "speed": 72.0
+  },
+  "legestor": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legeyes": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 280.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legfdrag": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 4450.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legfeconv": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 167.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legfhive": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1200.0,
+   "range": 1100.0,
+   "speed": 0.0
+  },
+  "legfhp": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3750.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legfig": {
+   "fight": 38.297,
+   "dps": 6.667,
+   "hp": 220.0,
+   "range": 600.0,
+   "speed": 270.0
+  },
+  "legflak": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1750.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legfloat": {
+   "fight": 847.054,
+   "dps": 205.0,
+   "hp": 3500.0,
+   "range": 550.0,
+   "speed": 55.0
+  },
+  "legfmg": {
+   "fight": 1026.158,
+   "dps": 270.0,
+   "hp": 3900.0,
+   "range": 575.0,
+   "speed": 0.0
+  },
+  "legfort": {
+   "fight": 3045.228,
+   "dps": 555.294,
+   "hp": 16700.0,
+   "range": 915.0,
+   "speed": 93.0
+  },
+  "legforti": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 8900.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legfrad": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 110.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legfrl": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 335.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legfus": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 4600.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "leggant": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 17800.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "leggantuw": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 17800.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "leggat": {
+   "fight": 677.495,
+   "dps": 180.0,
+   "hp": 2550.0,
+   "range": 361.0,
+   "speed": 45.0
+  },
+  "leggatet3": {
+   "fight": 134.164,
+   "dps": 1.0,
+   "hp": 18000.0,
+   "range": 710.0,
+   "speed": 0.0
+  },
+  "leggeo": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2050.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "leggob": {
+   "fight": 73.03,
+   "dps": 26.667,
+   "hp": 200.0,
+   "range": 261.0,
+   "speed": 75.0
+  },
+  "leghaap": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 17800.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "leghaca": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 435.0,
+   "range": 0.0,
+   "speed": 217.5
+  },
+  "leghack": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 830.0,
+   "range": 0.0,
+   "speed": 75.0
+  },
+  "leghacv": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 450.0,
+   "range": 0.0,
+   "speed": 110.0
+  },
+  "leghades": {
+   "fight": 133.073,
+   "dps": 41.667,
+   "hp": 425.0,
+   "range": 211.0,
+   "speed": 99.0
+  },
+  "leghalab": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 17800.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "leghavp": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 17800.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legheavydrone": {
+   "fight": 454.148,
+   "dps": 125.0,
+   "hp": 1650.0,
+   "range": 430.0,
+   "speed": 180.5
+  },
+  "legheavydronesmall": {
+   "fight": 454.148,
+   "dps": 125.0,
+   "hp": 1650.0,
+   "range": 430.0,
+   "speed": 180.5
+  },
+  "leghelios": {
+   "fight": 322.252,
+   "dps": 103.846,
+   "hp": 1000.0,
+   "range": 320.0,
+   "speed": 75.0
+  },
+  "leghive": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1200.0,
+   "range": 1100.0,
+   "speed": 0.0
+  },
+  "leghp": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3750.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "leghrk": {
+   "fight": 367.423,
+   "dps": 112.5,
+   "hp": 1200.0,
+   "range": 1200.0,
+   "speed": 45.0
+  },
+  "leginc": {
+   "fight": 2984.962,
+   "dps": 990.0,
+   "hp": 9000.0,
+   "range": 725.0,
+   "speed": 24.0
+  },
+  "leginf": {
+   "fight": 433.26,
+   "dps": 51.429,
+   "hp": 3650.0,
+   "range": 1200.0,
+   "speed": 37.5
+  },
+  "leginfestor": {
+   "fight": 379.473,
+   "dps": 120.0,
+   "hp": 1200.0,
+   "range": 300.0,
+   "speed": 54.0
+  },
+  "legionnaire": {
+   "fight": 97.98,
+   "dps": 20.0,
+   "hp": 480.0,
+   "range": 600.0,
+   "speed": 270.0
+  },
+  "legjam": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1070.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legjav": {
+   "fight": 1609.969,
+   "dps": 360.0,
+   "hp": 7200.0,
+   "range": 450.0,
+   "speed": 68.0
+  },
+  "legjuno": {
+   "fight": 35.355,
+   "dps": 0.5,
+   "hp": 2500.0,
+   "range": 32000.0,
+   "speed": 0.0
+  },
+  "legkam": {
+   "fight": 85.884,
+   "dps": 46.1,
+   "hp": 160.0,
+   "range": 500.0,
+   "speed": 220.0
+  },
+  "legkark": {
+   "fight": 570.818,
+   "dps": 188.889,
+   "hp": 1725.0,
+   "range": 360.0,
+   "speed": 42.0
+  },
+  "legkeres": {
+   "fight": 3352.786,
+   "dps": 535.294,
+   "hp": 21000.0,
+   "range": 481.0,
+   "speed": 48.0
+  },
+  "leglab": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2900.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "leglht": {
+   "fight": 316.228,
+   "dps": 181.818,
+   "hp": 550.0,
+   "range": 430.0,
+   "speed": 0.0
+  },
+  "leglob": {
+   "fight": 128.452,
+   "dps": 30.0,
+   "hp": 550.0,
+   "range": 400.0,
+   "speed": 51.0
+  },
+  "leglraa": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1670.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "leglrpc": {
+   "fight": 667.083,
+   "dps": 100.0,
+   "hp": 4450.0,
+   "range": 4800.0,
+   "speed": 0.0
+  },
+  "leglts": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 265.0,
+   "range": 0.0,
+   "speed": 207.0
+  },
+  "leglupara": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 4000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legmed": {
+   "fight": 866.025,
+   "dps": 250.0,
+   "hp": 3000.0,
+   "range": 1000.0,
+   "speed": 39.0
+  },
+  "legmex": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 275.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legmg": {
+   "fight": 748.999,
+   "dps": 255.0,
+   "hp": 2200.0,
+   "range": 575.0,
+   "speed": 0.0
+  },
+  "legmh": {
+   "fight": 166.533,
+   "dps": 53.333,
+   "hp": 520.0,
+   "range": 700.0,
+   "speed": 70.0
+  },
+  "legmine1": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 11.0,
+   "range": 64.0,
+   "speed": 0.0
+  },
+  "legmine2": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 11.0,
+   "range": 64.0,
+   "speed": 0.0
+  },
+  "legmine3": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 11.0,
+   "range": 64.0,
+   "speed": 0.0
+  },
+  "legmineb": {
+   "fight": 25.807,
+   "dps": 0.6,
+   "hp": 1110.0,
+   "range": 1600.0,
+   "speed": 210.0
+  },
+  "legmlv": {
+   "fight": 32.404,
+   "dps": 5.0,
+   "hp": 210.0,
+   "range": 220.0,
+   "speed": 69.0
+  },
+  "legmoho": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3900.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legmohobp": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3900.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legmohobpct": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 5125.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legmohocon": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3900.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legmohoconct": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3900.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legmohoconin": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3900.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legmos": {
+   "fight": 151.079,
+   "dps": 55.0,
+   "hp": 415.0,
+   "range": 380.0,
+   "speed": 165.0
+  },
+  "legmrv": {
+   "fight": 341.174,
+   "dps": 120.0,
+   "hp": 970.0,
+   "range": 240.0,
+   "speed": 135.0
+  },
+  "legmstor": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2100.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legnanotc": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 560.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legnanotcbase": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 20000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legnanotcplat": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 560.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legnanotct2": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2200.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legnanotct2plat": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2200.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legnap": {
+   "fight": 240.832,
+   "dps": 20.0,
+   "hp": 2900.0,
+   "range": 1280.0,
+   "speed": 215.0
+  },
+  "legnavaldefturret": {
+   "fight": 888.189,
+   "dps": 152.0,
+   "hp": 5190.0,
+   "range": 720.0,
+   "speed": 0.0
+  },
+  "legnavyaaship": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1200.0,
+   "range": 0.0,
+   "speed": 60.0
+  },
+  "legnavyartyship": {
+   "fight": 518.327,
+   "dps": 59.703,
+   "hp": 4500.0,
+   "range": 960.0,
+   "speed": 45.0
+  },
+  "legnavyconship": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1080.0,
+   "range": 0.0,
+   "speed": 71.0
+  },
+  "legnavydestro": {
+   "fight": 805.709,
+   "dps": 170.833,
+   "hp": 3800.0,
+   "range": 700.0,
+   "speed": 58.0
+  },
+  "legnavyfrigate": {
+   "fight": 748.332,
+   "dps": 215.385,
+   "hp": 2600.0,
+   "range": 460.0,
+   "speed": 72.0
+  },
+  "legnavyrezsub": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 420.0,
+   "range": 0.0,
+   "speed": 66.9
+  },
+  "legnavyscout": {
+   "fight": 204.939,
+   "dps": 60.0,
+   "hp": 700.0,
+   "range": 351.0,
+   "speed": 97.0
+  },
+  "legnavysub": {
+   "fight": 236.643,
+   "dps": 93.333,
+   "hp": 600.0,
+   "range": 400.0,
+   "speed": 57.0
+  },
+  "legner": {
+   "fight": 259.272,
+   "dps": 61.111,
+   "hp": 1100.0,
+   "range": 370.0,
+   "speed": 76.0
+  },
+  "legotter": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 950.0,
+   "range": 0.0,
+   "speed": 43.5
+  },
+  "legperdition": {
+   "fight": 1549.193,
+   "dps": 600.0,
+   "hp": 4000.0,
+   "range": 2300.0,
+   "speed": 0.0
+  },
+  "legphoenix": {
+   "fight": 190.394,
+   "dps": 18.125,
+   "hp": 2000.0,
+   "range": 1280.0,
+   "speed": 270.0
+  },
+  "legrad": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 180.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legrail": {
+   "fight": 171.27,
+   "dps": 26.667,
+   "hp": 1100.0,
+   "range": 650.0,
+   "speed": 46.5
+  },
+  "legrampart": {
+   "fight": 2539.685,
+   "dps": 750.0,
+   "hp": 8600.0,
+   "range": 72000.0,
+   "speed": 0.0
+  },
+  "legrezbot": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 220.0,
+   "range": 0.0,
+   "speed": 78.0
+  },
+  "legrhapsis": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1900.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legrl": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 335.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legscout": {
+   "fight": 42.046,
+   "dps": 23.571,
+   "hp": 75.0,
+   "range": 169.0,
+   "speed": 160.0
+  },
+  "legsd": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2650.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legsh": {
+   "fight": 114.891,
+   "dps": 60.0,
+   "hp": 220.0,
+   "range": 260.0,
+   "speed": 102.0
+  },
+  "legshot": {
+   "fight": 593.085,
+   "dps": 105.0,
+   "hp": 3350.0,
+   "range": 280.0,
+   "speed": 44.0
+  },
+  "legsilo": {
+   "fight": 1760.682,
+   "dps": 500.0,
+   "hp": 6200.0,
+   "range": 72000.0,
+   "speed": 0.0
+  },
+  "legsnapper": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 550.0,
+   "range": 42.0,
+   "speed": 81.0
+  },
+  "legsolar": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 340.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legspbomber": {
+   "fight": 418.927,
+   "dps": 150.0,
+   "hp": 1170.0,
+   "range": 1280.0,
+   "speed": 267.3
+  },
+  "legspcarrier": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1500.0,
+   "range": 1000.0,
+   "speed": 93.0
+  },
+  "legspcon": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 405.0,
+   "range": 0.0,
+   "speed": 124.0
+  },
+  "legspfighter": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 220.0,
+   "range": 0.0,
+   "speed": 310.8
+  },
+  "legsplab": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2200.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legspradarsonarplane": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 580.0,
+   "range": 0.0,
+   "speed": 338.1
+  },
+  "legspsurfacegunship": {
+   "fight": 261.861,
+   "dps": 57.143,
+   "hp": 1200.0,
+   "range": 400.0,
+   "speed": 148.0
+  },
+  "legsptorpgunship": {
+   "fight": 236.643,
+   "dps": 62.222,
+   "hp": 900.0,
+   "range": 460.0,
+   "speed": 273.0
+  },
+  "legsrail": {
+   "fight": 516.859,
+   "dps": 121.429,
+   "hp": 2200.0,
+   "range": 850.0,
+   "speed": 42.0
+  },
+  "legstarfall": {
+   "fight": 8378.544,
+   "dps": 2700.0,
+   "hp": 26000.0,
+   "range": 6100.0,
+   "speed": 0.0
+  },
+  "legstr": {
+   "fight": 653.605,
+   "dps": 240.0,
+   "hp": 1780.0,
+   "range": 280.0,
+   "speed": 84.0
+  },
+  "legstronghold": {
+   "fight": 624.5,
+   "dps": 150.0,
+   "hp": 2600.0,
+   "range": 450.0,
+   "speed": 160.0
+  },
+  "legsy": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 4300.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legtarg": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2100.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legtide": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 395.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legtl": {
+   "fight": 492.612,
+   "dps": 186.667,
+   "hp": 1300.0,
+   "range": 500.0,
+   "speed": 0.0
+  },
+  "leguwestore": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "leguwgeo": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2050.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "leguwmstore": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2100.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legvcarry": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1400.0,
+   "range": 1000.0,
+   "speed": 45.0
+  },
+  "legvenator": {
+   "fight": 77.769,
+   "dps": 28.8,
+   "hp": 210.0,
+   "range": 700.0,
+   "speed": 450.0
+  },
+  "legvflak": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2700.0,
+   "range": 0.0,
+   "speed": 70.0
+  },
+  "legvision": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 1.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legvp": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "legwhisper": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 990.0,
+   "range": 0.0,
+   "speed": 321.0
+  },
+  "legwin": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 230.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "lootboxbronze": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 33500.0,
+   "range": 0.0,
+   "speed": 0.03
+  },
+  "lootboxgold": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 56000.0,
+   "range": 0.0,
+   "speed": 0.03
+  },
+  "lootboxnano_t1_var1": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 11200.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "lootboxnano_t1_var2": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 11200.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "lootboxnano_t1_var3": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 11200.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "lootboxnano_t1_var4": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 11200.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "lootboxnano_t1_var5": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 11200.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "lootboxnano_t1_var6": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 11200.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "lootboxnano_t1_var7": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 11200.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "lootboxnano_t1_var8": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 11200.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "lootboxnano_t1_var9": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 11200.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "lootboxnano_t2_var1": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 22400.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "lootboxnano_t2_var2": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 22400.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "lootboxnano_t2_var3": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 22400.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "lootboxnano_t2_var4": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 22400.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "lootboxnano_t2_var5": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 22400.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "lootboxnano_t2_var6": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 22400.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "lootboxnano_t2_var7": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 22400.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "lootboxnano_t2_var8": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 22400.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "lootboxnano_t2_var9": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 22400.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "lootboxnano_t3_var1": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 44800.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "lootboxnano_t3_var2": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 44800.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "lootboxnano_t3_var3": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 44800.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "lootboxnano_t3_var4": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 44800.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "lootboxnano_t3_var5": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 44800.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "lootboxnano_t3_var6": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 44800.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "lootboxnano_t3_var7": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 44800.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "lootboxnano_t3_var8": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 44800.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "lootboxnano_t3_var9": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 44800.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "lootboxnano_t4_var1": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 89600.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "lootboxnano_t4_var2": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 89600.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "lootboxnano_t4_var3": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 89600.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "lootboxnano_t4_var4": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 89600.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "lootboxnano_t4_var5": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 89600.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "lootboxnano_t4_var6": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 89600.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "lootboxnano_t4_var7": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 89600.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "lootboxnano_t4_var8": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 89600.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "lootboxnano_t4_var9": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 89600.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "lootboxplatinum": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 67000.0,
+   "range": 0.0,
+   "speed": 0.03
+  },
+  "lootboxsilver": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 44500.0,
+   "range": 0.0,
+   "speed": 0.03
+  },
+  "lootdroppod_gold": {
+   "fight": 20.0,
+   "dps": 0.2,
+   "hp": 2000.0,
+   "range": 59999.0,
+   "speed": 0.0
+  },
+  "lootdroppod_printer": {
+   "fight": 20.0,
+   "dps": 0.2,
+   "hp": 2000.0,
+   "range": 59999.0,
+   "speed": 0.0
+  },
+  "meteor": {
+   "fight": 16.733,
+   "dps": 140.0,
+   "hp": 2.0,
+   "range": 29999.0,
+   "speed": 0.0
+  },
+  "mission_command_tower": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 11100.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "nuketest": {
+   "fight": 3348.134,
+   "dps": 1900.0,
+   "hp": 5900.0,
+   "range": 29999.0,
+   "speed": 0.0
+  },
+  "nuketestcor": {
+   "fight": 3776.241,
+   "dps": 2300.0,
+   "hp": 6200.0,
+   "range": 29999.0,
+   "speed": 0.0
+  },
+  "nuketestorg": {
+   "fight": 3348.134,
+   "dps": 1900.0,
+   "hp": 5900.0,
+   "range": 29999.0,
+   "speed": 0.0
+  },
+  "pbr_cube": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 940.0,
+   "range": 0.0,
+   "speed": 71.55
+  },
+  "resourcecheat": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 7900.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "va_cormando": {
+   "fight": 1372.953,
+   "dps": 362.5,
+   "hp": 5200.0,
+   "range": 320.0,
+   "speed": 78.0
+  },
+  "va_cormlv_fast": {
+   "fight": 43.589,
+   "dps": 5.0,
+   "hp": 380.0,
+   "range": 220.0,
+   "speed": 118.0
+  },
+  "va_ghost": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 300.0,
+   "range": 100.0,
+   "speed": 65.0
+  },
+  "va_halberd": {
+   "fight": 829.91,
+   "dps": 158.333,
+   "hp": 4350.0,
+   "range": 330.0,
+   "speed": 45.3
+  },
+  "va_infestor": {
+   "fight": 379.473,
+   "dps": 120.0,
+   "hp": 1200.0,
+   "range": 300.0,
+   "speed": 54.0
+  },
+  "va_jump_gate": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 24000.0,
+   "range": 0.0,
+   "speed": 0.0
+  },
+  "va_kettle": {
+   "fight": 411.377,
+   "dps": 76.923,
+   "hp": 2200.0,
+   "range": 1200.0,
+   "speed": 47.4
+  },
+  "va_lumen": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 2050.0,
+   "range": 0.0,
+   "speed": 52.5
+  },
+  "va_mask": {
+   "fight": 1043.765,
+   "dps": 294.444,
+   "hp": 3700.0,
+   "range": 300.0,
+   "speed": 37.5
+  },
+  "va_mav_stride": {
+   "fight": 575.083,
+   "dps": 265.0,
+   "hp": 1248.0,
+   "range": 365.0,
+   "speed": 61.9
+  },
+  "va_printer": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 3000.0,
+   "range": 0.0,
+   "speed": 49.5
+  },
+  "va_queen_nest": {
+   "fight": 45291.059,
+   "dps": 10256.4,
+   "hp": 200000.0,
+   "range": 1000.0,
+   "speed": 0.0
+  },
+  "volcano_projectile_unit": {
+   "fight": 4472.136,
+   "dps": 20.0,
+   "hp": 1000000.0,
+   "range": 32000.0,
+   "speed": 0.0
+  },
+  "xmasball1_1": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 560000.0,
+   "range": 0.0,
+   "speed": 30.0
+  },
+  "xmasball1_2": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 560000.0,
+   "range": 0.0,
+   "speed": 30.0
+  },
+  "xmasball1_3": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 560000.0,
+   "range": 0.0,
+   "speed": 30.0
+  },
+  "xmasball1_4": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 560000.0,
+   "range": 0.0,
+   "speed": 30.0
+  },
+  "xmasball1_5": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 560000.0,
+   "range": 0.0,
+   "speed": 30.0
+  },
+  "xmasball1_6": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 560000.0,
+   "range": 0.0,
+   "speed": 30.0
+  },
+  "xmasball2_1": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 560000.0,
+   "range": 0.0,
+   "speed": 30.0
+  },
+  "xmasball2_2": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 560000.0,
+   "range": 0.0,
+   "speed": 30.0
+  },
+  "xmasball2_3": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 560000.0,
+   "range": 0.0,
+   "speed": 30.0
+  },
+  "xmasball2_4": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 560000.0,
+   "range": 0.0,
+   "speed": 30.0
+  },
+  "xmasball2_5": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 560000.0,
+   "range": 0.0,
+   "speed": 30.0
+  },
+  "xmasball2_6": {
+   "fight": 0.0,
+   "dps": 0.0,
+   "hp": 560000.0,
+   "range": 0.0,
+   "speed": 30.0
+  }
+ }
+}

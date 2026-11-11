@@ -1035,6 +1035,18 @@ function gadget:Initialize()
   -- the kings' showdown ends only with the throne: twice that again before the company gives up
   if mission and type(mission.kings) == "table" and #mission.kings > 0 then CAP_FRAMES = CAP_FRAMES * 2 end
   MUSTER = mission ~= nil and type(mission.muster) == "table"
+  -- va_autopilot_profiles=1: every unit's fight profile, once, for the hub's reckoning
+  -- (tools/harvest_fight_profiles.py -> data/story/unit_fight.json): the same numbers both sides
+  if tostring(opts.va_autopilot_profiles) == "1" then
+    local n = 0
+    for id, ud in pairs(UnitDefs) do
+      local p = SafetyField.profile(id)
+      Spring.Echo(string.format("VA_FIGHT_PROFILE %s fight=%.3f dps=%.3f hp=%.1f range=%.1f speed=%.3f",
+        tostring(ud.name), p.fight, p.dps, p.hp, p.range, p.speed))
+      n = n + 1
+    end
+    Spring.Echo("VA_FIGHT_PROFILES_DONE n=" .. n)
+  end
   Spring.Echo("VA_AUTOPILOT armed team=" .. playerTeam .. " cap=" .. CAP_FRAMES .. " settle=" .. SETTLE_FRAMES
     .. " mission=" .. tostring(mission and mission.missionId) .. (MUSTER and " muster" or ""))
 end

@@ -129,13 +129,15 @@ def test_the_lua_minds_are_umwelts():
             start = _start(cluster["heroes"], 100 + n)
             script = _stream(cluster["heroes"], 200 + n, 60)
             case_in, ref = Path(tmp) / f"case{n}.json", Path(tmp) / f"ref{n}.json"
-            case_in.write_text(json.dumps({"cluster": cluster, "start": start, "script": script}), encoding="utf-8")
+            case_in.write_text(json.dumps({"cluster": cluster, "start": start, "script": script,
+                                           "roleGamma": dict(hero_mind.ROLE_GAMMA)}), encoding="utf-8")
             run = subprocess.run([sys.executable, "-B", "-m", "verdance.company.hero_mind", "reference", str(case_in), str(ref)],
                                  cwd=str(ROOT / "tools"), env=env, capture_output=True, text=True, timeout=600)
             assert run.returncode == 0, run.stderr[-2000:]
             expect = json.loads(ref.read_text(encoding="utf-8"))
             tables = {"roles": list(hero_mind.ROLES), "shared": list(hero_mind.SHARED_ROLES),
-                      "clusters": [cluster], "start": start, "umwelt": dict(hero_mind.UMWELT), "holdS": hero_mind.HOLD_S}
+                      "clusters": [cluster], "start": start, "umwelt": dict(hero_mind.UMWELT), "holdS": hero_mind.HOLD_S,
+                      "roleGamma": dict(hero_mind.ROLE_GAMMA)}
             lua = Path(tmp) / f"check{n}.lua"
             lua.write_text(LUA_CHECK % {"lite": LITE, "tol": repr(TOL), "name": "+".join(cluster["heroes"]),
                                         "case": _lua_literal({"tables": tables, "script": script, "expect": expect})},

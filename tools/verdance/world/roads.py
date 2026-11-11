@@ -534,13 +534,28 @@ def road_sorties(state: Dict[str, Any], workspace: Path, *, seed: Optional[int] 
     lean, rest = _draw(jobs, used)
     muster = muster_job(state, Path(workspace))
     due = bool(muster and muster["due"])
+    # The battle the hub recommends (owner call, 2026-11-11: "rock jungle should be primarily a place to
+    # build up the army and then invade the other locations"): once home is founded, a job off the home
+    # map when there is one, the strongest of them. The lean keeps its mark wherever the draw fell, and
+    # the home doors stay on offer. (Trial 13: the lean sent one company at Rock Jungle doors four times
+    # in five battles, every one partial, while it shrank from 38 units lifted to 2.)
+    battle = lean
+    if muster and lean and lean["mapId"] == HOME_MAP_ID:
+        away = [j for j in jobs if j["mapId"] != HOME_MAP_ID]   # legal_jobs sorts by score
+        if away:
+            battle = away[0]
     cards = [_muster_card(muster)] if due else []
+    if battle is not None and battle is not lean:
+        card = _card(battle, False)
+        card["recommended"] = not due
+        card["blurb"] = card["blurb"].replace("Still open.", "The army goes out from the jungle.")
+        cards.append(card)
     if lean:
         card = _card(lean, True)
-        if due:
-            card["recommended"] = False   # the lean stays a mark (the world's pull); the muster is the move
+        if due or battle is not lean:
+            card["recommended"] = False   # the lean stays a mark (the world's pull); the move is elsewhere
         cards.append(card)
-    cards += [_card(j, False) for j in rest]
+    cards += [_card(j, False) for j in rest if j is not battle]
     if muster and not due:
         cards.append(_muster_card(muster))
     fetches = fetch_jobs(state, Path(workspace))

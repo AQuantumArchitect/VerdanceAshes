@@ -55,7 +55,7 @@ def test_after_a_muster_the_next_sortie_is_a_battle():
     assert not muster["recommended"] and muster["muster"]["builtLast"]
     assert "Take the army out" in muster["blurb"]
     rec = [c for c in cards if c.get("recommended")]
-    assert len(rec) == 1 and rec[0].get("lean") and rec[0]["id"] != roads.MUSTER_ID
+    assert len(rec) == 1 and rec[0]["id"] != roads.MUSTER_ID, "one battle is recommended"
 
 
 def test_an_empty_bag_has_nothing_to_muster_with():
@@ -90,3 +90,23 @@ def test_the_debrief_says_where_a_new_recruit_waits():
     st = {"camp": {"people": {"mira": {"where": "field", "mapId": "tabula", "zoneId": "T_W_CAUSEWAY", "label": "West Causeway"}}}}
     mv = engine.what_moved({}, st, {}, "tabula", [{"heroId": "mira", "name": "Mira"}], [])
     assert mv["joined"] == [{"name": "Mira", "where": "field", "mapId": "tabula", "label": "West Causeway"}]
+
+
+def test_the_battle_goes_out_from_the_jungle():
+    """Once home is founded, a recommended battle is off the home map when one is open; the lean keeps
+    its mark wherever the draw fell, and the home doors stay on offer (owner call, 2026-11-11)."""
+    st = _founded(3, last_kind="fortify_zone")      # after a muster: a battle is the move
+    jobs = roads.legal_jobs(copy.deepcopy(st), WS)
+    assert any(j["mapId"] != roads.HOME_MAP_ID for j in jobs) and any(j["mapId"] == roads.HOME_MAP_ID for j in jobs)
+    checked = 0
+    for seed in range(200):
+        out = roads.road_sorties(copy.deepcopy(st), WS, seed=seed)
+        lean = next(c for c in out["cards"] if c.get("lean"))
+        rec = [c for c in out["cards"] if c.get("recommended")]
+        assert len(rec) == 1
+        assert rec[0]["effect"]["mapId"] != roads.HOME_MAP_ID, (seed, rec[0]["id"])
+        if lean["effect"]["mapId"] == roads.HOME_MAP_ID:
+            assert not lean["recommended"] and rec[0]["id"] != lean["id"]
+            assert any(c["id"] == lean["id"] for c in out["cards"]), "the home door stays on offer"
+            checked += 1
+    assert checked, "some draw leaned home"

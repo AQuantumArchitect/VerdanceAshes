@@ -83,7 +83,9 @@ Tenebrium is a **stake**, not a cost (`va_tenebrium_handlers.lua`). Building a c
 2. **Recommended = muster** when the bank can pay a builder's stake (at least the cheapest stake in the shop's constructors) *and* the last sortie wasn't a muster. Otherwise, a battle job. Among battle jobs, today's lean draw stands until the Lanchester weighing lands (design step 2). The card says why: "3 Tenebrium sits unstaked. Go home and build with it."
 3. **The muster drop brings a builder.** The kit adds the camp's constructor (`legck`, a pre-spawned kit unit, so its stake is stamped and not charged). BARb stakes the rest of the bank in the field: a lab, more constructors, nanos. The lab prints the army from the jungle's metal.
 4. **A muster isn't over when the gate is secured.** On a muster the autopilot doesn't leave on objective completion. It leaves on the wave forecast (now, or before a wave that would tip it) or the clock, so the builders have the whole safe window.
-5. **Measure:** paired Rock Jungle → battle campaigns with no `--prefer`. Tenebrium staked per muster, reserve value after each muster, battle sorties' army size, and hero deaths.
+5. **The battle goes out (built 11-11).** Once home is founded, the recommended battle is the strongest job off the home map, when one is open. The lean keeps its mark.
+6. **The strength reckoning, parked.** Reach from presence measured at the target misreads the jungle, where waves come and go (27,738 then 1,010 at one door), and hero packs make the company's landing weight nearly constant (about 10.7k). Next time, weigh the jungle's doors by the spawner's wave forecast and other maps by their bakes, with the harvested fight profiles (`data/story/unit_fight.json`) on both sides.
+7. **Measure:** paired Rock Jungle → battle campaigns with no `--prefer`. Tenebrium staked per muster, reserve value after each muster, battle sorties' army size, and hero deaths.
 
 ---
 

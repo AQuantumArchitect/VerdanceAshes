@@ -34,3 +34,17 @@ def test_the_tables_carry_temper_and_umwelts_numbers():
 
 def test_the_shadow_host_in_the_engine():
     assert lua_harness.run("tools/hud_harness/hero_mind_test.lua") is None
+
+
+def test_mood_lasts_a_sortie_and_the_field_a_few_thinks():
+    """Trial 14 (2026-11-11): every role forgot in ~12 s, so the temper from camp was gone a minute in.
+    Mood now takes one planned sortie (10 minutes) to forget to 1/e; threat and pain still forget in a
+    handful of thinks, as they are seen again each one."""
+    import math
+    steps_per_sortie = hero_mind.SORTIE_S / hero_mind.HOLD_S
+    for r in hero_mind.TEMPER_ROLES:
+        assert math.isclose(hero_mind.ROLE_GAMMA[r] * hero_mind.UMWELT["h"] * steps_per_sortie, 1.0)
+    fast_e_fold_s = hero_mind.HOLD_S / (hero_mind.UMWELT["gammaDiss"] * hero_mind.UMWELT["h"])
+    assert 10 < fast_e_fold_s < 15
+    t = hero_mind.mind_tables({"roster": {"heroes": []}}, ["vane"], ROOT, temper={"vane": {"nerve": 0.4, "drive": 0.0}})
+    assert t["roleGamma"] == hero_mind.ROLE_GAMMA

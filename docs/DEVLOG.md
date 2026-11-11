@@ -59,6 +59,18 @@ One entry per working day: what changed, what was measured, what's next. The new
   - One bug found: Umwelt's microsecond clock makes 2.4 s / 0.6 s = 3.9999999999999996, three holds. The runtime takes frames.
 - **A design call:** bridges carry mood (nerve, drive) only. Threat and pain stay each hero's own.
 
+**Later the same night**
+- **Trial 14** (with the constructor fix; still running). The founding's constructor staked 2 of 3 Tenebrium, a vehicle plant (`legvp`) and a vehicle constructor (`legcv`), placed by BARb itself. That's the first field spend in any trial.
+- **The minds in BAR:** armed every sortie, publishing, no failures. Clusters went from 4 to 1 as camp bonds formed. But mood faded to the centre within a minute (Ketha's nerve 0.567 to 0.500 by frame 1845), because every role relaxed at γ = 5. Nerve and drive now relax at γ = hold / (h × 600 s) = 0.1, one planned sortie (the stamp's targetDuration). Parity still holds at 7e-16, so Umwelt honours `gamma_diss_<role>` too.
+- **The battle goes out:**
+  - In trial 13 the lean sent campaign 2 at Rock Jungle doors in four of five battles, while it shrank to 2 units lifted.
+  - Once home is founded, the recommended battle is now the strongest job off the home map, when one is open. The lean keeps its mark and the home doors stay on offer.
+  - Tour: raid, found, take `GF_SE_PLATEAU`, muster, open Koom, muster, take `KV_SE_MUSTER`, muster.
+- **Tried and parked: a strength reckoning from measured presence.** Reach = what the company lands with / max(1500, 3 × hostile last measured at the target), the claim rule's own numbers.
+  - Two things sank it on the Rock Jungle. Hero packs return every drop, so the company always lands with about 10.7k. And the jungle's opposition is waves, not a garrison: the same door measured 27,738 one sortie and 1,010 a later one.
+  - It needs the forecast's wave strengths, not end-of-sortie presence.
+  - The fight profiles it would use are harvested (`data/story/unit_fight.json`, 849 units, from `va_autopilot_profiles=1`).
+
 **Nobody spends the Tenebrium** (the next work)
 - In all 14 sorties the bank stayed at 3, with `tenebriumSpent 0` and metal income 0.
 - The player's commander is swept at game start, the rig's band (verse, vane, halbard) has no builder, the Rock Jungle kit ("wild") brings none, and the mercenary buyer spends metal only. So BARb had nothing that could build.
