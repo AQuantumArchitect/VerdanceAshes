@@ -184,8 +184,13 @@ This one declarative spec is the single source of truth.
   - A hero going down makes its node despair (nerve 0), and its cluster steps at once.
   - It publishes `va_mind_<role>` and `va_mind_<role>_c` on each hero unit, the same interface as `va_doctrine`. Nothing reads it yet.
 - **A design call made here:** bridges carry mood (nerve, drive) only, as temper does. Threat and pain are a hero's own.
+- **Done since:**
+  - The sidebar draws nerve under each hero's health.
+  - Mood holds for a sortie (γ = 0.1, from the 10-minute targetDuration).
+  - A live mode, `va_hero_mind_live=1`, writes nerve and drive into the temper rows that caution and the doctrine read.
+  - Trial 17's pair (live against shadow, identical code) both had 0 deaths in 8 sorties, so live isn't claimed yet.
 - **Next:**
-  - Show the minds on the HUD's hero cards.
+  - More pairs on harder ground before going live.
   - Read them in the safety field instead of the camp-fixed temper (S × (V + G) with live nerve and drive).
   - Then intents with tendril hysteresis, paired trials, and learning between runs.
 

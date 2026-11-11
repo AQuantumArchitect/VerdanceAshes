@@ -83,6 +83,21 @@ One entry per working day: what changed, what was measured, what's next. The new
 - **Fix:** for an AI-run team, a refused build comes off that builder's queue the next frame (`tenebLoot.tickUnqueue`). A player's queue is left alone.
 - **Trial 16** (`va_hero_mind_live=1`) runs on the code from before this fix, so it compares live and shadow minds on otherwise identical code.
 
+**Trials 15 to 17: the night's tally** (every campaign had 8 sorties; no Lua errors beyond BAR's own headless widget lines)
+
+| Trial | Code | Home | Hero deaths | Musters (units lifted) | Furthest |
+|---|---|---|---|---|---|
+| 15a | battle goes out, shadow minds | 8/8 | 0 | 16, 7, 9 (factory jam) | Koom (victory) |
+| 15b | same | 8/8 | 0 | 105, 164, 226 (all victories) | Koom's SE door |
+| 16 | same + live minds | 8/8 | 0 | 16, 26 (factory jam) | Koom's SE door |
+| 17 live | factory fix + live minds | 8/8 | 0 | 89, 124 (both victories) | Koom's SE door |
+| 17 shadow | factory fix, shadow minds | 8/8 | 0 | 91, 36 | **Tabula (victory)** |
+
+- **The pathway works.** Every campaign raided, founded the camp, took the Plateau, mustered, opened Koom Valley, then alternated musters with battles out along the road. 17-shadow crossed into Tabula.
+- **The factory fix** cut refusals from 81 to 9 per muster. The jams disappeared in the trial 17 musters.
+- **Live against shadow minds:** 0 deaths in 8 sorties each. That's no evidence either way from one pair, so shadow stays the default (Umwelt's law: beat the baseline or don't claim it). The next measure needs more pairs and a harder field.
+- **From trial 13 on:** 40 sorties since the muster landed, 2 hero deaths (Vane, Halbard, both in trial 13 before the constructor fix), and none in the 46 sorties of trials 14 to 17.
+
 **Nobody spends the Tenebrium** (the next work)
 - In all 14 sorties the bank stayed at 3, with `tenebriumSpent 0` and metal income 0.
 - The player's commander is swept at game start, the rig's band (verse, vane, halbard) has no builder, the Rock Jungle kit ("wild") brings none, and the mercenary buyer spends metal only. So BARb had nothing that could build.
