@@ -379,8 +379,9 @@ def _muster_card(job: Dict[str, Any]) -> Dict[str, Any]:
     else:
         why = f"Nothing to stake: a builder takes {floor} Tenebrium and the bag holds {tnb}."
     lines = [why,
-             "Muster at the camp's gate. A constructor comes with you and stakes the Tenebrium on a lab and more "
-             "builders; the lab prints the army from the jungle's metal.",
+             "Muster at the camp's gate. A constructor comes with you: put the Tenebrium into a lab by the gate and "
+             "builders that stay near it, and keep the lab printing the army from the jungle's metal. Builders sent "
+             "out into the jungle feed the raptors.",
              "A living builder's stake comes back when you lift, and everything that lifts joins the reserve.",
              "Recommended." if job["due"] else "Still open."]
     effect = {"mapId": HOME_MAP_ID, "contractKind": "fortify_zone", "preferredCaptureZoneId": job["targetZoneId"],

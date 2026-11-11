@@ -71,6 +71,12 @@ One entry per working day: what changed, what was measured, what's next. The new
   - It needs the forecast's wave strengths, not end-of-sortie presence.
   - The fight profiles it would use are harvested (`data/story/unit_fight.json`, 849 units, from `va_autopilot_profiles=1`).
 
+**Trial 14 complete** (constructor fix; the code before 0734c3a)
+- **14/14 home, no hero deaths.**
+- **Campaign 2** built up exactly as asked. Units lifted per sortie: 20, 37, 21, 44 (muster, victory, 13 Tenebrium staked), 52, **166** (muster, victory), **228** (`TRJ_NE_RIM`, victory). Its first muster's vehicle lab turned out Hades, Helios, Gatlings and drones.
+- **Campaign 1's** muster spent the whole bank (5 + 2 reclaimed: six `legcv`, a nano, a beaver) but lifted 1 unit. BARb walked the new builders into raptor ground, and they died one after another (33 stakes pending).
+- **What's left is muster yield,** which depends on how BARb plays. The card now tells a player what works: a lab by the gate, builders kept near it.
+
 **Nobody spends the Tenebrium** (the next work)
 - In all 14 sorties the bank stayed at 3, with `tenebriumSpent 0` and metal income 0.
 - The player's commander is swept at game start, the rig's band (verse, vane, halbard) has no builder, the Rock Jungle kit ("wild") brings none, and the mercenary buyer spends metal only. So BARb had nothing that could build.
