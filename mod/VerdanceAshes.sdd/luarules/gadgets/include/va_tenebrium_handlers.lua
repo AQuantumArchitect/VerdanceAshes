@@ -567,9 +567,46 @@ return function(tenebLoot, api)
       else
         said.tries = said.tries + 1
       end
+      -- An AI's builder that keeps an unaffordable build at the front of its queue does nothing else:
+      -- in the 11-11 musters BARb's vehicle plant asked for a constructor 8,000 times every 30 seconds
+      -- and printed no army. For an AI-run team the build comes off that builder's queue next frame
+      -- (tickUnqueue), so the factory goes on to what the bank does not gate. A player's queue is theirs.
+      if builderID and tenebLoot.isAiTeam(builderTeam) then
+        tenebLoot.unqueue = tenebLoot.unqueue or {}
+        tenebLoot.unqueue[builderID] = unitDefID
+      end
       return false
     end
     return true
+  end
+
+  tenebLoot.isAiTeam = function(teamID)
+    tenebLoot.aiTeams = tenebLoot.aiTeams or {}
+    local known = tenebLoot.aiTeams[teamID]
+    if known == nil then
+      local ok, _, _, _, isAi = pcall(Spring.GetTeamInfo, teamID, false)
+      known = ok and isAi == true
+      tenebLoot.aiTeams[teamID] = known
+    end
+    return known
+  end
+
+  -- Take each refused build off its AI builder's queue (see allowCreate): a factory drops one of it,
+  -- a mobile builder drops its orders to build it.
+  tenebLoot.tickUnqueue = function()
+    local q = tenebLoot.unqueue
+    if not q or next(q) == nil then return end
+    for builderID, defID in pairs(q) do
+      q[builderID] = nil
+      if Spring.ValidUnitID(builderID) and not Spring.GetUnitIsDead(builderID) then
+        local ud = UnitDefs[Spring.GetUnitDefID(builderID) or -1]
+        if ud and ud.isFactory then
+          pcall(Spring.GiveOrderToUnit, builderID, -defID, {}, { "right" })
+        else
+          pcall(Spring.GiveOrderToUnit, builderID, CMD.REMOVE, { -defID }, { "alt" })
+        end
+      end
+    end
   end
 
   tenebLoot.onUnitCreated = function(unitID, unitDefID, unitTeam, builderID)

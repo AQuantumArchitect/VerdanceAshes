@@ -74,3 +74,40 @@ assert(back == 2 and n == 2, "the field build and the delivery come back, the ki
 assert(stake.bank == 4, "bank after exfil " .. stake.bank)
 assert(params[101].va_tenebrium_invested == 0, "every stake is cleared at exfil")
 print("ok: exfil refunds what the bank or the broker paid, never a kit unit's stamp")
+
+-- An AI's builder does not sit on a refused build (2026-11-11: BARb's plant asked for a constructor
+-- 8,000 times every 30 s and printed no army). The refused build comes off its queue the next frame:
+-- one from a factory's queue, every order to build it from a mobile builder. A player's queue is theirs.
+local given = {}
+CMD = CMD or {}
+CMD.REMOVE = 2
+Spring.GiveOrderToUnit = function(u, cmd, params, opts) given[#given + 1] = { u = u, cmd = cmd, params = params, opts = opts } end
+Spring.ValidUnitID = function() return true end
+Spring.GetUnitIsDead = function() return false end
+Spring.GetUnitDefID = function(u) return u == 500 and 50 or 51 end
+UnitDefs[50] = { name = "legvp", isFactory = true }
+UnitDefs[51] = { name = "legck" }
+local aiTeam = { [0] = true, [3] = false }
+Spring.GetTeamInfo = function(team) return team, 0, false, aiTeam[team] end
+local ai = { bank = 0, enabled = true, blockedSaid = {}, publish = function() end }
+local playerIsAi = true
+attach(ai, {
+  jnum = tostring, jstr = tostring, teamFaction = {}, SendToUnsynced = function() end,
+  playerTeamID = function() return playerIsAi and 0 or 3 end, playerAllyTeamID = function() return 0 end,
+  mission = function() return {} end, publishRules = function() end,
+})
+assert(ai.allowCreate(7, 0, 500) == false and ai.allowCreate(7, 0, 600) == false)
+ai.tickUnqueue()
+table.sort(given, function(a, b) return a.u < b.u end)
+assert(#given == 2, "two refused builds, two orders: " .. #given)
+assert(given[1].u == 500 and given[1].cmd == -7 and given[1].opts[1] == "right", "the factory drops one from its queue")
+assert(given[2].u == 600 and given[2].cmd == CMD.REMOVE and given[2].params[1] == -7 and given[2].opts[1] == "alt",
+  "the constructor drops its orders to build it")
+ai.tickUnqueue()
+assert(#given == 2, "and only once")
+given = {}
+playerIsAi = false
+assert(ai.allowCreate(7, 3, 500) == false)
+ai.tickUnqueue()
+assert(#given == 0, "a player's queue is left alone")
+print("ok: an AI's refused build comes off its queue; a player's stays")

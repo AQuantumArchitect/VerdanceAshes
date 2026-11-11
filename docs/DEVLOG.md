@@ -77,6 +77,12 @@ One entry per working day: what changed, what was measured, what's next. The new
 - **Campaign 1's** muster spent the whole bank (5 + 2 reclaimed: six `legcv`, a nano, a beaver) but lifted 1 unit. BARb walked the new builders into raptor ground, and they died one after another (33 stakes pending).
 - **What's left is muster yield,** which depends on how BARb plays. The card now tells a player what works: a lab by the gate, builders kept near it.
 
+**Trial 15 and the stalled factory**
+- **Trial 15 campaign 1** (the latest code, minds in shadow): 8/8 home, no hero deaths. Every recommended battle went out (Plateau, Plateau, then Koom as a victory). But its musters lifted only 16, 7 and 9 units.
+- **The cause** was 81 refusals in one muster. The vehicle plant kept an unaffordable `legcv` at the front of its queue and retried it every frame (`tries=8343` in 30 s), and builders did the same with `legnanotc`. The factory printed nothing else.
+- **Fix:** for an AI-run team, a refused build comes off that builder's queue the next frame (`tenebLoot.tickUnqueue`). A player's queue is left alone.
+- **Trial 16** (`va_hero_mind_live=1`) runs on the code from before this fix, so it compares live and shadow minds on otherwise identical code.
+
 **Nobody spends the Tenebrium** (the next work)
 - In all 14 sorties the bank stayed at 3, with `tenebriumSpent 0` and metal income 0.
 - The player's commander is swept at game start, the rig's band (verse, vane, halbard) has no builder, the Rock Jungle kit ("wild") brings none, and the mercenary buyer spends metal only. So BARb had nothing that could build.

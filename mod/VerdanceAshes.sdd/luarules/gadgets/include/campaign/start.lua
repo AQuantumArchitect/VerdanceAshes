@@ -256,6 +256,7 @@ end
 
 -- Called by gadget:GameFrame.
 function tickTenebrium(frame)
+  if tenebLoot.tickUnqueue then tenebLoot.tickUnqueue() end
   -- WO-043c: shard spawn + wreck-gone loss timeout.
   if frame % 5 == 0 then
     tenebLoot.tickPending(frame)
