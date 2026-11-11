@@ -15,7 +15,18 @@ The playtest rules it points to (CLAUDE.md, "Ready for a human playtest") landed
   - **11 sorties, the Overthrow won. No hero deaths.**
   - **The route:** raid, found the camp, take the Plateau, muster, open Koom, then musters alternating with Koom's Southeast door, then the finale.
   - **179 game minutes,** about 3.0 hours at normal speed for the bot, before hub time.
-- Two more full campaigns running for the evidence.
+- **Three full campaigns, headless, on a stock copy of BAR** (hard_aggressive BARb, HUD and beats on). All three won the Overthrow:
+
+  | Run | Sorties | Finale | Game minutes | Hero deaths |
+  |---|---|---|---|---|
+  | 20261111_120458 | 11 | won first try | 179 | 0 |
+  | 20261111_125559 | 12 | won on the second try | 166 | 0 |
+  | 20261111_125559_2 | 11 | won first try | 174 | Ketha (sortie 8) |
+
+  - The Lua errors are only BAR's own three headless widget lines per sortie. The `VA_MARK_FAIL` lines are failed rescues, which are gameplay.
+- **Ketha's death was a rig bug, now fixed** (9ccdccb). A muster's lab kept printing units during the walk home, so boarding never saw "everyone" aboard. The company waited its full two-minute fallback, and wave 12 landed on the walk. Boarding now waits only for the units told to go.
+- **Time to beat:** the bot spends 166 to 179 game minutes at normal speed. A human adds hub and camp time (3 to 5 minutes a sortie), loading, and a slower hand. My estimate is **4 to 5 hours**: act 1 (sorties 1–5) about 2 hours, act 2 (6–10) about 2 hours, the finale 30 to 45 minutes (it may take two tries).
+- **Judged ready for a human playtest.** Opening the `ready-for-human-playtest` issue.
 
 **Questions for Luke**
 1. Playwright's Chromium is gone from `%LOCALAPPDATA%\ms-playwright` on fenrir, so the hub's browser walk is skipped. Reinstall it (`export\venv\Scripts\python -m playwright install chromium-headless-shell`)? I didn't download it unasked.
