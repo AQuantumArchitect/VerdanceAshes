@@ -151,7 +151,7 @@ Event kinds:
 Current useful seed line:
 
 ```text
-The clans are listening. That matters more than the map says.
+The Ashwalkers are listening. That matters more than the map says.
 ```
 
 ## Map and Zone Notes

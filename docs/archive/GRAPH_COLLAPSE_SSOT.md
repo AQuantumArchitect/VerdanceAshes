@@ -72,7 +72,7 @@ Called from `process_result` after credit normalize. Saved to `state/campaign_st
 | `q0_armada_cortex` | Faction polarity (measured from zone masses / spectral) |
 | `q2_void_structure` | Hazard / spread pressure |
 | `q6_contested` | Flux / contested |
-| `q6_independent` | Clan / Ashwalker sovereignty floor |
+| `q6_independent` | Ashwalker sovereignty floor |
 | `q7_resource_scarcity` | Eco + Tnb scarcity |
 | `pathSignalA` / `B` / `C` | Path mixture (reinforced by mission path + verdict) |
 

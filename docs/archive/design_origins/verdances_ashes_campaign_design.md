@@ -39,8 +39,8 @@ useful (the `netHorizonEV` scoring concept translates directly), but it is not t
 
 A single-planet open-ended campaign set on **Verdance's Ashes**, a former Armada Horizon
 world in active collapse. The player commands a **Void-touched Commander** operating outside
-faction authority, leading a coalition called the **Ashwalkers** — drawn from Null-Mercs,
-Independent clan fighters, and defectors from both factions.
+faction authority, leading the **Ashwalkers**, a messy mercenary band within the Null Mercs,
+with defectors from both factions.
 
 **Two simultaneous functions:**
 - A *narrative tour* through the lore of Beyond All Reason, teaching the player the world
@@ -69,7 +69,7 @@ is a different stage of Taelith engineering success, abandonment, or reversion. 
 
 | Zone | Terrain | `spotMult` | `windMult` | `eBuildPenalty` | `bpMult` | Campaign flavour |
 |------|---------|-----------|-----------|-----------------|---------|-----------------|
-| Verdant Canopy | Megaflora jungle | 0.9 | 0.7 | 0 | 0.95 | Protect/escort; bots favoured; clan territory |
+| Verdant Canopy | Megaflora jungle | 0.9 | 0.7 | 0 | 0.95 | Protect/escort; bots favoured; Ashwalker ground |
 | Ashfields | Volcanic flats, original surface | 1.0 | 1.0 | 0 | 1.0 | Reclaim/hold; oldest settlements; reference zone |
 | Scaffold Ruins | Abandoned Taelith infrastructure | 1.4 | 0.6 | 15 E/s | 0.85 | Capture/sabotage; contested chokepoints; Taelith grid degrading |
 | Surge Flats | Low-gravity floodplains, periodic flood | 1.1 | 1.2 | 0 | 1.0 | Expand/race; hovercraft viable; flood timer urgency |
@@ -125,7 +125,7 @@ Q7:  |Ψ⟩ ≈ 0.98|scarce⟩
 Faction pressure scalars (drive mission frequency):
   Armada:              0.62
   Cortex:              0.21
-  Independent clans:   0.74
+  Ashwalkers:          0.74
   Null-Merc density:   0.43
 ```
 
@@ -229,9 +229,9 @@ For Cortex Mantleguard opportunists:
   - Read Q1 (Concordat) → fortified responses, artillery placement
   - Read Q6 (contested) → seize uncontested zones, hold them
 
-For Ashwalker/Independent clans:
+For the Ashwalkers:
   - Read Q6 (maximum superposition) → unpredictable; either ally or obstacle
-  - Read clan reputation scalar → ally if > 60, hostile if < 20
+  - Read Ashwalker reputation → ally if > 60, hostile if < 20
 ```
 
 Each AI "personality" is a **projection operator** on the density matrix. The AI doesn't
@@ -263,7 +263,7 @@ reading itself.
 Work with Armada forces, restore Taelith governance. Bittersweet — stable but absorbed.
 
 - **Victory:** Control >60% strategic zones AND hold Taelith Command Relay for 20 min
-- **Graph effect:** Q0 → ARM eigenstate; Q6 decreases; clan reputation irrelevant
+- **Graph effect:** Q0 → ARM eigenstate; Q6 decreases; Ashwalker reputation irrelevant
 - **Eco condition:** μ > 30 M/s sustained for the final 10 minutes
 
 ### Path B — "The Ashes Hold" (Free Space)
@@ -272,7 +272,7 @@ Expel both factions, hold the Verdance Broadcaster, declare sovereignty. Hard mo
 - **Victory:** Destroy Armada Command Node AND Cortex Forward HQ; hold Broadcaster 10 min
 - **Graph effect:** Q0 collapses to Independent eigenstate; Q1 becomes irrelevant;
   new "Free Space" node appears on galaxy map at Verdance's Ashes position
-- **Requirement:** clan reputation > 60 throughout
+- **Requirement:** Ashwalker reputation > 60 throughout
 
 ### Path C — "The Jump" (Escape to Terminal Verge)
 Decide the planet is unwinnable. Accumulate Metal, build 3 Jump Spires, charge with Energy,
@@ -302,8 +302,8 @@ missionSeed = {
   ε:                 current energy income
   β:                 current build power
   φ_progress:        campaign time elapsed (escalation)
-  factionPressures:  { armada, cortex, clans, nullmercs }
-  playerReputation:  { armada, cortex, clans }
+  factionPressures:  { armada, cortex, ashwalkers, nullmercs }
+  playerReputation:  { armada, cortex, ashwalkers }
 }
 ```
 
@@ -311,8 +311,8 @@ missionSeed = {
 
 ```
 if μ < 10:                          → emergency reclaim (The Scar or Ashfields)
-elif factionPressures.clans > 0.7
-     AND reputation.clans < 40:     → clan confrontation (Verdant Canopy)
+elif factionPressures.ashwalkers > 0.7
+     AND reputation.ashwalkers < 40: → fracture on Ashwalker ground (Verdant Canopy)
 elif Q6_value > 0.8:                → contested hold (any zone)
 elif P3_stability < 0.3:            → infrastructure crisis (Scaffold Ruins)
 elif φ_progress > 0.6
@@ -324,7 +324,7 @@ else:                               → weighted sample from zone archetypes
 
 | Zone | Mission types | Eco character | Enemy mix |
 |------|--------------|---------------|----------|
-| Verdant Canopy | Protect escort, clan rescue | Low BP (dense terrain) | Armada swarm units; clan ambush |
+| Verdant Canopy | Protect escort, Ashwalker rescue | Low BP (dense terrain) | Armada swarm units; Null Mercs ambush |
 | Ashfields | Reclaim hold, mex rush | Reference state | Mixed; first contact |
 | Scaffold Ruins | Capture sabotage, grid repair | Energy penalty | Cortex fortified; chokepoints |
 | Surge Flats | Expand race, naval | Flood timer | Fast Armada hover units |
@@ -339,7 +339,8 @@ Neither faction confirms their existence. The player decides who they were.
 
 **Sev** — Null-Merc quartermaster. Not Void-touched. Extremely practical. Provides mission
 briefings. Her willingness to attempt Path B or C depends on the player's reputation with
-her — tracked as a hidden scalar that responds to how the player treats clans and defectors.
+her — tracked as a hidden scalar that responds to how the player treats the Ashwalkers
+and defectors.
 
 **The Broadcaster** — Anonymous voice of the Verdance resistance; transmits from an unknown
 location in the Verdant Canopy. The player never meets them. Their transmissions bracket
@@ -351,7 +352,7 @@ villain nor ally. A bureaucrat trying to hold a world with insufficient resource
 ally in Path A, obstacle in B and C. Her resource state (μ, ε, BP) mirrors the player's
 eco manifold — she is running the same build decision math under the same biome pressures.
 
-**Rhekk** — Clan elder, largest Ashfield enclave. Face of what the planet fights to protect.
+**Rhekk** — elder of the largest Ashfield enclave. Face of what the planet fights to protect.
 Survival or death depending on player choices is the key Path B branch point. His faction
 pressure scalar feeds directly into Q6 — if he dies, Independent weight drops 0.15.
 
@@ -379,7 +380,7 @@ Each standard PvP match played on Verdance's Ashes maps contributes to the globa
 Armada win:         Q0 += 0.05 toward ARM eigenstate
 Cortex win:         Q0 += 0.05 toward COR eigenstate
 Ashwalker win:      Q6 -= 0.03 (world stabilises toward Free Space)
-                    clan reputation global scalar += 0.02
+                    Ashwalker reputation global scalar += 0.02
 
 Eco outcomes fed from match telemetry:
   Average μ across match → updates Q7 (metal pressure reading)

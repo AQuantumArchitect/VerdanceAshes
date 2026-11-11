@@ -202,7 +202,7 @@ biomeModifiers = {
 |----|-------------|-----------|
 | R0 | Armada reputation | >60: Path A available; <20: Armada hostile |
 | R1 | Cortex reputation | >60: Cortex tolerates; <20: Cortex priority target |
-| R2 | Clan reputation | >60: Path B viable; <20: Path B impossible |
+| R2 | Ashwalker reputation | >60: Path B viable; <20: Path B impossible |
 | R3 | Null-Merc reputation | >40: Ashwalker units unlock; >70: elite units |
 | R4 | Sev trust | >50: Path C intel available; >80: Jump Spire plans shared |
 
@@ -249,7 +249,7 @@ bead = {
   biomeZone:   active zone (P2),
   outcome:     win | loss | partial,
   pathSignal:  A | B | C | none,
-  factionDelta: { armada, cortex, clans, nullmercs },  // how each pressure changed
+  factionDelta: { armada, cortex, ashwalkers, nullmercs },  // how each pressure changed
   narrator:    broadcaster transmission ID (if triggered),
 }
 ```
@@ -287,9 +287,9 @@ Q3c ↔ P0:
   Disease debuff emerges from a cascade across three axes.
 
 R2 ↔ Q6b:
-  High clan reputation pushes Q6b toward Independent.
+  High Ashwalker reputation pushes Q6b toward Independent.
   This is the Path B entanglement — you cannot win Free Space
-  without the clans, and you cannot keep the clans without reputation.
+  without the Ashwalkers, and you cannot keep the Ashwalkers without reputation.
 ```
 
 These entanglements are what makes the geometry non-trivial.
@@ -305,7 +305,7 @@ There are no hard walls, no sudden unlocks, no binary flags.
 
 Every "condition" in the campaign is a **gradient**:
 - Path B doesn't become "available" at R2=60. It becomes *more likely* above 60
-  and *less likely* below. The player can attempt it at R2=45 but the clans
+  and *less likely* below. The player can attempt it at R2=45 but the Ashwalkers
   will fracture under pressure. The geometry bends, it doesn't break.
 - The disease debuff doesn't snap on at ε<5. It scales continuously from P0
   as the atmosphere degrades. At ε=8 units are slightly slower. At ε=3 they
