@@ -3,8 +3,10 @@
 -- The mind is specified in Python (verdance.company.hero_mind) and shipped as mission.heroMind: each
 -- hero a node with nerve, drive (its temper from camp), threat and pain; a bridge for each bond on the
 -- drop, carrying mood; the drop split into the clusters its bonds make, each stepped apart. Plan:
--- docs/PLAN_pathway_and_umwelt_minds.md, Part 2. SHADOW: it observes, steps and publishes; the hero
--- doctrine and the safety field do not read it yet.
+-- docs/PLAN_pathway_and_umwelt_minds.md, Part 2. SHADOW by default: it observes, steps and publishes.
+-- LIVE (modoption va_hero_mind_live=1, for paired trials): each think it also writes the hero's nerve
+-- and drive (2v - 1) into GG.VA_HeroTemper, the rows the doctrine and the autopilot's caution read as
+-- the temper from camp, so a hero's caution moves with what happens to it and its friends.
 --
 -- What it sees, each think (the doctrine's period, which is the mind's hold: one Umwelt step):
 --   pain    the share of its health it has lost (it knows its own health: confidence 1)
@@ -21,15 +23,15 @@ local M = {}
 local exp, floor, max = math.exp, math.floor, math.max
 local SAY_EVERY = 900   -- a VA_HERO_MIND line per hero every 30 game seconds, for the logs
 
-function M.load(mission)
+function M.load(mission, live)
   local t = type(mission) == "table" and mission.heroMind or nil
   if type(t) ~= "table" or type(t.clusters) ~= "table" or #t.clusters == 0 then return nil end
   local ok, mind = pcall(Lite.new, t)
   if not ok or not mind then return nil end
-  local st = { mind = mind, dirty = {}, h = {}, said = -SAY_EVERY, published = {} }
+  local st = { mind = mind, dirty = {}, h = {}, said = -SAY_EVERY, published = {}, live = live and true or false }
   for ci = 1, #mind.clusters do st.dirty[ci] = false end
   Spring.Echo("VA_HERO_MIND armed heroes=" .. #mind.heroes .. " clusters=" .. #mind.clusters
-    .. " roles=" .. table.concat(mind.roles, ","))
+    .. " roles=" .. table.concat(mind.roles, ",") .. (st.live and " live" or " shadow"))
   return st
 end
 
@@ -100,6 +102,14 @@ function M.publish(st, frame, heroes)
         if line then line[#line + 1] = roles[r] .. "=" .. v .. "/" .. c end
       end
       if line then Spring.Echo(table.concat(line, " ") .. " frame=" .. frame) end
+      if st.live and GG and GG.VA_HeroTemper then
+        local row = GG.VA_HeroTemper[hid]
+        if not row then row = {}; GG.VA_HeroTemper[hid] = row end
+        local nv = Lite.belief(st.mind, hid, "nerve")
+        local dv = Lite.belief(st.mind, hid, "drive")
+        if nv then row.nerve = 2 * nv - 1 end
+        if dv then row.drive = 2 * dv - 1 end
+      end
     end
   end
 end

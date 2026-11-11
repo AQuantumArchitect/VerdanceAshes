@@ -27,7 +27,7 @@ local mission = { heroMind = {
     verse = { nerve = 0.7, drive = 0.6, threat = 0.5, pain = 0.5 },
     halbard = { nerve = 0.7, drive = 0.6, threat = 0.5, pain = 0.5 },
   },
-  umwelt = U, holdS = 0.6,
+  umwelt = U, holdS = 0.6, roleGamma = { nerve = 0.1, drive = 0.1 },   -- mood holds for a sortie (hero_mind.ROLE_GAMMA)
 } }
 -- a field where only unit 2 (Ketha) stands under fire
 local field = {
@@ -64,3 +64,23 @@ for _, s in ipairs(said) do if s:find("VA_HERO_MIND down hero=vane", 1, true) th
 assert(downs == 1, "the fall is logged")
 assert(Mind.load({}) == nil, "no minds in the mission: nothing runs")
 print("ok: hero minds see pain and threat, publish va_mind_*, and a fall reaches a friend and a rival through the bonds")
+
+-- Live (va_hero_mind_live=1): the mind keeps the temper rows the doctrine and caution read current.
+-- Shadow (the default): it never touches them.
+GG = { VA_HeroTemper = { vane = { nerve = 0.4, drive = 0.2 } } }
+local shadow = Mind.load(mission)
+Mind.think(shadow, 18, heroes, field)
+assert(GG.VA_HeroTemper.vane.nerve == 0.4 and GG.VA_HeroTemper.ketha == nil, "shadow writes no temper")
+local live = Mind.load(mission, true)
+assert(said[#said]:find(" live", 1, true), said[#said])
+frame = 0
+for _ = 1, 3 do frame = frame + 18; Mind.think(live, frame, heroes, field) end
+local before = GG.VA_HeroTemper.ketha.nerve
+local Lite = dofile("mod/VerdanceAshes.sdd/luarules/gadgets/include/va_umwelt_lite.lua")
+assert(math.abs(before - (2 * Lite.belief(live.mind, "ketha", "nerve") - 1)) < 1e-12,
+  "live: Ketha's row carries her mind's nerve (2v - 1): " .. before)
+Mind.down(live, frame + 5, "vane")
+frame = frame + 18
+Mind.think(live, frame, { { 2, "ketha" }, { 3, "verse" }, { 4, "halbard" } }, field)
+assert(GG.VA_HeroTemper.ketha.nerve < before - 0.02, "live: the fall reaches the temper caution reads: " .. before .. " -> " .. GG.VA_HeroTemper.ketha.nerve)
+print("ok: live minds keep the temper rows current; shadow minds leave them alone")

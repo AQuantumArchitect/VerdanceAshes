@@ -848,8 +848,10 @@ local function caution(f)
       local hp, maxHp = healthOf(uid)
       if x and hp > 0 then
         local hid = Spring.GetUnitRulesParam(uid, "va_hero_id")
-        -- its temper from camp (mission.heroTemper, on Umwelt): how large it sees danger and gain
-        local t = mission and type(mission.heroTemper) == "table" and mission.heroTemper[tostring(hid)] or nil
+        -- its temper from camp (mission.heroTemper, on Umwelt): how large it sees danger and gain. The
+        -- doctrine's copy on GG first: with va_hero_mind_live=1 the hero's mind keeps it current
+        local t = (GG.VA_HeroTemper and GG.VA_HeroTemper[tostring(hid)])
+          or (mission and type(mission.heroTemper) == "table" and mission.heroTemper[tostring(hid)]) or nil
         -- its own orders: BARb's now, or, while caution holds it, what BARb wanted when it was taken (it
         -- goes back only when that plan has become the best; weighing where it stands instead let it go
         -- every other second and BARb sent it straight back: 78 swaps in a sortie, field trial 11-09)

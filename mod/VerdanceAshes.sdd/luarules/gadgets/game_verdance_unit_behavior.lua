@@ -1234,7 +1234,8 @@ local function loadTemper()
   end
   GG.VA_HeroTemper = heroTemper   -- the safety field's choices read it too
   if mindHost.mod then
-    local okMind, st = pcall(mindHost.mod.load, ok and m or nil)
+    local live = tostring((Spring.GetModOptions() or {}).va_hero_mind_live) == "1"
+    local okMind, st = pcall(mindHost.mod.load, ok and m or nil, live)
     mindHost.st = okMind and st or nil
   end
   return n
