@@ -40,6 +40,9 @@ class SortieFlow(unittest.TestCase):
         errors = []
         try:
             with sync_playwright() as pw:
+                if not Path(pw.chromium.executable_path).exists():
+                    # Playwright's browser is not on this machine (`playwright install chromium-headless-shell`)
+                    raise unittest.SkipTest("Playwright's Chromium is not installed: " + pw.chromium.executable_path)
                 b = pw.chromium.launch()
                 pg = b.new_page(viewport={"width": 1500, "height": 950})
                 pg.on("pageerror", lambda e: errors.append(str(e)))

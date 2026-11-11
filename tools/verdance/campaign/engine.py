@@ -1323,7 +1323,7 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
         epilogue = pick_line(
             voice, "debrief.campaign_complete",
             state.get("campaignId", CAMPAIGN_ID), completed_mission,
-        ) or "The war is over. The clans stand. Whatever grows here now grows ours."
+        ) or "The war is over. The Ashwalkers stand. Whatever grows here now grows ours."
         debrief["headline"] = epilogue
         debrief["epilogue"] = True
     report = {

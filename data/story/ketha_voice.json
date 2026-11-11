@@ -115,7 +115,7 @@
     ],
     "briefing.objective.choose_target_then_extract": [
       "Three enemies, one sortie. Pick the wound that bleeds longest.",
-      "Choose your target like the clans are watching. They are."
+      "Choose your target like the whole band is watching. It is."
     ],
     "briefing.war.mercs_allied": [
       "Null flags on our flank today. Paid guns, pointed the right way. Use them.",
@@ -136,7 +136,7 @@
       "Scarcity does our recruiting for us. It also does theirs."
     ],
     "briefing.graph.independent_rising": [
-      "The clans hold more sky than they did last season. Because of this line.",
+      "The Ashwalkers hold more sky than they did last season. Because of this line.",
       "Free space is growing. It grows exactly as fast as we defend it."
     ],
     "briefing.companion.high_stress": [
@@ -157,10 +157,10 @@
     ],
     "briefing.path.A": [
       "Order has its uses. Just remember whose order it was first.",
-      "Stabilize the grid if you must. The clans will ask what it cost."
+      "Stabilize the grid if you must. The band will ask what it cost."
     ],
     "briefing.path.B": [
-      "The clans are listening. That matters more than the map says.",
+      "The Null Mercs are listening. That matters more than the map says.",
       "Every sortie signs the same sentence: we govern ourselves."
     ],
     "briefing.path.C": [
@@ -178,7 +178,7 @@
     ],
     "debrief.victory_clean": [
       "Clean exit. That matters more than the scorch marks.",
-      "In and out with the line intact. The clans will hear about this one.",
+      "In and out with the line intact. The Null Mercs will hear about this one.",
       "No one chased us out. We simply finished.",
       "Everyone who went came back. I counted twice. I'm allowed one luxury.",
       "Clean. That word is doing more work than it used to.",

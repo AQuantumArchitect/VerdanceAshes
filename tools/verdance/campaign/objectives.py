@@ -177,7 +177,7 @@ def threat_band(center: float) -> str:
 
 def summarize_front(state: Dict[str, Any], map_id: str) -> Dict[str, Any]:
     """A map's strategic picture from zone memory: who holds it, how hot it is,
-    and whether clan ground there is eroding."""
+    and whether Ashwalker ground there is eroding."""
     mid = canonical_map_id(map_id)
     zones = state.get("zoneMemory", {}).get(mid, {})
     control_counts: Dict[str, int] = {}
@@ -216,7 +216,7 @@ def consequence_note(front: Dict[str, Any]) -> str:
     """One line on what happens if the player ignores this front."""
     if front.get("atRisk"):
         loser = front.get("dominantEnemy") or "the enemy"
-        return "Clan ground here is eroding — leave it and {} takes a zone.".format(loser)
+        return "Ashwalker ground here is eroding — leave it and {} takes a zone.".format(loser)
     fam = front.get("family")
     if fam == "wild":
         return "Hives keep multiplying — the hazard only grows the longer it waits."
@@ -310,7 +310,7 @@ def world_reading(graph: Dict[str, Any]) -> List[str]:
     if q6i >= 0.45:
         lines.append("Ashwalker sovereignty is rising.")
     elif q6i <= 0.2:
-        lines.append("The clans are a fringe force.")
+        lines.append("The Ashwalkers are a fringe force.")
     if q7 > 0.85:
         lines.append("Tenebrium is all but gone — scarcity bites.")
     if q2 > 0.5:

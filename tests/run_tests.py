@@ -147,7 +147,8 @@ def main(argv: list[str]) -> int:
     for label, tb in failures:
         print("=" * 72)
         print(label)
-        print(tb.rstrip()[-2500:])
+        # a console that cannot show a character (cp1252) must not hide the failure behind its own error
+        print(tb.rstrip()[-2500:].encode(sys.stdout.encoding or "utf-8", "replace").decode(sys.stdout.encoding or "utf-8"))
     if skips:
         print("-" * 72)
         print("skipped:")
