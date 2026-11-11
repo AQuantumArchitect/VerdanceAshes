@@ -2,6 +2,36 @@
 
 One entry per working day: what changed, what was measured, what's next. The newest entry comes first. Run folders live under `autopilot_runs\` on the dev PC (fenrir); they're not in git.
 
+## 2026-11-11: the raptor wave forecast, and why nobody spends Tenebrium
+
+**Owner calls**
+- Start the raptor wave forecast ("Yes, start on it").
+- Next is the pathway through Koom Valley. The Rock Jungle is where the army is built, and then it invades. "They should go to the jungle, do a sortie while the builders spend all their Tnb, and then the next sortie should be out on the fields of battle again."
+- Muster and fortify merge into one mission type.
+- Umwelt hero minds: sparse clusters with few bridges, run in parallel. Coarse, event-driven steps (orders given, the known field changing). The resolver lives in the engine and the HUD reads it through the same interface. Learning happens between runs while the player is in the menu, and camp decisions could shape what a hero learns. All of it is written into `docs/PLAN_pathway_and_umwelt_minds.md`.
+
+**The wave forecast** (landed)
+- **The spawner publishes the coming wave:**
+  - `va_raptor_wave_fight`: the queued wave's strength, sum of sqrt(dps × hp), using the safety field's profiles;
+  - `va_raptor_next_wave`: when it lands;
+  - `va_raptor_team`.
+  - It tags every wave-spawned unit `va_wave = 1`.
+- **The autopilot's `raptorsCall` replaced "60 s after the grace".** It works in fight units, with r = raptors / ours:
+  - It goes now if the fight on its hands is lost (keep = sqrt(1 − r²) below one half).
+  - It goes for the next wave if adding the last wave's strength would lose it, and that wave lands no later than the slowest named hero's walk to the pad.
+- **Trial 11 left in its first second:** the den residents (about 19k of standing raptors) counted as the wave. Fix: only `va_wave` units count. Den raptors that never march aren't the company's fight.
+- **Trial 12** (two hard_aggressive campaigns, seven Rock Jungle sorties each):
+  - 14 of 14 came home, with no hero deaths and no Lua errors. That matches master's baseline (14/14, 0 deaths).
+  - The forecast decided 11 of the 14 departures, at 375–875 s. The clock decided 3.
+  - Some stragglers didn't make the pad on three sorties (26/29, 20/26, 20/25). That's the boarding, not the call.
+
+**Nobody spends the Tenebrium** (the next work)
+- In all 14 sorties the bank stayed at 3, with `tenebriumSpent 0` and metal income 0.
+- The player's commander is swept at game start, the rig's band (verse, vane, halbard) has no builder, the Rock Jungle kit ("wild") brings none, and the mercenary buyer spends metal only. So BARb had nothing that could build.
+- Tenebrium is a stake: what the bank pays into a builder comes back at exfil while it lives. So a muster at home costs only the builders' risk.
+- **Found while planning:** the exfil refund also paid back the stamp a kit unit carries but never paid for. A free kit constructor would have minted a Tenebrium each sortie it survived.
+- Plan: `docs/PLAN_pathway_and_umwelt_minds.md` ("What the trials showed", "First slice").
+
 ## 2026-11-10 (overnight): leaving on the field, Umwelt v0.2.0
 
 **Owner calls**

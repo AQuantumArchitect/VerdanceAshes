@@ -486,4 +486,64 @@ assert(not gadget:AllowCommand(6), "Vane at a tenth: out of it")
 mv = lastOf(6, CMD.MOVE)
 assert(mv and math.abs(mv.params[1] - 1800) > 400, "out of the gun's reach")
 
-print("ok: scout marks, rescue squad sized to outfight the gun, protected orders, departure to the real pad radius, leaving with and without a HUD, holding a capture, the Spire Gate and its tech ladder, the siege, hero caution from the safety field")
+-- 8. Raptor ground: the company leaves on the waves' forecast (the spawner publishes each wave's strength,
+--    when the next is due, and its team). Fighters are 447 strong each ((100 dps x 2000 hp)^1/2).
+local residents = {}
+local function raptorWorld(company, raptors, wave, nextIn, heroAt)
+  local wasOpts = Spring.GetModOptions
+  Spring.GetModOptions = function() return { va_autopilot = "1", va_autopilot_minutes = "60", va_raptor_grace_seconds = "300" } end
+  reset()
+  Spring.GetModOptions = wasOpts
+  GG.VA_RivalKings, GG.VA_ObjectiveTargets = nil, nil
+  rules.va_secondary_total = 0
+  rules.va_raptor_team, rules.va_raptor_wave_fight = 1, wave
+  threats = raptors
+  for i, uid in ipairs(company) do positions[uid] = { 30 + i, 0 } end
+  positions[company[1]] = { heroAt or 30, 0 }                  -- the hero, out from the pad at (0, 0)
+  for i, uid in ipairs(raptors) do positions[uid] = { 7000 + i * 10, 7000 } end   -- far off, walking in
+  Spring.GetTeamUnits = function(team) if team == 1 then return threats end return company end
+  Spring.GetUnitDefID = function() return 6 end
+  Spring.GetUnitRulesParam = function(uid, k)
+    if k == "va_hero_id" and uid == company[1] then return "vane" end
+    if k == "va_wave" and uid >= 60 and uid < 70 and not residents[uid] then return 1 end   -- sent by a wave
+  end
+  Spring.GetUnitHealth = function() return 2000, 2000 end
+  Spring.GetUnitCommands = function() return {} end
+  Spring.GetAllFeatures = function() return {} end
+  Spring.GiveOrderToUnit = function(uid, cmd, params) orders[#orders + 1] = { cmd = cmd, params = params, units = { uid } } end
+  return function(f, untilNext) rules.va_raptor_next_wave = f / 30 + untilNext; gadget:GameFrame(f) end
+end
+local function regrouped()
+  for _, o in ipairs(orders) do if o.cmd == CMD.MOVE and #o.units > 1 and o.params[1] == 0 then return true end end
+  return false
+end
+local army = {}
+for i = 100, 109 do army[#army + 1] = i end
+-- ten fighters, two raptors walking in, the last wave two strong: r 0.2 now, 0.4 with the next
+local step = raptorWorld(army, { 60, 61 }, 894, 30)
+step(341, 30)
+assert(not regrouped(), "a strong company holds through the next wave")
+-- two fighters (the hero 2000 out: 40 s from the pad), one raptor in, the last wave two: the next wave
+-- would tip it (r 1.5), so it holds while the wave is further off than the hero's walk, then goes
+step = raptorWorld({ 100, 101 }, { 60 }, 894, 120, 2000)
+step(341, 120)
+assert(not regrouped(), "the next wave 120 s off, the hero 40 s from the pad: it fights on")
+step(371, 39)
+assert(regrouped(), "the next wave closer than the hero's walk home: the company walks to the pad")
+-- one fighter, two raptors already on the field: the fight on its hands is lost (r 2): it goes now
+step = raptorWorld({ 100 }, { 60, 61 }, 0, 600)
+step(341, 600)
+assert(regrouped() or find(CMD.MOVE), "losing the fight on its hands: it goes at once")
+-- the same two raptors as wild-den residents (not sent by a wave): they guard their dens, it stays
+residents = { [60] = true, [61] = true }
+step = raptorWorld({ 100 }, { 60, 61 }, 0, 600)
+step(341, 600)
+assert(not regrouped() and not find(CMD.MOVE), "den residents do not march: the company stays")
+residents = {}
+-- no forecast published (no burrows, no waves): nothing to leave for
+step = raptorWorld({ 100 }, { 60, 61 }, 0, 600)
+rules.va_raptor_next_wave = nil
+gadget:GameFrame(341)
+assert(not regrouped(), "no waves forecast: the raptors alone do not send it home")
+
+print("ok: scout marks, rescue squad sized to outfight the gun, protected orders, departure to the real pad radius, leaving with and without a HUD, holding a capture, the Spire Gate and its tech ladder, the siege, hero caution from the safety field, leaving on the raptor waves' forecast")

@@ -36,9 +36,11 @@ end
 --   departure  the objective done, failed, or the clock out: everyone walks to the real pad
 --              (va_pad_x/z/r), and the company leaves once all of it stands there (or after
 --              three settles, for stuck units)
---   raptors    on raptor ground (va_raptor_grace_seconds set: the Rock Jungle) the company builds
---              through the grace and leaves RAPTOR_STAY seconds after the waves are due, done or
---              not (owner call, 2026-11-09: the baseline's six home wipes came from staying)
+--   raptors    on raptor ground (va_raptor_grace_seconds set: the Rock Jungle) the company leaves on
+--              the waves' forecast (raptorsCall, below): now if it is losing the fight on its
+--              hands, or in time to be on the pad before a wave that would tip it lands. It replaced
+--              "60 s after the grace" (owner calls 2026-11-09; the baseline's six home wipes came
+--              from staying)
 --   caution    a named hero badly hurt, or hurt and outnumbered, walks back to the pad and is held
 --              there until it is mostly whole again or the ground near it has been quiet a while;
 --              heroes are never nudged into the wound (the baseline lost 20 named heroes)
@@ -62,10 +64,8 @@ local RESCUE_EVERY = 600
 local HUD_WAIT = 20 * 30
 -- test rig only: va_autopilot_force_complete=M marks the objective done at game minute M
 local FORCE_AT = num("va_autopilot_force_complete", 0) > 0 and math.floor(num("va_autopilot_force_complete", 0) * 1800) or nil
--- raptor ground: leave this long after the grace ends (va_autopilot_raptor_stay seconds, default 60)
+-- raptor ground (the wave forecast decides when the company leaves: raptorsCall)
 local RAPTOR_GRACE = tonumber(opts.va_raptor_grace_seconds)
-local RAPTOR_STAY = num("va_autopilot_raptor_stay", 60)
-local RAPTOR_LEAVE_FRAMES = RAPTOR_GRACE and math.floor((RAPTOR_GRACE + RAPTOR_STAY) * 30) or nil
 -- hero caution, once a second: the safety field (include/va_safety_field.lua) weighs each place a hero
 -- could be (its own orders; the pad; the middle of the company's strength; a ring as far as it walks
 -- in the time it takes to cross the enemy's reach; for a rez hero, the wrecks it knows of) by the chance
@@ -904,6 +904,11 @@ local function regroup()
   Spring.Echo("VA_AUTOPILOT regroup units=" .. #mob .. " pad=" .. tostring((Spring.GetGameRulesParam("va_pad_zone"))))
 end
 
+local function departSaying(why, f, said)
+  Spring.Echo("VA_AUTOPILOT raptors go" .. (said or ""))
+  return why, f
+end
+
 local function depart(why, f)
   if departureAt then return end
   departureAt, departureWhy = f, why
@@ -951,6 +956,63 @@ local function leave(reason, f)
   if f - leaveAt >= HUD_WAIT then extractDirectly(reason, f, "VA_AUTOPILOT_HUD_SILENT (the HUD did not extract; extracting directly)") end
 end
 
+-- ---------------------------------------------------------------- raptor waves
+-- On raptor ground the danger keeps a schedule. The spawner (raptor_spawner_defense.lua) publishes each
+-- wave's strength (va_raptor_wave_fight: the sum of (dps x hp)^1/2 of what it queued), when the next is
+-- due (va_raptor_next_wave, game seconds) and its team (va_raptor_team). Lanchester, as the safety
+-- field reckons it: the company's strength is the sum of (dps x hp)^1/2 of all its guns at the health
+-- they have (turrets too: the raptors come to it); the raptors' is what the waves have sent and still
+-- stands (the spawner tags it va_wave; the wild dens' residents guard their dens and do not march: counted
+-- as all coming, they read r = 1 at every pad and the company left each sortie in its first second, trial
+-- 11, 11-10), and the next wave will add what the last one brought (the forecast is the last wave).
+-- With r = theirs / ours the company keeps sqrt(1 - r^2) of itself by winning. The objective is worth
+-- what it risked to come for it, and is won with what is left standing: staying is worth twice what it
+-- keeps, going all of it (the walk home is paid either way). So it fights while sqrt(1 - r^2) >= 1/2:
+--   the fight on its hands is lost on that reckoning: it goes now;
+--   the next wave would tip it: it is on the pad before that wave comes (it goes once the time until it
+--   is no more than the slowest named hero's walk to the pad; the wave's own walk is not counted).
+-- This replaced "60 s after the grace" (owner call 2026-11-09; history in docs/DEVLOG.md).
+local function strengthOf(team, wavesOnly)
+  local s = 0
+  for _, uid in ipairs(Spring.GetTeamUnits(team) or {}) do
+    local p = SafetyField.profile(Spring.GetUnitDefID(uid))
+    if p.dps > 0 and (not wavesOnly or Spring.GetUnitRulesParam(uid, "va_wave") == 1) then
+      local hp = tonumber((Spring.GetUnitHealth(uid))) or 0
+      if hp > 0 then s = s + math.sqrt(p.dps * hp) end
+    end
+  end
+  return s
+end
+
+local function keepOf(r) return r < 1 and math.sqrt(1 - r * r) or 0 end
+
+local raptorSaid = -1
+local function raptorsCall(f)
+  local team = tonumber((Spring.GetGameRulesParam("va_raptor_team")))
+  local nextWave = rp("va_raptor_next_wave")
+  if not team or team < 0 or nextWave <= 0 then return nil end
+  local ours, live, wave = strengthOf(playerTeam, false), strengthOf(team, true), rp("va_raptor_wave_fight")
+  local rNow = ours > 0 and live / ours or math.huge
+  local rNext = ours > 0 and (live + wave) / ours or math.huge
+  local untilNext = nextWave - f / 30
+  local px, pz, home = rp("va_pad_x"), rp("va_pad_z"), 0
+  for _, uid in ipairs(Spring.GetTeamUnits(playerTeam) or {}) do
+    if isHero(uid) then
+      local x, _, z = Spring.GetUnitPosition(uid)
+      local speed = SafetyField.profile(Spring.GetUnitDefID(uid)).speed
+      if x and speed > 0 then home = math.max(home, math.sqrt((x - px) ^ 2 + (z - pz) ^ 2) / speed) end
+    end
+  end
+  local said = string.format(" r_now=%.2f r_next=%.2f ours=%.0f raptors=%.0f wave=%.0f next_in=%.0fs home_in=%.0fs",
+    math.min(rNow, 99), math.min(rNext, 99), ours, live, wave, untilNext, home)
+  if keepOf(rNow) < 0.5 then return "raptors_now", said end
+  if keepOf(rNext) < 0.5 and untilNext <= home then return "raptors_next", said end
+  if f - raptorSaid >= 1800 then
+    raptorSaid = f
+    Spring.Echo("VA_AUTOPILOT raptors hold" .. said)
+  end
+end
+
 -- ---------------------------------------------------------------- call-ins
 function gadget:Initialize()
   gadgetHandler:RegisterAllowCommand(CMD.ANY)
@@ -995,8 +1057,11 @@ function gadget:GameFrame(f)
   if not departureAt then
     if rp("va_objective_complete") == 1 then depart("objective", f)
     elseif rp("va_objective_failed") == 1 then depart("objective_failed", f)
-    elseif RAPTOR_LEAVE_FRAMES and f >= RAPTOR_LEAVE_FRAMES then depart("raptors", f)
-    elseif f >= CAP_FRAMES then depart("clock", f) end
+    elseif f >= CAP_FRAMES then depart("clock", f)
+    elseif RAPTOR_GRACE then
+      local why, said = raptorsCall(f)
+      if why then depart(departSaying(why, f, said)) end
+    end
   end
   if departureAt then
     if (f - departureAt) % 450 == 0 and f > departureAt then regroup() end

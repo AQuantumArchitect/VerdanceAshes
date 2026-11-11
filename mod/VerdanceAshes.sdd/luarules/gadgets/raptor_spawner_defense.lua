@@ -199,6 +199,14 @@ if gadgetHandler:IsSyncedCode() then
 	local bosses = {resistances = queenResistance, statuses = {}, playerDamages = {}}
 	local raptorTeamID = Utilities.GetRaptorTeamID()
 	local raptorAllyTeamID = Utilities.GetRaptorAllyTeamID()
+	-- Verdance: the waves as known danger (the autopilot's leaving reads them). Each wave's strength is
+	-- the sum of (dps x hp)^1/2 of what it queued, from the safety field's profiles of the unit defs;
+	-- the next wave fires once raptorSpawnRate x waveTimeMultiplier seconds have passed since the last.
+	local vaField = (function()
+		local ok, m = pcall(VFS.Include, "luarules/gadgets/include/va_safety_field.lua")
+		return ok and type(m) == "table" and m or nil
+	end)()
+	SetGameRulesParam("va_raptor_team", raptorTeamID or -1)
 	local lsx1, lsz1, lsx2, lsz2
 	local burrows = {}
 	local aliveEggsTable = {}
@@ -1312,6 +1320,17 @@ if gadgetHandler:IsSyncedCode() then
 			end
 		until (cCount > currentMaxWaveSize*waveParameters.waveSizeMultiplier or loopCounter >= 200*config.raptorSpawnMultiplier)
 
+		if vaField then
+			local fight = 0
+			for _, q in pairs(spawnQueue) do
+				local ud = q and UnitDefNames[q.unitName]
+				if ud then fight = fight + vaField.profile(ud.id).fight end
+			end
+			SetGameRulesParam("va_raptor_wave_fight", math.floor(fight))
+			SetGameRulesParam("va_raptor_wave_at", math.floor(Spring.GetGameSeconds()))
+			Spring.Echo("VA_RAPTOR_WAVE n=" .. tostring(waveParameters.waveCounter) .. " units=" .. tostring(cCount) .. " fight=" .. math.floor(fight))
+		end
+
 		if config.useWaveMsg then
 			raptorEvent("wave", cCount)
 		end
@@ -1788,6 +1807,8 @@ if gadgetHandler:IsSyncedCode() then
 				return
 			end
 			local unitID = CreateUnit(defs.unitName, x, y, z, mRandom(0,3), defs.team)
+			-- Verdance: a unit a wave sent (the autopilot's forecast counts these, not the wild dens' residents)
+			if unitID then Spring.SetUnitRulesParam(unitID, "va_wave", 1) end
 
 			if unitID then
 				if (not defs.squadID) or (defs.squadID and defs.squadID == 1) then
@@ -2103,6 +2124,9 @@ if gadgetHandler:IsSyncedCode() then
 					timeOfLastWave = t
 				end
 			end
+			-- Verdance: when the next wave is due (it also waits for the last one to finish spawning)
+			SetGameRulesParam("va_raptor_next_wave", math.max(config.gracePeriodInitial + 5,
+				timeOfLastWave + config.raptorSpawnRate * waveParameters.waveTimeMultiplier))
 
 			updateRaptorSpawnBox()
 		end
