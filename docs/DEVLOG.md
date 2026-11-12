@@ -21,6 +21,14 @@ One entry per working day: what changed, what was measured, what's next. The new
   - by army, at 3 Tnb: a 1.3k army 43%; a full 3k drop 36%.
 - **Hero minds live by default** (`va_hero_mind_live=0` for shadow).
 
+**Trial 18** (66d0323: the pressure draw, live minds; run 20261112_105449, hard_aggressive, HUD and beats on, stock BAR)
+- **11 sorties, the Overthrow won first try,** 167 game minutes. Every sortie came home, no hero deaths, and four recruits joined (Gladius, Rookery, Rusk, Arc).
+- **Route:** raid, found, Plateau (partial), Plateau (victory), open Koom, the Rim door, Koom's Southeast door, muster, muster, Koom's Southeast door, finale.
+- **Units lifted:** 20, 32, 12, 54, 50, 98, 79, **118** (muster), **242** (muster), 173, 67. The reserve ended at 576 units.
+- **The bag outruns the musters.** Bank at each drop from sortie 6: 5, 15, 18, 22, 43, 60, ending at 66. The first muster staked 9. Stakes come back at exfil and shards and rewards keep coming in, so the home pull (T·ln stakes) keeps rising. That is why the two musters came back to back. Over 11 sorties it did no harm; a longer campaign would lean home more and more.
+- **The live minds are flat.** They armed live on every sortie with no failures and no downs. But each hero's end-of-sortie nerve read 0.49 to 0.56, and the heroes in one cluster read the same, since the bridges pull them to their mean. So caution barely moved. Next micro-layer question: is the camp temper arriving near neutral, or is it averaged away?
+- **A blocked launch:** the first attempt stopped before sortie 1 with WinError 4551 ("An Application Control policy has blocked this file") on the run's fresh copy of `spring-headless.exe`. The same copy ran a minute later and the retry played through, so it looks like a one-time check on a new file.
+
 ## 2026-11-11 (afternoon): toward a human playtest
 
 **Brief.** Game Butler (Luke's release manager bot) set a standing brief: get the game polished, fun and itch-ready by about 2026-11-22, then open one `ready-for-human-playtest` issue. Never tag a release or push to itch.
