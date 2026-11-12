@@ -65,8 +65,8 @@ assert(downs == 1, "the fall is logged")
 assert(Mind.load({}) == nil, "no minds in the mission: nothing runs")
 print("ok: hero minds see pain and threat, publish va_mind_*, and a fall reaches a friend and a rival through the bonds")
 
--- Live (va_hero_mind_live=1): the mind keeps the temper rows the doctrine and caution read current.
--- Shadow (the default): it never touches them.
+-- Live (the default; va_hero_mind_live=0 is shadow): the mind keeps the temper rows the doctrine and caution read current.
+-- Shadow: it never touches them.
 GG = { VA_HeroTemper = { vane = { nerve = 0.4, drive = 0.2 } } }
 local shadow = Mind.load(mission)
 Mind.think(shadow, 18, heroes, field)

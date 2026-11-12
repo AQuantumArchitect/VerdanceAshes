@@ -1245,13 +1245,13 @@ def build_hub(state: dict, war: dict) -> dict:
     home_camp["worthK"] = _hp["stake"]
     home_camp["stockWanted"] = _hp["threshold"]
     home_camp["cleared"] = home_cleared
-    # The muster (verdance.world.roads.muster_job): what the rail's line says about Tenebrium at home.
+    # The muster (verdance.world.roads.muster_job): the rail's line on the two pressures, the bag and the army.
     try:
         _mj = _roads.muster_job(state, ROOT)
     except Exception as exc:  # noqa: BLE001
         print(f"VA_MUSTER_HUB_FAIL {exc}")
         _mj = None
-    home_camp["muster"] = ({k: _mj[k] for k in ("due", "tenebrium", "floor", "builtLast")} if _mj else None)
+    home_camp["muster"] = ({k: _mj[k] for k in ("tenebrium", "floor", "stakes", "army", "reserve", "cap")} if _mj else None)
     home_camp["clearReady"] = bool(flags.get("homeClearReady") or (home_eval or {}).get("homeClearReady"))
     try:
 

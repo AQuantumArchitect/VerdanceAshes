@@ -1234,7 +1234,9 @@ local function loadTemper()
   end
   GG.VA_HeroTemper = heroTemper   -- the safety field's choices read it too
   if mindHost.mod then
-    local live = tostring((Spring.GetModOptions() or {}).va_hero_mind_live) == "1"
+    -- live by default (owner call, 2026-11-12: "the hero minds should come out of the shadow so we can
+    -- kind of see what's happening"); va_hero_mind_live=0 puts them back in shadow for a paired trial
+    local live = tostring((Spring.GetModOptions() or {}).va_hero_mind_live) ~= "0"
     local okMind, st = pcall(mindHost.mod.load, ok and m or nil, live)
     mindHost.st = okMind and st or nil
   end

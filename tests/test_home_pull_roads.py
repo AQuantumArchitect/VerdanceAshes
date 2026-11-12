@@ -1,15 +1,19 @@
-"""Tenebrium sends the company home to muster (owner call, 2026-11-11: "go to the jungle, do a sortie
-while the builders spend all their Tnb, and then the next sortie should be out on the fields of battle
-again"; muster and fortify are one mission type). It replaced the home pull on the Rock Jungle's door
-jobs (2026-11-04), which raised them while the bag was full."""
+"""Tenebrium pulls the company home to muster; the army in hand pulls it out (owner calls: 2026-11-11,
+"go to the jungle, do a sortie while the builders spend all their Tnb, and then the next sortie should
+be out on the fields of battle again", muster and fortify one mission type; 2026-11-12, no rule about
+when, "the total amount of tenebrium you have available to spend should apply pressure to go to the
+jungle... the larger the army you have, the more pressure there is to go somewhere else"). Both are
+pressures on the one seeded draw every job is in; the job it falls on is the recommendation."""
 import copy
 from pathlib import Path
 
 from verdance.common import WORKSPACE_ROOT
 from verdance.campaign import engine
 from verdance.world import roads
+from verdance.world.claim import CLAIM_NEED
 
 WS = Path(WORKSPACE_ROOT)
+SEEDS = range(300)
 
 
 def _home_scores(tnb):
@@ -19,17 +23,23 @@ def _home_scores(tnb):
             if j["mapId"] == roads.HOME_MAP_ID}
 
 
-def _founded(tnb, last_kind="seize_lane", last_map=roads.HOME_MAP_ID):
+def _founded(tnb, last_kind="seize_lane", reserve=None):
     st = engine.default_v1_state()
     st["commerce"]["tenebrium"] = tnb
     st["history"] = [{"mapId": "greenest_fields", "objectiveKind": "seize_lane", "verdict": "victory", "resultKey": "a"},
                      {"mapId": roads.HOME_MAP_ID, "objectiveKind": "fortify_zone", "verdict": "partial", "resultKey": "b"},
-                     {"mapId": last_map, "objectiveKind": last_kind, "verdict": "partial", "resultKey": "c"}]
+                     {"mapId": roads.HOME_MAP_ID, "objectiveKind": last_kind, "verdict": "partial", "resultKey": "c"}]
+    if reserve is not None:
+        st.setdefault("roster", {})["reserve"] = dict(reserve)
     return st
 
 
-def _cards(st):
-    return roads.road_sorties(copy.deepcopy(st), WS)["cards"]
+def _cards(st, seed=None):
+    return roads.road_sorties(copy.deepcopy(st), WS, seed=seed)["cards"]
+
+
+def _muster_share(st):
+    return sum(_cards(st, s)[0]["id"] == roads.MUSTER_ID for s in SEEDS) / len(SEEDS)
 
 
 def test_the_door_jobs_no_longer_move_with_the_bag():
@@ -37,33 +47,53 @@ def test_the_door_jobs_no_longer_move_with_the_bag():
     assert _home_scores(0) == _home_scores(7)
 
 
-def test_tenebrium_after_a_battle_recommends_the_muster():
-    cards = _cards(_founded(3))
-    assert cards[0]["id"] == roads.MUSTER_ID and cards[0]["recommended"]
-    assert [c["id"] for c in cards if c.get("recommended")] == [roads.MUSTER_ID], "one recommendation"
-    eff = cards[0]["effect"]
-    assert (eff["mapId"], eff["contractKind"], eff["preferredCaptureZoneId"], eff["journey"]) == \
-        (roads.HOME_MAP_ID, "fortify_zone", roads.MUSTER_ZONE, "muster")
-    assert "3 Tenebrium sits unstaked" in cards[0]["blurb"]
-    lean = [c for c in cards if c.get("lean")]
-    assert len(lean) == 1 and not lean[0]["recommended"], "the lean stays, as a mark"
+def test_one_draw_one_recommendation_and_the_muster_always_offered():
+    for seed in range(40):
+        cards = _cards(_founded(3), seed)
+        rec = [c for c in cards if c.get("recommended")]
+        assert len(rec) == 1 and rec[0] is cards[0] and cards[0]["lean"], seed
+        assert sum(c["id"] == roads.MUSTER_ID for c in cards) == 1, "the muster is a standing offer"
 
 
-def test_after_a_muster_the_next_sortie_is_a_battle():
-    cards = _cards(_founded(3, last_kind="fortify_zone"))
-    muster = next(c for c in cards if c["id"] == roads.MUSTER_ID)
-    assert not muster["recommended"] and muster["muster"]["builtLast"]
-    assert "Take the army out" in muster["blurb"]
-    rec = [c for c in cards if c.get("recommended")]
-    assert len(rec) == 1 and rec[0]["id"] != roads.MUSTER_ID, "one battle is recommended"
+def test_tenebrium_pulls_home():
+    shares = [_muster_share(_founded(t)) for t in (1, 3, 9)]
+    assert shares[0] < shares[1] < shares[2], shares
+    m = roads.muster_job(_founded(4), WS)
+    assert abs(m["pull"] - roads.TEMPERATURE * __import__("math").log(4)) < 1e-12, "four stakes: four times as likely"
+    card = next(c for c in _cards(_founded(3)) if c["id"] == roads.MUSTER_ID)
+    eff = card["effect"]
+    assert (eff["mapId"], eff["contractKind"], eff["preferredCaptureZoneId"], eff["journey"]) ==         (roads.HOME_MAP_ID, "fortify_zone", roads.MUSTER_ZONE, "muster")
+    assert "3 Tenebrium sits unstaked, 3 builders' stake" in card["blurb"]
+
+
+def test_no_rule_after_a_muster():
+    """A muster last time is no bar: the bag and the army decide."""
+    assert _muster_share(_founded(3, last_kind="fortify_zone")) > 0
 
 
 def test_an_empty_bag_has_nothing_to_muster_with():
     floor = roads.build_floor(WS)
-    cards = _cards(_founded(floor - 1))
-    muster = next(c for c in cards if c["id"] == roads.MUSTER_ID)
+    st = _founded(floor - 1)
+    assert _muster_share(st) == 0
+    muster = next(c for c in _cards(st) if c["id"] == roads.MUSTER_ID)
     assert not muster["recommended"] and "Nothing to stake" in muster["blurb"]
-    assert _cards(_founded(floor))[0]["id"] == roads.MUSTER_ID, "the cheapest builder's stake is enough"
+    assert _muster_share(_founded(floor)) > 0, "the cheapest builder's stake is enough"
+
+
+def test_the_army_in_hand_pulls_out():
+    """Each claim's worth of army the company can bring raises every job off the home map, up to
+    the drop limit: units past it stay in the reserve and do not pull."""
+    bare = _founded(3)
+    full = _founded(3, reserve={"leggob": 400})
+    hand = roads.army_in_hand(full, WS)
+    assert hand["army"] == hand["cap"] < hand["reserve"]
+    out = roads.out_pressure(full, WS)
+    assert abs(out - roads.TEMPERATURE * __import__("math").log1p(hand["cap"] / CLAIM_NEED)) < 1e-12
+    away = lambda st: {j["id"]: j["score"] for j in roads.road_sorties(copy.deepcopy(st), WS, seed=0)["jobs"]
+                       if j["mapId"] not in (roads.HOME_MAP_ID,) and j.get("kind") != "fetch"}
+    a, b = away(bare), away(full)
+    assert a and all(abs(b[k] - a[k] - out) < 1e-3 for k in a)
+    assert _muster_share(full) < _muster_share(bare)
 
 
 def test_no_muster_before_the_jungle_is_founded():
@@ -90,23 +120,3 @@ def test_the_debrief_says_where_a_new_recruit_waits():
     st = {"camp": {"people": {"mira": {"where": "field", "mapId": "tabula", "zoneId": "T_W_CAUSEWAY", "label": "West Causeway"}}}}
     mv = engine.what_moved({}, st, {}, "tabula", [{"heroId": "mira", "name": "Mira"}], [])
     assert mv["joined"] == [{"name": "Mira", "where": "field", "mapId": "tabula", "label": "West Causeway"}]
-
-
-def test_the_battle_goes_out_from_the_jungle():
-    """Once home is founded, a recommended battle is off the home map when one is open; the lean keeps
-    its mark wherever the draw fell, and the home doors stay on offer (owner call, 2026-11-11)."""
-    st = _founded(3, last_kind="fortify_zone")      # after a muster: a battle is the move
-    jobs = roads.legal_jobs(copy.deepcopy(st), WS)
-    assert any(j["mapId"] != roads.HOME_MAP_ID for j in jobs) and any(j["mapId"] == roads.HOME_MAP_ID for j in jobs)
-    checked = 0
-    for seed in range(200):
-        out = roads.road_sorties(copy.deepcopy(st), WS, seed=seed)
-        lean = next(c for c in out["cards"] if c.get("lean"))
-        rec = [c for c in out["cards"] if c.get("recommended")]
-        assert len(rec) == 1
-        assert rec[0]["effect"]["mapId"] != roads.HOME_MAP_ID, (seed, rec[0]["id"])
-        if lean["effect"]["mapId"] == roads.HOME_MAP_ID:
-            assert not lean["recommended"] and rec[0]["id"] != lean["id"]
-            assert any(c["id"] == lean["id"] for c in out["cards"]), "the home door stays on offer"
-            checked += 1
-    assert checked, "some draw leaned home"

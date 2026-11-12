@@ -325,18 +325,27 @@ def legal_jobs(state: Dict[str, Any], workspace: Path) -> List[Dict[str, Any]]:
 
 
 # --- the muster ------------------------------------------------------------------
-# Owner call, 2026-11-11: "they should go to the jungle, do a sortie while the builders spend all
+# Owner calls, 2026-11-11: "they should go to the jungle, do a sortie while the builders spend all
 # their Tnb, and then the next sortie should be out on the fields of battle again", and muster and
 # fortify are one mission type: the dig-in at the camp's gate (Journey A's). Tenebrium is a stake
 # (va_tenebrium_handlers.lua): what the bank pays into a builder comes back at exfil while the
 # builder lives, so a muster puts the whole bank to work for the builders' risk alone, and what they
-# build lifts into the reserve (verdance.company.reserve). This replaced the home pull, a term on
-# every Rock Jungle door job (HOME_PULL_WEIGHT): it raised the home doors while the bag was full,
-# and in the 11-10 trials nothing built there anyway (no builder came; DEVLOG 2026-11-11).
+# build lifts into the reserve (verdance.company.reserve).
+#
+# 2026-11-12: no rules about when ("I don't think we should go back and build every time we can build
+# one build... the total amount of tenebrium you have available to spend should apply pressure to go
+# to the jungle... the larger the army you have, the more pressure there is to go somewhere else").
+# Two pressures go into the one draw every job is in (_draw), in its own unit, the temperature: a
+# pressure of TEMPERATURE * ln(k) makes a job k times as likely.
+#   home   the muster: one for each builder stake the bag can pay (Tenebrium // the cheapest
+#          builder's stake). An empty bag has nothing to build with and is not drawn.
+#   out    every job off the home map: one, plus one for each claim's worth (verdance.world.claim's
+#          CLAIM_NEED) of army the company can bring (the reserve, up to the drop limit).
+# So the draw weighs a builder's stake against a claim's worth of army. A muster fills the reserve
+# and the next draw leans out; battles spend it, and the draw leans home again.
 MUSTER_ID = "muster_rock_jungle"
 MUSTER_ZONE = "TRJ_NW_GATE"          # the camp's gate: Journey A's dig-in
 MUSTER_PAD = "TRJ_NW_OUTER_MUSTER"   # home's door, the pad of every home sortie
-HOME_BUILD_KINDS = ("fortify_zone", "home_founding")   # a sortie that built at home
 
 
 def build_floor(workspace: Path) -> int:
@@ -347,35 +356,53 @@ def build_floor(workspace: Path) -> int:
     return max(1, int((catalog.get("resource") or {}).get("buildFloor") or 1))
 
 
-def built_at_home_last(state: Dict[str, Any]) -> bool:
-    """The last sortie fought was a dig-in at home (the founding or a muster)."""
-    hist = [b for b in (state.get("history") or []) if isinstance(b, dict)]
-    if not hist:
-        return False
-    last = hist[-1]
-    return _canon_map(last.get("mapId")) == HOME_MAP_ID and str(last.get("objectiveKind") or "") in HOME_BUILD_KINDS
+def army_in_hand(state: Dict[str, Any], workspace: Path) -> Dict[str, float]:
+    """What the company can bring onto a field: the reserve's value, up to the drop limit."""
+    from verdance.company import reserve as _reserve
+    roster = state.get("roster") or {}
+    units = roster.get("reserve") if isinstance(roster.get("reserve"), dict) else (roster.get("cadre") or {})
+    held_value = _reserve.bring_value(_reserve._counts(units), Path(workspace))
+    cap = _reserve.lift_cap(state)
+    return {"reserve": held_value, "cap": cap, "army": min(held_value, cap)}
+
+
+def out_pressure(state: Dict[str, Any], workspace: Path) -> float:
+    """The army's pull off the home map: TEMPERATURE * ln(1 + army / CLAIM_NEED)."""
+    from verdance.world.claim import CLAIM_NEED
+    return TEMPERATURE * math.log1p(army_in_hand(state, workspace)["army"] / CLAIM_NEED)
+
+
+def _home_base(state: Dict[str, Any]) -> float:
+    """A dig-in at home scores as the founding it continues (legal_jobs' found job)."""
+    return 1.6 * (SHUT_MAP + 0.3 * _leak(state, HOME_MAP_ID))
 
 
 def muster_job(state: Dict[str, Any], workspace: Path) -> Optional[Dict[str, Any]]:
-    """The camp's standing offer once the Rock Jungle is founded. It is due (the hub recommends it)
-    when the bag can pay a builder's stake and the last sortie did not already build at home."""
+    """The camp's standing offer once the Rock Jungle is founded, with its pull home."""
     walked = {_canon_map(b.get("mapId")) for b in (state.get("history") or []) if isinstance(b, dict) and b.get("mapId")}
     if HOME_MAP_ID not in walked:
         return None   # the founding comes first (legal_jobs' found job, or the home card)
     tnb = int((state.get("commerce") or {}).get("tenebrium") or 0)
     floor = build_floor(workspace)
-    built = built_at_home_last(state)
+    stakes = tnb // floor
+    hand = army_in_hand(state, workspace)
+    pull = TEMPERATURE * math.log(stakes) if stakes > 0 else None
     return {"kind": "muster", "mapId": HOME_MAP_ID, "padZoneId": MUSTER_PAD, "targetZoneId": MUSTER_ZONE,
-            "tenebrium": tnb, "floor": floor, "builtLast": built, "due": tnb >= floor and not built,
-            "score": 0.0, "id": MUSTER_ID}
+            "tenebrium": tnb, "floor": floor, "stakes": stakes, "army": round(hand["army"]),
+            "reserve": round(hand["reserve"]), "cap": round(hand["cap"]), "pull": pull,
+            "score": round(_home_base(state) + pull, 4) if pull is not None else None, "id": MUSTER_ID}
 
 
-def _muster_card(job: Dict[str, Any]) -> Dict[str, Any]:
-    tnb, floor = job["tenebrium"], job["floor"]
-    if job["due"]:
-        why = f"{tnb} Tenebrium sits unstaked. Put it to work at the camp, then take the army out."
-    elif job["builtLast"]:
-        why = "The camp built last time. Take the army out onto the field first."
+def _k(v: float) -> str:
+    return f"{v / 1000:.1f}k"
+
+
+def _muster_card(job: Dict[str, Any], lean: bool) -> Dict[str, Any]:
+    tnb, floor, stakes = job["tenebrium"], job["floor"], job["stakes"]
+    army = f"the army in hand is {_k(job['army'])} of a {_k(job['cap'])} drop"
+    if stakes:
+        plural = "s" if stakes != 1 else ""
+        why = f"{tnb} Tenebrium sits unstaked, {stakes} builder{plural}' stake; {army}."
     else:
         why = f"Nothing to stake: a builder takes {floor} Tenebrium and the bag holds {tnb}."
     lines = [why,
@@ -383,13 +410,13 @@ def _muster_card(job: Dict[str, Any]) -> Dict[str, Any]:
              "builders that stay near it, and keep the lab printing the army from the jungle's metal. Builders sent "
              "out into the jungle feed the raptors.",
              "A living builder's stake comes back when you lift, and everything that lifts joins the reserve.",
-             "Recommended." if job["due"] else "Still open."]
+             "The world leans this way." if lean else "Still open."]
     effect = {"mapId": HOME_MAP_ID, "contractKind": "fortify_zone", "preferredCaptureZoneId": job["targetZoneId"],
               "preferredDeployZoneId": job["padZoneId"], "preferredExtractionZoneId": job["padZoneId"],
               "padLocked": True, "sessionMode": "same_map", "against": "wild", "journey": "muster"}
     return {"id": job["id"], "label": "Muster at the Rock Jungle camp", "blurb": "\n".join(lines), "kind": "deploy",
-            "lean": False, "recommended": bool(job["due"]), "score": job["score"], "effect": effect,
-            "muster": {"due": bool(job["due"]), "tenebrium": tnb, "floor": floor, "builtLast": bool(job["builtLast"])}}
+            "lean": lean, "recommended": lean, "score": job["score"], "effect": effect,
+            "muster": {k: job[k] for k in ("tenebrium", "floor", "stakes", "army", "reserve", "cap")}}
 
 
 def walls(state: Dict[str, Any], workspace: Path) -> List[Dict[str, Any]]:
@@ -528,45 +555,37 @@ def _fetch_card(job: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def road_sorties(state: Dict[str, Any], workspace: Path, *, seed: Optional[int] = None) -> Dict[str, Any]:
-    """One seeded lean plus the two strongest leftovers, and a fetch job for every field where
-    someone of ours still stands."""
-    jobs = legal_jobs(state, Path(workspace))
+    """One seeded lean (the recommendation) plus the two strongest leftovers, the muster once home
+    is founded, and a fetch job for every field where someone of ours still stands."""
+    ws = Path(workspace)
+    jobs = legal_jobs(state, ws)
+    muster = muster_job(state, ws)
+    drawn = jobs
+    if muster:
+        # the pressures (the muster's notes above): the army's pull out on every job off the home map
+        out = out_pressure(state, ws)
+        for j in jobs:
+            if j["mapId"] != HOME_MAP_ID:
+                j["score"] = round(float(j["score"]) + out, 4)
+        drawn = jobs + ([muster] if muster["score"] is not None else [])
+        drawn.sort(key=lambda j: (-float(j["score"]), j["id"]))
     used = collapse_seed(state) if seed is None else int(seed)
-    lean, rest = _draw(jobs, used)
-    muster = muster_job(state, Path(workspace))
-    due = bool(muster and muster["due"])
-    # The battle the hub recommends (owner call, 2026-11-11: "rock jungle should be primarily a place to
-    # build up the army and then invade the other locations"): once home is founded, a job off the home
-    # map when there is one, the strongest of them. The lean keeps its mark wherever the draw fell, and
-    # the home doors stay on offer. (Trial 13: the lean sent one company at Rock Jungle doors four times
-    # in five battles, every one partial, while it shrank from 38 units lifted to 2.)
-    battle = lean
-    if muster and lean and lean["mapId"] == HOME_MAP_ID:
-        away = [j for j in jobs if j["mapId"] != HOME_MAP_ID]   # legal_jobs sorts by score
-        if away:
-            battle = away[0]
-    cards = [_muster_card(muster)] if due else []
-    if battle is not None and battle is not lean:
-        card = _card(battle, False)
-        card["recommended"] = not due
-        card["blurb"] = card["blurb"].replace("Still open.", "The army goes out from the jungle.")
-        cards.append(card)
-    if lean:
-        card = _card(lean, True)
-        if due or battle is not lean:
-            card["recommended"] = False   # the lean stays a mark (the world's pull); the move is elsewhere
-        cards.append(card)
-    cards += [_card(j, False) for j in rest if j is not battle]
-    if muster and not due:
-        cards.append(_muster_card(muster))
-    fetches = fetch_jobs(state, Path(workspace))
+    lean, _ = _draw(drawn, used)
+    rest = [j for j in drawn if j is not lean and j is not muster][:2]
+    cards = []
+    if lean is not None:
+        cards.append(_muster_card(lean, True) if lean is muster else _card(lean, True))
+    cards += [_card(j, False) for j in rest]
+    if muster and lean is not muster:
+        cards.append(_muster_card(muster, False))
+    fetches = fetch_jobs(state, ws)
     cards += [_fetch_card(j) for j in fetches]
     jobs = jobs + ([muster] if muster else []) + fetches
     voice = ""
     if cards:
         voice = ("Doors are the way between maps. Hold the door you leave by and the road is open; "
                  "lose it and the road shuts until you take it back.")
-    wall = walls(state, Path(workspace))
+    wall = walls(state, ws)
     if wall:
         voice = (voice + " " if voice else "") + wall[0]["label"] + " " + wall[0]["how"]
     return {"seed": used, "openMaps": sorted(open_maps(state)), "jobs": jobs, "cards": cards, "voice": voice,

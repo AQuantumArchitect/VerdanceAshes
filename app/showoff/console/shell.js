@@ -81,11 +81,10 @@ function renderInspector() {
 // kind of job, or the reason the company is pushing it.
 function opCard(c, op, snap) {
   const raw = String(c.label || "Operation");
-  // Two marks, two meanings (owner call, 2026-11-11): "recommended" is the company's best move (the
-  // muster when Tenebrium sits unstaked; otherwise the road the world leans to), "the world leans
-  // here" is the story's pull. A muster recommended over the lean shows both, on different cards.
+  // One draw (verdance.world.roads, 2026-11-12): the job the world leans to is the recommendation, so
+  // a card carries one mark; "the world leans here" shows alone only on a card the hub did not recommend.
   const recommended = !!c.recommended;
-  const lean = !!(c.lean || raw.startsWith("Lean · "));
+  const lean = !recommended && !!(c.lean || raw.startsWith("Lean · "));
   const title = raw.replace(/^Lean · /, "");
   const kind = (c.effect && (c.effect.objectiveArchetype || c.effect.contractKind)) || "";
   // The muster says why it is (or is not) the move: its first line (verdance.world.roads._muster_card).
@@ -117,19 +116,21 @@ function opCard(c, op, snap) {
   const standing = sideName[against] && rep[against] != null
     ? `<span class="cc-standing">against ${escape(sideName[against])} · standing ${Math.round(Number(rep[against]))} of 100</span>` : "";
   return `<button class="cc-operation" type="button" data-operation="${escape(c.id)}" ${c.disabled ? "disabled" : ""} aria-pressed="${c.id === snap.plan?.choiceId}">` +
-    `${recommended ? `<em class="cc-lean cc-recommended" title="The company's best move">recommended</em>` : ""}` +
+    `${recommended ? `<em class="cc-lean cc-recommended" title="The world leans this way: the company's best move">recommended</em>` : ""}` +
     `${lean ? `<em class="cc-lean" title="The war is moving this way">the world leans here</em>` : ""}<strong>${escape(title)}</strong><span>${escape(sub)}</span>${standing}` +
     `${shownMeet.map(m => `<span class="cc-meet rescue${m.hostile ? " hostile" : ""}">rescue ${escape(m.text)}</span>`).join("")}${moreMeet > 0 ? `<span class="cc-meet rescue more">and ${moreMeet} more</span>` : ""}</button>`;
 }
-// Tenebrium at home in one line. Once the Rock Jungle is founded it follows the muster
-// (verdance.world.roads.muster_job: due when the bag can pay a builder's stake and the last sortie
-// was not a dig-in at home); before that, the pull home (verdance.campaign.home.home_pull).
+// Tenebrium at home in one line. Once the Rock Jungle is founded it shows the two pressures on the
+// draw (verdance.world.roads, the muster's notes): the bag's stakes pull home, the army in hand pulls
+// out. Before that, the pull home (verdance.campaign.home.home_pull).
 function homePullLine(hub) {
   const c = (hub && hub.homeCamp) || {};
   const m = c.muster;
   if (m) {
-    if (!m.due) return "";
-    return `<p class="cc-home-pull">${escape(`${m.tenebrium} Tenebrium sits unstaked. Muster at the camp: the builders put it to work, then the army goes out.`)}</p>`;
+    const k = v => `${(Number(v) / 1000).toFixed(1)}k`;
+    const bag = m.stakes > 0 ? `${m.tenebrium} Tenebrium sits unstaked (${m.stakes} builder${m.stakes === 1 ? "" : "s"}' stake) and pulls home`
+      : `Nothing to stake: a builder takes ${m.floor} Tenebrium`;
+    return `<p class="cc-home-pull">${escape(`${bag}; the army in hand, ${k(m.army)} of a ${k(m.cap)} drop, pulls out.`)}</p>`;
   }
   if (c.cleared || !(Number(c.pull) >= 0.5)) return "";
   const tnb = Number((hub.commerce || {}).tenebrium ?? hub.tenebrium ?? 0);

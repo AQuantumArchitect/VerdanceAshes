@@ -3,10 +3,10 @@
 -- The mind is specified in Python (verdance.company.hero_mind) and shipped as mission.heroMind: each
 -- hero a node with nerve, drive (its temper from camp), threat and pain; a bridge for each bond on the
 -- drop, carrying mood; the drop split into the clusters its bonds make, each stepped apart. Plan:
--- docs/PLAN_pathway_and_umwelt_minds.md, Part 2. SHADOW by default: it observes, steps and publishes.
--- LIVE (modoption va_hero_mind_live=1, for paired trials): each think it also writes the hero's nerve
--- and drive (2v - 1) into GG.VA_HeroTemper, the rows the doctrine and the autopilot's caution read as
--- the temper from camp, so a hero's caution moves with what happens to it and its friends.
+-- docs/PLAN_pathway_and_umwelt_minds.md, Part 2. LIVE by default (owner call, 2026-11-12): each think it
+-- also writes the hero's nerve and drive (2v - 1) into GG.VA_HeroTemper, the rows the doctrine and
+-- the autopilot's caution read as the temper from camp, so a hero's caution moves with what happens to it and its friends.
+-- SHADOW (modoption va_hero_mind_live=0, for paired trials): it observes, steps and publishes only.
 --
 -- What it sees, each think (the doctrine's period, which is the mind's hold: one Umwelt step):
 --   pain    the share of its health it has lost (it knows its own health: confidence 1)

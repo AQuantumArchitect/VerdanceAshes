@@ -2,6 +2,25 @@
 
 One entry per working day: what changed, what was measured, what's next. The newest entry comes first. Run folders live under `autopilot_runs\` on the dev PC (fenrir); they're not in git.
 
+## 2026-11-12: pressures, not rules; hero minds live
+
+**Owner calls**
+- No muster rule. "The total amount of tenebrium you have available to spend should apply pressure to go to the jungle... the larger the army you have, the more pressure there is to go somewhere else." Layering rules was making it worse.
+- Hero minds come out of shadow, so the campaign (macro) and the unit behaviour (micro) can both be debugged.
+- The aim: play as recommended and win in 10 to 15 sorties.
+
+**Sorties to win.** The campaign already fits: the finale fires on the act clock at sortie 11, and the three full campaigns of 11-11 won the Overthrow in 11, 12 and 11 sorties. The "46 sorties" in last night's tally were hero-death-free sorties summed across trials 14 to 17, which ran 8 sorties each and stopped before the finale.
+
+**The draw** (`verdance.world.roads`, the muster's notes)
+- Every job is in the one seeded softmax, and its pick is the recommendation. A pressure of T·ln(k) makes a job k times as likely (T is the draw's temperature, 0.75).
+- **Home:** the muster scores as the home founding it continues, plus T·ln(stakes), where stakes = Tenebrium // the cheapest builder's stake. An empty bag isn't drawn, but the muster is always offered.
+- **Out:** every job off the home map gets T·ln(1 + army / CLAIM_NEED). The army is the reserve's value up to the drop limit, so units past the limit don't pull.
+- **Gone:** `built_at_home_last`, `due`, and the "battle goes out" override. A card carries one mark now.
+- **On a founded state** (300 seeds), the muster's share of the draw:
+  - by Tenebrium, with an empty reserve: 0 Tnb never; 1 Tnb 20%; 3 Tnb 48%; 9 Tnb 74%;
+  - by army, at 3 Tnb: a 1.3k army 43%; a full 3k drop 36%.
+- **Hero minds live by default** (`va_hero_mind_live=0` for shadow).
+
 ## 2026-11-11 (afternoon): toward a human playtest
 
 **Brief.** Game Butler (Luke's release manager bot) set a standing brief: get the game polished, fun and itch-ready by about 2026-11-22, then open one `ready-for-human-playtest` issue. Never tag a release or push to itch.
