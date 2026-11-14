@@ -319,17 +319,38 @@ def apply_zone_dv(state: Dict[str, Any], result: Dict[str, Any], workspace: Opti
     return changed
 
 
+def live_zone_ids(measured_zones: Iterable[str], result: Dict[str, Any],
+                  workspace: Optional[Path] = None) -> List[str]:
+    """The zones this homecoming measured: the telemetry zones plus every zone the gadget
+    reported presence for at extraction (result.zoneDv). Both are ground truth for this sortie,
+    so neither is re-estimated by the offscreen tick, front decay or regression."""
+    out = [str(z) for z in (measured_zones or [])]
+    seen = set(out)
+    dv = result.get("zoneDv") if isinstance(result, dict) else None
+    if isinstance(dv, dict):
+        for zone_id in dv:
+            zid = str(canonical_zone_id(zone_id, workspace) or zone_id)
+            if zid not in seen:
+                seen.add(zid)
+                out.append(zid)
+    return out
+
+
 def actor_for_zone(state: Dict[str, Any], map_id: str, zone_id: str, zone_mem: Dict[str, Any]) -> str:
+    control = zone_mem.get("controllingFaction") or zone_mem.get("abstract", {}).get("control")
+    # Ground the company (or its paymasters) holds is theirs offscreen too, even on a wild map
+    # whose seeded actor is RaptorsAI and with raptor pressure left in it. Before 2026-11-13 the
+    # seeded actor and the hazard check came first, so every homecoming handed held Rock Jungle
+    # lanes straight back to the wild.
+    if control == "ashwalkers":
+        return "Ashwalkers"
+    if control == "nullmercs":
+        return "NullMercsAI"
     actor = state.get("offscreenActors", {}).get(map_id, {}).get(zone_id)
     if actor:
         return actor
     if map_family(map_id) == "wild" and ("HIVE" in zone_id.upper() or "RAPTOR" in zone_id.upper() or zone_mem.get("hazardPressure", 0) > 0):
         return "RaptorsAI"
-    control = zone_mem.get("controllingFaction") or zone_mem.get("abstract", {}).get("control")
-    if control == "ashwalkers":
-        return "Ashwalkers"
-    if control == "nullmercs":
-        return "NullMercsAI"
     if map_family(map_id) == "siege":
         return "SimpleDefenderAI"
     return "SimpleAI"
