@@ -557,7 +557,22 @@ def company_travel_structure_defs(state: Any, ws: Path) -> Set[str]:
     """Get-CompanyTravelStructureDefs: hero bodies and the structures that ship inside their pack.
     Those travel with the dropping list; rehydrating them paints a second Solarium (and the rest of
     that nest) onto wherever they stood last time, often the target."""
-    skip: Set[str] = set()
+    return set(company_travel_structure_counts(state, ws))
+
+
+def company_travel_structure_counts(state: Any, ws: Path) -> Dict[str, int]:
+    """How many of each def the company's hero bodies and pack escorts account for. The footprint
+    leaves at most that many of a def behind: the rest are the company's own builds (a player-built
+    Legion vehicle plant or metal storage while Spoke rides along; playtest 2026-11-13), and stay
+    with the base. The match already leaves hero- and pack-marked units out of the footprint."""
+    counts: Dict[str, int] = {}
+    for d in _company_travel_defs_list(state, ws):
+        counts[d] = counts.get(d, 0) + 1
+    return counts
+
+
+def _company_travel_defs_list(state: Any, ws: Path) -> List[str]:
+    skip: List[str] = []
     if not T(state) or not T(g(state, "company")):
         return skip
     pack_path = Path(ws) / "data" / "story" / "crew_packs.json"
@@ -581,11 +596,16 @@ def company_travel_structure_defs(state: Any, ws: Path) -> Set[str]:
             continue
         h = ci_get(heroes, hid)
         if T(g(h, "unitDef")):
-            skip.add(S(h["unitDef"]).lower())
+            skip.append(S(h["unitDef"]).lower())
         if T(g(h, "escorts")):
             for e in arr(h["escorts"]):
                 if T(e) and T(g(e, "unitDef")):
-                    skip.add(S(e["unitDef"]).lower())
+                    n = 1
+                    try:
+                        n = max(1, int(g(e, "count") or 1))
+                    except (TypeError, ValueError):
+                        n = 1
+                    skip += [S(e["unitDef"]).lower()] * n
     return skip
 
 
@@ -637,7 +657,7 @@ def merge_player_footprint(state: Any, map_id: str, payload: Optional[Dict[str, 
                 size_z = D(authored["map"].get("sizeZ"))
         except Exception:  # noqa: BLE001
             pass
-    travel = company_travel_structure_defs(state, ws)
+    travel = dict(company_travel_structure_counts(state, ws))
     for u in arr(fp["units"]):
         if not T(u):
             continue
@@ -649,7 +669,8 @@ def merge_player_footprint(state: Any, map_id: str, payload: Optional[Dict[str, 
             def_name = ""
         if not def_name:
             continue
-        if def_name.lower() in travel:
+        if travel.get(def_name.lower(), 0) > 0:
+            travel[def_name.lower()] -= 1
             skipped_travel += 1
             continue
         try:
