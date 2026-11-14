@@ -193,6 +193,22 @@ function Board:refreshRoles()
   self.roleKey = self:roleKeyNow()
 end
 
+-- The zones outlined on the battlefield's ground (issue #14, Luke 2026-11-13: "I'd like to have those
+-- zones show up for all zones that I control. so that way I know who's safe to extract"): the pad,
+-- then every other zone the exfil gadget names an extraction point (va_lift_zones: held road doors,
+-- our own ground, ground owned right now by va_claim). That list is the exfil gadget's own safe rule
+-- (safeZone), so an outline is exactly where everything of ours lifts. A zone taken mid-fight joins
+-- it within a second; ground lost leaves it. Returns pad id (or nil) and the sorted others.
+function Board:groundOutlineIds()
+  local pad = self.padId and self.byId[self.padId] and self.padId or nil
+  local others = {}
+  for zid in pairs(self.liftIds or {}) do
+    if zid ~= pad and self.byId[zid] then others[#others + 1] = zid end
+  end
+  table.sort(others)
+  return pad, others
+end
+
 function Board:roleKeyNow()
   return tostring(self.objectiveId) .. ":" .. tostring(str("va_pad_zone") or self.padId) .. ":" .. tostring(str("va_lift_zones") or "")
     .. ":" .. tostring(num("va_op_stage", 0))

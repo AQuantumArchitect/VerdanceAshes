@@ -58,7 +58,7 @@ Spring = {
   GetModOptions = function() return { va_campaign = "1" } end,
   Echo = function(...) end, Log = function() end,
   SetGameRulesParam = function(k, v) RULES[k] = v end, GetGameRulesParam = function(k) return RULES[k] end,
-  GetGameFrame = function() return 300 end,
+  GetGameFrame = function() return FRAME or 300 end,
   GetTeamUnits = function(t) local o = {} for id, u in pairs(U) do if u.team == t then o[#o + 1] = id end end table.sort(o) return o end,
   GetUnitsInCylinder = function(x, z, r) local o = {} for id, u in pairs(U) do if (u.x - x)^2 + (u.z - z)^2 <= r * r then o[#o + 1] = id end end return o end,
   ValidUnitID = function(id) return U[id] ~= nil end, GetUnitIsDead = function() return false end,
@@ -129,13 +129,50 @@ has('"unitCount":4', "owned now: the unit on FAR lifts")
 has('"liftZones":["Far Field"]', "... and FAR is named an extraction point")
 GG.VA_ZoneDv = nil
 print("ok   safe ground: whatever stands on ground we hold lifts, ground owned right now included")
+-- Issue #14: the board outlines every zone we control (va_lift_zones), and that list IS the extraction
+-- rule: each zone is in it exactly when a unit standing there lifts. Taken mid-fight, the outline comes
+-- within a scan (a second); ground lost, it goes.
+local function scan(from) for f = from, from + 60 do FRAME = f; gadget:GameFrame(f) end end
+local function liftsHere(zx, zz)   -- does a unit of ours standing at (zx, zz) lift?
+  U[20] = { x = zx, z = zz, def = 1, team = 0 }
+  GG.VA_ExfilCmd("manifest")
+  local going = tonumber(RULES.va_manifest_json:match('"going":{.-"unitCount":(%%d+)'))
+  U[20] = nil
+  GG.VA_ExfilCmd("manifest")
+  local without = tonumber(RULES.va_manifest_json:match('"going":{.-"unitCount":(%%d+)'))
+  return going > without
+end
+local function outlined(z) for id in tostring(RULES.va_lift_zones or ""):gmatch("[^,]+") do if id == z then return true end end return false end
+local function same_as_the_rule(why)
+  assert(outlined("FAR") == liftsHere(2048, 3000), why .. ": FAR outlined=" .. tostring(outlined("FAR")) .. " lifts=" .. tostring(liftsHere(2048, 3000)))
+  assert(not outlined("PAD"), "the pad has its own ring, never a second outline")
+end
+GG.VA_ZoneDv = function() return { FAR = { ashwalkers = 2000, armada = 100 } } end
+scan(100)
+assert(RULES.va_lift_zones == "FAR", "taken mid-fight: FAR is outlined, got " .. tostring(RULES.va_lift_zones))
+same_as_the_rule("owned")
+GG.VA_ZoneDv = function() return { FAR = { ashwalkers = 2000, armada = 700 } } end
+scan(200)
+assert(RULES.va_lift_zones == "", "lost: the outline goes, got " .. tostring(RULES.va_lift_zones))
+same_as_the_rule("lost")
+GG.VA_ZoneDv = nil
+mission.safeZoneIds = { "FAR", "NOWHERE" }
+scan(300)
+assert(RULES.va_lift_zones == "FAR", "ground the ledger names ours is outlined (a zone not on this map is not)")
+same_as_the_rule("named ours")
+mission.safeZoneIds = nil
+scan(400)
+assert(RULES.va_lift_zones == "", "and leaves with it")
+FRAME = nil
+print("ok   every zone we control is outlined, and only where the extraction rule lifts (#14)")
 -- taking a door: once the objective is done the extraction moves onto it, even with a hero raised in
 -- the wound (a territory mission with a rescue inside it, Greenest Fields 2026-10-26)
 mission.objective = { targetZoneId = "FAR" }
 GG.VA_ExtractRule = function() return "territory", "FAR" end
 assert(RULES.va_pad_zone == "PAD", "the pad starts on the landing zone")
 RULES.va_objective_complete = 1
-for f = 62, 92 do gadget:GameFrame(f) end
+for f = 662, 692 do FRAME = f; gadget:GameFrame(f) end
+FRAME = nil
 assert(RULES.va_pad_zone == "FAR" and RULES.va_pad_moved == 1, "the pad did not move to the exit door")
 GG.VA_ExfilCmd("manifest")
 m = RULES.va_manifest_json

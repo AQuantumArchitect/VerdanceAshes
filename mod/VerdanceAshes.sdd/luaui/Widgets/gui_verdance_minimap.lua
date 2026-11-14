@@ -260,9 +260,54 @@ local function buildRing(zone, px, pz, pr)
   end)
 end
 
+-- Every other zone we control, outlined on the ground the same way, steady and fainter than the
+-- pad: these are the places everything of ours lifts from (Board:groundOutlineIds, issue #14). The
+-- outline set is rebuilt into one display list only when va_lift_zones or the pad changes.
+local held = { key = nil, list = nil, ids = {} }
+
+local function freeHeld()
+  if held.list then gl.DeleteList(held.list) end
+  held.list, held.key, held.ids = nil, nil, {}
+end
+
+local function buildHeld(ids, key)
+  freeHeld()
+  held.ids = ids
+  held.key = key
+  if #ids == 0 then return end
+  held.list = gl.CreateList(function()
+    gl.BeginEnd(GL.LINES, function()
+      for _, zid in ipairs(ids) do
+        local z = board.byId[zid]
+        for _, e in ipairs((z and z.edges) or {}) do
+          gl.Vertex(e[1], groundY(e[1], e[2]) + 10, e[2])
+          gl.Vertex(e[3], groundY(e[3], e[4]) + 10, e[4])
+        end
+      end
+    end)
+  end)
+end
+
+local function drawHeld()
+  -- board.roleKey changes with va_lift_zones and the pad (refreshRoles): no string built per frame
+  if held.key ~= board.roleKey then
+    local _, ids = board:groundOutlineIds()
+    buildHeld(ids, board.roleKey)
+  end
+  if not held.list then return end
+  local steam = Ash.COL.steam
+  gl.Color(steam[1], steam[2], steam[3], 0.45)
+  gl.LineWidth(2)
+  gl.CallList(held.list)
+  gl.LineWidth(1)
+  gl.Color(1, 1, 1, 1)
+end
+if WG then WG.vaHeldOutlines = function() return held.ids end end
+
 function widget:DrawWorld()
   if not board or Spring.IsGUIHidden() then return end
   if Hud.over() then return end
+  drawHeld()
   local px, pz, pr = board:pad()
   if not px then return end
   local steam = Ash.COL.steam
@@ -301,6 +346,7 @@ end
 local baseShutdown = widget.Shutdown
 function widget:Shutdown()
   freeRing()
+  freeHeld()
   if board and board.dropCaches then board:dropCaches() end
   baseShutdown(self)
 end
