@@ -41,6 +41,7 @@ from .measure import (
     spectral_summary,
     tick_offscreen_zones,
     update_measured_zone_memory,
+    live_zone_ids,
 )
 from .voice import (
     generate_beats,
@@ -808,6 +809,10 @@ def process_result(state: Dict[str, Any], result: Dict[str, Any], telemetry: Opt
     state["campaignClockMinutes"] = round(old_clock + elapsed, 4)
     measured_zones = update_measured_zone_memory(state, result, telemetry, workspace)
     dv_flips = apply_zone_dv(state, result, workspace)
+    # Every zone the gadget measured at extraction (result.zoneDv) is live this homecoming, not
+    # just the telemetry zones: the offscreen tick must not re-estimate ground the sortie just
+    # measured (playtest 2026-11-13: the Rock Jungle lanes the company held went back to the wild).
+    measured_zones = live_zone_ids(measured_zones, result, workspace)
     door_changes = _roads.record_homecoming(state, result, workspace)
     graph_delta = apply_graph_deltas(state, result, elapsed)
     # The Eye's contracts name their enemy (verdance.world.eye_story); the result only names the job.
