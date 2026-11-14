@@ -229,6 +229,9 @@ function Render-Team {
 function Render-AI {
   param($Ai, [int]$Index)
   $version = if ($Ai.PSObject.Properties["version"]) { [string]$Ai.version } else { "<not-versioned>" }
+  # BARb is a native AI: the engine matches its version exactly and BAR ships it as "stable".
+  # "<not-versioned>" (a Lua AI's word) finds no BARb, and the seat plays with no AI at all.
+  if ([string]$Ai.shortName -eq "BARb" -and ($version -eq "" -or $version -eq "<not-versioned>")) { $version = "stable" }
   $lines = @(
     "Host=0;",
     "IsFromDemo=0;",

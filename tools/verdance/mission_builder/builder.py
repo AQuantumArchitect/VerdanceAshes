@@ -279,13 +279,36 @@ class BuildResult:
         self.map_name = ""
 
 
-# The reference PS1's faults (found in the port, 2026-11-04). The game builds with the first two fixed;
+# The reference PS1's faults (found in the port, 2026-11-04; the last two on 2026-11-13). The game builds
+# with them fixed;
 # build_scenario(..., ps1_faults=True) reproduces them for the parity test against the PC corpus.
 FIXED_PS1_FAULTS = {
     "war_seat_colour": "Armada and Cortex war seats went out with rgb null ($Faction shadowed $FACTION).",
     "lone_warden": "A single visit-tier warden never took the field (5.1: a bare object has no .Count).",
+    "native_ai_version": "Every BARb seat went out as Version=<not-versioned>, a Lua AI's word; the engine "
+                         "matches a native AI's version exactly, found no BARb of that version and never "
+                         "started it, so every BARbarian on the field stood idle (Koom, 2026-11-13).",
+    "random_start_points": "StartPosType 1 dropped each team's engine commander on one of the map's own start "
+                           "points in random order, not on its seat: an AI's commander in the company's pad.",
     # not fixed, moot: "rock_jungle_grace" (the visit-tier raptor pace always sets the grace now)
 }
+
+# A native (C++) skirmish AI is found by its short name AND its version, matched exactly when one is
+# given (RecoilEngine AILibraryManager::FittingSkirmishAIKeys); BAR ships BARb as version "stable".
+# "<not-versioned>" is what BAR's Lua AIs (SimpleAI, RaptorsAI, ...) answer to, and on a native AI it
+# matches nothing: the engine logs "unknown skirmish AI" and the team plays with no AI at all.
+NATIVE_AI_VERSIONS = {"barb": "stable"}
+LUA_AI_VERSION = "<not-versioned>"
+
+
+def ai_version(short_name: Any) -> str:
+    """The startscript Version= an AI's short name needs: a native AI's own, else a Lua AI's."""
+    return NATIVE_AI_VERSIONS.get(str(short_name or "").strip().lower(), LUA_AI_VERSION)
+
+
+def versioned_ais(ais: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Every [AI] block with the version its short name needs (FIXED_PS1_FAULTS["native_ai_version"])."""
+    return [dict(a, version=ai_version(a.get("shortName"))) for a in ais]
 
 
 def _build(ws: Path, intent: Dict[str, Any], state: Any, *, intent_path: str, state_path: str,
@@ -1353,9 +1376,11 @@ def _build(ws: Path, intent: Dict[str, Any], state: Any, *, intent_path: str, st
             "id": "alpha_player",
             "label": "Alpha Campaign Player",
             "playerTeamID": 0,
-            # The kings start on their seats (StartPosType 3 reads StartPosX/Z). With 1, BAR put each king
-            # on one of the map's own start points in random order.
-            "startPosType": 3 if is_kings else 1,
+            # Every team starts on its seat (StartPosType 3 reads StartPosX/Z): the company on its pad,
+            # each war seat, camp and foothold on its base. With 1, BAR put each team's commander on
+            # one of the map's own start points in random order (FIXED_PS1_FAULTS["random_start_points"]):
+            # on Koom a war seat's commander stood in the company's pad.
+            "startPosType": 3 if (is_kings or not ps1_faults) else 1,
             # The showdown's raptor den harries every king without deciding the throne: at normal pace its
             # T4 broods took the company's commander at 35 minutes (Luke's PC, 2026-11-03).
             "raptorDifficulty": "veryeasy" if is_kings else "normal",
@@ -1363,7 +1388,7 @@ def _build(ws: Path, intent: Dict[str, Any], state: Any, *, intent_path: str, st
             "playerSide": "Legion",
             "playerStartLabel": "Legion Green Player",
             "notes": "Human-controlled alpha campaign sortie generated from next_mission_intent.json.",
-            "ai": f.ai,
+            "ai": f.ai if ps1_faults else versioned_ais(f.ai),
         }],
     }
     # install_playable_slice needs explicit dimensions for start positions.
