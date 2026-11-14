@@ -211,6 +211,23 @@ step("sidebar poll+route", function() sb:GameFrame(400); assert(WG.vaRoute and W
 step("route painted once", function() local n = 0; for _, s in ipairs(SENT) do if s == "line" then n = n + 1 end end; assert(n == 1, "lines " .. n); sb:GameFrame(430); n = 0; for _, s in ipairs(SENT) do if s == "line" then n = n + 1 end end; assert(n == 1, "repainted") end)
 step("sidebar draw", function() CALLS.text = 0; sb:DrawScreen(); assert(CALLS.text > 15, "little drawn " .. CALLS.text) end)
 step("minimap draw", function() mm:Update(); mm:DrawInMiniMap(300, 300); mm:DrawWorld() end)
+-- Issue #14: every zone the exfil gadget names an extraction point (va_lift_zones, read off its safe
+-- rule) is outlined on the ground; the pad keeps its own ring; a zone taken joins, a zone lost leaves.
+step("every zone we control is outlined on the ground (#14)", function()
+  local b = WG.vaBoard
+  local function outlines() mm:Update(); mm:DrawWorld(); return table.concat(WG.vaHeldOutlines(), ",") end
+  RULES.va_lift_zones = "TRJ_NW_MUSTER," .. b.padId .. ",NOT_A_ZONE"
+  assert(outlines() == "TRJ_NW_MUSTER", "owned ground, not the pad, not a zone off the map: " .. outlines())
+  local pad = b:groundOutlineIds(); assert(pad == "TRJ_SW_LANE", tostring(pad))
+  local before = CALLS.vertex
+  RULES.va_lift_zones = "TRJ_SE_MUSTER,TRJ_NW_MUSTER"
+  assert(outlines() == "TRJ_NW_MUSTER,TRJ_SE_MUSTER", "a zone taken mid-fight joins: " .. outlines())
+  assert(CALLS.vertex > before, "the new outline was drawn")
+  RULES.va_lift_zones = "TRJ_SE_MUSTER"
+  assert(outlines() == "TRJ_SE_MUSTER", "a zone lost leaves: " .. outlines())
+  RULES.va_lift_zones = nil
+  assert(outlines() == "", "nothing held but the pad: no outlines")
+end)
 step("voice draw", function() WG.vaVoice.say("Ketha", "Test line", 5); vo:DrawScreen() end)
 step("hero tags", function() ht:GameFrame(30); ht:DrawScreenEffects() end)
 -- hero card click: find rect

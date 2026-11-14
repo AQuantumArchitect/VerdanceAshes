@@ -343,17 +343,15 @@ local function safeZone(zid)
   return false
 end
 
--- The extraction points besides the pad, for the board (va_lift_zones, comma-separated).
+-- The extraction points besides the pad, for the board (va_lift_zones, comma-separated). Read off
+-- safeZone itself, zone by zone, so the board's outlines (va_board groundOutlineIds, issue #14) are
+-- exactly the ground the extraction rule lifts from: one rule, not a second list that could drift.
 local liftZonesSeen = nil
 local function publishLiftZones()
-  local ids, seen = {}, {}
-  local function add(z)
-    z = tostring(z or "")
-    if z ~= "" and not seen[z] and not (pad and z == pad.zoneId) and anchorOf[z] then seen[z] = true; ids[#ids + 1] = z end
+  local ids = {}
+  for z in pairs(anchorOf) do
+    if not (pad and z == pad.zoneId) and safeZone(z) then ids[#ids + 1] = z end
   end
-  if homePad then add(homePad.zoneId) end
-  for _, z in ipairs((mission and type(mission.safeZoneIds) == "table" and mission.safeZoneIds) or {}) do add(z) end
-  for z in pairs(liveOwned) do add(z) end
   table.sort(ids)
   local s = table.concat(ids, ",")
   if s ~= liftZonesSeen then

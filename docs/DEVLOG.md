@@ -18,6 +18,11 @@ One entry per working day: what changed, what was measured, what's next. The new
 
 **Not yet seen in the field.** No BAR on the box. On Fenrir: drop on Koom and check the infolog for no `unknown skirmish AI` line and for BARb's own start lines on each seat; the war should move within a minute. Expect Koom to be harder than in trials 14 to 18: those wars were asleep.
 
+**Every zone we control is outlined on the battlefield (#14).** Luke: "I'd like to have those zones show up for all zones that I control. so that way I know who's safe to extract." Until now only the pad had a ground outline; the other extraction points were on the minimap only.
+- The minimap widget now also outlines on the ground every zone the exfil gadget names an extraction point (`va_lift_zones`): held road doors, ground the ledger names ours, and ground owned right now by the claim rule. These outlines are steady and fainter than the pad's pulsing ring (`Board:groundOutlineIds`, one display list rebuilt only when the list or the pad changes).
+- `va_lift_zones` is now read off `safeZone` itself, zone by zone, so an outline is exactly where everything of ours lifts. The exfil scan republishes it every second: a zone taken mid-fight gets its outline within about a second, and a zone lost drops it.
+- Tests: `exfil_gadget_test.py` checks the list against the lift rule (owned, lost, named ours, the pad never doubled). The HUD harness checks the outlines follow the list (`tests/test_zone_outlines.py`).
+
 ## 2026-11-12: pressures, not rules; hero minds live
 
 **Owner calls**
