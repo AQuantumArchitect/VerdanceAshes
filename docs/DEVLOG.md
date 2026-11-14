@@ -2,6 +2,22 @@
 
 One entry per working day: what changed, what was measured, what's next. The newest entry comes first. Run folders live under `autopilot_runs\` on the dev PC (fenrir); they're not in git.
 
+## 2026-11-13: Koom's BARbarians wake up
+
+**Luke's report** (a sortie on Koom Valley, screenshot): "half the teams are confused? it looks like my allies are not active", then: the enemy is idle too.
+
+**Root cause: no BARb seat ever started.** The mission builder wrote every BARb seat as `Version=<not-versioned>`. That is a Lua AI's word (SimpleAI, RaptorsAI). BARb is a native AI, and the engine matches a native AI's version exactly when one is given (RecoilEngine `AILibraryManager::FittingSkirmishAIKeys`). BAR ships BARb as `stable`, so the engine found no BARb, logged "unknown skirmish AI BARb <not-versioned>", and left the seat with no AI. On Koom that is the whole war, both sides: the Null Mercs allies and Armada stood where the bake left them and only shot at what walked up. The same held for every BARb seat on every map: Tabula's and the Bastion's wars, the Eye's Cortex camp, the kings on All That Simmers, the forts (`va_warden`), and an enemy camp on a BARbarian arc. The PS1 builder had the same line; the war bake and the autopilot always wrote `stable`, which is why the bakes and the company's own autopilot played and nobody saw it in a trial: a still war just looks like an easy one.
+
+**Second fault: commanders on random start points.** Every sortie but the kings' went out with `StartPosType=1`, which puts each team's engine commander on one of the map's own start points in random order, not on its seat. On Koom a war seat's commander could stand in the company's pad: the red "Zagupi (AI)" commander beside Sister Lumen in Luke's screenshot.
+
+**Fixed**
+- `verdance.mission_builder.builder.ai_version`: BARb gets `stable`, a Lua AI `<not-versioned>`, on every `[AI]` block at the end of the build. `install_playable_slice.ps1` also refuses to write BARb unversioned.
+- Every sortie is `StartPosType=3`: each team starts on its seat (the company on its pad).
+- Both are in `FIXED_PS1_FAULTS` (`native_ai_version`, `random_start_points`); `ps1_faults=True` still reproduces them for the parity corpus.
+- `tests/test_ai_seats.py`: on the three corpus tours and on Koom (two pads), Tabula, the Bastion, the Eye and the kings, every team but the company's (and the living shell, which its gadget runs) has exactly one AI, BARb is `stable`, Lua AIs are unversioned, every seat is inside its own start box, and on Koom the two sides are allied within and at war across, with no seat in the company's pad.
+
+**Not yet seen in the field.** No BAR on the box. On Fenrir: drop on Koom and check the infolog for no `unknown skirmish AI` line and for BARb's own start lines on each seat; the war should move within a minute. Expect Koom to be harder than in trials 14 to 18: those wars were asleep.
+
 ## 2026-11-12: pressures, not rules; hero minds live
 
 **Owner calls**

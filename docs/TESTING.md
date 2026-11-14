@@ -44,7 +44,7 @@ Useful autopilot flags:
 Missions are built in Python: `python -m verdance.mission_builder`, called by the kernel's `build_mission()`.
 - `scripts\build_next_mission_v1.ps1` stays as the reference. `VERDANCE_BUILDER=ps1` switches back to it.
 - `tests/test_mission_builder_parity.py` holds the Python builder to the PowerShell one on three committed tours (`tests/fixtures/mission_builder/`). With `VA_BUILDER_CORPUS=<dir with tour/NN/build/>` it checks all 11 tours of the 2026-11-04 PC run.
-- `build_scenario(..., ps1_faults=True)` reproduces the two PowerShell faults the game no longer has: war seats without colour, and the lone warden that never took the field.
+- `build_scenario(..., ps1_faults=True)` reproduces the four PowerShell faults the game no longer has: war seats without colour, the lone warden that never took the field, BARb seats written `Version=<not-versioned>` (the engine never started them), and commanders on the map's random start points.
 - To make a new corpus after a builder change, run `scripts\test\tour.bat`, then zip `autopilot_runs\<stamp>\tour\*\build`.
 
 ## What was open on 2026-11-08, and where it stands

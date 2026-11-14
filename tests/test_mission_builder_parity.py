@@ -223,7 +223,7 @@ def test_the_game_builds_with_the_ps1_faults_fixed():
     """Proxy call, 2026-11-04: war seats get their side's colour, and a lone warden takes the field.
     Tour 02 had one warden and a standing war; tour 08 seats Armada in a standing war."""
     from verdance.mission_builder.builder import FIXED_PS1_FAULTS
-    assert set(FIXED_PS1_FAULTS) == {"war_seat_colour", "lone_warden"}
+    assert set(FIXED_PS1_FAULTS) == {"war_seat_colour", "lone_warden", "native_ai_version", "random_start_points"}
     for case in FIXTURE_CASES:
         d = FIXTURE / f"tour{case}"
         intent, state = _load(d / "intent.json.gz"), _load(d / "state.json.gz")
