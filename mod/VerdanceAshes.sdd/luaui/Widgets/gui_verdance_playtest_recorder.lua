@@ -1,6 +1,9 @@
 if not VFS.Include("LuaRules/Configs/va_active.lua") then return false end -- plain BAR unless the hub launched this
 function widget:GetInfo()
   return {
+    -- The real widgetHandler (BAR grants it to game-archive widgets that ask): the proxy's
+    -- RegisterGlobal takes (name, value), so RegisterGlobal(widget, name, fn) registered nothing.
+    handler = true,
     name    = "Verdance Playtest Recorder",
     desc    = "Records a tracked campaign session to disk from inside the client: "
            .. "zone occupancy over time, border crossings, your orders, the outcome.",

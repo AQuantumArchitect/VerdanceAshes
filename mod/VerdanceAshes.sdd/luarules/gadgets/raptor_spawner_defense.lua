@@ -2190,7 +2190,9 @@ if gadgetHandler:IsSyncedCode() then
 			Spring.Echo("VA_QUEEN_NEST_FALLEN unit=" .. tostring(unitID))
 		end
 		if unitTeam == raptorTeamID then
-			if config.useEggs then
+			-- Verdance: raptors drop nothing, eggs included (Luke, 2026-11-13: "I don't even think
+			-- they should drop anything"). config.vaRaptorEggs is unset unless a mission turns it on.
+			if config.useEggs and config.vaRaptorEggs then
 				local x,y,z = GetUnitPosition(unitID)
 				spawnRandomEgg(x,y,z, UnitDefs[unitDefID].name)
 			end

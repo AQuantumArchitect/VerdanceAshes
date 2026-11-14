@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- **Ground you hold stays yours when you come home** (#22). After a Rock Jungle sortie, lanes the company held at extraction went straight back to "the wild": the same homecoming re-estimated them as raptor ground. Zones measured at extraction are now kept as measured, and ground you hold is treated as yours on later homecomings too.
+- **Your base comes back with its nano turrets** (#21). A nano turret built while Solarium or Consul was in the field was counted as their pack's kit and left out of the base. So were player-built vehicle plants and storages that shared a def with a hero's escort. They now persist with the base.
+- **The drop screen flags builders** (#21). Builders in the reserve carry a "builder" tag. A plain warning shows when none are boarding, and "Suggested" brings two constructors first.
+- **The first drop you can pick for starts at 1,000** (#20), and it still grows 1,000 with every sortie.
+- **BAR's raptor panel moves aside for the mission rail** (#17). It's dragged left, clear of the rail, and the rail keeps its place at the top.
+- **Raptors drop nothing** (#18): no Tenebrium shard and no eggs.
+- **A cue to extract** (#19). When the required work is done, you get a one-time sound and a boxed Ketha prompt: "Extraction's open — load the pad, then press EXTRACT." The rail and the voice stack now actually receive the match's mission events (they weren't registered in BAR). The sound is a placeholder (BAR's beep) until a recorded Ketha line ships.
 - **Every zone you control is outlined on the battlefield.** Before, only the landing zone had an outline on the ground. Now every zone you could extract from has one too: doors you hold, ground that is yours, and ground you take during the fight. A zone gets its outline within a second of being taken and loses it when it is lost. These are exactly the places where everything of yours lifts on extract.
 - **The BARbarians on the field play again.** Every BARb seat (Koom Valley's whole war, both sides; Tabula's and the Bastion's wars, the Eye's Cortex camp, the kings, the forts) went out with a version the engine could not match, so no BARb started and those armies stood idle. They now start as BAR's `stable` BARb. Every team also starts on its own seat, so another side's commander no longer turns up in the company's landing zone. Expect Koom to fight back.
 - **Autopilot (testing rig): boarding waits only for who was told to go.** After a muster, the lab kept turning out units during the walk home, so "everyone on the pad" kept moving out of reach. The company waited its full two-minute fallback, a raptor wave landed on the walk, and Ketha died (one full campaign of three). Units made after the call to leave no longer hold the company on the field.
