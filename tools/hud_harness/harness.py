@@ -310,6 +310,23 @@ step("verbs: one name for a key, a click and the rig", function()
   local before = #SENT
   assert(sb:TextCommand("vaextract")); assert(SENT[#SENT] == "VA_CMD:manifest" and #SENT == before + 1, tostring(SENT[#SENT]))
 end)
+-- Playtest 2026-11-13 (#19): "we need some sort of like voice line telling us to extract". Once the
+-- required work is done the rail cues extraction once: the recorded line when it ships, BAR's beep6
+-- as the placeholder until then, and a boxed Ketha prompt.
+step("extraction cue: a sound and a Ketha prompt, once (#19)", function()
+  local played, said = {}, {}
+  local realPlay, realSay = Spring.PlaySoundFile, WG.vaVoice.say
+  Spring.PlaySoundFile = function(f) played[#played + 1] = tostring(f); return not tostring(f):find("ketha_extract", 1, true) end
+  WG.vaVoice.say = function(who, text, sec, acc, amb, tag, boxed) said[#said + 1] = { who = who, text = text, tag = tag, boxed = boxed }; return realSay(who, text, sec, acc, amb, tag, boxed) end
+  GLOBALS.VerdanceMissionEvent("all_objectives_complete", "x")
+  GLOBALS.VerdanceMissionEvent("all_objectives_complete", "x")
+  Spring.PlaySoundFile, WG.vaVoice.say = realPlay, realSay
+  assert(played[1] and played[1]:find("ketha_extract", 1, true), "tries the recorded line first: " .. tostring(played[1]))
+  local beep = false
+  for _, f in ipairs(played) do if f:find("beep6", 1, true) then beep = true end end
+  assert(beep, "falls back to BAR's beep6: " .. table.concat(played, ","))
+  assert(#said == 1 and said[1].who == "Ketha" and said[1].text:find("EXTRACT", 1, true) and said[1].boxed, "one boxed Ketha prompt, not " .. #said)
+end)
 step("sortie over", function() RULES.va_terminal = 1; RULES.va_status = "extracted"; ex:Update(); ex:DrawScreen(); GLOBALS.VerdanceMissionEvent("sortie_over", "extracted"); sb:DrawScreen(); mm:DrawWorld() end)
 step("mission events", function() RULES.va_terminal = 0; GLOBALS.VerdanceMissionEvent("objective_complete", "x"); GLOBALS.VerdanceHeroEvent("down", "grath", "Grath", 0, 1, 2); GLOBALS.VerdanceBeat("bark", "Ketha", "ambient line", 5); GLOBALS.VerdanceBeat("wave_warning", 1, 2, 3, "north"); GLOBALS.VerdanceVetRank(101, "green", "hardened", 1, 2, 3, "m"); vo:DrawScreen() end)
 step("infil reopen", function() inf:TextCommand("vabrief"); inf:DrawScreen(); inf:KeyPress(13) end)
@@ -333,6 +350,45 @@ step("tnb chip draws beside the metal bar", function()
   RULES.va_tenebrium_bank = 7; W_gui_verdance_tnb_bar:GameFrame(60); local before = CALLS.text
   W_gui_verdance_tnb_bar:DrawScreen(); assert(CALLS.text > before, "no number drawn")
   WG["topbar"] = nil; W_gui_verdance_tnb_bar:DrawScreen()
+end)
+-- Playtest 2026-11-13 (#17): "The raptor bar should get moved slightly over to the side." On raptor
+-- ground the rail drags BAR's Raptor Stats Panel (a stand-in with BAR's placement and drag code) left,
+-- clear of the rail, and keeps its own place at the top.
+step("raptor panel is moved clear of the rail (#17)", function()
+  local vx, vy = 1920, 1080
+  local s = 0.75 + vx * vy / 1e7
+  local pw, ph = 300 * s, 210 * s
+  local panel = { enabled = true, moving = false }
+  local function updatePos(x, y) panel.x1 = math.min(vx * 0.94 - pw / 2, x); panel.y1 = math.min(vy * 0.89 - ph / 2, y) end
+  updatePos(vx - 320, vy - 300)
+  function panel:MousePress(x, y) if self.enabled and x > self.x1 and x < self.x1 + pw and y > self.y1 and y < self.y1 + ph then self.moving = true; return true end end
+  function panel:MouseMove(x, y, dx, dy) if self.enabled and self.moving then updatePos(self.x1 + dx, self.y1 + dy) end end
+  function panel:MouseRelease() self.moving = nil end
+  local before = panel.x1
+  local railLeft = vx - 10 - 272
+  assert(before + pw > railLeft, "the stand-in starts overlapping the rail, as in the playtest")
+  local saved = { Spring.GetTeamList, Spring.GetTeamLuaAI, widgetHandler.FindWidget }
+  Spring.GetTeamList = function() return { 0, 1 } end
+  Spring.GetTeamLuaAI = function(t) return t == 1 and "RaptorsAI" or "" end
+  widgetHandler.FindWidget = function(_, name) if name == "Raptor Stats Panel" then return panel end end
+  local path
+  for _, n in ipairs(WIDGET_PATHS) do if n:find("gui_verdance_sidebar.lua", 1, true) then path = n end end
+  local rail = LOADW(path, "sidebar_raptor")
+  rail:Initialize()
+  rail:GameFrame(60)
+  Spring.GetTeamList, Spring.GetTeamLuaAI, widgetHandler.FindWidget = saved[1], saved[2], saved[3]
+  assert(panel.x1 < before, "panel not moved: " .. tostring(panel.x1))
+  assert(panel.x1 + pw <= railLeft - 8, "panel still under the rail: right edge " .. tostring(panel.x1 + pw) .. " rail " .. railLeft)
+  assert(not panel.moving, "the drag was released")
+  if rail.Shutdown then rail:Shutdown() end
+end)
+step("every Verdance widget that registers globals asks for the real handler", function()
+  for _, n in ipairs(WIDGET_PATHS) do
+    local fh = assert(io.open(n, "rb")); local src = fh:read("a"); fh:close()
+    if src:find("widgetHandler:RegisterGlobal(widget", 1, true) then
+      assert(src:find("handler = true", 1, true), n .. ": RegisterGlobal(widget, ...) needs handler = true (the proxy takes name, value)")
+    end
+  end
 end)
 print(FAILED and "HARNESS FAILED" or "HARNESS PASSED")
 '''

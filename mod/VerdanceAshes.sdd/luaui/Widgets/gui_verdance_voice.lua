@@ -3,6 +3,9 @@ local widget = widget
 
 function widget:GetInfo()
   return {
+    -- The real widgetHandler (BAR grants it to game-archive widgets that ask): the proxy's
+    -- RegisterGlobal takes (name, value), so RegisterGlobal(widget, name, fn) registered nothing.
+    handler = true,
     name = "Verdance Voice",
     desc = "One voice stack for everyone: Ketha, Yeva, rank-ups, inbound warnings. Framed lines under the Tnb bar, nothing centre-screen, no map pings.",
     author = "Verdance",

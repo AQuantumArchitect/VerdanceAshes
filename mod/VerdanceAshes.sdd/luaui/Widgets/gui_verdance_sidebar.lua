@@ -3,6 +3,9 @@ local widget = widget
 
 function widget:GetInfo()
   return {
+    -- The real widgetHandler (BAR grants it to game-archive widgets that ask): the proxy's
+    -- RegisterGlobal takes (name, value), so RegisterGlobal(widget, name, fn) registered nothing.
+    handler = true,
     name = "Verdance Sidebar",
     desc = "The command rail, top to bottom as a sentence: phase + clock · mission + its gauge + marks · the company (one card per hero, click selects, double-click focuses) · the pad + EXTRACT. Paints the route stage on the battlefield.",
     author = "Verdance",
@@ -43,7 +46,34 @@ local function raptorPanelBottom()
   end
   if not raptorGame then return nil end
   local s = 0.75 + (vsx * vsy) / 10000000
-  return vsy * 0.89 - (210 * s) / 2
+  -- BAR places it with min(): at 1080p its bottom is vsy - 300, not 0.89 vsy - h/2 (2026-11-13).
+  return math.min(vsy * 0.89 - (210 * s) / 2, vsy - 300)
+end
+
+-- Luke, 2026-11-13: "The raptor bar should get moved slightly over to the side." The panel is
+-- draggable; once it takes input (BAR enables it after frame 1) the rail drags it left, clear of
+-- the rail, through its own MousePress/MouseMove/MouseRelease. The rail then keeps its place at
+-- the top. If the panel can't be found or grabbed, the rail starts below it as before.
+local raptorNudged, raptorTries = false, 0
+local function nudgeRaptorPanel()
+  if raptorNudged or raptorTries >= 20 or not raptorPanelBottom() then return end
+  raptorTries = raptorTries + 1
+  local wh = widgetHandler
+  local rp = wh and wh.FindWidget and wh:FindWidget("Raptor Stats Panel")
+  if not rp or not rp.MousePress or not rp.MouseMove then return end
+  local s = 0.75 + (vsx * vsy) / 10000000
+  local pw, ph = 300 * s, 210 * s
+  local x1 = math.min(vsx * 0.94 - pw / 2, vsx - 320)
+  local y1 = math.min(vsy * 0.89 - ph / 2, vsy - 300)
+  local dx = math.floor((vsx - 10 - W - 16 - pw) - x1)
+  if dx >= 0 then raptorNudged = true return end
+  local px, py = x1 + 12, y1 + 12
+  local ok, grabbed = pcall(rp.MousePress, rp, px, py, 1)
+  if not ok or not grabbed then return end   -- not taking input yet: try again next poll
+  pcall(rp.MouseMove, rp, px + dx, py, dx, 0, 1)
+  if rp.MouseRelease then pcall(rp.MouseRelease, rp, px + dx, py, 1) end
+  raptorNudged = true
+  Spring.Echo("VA_UI_RAPTOR_PANEL moved left " .. tostring(-dx) .. "px, clear of the rail")
 end
 
 local M = {}                -- the mission seed: title, objective, kind, requiredFrames, roster, kings
@@ -468,18 +498,37 @@ local function refresh()
 end
 
 -- ---------------------------------------------------------------- events: what the rail says aloud
+-- The extract cue (Luke, 2026-11-13: "we need some sort of like voice line telling us to extract"):
+-- once a match, when the required work is done and extraction is the next move. A recorded Ketha
+-- line plays from EXTRACT_VO when the file ships; until then BAR's beep6 is the placeholder sound,
+-- and the line goes up as a boxed prompt in the voice stack.
+local EXTRACT_VO = "sounds/va/ketha_extract.ogg"   -- placeholder path: no recording ships yet
+local extractCued = false
+local function extractCue(text)
+  if extractCued then return end
+  extractCued = true
+  local played = Spring.PlaySoundFile and Spring.PlaySoundFile(EXTRACT_VO, 1.0, "ui")
+  if not played then playUi("beep6", 1.0) end
+  if WG and WG.vaVoice then
+    WG.vaVoice.say("Ketha", text, 9, Ash and Ash.COL and Ash.COL.steam, false, "extract_cue", true)
+  end
+  Spring.Echo("VA_UI_EXTRACT_CUE vo=" .. tostring(played and EXTRACT_VO or "placeholder:beep6"))
+end
+if WG then WG.vaExtractCue = function(text) extractCue(text or "Extraction's open. Load the pad, then press EXTRACT.") end end
+
 local ON_MISSION = {
   objective_complete = function()
-    playUi("beep6", 1.0)
-    if S.requiredLeft > 0 then say("Ketha", "Primary's yours — finish the required marks, then bring them home.", 7)
-    else say("Ketha", "Mark claimed. Your call when we leave. Load the pad, then press EXTRACT.", 7) end
+    if S.requiredLeft > 0 then
+      playUi("beep6", 1.0)
+      say("Ketha", "Primary's yours — finish the required marks, then bring them home.", 7)
+    else extractCue("Mark claimed. Extraction's open — load the pad, then press EXTRACT.") end
   end,
   objective_failed = function()
     playUi("warning1", 1.0)
     say("Ketha", "Wreck's gone — rescue is scrubbed. Get the company onto the pad.", 7)
   end,
   all_objectives_complete = function()
-    say("Ketha", "Required objectives complete. Load the pad with what you're keeping, then press EXTRACT.", 7)
+    extractCue("Required objectives complete. Extraction's open — load the pad with what you're keeping, then press EXTRACT.")
   end,
   purge_complete = function()
     playUi("beep6", 0.9)
@@ -559,6 +608,7 @@ local lastSaid = nil
 function widget:GameFrame(frame)
   if frame - lastPoll < 30 then return end
   lastPoll = frame
+  if frame > 30 then nudgeRaptorPanel() end
   refresh()
   -- the rail's sentence, once a minute when it changed: a headless run reads what a player would
   if frame % 1800 < 30 and R.sentence ~= lastSaid and Hud.begun() then
@@ -802,7 +852,7 @@ function widget:DrawScreen()
   local right = vsx - 10
   local left = right - W
   local top = vsy - TOP_GAP
-  local rb = raptorPanelBottom()
+  local rb = (not raptorNudged) and raptorPanelBottom()
   if rb then top = math.min(top, rb - 14) end
   local x, inner = left + 12, right - 12
   -- the panel's height is last frame's content height (content changes slowly); when it changed,

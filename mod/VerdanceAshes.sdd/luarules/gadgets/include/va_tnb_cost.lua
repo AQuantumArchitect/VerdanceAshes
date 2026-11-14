@@ -78,11 +78,23 @@ function M.costOf(unitDefID, opts)
   return math.max(1, math.ceil(bp / per))
 end
 
---- Shard amount on death; eco converters drop nothing.
+--- The wild's own: raptor units, turrets, hives and the queen (BAR names every one raptor_*).
+function M.isRaptorDef(ud)
+  if not ud then return false end
+  local n = unitDefName(ud)
+  if n:sub(1, 6) == "raptor" then return true end
+  local cp = ud.customParams or {}
+  local sub = string.lower(tostring(cp.subfolder or ""))
+  return sub:find("raptor", 1, true) ~= nil
+end
+
+--- Shard amount on death; eco converters drop nothing, and nor do raptors (Luke, 2026-11-13:
+--- "the raptor turrets should not drop tenebrium ... I don't even think they should drop anything").
 function M.dropOf(unitDefID, opts)
   local ud = unitDefID and UnitDefs and UnitDefs[unitDefID]
   if not ud then return 0 end
   local n = unitDefName(ud)
+  if M.isRaptorDef(ud) then return 0 end
   if M.STRUCTURE_NO_DROP[n] then return 0 end
   if n:find("mmkr", 1, true) or n:find("adveconv", 1, true) then return 0 end
   if n:find("makr", 1, true) or n == "legeconv" then return 0 end

@@ -2,6 +2,42 @@
 
 One entry per working day: what changed, what was measured, what's next. The newest entry comes first. Run folders live under `autopilot_runs\` on the dev PC (fenrir); they're not in git.
 
+## 2026-11-13 (evening): Rock Jungle playtest log
+
+Luke's live notes from three rounds on the Rock Jungle, kept verbatim. Issues: #17 (raptor panel), #18 (raptor loot), #19 (extract cue), #20 (first drop limit), #21 (nano turrets and builders), #22 (lanes back to the wild). Fixes: PR #23 (#22), PR #24 (#21, #20), and the PR that carries this entry (#17, #18, #19).
+
+**Round 1, about 8:04 PM PT:**
+
+> "Okay, I'm playing on Rock Jungle. The first mission does feel pretty good. I'm pretty happy with it. the sidebar, there's this Lua bar for the, the missions, and it's overlapping with the Lua bar for the for the, for the raptors. So either the raptors need to get moved over a little bit, I think that's what should happen. The raptor bar should get moved slightly over to the side. And then Okay, the enemies on the, the, the enemies in the game should not, what are they called, the, the raptor turrets should not drop tenebrium. Should not drop tenebrium. I don't even think they should drop anything. Unit lost. What else? we need some sort of like voice line telling us to extract. What else? it's pretty good. It's pretty good. It says Now the map is updating, it now shows me owning those things instead of other people owning those things, that's good. Nice, it's having me capture it on this tabula. That makes sense. what else? The, oh, the first lift, how many people can you bring is going up by 1000 every time, which is fine, but the first mission that you get to pick anything from it's giving me zero, so it needs to start with 1000."
+
+**Round 2, about 8:11 PM PT:**
+
+> "Okay, I am playing another round on the jungle, and we have a couple problems. The first is that, heck, why is there a Shiva running around? There shouldn't be any units. Everyone, it should be an abandoned section that is just the player and the raptors, but I'm seeing here that there is a Shiva, and I don't understand why. Anyway the other more important thing is I spawned it, and my buildings are all here, but my res, my but my my build turrets are gone. So are most of my build units, but maybe that's cause I didn't pick the right ones. When I deployed, I didn't really check carefully."
+
+**Round 3, about 8:21 PM PT:**
+
+> "Oh wait, no, no, no, no, the Shiva was an enemy. It was a Shiva whatever, it's a, it's a hero, but it's a rival, so it spawned as real and antagonistic. But that's actually good. That's good, never mind, I take back my criticism. ... Okay, I finished the tabula, the, the run on jungle, and I took the tabula, I think I thought, took the tabula lane, but it's saying it still belongs to the, the wild, and I'm not sure why. So it looks like some of the information got dropped on the ingest, cause I have like towers, and I have a bunch of units, and I have some metal extractors, all built along the two lanes that say that they're still taken. So, I didn't get access to tabula, and I'm pretty sure I earned it based on what I did. So that's also a problem."
+
+**What worked:**
+- The first mission feels good.
+- The map now shows Luke's own ground as his.
+- The Tabula capture makes sense.
+- The Shiva was a rival hero spawning as a real enemy, which is working as intended. No issue filed.
+
+**What we found:**
+- **Lanes back to the wild (#22).** The gadget measured the lanes correctly, and the homecoming flipped them to the company. Then the offscreen tick, in the same homecoming, ran over every Rock Jungle zone that wasn't in the telemetry file. It ticked them as RaptorsAI (the seeded actor, or the hazard check, came before control), and RaptorsAI writes "wild". Zones measured at extraction are now live for the homecoming, and held ground ticks as the company's.
+- **Nano turrets gone (#21).** A pack mentor in the field (Solarium, Consul and others) stamps every new player unit from its product list as a pack mate, whoever built it. The nano turret is on Solarium's and Consul's lists, and the footprint skips pack-marked structures as "travels with the hero". A mentor's mint is now marked and stays with the base. The mission builder also dropped *every* player structure sharing a def with any hero or escort (all your Legion vehicle plants while Spoke rides along). It now drops only the packs' share.
+- **Builders left behind (#21).** The drop screen tags builders, warns in plain words when none are boarding, and the suggested bring takes two constructors first.
+- **First drop limit 0 (#20).** It now starts at 1000 and still grows 1000 per sortie.
+- **Raptor panel over the rail (#17).** The rail's guess at the panel's bottom ignored BAR's `min(..., vsy - 300)`. The rail now drags the panel left, clear of itself, and keeps its place at the top.
+- **Raptor loot (#18).** Raptors leave no Tenebrium shard and lay no eggs.
+- **Extract cue (#19).** The rail, the voice stack and the recorder never received the gadget's events in BAR. They called `widgetHandler:RegisterGlobal(widget, name, fn)` through BAR's proxy handler, which takes `(name, value)`, so nothing was registered. So Ketha's "Load the pad, then press EXTRACT" line never showed. They now ask for the real handler (`handler = true`). When the required work is done, the rail plays a one-time extract cue with a boxed Ketha prompt. **Placeholder:** no recorded line ships yet. The cue tries `sounds/va/ketha_extract.ogg` and falls back to BAR's `beep6`.
+
+**If a lane still reads "the wild" after this:** ownership is still the armed rule: towers and armed units over 1500 metal in the zone, and over three times the raptors there. Extractors, nano turrets and unarmed builders add nothing. The Tabula road's door on the Rock Jungle is the **Northeast Rim** (TRJ_NE_RIM), not the lanes. On fenrir, the files that settle it are:
+- the sortie's result, `inbox/latest_va_result.json` (or `inbox/archive/<resultKey>.json`): its `zoneDv` shows each zone's presence by side at extraction;
+- `state/campaign_state.json`: `zoneMemory.the_rock_jungle` for the hub's reading, and `doors.TRJ_NE_RIM` for the Tabula door;
+- BAR's `infolog.txt`: the `VA_RESULT_JSON_*` lines and `VA_PLAYER_FOOTPRINT count=` for the base.
+
 ## 2026-11-13: Koom's BARbarians wake up
 
 **Luke's report** (a sortie on Koom Valley, screenshot): "half the teams are confused? it looks like my allies are not active", then: the enemy is idle too.
