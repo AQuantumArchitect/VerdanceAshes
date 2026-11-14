@@ -8,19 +8,22 @@ drop can start with, in metal value (metal + energy / energyPerMetal, the same m
 hero packs). The code calls it the lift cap (``lift_cap`` / ``liftCap``).
 
 The drop limit grows with time on Verdance (owner call, 2026-11-09): DROP_PER_MISSION for every
-sortie played, whatever its verdict, with no ceiling. The longer the campaign, the more of the
+sortie played, whatever its verdict, with no ceiling. It starts at LIFT_BASE, 1k (Luke, 2026-11-13:
+"the first mission that you get to pick anything from it's giving me zero, so it needs to start
+with 1000"). The longer the campaign, the more of the
 reserve the company can start a drop with. Units left in the field stay where they were left;
 they are not in the reserve.
 """
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import Any, Dict, Optional
 
 from verdance.common import WORKSPACE_ROOT
 
-LIFT_BASE = 0.0            # the first drop is the packs alone
+LIFT_BASE = 1000.0         # the first drop you can pick for starts at 1k (playtest 2026-11-13: it read 0)
 DROP_PER_MISSION = 1000.0  # every sortie played lets the next drops start with 1k metal more
 VETERAN_LIFT = 1000.0      # the commander's veteran_cadre perk: one more mission's worth
 NOT_PLAYED = ("abandon",)  # a sortie abandoned before it was fought does not count
@@ -45,6 +48,18 @@ def unit_value(unit_def: str, workspace: Optional[Path] = None, epm: float = 70.
 
 def unit_name(unit_def: str, workspace: Optional[Path] = None) -> str:
     return (_costs(workspace).get("names") or {}).get(str(unit_def)) or str(unit_def)
+
+
+# Constructors: the units that raise a base (BAR's con bots, vehicles, aircraft, ships and
+# hovers at both tech levels, the amphibious and combat engineers). Nano turrets are structures
+# and stay with the base; they never ride in the reserve.
+_BUILDER_RE = re.compile(r"^(arm|cor|leg)(a?c[kvash]|acsub|otter|beaver|muskrat|fark|consul)$")
+_BUILDER_EXTRA = {"corfast"}
+
+
+def is_builder_def(unit_def: str) -> bool:
+    d = str(unit_def or "").lower()
+    return bool(_BUILDER_RE.match(d)) or d in _BUILDER_EXTRA
 
 
 def _counts(d: Any) -> Dict[str, int]:
@@ -96,9 +111,29 @@ def clamp_bring(requested: Any, reserve: Dict[str, int], cap: float, workspace: 
     return out
 
 
+SUGGESTED_BUILDERS = 2
+
+
 def default_bring(reserve: Dict[str, int], cap: float, workspace: Optional[Path] = None) -> Dict[str, int]:
-    """The suggestion: the most valuable units that fit."""
-    return clamp_bring(reserve, reserve, cap, workspace)
+    """The suggestion: a couple of constructors first (playtest 2026-11-13: a return sortie landed
+    with "most of my build units" left at home), then the most valuable units that fit."""
+    builders = sorted((d for d in reserve if is_builder_def(d)), key=lambda d: unit_value(d, workspace))
+    out: Dict[str, int] = {}
+    room = cap
+    left = SUGGESTED_BUILDERS
+    for d in builders:
+        v = unit_value(d, workspace)
+        k = min(int(reserve.get(d, 0)), left, int(room // v) if v > 0 else left)
+        if k > 0:
+            out[d] = k
+            room -= k * v
+            left -= k
+        if left <= 0:
+            break
+    rest = {d: int(n) - out.get(d, 0) for d, n in reserve.items() if int(n) - out.get(d, 0) > 0}
+    for d, n in clamp_bring(rest, rest, room, workspace).items():
+        out[d] = out.get(d, 0) + n
+    return out
 
 
 def homecoming(roster: Dict[str, Any], result: Dict[str, Any]) -> Dict[str, Any]:
@@ -133,10 +168,12 @@ def hub_surface(state: Dict[str, Any], workspace: Optional[Path] = None) -> Dict
     reserve = _counts(roster.get("reserve")) if isinstance(roster.get("reserve"), dict) else _counts(roster.get("cadre"))
     cap = lift_cap(state)
     rows = sorted(
-        ({"unitDef": d, "name": unit_name(d, workspace), "count": n, "value": round(unit_value(d, workspace))}
+        ({"unitDef": d, "name": unit_name(d, workspace), "count": n, "value": round(unit_value(d, workspace)),
+          "builder": is_builder_def(d)}
          for d, n in reserve.items()),
         key=lambda r: -r["value"],
     )
     return {"units": rows, "liftCap": round(cap), "missionsPlayed": missions_played(state),
+            "buildersInReserve": sum(n for d, n in reserve.items() if is_builder_def(d)),
             "suggested": default_bring(reserve, cap, workspace),
             "perMission": round(DROP_PER_MISSION), "base": round(LIFT_BASE)}

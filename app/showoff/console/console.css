@@ -782,6 +782,10 @@ details.advanced summary { color:var(--steam); }
 .rv-meter i { display:block; height:100%; background:var(--gold); transition:width .15s; }
 .drop-reserve .rv-note, .drop-reserve .rv-rule { margin:.1rem 0 .4rem; font-size:var(--fs-xs); color:var(--muted); }
 .drop-reserve .rv-rule { margin-top:.5rem; color:var(--steam); }
+.drop-reserve .rv-builders { margin:.2rem 0 .4rem; font-size:var(--fs-sm); }
+.drop-reserve .rv-builders.warn { color:#ffb347; font-weight:600; border-left:3px solid #ffb347; padding-left:.4rem; }
+.drop-reserve .rv-builders.ok { color:var(--muted); }
+.drop-reserve .rv-tag { font-style:normal; font-size:var(--fs-xs); color:var(--steam); border:1px solid currentColor; border-radius:3px; padding:0 .2rem; }
 .rv-rows { list-style:none; margin:0; padding:0; overflow:auto; min-height:0; }
 .rv-row { display:grid; grid-template-columns:1fr auto auto; align-items:center; gap:.8rem; padding:.3rem 0; border-top:1px solid var(--line-soft); font-size:var(--fs-sm); color:var(--muted); }
 .rv-row.on { color:var(--ink); }

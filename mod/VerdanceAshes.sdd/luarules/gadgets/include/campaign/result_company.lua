@@ -41,8 +41,13 @@ function playerUnitFacts()
           local isShell = (shell == 1 or shell == true or shell == "1")
           local heroMark = Spring.GetUnitRulesParam(uID, "va_hero_id")
           local packMark = Spring.GetUnitRulesParam(uID, "va_pack_id")
+          -- A mentor's mint (stampMentorSubordinate: va_mentor_mint) is the company's own build,
+          -- not pack kit: a nano turret or converter built while Solarium or Consul was in the
+          -- field stays with the base (playtest 2026-11-13: "my build turrets are gone").
+          local mint = Spring.GetUnitRulesParam(uID, "va_mentor_mint")
+          local minted = (mint == 1 or mint == true or mint == "1")
           local travels = (heroMark ~= nil and heroMark ~= "" and heroMark ~= 0)
-            or (packMark ~= nil and packMark ~= "" and packMark ~= 0)
+            or ((not minted) and packMark ~= nil and packMark ~= "" and packMark ~= 0)
           if (not isShell) and (not travels) then
             local facing = 0
             if Spring.GetUnitBuildFacing then

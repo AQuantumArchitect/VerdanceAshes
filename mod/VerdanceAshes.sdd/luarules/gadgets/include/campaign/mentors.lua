@@ -71,6 +71,10 @@ function stampMentorSubordinate(unitID, heroId)
   Spring.SetUnitRulesParam(unitID, "va_pack_leader", heroId, { public = true })
   Spring.SetUnitRulesParam(unitID, "va_pack_id", heroId, { public = true })
   Spring.SetUnitRulesParam(unitID, "va_pack_role", "mate", { public = true })
+  -- Minted, not packed: the company built this with the mentor's help. A minted structure (nano
+  -- turret, converter, storage) is part of the base and persists with it (result_company.lua);
+  -- only the pack's own kit travels with the hero (playtest 2026-11-13: build turrets vanished).
+  Spring.SetUnitRulesParam(unitID, "va_mentor_mint", 1, { public = true })
   if floor > 0 and Spring.SetUnitExperience then
     pcall(Spring.SetUnitExperience, unitID, floor)
     Spring.SetUnitRulesParam(unitID, "va_mentor_xp_floor", floor, { public = true })

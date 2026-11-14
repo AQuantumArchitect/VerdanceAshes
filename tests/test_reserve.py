@@ -1,5 +1,5 @@
 """The company's reserve: what lifts comes home (hero packs excepted), what boards leaves it, and
-the drop limit, which starts at nothing and grows 1k with every sortie played, with no ceiling."""
+the drop limit, which starts at 1k and grows 1k with every sortie played, with no ceiling."""
 from pathlib import Path
 
 from verdance.company import reserve as R
@@ -26,13 +26,15 @@ def test_the_drop_limit_grows_with_every_sortie_played_whatever_the_verdict():
     the reserve you can start a drop with. A partial or a defeat counts; an abandoned sortie does not."""
     reserve = {"armart": 40, "armsh": 40}
     st = {"history": []}
-    assert R.lift_cap(st) == 0 and R.default_bring(reserve, 0) == {}
+    assert R.default_bring(reserve, 0) == {}
+    # Luke, 2026-11-13: the first drop you can pick for read 0; it starts at 1000.
+    assert R.lift_cap(st) == 1000
     st["history"] = [{"verdict": "victory"}, {"verdict": "partial"}, {"verdict": "defeat"},
                      {"verdict": "abandon"}, {"verdict": "extracted"}]
     cap = R.lift_cap(st)
-    assert R.missions_played(st) == 4 and cap == 4 * R.DROP_PER_MISSION == 4000
+    assert R.missions_played(st) == 4 and cap == 1000 + 4 * R.DROP_PER_MISSION == 5000
     st["history"] += [{"verdict": "partial"}] * 46
-    assert R.lift_cap(st) == 50_000                     # no ceiling
+    assert R.lift_cap(st) == 51_000                     # no ceiling
     bring = R.default_bring(reserve, cap)
     assert 0 < R.bring_value(bring) <= cap
     assert R.clamp_bring({"armart": 99}, {"armart": 3}, 1e9) == {"armart": 3}
@@ -40,7 +42,7 @@ def test_the_drop_limit_grows_with_every_sortie_played_whatever_the_verdict():
 
 def test_the_veteran_perk_is_one_more_missions_worth():
     st = {"history": [{"verdict": "partial"}], "roster": {"commander": {"perks": ["veteran_cadre"]}}}
-    assert R.lift_cap(st) == 2000
+    assert R.lift_cap(st) == 3000
 
 
 def test_an_old_save_starts_its_reserve_from_the_cadre():
@@ -84,3 +86,27 @@ def test_presence_is_defensive_value():
     assert zm["T_C_SPILLWAY"]["controllingFaction"] == "ashwalkers"
     assert zm["T_C_INNER_SPILLWAY"]["controllingFaction"] == "armada"
     assert set(changed) == {"T_C_SPILLWAY", "T_C_INNER_SPILLWAY"}
+
+
+def test_the_first_pick_can_bring_a_thousand_and_each_sortie_adds_a_thousand():
+    caps = [R.lift_cap({"history": [{"verdict": "partial"}] * n}) for n in range(4)]
+    assert caps == [1000, 2000, 3000, 4000]
+
+
+def test_builders_are_marked_and_suggested_first():
+    """Playtest 2026-11-13: a return sortie landed without "most of my build units"; the drop screen
+    marks builders, warns when none board, and the suggestion brings a couple."""
+    assert R.is_builder_def("legck") and R.is_builder_def("armacv") and R.is_builder_def("corfast")
+    assert not R.is_builder_def("armfast") and not R.is_builder_def("legnanotc") and not R.is_builder_def("armart")
+    reserve = {"legck": 3, "armfboy": 10, "legcv": 1}
+    bring = R.default_bring(reserve, 2000, ROOT)
+    assert sum(n for d, n in bring.items() if R.is_builder_def(d)) == 2
+    st = {"history": [{"verdict": "partial"}], "roster": {"reserve": reserve}}
+    surf = R.hub_surface(st, ROOT)
+    assert surf["buildersInReserve"] == 4
+    assert {u["unitDef"] for u in surf["units"] if u["builder"]} == {"legck", "legcv"}
+
+
+def test_the_drop_screen_warns_when_no_builder_boards():
+    js = (ROOT / "app" / "showoff" / "console" / "reserve.js").read_text(encoding="utf-8")
+    assert "No builders boarding" in js and "u.builder" in js and "rv-tag" in js

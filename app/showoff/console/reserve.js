@@ -44,12 +44,20 @@ export function renderReserve(locked) {
   const used = bringValue(bring);
   const cap = Number(s.liftCap) || 0;
   const room = cap - used;
+  // Builders (playtest 2026-11-13: "most of my build units [are gone] ... I didn't really check
+  // carefully"). Say plainly when the reserve has constructors and none are boarding.
+  const buildersHere = (s.units || []).filter(u => u.builder).reduce((a, u) => a + u.count, 0);
+  const buildersBoarding = (s.units || []).filter(u => u.builder).reduce((a, u) => a + (bring[u.unitDef] || 0), 0);
+  const builderNote = !buildersHere ? "" : buildersBoarding
+    ? `<p class="rv-builders ok">Builders boarding: <b>${buildersBoarding}</b> of ${buildersHere}.</p>`
+    : `<p class="rv-builders warn" role="alert">No builders boarding. ${buildersHere} wait in the reserve; ` +
+      `without one you land with no one to build or repair. Add a builder (marked below) or press Suggested.</p>`;
   const rows = (s.units || []).map(u => {
     const n = bring[u.unitDef] || 0;
     const canAdd = !locked && n < u.count && u.value <= room;
     const canDrop = !locked && n > 0;
     return `<li class="rv-row${n ? " on" : ""}${""}">` +
-      `<span class="rv-name">${esc(u.name)}</span>` +
+      `<span class="rv-name">${esc(u.name)}${u.builder ? ` <i class="rv-tag">builder</i>` : ""}</span>` +
       `<span class="rv-each">${Math.round(u.value)} each</span>` +
       `<span class="rv-step">` +
         `<button type="button" data-rv-minus="${esc(u.unitDef)}" aria-label="One fewer ${esc(u.name)}" ${canDrop ? "" : "disabled"}>−</button>` +
@@ -62,7 +70,7 @@ export function renderReserve(locked) {
     (locked ? "" : ` <button type="button" class="btn-ghost rv-suggest" data-rv-suggest="1">Suggested</button>`) + `</div>` +
     `<div class="rv-meter"><i style="width:${cap ? Math.min(100, used / cap * 100).toFixed(1) : 0}%"></i></div>` +
     `<p class="rv-note" title="How much of the reserve a drop can start with, in metal value">The drop limit grows by ${Number(s.perMission || 0).toLocaleString()} metal with every sortie you play.</p>` +
-    `<ul class="rv-rows">${rows}</ul>` + padRule;
+    builderNote + `<ul class="rv-rows">${rows}</ul>` + padRule;
 }
 
 export function installReserve() {
