@@ -77,6 +77,10 @@ Tenebrium is a **stake**, not a cost (`va_tenebrium_handlers.lua`). Building a c
 - **Muster and fortify are one mission type.** The home "Hold the jungle shelf" fortify at `TRJ_NW_GATE` *is* the muster. There's no separate camp contract.
 - Still open: the finale path by geography (step 3 of the design), and whether to keep the lean mark visible.
 
+### Owner call (2026-11-16)
+
+- **The Tenebrium pile-up is fine; keep it.** Trial 18 ended with 66 in the bag (stakes come back at exfil). "Having 60 Tenebrium like that sounds like it would be really useful if we ever do put in T2... for scaling." The home pull (T·ln stakes) stays as it is.
+
 ### First slice (this week), from those calls
 
 1. **The muster card is always on offer at home after the founding.** It's merged into the road cards instead of being replaced by them. Fortify at `TRJ_NW_GATE`, journey `muster`.
@@ -193,6 +197,7 @@ This one declarative spec is the single source of truth.
   - More pairs on harder ground before going live.
   - Read them in the safety field instead of the camp-fixed temper (S × (V + G) with live nerve and drive).
   - Then intents with tendril hysteresis, paired trials, and learning between runs.
+- **Wishlist (owner, 2026-11-16: "let's come back to that"): the minds are flat.** In trial 18 (live) every hero ended each sortie with nerve at 0.49 to 0.56, and heroes in one cluster read the same, so caution barely moved. Find out whether the camp temper arrives near neutral (`mission.heroMind.start`) or the bridges average it away, then make mood carry.
 
 ### Owner calls needed
 
