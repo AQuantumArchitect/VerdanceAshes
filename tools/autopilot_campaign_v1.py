@@ -231,6 +231,96 @@ def archive_log(run_dir: Path, n: int) -> Path:
 
 # ----------------------------------------------------------------------------- launch + watch
 
+# --- co-op: the further players' clients (verdance.company.players) -------------------------------
+COOP_SETTINGS = "NetworkTimeout = 240\nReconnectTimeout = 240\n"   # a client loading while the host plays on
+HOST_UP = "Connection established (given id 0)"   # the host's own client is in: its server takes joins now
+
+
+class CoopJoin:
+    """The further players of one sortie, joining as another PC would: once the host's server is up,
+    and again if a client misses it (it gives up 30 s after it starts without a server)."""
+
+    def __init__(self, ws: Path, run_dir: Path, n: int, exe: Path, settings: Path, host_bar: Path, port: int):
+        self.args = (ws, run_dir, n, exe, settings, host_bar, port)
+        self.clients: list = []
+        self.started = False
+        self.tries = 0
+
+    def tick(self, host_log: str) -> None:
+        if not self.started:
+            if HOST_UP in host_log:
+                self.clients = coop_clients(*self.args)
+                self.started, self.tries = True, 1
+            return
+        for i, c in enumerate(self.clients):
+            if c["proc"].poll() is None:
+                continue
+            txt = c["log"].read_text(encoding="utf-8", errors="replace") if c["log"].is_file() else ""
+            if "server connection timeout" in txt and "VA_PLAYERS" not in txt:
+                ws, run_dir, n, exe, settings, host_bar, port = self.args
+                self.tries += 1
+                c["log"] = run_dir / f"sortie_{n:02d}.{c['name']}.try{self.tries}.txt"
+                with c["log"].open("wb") as out:
+                    c["proc"] = subprocess.Popen(c["cmd"], cwd=c["cwd"], stdin=subprocess.DEVNULL, stdout=out, stderr=subprocess.STDOUT)
+
+
+def coop_clients(ws: Path, run_dir: Path, n: int, exe: Path, settings: Path, host_bar: Path, port: int) -> list:
+    """Start one headless client per further player, as another PC would join: its own BAR data
+    with this sortie's mod (the seed in it) and the map, connecting to the host by its player name."""
+    from verdance_kernel import sortie as S  # type: ignore
+    clients = []
+    for p in S.players_from_manifest(ws)[1:]:
+        name = str(p.get("name") or "")
+        data = run_dir / "clients" / name
+        if not data.is_dir():
+            data.mkdir(parents=True)
+            for sub_name in ("engine", "pool", "packages", "rapid"):
+                if (host_bar / sub_name).exists():
+                    link_content(host_bar / sub_name, data / sub_name)
+        maps = data / "maps"
+        if not maps.exists() and (host_bar / "maps").exists():
+            link_content(host_bar / "maps", maps)
+        # the archive cache a PC that has played BAR already has: without it the client spends the
+        # whole sortie hashing BAR's archives before it can join (co-op trial, 2026-11-16)
+        if (host_bar / "cache").is_dir():
+            shutil.copytree(host_bar / "cache", data / "cache", dirs_exist_ok=True)
+        # the sortie's mod, seed and all: what the host's launcher would send a joining player
+        game = data / "games" / "VerdanceAshes.sdd"
+        if game.exists():
+            shutil.rmtree(game)
+        shutil.copytree(host_bar / "games" / "VerdanceAshes.sdd", game)
+        script = data / "join.txt"
+        script.write_text(f"[GAME]\n{{\n  HostIP=127.0.0.1;\n  HostPort={port};\n  IsHost=0;\n  MyPlayerName={name};\n}}\n",
+                          encoding="ascii")
+        log = run_dir / f"sortie_{n:02d}.{name}.txt"
+        cmd = [str(exe), "--safemode", "--isolation", "--config", str(settings), "--write-dir", str(data), str(script)]
+        with log.open("wb") as out:
+            proc = subprocess.Popen(cmd, cwd=str(data), stdin=subprocess.DEVNULL, stdout=out, stderr=subprocess.STDOUT)
+        clients.append({"name": name, "proc": proc, "log": log, "cmd": cmd, "cwd": str(data)})
+    return clients
+
+
+def coop_report(clients: list) -> list:
+    """Each client: did it get in, did it stay in sync, how far it played. Then stop it."""
+    out = []
+    for c in clients:
+        if c["proc"].poll() is None:
+            c["proc"].kill()
+            c["proc"].wait(timeout=15)
+        # the client's own infolog (its stdout is buffered and stops short), kept beside the sortie's
+        info = Path(c["cwd"]) / "infolog.txt"
+        if info.is_file():
+            shutil.copy2(info, c["log"].with_suffix(".infolog.txt"))
+        src = info if info.is_file() else c["log"]
+        txt = src.read_text(encoding="utf-8", errors="replace") if src.is_file() else ""
+        frames = [int(f) for f in re.findall(r"\[f=(\d+)\]", txt)]
+        out.append({"name": c["name"], "ingame": "VA_PLAYERS" in txt and bool(frames),
+                    "desync": bool(re.search(r"desync|sync error", txt, re.I)),
+                    "lostHost": "lost connection to server" in txt, "lastFrame": max(frames) if frames else None,
+                    "players": (re.findall(r"VA_PLAYERS n=\d+ ([^\r\n]*)", txt) or [""])[-1][:200]})
+    return out
+
+
 def launch(ws: Path, *, headless: bool, run_dir: Path, n: int, hud: bool = False):
     from verdance_kernel import sortie as S  # type: ignore
     cfg = S.bar_config(ws)
@@ -257,19 +347,29 @@ def launch(ws: Path, *, headless: bool, run_dir: Path, n: int, hud: bool = False
                 pass
     exe = S.engine_exe(cfg, "spring-headless.exe" if headless else "spring.exe")
     infolog = run_dir / f"sortie_{n:02d}.engine.txt"
-    args = [str(exe), "--write-dir", cfg["barDataRoot"], "--only-local", str(script)]
+    coop = len(S.players_from_manifest(ws)) > 1
+    port = 0
+    if coop:
+        # the rig's co-op is on this PC: the host listens on loopback only (no firewall prompt)
+        text = script.read_text(encoding="utf-8", errors="replace")
+        port = int((re.search(r"HostPort=(\d+);", text) or [None, "8452"])[1]) or 8452
+        script.write_text(re.sub(r"HostIP=[^;]*;", "HostIP=127.0.0.1;", text, count=1), encoding="utf-8")
+    args = [str(exe), "--write-dir", cfg["barDataRoot"]] + ([] if coop else ["--only-local"]) + [str(script)]
+    settings = run_dir / "headless.cfg"
     if headless:
-        settings = run_dir / "headless.cfg"
         if not settings.exists():
             # --hud keeps LuaUI (the widgets run, nothing draws); without it the headless engine
             # skips the widget set, which on Windows otherwise never reaches frame 0
             settings.write_text("TextureMemPoolSize = 0\nUseLuaMemPools = 0\n" + ("" if hud else "LuaUI = 0\n") +
-                                "UnitIconsAsUI = 0\nUnitIconDist = 99999\nSplashScreenDir =\n", encoding="utf-8")
+                                "UnitIconsAsUI = 0\nUnitIconDist = 99999\nSplashScreenDir =\n" + (COOP_SETTINGS if coop else ""),
+                                encoding="utf-8")
         args[1:1] = ["--safemode", "--isolation", "--config", str(settings)]
     with infolog.open("wb") as out:
         proc = subprocess.Popen(args, cwd=cfg["barDataRoot"], stdin=subprocess.DEVNULL, stdout=out, stderr=subprocess.STDOUT)
+    join = CoopJoin(ws, run_dir, n, S.engine_exe(cfg, "spring-headless.exe"), settings, Path(cfg["barDataRoot"]), port) \
+        if coop and headless else None
     return {"ok": True, "pid": proc.pid, "proc": proc, "engine": str(exe), "startScriptPath": str(script),
-            "infologPath": str(infolog), "infologBaseline": 0, "mapName": map_name}
+            "infologPath": str(infolog), "infologBaseline": 0, "mapName": map_name, "join": join}
 
 
 def keep_hub(ws: Path, dest: Path) -> None:
@@ -317,6 +417,9 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--sorties", type=int, default=20)
     ap.add_argument("--band", default="verse,vane,halbard", help="three packs (hero ids); the first is you")
+    ap.add_argument("--players", default="", metavar="HERO,HERO",
+                    help="co-op: one more player per hero (verdance.company.players). Each joins every sortie "
+                         "as a headless client on this PC, from its own BAR data, idle on the company's team")
     ap.add_argument("--boost", default="verse=4.0", help="hero=xp,... set before sealing (unlocks them); '' for none")
     ap.add_argument("--profile", default="hard_aggressive", help="BARb profile: hard_aggressive | hard | medium | easy")
     ap.add_argument("--home-profile", default="hard",
@@ -443,6 +546,12 @@ def main() -> int:
     print(f"[autopilot] company {band} boost {boosts} -> {'preserved' if args.resume else 'sealed' if seal.get('ok') else seal}")
     if not seal.get("ok"):
         return 2
+    others = [h.strip() for h in (args.players or "").split(",") if h.strip()]
+    if others and not args.resume:
+        res = k.set_players(others=others)
+        print(f"[autopilot] players {res.get('players')}" if res.get("ok") else f"[autopilot] players refused: {res.get('error')}")
+        if not res.get("ok"):
+            return 2
     if not args.resume and args.finale:
         # after the seal: past mission 1 the hub forms a default company of its own
         st = jload(sp)
@@ -533,6 +642,7 @@ def main() -> int:
             break
         print(f"[autopilot] sortie {n}: {row['map']} {row['objective']} pad={row['pad']} target={row['target']} (pid {rep['pid']})")
         proc = rep.pop("proc")
+        join = rep.pop("join", None)
         watch = S.SortieWatch(ws, k.bring_home, k._incomplete_home)
         watch.watch(rep)
         engine_start = time.time()
@@ -544,6 +654,8 @@ def main() -> int:
                 # and two chat apps left 2.6 GB of commit): wait and look again, do not lose the sortie
                 time.sleep(5)
                 continue
+            if join is not None:
+                join.tick(txt)
             if "VA_SEED_MISSING" in txt:
                 row["stall"] = "engine did not load the campaign seed"
                 break
@@ -594,6 +706,12 @@ def main() -> int:
                    doors=sorted(z for z, d in (st2.get("doors") or {}).items() if d.get("held")),
                    complete=bool(st2.get("campaignComplete")))
         row["engineExitCode"] = proc.returncode
+        if join is not None:
+            row["coop"] = coop_report(join.clients) + ([] if join.started else [{"stall": "the host never took joins"}])
+            row["coopTries"] = join.tries
+            print("[autopilot] co-op " + "; ".join(f"{c.get('name')} ingame={c.get('ingame')} desync={c.get('desync')} "
+                                                   f"lastFrame={c.get('lastFrame')}" for c in row["coop"])
+                  + f" (tries {join.tries})", flush=True)
         row["watchStatus"] = watch.status()
         advanced = int(st2.get("missionNumber") or 0) > int(st.get("missionNumber") or 0) or st2.get("campaignComplete")
         stalls = 0 if advanced else stalls + 1

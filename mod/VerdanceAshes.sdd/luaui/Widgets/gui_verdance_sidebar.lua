@@ -152,6 +152,8 @@ local function pollHeroes()
       if h.name and h.name ~= "" then rec.name = h.name end
       -- its mind, when it has one (va_hero_mind.lua publishes va_mind_* on the hero unit)
       rec.nerve = rec.unit and tonumber((Spring.GetUnitRulesParam(rec.unit, "va_mind_nerve"))) or nil
+      -- whose hero it is, when it is a player's (include/va_players.lua): 0 is the first player
+      rec.player = rec.unit and tonumber((Spring.GetUnitRulesParam(rec.unit, "va_hero_player"))) or rec.player
     end
   end
   for id, st in pairs(type(states) == "table" and states or {}) do
@@ -180,6 +182,11 @@ local function pollHeroes()
     return a.name < b.name
   end)
   H.list, H.byId = dropped, byId
+  -- the hero this client's player is (va_player_hero_<pid>), and how many play
+  local pid = Spring.GetMyPlayerID and Spring.GetMyPlayerID()
+  local mine = pid and Spring.GetGameRulesParam("va_player_hero_" .. pid)
+  H.mine = (mine ~= nil and mine ~= "") and tostring(mine) or nil
+  H.players = tonumber((Spring.GetGameRulesParam("va_players"))) or 1
   if WG then WG.vaHeroes = dropped end
 end
 
@@ -746,7 +753,9 @@ local function drawCompany(x, y, right)
     local strip = (rec.state == "down" and Ash.COL.bad) or (rec.state == "lost" and Ash.COL.muted) or (rec.crit and Ash.COL.gold) or Ash.COL.edge
     Ash.rect(x, y1 + 2, right, y2 - 2, Ash.with(Ash.COL.bg, 0.55))
     Ash.rect(x, y1 + 2, x + 3, y2 - 2, Ash.with(strip, 0.95))
-    text(Ash.fit(rec.name, 11, 120), x + 10, y2 - 13, 11, (rec.state == "alive") and Ash.COL.ink or Ash.COL.muted, "l")
+    -- yours says so; with more than one player, another player's hero carries its player's number
+    local who = (rec.id == H.mine and "You · ") or ((H.players > 1 and rec.player) and ("P" .. (rec.player + 1) .. " · ")) or ""
+    text(Ash.fit(who .. rec.name, 11, 120), x + 10, y2 - 13, 11, (rec.state == "alive") and ((rec.id == H.mine) and Ash.COL.gold or Ash.COL.ink) or Ash.COL.muted, "l")
     local chip = (rec.rank ~= "" and rec.rank or "Runner") .. " L" .. tostring(rec.level or 1)
     -- the field effect, and "on" while its condition holds (field effects v2)
     if rec.state == "alive" and rec.fx and rec.fx ~= "" then chip = chip .. " · " .. rec.fx .. (rec.fxOn and " on" or "") end

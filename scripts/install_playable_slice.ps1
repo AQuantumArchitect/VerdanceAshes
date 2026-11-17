@@ -387,7 +387,30 @@ $playerSpectator = if ($playerAi -or $PlayerController -eq "clean_baseline") { 1
 $variantPlayerTeam = $null
 if ($variantObject.PSObject.Properties["playerTeamID"]) { $variantPlayerTeam = [int]$variantObject.playerTeamID }
 $playerTeamID = if ($null -ne $variantPlayerTeam) { $variantPlayerTeam } elseif ($PlayerController -eq "clean_baseline") { 0 } else { 3 }
-$numUsers = 1 + @($aiSpecs).Count
+# The players, one per hero (verdance.company.players; mission.players only when there is more than
+# one). Each is an engine player on the company's team, so every player commands the whole company.
+# One player keeps the local-only script every single-player sortie has; more than one listens on
+# Recoil's default port for the others to join (they give the same names as MyPlayerName).
+$coopPlayers = @()
+if ($scenario.missionBase.PSObject.Properties["players"] -and $scenario.missionBase.players) { $coopPlayers = @($scenario.missionBase.players) }
+$numPlayers = [Math]::Max(1, $coopPlayers.Count)
+$hostIP = if ($numPlayers -gt 1) { "" } else { "127.0.0.1" }
+$hostPort = if ($numPlayers -gt 1) { 8452 } else { 0 }
+$extraPlayerBlocks = @()
+for ($pi = 1; $pi -lt $coopPlayers.Count; $pi++) {
+  $extraPlayerBlocks += @"
+  [PLAYER$pi]
+  {
+    IsFromDemo=0;
+    Name=$($coopPlayers[$pi].name);
+    Team=$playerTeamID;
+    Spectator=0;
+    Rank=0;
+  }
+"@
+}
+$extraPlayersText = $extraPlayerBlocks -join "`r`n"
+$numUsers = $numPlayers + @($aiSpecs).Count
 
 $bodyBlocks = @($allyTeamBlocks) + @($teamBlocks) + @($aiBlocks)
 $blocksText = $bodyBlocks -join "`r`n`r`n"
@@ -413,10 +436,10 @@ $startScript = @"
   MyPlayerName=VerdanceCommander;
   IsHost=1;
   FixedRNGSeed=1;
-  NumPlayers=1;
+  NumPlayers=$numPlayers;
   NumUsers=$numUsers;
-  HostIP=127.0.0.1;
-  HostPort=0;
+  HostIP=$hostIP;
+  HostPort=$hostPort;
   NoHelperAIs=0;
 
   [MODOPTIONS]
@@ -444,6 +467,7 @@ $blocksText
     Spectator=$playerSpectator;
     Rank=0;
   }
+$extraPlayersText
 }
 "@
 Set-Content -Encoding ASCII -Path $startScriptPath -Value $startScript
@@ -463,6 +487,8 @@ $scenarioManifest = [ordered]@{
   }
   startPosType = $startPosType
   playerTeamID = $playerTeamID
+  players = @($coopPlayers)
+  hostPort = $hostPort
   seedOutbox = $config.seedOutbox
   seedDestination = $config.seedDestination
   startScriptPath = $startScriptPath

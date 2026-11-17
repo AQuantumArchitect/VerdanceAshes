@@ -711,6 +711,26 @@ class CampaignKernel:
         return {"ok": True, "at": utc_now(), "saves": slots, "dir": str(root)}
 
     @_campaign_lock
+    def set_players(self, *, others: list[str] | None = None) -> dict[str, Any]:
+        """The players after the first, one hero each (verdance.company.players); [] is single player."""
+        from verdance.company.players import set_players as _set_players
+        sp = state_path(self.ws)
+        if not sp.is_file():
+            return {"ok": False, "error": "campaign_state.json missing", "at": utc_now()}
+        try:
+            state = migrate_state(load_json(sp))
+        except Exception as e:  # noqa: BLE001
+            return {"ok": False, "error": f"load state failed: {e}", "at": utc_now()}
+        ok, err, now = _set_players(state, list(others or []), workspace=self.ws)
+        if not ok:
+            return {"ok": False, "error": err, "players": now, "at": utc_now()}
+        try:
+            save_json(sp, state)
+        except Exception as e:  # noqa: BLE001
+            return {"ok": False, "error": f"save state failed: {e}", "at": utc_now()}
+        self.rebuild_hub()
+        return {"ok": True, "players": now, "company": hub_company_surface(state, self.ws), "at": utc_now()}
+
     def seal_company(self, *, band: list[str] | None = None) -> dict[str, Any]:
         """Hub preamble: lock core + exactly seatCap band packs for this run."""
 

@@ -189,6 +189,7 @@ function registerHeroSpawn(unitID, spec)
   Spring.SetUnitRulesParam(unitID, "va_hero_id", id, { public = true })
   Spring.SetUnitRulesParam(unitID, "va_hero_name", rec.name, { public = true })
   Spring.SetUnitRulesParam(unitID, "va_hero_critical", rec.missionCritical and 1 or 0, { public = true })
+  if GG.VA_Players and GG.VA_Players[tostring(id)] then Spring.SetUnitRulesParam(unitID, "va_hero_player", GG.VA_Players[tostring(id)], { public = true }) end
   Spring.SetUnitRulesParam(unitID, "va_hero_level", rec.level or 1, { public = true })
   Spring.SetUnitRulesParam(unitID, "va_hero_rank", rec.rank or "Green", { public = true })
   Spring.SetUnitRulesParam(unitID, "va_hero_xp", rec.peakXp or 0, { public = true })

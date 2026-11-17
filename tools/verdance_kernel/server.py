@@ -246,6 +246,17 @@ def make_handler(kernel: CampaignKernel, showoff: Path):
                 code, body, ct = _json_bytes(result, code)
                 return self._send(code, body, ct)
 
+            if path == "/api/set-players":
+                try:
+                    body_in = _read_json_body(self)
+                except Exception as e:  # noqa: BLE001
+                    code, body, ct = _json_bytes({"ok": False, "error": f"bad json: {e}"}, 400)
+                    return self._send(code, body, ct)
+                others = body_in.get("others") if isinstance(body_in, dict) else []
+                result = kernel.set_players(others=[str(x) for x in (others if isinstance(others, list) else [])])
+                code, body, ct = _json_bytes(result, 200 if result.get("ok") else 400)
+                return self._send(code, body, ct)
+
             if path == "/api/seal-company":
                 try:
                     body_in = _read_json_body(self)

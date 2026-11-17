@@ -105,6 +105,7 @@ function heroRecovered(rec, newUnitID)
   Spring.SetUnitRulesParam(newUnitID, "va_hero_id", rec.id, { public = true })
   Spring.SetUnitRulesParam(newUnitID, "va_hero_name", rec.name, { public = true })
   Spring.SetUnitRulesParam(newUnitID, "va_hero_critical", rec.missionCritical and 1 or 0, { public = true })
+  if GG.VA_Players and GG.VA_Players[rec.id] then Spring.SetUnitRulesParam(newUnitID, "va_hero_player", GG.VA_Players[rec.id], { public = true }) end
   Spring.SetUnitRulesParam(newUnitID, "va_hero_level", rec.level or 1, { public = true })
   Spring.SetUnitRulesParam(newUnitID, "va_hero_rank", HeroTags.normalizeRank(rec.rank or "Green"), { public = true })
   stampPadToothIfNeeded(newUnitID, rec.id)

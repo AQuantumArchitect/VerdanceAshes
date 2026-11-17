@@ -456,6 +456,7 @@ export function renderCompany() {
     }
   }
   renderCompanyRecruitSlot();
+  renderCompanyPlayers();
   const rep = state.hub.reputation || {};
   if ($("rep")) {
     $("rep").innerHTML = Object.entries(rep).map(([k, v]) =>
@@ -463,6 +464,41 @@ export function renderCompany() {
     ).join("");
   }
   updateDeployGate();
+}
+
+/* ---- the players: one per hero (verdance.company.players) ---------------------------------
+   Everyone playing commands the whole company; each person is one of its heroes. Player 1 is you. */
+function renderCompanyPlayers() {
+  const el = $("cc-company-players");
+  if (!el) return;
+  const c = companySurface();
+  if (!companySealed()) { el.innerHTML = ""; return; }
+  const players = list(c.players);
+  const could = list(c.playerCandidates);
+  const locked = dropRosterSealed();
+  const rows = players.map(p => {
+    const you = p.player === 0;
+    const drop = !you && !locked ? ` <button type="button" class="btn-ghost cc-player-drop" data-hero="${esc(p.heroId)}">remove</button>` : "";
+    return `<li><b>Player ${p.player + 1}</b> · ${esc(crewHeroName(p.heroId))}${you ? ` <span class="muted">(you)</span>` : ""}${drop}</li>`;
+  }).join("");
+  const add = could.length && !locked
+    ? `<p class="cr-note">Add a player as: ${could.map(h => `<button type="button" class="btn-ghost cc-player-add" data-hero="${esc(h)}">${esc(crewHeroName(h))}</button>`).join(" ")}</p>` : "";
+  const how = players.length > 1
+    ? `Co-op: everyone commands the whole company, and each player is one hero. This PC hosts the sortie; the others join it on port 8452 as ${players.slice(1).map(p => esc(p.name)).join(", ")}.`
+    : "Playing alone. Give a friend one of the company's heroes and they play the sortie with you.";
+  el.innerHTML = `<h3>Players <span class="cc-hint">one per hero</span></h3><ul class="cr-list">${rows}</ul>${add}<p class="cr-note">${how}</p>`;
+  const others = players.slice(1).map(p => p.heroId);
+  const send = async (next) => {
+    if (!state.hostLive) return toast("Start PLAY.bat and keep its window open to change the players", "err");
+    const { ok, data: j } = await api.setPlayers(next);
+    if (!ok || j.ok === false) return toast((j && j.error) || "Could not change the players", "err");
+    if (j.company && state.hub) state.hub.company = j.company;
+    else await pullHubState();
+    renderCompanyPlayers();
+    toast(next.length ? `${next.length + 1} players` : "Playing alone", "ok");
+  };
+  el.querySelectorAll(".cc-player-add").forEach(b => { b.onclick = () => send(others.concat([b.dataset.hero])); });
+  el.querySelectorAll(".cc-player-drop").forEach(b => { b.onclick = () => send(others.filter(h => h !== b.dataset.hero)); });
 }
 
 /* ---- broker ------------------------------------------------------------------------- */

@@ -185,6 +185,17 @@ def startscript_from_manifest(ws: Path) -> Optional[Path]:
     return None
 
 
+def players_from_manifest(ws: Path) -> list:
+    """The players the installer seated (verdance.company.players): [] or one entry is single player."""
+    cand = ws / "playable_runs" / "latest_playable_variant_manifest.json"
+    try:
+        d = json.loads(cand.read_text(encoding="utf-8-sig"))
+        rows = d.get("players") or []
+        return [r for r in (rows if isinstance(rows, list) else [rows]) if isinstance(r, dict)]
+    except Exception:  # noqa: BLE001
+        return []
+
+
 # ----------------------------------------------------------------------------- process helpers
 
 def pid_alive(pid: Optional[int]) -> bool:
@@ -344,14 +355,18 @@ def _launch(ws: Path) -> dict[str, Any]:
     exe = engine_exe(cfg)
     infolog = Path(cfg["infolog"])
     baseline = infolog.stat().st_size if infolog.is_file() else 0
-    args = [str(exe), "--write-dir", cfg["barDataRoot"], "--only-local", str(script)]
+    # One player stays local-only. With more (co-op, verdance.company.players) the host listens for
+    # the others: the start script names them and the port.
+    coop = len(players_from_manifest(ws)) > 1
+    args = [str(exe), "--write-dir", cfg["barDataRoot"]] + ([] if coop else ["--only-local"]) + [str(script)]
     try:
         proc = subprocess.Popen(args, cwd=cfg["barDataRoot"], stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
                                 creationflags=(0x00000008 if sys.platform == "win32" else 0))
     except Exception as e:  # noqa: BLE001
         return {"ok": False, "reason": f"{type(e).__name__}: {e}", "engine": str(exe)}
     report = {"ok": True, "pid": proc.pid, "engine": str(exe), "startScriptPath": str(script), "infologPath": str(infolog),
-              "infologBaseline": baseline, "mapName": map_name, "provision": prov, "at": utc_now(), "schemaVersion": "verdance-launch/2.0"}
+              "infologBaseline": baseline, "mapName": map_name, "provision": prov, "at": utc_now(), "schemaVersion": "verdance-launch/2.0",
+              "players": len(players_from_manifest(ws)) or 1}
     try:
         out = ws / "playable_runs" / "latest_launch.json"
         out.parent.mkdir(parents=True, exist_ok=True)

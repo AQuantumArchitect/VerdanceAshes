@@ -41,6 +41,7 @@ export const api = {
   narrativeChoice: (body) => post("/api/narrative-choice", body),
   campTalk: (body) => post("/api/camp-talk", body),
   sealCompany: (band) => post("/api/seal-company", { band }),
+  setPlayers: (others) => post("/api/set-players", { others }),
   // Hot drop: load the field on sortie pick, then drop the chosen packs into the running game.
   preload: (plan) => post("/api/preload", plan),
   drop: (body) => post("/api/drop", body),

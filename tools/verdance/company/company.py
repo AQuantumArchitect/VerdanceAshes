@@ -632,6 +632,15 @@ def _set_roster_status(state: Dict[str, Any], hid: str, status: str, *, player: 
         sheet["player"] = False if player is None else bool(player)
 
 
+def _players_surface(state: Dict[str, Any], packs: Dict[str, Any]) -> Dict[str, Any]:
+    from verdance.company import players as _players
+    now = _players.players(state)
+    could = [h for h in _players.company_heroes(state)
+             if h not in now and hero_can_lead(h, packs) and _players._status(state, h) not in _players.GONE]
+    return {"players": [{"player": i, "heroId": h, "name": _players.player_name(i)} for i, h in enumerate(now)],
+            "playerCandidates": could}
+
+
 def seal_company(
     state: Dict[str, Any],
     band_ids: List[str],
@@ -1299,6 +1308,9 @@ def hub_company_surface(state: Dict[str, Any], workspace: Optional[Path] = None)
         "core": [card(h) for h in (company.get("core") or core_hero_ids(packs))],
         "band": list(company.get("band") or []),
         "you": company.get("you"),
+        # the players, one per hero (verdance.company.players): who each person playing is, and who
+        # else could be a player's hero (alive, in the company, able to lead)
+        **_players_surface(state, packs),
         "joinedLater": list(company.get("joinedLater") or []),
         # heroes rented from the Cortex mercenary store for the next drop (verdance.company.rentals)
         "rented": list(company.get("rented") or []),

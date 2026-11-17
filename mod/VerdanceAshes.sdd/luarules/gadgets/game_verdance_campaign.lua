@@ -136,6 +136,8 @@ function gadget:Initialize()
   -- The player's team is a fact other gadgets need (craft_xp, veterancy,
   -- unit_behavior resolve it at GameStart); publish it once, clamped.
   Spring.SetGameRulesParam("va_player_team", playerTeamID, { public = true })
+  -- The players, one per hero (include/va_players.lua): GG.VA_Players and who each engine player is.
+  VFS.Include("luarules/gadgets/include/va_players.lua").publish(mission, playerTeamID)
   configureHeadlessClient(modOptions)
   configureZoneFlowSample(modOptions)
   -- Escalation: mission.escalation.mode / waves.max wins; modoption force still works.

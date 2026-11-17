@@ -1332,7 +1332,7 @@ def _build(ws: Path, intent: Dict[str, Any], state: Any, *, intent_path: str, st
         # griefs as nerve and drive; game_verdance_unit_behavior scales the hero's doctrine by them.
         "heroTemper": hero_temper,
         # each hero's mind, run in the engine on Umwelt's dynamics (verdance.company.hero_mind;
-        # va_umwelt_lite.lua); shadow for now: published for the HUD, deciding nothing yet
+        # va_umwelt_lite.lua); live: its nerve and drive are the temper caution reads
         "heroMind": _hero_mind(state, deploy_allow, ws, log, hero_temper),
         # Per-def veteran XP bank: the gadget seeds SetUnitExperience / craft XP on spawn.
         "cadreXp": cadre_xp,
@@ -1355,6 +1355,12 @@ def _build(ws: Path, intent: Dict[str, Any], state: Any, *, intent_path: str, st
         "worldConflict": piped(intent["worldConflict"]) if (has(intent, "worldConflict") and T(intent["worldConflict"])) else {},
         "storyIntent": intent,
     }
+    # The players, one per hero (verdance.company.players): only with more than one, so a one-player
+    # mission keeps the PS1's shape (parity). The start script seats one engine player per entry.
+    from verdance.company.players import mission_players
+    _players = mission_players(state) if T(state) else []
+    if len(_players) > 1:
+        mission_base["players"] = _players
     if muster:
         # Only on a muster, so every other scenario keeps the PS1's shape (parity). The autopilot reads
         # it: a muster is not over when the gate is secured (game_verdance_autopilot.lua).

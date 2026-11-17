@@ -53,7 +53,9 @@ The company's currency. Looted from wrecks in the field, spent on hires and gear
 
 ## 7. What it is not
 
-Not a new RTS, not a balance mod, not multiplayer. BAR's units, maps, AI and fight are BAR's. Verdance's Ashes decides where you fight, with whom, and what it costs.
+Not a new RTS, not a balance mod. BAR's units, maps, AI and fight are BAR's. Verdance's Ashes decides where you fight, with whom, and what it costs.
+
+It can be played together (owner call, 2026-11-16): one player per hero, all commanding the one company. The campaign lives on the host's PC; the others join its sorties (`verdance.company.players`).
 
 ---
 

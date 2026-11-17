@@ -31,8 +31,10 @@ function VA_CREW_spawnHeroPack(heroId, baseX, baseZ, dx0, heroOnly)
     spacing = 100,
     heroId = tostring(heroId),
     heroName = tostring(h.fieldName or h.name or heroId),
-    -- you (the first company pick, mission.you) are mission-critical, like Ketha
-    missionCritical = h.missionCritical == true or (mission ~= nil and tostring(mission.you or "") == tostring(heroId)),
+    -- every player's hero (you, the first company pick, and each co-op player's: include/va_players.lua)
+    -- is mission-critical, like Ketha
+    missionCritical = h.missionCritical == true or (mission ~= nil and tostring(mission.you or "") == tostring(heroId))
+      or (GG.VA_Players ~= nil and GG.VA_Players[tostring(heroId)] ~= nil),
     heroTrait = h.heroTrait,
     heroTags = h.tags or h.traits,
     packageTag = "crew_" .. tostring(heroId),
