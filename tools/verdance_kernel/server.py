@@ -85,6 +85,11 @@ def make_handler(kernel: CampaignKernel, showoff: Path):
                 code, body, ct = _json_bytes(kernel.exposure_surface())
                 return self._send(code, body, ct)
 
+            if path == "/api/coop-info":
+                from verdance_kernel import coop
+                code, body, ct = _json_bytes(coop.info(kernel.ws))
+                return self._send(code, body, ct)
+
             if path == "/api/health":
                 code, body, ct = _json_bytes(kernel.health())
                 return self._send(code, body, ct)

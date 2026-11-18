@@ -11,6 +11,8 @@
 --   game rules  va_players              how many players
 --   game rules  va_player_hero_<pid>    the hero id of the engine player <pid> (matched by name)
 --   unit rules  va_hero_player          on a player's hero unit: its player index (stamp(), at spawn)
+-- and, unsynced, who the drop still waits for (waiting(): the host holds the start pause until every
+-- player is in; include/campaign/unsynced.lua).
 
 local M = {}
 
@@ -66,6 +68,27 @@ end
 function M.stamp(unitID, heroId)
   local p = GG.VA_Players and GG.VA_Players[tostring(heroId)]
   if p then Spring.SetUnitRulesParam(unitID, "va_hero_player", p, { public = true }) end
+end
+
+-- Unsynced: the players the drop still waits for, [{pid, name, heroId}]: in the start script as a
+-- player's hero but not in the game yet. Single player waits for nobody.
+function M.waiting()
+  local out = {}
+  if (tonumber((Spring.GetGameRulesParam("va_players"))) or 1) <= 1 then return out end
+  for _, pid in ipairs(Spring.GetPlayerList() or {}) do
+    local h = Spring.GetGameRulesParam("va_player_hero_" .. pid)
+    if h ~= nil and h ~= "" then
+      local name, active = Spring.GetPlayerInfo(pid, false)
+      if not active then out[#out + 1] = { pid = pid, name = tostring(name), heroId = tostring(h) } end
+    end
+  end
+  return out
+end
+
+-- Unsynced: this client is the host's (the first player's: the campaign lives on its PC).
+function M.isHost()
+  local pid = Spring.GetMyPlayerID and Spring.GetMyPlayerID()
+  return pid ~= nil and tostring((Spring.GetPlayerInfo(pid, false))) == FIRST
 end
 
 -- Unsynced: the hero id this client's player is, or nil.

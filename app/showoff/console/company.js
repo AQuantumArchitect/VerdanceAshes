@@ -483,9 +483,16 @@ function renderCompanyPlayers() {
   }).join("");
   const add = could.length && !locked
     ? `<p class="cr-note">Add a player as: ${could.map(h => `<button type="button" class="btn-ghost cc-player-add" data-hero="${esc(h)}">${esc(crewHeroName(h))}</button>`).join(" ")}</p>` : "";
+  const addr = (state.coopInfo && list(state.coopInfo.addresses)) || [];
   const how = players.length > 1
-    ? `Co-op: everyone commands the whole company, and each player is one hero. This PC hosts the sortie; the others join it on port 8452 as ${players.slice(1).map(p => esc(p.name)).join(", ")}.`
+    ? `Co-op: everyone commands the whole company, and each player is one hero. This PC hosts. Once you pick the sortie, each friend runs JOIN.bat and types ` +
+      (addr.length ? `<b>${addr.map(esc).join("</b> or <b>")}</b>` : "this PC's address") +
+      ` (player ${players.slice(1).map(p => p.player + 1).join(", ")}). The drop waits until everyone is in. Their PC has to reach yours on port 8452: the same network, a VPN like Tailscale, or the port forwarded.`
     : "Playing alone. Give a friend one of the company's heroes and they play the sortie with you.";
+  if (players.length > 1 && !state.coopInfo && state.hostLive) {
+    state.coopInfo = {};
+    api.coopInfo().then(r => { state.coopInfo = (r && r.data) || r || {}; renderCompanyPlayers(); }).catch(() => {});
+  }
   el.innerHTML = `<h3>Players <span class="cc-hint">one per hero</span></h3><ul class="cr-list">${rows}</ul>${add}<p class="cr-note">${how}</p>`;
   const others = players.slice(1).map(p => p.heroId);
   const send = async (next) => {

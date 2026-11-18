@@ -31,6 +31,7 @@ export const api = {
   hubState: () => get("/api/hub-state"),
   result: () => get("/api/result"),
   health: () => get("/api/health"),
+  coopInfo: () => getJson("/api/coop-info"),
   saves: () => get("/api/saves"),
   narrative: () => getJson("/api/narrative"),
   camp: () => getJson("/api/camp"),

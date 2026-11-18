@@ -187,6 +187,20 @@ local function pollHeroes()
   local mine = pid and Spring.GetGameRulesParam("va_player_hero_" .. pid)
   H.mine = (mine ~= nil and mine ~= "") and tostring(mine) or nil
   H.players = tonumber((Spring.GetGameRulesParam("va_players"))) or 1
+  -- co-op: who the drop still waits for (in the start script, not in the game yet; include/va_players.lua)
+  H.waiting = {}
+  if H.players > 1 then
+    for _, p in ipairs(Spring.GetPlayerList() or {}) do
+      local h = Spring.GetGameRulesParam("va_player_hero_" .. p)
+      if h ~= nil and h ~= "" then
+        local name, active = Spring.GetPlayerInfo(p, false)
+        if not active then
+          local rec = byId[tostring(h)]
+          H.waiting[#H.waiting + 1] = (rec and rec.name) or tostring(h)
+        end
+      end
+    end
+  end
   if WG then WG.vaHeroes = dropped end
 end
 
@@ -745,6 +759,12 @@ local function drawCompany(x, y, right)
   text(Hud.plural(n, "person", "people"), right, y, 9, Ash.COL.muted, "r")
   Ash.rule(x, y - 4, right, Ash.COL.edge, 0.35)
   y = y - 12
+  -- co-op: the drop holds paused until every player is in (the host can start without them)
+  if H.waiting and #H.waiting > 0 then
+    text(Ash.fit("Waiting for " .. table.concat(H.waiting, ", ") .. " to join", 10, right - x), x, y - 10, 10, Ash.COL.warn, "l")
+    text(Ash.fit("host: /luarules va_go starts without them", 8, right - x), x, y - 22, 8, Ash.COL.muted, "l")
+    y = y - 30
+  end
   if n == 0 then text("nobody on the manifest", x, y - 10, 10, Ash.COL.muted, "l"); return y - 24 end
   local rowH = 30
   local b = Hud.board()

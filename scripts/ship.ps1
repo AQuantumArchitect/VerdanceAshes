@@ -265,6 +265,7 @@ New-Item -ItemType Directory -Force -Path (Join-Path $staging "app\bin") | Out-N
 Copy-File (Join-Path $Workspace "app\bin\_env.bat") (Join-Path $staging "app\bin\_env.bat")
 Copy-File (Join-Path $Workspace "app\bin\PLAY.bat") (Join-Path $staging "app\bin\PLAY.bat")
 Copy-File (Join-Path $Workspace "app\bin\HUB_HOST.bat") (Join-Path $staging "app\bin\HUB_HOST.bat")
+Copy-File (Join-Path $Workspace "app\bin\JOIN.bat") (Join-Path $staging "app\bin\JOIN.bat")
 
 # ---- root entry points ----
 @'
@@ -273,6 +274,14 @@ setlocal
 call "%~dp0app\bin\PLAY.bat" %*
 exit /b %ERRORLEVEL%
 '@ | Set-Content -Encoding ASCII (Join-Path $staging "PLAY.bat")
+
+# Co-op: join a friend's sortie (verdance_kernel.coop)
+@'
+@echo off
+setlocal
+call "%~dp0app\bin\JOIN.bat" %*
+exit /b %ERRORLEVEL%
+'@ | Set-Content -Encoding ASCII (Join-Path $staging "JOIN.bat")
 
 @'
 @echo off
@@ -476,7 +485,7 @@ $manifest = [ordered]@{
   sourceCommit    = (Invoke-GitQuiet -C $Workspace rev-parse HEAD)
   umweltCommit    = $umweltHash
   fileCount       = $files.Count
-  playerEntry     = @("SETUP.bat", "PLAY.bat")
+  playerEntry     = @("SETUP.bat", "PLAY.bat", "JOIN.bat")
   includesKernel  = $true
   includesMod     = $true
   includesPython  = (Test-Path (Join-Path $staging "runtime\python\python.exe"))

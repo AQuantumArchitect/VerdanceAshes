@@ -29,12 +29,15 @@ def main(argv: list[str] | None = None) -> int:
             "phases",
             "ship",
             "sync-mod",
+            "join",
         ],
         help="launch=product entry (default), serve=HTTP only, ship=export/dist",
     )
     ap.add_argument("--workspace", default=None)
     ap.add_argument("--host", default="127.0.0.1")
     ap.add_argument("--port", type=int, default=8770)
+    ap.add_argument("--to", default=None, help="join: the host's address (its LAN or VPN IP, or a name)")
+    ap.add_argument("--player", default=None, help="join: which player to be (2, 3..., or the hero's id); default the first free")
     ap.add_argument("--no-ui", action="store_true")
     ap.add_argument("--browser", action="store_true")
     ap.add_argument("--no-bridge", action="store_true")
@@ -61,6 +64,20 @@ def main(argv: list[str] | None = None) -> int:
             enable_bridge=not args.no_bridge,
             rebuild=not args.no_rebuild,
         )
+
+    if args.command == "join":
+        # co-op: join the host's sortie from this PC (verdance_kernel.coop; JOIN.bat)
+        from verdance_kernel import coop
+        from verdance_kernel import sortie as S
+        from verdance_kernel.paths import resolve_workspace
+        if not args.to:
+            print("JOIN: give the host's address: JOIN.bat 192.168.1.20")
+            return 2
+        ws = Path(resolve_workspace(args.workspace))
+        cfg = S.bar_config(ws)
+        res = coop.join(cfg, args.to, player=args.player, provision=lambda m: S.provision_map(ws, cfg, m))
+        print(json.dumps(res, indent=2, default=str))
+        return 0 if res.get("ok") else 1
 
     if args.command == "serve":
         from verdance_kernel.server import serve

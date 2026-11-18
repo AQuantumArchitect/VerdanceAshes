@@ -367,6 +367,10 @@ def _launch(ws: Path) -> dict[str, Any]:
     report = {"ok": True, "pid": proc.pid, "engine": str(exe), "startScriptPath": str(script), "infologPath": str(infolog),
               "infologBaseline": baseline, "mapName": map_name, "provision": prov, "at": utc_now(), "schemaVersion": "verdance-launch/2.0",
               "players": len(players_from_manifest(ws)) or 1}
+    if coop:
+        # the others' launchers fetch this sortie from here (verdance_kernel.coop, JOIN.bat)
+        from verdance_kernel.coop import serve_sortie
+        report["coopServer"] = serve_sortie(ws)
     try:
         out = ws / "playable_runs" / "latest_launch.json"
         out.parent.mkdir(parents=True, exist_ok=True)

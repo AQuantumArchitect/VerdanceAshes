@@ -83,6 +83,7 @@ local SafetyField = VFS.Include("luarules/gadgets/include/va_safety_field.lua")
 
 if not gadgetHandler:IsSyncedCode() then
   local started, sped, echoed = false, false, false
+  local CoopPlayers = VFS.Include("luarules/gadgets/include/va_players.lua")
   -- va_autopilot_shots=S: a screenshot every S game seconds (windowed runs only: the HUD review rig)
   local SHOT_EVERY = math.floor(num("va_autopilot_shots", 0) * 30)
   local nextShot = SHOT_EVERY > 0 and 30 * 20 or nil
@@ -108,7 +109,8 @@ if not gadgetHandler:IsSyncedCode() then
       Spring.Echo("VA_AUTOPILOT_SHOT frame=" .. tostring(Spring.GetGameFrame()))
     end
     local _, _, paused = Spring.GetGameSpeed()
-    if paused then
+    -- a co-op drop waits for every player (include/va_players.lua): no unpause while one is joining
+    if paused and #CoopPlayers.waiting() == 0 then
       pcall(Spring.SendCommands, "pause 0")
       if not echoed then echoed = true; Spring.Echo("VA_AUTOPILOT unpause") end
     end

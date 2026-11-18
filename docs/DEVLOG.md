@@ -59,6 +59,23 @@ Luke's live notes from three rounds on the Rock Jungle, kept verbatim. Issues: #
 - `va_lift_zones` is now read off `safeZone` itself, zone by zone, so an outline is exactly where everything of ours lifts. The exfil scan republishes it every second: a zone taken mid-fight gets its outline within about a second, and a zone lost drops it.
 - Tests: `exfil_gadget_test.py` checks the list against the lift rule (owned, lost, named ours, the pad never doubled). The HUD harness checks the outlines follow the list (`tests/test_zone_outlines.py`).
 
+## 2026-11-17: co-op you can play: the waiting drop and JOIN.bat
+
+**Owner call:** "Yes, build both" (the drop waits for every player; a friend's PC joins).
+
+**Built**
+- **The waiting drop.** The host's client holds the start pause while any player named in the start script isn't in the game (`va_players.lua` `waiting()`, `campaign/unsynced.lua`). The autopilot won't unpause over it. The sidebar says who it's waiting for, and `/luarules va_go` starts without them. A player who joins late has only the paused opening to catch up.
+- **The sortie server** (`verdance_kernel.coop`). While a co-op sortie runs, the host's launcher serves `/coop/sortie.json` (players, map, engine, hash, whether the host is up) and `/coop/sortie.zip` (the game folder the host loaded, seed and all) on TCP 8452, the same number as the game's UDP port. Nothing else of the host's is served.
+- **JOIN.bat** (`verdance_kernel join --to HOST [--player N]`). It waits for the host's game, downloads and checks the sortie, installs it as this PC's game folder, gets the map and connects as the next free player. If the join missed the host's game starting, or the host dropped it while it loaded, it tries again while the host still plays that sortie. It counts as in only once it logs at a game frame.
+- The hub's Players list shows this PC's addresses, LAN and VPN, for friends to type. `docs/COOP.md` has the how-to. The ship includes JOIN.bat.
+- The trial rig's clients now join through `coop.join` against the real sortie server, on loopback.
+
+**Trial** (run 20261117_180003, two sorties, Vane as player 2, through the launcher's join)
+- Both sorties: the join waited for the host, downloaded the sortie and got in. The host held at frame 30 until "VerdancePlayer2 finished loading and is now ingame", then `VA_PLAYERS_ALL_IN`, then the unpause. No desync. Both came home.
+- On one busy PC a client can take seven minutes to load. A first try had the host drop it at the 4-minute network timeout; the rig now allows 15. A real friend's PC loads in about a minute, well inside Recoil's default.
+
+**Not yet tried:** two real PCs over a LAN or Tailscale, and the Windows Firewall prompt on the host's first co-op sortie.
+
 ## 2026-11-16: co-op groundwork, one player per hero
 
 **Owner calls**
